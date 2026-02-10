@@ -7,40 +7,40 @@ export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/50 backdrop-blur-xl">
+    <header className="fixed top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="flex items-center space-x-2">
-          <h1 className="text-2xl font-black gradient-text">MassageConnect</h1>
+          <span className="text-xl font-bold text-foreground tracking-tight font-heading">MassageConnect</span>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
-          <Link to="/explore" className="text-sm font-medium text-white/80 hover:text-white transition-colors">
+        <nav className="hidden md:flex items-center space-x-8">
+          <Link to="/explore" className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300">
             Explore
           </Link>
-          <Link to="/pricing" className="text-sm font-medium text-white/80 hover:text-white transition-colors">
+          <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300">
             Pricing
           </Link>
-          <Link to="/about" className="text-sm font-medium text-white/80 hover:text-white transition-colors">
+          <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300">
             About
           </Link>
-          <Link to="/contact" className="text-sm font-medium text-white/80 hover:text-white transition-colors">
+          <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300">
             Contact
           </Link>
         </nav>
 
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="hidden md:flex items-center space-x-3">
           <Link to="/auth">
-            <Button variant="ghost" size="sm">Sign In</Button>
+            <Button variant="ghost" size="sm" className="text-sm">Sign In</Button>
           </Link>
           <Link to="/register">
-            <Button variant="hero" size="sm">Join Now</Button>
+            <Button variant="default" size="sm" className="text-sm">Join Now</Button>
           </Link>
         </div>
 
         {/* Mobile Menu Button */}
         <button
-          className="md:hidden text-white"
+          className="md:hidden text-foreground"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -49,26 +49,26 @@ export const Header = () => {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-white/10 bg-black/95 backdrop-blur-xl">
+        <div className="md:hidden border-t border-border bg-background">
           <nav className="container mx-auto flex flex-col space-y-4 px-4 py-6">
-            <Link to="/explore" className="text-sm font-medium text-white/80 hover:text-white transition-colors" onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/explore" className="text-sm text-muted-foreground hover:text-foreground transition-colors" onClick={() => setMobileMenuOpen(false)}>
               Explore
             </Link>
-            <Link to="/pricing" className="text-sm font-medium text-white/80 hover:text-white transition-colors" onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors" onClick={() => setMobileMenuOpen(false)}>
               Pricing
             </Link>
-            <Link to="/about" className="text-sm font-medium text-white/80 hover:text-white transition-colors" onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors" onClick={() => setMobileMenuOpen(false)}>
               About
             </Link>
-            <Link to="/contact" className="text-sm font-medium text-white/80 hover:text-white transition-colors" onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors" onClick={() => setMobileMenuOpen(false)}>
               Contact
             </Link>
-            <div className="flex flex-col space-y-2 pt-4">
+            <div className="flex flex-col space-y-2 pt-4 border-t border-border">
               <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="outline" className="w-full">Sign In</Button>
               </Link>
               <Link to="/register" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="hero" className="w-full">Join Now</Button>
+                <Button variant="default" className="w-full">Join Now</Button>
               </Link>
             </div>
           </nav>
