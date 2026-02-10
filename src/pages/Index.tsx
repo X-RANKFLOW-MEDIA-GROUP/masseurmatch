@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { CheckCircle2, Shield, Star, TrendingUp } from "lucide-react";
-import heroImage from "@/assets/hero-bg.jpg";
+import { CheckCircle2, Star, ArrowRight } from "lucide-react";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const Index = () => {
+  const scrollRef = useScrollReveal();
+
   const featuredTherapists = [
     {
       id: 1,
@@ -76,116 +77,123 @@ const Index = () => {
     }
   ];
 
+  const stats = [
+    { label: "Verified Therapists", value: "10,000+" },
+    { label: "Cities Covered", value: "500+" },
+    { label: "Client Sessions", value: "2M+" },
+    { label: "5-Star Reviews", value: "98%" },
+  ];
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background" ref={scrollRef}>
       <Header />
       
       {/* Hero Section */}
-      <section className="hero-section relative py-20 md:py-32">
-        <div className="absolute inset-0 overflow-hidden">
-          <img 
-            src={heroImage} 
-            alt="Professional massage therapy" 
-            className="w-full h-full object-cover opacity-30"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-background"></div>
-        </div>
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <Badge className="mb-6 bg-primary/20 text-primary border-primary/30 px-4 py-1.5">
-              Over 10,000+ Professional Therapists
-            </Badge>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight">
+      <section className="relative min-h-screen flex items-center justify-center pt-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto text-center">
+            <p className="reveal text-xs uppercase tracking-[0.3em] text-muted-foreground mb-8">
+              The Professional Massage Directory
+            </p>
+            <h1 className="reveal reveal-delay-1 text-5xl md:text-7xl lg:text-8xl font-bold text-foreground leading-[0.9] tracking-tight mb-8">
               Find Your Perfect
-              <span className="gradient-text block mt-2">Massage Therapist</span>
+              <br />
+              Massage Therapist
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p className="reveal reveal-delay-2 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">
               Connect with verified, professional massage therapists in your area. 
               Book trusted wellness services with confidence.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="reveal reveal-delay-3 flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/explore">
-                <Button variant="hero" size="lg" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto group">
                   Explore Therapists
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Link to="/pricing">
-                <Button variant="glass" size="lg" className="w-full sm:w-auto">
+                <Button variant="outline" size="lg" className="w-full sm:w-auto">
                   View Plans
                 </Button>
               </Link>
             </div>
           </div>
         </div>
+
+        {/* Subtle divider line */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-border" />
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-24 border-b border-border">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, i) => (
+              <div key={stat.label} className={`reveal reveal-delay-${i + 1} text-center`}>
+                <div className="text-4xl md:text-5xl font-bold text-foreground mb-2 font-heading">{stat.value}</div>
+                <div className="text-sm text-muted-foreground uppercase tracking-wider">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Featured Therapists */}
-      <section className="py-16 md:py-24">
+      <section className="py-24 md:py-32">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <Badge className="mb-4 bg-accent/20 text-accent border-accent/30">Featured Professionals</Badge>
-            <h2 className="text-3xl md:text-5xl font-black mb-4">
-              Top <span className="gradient-text">Verified</span> Therapists
+          <div className="reveal mb-16">
+            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">Featured Professionals</p>
+            <h2 className="text-4xl md:text-6xl font-bold text-foreground tracking-tight">
+              Top Verified Therapists
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Browse our most trusted and highly-rated massage professionals
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredTherapists.map((therapist) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border">
+            {featuredTherapists.map((therapist, i) => (
               <Link 
                 key={therapist.id} 
                 to={`/therapist/${therapist.id}`}
-                className="glass-card p-6 card-hover group"
+                className={`reveal reveal-delay-${(i % 3) + 1} bg-background p-8 group transition-colors duration-500 hover:bg-card`}
               >
-                <div className="relative mb-4">
+                <div className="relative mb-6 overflow-hidden">
                   <img 
                     src={therapist.image} 
                     alt={therapist.name}
-                    className="w-full h-64 object-cover rounded-lg"
+                    className="w-full h-72 object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                   />
                   {therapist.verified && (
-                    <Badge className="absolute top-3 right-3 bg-primary/90 backdrop-blur-sm">
-                      <CheckCircle2 className="w-3 h-3 mr-1" />
+                    <div className="absolute top-4 right-4 flex items-center gap-1 bg-background/90 backdrop-blur-sm px-2 py-1 text-xs text-foreground">
+                      <CheckCircle2 className="w-3 h-3" />
                       Verified
-                    </Badge>
-                  )}
-                  {therapist.plan === "Platinum" && (
-                    <Badge className="absolute top-3 left-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white border-0">
-                      💎 Elite
-                    </Badge>
-                  )}
-                  {therapist.plan === "Gold" && (
-                    <Badge className="absolute top-3 left-3 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white border-0">
-                      ⭐ Gold
-                    </Badge>
+                    </div>
                   )}
                 </div>
                 
-                <h3 className="text-xl font-bold mb-1">{therapist.name}</h3>
-                <p className="text-sm text-muted-foreground mb-2">{therapist.city}</p>
-                <p className="text-sm text-primary mb-3">{therapist.specialty}</p>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-yellow-500 text-yellow-500" />
-                    <span className="font-semibold">{therapist.rating}</span>
-                    <span className="text-sm text-muted-foreground">({therapist.reviews})</span>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mb-1">{therapist.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-1">{therapist.city}</p>
+                    <p className="text-sm text-muted-foreground">{therapist.specialty}</p>
                   </div>
-                  <Button variant="ghost" size="sm" className="group-hover:text-primary">
-                    View Profile →
-                  </Button>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Star className="w-3 h-3 fill-foreground text-foreground" />
+                    <span>{therapist.rating}</span>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex items-center text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                  View Profile
+                  <ArrowRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
             ))}
           </div>
 
-          <div className="text-center mt-12">
+          <div className="reveal text-center mt-16">
             <Link to="/explore">
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" className="group">
                 View All Therapists
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
           </div>
@@ -193,36 +201,37 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-24 md:py-32 border-t border-border">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="glass-card p-8 text-center">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Verified Professionals</h3>
-              <p className="text-muted-foreground">
-                All therapists undergo thorough verification and background checks
+          <div className="reveal mb-16 max-w-2xl">
+            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">Why MassageConnect</p>
+            <h2 className="text-4xl md:text-6xl font-bold text-foreground tracking-tight">
+              Built on trust
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border">
+            <div className="reveal reveal-delay-1 bg-background p-12">
+              <div className="text-5xl font-bold text-foreground mb-6 font-heading">01</div>
+              <h3 className="text-xl font-semibold text-foreground mb-3">Verified Professionals</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                All therapists undergo thorough verification and background checks before joining the platform.
               </p>
             </div>
 
-            <div className="glass-card p-8 text-center">
-              <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Star className="w-8 h-8 text-accent" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Trusted Reviews</h3>
-              <p className="text-muted-foreground">
-                Real reviews from verified clients to help you choose
+            <div className="reveal reveal-delay-2 bg-background p-12">
+              <div className="text-5xl font-bold text-foreground mb-6 font-heading">02</div>
+              <h3 className="text-xl font-semibold text-foreground mb-3">Trusted Reviews</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Real reviews from verified clients help you make informed decisions about your wellness journey.
               </p>
             </div>
 
-            <div className="glass-card p-8 text-center">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="w-8 h-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Professional Growth</h3>
-              <p className="text-muted-foreground">
-                Flexible subscription plans to grow your practice
+            <div className="reveal reveal-delay-3 bg-background p-12">
+              <div className="text-5xl font-bold text-foreground mb-6 font-heading">03</div>
+              <h3 className="text-xl font-semibold text-foreground mb-3">Professional Growth</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Flexible subscription plans designed to help therapists grow their practice and reach more clients.
               </p>
             </div>
           </div>
@@ -230,19 +239,20 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-32 md:py-40">
         <div className="container mx-auto px-4">
-          <div className="glass-card p-12 text-center max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-black mb-4">
-              Ready to Join <span className="gradient-text">MassageConnect</span>?
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="reveal text-4xl md:text-7xl font-bold text-foreground tracking-tight mb-8">
+              Ready to get started?
             </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Start your free profile today and connect with clients seeking your expertise
+            <p className="reveal reveal-delay-1 text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
+              Create your free profile today and connect with clients seeking your expertise.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="reveal reveal-delay-2 flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/register">
-                <Button variant="hero" size="lg" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto group">
                   Get Started Free
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Link to="/pricing">
