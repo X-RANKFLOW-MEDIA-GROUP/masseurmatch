@@ -1,6 +1,6 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { Shield, Users, TrendingUp, Heart } from "lucide-react";
+import { ShieldIllustration, CommunityIllustration, GrowthIllustration, HeartIllustration } from "@/components/icons/IllustrationIcons";
 import { motion } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { TextReveal } from "@/components/animations/TextReveal";
@@ -109,19 +109,19 @@ const About = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border max-w-4xl">
             {[
               {
-                icon: Shield, title: "Trust & Safety",
+                Icon: ShieldIllustration, title: "Trust & Safety",
                 desc: "All male massage professionals undergo thorough verification including license validation, identity checks, and background screening — ensuring a safe experience for the gay community."
               },
               {
-                icon: Users, title: "LGBTQ+ Inclusive Community",
+                Icon: CommunityIllustration, title: "LGBTQ+ Inclusive Community",
                 desc: "We foster a supportive, gay-friendly community of male wellness professionals and clients. Everyone is welcome, and inclusion is at our core."
               },
               {
-                icon: TrendingUp, title: "Professional Growth",
+                Icon: GrowthIllustration, title: "Professional Growth",
                 desc: "Flexible tools and subscription plans designed to help male massage therapists grow their practice and reach more men seeking quality bodywork."
               },
               {
-                icon: Heart, title: "Quality Standards",
+                Icon: HeartIllustration, title: "Quality Standards",
                 desc: "We maintain the highest standards to ensure clients receive exceptional men's wellness experiences from verified, professional male massage therapists."
               },
             ].map((value, i) => (
@@ -134,7 +134,7 @@ const About = () => {
                 variants={fadeUp}
                 className="bg-background p-12 glow-hover"
               >
-                <value.icon className="w-5 h-5 text-muted-foreground mb-6" />
+                <value.Icon className="text-muted-foreground mb-6" size={36} />
                 <h3 className="text-xl font-semibold text-foreground mb-3">{value.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{value.desc}</p>
               </motion.div>

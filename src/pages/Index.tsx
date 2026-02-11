@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { CheckCircle2, Star, ArrowRight, Shield, Users, Zap } from "lucide-react";
+import { CheckCircle2, Star, ArrowRight } from "lucide-react";
+import { ShieldIllustration, CommunityIllustration, GrowthIllustration } from "@/components/icons/IllustrationIcons";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { motion } from "framer-motion";
 import { AnimatedCounter } from "@/components/animations/AnimatedCounter";
@@ -269,15 +270,15 @@ const Index = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border">
               {[
                 {
-                  icon: Shield, num: "01", title: "Verified Male Professionals",
+                  Icon: ShieldIllustration, num: "01", title: "Verified Male Professionals",
                   desc: "Every male massage therapist undergoes thorough license verification, identity checks, and background screening. Your safety is our priority in the gay massage community."
                 },
                 {
-                  icon: Users, num: "02", title: "Gay-Friendly Community",
+                  Icon: CommunityIllustration, num: "02", title: "Gay-Friendly Community",
                   desc: "A trusted directory built specifically for men seeking professional male massage services. Read authentic reviews from verified clients in a safe, inclusive space."
                 },
                 {
-                  icon: Zap, num: "03", title: "Instant Booking & Growth",
+                  Icon: GrowthIllustration, num: "03", title: "Instant Booking & Growth",
                   desc: "Flexible subscription plans designed to help male massage therapists grow their practice and reach more clients seeking men's bodywork services."
                 },
               ].map((feature, i) => (
@@ -290,7 +291,7 @@ const Index = () => {
                   variants={fadeUp}
                   className="bg-background p-12 glow-hover relative"
                 >
-                  <feature.icon className="w-6 h-6 text-muted-foreground mb-6" />
+                  <feature.Icon className="text-muted-foreground mb-6" size={40} />
                   <div className="text-5xl font-bold text-foreground/10 mb-4 font-heading">{feature.num}</div>
                   <h3 className="text-xl font-semibold text-foreground mb-3">{feature.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
