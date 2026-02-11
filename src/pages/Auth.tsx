@@ -31,7 +31,7 @@ const Auth = () => {
     }
     toast({
       title: "Account created!",
-      description: "Welcome to MassageConnect",
+      description: "Welcome to MasseurMatch",
     });
   };
 
@@ -40,7 +40,7 @@ const Auth = () => {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-block mb-6">
-            <h1 className="text-3xl font-black gradient-text">MassageConnect</h1>
+            <h1 className="text-3xl font-black gradient-text">MasseurMatch</h1>
           </Link>
           <Badge className="mb-4 bg-primary/20 text-primary border-primary/30">
             Join 10,000+ Professionals
