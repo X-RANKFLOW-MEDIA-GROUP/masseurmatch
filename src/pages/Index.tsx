@@ -12,6 +12,7 @@ import { CursorGlow } from "@/components/animations/CursorGlow";
 import { ScrollProgress } from "@/components/animations/ScrollProgress";
 import { Marquee } from "@/components/animations/Marquee";
 import { ParallaxSection } from "@/components/animations/ParallaxSection";
+import { GradientMesh } from "@/components/animations/GradientMesh";
 import { fadeUp } from "@/components/animations/variants";
 
 const Index = () => {
@@ -76,21 +77,7 @@ const Index = () => {
 
       {/* ─── HERO ─── */}
       <section className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
-        {/* Floating particles */}
-        <div className="absolute inset-0 pointer-events-none">
-          {Array.from({ length: 20 }).map((_, i) => (
-            <div
-              key={i}
-              className="particle"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 8}s`,
-                animationDuration: `${6 + Math.random() * 6}s`,
-              }}
-            />
-          ))}
-        </div>
+      <GradientMesh />
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-5xl mx-auto text-center">
@@ -270,7 +257,7 @@ const Index = () => {
         <section className="py-28 md:py-36 border-t border-border">
           <div className="container mx-auto px-4">
             <div className="reveal mb-16 max-w-2xl">
-              <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">Why Choose MassageConnect</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">Why Choose MasseurMatch</p>
               <h2 className="text-4xl md:text-6xl font-bold text-foreground tracking-tight">
                 <TextReveal text="Built for Trust & Safety" />
               </h2>

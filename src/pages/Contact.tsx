@@ -119,7 +119,7 @@ const Contact = () => {
               {/* Contact Info */}
               <div className="lg:col-span-2 flex flex-col">
                 {[
-                  { icon: Mail, title: "Email Us", info: "support@massageconnect.com" },
+                  { icon: Mail, title: "Email Us", info: "support@masseurmatch.com" },
                   { icon: Phone, title: "Call Us", info: "1-800-MASSAGE" },
                   { icon: MapPin, title: "Visit Us", info: "123 Wellness St\nSan Francisco, CA 94102" },
                 ].map((item, i) => (

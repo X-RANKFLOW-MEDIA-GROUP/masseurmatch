@@ -39,7 +39,7 @@ export const Footer = () => {
       <div className="container mx-auto px-4 py-20">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           <div>
-            <h3 className="text-lg font-bold font-heading text-foreground mb-4">MassageConnect</h3>
+            <h3 className="text-lg font-bold font-heading text-foreground mb-4">MasseurMatch</h3>
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">
               The #1 gay massage directory connecting men with verified male massage therapists. 
               Professional, trusted, gay-friendly bodywork services.
@@ -67,7 +67,7 @@ export const Footer = () => {
 
         <div className="border-t border-border mt-16 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
-            &copy; {currentYear} MassageConnect — Gay Massage Directory. All rights reserved.
+            &copy; {currentYear} MasseurMatch — Gay Massage Directory. All rights reserved.
           </p>
           <p className="text-xs text-muted-foreground">
             Find verified male massage therapists near you

@@ -136,7 +136,7 @@ const Pricing = () => {
                 { q: "What payment methods do you accept?", a: "We accept all major credit cards and PayPal through our secure Stripe payment processor." },
                 { q: "Is there a contract or commitment?", a: "No contracts. All plans are month-to-month. Cancel anytime with no penalties." },
                 { q: "How does verification work for male massage therapists?", a: "Premium plans and above include professional verification — license checks, identity verification, and background screening within 24–48 hours." },
-                { q: "Is this platform LGBTQ+ friendly?", a: "Absolutely. MassageConnect was built as a trusted, inclusive directory for gay-friendly male massage therapists and their clients." },
+                { q: "Is this platform LGBTQ+ friendly?", a: "Absolutely. MasseurMatch was built as a trusted, inclusive directory for gay-friendly male massage therapists and their clients." },
               ].map((faq, i) => (
                 <motion.div
                   key={i}

@@ -218,7 +218,7 @@ const Explore = () => {
             <h2 className="reveal text-3xl font-bold mb-6">Find Gay Massage Therapists Near You</h2>
             <div className="reveal reveal-delay-1 text-sm text-muted-foreground space-y-4 leading-relaxed">
               <p>
-                MassageConnect is the leading gay massage directory for finding verified male massage therapists 
+                MasseurMatch is the leading gay massage directory for finding verified male massage therapists 
                 in your city. Whether you're looking for deep tissue massage, Swedish relaxation, sports recovery, 
                 hot stone therapy, or professional men's bodywork, our platform connects you with trusted, 
                 gay-friendly massage professionals.

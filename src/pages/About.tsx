@@ -28,7 +28,7 @@ const About = () => {
               animate={{ opacity: 1, y: 0 }}
               className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-6"
             >
-              About MassageConnect
+              About MasseurMatch
             </motion.p>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-8 leading-[0.95]">
               <TextReveal text="The Trusted Gay Massage Directory" delay={0.1} />
@@ -39,7 +39,7 @@ const About = () => {
               transition={{ duration: 1, delay: 0.8 }}
               className="text-lg text-muted-foreground max-w-2xl leading-relaxed"
             >
-              MassageConnect is the premier platform for verified male massage therapists 
+              MasseurMatch is the premier platform for verified male massage therapists 
               to showcase their expertise and connect with men seeking trusted, gay-friendly 
               wellness and bodywork services.
             </motion.p>
@@ -152,14 +152,14 @@ const About = () => {
             <h2 className="text-2xl font-bold mb-6">About Our Gay Massage Directory</h2>
             <div className="text-sm text-muted-foreground space-y-4 leading-relaxed">
               <p>
-                MassageConnect is the most comprehensive gay massage directory on the internet. We connect 
+                MasseurMatch is the most comprehensive gay massage directory on the internet. We connect 
                 men with verified male massage therapists across 500+ cities in the United States. Our platform 
                 specializes in helping gay, bisexual, and queer men find professional, trusted bodywork services.
               </p>
               <p>
                 Whether you're searching for deep tissue massage, Swedish relaxation massage, sports recovery, 
                 hot stone therapy, Thai massage, or therapeutic wellness bodywork from a male therapist, 
-                MassageConnect makes it easy to find, compare, and book appointments with confidence.
+                MasseurMatch makes it easy to find, compare, and book appointments with confidence.
               </p>
               <p>
                 Every male massage therapist in our directory can be verified through our multi-step process 
