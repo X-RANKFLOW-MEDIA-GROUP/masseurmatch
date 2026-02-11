@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { PageTransition } from "@/components/animations/PageTransition";
+import { KnottyChat } from "@/components/ai/KnottyChat";
 import Index from "./pages/Index";
 import Explore from "./pages/Explore";
 import Pricing from "./pages/Pricing";
@@ -43,6 +44,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AnimatedRoutes />
+        <KnottyChat />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
