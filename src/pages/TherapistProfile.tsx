@@ -25,6 +25,9 @@ const TherapistProfile = () => {
   const therapist = {
     name: "Marcus Rivera",
     city: "Los Angeles, CA",
+    lat: 34.0522,
+    lng: -118.2437,
+    neighborhood: "West Hollywood",
     specialty: "Deep Tissue & Sports Massage",
     rating: 4.9,
     reviews: 127,
@@ -541,6 +544,48 @@ const TherapistProfile = () => {
           </motion.section>
 
           {/* ═══════════════════════════════════════════
+              LOCATION MAP
+              ═══════════════════════════════════════════ */}
+          <motion.section
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg"
+          >
+            <h2 className="text-2xl font-bold mb-2 flex items-center gap-3">
+              <MapPin className="w-5 h-5" />
+              Location
+            </h2>
+            <p className="text-sm text-muted-foreground mb-6">
+              {therapist.neighborhood} · {therapist.city}
+            </p>
+            <div className="relative rounded-lg overflow-hidden border border-border">
+              <iframe
+                title={`${therapist.name} location map`}
+                src={`https://www.openstreetmap.org/export/embed.html?bbox=${therapist.lng - 0.04}%2C${therapist.lat - 0.02}%2C${therapist.lng + 0.04}%2C${therapist.lat + 0.02}&layer=mapnik&marker=${therapist.lat}%2C${therapist.lng}`}
+                className="w-full h-64 md:h-80 border-0 grayscale contrast-125 invert"
+                loading="lazy"
+              />
+              {/* Overlay tint */}
+              <div className="absolute inset-0 pointer-events-none bg-background/10" />
+            </div>
+            <div className="flex items-center justify-between mt-4">
+              <p className="text-xs text-muted-foreground">
+                Approximate area shown for privacy. Exact address provided after booking.
+              </p>
+              <a
+                href={`https://www.openstreetmap.org/?mlat=${therapist.lat}&mlon=${therapist.lng}#map=14/${therapist.lat}/${therapist.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground underline-sweep hover:text-foreground transition-colors"
+              >
+                Open in Maps →
+              </a>
+            </div>
+          </motion.section>
+
+          {/* ═══════════════════════════════════════════
               BUSINESS HOURS
               ═══════════════════════════════════════════ */}
           <motion.section
@@ -558,7 +603,7 @@ const TherapistProfile = () => {
                     <Clock className="w-4 h-4 text-muted-foreground" />
                     <span className="font-semibold text-sm">{day}</span>
                   </div>
-                  <span className={`text-sm ${hours === "Closed" ? "text-muted-foreground" : "text-muted-foreground"}`}>{hours}</span>
+                  <span className="text-sm text-muted-foreground">{hours}</span>
                 </div>
               ))}
             </div>
