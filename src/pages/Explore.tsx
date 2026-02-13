@@ -6,9 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import {
   Search, MapPin, CheckCircle2, Star, ArrowRight, Heart, X,
-  LayoutGrid, List, Map as MapIcon
+  LayoutGrid, List, Map as MapIcon, SlidersHorizontal, ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -24,42 +27,42 @@ const therapists = [
     id: 1, name: "Marcus Rivera", city: "Los Angeles", lat: 34.0522, lng: -118.2437,
     specialty: "Deep Tissue & Sports Massage", rating: 4.9, reviews: 127,
     image: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=800&h=800&fit=crop",
-    verified: true, price: "$120/hr", available: true,
+    verified: true, price: "$120/hr", priceNum: 120, available: true,
     bio: "10+ years specializing in deep tissue and sports recovery for active men.",
   },
   {
     id: 2, name: "James Chen", city: "San Francisco", lat: 37.7749, lng: -122.4194,
     specialty: "Swedish & Relaxation Massage", rating: 4.8, reviews: 94,
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop",
-    verified: true, price: "$100/hr", available: true,
+    verified: true, price: "$100/hr", priceNum: 100, available: true,
     bio: "Creating calm through expert Swedish technique in a safe, welcoming space.",
   },
   {
     id: 3, name: "David Anderson", city: "New York", lat: 40.7128, lng: -74.0060,
     specialty: "Therapeutic Wellness Bodywork", rating: 5.0, reviews: 156,
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&h=800&fit=crop",
-    verified: true, price: "$150/hr", available: false,
+    verified: true, price: "$150/hr", priceNum: 150, available: false,
     bio: "Holistic bodywork focused on total mind-body restoration.",
   },
   {
     id: 4, name: "Alex Thompson", city: "Miami", lat: 25.7617, lng: -80.1918,
     specialty: "Hot Stone & Aromatherapy", rating: 4.9, reviews: 112,
     image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&h=800&fit=crop",
-    verified: true, price: "$110/hr", available: true,
+    verified: true, price: "$110/hr", priceNum: 110, available: true,
     bio: "Blending hot stone therapy with aromatherapy for deep relaxation.",
   },
   {
     id: 5, name: "Ryan Martinez", city: "Chicago", lat: 41.8781, lng: -87.6298,
     specialty: "Sports Recovery Massage", rating: 4.7, reviews: 89,
     image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&h=800&fit=crop",
-    verified: true, price: "$95/hr", available: true,
+    verified: true, price: "$95/hr", priceNum: 95, available: true,
     bio: "Helping athletes push limits and recover faster.",
   },
   {
     id: 6, name: "Kyle Johnson", city: "Seattle", lat: 47.6062, lng: -122.3321,
     specialty: "Men's Wellness & Bodywork", rating: 4.8, reviews: 103,
     image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=800&h=800&fit=crop",
-    verified: false, price: "$90/hr", available: true,
+    verified: false, price: "$90/hr", priceNum: 90, available: true,
     bio: "Personalized wellness bodywork in a private studio.",
   },
 ];
@@ -187,11 +190,26 @@ const Explore = () => {
   const [cardIndex, setCardIndex] = useState(0);
   const [liked, setLiked] = useState<number[]>([]);
 
-  const filteredTherapists = therapists.filter((t) => {
-    const matchesSearch = t.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCity = selectedCity === "all" || t.city.toLowerCase().replace(/\s/g, "-") === selectedCity;
-    return matchesSearch && matchesCity;
-  });
+  const [priceRange, setPriceRange] = useState([50, 200]);
+  const [availableOnly, setAvailableOnly] = useState(false);
+  const [sortBy, setSortBy] = useState("default");
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  const filteredTherapists = therapists
+    .filter((t) => {
+      const matchesSearch = t.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCity = selectedCity === "all" || t.city.toLowerCase().replace(/\s/g, "-") === selectedCity;
+      const matchesPrice = t.priceNum >= priceRange[0] && t.priceNum <= priceRange[1];
+      const matchesAvailable = !availableOnly || t.available;
+      return matchesSearch && matchesCity && matchesPrice && matchesAvailable;
+    })
+    .sort((a, b) => {
+      if (sortBy === "price-asc") return a.priceNum - b.priceNum;
+      if (sortBy === "price-desc") return b.priceNum - a.priceNum;
+      if (sortBy === "rating") return b.rating - a.rating;
+      if (sortBy === "reviews") return b.reviews - a.reviews;
+      return 0;
+    });
 
   const handleSwipe = useCallback(
     (dir: "left" | "right") => {
@@ -313,6 +331,116 @@ const Explore = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Advanced Filters Toggle */}
+              <button
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="flex items-center gap-2 mt-4 text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                Advanced Filters
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showAdvanced ? "rotate-180" : ""}`} />
+                {(availableOnly || priceRange[0] > 50 || priceRange[1] < 200 || sortBy !== "default") && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                )}
+              </button>
+
+              {/* Advanced Filters Panel */}
+              <AnimatePresence>
+                {showAdvanced && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-5 mt-4 border-t border-border">
+                      {/* Price Range */}
+                      <div className="space-y-3">
+                        <Label className="text-xs uppercase tracking-widest text-muted-foreground">
+                          Price Range
+                        </Label>
+                        <Slider
+                          min={50}
+                          max={200}
+                          step={5}
+                          value={priceRange}
+                          onValueChange={setPriceRange}
+                          className="w-full"
+                        />
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>${priceRange[0]}</span>
+                          <span>${priceRange[1]}</span>
+                        </div>
+                      </div>
+
+                      {/* Available Now */}
+                      <div className="space-y-3">
+                        <Label className="text-xs uppercase tracking-widest text-muted-foreground">
+                          Availability
+                        </Label>
+                        <div className="flex items-center gap-3">
+                          <Switch
+                            checked={availableOnly}
+                            onCheckedChange={setAvailableOnly}
+                          />
+                          <span className="text-sm">
+                            {availableOnly ? "Available Now" : "All Therapists"}
+                          </span>
+                          {availableOnly && (
+                            <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "hsl(145 80% 50%)" }} />
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Sort By */}
+                      <div className="space-y-3">
+                        <Label className="text-xs uppercase tracking-widest text-muted-foreground">
+                          Sort By
+                        </Label>
+                        <Select value={sortBy} onValueChange={setSortBy}>
+                          <SelectTrigger className="bg-secondary border-border">
+                            <SelectValue placeholder="Default" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="default">Default</SelectItem>
+                            <SelectItem value="rating">Highest Rating</SelectItem>
+                            <SelectItem value="reviews">Most Reviews</SelectItem>
+                            <SelectItem value="price-asc">Price: Low → High</SelectItem>
+                            <SelectItem value="price-desc">Price: High → Low</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Reset */}
+                      <div className="space-y-3">
+                        <Label className="text-xs uppercase tracking-widest text-muted-foreground">
+                          &nbsp;
+                        </Label>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => {
+                            setPriceRange([50, 200]);
+                            setAvailableOnly(false);
+                            setSortBy("default");
+                            setSelectedCity("all");
+                            setSelectedType("all");
+                            setSearchQuery("");
+                          }}
+                        >
+                          Reset All Filters
+                        </Button>
+                        <p className="text-[10px] text-muted-foreground text-center">
+                          {filteredTherapists.length} result{filteredTherapists.length !== 1 ? "s" : ""}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
 
