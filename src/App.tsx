@@ -13,6 +13,12 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import TherapistProfile from "./pages/TherapistProfile";
+import FAQPage from "./pages/FAQ";
+import Safety from "./pages/Safety";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import City from "./pages/City";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +37,12 @@ const AnimatedRoutes = () => {
         <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
         <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
         <Route path="/register" element={<PageTransition><Auth /></PageTransition>} />
+        <Route path="/faq" element={<PageTransition><FAQPage /></PageTransition>} />
+        <Route path="/safety" element={<PageTransition><Safety /></PageTransition>} />
+        <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
+        <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
+        <Route path="/city/:slug" element={<PageTransition><City /></PageTransition>} />
+        <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>

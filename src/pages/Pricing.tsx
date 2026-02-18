@@ -36,14 +36,14 @@ const Pricing = () => {
     {
       name: "Gold", price: "$99", period: "month",
       description: "Maximum exposure for your massage practice",
-      features: ["All Premium features", "Top search placement", "Daily homepage feature", "Extended profile content", "Booking integration ready", "Dedicated account manager", "Custom branding"],
+      features: ["All Premium features", "Top search placement", "Daily homepage feature", "Extended profile content", "'Featured' badge", "Dedicated account manager", "Custom branding"],
       cta: "Choose Gold", popular: false,
     },
     {
       name: "Platinum", price: "$149", period: "month",
-      description: "Elite tier for established male therapists",
-      features: ["All Gold features", "Permanent homepage presence", "Exclusive 'Elite' badge", "API access", "White-label options", "Custom domain support", "Marketing consultation", "Priority feature requests"],
-      cta: "Go Elite", popular: false,
+      description: "Top tier for established male therapists",
+      features: ["All Gold features", "Permanent homepage presence", "'Boosted' badge", "API access", "White-label options", "Custom domain support", "Marketing consultation", "Priority feature requests"],
+      cta: "Go Platinum", popular: false,
     },
   ];
 
@@ -61,10 +61,10 @@ const Pricing = () => {
               animate={{ opacity: 1, y: 0 }}
               className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4"
             >
-              Flexible Plans for Male Massage Therapists
+              Advertising Plans for Male Massage Therapists
             </motion.p>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6">
-              <TextReveal text="Choose Your Growth Plan" delay={0.1} />
+              <TextReveal text="Choose Your Advertising Plan" delay={0.1} />
             </h1>
             <motion.p
               initial={{ opacity: 0 }}
@@ -135,7 +135,7 @@ const Pricing = () => {
                 { q: "Can I change plans at any time?", a: "Yes! Upgrade or downgrade your male massage therapist listing anytime. Changes take effect immediately with prorated billing." },
                 { q: "What payment methods do you accept?", a: "We accept all major credit cards and PayPal through our secure Stripe payment processor." },
                 { q: "Is there a contract or commitment?", a: "No contracts. All plans are month-to-month. Cancel anytime with no penalties." },
-                { q: "How does verification work for male massage therapists?", a: "Premium plans and above include professional verification — license checks, identity verification, and background screening within 24–48 hours." },
+                { q: "How does verification work for male massage therapists?", a: "MasseurMatch does not verify licenses, credentials, or qualifications. 'Verified' badges and 'Featured'/'Boosted' labels indicate paid advertising placement only. Users are encouraged to verify providers independently." },
                 { q: "Is this platform LGBTQ+ friendly?", a: "Absolutely. MasseurMatch was built as a trusted, inclusive directory for gay-friendly male massage therapists and their clients." },
               ].map((faq, i) => (
                 <motion.div
@@ -152,7 +152,11 @@ const Pricing = () => {
                 </motion.div>
               ))}
             </div>
-          </div>
+            </div>
+
+            <div className="mt-8 text-center text-xs text-muted-foreground max-w-xl mx-auto">
+              <p>All plans are advertising placements only. "Featured," "Boosted," and similar labels do not imply endorsement, verification, or recommendation by MasseurMatch.</p>
+            </div>
         </div>
       </section>
 

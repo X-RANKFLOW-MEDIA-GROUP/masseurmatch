@@ -1,4 +1,6 @@
 import { useParams } from "react-router-dom";
+import { AdTransparency } from "@/components/legal/AdTransparency";
+import { SafetyDisclaimer } from "@/components/legal/SafetyDisclaimer";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -34,7 +36,7 @@ const TherapistProfile = () => {
     image: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=1200&h=800&fit=crop",
     coverImage: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1600&h=400&fit=crop",
     verified: true,
-    plan: "Elite",
+    plan: "Featured",
     available: true,
     availableFor: 120,
     bio: "More than a service, an exchange of energy. With over 10 years of hands-on experience, I blend traditional techniques with modern recovery methods to create a deeply restorative experience. My practice is a safe, professional, LGBTQ+ affirming space where healing begins the moment you walk in.",
@@ -177,7 +179,7 @@ const TherapistProfile = () => {
                     </Badge>
                   )}
                   <Badge variant="outline" className="text-xs border-muted-foreground/30">
-                    💎 {therapist.plan}
+                    ⭐ {therapist.plan}
                   </Badge>
                   <Badge variant="outline" className="text-xs border-muted-foreground/30">
                     🏳️‍🌈 LGBTQ+ Safe Space
@@ -209,7 +211,7 @@ const TherapistProfile = () => {
                 <div className="flex flex-wrap gap-3">
                   <MagneticButton>
                     <Button className="group">
-                      Book Online
+                      Send Message
                       <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </MagneticButton>
@@ -389,7 +391,7 @@ const TherapistProfile = () => {
                   <Plane className="w-5 h-5" />
                   Upcoming Travel
                 </h2>
-                <p className="text-sm text-muted-foreground mt-1">Book in advance when I'm visiting your city</p>
+                <p className="text-sm text-muted-foreground mt-1">Contact me in advance when I'm visiting your city</p>
               </div>
               <div className="hidden md:flex gap-2">
                 <button onClick={() => scrollTravel("left")} className="border border-border rounded-md p-2 hover:bg-secondary transition-colors">
@@ -421,7 +423,7 @@ const TherapistProfile = () => {
                       {trip.status}
                     </Badge>
                     <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                      Book →
+                      Contact →
                     </span>
                   </div>
                 </motion.div>
@@ -572,7 +574,7 @@ const TherapistProfile = () => {
             </div>
             <div className="flex items-center justify-between mt-4">
               <p className="text-xs text-muted-foreground">
-                Approximate area shown for privacy. Exact address provided after booking.
+                Approximate area shown for privacy. Exact address provided upon contact.
               </p>
               <a
                 href={`https://www.openstreetmap.org/?mlat=${therapist.lat}&mlon=${therapist.lng}#map=14/${therapist.lat}/${therapist.lng}`}
@@ -593,7 +595,7 @@ const TherapistProfile = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="border border-border bg-card p-8 md:p-10 mb-20 rounded-lg"
+            className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg"
           >
             <h2 className="text-2xl font-bold mb-6">Business Hours</h2>
             <div className="space-y-px bg-border rounded-lg overflow-hidden">
@@ -608,8 +610,15 @@ const TherapistProfile = () => {
               ))}
             </div>
           </motion.section>
+
+          {/* Ad Transparency Notice */}
+          <div className="mb-8">
+            <AdTransparency />
+          </div>
         </div>
       </div>
+
+      <SafetyDisclaimer />
 
       {/* ═══════════════════════════════════════════
           7. STICKY ACTION BAR
@@ -640,7 +649,7 @@ const TherapistProfile = () => {
                 Text Now
               </Button>
               <Button size="sm" className="flex-1 md:flex-none group">
-                Book Online
+                Contact
                 <ArrowRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button variant="ghost" size="icon" className="flex-shrink-0">
