@@ -659,24 +659,32 @@ const Explore = () => {
       <section className="py-20 border-t border-border">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
-            <h2 className="reveal text-3xl font-bold mb-6">Find Gay Massage Therapists Near You</h2>
+            <h2 className="reveal text-3xl font-bold mb-6">Find Male Massage Therapists Near You</h2>
             <div className="reveal reveal-delay-1 text-sm text-muted-foreground space-y-4 leading-relaxed">
               <p>
-                MasseurMatch is the leading gay massage directory for finding verified male massage therapists
+                MasseurMatch is an advertising directory for finding male massage therapists
                 in your city. Whether you're looking for deep tissue massage, Swedish relaxation, sports recovery,
-                hot stone therapy, or professional men's bodywork, our platform connects you with trusted,
-                gay-friendly massage professionals.
+                hot stone therapy, or professional men's bodywork, our platform connects you with
+                gay-friendly massage professionals who advertise their services here.
               </p>
               <p>
-                Every male massage therapist on our platform is professionally verified with license checks,
-                identity verification, and client reviews. Search by city — Los Angeles, San Francisco, New York,
-                Miami, Chicago, Seattle, and 500+ more — to find the perfect male massage therapist near you.
+                Search by city — Los Angeles, San Francisco, New York,
+                Miami, Chicago, Seattle, and 500+ more — to find male massage therapists near you.
+                All arrangements are made directly between you and the provider.
               </p>
-              <p>
-                Our directory serves the LGBTQ+ community with a safe, inclusive space to discover professional
-                male bodywork services. From outcall massage to in-studio sessions, find exactly what you need
-                with transparent pricing, real reviews, and instant booking.
+              <p className="text-xs italic">
+                MasseurMatch is an advertising directory only. We do not verify providers, guarantee services,
+                or process bookings or payments. Users must be 18+.
               </p>
+            </div>
+
+            {/* City links */}
+            <div className="mt-8 flex flex-wrap gap-2">
+              {["los-angeles", "new-york", "san-francisco", "miami", "chicago", "seattle"].map(slug => (
+                <Link key={slug} to={`/city/${slug}`} className="text-xs text-muted-foreground border border-border rounded-md px-3 py-1.5 hover:bg-card transition-colors capitalize">
+                  {slug.replace("-", " ")}
+                </Link>
+              ))}
             </div>
           </div>
         </div>

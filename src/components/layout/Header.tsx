@@ -10,6 +10,7 @@ export const Header = () => {
 
   const navLinks = [
     { to: "/explore", label: "Explore" },
+    { to: "/safety", label: "Safety" },
     { to: "/pricing", label: "Pricing" },
     { to: "/about", label: "About" },
     { to: "/contact", label: "Contact" },
@@ -43,10 +44,10 @@ export const Header = () => {
 
         <div className="hidden md:flex items-center space-x-3">
           <Link to="/auth">
-            <Button variant="ghost" size="sm" className="text-sm">Sign In</Button>
+            <Button variant="ghost" size="sm" className="text-sm">Provider Login</Button>
           </Link>
           <Link to="/register">
-            <Button variant="default" size="sm" className="text-sm">Join Now</Button>
+            <Button variant="default" size="sm" className="text-sm">List Your Practice</Button>
           </Link>
         </div>
 

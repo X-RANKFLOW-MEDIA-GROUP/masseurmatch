@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -8,28 +7,30 @@ export const Footer = () => {
     {
       title: "Directory",
       links: [
-        { to: "/explore", label: "Browse Male Therapists" },
-        { to: "/pricing", label: "Therapist Plans" },
+        { to: "/explore", label: "Browse Therapists" },
+        { to: "/city/los-angeles", label: "Los Angeles" },
+        { to: "/city/new-york", label: "New York" },
+        { to: "/city/san-francisco", label: "San Francisco" },
+        { to: "/city/miami", label: "Miami" },
+      ],
+    },
+    {
+      title: "For Providers",
+      links: [
+        { to: "/register", label: "List Your Practice" },
+        { to: "/pricing", label: "Advertising Plans" },
+        { to: "/dashboard", label: "Provider Dashboard" },
         { to: "/about", label: "About Us" },
-        { to: "/contact", label: "Contact" },
       ],
     },
     {
-      title: "For Therapists",
+      title: "Legal & Safety",
       links: [
-        { to: "/register", label: "Join as Therapist" },
-        { to: "/dashboard", label: "Dashboard" },
-        { to: "/billing", label: "Billing" },
-        { to: "/settings", label: "Settings" },
-      ],
-    },
-    {
-      title: "Legal",
-      links: [
-        { to: "/privacy", label: "Privacy Policy" },
+        { to: "/safety", label: "Safety Guidelines" },
+        { to: "/faq", label: "FAQ" },
         { to: "/terms", label: "Terms of Service" },
-        { to: "/refund-policy", label: "Refund Policy" },
-        { to: "/cookie-policy", label: "Cookie Policy" },
+        { to: "/privacy", label: "Privacy Policy" },
+        { to: "/contact", label: "Contact" },
       ],
     },
   ];
@@ -41,11 +42,11 @@ export const Footer = () => {
           <div>
             <h3 className="text-lg font-bold font-heading text-foreground mb-4">MasseurMatch</h3>
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-              The #1 gay massage directory connecting men with verified male massage therapists. 
+              An advertising directory connecting men with male massage therapists. 
               Professional, trusted, gay-friendly bodywork services.
             </p>
             <p className="text-xs text-muted-foreground">
-              Gay massage • Male therapists • Men's bodywork • LGBTQ+ wellness
+              This is an advertising directory only. We do not verify providers or guarantee services.
             </p>
           </div>
 
@@ -67,10 +68,10 @@ export const Footer = () => {
 
         <div className="border-t border-border mt-16 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
-            &copy; {currentYear} MasseurMatch — Gay Massage Directory. All rights reserved.
+            &copy; {currentYear} MasseurMatch — Advertising Directory. All rights reserved.
           </p>
           <p className="text-xs text-muted-foreground">
-            Find verified male massage therapists near you
+            18+ only · Not a marketplace · No booking or payments processed
           </p>
         </div>
       </div>

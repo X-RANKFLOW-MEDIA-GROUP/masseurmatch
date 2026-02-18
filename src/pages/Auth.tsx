@@ -4,12 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
 const Auth = () => {
   const { toast } = useToast();
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,17 +26,18 @@ const Auth = () => {
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
     if (signupData.password !== signupData.confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords don't match",
-        variant: "destructive"
-      });
+      toast({ title: "Error", description: "Passwords don't match", variant: "destructive" });
       return;
     }
-    toast({
-      title: "Account created!",
-      description: "Welcome to MasseurMatch",
-    });
+    if (!ageConfirmed) {
+      toast({ title: "Error", description: "You must confirm you are 18 or older", variant: "destructive" });
+      return;
+    }
+    if (!termsAccepted) {
+      toast({ title: "Error", description: "You must accept the Terms of Service and Privacy Policy", variant: "destructive" });
+      return;
+    }
+    toast({ title: "Account created!", description: "Welcome to MasseurMatch" });
   };
 
   return (
@@ -43,10 +48,10 @@ const Auth = () => {
             <h1 className="text-3xl font-black gradient-text">MasseurMatch</h1>
           </Link>
           <Badge className="mb-4 bg-primary/20 text-primary border-primary/30">
-            Join 10,000+ Professionals
+            Provider Registration
           </Badge>
           <h2 className="text-3xl font-black mb-2">Welcome</h2>
-          <p className="text-muted-foreground">Sign in to your account or create a new one</p>
+          <p className="text-muted-foreground">Sign in to manage your listing or create a new one</p>
         </div>
 
         <Tabs defaultValue="signin" className="glass-card p-8">
@@ -142,16 +147,36 @@ const Auth = () => {
                 />
               </div>
 
-              <Button type="submit" variant="hero" className="w-full">
-                Create Account
-              </Button>
+              <div className="space-y-3 pt-2">
+                <div className="flex items-start gap-2">
+                  <Checkbox
+                    id="age-confirm"
+                    checked={ageConfirmed}
+                    onCheckedChange={(checked) => setAgeConfirmed(checked === true)}
+                  />
+                  <Label htmlFor="age-confirm" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                    I confirm that I am <strong className="text-foreground">18 years or older</strong>
+                  </Label>
+                </div>
 
-              <p className="text-xs text-muted-foreground text-center">
-                By signing up, you agree to our{" "}
-                <Link to="/terms" className="text-primary hover:underline">Terms</Link>
-                {" "}and{" "}
-                <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
-              </p>
+                <div className="flex items-start gap-2">
+                  <Checkbox
+                    id="terms-accept"
+                    checked={termsAccepted}
+                    onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                  />
+                  <Label htmlFor="terms-accept" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                    I agree to the{" "}
+                    <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
+                    {" "}and{" "}
+                    <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+                  </Label>
+                </div>
+              </div>
+
+              <Button type="submit" variant="hero" className="w-full">
+                Create Provider Account
+              </Button>
             </form>
           </TabsContent>
         </Tabs>

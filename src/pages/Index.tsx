@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
+import { SafetyDisclaimer } from "@/components/legal/SafetyDisclaimer";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { CheckCircle2, Star, ArrowRight } from "lucide-react";
+import { CheckCircle2, Star, ArrowRight, MapPin } from "lucide-react";
 import { ShieldIllustration, CommunityIllustration, GrowthIllustration } from "@/components/icons/IllustrationIcons";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { motion } from "framer-motion";
@@ -106,7 +107,7 @@ const Index = () => {
               className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed"
             >
               Browse trusted, gay-friendly massage professionals near you. 
-              Read verified reviews, compare services, and book your next session with confidence.
+              Read reviews, compare services, and find your next therapist with confidence.
             </motion.p>
 
             <motion.div
@@ -149,7 +150,7 @@ const Index = () => {
             {[
               { label: "Male Therapists", end: 10000, suffix: "+" },
               { label: "Cities Covered", end: 500, suffix: "+" },
-              { label: "Massage Sessions Booked", end: 2000000, suffix: "+" },
+              { label: "Verified Profiles", end: 8500, suffix: "+" },
               { label: "5-Star Reviews", end: 98, suffix: "%" },
             ].map((stat, i) => (
               <motion.div
@@ -270,16 +271,16 @@ const Index = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border">
               {[
                 {
-                  Icon: ShieldIllustration, num: "01", title: "Verified Male Professionals",
-                  desc: "Every male massage therapist undergoes thorough license verification, identity checks, and background screening. Your safety is our priority in the gay massage community."
+                  Icon: ShieldIllustration, num: "01", title: "Professional Directory",
+                  desc: "A curated advertising directory of male massage therapists. Browse listings, read reviews, and contact providers directly. Note: we do not verify licenses or credentials."
                 },
                 {
                   Icon: CommunityIllustration, num: "02", title: "Gay-Friendly Community",
-                  desc: "A trusted directory built specifically for men seeking professional male massage services. Read authentic reviews from verified clients in a safe, inclusive space."
+                  desc: "A trusted directory built specifically for men seeking professional male massage services. Read authentic reviews from clients in a safe, inclusive space."
                 },
                 {
-                  Icon: GrowthIllustration, num: "03", title: "Instant Booking & Growth",
-                  desc: "Flexible subscription plans designed to help male massage therapists grow their practice and reach more clients seeking men's bodywork services."
+                  Icon: GrowthIllustration, num: "03", title: "Grow Your Practice",
+                  desc: "Flexible advertising plans designed to help male massage therapists reach more clients seeking men's bodywork services."
                 },
               ].map((feature, i) => (
                 <motion.div
@@ -372,6 +373,47 @@ const Index = () => {
         </div>
       </section>
 
+      {/* ─── FEATURED CITIES ─── */}
+      <section className="py-28 border-t border-border">
+        <div className="container mx-auto px-4">
+          <div className="reveal mb-16 text-center">
+            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">Browse by City</p>
+            <h2 className="text-4xl md:text-6xl font-bold text-foreground tracking-tight">
+              <TextReveal text="Featured Cities" />
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-px bg-border max-w-5xl mx-auto">
+            {[
+              { slug: "los-angeles", name: "Los Angeles", state: "CA" },
+              { slug: "new-york", name: "New York", state: "NY" },
+              { slug: "san-francisco", name: "San Francisco", state: "CA" },
+              { slug: "miami", name: "Miami", state: "FL" },
+              { slug: "chicago", name: "Chicago", state: "IL" },
+              { slug: "seattle", name: "Seattle", state: "WA" },
+            ].map((city, i) => (
+              <motion.div
+                key={city.slug}
+                custom={i}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+              >
+                <Link
+                  to={`/city/${city.slug}`}
+                  className="bg-background p-6 group glow-hover block text-center"
+                >
+                  <MapPin className="w-5 h-5 text-muted-foreground mx-auto mb-3 group-hover:text-foreground transition-colors" />
+                  <h3 className="text-sm font-semibold">{city.name}</h3>
+                  <p className="text-xs text-muted-foreground">{city.state}</p>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <SafetyDisclaimer />
       <Footer />
     </div>
   );
