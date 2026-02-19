@@ -1,8 +1,14 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /dashboard
+Disallow: /auth
+Disallow: /register
 
 User-agent: Bingbot
 Allow: /
+Disallow: /dashboard
+Disallow: /auth
+Disallow: /register
 
 User-agent: Twitterbot
 Allow: /
@@ -12,3 +18,8 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /dashboard
+Disallow: /auth
+Disallow: /register
+
+Sitemap: https://cnycelkfbtzfnphbeurd.supabase.co/functions/v1/generate-sitemap
