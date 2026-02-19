@@ -19,8 +19,19 @@ import Safety from "./pages/Safety";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import City from "./pages/City";
-import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import DashboardOverview from "./pages/dashboard/DashboardOverview";
+import DashboardProfile from "./pages/dashboard/DashboardProfile";
+import DashboardPhotos from "./pages/dashboard/DashboardPhotos";
+import DashboardLocation from "./pages/dashboard/DashboardLocation";
+import DashboardPricing from "./pages/dashboard/DashboardPricing";
+import DashboardAvailability from "./pages/dashboard/DashboardAvailability";
+import DashboardVerification from "./pages/dashboard/DashboardVerification";
+import DashboardSubscription from "./pages/dashboard/DashboardSubscription";
+import DashboardSettings from "./pages/dashboard/DashboardSettings";
+import DashboardSeo from "./pages/dashboard/DashboardSeo";
+import DashboardPromotion from "./pages/dashboard/DashboardPromotion";
 
 const queryClient = new QueryClient();
 
@@ -43,7 +54,19 @@ const AnimatedRoutes = () => {
         <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
         <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
         <Route path="/city/:slug" element={<PageTransition><City /></PageTransition>} />
-        <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route index element={<DashboardOverview />} />
+          <Route path="profile" element={<DashboardProfile />} />
+          <Route path="photos" element={<DashboardPhotos />} />
+          <Route path="location" element={<DashboardLocation />} />
+          <Route path="pricing" element={<DashboardPricing />} />
+          <Route path="availability" element={<DashboardAvailability />} />
+          <Route path="verification" element={<DashboardVerification />} />
+          <Route path="subscription" element={<DashboardSubscription />} />
+          <Route path="settings" element={<DashboardSettings />} />
+          <Route path="seo" element={<DashboardSeo />} />
+          <Route path="promotion" element={<DashboardPromotion />} />
+        </Route>
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
