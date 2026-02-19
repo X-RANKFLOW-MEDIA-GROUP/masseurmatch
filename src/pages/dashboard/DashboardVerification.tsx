@@ -1,11 +1,44 @@
+import { useState } from "react";
 import { useProfile } from "@/hooks/useProfile";
-import { CheckCircle2, XCircle, Clock, ShieldCheck, AlertTriangle } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, ShieldCheck, AlertTriangle, Loader2, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const DashboardVerification = () => {
-  const { profile, loading } = useProfile();
+  const { profile, loading, refetch } = useProfile();
+  const [startingVerification, setStartingVerification] = useState(false);
+
+  const handleStartVerification = async () => {
+    setStartingVerification(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Você precisa estar logado para iniciar a verificação.");
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke("create-verification-session", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, "_blank");
+        toast.success("Sessão de verificação criada! Complete no Stripe.");
+        await refetch();
+      } else {
+        throw new Error("URL de verificação não recebida.");
+      }
+    } catch (err: any) {
+      console.error("Verification error:", err);
+      toast.error(err.message || "Erro ao iniciar verificação.");
+    } finally {
+      setStartingVerification(false);
+    }
+  };
 
   if (loading) return <div className="animate-pulse h-40 bg-muted rounded" />;
 
@@ -73,9 +106,24 @@ const DashboardVerification = () => {
               <h3 className="text-sm font-semibold">{check.label}</h3>
               <p className="text-xs text-muted-foreground">{check.desc}</p>
             </div>
-            <Badge variant="outline" className={`text-[10px] ${check.done ? "border-success/40 text-success" : "border-warning/40 text-warning"}`}>
-              {check.done ? "Completo" : "Pendente"}
-            </Badge>
+            <div className="flex items-center gap-2">
+              {check.label === "Verificação de Identidade" && !check.done && (
+                <Button
+                  size="sm"
+                  onClick={handleStartVerification}
+                  disabled={startingVerification}
+                >
+                  {startingVerification ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Iniciando…</>
+                  ) : (
+                    <><ExternalLink className="w-4 h-4" /> Verificar Agora</>
+                  )}
+                </Button>
+              )}
+              <Badge variant="outline" className={`text-[10px] ${check.done ? "border-success/40 text-success" : "border-warning/40 text-warning"}`}>
+                {check.done ? "Completo" : "Pendente"}
+              </Badge>
+            </div>
           </div>
         ))}
       </div>
