@@ -17,7 +17,10 @@ serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
+    const rawStripeKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
+    // Strip any non-ASCII characters (BOM, zero-width chars, etc.)
+    const stripeKey = rawStripeKey.replace(/[^\x20-\x7E]/g, '').trim();
+    console.log('Stripe key length:', rawStripeKey.length, 'cleaned:', stripeKey.length, 'starts with sk_:', stripeKey.startsWith('sk_'));
     if (!stripeKey) throw new Error('STRIPE_SECRET_KEY not configured');
 
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -28,17 +31,15 @@ serve(async (req) => {
     if (userError || !user) throw new Error('Invalid user');
 
     // Create Stripe Identity Verification Session
+    const stripeHeaders = new Headers();
+    stripeHeaders.set('Authorization', 'Bearer ' + stripeKey);
+    stripeHeaders.set('Content-Type', 'application/x-www-form-urlencoded');
+
+    const body = 'type=document&metadata[user_id]=' + encodeURIComponent(user.id) + '&options[document][require_matching_selfie]=true';
     const response = await fetch('https://api.stripe.com/v1/identity/verification_sessions', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${stripeKey}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        type: 'document',
-        'metadata[user_id]': user.id,
-        'options[document][require_matching_selfie]': 'true',
-      }),
+      headers: stripeHeaders,
+      body: body,
     });
 
     const session = await response.json();
