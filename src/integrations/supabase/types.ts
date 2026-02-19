@@ -14,16 +14,208 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      identity_verifications: {
+        Row: {
+          created_at: string
+          id: string
+          status: Database["public"]["Enums"]["verification_status"]
+          stripe_report: Json | null
+          stripe_session_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          status?: Database["public"]["Enums"]["verification_status"]
+          stripe_report?: Json | null
+          stripe_session_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          status?: Database["public"]["Enums"]["verification_status"]
+          stripe_report?: Json | null
+          stripe_session_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profile_photos: {
+        Row: {
+          created_at: string
+          id: string
+          is_primary: boolean | null
+          moderation_reason: string | null
+          moderation_status: Database["public"]["Enums"]["moderation_status"]
+          profile_id: string
+          sort_order: number | null
+          storage_path: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          moderation_reason?: string | null
+          moderation_status?: Database["public"]["Enums"]["moderation_status"]
+          profile_id: string
+          sort_order?: number | null
+          storage_path: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          moderation_reason?: string | null
+          moderation_status?: Database["public"]["Enums"]["moderation_status"]
+          profile_id?: string
+          sort_order?: number | null
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_photos_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          business_hours: Json | null
+          certifications: string[] | null
+          city: string | null
+          country: string | null
+          created_at: string
+          custom_faq: Json | null
+          display_name: string | null
+          full_name: string
+          id: string
+          incall_price: number | null
+          is_active: boolean
+          is_verified_identity: boolean
+          is_verified_photos: boolean
+          languages: string[] | null
+          outcall_price: number | null
+          phone: string | null
+          presentation_video_url: string | null
+          service_areas: Json | null
+          social_media: Json | null
+          specialties: string[] | null
+          state: string | null
+          stripe_verification_session_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          business_hours?: Json | null
+          certifications?: string[] | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          custom_faq?: Json | null
+          display_name?: string | null
+          full_name?: string
+          id?: string
+          incall_price?: number | null
+          is_active?: boolean
+          is_verified_identity?: boolean
+          is_verified_photos?: boolean
+          languages?: string[] | null
+          outcall_price?: number | null
+          phone?: string | null
+          presentation_video_url?: string | null
+          service_areas?: Json | null
+          social_media?: Json | null
+          specialties?: string[] | null
+          state?: string | null
+          stripe_verification_session_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          business_hours?: Json | null
+          certifications?: string[] | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          custom_faq?: Json | null
+          display_name?: string | null
+          full_name?: string
+          id?: string
+          incall_price?: number | null
+          is_active?: boolean
+          is_verified_identity?: boolean
+          is_verified_photos?: boolean
+          languages?: string[] | null
+          outcall_price?: number | null
+          phone?: string | null
+          presentation_video_url?: string | null
+          service_areas?: Json | null
+          social_media?: Json | null
+          specialties?: string[] | null
+          state?: string | null
+          stripe_verification_session_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_profile_owner: { Args: { _profile_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "provider"
+      moderation_status: "pending" | "approved" | "rejected"
+      verification_status:
+        | "pending"
+        | "processing"
+        | "verified"
+        | "failed"
+        | "expired"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +342,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "provider"],
+      moderation_status: ["pending", "approved", "rejected"],
+      verification_status: [
+        "pending",
+        "processing",
+        "verified",
+        "failed",
+        "expired",
+      ],
+    },
   },
 } as const

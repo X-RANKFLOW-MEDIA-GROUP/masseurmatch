@@ -1,1 +1,10 @@
 project_id = "cnycelkfbtzfnphbeurd"
+
+[functions.create-verification-session]
+verify_jwt = false
+
+[functions.stripe-identity-webhook]
+verify_jwt = false
+
+[functions.moderate-photo]
+verify_jwt = false
