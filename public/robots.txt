@@ -3,12 +3,14 @@ Allow: /
 Disallow: /dashboard
 Disallow: /auth
 Disallow: /register
+Disallow: /admin
 
 User-agent: Bingbot
 Allow: /
 Disallow: /dashboard
 Disallow: /auth
 Disallow: /register
+Disallow: /admin
 
 User-agent: Twitterbot
 Allow: /
@@ -21,5 +23,6 @@ Allow: /
 Disallow: /dashboard
 Disallow: /auth
 Disallow: /register
+Disallow: /admin
 
 Sitemap: https://cnycelkfbtzfnphbeurd.supabase.co/functions/v1/generate-sitemap
