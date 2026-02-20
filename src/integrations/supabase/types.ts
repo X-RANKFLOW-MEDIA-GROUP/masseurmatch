@@ -14,6 +14,122 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_log: {
+        Row: {
+          action: string
+          admin_user_id: string
+          created_at: string
+          details: Json | null
+          id: string
+          target_id: string | null
+          target_type: string
+        }
+        Insert: {
+          action: string
+          admin_user_id: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_type: string
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_type?: string
+        }
+        Relationships: []
+      }
+      content_flags: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          reason: string
+          reporter_id: string
+          resolution_note: string | null
+          resolved_by: string | null
+          status: string
+          target_id: string
+          target_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          reason: string
+          reporter_id: string
+          resolution_note?: string | null
+          resolved_by?: string | null
+          status?: string
+          target_id: string
+          target_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          reason?: string
+          reporter_id?: string
+          resolution_note?: string | null
+          resolved_by?: string | null
+          status?: string
+          target_id?: string
+          target_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      featured_masters: {
+        Row: {
+          city: string | null
+          created_at: string
+          display_order: number
+          ends_at: string | null
+          featured_by: string
+          id: string
+          is_active: boolean
+          profile_id: string
+          starts_at: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          display_order?: number
+          ends_at?: string | null
+          featured_by: string
+          id?: string
+          is_active?: boolean
+          profile_id: string
+          starts_at?: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          display_order?: number
+          ends_at?: string | null
+          featured_by?: string
+          id?: string
+          is_active?: boolean
+          profile_id?: string
+          starts_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "featured_masters_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       identity_verifications: {
         Row: {
           created_at: string
@@ -110,6 +226,7 @@ export type Database = {
           social_media: Json | null
           specialties: string[] | null
           state: string | null
+          status: string
           stripe_verification_session_id: string | null
           updated_at: string
           user_id: string
@@ -138,6 +255,7 @@ export type Database = {
           social_media?: Json | null
           specialties?: string[] | null
           state?: string | null
+          status?: string
           stripe_verification_session_id?: string | null
           updated_at?: string
           user_id: string
@@ -166,9 +284,46 @@ export type Database = {
           social_media?: Json | null
           specialties?: string[] | null
           state?: string | null
+          status?: string
           stripe_verification_session_id?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          id: string
+          message: string
+          priority: string
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          priority?: string
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          priority?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -189,6 +344,54 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_suspensions: {
+        Row: {
+          admin_id: string
+          created_at: string
+          duration_days: number | null
+          ends_at: string | null
+          id: string
+          is_active: boolean
+          reason: string
+          reason_detail: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          starts_at: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string
+          duration_days?: number | null
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          reason: string
+          reason_detail?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          starts_at?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string
+          duration_days?: number | null
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          reason?: string
+          reason_detail?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          starts_at?: string
+          type?: string
           user_id?: string
         }
         Relationships: []

@@ -33,6 +33,19 @@ import DashboardSettings from "./pages/dashboard/DashboardSettings";
 import DashboardSeo from "./pages/dashboard/DashboardSeo";
 import DashboardPromotion from "./pages/dashboard/DashboardPromotion";
 
+// Admin
+import AdminLogin from "./pages/AdminLogin";
+import { AdminLayout } from "@/components/admin/AdminLayout";
+import AdminOverview from "./pages/admin/AdminOverview";
+import AdminMailbox from "./pages/admin/AdminMailbox";
+import AdminModeration from "./pages/admin/AdminModeration";
+import AdminAIPrecheck from "./pages/admin/AdminAIPrecheck";
+import AdminFlags from "./pages/admin/AdminFlags";
+import AdminFeatured from "./pages/admin/AdminFeatured";
+import AdminCityOps from "./pages/admin/AdminCityOps";
+import AdminAuditLog from "./pages/admin/AdminAuditLog";
+import AdminUsers from "./pages/admin/AdminUsers";
+
 const queryClient = new QueryClient();
 
 const AnimatedRoutes = () => {
@@ -66,6 +79,18 @@ const AnimatedRoutes = () => {
           <Route path="settings" element={<DashboardSettings />} />
           <Route path="seo" element={<DashboardSeo />} />
           <Route path="promotion" element={<DashboardPromotion />} />
+        </Route>
+        <Route path="/admin/login" element={<PageTransition><AdminLogin /></PageTransition>} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminOverview />} />
+          <Route path="mailbox" element={<AdminMailbox />} />
+          <Route path="moderation" element={<AdminModeration />} />
+          <Route path="ai-precheck" element={<AdminAIPrecheck />} />
+          <Route path="flags" element={<AdminFlags />} />
+          <Route path="featured" element={<AdminFeatured />} />
+          <Route path="city-ops" element={<AdminCityOps />} />
+          <Route path="audit-log" element={<AdminAuditLog />} />
+          <Route path="users" element={<AdminUsers />} />
         </Route>
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
