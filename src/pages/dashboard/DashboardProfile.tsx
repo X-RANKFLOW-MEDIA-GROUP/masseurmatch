@@ -5,15 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, X, Save } from "lucide-react";
+import { Loader2, Plus, X, Save, AlertTriangle } from "lucide-react";
 
 const SPECIALTIES_OPTIONS = [
-  "Massagem Relaxante", "Massagem Terapêutica", "Massagem Desportiva",
-  "Shiatsu", "Reflexologia", "Drenagem Linfática", "Massagem Tantrica",
-  "Thai Massage", "Hot Stones", "Aromaterapia", "Quiropraxia",
+  "Relaxation Massage", "Therapeutic Massage", "Sports Massage",
+  "Shiatsu", "Reflexology", "Lymphatic Drainage", "Tantric Massage",
+  "Thai Massage", "Hot Stones", "Aromatherapy", "Chiropractic",
 ];
 
-const LANGUAGES_OPTIONS = ["Português", "English", "Español", "Français", "Deutsch", "Italiano"];
+const LANGUAGES_OPTIONS = ["Portuguese", "English", "Spanish", "French", "German", "Italian"];
 
 const DashboardProfile = () => {
   const { profile, loading, updateProfile } = useProfile();
@@ -68,8 +68,8 @@ const DashboardProfile = () => {
     });
     setSaving(false);
     toast({
-      title: error ? "Erro ao salvar" : "Perfil atualizado",
-      description: error?.message || "Suas alterações foram salvas com sucesso.",
+      title: error ? "Error saving" : "Profile updated",
+      description: error?.message || "Your changes have been saved. Your profile is now under review.",
       variant: error ? "destructive" : "default",
     });
   };
@@ -80,37 +80,57 @@ const DashboardProfile = () => {
     <div className="max-w-3xl space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Perfil</h1>
-          <p className="text-sm text-muted-foreground">Edite suas informações profissionais</p>
+          <h1 className="text-2xl font-bold">Profile</h1>
+          <p className="text-sm text-muted-foreground">Edit your professional information</p>
         </div>
         <Button onClick={handleSave} disabled={saving}>
           {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-          Salvar
+          Save
         </Button>
       </div>
 
+      {/* Re-approval warning */}
+      <div className="flex items-start gap-3 rounded-lg border border-warning/40 bg-warning/5 p-4">
+        <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
+        <div>
+          <p className="text-sm font-medium">Changes require re-approval</p>
+          <p className="text-xs text-muted-foreground">Saving changes to your profile will send it back for admin review before it goes live again.</p>
+        </div>
+      </div>
+
+      {/* Under review banner */}
+      {profile?.status === "pending_approval" && (
+        <div className="flex items-start gap-3 rounded-lg border border-primary/40 bg-primary/5 p-4">
+          <Loader2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-medium">Profile under review</p>
+            <p className="text-xs text-muted-foreground">Your profile is currently being reviewed by our team. It will go live once approved.</p>
+          </div>
+        </div>
+      )}
+
       {/* Basic */}
       <section className="glass-card p-6 space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Informações Básicas</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Basic Information</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <Label>Nome de exibição</Label>
-            <Input value={form.display_name} onChange={(e) => setForm((f) => ({ ...f, display_name: e.target.value }))} placeholder="Como deseja ser chamado" />
+            <Label>Display Name</Label>
+            <Input value={form.display_name} onChange={(e) => setForm((f) => ({ ...f, display_name: e.target.value }))} placeholder="How you want to be called" />
           </div>
           <div>
-            <Label>Telefone</Label>
-            <Input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} placeholder="+55 11 99999-9999" />
+            <Label>Phone</Label>
+            <Input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} placeholder="+1 555 123 4567" />
           </div>
         </div>
         <div>
-          <Label>Bio profissional</Label>
-          <Textarea value={form.bio} onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))} placeholder="Conte sobre sua experiência e abordagem..." className="min-h-[120px]" />
+          <Label>Professional Bio</Label>
+          <Textarea value={form.bio} onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))} placeholder="Tell us about your experience and approach..." className="min-h-[120px]" />
         </div>
       </section>
 
       {/* Specialties */}
       <section className="glass-card p-6 space-y-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Especialidades</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Specialties</h2>
         <div className="flex flex-wrap gap-2">
           {SPECIALTIES_OPTIONS.map((spec) => (
             <button
@@ -131,7 +151,7 @@ const DashboardProfile = () => {
 
       {/* Languages */}
       <section className="glass-card p-6 space-y-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Idiomas</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Languages</h2>
         <div className="flex flex-wrap gap-2">
           {LANGUAGES_OPTIONS.map((lang) => (
             <button
@@ -152,9 +172,9 @@ const DashboardProfile = () => {
 
       {/* Certifications */}
       <section className="glass-card p-6 space-y-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Certificações</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Certifications</h2>
         <div className="flex gap-2">
-          <Input value={newCert} onChange={(e) => setNewCert(e.target.value)} placeholder="Adicionar certificação..." onKeyDown={(e) => {
+          <Input value={newCert} onChange={(e) => setNewCert(e.target.value)} placeholder="Add certification..." onKeyDown={(e) => {
             if (e.key === "Enter" && newCert.trim()) {
               setForm((f) => ({ ...f, certifications: [...f.certifications, newCert.trim()] }));
               setNewCert("");
@@ -176,11 +196,11 @@ const DashboardProfile = () => {
 
       {/* Social & Video */}
       <section className="glass-card p-6 space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Redes Sociais & Vídeo</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Social Media & Video</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <Label>Instagram</Label>
-            <Input value={form.social_media.instagram || ""} onChange={(e) => setForm((f) => ({ ...f, social_media: { ...f.social_media, instagram: e.target.value } }))} placeholder="@seuuser" />
+            <Input value={form.social_media.instagram || ""} onChange={(e) => setForm((f) => ({ ...f, social_media: { ...f.social_media, instagram: e.target.value } }))} placeholder="@youruser" />
           </div>
           <div>
             <Label>Website</Label>
@@ -188,7 +208,7 @@ const DashboardProfile = () => {
           </div>
         </div>
         <div>
-          <Label>Vídeo de apresentação (URL)</Label>
+          <Label>Presentation Video (URL)</Label>
           <Input value={form.presentation_video_url} onChange={(e) => setForm((f) => ({ ...f, presentation_video_url: e.target.value }))} placeholder="https://youtube.com/..." />
         </div>
       </section>

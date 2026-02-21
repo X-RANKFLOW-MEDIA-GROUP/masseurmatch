@@ -13,12 +13,12 @@ interface StepProfileProps {
 }
 
 const SPECIALTIES_OPTIONS = [
-  "Massagem Relaxante", "Massagem Terapêutica", "Massagem Desportiva",
-  "Shiatsu", "Reflexologia", "Drenagem Linfática", "Massagem Tantrica",
-  "Thai Massage", "Hot Stones", "Aromaterapia", "Quiropraxia",
+  "Relaxation Massage", "Therapeutic Massage", "Sports Massage",
+  "Shiatsu", "Reflexology", "Lymphatic Drainage", "Tantric Massage",
+  "Thai Massage", "Hot Stones", "Aromatherapy", "Chiropractic",
 ];
 
-const LANGUAGES_OPTIONS = ["Português", "English", "Español", "Français", "Deutsch", "Italiano"];
+const LANGUAGES_OPTIONS = ["Portuguese", "English", "Spanish", "French", "German", "Italian"];
 
 export const StepProfile = ({ onComplete }: StepProfileProps) => {
   const { toast } = useToast();
@@ -70,10 +70,8 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
     for (let i = 0; i < photos.length; i++) {
       const photo = photos[i];
       try {
-        // Upload to storage-like path (using profile_photos table)
         const filePath = `${user!.id}/${Date.now()}_${photo.file.name}`;
         
-        // Insert photo record
         const { data: photoRecord, error: insertError } = await supabase
           .from('profile_photos')
           .insert({
@@ -87,10 +85,8 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
 
         if (insertError) throw insertError;
 
-        // Convert to base64 for moderation
         const base64 = await fileToBase64(photo.file);
 
-        // Call moderation edge function
         const { data: modResult, error: modError } = await supabase.functions.invoke('moderate-photo', {
           body: { photo_id: photoRecord.id, image_base64: base64 },
         });
@@ -102,7 +98,6 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
           results.push({ ...photo, status: modResult.approved ? 'approved' : 'rejected' });
         }
 
-        // Update local state
         setPhotos(prev => prev.map((p, idx) => 
           idx === i ? { ...p, status: modResult?.approved ? 'approved' : modResult ? 'rejected' : 'error' } : p
         ));
@@ -133,7 +128,6 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
     setIsLoading(true);
 
     try {
-      // Update profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .update({
@@ -149,6 +143,8 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
           outcall_price: profile.outcall_price ? parseFloat(profile.outcall_price) : null,
           presentation_video_url: profile.presentation_video_url || null,
           social_media: profile.social_media,
+          status: "pending_approval",
+          is_active: false,
         })
         .eq('user_id', user.id)
         .select()
@@ -156,14 +152,13 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
 
       if (profileError) throw profileError;
 
-      // Upload and moderate photos
       if (photos.length > 0 && profileData) {
         const results = await uploadAndModeratePhotos(profileData.id);
         const rejected = results.filter(r => r.status === 'rejected');
         if (rejected.length > 0) {
           toast({
-            title: `${rejected.length} foto(s) rejeitada(s)`,
-            description: "Algumas fotos não passaram na moderação de conteúdo.",
+            title: `${rejected.length} photo(s) rejected`,
+            description: "Some photos did not pass content moderation.",
             variant: "destructive",
           });
         }
@@ -171,7 +166,7 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
 
       onComplete();
     } catch (error: any) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -180,42 +175,42 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
   return (
     <div className="space-y-6">
       <div className="text-center mb-4">
-        <h3 className="text-xl font-bold mb-1">Complete seu Perfil</h3>
-        <p className="text-sm text-muted-foreground">Preencha suas informações e adicione fotos profissionais</p>
+        <h3 className="text-xl font-bold mb-1">Complete Your Profile</h3>
+        <p className="text-sm text-muted-foreground">Fill in your information and add professional photos</p>
       </div>
 
       {/* Basic Info */}
       <div className="space-y-4">
-        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Informações Básicas</h4>
+        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Basic Information</h4>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label>Nome de exibição</Label>
-            <Input value={profile.display_name} onChange={e => setProfile(p => ({ ...p, display_name: e.target.value }))} placeholder="Como deseja ser chamado" className="bg-white/5 border-white/10" />
+            <Label>Display Name</Label>
+            <Input value={profile.display_name} onChange={e => setProfile(p => ({ ...p, display_name: e.target.value }))} placeholder="How you want to be called" className="bg-white/5 border-white/10" />
           </div>
           <div>
-            <Label>Telefone</Label>
-            <Input value={profile.phone} onChange={e => setProfile(p => ({ ...p, phone: e.target.value }))} placeholder="+55 11 99999-9999" className="bg-white/5 border-white/10" />
+            <Label>Phone</Label>
+            <Input value={profile.phone} onChange={e => setProfile(p => ({ ...p, phone: e.target.value }))} placeholder="+1 555 123 4567" className="bg-white/5 border-white/10" />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label>Cidade</Label>
-            <Input value={profile.city} onChange={e => setProfile(p => ({ ...p, city: e.target.value }))} placeholder="São Paulo" className="bg-white/5 border-white/10" />
+            <Label>City</Label>
+            <Input value={profile.city} onChange={e => setProfile(p => ({ ...p, city: e.target.value }))} placeholder="New York" className="bg-white/5 border-white/10" />
           </div>
           <div>
-            <Label>Estado</Label>
-            <Input value={profile.state} onChange={e => setProfile(p => ({ ...p, state: e.target.value }))} placeholder="SP" className="bg-white/5 border-white/10" />
+            <Label>State</Label>
+            <Input value={profile.state} onChange={e => setProfile(p => ({ ...p, state: e.target.value }))} placeholder="NY" className="bg-white/5 border-white/10" />
           </div>
         </div>
         <div>
           <Label>Bio</Label>
-          <Textarea value={profile.bio} onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))} placeholder="Conte sobre você e sua experiência..." className="bg-white/5 border-white/10 min-h-[100px]" />
+          <Textarea value={profile.bio} onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))} placeholder="Tell us about yourself and your experience..." className="bg-white/5 border-white/10 min-h-[100px]" />
         </div>
       </div>
 
       {/* Specialties */}
       <div className="space-y-3">
-        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Especialidades</h4>
+        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Specialties</h4>
         <div className="flex flex-wrap gap-2">
           {SPECIALTIES_OPTIONS.map(spec => (
             <button
@@ -236,7 +231,7 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
 
       {/* Languages */}
       <div className="space-y-3">
-        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Idiomas</h4>
+        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Languages</h4>
         <div className="flex flex-wrap gap-2">
           {LANGUAGES_OPTIONS.map(lang => (
             <button
@@ -257,9 +252,9 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
 
       {/* Certifications */}
       <div className="space-y-3">
-        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Certificações</h4>
+        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Certifications</h4>
         <div className="flex gap-2">
-          <Input value={newCertification} onChange={e => setNewCertification(e.target.value)} placeholder="Adicionar certificação..." className="bg-white/5 border-white/10" />
+          <Input value={newCertification} onChange={e => setNewCertification(e.target.value)} placeholder="Add certification..." className="bg-white/5 border-white/10" />
           <Button type="button" variant="outline" size="sm" onClick={() => {
             if (newCertification.trim()) {
               setProfile(p => ({ ...p, certifications: [...p.certifications, newCertification.trim()] }));
@@ -283,14 +278,14 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
 
       {/* Pricing */}
       <div className="space-y-3">
-        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Preços</h4>
+        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Pricing</h4>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label>Incall (R$)</Label>
+            <Label>Incall ($)</Label>
             <Input type="number" value={profile.incall_price} onChange={e => setProfile(p => ({ ...p, incall_price: e.target.value }))} placeholder="150.00" className="bg-white/5 border-white/10" />
           </div>
           <div>
-            <Label>Outcall (R$)</Label>
+            <Label>Outcall ($)</Label>
             <Input type="number" value={profile.outcall_price} onChange={e => setProfile(p => ({ ...p, outcall_price: e.target.value }))} placeholder="200.00" className="bg-white/5 border-white/10" />
           </div>
         </div>
@@ -298,11 +293,11 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
 
       {/* Social Media */}
       <div className="space-y-3">
-        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Redes Sociais</h4>
+        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Social Media</h4>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label>Instagram</Label>
-            <Input value={profile.social_media.instagram} onChange={e => setProfile(p => ({ ...p, social_media: { ...p.social_media, instagram: e.target.value } }))} placeholder="@seuuser" className="bg-white/5 border-white/10" />
+            <Input value={profile.social_media.instagram} onChange={e => setProfile(p => ({ ...p, social_media: { ...p.social_media, instagram: e.target.value } }))} placeholder="@youruser" className="bg-white/5 border-white/10" />
           </div>
           <div>
             <Label>Website</Label>
@@ -313,17 +308,17 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
 
       {/* Video */}
       <div className="space-y-3">
-        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Vídeo de Apresentação</h4>
+        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Presentation Video</h4>
         <div>
-          <Label>URL do vídeo (YouTube ou Vimeo)</Label>
+          <Label>Video URL (YouTube or Vimeo)</Label>
           <Input value={profile.presentation_video_url} onChange={e => setProfile(p => ({ ...p, presentation_video_url: e.target.value }))} placeholder="https://youtube.com/..." className="bg-white/5 border-white/10" />
         </div>
       </div>
 
       {/* Photos */}
       <div className="space-y-3">
-        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Fotos Profissionais</h4>
-        <p className="text-xs text-muted-foreground">Adicione até 10 fotos profissionais. Todas passam por moderação automática.</p>
+        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Professional Photos</h4>
+        <p className="text-xs text-muted-foreground">Add up to 10 professional photos. All go through automatic moderation.</p>
         
         <div className="grid grid-cols-3 gap-3">
           {photos.map((photo, idx) => (
@@ -345,7 +340,7 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
               >
                 <Trash2 className="w-3 h-3 text-white" />
               </button>
-              {idx === 0 && <span className="absolute bottom-1 left-1 text-[10px] bg-primary px-1.5 py-0.5 rounded text-primary-foreground font-medium">Principal</span>}
+              {idx === 0 && <span className="absolute bottom-1 left-1 text-[10px] bg-primary px-1.5 py-0.5 rounded text-primary-foreground font-medium">Primary</span>}
             </div>
           ))}
           
@@ -356,7 +351,7 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
               className="aspect-square rounded-lg border-2 border-dashed border-white/20 flex flex-col items-center justify-center gap-2 hover:border-white/40 transition-colors"
             >
               <Upload className="w-6 h-6 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Adicionar</span>
+              <span className="text-xs text-muted-foreground">Add</span>
             </button>
           )}
         </div>
@@ -370,9 +365,9 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
         disabled={isLoading || uploadingPhotos}
       >
         {isLoading || uploadingPhotos ? (
-          <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Salvando perfil...</>
+          <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving profile...</>
         ) : (
-          "Salvar Perfil e Enviar para Análise"
+          "Save Profile & Submit for Review"
         )}
       </Button>
     </div>

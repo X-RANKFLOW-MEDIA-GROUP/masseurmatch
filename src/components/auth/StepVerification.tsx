@@ -20,19 +20,18 @@ export const StepVerification = ({ onComplete }: StepVerificationProps) => {
       
       if (data?.url) {
         setStatus('redirecting');
-        // Open Stripe Identity in new tab
         window.open(data.url, '_blank');
         setStatus('polling');
         toast({
-          title: "Verificação iniciada",
-          description: "Complete a verificação na aba que abriu. Após concluir, clique em 'Verificação concluída'.",
+          title: "Verification started",
+          description: "Complete the verification in the tab that opened. Once done, click 'Verification Complete'.",
         });
       } else {
         throw new Error('No verification URL returned');
       }
     } catch (error: any) {
       console.error('Verification error:', error);
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
+      toast({ title: "Error", description: error.message, variant: "destructive" });
       setStatus('idle');
     }
   };
@@ -50,24 +49,24 @@ export const StepVerification = ({ onComplete }: StepVerificationProps) => {
         .single();
 
       if (profile?.is_verified_identity) {
-        toast({ title: "Identidade verificada!", description: "Sua identidade foi confirmada com sucesso." });
+        toast({ title: "Identity verified!", description: "Your identity has been confirmed successfully." });
         onComplete();
       } else {
         toast({ 
-          title: "Ainda em processamento", 
-          description: "A verificação ainda está sendo processada. Tente novamente em alguns minutos.",
+          title: "Still processing", 
+          description: "Verification is still being processed. Try again in a few minutes.",
           variant: "destructive" 
         });
         setStatus('polling');
       }
     } catch (error: any) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
+      toast({ title: "Error", description: error.message, variant: "destructive" });
       setStatus('polling');
     }
   };
 
   const skipForNow = () => {
-    toast({ title: "Verificação pendente", description: "Você pode completar a verificação depois no Dashboard." });
+    toast({ title: "Verification pending", description: "You can complete verification later from your Dashboard." });
     onComplete();
   };
 
@@ -78,10 +77,10 @@ export const StepVerification = ({ onComplete }: StepVerificationProps) => {
       </div>
       
       <div>
-        <h3 className="text-xl font-bold mb-2">Verificação de Identidade</h3>
+        <h3 className="text-xl font-bold mb-2">Identity Verification</h3>
         <p className="text-muted-foreground text-sm">
-          Para garantir a segurança da plataforma, precisamos verificar sua identidade 
-          com um documento oficial (RG, CNH ou Passaporte).
+          To ensure platform safety, we need to verify your identity 
+          with an official document (ID card, driver's license, or passport).
         </p>
       </div>
 
@@ -89,22 +88,22 @@ export const StepVerification = ({ onComplete }: StepVerificationProps) => {
         <div className="flex items-start gap-3">
           <CheckCircle className="w-5 h-5 text-primary mt-0.5 shrink-0" />
           <div>
-            <p className="text-sm font-medium">Documento com foto</p>
-            <p className="text-xs text-muted-foreground">RG, CNH ou Passaporte válido</p>
+            <p className="text-sm font-medium">Photo ID</p>
+            <p className="text-xs text-muted-foreground">Valid ID card, driver's license, or passport</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
           <CheckCircle className="w-5 h-5 text-primary mt-0.5 shrink-0" />
           <div>
-            <p className="text-sm font-medium">Selfie de verificação</p>
-            <p className="text-xs text-muted-foreground">Para confirmar que o documento é seu</p>
+            <p className="text-sm font-medium">Verification selfie</p>
+            <p className="text-xs text-muted-foreground">To confirm the document belongs to you</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-muted-foreground mt-0.5 shrink-0" />
           <div>
-            <p className="text-sm font-medium text-muted-foreground">Processamento seguro</p>
-            <p className="text-xs text-muted-foreground">Dados processados via Stripe, não armazenamos seus documentos</p>
+            <p className="text-sm font-medium text-muted-foreground">Secure processing</p>
+            <p className="text-xs text-muted-foreground">Data processed via Stripe — we don't store your documents</p>
           </div>
         </div>
       </div>
@@ -112,14 +111,14 @@ export const StepVerification = ({ onComplete }: StepVerificationProps) => {
       {status === 'idle' && (
         <Button variant="hero" className="w-full" onClick={startVerification}>
           <Shield className="w-4 h-4 mr-2" />
-          Iniciar Verificação
+          Start Verification
         </Button>
       )}
 
       {status === 'loading' && (
         <Button variant="hero" className="w-full" disabled>
           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          Processando...
+          Processing...
         </Button>
       )}
 
@@ -127,17 +126,17 @@ export const StepVerification = ({ onComplete }: StepVerificationProps) => {
         <div className="space-y-3">
           <Button variant="hero" className="w-full" onClick={checkVerification}>
             <CheckCircle className="w-4 h-4 mr-2" />
-            Verificação concluída
+            Verification Complete
           </Button>
           <Button variant="outline" className="w-full" onClick={startVerification}>
             <ExternalLink className="w-4 h-4 mr-2" />
-            Abrir verificação novamente
+            Open verification again
           </Button>
         </div>
       )}
 
       <Button variant="ghost" className="w-full text-muted-foreground" onClick={skipForNow}>
-        Pular por enquanto
+        Skip for now
       </Button>
     </div>
   );
