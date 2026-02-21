@@ -230,6 +230,7 @@ export type Database = {
           state: string | null
           status: string
           stripe_verification_session_id: string | null
+          terms_accepted_at: string | null
           updated_at: string
           user_id: string
         }
@@ -261,6 +262,7 @@ export type Database = {
           state?: string | null
           status?: string
           stripe_verification_session_id?: string | null
+          terms_accepted_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -292,6 +294,7 @@ export type Database = {
           state?: string | null
           status?: string
           stripe_verification_session_id?: string | null
+          terms_accepted_at?: string | null
           updated_at?: string
           user_id?: string
         }

@@ -152,6 +152,7 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
           social_media: profile.social_media,
           status: "pending_approval",
           is_active: false,
+          terms_accepted_at: new Date().toISOString(),
         })
         .eq('user_id', user.id)
         .select()
