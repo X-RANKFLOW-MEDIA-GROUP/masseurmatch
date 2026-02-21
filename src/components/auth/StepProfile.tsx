@@ -2,11 +2,13 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Camera, Upload, X, Loader2, Plus, Trash2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { Link } from "react-router-dom";
 
 interface StepProfileProps {
   onComplete: () => void;
@@ -44,6 +46,11 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
   });
 
   const [newCertification, setNewCertification] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [photoTermsAccepted, setPhotoTermsAccepted] = useState(false);
+  const [adTermsAccepted, setAdTermsAccepted] = useState(false);
+
+  const allTermsAccepted = termsAccepted && photoTermsAccepted && adTermsAccepted;
 
   const toggleArrayItem = (arr: string[], item: string) => {
     return arr.includes(item) ? arr.filter(i => i !== item) : [...arr, item];
@@ -358,11 +365,39 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
         <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handlePhotoSelect} className="hidden" />
       </div>
 
+      {/* Terms & Policy Acceptance */}
+      <div className="space-y-4 rounded-lg border border-border bg-secondary/30 p-4">
+        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Terms & Policy Acceptance</h4>
+
+        <div className="flex items-start gap-3">
+          <Checkbox id="terms" checked={termsAccepted} onCheckedChange={(v) => setTermsAccepted(v === true)} className="mt-0.5" />
+          <Label htmlFor="terms" className="text-sm leading-relaxed font-normal cursor-pointer">
+            I have read and agree to the{" "}
+            <Link to="/terms" target="_blank" className="text-primary underline underline-offset-2 hover:text-primary/80">Terms of Service</Link>{" "}and{" "}
+            <Link to="/privacy" target="_blank" className="text-primary underline underline-offset-2 hover:text-primary/80">Privacy Policy</Link>.
+          </Label>
+        </div>
+
+        <div className="flex items-start gap-3">
+          <Checkbox id="photo-terms" checked={photoTermsAccepted} onCheckedChange={(v) => setPhotoTermsAccepted(v === true)} className="mt-0.5" />
+          <Label htmlFor="photo-terms" className="text-sm leading-relaxed font-normal cursor-pointer">
+            I confirm my photos are recent (within 12 months), fully clothed, and comply with the Photo Guidelines. No nudity, sexual poses, or stock photos.
+          </Label>
+        </div>
+
+        <div className="flex items-start gap-3">
+          <Checkbox id="ad-terms" checked={adTermsAccepted} onCheckedChange={(v) => setAdTermsAccepted(v === true)} className="mt-0.5" />
+          <Label htmlFor="ad-terms" className="text-sm leading-relaxed font-normal cursor-pointer">
+            I confirm my profile description is accurate, professional, and does not contain sexual content, coded language, misleading claims, or deceptive pricing.
+          </Label>
+        </div>
+      </div>
+
       <Button
         variant="hero"
         className="w-full"
         onClick={handleSubmit}
-        disabled={isLoading || uploadingPhotos}
+        disabled={isLoading || uploadingPhotos || !allTermsAccepted}
       >
         {isLoading || uploadingPhotos ? (
           <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving profile...</>
