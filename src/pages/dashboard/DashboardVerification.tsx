@@ -15,7 +15,7 @@ const DashboardVerification = () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        toast.error("Você precisa estar logado para iniciar a verificação.");
+        toast.error("You must be logged in to start verification.");
         return;
       }
 
@@ -27,14 +27,14 @@ const DashboardVerification = () => {
 
       if (data?.url) {
         window.open(data.url, "_blank");
-        toast.success("Sessão de verificação criada! Complete no Stripe.");
+        toast.success("Verification session created! Complete it in the new tab.");
         await refetch();
       } else {
-        throw new Error("URL de verificação não recebida.");
+        throw new Error("Verification URL not received.");
       }
     } catch (err: any) {
       console.error("Verification error:", err);
-      toast.error(err.message || "Erro ao iniciar verificação.");
+      toast.error(err.message || "Error starting verification.");
     } finally {
       setStartingVerification(false);
     }
@@ -44,20 +44,32 @@ const DashboardVerification = () => {
 
   const checks = [
     {
-      label: "Verificação de Identidade",
-      desc: "Confirmação via documento oficial e selfie",
+      label: "Identity Verification",
+      desc: "Confirmed via official ID document and selfie",
       done: !!profile?.is_verified_identity,
       icon: ShieldCheck,
     },
     {
-      label: "Fotos Moderadas",
-      desc: "Pelo menos uma foto aprovada pela moderação automática",
+      label: "Phone Verified",
+      desc: "Phone number confirmed",
+      done: !!profile?.is_verified_phone,
+      icon: CheckCircle2,
+    },
+    {
+      label: "Photos Approved",
+      desc: "At least one photo approved by moderation",
       done: !!profile?.is_verified_photos,
       icon: CheckCircle2,
     },
     {
-      label: "Perfil Completo",
-      desc: "Bio, especialidades, localização e preço preenchidos",
+      label: "Profile Text Approved",
+      desc: "Bio, specialties, and details reviewed by admin",
+      done: !!profile?.is_verified_profile,
+      icon: CheckCircle2,
+    },
+    {
+      label: "Profile Complete",
+      desc: "Bio, specialties, location, and pricing filled in",
       done: !!profile?.bio && !!profile?.city && (!!profile?.incall_price || !!profile?.outcall_price),
       icon: CheckCircle2,
     },
@@ -68,8 +80,8 @@ const DashboardVerification = () => {
   return (
     <div className="max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Verificação</h1>
-        <p className="text-sm text-muted-foreground">Status da sua verificação e checklist de confiança</p>
+        <h1 className="text-2xl font-bold">Verification</h1>
+        <p className="text-sm text-muted-foreground">Your verification status and trust checklist</p>
       </div>
 
       {/* Overall Status */}
@@ -81,15 +93,26 @@ const DashboardVerification = () => {
             <AlertTriangle className="w-6 h-6 text-warning" />
           )}
           <div>
-            <h2 className="font-semibold">{allDone ? "Perfil Verificado" : "Verificação Incompleta"}</h2>
+            <h2 className="font-semibold">{allDone ? "Profile Verified" : "Verification Incomplete"}</h2>
             <p className="text-xs text-muted-foreground">
               {allDone
-                ? "Seu perfil está totalmente verificado e visível no diretório."
-                : "Complete todos os itens abaixo para ativar seu perfil no diretório."}
+                ? "Your profile is fully verified and visible in the directory."
+                : "Complete all items below to activate your profile in the directory."}
             </p>
           </div>
         </div>
       </div>
+
+      {/* Under review banner */}
+      {profile?.status === "pending_approval" && (
+        <div className="flex items-start gap-3 rounded-lg border border-primary/40 bg-primary/5 p-4">
+          <Loader2 className="w-5 h-5 text-primary shrink-0 mt-0.5 animate-spin" />
+          <div>
+            <p className="text-sm font-medium">Profile Under Review</p>
+            <p className="text-xs text-muted-foreground">Your profile is currently being reviewed by our team. It will go live once all checks pass.</p>
+          </div>
+        </div>
+      )}
 
       {/* Checklist */}
       <div className="space-y-3">
@@ -107,21 +130,21 @@ const DashboardVerification = () => {
               <p className="text-xs text-muted-foreground">{check.desc}</p>
             </div>
             <div className="flex items-center gap-2">
-              {check.label === "Verificação de Identidade" && !check.done && (
+              {check.label === "Identity Verification" && !check.done && (
                 <Button
                   size="sm"
                   onClick={handleStartVerification}
                   disabled={startingVerification}
                 >
                   {startingVerification ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Iniciando…</>
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Starting…</>
                   ) : (
-                    <><ExternalLink className="w-4 h-4" /> Verificar Agora</>
+                    <><ExternalLink className="w-4 h-4" /> Verify Now</>
                   )}
                 </Button>
               )}
               <Badge variant="outline" className={`text-[10px] ${check.done ? "border-success/40 text-success" : "border-warning/40 text-warning"}`}>
-                {check.done ? "Completo" : "Pendente"}
+                {check.done ? "Complete" : "Pending"}
               </Badge>
             </div>
           </div>
@@ -130,11 +153,11 @@ const DashboardVerification = () => {
 
       {/* Compliance */}
       <div className="glass-card p-4">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Avisos de Compliance</h3>
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Compliance Notices</h3>
         <ul className="text-xs text-muted-foreground space-y-1">
-          <li>• Perfis só ficam públicos após verificação de identidade e aprovação de fotos</li>
-          <li>• Violações das políticas de conteúdo resultam em desativação imediata</li>
-          <li>• Mantenha suas informações atualizadas para evitar suspensão</li>
+          <li>• Profiles only go public after identity verification, photo approval, and profile text review</li>
+          <li>• Content policy violations result in immediate deactivation</li>
+          <li>• Keep your information up to date to avoid suspension</li>
         </ul>
       </div>
     </div>

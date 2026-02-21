@@ -217,7 +217,9 @@ export type Database = {
           incall_price: number | null
           is_active: boolean
           is_verified_identity: boolean
+          is_verified_phone: boolean
           is_verified_photos: boolean
+          is_verified_profile: boolean
           languages: string[] | null
           outcall_price: number | null
           phone: string | null
@@ -246,7 +248,9 @@ export type Database = {
           incall_price?: number | null
           is_active?: boolean
           is_verified_identity?: boolean
+          is_verified_phone?: boolean
           is_verified_photos?: boolean
+          is_verified_profile?: boolean
           languages?: string[] | null
           outcall_price?: number | null
           phone?: string | null
@@ -275,7 +279,9 @@ export type Database = {
           incall_price?: number | null
           is_active?: boolean
           is_verified_identity?: boolean
+          is_verified_phone?: boolean
           is_verified_photos?: boolean
+          is_verified_profile?: boolean
           languages?: string[] | null
           outcall_price?: number | null
           phone?: string | null
