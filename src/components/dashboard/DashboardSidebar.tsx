@@ -25,6 +25,7 @@ import {
   Search,
   Megaphone,
   MessageCircleQuestion,
+  Plane,
   LogOut,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -41,6 +42,7 @@ const menuItems = [
   { title: "SEO", url: "/dashboard/seo", icon: Search },
   { title: "Promoção", url: "/dashboard/promotion", icon: Megaphone },
   { title: "Q&A", url: "/dashboard/faq", icon: MessageCircleQuestion },
+  { title: "Travel", url: "/dashboard/travel", icon: Plane },
 ];
 
 const accountItems = [
