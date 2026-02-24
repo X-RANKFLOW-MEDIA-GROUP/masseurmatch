@@ -16,54 +16,40 @@ import { Marquee } from "@/components/animations/Marquee";
 import { ParallaxSection } from "@/components/animations/ParallaxSection";
 import { GradientMesh } from "@/components/animations/GradientMesh";
 import { fadeUp } from "@/components/animations/variants";
+import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const scrollRef = useScrollReveal();
+  const { t } = useTranslation();
 
-  const featuredTherapists = [
-    {
-      id: 1, name: "Marcus Rivera", city: "Los Angeles",
-      specialty: "Deep Tissue & Sports Massage",
-      rating: 4.9, reviews: 127,
-      image: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=800&h=800&fit=crop",
-      verified: true, plan: "Platinum"
-    },
-    {
-      id: 2, name: "James Chen", city: "San Francisco",
-      specialty: "Swedish & Relaxation Massage",
-      rating: 4.8, reviews: 94,
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop",
-      verified: true, plan: "Gold"
-    },
-    {
-      id: 3, name: "David Anderson", city: "New York",
-      specialty: "Therapeutic Wellness Bodywork",
-      rating: 5.0, reviews: 156,
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&h=800&fit=crop",
-      verified: true, plan: "Premium"
-    },
-    {
-      id: 4, name: "Alex Thompson", city: "Miami",
-      specialty: "Hot Stone & Aromatherapy",
-      rating: 4.9, reviews: 112,
-      image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&h=800&fit=crop",
-      verified: true, plan: "Premium"
-    },
-    {
-      id: 5, name: "Ryan Martinez", city: "Chicago",
-      specialty: "Sports Recovery Massage",
-      rating: 4.7, reviews: 89,
-      image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&h=800&fit=crop",
-      verified: true, plan: "Standard"
-    },
-    {
-      id: 6, name: "Kyle Johnson", city: "Seattle",
-      specialty: "Men's Wellness & Bodywork",
-      rating: 4.8, reviews: 103,
-      image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=800&h=800&fit=crop",
-      verified: false, plan: "Standard"
-    }
-  ];
+  // Fetch featured therapists from database
+  const [featuredTherapists, setFeaturedTherapists] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      const { data } = await supabase
+        .from("featured_masters")
+        .select("*, profiles(id, display_name, full_name, city, specialties, avatar_url, is_verified_identity)")
+        .eq("is_active", true)
+        .order("display_order");
+
+      if (data && data.length > 0) {
+        setFeaturedTherapists(
+          data.map((f) => ({
+            id: f.profiles?.id,
+            name: f.profiles?.display_name || f.profiles?.full_name || "Therapist",
+            city: f.city || f.profiles?.city || "",
+            specialty: f.profiles?.specialties?.join(", ") || "Male Massage",
+            image: f.profiles?.avatar_url || "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=800&h=800&fit=crop",
+            verified: f.profiles?.is_verified_identity || false,
+          }))
+        );
+      }
+    };
+    fetchFeatured();
+  }, []);
 
   const marqueeWords = [
     "Deep Tissue", "Swedish", "Sports Recovery", "Hot Stone", "Aromatherapy",
@@ -89,15 +75,15 @@ const Index = () => {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-xs uppercase tracking-[0.4em] text-muted-foreground mb-8"
             >
-              The #1 Gay Massage Directory
+              {t("home.heroTag")}
             </motion.p>
 
             <h1 className="text-5xl md:text-7xl lg:text-[6rem] font-bold text-foreground leading-[0.9] tracking-tight mb-8">
-              <TextReveal text="Find Verified" delay={0.3} />
+              <TextReveal text={t("home.heroTitle1")} delay={0.3} />
               <br />
-              <TextReveal text="Male Massage" delay={0.5} />
+              <TextReveal text={t("home.heroTitle2")} delay={0.5} />
               <br />
-              <TextReveal text="Therapists" delay={0.7} />
+              <TextReveal text={t("home.heroTitle3")} delay={0.7} />
             </h1>
 
             <motion.p
@@ -106,8 +92,7 @@ const Index = () => {
               transition={{ duration: 1, delay: 1.2 }}
               className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed"
             >
-              Browse trusted, gay-friendly massage professionals near you. 
-              Read reviews, compare services, and find your next therapist with confidence.
+              {t("home.heroDesc")}
             </motion.p>
 
             <motion.div
@@ -119,7 +104,7 @@ const Index = () => {
               <MagneticButton>
                 <Link to="/explore">
                   <Button size="lg" className="w-full sm:w-auto group text-base px-8">
-                    Explore Therapists
+                    {t("home.exploreBtn")}
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-300" />
                   </Button>
                 </Link>
@@ -127,7 +112,7 @@ const Index = () => {
               <MagneticButton>
                 <Link to="/pricing">
                   <Button variant="outline" size="lg" className="w-full sm:w-auto text-base px-8">
-                    View Plans
+                    {t("home.viewPlans")}
                   </Button>
                 </Link>
               </MagneticButton>
@@ -148,10 +133,10 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
             {[
-              { label: "Male Therapists", end: 10000, suffix: "+" },
-              { label: "Cities Covered", end: 500, suffix: "+" },
-              { label: "Verified Profiles", end: 8500, suffix: "+" },
-              { label: "5-Star Reviews", end: 98, suffix: "%" },
+              { label: t("home.statTherapists"), end: 10000, suffix: "+" },
+              { label: t("home.statCities"), end: 500, suffix: "+" },
+              { label: t("home.statVerified"), end: 8500, suffix: "+" },
+              { label: t("home.statReviews"), end: 98, suffix: "%" },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -173,115 +158,104 @@ const Index = () => {
       </section>
 
       {/* ─── FEATURED THERAPISTS ─── */}
-      <section className="py-28 md:py-36">
-        <div className="container mx-auto px-4">
-          <div className="reveal mb-16">
-            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">Featured Male Massage Professionals</p>
-            <h2 className="text-4xl md:text-6xl font-bold text-foreground tracking-tight">
-              <TextReveal text="Top Verified Therapists" />
-            </h2>
-            <p className="text-muted-foreground mt-4 max-w-xl">
-              Discover gay-friendly male massage therapists verified for trust, professionalism, and excellence in men's bodywork.
-            </p>
-          </div>
+      {featuredTherapists.length > 0 && (
+        <section className="py-28 md:py-36">
+          <div className="container mx-auto px-4">
+            <div className="reveal mb-16">
+              <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">{t("home.featuredTag")}</p>
+              <h2 className="text-4xl md:text-6xl font-bold text-foreground tracking-tight">
+                <TextReveal text={t("home.featuredTitle")} />
+              </h2>
+              <p className="text-muted-foreground mt-4 max-w-xl">
+                {t("home.featuredDesc")}
+              </p>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border">
-            {featuredTherapists.map((therapist, i) => (
-              <motion.div
-                key={therapist.id}
-                custom={i}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-80px" }}
-                variants={fadeUp}
-              >
-                <Link
-                  to={`/therapist/${therapist.id}`}
-                  className="bg-background p-8 group transition-all duration-700 hover:bg-card block glow-hover relative"
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border">
+              {featuredTherapists.map((therapist, i) => (
+                <motion.div
+                  key={therapist.id}
+                  custom={i}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-80px" }}
+                  variants={fadeUp}
                 >
-                  <div className="relative mb-6 overflow-hidden">
-                    <img
-                      src={therapist.image}
-                      alt={`${therapist.name} — gay-friendly male massage therapist in ${therapist.city}`}
-                      loading="lazy"
-                      className="w-full h-72 object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
-                    />
-                    {therapist.verified && (
-                      <div className="absolute top-4 right-4 flex items-center gap-1 bg-background/90 backdrop-blur-sm px-2 py-1 text-xs text-foreground">
-                        <CheckCircle2 className="w-3 h-3" />
-                        Verified
+                  <Link
+                    to={`/therapist/${therapist.id}`}
+                    className="bg-background p-8 group transition-all duration-700 hover:bg-card block glow-hover relative"
+                  >
+                    <div className="relative mb-6 overflow-hidden">
+                      <img
+                        src={therapist.image}
+                        alt={`${therapist.name} — gay-friendly male massage therapist in ${therapist.city}`}
+                        loading="lazy"
+                        className="w-full h-72 object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
+                      />
+                      {therapist.verified && (
+                        <div className="absolute top-4 right-4 flex items-center gap-1 bg-background/90 backdrop-blur-sm px-2 py-1 text-xs text-foreground">
+                          <CheckCircle2 className="w-3 h-3" />
+                          {t("home.verified")}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-foreground mb-1">{therapist.name}</h3>
+                        <p className="text-sm text-muted-foreground mb-1">{therapist.city}</p>
+                        <p className="text-sm text-muted-foreground">{therapist.specialty}</p>
                       </div>
-                    )}
-                  </div>
-
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold text-foreground mb-1">{therapist.name}</h3>
-                      <p className="text-sm text-muted-foreground mb-1">{therapist.city}</p>
-                      <p className="text-sm text-muted-foreground">{therapist.specialty}</p>
                     </div>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Star className="w-3 h-3 fill-foreground text-foreground" />
-                      <span>{therapist.rating}</span>
-                    </div>
-                  </div>
 
-                  <div className="mt-6 flex items-center text-sm text-muted-foreground group-hover:text-foreground transition-colors duration-500">
-                    View Profile
-                    <ArrowRight className="w-3 h-3 ml-2 group-hover:translate-x-2 transition-transform duration-500" />
-                  </div>
+                    <div className="mt-6 flex items-center text-sm text-muted-foreground group-hover:text-foreground transition-colors duration-500">
+                      {t("home.viewProfile")}
+                      <ArrowRight className="w-3 h-3 ml-2 group-hover:translate-x-2 transition-transform duration-500" />
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="text-center mt-16"
+            >
+              <MagneticButton>
+                <Link to="/explore">
+                  <Button variant="outline" size="lg" className="group">
+                    {t("home.browseAll")}
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-300" />
+                  </Button>
                 </Link>
-              </motion.div>
-            ))}
+              </MagneticButton>
+            </motion.div>
           </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-center mt-16"
-          >
-            <MagneticButton>
-              <Link to="/explore">
-                <Button variant="outline" size="lg" className="group">
-                  Browse All Male Massage Therapists
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-300" />
-                </Button>
-              </Link>
-            </MagneticButton>
-          </motion.div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ─── WHY CHOOSE US ─── */}
       <ParallaxSection speed={0.15}>
         <section className="py-28 md:py-36 border-t border-border">
           <div className="container mx-auto px-4">
             <div className="reveal mb-16 max-w-2xl">
-              <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">Why Choose MasseurMatch</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">{t("home.whyTag")}</p>
               <h2 className="text-4xl md:text-6xl font-bold text-foreground tracking-tight">
-                <TextReveal text="Built for Trust & Safety" />
+                <TextReveal text={t("home.whyTitle")} />
               </h2>
               <p className="text-muted-foreground mt-4">
-                The most trusted gay massage directory — every male therapist is professionally verified for your peace of mind.
+                {t("home.whyDesc")}
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border">
               {[
-                {
-                  Icon: ShieldIllustration, num: "01", title: "Professional Directory",
-                  desc: "A curated advertising directory of male massage therapists. Browse listings, read reviews, and contact providers directly. Note: we do not verify licenses or credentials."
-                },
-                {
-                  Icon: CommunityIllustration, num: "02", title: "Gay-Friendly Community",
-                  desc: "A trusted directory built specifically for men seeking professional male massage services. Read authentic reviews from clients in a safe, inclusive space."
-                },
-                {
-                  Icon: GrowthIllustration, num: "03", title: "Grow Your Practice",
-                  desc: "Flexible advertising plans designed to help male massage therapists reach more clients seeking men's bodywork services."
-                },
+                { Icon: ShieldIllustration, num: "01", title: t("home.feature01Title"), desc: t("home.feature01Desc") },
+                { Icon: CommunityIllustration, num: "02", title: t("home.feature02Title"), desc: t("home.feature02Desc") },
+                { Icon: GrowthIllustration, num: "03", title: t("home.feature03Title"), desc: t("home.feature03Desc") },
               ].map((feature, i) => (
                 <motion.div
                   key={feature.num}
@@ -314,7 +288,7 @@ const Index = () => {
               transition={{ duration: 1 }}
               className="text-2xl md:text-4xl font-heading font-bold text-foreground leading-snug mb-8"
             >
-              "Finally, a directory I can trust. Found an incredible male massage therapist in minutes."
+              {t("home.testimonial")}
             </motion.blockquote>
             <motion.p
               initial={{ opacity: 0 }}
@@ -323,7 +297,7 @@ const Index = () => {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="text-sm text-muted-foreground uppercase tracking-widest"
             >
-              — Verified Client, New York
+              {t("home.testimonialAuthor")}
             </motion.p>
           </div>
         </div>
@@ -334,7 +308,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-4xl md:text-7xl font-bold text-foreground tracking-tight mb-8">
-              <TextReveal text="Ready to get started?" />
+              <TextReveal text={t("home.ctaTitle")} />
             </h2>
             <motion.p
               initial={{ opacity: 0 }}
@@ -343,8 +317,7 @@ const Index = () => {
               transition={{ duration: 1, delay: 0.3 }}
               className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto"
             >
-              List your male massage services today and connect with thousands of clients 
-              seeking gay-friendly, professional bodywork in their area.
+              {t("home.ctaDesc")}
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -356,7 +329,7 @@ const Index = () => {
               <MagneticButton>
                 <Link to="/register">
                   <Button size="lg" className="w-full sm:w-auto group text-base px-8">
-                    Create Free Profile
+                    {t("home.ctaBtn")}
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-300" />
                   </Button>
                 </Link>
@@ -364,7 +337,7 @@ const Index = () => {
               <MagneticButton>
                 <Link to="/pricing">
                   <Button variant="outline" size="lg" className="w-full sm:w-auto text-base px-8">
-                    View Plans
+                    {t("home.viewPlans")}
                   </Button>
                 </Link>
               </MagneticButton>
@@ -377,9 +350,9 @@ const Index = () => {
       <section className="py-28 border-t border-border">
         <div className="container mx-auto px-4">
           <div className="reveal mb-16 text-center">
-            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">Browse by City</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">{t("home.citiesTag")}</p>
             <h2 className="text-4xl md:text-6xl font-bold text-foreground tracking-tight">
-              <TextReveal text="Featured Cities" />
+              <TextReveal text={t("home.citiesTitle")} />
             </h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-px bg-border max-w-5xl mx-auto">
