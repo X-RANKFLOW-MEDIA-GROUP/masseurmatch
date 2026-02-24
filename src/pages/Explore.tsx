@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LocationPicker } from "@/components/explore/LocationPicker";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -412,19 +413,11 @@ const Explore = () => {
                     className="pl-10 bg-secondary border-border"
                   />
                 </div>
-                <Select value={selectedCity} onValueChange={setSelectedCity}>
-                  <SelectTrigger className="bg-secondary border-border">
-                    <SelectValue placeholder="Select city" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Cities</SelectItem>
-                    {cities.map((city) => (
-                      <SelectItem key={city} value={city.toLowerCase().replace(/\s/g, "-")}>
-                        {city}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <LocationPicker
+                  availableCities={cities}
+                  selectedCity={selectedCity}
+                  onCityChange={setSelectedCity}
+                />
                 <Select value={selectedType} onValueChange={setSelectedType}>
                   <SelectTrigger className="bg-secondary border-border">
                     <SelectValue placeholder="Massage type" />
