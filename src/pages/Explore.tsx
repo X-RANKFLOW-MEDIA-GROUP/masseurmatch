@@ -11,7 +11,8 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import {
   Search, MapPin, CheckCircle2, Star, ArrowRight, Heart, X,
-  LayoutGrid, List, Map as MapIcon, SlidersHorizontal, ChevronDown, Loader2
+  LayoutGrid, List, Map as MapIcon, SlidersHorizontal, ChevronDown, Loader2,
+  Sparkles, Plane
 } from "lucide-react";
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -22,6 +23,7 @@ import { fadeUp } from "@/components/animations/variants";
 import { useTranslation } from "react-i18next";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
+import { IntentMatchWizard } from "@/components/explore/IntentMatchWizard";
 
 type ViewMode = "cards" | "list" | "map";
 
@@ -40,6 +42,10 @@ interface TherapistItem {
   priceNum: number;
   available: boolean;
   bio: string;
+  isTraveling?: boolean;
+  incallPrice?: number;
+  outcallPrice?: number;
+  specialties?: string[];
 }
 
 // Simple city → lat/lng fallback for map view
@@ -71,7 +77,7 @@ function mapProfileToTherapist(p: any): TherapistItem {
     lat: coords.lat,
     lng: coords.lng,
     specialty: (p.specialties || []).slice(0, 2).join(" & ") || "Massage Therapy",
-    rating: 5.0, // Ratings not yet implemented
+    rating: 5.0,
     reviews: 0,
     image: avatarUrl,
     verified: p.is_verified_profile || false,
@@ -79,6 +85,10 @@ function mapProfileToTherapist(p: any): TherapistItem {
     priceNum: displayPrice,
     available: p.is_active || false,
     bio: p.bio?.slice(0, 120) || "",
+    isTraveling: false,
+    incallPrice: p.incall_price ?? 0,
+    outcallPrice: p.outcall_price ?? 0,
+    specialties: p.specialties || [],
   };
 }
 
@@ -152,12 +162,20 @@ const SwipeCard = ({
           Nope
         </motion.div>
 
-        {therapist.verified && (
-          <Badge className="absolute top-4 left-4 bg-background/80 backdrop-blur-sm text-foreground border-border text-xs">
-            <CheckCircle2 className="w-3 h-3 mr-1" />
-            Verified
-          </Badge>
-        )}
+        <div className="absolute top-4 left-4 flex gap-1.5">
+          {therapist.verified && (
+            <Badge className="bg-background/80 backdrop-blur-sm text-foreground border-border text-xs">
+              <CheckCircle2 className="w-3 h-3 mr-1" />
+              Verified
+            </Badge>
+          )}
+          {therapist.isTraveling && (
+            <Badge className="bg-background/80 backdrop-blur-sm text-primary border-primary/30 text-xs">
+              <Plane className="w-3 h-3 mr-1" />
+              Visiting
+            </Badge>
+          )}
+        </div>
 
         {therapist.available && (
           <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-background/80 backdrop-blur-sm rounded-full px-2.5 py-1">
@@ -217,28 +235,58 @@ const Explore = () => {
   const [availableOnly, setAvailableOnly] = useState(false);
   const [sortBy, setSortBy] = useState("default");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showSmartMatch, setShowSmartMatch] = useState(false);
 
   useEffect(() => {
     const fetchProfiles = async () => {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, display_name, full_name, bio, city, state, country, specialties, incall_price, outcall_price, avatar_url, is_active, is_verified_profile, is_verified_identity, is_verified_photos, profile_photos(storage_path, is_primary, moderation_status)")
-        .eq("status", "active")
-        .eq("is_active", true)
-        .not("city", "is", null)
-        .order("created_at", { ascending: false });
 
-      if (error) {
-        console.error("Failed to fetch profiles:", error);
+      // Fetch profiles and active travel in parallel
+      const today = new Date().toISOString().split("T")[0];
+
+      const [profilesRes, travelRes] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, display_name, full_name, bio, city, state, country, specialties, incall_price, outcall_price, avatar_url, is_active, is_verified_profile, is_verified_identity, is_verified_photos, profile_photos(storage_path, is_primary, moderation_status)")
+          .eq("status", "active")
+          .eq("is_active", true)
+          .not("city", "is", null)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("provider_travel")
+          .select("profile_id, destination_city, destination_state, start_date, end_date")
+          .eq("is_active", true)
+          .lte("start_date", today)
+          .gte("end_date", today),
+      ]);
+
+      if (profilesRes.error) {
+        console.error("Failed to fetch profiles:", profilesRes.error);
         setLoading(false);
         return;
       }
 
-      const mapped = (data || []).map(mapProfileToTherapist);
-      setTherapists(mapped);
+      const activeTravels = travelRes.data || [];
+      const travelingProfileIds = new Set(activeTravels.map((t: any) => t.profile_id));
 
-      // Extract unique cities for filter
+      const mapped = (profilesRes.data || []).map((p: any) => {
+        const travel = activeTravels.find((t: any) => t.profile_id === p.id);
+        const item = mapProfileToTherapist(p);
+
+        if (travel) {
+          // Override city to destination during travel
+          item.city = travel.destination_city;
+          item.isTraveling = true;
+          const cityLower = travel.destination_city.toLowerCase();
+          const coords = CITY_COORDS[cityLower] || { lat: 39.8283, lng: -98.5795 };
+          item.lat = coords.lat;
+          item.lng = coords.lng;
+        }
+
+        return item;
+      });
+
+      setTherapists(mapped);
       const uniqueCities = [...new Set(mapped.map((t) => t.city).filter(Boolean))].sort();
       setCities(uniqueCities);
       setLoading(false);
@@ -324,6 +372,26 @@ const Explore = () => {
               Find verified, gay-friendly male massage therapists near you.
               Deep tissue, Swedish, sports recovery &amp; more.
             </motion.p>
+
+            {/* Smart Match CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              className="mt-6"
+            >
+              <Button
+                size="lg"
+                onClick={() => setShowSmartMatch(true)}
+                className="gap-2 text-base px-8"
+              >
+                <Sparkles className="w-4 h-4" />
+                Smart Match — Find My Therapist
+              </Button>
+              <p className="text-xs text-muted-foreground mt-2">
+                4 quick taps to find your best match
+              </p>
+            </motion.div>
           </div>
 
           {/* Search + Filters + View Toggle */}
@@ -638,7 +706,15 @@ const Explore = () => {
                     </div>
 
                     <div className="flex-1 flex flex-col justify-center">
-                      <h3 className="text-lg font-semibold mb-1">{therapist.name}</h3>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-lg font-semibold">{therapist.name}</h3>
+                        {therapist.isTraveling && (
+                          <Badge variant="outline" className="text-[10px] border-primary/30 text-primary gap-1">
+                            <Plane className="w-3 h-3" />
+                            Visiting
+                          </Badge>
+                        )}
+                      </div>
                       <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
                         <MapPin className="w-3 h-3" />
                         {therapist.city}
@@ -803,6 +879,13 @@ const Explore = () => {
       </section>
 
       <Footer />
+
+      {/* Intent Match Wizard */}
+      <IntentMatchWizard
+        therapists={therapists}
+        isOpen={showSmartMatch}
+        onClose={() => setShowSmartMatch(false)}
+      />
     </div>
   );
 };

@@ -300,6 +300,53 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_travel: {
+        Row: {
+          created_at: string
+          destination_city: string
+          destination_state: string | null
+          end_date: string
+          id: string
+          is_active: boolean
+          notes: string | null
+          profile_id: string
+          start_date: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          destination_city: string
+          destination_state?: string | null
+          end_date: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          profile_id: string
+          start_date: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          destination_city?: string
+          destination_state?: string | null
+          end_date?: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          profile_id?: string
+          start_date?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_travel_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_tickets: {
         Row: {
           assigned_to: string | null
