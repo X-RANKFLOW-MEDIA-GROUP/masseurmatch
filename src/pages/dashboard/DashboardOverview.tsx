@@ -12,37 +12,37 @@ const DashboardOverview = () => {
   const completeness = calculateCompleteness(profile);
 
   const stats = [
-    { icon: Eye, label: "Visualizações", value: "—", desc: "do perfil" },
-    { icon: MousePointerClick, label: "Cliques em Contato", value: "—", desc: "total" },
-    { icon: TrendingUp, label: "Aparições na Busca", value: "—", desc: "esta semana" },
-    { icon: MessageSquare, label: "Pico de Atividade", value: "—", desc: "melhor horário" },
+    { icon: Eye, label: "Profile Views", value: "—", desc: "total" },
+    { icon: MousePointerClick, label: "Contact Clicks", value: "—", desc: "total" },
+    { icon: TrendingUp, label: "Search Appearances", value: "—", desc: "this week" },
+    { icon: MessageSquare, label: "Peak Activity", value: "—", desc: "best time" },
   ];
 
   const checklist = [
-    { label: "Perfil preenchido", done: !!profile?.bio && !!profile?.display_name },
-    { label: "Identidade verificada", done: !!profile?.is_verified_identity },
-    { label: "Fotos aprovadas", done: !!profile?.is_verified_photos },
-    { label: "Localização configurada", done: !!profile?.city },
-    { label: "Preço definido", done: !!profile?.incall_price || !!profile?.outcall_price },
+    { label: "Profile completed", done: !!profile?.bio && !!profile?.display_name },
+    { label: "Identity verified", done: !!profile?.is_verified_identity },
+    { label: "Photos approved", done: !!profile?.is_verified_photos },
+    { label: "Location configured", done: !!profile?.city },
+    { label: "Pricing set", done: !!profile?.incall_price || !!profile?.outcall_price },
   ];
 
   return (
     <div className="max-w-5xl space-y-8">
       <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-2">Painel do Massagista</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-2">Masseur Dashboard</p>
         <h1 className="text-3xl font-bold">
-          Bem-vindo, {profile?.display_name || profile?.full_name || "Profissional"}
+          Welcome, {profile?.display_name || profile?.full_name || "Professional"}
         </h1>
         <div className="flex items-center gap-3 mt-2">
           {profile?.is_active ? (
-            <Badge variant="outline" className="text-xs border-success/40 text-success">Perfil Ativo</Badge>
+            <Badge variant="outline" className="text-xs border-success/40 text-success">Profile Active</Badge>
           ) : (
-            <Badge variant="outline" className="text-xs border-warning/40 text-warning">Perfil Inativo</Badge>
+            <Badge variant="outline" className="text-xs border-warning/40 text-warning">Profile Inactive</Badge>
           )}
           <span className="text-xs text-muted-foreground">
             {profile?.is_active
-              ? "Seu perfil está visível no diretório."
-              : "Complete os requisitos para ativar seu perfil."}
+              ? "Your profile is visible in the directory."
+              : "Complete the requirements to activate your profile."}
           </span>
         </div>
       </div>
@@ -50,7 +50,7 @@ const DashboardOverview = () => {
       {/* Profile Completeness */}
       <div className="glass-card p-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-sm">Completude do Perfil</h3>
+          <h3 className="font-semibold text-sm">Profile Completeness</h3>
           <span className="text-sm font-bold">{completeness}%</span>
         </div>
         <Progress value={completeness} className="h-2" />
@@ -82,15 +82,15 @@ const DashboardOverview = () => {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border rounded-lg overflow-hidden">
         {[
-          { title: "Editar Perfil", desc: "Atualize bio, especialidades e certificações", link: "/dashboard/profile" },
-          { title: "Gerenciar Fotos", desc: "Adicione e organize suas fotos profissionais", link: "/dashboard/photos" },
-          { title: "Assinatura", desc: "Veja seu plano e faça upgrade", link: "/dashboard/subscription" },
+          { title: "Edit Profile", desc: "Update bio, specialties and certifications", link: "/dashboard/profile" },
+          { title: "Manage Photos", desc: "Add and organize your professional photos", link: "/dashboard/photos" },
+          { title: "Subscription", desc: "View your plan and upgrade", link: "/dashboard/subscription" },
         ].map((action) => (
           <Link key={action.title} to={action.link} className="block bg-background p-6 hover:bg-card transition-colors group glow-hover">
             <h3 className="font-semibold mb-1 text-sm">{action.title}</h3>
             <p className="text-xs text-muted-foreground mb-3">{action.desc}</p>
             <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors inline-flex items-center gap-1 uppercase tracking-widest">
-              Abrir <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+              Open <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
             </span>
           </Link>
         ))}

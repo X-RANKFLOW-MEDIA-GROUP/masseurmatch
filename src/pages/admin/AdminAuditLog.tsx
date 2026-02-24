@@ -33,7 +33,7 @@ const AdminAuditLog = () => {
     <div className="space-y-6">
       <h1 className="text-2xl font-black">Audit Log</h1>
       {entries.length === 0 ? (
-        <p className="text-muted-foreground">Nenhuma entrada no log.</p>
+        <p className="text-muted-foreground">No log entries.</p>
       ) : (
         <div className="space-y-2">
           {entries.map((e) => (
@@ -46,7 +46,7 @@ const AdminAuditLog = () => {
                 </div>
                 <div className="text-xs text-muted-foreground">
                   <span className="font-mono mr-2">{e.admin_user_id.slice(0, 8)}</span>
-                  {format(new Date(e.created_at), "dd/MM/yyyy HH:mm")}
+                  {format(new Date(e.created_at), "MM/dd/yyyy HH:mm")}
                 </div>
               </CardContent>
             </Card>

@@ -13,13 +13,13 @@ const AdminCityOps = () => {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-sm">
-            Gerencie janelas de visita por cidade, configure cidades destacadas e controle a visibilidade regional dos profissionais.
+            Manage visit windows by city, configure featured cities, and control regional visibility for professionals.
           </p>
           <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-3">
             {["Los Angeles", "San Francisco", "New York", "Miami", "Chicago", "Seattle"].map((city) => (
               <div key={city} className="p-3 rounded-lg bg-secondary border border-border">
                 <p className="text-sm font-medium">{city}</p>
-                <p className="text-xs text-muted-foreground">Ativo</p>
+                <p className="text-xs text-muted-foreground">Active</p>
               </div>
             ))}
           </div>

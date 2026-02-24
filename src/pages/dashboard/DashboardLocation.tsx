@@ -34,8 +34,8 @@ const DashboardLocation = () => {
     });
     setSaving(false);
     toast({
-      title: error ? "Erro" : "Localização atualizada",
-      description: error?.message || "Suas alterações foram salvas.",
+      title: error ? "Error" : "Location updated",
+      description: error?.message || "Your changes have been saved.",
       variant: error ? "destructive" : "default",
     });
   };
@@ -46,43 +46,43 @@ const DashboardLocation = () => {
     <div className="max-w-3xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Localização</h1>
-          <p className="text-sm text-muted-foreground">Configure sua cidade principal e áreas de atendimento</p>
+          <h1 className="text-2xl font-bold">Location</h1>
+          <p className="text-sm text-muted-foreground">Configure your main city and service areas</p>
         </div>
         <Button onClick={handleSave} disabled={saving}>
           {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-          Salvar
+          Save
         </Button>
       </div>
 
       <section className="glass-card p-6 space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-          <MapPin className="w-4 h-4" /> Cidade Principal
+          <MapPin className="w-4 h-4" /> Main City
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <Label>Cidade</Label>
-            <Input value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} placeholder="São Paulo" />
+            <Label>City</Label>
+            <Input value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} placeholder="Los Angeles" />
           </div>
           <div>
-            <Label>Estado</Label>
-            <Input value={form.state} onChange={(e) => setForm((f) => ({ ...f, state: e.target.value }))} placeholder="SP" />
+            <Label>State</Label>
+            <Input value={form.state} onChange={(e) => setForm((f) => ({ ...f, state: e.target.value }))} placeholder="CA" />
           </div>
           <div>
-            <Label>País</Label>
-            <Input value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} placeholder="Brasil" />
+            <Label>Country</Label>
+            <Input value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} placeholder="USA" />
           </div>
         </div>
       </section>
 
       <section className="glass-card p-6 space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Áreas de Atendimento</h2>
-        <p className="text-xs text-muted-foreground">Cidades ou bairros onde você atende (de acordo com seu plano).</p>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Service Areas</h2>
+        <p className="text-xs text-muted-foreground">Cities or neighborhoods where you provide services (according to your plan).</p>
         <div className="flex gap-2">
-          <Input value={newArea} onChange={(e) => setNewArea(e.target.value)} placeholder="Adicionar área..." onKeyDown={(e) => {
+          <Input value={newArea} onChange={(e) => setNewArea(e.target.value)} placeholder="Add area..." onKeyDown={(e) => {
             if (e.key === "Enter" && newArea.trim()) { setForm((f) => ({ ...f, service_areas: [...f.service_areas, newArea.trim()] })); setNewArea(""); }
           }} />
-          <Button variant="outline" size="sm" onClick={() => { if (newArea.trim()) { setForm((f) => ({ ...f, service_areas: [...f.service_areas, newArea.trim()] })); setNewArea(""); } }}>Adicionar</Button>
+          <Button variant="outline" size="sm" onClick={() => { if (newArea.trim()) { setForm((f) => ({ ...f, service_areas: [...f.service_areas, newArea.trim()] })); setNewArea(""); } }}>Add</Button>
         </div>
         <div className="flex flex-wrap gap-2">
           {form.service_areas.map((area, i) => (

@@ -33,22 +33,22 @@ import { useProfile } from "@/hooks/useProfile";
 import { Badge } from "@/components/ui/badge";
 
 const menuItems = [
-  { title: "Visão Geral", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Perfil", url: "/dashboard/profile", icon: User },
-  { title: "Fotos", url: "/dashboard/photos", icon: Camera },
-  { title: "Localização", url: "/dashboard/location", icon: MapPin },
-  { title: "Preços", url: "/dashboard/pricing", icon: DollarSign },
-  { title: "Disponibilidade", url: "/dashboard/availability", icon: Clock },
+  { title: "Overview", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Profile", url: "/dashboard/profile", icon: User },
+  { title: "Photos", url: "/dashboard/photos", icon: Camera },
+  { title: "Location", url: "/dashboard/location", icon: MapPin },
+  { title: "Pricing", url: "/dashboard/pricing", icon: DollarSign },
+  { title: "Availability", url: "/dashboard/availability", icon: Clock },
   { title: "SEO", url: "/dashboard/seo", icon: Search },
-  { title: "Promoção", url: "/dashboard/promotion", icon: Megaphone },
+  { title: "Promotion", url: "/dashboard/promotion", icon: Megaphone },
   { title: "Q&A", url: "/dashboard/faq", icon: MessageCircleQuestion },
   { title: "Travel", url: "/dashboard/travel", icon: Plane },
 ];
 
 const accountItems = [
-  { title: "Verificação", url: "/dashboard/verification", icon: ShieldCheck },
-  { title: "Assinatura", url: "/dashboard/subscription", icon: CreditCard },
-  { title: "Configurações", url: "/dashboard/settings", icon: Settings },
+  { title: "Verification", url: "/dashboard/verification", icon: ShieldCheck },
+  { title: "Subscription", url: "/dashboard/subscription", icon: CreditCard },
+  { title: "Settings", url: "/dashboard/settings", icon: Settings },
 ];
 
 export const DashboardSidebar = () => {
@@ -79,14 +79,14 @@ export const DashboardSidebar = () => {
             </p>
             <div className="flex items-center gap-2 mt-1">
               {profile.is_verified_identity ? (
-                <Badge variant="outline" className="text-[10px] border-success/40 text-success">Verificado</Badge>
+                <Badge variant="outline" className="text-[10px] border-success/40 text-success">Verified</Badge>
               ) : (
-                <Badge variant="outline" className="text-[10px] border-warning/40 text-warning">Não verificado</Badge>
+                <Badge variant="outline" className="text-[10px] border-warning/40 text-warning">Unverified</Badge>
               )}
               {profile.is_active ? (
-                <Badge variant="outline" className="text-[10px] border-success/40 text-success">Ativo</Badge>
+                <Badge variant="outline" className="text-[10px] border-success/40 text-success">Active</Badge>
               ) : (
-                <Badge variant="outline" className="text-[10px] border-muted-foreground/40 text-muted-foreground">Inativo</Badge>
+                <Badge variant="outline" className="text-[10px] border-muted-foreground/40 text-muted-foreground">Inactive</Badge>
               )}
             </div>
           </div>
@@ -97,7 +97,7 @@ export const DashboardSidebar = () => {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Meu Negócio</SidebarGroupLabel>
+          <SidebarGroupLabel>My Business</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
@@ -117,7 +117,7 @@ export const DashboardSidebar = () => {
         <SidebarSeparator />
 
         <SidebarGroup>
-          <SidebarGroupLabel>Conta</SidebarGroupLabel>
+          <SidebarGroupLabel>Account</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {accountItems.map((item) => (
@@ -138,9 +138,9 @@ export const DashboardSidebar = () => {
       <SidebarFooter className="p-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Sair" onClick={signOut}>
+            <SidebarMenuButton tooltip="Sign Out" onClick={signOut}>
               <LogOut className="shrink-0" />
-              <span>Sair</span>
+              <span>Sign Out</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

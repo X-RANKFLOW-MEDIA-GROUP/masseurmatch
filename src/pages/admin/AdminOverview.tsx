@@ -60,7 +60,7 @@ const AdminOverview = () => {
     <div className="space-y-6">
       <h1 className="text-2xl font-black">Dashboard Overview</h1>
       {!stats ? (
-        <p className="text-muted-foreground">Carregando...</p>
+        <p className="text-muted-foreground">Loading...</p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {kpis.map((kpi) => (
