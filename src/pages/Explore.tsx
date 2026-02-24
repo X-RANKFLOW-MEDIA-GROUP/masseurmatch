@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import {
   Search, MapPin, CheckCircle2, Star, ArrowRight, Heart, X,
-  LayoutGrid, List, Map as MapIcon, SlidersHorizontal, ChevronDown
+  LayoutGrid, List, Map as MapIcon, SlidersHorizontal, ChevronDown, Loader2
 } from "lucide-react";
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -21,53 +21,66 @@ import { CursorGlow } from "@/components/animations/CursorGlow";
 import { fadeUp } from "@/components/animations/variants";
 import { useTranslation } from "react-i18next";
 import { SEOHead } from "@/components/seo/SEOHead";
+import { supabase } from "@/integrations/supabase/client";
 
 type ViewMode = "cards" | "list" | "map";
 
-const therapists = [
-  {
-    id: 1, name: "Marcus Rivera", city: "Los Angeles", lat: 34.0522, lng: -118.2437,
-    specialty: "Deep Tissue & Sports Massage", rating: 4.9, reviews: 127,
-    image: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=800&h=800&fit=crop",
-    verified: true, price: "$120/hr", priceNum: 120, available: true,
-    bio: "10+ years specializing in deep tissue and sports recovery for active men.",
-  },
-  {
-    id: 2, name: "James Chen", city: "San Francisco", lat: 37.7749, lng: -122.4194,
-    specialty: "Swedish & Relaxation Massage", rating: 4.8, reviews: 94,
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop",
-    verified: true, price: "$100/hr", priceNum: 100, available: true,
-    bio: "Creating calm through expert Swedish technique in a safe, welcoming space.",
-  },
-  {
-    id: 3, name: "David Anderson", city: "New York", lat: 40.7128, lng: -74.0060,
-    specialty: "Therapeutic Wellness Bodywork", rating: 5.0, reviews: 156,
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&h=800&fit=crop",
-    verified: true, price: "$150/hr", priceNum: 150, available: false,
-    bio: "Holistic bodywork focused on total mind-body restoration.",
-  },
-  {
-    id: 4, name: "Alex Thompson", city: "Miami", lat: 25.7617, lng: -80.1918,
-    specialty: "Hot Stone & Aromatherapy", rating: 4.9, reviews: 112,
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&h=800&fit=crop",
-    verified: true, price: "$110/hr", priceNum: 110, available: true,
-    bio: "Blending hot stone therapy with aromatherapy for deep relaxation.",
-  },
-  {
-    id: 5, name: "Ryan Martinez", city: "Chicago", lat: 41.8781, lng: -87.6298,
-    specialty: "Sports Recovery Massage", rating: 4.7, reviews: 89,
-    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&h=800&fit=crop",
-    verified: true, price: "$95/hr", priceNum: 95, available: true,
-    bio: "Helping athletes push limits and recover faster.",
-  },
-  {
-    id: 6, name: "Kyle Johnson", city: "Seattle", lat: 47.6062, lng: -122.3321,
-    specialty: "Men's Wellness & Bodywork", rating: 4.8, reviews: 103,
-    image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=800&h=800&fit=crop",
-    verified: false, price: "$90/hr", priceNum: 90, available: true,
-    bio: "Personalized wellness bodywork in a private studio.",
-  },
-];
+interface TherapistItem {
+  id: string;
+  name: string;
+  city: string;
+  lat: number;
+  lng: number;
+  specialty: string;
+  rating: number;
+  reviews: number;
+  image: string;
+  verified: boolean;
+  price: string;
+  priceNum: number;
+  available: boolean;
+  bio: string;
+}
+
+// Simple city → lat/lng fallback for map view
+const CITY_COORDS: Record<string, { lat: number; lng: number }> = {
+  "los angeles": { lat: 34.0522, lng: -118.2437 },
+  "san francisco": { lat: 37.7749, lng: -122.4194 },
+  "new york": { lat: 40.7128, lng: -74.006 },
+  miami: { lat: 25.7617, lng: -80.1918 },
+  chicago: { lat: 41.8781, lng: -87.6298 },
+  seattle: { lat: 47.6062, lng: -122.3321 },
+};
+
+function mapProfileToTherapist(p: any): TherapistItem {
+  const cityLower = (p.city || "").toLowerCase();
+  const coords = CITY_COORDS[cityLower] || { lat: 39.8283, lng: -98.5795 };
+  const primaryPhoto = p.profile_photos?.[0]?.storage_path;
+  const avatarUrl = primaryPhoto
+    ? supabase.storage.from("profile-photos").getPublicUrl(primaryPhoto).data.publicUrl
+    : p.avatar_url || "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=800&h=800&fit=crop";
+
+  const incall = p.incall_price ?? 0;
+  const outcall = p.outcall_price ?? 0;
+  const displayPrice = incall || outcall;
+
+  return {
+    id: p.id,
+    name: p.display_name || p.full_name || "Therapist",
+    city: p.city || "Unknown",
+    lat: coords.lat,
+    lng: coords.lng,
+    specialty: (p.specialties || []).slice(0, 2).join(" & ") || "Massage Therapy",
+    rating: 5.0, // Ratings not yet implemented
+    reviews: 0,
+    image: avatarUrl,
+    verified: p.is_verified_profile || false,
+    price: displayPrice ? `$${displayPrice}/hr` : "Contact",
+    priceNum: displayPrice,
+    available: p.is_active || false,
+    bio: p.bio?.slice(0, 120) || "",
+  };
+}
 
 /* ═══════════════════════════════════════════
    SWIPE CARD COMPONENT (Tinder-style)
@@ -77,7 +90,7 @@ const SwipeCard = ({
   onSwipe,
   isFront,
 }: {
-  therapist: (typeof therapists)[0];
+  therapist: TherapistItem;
   onSwipe: (dir: "left" | "right") => void;
   isFront: boolean;
 }) => {
@@ -110,14 +123,14 @@ const SwipeCard = ({
       }}
     >
       <div className="h-full rounded-2xl border border-border overflow-hidden relative bg-card">
-        {/* Image */}
         <img
           src={therapist.image}
           alt={therapist.name}
           className="w-full h-[65%] object-cover"
+          width={800}
+          height={520}
         />
 
-        {/* Like / Nope overlays */}
         <motion.div
           className="absolute top-8 right-8 border-4 rounded-lg px-4 py-2 font-bold text-2xl uppercase tracking-wider rotate-[-20deg]"
           style={{
@@ -139,7 +152,6 @@ const SwipeCard = ({
           Nope
         </motion.div>
 
-        {/* Verified badge */}
         {therapist.verified && (
           <Badge className="absolute top-4 left-4 bg-background/80 backdrop-blur-sm text-foreground border-border text-xs">
             <CheckCircle2 className="w-3 h-3 mr-1" />
@@ -147,7 +159,6 @@ const SwipeCard = ({
           </Badge>
         )}
 
-        {/* Available indicator */}
         {therapist.available && (
           <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-background/80 backdrop-blur-sm rounded-full px-2.5 py-1">
             <div className="w-2 h-2 rounded-full neon-ring" style={{ background: "hsl(145 80% 50%)" }} />
@@ -155,14 +166,9 @@ const SwipeCard = ({
           </div>
         )}
 
-        {/* Info */}
         <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background via-background/90 to-transparent">
           <div className="flex items-center gap-2 mb-1">
             <h3 className="text-2xl font-bold">{therapist.name}</h3>
-            <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 fill-foreground text-foreground" />
-              <span className="font-semibold text-sm">{therapist.rating}</span>
-            </div>
           </div>
           <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
             <MapPin className="w-3 h-3" />
@@ -195,23 +201,60 @@ const Explore = () => {
       { "@type": "ListItem", "position": 2, "name": "Explore Therapists", "item": "https://masseurmatch.com/explore" },
     ],
   };
+
+  const [therapists, setTherapists] = useState<TherapistItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [cities, setCities] = useState<string[]>([]);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCity, setSelectedCity] = useState("all");
   const [selectedType, setSelectedType] = useState("all");
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
   const [cardIndex, setCardIndex] = useState(0);
-  const [liked, setLiked] = useState<number[]>([]);
+  const [liked, setLiked] = useState<string[]>([]);
 
-  const [priceRange, setPriceRange] = useState([50, 200]);
+  const [priceRange, setPriceRange] = useState([0, 500]);
   const [availableOnly, setAvailableOnly] = useState(false);
   const [sortBy, setSortBy] = useState("default");
   const [showAdvanced, setShowAdvanced] = useState(false);
 
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, display_name, full_name, bio, city, state, country, specialties, incall_price, outcall_price, avatar_url, is_active, is_verified_profile, is_verified_identity, is_verified_photos, profile_photos(storage_path, is_primary, moderation_status)")
+        .eq("status", "approved")
+        .eq("is_active", true)
+        .not("city", "is", null)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Failed to fetch profiles:", error);
+        setLoading(false);
+        return;
+      }
+
+      const mapped = (data || []).map(mapProfileToTherapist);
+      setTherapists(mapped);
+
+      // Extract unique cities for filter
+      const uniqueCities = [...new Set(mapped.map((t) => t.city).filter(Boolean))].sort();
+      setCities(uniqueCities);
+      setLoading(false);
+    };
+
+    fetchProfiles();
+  }, []);
+
   const filteredTherapists = therapists
     .filter((t) => {
-      const matchesSearch = t.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch =
+        t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        t.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        t.city.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCity = selectedCity === "all" || t.city.toLowerCase().replace(/\s/g, "-") === selectedCity;
-      const matchesPrice = t.priceNum >= priceRange[0] && t.priceNum <= priceRange[1];
+      const matchesPrice = t.priceNum === 0 || (t.priceNum >= priceRange[0] && t.priceNum <= priceRange[1]);
       const matchesAvailable = !availableOnly || t.available;
       return matchesSearch && matchesCity && matchesPrice && matchesAvailable;
     })
@@ -241,7 +284,6 @@ const Explore = () => {
     { key: "map", icon: MapIcon, label: "Map" },
   ];
 
-  // Map center calculation
   const mapCenter = {
     lat: filteredTherapists.reduce((a, t) => a + t.lat, 0) / (filteredTherapists.length || 1),
     lng: filteredTherapists.reduce((a, t) => a + t.lng, 0) / (filteredTherapists.length || 1),
@@ -308,12 +350,11 @@ const Explore = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Cities</SelectItem>
-                    <SelectItem value="los-angeles">Los Angeles</SelectItem>
-                    <SelectItem value="san-francisco">San Francisco</SelectItem>
-                    <SelectItem value="new-york">New York</SelectItem>
-                    <SelectItem value="miami">Miami</SelectItem>
-                    <SelectItem value="chicago">Chicago</SelectItem>
-                    <SelectItem value="seattle">Seattle</SelectItem>
+                    {cities.map((city) => (
+                      <SelectItem key={city} value={city.toLowerCase().replace(/\s/g, "-")}>
+                        {city}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <Select value={selectedType} onValueChange={setSelectedType}>
@@ -331,7 +372,6 @@ const Explore = () => {
                   </SelectContent>
                 </Select>
 
-                {/* View mode toggle */}
                 <div className="flex border border-border rounded-md overflow-hidden">
                   {viewModes.map(({ key, icon: Icon, label }) => (
                     <button
@@ -358,7 +398,7 @@ const Explore = () => {
                 <SlidersHorizontal className="w-3.5 h-3.5" />
                 Advanced Filters
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showAdvanced ? "rotate-180" : ""}`} />
-                {(availableOnly || priceRange[0] > 50 || priceRange[1] < 200 || sortBy !== "default") && (
+                {(availableOnly || priceRange[0] > 0 || priceRange[1] < 500 || sortBy !== "default") && (
                   <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                 )}
               </button>
@@ -374,15 +414,14 @@ const Explore = () => {
                     className="overflow-hidden"
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-5 mt-4 border-t border-border">
-                      {/* Price Range */}
                       <div className="space-y-3">
                         <Label className="text-xs uppercase tracking-widest text-muted-foreground">
                           Price Range
                         </Label>
                         <Slider
-                          min={50}
-                          max={200}
-                          step={5}
+                          min={0}
+                          max={500}
+                          step={10}
                           value={priceRange}
                           onValueChange={setPriceRange}
                           className="w-full"
@@ -393,7 +432,6 @@ const Explore = () => {
                         </div>
                       </div>
 
-                      {/* Available Now */}
                       <div className="space-y-3">
                         <Label className="text-xs uppercase tracking-widest text-muted-foreground">
                           Availability
@@ -412,7 +450,6 @@ const Explore = () => {
                         </div>
                       </div>
 
-                      {/* Sort By */}
                       <div className="space-y-3">
                         <Label className="text-xs uppercase tracking-widest text-muted-foreground">
                           Sort By
@@ -431,7 +468,6 @@ const Explore = () => {
                         </Select>
                       </div>
 
-                      {/* Reset */}
                       <div className="space-y-3">
                         <Label className="text-xs uppercase tracking-widest text-muted-foreground">
                           &nbsp;
@@ -441,7 +477,7 @@ const Explore = () => {
                           size="sm"
                           className="w-full"
                           onClick={() => {
-                            setPriceRange([50, 200]);
+                            setPriceRange([0, 500]);
                             setAvailableOnly(false);
                             setSortBy("default");
                             setSelectedCity("all");
@@ -462,10 +498,49 @@ const Explore = () => {
             </div>
           </motion.div>
 
+          {/* Loading State */}
+          {loading && (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!loading && therapists.length === 0 && (
+            <div className="max-w-md mx-auto text-center py-20">
+              <p className="text-muted-foreground mb-2">No therapists listed yet.</p>
+              <p className="text-sm text-muted-foreground">Be the first to create a profile on MasseurMatch.</p>
+              <Link to="/auth">
+                <Button className="mt-6" variant="outline">Create Your Listing</Button>
+              </Link>
+            </div>
+          )}
+
+          {/* No Results After Filtering */}
+          {!loading && therapists.length > 0 && filteredTherapists.length === 0 && (
+            <div className="max-w-md mx-auto text-center py-20">
+              <p className="text-muted-foreground mb-2">No therapists match your filters.</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setPriceRange([0, 500]);
+                  setAvailableOnly(false);
+                  setSortBy("default");
+                  setSelectedCity("all");
+                  setSelectedType("all");
+                  setSearchQuery("");
+                }}
+              >
+                Reset Filters
+              </Button>
+            </div>
+          )}
+
           {/* ═══════════════════════════════════════════
               VIEW: AI CARDS (Tinder Swipe)
               ═══════════════════════════════════════════ */}
-          {viewMode === "cards" && (
+          {!loading && filteredTherapists.length > 0 && viewMode === "cards" && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -496,7 +571,6 @@ const Explore = () => {
                 )}
               </div>
 
-              {/* Action buttons */}
               {cardIndex < filteredTherapists.length && (
                 <div className="flex items-center justify-center gap-6 mt-6">
                   <button
@@ -525,7 +599,7 @@ const Explore = () => {
           {/* ═══════════════════════════════════════════
               VIEW: LIST WITH PHOTOS
               ═══════════════════════════════════════════ */}
-          {viewMode === "list" && (
+          {!loading && filteredTherapists.length > 0 && viewMode === "list" && (
             <div className="max-w-5xl mx-auto space-y-px bg-border rounded-lg overflow-hidden">
               {filteredTherapists.map((therapist, i) => (
                 <motion.div
@@ -545,6 +619,8 @@ const Explore = () => {
                         src={therapist.image}
                         alt={`${therapist.name} — male massage therapist in ${therapist.city}`}
                         loading="lazy"
+                        width={192}
+                        height={128}
                         className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
                       />
                       {therapist.available && (
@@ -572,11 +648,6 @@ const Explore = () => {
                     </div>
 
                     <div className="flex md:flex-col items-center md:items-end justify-between md:justify-center gap-2 flex-shrink-0">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-3 h-3 fill-foreground text-foreground" />
-                        <span className="font-semibold text-sm">{therapist.rating}</span>
-                        <span className="text-xs text-muted-foreground">({therapist.reviews})</span>
-                      </div>
                       <span className="text-lg font-bold">{therapist.price}</span>
                       <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors uppercase tracking-widest flex items-center gap-1">
                         View
@@ -592,14 +663,13 @@ const Explore = () => {
           {/* ═══════════════════════════════════════════
               VIEW: MAP
               ═══════════════════════════════════════════ */}
-          {viewMode === "map" && (
+          {!loading && filteredTherapists.length > 0 && viewMode === "map" && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="max-w-5xl mx-auto"
             >
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Map */}
                 <div className="lg:col-span-2 rounded-lg overflow-hidden border border-border relative">
                   <iframe
                     title="Therapists map"
@@ -609,10 +679,8 @@ const Explore = () => {
                   />
                   <div className="absolute inset-0 pointer-events-none bg-background/10" />
 
-                  {/* Pin overlay (simulated) */}
                   <div className="absolute inset-0 pointer-events-none">
                     {filteredTherapists.map((t) => {
-                      // Simple projection to percentage (approximate)
                       const xPct = ((t.lng - (mapCenter.lng - 30)) / 60) * 100;
                       const yPct = ((mapCenter.lat + 15 - t.lat) / 30) * 100;
                       return (
@@ -626,7 +694,6 @@ const Explore = () => {
                               <div className="w-8 h-8 rounded-full border-2 border-foreground overflow-hidden bg-card shadow-lg hover:scale-110 transition-transform">
                                 <img src={t.image} alt={t.name} className="w-full h-full object-cover" />
                               </div>
-                              {/* Tooltip */}
                               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
                                 <div className="bg-card border border-border rounded-md px-3 py-1.5 text-xs shadow-lg">
                                   <p className="font-semibold">{t.name}</p>
@@ -641,7 +708,6 @@ const Explore = () => {
                   </div>
                 </div>
 
-                {/* Side list */}
                 <div className="space-y-3 max-h-[500px] overflow-y-auto">
                   {filteredTherapists.map((t) => (
                     <Link
@@ -657,10 +723,6 @@ const Explore = () => {
                           {t.city}
                         </div>
                         <div className="flex items-center justify-between mt-1">
-                          <div className="flex items-center gap-1">
-                            <Star className="w-3 h-3 fill-foreground text-foreground" />
-                            <span className="text-xs font-semibold">{t.rating}</span>
-                          </div>
                           <span className="text-xs font-semibold">{t.price}</span>
                         </div>
                       </div>
