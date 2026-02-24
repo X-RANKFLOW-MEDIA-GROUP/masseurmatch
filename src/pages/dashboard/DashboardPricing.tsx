@@ -13,8 +13,9 @@ interface PricingSession {
   outcall_price: string;
 }
 
-const DURATION_OPTIONS = [30, 40, 45, 50, 60, 75, 90, 120];
-const MAX_PER_MINUTE = 33; // max $33 per minute
+
+
+const MAX_PER_MINUTE = 33;
 
 const DashboardPricing = () => {
   const { profile, loading, updateProfile } = useProfile();
@@ -43,13 +44,7 @@ const DashboardPricing = () => {
   }, [profile]);
 
   const addSession = () => {
-    const usedDurations = sessions.map((s) => s.duration);
-    const next = DURATION_OPTIONS.find((d) => !usedDurations.includes(d));
-    if (!next) {
-      toast({ title: "All durations added", variant: "destructive" });
-      return;
-    }
-    setSessions((prev) => [...prev, { duration: next, incall_price: "", outcall_price: "" }]);
+    setSessions((prev) => [...prev, { duration: 60, incall_price: "", outcall_price: "" }]);
   };
 
   const removeSession = (idx: number) => {
@@ -147,21 +142,20 @@ const DashboardPricing = () => {
               <div key={idx} className="rounded-lg border border-border p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Select
-                      value={session.duration.toString()}
-                      onValueChange={(v) => updateSession(idx, "duration", parseInt(v))}
-                    >
-                      <SelectTrigger className="w-32">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {DURATION_OPTIONS.map((d) => (
-                          <SelectItem key={d} value={d.toString()} disabled={sessions.some((s, i) => i !== idx && s.duration === d)}>
-                            {d} min
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Duration (minutes)</Label>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={480}
+                        value={session.duration}
+                        onChange={(e) => {
+                          const v = Math.max(1, Math.min(480, parseInt(e.target.value) || 1));
+                          updateSession(idx, "duration", v);
+                        }}
+                        className="w-28"
+                      />
+                    </div>
                   </div>
                   {sessions.length > 1 && (
                     <Button variant="ghost" size="icon" onClick={() => removeSession(idx)} className="text-destructive hover:text-destructive">
