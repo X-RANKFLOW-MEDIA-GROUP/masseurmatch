@@ -224,7 +224,7 @@ const Explore = () => {
       const { data, error } = await supabase
         .from("profiles")
         .select("id, display_name, full_name, bio, city, state, country, specialties, incall_price, outcall_price, avatar_url, is_active, is_verified_profile, is_verified_identity, is_verified_photos, profile_photos(storage_path, is_primary, moderation_status)")
-        .eq("status", "approved")
+        .eq("status", "active")
         .eq("is_active", true)
         .not("city", "is", null)
         .order("created_at", { ascending: false });
