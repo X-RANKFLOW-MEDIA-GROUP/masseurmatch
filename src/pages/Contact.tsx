@@ -83,8 +83,7 @@ const Contact = () => {
               <div className="lg:col-span-2 flex flex-col">
                 {[
                   { icon: Mail, title: t("contact.emailUs"), info: "support@masseurmatch.com" },
-                  { icon: Phone, title: t("contact.callUs"), info: "1-800-MASSAGE" },
-                  { icon: MapPin, title: t("contact.visitUs"), info: "123 Wellness St\nSan Francisco, CA 94102" },
+                  { icon: Phone, title: t("contact.callUs"), info: "978-MASSEUR" },
                 ].map((item, i) => (
                   <motion.div key={item.title} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="bg-background p-10 flex-1 glow-hover">
                     <item.icon className="w-5 h-5 text-muted-foreground mb-4" />
