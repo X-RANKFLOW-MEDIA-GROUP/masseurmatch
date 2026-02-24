@@ -39,7 +39,7 @@ const AdminMailbox = () => {
 
   const updateStatus = async (id: string, status: string) => {
     await supabase.from("support_tickets").update({ status }).eq("id", id);
-    toast({ title: `Ticket atualizado para ${status}` });
+    toast({ title: `Ticket updated to ${status}` });
     load();
   };
 
@@ -50,17 +50,17 @@ const AdminMailbox = () => {
         <Select value={filter} onValueChange={setFilter}>
           <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="open">Abertos</SelectItem>
-            <SelectItem value="in_progress">Em andamento</SelectItem>
-            <SelectItem value="resolved">Resolvidos</SelectItem>
-            <SelectItem value="closed">Fechados</SelectItem>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="open">Open</SelectItem>
+            <SelectItem value="in_progress">In Progress</SelectItem>
+            <SelectItem value="resolved">Resolved</SelectItem>
+            <SelectItem value="closed">Closed</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {tickets.length === 0 ? (
-        <p className="text-muted-foreground">Nenhum ticket encontrado.</p>
+        <p className="text-muted-foreground">No tickets found.</p>
       ) : (
         <div className="space-y-3">
           {tickets.map((t) => (
@@ -78,13 +78,13 @@ const AdminMailbox = () => {
                 <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{t.message}</p>
                 <div className="flex items-center gap-2">
                   {t.status === "open" && (
-                    <Button size="sm" variant="outline" onClick={() => updateStatus(t.id, "in_progress")}>Iniciar</Button>
+                    <Button size="sm" variant="outline" onClick={() => updateStatus(t.id, "in_progress")}>Start</Button>
                   )}
                   {t.status === "in_progress" && (
-                    <Button size="sm" variant="outline" onClick={() => updateStatus(t.id, "resolved")}>Resolver</Button>
+                    <Button size="sm" variant="outline" onClick={() => updateStatus(t.id, "resolved")}>Resolve</Button>
                   )}
                   {t.status !== "closed" && (
-                    <Button size="sm" variant="ghost" onClick={() => updateStatus(t.id, "closed")}>Fechar</Button>
+                    <Button size="sm" variant="ghost" onClick={() => updateStatus(t.id, "closed")}>Close</Button>
                   )}
                 </div>
               </CardContent>

@@ -13,12 +13,12 @@ const AdminAIPrecheck = () => {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-sm">
-            O sistema de AI Pre-check utiliza Gemini 2.0 Flash para escanear automaticamente fotos e conteúdo de perfil.
-            Itens sinalizados pela AI aparecem na fila de moderação para revisão humana.
+            The AI Pre-check system uses Gemini 2.0 Flash to automatically scan photos and profile content.
+            Items flagged by AI appear in the moderation queue for human review.
           </p>
           <div className="mt-4 p-4 rounded-lg bg-secondary border border-border">
-            <p className="text-sm font-medium">Status: Ativo</p>
-            <p className="text-xs text-muted-foreground mt-1">Fotos são automaticamente escaneadas no upload via edge function moderate-photo.</p>
+            <p className="text-sm font-medium">Status: Active</p>
+            <p className="text-xs text-muted-foreground mt-1">Photos are automatically scanned on upload via the moderate-photo edge function.</p>
           </div>
         </CardContent>
       </Card>

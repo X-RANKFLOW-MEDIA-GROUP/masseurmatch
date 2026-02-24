@@ -7,12 +7,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 
 const reasonLabels: Record<string, string> = {
-  terms_violation: "Violação dos Termos",
+  terms_violation: "Terms Violation",
   spam: "Spam",
-  inappropriate_content: "Conteúdo Impróprio",
-  fake_profile: "Perfil Falso",
-  harassment: "Assédio",
-  other: "Outro",
+  inappropriate_content: "Inappropriate Content",
+  fake_profile: "Fake Profile",
+  harassment: "Harassment",
+  other: "Other",
 };
 
 const AdminFlags = () => {
@@ -35,7 +35,7 @@ const AdminFlags = () => {
     if (user) {
       await supabase.from("audit_log").insert({ admin_user_id: user.id, action: `flag_${status}`, target_type: "flag", target_id: id });
     }
-    toast({ title: `Flag ${status === "resolved" ? "resolvido" : "dispensado"}` });
+    toast({ title: `Flag ${status === "resolved" ? "resolved" : "dismissed"}` });
     load();
   };
 
@@ -46,17 +46,17 @@ const AdminFlags = () => {
         <Select value={filter} onValueChange={setFilter}>
           <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="pending">Pendentes</SelectItem>
-            <SelectItem value="reviewing">Em revisão</SelectItem>
-            <SelectItem value="resolved">Resolvidos</SelectItem>
-            <SelectItem value="dismissed">Dispensados</SelectItem>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="reviewing">Reviewing</SelectItem>
+            <SelectItem value="resolved">Resolved</SelectItem>
+            <SelectItem value="dismissed">Dismissed</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {flags.length === 0 ? (
-        <p className="text-muted-foreground">Nenhum flag encontrado.</p>
+        <p className="text-muted-foreground">No flags found.</p>
       ) : (
         <div className="space-y-3">
           {flags.map((f) => (
@@ -68,12 +68,12 @@ const AdminFlags = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm mb-1"><span className="text-muted-foreground">Motivo:</span> {reasonLabels[f.reason] || f.reason}</p>
+                <p className="text-sm mb-1"><span className="text-muted-foreground">Reason:</span> {reasonLabels[f.reason] || f.reason}</p>
                 {f.description && <p className="text-xs text-muted-foreground mb-3">{f.description}</p>}
                 {f.status === "pending" && (
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => resolve(f.id, "resolved")}>Resolver</Button>
-                    <Button size="sm" variant="ghost" onClick={() => resolve(f.id, "dismissed")}>Dispensar</Button>
+                    <Button size="sm" variant="outline" onClick={() => resolve(f.id, "resolved")}>Resolve</Button>
+                    <Button size="sm" variant="ghost" onClick={() => resolve(f.id, "dismissed")}>Dismiss</Button>
                   </div>
                 )}
               </CardContent>

@@ -6,26 +6,26 @@ import { Link } from "react-router-dom";
 const promotions = [
   {
     icon: Star,
-    title: "Destaque no Topo",
-    desc: "Apareça nas primeiras posições da sua cidade",
+    title: "Top Placement",
+    desc: "Appear in the top positions for your city",
     plan: "Gold+",
   },
   {
     icon: Zap,
-    title: "Boost Temporário",
-    desc: "Aumente sua visibilidade por 24h",
+    title: "Temporary Boost",
+    desc: "Increase your visibility for 24h",
     plan: "Premium+",
   },
   {
     icon: Layers,
-    title: "Múltiplas Categorias",
-    desc: "Apareça em mais de uma especialidade",
+    title: "Multiple Categories",
+    desc: "Appear in more than one specialty",
     plan: "Premium+",
   },
   {
     icon: Megaphone,
-    title: "Selo Premium",
-    desc: "Destaque visual no seu perfil",
+    title: "Premium Badge",
+    desc: "Visual highlight on your profile",
     plan: "Premium+",
   },
 ];
@@ -34,17 +34,17 @@ const DashboardPromotion = () => {
   return (
     <div className="max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Promoção</h1>
-        <p className="text-sm text-muted-foreground">Ferramentas de visibilidade para planos Pro e Elite</p>
+        <h1 className="text-2xl font-bold">Promotion</h1>
+        <p className="text-sm text-muted-foreground">Visibility tools for Pro and Elite plans</p>
       </div>
 
       <div className="glass-card p-6 border-l-4 border-l-warning">
         <div className="flex items-center gap-3">
           <Lock className="w-5 h-5 text-warning" />
           <div>
-            <h2 className="font-semibold text-sm">Recursos Premium</h2>
+            <h2 className="font-semibold text-sm">Premium Features</h2>
             <p className="text-xs text-muted-foreground">
-              Faça upgrade para Premium ou superior para acessar ferramentas de promoção.
+              Upgrade to Premium or higher to access promotion tools.
             </p>
           </div>
         </div>
@@ -66,7 +66,7 @@ const DashboardPromotion = () => {
       <div className="text-center">
         <Link to="/dashboard/subscription">
           <Button variant="outline">
-            Ver Planos <ArrowRight className="w-4 h-4 ml-1" />
+            View Plans <ArrowRight className="w-4 h-4 ml-1" />
           </Button>
         </Link>
       </div>

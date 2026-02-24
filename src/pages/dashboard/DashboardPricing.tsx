@@ -29,8 +29,8 @@ const DashboardPricing = () => {
     });
     setSaving(false);
     toast({
-      title: error ? "Erro" : "Preços atualizados",
-      description: error?.message || "Suas alterações foram salvas.",
+      title: error ? "Error" : "Pricing updated",
+      description: error?.message || "Your changes have been saved.",
       variant: error ? "destructive" : "default",
     });
   };
@@ -41,28 +41,28 @@ const DashboardPricing = () => {
     <div className="max-w-3xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Preços</h1>
-          <p className="text-sm text-muted-foreground">Defina seus valores de atendimento</p>
+          <h1 className="text-2xl font-bold">Pricing</h1>
+          <p className="text-sm text-muted-foreground">Set your service rates</p>
         </div>
         <Button onClick={handleSave} disabled={saving}>
           {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-          Salvar
+          Save
         </Button>
       </div>
 
       <section className="glass-card p-6 space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-          <DollarSign className="w-4 h-4" /> Valores
+          <DollarSign className="w-4 h-4" /> Rates
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label>Incall (R$)</Label>
-            <p className="text-xs text-muted-foreground">Atendimento no seu espaço</p>
+            <Label>Incall ($)</Label>
+            <p className="text-xs text-muted-foreground">Service at your location</p>
             <Input type="number" value={form.incall_price} onChange={(e) => setForm((f) => ({ ...f, incall_price: e.target.value }))} placeholder="150.00" />
           </div>
           <div className="space-y-2">
-            <Label>Outcall (R$)</Label>
-            <p className="text-xs text-muted-foreground">Atendimento no local do cliente</p>
+            <Label>Outcall ($)</Label>
+            <p className="text-xs text-muted-foreground">Service at the client's location</p>
             <Input type="number" value={form.outcall_price} onChange={(e) => setForm((f) => ({ ...f, outcall_price: e.target.value }))} placeholder="200.00" />
           </div>
         </div>
@@ -70,7 +70,7 @@ const DashboardPricing = () => {
 
       <div className="glass-card p-4">
         <p className="text-xs text-muted-foreground">
-          💡 Valores são exibidos no seu perfil público. Clientes usam esses valores como referência para entrar em contato com você diretamente.
+          💡 Rates are displayed on your public profile. Clients use these as a reference to contact you directly.
         </p>
       </div>
     </div>

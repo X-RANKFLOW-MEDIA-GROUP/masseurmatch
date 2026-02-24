@@ -6,7 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Save, Loader2, Clock } from "lucide-react";
 
-const DAYS = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
+const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 const DashboardAvailability = () => {
   const { profile, loading, updateProfile } = useProfile();
@@ -34,8 +34,8 @@ const DashboardAvailability = () => {
     });
     setSaving(false);
     toast({
-      title: error ? "Erro" : "Disponibilidade atualizada",
-      description: error?.message || "Suas alterações foram salvas.",
+      title: error ? "Error" : "Availability updated",
+      description: error?.message || "Your changes have been saved.",
       variant: error ? "destructive" : "default",
     });
   };
@@ -46,12 +46,12 @@ const DashboardAvailability = () => {
     <div className="max-w-3xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Disponibilidade</h1>
-          <p className="text-sm text-muted-foreground">Controle quando seu perfil está ativo e seus horários</p>
+          <h1 className="text-2xl font-bold">Availability</h1>
+          <p className="text-sm text-muted-foreground">Control when your profile is active and your schedule</p>
         </div>
         <Button onClick={handleSave} disabled={saving}>
           {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-          Salvar
+          Save
         </Button>
       </div>
 
@@ -59,13 +59,13 @@ const DashboardAvailability = () => {
       <section className="glass-card p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="font-semibold">Status do Perfil</h2>
+            <h2 className="font-semibold">Profile Status</h2>
             <p className="text-xs text-muted-foreground mt-1">
-              {isActive ? "Seu perfil está visível no diretório." : "Seu perfil está pausado e não aparece nas buscas."}
+              {isActive ? "Your profile is visible in the directory." : "Your profile is paused and won't appear in searches."}
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-muted-foreground">{isActive ? "Ativo" : "Inativo"}</span>
+            <span className="text-xs text-muted-foreground">{isActive ? "Active" : "Inactive"}</span>
             <Switch checked={isActive} onCheckedChange={setIsActive} />
           </div>
         </div>
@@ -74,7 +74,7 @@ const DashboardAvailability = () => {
       {/* Weekly Schedule */}
       <section className="glass-card p-6 space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-          <Clock className="w-4 h-4" /> Horários Semanais
+          <Clock className="w-4 h-4" /> Weekly Schedule
         </h2>
         <div className="space-y-3">
           {DAYS.map((day) => (
@@ -94,7 +94,7 @@ const DashboardAvailability = () => {
                     onChange={(e) => setHours((h) => ({ ...h, [day]: { ...h[day], start: e.target.value } }))}
                     className="bg-card border border-border rounded px-2 py-1 text-xs text-foreground"
                   />
-                  <span className="text-muted-foreground">até</span>
+                  <span className="text-muted-foreground">to</span>
                   <input
                     type="time"
                     value={hours[day]?.end || "18:00"}

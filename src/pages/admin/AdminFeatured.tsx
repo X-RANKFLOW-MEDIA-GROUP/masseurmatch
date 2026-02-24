@@ -22,13 +22,13 @@ const AdminFeatured = () => {
 
   const remove = async (id: string) => {
     await supabase.from("featured_masters").delete().eq("id", id);
-    toast({ title: "Removido dos destaques" });
+    toast({ title: "Removed from featured" });
     load();
   };
 
   const toggle = async (id: string, active: boolean) => {
     await supabase.from("featured_masters").update({ is_active: !active }).eq("id", id);
-    toast({ title: active ? "Desativado" : "Ativado" });
+    toast({ title: active ? "Deactivated" : "Activated" });
     load();
   };
 
@@ -36,7 +36,7 @@ const AdminFeatured = () => {
     <div className="space-y-6">
       <h1 className="text-2xl font-black">Featured Masters</h1>
       {featured.length === 0 ? (
-        <p className="text-muted-foreground">Nenhum profissional em destaque.</p>
+        <p className="text-muted-foreground">No featured professionals.</p>
       ) : (
         <div className="space-y-3">
           {featured.map((f) => (
@@ -50,14 +50,14 @@ const AdminFeatured = () => {
                   <div className="flex items-center gap-2">
                     {f.city && <Badge variant="outline">{f.city}</Badge>}
                     <Badge variant="outline" className={f.is_active ? "text-success border-success/30" : "text-muted-foreground"}>
-                      {f.is_active ? "Ativo" : "Inativo"}
+                      {f.is_active ? "Active" : "Inactive"}
                     </Badge>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="flex gap-2">
                 <Button size="sm" variant="outline" onClick={() => toggle(f.id, f.is_active)}>
-                  {f.is_active ? "Desativar" : "Ativar"}
+                  {f.is_active ? "Deactivate" : "Activate"}
                 </Button>
                 <Button size="sm" variant="destructive" onClick={() => remove(f.id)}>
                   <Trash2 className="w-4 h-4" />

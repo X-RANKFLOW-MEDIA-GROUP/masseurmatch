@@ -8,12 +8,12 @@ const DashboardSeo = () => {
   if (loading) return <div className="animate-pulse h-40 bg-muted rounded" />;
 
   const suggestions = [
-    { text: "Adicione uma bio com pelo menos 100 caracteres", done: (profile?.bio?.length || 0) >= 100 },
-    { text: "Defina pelo menos 3 especialidades", done: (profile?.specialties?.length || 0) >= 3 },
-    { text: "Adicione suas certificações", done: (profile?.certifications?.length || 0) > 0 },
-    { text: "Preencha cidade e estado", done: !!profile?.city && !!profile?.state },
-    { text: "Adicione foto de perfil aprovada", done: !!profile?.is_verified_photos },
-    { text: "Adicione vídeo de apresentação", done: !!profile?.presentation_video_url },
+    { text: "Add a bio with at least 100 characters", done: (profile?.bio?.length || 0) >= 100 },
+    { text: "Set at least 3 specialties", done: (profile?.specialties?.length || 0) >= 3 },
+    { text: "Add your certifications", done: (profile?.certifications?.length || 0) > 0 },
+    { text: "Fill in city and state", done: !!profile?.city && !!profile?.state },
+    { text: "Add an approved profile photo", done: !!profile?.is_verified_photos },
+    { text: "Add a presentation video", done: !!profile?.presentation_video_url },
   ];
 
   const score = Math.round((suggestions.filter((s) => s.done).length / suggestions.length) * 100);
@@ -21,8 +21,8 @@ const DashboardSeo = () => {
   return (
     <div className="max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">SEO Assistido</h1>
-        <p className="text-sm text-muted-foreground">Otimize seu perfil para aparecer melhor nas buscas</p>
+        <h1 className="text-2xl font-bold">Assisted SEO</h1>
+        <p className="text-sm text-muted-foreground">Optimize your profile to rank better in searches</p>
       </div>
 
       {/* SEO Score */}
@@ -31,9 +31,9 @@ const DashboardSeo = () => {
           <span className="text-2xl font-bold">{score}</span>
         </div>
         <div>
-          <h2 className="font-semibold">Pontuação SEO</h2>
+          <h2 className="font-semibold">SEO Score</h2>
           <p className="text-xs text-muted-foreground mt-1">
-            {score >= 80 ? "Excelente! Seu perfil está bem otimizado." : score >= 50 ? "Bom, mas há melhorias possíveis." : "Precisa de atenção. Complete os itens abaixo."}
+            {score >= 80 ? "Excellent! Your profile is well optimized." : score >= 50 ? "Good, but there's room for improvement." : "Needs attention. Complete the items below."}
           </p>
         </div>
       </div>
@@ -41,7 +41,7 @@ const DashboardSeo = () => {
       {/* Suggestions */}
       <section className="glass-card p-6 space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-          <Lightbulb className="w-4 h-4" /> Sugestões de Melhoria
+          <Lightbulb className="w-4 h-4" /> Improvement Suggestions
         </h2>
         <div className="space-y-3">
           {suggestions.map((s) => (
@@ -56,19 +56,19 @@ const DashboardSeo = () => {
       {/* Stats placeholder */}
       <section className="glass-card p-6 space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-          <BarChart3 className="w-4 h-4" /> Métricas de Busca
+          <BarChart3 className="w-4 h-4" /> Search Metrics
         </h2>
         <div className="grid grid-cols-2 gap-4">
           <div className="p-4 bg-secondary rounded-lg">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Posição Média</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">Average Position</p>
             <p className="text-2xl font-bold mt-1">—</p>
           </div>
           <div className="p-4 bg-secondary rounded-lg">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Competitividade</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">Competitiveness</p>
             <p className="text-2xl font-bold mt-1">—</p>
           </div>
         </div>
-        <p className="text-xs text-muted-foreground">Dados de busca estarão disponíveis após seu perfil estar ativo por 7 dias.</p>
+        <p className="text-xs text-muted-foreground">Search data will be available after your profile has been active for 7 days.</p>
       </section>
     </div>
   );
