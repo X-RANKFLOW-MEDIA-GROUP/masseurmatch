@@ -24,6 +24,7 @@ import {
   Settings,
   Search,
   Megaphone,
+  MessageCircleQuestion,
   LogOut,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -39,6 +40,7 @@ const menuItems = [
   { title: "Disponibilidade", url: "/dashboard/availability", icon: Clock },
   { title: "SEO", url: "/dashboard/seo", icon: Search },
   { title: "Promoção", url: "/dashboard/promotion", icon: Megaphone },
+  { title: "Q&A", url: "/dashboard/faq", icon: MessageCircleQuestion },
 ];
 
 const accountItems = [

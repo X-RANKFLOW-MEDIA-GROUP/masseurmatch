@@ -32,6 +32,7 @@ import DashboardSubscription from "./pages/dashboard/DashboardSubscription";
 import DashboardSettings from "./pages/dashboard/DashboardSettings";
 import DashboardSeo from "./pages/dashboard/DashboardSeo";
 import DashboardPromotion from "./pages/dashboard/DashboardPromotion";
+import DashboardFAQ from "./pages/dashboard/DashboardFAQ";
 
 // Admin
 import AdminLogin from "./pages/AdminLogin";
@@ -79,6 +80,7 @@ const AnimatedRoutes = () => {
           <Route path="settings" element={<DashboardSettings />} />
           <Route path="seo" element={<DashboardSeo />} />
           <Route path="promotion" element={<DashboardPromotion />} />
+          <Route path="faq" element={<DashboardFAQ />} />
         </Route>
         <Route path="/admin/login" element={<PageTransition><AdminLogin /></PageTransition>} />
         <Route path="/admin" element={<AdminLayout />}>
