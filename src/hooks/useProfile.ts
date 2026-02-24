@@ -28,7 +28,7 @@ export const useProfile = () => {
     if (!user || !profile) return { error: new Error("No profile") };
 
     // Determine if this is a content edit that should trigger re-approval
-    const contentFields = ["display_name", "bio", "phone", "specialties", "certifications", "languages", "presentation_video_url", "social_media", "incall_price", "outcall_price", "city", "state"];
+    const contentFields = ["display_name", "bio", "phone", "specialties", "certifications", "languages", "presentation_video_url", "social_media", "incall_price", "outcall_price", "city", "state", "zip_code", "pricing_sessions"];
     const isContentEdit = Object.keys(updates).some(k => contentFields.includes(k));
 
     // If it's a content edit and not already explicitly setting status, set pending

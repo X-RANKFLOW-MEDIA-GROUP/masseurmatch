@@ -27,6 +27,7 @@ import {
   MessageCircleQuestion,
   Plane,
   LogOut,
+  LifeBuoy,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
@@ -48,6 +49,7 @@ const menuItems = [
 const accountItems = [
   { title: "Verification", url: "/dashboard/verification", icon: ShieldCheck },
   { title: "Subscription", url: "/dashboard/subscription", icon: CreditCard },
+  { title: "Support", url: "/dashboard/support", icon: LifeBuoy },
   { title: "Settings", url: "/dashboard/settings", icon: Settings },
 ];
 

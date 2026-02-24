@@ -260,6 +260,7 @@ export type Database = {
           outcall_price: number | null
           phone: string | null
           presentation_video_url: string | null
+          pricing_sessions: Json | null
           service_areas: Json | null
           social_media: Json | null
           specialties: string[] | null
@@ -269,6 +270,7 @@ export type Database = {
           terms_accepted_at: string | null
           updated_at: string
           user_id: string
+          zip_code: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -292,6 +294,7 @@ export type Database = {
           outcall_price?: number | null
           phone?: string | null
           presentation_video_url?: string | null
+          pricing_sessions?: Json | null
           service_areas?: Json | null
           social_media?: Json | null
           specialties?: string[] | null
@@ -301,6 +304,7 @@ export type Database = {
           terms_accepted_at?: string | null
           updated_at?: string
           user_id: string
+          zip_code?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -324,6 +328,7 @@ export type Database = {
           outcall_price?: number | null
           phone?: string | null
           presentation_video_url?: string | null
+          pricing_sessions?: Json | null
           service_areas?: Json | null
           social_media?: Json | null
           specialties?: string[] | null
@@ -333,6 +338,7 @@ export type Database = {
           terms_accepted_at?: string | null
           updated_at?: string
           user_id?: string
+          zip_code?: string | null
         }
         Relationships: []
       }
