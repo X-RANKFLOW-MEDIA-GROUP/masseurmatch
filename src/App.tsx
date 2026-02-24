@@ -13,6 +13,8 @@ import Pricing from "./pages/Pricing";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import TherapistProfile from "./pages/TherapistProfile";
 import FAQPage from "./pages/FAQ";
 import Safety from "./pages/Safety";
@@ -63,6 +65,8 @@ const AnimatedRoutes = () => {
         <Route path="/about" element={<PageTransition><About /></PageTransition>} />
         <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
         <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
+        <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
+        <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
         <Route path="/register" element={<PageTransition><Auth /></PageTransition>} />
         <Route path="/faq" element={<PageTransition><FAQPage /></PageTransition>} />
         <Route path="/safety" element={<PageTransition><Safety /></PageTransition>} />
