@@ -93,6 +93,11 @@ const TherapistProfile = () => {
       Saturday: "10:00 AM – 4:00 PM",
       Sunday: "Closed",
     },
+    customFaq: [
+      { question: "What types of massage do you specialize in?", answer: "I specialize in deep tissue, sports recovery, Swedish, and hot stone massage. Each session is tailored to your specific needs." },
+      { question: "What should I expect during my first session?", answer: "We'll start with a brief consultation to understand your goals. I'll explain the process and make sure you're comfortable before we begin." },
+      { question: "Is your space LGBTQ+ friendly and inclusive?", answer: "Absolutely. My practice is a safe, affirming space for everyone. I'm proud to serve the LGBTQ+ community with the same professionalism and care I extend to all clients." },
+    ] as { question: string; answer: string }[],
   };
 
   const avgRating = (therapist.reviewsList.reduce((a, r) => a + r.rating, 0) / therapist.reviewsList.length).toFixed(1);
@@ -610,6 +615,37 @@ const TherapistProfile = () => {
               ))}
             </div>
           </motion.section>
+
+          {/* ═══════════════════════════════════════════
+              Q&A — FROM custom_faq
+              ═══════════════════════════════════════════ */}
+          {therapist.customFaq && therapist.customFaq.length > 0 && (
+            <motion.section
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg"
+            >
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <MessageSquare className="w-5 h-5" />
+                Q&A
+              </h2>
+              <div className="space-y-px bg-border rounded-lg overflow-hidden">
+                {therapist.customFaq.map((faq: { question: string; answer: string }, i: number) => (
+                  <details key={i} className="bg-background group">
+                    <summary className="flex items-center justify-between p-5 cursor-pointer hover:bg-secondary/30 transition-colors list-none">
+                      <span className="font-semibold text-sm pr-4">{faq.question}</span>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 transition-transform group-open:rotate-90" />
+                    </summary>
+                    <div className="px-5 pb-5 pt-0">
+                      <p className="text-sm text-muted-foreground leading-relaxed">{faq.answer}</p>
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </motion.section>
+          )}
 
           {/* Ad Transparency Notice */}
           <div className="mb-8">
