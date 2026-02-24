@@ -9,6 +9,7 @@ import { CursorGlow } from "@/components/animations/CursorGlow";
 import { fadeUp } from "@/components/animations/variants";
 import { ShieldCheck, AlertTriangle, UserCheck, Phone } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { SEOHead } from "@/components/seo/SEOHead";
 
 const Safety = () => {
   const scrollRef = useScrollReveal();
@@ -23,6 +24,11 @@ const Safety = () => {
 
   return (
     <div className="min-h-screen bg-background" ref={scrollRef}>
+      <SEOHead
+        title="Safety Guidelines — MasseurMatch Gay Massage Directory"
+        description="Important safety guidelines for using MasseurMatch. Learn how to stay safe when finding male massage therapists through our directory."
+        path="/safety"
+      />
       <CursorGlow />
       <ScrollProgress />
       <Header />

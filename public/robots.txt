@@ -1,16 +1,24 @@
 User-agent: Googlebot
 Allow: /
 Disallow: /dashboard
+Disallow: /dashboard/*
 Disallow: /auth
 Disallow: /register
 Disallow: /admin
+Disallow: /admin/*
+Disallow: /admin/login
+Disallow: /*?*sort=
+Disallow: /*?*filter=
+Disallow: /*?*token=
 
 User-agent: Bingbot
 Allow: /
 Disallow: /dashboard
+Disallow: /dashboard/*
 Disallow: /auth
 Disallow: /register
 Disallow: /admin
+Disallow: /admin/*
 
 User-agent: Twitterbot
 Allow: /
@@ -21,8 +29,10 @@ Allow: /
 User-agent: *
 Allow: /
 Disallow: /dashboard
+Disallow: /dashboard/*
 Disallow: /auth
 Disallow: /register
 Disallow: /admin
+Disallow: /admin/*
 
-Sitemap: https://cnycelkfbtzfnphbeurd.supabase.co/functions/v1/generate-sitemap
+Sitemap: https://masseurmatch.com/sitemap.xml

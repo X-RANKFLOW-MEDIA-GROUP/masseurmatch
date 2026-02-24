@@ -19,6 +19,8 @@ import { TextReveal } from "@/components/animations/TextReveal";
 import { ScrollProgress } from "@/components/animations/ScrollProgress";
 import { CursorGlow } from "@/components/animations/CursorGlow";
 import { fadeUp } from "@/components/animations/variants";
+import { useTranslation } from "react-i18next";
+import { SEOHead } from "@/components/seo/SEOHead";
 
 type ViewMode = "cards" | "list" | "map";
 
@@ -183,6 +185,16 @@ const SwipeCard = ({
 
 const Explore = () => {
   const scrollRef = useScrollReveal();
+  const { t } = useTranslation();
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://masseurmatch.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Explore Therapists", "item": "https://masseurmatch.com/explore" },
+    ],
+  };
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCity, setSelectedCity] = useState("all");
   const [selectedType, setSelectedType] = useState("all");
@@ -237,6 +249,12 @@ const Explore = () => {
 
   return (
     <div className="min-h-screen bg-background" ref={scrollRef}>
+      <SEOHead
+        title="Explore Male Massage Therapists — Gay Massage Directory | MasseurMatch"
+        description="Browse verified male massage therapists near you. Filter by city, massage type, price. Deep tissue, Swedish, sports recovery. Gay-friendly professionals."
+        path="/explore"
+        jsonLd={breadcrumbJsonLd}
+      />
       <CursorGlow />
       <ScrollProgress />
       <Header />
@@ -659,7 +677,7 @@ const Explore = () => {
       <section className="py-20 border-t border-border">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
-            <h2 className="reveal text-3xl font-bold mb-6">Find Male Massage Therapists Near You</h2>
+            <h2 className="reveal text-3xl font-bold mb-6">{t("explore.title")}</h2>
             <div className="reveal reveal-delay-1 text-sm text-muted-foreground space-y-4 leading-relaxed">
               <p>
                 MasseurMatch is an advertising directory for finding male massage therapists
@@ -672,19 +690,51 @@ const Explore = () => {
                 Miami, Chicago, Seattle, and 500+ more — to find male massage therapists near you.
                 All arrangements are made directly between you and the provider.
               </p>
-              <p className="text-xs italic">
-                MasseurMatch is an advertising directory only. We do not verify providers, guarantee services,
-                or process bookings or payments. Users must be 18+.
-              </p>
             </div>
 
-            {/* City links */}
-            <div className="mt-8 flex flex-wrap gap-2">
-              {["los-angeles", "new-york", "san-francisco", "miami", "chicago", "seattle"].map(slug => (
-                <Link key={slug} to={`/city/${slug}`} className="text-xs text-muted-foreground border border-border rounded-md px-3 py-1.5 hover:bg-card transition-colors capitalize">
-                  {slug.replace("-", " ")}
-                </Link>
+            {/* Mini FAQ for Explore */}
+            <div className="mt-12 space-y-6">
+              <h3 className="text-xl font-bold text-foreground">Common Questions</h3>
+              {[
+                { q: "How do I choose a massage therapist?", a: "Browse profiles, read reviews, compare specialties and pricing. Contact providers directly through their listing to discuss your needs before booking." },
+                { q: "What massage types are available?", a: "Our directory includes deep tissue, Swedish, sports recovery, hot stone, aromatherapy, Thai, shiatsu, reflexology, and therapeutic wellness bodywork." },
+                { q: "Is MasseurMatch free to browse?", a: "Yes. Browsing the directory is completely free. No account is needed to view listings or contact providers." },
+                { q: "Are the therapists verified?", a: "MasseurMatch does not verify licenses or credentials. 'Verified' badges indicate paid advertising placement. Always do your own research." },
+              ].map((faq, i) => (
+                <div key={i} className="border-b border-border pb-4">
+                  <h4 className="font-semibold text-foreground text-sm mb-1">{faq.q}</h4>
+                  <p className="text-sm text-muted-foreground">{faq.a}</p>
+                </div>
               ))}
+            </div>
+
+            <p className="text-xs italic text-muted-foreground mt-6">
+              MasseurMatch is an advertising directory only. We do not verify providers, guarantee services,
+              or process bookings or payments. Users must be 18+.
+            </p>
+
+            {/* City links for internal linking */}
+            <div className="mt-8">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-4">Browse by City</h3>
+              <div className="flex flex-wrap gap-2">
+                {["los-angeles", "new-york", "san-francisco", "miami", "chicago", "seattle"].map(slug => (
+                  <Link key={slug} to={`/city/${slug}`} className="text-xs text-muted-foreground border border-border rounded-md px-3 py-1.5 hover:bg-card transition-colors capitalize">
+                    {slug.replace(/-/g, " ")}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Massage type links */}
+            <div className="mt-6">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-4">Popular Massage Types</h3>
+              <div className="flex flex-wrap gap-2">
+                {["Deep Tissue", "Swedish", "Sports Recovery", "Hot Stone", "Therapeutic", "Thai Massage", "Shiatsu", "Aromatherapy"].map(type => (
+                  <span key={type} className="text-xs text-muted-foreground border border-border rounded-md px-3 py-1.5">
+                    {type}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>

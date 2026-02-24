@@ -10,6 +10,7 @@ import { CursorGlow } from "@/components/animations/CursorGlow";
 import { ParallaxSection } from "@/components/animations/ParallaxSection";
 import { fadeUp } from "@/components/animations/variants";
 import { useTranslation } from "react-i18next";
+import { SEOHead } from "@/components/seo/SEOHead";
 
 const About = () => {
   const scrollRef = useScrollReveal();
@@ -17,6 +18,11 @@ const About = () => {
 
   return (
     <div className="min-h-screen bg-background" ref={scrollRef}>
+      <SEOHead
+        title="About MasseurMatch — The Trusted Gay Massage Directory"
+        description="Learn about MasseurMatch, the premier gay-friendly directory for male massage therapists. Our mission, values, and commitment to trust and safety."
+        path="/about"
+      />
       <CursorGlow />
       <ScrollProgress />
       <Header />

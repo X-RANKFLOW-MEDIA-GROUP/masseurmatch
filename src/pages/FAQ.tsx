@@ -9,6 +9,7 @@ import { ScrollProgress } from "@/components/animations/ScrollProgress";
 import { CursorGlow } from "@/components/animations/CursorGlow";
 import { fadeUp } from "@/components/animations/variants";
 import { useTranslation } from "react-i18next";
+import { SEOHead } from "@/components/seo/SEOHead";
 
 const FAQPage = () => {
   const scrollRef = useScrollReveal();
@@ -28,6 +29,11 @@ const FAQPage = () => {
 
   return (
     <div className="min-h-screen bg-background" ref={scrollRef}>
+      <SEOHead
+        title="FAQ — MasseurMatch Gay Massage Directory"
+        description="Frequently asked questions about MasseurMatch. Learn about our gay massage directory, how it works, and our policies."
+        path="/faq"
+      />
       <CursorGlow />
       <ScrollProgress />
       <Header />
