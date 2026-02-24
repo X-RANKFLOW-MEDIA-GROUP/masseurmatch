@@ -63,45 +63,7 @@
     position: relative;
   }
 
-  /* Smoky neon ambient atmosphere */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background:
-      radial-gradient(ellipse 80% 60% at 8% 15%, hsla(260, 70%, 40%, 0.18) 0%, transparent 55%),
-      radial-gradient(ellipse 60% 55% at 92% 10%, hsla(210, 80%, 35%, 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse 70% 45% at 50% 95%, hsla(300, 60%, 30%, 0.12) 0%, transparent 50%),
-      radial-gradient(ellipse 55% 50% at 80% 75%, hsla(170, 70%, 30%, 0.10) 0%, transparent 45%);
-    pointer-events: none;
-    animation: smoke-drift 20s ease-in-out infinite alternate;
-  }
 
-  /* Subtle secondary glow layer */
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background:
-      radial-gradient(ellipse 45% 35% at 20% 55%, hsla(220, 80%, 45%, 0.10) 0%, transparent 55%),
-      radial-gradient(ellipse 50% 40% at 70% 35%, hsla(280, 60%, 35%, 0.08) 0%, transparent 50%);
-    pointer-events: none;
-    animation: smoke-drift-alt 25s ease-in-out infinite alternate;
-  }
-
-  @keyframes smoke-drift {
-    0%   { opacity: 1; transform: scale(1) translate(0, 0); }
-    50%  { opacity: 0.8; transform: scale(1.05) translate(1%, -1%); }
-    100% { opacity: 1; transform: scale(1) translate(-1%, 1%); }
-  }
-
-  @keyframes smoke-drift-alt {
-    0%   { opacity: 0.7; transform: scale(1) translate(0, 0); }
-    50%  { opacity: 1; transform: scale(1.08) translate(-2%, 1%); }
-    100% { opacity: 0.7; transform: scale(1) translate(1%, -1%); }
-  }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading font-bold tracking-tight;
@@ -183,44 +145,20 @@
     width: 100%;
   }
 
-  /* Glass Card — true glassmorphism with neon bleed */
+  /* Glass Card — clean glassmorphism */
   .glass-card {
-    position: relative;
     background: hsla(0, 0%, 100%, 0.05);
     border: 1px solid hsla(0, 0%, 100%, 0.10);
     border-radius: 0.75rem;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    overflow: hidden;
-  }
-
-  /* Orange → Violet blurred glow behind the card */
-  .glass-card::before {
-    content: '';
-    position: absolute;
-    inset: -40%;
-    background: radial-gradient(
-      ellipse at 30% 50%,
-      hsla(25, 95%, 55%, 0.12) 0%,
-      hsla(280, 70%, 45%, 0.10) 50%,
-      transparent 80%
-    );
-    filter: blur(100px);
-    z-index: -1;
-    opacity: 0.6;
-    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    pointer-events: none;
   }
 
   .glass-card:hover {
     background: hsla(0, 0%, 100%, 0.08);
     border-color: hsla(0, 0%, 100%, 0.15);
     box-shadow: 0 8px 32px hsla(0, 0%, 100%, 0.04);
-  }
-
-  .glass-card:hover::before {
-    opacity: 0.85;
   }
 
   .gradient-text {
