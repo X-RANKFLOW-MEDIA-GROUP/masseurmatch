@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { PageTransition } from "@/components/animations/PageTransition";
 import { KnottyChat } from "@/components/ai/KnottyChat";
+import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Explore from "./pages/Explore";
@@ -54,7 +55,7 @@ const queryClient = new QueryClient();
 
 const AnimatedRoutes = () => {
   const location = useLocation();
-
+  useSmoothScroll();
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
