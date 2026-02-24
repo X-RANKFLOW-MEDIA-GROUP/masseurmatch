@@ -21,32 +21,32 @@ const Pricing = () => {
     {
       name: t("pricing.free"), price: t("pricing.freePrice"), period: t("pricing.month"),
       description: t("pricing.freeDesc"),
-      features: ["Basic profile listing", "3 photos maximum", "City-level visibility", "Standard search results", "Basic contact display"],
-      cta: "Get Started Free", popular: false,
+      features: [t("pricing.freeFeature1"), t("pricing.freeFeature2"), t("pricing.freeFeature3"), t("pricing.freeFeature4"), t("pricing.freeFeature5")],
+      cta: t("pricing.freeCta"), popular: false,
     },
     {
       name: t("pricing.standard"), price: t("pricing.standardPrice"), period: t("pricing.month"),
       description: t("pricing.standardDesc"),
-      features: ["Enhanced profile listing", "10 photos maximum", "Featured in search results", "Service menu display", "Basic analytics", "Priority email support"],
-      cta: "Start Standard", popular: false,
+      features: [t("pricing.standardFeature1"), t("pricing.standardFeature2"), t("pricing.standardFeature3"), t("pricing.standardFeature4"), t("pricing.standardFeature5"), t("pricing.standardFeature6")],
+      cta: t("pricing.standardCta"), popular: false,
     },
     {
       name: t("pricing.premium"), price: t("pricing.premiumPrice"), period: t("pricing.month"),
       description: t("pricing.premiumDesc"),
-      features: ["Verified badge", "Unlimited photos", "Homepage rotation (3x/week)", "Advanced analytics", "Gallery & hours management", "Premium placement", "24/7 priority support"],
-      cta: "Go Premium", popular: true,
+      features: [t("pricing.premiumFeature1"), t("pricing.premiumFeature2"), t("pricing.premiumFeature3"), t("pricing.premiumFeature4"), t("pricing.premiumFeature5"), t("pricing.premiumFeature6"), t("pricing.premiumFeature7")],
+      cta: t("pricing.premiumCta"), popular: true,
     },
     {
       name: t("pricing.gold"), price: t("pricing.goldPrice"), period: t("pricing.month"),
       description: t("pricing.goldDesc"),
-      features: ["All Premium features", "Top search placement", "Daily homepage feature", "Extended profile content", "'Featured' badge", "Dedicated account manager", "Custom branding"],
-      cta: "Choose Gold", popular: false,
+      features: [t("pricing.goldFeature1"), t("pricing.goldFeature2"), t("pricing.goldFeature3"), t("pricing.goldFeature4"), t("pricing.goldFeature5"), t("pricing.goldFeature6"), t("pricing.goldFeature7")],
+      cta: t("pricing.goldCta"), popular: false,
     },
     {
       name: t("pricing.platinum"), price: t("pricing.platinumPrice"), period: t("pricing.month"),
       description: t("pricing.platinumDesc"),
-      features: ["All Gold features", "Permanent homepage presence", "'Boosted' badge", "API access", "White-label options", "Custom domain support", "Marketing consultation", "Priority feature requests"],
-      cta: "Go Platinum", popular: false,
+      features: [t("pricing.platinumFeature1"), t("pricing.platinumFeature2"), t("pricing.platinumFeature3"), t("pricing.platinumFeature4"), t("pricing.platinumFeature5"), t("pricing.platinumFeature6"), t("pricing.platinumFeature7"), t("pricing.platinumFeature8")],
+      cta: t("pricing.platinumCta"), popular: false,
     },
   ];
 
@@ -121,11 +121,11 @@ const Pricing = () => {
             </div>
             <div className="space-y-px bg-border">
               {[
-                { q: "Can I change plans at any time?", a: "Yes! Upgrade or downgrade your male massage therapist listing anytime. Changes take effect immediately with prorated billing." },
-                { q: "What payment methods do you accept?", a: "We accept all major credit cards and PayPal through our secure Stripe payment processor." },
-                { q: "Is there a contract or commitment?", a: "No contracts. All plans are month-to-month. Cancel anytime with no penalties." },
-                { q: "How does verification work for male massage therapists?", a: "MasseurMatch does not verify licenses, credentials, or qualifications. 'Verified' badges and 'Featured'/'Boosted' labels indicate paid advertising placement only. Users are encouraged to verify providers independently." },
-                { q: "Is this platform LGBTQ+ friendly?", a: "Absolutely. MasseurMatch was built as a trusted, inclusive directory for gay-friendly male massage therapists and their clients." },
+                { q: t("pricing.faqQ1"), a: t("pricing.faqA1") },
+                { q: t("pricing.faqQ2"), a: t("pricing.faqA2") },
+                { q: t("pricing.faqQ3"), a: t("pricing.faqA3") },
+                { q: t("pricing.faqQ4"), a: t("pricing.faqA4") },
+                { q: t("pricing.faqQ5"), a: t("pricing.faqA5") },
               ].map((faq, i) => (
                 <motion.div key={i} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="bg-background p-8">
                   <h3 className="font-semibold text-foreground mb-2">{faq.q}</h3>
