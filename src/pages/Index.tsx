@@ -17,6 +17,7 @@ import { ParallaxSection } from "@/components/animations/ParallaxSection";
 import { GradientMesh } from "@/components/animations/GradientMesh";
 import { TiltCard } from "@/components/animations/TiltCard";
 import { ImageReveal } from "@/components/animations/ImageReveal";
+import { HorizontalScroll, HorizontalPanel } from "@/components/animations/HorizontalScroll";
 import { fadeUp } from "@/components/animations/variants";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
@@ -165,81 +166,99 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ─── FEATURED THERAPISTS ─── */}
+      {/* ─── FEATURED THERAPISTS — Horizontal Scroll ─── */}
       {featuredTherapists.length > 0 && (
-        <section className="py-28 md:py-36">
-          <div className="container mx-auto px-4">
-            <div className="reveal mb-16">
-              <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">{t("home.featuredTag")}</p>
-              <h2 className="text-4xl md:text-6xl font-bold text-foreground tracking-tight">
-                <TextReveal text={t("home.featuredTitle")} />
-              </h2>
-              <p className="text-muted-foreground mt-4 max-w-xl">
-                {t("home.featuredDesc")}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredTherapists.map((therapist, i) => (
-                <motion.div
-                  key={therapist.id}
-                  custom={i}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-80px" }}
-                  variants={fadeUp}
+        <>
+          <HorizontalScroll panels={Math.min(featuredTherapists.length + 1, 5)}>
+            {/* Panel 1: Intro */}
+            <HorizontalPanel>
+              <div className="max-w-2xl">
+                <motion.p
+                  initial={{ opacity: 0, x: -40 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8 }}
+                  className="text-xs uppercase tracking-[0.4em] text-muted-foreground mb-6"
                 >
-                  <TiltCard className="glass-card overflow-hidden group">
-                    <Link
-                      to={`/therapist/${therapist.id}`}
-                      className="block"
-                    >
-                      <ImageReveal
-                        direction={i % 2 === 0 ? "left" : "right"}
-                        duration={1.2}
-                        delay={i * 0.1}
-                        className="relative"
-                      >
-                        <img
-                          src={therapist.image}
-                          alt={`${therapist.name} — gay-friendly male massage therapist in ${therapist.city}`}
-                          loading="lazy"
-                          className="w-full h-72 object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
-                        />
-                        {therapist.verified && (
-                          <div className="absolute top-4 right-4 flex items-center gap-1 bg-background/90 backdrop-blur-sm px-2 py-1 text-xs text-foreground z-20">
-                            <CheckCircle2 className="w-3 h-3" />
-                            {t("home.verified")}
-                          </div>
-                        )}
-                      </ImageReveal>
-
-                      <div className="p-6">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <h3 className="text-lg font-semibold text-foreground mb-1">{therapist.name}</h3>
-                            <p className="text-sm text-muted-foreground mb-1">{therapist.city}</p>
-                            <p className="text-sm text-muted-foreground">{therapist.specialty}</p>
-                          </div>
-                        </div>
-
-                        <div className="mt-6 flex items-center text-sm text-muted-foreground group-hover:text-foreground transition-colors duration-500">
-                          {t("home.viewProfile")}
-                          <ArrowRight className="w-3 h-3 ml-2 group-hover:translate-x-2 transition-transform duration-500" />
-                        </div>
-                      </div>
-                    </Link>
-                  </TiltCard>
+                  {t("home.featuredTag")}
+                </motion.p>
+                <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold text-foreground tracking-tight leading-[0.9] mb-6">
+                  <TextReveal text={t("home.featuredTitle")} />
+                </h2>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1, delay: 0.5 }}
+                  className="text-lg text-muted-foreground max-w-md"
+                >
+                  {t("home.featuredDesc")}
+                </motion.p>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.8 }}
+                  className="mt-10 flex items-center gap-3 text-sm text-muted-foreground"
+                >
+                  <div className="w-12 h-px bg-muted-foreground/30" />
+                  <span className="uppercase tracking-[0.3em] text-xs">Scroll to explore</span>
+                  <ArrowRight className="w-4 h-4 animate-pulse" />
                 </motion.div>
-              ))}
-            </div>
+              </div>
+            </HorizontalPanel>
 
+            {/* Therapist panels */}
+            {featuredTherapists.slice(0, 4).map((therapist, i) => (
+              <HorizontalPanel key={therapist.id}>
+                <TiltCard className="glass-card overflow-hidden group w-full max-w-lg">
+                  <Link to={`/therapist/${therapist.id}`} className="block">
+                    <ImageReveal
+                      direction={i % 2 === 0 ? "bottom" : "top"}
+                      duration={1.4}
+                      delay={0.1}
+                      className="relative"
+                    >
+                      <img
+                        src={therapist.image}
+                        alt={`${therapist.name} — gay-friendly male massage therapist in ${therapist.city}`}
+                        loading="lazy"
+                        className="w-full h-[420px] object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
+                      />
+                      {therapist.verified && (
+                        <div className="absolute top-4 right-4 flex items-center gap-1 bg-background/90 backdrop-blur-sm px-3 py-1.5 text-xs text-foreground z-20">
+                          <CheckCircle2 className="w-3 h-3" />
+                          {t("home.verified")}
+                        </div>
+                      )}
+                    </ImageReveal>
+
+                    <div className="p-8">
+                      <span className="text-5xl font-bold text-foreground/5 font-heading block mb-2">
+                        0{i + 1}
+                      </span>
+                      <h3 className="text-2xl font-bold text-foreground mb-1">{therapist.name}</h3>
+                      <p className="text-sm text-muted-foreground mb-1">{therapist.city}</p>
+                      <p className="text-sm text-muted-foreground">{therapist.specialty}</p>
+
+                      <div className="mt-6 flex items-center text-sm text-muted-foreground group-hover:text-foreground transition-colors duration-500">
+                        {t("home.viewProfile")}
+                        <ArrowRight className="w-3 h-3 ml-2 group-hover:translate-x-2 transition-transform duration-500" />
+                      </div>
+                    </div>
+                  </Link>
+                </TiltCard>
+              </HorizontalPanel>
+            ))}
+          </HorizontalScroll>
+
+          <div className="container mx-auto px-4">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-center mt-16"
+              className="text-center py-16"
             >
               <MagneticButton>
                 <Link to="/explore">
@@ -251,7 +270,7 @@ const Index = () => {
               </MagneticButton>
             </motion.div>
           </div>
-        </section>
+        </>
       )}
 
       {/* ─── WHY CHOOSE US ─── */}
