@@ -878,6 +878,7 @@ const Explore = () => {
         therapists={therapists}
         isOpen={showSmartMatch}
         onClose={() => setShowSmartMatch(false)}
+        availableCities={cities}
       />
     </div>
   );

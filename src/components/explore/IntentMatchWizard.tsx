@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   X, ArrowRight, ArrowLeft, Sparkles, MapPin, CheckCircle2,
-  MessageSquare, Home, Car, DollarSign, Clock, Zap
+  MessageSquare, Home, Car, DollarSign, Clock, Zap, Navigation, Loader2
 } from "lucide-react";
 
 interface TherapistItem {
@@ -28,24 +29,61 @@ interface IntentMatchWizardProps {
   therapists: TherapistItem[];
   onClose: () => void;
   isOpen: boolean;
+  availableCities?: string[];
 }
 
-type Step = "location" | "budget" | "timeframe" | "type" | "results";
+type Step = "location" | "area" | "budget" | "timeframe" | "type" | "results";
 
 const MASSAGE_TYPES = [
   "Deep Tissue", "Swedish", "Sports Recovery", "Hot Stone",
   "Thai", "Shiatsu", "Therapeutic", "Relaxation",
 ];
 
-export const IntentMatchWizard = ({ therapists, onClose, isOpen }: IntentMatchWizardProps) => {
+// Nearest city from GPS coords
+const CITY_COORDS: { city: string; lat: number; lng: number }[] = [
+  { city: "Los Angeles", lat: 34.0522, lng: -118.2437 },
+  { city: "New York", lat: 40.7128, lng: -74.006 },
+  { city: "Miami", lat: 25.7617, lng: -80.1918 },
+  { city: "San Francisco", lat: 37.7749, lng: -122.4194 },
+  { city: "Chicago", lat: 41.8781, lng: -87.6298 },
+  { city: "Seattle", lat: 47.6062, lng: -122.3321 },
+];
+
+function distanceMiles(lat1: number, lng1: number, lat2: number, lng2: number) {
+  const R = 3959;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function nearestCity(lat: number, lng: number): string | null {
+  let closest: { city: string; dist: number } | null = null;
+  for (const c of CITY_COORDS) {
+    const d = distanceMiles(lat, lng, c.lat, c.lng);
+    if (!closest || d < closest.dist) closest = { city: c.city, dist: d };
+  }
+  return closest && closest.dist < 150 ? closest.city : null;
+}
+
+export const IntentMatchWizard = ({ therapists, onClose, isOpen, availableCities = [] }: IntentMatchWizardProps) => {
   const [step, setStep] = useState<Step>("location");
   const [locationPref, setLocationPref] = useState<"incall" | "outcall" | "either" | null>(null);
+  const [areaPref, setAreaPref] = useState<string | null>(null);
   const [budgetPref, setBudgetPref] = useState<"$" | "$$" | "$$$" | "any" | null>(null);
   const [timeframePref, setTimeframePref] = useState<"today" | "this-week" | "flexible" | null>(null);
   const [typePref, setTypePref] = useState<string[]>([]);
 
-  const steps: Step[] = ["location", "budget", "timeframe", "type", "results"];
+  // Area step state
+  const [areaInput, setAreaInput] = useState("");
+  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoError, setGeoError] = useState("");
+
+  const steps: Step[] = ["location", "area", "budget", "timeframe", "type", "results"];
   const stepIdx = steps.indexOf(step);
+  const visibleSteps = 5; // location, area, budget, timeframe, type
 
   const goNext = () => {
     if (stepIdx < steps.length - 1) setStep(steps[stepIdx + 1]);
@@ -57,15 +95,71 @@ export const IntentMatchWizard = ({ therapists, onClose, isOpen }: IntentMatchWi
   const resetAndClose = () => {
     setStep("location");
     setLocationPref(null);
+    setAreaPref(null);
     setBudgetPref(null);
     setTimeframePref(null);
     setTypePref([]);
+    setAreaInput("");
+    setGeoError("");
     onClose();
   };
+
+  const handleGeolocate = () => {
+    if (!navigator.geolocation) {
+      setGeoError("Geolocation not supported");
+      return;
+    }
+    setGeoLoading(true);
+    setGeoError("");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const city = nearestCity(pos.coords.latitude, pos.coords.longitude);
+        setGeoLoading(false);
+        if (city) {
+          setAreaPref(city);
+          setAreaInput(city);
+          goNext();
+        } else {
+          setGeoError("No therapists near your location yet");
+        }
+      },
+      () => {
+        setGeoLoading(false);
+        setGeoError("Location access denied. Select a city below.");
+      },
+      { timeout: 10000 }
+    );
+  };
+
+  const handleAreaSubmit = () => {
+    const trimmed = areaInput.trim();
+    if (!trimmed) return;
+    // Try to match against available cities
+    const match = (availableCities.length > 0 ? availableCities : therapists.map(t => t.city))
+      .find(c => c.toLowerCase().includes(trimmed.toLowerCase()) || trimmed.toLowerCase().includes(c.toLowerCase()));
+    if (match) {
+      setAreaPref(match);
+      setAreaInput(match);
+      goNext();
+    } else {
+      setGeoError(`No therapists found for "${trimmed}". Try a major city.`);
+    }
+  };
+
+  // Unique cities from therapists
+  const uniqueCities = availableCities.length > 0
+    ? availableCities
+    : [...new Set(therapists.map(t => t.city).filter(Boolean))].sort();
 
   // Scoring logic
   const scoreTherapist = (t: TherapistItem): number => {
     let score = 0;
+
+    // Area match — strongest signal
+    if (areaPref) {
+      if (t.city.toLowerCase() === areaPref.toLowerCase()) score += 40;
+      else score -= 10;
+    }
 
     // Location preference
     if (locationPref === "incall" && (t.incallPrice || t.priceNum > 0)) score += 30;
@@ -78,7 +172,7 @@ export const IntentMatchWizard = ({ therapists, onClose, isOpen }: IntentMatchWi
     else if (budgetPref === "$$" && price > 80 && price <= 150) score += 30;
     else if (budgetPref === "$$$" && price > 150) score += 30;
     else if (budgetPref === "any") score += 15;
-    else if (price > 0) score += 5; // partial match
+    else if (price > 0) score += 5;
 
     // Massage type match
     if (typePref.length > 0) {
@@ -104,9 +198,10 @@ export const IntentMatchWizard = ({ therapists, onClose, isOpen }: IntentMatchWi
 
   const canProceed = () => {
     if (step === "location") return locationPref !== null;
+    if (step === "area") return areaPref !== null;
     if (step === "budget") return budgetPref !== null;
     if (step === "timeframe") return timeframePref !== null;
-    if (step === "type") return true; // optional
+    if (step === "type") return true;
     return true;
   };
 
@@ -144,7 +239,7 @@ export const IntentMatchWizard = ({ therapists, onClose, isOpen }: IntentMatchWi
           {step !== "results" && (
             <div className="px-5 pt-4">
               <div className="flex gap-1">
-                {steps.slice(0, 4).map((s, i) => (
+                {steps.slice(0, visibleSteps).map((s, i) => (
                   <div
                     key={s}
                     className={`h-1 flex-1 rounded-full transition-colors ${
@@ -154,7 +249,7 @@ export const IntentMatchWizard = ({ therapists, onClose, isOpen }: IntentMatchWi
                 ))}
               </div>
               <p className="text-xs text-muted-foreground mt-2">
-                Step {stepIdx + 1} of 4
+                Step {stepIdx + 1} of {visibleSteps}
               </p>
             </div>
           )}
@@ -162,7 +257,7 @@ export const IntentMatchWizard = ({ therapists, onClose, isOpen }: IntentMatchWi
           {/* Content */}
           <div className="p-5 min-h-[280px]">
             <AnimatePresence mode="wait">
-              {/* STEP 1: Location */}
+              {/* STEP 1: Location (incall/outcall) */}
               {step === "location" && (
                 <motion.div key="location" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                   <h3 className="text-xl font-bold mb-2">Where do you want your session?</h3>
@@ -193,7 +288,69 @@ export const IntentMatchWizard = ({ therapists, onClose, isOpen }: IntentMatchWi
                 </motion.div>
               )}
 
-              {/* STEP 2: Budget */}
+              {/* STEP 2: Area / City */}
+              {step === "area" && (
+                <motion.div key="area" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                  <h3 className="text-xl font-bold mb-2">What area are you in?</h3>
+                  <p className="text-sm text-muted-foreground mb-5">Use GPS or enter a city / zipcode</p>
+
+                  {/* GPS Button */}
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2 justify-start mb-4"
+                    onClick={handleGeolocate}
+                    disabled={geoLoading}
+                  >
+                    {geoLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Navigation className="w-4 h-4" />
+                    )}
+                    {geoLoading ? "Detecting location..." : "Use my current location"}
+                  </Button>
+
+                  {/* Manual input */}
+                  <div className="flex gap-2 mb-4">
+                    <Input
+                      placeholder="City name or zipcode"
+                      value={areaInput}
+                      onChange={(e) => { setAreaInput(e.target.value); setGeoError(""); }}
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleAreaSubmit(); } }}
+                      className="bg-background border-border flex-1"
+                    />
+                    <Button size="sm" onClick={handleAreaSubmit} className="shrink-0">
+                      Go
+                    </Button>
+                  </div>
+
+                  {geoError && (
+                    <p className="text-xs text-destructive mb-3">{geoError}</p>
+                  )}
+
+                  {/* Quick city chips */}
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-2">Or pick a city</p>
+                    <div className="flex flex-wrap gap-2">
+                      {uniqueCities.slice(0, 10).map((city) => (
+                        <button
+                          key={city}
+                          onClick={() => { setAreaPref(city); setAreaInput(city); goNext(); }}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                            areaPref === city
+                              ? "bg-primary text-primary-foreground border-primary"
+                              : "bg-card border-border text-muted-foreground hover:border-foreground/30"
+                          }`}
+                        >
+                          <MapPin className="w-3 h-3 inline mr-1" />
+                          {city}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* STEP 3: Budget */}
               {step === "budget" && (
                 <motion.div key="budget" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                   <h3 className="text-xl font-bold mb-2">What's your budget?</h3>
@@ -223,7 +380,7 @@ export const IntentMatchWizard = ({ therapists, onClose, isOpen }: IntentMatchWi
                 </motion.div>
               )}
 
-              {/* STEP 3: Timeframe */}
+              {/* STEP 4: Timeframe */}
               {step === "timeframe" && (
                 <motion.div key="timeframe" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                   <h3 className="text-xl font-bold mb-2">When do you need it?</h3>
@@ -254,7 +411,7 @@ export const IntentMatchWizard = ({ therapists, onClose, isOpen }: IntentMatchWi
                 </motion.div>
               )}
 
-              {/* STEP 4: Massage Type */}
+              {/* STEP 5: Massage Type */}
               {step === "type" && (
                 <motion.div key="type" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                   <h3 className="text-xl font-bold mb-2">What type of massage?</h3>
@@ -289,7 +446,7 @@ export const IntentMatchWizard = ({ therapists, onClose, isOpen }: IntentMatchWi
                     <h3 className="text-xl font-bold">Your Top Matches</h3>
                   </div>
                   <p className="text-sm text-muted-foreground mb-5">
-                    Based on your preferences. Contact directly — no bookings, no payments.
+                    {areaPref ? `In ${areaPref} · ` : ""}Based on your preferences. Contact directly — no bookings, no payments.
                   </p>
 
                   {top3.length === 0 ? (
