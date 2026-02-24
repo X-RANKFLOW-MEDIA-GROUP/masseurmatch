@@ -11,6 +11,7 @@ import { TextReveal } from "@/components/animations/TextReveal";
 import { ScrollProgress } from "@/components/animations/ScrollProgress";
 import { CursorGlow } from "@/components/animations/CursorGlow";
 import { fadeUp } from "@/components/animations/variants";
+import { SEOHead } from "@/components/seo/SEOHead";
 
 const cityData: Record<string, { name: string; state: string; intro: string; lat: number; lng: number }> = {
   "los-angeles": { name: "Los Angeles", state: "CA", intro: "Discover professional male massage therapists across Los Angeles — from West Hollywood to Santa Monica. LA's vibrant LGBTQ+ community makes it one of the top cities for finding trusted, gay-friendly bodywork providers.", lat: 34.05, lng: -118.24 },
@@ -61,8 +62,24 @@ const City = () => {
     );
   }
 
+  const cityJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://masseurmatch.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Explore", "item": "https://masseurmatch.com/explore" },
+      { "@type": "ListItem", "position": 3, "name": `${city.name}, ${city.state}`, "item": `https://masseurmatch.com/city/${slug}` },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-background" ref={scrollRef}>
+      <SEOHead
+        title={`Male Massage Therapists in ${city.name}, ${city.state} — MasseurMatch`}
+        description={`Find gay-friendly male massage therapists in ${city.name}. Browse verified profiles, compare services and prices. Deep tissue, Swedish, sports recovery & more.`}
+        path={`/city/${slug}`}
+        jsonLd={cityJsonLd}
+      />
       <CursorGlow />
       <ScrollProgress />
       <Header />

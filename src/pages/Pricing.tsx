@@ -11,6 +11,7 @@ import { ScrollProgress } from "@/components/animations/ScrollProgress";
 import { CursorGlow } from "@/components/animations/CursorGlow";
 import { fadeUp } from "@/components/animations/variants";
 import { useTranslation } from "react-i18next";
+import { SEOHead } from "@/components/seo/SEOHead";
 
 const Pricing = () => {
   const scrollRef = useScrollReveal();
@@ -51,6 +52,11 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-background" ref={scrollRef}>
+      <SEOHead
+        title="Advertising Plans — MasseurMatch Gay Massage Directory"
+        description="Choose your advertising plan on MasseurMatch. Free to Platinum plans for male massage therapists. Reach more gay-friendly massage clients."
+        path="/pricing"
+      />
       <CursorGlow />
       <ScrollProgress />
       <Header />

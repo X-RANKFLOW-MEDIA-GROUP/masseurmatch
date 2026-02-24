@@ -18,6 +18,7 @@ import { GradientMesh } from "@/components/animations/GradientMesh";
 import { fadeUp } from "@/components/animations/variants";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
+import { SEOHead } from "@/components/seo/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
@@ -59,6 +60,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background" ref={scrollRef}>
+      <SEOHead
+        title="Gay Massage Directory — Find Male Massage Therapists Near You | MasseurMatch"
+        description="The #1 gay massage directory. Browse verified male massage therapists near you. Deep tissue, Swedish, sports & therapeutic massage. Gay-friendly, trusted professionals."
+        path="/"
+      />
       <CursorGlow />
       <ScrollProgress />
       <Header />

@@ -14,6 +14,7 @@ import { ScrollProgress } from "@/components/animations/ScrollProgress";
 import { CursorGlow } from "@/components/animations/CursorGlow";
 import { fadeUp } from "@/components/animations/variants";
 import { useTranslation } from "react-i18next";
+import { SEOHead } from "@/components/seo/SEOHead";
 
 const Contact = () => {
   const scrollRef = useScrollReveal();
@@ -29,6 +30,11 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-background" ref={scrollRef}>
+      <SEOHead
+        title="Contact MasseurMatch — Gay Massage Directory Support"
+        description="Contact MasseurMatch for questions about our gay massage directory. Support for therapists and clients."
+        path="/contact"
+      />
       <CursorGlow />
       <ScrollProgress />
       <Header />
