@@ -1,13 +1,15 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { t } = useTranslation();
 
   const linkGroups = [
     {
-      title: "Directory",
+      title: t("footer.directory"),
       links: [
-        { to: "/explore", label: "Browse Therapists" },
+        { to: "/explore", label: t("footer.browseTherapists") },
         { to: "/city/los-angeles", label: "Los Angeles" },
         { to: "/city/new-york", label: "New York" },
         { to: "/city/san-francisco", label: "San Francisco" },
@@ -15,22 +17,22 @@ export const Footer = () => {
       ],
     },
     {
-      title: "For Providers",
+      title: t("footer.forProviders"),
       links: [
-        { to: "/register", label: "List Your Practice" },
-        { to: "/pricing", label: "Advertising Plans" },
-        { to: "/dashboard", label: "Provider Dashboard" },
-        { to: "/about", label: "About Us" },
+        { to: "/register", label: t("footer.listYourPractice") },
+        { to: "/pricing", label: t("footer.advertisingPlans") },
+        { to: "/dashboard", label: t("footer.providerDashboard") },
+        { to: "/about", label: t("footer.aboutUs") },
       ],
     },
     {
-      title: "Legal & Safety",
+      title: t("footer.legalSafety"),
       links: [
-        { to: "/safety", label: "Safety Guidelines" },
-        { to: "/faq", label: "FAQ" },
-        { to: "/terms", label: "Terms of Service" },
-        { to: "/privacy", label: "Privacy Policy" },
-        { to: "/contact", label: "Contact" },
+        { to: "/safety", label: t("footer.safetyGuidelines") },
+        { to: "/faq", label: t("footer.faq") },
+        { to: "/terms", label: t("footer.termsOfService") },
+        { to: "/privacy", label: t("footer.privacyPolicy") },
+        { to: "/contact", label: t("nav.contact") },
       ],
     },
   ];
@@ -42,11 +44,10 @@ export const Footer = () => {
           <div>
             <h3 className="text-lg font-bold font-heading text-foreground mb-4">MasseurMatch</h3>
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-              An advertising directory connecting men with male massage therapists. 
-              Professional, trusted, gay-friendly bodywork services.
+              {t("footer.brandDescription")}
             </p>
             <p className="text-xs text-muted-foreground">
-              This is an advertising directory only. We do not verify providers or guarantee services.
+              {t("footer.disclaimer")}
             </p>
           </div>
 
@@ -68,10 +69,10 @@ export const Footer = () => {
 
         <div className="border-t border-border mt-16 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
-            &copy; {currentYear} MasseurMatch — Advertising Directory. All rights reserved.
+            &copy; {currentYear} {t("footer.copyright")}
           </p>
           <p className="text-xs text-muted-foreground">
-            18+ only · Not a marketplace · No booking or payments processed
+            {t("footer.ageNotice")}
           </p>
         </div>
       </div>
