@@ -20,6 +20,8 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { TextReveal } from "@/components/animations/TextReveal";
 import { ScrollProgress } from "@/components/animations/ScrollProgress";
 import { CursorGlow } from "@/components/animations/CursorGlow";
+import { TiltCard } from "@/components/animations/TiltCard";
+import { ImageReveal } from "@/components/animations/ImageReveal";
 import { fadeUp } from "@/components/animations/variants";
 import { useTranslation } from "react-i18next";
 import { SEOHead } from "@/components/seo/SEOHead";
@@ -661,7 +663,7 @@ const Explore = () => {
               VIEW: LIST WITH PHOTOS
               ═══════════════════════════════════════════ */}
           {!loading && filteredTherapists.length > 0 && viewMode === "list" && (
-            <div className="max-w-5xl mx-auto space-y-px bg-border rounded-lg overflow-hidden">
+            <div className="max-w-5xl mx-auto space-y-4">
               {filteredTherapists.map((therapist, i) => (
                 <motion.div
                   key={therapist.id}
@@ -671,59 +673,66 @@ const Explore = () => {
                   viewport={{ once: true, margin: "-50px" }}
                   variants={fadeUp}
                 >
-                  <Link
-                    to={`/therapist/${therapist.id}`}
-                    className="flex flex-col md:flex-row gap-6 p-6 bg-background hover:bg-card transition-colors duration-500 group glow-hover relative"
-                  >
-                    <div className="relative w-full md:w-48 h-48 md:h-32 rounded-lg overflow-hidden flex-shrink-0">
-                      <img
-                        src={therapist.image}
-                        alt={`${therapist.name} — male massage therapist in ${therapist.city}`}
-                        loading="lazy"
-                        width={192}
-                        height={128}
-                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
-                      />
-                      {therapist.available && (
-                        <div className="absolute top-2 left-2 flex items-center gap-1 bg-background/80 backdrop-blur-sm rounded-full px-2 py-0.5">
-                          <div className="w-1.5 h-1.5 rounded-full" style={{ background: "hsl(145 80% 50%)" }} />
-                          <span className="text-[9px] font-semibold uppercase">Online</span>
-                        </div>
-                      )}
-                      {therapist.verified && (
-                        <Badge className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm text-foreground border-border text-[10px] px-1.5 py-0.5">
-                          <CheckCircle2 className="w-2.5 h-2.5 mr-0.5" />
-                          Verified
-                        </Badge>
-                      )}
-                    </div>
-
-                    <div className="flex-1 flex flex-col justify-center">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-lg font-semibold">{therapist.name}</h3>
-                        {therapist.isTraveling && (
-                          <Badge variant="outline" className="text-[10px] border-primary/30 text-primary gap-1">
-                            <Plane className="w-3 h-3" />
-                            Visiting
+                  <TiltCard className="glass-card overflow-hidden" maxTilt={8}>
+                    <Link
+                      to={`/therapist/${therapist.id}`}
+                      className="flex flex-col md:flex-row gap-6 p-6 group"
+                    >
+                      <ImageReveal
+                        direction={i % 2 === 0 ? "left" : "right"}
+                        duration={0.9}
+                        delay={i * 0.05}
+                        className="relative w-full md:w-48 h-48 md:h-32 rounded-lg overflow-hidden flex-shrink-0"
+                      >
+                        <img
+                          src={therapist.image}
+                          alt={`${therapist.name} — male massage therapist in ${therapist.city}`}
+                          loading="lazy"
+                          width={192}
+                          height={128}
+                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                        />
+                        {therapist.available && (
+                          <div className="absolute top-2 left-2 flex items-center gap-1 bg-background/80 backdrop-blur-sm rounded-full px-2 py-0.5 z-20">
+                            <div className="w-1.5 h-1.5 rounded-full" style={{ background: "hsl(145 80% 50%)" }} />
+                            <span className="text-[9px] font-semibold uppercase">Online</span>
+                          </div>
+                        )}
+                        {therapist.verified && (
+                          <Badge className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm text-foreground border-border text-[10px] px-1.5 py-0.5 z-20">
+                            <CheckCircle2 className="w-2.5 h-2.5 mr-0.5" />
+                            Verified
                           </Badge>
                         )}
-                      </div>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
-                        <MapPin className="w-3 h-3" />
-                        {therapist.city}
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-2">{therapist.specialty}</p>
-                      <p className="text-xs text-muted-foreground line-clamp-1">{therapist.bio}</p>
-                    </div>
+                      </ImageReveal>
 
-                    <div className="flex md:flex-col items-center md:items-end justify-between md:justify-center gap-2 flex-shrink-0">
-                      <span className="text-lg font-bold">{therapist.price}</span>
-                      <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors uppercase tracking-widest flex items-center gap-1">
-                        View
-                        <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                      </span>
-                    </div>
-                  </Link>
+                      <div className="flex-1 flex flex-col justify-center">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-lg font-semibold">{therapist.name}</h3>
+                          {therapist.isTraveling && (
+                            <Badge variant="outline" className="text-[10px] border-primary/30 text-primary gap-1">
+                              <Plane className="w-3 h-3" />
+                              Visiting
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
+                          <MapPin className="w-3 h-3" />
+                          {therapist.city}
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-2">{therapist.specialty}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-1">{therapist.bio}</p>
+                      </div>
+
+                      <div className="flex md:flex-col items-center md:items-end justify-between md:justify-center gap-2 flex-shrink-0">
+                        <span className="text-lg font-bold">{therapist.price}</span>
+                        <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors uppercase tracking-widest flex items-center gap-1">
+                          View
+                          <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                        </span>
+                      </div>
+                    </Link>
+                  </TiltCard>
                 </motion.div>
               ))}
             </div>
@@ -779,23 +788,24 @@ const Explore = () => {
 
                 <div className="space-y-3 max-h-[500px] overflow-y-auto">
                   {filteredTherapists.map((t) => (
-                    <Link
-                      key={t.id}
-                      to={`/therapist/${t.id}`}
-                      className="flex gap-3 p-3 border border-border rounded-lg hover:bg-card transition-colors group"
-                    >
-                      <img src={t.image} alt={t.name} className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-sm truncate">{t.name}</h3>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <MapPin className="w-3 h-3" />
-                          {t.city}
+                    <TiltCard key={t.id} className="glass-card overflow-hidden" maxTilt={6}>
+                      <Link
+                        to={`/therapist/${t.id}`}
+                        className="flex gap-3 p-3 group"
+                      >
+                        <img src={t.image} alt={t.name} className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm truncate">{t.name}</h3>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <MapPin className="w-3 h-3" />
+                            {t.city}
+                          </div>
+                          <div className="flex items-center justify-between mt-1">
+                            <span className="text-xs font-semibold">{t.price}</span>
+                          </div>
                         </div>
-                        <div className="flex items-center justify-between mt-1">
-                          <span className="text-xs font-semibold">{t.price}</span>
-                        </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    </TiltCard>
                   ))}
                 </div>
               </div>
