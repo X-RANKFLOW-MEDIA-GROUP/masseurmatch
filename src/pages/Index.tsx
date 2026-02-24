@@ -15,6 +15,8 @@ import { ScrollProgress } from "@/components/animations/ScrollProgress";
 import { Marquee } from "@/components/animations/Marquee";
 import { ParallaxSection } from "@/components/animations/ParallaxSection";
 import { GradientMesh } from "@/components/animations/GradientMesh";
+import { TiltCard } from "@/components/animations/TiltCard";
+import { ImageReveal } from "@/components/animations/ImageReveal";
 import { fadeUp } from "@/components/animations/variants";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
@@ -177,7 +179,7 @@ const Index = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredTherapists.map((therapist, i) => (
                 <motion.div
                   key={therapist.id}
@@ -187,38 +189,47 @@ const Index = () => {
                   viewport={{ once: true, margin: "-80px" }}
                   variants={fadeUp}
                 >
-                  <Link
-                    to={`/therapist/${therapist.id}`}
-                    className="bg-background p-8 group transition-all duration-700 hover:bg-card block glow-hover relative"
-                  >
-                    <div className="relative mb-6 overflow-hidden">
-                      <img
-                        src={therapist.image}
-                        alt={`${therapist.name} — gay-friendly male massage therapist in ${therapist.city}`}
-                        loading="lazy"
-                        className="w-full h-72 object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
-                      />
-                      {therapist.verified && (
-                        <div className="absolute top-4 right-4 flex items-center gap-1 bg-background/90 backdrop-blur-sm px-2 py-1 text-xs text-foreground">
-                          <CheckCircle2 className="w-3 h-3" />
-                          {t("home.verified")}
+                  <TiltCard className="glass-card overflow-hidden group">
+                    <Link
+                      to={`/therapist/${therapist.id}`}
+                      className="block"
+                    >
+                      <ImageReveal
+                        direction={i % 2 === 0 ? "left" : "right"}
+                        duration={1.2}
+                        delay={i * 0.1}
+                        className="relative"
+                      >
+                        <img
+                          src={therapist.image}
+                          alt={`${therapist.name} — gay-friendly male massage therapist in ${therapist.city}`}
+                          loading="lazy"
+                          className="w-full h-72 object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
+                        />
+                        {therapist.verified && (
+                          <div className="absolute top-4 right-4 flex items-center gap-1 bg-background/90 backdrop-blur-sm px-2 py-1 text-xs text-foreground z-20">
+                            <CheckCircle2 className="w-3 h-3" />
+                            {t("home.verified")}
+                          </div>
+                        )}
+                      </ImageReveal>
+
+                      <div className="p-6">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h3 className="text-lg font-semibold text-foreground mb-1">{therapist.name}</h3>
+                            <p className="text-sm text-muted-foreground mb-1">{therapist.city}</p>
+                            <p className="text-sm text-muted-foreground">{therapist.specialty}</p>
+                          </div>
                         </div>
-                      )}
-                    </div>
 
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold text-foreground mb-1">{therapist.name}</h3>
-                        <p className="text-sm text-muted-foreground mb-1">{therapist.city}</p>
-                        <p className="text-sm text-muted-foreground">{therapist.specialty}</p>
+                        <div className="mt-6 flex items-center text-sm text-muted-foreground group-hover:text-foreground transition-colors duration-500">
+                          {t("home.viewProfile")}
+                          <ArrowRight className="w-3 h-3 ml-2 group-hover:translate-x-2 transition-transform duration-500" />
+                        </div>
                       </div>
-                    </div>
-
-                    <div className="mt-6 flex items-center text-sm text-muted-foreground group-hover:text-foreground transition-colors duration-500">
-                      {t("home.viewProfile")}
-                      <ArrowRight className="w-3 h-3 ml-2 group-hover:translate-x-2 transition-transform duration-500" />
-                    </div>
-                  </Link>
+                    </Link>
+                  </TiltCard>
                 </motion.div>
               ))}
             </div>
@@ -257,7 +268,7 @@ const Index = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
                 { Icon: ShieldIllustration, num: "01", title: t("home.feature01Title"), desc: t("home.feature01Desc") },
                 { Icon: CommunityIllustration, num: "02", title: t("home.feature02Title"), desc: t("home.feature02Desc") },
@@ -270,12 +281,13 @@ const Index = () => {
                   whileInView="visible"
                   viewport={{ once: true }}
                   variants={fadeUp}
-                  className="bg-background p-12 glow-hover relative"
                 >
-                  <feature.Icon className="text-muted-foreground mb-6" size={40} />
-                  <div className="text-5xl font-bold text-foreground/10 mb-4 font-heading">{feature.num}</div>
-                  <h3 className="text-xl font-semibold text-foreground mb-3">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
+                  <TiltCard className="glass-card p-12">
+                    <feature.Icon className="text-muted-foreground mb-6" size={40} />
+                    <div className="text-5xl font-bold text-foreground/10 mb-4 font-heading">{feature.num}</div>
+                    <h3 className="text-xl font-semibold text-foreground mb-3">{feature.title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
+                  </TiltCard>
                 </motion.div>
               ))}
             </div>
