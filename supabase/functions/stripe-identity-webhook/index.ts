@@ -30,9 +30,9 @@ serve(async (req) => {
         .update({ status: 'verified', stripe_report: session })
         .eq('stripe_session_id', sessionId);
 
-      // Update profile
+      // Update profile — Stripe Identity covers both identity and phone verification
       await supabase.from('profiles')
-        .update({ is_verified_identity: true })
+        .update({ is_verified_identity: true, is_verified_phone: true })
         .eq('stripe_verification_session_id', sessionId);
 
       console.log('Identity verified for session:', sessionId);
