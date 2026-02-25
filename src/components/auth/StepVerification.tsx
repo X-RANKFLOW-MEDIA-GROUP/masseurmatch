@@ -18,6 +18,7 @@ export const StepVerification = ({ onComplete }: StepVerificationProps) => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [phoneLoading, setPhoneLoading] = useState(false);
+  const [devOtp, setDevOtp] = useState<string | null>(null);
 
   // Identity verification state
   const [status, setStatus] = useState<'idle' | 'loading' | 'redirecting' | 'polling'>('idle');
@@ -35,7 +36,13 @@ export const StepVerification = ({ onComplete }: StepVerificationProps) => {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       
-      toast({ title: "Code sent!", description: "Check your phone for the 6-digit verification code." });
+      if (data?.dev_otp) {
+        setDevOtp(data.dev_otp);
+        toast({ title: "SMS failed — Dev mode", description: "The OTP code is shown on screen for testing.", variant: "destructive" });
+      } else {
+        setDevOtp(null);
+        toast({ title: "Code sent!", description: "Check your phone for the 6-digit verification code." });
+      }
       setPhoneStep('otp');
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -155,6 +162,12 @@ export const StepVerification = ({ onComplete }: StepVerificationProps) => {
 
         {phoneStep === 'otp' && (
           <div className="space-y-4">
+            {devOtp && (
+              <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 text-center">
+                <p className="text-xs text-yellow-400 font-medium mb-1">⚠️ Dev Fallback — SMS failed</p>
+                <p className="text-2xl font-mono font-bold tracking-[0.3em] text-yellow-300">{devOtp}</p>
+              </div>
+            )}
             <p className="text-sm text-center text-muted-foreground">
               Enter the 6-digit code sent to <strong className="text-foreground">{phoneNumber}</strong>
             </p>
