@@ -84,7 +84,16 @@ serve(async (req) => {
     if (!twilioRes.ok) {
       const errText = await twilioRes.text();
       console.error('Twilio error:', errText);
-      throw new Error('Failed to send SMS. Please check your phone number and try again.');
+      // DEV FALLBACK: return OTP in response so it can be shown on screen
+      console.warn('SMS delivery failed — returning OTP in dev fallback mode');
+      return new Response(JSON.stringify({ 
+        success: true, 
+        message: 'SMS failed — showing code on screen (dev mode)',
+        dev_otp: otp,
+        sms_failed: true,
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     console.log('OTP sent to:', cleanPhone.slice(0, -4) + '****');
