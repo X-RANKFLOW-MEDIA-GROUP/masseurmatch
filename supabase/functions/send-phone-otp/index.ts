@@ -84,25 +84,14 @@ serve(async (req) => {
     if (!twilioRes.ok) {
       const errText = await twilioRes.text();
       console.error('Twilio error:', errText);
-      // DEV FALLBACK: return OTP in response so it can be shown on screen
-      console.warn('SMS delivery failed — returning OTP in dev fallback mode');
-      return new Response(JSON.stringify({ 
-        success: true, 
-        message: 'SMS failed — showing code on screen (dev mode)',
-        dev_otp: otp,
-        sms_failed: true,
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      throw new Error('Failed to send verification code. Please try again.');
     }
 
     console.log('OTP sent to:', cleanPhone.slice(0, -4) + '****');
 
-    // DEV MODE: Always return OTP for on-screen display during development
     return new Response(JSON.stringify({ 
       success: true, 
       message: 'Verification code sent',
-      dev_otp: otp,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
