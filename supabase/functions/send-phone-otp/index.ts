@@ -98,7 +98,12 @@ serve(async (req) => {
 
     console.log('OTP sent to:', cleanPhone.slice(0, -4) + '****');
 
-    return new Response(JSON.stringify({ success: true, message: 'Verification code sent' }), {
+    // DEV MODE: Always return OTP for on-screen display during development
+    return new Response(JSON.stringify({ 
+      success: true, 
+      message: 'Verification code sent',
+      dev_otp: otp,
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
