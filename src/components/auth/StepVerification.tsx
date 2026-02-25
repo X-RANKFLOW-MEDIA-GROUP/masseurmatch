@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, ExternalLink, CheckCircle, AlertCircle, Loader2, Phone, ArrowRight } from "lucide-react";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { Shield, ExternalLink, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 
 interface StepVerificationProps {
   onComplete: () => void;
@@ -12,60 +10,7 @@ interface StepVerificationProps {
 
 export const StepVerification = ({ onComplete }: StepVerificationProps) => {
   const { toast } = useToast();
-  
-  // Phone verification state
-  const [phoneStep, setPhoneStep] = useState<'input' | 'otp' | 'verified'>('input');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [otpCode, setOtpCode] = useState('');
-  const [phoneLoading, setPhoneLoading] = useState(false);
-
-  // Identity verification state
   const [status, setStatus] = useState<'idle' | 'loading' | 'redirecting' | 'polling'>('idle');
-
-  const sendOtp = async () => {
-    if (!phoneNumber.trim()) {
-      toast({ title: "Error", description: "Please enter your phone number", variant: "destructive" });
-      return;
-    }
-    setPhoneLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('send-phone-otp', {
-        body: { phone: phoneNumber },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      
-      toast({ title: "Code sent!", description: "Check your phone for the 6-digit verification code." });
-      setPhoneStep('otp');
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setPhoneLoading(false);
-    }
-  };
-
-  const verifyOtp = async () => {
-    if (otpCode.length !== 6) {
-      toast({ title: "Error", description: "Please enter the full 6-digit code", variant: "destructive" });
-      return;
-    }
-    setPhoneLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('verify-phone-otp', {
-        body: { phone: phoneNumber, otp: otpCode },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      
-      toast({ title: "Phone verified!", description: "Your phone number has been confirmed." });
-      setPhoneStep('verified');
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-      setOtpCode('');
-    } finally {
-      setPhoneLoading(false);
-    }
-  };
 
   const startVerification = async () => {
     setStatus('loading');
@@ -127,79 +72,6 @@ export const StepVerification = ({ onComplete }: StepVerificationProps) => {
 
   return (
     <div className="space-y-8">
-      {/* ── PHONE VERIFICATION ── */}
-      <div className="space-y-5">
-        <div className="text-center">
-          <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center mx-auto mb-3">
-            <Phone className="w-7 h-7 text-primary" />
-          </div>
-          <h3 className="text-lg font-bold mb-1">Phone Verification</h3>
-          <p className="text-muted-foreground text-sm">We'll send a 6-digit code to verify your phone number.</p>
-        </div>
-
-        {phoneStep === 'input' && (
-          <div className="space-y-3">
-            <Input
-              type="tel"
-              placeholder="+1 555 123 4567"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              className="bg-white/5 border-white/10 text-center text-lg"
-            />
-            <Button variant="hero" className="w-full" onClick={sendOtp} disabled={phoneLoading}>
-              {phoneLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Phone className="w-4 h-4 mr-2" />}
-              {phoneLoading ? "Sending..." : "Send Verification Code"}
-            </Button>
-          </div>
-        )}
-
-        {phoneStep === 'otp' && (
-          <div className="space-y-4">
-            <p className="text-sm text-center text-muted-foreground">
-              Enter the 6-digit code sent to <strong className="text-foreground">{phoneNumber}</strong>
-            </p>
-            <div className="flex justify-center">
-              <InputOTP maxLength={6} value={otpCode} onChange={setOtpCode}>
-                <InputOTPGroup>
-                  <InputOTPSlot index={0} />
-                  <InputOTPSlot index={1} />
-                  <InputOTPSlot index={2} />
-                  <InputOTPSlot index={3} />
-                  <InputOTPSlot index={4} />
-                  <InputOTPSlot index={5} />
-                </InputOTPGroup>
-              </InputOTP>
-            </div>
-            <Button variant="hero" className="w-full" onClick={verifyOtp} disabled={phoneLoading || otpCode.length !== 6}>
-              {phoneLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <CheckCircle className="w-4 h-4 mr-2" />}
-              {phoneLoading ? "Verifying..." : "Verify Code"}
-            </Button>
-            <div className="flex justify-between">
-              <Button variant="ghost" size="sm" onClick={() => { setPhoneStep('input'); setOtpCode(''); }}>
-                Change number
-              </Button>
-              <Button variant="ghost" size="sm" onClick={sendOtp} disabled={phoneLoading}>
-                Resend code
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {phoneStep === 'verified' && (
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/30">
-            <CheckCircle className="w-5 h-5 text-primary shrink-0" />
-            <div>
-              <p className="text-sm font-medium">Phone verified</p>
-              <p className="text-xs text-muted-foreground">{phoneNumber}</p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ── DIVIDER ── */}
-      <div className="border-t border-border" />
-
-      {/* ── IDENTITY VERIFICATION ── */}
       <div className="space-y-5 text-center">
         <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center mx-auto">
           <Shield className="w-7 h-7 text-primary" />
@@ -208,7 +80,7 @@ export const StepVerification = ({ onComplete }: StepVerificationProps) => {
         <div>
           <h3 className="text-lg font-bold mb-1">Identity Verification</h3>
           <p className="text-muted-foreground text-sm">
-            Verify your identity with an official document (ID card, driver's license, or passport).
+            Verify your identity with an official document. This also confirms your phone number and email.
           </p>
         </div>
 
