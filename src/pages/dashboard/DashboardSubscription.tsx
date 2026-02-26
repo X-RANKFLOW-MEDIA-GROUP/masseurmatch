@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 
 const plans = [
+  { key: "free", name: "Free Trial", price: 0, features: ["Basic profile", "1 city", "Up to 3 photos", "14-day trial", "Card required"], isFree: true },
   { key: "standard", name: "Standard", price: 29, features: ["Full profile", "1 city", "Up to 6 photos", "Standard badge"] },
   { key: "premium", name: "Premium", price: 59, features: ["Everything in Standard", "3 cities", "10 photos", "Premium badge", "Assisted SEO"], popular: true },
   { key: "gold", name: "Gold", price: 99, features: ["Everything in Premium", "5 cities", "Top placement", "Advanced analytics"] },
@@ -128,8 +129,8 @@ const DashboardSubscription = () => {
           <div className="flex items-center gap-3">
             <Sparkles className="w-5 h-5 text-success shrink-0" />
             <div>
-              <p className="font-semibold text-sm">Founder Deal — 50% OFF forever</p>
-              <p className="text-xs text-muted-foreground">Limited to the first 50 members. All plans include a 14-day free trial with card required.</p>
+              <p className="font-semibold text-sm">Founder Deal — 50% OFF for 3 months</p>
+              <p className="text-xs text-muted-foreground">Limited to the first 50 members. All plans include a 14-day free trial. Card required to prevent fraud.</p>
             </div>
           </div>
         </div>
