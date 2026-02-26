@@ -79,16 +79,11 @@ const DashboardPhotos = () => {
           .single();
         if (error) throw error;
 
-        // Moderate using base64
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = async () => {
-          const base64 = (reader.result as string).split(",")[1];
-          await supabase.functions.invoke("moderate-photo", {
-            body: { photo_id: photoRecord.id, image_base64: base64 },
-          });
-          fetchPhotos();
-        };
+        // Moderate using Cloudinary URL via SightEngine
+        await supabase.functions.invoke("moderate-photo", {
+          body: { photo_id: photoRecord.id, image_url: imageUrl },
+        });
+        fetchPhotos();
       } catch (err: any) {
         toast({ title: "Upload error", description: err.message, variant: "destructive" });
       }
