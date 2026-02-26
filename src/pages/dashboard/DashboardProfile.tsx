@@ -120,6 +120,29 @@ const DashboardProfile = () => {
       return;
     }
     setSaving(true);
+
+    // Moderate bio text via SightEngine before saving
+    if (form.bio.trim()) {
+      try {
+        const { data: textMod, error: modError } = await supabase.functions.invoke('moderate-text', {
+          body: { profile_id: profile?.id, text: form.bio, field_name: 'bio' },
+        });
+        if (modError) {
+          console.error('Text moderation error:', modError);
+        } else if (textMod && !textMod.approved) {
+          setSaving(false);
+          toast({
+            title: "Bio content flagged",
+            description: textMod.reason || "Your bio contains content that violates our guidelines. Please revise it.",
+            variant: "destructive",
+          });
+          return;
+        }
+      } catch (err) {
+        console.error('Text moderation failed:', err);
+      }
+    }
+
     const { error } = await updateProfile({
       display_name: form.display_name || null,
       bio: form.bio || null,
