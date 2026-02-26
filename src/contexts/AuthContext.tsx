@@ -1,15 +1,41 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+
+interface SubscriptionState {
+  subscribed: boolean;
+  plan_key: string | null;
+  plan_name: string | null;
+  subscription_end: string | null;
+  trial_end: string | null;
+  is_trial: boolean;
+  has_founder_discount: boolean;
+  status: string | null;
+  loading: boolean;
+}
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  subscription: SubscriptionState;
+  refreshSubscription: () => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
+
+const defaultSubscription: SubscriptionState = {
+  subscribed: false,
+  plan_key: null,
+  plan_name: null,
+  subscription_end: null,
+  trial_end: null,
+  is_trial: false,
+  has_founder_discount: false,
+  status: null,
+  loading: true,
+};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -17,22 +43,65 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [subscription, setSubscription] = useState<SubscriptionState>(defaultSubscription);
+
+  const refreshSubscription = useCallback(async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('check-subscription');
+      if (error) {
+        console.error('Subscription check error:', error);
+        setSubscription(prev => ({ ...prev, loading: false }));
+        return;
+      }
+      setSubscription({
+        subscribed: data.subscribed ?? false,
+        plan_key: data.plan_key ?? null,
+        plan_name: data.plan_name ?? null,
+        subscription_end: data.subscription_end ?? null,
+        trial_end: data.trial_end ?? null,
+        is_trial: data.is_trial ?? false,
+        has_founder_discount: data.has_founder_discount ?? false,
+        status: data.status ?? null,
+        loading: false,
+      });
+    } catch {
+      setSubscription(prev => ({ ...prev, loading: false }));
+    }
+  }, []);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      if (session?.user) {
+        // Defer to avoid Supabase deadlock
+        setTimeout(() => refreshSubscription(), 0);
+      } else {
+        setSubscription({ ...defaultSubscription, loading: false });
+      }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      if (session?.user) {
+        refreshSubscription();
+      } else {
+        setSubscription({ ...defaultSubscription, loading: false });
+      }
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => authSub.unsubscribe();
+  }, [refreshSubscription]);
+
+  // Auto-refresh subscription every 60s
+  useEffect(() => {
+    if (!user) return;
+    const interval = setInterval(refreshSubscription, 60_000);
+    return () => clearInterval(interval);
+  }, [user, refreshSubscription]);
 
   const signUp = async (email: string, password: string, fullName: string) => {
     const { error } = await supabase.auth.signUp({
@@ -56,7 +125,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, subscription, refreshSubscription, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
