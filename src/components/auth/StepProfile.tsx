@@ -160,6 +160,22 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
 
       if (profileError) throw profileError;
 
+      // Moderate text content via SightEngine
+      if (profile.bio) {
+        const { data: textMod } = await supabase.functions.invoke('moderate-text', {
+          body: { profile_id: profileData.id, text: profile.bio, field_name: 'bio' },
+        });
+        if (textMod && !textMod.approved) {
+          toast({
+            title: "Bio content flagged",
+            description: textMod.reason || "Your bio contains content that violates our guidelines.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+      }
+
       if (photos.length > 0 && profileData) {
         const results = await uploadAndModeratePhotos(profileData.id);
         const rejected = results.filter(r => r.status === 'rejected');

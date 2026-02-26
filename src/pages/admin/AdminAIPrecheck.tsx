@@ -8,17 +8,18 @@ const AdminAIPrecheck = () => {
       <Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Bot className="w-5 h-5" /> Automatic Scan + Human Review
+            <Bot className="w-5 h-5" /> SightEngine Moderation + Human Review
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-sm">
-            The AI Pre-check system uses Gemini 2.0 Flash to automatically scan photos and profile content.
-            Items flagged by AI appear in the moderation queue for human review.
+            The moderation system uses SightEngine API to automatically scan photos (nudity, violence, offensive content) and profile text (sexual content, personal info, links).
+            Items flagged by SightEngine appear in the moderation queue for human review.
           </p>
-          <div className="mt-4 p-4 rounded-lg bg-secondary border border-border">
+          <div className="mt-4 p-4 rounded-lg bg-secondary border border-border space-y-2">
             <p className="text-sm font-medium">Status: Active</p>
-            <p className="text-xs text-muted-foreground mt-1">Photos are automatically scanned on upload via the moderate-photo edge function.</p>
+            <p className="text-xs text-muted-foreground">Photos → <code className="text-xs">moderate-photo</code> (nudity-2.1, offensive, gore, violence, drugs)</p>
+            <p className="text-xs text-muted-foreground">Text → <code className="text-xs">moderate-text</code> (nudity, links, personal info)</p>
           </div>
         </CardContent>
       </Card>
