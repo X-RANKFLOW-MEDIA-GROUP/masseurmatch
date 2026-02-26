@@ -17,3 +17,9 @@ verify_jwt = false
 
 [functions.send-notification-email]
 verify_jwt = false
+
+[functions.moderate-text]
+verify_jwt = false
+
+[functions.cloudinary-sign]
+verify_jwt = false
