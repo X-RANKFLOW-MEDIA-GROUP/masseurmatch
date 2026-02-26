@@ -1,17 +1,70 @@
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import { CheckCircle2, ArrowRight, Loader2, Crown, Sparkles, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
+import { toast } from "@/hooks/use-toast";
 
 const plans = [
-  { name: "Free", price: 0, features: ["Basic profile", "1 city", "Up to 3 photos"], current: true },
-  { name: "Standard", price: 29, features: ["Full profile", "1 city", "Up to 6 photos", "Standard badge"] },
-  { name: "Premium", price: 59, features: ["Everything in Standard", "3 cities", "10 photos", "Premium badge", "Assisted SEO"] },
-  { name: "Gold", price: 99, features: ["Everything in Premium", "5 cities", "Top placement", "Advanced analytics"] },
-  { name: "Platinum", price: 149, features: ["Everything in Gold", "Unlimited cities", "Permanent boost", "Priority support"] },
+  { key: "standard", name: "Standard", price: 29, features: ["Full profile", "1 city", "Up to 6 photos", "Standard badge"] },
+  { key: "premium", name: "Premium", price: 59, features: ["Everything in Standard", "3 cities", "10 photos", "Premium badge", "Assisted SEO"], popular: true },
+  { key: "gold", name: "Gold", price: 99, features: ["Everything in Premium", "5 cities", "Top placement", "Advanced analytics"] },
+  { key: "platinum", name: "Platinum", price: 149, features: ["Everything in Gold", "Unlimited cities", "Permanent boost", "Priority support"] },
 ];
 
 const DashboardSubscription = () => {
+  const { subscription, refreshSubscription } = useAuth();
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [searchParams] = useSearchParams();
+
+  // Handle return from Stripe checkout
+  useEffect(() => {
+    if (searchParams.get("success") === "true") {
+      toast({ title: "Welcome aboard!", description: "Your subscription is now active. Enjoy your 14-day free trial!" });
+      refreshSubscription();
+    } else if (searchParams.get("canceled") === "true") {
+      toast({ title: "Checkout canceled", description: "No charges were made.", variant: "destructive" });
+    }
+  }, [searchParams, refreshSubscription]);
+
+  const handleCheckout = async (planKey: string) => {
+    setCheckoutLoading(planKey);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { plan_key: planKey },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, "_blank");
+      }
+    } catch (err: any) {
+      toast({ title: "Checkout error", description: err.message || "Failed to create checkout session", variant: "destructive" });
+    } finally {
+      setCheckoutLoading(null);
+    }
+  };
+
+  const handleManage = async () => {
+    setPortalLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("customer-portal");
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, "_blank");
+      }
+    } catch (err: any) {
+      toast({ title: "Portal error", description: err.message || "Failed to open portal", variant: "destructive" });
+    } finally {
+      setPortalLoading(false);
+    }
+  };
+
+  const currentPlanKey = subscription.plan_key;
+  const isSubscribed = subscription.subscribed;
+
   return (
     <div className="max-w-5xl space-y-6">
       <div>
@@ -24,35 +77,112 @@ const DashboardSubscription = () => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs uppercase tracking-wider text-muted-foreground">Current Plan</p>
-            <h2 className="text-xl font-bold mt-1">Free</h2>
-            <p className="text-sm text-muted-foreground mt-1">$0/month</p>
+            <h2 className="text-xl font-bold mt-1 flex items-center gap-2">
+              {subscription.loading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : isSubscribed ? (
+                <>
+                  <Crown className="w-5 h-5" />
+                  {subscription.plan_name || "Active Plan"}
+                </>
+              ) : (
+                "Free"
+              )}
+            </h2>
+            {isSubscribed && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {subscription.is_trial && (
+                  <Badge variant="secondary" className="text-[10px]">
+                    Trial until {subscription.trial_end ? new Date(subscription.trial_end).toLocaleDateString() : "N/A"}
+                  </Badge>
+                )}
+                {subscription.has_founder_discount && (
+                  <Badge className="text-[10px] bg-success/20 text-success border-success/30">
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    Founder 50% OFF
+                  </Badge>
+                )}
+              </div>
+            )}
+            <p className="text-sm text-muted-foreground mt-1">
+              {isSubscribed
+                ? `Renews ${subscription.subscription_end ? new Date(subscription.subscription_end).toLocaleDateString() : ""}`
+                : "$0/month"}
+            </p>
           </div>
-          <Badge variant="outline" className="text-xs">Active</Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-xs">{isSubscribed ? subscription.status === "trialing" ? "Trial" : "Active" : "Free"}</Badge>
+            {isSubscribed && (
+              <Button variant="outline" size="sm" onClick={handleManage} disabled={portalLoading}>
+                {portalLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <ExternalLink className="w-3 h-3" />}
+                <span className="ml-1">Manage</span>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Plan Comparison */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {plans.filter(p => p.name !== "Free").map((plan) => (
-          <div key={plan.name} className={`glass-card p-6 space-y-4 ${plan.name === "Premium" ? "ring-1 ring-primary" : ""}`}>
-            {plan.name === "Premium" && <Badge className="text-[10px]">Most Popular</Badge>}
+      {/* Founder Deal Banner */}
+      {!isSubscribed && (
+        <div className="glass-card p-4 border border-success/20 bg-success/5">
+          <div className="flex items-center gap-3">
+            <Sparkles className="w-5 h-5 text-success shrink-0" />
             <div>
-              <h3 className="font-bold text-lg">{plan.name}</h3>
-              <p className="text-2xl font-bold mt-1">${plan.price}<span className="text-sm text-muted-foreground font-normal">/month</span></p>
+              <p className="font-semibold text-sm">Founder Deal — 50% OFF forever</p>
+              <p className="text-xs text-muted-foreground">Limited to the first 50 members. All plans include a 14-day free trial with card required.</p>
             </div>
-            <ul className="space-y-2">
-              {plan.features.map((f) => (
-                <li key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <CheckCircle2 className="w-3 h-3 text-success shrink-0" />
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <Button variant="outline" className="w-full text-xs" size="sm">
-              Upgrade <ArrowRight className="w-3 h-3 ml-1" />
-            </Button>
           </div>
-        ))}
+        </div>
+      )}
+
+      {/* Plan Comparison */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+        {plans.map((plan) => {
+          const isCurrent = currentPlanKey === plan.key;
+          return (
+            <div key={plan.key} className={`glass-card p-6 space-y-4 ${plan.popular ? "ring-1 ring-primary" : ""} ${isCurrent ? "border-l-4 border-l-success" : ""}`}>
+              <div className="flex items-center gap-2">
+                {plan.popular && <Badge className="text-[10px]">Most Popular</Badge>}
+                {isCurrent && <Badge variant="secondary" className="text-[10px]">Your Plan</Badge>}
+              </div>
+              <div>
+                <h3 className="font-bold text-lg">{plan.name}</h3>
+                <p className="text-2xl font-bold mt-1">
+                  ${plan.price}
+                  <span className="text-sm text-muted-foreground font-normal">/month</span>
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">14-day free trial included</p>
+              </div>
+              <ul className="space-y-2">
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <CheckCircle2 className="w-3 h-3 text-success shrink-0" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              {isCurrent ? (
+                <Button variant="outline" className="w-full text-xs" size="sm" disabled>
+                  Current Plan
+                </Button>
+              ) : (
+                <Button
+                  variant={plan.popular ? "default" : "outline"}
+                  className="w-full text-xs"
+                  size="sm"
+                  onClick={() => handleCheckout(plan.key)}
+                  disabled={!!checkoutLoading}
+                >
+                  {checkoutLoading === plan.key ? (
+                    <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                  ) : null}
+                  {isSubscribed ? "Switch Plan" : "Start Free Trial"}
+                  <ArrowRight className="w-3 h-3 ml-1" />
+                </Button>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       <div className="glass-card p-4 text-center">
