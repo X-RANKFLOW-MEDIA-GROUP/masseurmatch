@@ -30,6 +30,32 @@ const DashboardPhotos = () => {
 
   useEffect(() => { fetchPhotos(); }, [profile]);
 
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    // Get signed upload params from edge function
+    const { data: signData, error: signError } = await supabase.functions.invoke('cloudinary-sign');
+    if (signError || !signData) throw new Error(signError?.message || 'Failed to get upload signature');
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('api_key', signData.api_key);
+    formData.append('timestamp', signData.timestamp.toString());
+    formData.append('signature', signData.signature);
+    formData.append('folder', signData.folder);
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${signData.cloud_name}/image/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json();
+      throw new Error(errBody?.error?.message || 'Cloudinary upload failed');
+    }
+
+    const result = await res.json();
+    return result.secure_url;
+  };
+
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (!files.length || !user || !profile) return;
@@ -37,15 +63,23 @@ const DashboardPhotos = () => {
 
     for (const file of files) {
       try {
-        const filePath = `${user.id}/${Date.now()}_${file.name}`;
+        // Upload to Cloudinary
+        const imageUrl = await uploadToCloudinary(file);
+
+        // Save record with Cloudinary URL as storage_path
         const { data: photoRecord, error } = await supabase
           .from("profile_photos")
-          .insert({ profile_id: profile.id, storage_path: filePath, is_primary: photos.length === 0, sort_order: photos.length })
+          .insert({
+            profile_id: profile.id,
+            storage_path: imageUrl,
+            is_primary: photos.length === 0,
+            sort_order: photos.length,
+          })
           .select()
           .single();
         if (error) throw error;
 
-        // Moderate
+        // Moderate using base64
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = async () => {
@@ -60,7 +94,6 @@ const DashboardPhotos = () => {
       }
     }
 
-    // Set profile back to pending after photo upload
     await updateProfile({ status: "pending_approval", is_active: false, is_verified_photos: false });
     setUploading(false);
     toast({ title: "Photos uploaded", description: "Your photos are being reviewed. Your profile is now under review." });
@@ -85,6 +118,13 @@ const DashboardPhotos = () => {
     if (status === "approved") return "border-success/40 text-success";
     if (status === "rejected") return "border-destructive/40 text-destructive";
     return "border-warning/40 text-warning";
+  };
+
+  const getPhotoUrl = (photo: Tables<"profile_photos">) => {
+    // If storage_path is a full URL (Cloudinary), use directly
+    if (photo.storage_path.startsWith('http')) return photo.storage_path;
+    // Fallback for any legacy paths
+    return undefined;
   };
 
   return (
@@ -116,31 +156,38 @@ const DashboardPhotos = () => {
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {photos.map((photo) => (
-            <div key={photo.id} className="relative aspect-square rounded-lg overflow-hidden border border-border group">
-              <div className="w-full h-full bg-muted flex items-center justify-center text-xs text-muted-foreground">
-                <Camera className="w-8 h-8" />
-              </div>
-              <div className="absolute top-2 left-2">
-                <Badge variant="outline" className={`text-[10px] ${statusColor(photo.moderation_status)}`}>
-                  {photo.moderation_status === "approved" ? "Approved" : photo.moderation_status === "rejected" ? "Rejected" : "Pending"}
-                </Badge>
-              </div>
-              {photo.is_primary && (
-                <span className="absolute bottom-2 left-2 text-[10px] bg-primary px-1.5 py-0.5 rounded text-primary-foreground font-medium">Primary</span>
-              )}
-              <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                {!photo.is_primary && (
-                  <button onClick={() => setPrimary(photo.id)} className="bg-background/80 rounded p-1 hover:bg-background" title="Set as primary">
-                    <Camera className="w-3 h-3" />
-                  </button>
+          {photos.map((photo) => {
+            const url = getPhotoUrl(photo);
+            return (
+              <div key={photo.id} className="relative aspect-square rounded-lg overflow-hidden border border-border group">
+                {url ? (
+                  <img src={url} alt="Profile photo" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-muted flex items-center justify-center text-xs text-muted-foreground">
+                    <Camera className="w-8 h-8" />
+                  </div>
                 )}
-                <button onClick={() => deletePhoto(photo.id)} className="bg-background/80 rounded p-1 hover:bg-destructive/80" title="Remove">
-                  <Trash2 className="w-3 h-3" />
-                </button>
+                <div className="absolute top-2 left-2">
+                  <Badge variant="outline" className={`text-[10px] ${statusColor(photo.moderation_status)}`}>
+                    {photo.moderation_status === "approved" ? "Approved" : photo.moderation_status === "rejected" ? "Rejected" : "Pending"}
+                  </Badge>
+                </div>
+                {photo.is_primary && (
+                  <span className="absolute bottom-2 left-2 text-[10px] bg-primary px-1.5 py-0.5 rounded text-primary-foreground font-medium">Primary</span>
+                )}
+                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {!photo.is_primary && (
+                    <button onClick={() => setPrimary(photo.id)} className="bg-background/80 rounded p-1 hover:bg-background" title="Set as primary">
+                      <Camera className="w-3 h-3" />
+                    </button>
+                  )}
+                  <button onClick={() => deletePhoto(photo.id)} className="bg-background/80 rounded p-1 hover:bg-destructive/80" title="Remove">
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
