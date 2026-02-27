@@ -31,7 +31,9 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
 import { Badge } from "@/components/ui/badge";
+import { Crown, ArrowUpCircle } from "lucide-react";
 
 const menuItems = [
   { title: "Overview", url: "/dashboard", icon: LayoutDashboard },
@@ -57,6 +59,17 @@ export const DashboardSidebar = () => {
   const location = useLocation();
   const { signOut } = useAuth();
   const { profile } = useProfile();
+  const { planLabel, planKey } = usePlanLimits();
+
+  const planColorMap: Record<string, string> = {
+    free: "border-muted-foreground/40 text-muted-foreground",
+    standard: "border-primary/40 text-primary",
+    premium: "border-accent/60 text-accent-foreground bg-accent/20",
+    gold: "border-warning/40 text-warning bg-warning/10",
+    platinum: "border-chart-4/40 text-chart-4 bg-chart-4/10",
+  };
+  const badgeClass = planColorMap[planKey || "free"] || planColorMap.free;
+  const showUpgrade = !planKey || planKey === "free" || planKey === "standard";
 
   const isActive = (url: string) => {
     if (url === "/dashboard") return location.pathname === "/dashboard";
@@ -137,7 +150,21 @@ export const DashboardSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-2">
+      <SidebarFooter className="p-2 space-y-1">
+        <div className="px-2 py-2 group-data-[collapsible=icon]:hidden">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <Crown className="h-3.5 w-3.5 text-warning" />
+              <Badge variant="outline" className={`text-[10px] ${badgeClass}`}>{planLabel}</Badge>
+            </div>
+            {showUpgrade && (
+              <Link to="/dashboard/subscription" className="flex items-center gap-1 text-[10px] font-medium text-primary hover:underline">
+                <ArrowUpCircle className="h-3 w-3" />
+                Upgrade
+              </Link>
+            )}
+          </div>
+        </div>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton tooltip="Sign Out" onClick={signOut}>
