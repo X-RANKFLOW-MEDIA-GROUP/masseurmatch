@@ -2,16 +2,19 @@ import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Upload, X, Trash2, Camera, Loader2, GripVertical } from "lucide-react";
+import { Upload, X, Trash2, Camera, Loader2, GripVertical, Lock, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 import type { Tables } from "@/integrations/supabase/types";
 
 const DashboardPhotos = () => {
   const { user } = useAuth();
   const { profile, updateProfile } = useProfile();
   const { toast } = useToast();
+  const { maxPhotos, planLabel, isLoading: limitsLoading } = usePlanLimits();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [photos, setPhotos] = useState<Tables<"profile_photos">[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,8 +33,9 @@ const DashboardPhotos = () => {
 
   useEffect(() => { fetchPhotos(); }, [profile]);
 
+  const atLimit = photos.length >= maxPhotos;
+
   const uploadToCloudinary = async (file: File): Promise<string> => {
-    // Get signed upload params from edge function
     const { data: signData, error: signError } = await supabase.functions.invoke('cloudinary-sign');
     if (signError || !signData) throw new Error(signError?.message || 'Failed to get upload signature');
 
@@ -59,14 +63,24 @@ const DashboardPhotos = () => {
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (!files.length || !user || !profile) return;
+
+    const remaining = maxPhotos - photos.length;
+    if (remaining <= 0) {
+      toast({ title: "Photo limit reached", description: `Your ${planLabel} plan allows up to ${maxPhotos} photos. Upgrade for more.`, variant: "destructive" });
+      return;
+    }
+
+    const filesToUpload = files.slice(0, remaining);
+    if (filesToUpload.length < files.length) {
+      toast({ title: "Limit applied", description: `Only uploading ${filesToUpload.length} of ${files.length} photos (plan limit: ${maxPhotos}).` });
+    }
+
     setUploading(true);
 
-    for (const file of files) {
+    for (const file of filesToUpload) {
       try {
-        // Upload to Cloudinary
         const imageUrl = await uploadToCloudinary(file);
 
-        // Save record with Cloudinary URL as storage_path
         const { data: photoRecord, error } = await supabase
           .from("profile_photos")
           .insert({
@@ -79,7 +93,6 @@ const DashboardPhotos = () => {
           .single();
         if (error) throw error;
 
-        // Moderate using Cloudinary URL via SightEngine
         await supabase.functions.invoke("moderate-photo", {
           body: { photo_id: photoRecord.id, image_url: imageUrl },
         });
@@ -116,9 +129,7 @@ const DashboardPhotos = () => {
   };
 
   const getPhotoUrl = (photo: Tables<"profile_photos">) => {
-    // If storage_path is a full URL (Cloudinary), use directly
     if (photo.storage_path.startsWith('http')) return photo.storage_path;
-    // Fallback for any legacy paths
     return undefined;
   };
 
@@ -129,11 +140,25 @@ const DashboardPhotos = () => {
           <h1 className="text-2xl font-bold">Photos</h1>
           <p className="text-sm text-muted-foreground">Manage your professional photos. All photos go through moderation.</p>
         </div>
-        <Button onClick={() => fileInputRef.current?.click()} disabled={uploading}>
-          {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
-          Add Photos
+        <Button onClick={() => fileInputRef.current?.click()} disabled={uploading || atLimit}>
+          {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : atLimit ? <Lock className="w-4 h-4 mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
+          {atLimit ? "Limit Reached" : "Add Photos"}
         </Button>
         <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" />
+      </div>
+
+      {/* Plan limit indicator */}
+      <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-2">
+        <span className="text-xs text-muted-foreground">
+          Photos: <span className="font-semibold text-foreground">{photos.length}</span> / {maxPhotos} ({planLabel})
+        </span>
+        {atLimit && (
+          <Link to="/dashboard/subscription">
+            <Button variant="link" size="sm" className="text-xs h-auto p-0">
+              Upgrade for more <ArrowRight className="w-3 h-3 ml-1" />
+            </Button>
+          </Link>
+        )}
       </div>
 
       {loading ? (

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useProfile } from "@/hooks/useProfile";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Trash2, Plane, MapPin, Calendar } from "lucide-react";
+import { Loader2, Plus, Trash2, Plane, MapPin, Calendar, Lock, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface TravelEntry {
   id: string;
@@ -21,6 +23,7 @@ interface TravelEntry {
 
 const DashboardTravel = () => {
   const { profile, loading: profileLoading } = useProfile();
+  const { maxCities, planLabel } = usePlanLimits();
   const { toast } = useToast();
   const [travels, setTravels] = useState<TravelEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,11 +54,25 @@ const DashboardTravel = () => {
     if (profile) fetchTravels();
   }, [profile]);
 
+  // Count unique active destination cities
+  const activeCities = new Set(
+    travels.filter(t => t.is_active && new Date(t.end_date) >= new Date(new Date().toDateString())).map(t => t.destination_city.toLowerCase())
+  );
+  const atCityLimit = activeCities.size >= maxCities;
+
   const handleAdd = async () => {
     if (!profile || !form.destination_city || !form.start_date || !form.end_date) {
       toast({ title: "Please fill in city and dates", variant: "destructive" });
       return;
     }
+
+    // Check if this is a new city
+    const isNewCity = !activeCities.has(form.destination_city.toLowerCase());
+    if (isNewCity && atCityLimit) {
+      toast({ title: "City limit reached", description: `Your ${planLabel} plan allows up to ${maxCities} destination cities. Upgrade for more.`, variant: "destructive" });
+      return;
+    }
+
     setSaving(true);
     const { error } = await supabase.from("provider_travel").insert({
       profile_id: profile.id,
@@ -108,10 +125,24 @@ const DashboardTravel = () => {
             Add cities you're visiting. During travel dates, you'll appear in the destination city instead of your home city.
           </p>
         </div>
-        <Button onClick={() => setShowForm(!showForm)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add Trip
+        <Button onClick={() => setShowForm(!showForm)} disabled={atCityLimit && !showForm}>
+          {atCityLimit ? <Lock className="w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
+          {atCityLimit ? "Limit Reached" : "Add Trip"}
         </Button>
+      </div>
+
+      {/* Plan limit indicator */}
+      <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-2">
+        <span className="text-xs text-muted-foreground">
+          Active cities: <span className="font-semibold text-foreground">{activeCities.size}</span> / {maxCities === 999 ? "∞" : maxCities} ({planLabel})
+        </span>
+        {atCityLimit && (
+          <Link to="/dashboard/subscription">
+            <Button variant="link" size="sm" className="text-xs h-auto p-0">
+              Upgrade for more <ArrowRight className="w-3 h-3 ml-1" />
+            </Button>
+          </Link>
+        )}
       </div>
 
       {/* Info box */}
