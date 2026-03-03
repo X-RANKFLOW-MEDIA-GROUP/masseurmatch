@@ -3,7 +3,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SafetyDisclaimer } from "@/components/legal/SafetyDisclaimer";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Star, CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
+import { MapPin, Star, CheckCircle2, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { TextReveal } from "@/components/animations/TextReveal";
@@ -178,8 +178,20 @@ const City = () => {
 
           {/* Therapist Cards */}
           {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+            <div className="max-w-4xl mx-auto space-y-px bg-border rounded-lg overflow-hidden mb-12">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex flex-col md:flex-row gap-6 p-6 bg-background animate-pulse">
+                  <div className="w-full md:w-40 h-40 md:h-28 rounded-lg bg-secondary flex-shrink-0" />
+                  <div className="flex-1 space-y-3">
+                    <div className="h-5 bg-secondary rounded w-1/3" />
+                    <div className="h-3 bg-secondary rounded w-1/4" />
+                    <div className="h-3 bg-secondary rounded w-1/6" />
+                  </div>
+                  <div className="flex items-center">
+                    <div className="h-3 bg-secondary rounded w-12" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : profiles.length === 0 ? (
             <div className="text-center py-20">
