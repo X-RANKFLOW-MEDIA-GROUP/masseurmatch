@@ -25,8 +25,14 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
+    const rawStripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    if (!rawStripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
+    // Sanitize: strip non-ASCII chars, whitespace, newlines
+    const stripeKey = rawStripeKey.replace(/[^\x20-\x7E]/g, "").trim();
+    if (!stripeKey.startsWith("sk_")) {
+      throw new Error("STRIPE_SECRET_KEY is invalid (must start with sk_test_ or sk_live_)");
+    }
+    logStep("Stripe key verified", { prefix: stripeKey.substring(0, 7) });
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header");
