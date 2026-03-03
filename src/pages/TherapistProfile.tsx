@@ -6,9 +6,9 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  MapPin, CheckCircle2, Star, Phone, Globe, Clock, ArrowRight,
+  MapPin, CheckCircle2, Phone, Globe, Clock, ArrowRight,
   MessageSquare, Bookmark, Award, Languages, ChevronLeft, ChevronRight,
-  Plane, Loader2
+  Plane
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -98,8 +98,37 @@ const TherapistProfile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="relative h-72 md:h-96 bg-secondary animate-pulse" />
+        <div className="container mx-auto px-4 -mt-28 relative z-10">
+          <div className="max-w-5xl mx-auto">
+            <div className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg animate-pulse">
+              <div className="flex flex-col md:flex-row gap-8">
+                <div className="w-36 h-36 rounded-full bg-secondary flex-shrink-0" />
+                <div className="flex-1 space-y-4">
+                  <div className="h-8 bg-secondary rounded w-1/3" />
+                  <div className="h-4 bg-secondary rounded w-1/4" />
+                  <div className="h-4 bg-secondary rounded w-1/2" />
+                  <div className="flex gap-3 pt-2">
+                    <div className="h-10 bg-secondary rounded w-28" />
+                    <div className="h-10 bg-secondary rounded w-28" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {[1, 2, 3].map(i => (
+              <div key={i} className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg animate-pulse">
+                <div className="h-6 bg-secondary rounded w-1/4 mb-6" />
+                <div className="space-y-3">
+                  <div className="h-4 bg-secondary rounded w-full" />
+                  <div className="h-4 bg-secondary rounded w-3/4" />
+                  <div className="h-4 bg-secondary rounded w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -146,6 +175,7 @@ const TherapistProfile = () => {
         title={`${displayName} — Massage Therapist in ${cityLabel || "Your City"} | MasseurMatch`}
         description={profile.bio?.slice(0, 155) || `Book a professional massage with ${displayName} in ${cityLabel}.`}
         path={`/therapist/${id}`}
+        ogImage={primaryPhoto?.storage_path || undefined}
         jsonLd={profileJsonLd}
       />
       <CursorGlow />
