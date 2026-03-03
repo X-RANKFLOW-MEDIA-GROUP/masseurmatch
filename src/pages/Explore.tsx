@@ -264,7 +264,6 @@ const Explore = () => {
       ]);
 
       if (profilesRes.error) {
-        console.error("Failed to fetch profiles:", profilesRes.error);
         setLoading(false);
         return;
       }
@@ -561,10 +560,25 @@ const Explore = () => {
             </div>
           </motion.div>
 
-          {/* Loading State */}
+          {/* Loading Skeleton */}
           {loading && (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+            <div className="max-w-5xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="rounded-lg border border-border bg-card overflow-hidden animate-pulse">
+                    <div className="h-48 bg-secondary" />
+                    <div className="p-5 space-y-3">
+                      <div className="h-5 bg-secondary rounded w-2/3" />
+                      <div className="h-3 bg-secondary rounded w-1/3" />
+                      <div className="h-3 bg-secondary rounded w-full" />
+                      <div className="flex justify-between items-center pt-2">
+                        <div className="h-4 bg-secondary rounded w-16" />
+                        <div className="h-3 bg-secondary rounded w-12" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
