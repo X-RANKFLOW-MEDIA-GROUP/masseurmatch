@@ -18,68 +18,54 @@ export interface PlanLimits {
   planLabel: string;
 }
 
+const FREE_LIMITS: PlanLimits = {
+  maxPhotos: 3,
+  maxCities: 1,
+  hasPremiumBadge: false,
+  hasGoldBadge: false,
+  hasPlatinumBadge: false,
+  hasTopPlacement: false,
+  hasBoost: false,
+  hasMultipleCategories: false,
+  hasPrioritySupport: false,
+  hasAssistedSeo: false,
+  hasAdvancedAnalytics: false,
+  hasPermanentBoost: false,
+  planLabel: "Free Trial",
+};
+
 const PLAN_LIMITS: Record<string, PlanLimits> = {
-  free: {
-    maxPhotos: 3,
-    maxCities: 1,
-    hasPremiumBadge: false,
-    hasGoldBadge: false,
-    hasPlatinumBadge: false,
-    hasTopPlacement: false,
-    hasBoost: false,
-    hasMultipleCategories: false,
-    hasPrioritySupport: false,
-    hasAssistedSeo: false,
-    hasAdvancedAnalytics: false,
-    hasPermanentBoost: false,
-    planLabel: "Free Trial",
-  },
+  free: FREE_LIMITS,
   standard: {
+    ...FREE_LIMITS,
     maxPhotos: 6,
-    maxCities: 1,
-    hasPremiumBadge: false,
-    hasGoldBadge: false,
-    hasPlatinumBadge: false,
-    hasTopPlacement: false,
-    hasBoost: false,
-    hasMultipleCategories: false,
-    hasPrioritySupport: false,
-    hasAssistedSeo: false,
-    hasAdvancedAnalytics: false,
-    hasPermanentBoost: false,
     planLabel: "Standard",
   },
   premium: {
+    ...FREE_LIMITS,
     maxPhotos: 10,
     maxCities: 3,
     hasPremiumBadge: true,
-    hasGoldBadge: false,
-    hasPlatinumBadge: false,
-    hasTopPlacement: false,
     hasBoost: true,
     hasMultipleCategories: true,
-    hasPrioritySupport: false,
     hasAssistedSeo: true,
-    hasAdvancedAnalytics: false,
-    hasPermanentBoost: false,
     planLabel: "Premium",
   },
   gold: {
+    ...FREE_LIMITS,
     maxPhotos: 20,
     maxCities: 5,
     hasPremiumBadge: true,
     hasGoldBadge: true,
-    hasPlatinumBadge: false,
     hasTopPlacement: true,
     hasBoost: true,
     hasMultipleCategories: true,
-    hasPrioritySupport: false,
     hasAssistedSeo: true,
     hasAdvancedAnalytics: true,
-    hasPermanentBoost: false,
     planLabel: "Gold",
   },
   platinum: {
+    ...FREE_LIMITS,
     maxPhotos: 50,
     maxCities: 999,
     hasPremiumBadge: true,
@@ -97,14 +83,22 @@ const PLAN_LIMITS: Record<string, PlanLimits> = {
 };
 
 export const usePlanLimits = (): PlanLimits & { planKey: PlanKey; isLoading: boolean } => {
-  const { subscription } = useAuth();
+  try {
+    const { subscription } = useAuth();
+    const planKey = (subscription?.plan_key as PlanKey) || (subscription?.subscribed ? "standard" : null);
+    const limits = PLAN_LIMITS[planKey || "free"] || FREE_LIMITS;
 
-  const planKey = (subscription.plan_key as PlanKey) || (subscription.subscribed ? "standard" : null);
-  const limits = PLAN_LIMITS[planKey || "free"] || PLAN_LIMITS.free;
-
-  return {
-    ...limits,
-    planKey,
-    isLoading: subscription.loading,
-  };
+    return {
+      ...limits,
+      planKey,
+      isLoading: subscription?.loading ?? false,
+    };
+  } catch {
+    // If AuthContext is unavailable or subscription check fails, return safe defaults
+    return {
+      ...FREE_LIMITS,
+      planKey: null,
+      isLoading: false,
+    };
+  }
 };
