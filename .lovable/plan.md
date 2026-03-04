@@ -1,26 +1,59 @@
 
 
-# Add Terms & Content Policy Acceptance Checkboxes to Profile Setup
+## SEO no seu projeto atual vs Next.js
 
-## What Changes
+### A realidade sobre Next.js no Lovable
 
-Add a mandatory acceptance section at the bottom of the profile setup form (`StepProfile.tsx`, step 3 of onboarding) with three checkboxes that must all be checked before the user can submit:
+O Lovable **não suporta Next.js** — ele é construído sobre React + Vite. Migrar para Next.js significaria sair do Lovable e reescrever o projeto do zero em outra plataforma.
 
-1. **Terms & Conditions** -- "I have read and agree to the Terms of Service and Privacy Policy"
-2. **Photo Policy** -- "I confirm my photos are recent (within 12 months), fully clothed, and comply with the Photo Guidelines. No nudity, sexual poses, or stock photos."
-3. **Profile & Ad Description Policy** -- "I confirm my profile description is accurate, professional, and does not contain sexual content, coded language, misleading claims, or deceptive pricing."
+**Mas a boa notícia**: você já pode ter SEO excelente com o stack atual. O Google renderiza JavaScript (CSR) normalmente desde 2019. O que realmente importa são as práticas técnicas corretas.
 
-## Where It Appears
+---
 
-The acceptance block will appear between the Photos section and the "Save Profile & Submit for Review" button in `StepProfile.tsx`. The submit button will be disabled until all three checkboxes are checked.
+### O que já está implementado no seu projeto
 
-## Technical Details
+- `SEOHead.tsx` com meta tags dinâmicas (OG, Twitter Cards, hreflang)
+- Sitemap dinâmico via Edge Function (`generate-sitemap`)
+- `robots.txt` configurado
+- JSON-LD structured data
+- Canonical URLs
 
-**File modified:** `src/components/auth/StepProfile.tsx`
+### O que falta para SEO de nível profissional (sem Next.js)
 
-- Add three boolean state variables: `termsAccepted`, `photoTermsAccepted`, `adTermsAccepted`
-- Add a styled section with three `Checkbox` + `Label` pairs, each linking to the relevant policy page (`/terms`, `/privacy`, `/safety`)
-- Disable the submit button unless all three are `true`
-- Store acceptance timestamp in the profile update payload (`terms_accepted_at` field) for audit purposes -- or simply gate submission client-side if no DB column is needed
+1. **Pre-rendering / SSG estático** — Adicionar um plugin de pre-rendering ao Vite (`vite-plugin-ssr` ou `vite-ssg`) que gera HTML estático no build para as rotas principais. Isso resolve o problema de crawlers que não executam JS e melhora o First Contentful Paint.
 
-No database changes required -- this is a client-side gate ensuring the user explicitly agrees before submitting.
+2. **Meta tags no `index.html`** — Atualmente as meta tags são injetadas via JS no client. Para crawlers de redes sociais (Facebook, WhatsApp, Twitter) que NÃO executam JS, precisamos de uma Edge Function que sirva HTML com meta tags server-side para bots (detectando User-Agent).
+
+3. **Dynamic OG Image rendering** — Uma Edge Function que gera imagens OG dinâmicas (com nome e foto do terapeuta) para compartilhamento em redes sociais.
+
+### Plano de implementação
+
+**Tarefa 1: Edge Function de Server-Side Rendering para bots (meta tags)**
+- Criar `supabase/functions/render-meta/index.ts`
+- Detectar User-Agent de crawlers (Googlebot, facebookexternalhit, Twitterbot, WhatsApp)
+- Para bots: buscar dados do perfil/cidade no Supabase e retornar HTML com meta tags preenchidas
+- Para humanos: redirecionar para o SPA normalmente
+- Isso resolve o problema principal de compartilhamento em redes sociais
+
+**Tarefa 2: Atualizar `robots.txt` e configurar redirects**
+- O `robots.txt` já aponta para o sitemap dinâmico (correto)
+- Adicionar headers `X-Robots-Tag` nas respostas da Edge Function
+
+**Tarefa 3: Otimizar Core Web Vitals**
+- Lazy loading de imagens com `loading="lazy"` e `fetchpriority="high"` no hero
+- Preconnect para domínios externos (Supabase storage, fontes)
+- Adicionar `<link rel="preload">` para assets críticos no `index.html`
+
+### Resumo
+
+| Aspecto | Next.js | Seu stack atual (com melhorias) |
+|---|---|---|
+| SSR para bots | Nativo | Via Edge Function (bot detection) |
+| Meta tags sociais | Nativo | Edge Function serve HTML para bots |
+| Sitemap | Plugin | Já implementado via Edge Function |
+| Structured Data | Manual | Já implementado no SEOHead |
+| Performance | ISR/SSG | Pre-rendering + lazy loading |
+| **Esforço** | Reescrever tudo | ~3 tarefas incrementais |
+
+A abordagem recomendada é implementar a **Edge Function de bot detection** que serve HTML com meta tags corretas para crawlers — isso resolve 90% do gap entre CSR e SSR para SEO.
+
