@@ -30,12 +30,16 @@
     <link rel="alternate" hreflang="fr" href="https://masseurmatch.com/?lang=fr" />
     <link rel="alternate" hreflang="x-default" href="https://masseurmatch.com/" />
 
-    <!-- Preload hero image for LCP -->
-    <link rel="preload" as="image" href="/placeholder.svg" />
-
-    <!-- Preconnect to external origins -->
+    <!-- Preconnect to critical origins -->
+    <link rel="preconnect" href="https://cnycelkfbtzfnphbeurd.supabase.co" crossorigin />
+    <link rel="dns-prefetch" href="https://cnycelkfbtzfnphbeurd.supabase.co" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://images.unsplash.com" />
     <link rel="dns-prefetch" href="https://images.unsplash.com" />
+
+    <!-- Preload critical assets -->
+    <link rel="preload" as="image" href="/og-default.png" fetchpriority="high" />
 
     <script type="application/ld+json">
     {

@@ -19,3 +19,5 @@ project_id = "cnycelkfbtzfnphbeurd"
     verify_jwt = false
   [functions.stripe-identity-webhook]
     verify_jwt = false
+  [functions.render-meta]
+    verify_jwt = false
