@@ -104,7 +104,12 @@ const TherapistProfile = () => {
   const certifications = (profile?.certifications || []) as string[];
   const langs = (profile?.languages || []) as string[];
   const socialMedia = (profile?.social_media || {}) as Record<string, string>;
-  const businessHours = (profile?.business_hours || {}) as Record<string, string>;
+  const businessHours = (profile?.business_hours || {}) as Record<string, Record<string, string>> | Record<string, string>;
+  // Support both new format { incall: {...}, outcall: {...} } and legacy flat format { Mon: "...", ... }
+  const hasStructuredHours = businessHours && typeof businessHours === "object" && ("incall" in businessHours || "outcall" in businessHours);
+  const incallHours = hasStructuredHours ? (businessHours as Record<string, Record<string, string>>).incall || {} : businessHours as Record<string, string>;
+  const outcallHours = hasStructuredHours ? (businessHours as Record<string, Record<string, string>>).outcall || {} : {};
+  const RATE_CAP_PER_MIN = 33;
   const customFaq = (profile?.custom_faq || []) as { question: string; answer: string }[];
   const pricingSessions = (profile?.pricing_sessions || []) as { name: string; duration: number; incall: number; outcall: number }[];
   const paymentMethods = ((profile as any)?.payment_methods || []) as string[];
@@ -151,12 +156,15 @@ const TherapistProfile = () => {
       ...[profile.incall_price, profile.outcall_price, ...pricingSessions.map(s => Math.max(s.incall, s.outcall))].filter(Boolean).map(Number)
     );
 
-    const openingHoursSpec = Object.entries(businessHours).map(([day, hours]) => ({
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": day,
-      "opens": hours.split("-")[0]?.trim() || "09:00",
-      "closes": hours.split("-")[1]?.trim() || "18:00",
-    }));
+    const flatHours = hasStructuredHours ? incallHours : businessHours as Record<string, string>;
+    const openingHoursSpec = Object.entries(flatHours)
+      .filter(([, h]) => typeof h === "string" && h !== "Closed")
+      .map(([day, hours]) => ({
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": day,
+        "opens": (hours as string).split("-")[0]?.trim() || "09:00",
+        "closes": (hours as string).split("-")[1]?.trim() || "18:00",
+      }));
 
     const localBusiness: Record<string, unknown> = {
       "@context": "https://schema.org",
@@ -520,40 +528,67 @@ const TherapistProfile = () => {
             </motion.section>
           )}
 
-          {/* Services & Pricing */}
+          {/* Services & Rates */}
           {(profile.incall_price || profile.outcall_price || pricingSessions.length > 0) && (
             <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg" aria-labelledby="services-heading">
-              <h2 id="services-heading" className="text-2xl font-bold mb-6">Services & Pricing</h2>
+              <h2 id="services-heading" className="text-2xl font-bold mb-2">Services & Rates</h2>
+              <p className="text-xs text-muted-foreground mb-6">All rates are per session. Maximum rate: ${RATE_CAP_PER_MIN}/min.</p>
 
               {pricingSessions.length > 0 ? (
                 <div className="overflow-x-auto mb-8">
-                  <table className="w-full text-sm" aria-label="Pricing table">
+                  <table className="w-full text-sm" aria-label="Service rates table">
                     <thead>
                       <tr className="border-b border-border">
                         <th scope="col" className="text-left py-3 pr-4 font-semibold">Service</th>
                         <th scope="col" className="text-center py-3 px-2 font-normal text-xs uppercase tracking-wider text-muted-foreground">Duration</th>
-                        <th scope="col" className="text-center py-3 px-2 font-normal text-xs uppercase tracking-wider text-muted-foreground">Incall</th>
-                        <th scope="col" className="text-center py-3 px-2 font-normal text-xs uppercase tracking-wider text-muted-foreground">Outcall</th>
+                        <th scope="col" className="text-center py-3 px-2 font-normal text-xs uppercase tracking-wider text-muted-foreground">$/min</th>
+                        <th scope="col" className="text-center py-3 px-2 font-normal text-xs uppercase tracking-wider text-muted-foreground">
+                          <span className="flex items-center justify-center gap-1"><Home className="w-3 h-3" />Incall</span>
+                        </th>
+                        <th scope="col" className="text-center py-3 px-2 font-normal text-xs uppercase tracking-wider text-muted-foreground">
+                          <span className="flex items-center justify-center gap-1"><MapPin className="w-3 h-3" />Outcall</span>
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
-                      {pricingSessions.map((s, i) => (
-                        <tr key={i} className="border-b border-border/50 hover:bg-secondary/30 transition-colors" itemProp="makesOffer" itemScope itemType="https://schema.org/Offer">
-                          <td className="py-4 pr-4 font-semibold" itemProp="itemOffered" itemScope itemType="https://schema.org/Service">
-                            <span itemProp="name">{s.name}</span>
-                          </td>
-                          <td className="text-center py-4 px-2 text-muted-foreground">{s.duration}min</td>
-                          <td className="text-center py-4 px-2 font-semibold">${s.incall}</td>
-                          <td className="text-center py-4 px-2 font-semibold">${s.outcall}</td>
-                        </tr>
-                      ))}
+                      {pricingSessions.map((s, i) => {
+                        const ratePerMin = s.duration > 0 ? (s.incall / s.duration) : 0;
+                        const isWithinCap = ratePerMin <= RATE_CAP_PER_MIN;
+                        return (
+                          <tr key={i} className="border-b border-border/50 hover:bg-secondary/30 transition-colors" itemProp="makesOffer" itemScope itemType="https://schema.org/Offer">
+                            <td className="py-4 pr-4 font-semibold" itemProp="itemOffered" itemScope itemType="https://schema.org/Service">
+                              <span itemProp="name">{s.name}</span>
+                            </td>
+                            <td className="text-center py-4 px-2 text-muted-foreground">{s.duration}min</td>
+                            <td className="text-center py-4 px-2">
+                              <span className={`text-xs font-mono ${isWithinCap ? "text-muted-foreground" : "text-destructive"}`}>
+                                ${ratePerMin.toFixed(2)}
+                              </span>
+                            </td>
+                            <td className="text-center py-4 px-2 font-semibold">${s.incall}</td>
+                            <td className="text-center py-4 px-2 font-semibold">${s.outcall}</td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
               ) : (
-                <div className="flex gap-8 text-sm mb-6">
-                  {profile.incall_price && <div><span className="text-muted-foreground">Incall:</span> <span className="font-semibold">${Number(profile.incall_price).toFixed(0)}/hr</span></div>}
-                  {profile.outcall_price && <div><span className="text-muted-foreground">Outcall:</span> <span className="font-semibold">${Number(profile.outcall_price).toFixed(0)}/hr</span></div>}
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  {profile.incall_price && (
+                    <div className="border border-border rounded-lg p-5 text-center">
+                      <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-widest text-muted-foreground mb-2"><Home className="w-3.5 h-3.5" />Incall</div>
+                      <p className="text-2xl font-bold">${Number(profile.incall_price).toFixed(0)}</p>
+                      <p className="text-xs text-muted-foreground">per hour</p>
+                    </div>
+                  )}
+                  {profile.outcall_price && (
+                    <div className="border border-border rounded-lg p-5 text-center">
+                      <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-widest text-muted-foreground mb-2"><MapPin className="w-3.5 h-3.5" />Outcall</div>
+                      <p className="text-2xl font-bold">${Number(profile.outcall_price).toFixed(0)}</p>
+                      <p className="text-xs text-muted-foreground">per hour</p>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -678,17 +713,45 @@ const TherapistProfile = () => {
             )}
           </AnimatePresence>
 
-          {/* Business Hours */}
-          {Object.keys(businessHours).length > 0 && (
+          {/* Availability & Hours */}
+          {(Object.keys(incallHours).length > 0 || Object.keys(outcallHours).length > 0) && (
             <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg" aria-labelledby="hours-heading">
-              <h2 id="hours-heading" className="text-2xl font-bold mb-6">Availability & Business Hours</h2>
-              <div className="space-y-px bg-border rounded-lg overflow-hidden">
-                {Object.entries(businessHours).map(([day, hours]) => (
-                  <div key={day} className="flex items-center justify-between p-4 bg-background">
-                    <div className="flex items-center gap-3"><Clock className="w-4 h-4 text-muted-foreground" /><span className="font-semibold text-sm">{day}</span></div>
-                    <span className="text-sm text-muted-foreground">{hours}</span>
+              <h2 id="hours-heading" className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <Clock className="w-5 h-5" />Availability & Hours
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Incall Hours */}
+                {Object.keys(incallHours).length > 0 && (
+                  <div>
+                    <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-2">
+                      <Home className="w-3.5 h-3.5" />Incall Hours
+                    </h3>
+                    <div className="space-y-px bg-border rounded-lg overflow-hidden">
+                      {Object.entries(incallHours).map(([day, hours]) => (
+                        <div key={day} className="flex items-center justify-between p-3 bg-background">
+                          <span className="font-semibold text-sm">{day}</span>
+                          <span className={`text-sm ${hours === "Closed" ? "text-destructive/70" : "text-muted-foreground"}`}>{hours}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
+                )}
+                {/* Outcall Hours */}
+                {Object.keys(outcallHours).length > 0 && (
+                  <div>
+                    <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-2">
+                      <MapPin className="w-3.5 h-3.5" />Outcall Hours
+                    </h3>
+                    <div className="space-y-px bg-border rounded-lg overflow-hidden">
+                      {Object.entries(outcallHours).map(([day, hours]) => (
+                        <div key={day} className="flex items-center justify-between p-3 bg-background">
+                          <span className="font-semibold text-sm">{day}</span>
+                          <span className={`text-sm ${hours === "Closed" ? "text-destructive/70" : "text-muted-foreground"}`}>{hours}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </motion.section>
           )}
