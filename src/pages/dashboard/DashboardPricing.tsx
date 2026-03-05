@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Save, Loader2, DollarSign, Plus, Trash2, AlertCircle } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Save, Loader2, DollarSign, Plus, Trash2, AlertCircle, CreditCard } from "lucide-react";
 
 interface PricingSession {
   duration: number;
@@ -13,16 +14,18 @@ interface PricingSession {
   outcall_price: string;
 }
 
-
-
 const MAX_PER_MINUTE = 33;
+
+const PAYMENT_OPTIONS = [
+  "Cash", "Credit Card", "Debit Card", "Venmo", "Zelle", "CashApp", "PayPal", "Apple Pay", "Google Pay", "Pix", "Crypto",
+];
 
 const DashboardPricing = () => {
   const { profile, loading, updateProfile } = useProfile();
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [sessions, setSessions] = useState<PricingSession[]>([]);
-
+  const [paymentMethods, setPaymentMethods] = useState<string[]>([]);
   useEffect(() => {
     if (profile) {
       const saved = (profile as any).pricing_sessions;
@@ -33,13 +36,13 @@ const DashboardPricing = () => {
           outcall_price: s.outcall_price?.toString() || "",
         })));
       } else {
-        // Migrate from legacy fields
         setSessions([{
           duration: 60,
           incall_price: profile.incall_price?.toString() || "",
           outcall_price: profile.outcall_price?.toString() || "",
         }]);
       }
+      setPaymentMethods(profile.payment_methods || []);
     }
   }, [profile]);
 
@@ -89,6 +92,7 @@ const DashboardPricing = () => {
       incall_price: first?.incall_price ?? null,
       outcall_price: first?.outcall_price ?? null,
       pricing_sessions: pricingSessions,
+      payment_methods: paymentMethods,
     } as any);
     setSaving(false);
     toast({
@@ -202,9 +206,31 @@ const DashboardPricing = () => {
         </div>
       </section>
 
+      {/* Payment Methods */}
+      <section className="glass-card p-6 space-y-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+          <CreditCard className="w-4 h-4" /> Accepted Payment Methods
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {PAYMENT_OPTIONS.map((method) => (
+            <label key={method} className="flex items-center gap-2 cursor-pointer">
+              <Checkbox
+                checked={paymentMethods.includes(method)}
+                onCheckedChange={(checked) => {
+                  setPaymentMethods((prev) =>
+                    checked ? [...prev, method] : prev.filter((m) => m !== method)
+                  );
+                }}
+              />
+              <span className="text-sm">{method}</span>
+            </label>
+          ))}
+        </div>
+      </section>
+
       <div className="glass-card p-4">
         <p className="text-xs text-muted-foreground">
-          💡 Rates are displayed on your public profile. Clients use these as a reference to contact you directly.
+          💡 Rates and payment methods are displayed on your public profile. Clients use these as a reference to contact you directly.
         </p>
       </div>
     </div>

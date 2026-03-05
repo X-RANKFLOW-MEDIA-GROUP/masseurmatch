@@ -4,24 +4,39 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Save, Loader2, Clock } from "lucide-react";
+import { Save, Loader2, Clock, Home, Car } from "lucide-react";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+type DaySchedule = { active: boolean; start: string; end: string };
+type WeekSchedule = Record<string, DaySchedule>;
+type BusinessHours = { incall: WeekSchedule; outcall: WeekSchedule };
+
+const defaultWeek = (): WeekSchedule =>
+  Object.fromEntries(DAYS.map((d) => [d, { active: false, start: "09:00", end: "18:00" }]));
 
 const DashboardAvailability = () => {
   const { profile, loading, updateProfile } = useProfile();
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [isActive, setIsActive] = useState(false);
-  const [hours, setHours] = useState<Record<string, { active: boolean; start: string; end: string }>>(
-    Object.fromEntries(DAYS.map((d) => [d, { active: false, start: "09:00", end: "18:00" }]))
-  );
+  const [hours, setHours] = useState<BusinessHours>({ incall: defaultWeek(), outcall: defaultWeek() });
 
   useEffect(() => {
     if (profile) {
       setIsActive(profile.is_active);
-      if (profile.business_hours && typeof profile.business_hours === "object") {
-        setHours((prev) => ({ ...prev, ...(profile.business_hours as any) }));
+      const bh = profile.business_hours as any;
+      if (bh && typeof bh === "object") {
+        if (bh.incall && bh.outcall) {
+          setHours({
+            incall: { ...defaultWeek(), ...bh.incall },
+            outcall: { ...defaultWeek(), ...bh.outcall },
+          });
+        } else {
+          // Legacy flat format → apply to both
+          const legacy = { ...defaultWeek(), ...bh };
+          setHours({ incall: legacy, outcall: { ...legacy } });
+        }
       }
     }
   }, [profile]);
@@ -41,6 +56,54 @@ const DashboardAvailability = () => {
   };
 
   if (loading) return <div className="animate-pulse h-40 bg-muted rounded" />;
+
+  const updateDay = (type: "incall" | "outcall", day: string, patch: Partial<DaySchedule>) => {
+    setHours((prev) => ({
+      ...prev,
+      [type]: { ...prev[type], [day]: { ...prev[type][day], ...patch } },
+    }));
+  };
+
+  const ScheduleSection = ({ type, icon, label }: { type: "incall" | "outcall"; icon: React.ReactNode; label: string }) => (
+    <section className="glass-card p-6 space-y-4">
+      <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+        {icon} {label}
+      </h2>
+      <div className="space-y-3">
+        {DAYS.map((day) => {
+          const d = hours[type][day];
+          return (
+            <div key={day} className="flex items-center gap-4 py-2 border-b border-border last:border-0">
+              <div className="w-24">
+                <Label className="text-sm">{day}</Label>
+              </div>
+              <Switch
+                checked={d?.active || false}
+                onCheckedChange={(v) => updateDay(type, day, { active: v })}
+              />
+              {d?.active && (
+                <div className="flex items-center gap-2 text-sm">
+                  <input
+                    type="time"
+                    value={d.start || "09:00"}
+                    onChange={(e) => updateDay(type, day, { start: e.target.value })}
+                    className="bg-card border border-border rounded px-2 py-1 text-xs text-foreground"
+                  />
+                  <span className="text-muted-foreground">to</span>
+                  <input
+                    type="time"
+                    value={d.end || "18:00"}
+                    onChange={(e) => updateDay(type, day, { end: e.target.value })}
+                    className="bg-card border border-border rounded px-2 py-1 text-xs text-foreground"
+                  />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -71,42 +134,8 @@ const DashboardAvailability = () => {
         </div>
       </section>
 
-      {/* Weekly Schedule */}
-      <section className="glass-card p-6 space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-          <Clock className="w-4 h-4" /> Weekly Schedule
-        </h2>
-        <div className="space-y-3">
-          {DAYS.map((day) => (
-            <div key={day} className="flex items-center gap-4 py-2 border-b border-border last:border-0">
-              <div className="w-24">
-                <Label className="text-sm">{day}</Label>
-              </div>
-              <Switch
-                checked={hours[day]?.active || false}
-                onCheckedChange={(v) => setHours((h) => ({ ...h, [day]: { ...h[day], active: v } }))}
-              />
-              {hours[day]?.active && (
-                <div className="flex items-center gap-2 text-sm">
-                  <input
-                    type="time"
-                    value={hours[day]?.start || "09:00"}
-                    onChange={(e) => setHours((h) => ({ ...h, [day]: { ...h[day], start: e.target.value } }))}
-                    className="bg-card border border-border rounded px-2 py-1 text-xs text-foreground"
-                  />
-                  <span className="text-muted-foreground">to</span>
-                  <input
-                    type="time"
-                    value={hours[day]?.end || "18:00"}
-                    onChange={(e) => setHours((h) => ({ ...h, [day]: { ...h[day], end: e.target.value } }))}
-                    className="bg-card border border-border rounded px-2 py-1 text-xs text-foreground"
-                  />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
+      <ScheduleSection type="incall" icon={<Home className="w-4 h-4" />} label="Incall Hours" />
+      <ScheduleSection type="outcall" icon={<Car className="w-4 h-4" />} label="Outcall Hours" />
     </div>
   );
 };
