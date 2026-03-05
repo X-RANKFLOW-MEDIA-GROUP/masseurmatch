@@ -2,7 +2,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, ArrowRight, Sparkles, CreditCard, Shield } from "lucide-react";
+import { CheckCircle2, ArrowRight, Sparkles, CreditCard, Shield, Gift } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -29,25 +29,19 @@ const Pricing = () => {
       name: t("pricing.standard"), price: t("pricing.standardPrice"), period: t("pricing.month"),
       description: t("pricing.standardDesc"),
       features: [t("pricing.standardFeature1"), t("pricing.standardFeature2"), t("pricing.standardFeature3"), t("pricing.standardFeature4"), t("pricing.standardFeature5"), t("pricing.standardFeature6")],
-      cta: t("pricing.standardCta"), popular: false, isFree: false, founderPrice: "$14.50",
+      cta: t("pricing.standardCta"), popular: false, isFree: false, founderPrice: "$19.50",
     },
     {
-      name: t("pricing.premium"), price: t("pricing.premiumPrice"), period: t("pricing.month"),
-      description: t("pricing.premiumDesc"),
-      features: [t("pricing.premiumFeature1"), t("pricing.premiumFeature2"), t("pricing.premiumFeature3"), t("pricing.premiumFeature4"), t("pricing.premiumFeature5"), t("pricing.premiumFeature6"), t("pricing.premiumFeature7")],
-      cta: t("pricing.premiumCta"), popular: true, isFree: false, founderPrice: "$29.50",
+      name: t("pricing.pro"), price: t("pricing.proPrice"), period: t("pricing.month"),
+      description: t("pricing.proDesc"),
+      features: [t("pricing.proFeature1"), t("pricing.proFeature2"), t("pricing.proFeature3"), t("pricing.proFeature4"), t("pricing.proFeature5"), t("pricing.proFeature6"), t("pricing.proFeature7"), t("pricing.proFeature8")],
+      cta: t("pricing.proCta"), popular: true, isFree: false, founderPrice: "$39.50",
     },
     {
-      name: t("pricing.gold"), price: t("pricing.goldPrice"), period: t("pricing.month"),
-      description: t("pricing.goldDesc"),
-      features: [t("pricing.goldFeature1"), t("pricing.goldFeature2"), t("pricing.goldFeature3"), t("pricing.goldFeature4"), t("pricing.goldFeature5"), t("pricing.goldFeature6"), t("pricing.goldFeature7")],
-      cta: t("pricing.goldCta"), popular: false, isFree: false, founderPrice: "$49.50",
-    },
-    {
-      name: t("pricing.platinum"), price: t("pricing.platinumPrice"), period: t("pricing.month"),
-      description: t("pricing.platinumDesc"),
-      features: [t("pricing.platinumFeature1"), t("pricing.platinumFeature2"), t("pricing.platinumFeature3"), t("pricing.platinumFeature4"), t("pricing.platinumFeature5"), t("pricing.platinumFeature6"), t("pricing.platinumFeature7"), t("pricing.platinumFeature8")],
-      cta: t("pricing.platinumCta"), popular: false, isFree: false, founderPrice: "$74.50",
+      name: t("pricing.elite"), price: t("pricing.elitePrice"), period: t("pricing.month"),
+      description: t("pricing.eliteDesc"),
+      features: [t("pricing.eliteFeature1"), t("pricing.eliteFeature2"), t("pricing.eliteFeature3")],
+      cta: t("pricing.eliteCta"), popular: false, isFree: false, founderPrice: "$49.50",
     },
   ];
 
@@ -99,7 +93,7 @@ const Pricing = () => {
             </div>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-border max-w-7xl mx-auto">
             {plans.map((plan, i) => (
               <motion.div
                 key={plan.name}
@@ -150,6 +144,28 @@ const Pricing = () => {
               </motion.div>
             ))}
           </div>
+
+          {/* Add-ons Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-3xl mx-auto mt-20 p-8 rounded-lg border border-border bg-background"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <Gift className="w-5 h-5 text-primary" />
+              <h2 className="text-xl font-bold">{t("pricing.addonsTitle")}</h2>
+            </div>
+            <p className="text-sm text-muted-foreground mb-6">{t("pricing.addonsDesc")}</p>
+            <ul className="space-y-3">
+              {[t("pricing.addon1"), t("pricing.addon2"), t("pricing.addon3"), t("pricing.addon4"), t("pricing.addon5")].map((addon, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm">
+                  <Sparkles className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-muted-foreground">{addon}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
 
           <div className="max-w-3xl mx-auto mt-32">
             <div className="reveal mb-12">

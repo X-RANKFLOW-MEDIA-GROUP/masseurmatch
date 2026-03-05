@@ -1,37 +1,49 @@
 import { useAuth } from "@/contexts/AuthContext";
 
-export type PlanKey = "free" | "standard" | "premium" | "gold" | "platinum" | null;
+export type PlanKey = "free" | "standard" | "pro" | "elite" | null;
 
 export interface PlanLimits {
   maxPhotos: number;
   maxCities: number;
-  hasPremiumBadge: boolean;
-  hasGoldBadge: boolean;
-  hasPlatinumBadge: boolean;
+  hasAvailableNow: boolean;
+  availableNowMinutes: number;
+  maxTravelSchedules: number; // -1 = unlimited
+  hasVideo: boolean;
+  hasVerifiedBadge: boolean;
+  hasWeeklySpecials: boolean;
+  hasHomepageRotation: boolean;
+  hasNewsletter: boolean;
+  hasBasicWatermark: boolean;
   hasTopPlacement: boolean;
   hasBoost: boolean;
   hasMultipleCategories: boolean;
   hasPrioritySupport: boolean;
   hasAssistedSeo: boolean;
   hasAdvancedAnalytics: boolean;
-  hasPermanentBoost: boolean;
+  hasBasicAnalytics: boolean;
   planLabel: string;
 }
 
 const FREE_LIMITS: PlanLimits = {
-  maxPhotos: 3,
+  maxPhotos: 1,
   maxCities: 1,
-  hasPremiumBadge: false,
-  hasGoldBadge: false,
-  hasPlatinumBadge: false,
+  hasAvailableNow: false,
+  availableNowMinutes: 0,
+  maxTravelSchedules: 1,
+  hasVideo: false,
+  hasVerifiedBadge: false,
+  hasWeeklySpecials: false,
+  hasHomepageRotation: false,
+  hasNewsletter: false,
+  hasBasicWatermark: true,
   hasTopPlacement: false,
   hasBoost: false,
   hasMultipleCategories: false,
   hasPrioritySupport: false,
   hasAssistedSeo: false,
   hasAdvancedAnalytics: false,
-  hasPermanentBoost: false,
-  planLabel: "Free Trial",
+  hasBasicAnalytics: false,
+  planLabel: "Free",
 };
 
 const PLAN_LIMITS: Record<string, PlanLimits> = {
@@ -39,46 +51,52 @@ const PLAN_LIMITS: Record<string, PlanLimits> = {
   standard: {
     ...FREE_LIMITS,
     maxPhotos: 6,
+    hasAvailableNow: true,
+    availableNowMinutes: 60,
+    maxTravelSchedules: 3,
+    hasBasicWatermark: false,
+    hasBasicAnalytics: true,
+    hasNewsletter: true,
     planLabel: "Standard",
   },
-  premium: {
+  pro: {
     ...FREE_LIMITS,
-    maxPhotos: 10,
-    maxCities: 3,
-    hasPremiumBadge: true,
-    hasBoost: true,
-    hasMultipleCategories: true,
-    hasAssistedSeo: true,
-    planLabel: "Premium",
-  },
-  gold: {
-    ...FREE_LIMITS,
-    maxPhotos: 20,
-    maxCities: 5,
-    hasPremiumBadge: true,
-    hasGoldBadge: true,
+    maxPhotos: 12,
+    maxCities: 1,
+    hasAvailableNow: true,
+    availableNowMinutes: 120,
+    maxTravelSchedules: -1,
+    hasVideo: true,
+    hasVerifiedBadge: true,
+    hasWeeklySpecials: true,
+    hasHomepageRotation: true,
+    hasBasicWatermark: false,
     hasTopPlacement: true,
     hasBoost: true,
     hasMultipleCategories: true,
-    hasAssistedSeo: true,
+    hasBasicAnalytics: true,
     hasAdvancedAnalytics: true,
-    planLabel: "Gold",
+    planLabel: "Pro",
   },
-  platinum: {
+  elite: {
     ...FREE_LIMITS,
-    maxPhotos: 50,
-    maxCities: 999,
-    hasPremiumBadge: true,
-    hasGoldBadge: true,
-    hasPlatinumBadge: true,
+    maxPhotos: 12,
+    maxCities: 2,
+    hasAvailableNow: true,
+    availableNowMinutes: 120,
+    maxTravelSchedules: -1,
+    hasVideo: true,
+    hasVerifiedBadge: true,
+    hasWeeklySpecials: true,
+    hasHomepageRotation: true,
+    hasBasicWatermark: false,
     hasTopPlacement: true,
     hasBoost: true,
     hasMultipleCategories: true,
     hasPrioritySupport: true,
-    hasAssistedSeo: true,
+    hasBasicAnalytics: true,
     hasAdvancedAnalytics: true,
-    hasPermanentBoost: true,
-    planLabel: "Platinum",
+    planLabel: "Elite",
   },
 };
 
@@ -94,7 +112,6 @@ export const usePlanLimits = (): PlanLimits & { planKey: PlanKey; isLoading: boo
       isLoading: subscription?.loading ?? false,
     };
   } catch {
-    // If AuthContext is unavailable or subscription check fails, return safe defaults
     return {
       ...FREE_LIMITS,
       planKey: null,

@@ -8,11 +8,10 @@ import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 
 const plans = [
-  { key: "free", name: "Free Trial", price: 0, features: ["Basic profile", "1 city", "Up to 3 photos", "14-day trial", "Card required"], isFree: true },
-  { key: "standard", name: "Standard", price: 29, features: ["Full profile", "1 city", "Up to 6 photos", "Standard badge"] },
-  { key: "premium", name: "Premium", price: 59, features: ["Everything in Standard", "3 cities", "10 photos", "Premium badge", "Assisted SEO"], popular: true },
-  { key: "gold", name: "Gold", price: 99, features: ["Everything in Premium", "5 cities", "Top placement", "Advanced analytics"] },
-  { key: "platinum", name: "Platinum", price: 149, features: ["Everything in Gold", "Unlimited cities", "Permanent boost", "Priority support"] },
+  { key: "free", name: "Free", price: 0, features: ["1 photo", "Bottom-tier search", "1 travel schedule/mo", "No analytics", "\"Basic Listing\" watermark"], isFree: true },
+  { key: "standard", name: "Standard", price: 39, features: ["6 photos", "Mid-tier search", "Available Now (60 min)", "3 travel schedules/mo", "Basic analytics (views)", "Newsletter chance"] },
+  { key: "pro", name: "Pro", price: 79, features: ["12 photos + video", "Top-tier search", "Available Now (120 min)", "Unlimited travel", "Analytics (views + clicks)", "Homepage rotation", "Weekly specials", "Verified badge"], popular: true },
+  { key: "elite", name: "Elite", price: 99, features: ["Everything in Pro", "2 active ads (2 cities)", "Priority support"] },
 ];
 
 const DashboardSubscription = () => {
