@@ -42,8 +42,36 @@ export const useProfile = () => {
     if (!user || !profile) return { error: new Error("No profile") };
 
     try {
+      const textFields = ["display_name", "bio"] as const;
       const contentFields = ["display_name", "bio", "phone", "specialties", "certifications", "languages", "presentation_video_url", "social_media", "incall_price", "outcall_price", "city", "state", "zip_code", "pricing_sessions"];
       const isContentEdit = Object.keys(updates).some(k => contentFields.includes(k));
+
+      // Auto-moderate text fields via SightEngine
+      const textsToModerate: { field: string; value: string }[] = [];
+      for (const field of textFields) {
+        if (field in updates && updates[field]) {
+          textsToModerate.push({ field, value: String(updates[field]) });
+        }
+      }
+      // Also moderate specialties/certifications as joined text
+      if (updates.specialties && Array.isArray(updates.specialties) && updates.specialties.length > 0) {
+        textsToModerate.push({ field: "specialties", value: updates.specialties.join(", ") });
+      }
+
+      for (const { field, value } of textsToModerate) {
+        const { data: modResult, error: modError } = await supabase.functions.invoke("moderate-text", {
+          body: { profile_id: profile.id, text: value, field_name: field },
+        });
+        if (modError) {
+          console.error("[useProfile] Moderation call failed:", modError.message);
+          // Allow save if moderation service is down (fail-open for UX)
+        } else if (modResult && !modResult.approved) {
+          return {
+            error: new Error(`Content rejected in "${field}": ${modResult.reason}`),
+            moderation: modResult,
+          };
+        }
+      }
 
       if (isContentEdit && !("status" in updates)) {
         updates.status = "pending_approval";
