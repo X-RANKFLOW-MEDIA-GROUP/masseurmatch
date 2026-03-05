@@ -257,6 +257,7 @@ export type Database = {
           id: string
           incall_price: number | null
           is_active: boolean
+          is_seed_profile: boolean
           is_verified_identity: boolean
           is_verified_phone: boolean
           is_verified_photos: boolean
@@ -267,6 +268,9 @@ export type Database = {
           phone: string | null
           presentation_video_url: string | null
           pricing_sessions: Json | null
+          seed_claimed_at: string | null
+          seed_claimed_by: string | null
+          seed_slug: string | null
           service_areas: Json | null
           social_media: Json | null
           specialties: string[] | null
@@ -297,6 +301,7 @@ export type Database = {
           id?: string
           incall_price?: number | null
           is_active?: boolean
+          is_seed_profile?: boolean
           is_verified_identity?: boolean
           is_verified_phone?: boolean
           is_verified_photos?: boolean
@@ -307,6 +312,9 @@ export type Database = {
           phone?: string | null
           presentation_video_url?: string | null
           pricing_sessions?: Json | null
+          seed_claimed_at?: string | null
+          seed_claimed_by?: string | null
+          seed_slug?: string | null
           service_areas?: Json | null
           social_media?: Json | null
           specialties?: string[] | null
@@ -337,6 +345,7 @@ export type Database = {
           id?: string
           incall_price?: number | null
           is_active?: boolean
+          is_seed_profile?: boolean
           is_verified_identity?: boolean
           is_verified_phone?: boolean
           is_verified_photos?: boolean
@@ -347,6 +356,9 @@ export type Database = {
           phone?: string | null
           presentation_video_url?: string | null
           pricing_sessions?: Json | null
+          seed_claimed_at?: string | null
+          seed_claimed_by?: string | null
+          seed_slug?: string | null
           service_areas?: Json | null
           social_media?: Json | null
           specialties?: string[] | null

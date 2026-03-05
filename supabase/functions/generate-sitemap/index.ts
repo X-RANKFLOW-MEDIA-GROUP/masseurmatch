@@ -67,8 +67,9 @@ serve(async (req) => {
 
     const { data: profiles, error } = await supabase
       .from("profiles")
-      .select("id, display_name, full_name, bio, city, updated_at")
+      .select("id, display_name, full_name, bio, city, updated_at, is_seed_profile")
       .eq("is_active", true)
+      .eq("is_seed_profile", false)
       .not("city", "is", null);
 
     if (error) {
