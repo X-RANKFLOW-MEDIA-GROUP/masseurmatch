@@ -22,6 +22,7 @@ import Safety from "./pages/Safety";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import City from "./pages/City";
+import ClaimProfile from "./pages/ClaimProfile";
 import NotFound from "./pages/NotFound";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import DashboardOverview from "./pages/dashboard/DashboardOverview";
@@ -75,6 +76,7 @@ const AnimatedRoutes = () => {
         <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
         <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
         <Route path="/city/:slug" element={<PageTransition><City /></PageTransition>} />
+        <Route path="/claim/:slug" element={<PageTransition><ClaimProfile /></PageTransition>} />
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<DashboardOverview />} />
           <Route path="profile" element={<DashboardProfile />} />

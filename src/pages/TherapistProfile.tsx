@@ -316,7 +316,8 @@ const TherapistProfile = () => {
         path={`/therapist/${id}`}
         ogImage={primaryPhoto?.storage_path || undefined}
         ogType="profile"
-        jsonLd={jsonLdItems}
+        noindex={!!(profile as any).is_seed_profile}
+        jsonLd={(profile as any).is_seed_profile ? undefined : jsonLdItems}
       />
       <CursorGlow />
       <ScrollProgress />
