@@ -11,6 +11,45 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CHECK-SUBSCRIPTION] ${step}${details ? ` - ${JSON.stringify(details)}` : ""}`);
 };
 
+const emptySubscriptionPayload = {
+  subscribed: false,
+  plan_key: null,
+  plan_name: null,
+  subscription_end: null,
+  is_trial: false,
+  has_founder_discount: false,
+};
+
+const normalizeStripeSecretKey = (rawKey: string): { key: string | null; error: string | null } => {
+  const sanitized = rawKey.replace(/[^\x20-\x7E]/g, "").trim().replace(/^['"]+|['"]+$/g, "");
+  const extracted = sanitized.match(/sk_(test|live)_[A-Za-z0-9_]+/);
+  const candidate = extracted?.[0] ?? sanitized;
+
+  if (!candidate) {
+    return { key: null, error: "STRIPE_SECRET_KEY is not set" };
+  }
+
+  if (candidate.startsWith("pk_")) {
+    return {
+      key: null,
+      error: "STRIPE_SECRET_KEY must be a secret key (sk_test_ or sk_live_), not a publishable key (pk_)",
+    };
+  }
+
+  if (candidate.startsWith("rk_")) {
+    return {
+      key: null,
+      error: "STRIPE_SECRET_KEY must be a full secret key (sk_test_ or sk_live_), not a restricted key (rk_)",
+    };
+  }
+
+  if (!candidate.startsWith("sk_test_") && !candidate.startsWith("sk_live_")) {
+    return { key: null, error: "STRIPE_SECRET_KEY is invalid (must start with sk_test_ or sk_live_)" };
+  }
+
+  return { key: candidate, error: null };
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -25,23 +64,21 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const rawStripeKey = Deno.env.get("STRIPE_SECRET_KEY") ?? "";
-    // Sanitize and normalize copied values (quotes/newlines/hidden chars)
-    const sanitizedStripeKey = rawStripeKey.replace(/[^\x20-\x7E]/g, "").trim();
-    const unquotedStripeKey = sanitizedStripeKey.replace(/^['"]+|['"]+$/g, "");
+    const { key: stripeKey, error: stripeKeyError } = normalizeStripeSecretKey(
+      Deno.env.get("STRIPE_SECRET_KEY") ?? ""
+    );
 
-    if (!unquotedStripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
-    if (unquotedStripeKey.startsWith("pk_")) {
-      throw new Error("STRIPE_SECRET_KEY must be a secret key (sk_test_ or sk_live_), not a publishable key (pk_)");
-    }
-    if (unquotedStripeKey.startsWith("rk_")) {
-      throw new Error("STRIPE_SECRET_KEY must be a full secret key (sk_test_ or sk_live_), not a restricted key (rk_)");
-    }
-    if (!unquotedStripeKey.startsWith("sk_test_") && !unquotedStripeKey.startsWith("sk_live_")) {
-      throw new Error("STRIPE_SECRET_KEY is invalid (must start with sk_test_ or sk_live_)");
+    if (!stripeKey) {
+      logStep("Stripe key invalid", { reason: stripeKeyError });
+      return new Response(
+        JSON.stringify({ ...emptySubscriptionPayload, config_error: stripeKeyError }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        }
+      );
     }
 
-    const stripeKey = unquotedStripeKey;
     logStep("Stripe key verified", { prefix: stripeKey.substring(0, 12) });
 
     const authHeader = req.headers.get("Authorization");
@@ -59,14 +96,7 @@ serve(async (req) => {
 
     if (customers.data.length === 0) {
       logStep("No Stripe customer found");
-      return new Response(JSON.stringify({
-        subscribed: false,
-        plan_key: null,
-        plan_name: null,
-        subscription_end: null,
-        is_trial: false,
-        has_founder_discount: false,
-      }), {
+      return new Response(JSON.stringify(emptySubscriptionPayload), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -74,7 +104,6 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     logStep("Found customer", { customerId });
 
-    // Check active or trialing subscriptions
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
       status: "all",
@@ -87,14 +116,7 @@ serve(async (req) => {
 
     if (!activeSub) {
       logStep("No active subscription");
-      return new Response(JSON.stringify({
-        subscribed: false,
-        plan_key: null,
-        plan_name: null,
-        subscription_end: null,
-        is_trial: false,
-        has_founder_discount: false,
-      }), {
+      return new Response(JSON.stringify(emptySubscriptionPayload), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -106,10 +128,8 @@ serve(async (req) => {
       ? new Date(activeSub.trial_end * 1000).toISOString()
       : null;
 
-    // Check if founder discount is applied
     const hasFounderDiscount = activeSub.discount?.coupon?.id === "FOUNDER50";
 
-    // Get product name
     const priceItem = activeSub.items.data[0];
     const product = await stripe.products.retrieve(priceItem.price.product as string);
 
@@ -135,6 +155,23 @@ serve(async (req) => {
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: msg });
+
+    const isStripeKeyIssue =
+      msg.includes("STRIPE_SECRET_KEY") ||
+      msg.includes("Invalid API Key provided") ||
+      msg.includes("You did not provide an API key") ||
+      msg.includes("api_key");
+
+    if (isStripeKeyIssue) {
+      return new Response(
+        JSON.stringify({ ...emptySubscriptionPayload, config_error: "stripe_key_invalid" }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        }
+      );
+    }
+
     return new Response(JSON.stringify({ error: msg }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
