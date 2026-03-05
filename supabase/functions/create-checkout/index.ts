@@ -14,11 +14,10 @@ const logStep = (step: string, details?: any) => {
 // Plan definitions — prices are created lazily in Stripe on first use
 // "free" is a $0 setup-intent trial (14 days) requiring card on file
 const PLANS: Record<string, { name: string; amount: number; features: string; isFree?: boolean }> = {
-  free:     { name: "Free Trial", amount: 0, features: "Basic profile, 1 city, 3 photos", isFree: true },
-  standard: { name: "Standard", amount: 2900, features: "Full profile, 1 city, 6 photos" },
-  premium:  { name: "Premium",  amount: 5900, features: "3 cities, 10 photos, Premium badge, SEO" },
-  gold:     { name: "Gold",     amount: 9900, features: "5 cities, top placement, analytics" },
-  platinum: { name: "Platinum", amount: 14900, features: "Unlimited cities, permanent boost, priority support" },
+  free:     { name: "Free", amount: 0, features: "1 photo, bottom search, no analytics", isFree: true },
+  standard: { name: "Standard", amount: 3900, features: "6 photos, mid search, Available Now 60min" },
+  pro:      { name: "Pro",      amount: 7900, features: "12 photos + video, top search, Verified badge" },
+  elite:    { name: "Elite",    amount: 9900, features: "Everything in Pro, 2 cities" },
 };
 
 const FOUNDER_COUPON_ID = "FOUNDER50";
@@ -194,7 +193,7 @@ serve(async (req) => {
         subscription_data: {
           trial_period_days: 14,
           metadata: { masseurmatch_plan: "free", user_id: user.id },
-          // After trial ends, they'll be charged $29/mo (Standard) unless they cancel
+          // After trial ends, they'll be charged $39/mo (Standard) unless they cancel
         },
         payment_method_collection: "always",
         success_url: `${req.headers.get("origin")}/dashboard/subscription?success=true&plan=free`,
