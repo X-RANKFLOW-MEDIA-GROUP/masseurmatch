@@ -421,6 +421,23 @@ function getTemplate(template: string, data: TemplateData): { subject: string; h
         `),
       };
 
+    // ═══════════════════════════════════════
+    // 7. SUPPORT TICKETS
+    // ═══════════════════════════════════════
+    case "ticket_reply":
+      return {
+        from: `${BRAND.name} <support@masseurmatch.com>`,
+        subject: `New reply on your ticket: ${data.ticket_subject || "Support Request"}`,
+        html: htmlEmail("Ticket Reply", `
+          <h1>New reply on your ticket</h1>
+          <p>Hi ${n},</p>
+          <p>Our support team has replied to your ticket <strong>"${data.ticket_subject || "Support Request"}"</strong>:</p>
+          <div class="info-box"><p>${data.reply_message || "Please check your dashboard for the full response."}</p></div>
+          <p style="text-align:center"><a href="${dashboardLink}/support" class="btn">View Conversation</a></p>
+          <p class="muted">You can reply directly from your dashboard.</p>
+        `, "You have a new reply on your support ticket"),
+      };
+
     default:
       throw new Error(`Unknown template: ${template}`);
   }
