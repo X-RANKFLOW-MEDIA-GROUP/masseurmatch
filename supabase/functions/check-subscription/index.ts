@@ -25,14 +25,24 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const rawStripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!rawStripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
-    // Sanitize: strip non-ASCII chars, whitespace, newlines
-    const stripeKey = rawStripeKey.replace(/[^\x20-\x7E]/g, "").trim();
-    if (!stripeKey.startsWith("sk_")) {
+    const rawStripeKey = Deno.env.get("STRIPE_SECRET_KEY") ?? "";
+    // Sanitize and normalize copied values (quotes/newlines/hidden chars)
+    const sanitizedStripeKey = rawStripeKey.replace(/[^\x20-\x7E]/g, "").trim();
+    const unquotedStripeKey = sanitizedStripeKey.replace(/^['"]+|['"]+$/g, "");
+
+    if (!unquotedStripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
+    if (unquotedStripeKey.startsWith("pk_")) {
+      throw new Error("STRIPE_SECRET_KEY must be a secret key (sk_test_ or sk_live_), not a publishable key (pk_)");
+    }
+    if (unquotedStripeKey.startsWith("rk_")) {
+      throw new Error("STRIPE_SECRET_KEY must be a full secret key (sk_test_ or sk_live_), not a restricted key (rk_)");
+    }
+    if (!unquotedStripeKey.startsWith("sk_test_") && !unquotedStripeKey.startsWith("sk_live_")) {
       throw new Error("STRIPE_SECRET_KEY is invalid (must start with sk_test_ or sk_live_)");
     }
-    logStep("Stripe key verified", { prefix: stripeKey.substring(0, 7) });
+
+    const stripeKey = unquotedStripeKey;
+    logStep("Stripe key verified", { prefix: stripeKey.substring(0, 12) });
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header");
