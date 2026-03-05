@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   MapPin, CheckCircle2, Phone, Globe, Clock, ArrowRight,
   MessageSquare, Bookmark, Award, Languages, ChevronLeft, ChevronRight,
-  Plane, Home, Star, CreditCard, Banknote, Wallet, Smartphone
+  Plane, Home, Star, CreditCard, Banknote, Wallet, Smartphone, Zap
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -396,6 +396,11 @@ const TherapistProfile = () => {
                   {profile.is_verified_identity && (
                     <Badge className="bg-foreground text-background text-xs">
                       <CheckCircle2 className="w-3 h-3 mr-1" />Verified
+                    </Badge>
+                  )}
+                  {(profile as any).available_now && (profile as any).available_now_expires && new Date((profile as any).available_now_expires) > new Date() && (
+                    <Badge className="bg-primary text-primary-foreground text-xs animate-pulse">
+                      <Zap className="w-3 h-3 mr-1" />Available Now
                     </Badge>
                   )}
                 </div>

@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import {
   Search, MapPin, CheckCircle2, Star, ArrowRight, Heart, X,
   LayoutGrid, List, Map as MapIcon, SlidersHorizontal, ChevronDown, Loader2,
-  Sparkles, Plane
+  Sparkles, Plane, Zap
 } from "lucide-react";
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -49,6 +49,9 @@ interface TherapistItem {
   incallPrice?: number;
   outcallPrice?: number;
   specialties?: string[];
+  availableNow?: boolean;
+  availableNowExpires?: string | null;
+  availableNowTier?: string;
 }
 
 // Simple city → lat/lng fallback for map view
@@ -73,6 +76,12 @@ function mapProfileToTherapist(p: any): TherapistItem {
   const outcall = p.outcall_price ?? 0;
   const displayPrice = incall || outcall;
 
+  // Determine Available Now status
+  const now = new Date();
+  const isAvailableNow = p.available_now === true &&
+    p.available_now_expires &&
+    new Date(p.available_now_expires) > now;
+
   return {
     id: p.id,
     name: p.display_name || p.full_name || "Therapist",
@@ -92,6 +101,9 @@ function mapProfileToTherapist(p: any): TherapistItem {
     incallPrice: p.incall_price ?? 0,
     outcallPrice: p.outcall_price ?? 0,
     specialties: p.specialties || [],
+    availableNow: isAvailableNow,
+    availableNowExpires: isAvailableNow ? p.available_now_expires : null,
+    availableNowTier: p._tier || "free",
   };
 }
 
@@ -178,6 +190,12 @@ const SwipeCard = ({
               Visiting
             </Badge>
           )}
+          {therapist.availableNow && (
+            <Badge className="bg-primary/90 backdrop-blur-sm text-primary-foreground border-primary text-xs animate-pulse">
+              <Zap className="w-3 h-3 mr-1" />
+              Available Now
+            </Badge>
+          )}
         </div>
 
         {therapist.available && (
@@ -236,6 +254,7 @@ const Explore = () => {
 
   const [priceRange, setPriceRange] = useState([0, 500]);
   const [availableOnly, setAvailableOnly] = useState(false);
+  const [availableNowOnly, setAvailableNowOnly] = useState(false);
   const [sortBy, setSortBy] = useState("default");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showSmartMatch, setShowSmartMatch] = useState(false);
@@ -250,7 +269,7 @@ const Explore = () => {
       const [profilesRes, travelRes] = await Promise.all([
         supabase
           .from("profiles")
-          .select("id, display_name, full_name, bio, city, state, country, specialties, incall_price, outcall_price, avatar_url, is_active, is_verified_profile, is_verified_identity, is_verified_photos, profile_photos(storage_path, is_primary, moderation_status)")
+          .select("id, display_name, full_name, bio, city, state, country, specialties, incall_price, outcall_price, avatar_url, is_active, is_verified_profile, is_verified_identity, is_verified_photos, available_now, available_now_expires, profile_photos(storage_path, is_primary, moderation_status)")
           .eq("status", "active")
           .eq("is_active", true)
           .not("city", "is", null)
@@ -297,6 +316,8 @@ const Explore = () => {
     fetchProfiles();
   }, []);
 
+  const TIER_RANK: Record<string, number> = { elite: 1, pro: 2, standard: 3, free: 4 };
+
   const filteredTherapists = therapists
     .filter((t) => {
       const matchesSearch =
@@ -306,14 +327,32 @@ const Explore = () => {
       const matchesCity = selectedCity === "all" || t.city.toLowerCase().replace(/\s/g, "-") === selectedCity;
       const matchesPrice = t.priceNum === 0 || (t.priceNum >= priceRange[0] && t.priceNum <= priceRange[1]);
       const matchesAvailable = !availableOnly || t.available;
-      return matchesSearch && matchesCity && matchesPrice && matchesAvailable;
+      const matchesAvailableNow = !availableNowOnly || t.availableNow;
+      return matchesSearch && matchesCity && matchesPrice && matchesAvailable && matchesAvailableNow;
     })
     .sort((a, b) => {
       if (sortBy === "price-asc") return a.priceNum - b.priceNum;
       if (sortBy === "price-desc") return b.priceNum - a.priceNum;
       if (sortBy === "rating") return b.rating - a.rating;
       if (sortBy === "reviews") return b.reviews - a.reviews;
-      return 0;
+
+      // Default sort: Available Now first (by tier), then regular profiles by tier
+      const aIsAN = a.availableNow ? 1 : 0;
+      const bIsAN = b.availableNow ? 1 : 0;
+      if (aIsAN !== bIsAN) return bIsAN - aIsAN; // Available Now first
+
+      if (a.availableNow && b.availableNow) {
+        // Both Available Now: sort by tier priority, then time remaining
+        const tierDiff = (TIER_RANK[a.availableNowTier || "free"] || 4) - (TIER_RANK[b.availableNowTier || "free"] || 4);
+        if (tierDiff !== 0) return tierDiff;
+        // More time remaining = lower urgency, show those with less time first (urgency)
+        const aExp = a.availableNowExpires ? new Date(a.availableNowExpires).getTime() : 0;
+        const bExp = b.availableNowExpires ? new Date(b.availableNowExpires).getTime() : 0;
+        return aExp - bExp;
+      }
+
+      // Regular profiles: sort by tier
+      return (TIER_RANK[a.availableNowTier || "free"] || 4) - (TIER_RANK[b.availableNowTier || "free"] || 4);
     });
 
   const handleSwipe = useCallback(
@@ -460,7 +499,7 @@ const Explore = () => {
                 <SlidersHorizontal className="w-3.5 h-3.5" />
                 Advanced Filters
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showAdvanced ? "rotate-180" : ""}`} />
-                {(availableOnly || priceRange[0] > 0 || priceRange[1] < 500 || sortBy !== "default") && (
+                {(availableOnly || availableNowOnly || priceRange[0] > 0 || priceRange[1] < 500 || sortBy !== "default") && (
                   <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                 )}
               </button>
@@ -498,17 +537,28 @@ const Explore = () => {
                         <Label className="text-xs uppercase tracking-widest text-muted-foreground">
                           Availability
                         </Label>
-                        <div className="flex items-center gap-3">
-                          <Switch
-                            checked={availableOnly}
-                            onCheckedChange={setAvailableOnly}
-                          />
-                          <span className="text-sm">
-                            {availableOnly ? "Available Now" : "All Therapists"}
-                          </span>
-                          {availableOnly && (
-                            <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "hsl(145 80% 50%)" }} />
-                          )}
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-3">
+                            <Switch
+                              checked={availableOnly}
+                              onCheckedChange={setAvailableOnly}
+                            />
+                            <span className="text-sm">
+                              {availableOnly ? "Online Only" : "All Therapists"}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Switch
+                              checked={availableNowOnly}
+                              onCheckedChange={setAvailableNowOnly}
+                            />
+                            <span className="text-sm flex items-center gap-1.5">
+                              Available Now
+                              {availableNowOnly && (
+                                <Zap className="w-3 h-3 text-primary" />
+                              )}
+                            </span>
+                          </div>
                         </div>
                       </div>
 
@@ -541,6 +591,7 @@ const Explore = () => {
                           onClick={() => {
                             setPriceRange([0, 500]);
                             setAvailableOnly(false);
+                            setAvailableNowOnly(false);
                             setSortBy("default");
                             setSelectedCity("all");
                             setSelectedType("all");
@@ -603,6 +654,7 @@ const Explore = () => {
                 onClick={() => {
                   setPriceRange([0, 500]);
                   setAvailableOnly(false);
+                  setAvailableNowOnly(false);
                   setSortBy("default");
                   setSelectedCity("all");
                   setSelectedType("all");
@@ -727,6 +779,12 @@ const Explore = () => {
                             <Badge variant="outline" className="text-[10px] border-primary/30 text-primary gap-1">
                               <Plane className="w-3 h-3" />
                               Visiting
+                            </Badge>
+                          )}
+                          {therapist.availableNow && (
+                            <Badge className="text-[10px] bg-primary/90 text-primary-foreground border-primary gap-1 animate-pulse">
+                              <Zap className="w-3 h-3" />
+                              Available Now
                             </Badge>
                           )}
                         </div>
