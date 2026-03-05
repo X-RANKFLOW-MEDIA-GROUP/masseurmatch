@@ -1,59 +1,78 @@
 
 
-## SEO no seu projeto atual vs Next.js
+## Restructure Subscription Tiers: Free → Standard → Pro → Elite + Add-ons
 
-### A realidade sobre Next.js no Lovable
+The current system has 5 tiers (Free, Standard, Premium, Gold, Platinum). The new structure consolidates to 4 tiers with new pricing, features, and adds upsell add-ons.
 
-O Lovable **não suporta Next.js** — ele é construído sobre React + Vite. Migrar para Next.js significaria sair do Lovable e reescrever o projeto do zero em outra plataforma.
+### Tier Mapping
 
-**Mas a boa notícia**: você já pode ter SEO excelente com o stack atual. O Google renderiza JavaScript (CSR) normalmente desde 2019. O que realmente importa são as práticas técnicas corretas.
+```text
+OLD                          NEW
+─────────────────────────────────────────────
+Free ($0)        →  Free ($0)
+Standard ($29)   →  Standard ($39)
+Premium ($59)    →  Pro ($79)
+Gold ($99)       →  Elite ($99)
+Platinum ($149)  →  REMOVED
+```
+
+### New Tier Details
+
+| Tier | Price | Photos | Search | Available Now | Travel | Analytics | Extras |
+|------|-------|--------|--------|---------------|--------|-----------|--------|
+| Free | $0 | 1 | bottom | No | 1/mo | No | "Basic Listing" watermark |
+| Standard | $39 | 6 | middle | 60 min | 3/mo | views | newsletter chance |
+| Pro | $79 | 12 + video | top | 120 min | unlimited | views+clicks | homepage rotation, weekly specials, Verified badge |
+| Elite | $99 | 12 + video | top | 120 min | unlimited | views+clicks | 2 active ads (2 cities), everything in Pro |
+
+### Add-ons (Upsell)
+
+- Masseur of the Day: $15/day
+- Sponsor Profile: $99/month
+- Extra Travel Schedules: $5 each (Standard only)
+- Homepage Banner: $120/month
+- Credits/Cards: secure communication
 
 ---
 
-### O que já está implementado no seu projeto
+### Files to Change
 
-- `SEOHead.tsx` com meta tags dinâmicas (OG, Twitter Cards, hreflang)
-- Sitemap dinâmico via Edge Function (`generate-sitemap`)
-- `robots.txt` configurado
-- JSON-LD structured data
-- Canonical URLs
+**1. `src/hooks/usePlanLimits.ts`**
+- Replace 5-tier PlanKey with 4-tier: `"free" | "standard" | "pro" | "elite"`
+- Update limits per tier (maxPhotos: 1/6/12/12, maxCities: 1/1/1/2, etc.)
+- Add new feature flags: `hasAvailableNow`, `availableNowMinutes`, `maxTravelSchedules`, `hasVideo`, `hasVerifiedBadge`, `hasWeeklySpecials`, `hasHomepageRotation`, `hasNewsletter`, `hasBasicWatermark`
+- Remove old tiers (premium, gold, platinum)
 
-### O que falta para SEO de nível profissional (sem Next.js)
+**2. `src/pages/Pricing.tsx`**
+- Replace 5 plans array with 4 new plans (Free $0, Standard $39, Pro $79, Elite $99)
+- Update features lists to match new spec
+- Mark Pro as "Most Popular"
+- Add Add-ons section below plans grid (Masseur of the Day, Sponsor Profile, etc.)
+- Update Founder Deal pricing (50% of new prices)
 
-1. **Pre-rendering / SSG estático** — Adicionar um plugin de pre-rendering ao Vite (`vite-plugin-ssr` ou `vite-ssg`) que gera HTML estático no build para as rotas principais. Isso resolve o problema de crawlers que não executam JS e melhora o First Contentful Paint.
+**3. `src/pages/dashboard/DashboardSubscription.tsx`**
+- Replace plans array with new 4 tiers and updated pricing/features
+- Mark Pro as popular
+- Update plan keys
 
-2. **Meta tags no `index.html`** — Atualmente as meta tags são injetadas via JS no client. Para crawlers de redes sociais (Facebook, WhatsApp, Twitter) que NÃO executam JS, precisamos de uma Edge Function que sirva HTML com meta tags server-side para bots (detectando User-Agent).
+**4. `src/pages/dashboard/DashboardPromotion.tsx`**
+- Update promotion checks to reference new plan keys (pro/elite instead of premium/gold)
 
-3. **Dynamic OG Image rendering** — Uma Edge Function que gera imagens OG dinâmicas (com nome e foto do terapeuta) para compartilhamento em redes sociais.
+**5. `supabase/functions/create-checkout/index.ts`**
+- Replace PLANS object: remove premium/gold/platinum, add pro ($7900) and elite ($9900)
+- Update standard amount to $3900
 
-### Plano de implementação
+**6. `src/i18n/locales/en.json`** (and es.json, fr.json, pt.json)
+- Replace pricing section keys: remove premium/gold/platinum, add pro/elite
+- Update prices, descriptions, features
+- Add add-ons section translations
 
-**Tarefa 1: Edge Function de Server-Side Rendering para bots (meta tags)**
-- Criar `supabase/functions/render-meta/index.ts`
-- Detectar User-Agent de crawlers (Googlebot, facebookexternalhit, Twitterbot, WhatsApp)
-- Para bots: buscar dados do perfil/cidade no Supabase e retornar HTML com meta tags preenchidas
-- Para humanos: redirecionar para o SPA normalmente
-- Isso resolve o problema principal de compartilhamento em redes sociais
+**7. `src/contexts/AuthContext.tsx`**
+- No structural changes needed (plan_key is dynamic from Stripe)
 
-**Tarefa 2: Atualizar `robots.txt` e configurar redirects**
-- O `robots.txt` já aponta para o sitemap dinâmico (correto)
-- Adicionar headers `X-Robots-Tag` nas respostas da Edge Function
+### Add-ons Section
+For now, add-ons will be displayed as a static informational section on the Pricing page and DashboardPromotion page. The actual purchase flow for add-ons can be implemented as a follow-up with individual Stripe products.
 
-**Tarefa 3: Otimizar Core Web Vitals**
-- Lazy loading de imagens com `loading="lazy"` e `fetchpriority="high"` no hero
-- Preconnect para domínios externos (Supabase storage, fontes)
-- Adicionar `<link rel="preload">` para assets críticos no `index.html`
-
-### Resumo
-
-| Aspecto | Next.js | Seu stack atual (com melhorias) |
-|---|---|---|
-| SSR para bots | Nativo | Via Edge Function (bot detection) |
-| Meta tags sociais | Nativo | Edge Function serve HTML para bots |
-| Sitemap | Plugin | Já implementado via Edge Function |
-| Structured Data | Manual | Já implementado no SEOHead |
-| Performance | ISR/SSG | Pre-rendering + lazy loading |
-| **Esforço** | Reescrever tudo | ~3 tarefas incrementais |
-
-A abordagem recomendada é implementar a **Edge Function de bot detection** que serve HTML com meta tags corretas para crawlers — isso resolve 90% do gap entre CSR e SSR para SEO.
+### Migration Note
+Existing Stripe products with old plan keys (premium, gold, platinum) will remain in Stripe but won't be offered to new users. The `check-subscription` edge function already reads `plan_key` from Stripe metadata dynamically, so existing subscribers keep their current plan until renewal.
 
