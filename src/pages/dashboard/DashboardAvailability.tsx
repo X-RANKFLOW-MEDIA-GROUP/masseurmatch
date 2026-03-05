@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Save, Loader2, Clock, Home, Car } from "lucide-react";
+import { AvailableNowCard } from "@/components/dashboard/AvailableNowCard";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
@@ -135,6 +136,9 @@ const DashboardAvailability = () => {
           </div>
         </div>
       </section>
+
+      {/* Available Now Boost */}
+      <AvailableNowCard />
 
       <ScheduleSection type="incall" icon={<Home className="w-4 h-4" />} label="Incall Hours" />
       <ScheduleSection type="outcall" icon={<Car className="w-4 h-4" />} label="Outcall Hours" />

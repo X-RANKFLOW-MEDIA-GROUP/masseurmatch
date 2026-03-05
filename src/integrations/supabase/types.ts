@@ -239,6 +239,11 @@ export type Database = {
       }
       profiles: {
         Row: {
+          available_now: boolean
+          available_now_credits: number
+          available_now_expires: string | null
+          available_now_last_used: string | null
+          available_now_started_at: string | null
           avatar_url: string | null
           bio: string | null
           business_hours: Json | null
@@ -274,6 +279,11 @@ export type Database = {
           zip_code: string | null
         }
         Insert: {
+          available_now?: boolean
+          available_now_credits?: number
+          available_now_expires?: string | null
+          available_now_last_used?: string | null
+          available_now_started_at?: string | null
           avatar_url?: string | null
           bio?: string | null
           business_hours?: Json | null
@@ -309,6 +319,11 @@ export type Database = {
           zip_code?: string | null
         }
         Update: {
+          available_now?: boolean
+          available_now_credits?: number
+          available_now_expires?: string | null
+          available_now_last_used?: string | null
+          available_now_started_at?: string | null
           avatar_url?: string | null
           bio?: string | null
           business_hours?: Json | null

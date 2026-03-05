@@ -80,8 +80,9 @@ const DashboardOverview = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border rounded-lg overflow-hidden">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-border rounded-lg overflow-hidden">
         {[
+          { title: "Available Now", desc: "Activate your boost to appear at the top of search", link: "/dashboard/availability" },
           { title: "Edit Profile", desc: "Update bio, specialties and certifications", link: "/dashboard/profile" },
           { title: "Manage Photos", desc: "Add and organize your professional photos", link: "/dashboard/photos" },
           { title: "Subscription", desc: "View your plan and upgrade", link: "/dashboard/subscription" },

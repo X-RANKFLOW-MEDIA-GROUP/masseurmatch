@@ -2,11 +2,21 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export type PlanKey = "free" | "standard" | "pro" | "elite" | null;
 
+export interface AvailableNowConfig {
+  enabled: boolean;
+  durationHours: number;
+  cooldownHours: number;
+  maxPerDay: number;
+  rankPriority: number; // lower = higher priority in search (1=Elite, 2=Pro, 3=Standard, 99=Free)
+  badgeLabel: string | null;
+}
+
 export interface PlanLimits {
   maxPhotos: number;
   maxCities: number;
   hasAvailableNow: boolean;
   availableNowMinutes: number;
+  availableNowConfig: AvailableNowConfig;
   maxTravelSchedules: number; // -1 = unlimited
   hasVideo: boolean;
   hasVerifiedBadge: boolean;
@@ -24,11 +34,21 @@ export interface PlanLimits {
   planLabel: string;
 }
 
+const FREE_AVAILABLE_NOW: AvailableNowConfig = {
+  enabled: false,
+  durationHours: 0,
+  cooldownHours: 0,
+  maxPerDay: 0,
+  rankPriority: 99,
+  badgeLabel: null,
+};
+
 const FREE_LIMITS: PlanLimits = {
   maxPhotos: 1,
   maxCities: 1,
   hasAvailableNow: false,
   availableNowMinutes: 0,
+  availableNowConfig: FREE_AVAILABLE_NOW,
   maxTravelSchedules: 1,
   hasVideo: false,
   hasVerifiedBadge: false,
@@ -52,7 +72,15 @@ const PLAN_LIMITS: Record<string, PlanLimits> = {
     ...FREE_LIMITS,
     maxPhotos: 6,
     hasAvailableNow: true,
-    availableNowMinutes: 60,
+    availableNowMinutes: 120, // 2 hours
+    availableNowConfig: {
+      enabled: true,
+      durationHours: 2,
+      cooldownHours: 24,
+      maxPerDay: 1,
+      rankPriority: 3,
+      badgeLabel: "Available Now",
+    },
     maxTravelSchedules: 3,
     hasBasicWatermark: false,
     hasBasicAnalytics: true,
@@ -64,7 +92,15 @@ const PLAN_LIMITS: Record<string, PlanLimits> = {
     maxPhotos: 12,
     maxCities: 1,
     hasAvailableNow: true,
-    availableNowMinutes: 120,
+    availableNowMinutes: 180, // 3 hours
+    availableNowConfig: {
+      enabled: true,
+      durationHours: 3,
+      cooldownHours: 8,
+      maxPerDay: 2,
+      rankPriority: 2,
+      badgeLabel: "Available Now",
+    },
     maxTravelSchedules: -1,
     hasVideo: true,
     hasVerifiedBadge: true,
@@ -83,7 +119,15 @@ const PLAN_LIMITS: Record<string, PlanLimits> = {
     maxPhotos: 12,
     maxCities: 2,
     hasAvailableNow: true,
-    availableNowMinutes: 120,
+    availableNowMinutes: 240, // 4 hours
+    availableNowConfig: {
+      enabled: true,
+      durationHours: 4,
+      cooldownHours: 4,
+      maxPerDay: -1, // unlimited
+      rankPriority: 1,
+      badgeLabel: "Available Now Elite",
+    },
     maxTravelSchedules: -1,
     hasVideo: true,
     hasVerifiedBadge: true,
@@ -98,6 +142,14 @@ const PLAN_LIMITS: Record<string, PlanLimits> = {
     hasAdvancedAnalytics: true,
     planLabel: "Elite",
   },
+};
+
+// Exported for search ranking logic
+export const AVAILABLE_NOW_TIER_PRIORITY: Record<string, number> = {
+  elite: 1,
+  pro: 2,
+  standard: 3,
+  free: 99,
 };
 
 export const usePlanLimits = (): PlanLimits & { planKey: PlanKey; isLoading: boolean } => {
