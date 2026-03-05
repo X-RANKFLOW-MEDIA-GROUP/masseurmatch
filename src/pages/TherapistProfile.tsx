@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   MapPin, CheckCircle2, Phone, Globe, Clock, ArrowRight,
   MessageSquare, Bookmark, Award, Languages, ChevronLeft, ChevronRight,
-  Plane, Home, Star
+  Plane, Home, Star, CreditCard, Banknote, Wallet, Smartphone
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -107,8 +107,24 @@ const TherapistProfile = () => {
   const businessHours = (profile?.business_hours || {}) as Record<string, string>;
   const customFaq = (profile?.custom_faq || []) as { question: string; answer: string }[];
   const pricingSessions = (profile?.pricing_sessions || []) as { name: string; duration: number; incall: number; outcall: number }[];
+  const paymentMethods = ((profile as any)?.payment_methods || []) as string[];
   const primaryPhoto = photos.find(p => p.is_primary) || photos[0];
   const galleryPhotos = photos.map(p => p.storage_path);
+
+  // City coordinates for OpenStreetMap
+  const cityCoords: Record<string, [number, number]> = {
+    "los angeles": [34.0522, -118.2437],
+    "new york": [40.7128, -74.006],
+    "miami": [25.7617, -80.1918],
+    "san francisco": [37.7749, -122.4194],
+    "chicago": [41.8781, -87.6298],
+    "seattle": [47.6062, -122.3321],
+    "houston": [29.7604, -95.3698],
+    "atlanta": [33.749, -84.388],
+    "dallas": [32.7767, -96.797],
+    "denver": [39.7392, -104.9903],
+  };
+  const mapCenter = profile?.city ? cityCoords[profile.city.toLowerCase()] : null;
 
   // ── Build rich JSON-LD ──
   const jsonLdItems = useMemo(() => {
@@ -549,6 +565,63 @@ const TherapistProfile = () => {
                   </div>
                 </div>
               )}
+            </motion.section>
+          )}
+
+          {/* Accepted Payment Methods */}
+          {paymentMethods.length > 0 && (
+            <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg" aria-labelledby="payment-heading">
+              <h2 id="payment-heading" className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <Wallet className="w-5 h-5" />Accepted Payment Methods
+              </h2>
+              <div className="flex flex-wrap gap-4">
+                {paymentMethods.map(method => {
+                  const iconMap: Record<string, React.ReactNode> = {
+                    "Cash": <Banknote className="w-5 h-5" />,
+                    "Venmo": <Smartphone className="w-5 h-5" />,
+                    "Zelle": <Smartphone className="w-5 h-5" />,
+                    "CashApp": <Smartphone className="w-5 h-5" />,
+                    "Apple Pay": <Smartphone className="w-5 h-5" />,
+                    "Credit Card": <CreditCard className="w-5 h-5" />,
+                    "Debit Card": <CreditCard className="w-5 h-5" />,
+                    "PayPal": <Wallet className="w-5 h-5" />,
+                    "Pix": <Smartphone className="w-5 h-5" />,
+                  };
+                  return (
+                    <div key={method} className="flex items-center gap-2 border border-border rounded-lg px-4 py-3 bg-background hover:border-muted-foreground/40 transition-colors">
+                      <span className="text-muted-foreground">{iconMap[method] || <CreditCard className="w-5 h-5" />}</span>
+                      <span className="text-sm font-medium">{method}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground mt-4">Payment is arranged directly between you and the therapist. MasseurMatch does not process payments.</p>
+            </motion.section>
+          )}
+
+          {/* Location Map */}
+          {mapCenter && profile.city && (
+            <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg" aria-labelledby="location-heading">
+              <h2 id="location-heading" className="text-2xl font-bold mb-2 flex items-center gap-3">
+                <MapPin className="w-5 h-5" />Location
+              </h2>
+              <p className="text-sm text-muted-foreground mb-6">Based in {cityLabel}. Exact location shared after booking.</p>
+              <div className="rounded-lg overflow-hidden border border-border" style={{ height: 280 }}>
+                <iframe
+                  title={`${displayName} location in ${cityLabel}`}
+                  width="100%"
+                  height="100%"
+                  loading="lazy"
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${mapCenter[1] - 0.08},${mapCenter[0] - 0.05},${mapCenter[1] + 0.08},${mapCenter[0] + 0.05}&layer=mapnik&marker=${mapCenter[0]},${mapCenter[1]}`}
+                  style={{ border: 0, filter: "grayscale(100%) invert(92%) hue-rotate(180deg)", opacity: 0.85 }}
+                />
+              </div>
+              <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground" itemProp="geo" itemScope itemType="https://schema.org/GeoCoordinates">
+                <meta itemProp="latitude" content={String(mapCenter[0])} />
+                <meta itemProp="longitude" content={String(mapCenter[1])} />
+                <MapPin className="w-3 h-3" />
+                <span>Approximate area shown — {cityLabel}</span>
+              </div>
             </motion.section>
           )}
 

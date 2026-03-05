@@ -258,6 +258,7 @@ export type Database = {
           is_verified_profile: boolean
           languages: string[] | null
           outcall_price: number | null
+          payment_methods: string[] | null
           phone: string | null
           presentation_video_url: string | null
           pricing_sessions: Json | null
@@ -292,6 +293,7 @@ export type Database = {
           is_verified_profile?: boolean
           languages?: string[] | null
           outcall_price?: number | null
+          payment_methods?: string[] | null
           phone?: string | null
           presentation_video_url?: string | null
           pricing_sessions?: Json | null
@@ -326,6 +328,7 @@ export type Database = {
           is_verified_profile?: boolean
           languages?: string[] | null
           outcall_price?: number | null
+          payment_methods?: string[] | null
           phone?: string | null
           presentation_video_url?: string | null
           pricing_sessions?: Json | null
