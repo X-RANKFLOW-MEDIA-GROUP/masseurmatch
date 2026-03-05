@@ -65,7 +65,7 @@ const DashboardAvailability = () => {
   };
 
   const ScheduleSection = ({ type, icon, label }: { type: "incall" | "outcall"; icon: React.ReactNode; label: string }) => (
-    <section className="glass-card p-6 space-y-4">
+    <section className="glass-card p-4 sm:p-6 space-y-4">
       <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
         {icon} {label}
       </h2>
@@ -73,28 +73,30 @@ const DashboardAvailability = () => {
         {DAYS.map((day) => {
           const d = hours[type][day];
           return (
-            <div key={day} className="flex items-center gap-4 py-2 border-b border-border last:border-0">
-              <div className="w-24">
-                <Label className="text-sm">{day}</Label>
+            <div key={day} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 py-3 border-b border-border last:border-0">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="w-20 sm:w-24">
+                  <Label className="text-sm">{day.slice(0, 3)}<span className="hidden sm:inline">{day.slice(3)}</span></Label>
+                </div>
+                <Switch
+                  checked={d?.active || false}
+                  onCheckedChange={(v) => updateDay(type, day, { active: v })}
+                />
               </div>
-              <Switch
-                checked={d?.active || false}
-                onCheckedChange={(v) => updateDay(type, day, { active: v })}
-              />
               {d?.active && (
-                <div className="flex items-center gap-2 text-sm">
+                <div className="flex items-center gap-2 text-sm pl-[calc(1.25rem+0.75rem)] sm:pl-0">
                   <input
                     type="time"
                     value={d.start || "09:00"}
                     onChange={(e) => updateDay(type, day, { start: e.target.value })}
-                    className="bg-card border border-border rounded px-2 py-1 text-xs text-foreground"
+                    className="bg-card border border-border rounded px-2 py-1.5 text-xs text-foreground min-w-0"
                   />
-                  <span className="text-muted-foreground">to</span>
+                  <span className="text-muted-foreground text-xs">to</span>
                   <input
                     type="time"
                     value={d.end || "18:00"}
                     onChange={(e) => updateDay(type, day, { end: e.target.value })}
-                    className="bg-card border border-border rounded px-2 py-1 text-xs text-foreground"
+                    className="bg-card border border-border rounded px-2 py-1.5 text-xs text-foreground min-w-0"
                   />
                 </div>
               )}
@@ -106,13 +108,13 @@ const DashboardAvailability = () => {
   );
 
   return (
-    <div className="max-w-3xl space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="max-w-3xl space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Availability</h1>
-          <p className="text-sm text-muted-foreground">Control when your profile is active and your schedule</p>
+          <h1 className="text-xl sm:text-2xl font-bold">Availability</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">Control when your profile is active and your schedule</p>
         </div>
-        <Button onClick={handleSave} disabled={saving}>
+        <Button onClick={handleSave} disabled={saving} className="w-full sm:w-auto">
           {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
           Save
         </Button>

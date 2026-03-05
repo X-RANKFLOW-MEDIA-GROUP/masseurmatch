@@ -105,13 +105,13 @@ const DashboardPricing = () => {
   if (loading) return <div className="animate-pulse h-40 bg-muted rounded" />;
 
   return (
-    <div className="max-w-3xl space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="max-w-3xl space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Pricing</h1>
-          <p className="text-sm text-muted-foreground">Set your service rates by session duration</p>
+          <h1 className="text-xl sm:text-2xl font-bold">Pricing</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">Set your service rates by session duration</p>
         </div>
-        <Button onClick={handleSave} disabled={saving}>
+        <Button onClick={handleSave} disabled={saving} className="w-full sm:w-auto">
           {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
           Save
         </Button>
@@ -144,25 +144,23 @@ const DashboardPricing = () => {
 
             return (
               <div key={idx} className="rounded-lg border border-border p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="space-y-1">
-                      <Label className="text-xs">Duration (minutes)</Label>
-                      <Input
-                        type="number"
-                        min={1}
-                        max={480}
-                        value={session.duration}
-                        onChange={(e) => {
-                          const v = Math.max(1, Math.min(480, parseInt(e.target.value) || 1));
-                          updateSession(idx, "duration", v);
-                        }}
-                        className="w-28"
-                      />
-                    </div>
+              <div className="flex items-center justify-between gap-2">
+                  <div className="space-y-1 flex-1 min-w-0">
+                    <Label className="text-xs">Duration (minutes)</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={480}
+                      value={session.duration}
+                      onChange={(e) => {
+                        const v = Math.max(1, Math.min(480, parseInt(e.target.value) || 1));
+                        updateSession(idx, "duration", v);
+                      }}
+                      className="w-full sm:w-28"
+                    />
                   </div>
                   {sessions.length > 1 && (
-                    <Button variant="ghost" size="icon" onClick={() => removeSession(idx)} className="text-destructive hover:text-destructive">
+                    <Button variant="ghost" size="icon" onClick={() => removeSession(idx)} className="text-destructive hover:text-destructive shrink-0 mt-4">
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   )}
