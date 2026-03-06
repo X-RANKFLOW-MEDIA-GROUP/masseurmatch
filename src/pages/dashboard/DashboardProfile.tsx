@@ -67,6 +67,8 @@ const DashboardProfile = () => {
         languages: profile.languages || [],
         presentation_video_url: profile.presentation_video_url || "",
         social_media: (profile.social_media as Record<string, string>) || { instagram: "", website: "" },
+        height_inches: (profile as any).height_inches ?? null,
+        body_type: (profile as any).body_type ?? null,
       });
     }
   }, [profile]);
