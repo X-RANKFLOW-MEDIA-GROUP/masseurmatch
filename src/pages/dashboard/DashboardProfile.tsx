@@ -49,6 +49,8 @@ const DashboardProfile = () => {
     languages: [] as string[],
     presentation_video_url: "",
     social_media: { instagram: "", website: "" } as Record<string, string>,
+    height_inches: null as number | null,
+    body_type: null as string | null,
   });
 
   useEffect(() => {
