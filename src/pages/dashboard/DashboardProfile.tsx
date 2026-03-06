@@ -18,6 +18,16 @@ const SPECIALTIES_OPTIONS = [
 
 const LANGUAGES_OPTIONS = ["Portuguese", "English", "Spanish", "French", "German", "Italian"];
 
+const BODY_TYPE_OPTIONS = ["Slim", "Athletic", "Average", "Muscular", "Stocky", "Large"];
+
+// Generate height options from 4'8" to 7'0"
+const HEIGHT_OPTIONS: { value: number; label: string }[] = [];
+for (let inches = 56; inches <= 84; inches++) {
+  const ft = Math.floor(inches / 12);
+  const rem = inches % 12;
+  HEIGHT_OPTIONS.push({ value: inches, label: `${ft}'${rem}"` });
+}
+
 const DashboardProfile = () => {
   const { user } = useAuth();
   const { profile, loading, updateProfile } = useProfile();
