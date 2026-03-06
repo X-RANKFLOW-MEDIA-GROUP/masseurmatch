@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, X, Save, AlertTriangle, Sparkles, MapPin } from "lucide-react";
+import { Loader2, Plus, X, Save, AlertTriangle, Sparkles, MapPin, Ruler } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const SPECIALTIES_OPTIONS = [
   "Relaxation Massage", "Therapeutic Massage", "Sports Massage",
@@ -16,6 +17,16 @@ const SPECIALTIES_OPTIONS = [
 ];
 
 const LANGUAGES_OPTIONS = ["Portuguese", "English", "Spanish", "French", "German", "Italian"];
+
+const BODY_TYPE_OPTIONS = ["Slim", "Athletic", "Average", "Muscular", "Stocky", "Large"];
+
+// Generate height options from 4'8" to 7'0"
+const HEIGHT_OPTIONS: { value: number; label: string }[] = [];
+for (let inches = 56; inches <= 84; inches++) {
+  const ft = Math.floor(inches / 12);
+  const rem = inches % 12;
+  HEIGHT_OPTIONS.push({ value: inches, label: `${ft}'${rem}"` });
+}
 
 const DashboardProfile = () => {
   const { user } = useAuth();
@@ -38,6 +49,8 @@ const DashboardProfile = () => {
     languages: [] as string[],
     presentation_video_url: "",
     social_media: { instagram: "", website: "" } as Record<string, string>,
+    height_inches: null as number | null,
+    body_type: null as string | null,
   });
 
   useEffect(() => {
@@ -54,6 +67,8 @@ const DashboardProfile = () => {
         languages: profile.languages || [],
         presentation_video_url: profile.presentation_video_url || "",
         social_media: (profile.social_media as Record<string, string>) || { instagram: "", website: "" },
+        height_inches: (profile as any).height_inches ?? null,
+        body_type: (profile as any).body_type ?? null,
       });
     }
   }, [profile]);
@@ -154,6 +169,8 @@ const DashboardProfile = () => {
       languages: form.languages,
       presentation_video_url: form.presentation_video_url || null,
       social_media: form.social_media,
+      height_inches: form.height_inches,
+      body_type: form.body_type,
     } as any);
     setSaving(false);
     toast({
@@ -332,6 +349,48 @@ const DashboardProfile = () => {
               <button onClick={() => setForm((f) => ({ ...f, certifications: f.certifications.filter((_, idx) => idx !== i) }))}><X className="w-3 h-3" /></button>
             </span>
           ))}
+        </div>
+      </section>
+
+      {/* Physical Attributes */}
+      <section className="glass-card p-6 space-y-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+          <Ruler className="w-4 h-4" /> Physical Attributes
+        </h2>
+        <p className="text-xs text-muted-foreground">Optional and self-reported. MasseurMatch does not verify this information.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <Label>Height</Label>
+            <Select
+              value={form.height_inches ? String(form.height_inches) : ""}
+              onValueChange={(v) => setForm((f) => ({ ...f, height_inches: v ? Number(v) : null }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select height" />
+              </SelectTrigger>
+              <SelectContent>
+                {HEIGHT_OPTIONS.map((h) => (
+                  <SelectItem key={h.value} value={String(h.value)}>{h.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Body Type</Label>
+            <Select
+              value={form.body_type || ""}
+              onValueChange={(v) => setForm((f) => ({ ...f, body_type: v || null }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select body type" />
+              </SelectTrigger>
+              <SelectContent>
+                {BODY_TYPE_OPTIONS.map((bt) => (
+                  <SelectItem key={bt} value={bt}>{bt}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </section>
 

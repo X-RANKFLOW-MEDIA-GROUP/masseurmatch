@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   MapPin, CheckCircle2, Phone, Globe, Clock, ArrowRight,
   MessageSquare, Bookmark, Award, Languages, ChevronLeft, ChevronRight,
-  Plane, Home, Star, CreditCard, Banknote, Wallet, Smartphone, Zap
+  Plane, Home, Star, CreditCard, Banknote, Wallet, Smartphone, Zap, Ruler
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -113,6 +113,10 @@ const TherapistProfile = () => {
   const customFaq = (profile?.custom_faq || []) as { question: string; answer: string }[];
   const pricingSessions = (profile?.pricing_sessions || []) as { name: string; duration: number; incall: number; outcall: number }[];
   const paymentMethods = ((profile as any)?.payment_methods || []) as string[];
+  const heightInches = (profile as any)?.height_inches as number | null;
+  const bodyType = (profile as any)?.body_type as string | null;
+  const heightLabel = heightInches ? `${Math.floor(heightInches / 12)}'${heightInches % 12}"` : null;
+  const hasPhysicalAttributes = !!heightLabel || !!bodyType;
   const primaryPhoto = photos.find(p => p.is_primary) || photos[0];
   const galleryPhotos = photos.map(p => p.storage_path);
 
@@ -531,6 +535,32 @@ const TherapistProfile = () => {
                   )}
                 </div>
               </div>
+            </motion.section>
+          )}
+
+          {/* Physical Attributes */}
+          {hasPhysicalAttributes && (
+            <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg" aria-labelledby="physical-heading">
+              <h2 id="physical-heading" className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <Ruler className="w-5 h-5" />Physical Attributes
+              </h2>
+              <div className="grid grid-cols-2 gap-6">
+                {heightLabel && (
+                  <div>
+                    <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Height</h3>
+                    <p className="text-lg font-semibold">{heightLabel}</p>
+                  </div>
+                )}
+                {bodyType && (
+                  <div>
+                    <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Body Type</h3>
+                    <p className="text-lg font-semibold">{bodyType}</p>
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground mt-6 border-t border-border pt-4">
+                Physical attributes are optional and self-reported by the therapist. MasseurMatch does not verify this information.
+              </p>
             </motion.section>
           )}
 

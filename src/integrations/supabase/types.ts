@@ -246,6 +246,7 @@ export type Database = {
           available_now_started_at: string | null
           avatar_url: string | null
           bio: string | null
+          body_type: string | null
           business_hours: Json | null
           certifications: string[] | null
           city: string | null
@@ -254,6 +255,7 @@ export type Database = {
           custom_faq: Json | null
           display_name: string | null
           full_name: string
+          height_inches: number | null
           id: string
           incall_price: number | null
           is_active: boolean
@@ -290,6 +292,7 @@ export type Database = {
           available_now_started_at?: string | null
           avatar_url?: string | null
           bio?: string | null
+          body_type?: string | null
           business_hours?: Json | null
           certifications?: string[] | null
           city?: string | null
@@ -298,6 +301,7 @@ export type Database = {
           custom_faq?: Json | null
           display_name?: string | null
           full_name?: string
+          height_inches?: number | null
           id?: string
           incall_price?: number | null
           is_active?: boolean
@@ -334,6 +338,7 @@ export type Database = {
           available_now_started_at?: string | null
           avatar_url?: string | null
           bio?: string | null
+          body_type?: string | null
           business_hours?: Json | null
           certifications?: string[] | null
           city?: string | null
@@ -342,6 +347,7 @@ export type Database = {
           custom_faq?: Json | null
           display_name?: string | null
           full_name?: string
+          height_inches?: number | null
           id?: string
           incall_price?: number | null
           is_active?: boolean
