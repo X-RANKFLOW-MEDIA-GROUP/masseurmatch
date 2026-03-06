@@ -1,4 +1,4 @@
-import { CheckCircle2, ArrowRight, Loader2, Crown, Sparkles, ExternalLink } from "lucide-react";
+import { CheckCircle2, ArrowRight, Loader2, Crown, Sparkles, ExternalLink, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link, useSearchParams } from "react-router-dom";
@@ -67,6 +67,14 @@ const DashboardSubscription = () => {
 
   return (
     <div className="max-w-5xl space-y-6">
+      {subscription.config_error && (
+        <div className="flex items-center gap-3 rounded-lg border border-accent/30 bg-accent/10 px-4 py-3">
+          <AlertTriangle className="w-4 h-4 text-accent-foreground shrink-0" />
+          <p className="text-sm text-muted-foreground">
+            Subscription info is temporarily unavailable. Your current plan details will refresh automatically.
+          </p>
+        </div>
+      )}
       <div>
         <h1 className="text-2xl font-bold">Subscription</h1>
         <p className="text-sm text-muted-foreground">Manage your advertising plan</p>

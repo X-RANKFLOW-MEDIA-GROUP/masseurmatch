@@ -2,7 +2,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, ArrowRight, Sparkles, CreditCard, Shield, Gift } from "lucide-react";
+import { CheckCircle2, ArrowRight, Sparkles, CreditCard, Shield, Gift, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -13,10 +13,12 @@ import { CursorGlow } from "@/components/animations/CursorGlow";
 import { fadeUp } from "@/components/animations/variants";
 import { useTranslation } from "react-i18next";
 import { SEOHead } from "@/components/seo/SEOHead";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Pricing = () => {
   const scrollRef = useScrollReveal();
   const { t } = useTranslation();
+  const { subscription } = useAuth();
 
   const plans = [
     {
@@ -57,6 +59,16 @@ const Pricing = () => {
       <Header />
 
       <section className="pt-28 pb-16">
+        {subscription.config_error && (
+          <div className="container mx-auto px-4 mb-6">
+            <div className="max-w-3xl mx-auto flex items-center gap-3 rounded-lg border border-accent/30 bg-accent/10 px-4 py-3">
+              <AlertTriangle className="w-4 h-4 text-accent-foreground shrink-0" />
+              <p className="text-sm text-muted-foreground">
+                Subscription info is temporarily unavailable. Prices shown are standard rates — your actual plan will be reflected once the system reconnects.
+              </p>
+            </div>
+          </div>
+        )}
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center mb-20">
             <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">

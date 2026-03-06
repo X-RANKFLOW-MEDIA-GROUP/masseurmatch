@@ -12,6 +12,7 @@ interface SubscriptionState {
   has_founder_discount: boolean;
   status: string | null;
   loading: boolean;
+  config_error: string | null;
 }
 
 interface AuthContextType {
@@ -35,6 +36,7 @@ const defaultSubscription: SubscriptionState = {
   has_founder_discount: false,
   status: null,
   loading: true,
+  config_error: null,
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -63,6 +65,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         has_founder_discount: data.has_founder_discount ?? false,
         status: data.status ?? null,
         loading: false,
+        config_error: data.config_error ?? null,
       });
     } catch {
       setSubscription(prev => ({ ...prev, loading: false }));
