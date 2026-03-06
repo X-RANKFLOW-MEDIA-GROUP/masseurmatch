@@ -352,6 +352,48 @@ const DashboardProfile = () => {
         </div>
       </section>
 
+      {/* Physical Attributes */}
+      <section className="glass-card p-6 space-y-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+          <Ruler className="w-4 h-4" /> Physical Attributes
+        </h2>
+        <p className="text-xs text-muted-foreground">Optional and self-reported. MasseurMatch does not verify this information.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <Label>Height</Label>
+            <Select
+              value={form.height_inches ? String(form.height_inches) : ""}
+              onValueChange={(v) => setForm((f) => ({ ...f, height_inches: v ? Number(v) : null }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select height" />
+              </SelectTrigger>
+              <SelectContent>
+                {HEIGHT_OPTIONS.map((h) => (
+                  <SelectItem key={h.value} value={String(h.value)}>{h.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Body Type</Label>
+            <Select
+              value={form.body_type || ""}
+              onValueChange={(v) => setForm((f) => ({ ...f, body_type: v || null }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select body type" />
+              </SelectTrigger>
+              <SelectContent>
+                {BODY_TYPE_OPTIONS.map((bt) => (
+                  <SelectItem key={bt} value={bt}>{bt}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </section>
+
       {/* Social & Video */}
       <section className="glass-card p-6 space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Social Media & Video</h2>
