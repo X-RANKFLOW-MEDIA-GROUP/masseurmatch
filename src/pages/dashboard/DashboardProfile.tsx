@@ -169,6 +169,8 @@ const DashboardProfile = () => {
       languages: form.languages,
       presentation_video_url: form.presentation_video_url || null,
       social_media: form.social_media,
+      height_inches: form.height_inches,
+      body_type: form.body_type,
     } as any);
     setSaving(false);
     toast({
