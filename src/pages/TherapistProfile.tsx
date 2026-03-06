@@ -113,6 +113,10 @@ const TherapistProfile = () => {
   const customFaq = (profile?.custom_faq || []) as { question: string; answer: string }[];
   const pricingSessions = (profile?.pricing_sessions || []) as { name: string; duration: number; incall: number; outcall: number }[];
   const paymentMethods = ((profile as any)?.payment_methods || []) as string[];
+  const heightInches = (profile as any)?.height_inches as number | null;
+  const bodyType = (profile as any)?.body_type as string | null;
+  const heightLabel = heightInches ? `${Math.floor(heightInches / 12)}'${heightInches % 12}"` : null;
+  const hasPhysicalAttributes = !!heightLabel || !!bodyType;
   const primaryPhoto = photos.find(p => p.is_primary) || photos[0];
   const galleryPhotos = photos.map(p => p.storage_path);
 
