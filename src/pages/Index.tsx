@@ -383,6 +383,93 @@ const Index = () => {
         </div>
       </section>
 
+      {/* ─── SPECIAL OFFERS ─── */}
+      {specialOfferProfiles.length > 0 && (
+        <section className="py-20 border-t border-border">
+          <div className="container mx-auto px-4">
+            <div className="max-w-5xl mx-auto">
+              <div className="flex items-center justify-between mb-10">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-warning mb-2 flex items-center gap-2">
+                    <Tag className="w-3.5 h-3.5" /> Weekly Specials
+                  </p>
+                  <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight">
+                    <TextReveal text="Special Offers" />
+                  </h2>
+                </div>
+                <Link to="/explore">
+                  <Button variant="outline" size="sm" className="gap-1">
+                    View All <ArrowRight className="w-3 h-3" />
+                  </Button>
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {specialOfferProfiles.slice(0, 6).map((p, i) => (
+                  <motion.div key={p.id + "-" + i} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+                    <Link to={`/therapist/${p.id}`}>
+                      <TiltCard className="glass-card p-5 group">
+                        <div className="flex items-center gap-3 mb-3">
+                          <img src={p.image} alt={p.name} className="w-12 h-12 rounded-full object-cover" loading="lazy" />
+                          <div>
+                            <h3 className="font-semibold text-sm">{p.name}</h3>
+                            <p className="text-xs text-muted-foreground">{p.city}</p>
+                          </div>
+                          <Badge className="ml-auto text-[10px] bg-warning/20 text-warning border-warning/30">
+                            <Tag className="w-2.5 h-2.5 mr-0.5" /> Offer
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground line-clamp-2">{p.specialText}</p>
+                      </TiltCard>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ─── NEW THERAPISTS ─── */}
+      {newProfiles.length > 0 && (
+        <section className="py-20 border-t border-border">
+          <div className="container mx-auto px-4">
+            <div className="max-w-5xl mx-auto">
+              <div className="flex items-center justify-between mb-10">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-success mb-2 flex items-center gap-2">
+                    <UserPlus className="w-3.5 h-3.5" /> Just Joined
+                  </p>
+                  <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight">
+                    <TextReveal text="New Therapists" />
+                  </h2>
+                </div>
+                <Link to="/explore">
+                  <Button variant="outline" size="sm" className="gap-1">
+                    View All <ArrowRight className="w-3 h-3" />
+                  </Button>
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                {newProfiles.slice(0, 6).map((p, i) => (
+                  <motion.div key={p.id} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+                    <Link to={`/therapist/${p.id}`}>
+                      <TiltCard className="glass-card p-4 text-center group">
+                        <img src={p.image} alt={p.name} className="w-16 h-16 rounded-full object-cover mx-auto mb-3 grayscale group-hover:grayscale-0 transition-all" loading="lazy" />
+                        <h3 className="font-semibold text-sm truncate">{p.name}</h3>
+                        <p className="text-xs text-muted-foreground truncate">{p.city}</p>
+                        <Badge className="mt-2 text-[10px] bg-success/20 text-success border-success/30">
+                          <UserPlus className="w-2.5 h-2.5 mr-0.5" /> New
+                        </Badge>
+                      </TiltCard>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ─── CTA ─── */}
       <section className="py-36 md:py-44">
         <div className="container mx-auto px-4">
