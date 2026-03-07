@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard, Shield, Camera, Flag, Star, MapPin, ScrollText,
-  Users, Mail, LogOut, Bot,
+  Users, Mail, LogOut, Bot, Newspaper,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -22,6 +22,7 @@ const mainItems = [
 
 const userItems = [
   { title: "User Management", url: "/admin/users", icon: Users },
+  { title: "Newsletter", url: "/admin/newsletter", icon: Newspaper },
 ];
 
 export const AdminSidebar = () => {

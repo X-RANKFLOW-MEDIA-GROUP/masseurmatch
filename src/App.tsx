@@ -53,6 +53,7 @@ import AdminFeatured from "./pages/admin/AdminFeatured";
 import AdminCityOps from "./pages/admin/AdminCityOps";
 import AdminAuditLog from "./pages/admin/AdminAuditLog";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminNewsletter from "./pages/admin/AdminNewsletter";
 
 const queryClient = new QueryClient();
 
@@ -106,6 +107,7 @@ const AnimatedRoutes = () => {
           <Route path="city-ops" element={<AdminCityOps />} />
           <Route path="audit-log" element={<AdminAuditLog />} />
           <Route path="users" element={<AdminUsers />} />
+          <Route path="newsletter" element={<AdminNewsletter />} />
         </Route>
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
