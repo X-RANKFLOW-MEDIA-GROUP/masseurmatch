@@ -424,6 +424,24 @@ function getTemplate(template: string, data: TemplateData): { subject: string; h
     // ═══════════════════════════════════════
     // 7. SUPPORT TICKETS
     // ═══════════════════════════════════════
+    case "ticket_created":
+      return {
+        from: `${BRAND.name} <support@masseurmatch.com>`,
+        subject: `Ticket received: ${data.ticket_subject || "Support Request"} — we're on it`,
+        html: htmlEmail("Ticket Created", `
+          <h1>We received your ticket</h1>
+          <p>Hi ${n},</p>
+          <p>Your support ticket <strong>"${data.ticket_subject || "Support Request"}"</strong> has been submitted successfully.</p>
+          <div class="info-box">
+            <p><strong>Subject:</strong> ${data.ticket_subject || "N/A"}</p>
+            <p><strong>Message:</strong> ${data.ticket_message ? data.ticket_message.substring(0, 300) + (data.ticket_message.length > 300 ? "..." : "") : "N/A"}</p>
+          </div>
+          <p>Our team will review it and respond within <strong>24–48 hours</strong>. You'll receive an email when we reply.</p>
+          <p style="text-align:center"><a href="${dashboardLink}/support" class="btn">View Ticket</a></p>
+          <p class="muted">You can track and reply to your ticket from your dashboard.</p>
+        `, "We received your support ticket"),
+      };
+
     case "ticket_reply":
       return {
         from: `${BRAND.name} <support@masseurmatch.com>`,
