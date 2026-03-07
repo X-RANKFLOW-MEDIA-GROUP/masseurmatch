@@ -437,6 +437,7 @@ export type Database = {
       support_tickets: {
         Row: {
           assigned_to: string | null
+          attachment_urls: string[] | null
           created_at: string
           id: string
           message: string
@@ -448,6 +449,7 @@ export type Database = {
         }
         Insert: {
           assigned_to?: string | null
+          attachment_urls?: string[] | null
           created_at?: string
           id?: string
           message: string
@@ -459,6 +461,7 @@ export type Database = {
         }
         Update: {
           assigned_to?: string | null
+          attachment_urls?: string[] | null
           created_at?: string
           id?: string
           message?: string
@@ -472,6 +475,7 @@ export type Database = {
       }
       ticket_replies: {
         Row: {
+          attachment_urls: string[] | null
           created_at: string
           id: string
           is_admin: boolean
@@ -480,6 +484,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          attachment_urls?: string[] | null
           created_at?: string
           id?: string
           is_admin?: boolean
@@ -488,6 +493,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          attachment_urls?: string[] | null
           created_at?: string
           id?: string
           is_admin?: boolean
