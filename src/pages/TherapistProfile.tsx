@@ -609,6 +609,28 @@ const TherapistProfile = () => {
             </motion.section>
           )}
 
+          {/* Weekly Specials */}
+          {weeklySpecials.length > 0 && (
+            <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="border border-warning/30 bg-warning/5 p-8 md:p-10 mb-8 rounded-lg" aria-labelledby="specials-heading">
+              <h2 id="specials-heading" className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <Tag className="w-5 h-5 text-warning" />Weekly Specials
+              </h2>
+              <div className="space-y-4">
+                {weeklySpecials.map((special) => (
+                  <div key={special.id} className="flex items-start gap-3">
+                    <div className="w-2 h-2 rounded-full bg-warning mt-2 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium">{special.text}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Valid until {new Date(special.expires_at).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.section>
+          )}
+
           {/* Services & Rates */}
           {(profile.incall_price || profile.outcall_price || pricingSessions.length > 0) && (
             <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg" aria-labelledby="services-heading">
