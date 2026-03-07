@@ -495,25 +495,77 @@ const TherapistProfile = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-                  {profile.phone && (
+                  {showCall && profile.phone && (
                     <MagneticButton>
-                      <Button asChild className="group">
-                        <a href={`tel:${profile.phone}`} aria-label={`Call ${displayName}`}>
+                      {revealedContacts.call ? (
+                        <Button asChild className="group">
+                          <a href={`tel:${profile.phone}`} aria-label={`Call ${displayName}`}>
+                            <Phone className="w-4 h-4 mr-1" />
+                            {profile.phone}
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button onClick={() => revealContact("call")} className="group">
                           <Phone className="w-4 h-4 mr-1" />
                           Call
-                          <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                        </a>
-                      </Button>
+                          <Eye className="w-3 h-3 ml-1 opacity-50" />
+                        </Button>
+                      )}
                     </MagneticButton>
                   )}
-                  {socialMedia.whatsapp && (
+                  {showText && profile.phone && (
                     <MagneticButton>
-                      <Button asChild variant="outline" className="group">
-                        <a href={`https://wa.me/${socialMedia.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" aria-label={`Message ${displayName} on WhatsApp`}>
+                      {revealedContacts.text ? (
+                        <Button asChild variant="outline" className="group">
+                          <a href={`sms:${profile.phone}`} aria-label={`Text ${displayName}`}>
+                            <MessageSquare className="w-4 h-4 mr-1" />
+                            {profile.phone}
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button variant="outline" onClick={() => revealContact("text")} className="group">
+                          <MessageSquare className="w-4 h-4 mr-1" />
+                          Text
+                          <Eye className="w-3 h-3 ml-1 opacity-50" />
+                        </Button>
+                      )}
+                    </MagneticButton>
+                  )}
+                  {showEmail && (
+                    <MagneticButton>
+                      {revealedContacts.email ? (
+                        <Button asChild variant="outline" className="group">
+                          <a href={`mailto:${socialMedia.email || ""}`} aria-label={`Email ${displayName}`}>
+                            <Mail className="w-4 h-4 mr-1" />
+                            {socialMedia.email || "Email"}
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button variant="outline" onClick={() => revealContact("email")} className="group">
+                          <Mail className="w-4 h-4 mr-1" />
+                          Email
+                          <Eye className="w-3 h-3 ml-1 opacity-50" />
+                        </Button>
+                      )}
+                    </MagneticButton>
+                  )}
+                  {showWhatsApp && socialMedia.whatsapp && (
+                    <MagneticButton>
+                      {revealedContacts.whatsapp ? (
+                        <Button asChild variant="outline" className="group">
+                          <a href={`https://wa.me/${socialMedia.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp ${displayName}`}>
+                            <MessageSquare className="w-4 h-4 mr-1" />
+                            WhatsApp
+                            <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button variant="outline" onClick={() => revealContact("whatsapp")} className="group">
                           <MessageSquare className="w-4 h-4 mr-1" />
                           WhatsApp
-                        </a>
-                      </Button>
+                          <Eye className="w-3 h-3 ml-1 opacity-50" />
+                        </Button>
+                      )}
                     </MagneticButton>
                   )}
                   <Button variant="ghost" aria-label="Save profile"><Bookmark className="w-4 h-4 mr-1" />Save</Button>
