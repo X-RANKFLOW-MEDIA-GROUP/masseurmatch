@@ -75,10 +75,12 @@ const DashboardProfile = () => {
         certifications: profile.certifications || [],
         languages: profile.languages || [],
         presentation_video_url: profile.presentation_video_url || "",
-        social_media: (profile.social_media as Record<string, string>) || { instagram: "", website: "" },
+        social_media: (profile.social_media as Record<string, string>) || { instagram: "", website: "", email: "", whatsapp: "" },
         height_inches: (profile as any).height_inches ?? null,
         body_type: (profile as any).body_type ?? null,
         date_of_birth: (profile as any).date_of_birth ?? null,
+        contact_methods: (profile as any).contact_methods || [],
+        share_email: (profile as any).share_email || false,
       });
     }
   }, [profile]);
