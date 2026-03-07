@@ -426,6 +426,27 @@ const TherapistProfile = () => {
                       <Zap className="w-3 h-3 mr-1" />Available Now
                     </Badge>
                   )}
+                  {travel.length > 0 && (() => {
+                    const today = new Date().toISOString().split("T")[0];
+                    const activeTrip = travel.find(t => t.start_date <= today && t.end_date >= today);
+                    const upcomingTrip = travel.find(t => t.start_date > today);
+                    if (activeTrip) return (
+                      <Badge className="bg-primary text-primary-foreground text-xs">
+                        <Plane className="w-3 h-3 mr-1" />Visiting {activeTrip.destination_city} Now
+                      </Badge>
+                    );
+                    if (upcomingTrip) return (
+                      <Badge variant="outline" className="text-xs border-primary/30 text-primary">
+                        <Plane className="w-3 h-3 mr-1" />Visiting {upcomingTrip.destination_city} Soon
+                      </Badge>
+                    );
+                    return null;
+                  })()}
+                  {weeklySpecials.length > 0 && (
+                    <Badge className="bg-warning/90 text-warning-foreground text-xs">
+                      <Tag className="w-3 h-3 mr-1" />Special Offer
+                    </Badge>
+                  )}
                 </div>
 
                 {cityLabel && (
