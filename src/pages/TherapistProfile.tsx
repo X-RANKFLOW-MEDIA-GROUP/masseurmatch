@@ -139,6 +139,21 @@ const TherapistProfile = () => {
   const hasPhysicalAttributes = !!heightLabel || !!bodyType || !!calculatedAge;
   const primaryPhoto = photos.find(p => p.is_primary) || photos[0];
   const galleryPhotos = photos.map(p => p.storage_path);
+  const avatarFallback = profile?.avatar_url || "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=800&h=800&fit=crop";
+  const mainPhotoUrl = primaryPhoto?.storage_path || avatarFallback;
+  const contactMethods = ((profile as any)?.contact_methods || []) as string[];
+  const shareEmail = (profile as any)?.share_email || false;
+  const userEmail = profile ? (profile as any).user_email : null; // Not available from profiles, need separate lookup
+  const showCall = contactMethods.length === 0 || contactMethods.includes("call");
+  const showText = contactMethods.length === 0 || contactMethods.includes("text");
+  const showEmail = contactMethods.includes("email") && shareEmail;
+  const showWhatsApp = contactMethods.length === 0 || contactMethods.includes("whatsapp");
+
+  const revealContact = (type: string) => setRevealedContacts(prev => ({ ...prev, [type]: true }));
+  const maskPhone = (phone: string) => {
+    if (phone.length <= 4) return "•••• •••";
+    return phone.slice(0, -4).replace(/./g, "•") + " " + phone.slice(-4);
+  };
 
   // City coordinates for OpenStreetMap
   const cityCoords: Record<string, [number, number]> = {
