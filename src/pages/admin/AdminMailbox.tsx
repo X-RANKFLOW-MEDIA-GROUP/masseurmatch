@@ -233,10 +233,29 @@ const AdminMailbox = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-1 line-clamp-2">{t.message}</p>
-                <p className="text-xs text-muted-foreground">
-                  {new Date(t.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                </p>
+                <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{t.message}</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(t.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                  </p>
+                  <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                    {t.status === "open" && (
+                      <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => updateStatus(t.id, "in_progress")}>
+                        Reply →
+                      </Button>
+                    )}
+                    {t.status !== "resolved" && t.status !== "closed" && (
+                      <Button size="sm" variant="ghost" className="h-7 text-xs text-success" onClick={() => updateStatus(t.id, "resolved")}>
+                        ✓ Resolve
+                      </Button>
+                    )}
+                    {t.status === "resolved" && (
+                      <Button size="sm" variant="ghost" className="h-7 text-xs text-muted-foreground" onClick={() => updateStatus(t.id, "closed")}>
+                        Close
+                      </Button>
+                    )}
+                  </div>
+                </div>
               </CardContent>
             </Card>
           ))}
