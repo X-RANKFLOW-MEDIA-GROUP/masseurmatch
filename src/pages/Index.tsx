@@ -554,6 +554,7 @@ const Index = () => {
         </div>
       </section>
 
+      <NewsletterSignup />
       <SafetyDisclaimer />
       <Footer />
     </div>
