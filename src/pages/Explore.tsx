@@ -103,12 +103,17 @@ function mapProfileToTherapist(p: any): TherapistItem {
     available: p.is_active || false,
     bio: p.bio?.slice(0, 120) || "",
     isTraveling: false,
+    travelBadge: null,
     incallPrice: p.incall_price ?? 0,
     outcallPrice: p.outcall_price ?? 0,
     specialties: p.specialties || [],
     availableNow: isAvailableNow,
     availableNowExpires: isAvailableNow ? p.available_now_expires : null,
     availableNowTier: p._tier || "free",
+    hasSpecialOffer: false,
+    specialOfferText: "",
+    isNewUser: false,
+    createdAt: p.created_at,
   };
 }
 
