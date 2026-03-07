@@ -28,6 +28,7 @@ import {
   Plane,
   LogOut,
   LifeBuoy,
+  Tag,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
