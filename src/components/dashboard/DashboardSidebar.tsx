@@ -46,6 +46,7 @@ const menuItems = [
   { title: "SEO", url: "/dashboard/seo", icon: Search },
   { title: "Promotion", url: "/dashboard/promotion", icon: Megaphone },
   { title: "Q&A", url: "/dashboard/faq", icon: MessageCircleQuestion },
+  { title: "Specials", url: "/dashboard/specials", icon: Tag },
   { title: "Travel", url: "/dashboard/travel", icon: Plane },
 ];
 
