@@ -115,8 +115,17 @@ const TherapistProfile = () => {
   const paymentMethods = ((profile as any)?.payment_methods || []) as string[];
   const heightInches = (profile as any)?.height_inches as number | null;
   const bodyType = (profile as any)?.body_type as string | null;
+  const dateOfBirth = (profile as any)?.date_of_birth as string | null;
   const heightLabel = heightInches ? `${Math.floor(heightInches / 12)}'${heightInches % 12}"` : null;
-  const hasPhysicalAttributes = !!heightLabel || !!bodyType;
+  const calculatedAge = dateOfBirth ? (() => {
+    const dob = new Date(dateOfBirth + "T00:00:00");
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+    return age;
+  })() : null;
+  const hasPhysicalAttributes = !!heightLabel || !!bodyType || !!calculatedAge;
   const primaryPhoto = photos.find(p => p.is_primary) || photos[0];
   const galleryPhotos = photos.map(p => p.storage_path);
 
