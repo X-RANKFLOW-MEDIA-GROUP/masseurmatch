@@ -46,12 +46,17 @@ interface TherapistItem {
   available: boolean;
   bio: string;
   isTraveling?: boolean;
+  travelBadge?: "visiting_now" | "visiting_soon" | null;
   incallPrice?: number;
   outcallPrice?: number;
   specialties?: string[];
   availableNow?: boolean;
   availableNowExpires?: string | null;
   availableNowTier?: string;
+  hasSpecialOffer?: boolean;
+  specialOfferText?: string;
+  isNewUser?: boolean;
+  createdAt?: string;
 }
 
 // Simple city → lat/lng fallback for map view
