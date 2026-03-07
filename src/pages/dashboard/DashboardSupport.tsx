@@ -1,15 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Send, Loader2, TicketCheck, Plus, ArrowLeft, MessageSquare } from "lucide-react";
+import { Send, Loader2, TicketCheck, Plus, ArrowLeft, MessageSquare, Paperclip, X, FileText } from "lucide-react";
+
+const SUBJECT_OPTIONS = [
+  "Account & Login Issues",
+  "Profile & Photos",
+  "Verification Problems",
+  "Subscription & Billing",
+  "Bug Report",
+  "Feature Request",
+  "Safety Concern",
+  "Other",
+];
 
 interface Ticket {
   id: string;
@@ -18,6 +28,7 @@ interface Ticket {
   status: string;
   priority: string;
   created_at: string;
+  attachment_urls?: string[];
 }
 
 interface Reply {
@@ -27,6 +38,7 @@ interface Reply {
   message: string;
   is_admin: boolean;
   created_at: string;
+  attachment_urls?: string[];
 }
 
 const statusColors: Record<string, string> = {
@@ -36,6 +48,9 @@ const statusColors: Record<string, string> = {
   closed: "bg-muted text-muted-foreground border-border",
 };
 
+const MAX_FILES = 3;
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
 const DashboardSupport = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -43,11 +58,17 @@ const DashboardSupport = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ subject: "", message: "", priority: "normal" });
+  const [form, setForm] = useState({ subject: "", message: "" });
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [replies, setReplies] = useState<Reply[]>([]);
   const [replyText, setReplyText] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
+
+  // File attachments
+  const [files, setFiles] = useState<File[]>([]);
+  const [replyFiles, setReplyFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const replyFileInputRef = useRef<HTMLInputElement>(null);
 
   const loadTickets = async () => {
     if (!user) return;
@@ -76,22 +97,65 @@ const DashboardSupport = () => {
     if (selectedTicket) loadReplies(selectedTicket.id);
   }, [selectedTicket]);
 
+  const uploadFiles = async (filesToUpload: File[]): Promise<string[]> => {
+    if (!user || filesToUpload.length === 0) return [];
+    const urls: string[] = [];
+    for (const file of filesToUpload) {
+      const ext = file.name.split(".").pop();
+      const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from("ticket-attachments").upload(path, file);
+      if (!error) {
+        urls.push(path);
+      }
+    }
+    return urls;
+  };
+
+  const getSignedUrl = async (path: string) => {
+    const { data } = await supabase.storage.from("ticket-attachments").createSignedUrl(path, 3600);
+    return data?.signedUrl || "";
+  };
+
+  const addFiles = (newFiles: FileList | null, target: "form" | "reply") => {
+    if (!newFiles) return;
+    const current = target === "form" ? files : replyFiles;
+    const setter = target === "form" ? setFiles : setReplyFiles;
+    const remaining = MAX_FILES - current.length;
+    const valid: File[] = [];
+    for (let i = 0; i < Math.min(newFiles.length, remaining); i++) {
+      if (newFiles[i].size <= MAX_FILE_SIZE) {
+        valid.push(newFiles[i]);
+      } else {
+        toast({ title: "File too large", description: `${newFiles[i].name} exceeds 5MB limit.`, variant: "destructive" });
+      }
+    }
+    setter([...current, ...valid]);
+  };
+
+  const removeFile = (index: number, target: "form" | "reply") => {
+    const setter = target === "form" ? setFiles : setReplyFiles;
+    setter((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !form.subject.trim() || !form.message.trim()) return;
+    if (!user || !form.subject || !form.message.trim()) return;
     setSending(true);
+    const attachmentUrls = await uploadFiles(files);
     const { error } = await supabase.from("support_tickets").insert({
       user_id: user.id,
-      subject: form.subject.trim(),
+      subject: form.subject,
       message: form.message.trim(),
-      priority: form.priority,
-    });
+      priority: "normal",
+      attachment_urls: attachmentUrls,
+    } as any);
     setSending(false);
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "Ticket submitted", description: "Our team will review it shortly." });
-      setForm({ subject: "", message: "", priority: "normal" });
+      setForm({ subject: "", message: "" });
+      setFiles([]);
       setShowForm(false);
       loadTickets();
     }
@@ -100,16 +164,19 @@ const DashboardSupport = () => {
   const sendReply = async () => {
     if (!user || !selectedTicket || !replyText.trim()) return;
     setSendingReply(true);
+    const attachmentUrls = await uploadFiles(replyFiles);
     const { error } = await supabase.from("ticket_replies").insert({
       ticket_id: selectedTicket.id,
       user_id: user.id,
       message: replyText.trim(),
       is_admin: false,
-    });
+      attachment_urls: attachmentUrls,
+    } as any);
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
       setReplyText("");
+      setReplyFiles([]);
       loadReplies(selectedTicket.id);
     }
     setSendingReply(false);
@@ -134,15 +201,15 @@ const DashboardSupport = () => {
                   {new Date(selectedTicket.created_at).toLocaleString()}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className={statusColors[selectedTicket.status] || ""}>{selectedTicket.status.replace("_", " ")}</Badge>
-                <Badge variant="outline" className="capitalize">{selectedTicket.priority}</Badge>
-              </div>
+              <Badge variant="outline" className={statusColors[selectedTicket.status] || ""}>{selectedTicket.status.replace("_", " ")}</Badge>
             </div>
           </CardHeader>
           <CardContent>
             <div className="bg-muted/50 rounded-lg p-4">
               <p className="text-sm whitespace-pre-wrap">{selectedTicket.message}</p>
+              {selectedTicket.attachment_urls && selectedTicket.attachment_urls.length > 0 && (
+                <AttachmentList paths={selectedTicket.attachment_urls} getSignedUrl={getSignedUrl} />
+              )}
             </div>
           </CardContent>
         </Card>
@@ -171,6 +238,9 @@ const DashboardSupport = () => {
                 </span>
               </div>
               <p className="whitespace-pre-wrap">{r.message}</p>
+              {r.attachment_urls && r.attachment_urls.length > 0 && (
+                <AttachmentList paths={r.attachment_urls} getSignedUrl={getSignedUrl} />
+              )}
             </div>
           ))}
 
@@ -190,7 +260,27 @@ const DashboardSupport = () => {
                 className="min-h-[80px] mb-3"
                 maxLength={5000}
               />
-              <div className="flex justify-end">
+              <FilePreview files={replyFiles} onRemove={(i) => removeFile(i, "reply")} />
+              <div className="flex justify-between items-center">
+                <div>
+                  <input
+                    ref={replyFileInputRef}
+                    type="file"
+                    className="hidden"
+                    multiple
+                    accept="image/*,.pdf,.doc,.docx,.txt"
+                    onChange={(e) => { addFiles(e.target.files, "reply"); e.target.value = ""; }}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => replyFileInputRef.current?.click()}
+                    disabled={replyFiles.length >= MAX_FILES}
+                  >
+                    <Paperclip className="w-4 h-4 mr-1" /> Attach
+                  </Button>
+                </div>
                 <Button onClick={sendReply} disabled={sendingReply || !replyText.trim()}>
                   {sendingReply ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
                   Reply
@@ -227,23 +317,12 @@ const DashboardSupport = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Label>Subject <span className="text-destructive">*</span></Label>
-                <Input
-                  value={form.subject}
-                  onChange={(e) => setForm((f) => ({ ...f, subject: e.target.value }))}
-                  placeholder="Brief description of your issue"
-                  required
-                  maxLength={200}
-                />
-              </div>
-              <div>
-                <Label>Priority</Label>
-                <Select value={form.priority} onValueChange={(v) => setForm((f) => ({ ...f, priority: v }))}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <Select value={form.subject} onValueChange={(v) => setForm((f) => ({ ...f, subject: v }))}>
+                  <SelectTrigger><SelectValue placeholder="Select a topic..." /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="normal">Normal</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="urgent">Urgent</SelectItem>
+                    {SUBJECT_OPTIONS.map((s) => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -258,9 +337,31 @@ const DashboardSupport = () => {
                   maxLength={2000}
                 />
               </div>
+              <div>
+                <Label>Attachments</Label>
+                <p className="text-xs text-muted-foreground mb-2">Up to {MAX_FILES} files, max 5MB each (images, PDF, DOC, TXT)</p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className="hidden"
+                  multiple
+                  accept="image/*,.pdf,.doc,.docx,.txt"
+                  onChange={(e) => { addFiles(e.target.files, "form"); e.target.value = ""; }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={files.length >= MAX_FILES}
+                >
+                  <Paperclip className="w-4 h-4 mr-1" /> Choose Files
+                </Button>
+                <FilePreview files={files} onRemove={(i) => removeFile(i, "form")} />
+              </div>
               <div className="flex justify-end gap-2">
-                <Button type="button" variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
-                <Button type="submit" disabled={sending}>
+                <Button type="button" variant="ghost" onClick={() => { setShowForm(false); setFiles([]); }}>Cancel</Button>
+                <Button type="submit" disabled={sending || !form.subject}>
                   {sending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
                   Submit
                 </Button>
@@ -281,15 +382,12 @@ const DashboardSupport = () => {
             <Card
               key={t.id}
               className="bg-card border-border cursor-pointer hover:border-primary/40 transition-colors"
-              onClick={() => { setSelectedTicket(t); setReplyText(""); }}
+              onClick={() => { setSelectedTicket(t); setReplyText(""); setReplyFiles([]); }}
             >
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm font-semibold">{t.subject}</CardTitle>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className={statusColors[t.status] || ""}>{t.status.replace("_", " ")}</Badge>
-                    <Badge variant="outline" className="capitalize">{t.priority}</Badge>
-                  </div>
+                  <Badge variant="outline" className={statusColors[t.status] || ""}>{t.status.replace("_", " ")}</Badge>
                 </div>
               </CardHeader>
               <CardContent>
@@ -302,6 +400,62 @@ const DashboardSupport = () => {
           ))}
         </div>
       )}
+    </div>
+  );
+};
+
+// Small components
+const FilePreview = ({ files, onRemove }: { files: File[]; onRemove: (i: number) => void }) => {
+  if (files.length === 0) return null;
+  return (
+    <div className="flex flex-wrap gap-2 mt-2">
+      {files.map((f, i) => (
+        <div key={i} className="flex items-center gap-1 rounded-full bg-secondary border border-border px-3 py-1 text-xs">
+          <FileText className="w-3 h-3 text-muted-foreground" />
+          <span className="max-w-[120px] truncate">{f.name}</span>
+          <button type="button" onClick={() => onRemove(i)}>
+            <X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const AttachmentList = ({ paths, getSignedUrl }: { paths: string[]; getSignedUrl: (p: string) => Promise<string> }) => {
+  const [urls, setUrls] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    paths.forEach(async (p) => {
+      const url = await getSignedUrl(p);
+      setUrls((prev) => ({ ...prev, [p]: url }));
+    });
+  }, [paths]);
+
+  if (paths.length === 0) return null;
+
+  return (
+    <div className="flex flex-wrap gap-2 mt-3">
+      {paths.map((p) => {
+        const name = p.split("/").pop() || "file";
+        const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(name);
+        return (
+          <a
+            key={p}
+            href={urls[p] || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 rounded bg-secondary/50 border border-border px-2 py-1 text-xs hover:bg-secondary transition-colors"
+          >
+            {isImage ? (
+              <img src={urls[p]} alt="" className="w-8 h-8 rounded object-cover" />
+            ) : (
+              <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+            )}
+            <span className="max-w-[100px] truncate">{name}</span>
+          </a>
+        );
+      })}
     </div>
   );
 };
