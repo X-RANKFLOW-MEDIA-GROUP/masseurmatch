@@ -399,9 +399,7 @@ const TherapistProfile = () => {
 
       {/* Hero */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} className="relative h-72 md:h-96 overflow-hidden bg-secondary">
-        {galleryPhotos.length > 0 && (
-          <img src={galleryPhotos[0]} alt={`${displayName} massage studio in ${cityLabel}`} className="w-full h-full object-cover" loading="eager" fetchPriority="high" />
-        )}
+        <img src={galleryPhotos[0] || mainPhotoUrl} alt={`${displayName} massage studio in ${cityLabel}`} className="w-full h-full object-cover" loading="eager" fetchPriority="high" />
         <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/40 to-background" />
       </motion.div>
 
