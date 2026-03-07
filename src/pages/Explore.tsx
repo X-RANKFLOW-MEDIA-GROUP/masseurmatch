@@ -268,6 +268,8 @@ const Explore = () => {
   const [sortBy, setSortBy] = useState("default");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showSmartMatch, setShowSmartMatch] = useState(false);
+  const [specialOffersOnly, setSpecialOffersOnly] = useState(false);
+  const [newUsersOnly, setNewUsersOnly] = useState(false);
 
   useEffect(() => {
     const fetchProfiles = async () => {
