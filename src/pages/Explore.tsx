@@ -192,10 +192,7 @@ const SwipeCard = ({
 
         <div className="absolute top-4 left-4 flex gap-1.5 flex-wrap">
           {therapist.verified && (
-            <Badge className="bg-background/80 backdrop-blur-sm text-foreground border-border text-xs">
-              <CheckCircle2 className="w-3 h-3 mr-1" />
-              Verified
-            </Badge>
+            <VerifiedBadge size="sm" />
           )}
           {therapist.travelBadge === "visiting_now" && (
             <Badge className="bg-primary/90 backdrop-blur-sm text-primary-foreground border-primary text-xs">
