@@ -253,6 +253,7 @@ export type Database = {
           country: string | null
           created_at: string
           custom_faq: Json | null
+          date_of_birth: string | null
           display_name: string | null
           full_name: string
           height_inches: number | null
@@ -299,6 +300,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           custom_faq?: Json | null
+          date_of_birth?: string | null
           display_name?: string | null
           full_name?: string
           height_inches?: number | null
@@ -345,6 +347,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           custom_faq?: Json | null
+          date_of_birth?: string | null
           display_name?: string | null
           full_name?: string
           height_inches?: number | null
