@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Ban, CreditCard, RotateCcw, Search, Tag, Undo2, Loader2, DollarSign } from "lucide-react";
+import { Ban, CreditCard, RotateCcw, Search, Tag, Undo2, Loader2, DollarSign, UserPlus, Edit, KeyRound, Mail, ShieldCheck } from "lucide-react";
 
 const statusColors: Record<string, string> = {
   active: "text-success border-success/30",
@@ -60,9 +60,21 @@ const AdminUsers = () => {
   const [refundAmount, setRefundAmount] = useState("");
   const [refundReason, setRefundReason] = useState("requested_by_customer");
 
+  // Edit profile dialog
+  const [editDialog, setEditDialog] = useState<{ open: boolean; profile?: any }>({ open: false });
+  const [editForm, setEditForm] = useState({ display_name: "", bio: "", city: "", state: "", phone: "", incall_price: "", outcall_price: "" });
+
+  // Invite user dialog
+  const [inviteDialog, setInviteDialog] = useState(false);
+  const [inviteForm, setInviteForm] = useState({ email: "", full_name: "" });
+  const [inviteLoading, setInviteLoading] = useState(false);
+
+  // Reset password
+  const [resetLoading, setResetLoading] = useState<string | null>(null);
+
   const load = async () => {
-    let query = supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(50);
-    if (search) query = query.or(`full_name.ilike.%${search}%,display_name.ilike.%${search}%`);
+    let query = supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(100);
+    if (search) query = query.or(`full_name.ilike.%${search}%,display_name.ilike.%${search}%,city.ilike.%${search}%,phone.ilike.%${search}%`);
     const { data } = await query;
     setProfiles(data || []);
   };
@@ -107,6 +119,121 @@ const AdminUsers = () => {
       admin_user_id: admin.id, action: "user_reactivated", target_type: "user", target_id: profile.user_id,
     });
     toast({ title: "User reactivated" });
+    load();
+  };
+
+  // Edit profile
+  const openEditDialog = (profile: any) => {
+    setEditForm({
+      display_name: profile.display_name || "",
+      bio: profile.bio || "",
+      city: profile.city || "",
+      state: profile.state || "",
+      phone: profile.phone || "",
+      incall_price: profile.incall_price?.toString() || "",
+      outcall_price: profile.outcall_price?.toString() || "",
+    });
+    setEditDialog({ open: true, profile });
+  };
+
+  const saveProfileEdit = async () => {
+    if (!editDialog.profile) return;
+    setActionLoading(true);
+    const updates: any = {
+      display_name: editForm.display_name || null,
+      bio: editForm.bio || null,
+      city: editForm.city || null,
+      state: editForm.state || null,
+      phone: editForm.phone || null,
+      incall_price: editForm.incall_price ? parseFloat(editForm.incall_price) : null,
+      outcall_price: editForm.outcall_price ? parseFloat(editForm.outcall_price) : null,
+    };
+    const { error } = await supabase.from("profiles").update(updates).eq("id", editDialog.profile.id);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      const { data: { user: admin } } = await supabase.auth.getUser();
+      if (admin) {
+        await supabase.from("audit_log").insert({
+          admin_user_id: admin.id, action: "admin_edit_profile", target_type: "profile",
+          target_id: editDialog.profile.id, details: updates,
+        });
+      }
+      toast({ title: "Profile updated" });
+      setEditDialog({ open: false });
+      load();
+    }
+    setActionLoading(false);
+  };
+
+  // Reset password
+  const resetPassword = async (profile: any) => {
+    setResetLoading(profile.id);
+    try {
+      // We need the user's email - try auth admin or use profile data
+      const { data, error } = await supabase.functions.invoke("admin-stripe", {
+        body: { action: "lookup_customer", email: profile.phone }, // fallback
+      });
+      // Use Supabase password reset via email
+      // We need to get the email from auth - use admin API
+      const { data: authData } = await supabase.auth.admin.getUserById(profile.user_id);
+      const email = authData?.user?.email;
+      if (!email) {
+        toast({ title: "Email not found", variant: "destructive" });
+        setResetLoading(null);
+        return;
+      }
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (resetError) throw resetError;
+      toast({ title: "Password reset email sent", description: `Sent to ${email}` });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    }
+    setResetLoading(null);
+  };
+
+  // Invite user
+  const inviteUser = async () => {
+    if (!inviteForm.email) return;
+    setInviteLoading(true);
+    try {
+      const { data, error } = await supabase.auth.admin.inviteUserByEmail(inviteForm.email, {
+        data: { full_name: inviteForm.full_name },
+      });
+      if (error) throw error;
+      toast({ title: "Invitation sent!", description: `Invite sent to ${inviteForm.email}` });
+      setInviteDialog(false);
+      setInviteForm({ email: "", full_name: "" });
+      // Reload after a delay to allow trigger to create profile
+      setTimeout(load, 2000);
+    } catch (err: any) {
+      toast({ title: "Error sending invite", description: err.message, variant: "destructive" });
+    }
+    setInviteLoading(false);
+  };
+
+  // Manual verify identity
+  const manualVerifyIdentity = async (profile: any) => {
+    const { data: { user: admin } } = await supabase.auth.getUser();
+    if (!admin) return;
+    await supabase.from("identity_verifications").insert({
+      user_id: profile.user_id,
+      stripe_session_id: `manual_${Date.now()}`,
+      status: "verified" as any,
+    });
+    await supabase.from("profiles").update({
+      is_verified_identity: true,
+      is_verified_phone: true,
+    }).eq("id", profile.id);
+    await supabase.from("audit_log").insert({
+      admin_user_id: admin.id,
+      action: "manual_identity_verification",
+      target_type: "user",
+      target_id: profile.user_id,
+    });
+    toast({ title: "Identity manually verified" });
     load();
   };
 
@@ -215,75 +342,80 @@ const AdminUsers = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h1 className="text-2xl font-black">User Management</h1>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="sm" onClick={loadCoupons}>
-              <Tag className="w-4 h-4 mr-1" /> Coupons
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-lg">
-            <DialogHeader><DialogTitle>Manage Coupons</DialogTitle></DialogHeader>
-            <Tabs value={couponTab} onValueChange={setCouponTab}>
-              <TabsList className="w-full">
-                <TabsTrigger value="list" className="flex-1">Active Coupons</TabsTrigger>
-                <TabsTrigger value="create" className="flex-1">Create Coupon</TabsTrigger>
-              </TabsList>
-              <TabsContent value="list" className="space-y-2 mt-4">
-                {couponLoading ? (
-                  <div className="flex justify-center py-4"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>
-                ) : coupons.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4">No coupons found</p>
-                ) : (
-                  coupons.map((c: any) => (
-                    <div key={c.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
-                      <div>
-                        <p className="text-sm font-medium">{c.name || c.id}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {c.percent_off ? `${c.percent_off}% off` : c.amount_off ? formatCurrency(c.amount_off, c.currency) + " off" : ""} · {c.duration}
-                        </p>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setInviteDialog(true)}>
+            <UserPlus className="w-4 h-4 mr-1" /> Invite User
+          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" onClick={loadCoupons}>
+                <Tag className="w-4 h-4 mr-1" /> Coupons
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg">
+              <DialogHeader><DialogTitle>Manage Coupons</DialogTitle></DialogHeader>
+              <Tabs value={couponTab} onValueChange={setCouponTab}>
+                <TabsList className="w-full">
+                  <TabsTrigger value="list" className="flex-1">Active Coupons</TabsTrigger>
+                  <TabsTrigger value="create" className="flex-1">Create Coupon</TabsTrigger>
+                </TabsList>
+                <TabsContent value="list" className="space-y-2 mt-4">
+                  {couponLoading ? (
+                    <div className="flex justify-center py-4"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>
+                  ) : coupons.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">No coupons found</p>
+                  ) : (
+                    coupons.map((c: any) => (
+                      <div key={c.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
+                        <div>
+                          <p className="text-sm font-medium">{c.name || c.id}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {c.percent_off ? `${c.percent_off}% off` : c.amount_off ? formatCurrency(c.amount_off, c.currency) + " off" : ""} · {c.duration}
+                          </p>
+                        </div>
+                        <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteCoupon(c.id)}>Remove</Button>
                       </div>
-                      <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteCoupon(c.id)}>Remove</Button>
-                    </div>
-                  ))
-                )}
-              </TabsContent>
-              <TabsContent value="create" className="space-y-3 mt-4">
-                <Input placeholder="Coupon name" value={couponForm.name} onChange={(e) => setCouponForm({ ...couponForm, name: e.target.value })} />
-                <div className="flex gap-2">
-                  <Select value={couponForm.type} onValueChange={(v: any) => setCouponForm({ ...couponForm, type: v })}>
+                    ))
+                  )}
+                </TabsContent>
+                <TabsContent value="create" className="space-y-3 mt-4">
+                  <Input placeholder="Coupon name" value={couponForm.name} onChange={(e) => setCouponForm({ ...couponForm, name: e.target.value })} />
+                  <div className="flex gap-2">
+                    <Select value={couponForm.type} onValueChange={(v: any) => setCouponForm({ ...couponForm, type: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="percent">% Discount</SelectItem>
+                        <SelectItem value="amount">Fixed Amount ($)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input type="number" placeholder={couponForm.type === "percent" ? "e.g. 20" : "e.g. 15.00"} value={couponForm.value} onChange={(e) => setCouponForm({ ...couponForm, value: e.target.value })} />
+                  </div>
+                  <Select value={couponForm.duration} onValueChange={(v) => setCouponForm({ ...couponForm, duration: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="percent">% Discount</SelectItem>
-                      <SelectItem value="amount">Fixed Amount ($)</SelectItem>
+                      <SelectItem value="once">Once</SelectItem>
+                      <SelectItem value="repeating">Repeating</SelectItem>
+                      <SelectItem value="forever">Forever</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Input type="number" placeholder={couponForm.type === "percent" ? "e.g. 20" : "e.g. 15.00"} value={couponForm.value} onChange={(e) => setCouponForm({ ...couponForm, value: e.target.value })} />
-                </div>
-                <Select value={couponForm.duration} onValueChange={(v) => setCouponForm({ ...couponForm, duration: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="once">Once</SelectItem>
-                    <SelectItem value="repeating">Repeating</SelectItem>
-                    <SelectItem value="forever">Forever</SelectItem>
-                  </SelectContent>
-                </Select>
-                {couponForm.duration === "repeating" && (
-                  <Input type="number" placeholder="Months" value={couponForm.duration_months} onChange={(e) => setCouponForm({ ...couponForm, duration_months: e.target.value })} />
-                )}
-                <Button onClick={createCoupon} disabled={actionLoading || !couponForm.name || !couponForm.value} className="w-full">
-                  {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null} Create Coupon
-                </Button>
-              </TabsContent>
-            </Tabs>
-          </DialogContent>
-        </Dialog>
+                  {couponForm.duration === "repeating" && (
+                    <Input type="number" placeholder="Months" value={couponForm.duration_months} onChange={(e) => setCouponForm({ ...couponForm, duration_months: e.target.value })} />
+                  )}
+                  <Button onClick={createCoupon} disabled={actionLoading || !couponForm.name || !couponForm.value} className="w-full">
+                    {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null} Create Coupon
+                  </Button>
+                </TabsContent>
+              </Tabs>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input placeholder="Search by name..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
+        <Input placeholder="Search by name, city, phone..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
       </div>
 
       <div className="space-y-3">
@@ -291,14 +423,33 @@ const AdminUsers = () => {
           <Card key={p.id} className="bg-card border-border">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm">{p.display_name || p.full_name}</CardTitle>
-                <div className="flex items-center gap-2">
+                <div>
+                  <CardTitle className="text-sm">{p.display_name || p.full_name}</CardTitle>
+                  <p className="text-xs text-muted-foreground">
+                    {p.city && `${p.city}, ${p.state}`} {p.phone && `· ${p.phone}`}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
                   <Badge variant="outline" className={statusColors[p.status] || ""}>{p.status}</Badge>
-                  {p.is_verified_identity && <Badge variant="outline" className="text-success border-success/30">ID ✓</Badge>}
+                  {p.is_verified_identity && <Badge variant="outline" className="text-success border-success/30 text-xs">ID ✓</Badge>}
+                  {p.is_verified_photos && <Badge variant="outline" className="text-success border-success/30 text-xs">Photos ✓</Badge>}
+                  {p.is_verified_profile && <Badge variant="outline" className="text-success border-success/30 text-xs">Profile ✓</Badge>}
                 </div>
               </div>
             </CardHeader>
             <CardContent className="flex gap-2 flex-wrap">
+              <Button size="sm" variant="outline" onClick={() => openEditDialog(p)}>
+                <Edit className="w-4 h-4 mr-1" /> Edit
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => resetPassword(p)} disabled={resetLoading === p.id}>
+                {resetLoading === p.id ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <KeyRound className="w-4 h-4 mr-1" />}
+                Reset Password
+              </Button>
+              {!p.is_verified_identity && (
+                <Button size="sm" variant="outline" onClick={() => manualVerifyIdentity(p)}>
+                  <ShieldCheck className="w-4 h-4 mr-1" /> Verify ID
+                </Button>
+              )}
               <Button size="sm" variant="outline" onClick={() => openStripePanel(p)}>
                 <CreditCard className="w-4 h-4 mr-1" /> Stripe
               </Button>
@@ -355,6 +506,83 @@ const AdminUsers = () => {
           </Card>
         ))}
       </div>
+
+      {/* Edit Profile Dialog */}
+      <Dialog open={editDialog.open} onOpenChange={(o) => !o && setEditDialog({ open: false })}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader><DialogTitle>Edit Profile — {editDialog.profile?.display_name || editDialog.profile?.full_name}</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs text-muted-foreground">Display Name</label>
+              <Input value={editForm.display_name} onChange={(e) => setEditForm({ ...editForm, display_name: e.target.value })} />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">Bio</label>
+              <Textarea value={editForm.bio} onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })} className="min-h-[80px]" />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-xs text-muted-foreground">City</label>
+                <Input value={editForm.city} onChange={(e) => setEditForm({ ...editForm, city: e.target.value })} />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">State</label>
+                <Input value={editForm.state} onChange={(e) => setEditForm({ ...editForm, state: e.target.value })} />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">Phone</label>
+              <Input value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-xs text-muted-foreground">Incall Price</label>
+                <Input type="number" value={editForm.incall_price} onChange={(e) => setEditForm({ ...editForm, incall_price: e.target.value })} />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Outcall Price</label>
+                <Input type="number" value={editForm.outcall_price} onChange={(e) => setEditForm({ ...editForm, outcall_price: e.target.value })} />
+              </div>
+            </div>
+            <Button onClick={saveProfileEdit} disabled={actionLoading} className="w-full">
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null} Save Changes
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Invite User Dialog */}
+      <Dialog open={inviteDialog} onOpenChange={setInviteDialog}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Invite New User</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Send an email invitation. The user will receive a link to set their password and complete their profile.
+            </p>
+            <div>
+              <label className="text-xs text-muted-foreground">Email *</label>
+              <Input
+                type="email"
+                placeholder="user@example.com"
+                value={inviteForm.email}
+                onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">Full Name</label>
+              <Input
+                placeholder="John Doe"
+                value={inviteForm.full_name}
+                onChange={(e) => setInviteForm({ ...inviteForm, full_name: e.target.value })}
+              />
+            </div>
+            <Button onClick={inviteUser} disabled={inviteLoading || !inviteForm.email} className="w-full">
+              {inviteLoading ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Mail className="w-4 h-4 mr-1" />}
+              Send Invitation
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Stripe User Panel Dialog */}
       <Dialog open={stripeDialog.open} onOpenChange={(open) => !open && setStripeDialog({ open: false })}>

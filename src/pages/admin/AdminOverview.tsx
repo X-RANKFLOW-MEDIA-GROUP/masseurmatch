@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Camera, Flag, Shield, Mail, AlertTriangle } from "lucide-react";
@@ -15,6 +16,7 @@ interface Stats {
 }
 
 const AdminOverview = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState<Stats | null>(null);
 
   useEffect(() => {
@@ -46,14 +48,14 @@ const AdminOverview = () => {
   }, []);
 
   const kpis = stats ? [
-    { label: "Total Profiles", value: stats.totalProfiles, icon: Users, color: "text-foreground" },
-    { label: "Active", value: stats.activeProfiles, icon: Users, color: "text-success" },
-    { label: "Pending Photos", value: stats.pendingPhotos, icon: Camera, color: "text-warning" },
-    { label: "Pending Verifications", value: stats.pendingVerifications, icon: Shield, color: "text-warning" },
-    { label: "Open Tickets", value: stats.openTickets, icon: Mail, color: "text-primary" },
-    { label: "Pending Flags", value: stats.pendingFlags, icon: Flag, color: "text-destructive" },
-    { label: "Suspended", value: stats.suspendedUsers, icon: AlertTriangle, color: "text-warning" },
-    { label: "Banned", value: stats.bannedUsers, icon: AlertTriangle, color: "text-destructive" },
+    { label: "Total Profiles", value: stats.totalProfiles, icon: Users, color: "text-foreground", link: "/admin/users" },
+    { label: "Active", value: stats.activeProfiles, icon: Users, color: "text-success", link: "/admin/users" },
+    { label: "Pending Photos", value: stats.pendingPhotos, icon: Camera, color: "text-warning", link: "/admin/moderation" },
+    { label: "Pending Verifications", value: stats.pendingVerifications, icon: Shield, color: "text-warning", link: "/admin/moderation" },
+    { label: "Open Tickets", value: stats.openTickets, icon: Mail, color: "text-primary", link: "/admin/mailbox" },
+    { label: "Pending Flags", value: stats.pendingFlags, icon: Flag, color: "text-destructive", link: "/admin/flags" },
+    { label: "Suspended", value: stats.suspendedUsers, icon: AlertTriangle, color: "text-warning", link: "/admin/users" },
+    { label: "Banned", value: stats.bannedUsers, icon: AlertTriangle, color: "text-destructive", link: "/admin/users" },
   ] : [];
 
   return (
@@ -64,7 +66,11 @@ const AdminOverview = () => {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {kpis.map((kpi) => (
-            <Card key={kpi.label} className="bg-card border-border">
+            <Card
+              key={kpi.label}
+              className="bg-card border-border cursor-pointer hover:border-primary/50 hover:shadow-md transition-all"
+              onClick={() => navigate(kpi.link)}
+            >
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-2">
                   <kpi.icon className={`w-4 h-4 ${kpi.color}`} />
