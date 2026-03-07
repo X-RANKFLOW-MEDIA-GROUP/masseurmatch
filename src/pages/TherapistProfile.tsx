@@ -732,19 +732,12 @@ const TherapistProfile = () => {
                     </thead>
                     <tbody>
                       {pricingSessions.map((s, i) => {
-                        const ratePerMin = s.duration > 0 ? (s.incall / s.duration) : 0;
-                        const isWithinCap = ratePerMin <= RATE_CAP_PER_MIN;
                         return (
                           <tr key={i} className="border-b border-border/50 hover:bg-secondary/30 transition-colors" itemProp="makesOffer" itemScope itemType="https://schema.org/Offer">
                             <td className="py-4 pr-4 font-semibold" itemProp="itemOffered" itemScope itemType="https://schema.org/Service">
                               <span itemProp="name">{s.name}</span>
                             </td>
                             <td className="text-center py-4 px-2 text-muted-foreground">{s.duration}min</td>
-                            <td className="text-center py-4 px-2">
-                              <span className={`text-xs font-mono ${isWithinCap ? "text-muted-foreground" : "text-destructive"}`}>
-                                ${ratePerMin.toFixed(2)}
-                              </span>
-                            </td>
                             <td className="text-center py-4 px-2 font-semibold">${s.incall}</td>
                             <td className="text-center py-4 px-2 font-semibold">${s.outcall}</td>
                           </tr>
