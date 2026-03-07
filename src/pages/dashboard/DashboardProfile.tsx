@@ -398,6 +398,37 @@ const DashboardProfile = () => {
               </SelectContent>
             </Select>
           </div>
+          <div>
+            <Label>Date of Birth</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !form.date_of_birth && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {form.date_of_birth ? format(new Date(form.date_of_birth + "T00:00:00"), "PPP") : <span>Select date of birth</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={form.date_of_birth ? new Date(form.date_of_birth + "T00:00:00") : undefined}
+                  onSelect={(date) => setForm((f) => ({ ...f, date_of_birth: date ? format(date, "yyyy-MM-dd") : null }))}
+                  disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                  captionLayout="dropdown-buttons"
+                  fromYear={1940}
+                  toYear={new Date().getFullYear() - 18}
+                />
+              </PopoverContent>
+            </Popover>
+            <p className="text-xs text-muted-foreground mt-1">Only your age will be displayed publicly, not the full date.</p>
+          </div>
         </div>
       </section>
 

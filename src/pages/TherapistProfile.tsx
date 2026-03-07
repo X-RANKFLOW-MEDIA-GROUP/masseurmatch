@@ -553,7 +553,13 @@ const TherapistProfile = () => {
               <h2 id="physical-heading" className="text-2xl font-bold mb-6 flex items-center gap-3">
                 <Ruler className="w-5 h-5" />Physical Attributes
               </h2>
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                {calculatedAge && (
+                  <div>
+                    <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Age</h3>
+                    <p className="text-lg font-semibold">{calculatedAge}</p>
+                  </div>
+                )}
                 {heightLabel && (
                   <div>
                     <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Height</h3>
