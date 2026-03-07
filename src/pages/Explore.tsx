@@ -365,7 +365,9 @@ const Explore = () => {
       const matchesPrice = t.priceNum === 0 || (t.priceNum >= priceRange[0] && t.priceNum <= priceRange[1]);
       const matchesAvailable = !availableOnly || t.available;
       const matchesAvailableNow = !availableNowOnly || t.availableNow;
-      return matchesSearch && matchesCity && matchesPrice && matchesAvailable && matchesAvailableNow;
+      const matchesSpecialOffers = !specialOffersOnly || t.hasSpecialOffer;
+      const matchesNewUsers = !newUsersOnly || t.isNewUser;
+      return matchesSearch && matchesCity && matchesPrice && matchesAvailable && matchesAvailableNow && matchesSpecialOffers && matchesNewUsers;
     })
     .sort((a, b) => {
       if (sortBy === "price-asc") return a.priceNum - b.priceNum;
