@@ -164,9 +164,9 @@ const DashboardTravel = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label>Destination City *</Label>
-              <Input
+              <CityAutocomplete
                 value={form.destination_city}
-                onChange={(e) => setForm((f) => ({ ...f, destination_city: e.target.value }))}
+                onChange={(v) => setForm((f) => ({ ...f, destination_city: v }))}
                 placeholder="e.g. Miami"
               />
             </div>

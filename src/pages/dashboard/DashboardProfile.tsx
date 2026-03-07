@@ -350,7 +350,7 @@ const DashboardProfile = () => {
           </div>
           <div>
             <Label>City</Label>
-            <Input value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} placeholder="Los Angeles" />
+            <CityAutocomplete value={form.city} onChange={(v) => setForm((f) => ({ ...f, city: v }))} placeholder="Los Angeles" />
           </div>
           <div>
             <Label>State</Label>
