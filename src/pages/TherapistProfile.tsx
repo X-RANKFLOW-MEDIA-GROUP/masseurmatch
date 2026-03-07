@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import {
   MapPin, CheckCircle2, Phone, Globe, Clock, ArrowRight,
   MessageSquare, Bookmark, Award, Languages, ChevronLeft, ChevronRight,
-  Plane, Home, Star, CreditCard, Banknote, Wallet, Smartphone, Zap, Ruler, Tag
+  Plane, Home, Star, CreditCard, Banknote, Wallet, Smartphone, Zap, Ruler, Tag,
+  Mail, Eye, EyeOff
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
