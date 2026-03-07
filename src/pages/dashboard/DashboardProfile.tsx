@@ -6,9 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, X, Save, AlertTriangle, Sparkles, MapPin, Ruler } from "lucide-react";
+import { Loader2, Plus, X, Save, AlertTriangle, Sparkles, MapPin, Ruler, CalendarIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 const SPECIALTIES_OPTIONS = [
   "Relaxation Massage", "Therapeutic Massage", "Sports Massage",
@@ -51,6 +55,7 @@ const DashboardProfile = () => {
     social_media: { instagram: "", website: "" } as Record<string, string>,
     height_inches: null as number | null,
     body_type: null as string | null,
+    date_of_birth: null as string | null,
   });
 
   useEffect(() => {
@@ -69,6 +74,7 @@ const DashboardProfile = () => {
         social_media: (profile.social_media as Record<string, string>) || { instagram: "", website: "" },
         height_inches: (profile as any).height_inches ?? null,
         body_type: (profile as any).body_type ?? null,
+        date_of_birth: (profile as any).date_of_birth ?? null,
       });
     }
   }, [profile]);
@@ -171,6 +177,7 @@ const DashboardProfile = () => {
       social_media: form.social_media,
       height_inches: form.height_inches,
       body_type: form.body_type,
+      date_of_birth: form.date_of_birth,
     } as any);
     setSaving(false);
     toast({
@@ -390,6 +397,37 @@ const DashboardProfile = () => {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div>
+            <Label>Date of Birth</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !form.date_of_birth && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {form.date_of_birth ? format(new Date(form.date_of_birth + "T00:00:00"), "PPP") : <span>Select date of birth</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={form.date_of_birth ? new Date(form.date_of_birth + "T00:00:00") : undefined}
+                  onSelect={(date) => setForm((f) => ({ ...f, date_of_birth: date ? format(date, "yyyy-MM-dd") : null }))}
+                  disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                  captionLayout="dropdown-buttons"
+                  fromYear={1940}
+                  toYear={new Date().getFullYear() - 18}
+                />
+              </PopoverContent>
+            </Popover>
+            <p className="text-xs text-muted-foreground mt-1">Only your age will be displayed publicly, not the full date.</p>
           </div>
         </div>
       </section>
