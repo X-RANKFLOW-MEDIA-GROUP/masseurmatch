@@ -604,10 +604,28 @@ const TherapistProfile = () => {
                 <div>
                   <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-4">Contact Information</h3>
                   <div className="space-y-3">
-                    {profile.phone && (
+                    {showCall && profile.phone && (
                       <div className="flex items-center gap-3 text-sm">
                         <Phone className="w-4 h-4 text-muted-foreground" />
-                        <a href={`tel:${profile.phone}`} className="hover:text-foreground transition-colors">{profile.phone}</a>
+                        {revealedContacts.call ? (
+                          <a href={`tel:${profile.phone}`} className="hover:text-foreground transition-colors">{profile.phone}</a>
+                        ) : (
+                          <button onClick={() => revealContact("call")} className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
+                            {maskPhone(profile.phone)} <Eye className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
+                    )}
+                    {showEmail && socialMedia.email && (
+                      <div className="flex items-center gap-3 text-sm">
+                        <Mail className="w-4 h-4 text-muted-foreground" />
+                        {revealedContacts.email ? (
+                          <a href={`mailto:${socialMedia.email}`} className="hover:text-foreground transition-colors">{socialMedia.email}</a>
+                        ) : (
+                          <button onClick={() => revealContact("email")} className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
+                            ••••@•••• <Eye className="w-3 h-3" />
+                          </button>
+                        )}
                       </div>
                     )}
                     {socialMedia.website && (
