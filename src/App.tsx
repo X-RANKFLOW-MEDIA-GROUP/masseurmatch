@@ -53,6 +53,7 @@ import AdminFeatured from "./pages/admin/AdminFeatured";
 import AdminCityOps from "./pages/admin/AdminCityOps";
 import AdminAuditLog from "./pages/admin/AdminAuditLog";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminNewsletter from "./pages/admin/AdminNewsletter";
 
 const queryClient = new QueryClient();
 
