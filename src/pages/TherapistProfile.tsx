@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AvailableNowBadge } from "@/components/ui/available-now-badge";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
 import {
   MapPin, CheckCircle2, Phone, Globe, Clock, ArrowRight,
   MessageSquare, Bookmark, Award, Languages, ChevronLeft, ChevronRight,
