@@ -92,6 +92,7 @@ const AnimatedRoutes = () => {
           <Route path="promotion" element={<DashboardPromotion />} />
           <Route path="faq" element={<DashboardFAQ />} />
           <Route path="travel" element={<DashboardTravel />} />
+          <Route path="specials" element={<DashboardSpecials />} />
           <Route path="support" element={<DashboardSupport />} />
         </Route>
         <Route path="/admin/login" element={<PageTransition><AdminLogin /></PageTransition>} />
