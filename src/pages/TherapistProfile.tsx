@@ -712,7 +712,7 @@ const TherapistProfile = () => {
           {(profile.incall_price || profile.outcall_price || pricingSessions.length > 0) && (
             <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg" aria-labelledby="services-heading">
               <h2 id="services-heading" className="text-2xl font-bold mb-2">Services & Rates</h2>
-              <p className="text-xs text-muted-foreground mb-6">All rates are per session. Maximum rate: ${RATE_CAP_PER_MIN}/min.</p>
+              <p className="text-xs text-muted-foreground mb-6">All rates are per session.</p>
 
               {pricingSessions.length > 0 ? (
                 <div className="overflow-x-auto mb-8">
