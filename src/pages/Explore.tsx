@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import {
   Search, MapPin, CheckCircle2, Star, ArrowRight, Heart, X,
   LayoutGrid, List, Map as MapIcon, SlidersHorizontal, ChevronDown, Loader2,
-  Sparkles, Plane, Zap
+  Sparkles, Plane, Zap, Tag, UserPlus
 } from "lucide-react";
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -46,12 +46,17 @@ interface TherapistItem {
   available: boolean;
   bio: string;
   isTraveling?: boolean;
+  travelBadge?: "visiting_now" | "visiting_soon" | null;
   incallPrice?: number;
   outcallPrice?: number;
   specialties?: string[];
   availableNow?: boolean;
   availableNowExpires?: string | null;
   availableNowTier?: string;
+  hasSpecialOffer?: boolean;
+  specialOfferText?: string;
+  isNewUser?: boolean;
+  createdAt?: string;
 }
 
 // Simple city → lat/lng fallback for map view
@@ -98,12 +103,17 @@ function mapProfileToTherapist(p: any): TherapistItem {
     available: p.is_active || false,
     bio: p.bio?.slice(0, 120) || "",
     isTraveling: false,
+    travelBadge: null,
     incallPrice: p.incall_price ?? 0,
     outcallPrice: p.outcall_price ?? 0,
     specialties: p.specialties || [],
     availableNow: isAvailableNow,
     availableNowExpires: isAvailableNow ? p.available_now_expires : null,
     availableNowTier: p._tier || "free",
+    hasSpecialOffer: false,
+    specialOfferText: "",
+    isNewUser: false,
+    createdAt: p.created_at,
   };
 }
 
@@ -177,23 +187,41 @@ const SwipeCard = ({
           Nope
         </motion.div>
 
-        <div className="absolute top-4 left-4 flex gap-1.5">
+        <div className="absolute top-4 left-4 flex gap-1.5 flex-wrap">
           {therapist.verified && (
             <Badge className="bg-background/80 backdrop-blur-sm text-foreground border-border text-xs">
               <CheckCircle2 className="w-3 h-3 mr-1" />
               Verified
             </Badge>
           )}
-          {therapist.isTraveling && (
+          {therapist.travelBadge === "visiting_now" && (
+            <Badge className="bg-primary/90 backdrop-blur-sm text-primary-foreground border-primary text-xs">
+              <Plane className="w-3 h-3 mr-1" />
+              Visiting Now
+            </Badge>
+          )}
+          {therapist.travelBadge === "visiting_soon" && (
             <Badge className="bg-background/80 backdrop-blur-sm text-primary border-primary/30 text-xs">
               <Plane className="w-3 h-3 mr-1" />
-              Visiting
+              Visiting Soon
             </Badge>
           )}
           {therapist.availableNow && (
             <Badge className="bg-primary/90 backdrop-blur-sm text-primary-foreground border-primary text-xs animate-pulse">
               <Zap className="w-3 h-3 mr-1" />
               Available Now
+            </Badge>
+          )}
+          {therapist.hasSpecialOffer && (
+            <Badge className="bg-warning/90 backdrop-blur-sm text-warning-foreground border-warning text-xs">
+              <Tag className="w-3 h-3 mr-1" />
+              Special Offer
+            </Badge>
+          )}
+          {therapist.isNewUser && (
+            <Badge className="bg-success/20 backdrop-blur-sm text-success border-success/30 text-xs">
+              <UserPlus className="w-3 h-3 mr-1" />
+              New
             </Badge>
           )}
         </div>
@@ -258,6 +286,8 @@ const Explore = () => {
   const [sortBy, setSortBy] = useState("default");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showSmartMatch, setShowSmartMatch] = useState(false);
+  const [specialOffersOnly, setSpecialOffersOnly] = useState(false);
+  const [newUsersOnly, setNewUsersOnly] = useState(false);
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -265,11 +295,13 @@ const Explore = () => {
 
       // Fetch profiles and active travel in parallel
       const today = new Date().toISOString().split("T")[0];
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const threeDaysFromNow = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
 
-      const [profilesRes, travelRes] = await Promise.all([
+      const [profilesRes, travelRes, specialsRes] = await Promise.all([
         supabase
           .from("profiles")
-          .select("id, display_name, full_name, bio, city, state, country, specialties, incall_price, outcall_price, avatar_url, is_active, is_verified_profile, is_verified_identity, is_verified_photos, available_now, available_now_expires, profile_photos(storage_path, is_primary, moderation_status)")
+          .select("id, display_name, full_name, bio, city, state, country, specialties, incall_price, outcall_price, avatar_url, is_active, is_verified_profile, is_verified_identity, is_verified_photos, available_now, available_now_expires, created_at, profile_photos(storage_path, is_primary, moderation_status)")
           .eq("status", "active")
           .eq("is_active", true)
           .not("city", "is", null)
@@ -278,8 +310,13 @@ const Explore = () => {
           .from("provider_travel")
           .select("profile_id, destination_city, destination_state, start_date, end_date")
           .eq("is_active", true)
-          .lte("start_date", today)
-          .gte("end_date", today),
+          .gte("end_date", today)
+          .lte("start_date", threeDaysFromNow),
+        supabase
+          .from("weekly_specials")
+          .select("profile_id, text")
+          .eq("is_active", true)
+          .gt("expires_at", new Date().toISOString()),
       ]);
 
       if (profilesRes.error) {
@@ -288,16 +325,34 @@ const Explore = () => {
       }
 
       const activeTravels = travelRes.data || [];
-      const travelingProfileIds = new Set(activeTravels.map((t: any) => t.profile_id));
+      const specialsMap = new Map<string, string>();
+      (specialsRes.data || []).forEach((s: any) => {
+        if (!specialsMap.has(s.profile_id)) specialsMap.set(s.profile_id, s.text);
+      });
 
       const mapped = (profilesRes.data || []).map((p: any) => {
         const travel = activeTravels.find((t: any) => t.profile_id === p.id);
         const item = mapProfileToTherapist(p);
 
+        // Weekly specials
+        if (specialsMap.has(p.id)) {
+          item.hasSpecialOffer = true;
+          item.specialOfferText = specialsMap.get(p.id) || "";
+        }
+
+        // New user (last 7 days)
+        item.isNewUser = p.created_at && new Date(p.created_at) > new Date(sevenDaysAgo);
+
         if (travel) {
-          // Override city to destination during travel
           item.city = travel.destination_city;
           item.isTraveling = true;
+          const travelStart = new Date(travel.start_date);
+          const todayDate = new Date(today);
+          if (travelStart <= todayDate) {
+            item.travelBadge = "visiting_now";
+          } else {
+            item.travelBadge = "visiting_soon";
+          }
           const cityLower = travel.destination_city.toLowerCase();
           const coords = CITY_COORDS[cityLower] || { lat: 39.8283, lng: -98.5795 };
           item.lat = coords.lat;
@@ -328,7 +383,9 @@ const Explore = () => {
       const matchesPrice = t.priceNum === 0 || (t.priceNum >= priceRange[0] && t.priceNum <= priceRange[1]);
       const matchesAvailable = !availableOnly || t.available;
       const matchesAvailableNow = !availableNowOnly || t.availableNow;
-      return matchesSearch && matchesCity && matchesPrice && matchesAvailable && matchesAvailableNow;
+      const matchesSpecialOffers = !specialOffersOnly || t.hasSpecialOffer;
+      const matchesNewUsers = !newUsersOnly || t.isNewUser;
+      return matchesSearch && matchesCity && matchesPrice && matchesAvailable && matchesAvailableNow && matchesSpecialOffers && matchesNewUsers;
     })
     .sort((a, b) => {
       if (sortBy === "price-asc") return a.priceNum - b.priceNum;
@@ -499,7 +556,7 @@ const Explore = () => {
                 <SlidersHorizontal className="w-3.5 h-3.5" />
                 Advanced Filters
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showAdvanced ? "rotate-180" : ""}`} />
-                {(availableOnly || availableNowOnly || priceRange[0] > 0 || priceRange[1] < 500 || sortBy !== "default") && (
+                {(availableOnly || availableNowOnly || specialOffersOnly || newUsersOnly || priceRange[0] > 0 || priceRange[1] < 500 || sortBy !== "default") && (
                   <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                 )}
               </button>
@@ -535,7 +592,7 @@ const Explore = () => {
 
                       <div className="space-y-3">
                         <Label className="text-xs uppercase tracking-widest text-muted-foreground">
-                          Availability
+                          Filters
                         </Label>
                         <div className="flex flex-col gap-2">
                           <div className="flex items-center gap-3">
@@ -554,9 +611,27 @@ const Explore = () => {
                             />
                             <span className="text-sm flex items-center gap-1.5">
                               Available Now
-                              {availableNowOnly && (
-                                <Zap className="w-3 h-3 text-primary" />
-                              )}
+                              {availableNowOnly && <Zap className="w-3 h-3 text-primary" />}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Switch
+                              checked={specialOffersOnly}
+                              onCheckedChange={setSpecialOffersOnly}
+                            />
+                            <span className="text-sm flex items-center gap-1.5">
+                              Special Offers
+                              {specialOffersOnly && <Tag className="w-3 h-3 text-warning" />}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Switch
+                              checked={newUsersOnly}
+                              onCheckedChange={setNewUsersOnly}
+                            />
+                            <span className="text-sm flex items-center gap-1.5">
+                              New Therapists
+                              {newUsersOnly && <UserPlus className="w-3 h-3 text-success" />}
                             </span>
                           </div>
                         </div>
@@ -592,6 +667,8 @@ const Explore = () => {
                             setPriceRange([0, 500]);
                             setAvailableOnly(false);
                             setAvailableNowOnly(false);
+                            setSpecialOffersOnly(false);
+                            setNewUsersOnly(false);
                             setSortBy("default");
                             setSelectedCity("all");
                             setSelectedType("all");
@@ -655,6 +732,8 @@ const Explore = () => {
                   setPriceRange([0, 500]);
                   setAvailableOnly(false);
                   setAvailableNowOnly(false);
+                  setSpecialOffersOnly(false);
+                  setNewUsersOnly(false);
                   setSortBy("default");
                   setSelectedCity("all");
                   setSelectedType("all");
@@ -773,18 +852,36 @@ const Explore = () => {
                       </ImageReveal>
 
                       <div className="flex-1 flex flex-col justify-center">
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <h3 className="text-lg font-semibold">{therapist.name}</h3>
-                          {therapist.isTraveling && (
+                          {therapist.travelBadge === "visiting_now" && (
+                            <Badge className="text-[10px] bg-primary/90 text-primary-foreground border-primary gap-1">
+                              <Plane className="w-3 h-3" />
+                              Visiting Now
+                            </Badge>
+                          )}
+                          {therapist.travelBadge === "visiting_soon" && (
                             <Badge variant="outline" className="text-[10px] border-primary/30 text-primary gap-1">
                               <Plane className="w-3 h-3" />
-                              Visiting
+                              Visiting Soon
                             </Badge>
                           )}
                           {therapist.availableNow && (
                             <Badge className="text-[10px] bg-primary/90 text-primary-foreground border-primary gap-1 animate-pulse">
                               <Zap className="w-3 h-3" />
                               Available Now
+                            </Badge>
+                          )}
+                          {therapist.hasSpecialOffer && (
+                            <Badge className="text-[10px] bg-warning/90 text-warning-foreground border-warning gap-1">
+                              <Tag className="w-3 h-3" />
+                              Special Offer
+                            </Badge>
+                          )}
+                          {therapist.isNewUser && (
+                            <Badge className="text-[10px] bg-success/20 text-success border-success/30 gap-1">
+                              <UserPlus className="w-3 h-3" />
+                              New
                             </Badge>
                           )}
                         </div>

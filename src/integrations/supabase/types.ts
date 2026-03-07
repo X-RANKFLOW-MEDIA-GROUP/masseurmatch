@@ -568,6 +568,41 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_specials: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          is_active: boolean
+          profile_id: string
+          text: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_active?: boolean
+          profile_id: string
+          text: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_active?: boolean
+          profile_id?: string
+          text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_specials_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

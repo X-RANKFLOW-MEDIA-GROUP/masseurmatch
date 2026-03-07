@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   MapPin, CheckCircle2, Phone, Globe, Clock, ArrowRight,
   MessageSquare, Bookmark, Award, Languages, ChevronLeft, ChevronRight,
-  Plane, Home, Star, CreditCard, Banknote, Wallet, Smartphone, Zap, Ruler
+  Plane, Home, Star, CreditCard, Banknote, Wallet, Smartphone, Zap, Ruler, Tag
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -47,6 +47,7 @@ const TherapistProfile = () => {
   const [profile, setProfile] = useState<Tables<"profiles"> | null>(null);
   const [photos, setPhotos] = useState<ProfilePhoto[]>([]);
   const [travel, setTravel] = useState<TravelEntry[]>([]);
+  const [weeklySpecials, setWeeklySpecials] = useState<{ id: string; text: string; expires_at: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
@@ -69,7 +70,7 @@ const TherapistProfile = () => {
 
       setProfile(data);
 
-      const [photosRes, travelRes] = await Promise.all([
+      const [photosRes, travelRes, specialsRes] = await Promise.all([
         supabase
           .from("profile_photos")
           .select("id, storage_path, is_primary, sort_order")
@@ -83,10 +84,18 @@ const TherapistProfile = () => {
           .eq("is_active", true)
           .gte("end_date", new Date().toISOString().split("T")[0])
           .order("start_date", { ascending: true }),
+        supabase
+          .from("weekly_specials")
+          .select("id, text, expires_at")
+          .eq("profile_id", id)
+          .eq("is_active", true)
+          .gt("expires_at", new Date().toISOString())
+          .order("created_at", { ascending: false }),
       ]);
 
       if (photosRes.data) setPhotos(photosRes.data);
       if (travelRes.data) setTravel(travelRes.data);
+      if (specialsRes.data) setWeeklySpecials(specialsRes.data as any);
       setLoading(false);
     };
 
@@ -417,6 +426,27 @@ const TherapistProfile = () => {
                       <Zap className="w-3 h-3 mr-1" />Available Now
                     </Badge>
                   )}
+                  {travel.length > 0 && (() => {
+                    const today = new Date().toISOString().split("T")[0];
+                    const activeTrip = travel.find(t => t.start_date <= today && t.end_date >= today);
+                    const upcomingTrip = travel.find(t => t.start_date > today);
+                    if (activeTrip) return (
+                      <Badge className="bg-primary text-primary-foreground text-xs">
+                        <Plane className="w-3 h-3 mr-1" />Visiting {activeTrip.destination_city} Now
+                      </Badge>
+                    );
+                    if (upcomingTrip) return (
+                      <Badge variant="outline" className="text-xs border-primary/30 text-primary">
+                        <Plane className="w-3 h-3 mr-1" />Visiting {upcomingTrip.destination_city} Soon
+                      </Badge>
+                    );
+                    return null;
+                  })()}
+                  {weeklySpecials.length > 0 && (
+                    <Badge className="bg-warning/90 text-warning-foreground text-xs">
+                      <Tag className="w-3 h-3 mr-1" />Special Offer
+                    </Badge>
+                  )}
                 </div>
 
                 {cityLabel && (
@@ -576,6 +606,28 @@ const TherapistProfile = () => {
               <p className="text-xs text-muted-foreground mt-6 border-t border-border pt-4">
                 Physical attributes are optional and self-reported by the therapist. MasseurMatch does not verify this information.
               </p>
+            </motion.section>
+          )}
+
+          {/* Weekly Specials */}
+          {weeklySpecials.length > 0 && (
+            <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="border border-warning/30 bg-warning/5 p-8 md:p-10 mb-8 rounded-lg" aria-labelledby="specials-heading">
+              <h2 id="specials-heading" className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <Tag className="w-5 h-5 text-warning" />Weekly Specials
+              </h2>
+              <div className="space-y-4">
+                {weeklySpecials.map((special) => (
+                  <div key={special.id} className="flex items-start gap-3">
+                    <div className="w-2 h-2 rounded-full bg-warning mt-2 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium">{special.text}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Valid until {new Date(special.expires_at).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </motion.section>
           )}
 

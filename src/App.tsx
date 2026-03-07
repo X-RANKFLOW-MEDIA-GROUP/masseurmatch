@@ -39,6 +39,7 @@ import DashboardPromotion from "./pages/dashboard/DashboardPromotion";
 import DashboardFAQ from "./pages/dashboard/DashboardFAQ";
 import DashboardTravel from "./pages/dashboard/DashboardTravel";
 import DashboardSupport from "./pages/dashboard/DashboardSupport";
+import DashboardSpecials from "./pages/dashboard/DashboardSpecials";
 
 // Admin
 import AdminLogin from "./pages/AdminLogin";
@@ -91,6 +92,7 @@ const AnimatedRoutes = () => {
           <Route path="promotion" element={<DashboardPromotion />} />
           <Route path="faq" element={<DashboardFAQ />} />
           <Route path="travel" element={<DashboardTravel />} />
+          <Route path="specials" element={<DashboardSpecials />} />
           <Route path="support" element={<DashboardSupport />} />
         </Route>
         <Route path="/admin/login" element={<PageTransition><AdminLogin /></PageTransition>} />
