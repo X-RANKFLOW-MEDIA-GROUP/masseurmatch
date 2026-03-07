@@ -70,7 +70,7 @@ const TherapistProfile = () => {
 
       setProfile(data);
 
-      const [photosRes, travelRes] = await Promise.all([
+      const [photosRes, travelRes, specialsRes] = await Promise.all([
         supabase
           .from("profile_photos")
           .select("id, storage_path, is_primary, sort_order")
@@ -84,10 +84,18 @@ const TherapistProfile = () => {
           .eq("is_active", true)
           .gte("end_date", new Date().toISOString().split("T")[0])
           .order("start_date", { ascending: true }),
+        supabase
+          .from("weekly_specials")
+          .select("id, text, expires_at")
+          .eq("profile_id", id)
+          .eq("is_active", true)
+          .gt("expires_at", new Date().toISOString())
+          .order("created_at", { ascending: false }),
       ]);
 
       if (photosRes.data) setPhotos(photosRes.data);
       if (travelRes.data) setTravel(travelRes.data);
+      if (specialsRes.data) setWeeklySpecials(specialsRes.data as any);
       setLoading(false);
     };
 
