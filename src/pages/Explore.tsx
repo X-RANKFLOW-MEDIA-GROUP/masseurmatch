@@ -838,10 +838,9 @@ const Explore = () => {
                           </div>
                         )}
                         {therapist.verified && (
-                          <Badge className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm text-foreground border-border text-[10px] px-1.5 py-0.5 z-20">
-                            <CheckCircle2 className="w-2.5 h-2.5 mr-0.5" />
-                            Verified
-                          </Badge>
+                          <div className="absolute top-2 right-2 z-20">
+                            <VerifiedBadge size="sm" />
+                          </div>
                         )}
                       </ImageReveal>
 
