@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { AvailableNowBadge } from "@/components/ui/available-now-badge";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
+import { SpecialOfferBadge } from "@/components/ui/special-offer-badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LocationPicker } from "@/components/explore/LocationPicker";
 import { Slider } from "@/components/ui/slider";
@@ -190,10 +192,7 @@ const SwipeCard = ({
 
         <div className="absolute top-4 left-4 flex gap-1.5 flex-wrap">
           {therapist.verified && (
-            <Badge className="bg-background/80 backdrop-blur-sm text-foreground border-border text-xs">
-              <CheckCircle2 className="w-3 h-3 mr-1" />
-              Verified
-            </Badge>
+            <VerifiedBadge size="sm" />
           )}
           {therapist.travelBadge === "visiting_now" && (
             <Badge className="bg-primary/90 backdrop-blur-sm text-primary-foreground border-primary text-xs">
@@ -211,10 +210,7 @@ const SwipeCard = ({
             <AvailableNowBadge size="sm" />
           )}
           {therapist.hasSpecialOffer && (
-            <Badge className="bg-warning/90 backdrop-blur-sm text-warning-foreground border-warning text-xs">
-              <Tag className="w-3 h-3 mr-1" />
-              Special Offer
-            </Badge>
+            <SpecialOfferBadge size="sm" />
           )}
           {therapist.isNewUser && (
             <Badge className="bg-success/20 backdrop-blur-sm text-success border-success/30 text-xs">
@@ -842,10 +838,9 @@ const Explore = () => {
                           </div>
                         )}
                         {therapist.verified && (
-                          <Badge className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm text-foreground border-border text-[10px] px-1.5 py-0.5 z-20">
-                            <CheckCircle2 className="w-2.5 h-2.5 mr-0.5" />
-                            Verified
-                          </Badge>
+                          <div className="absolute top-2 right-2 z-20">
+                            <VerifiedBadge size="sm" />
+                          </div>
                         )}
                       </ImageReveal>
 
@@ -868,10 +863,7 @@ const Explore = () => {
                             <AvailableNowBadge size="sm" />
                           )}
                           {therapist.hasSpecialOffer && (
-                            <Badge className="text-[10px] bg-warning/90 text-warning-foreground border-warning gap-1">
-                              <Tag className="w-3 h-3" />
-                              Special Offer
-                            </Badge>
+                            <SpecialOfferBadge size="sm" />
                           )}
                           {therapist.isNewUser && (
                             <Badge className="text-[10px] bg-success/20 text-success border-success/30 gap-1">

@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AvailableNowBadge } from "@/components/ui/available-now-badge";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
 import {
   MapPin, CheckCircle2, Phone, Globe, Clock, ArrowRight,
   MessageSquare, Bookmark, Award, Languages, ChevronLeft, ChevronRight,
@@ -427,9 +428,7 @@ const TherapistProfile = () => {
                 <div className="flex flex-wrap items-center gap-3 mb-3">
                   <h1 className="text-3xl md:text-4xl font-bold" itemProp="name">{displayName}</h1>
                   {profile.is_verified_identity && (
-                    <Badge className="bg-foreground text-background text-xs">
-                      <CheckCircle2 className="w-3 h-3 mr-1" />Verified
-                    </Badge>
+                    <VerifiedBadge />
                   )}
                   {(profile as any).available_now && (profile as any).available_now_expires && new Date((profile as any).available_now_expires) > new Date() && (
                     <AvailableNowBadge />
