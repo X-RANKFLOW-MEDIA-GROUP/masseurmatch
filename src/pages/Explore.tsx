@@ -277,11 +277,13 @@ const Explore = () => {
 
       // Fetch profiles and active travel in parallel
       const today = new Date().toISOString().split("T")[0];
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const threeDaysFromNow = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
 
-      const [profilesRes, travelRes] = await Promise.all([
+      const [profilesRes, travelRes, specialsRes] = await Promise.all([
         supabase
           .from("profiles")
-          .select("id, display_name, full_name, bio, city, state, country, specialties, incall_price, outcall_price, avatar_url, is_active, is_verified_profile, is_verified_identity, is_verified_photos, available_now, available_now_expires, profile_photos(storage_path, is_primary, moderation_status)")
+          .select("id, display_name, full_name, bio, city, state, country, specialties, incall_price, outcall_price, avatar_url, is_active, is_verified_profile, is_verified_identity, is_verified_photos, available_now, available_now_expires, created_at, profile_photos(storage_path, is_primary, moderation_status)")
           .eq("status", "active")
           .eq("is_active", true)
           .not("city", "is", null)
@@ -290,8 +292,13 @@ const Explore = () => {
           .from("provider_travel")
           .select("profile_id, destination_city, destination_state, start_date, end_date")
           .eq("is_active", true)
-          .lte("start_date", today)
-          .gte("end_date", today),
+          .gte("end_date", today)
+          .lte("start_date", threeDaysFromNow),
+        supabase
+          .from("weekly_specials")
+          .select("profile_id, text")
+          .eq("is_active", true)
+          .gt("expires_at", new Date().toISOString()),
       ]);
 
       if (profilesRes.error) {
@@ -300,16 +307,34 @@ const Explore = () => {
       }
 
       const activeTravels = travelRes.data || [];
-      const travelingProfileIds = new Set(activeTravels.map((t: any) => t.profile_id));
+      const specialsMap = new Map<string, string>();
+      (specialsRes.data || []).forEach((s: any) => {
+        if (!specialsMap.has(s.profile_id)) specialsMap.set(s.profile_id, s.text);
+      });
 
       const mapped = (profilesRes.data || []).map((p: any) => {
         const travel = activeTravels.find((t: any) => t.profile_id === p.id);
         const item = mapProfileToTherapist(p);
 
+        // Weekly specials
+        if (specialsMap.has(p.id)) {
+          item.hasSpecialOffer = true;
+          item.specialOfferText = specialsMap.get(p.id) || "";
+        }
+
+        // New user (last 7 days)
+        item.isNewUser = p.created_at && new Date(p.created_at) > new Date(sevenDaysAgo);
+
         if (travel) {
-          // Override city to destination during travel
           item.city = travel.destination_city;
           item.isTraveling = true;
+          const travelStart = new Date(travel.start_date);
+          const todayDate = new Date(today);
+          if (travelStart <= todayDate) {
+            item.travelBadge = "visiting_now";
+          } else {
+            item.travelBadge = "visiting_soon";
+          }
           const cityLower = travel.destination_city.toLowerCase();
           const coords = CITY_COORDS[cityLower] || { lat: 39.8283, lng: -98.5795 };
           item.lat = coords.lat;
