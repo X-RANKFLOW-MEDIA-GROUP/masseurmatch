@@ -1,21 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
   id: number;
   role: "user" | "assistant";
   content: string;
 }
-
-const knottyResponses = [
-  "Hey there! 💆‍♂️ Looking for a therapist recommendation? I can help you find the perfect match based on your preferences.",
-  "Great question! Our verified therapists undergo thorough background checks, license validation, and identity verification. Your safety is our priority.",
-  "I'd recommend checking out our Premium plan — it includes the verified badge and homepage rotation, which really boosts visibility for therapists.",
-  "Deep tissue is perfect for muscle tension and recovery. Swedish is more relaxing and great for stress relief. Want me to help you choose?",
-  "You can browse by city, massage type, or rating. Try our Explore page for the full directory with filters!",
-  "All our therapists are LGBTQ+ friendly. MasseurMatch was built specifically as a safe, inclusive space for everyone.",
-];
 
 export const KnottyChat = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,25 +24,46 @@ export const KnottyChat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || isTyping) return;
     const userMsg: Message = { id: Date.now(), role: "user", content: input };
-    setMessages((prev) => [...prev, userMsg]);
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
     setInput("");
     setIsTyping(true);
 
-    setTimeout(() => {
-      const response = knottyResponses[Math.floor(Math.random() * knottyResponses.length)];
-      setMessages((prev) => [...prev, { id: Date.now() + 1, role: "assistant", content: response }]);
+    try {
+      const { data, error } = await supabase.functions.invoke("knotty-chat", {
+        body: {
+          messages: newMessages
+            .filter((m) => m.id !== 0)
+            .map((m) => ({ role: m.role, content: m.content })),
+        },
+      });
+
+      const reply = error
+        ? "Hmm, I'm having trouble connecting. Try again! 🔄"
+        : data?.reply || "Sorry, I couldn't process that. Try again!";
+
+      setMessages((prev) => [
+        ...prev,
+        { id: Date.now() + 1, role: "assistant", content: reply },
+      ]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { id: Date.now() + 1, role: "assistant", content: "Something went wrong. Try again! 🤕" },
+      ]);
+    } finally {
       setIsTyping(false);
-    }, 1200 + Math.random() * 800);
+    }
   };
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
       <AnimatePresence mode="wait">
         {!isOpen ? (
-          /* ─── MORPHING AVATAR ─── */
+          /* ─── MORPHING AVATAR WITH BLINK ─── */
           <motion.button
             key="avatar"
             onClick={() => setIsOpen(true)}
@@ -64,38 +78,45 @@ export const KnottyChat = () => {
             whileTap={{ scale: 0.95 }}
             aria-label="Open Knotty AI assistant"
           >
-            {/* Outer pulse ring */}
+            {/* Attention-grabbing pulse ring */}
             <motion.div
-              className="absolute inset-0 rounded-full"
-              style={{ background: "radial-gradient(circle, hsl(0 0% 100% / 0.15), transparent 70%)" }}
+              className="absolute -inset-2 rounded-full"
+              style={{ border: "2px solid hsl(var(--primary) / 0.4)" }}
               animate={{
-                scale: [1, 1.8, 1],
-                opacity: [0.6, 0, 0.6],
+                scale: [1, 1.5, 1],
+                opacity: [0.8, 0, 0.8],
               }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
             />
 
-            {/* Inner glow */}
+            {/* Secondary pulse */}
             <motion.div
-              className="absolute inset-0 rounded-full"
-              style={{ background: "radial-gradient(circle, hsl(0 0% 100% / 0.1), transparent 60%)" }}
+              className="absolute -inset-1 rounded-full"
+              style={{ background: "radial-gradient(circle, hsl(var(--primary) / 0.15), transparent 70%)" }}
               animate={{
-                scale: [1, 1.4, 1],
-                opacity: [0.4, 0.1, 0.4],
+                scale: [1, 1.3, 1],
+                opacity: [0.6, 0, 0.6],
               }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
             />
+
+            {/* Notification dot — blinks */}
+            <motion.div
+              className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary z-10 flex items-center justify-center"
+              animate={{ scale: [1, 1.2, 1], opacity: [1, 0.7, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              <span className="text-[8px] font-bold text-primary-foreground">AI</span>
+            </motion.div>
 
             {/* Avatar body */}
             <div className="relative w-16 h-16 rounded-full border border-border/50 overflow-hidden"
               style={{
-                background: "linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 4%))",
-                boxShadow: "0 0 30px hsl(0 0% 100% / 0.08), inset 0 1px 0 hsl(0 0% 100% / 0.1)",
+                background: "linear-gradient(135deg, hsl(var(--primary) / 0.2), hsl(0 0% 4%))",
+                boxShadow: "0 0 30px hsl(var(--primary) / 0.12), inset 0 1px 0 hsl(0 0% 100% / 0.1)",
               }}
             >
-              {/* Face - morphs on hover */}
               <svg viewBox="0 0 64 64" className="w-full h-full">
-                {/* Eyes */}
                 <motion.ellipse
                   cx="22" cy="28"
                   rx={isHovered ? 3.5 : 2.5}
@@ -112,7 +133,6 @@ export const KnottyChat = () => {
                   animate={{ ry: isHovered ? 3.5 : [2.5, 2.5, 0.5, 2.5], rx: isHovered ? 3.5 : 2.5 }}
                   transition={isHovered ? { duration: 0.2 } : { duration: 4, repeat: Infinity, times: [0, 0.9, 0.95, 1] }}
                 />
-                {/* Mouth */}
                 <motion.path
                   d={isHovered ? "M 20 40 Q 32 52 44 40" : "M 24 40 Q 32 46 40 40"}
                   stroke="white"
@@ -134,12 +154,7 @@ export const KnottyChat = () => {
                   exit={{ opacity: 0, x: 10, scale: 0.8 }}
                   className="absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap"
                 >
-                  <div className="px-3 py-1.5 rounded-full text-xs font-medium text-foreground border border-border/50"
-                    style={{
-                      background: "linear-gradient(135deg, hsl(0 0% 8% / 0.9), hsl(0 0% 4% / 0.9))",
-                      backdropFilter: "blur(20px)",
-                    }}
-                  >
+                  <div className="px-3 py-1.5 rounded-full text-xs font-medium text-foreground border border-border/50 bg-background/90 backdrop-blur-xl">
                     Ask Knotty ✨
                   </div>
                 </motion.div>
@@ -154,7 +169,7 @@ export const KnottyChat = () => {
             animate={{ scale: 1, opacity: 1, y: 0, borderRadius: "16px" }}
             exit={{ scale: 0.3, opacity: 0, y: 40, borderRadius: "50%" }}
             transition={{ type: "spring", stiffness: 260, damping: 24 }}
-            className="w-[380px] h-[520px] flex flex-col overflow-hidden border border-border/40"
+            className="w-[380px] h-[520px] flex flex-col overflow-hidden border border-border/40 rounded-2xl"
             style={{
               background: "linear-gradient(180deg, hsl(0 0% 6% / 0.95), hsl(0 0% 3% / 0.98))",
               backdropFilter: "blur(40px) saturate(1.2)",
@@ -211,7 +226,13 @@ export const KnottyChat = () => {
                         : { background: "hsl(0 0% 8% / 0.6)", backdropFilter: "blur(10px)" }
                     }
                   >
-                    {msg.content}
+                    {msg.role === "assistant" ? (
+                      <div className="prose prose-sm prose-invert max-w-none [&>p]:m-0">
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      msg.content
+                    )}
                   </div>
                 </motion.div>
               ))}
@@ -257,7 +278,7 @@ export const KnottyChat = () => {
                   type="submit"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  disabled={!input.trim()}
+                  disabled={!input.trim() || isTyping}
                   className="w-8 h-8 rounded-full flex items-center justify-center text-primary-foreground disabled:opacity-30 transition-opacity"
                   style={{ background: input.trim() ? "hsl(0 0% 100%)" : "hsl(0 0% 30%)" }}
                 >
