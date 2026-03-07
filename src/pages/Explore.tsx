@@ -5,6 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { AvailableNowBadge } from "@/components/ui/available-now-badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LocationPicker } from "@/components/explore/LocationPicker";
 import { Slider } from "@/components/ui/slider";
@@ -207,10 +208,7 @@ const SwipeCard = ({
             </Badge>
           )}
           {therapist.availableNow && (
-            <Badge className="bg-primary/90 backdrop-blur-sm text-primary-foreground border-primary text-xs animate-pulse">
-              <Zap className="w-3 h-3 mr-1" />
-              Available Now
-            </Badge>
+            <AvailableNowBadge size="sm" />
           )}
           {therapist.hasSpecialOffer && (
             <Badge className="bg-warning/90 backdrop-blur-sm text-warning-foreground border-warning text-xs">
@@ -867,10 +865,7 @@ const Explore = () => {
                             </Badge>
                           )}
                           {therapist.availableNow && (
-                            <Badge className="text-[10px] bg-primary/90 text-primary-foreground border-primary gap-1 animate-pulse">
-                              <Zap className="w-3 h-3" />
-                              Available Now
-                            </Badge>
+                            <AvailableNowBadge size="sm" />
                           )}
                           {therapist.hasSpecialOffer && (
                             <Badge className="text-[10px] bg-warning/90 text-warning-foreground border-warning gap-1">
