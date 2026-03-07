@@ -39,6 +39,7 @@ import DashboardPromotion from "./pages/dashboard/DashboardPromotion";
 import DashboardFAQ from "./pages/dashboard/DashboardFAQ";
 import DashboardTravel from "./pages/dashboard/DashboardTravel";
 import DashboardSupport from "./pages/dashboard/DashboardSupport";
+import DashboardSpecials from "./pages/dashboard/DashboardSpecials";
 
 // Admin
 import AdminLogin from "./pages/AdminLogin";
