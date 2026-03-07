@@ -852,18 +852,36 @@ const Explore = () => {
                       </ImageReveal>
 
                       <div className="flex-1 flex flex-col justify-center">
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <h3 className="text-lg font-semibold">{therapist.name}</h3>
-                          {therapist.isTraveling && (
+                          {therapist.travelBadge === "visiting_now" && (
+                            <Badge className="text-[10px] bg-primary/90 text-primary-foreground border-primary gap-1">
+                              <Plane className="w-3 h-3" />
+                              Visiting Now
+                            </Badge>
+                          )}
+                          {therapist.travelBadge === "visiting_soon" && (
                             <Badge variant="outline" className="text-[10px] border-primary/30 text-primary gap-1">
                               <Plane className="w-3 h-3" />
-                              Visiting
+                              Visiting Soon
                             </Badge>
                           )}
                           {therapist.availableNow && (
                             <Badge className="text-[10px] bg-primary/90 text-primary-foreground border-primary gap-1 animate-pulse">
                               <Zap className="w-3 h-3" />
                               Available Now
+                            </Badge>
+                          )}
+                          {therapist.hasSpecialOffer && (
+                            <Badge className="text-[10px] bg-warning/90 text-warning-foreground border-warning gap-1">
+                              <Tag className="w-3 h-3" />
+                              Special Offer
+                            </Badge>
+                          )}
+                          {therapist.isNewUser && (
+                            <Badge className="text-[10px] bg-success/20 text-success border-success/30 gap-1">
+                              <UserPlus className="w-3 h-3" />
+                              New
                             </Badge>
                           )}
                         </div>
