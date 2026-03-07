@@ -431,9 +431,7 @@ const TherapistProfile = () => {
                     </Badge>
                   )}
                   {(profile as any).available_now && (profile as any).available_now_expires && new Date((profile as any).available_now_expires) > new Date() && (
-                    <Badge className="bg-primary text-primary-foreground text-xs animate-pulse">
-                      <Zap className="w-3 h-3 mr-1" />Available Now
-                    </Badge>
+                    <AvailableNowBadge />
                   )}
                   {travel.length > 0 && (() => {
                     const today = new Date().toISOString().split("T")[0];

@@ -864,10 +864,7 @@ const Explore = () => {
                             </Badge>
                           )}
                           {therapist.availableNow && (
-                            <Badge className="text-[10px] bg-primary/90 text-primary-foreground border-primary gap-1 animate-pulse">
-                              <Zap className="w-3 h-3" />
-                              Available Now
-                            </Badge>
+                            <AvailableNowBadge size="sm" />
                           )}
                           {therapist.hasSpecialOffer && (
                             <Badge className="text-[10px] bg-warning/90 text-warning-foreground border-warning gap-1">
