@@ -538,7 +538,7 @@ const Explore = () => {
                 <SlidersHorizontal className="w-3.5 h-3.5" />
                 Advanced Filters
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showAdvanced ? "rotate-180" : ""}`} />
-                {(availableOnly || availableNowOnly || priceRange[0] > 0 || priceRange[1] < 500 || sortBy !== "default") && (
+                {(availableOnly || availableNowOnly || specialOffersOnly || newUsersOnly || priceRange[0] > 0 || priceRange[1] < 500 || sortBy !== "default") && (
                   <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                 )}
               </button>
