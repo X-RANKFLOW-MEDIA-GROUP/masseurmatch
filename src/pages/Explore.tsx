@@ -574,7 +574,7 @@ const Explore = () => {
 
                       <div className="space-y-3">
                         <Label className="text-xs uppercase tracking-widest text-muted-foreground">
-                          Availability
+                          Filters
                         </Label>
                         <div className="flex flex-col gap-2">
                           <div className="flex items-center gap-3">
@@ -593,9 +593,27 @@ const Explore = () => {
                             />
                             <span className="text-sm flex items-center gap-1.5">
                               Available Now
-                              {availableNowOnly && (
-                                <Zap className="w-3 h-3 text-primary" />
-                              )}
+                              {availableNowOnly && <Zap className="w-3 h-3 text-primary" />}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Switch
+                              checked={specialOffersOnly}
+                              onCheckedChange={setSpecialOffersOnly}
+                            />
+                            <span className="text-sm flex items-center gap-1.5">
+                              Special Offers
+                              {specialOffersOnly && <Tag className="w-3 h-3 text-warning" />}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Switch
+                              checked={newUsersOnly}
+                              onCheckedChange={setNewUsersOnly}
+                            />
+                            <span className="text-sm flex items-center gap-1.5">
+                              New Therapists
+                              {newUsersOnly && <UserPlus className="w-3 h-3 text-success" />}
                             </span>
                           </div>
                         </div>
