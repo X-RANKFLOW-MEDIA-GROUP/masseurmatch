@@ -51,6 +51,7 @@ const TherapistProfile = () => {
   const [weeklySpecials, setWeeklySpecials] = useState<{ id: string; text: string; expires_at: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [revealedContacts, setRevealedContacts] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const fetchProfile = async () => {
