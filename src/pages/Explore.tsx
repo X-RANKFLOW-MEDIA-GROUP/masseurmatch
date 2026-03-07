@@ -649,6 +649,8 @@ const Explore = () => {
                             setPriceRange([0, 500]);
                             setAvailableOnly(false);
                             setAvailableNowOnly(false);
+                            setSpecialOffersOnly(false);
+                            setNewUsersOnly(false);
                             setSortBy("default");
                             setSelectedCity("all");
                             setSelectedType("all");
