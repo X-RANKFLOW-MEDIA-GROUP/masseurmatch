@@ -187,23 +187,41 @@ const SwipeCard = ({
           Nope
         </motion.div>
 
-        <div className="absolute top-4 left-4 flex gap-1.5">
+        <div className="absolute top-4 left-4 flex gap-1.5 flex-wrap">
           {therapist.verified && (
             <Badge className="bg-background/80 backdrop-blur-sm text-foreground border-border text-xs">
               <CheckCircle2 className="w-3 h-3 mr-1" />
               Verified
             </Badge>
           )}
-          {therapist.isTraveling && (
+          {therapist.travelBadge === "visiting_now" && (
+            <Badge className="bg-primary/90 backdrop-blur-sm text-primary-foreground border-primary text-xs">
+              <Plane className="w-3 h-3 mr-1" />
+              Visiting Now
+            </Badge>
+          )}
+          {therapist.travelBadge === "visiting_soon" && (
             <Badge className="bg-background/80 backdrop-blur-sm text-primary border-primary/30 text-xs">
               <Plane className="w-3 h-3 mr-1" />
-              Visiting
+              Visiting Soon
             </Badge>
           )}
           {therapist.availableNow && (
             <Badge className="bg-primary/90 backdrop-blur-sm text-primary-foreground border-primary text-xs animate-pulse">
               <Zap className="w-3 h-3 mr-1" />
               Available Now
+            </Badge>
+          )}
+          {therapist.hasSpecialOffer && (
+            <Badge className="bg-warning/90 backdrop-blur-sm text-warning-foreground border-warning text-xs">
+              <Tag className="w-3 h-3 mr-1" />
+              Special Offer
+            </Badge>
+          )}
+          {therapist.isNewUser && (
+            <Badge className="bg-success/20 backdrop-blur-sm text-success border-success/30 text-xs">
+              <UserPlus className="w-3 h-3 mr-1" />
+              New
             </Badge>
           )}
         </div>
