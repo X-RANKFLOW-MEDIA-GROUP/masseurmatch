@@ -184,6 +184,8 @@ const DashboardProfile = () => {
       height_inches: form.height_inches,
       body_type: form.body_type,
       date_of_birth: form.date_of_birth,
+      contact_methods: form.contact_methods,
+      share_email: form.share_email,
     } as any);
     setSaving(false);
     toast({
