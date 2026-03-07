@@ -55,6 +55,7 @@ const DashboardProfile = () => {
     social_media: { instagram: "", website: "" } as Record<string, string>,
     height_inches: null as number | null,
     body_type: null as string | null,
+    date_of_birth: null as string | null,
   });
 
   useEffect(() => {
