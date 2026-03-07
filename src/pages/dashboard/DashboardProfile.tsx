@@ -54,10 +54,12 @@ const DashboardProfile = () => {
     certifications: [] as string[],
     languages: [] as string[],
     presentation_video_url: "",
-    social_media: { instagram: "", website: "" } as Record<string, string>,
+    social_media: { instagram: "", website: "", email: "", whatsapp: "" } as Record<string, string>,
     height_inches: null as number | null,
     body_type: null as string | null,
     date_of_birth: null as string | null,
+    contact_methods: [] as string[],
+    share_email: false,
   });
 
   useEffect(() => {
