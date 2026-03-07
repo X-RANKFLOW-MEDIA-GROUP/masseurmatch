@@ -3,6 +3,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CityAutocomplete } from "@/components/ui/city-autocomplete";
 import { Label } from "@/components/ui/label";
 import { Save, Loader2, MapPin } from "lucide-react";
 
@@ -62,7 +63,7 @@ const DashboardLocation = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <Label>City</Label>
-            <Input value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} placeholder="Los Angeles" />
+            <CityAutocomplete value={form.city} onChange={(v) => setForm((f) => ({ ...f, city: v }))} placeholder="Los Angeles" />
           </div>
           <div>
             <Label>State</Label>

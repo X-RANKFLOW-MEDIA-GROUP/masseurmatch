@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CityAutocomplete } from "@/components/ui/city-autocomplete";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
@@ -350,7 +351,7 @@ const DashboardProfile = () => {
           </div>
           <div>
             <Label>City</Label>
-            <Input value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} placeholder="Los Angeles" />
+            <CityAutocomplete value={form.city} onChange={(v) => setForm((f) => ({ ...f, city: v }))} placeholder="Los Angeles" />
           </div>
           <div>
             <Label>State</Label>

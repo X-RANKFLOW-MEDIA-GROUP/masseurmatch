@@ -712,7 +712,7 @@ const TherapistProfile = () => {
           {(profile.incall_price || profile.outcall_price || pricingSessions.length > 0) && (
             <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg" aria-labelledby="services-heading">
               <h2 id="services-heading" className="text-2xl font-bold mb-2">Services & Rates</h2>
-              <p className="text-xs text-muted-foreground mb-6">All rates are per session. Maximum rate: ${RATE_CAP_PER_MIN}/min.</p>
+              <p className="text-xs text-muted-foreground mb-6">All rates are per session.</p>
 
               {pricingSessions.length > 0 ? (
                 <div className="overflow-x-auto mb-8">
@@ -721,7 +721,7 @@ const TherapistProfile = () => {
                       <tr className="border-b border-border">
                         <th scope="col" className="text-left py-3 pr-4 font-semibold">Service</th>
                         <th scope="col" className="text-center py-3 px-2 font-normal text-xs uppercase tracking-wider text-muted-foreground">Duration</th>
-                        <th scope="col" className="text-center py-3 px-2 font-normal text-xs uppercase tracking-wider text-muted-foreground">$/min</th>
+                        
                         <th scope="col" className="text-center py-3 px-2 font-normal text-xs uppercase tracking-wider text-muted-foreground">
                           <span className="flex items-center justify-center gap-1"><Home className="w-3 h-3" />Incall</span>
                         </th>
@@ -732,19 +732,12 @@ const TherapistProfile = () => {
                     </thead>
                     <tbody>
                       {pricingSessions.map((s, i) => {
-                        const ratePerMin = s.duration > 0 ? (s.incall / s.duration) : 0;
-                        const isWithinCap = ratePerMin <= RATE_CAP_PER_MIN;
                         return (
                           <tr key={i} className="border-b border-border/50 hover:bg-secondary/30 transition-colors" itemProp="makesOffer" itemScope itemType="https://schema.org/Offer">
                             <td className="py-4 pr-4 font-semibold" itemProp="itemOffered" itemScope itemType="https://schema.org/Service">
                               <span itemProp="name">{s.name}</span>
                             </td>
                             <td className="text-center py-4 px-2 text-muted-foreground">{s.duration}min</td>
-                            <td className="text-center py-4 px-2">
-                              <span className={`text-xs font-mono ${isWithinCap ? "text-muted-foreground" : "text-destructive"}`}>
-                                ${ratePerMin.toFixed(2)}
-                              </span>
-                            </td>
                             <td className="text-center py-4 px-2 font-semibold">${s.incall}</td>
                             <td className="text-center py-4 px-2 font-semibold">${s.outcall}</td>
                           </tr>
