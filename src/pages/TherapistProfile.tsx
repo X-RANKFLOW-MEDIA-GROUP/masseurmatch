@@ -721,7 +721,7 @@ const TherapistProfile = () => {
                       <tr className="border-b border-border">
                         <th scope="col" className="text-left py-3 pr-4 font-semibold">Service</th>
                         <th scope="col" className="text-center py-3 px-2 font-normal text-xs uppercase tracking-wider text-muted-foreground">Duration</th>
-                        <th scope="col" className="text-center py-3 px-2 font-normal text-xs uppercase tracking-wider text-muted-foreground">$/min</th>
+                        
                         <th scope="col" className="text-center py-3 px-2 font-normal text-xs uppercase tracking-wider text-muted-foreground">
                           <span className="flex items-center justify-center gap-1"><Home className="w-3 h-3" />Incall</span>
                         </th>
