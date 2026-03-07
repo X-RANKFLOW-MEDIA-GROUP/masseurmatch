@@ -3,6 +3,7 @@ import { SafetyDisclaimer } from "@/components/legal/SafetyDisclaimer";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { NewsletterSignup } from "@/components/newsletter/NewsletterSignup";
 import { CheckCircle2, Star, ArrowRight, MapPin, Tag, UserPlus, Plane } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ShieldIllustration, CommunityIllustration, GrowthIllustration } from "@/components/icons/IllustrationIcons";
