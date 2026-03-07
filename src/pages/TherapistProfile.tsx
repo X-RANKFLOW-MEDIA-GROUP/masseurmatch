@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import {
   MapPin, CheckCircle2, Phone, Globe, Clock, ArrowRight,
   MessageSquare, Bookmark, Award, Languages, ChevronLeft, ChevronRight,
-  Plane, Home, Star, CreditCard, Banknote, Wallet, Smartphone, Zap, Ruler, Tag
+  Plane, Home, Star, CreditCard, Banknote, Wallet, Smartphone, Zap, Ruler, Tag,
+  Mail, Eye, EyeOff
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -50,6 +51,7 @@ const TherapistProfile = () => {
   const [weeklySpecials, setWeeklySpecials] = useState<{ id: string; text: string; expires_at: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [revealedContacts, setRevealedContacts] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -137,6 +139,21 @@ const TherapistProfile = () => {
   const hasPhysicalAttributes = !!heightLabel || !!bodyType || !!calculatedAge;
   const primaryPhoto = photos.find(p => p.is_primary) || photos[0];
   const galleryPhotos = photos.map(p => p.storage_path);
+  const avatarFallback = profile?.avatar_url || "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=800&h=800&fit=crop";
+  const mainPhotoUrl = primaryPhoto?.storage_path || avatarFallback;
+  const contactMethods = ((profile as any)?.contact_methods || []) as string[];
+  const shareEmail = (profile as any)?.share_email || false;
+  const userEmail = profile ? (profile as any).user_email : null; // Not available from profiles, need separate lookup
+  const showCall = contactMethods.length === 0 || contactMethods.includes("call");
+  const showText = contactMethods.length === 0 || contactMethods.includes("text");
+  const showEmail = contactMethods.includes("email") && shareEmail;
+  const showWhatsApp = contactMethods.length === 0 || contactMethods.includes("whatsapp");
+
+  const revealContact = (type: string) => setRevealedContacts(prev => ({ ...prev, [type]: true }));
+  const maskPhone = (phone: string) => {
+    if (phone.length <= 4) return "•••• •••";
+    return phone.slice(0, -4).replace(/./g, "•") + " " + phone.slice(-4);
+  };
 
   // City coordinates for OpenStreetMap
   const cityCoords: Record<string, [number, number]> = {
@@ -382,9 +399,7 @@ const TherapistProfile = () => {
 
       {/* Hero */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} className="relative h-72 md:h-96 overflow-hidden bg-secondary">
-        {galleryPhotos.length > 0 && (
-          <img src={galleryPhotos[0]} alt={`${displayName} massage studio in ${cityLabel}`} className="w-full h-full object-cover" loading="eager" fetchPriority="high" />
-        )}
+        <img src={galleryPhotos[0] || mainPhotoUrl} alt={`${displayName} massage studio in ${cityLabel}`} className="w-full h-full object-cover" loading="eager" fetchPriority="high" />
         <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/40 to-background" />
       </motion.div>
 
@@ -399,17 +414,11 @@ const TherapistProfile = () => {
           <motion.header initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg">
             <div className="flex flex-col md:flex-row gap-8">
               <div className="relative flex-shrink-0">
-                <div className="w-36 h-36 rounded-full p-[3px]" style={{ background: "linear-gradient(135deg, hsl(145 80% 50%), hsl(160 70% 40%))" }}>
-                  {primaryPhoto ? (
-                    <img src={primaryPhoto.storage_path} alt={`${displayName}, massage therapist in ${cityLabel}`} className="w-full h-full rounded-full object-cover border-2 border-background" width={144} height={144} />
-                  ) : (
-                    <div className="w-full h-full rounded-full bg-secondary flex items-center justify-center text-3xl font-bold border-2 border-background" aria-label={displayName}>
-                      {displayName.charAt(0)}
-                    </div>
-                  )}
+                <div className="w-36 h-36 rounded-full p-[3px]" style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))" }}>
+                  <img src={mainPhotoUrl} alt={`${displayName}, massage therapist in ${cityLabel}`} className="w-full h-full rounded-full object-cover border-2 border-background" width={144} height={144} />
                 </div>
                 {profile.is_active && (
-                  <span className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-green-500 border-2 border-background" title="Online now" />
+                  <span className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-success border-2 border-background" title="Online now" />
                 )}
               </div>
 
@@ -486,25 +495,77 @@ const TherapistProfile = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-                  {profile.phone && (
+                  {showCall && profile.phone && (
                     <MagneticButton>
-                      <Button asChild className="group">
-                        <a href={`tel:${profile.phone}`} aria-label={`Call ${displayName}`}>
+                      {revealedContacts.call ? (
+                        <Button asChild className="group">
+                          <a href={`tel:${profile.phone}`} aria-label={`Call ${displayName}`}>
+                            <Phone className="w-4 h-4 mr-1" />
+                            {profile.phone}
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button onClick={() => revealContact("call")} className="group">
                           <Phone className="w-4 h-4 mr-1" />
                           Call
-                          <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                        </a>
-                      </Button>
+                          <Eye className="w-3 h-3 ml-1 opacity-50" />
+                        </Button>
+                      )}
                     </MagneticButton>
                   )}
-                  {socialMedia.whatsapp && (
+                  {showText && profile.phone && (
                     <MagneticButton>
-                      <Button asChild variant="outline" className="group">
-                        <a href={`https://wa.me/${socialMedia.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" aria-label={`Message ${displayName} on WhatsApp`}>
+                      {revealedContacts.text ? (
+                        <Button asChild variant="outline" className="group">
+                          <a href={`sms:${profile.phone}`} aria-label={`Text ${displayName}`}>
+                            <MessageSquare className="w-4 h-4 mr-1" />
+                            {profile.phone}
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button variant="outline" onClick={() => revealContact("text")} className="group">
+                          <MessageSquare className="w-4 h-4 mr-1" />
+                          Text
+                          <Eye className="w-3 h-3 ml-1 opacity-50" />
+                        </Button>
+                      )}
+                    </MagneticButton>
+                  )}
+                  {showEmail && (
+                    <MagneticButton>
+                      {revealedContacts.email ? (
+                        <Button asChild variant="outline" className="group">
+                          <a href={`mailto:${socialMedia.email || ""}`} aria-label={`Email ${displayName}`}>
+                            <Mail className="w-4 h-4 mr-1" />
+                            {socialMedia.email || "Email"}
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button variant="outline" onClick={() => revealContact("email")} className="group">
+                          <Mail className="w-4 h-4 mr-1" />
+                          Email
+                          <Eye className="w-3 h-3 ml-1 opacity-50" />
+                        </Button>
+                      )}
+                    </MagneticButton>
+                  )}
+                  {showWhatsApp && socialMedia.whatsapp && (
+                    <MagneticButton>
+                      {revealedContacts.whatsapp ? (
+                        <Button asChild variant="outline" className="group">
+                          <a href={`https://wa.me/${socialMedia.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp ${displayName}`}>
+                            <MessageSquare className="w-4 h-4 mr-1" />
+                            WhatsApp
+                            <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button variant="outline" onClick={() => revealContact("whatsapp")} className="group">
                           <MessageSquare className="w-4 h-4 mr-1" />
                           WhatsApp
-                        </a>
-                      </Button>
+                          <Eye className="w-3 h-3 ml-1 opacity-50" />
+                        </Button>
+                      )}
                     </MagneticButton>
                   )}
                   <Button variant="ghost" aria-label="Save profile"><Bookmark className="w-4 h-4 mr-1" />Save</Button>
@@ -543,10 +604,28 @@ const TherapistProfile = () => {
                 <div>
                   <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-4">Contact Information</h3>
                   <div className="space-y-3">
-                    {profile.phone && (
+                    {showCall && profile.phone && (
                       <div className="flex items-center gap-3 text-sm">
                         <Phone className="w-4 h-4 text-muted-foreground" />
-                        <a href={`tel:${profile.phone}`} className="hover:text-foreground transition-colors">{profile.phone}</a>
+                        {revealedContacts.call ? (
+                          <a href={`tel:${profile.phone}`} className="hover:text-foreground transition-colors">{profile.phone}</a>
+                        ) : (
+                          <button onClick={() => revealContact("call")} className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
+                            {maskPhone(profile.phone)} <Eye className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
+                    )}
+                    {showEmail && socialMedia.email && (
+                      <div className="flex items-center gap-3 text-sm">
+                        <Mail className="w-4 h-4 text-muted-foreground" />
+                        {revealedContacts.email ? (
+                          <a href={`mailto:${socialMedia.email}`} className="hover:text-foreground transition-colors">{socialMedia.email}</a>
+                        ) : (
+                          <button onClick={() => revealContact("email")} className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
+                            ••••@•••• <Eye className="w-3 h-3" />
+                          </button>
+                        )}
                       </div>
                     )}
                     {socialMedia.website && (

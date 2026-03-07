@@ -6,7 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, X, Save, AlertTriangle, Sparkles, MapPin, Ruler, CalendarIcon } from "lucide-react";
+import { Loader2, Plus, X, Save, AlertTriangle, Sparkles, MapPin, Ruler, CalendarIcon, Phone, Mail, MessageSquare } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -52,10 +54,12 @@ const DashboardProfile = () => {
     certifications: [] as string[],
     languages: [] as string[],
     presentation_video_url: "",
-    social_media: { instagram: "", website: "" } as Record<string, string>,
+    social_media: { instagram: "", website: "", email: "", whatsapp: "" } as Record<string, string>,
     height_inches: null as number | null,
     body_type: null as string | null,
     date_of_birth: null as string | null,
+    contact_methods: [] as string[],
+    share_email: false,
   });
 
   useEffect(() => {
@@ -71,10 +75,12 @@ const DashboardProfile = () => {
         certifications: profile.certifications || [],
         languages: profile.languages || [],
         presentation_video_url: profile.presentation_video_url || "",
-        social_media: (profile.social_media as Record<string, string>) || { instagram: "", website: "" },
+        social_media: (profile.social_media as Record<string, string>) || { instagram: "", website: "", email: "", whatsapp: "" },
         height_inches: (profile as any).height_inches ?? null,
         body_type: (profile as any).body_type ?? null,
         date_of_birth: (profile as any).date_of_birth ?? null,
+        contact_methods: (profile as any).contact_methods || [],
+        share_email: (profile as any).share_email || false,
       });
     }
   }, [profile]);
@@ -178,6 +184,8 @@ const DashboardProfile = () => {
       height_inches: form.height_inches,
       body_type: form.body_type,
       date_of_birth: form.date_of_birth,
+      contact_methods: form.contact_methods,
+      share_email: form.share_email,
     } as any);
     setSaving(false);
     toast({
@@ -242,7 +250,85 @@ const DashboardProfile = () => {
         </div>
       </section>
 
-      {/* Location with Zip Code */}
+      {/* Contact Preferences */}
+      <section className="glass-card p-6 space-y-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+          <Phone className="w-4 h-4" /> Contact Preferences
+        </h2>
+        <p className="text-xs text-muted-foreground">Choose how clients can reach you. All contact info is hidden by default — clients must click to reveal.</p>
+
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-widest text-muted-foreground">Accepted Contact Methods</Label>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { value: "call", label: "Phone Call", icon: Phone },
+              { value: "text", label: "Text / SMS", icon: MessageSquare },
+              { value: "email", label: "Email", icon: Mail },
+              { value: "whatsapp", label: "WhatsApp", icon: MessageSquare },
+            ].map(({ value, label, icon: Icon }) => (
+              <label key={value} className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                form.contact_methods.includes(value)
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:border-foreground/30"
+              }`}>
+                <Checkbox
+                  checked={form.contact_methods.includes(value)}
+                  onCheckedChange={(checked) => {
+                    setForm((f) => ({
+                      ...f,
+                      contact_methods: checked
+                        ? [...f.contact_methods, value]
+                        : f.contact_methods.filter((m) => m !== value),
+                    }));
+                  }}
+                />
+                <Icon className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm">{label}</span>
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">If none selected, Call and WhatsApp will be shown by default.</p>
+        </div>
+
+        {form.contact_methods.includes("email") && (
+          <div className="space-y-3 pt-2 border-t border-border">
+            <div className="flex items-center gap-3">
+              <Switch
+                checked={form.share_email}
+                onCheckedChange={(v) => setForm((f) => ({ ...f, share_email: v }))}
+              />
+              <div>
+                <Label className="text-sm">Share email on profile</Label>
+                <p className="text-xs text-muted-foreground">Display your contact email publicly (click-to-reveal)</p>
+              </div>
+            </div>
+            {form.share_email && (
+              <div>
+                <Label>Contact Email</Label>
+                <Input
+                  value={form.social_media.email || ""}
+                  onChange={(e) => setForm((f) => ({ ...f, social_media: { ...f.social_media, email: e.target.value } }))}
+                  placeholder={user?.email || "your@email.com"}
+                />
+                <p className="text-xs text-muted-foreground mt-1">Leave empty to use your account email</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {form.contact_methods.includes("whatsapp") && (
+          <div className="pt-2 border-t border-border">
+            <Label>WhatsApp Number</Label>
+            <Input
+              value={form.social_media.whatsapp || ""}
+              onChange={(e) => setForm((f) => ({ ...f, social_media: { ...f.social_media, whatsapp: e.target.value } }))}
+              placeholder="+1 555 123 4567"
+            />
+            <p className="text-xs text-muted-foreground mt-1">Include country code</p>
+          </div>
+        )}
+      </section>
+
       <section className="glass-card p-6 space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
           <MapPin className="w-4 h-4" /> Location
