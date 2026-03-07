@@ -22,6 +22,7 @@ const mainItems = [
 
 const userItems = [
   { title: "User Management", url: "/admin/users", icon: Users },
+  { title: "Newsletter", url: "/admin/newsletter", icon: Newspaper },
 ];
 
 export const AdminSidebar = () => {
