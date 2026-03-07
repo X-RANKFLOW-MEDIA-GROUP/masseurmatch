@@ -3,6 +3,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CityAutocomplete } from "@/components/ui/city-autocomplete";
 import { Label } from "@/components/ui/label";
 import { Save, Loader2, MapPin } from "lucide-react";
 
