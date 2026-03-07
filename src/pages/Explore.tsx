@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import {
   Search, MapPin, CheckCircle2, Star, ArrowRight, Heart, X,
   LayoutGrid, List, Map as MapIcon, SlidersHorizontal, ChevronDown, Loader2,
-  Sparkles, Plane, Zap
+  Sparkles, Plane, Zap, Tag, UserPlus
 } from "lucide-react";
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
