@@ -207,10 +207,7 @@ const SwipeCard = ({
             </Badge>
           )}
           {therapist.availableNow && (
-            <Badge className="bg-primary/90 backdrop-blur-sm text-primary-foreground border-primary text-xs animate-pulse">
-              <Zap className="w-3 h-3 mr-1" />
-              Available Now
-            </Badge>
+            <AvailableNowBadge size="sm" />
           )}
           {therapist.hasSpecialOffer && (
             <Badge className="bg-warning/90 backdrop-blur-sm text-warning-foreground border-warning text-xs">
