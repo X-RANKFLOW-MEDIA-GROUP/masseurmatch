@@ -31,6 +31,8 @@ const Index = () => {
 
   // Fetch featured therapists from database
   const [featuredTherapists, setFeaturedTherapists] = useState<any[]>([]);
+  const [specialOfferProfiles, setSpecialOfferProfiles] = useState<any[]>([]);
+  const [newProfiles, setNewProfiles] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchFeatured = async () => {
