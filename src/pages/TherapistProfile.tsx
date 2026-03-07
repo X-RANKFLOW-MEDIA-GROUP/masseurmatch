@@ -414,17 +414,11 @@ const TherapistProfile = () => {
           <motion.header initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg">
             <div className="flex flex-col md:flex-row gap-8">
               <div className="relative flex-shrink-0">
-                <div className="w-36 h-36 rounded-full p-[3px]" style={{ background: "linear-gradient(135deg, hsl(145 80% 50%), hsl(160 70% 40%))" }}>
-                  {primaryPhoto ? (
-                    <img src={primaryPhoto.storage_path} alt={`${displayName}, massage therapist in ${cityLabel}`} className="w-full h-full rounded-full object-cover border-2 border-background" width={144} height={144} />
-                  ) : (
-                    <div className="w-full h-full rounded-full bg-secondary flex items-center justify-center text-3xl font-bold border-2 border-background" aria-label={displayName}>
-                      {displayName.charAt(0)}
-                    </div>
-                  )}
+                <div className="w-36 h-36 rounded-full p-[3px]" style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))" }}>
+                  <img src={mainPhotoUrl} alt={`${displayName}, massage therapist in ${cityLabel}`} className="w-full h-full rounded-full object-cover border-2 border-background" width={144} height={144} />
                 </div>
                 {profile.is_active && (
-                  <span className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-green-500 border-2 border-background" title="Online now" />
+                  <span className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-success border-2 border-background" title="Online now" />
                 )}
               </div>
 
