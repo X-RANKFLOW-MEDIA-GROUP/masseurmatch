@@ -47,6 +47,7 @@ const TherapistProfile = () => {
   const [profile, setProfile] = useState<Tables<"profiles"> | null>(null);
   const [photos, setPhotos] = useState<ProfilePhoto[]>([]);
   const [travel, setTravel] = useState<TravelEntry[]>([]);
+  const [weeklySpecials, setWeeklySpecials] = useState<{ id: string; text: string; expires_at: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
