@@ -36,21 +36,61 @@ const Index = () => {
 
   useEffect(() => {
     const fetchFeatured = async () => {
-      const { data } = await supabase
-        .from("featured_masters")
-        .select("*, profiles(id, display_name, full_name, city, specialties, avatar_url, is_verified_identity)")
-        .eq("is_active", true)
-        .order("display_order");
+      const [featuredRes, specialsRes, newRes] = await Promise.all([
+        supabase
+          .from("featured_masters")
+          .select("*, profiles(id, display_name, full_name, city, specialties, avatar_url, is_verified_identity)")
+          .eq("is_active", true)
+          .order("display_order"),
+        supabase
+          .from("weekly_specials")
+          .select("profile_id, text, profiles(id, display_name, full_name, city, avatar_url, specialties)")
+          .eq("is_active", true)
+          .gt("expires_at", new Date().toISOString())
+          .limit(6),
+        supabase
+          .from("profiles")
+          .select("id, display_name, full_name, city, avatar_url, specialties, created_at")
+          .eq("status", "active")
+          .eq("is_active", true)
+          .gte("created_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+          .order("created_at", { ascending: false })
+          .limit(6),
+      ]);
 
-      if (data && data.length > 0) {
+      if (featuredRes.data && featuredRes.data.length > 0) {
         setFeaturedTherapists(
-          data.map((f) => ({
+          featuredRes.data.map((f) => ({
             id: f.profiles?.id,
             name: f.profiles?.display_name || f.profiles?.full_name || "Therapist",
             city: f.city || f.profiles?.city || "",
             specialty: f.profiles?.specialties?.join(", ") || "Male Massage",
             image: f.profiles?.avatar_url || "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=800&h=800&fit=crop",
             verified: f.profiles?.is_verified_identity || false,
+          }))
+        );
+      }
+
+      if (specialsRes.data && specialsRes.data.length > 0) {
+        setSpecialOfferProfiles(
+          specialsRes.data.map((s: any) => ({
+            id: s.profiles?.id || s.profile_id,
+            name: s.profiles?.display_name || s.profiles?.full_name || "Therapist",
+            city: s.profiles?.city || "",
+            specialText: s.text,
+            image: s.profiles?.avatar_url || "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=800&h=800&fit=crop",
+          }))
+        );
+      }
+
+      if (newRes.data && newRes.data.length > 0) {
+        setNewProfiles(
+          newRes.data.map((p: any) => ({
+            id: p.id,
+            name: p.display_name || p.full_name || "Therapist",
+            city: p.city || "",
+            specialty: (p.specialties || []).slice(0, 2).join(", ") || "Massage Therapy",
+            image: p.avatar_url || "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=800&h=800&fit=crop",
           }))
         );
       }
