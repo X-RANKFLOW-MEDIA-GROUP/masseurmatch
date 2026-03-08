@@ -577,6 +577,28 @@ const TherapistProfile = () => {
                     </MagneticButton>
                   )}
                   <Button variant="ghost" aria-label="Save profile"><Bookmark className="w-4 h-4 mr-1" />Save</Button>
+                  <Button
+                    variant="ghost"
+                    aria-label="Share profile"
+                    onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({ title: displayName, url: window.location.href });
+                      } else {
+                        navigator.clipboard.writeText(window.location.href);
+                        toast.success("Profile link copied!");
+                      }
+                    }}
+                  >
+                    <Share2 className="w-4 h-4 mr-1" />Share
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="text-destructive/70 hover:text-destructive"
+                    aria-label="Report this profile"
+                    onClick={() => setShowReportDialog(true)}
+                  >
+                    <Flag className="w-4 h-4 mr-1" />Report
+                  </Button>
                 </div>
               </div>
             </div>
