@@ -476,7 +476,22 @@ const TherapistProfile = () => {
                   </div>
                 )}
 
-                {specialties.length > 0 && (
+                {/* Last Active Indicator */}
+                {profile.updated_at && (
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
+                    <Clock className="w-3 h-3" />
+                    {(() => {
+                      const diff = Date.now() - new Date(profile.updated_at).getTime();
+                      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                      if (days === 0) return "Active today";
+                      if (days === 1) return "Active yesterday";
+                      if (days <= 7) return `Active ${days} days ago`;
+                      if (days <= 30) return `Active ${Math.floor(days / 7)} weeks ago`;
+                      return `Active ${Math.floor(days / 30)} months ago`;
+                    })()}
+                  </div>
+                )}
+
                   <p className="text-sm text-muted-foreground mb-4">{specialties.slice(0, 3).join(" · ")}</p>
                 )}
 
