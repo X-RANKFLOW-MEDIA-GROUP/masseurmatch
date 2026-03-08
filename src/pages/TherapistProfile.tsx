@@ -159,6 +159,7 @@ const TherapistProfile = () => {
   const showText = contactMethods.length === 0 || contactMethods.includes("text");
   const showEmail = contactMethods.includes("email") && shareEmail;
   const showWhatsApp = contactMethods.length === 0 || contactMethods.includes("whatsapp");
+  const hasAnyContact = (showCall && profile.phone) || (showText && profile.phone) || showEmail || (showWhatsApp && socialMedia.whatsapp);
 
   const revealContact = (type: string) => setRevealedContacts(prev => ({ ...prev, [type]: true }));
   const maskPhone = (phone: string) => {
