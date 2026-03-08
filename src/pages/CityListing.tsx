@@ -71,6 +71,11 @@ const CityListing = () => {
     fetchProfiles();
   }, [citySlug, cityDisplayName]);
 
+  // Early return after all hooks
+  if (!isValid) {
+    return <NotFound />;
+  }
+
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
