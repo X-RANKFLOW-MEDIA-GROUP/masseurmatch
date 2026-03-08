@@ -129,7 +129,7 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background" ref={scrollRef}>
+    <div className="min-h-screen bg-background" ref={scrollRef} id="main-content">
       <SEOHead
         title="Gay Massage Directory — Find Male Massage Therapists Near You | MasseurMatch"
         description="The #1 gay massage directory. Browse verified male massage therapists near you. Deep tissue, Swedish, sports & therapeutic massage. Gay-friendly, trusted professionals."
