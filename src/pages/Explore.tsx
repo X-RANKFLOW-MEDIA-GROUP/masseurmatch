@@ -993,7 +993,7 @@ const Explore = () => {
             <div className="mt-12 space-y-6">
               <h3 className="text-xl font-bold text-foreground">Common Questions</h3>
               {[
-                { q: "How do I choose a massage therapist?", a: "Browse profiles, read reviews, compare specialties and pricing. Contact providers directly through their listing to discuss your needs before booking." },
+                { q: "How do I choose a massage therapist?", a: "Browse profiles, compare specialties and pricing. Contact providers directly through their listing to discuss your needs." },
                 { q: "What massage types are available?", a: "Our directory includes deep tissue, Swedish, sports recovery, hot stone, aromatherapy, Thai, shiatsu, reflexology, and therapeutic wellness bodywork." },
                 { q: "Is MasseurMatch free to browse?", a: "Yes. Browsing the directory is completely free. No account is needed to view listings or contact providers." },
                 { q: "Are the therapists verified?", a: "MasseurMatch does not verify licenses or credentials. 'Verified' badges indicate paid advertising placement. Always do your own research." },
