@@ -78,8 +78,15 @@ const City = () => {
   }
 
   // Get nearby cities for "Browse Other Cities"
+  // Get nearby cities — prioritize same state, then alphabetical
   const otherCities = US_CITIES
     .filter(c => c.slug !== citySlug)
+    .sort((a, b) => {
+      const aMatch = a.state === cityData?.state ? 0 : 1;
+      const bMatch = b.state === cityData?.state ? 0 : 1;
+      if (aMatch !== bMatch) return aMatch - bMatch;
+      return a.name.localeCompare(b.name);
+    })
     .slice(0, 12);
 
   const cityJsonLd = {
