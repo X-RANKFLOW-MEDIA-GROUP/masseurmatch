@@ -29,6 +29,7 @@ import {
   LogOut,
   LifeBuoy,
   Tag,
+  Radar,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
@@ -48,6 +49,7 @@ const menuItems = [
   { title: "Q&A", url: "/dashboard/faq", icon: MessageCircleQuestion },
   { title: "Specials", url: "/dashboard/specials", icon: Tag },
   { title: "Travel", url: "/dashboard/travel", icon: Plane },
+  { title: "Demand Radar", url: "/dashboard/demand-radar", icon: Radar },
 ];
 
 const accountItems = [
