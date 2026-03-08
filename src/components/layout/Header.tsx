@@ -108,6 +108,9 @@ export const Header = () => {
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
             className="md:hidden border-t border-border bg-background overflow-hidden"
+            id="mobile-nav"
+            role="navigation"
+            aria-label="Mobile navigation">
           >
             <nav className="container mx-auto flex flex-col space-y-4 px-4 py-6">
               {navLinks.map((link) => (
