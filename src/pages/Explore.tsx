@@ -814,7 +814,7 @@ const Explore = () => {
                 >
                   <TiltCard className="glass-card overflow-hidden" maxTilt={8}>
                     <Link
-                      to={`/therapist/${therapist.id}`}
+                      to={therapist.city ? `/${therapist.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${therapist.id}` : `/therapist/${therapist.id}`}
                       className="flex flex-col md:flex-row gap-6 p-6 group"
                     >
                       <ImageReveal

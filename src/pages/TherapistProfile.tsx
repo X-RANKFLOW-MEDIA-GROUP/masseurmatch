@@ -286,7 +286,7 @@ const TherapistProfile = () => {
   const seoDescription = useMemo(() => {
     if (!profile) return "";
     const parts: string[] = [];
-    parts.push(`Book ${displayName}, a professional massage therapist in ${cityLabel || "your city"}.`);
+    parts.push(`${displayName}, professional massage therapist in ${cityLabel || "your city"}.`);
     if (specialties.length > 0) parts.push(`Specializing in ${specialties.slice(0, 4).join(", ")}.`);
     if (certifications.length > 0) parts.push(`Certified: ${certifications.slice(0, 2).join(", ")}.`);
     if (profile.incall_price || pricingSessions.length > 0) {

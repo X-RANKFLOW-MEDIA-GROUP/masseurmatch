@@ -186,10 +186,10 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
             {[
-              { label: t("home.statTherapists"), end: 10000, suffix: "+" },
-              { label: t("home.statCities"), end: 500, suffix: "+" },
-              { label: t("home.statVerified"), end: 8500, suffix: "+" },
-              { label: t("home.statReviews"), end: 98, suffix: "%" },
+              { label: t("home.statTherapists"), end: 200, suffix: "+" },
+              { label: t("home.statCities"), end: 200, suffix: "+" },
+              { label: t("home.statVerified"), end: 100, suffix: "%" },
+              { label: "Satisfaction", end: 98, suffix: "%" },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
