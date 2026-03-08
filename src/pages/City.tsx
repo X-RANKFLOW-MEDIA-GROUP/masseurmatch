@@ -89,20 +89,41 @@ const City = () => {
     })
     .slice(0, 12);
 
-  const cityJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": `${BASE_URL}/` },
-      { "@type": "ListItem", "position": 2, "name": `${cityDisplayName}${cityState ? `, ${cityState}` : ""}`, "item": `${BASE_URL}/${citySlug}` },
-    ],
-  };
+  // City-specific FAQ
+  const cityFaqs = [
+    { q: `How do I find a massage therapist in ${cityDisplayName}?`, a: `Browse our directory of verified massage therapists in ${cityDisplayName}. Use filters to narrow by specialty, price range, or availability. Contact therapists directly through their profile.` },
+    { q: `Are the massage therapists in ${cityDisplayName} verified?`, a: `MasseurMatch offers optional identity verification through a secure third-party process. Look for the verified badge on profiles. We are an advertising directory and do not verify licenses or credentials.` },
+    { q: `How much does a massage cost in ${cityDisplayName}?`, a: `Massage prices in ${cityDisplayName} vary by therapist, session length, and type. Browse profiles to compare rates — most therapists list their incall and outcall pricing.` },
+    { q: `Can I book a massage directly on MasseurMatch?`, a: `No. MasseurMatch is a directory only. You contact therapists directly through their listed contact methods and arrange sessions independently.` },
+  ];
+
+  const profileCount = profiles.length;
+
+  const cityJsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": `${BASE_URL}/` },
+        { "@type": "ListItem", "position": 2, "name": `${cityDisplayName}${cityState ? `, ${cityState}` : ""}`, "item": `${BASE_URL}/${citySlug}` },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": cityFaqs.map(f => ({
+        "@type": "Question",
+        "name": f.q,
+        "acceptedAnswer": { "@type": "Answer", "text": f.a },
+      })),
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-background" ref={scrollRef}>
       <SEOHead
-        title={`Male Massage Therapists in ${cityDisplayName}${cityState ? `, ${cityState}` : ""} — MasseurMatch`}
-        description={`Find gay-friendly male massage therapists in ${cityDisplayName}. Browse verified profiles, compare services and prices.`}
+        title={`${profileCount > 0 ? `${profileCount} ` : ""}Male Massage Therapists in ${cityDisplayName}${cityState ? `, ${cityState}` : ""} — MasseurMatch`}
+        description={`${profileCount > 0 ? `Browse ${profileCount} verified` : "Find"} gay-friendly male massage therapists in ${cityDisplayName}. Compare services, prices, and contact therapists directly.`}
         path={`/${citySlug}`}
         jsonLd={cityJsonLd}
       />
@@ -229,6 +250,27 @@ const City = () => {
               </div>
             </>
           )}
+
+          {/* City FAQ Section */}
+          <div className="max-w-4xl mx-auto mt-20">
+            <h2 className="text-2xl font-bold mb-6">Frequently Asked Questions</h2>
+            <div className="space-y-4">
+              {cityFaqs.map((faq, i) => (
+                <motion.div
+                  key={i}
+                  custom={i}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeUp}
+                  className="border border-border rounded-lg p-5 bg-card"
+                >
+                  <h3 className="text-sm font-semibold text-foreground mb-2">{faq.q}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{faq.a}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
 
           {/* Other Cities */}
           {otherCities.length > 0 && (
