@@ -361,7 +361,7 @@ const TherapistProfile = () => {
       <SEOHead
         title={seoTitle}
         description={seoDescription}
-        path={`/therapist/${id}`}
+        path={urlCity && urlSlug ? `/${urlCity}/therapist/${urlSlug}` : `/therapist/${id || urlSlug || ""}`}
         ogImage={primaryPhoto?.storage_path || undefined}
         ogType="profile"
         noindex={!!(profile as any).is_seed_profile}
