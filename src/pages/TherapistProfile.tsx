@@ -55,6 +55,8 @@ const TherapistProfile = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [revealedContacts, setRevealedContacts] = useState<Record<string, boolean>>({});
+  const [showReportDialog, setShowReportDialog] = useState(false);
+  const [reportReason, setReportReason] = useState("");
 
   // Determine lookup method: by slug (new URLs) or by id (legacy)
   const lookupSlug = urlSlug;
