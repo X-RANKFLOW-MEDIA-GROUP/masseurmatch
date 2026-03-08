@@ -1023,6 +1023,43 @@ const TherapistProfile = () => {
             </motion.section>
           )}
 
+          {/* Similar Therapists */}
+          {similarProfiles.length > 0 && (
+            <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg">
+              <h2 className="text-2xl font-bold mb-6">Similar Therapists</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {similarProfiles.map((sp) => {
+                  const spName = sp.display_name || sp.full_name || "Therapist";
+                  const spCity = [sp.city, sp.state].filter(Boolean).join(", ");
+                  const spUrl = sp.slug ? `/${sp.city?.toLowerCase().replace(/\s+/g, "-") || "us"}/${sp.slug}` : `/therapist/${sp.id}`;
+                  return (
+                    <Link key={sp.id} to={spUrl} className="group block rounded-lg border border-border bg-background p-4 hover:bg-secondary/30 transition-colors">
+                      <div className="flex items-center gap-3 mb-2">
+                        <img
+                          src={sp.avatar_url || "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=200&h=200&fit=crop"}
+                          alt={spName}
+                          className="w-10 h-10 rounded-full object-cover"
+                          loading="lazy"
+                        />
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold truncate group-hover:text-primary transition-colors">{spName}</p>
+                          {spCity && <p className="text-[11px] text-muted-foreground truncate">{spCity}</p>}
+                        </div>
+                      </div>
+                      {sp.specialties && (sp.specialties as string[]).length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {(sp.specialties as string[]).slice(0, 2).map((s, i) => (
+                            <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">{s}</span>
+                          ))}
+                        </div>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </motion.section>
+          )}
+
           {/* Safety & Report */}
           <div className="mb-8 flex items-center gap-4 text-xs text-muted-foreground">
             <Link to="/safety" className="flex items-center gap-1 hover:text-foreground transition-colors">
