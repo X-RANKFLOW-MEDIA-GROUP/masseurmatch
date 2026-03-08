@@ -297,7 +297,7 @@ const Explore = () => {
       const [profilesRes, travelRes, specialsRes] = await Promise.all([
         supabase
           .from("profiles")
-          .select("id, display_name, full_name, bio, city, state, country, specialties, incall_price, outcall_price, avatar_url, is_active, is_verified_profile, is_verified_identity, is_verified_photos, available_now, available_now_expires, created_at, profile_photos(storage_path, is_primary, moderation_status)")
+          .select("id, slug, display_name, full_name, bio, city, state, country, specialties, incall_price, outcall_price, avatar_url, is_active, is_verified_profile, is_verified_identity, is_verified_photos, available_now, available_now_expires, created_at, profile_photos(storage_path, is_primary, moderation_status)")
           .eq("status", "active")
           .eq("is_active", true)
           .not("city", "is", null)
