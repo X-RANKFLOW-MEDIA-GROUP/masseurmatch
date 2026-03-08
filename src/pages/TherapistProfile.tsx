@@ -65,10 +65,9 @@ const TherapistProfile = () => {
       setLoading(true);
 
       // Fetch by slug (new URL) or by id (legacy URL)
-      const fetchById = async (col: string, val: string) => {
-        return supabase.from("profiles").select("*").eq(col as any, val).single();
-      };
-      const { data, error } = await fetchById(lookupSlug ? "slug" : "id", (lookupSlug || lookupId)!);
+      const col = lookupSlug ? "slug" : "id";
+      const val = (lookupSlug || lookupId)!;
+      const { data, error } = await (supabase.from("profiles").select("*") as any).eq(col, val).single();
 
       if (error || !data) {
         setNotFound(true);
