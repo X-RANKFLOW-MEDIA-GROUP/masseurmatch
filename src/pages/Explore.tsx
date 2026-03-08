@@ -35,6 +35,7 @@ type ViewMode = "cards" | "list" | "map";
 
 interface TherapistItem {
   id: string;
+  slug?: string;
   name: string;
   city: string;
   lat: number;
