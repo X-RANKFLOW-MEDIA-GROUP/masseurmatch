@@ -453,7 +453,7 @@ const Index = () => {
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                 {newProfiles.slice(0, 6).map((p, i) => (
                   <motion.div key={p.id} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-                    <Link to={`/therapist/${p.id}`}>
+                    <Link to={p.city ? `/${p.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${p.id}` : `/therapist/${p.id}`}>
                       <TiltCard className="glass-card p-4 text-center group">
                         <img src={p.image} alt={p.name} className="w-16 h-16 rounded-full object-cover mx-auto mb-3 grayscale group-hover:grayscale-0 transition-all" loading="lazy" />
                         <h3 className="font-semibold text-sm truncate">{p.name}</h3>
