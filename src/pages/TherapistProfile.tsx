@@ -43,7 +43,7 @@ const BASE_URL = "https://masseurmatch.com";
 
 const TherapistProfile = () => {
   const scrollRef = useScrollReveal();
-  const { id } = useParams<{ id: string }>();
+  const { id, slug: urlSlug, city: urlCity } = useParams<{ id?: string; slug?: string; city?: string }>();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const travelRef = useRef<HTMLDivElement>(null);
 
@@ -55,16 +55,64 @@ const TherapistProfile = () => {
   const [notFound, setNotFound] = useState(false);
   const [revealedContacts, setRevealedContacts] = useState<Record<string, boolean>>({});
 
+  // Determine lookup method: by slug (new URLs) or by id (legacy)
+  const lookupSlug = urlSlug;
+  const lookupId = id;
+
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!id) { setNotFound(true); setLoading(false); return; }
+      if (!lookupSlug && !lookupId) { setNotFound(true); setLoading(false); return; }
       setLoading(true);
 
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", id)
-        .single();
+      let query = supabase.from("profiles").select("*");
+      if (lookupSlug) {
+        query = query.eq("slug" as any, lookupSlug);
+      } else {
+        query = query.eq("id", lookupId!);
+      }
+
+      const { data, error } = await query.single();
+
+      if (error || !data) {
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
+
+      setProfile(data);
+      const profileId = data.id;
+
+      const [photosRes, travelRes, specialsRes] = await Promise.all([
+        supabase
+          .from("profile_photos")
+          .select("id, storage_path, is_primary, sort_order")
+          .eq("profile_id", profileId)
+          .eq("moderation_status", "approved")
+          .order("sort_order", { ascending: true }),
+        supabase
+          .from("provider_travel")
+          .select("id, destination_city, destination_state, start_date, end_date, is_active")
+          .eq("profile_id", profileId)
+          .eq("is_active", true)
+          .gte("end_date", new Date().toISOString().split("T")[0])
+          .order("start_date", { ascending: true }),
+        supabase
+          .from("weekly_specials")
+          .select("id, text, expires_at")
+          .eq("profile_id", profileId)
+          .eq("is_active", true)
+          .gt("expires_at", new Date().toISOString())
+          .order("created_at", { ascending: false }),
+      ]);
+
+      if (photosRes.data) setPhotos(photosRes.data);
+      if (travelRes.data) setTravel(travelRes.data);
+      if (specialsRes.data) setWeeklySpecials(specialsRes.data as any);
+      setLoading(false);
+    };
+
+    fetchProfile();
+  }, [lookupSlug, lookupId]);
 
       if (error || !data) {
         setNotFound(true);
