@@ -171,10 +171,34 @@ const Index = () => {
               {t("home.heroDesc")}
             </motion.p>
 
+            {/* City Search Autocomplete */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 1.5 }}
+              className="max-w-md mx-auto mb-8"
+            >
+              <div className="relative">
+                <CityAutocomplete
+                  value={heroCity}
+                  onChange={(val) => {
+                    setHeroCity(val);
+                    // If user selects from dropdown, navigate
+                    const slug = val.toLowerCase().replace(/\s+/g, "-");
+                    if (val && slug) {
+                      navigate(`/${slug}`);
+                    }
+                  }}
+                  placeholder="Search your city..."
+                  className="w-full"
+                />
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.8 }}
               className="flex flex-col sm:flex-row gap-4 justify-center"
             >
               <MagneticButton>
