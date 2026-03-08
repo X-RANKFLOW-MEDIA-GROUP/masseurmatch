@@ -994,9 +994,63 @@ const TherapistProfile = () => {
             </motion.section>
           )}
 
+          {/* Safety & Report */}
+          <div className="mb-8 flex items-center gap-4 text-xs text-muted-foreground">
+            <Link to="/safety" className="flex items-center gap-1 hover:text-foreground transition-colors">
+              <Shield className="w-3 h-3" /> Safety Guidelines
+            </Link>
+            <span>·</span>
+            <button onClick={() => setShowReportDialog(true)} className="flex items-center gap-1 hover:text-destructive transition-colors">
+              <Flag className="w-3 h-3" /> Report this profile
+            </button>
+          </div>
+
           <div className="mb-8"><AdTransparency /></div>
         </article>
       </div>
+
+      {/* Report Dialog */}
+      {showReportDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm" onClick={() => setShowReportDialog(false)}>
+          <div className="bg-card border border-border rounded-lg p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Flag className="w-4 h-4 text-destructive" /> Report Profile</h3>
+            <p className="text-sm text-muted-foreground mb-4">Help us keep MasseurMatch safe. Select a reason:</p>
+            <div className="space-y-2 mb-4">
+              {["Inappropriate content", "Fake profile", "Harassment", "Spam / scam", "Other"].map((reason) => (
+                <button
+                  key={reason}
+                  onClick={() => setReportReason(reason)}
+                  className={`w-full text-left px-3 py-2 text-sm rounded border transition-colors ${reportReason === reason ? "border-primary bg-primary/10 text-foreground" : "border-border hover:bg-secondary"}`}
+                >
+                  {reason}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-3">
+              <Button variant="outline" className="flex-1" onClick={() => setShowReportDialog(false)}>Cancel</Button>
+              <Button
+                className="flex-1"
+                disabled={!reportReason}
+                onClick={async () => {
+                  const { data: { user } } = await supabase.auth.getUser();
+                  if (!user) { toast.error("Please sign in to report a profile"); return; }
+                  await supabase.from("content_flags").insert({
+                    reporter_id: user.id,
+                    target_type: "profile",
+                    target_id: profile.id,
+                    reason: reportReason,
+                  });
+                  toast.success("Report submitted. Thank you for helping keep our community safe.");
+                  setShowReportDialog(false);
+                  setReportReason("");
+                }}
+              >
+                Submit Report
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <SafetyDisclaimer />
 
