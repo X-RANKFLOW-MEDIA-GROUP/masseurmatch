@@ -946,7 +946,7 @@ const Explore = () => {
                   {filteredTherapists.map((t) => (
                     <TiltCard key={t.id} className="glass-card overflow-hidden" maxTilt={6}>
                       <Link
-                        to={`/therapist/${t.id}`}
+                        to={t.city ? `/${t.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${t.id}` : `/therapist/${t.id}`}
                         className="flex gap-3 p-3 group"
                       >
                         <img src={t.image} alt={t.name} className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
