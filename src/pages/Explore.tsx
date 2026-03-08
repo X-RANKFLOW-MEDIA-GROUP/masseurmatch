@@ -74,6 +74,14 @@ const CITY_COORDS: Record<string, { lat: number; lng: number }> = {
 };
 
 function mapProfileToTherapist(p: any): TherapistItem {
+/** Build profile URL: prefer slug, fallback to id */
+function profileUrl(t: { city?: string; slug?: string; id: string }) {
+  const citySlug = t.city ? t.city.toLowerCase().replace(/\s+/g, "-") : "";
+  const identifier = t.slug || t.id;
+  return citySlug ? `/${citySlug}/therapist/${identifier}` : `/therapist/${identifier}`;
+}
+
+function mapProfileToTherapist(p: any): TherapistItem {
   const cityLower = (p.city || "").toLowerCase();
   const coords = CITY_COORDS[cityLower] || { lat: 39.8283, lng: -98.5795 };
   const primaryPhoto = p.profile_photos?.[0]?.storage_path;
