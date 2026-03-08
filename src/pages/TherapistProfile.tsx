@@ -391,7 +391,7 @@ const TherapistProfile = () => {
             <>
               <li className="text-muted-foreground/50">/</li>
               <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
-                <Link to={`/city/${profile.city.toLowerCase().replace(/\s+/g, "-")}`} className="hover:text-foreground transition-colors" itemProp="item">
+                <Link to={`/${profile.city.toLowerCase().replace(/\s+/g, "-")}`} className="hover:text-foreground transition-colors" itemProp="item">
                   <span itemProp="name">{profile.city}</span>
                 </Link>
                 <meta itemProp="position" content="3" />
