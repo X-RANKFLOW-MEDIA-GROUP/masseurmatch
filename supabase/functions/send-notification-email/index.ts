@@ -497,6 +497,12 @@ serve(async (req) => {
     const resendKey = Deno.env.get("RESEND_API_KEY");
     if (!resendKey) throw new Error("RESEND_API_KEY not configured");
 
+    // Guard: only newsletter_welcome can use direct email (no user_id)
+    const DIRECT_EMAIL_TEMPLATES = ["newsletter_welcome"];
+    if (directEmail && !user_id && !DIRECT_EMAIL_TEMPLATES.includes(template)) {
+      throw new Error("Direct email sending is not allowed for this template");
+    }
+
     let recipientEmail = directEmail;
     let recipientName = templateData?.name;
 
