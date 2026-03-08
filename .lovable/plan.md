@@ -1,78 +1,62 @@
 
 
-## Restructure Subscription Tiers: Free → Standard → Pro → Elite + Add-ons
+## SEO URL Restructuring Plan
 
-The current system has 5 tiers (Free, Standard, Premium, Gold, Platinum). The new structure consolidates to 4 tiers with new pricing, features, and adds upsell add-ons.
+Currently the app uses `/city/:slug` for city pages and `/therapist/:id` for profiles. The goal is to restructure to flat, SEO-optimized URLs.
 
-### Tier Mapping
+### New Route Structure
 
 ```text
-OLD                          NEW
-─────────────────────────────────────────────
-Free ($0)        →  Free ($0)
-Standard ($29)   →  Standard ($39)
-Premium ($59)    →  Pro ($79)
-Gold ($99)       →  Elite ($99)
-Platinum ($149)  →  REMOVED
+/:city                        → City landing page (e.g. /dallas)
+/:city/massage-therapists     → Listing page with filters (e.g. /dallas/massage-therapists)
+/:city/therapist/:slug        → Profile page (e.g. /dallas/therapist/john-doe)
 ```
 
-### New Tier Details
+### Changes Required
 
-| Tier | Price | Photos | Search | Available Now | Travel | Analytics | Extras |
-|------|-------|--------|--------|---------------|--------|-----------|--------|
-| Free | $0 | 1 | bottom | No | 1/mo | No | "Basic Listing" watermark |
-| Standard | $39 | 6 | middle | 60 min | 3/mo | views | newsletter chance |
-| Pro | $79 | 12 + video | top | 120 min | unlimited | views+clicks | homepage rotation, weekly specials, Verified badge |
-| Elite | $99 | 12 + video | top | 120 min | unlimited | views+clicks | 2 active ads (2 cities), everything in Pro |
+**1. Database: Add `slug` column to `profiles`**
+- Add unique `slug` text column to `profiles` table
+- Create a database function to auto-generate slugs from `display_name` on insert/update (lowercase, hyphenated, unique with suffix if needed)
+- Backfill existing profiles with generated slugs
 
-### Add-ons (Upsell)
+**2. New Page: `CityListing.tsx`**
+- New page for `/:city/massage-therapists` route
+- Fetches profiles filtered by city matching the URL slug
+- SEO-optimized with structured data (LocalBusiness list), breadcrumbs, meta tags
+- Links each therapist card to `/:city/therapist/:slug`
 
-- Masseur of the Day: $15/day
-- Sponsor Profile: $99/month
-- Extra Travel Schedules: $5 each (Standard only)
-- Homepage Banner: $120/month
-- Credits/Cards: secure communication
+**3. Update `City.tsx`**
+- Change route from `/city/:slug` to `/:city`
+- Update internal links to point to `/:city/massage-therapists` for the listing CTA
+- Update therapist card links to `/:city/therapist/:slug`
 
----
+**4. Update `TherapistProfile.tsx`**
+- Accept both `:city` and `:slug` params instead of `:id`
+- Fetch profile by `slug` column instead of `id`
+- Use city param for breadcrumbs and canonical URL
+- Update JSON-LD structured data with city context
 
-### Files to Change
+**5. Update `App.tsx` Routes**
+- Remove `/city/:slug` and `/therapist/:id`
+- Add `/:city` (City page), `/:city/massage-therapists` (CityListing), `/:city/therapist/:slug` (TherapistProfile)
+- Place these AFTER all static routes to avoid conflicts (e.g. `/pricing`, `/about`)
 
-**1. `src/hooks/usePlanLimits.ts`**
-- Replace 5-tier PlanKey with 4-tier: `"free" | "standard" | "pro" | "elite"`
-- Update limits per tier (maxPhotos: 1/6/12/12, maxCities: 1/1/1/2, etc.)
-- Add new feature flags: `hasAvailableNow`, `availableNowMinutes`, `maxTravelSchedules`, `hasVideo`, `hasVerifiedBadge`, `hasWeeklySpecials`, `hasHomepageRotation`, `hasNewsletter`, `hasBasicWatermark`
-- Remove old tiers (premium, gold, platinum)
+**6. Update Internal Links Across the App**
+- Homepage featured therapists, explore page, city links in footer — all updated to new URL format
+- Helper function: `buildProfileUrl(city, slug)` → `/${citySlug}/therapist/${slug}`
 
-**2. `src/pages/Pricing.tsx`**
-- Replace 5 plans array with 4 new plans (Free $0, Standard $39, Pro $79, Elite $99)
-- Update features lists to match new spec
-- Mark Pro as "Most Popular"
-- Add Add-ons section below plans grid (Masseur of the Day, Sponsor Profile, etc.)
-- Update Founder Deal pricing (50% of new prices)
+**7. Update Sitemap Edge Function**
+- Generate URLs in new format: `/:city`, `/:city/massage-therapists`, `/:city/therapist/:slug`
+- Remove old `/city/:slug` and `/therapist/:id` patterns
 
-**3. `src/pages/dashboard/DashboardSubscription.tsx`**
-- Replace plans array with new 4 tiers and updated pricing/features
-- Mark Pro as popular
-- Update plan keys
+**8. Update `robots.txt`**
+- Sitemap URL stays the same (edge function)
+- No new disallow rules needed (public pages)
 
-**4. `src/pages/dashboard/DashboardPromotion.tsx`**
-- Update promotion checks to reference new plan keys (pro/elite instead of premium/gold)
+**9. Update `render-meta` Edge Function**
+- Parse new URL patterns for crawler meta tag injection
 
-**5. `supabase/functions/create-checkout/index.ts`**
-- Replace PLANS object: remove premium/gold/platinum, add pro ($7900) and elite ($9900)
-- Update standard amount to $3900
+### Route Conflict Prevention
 
-**6. `src/i18n/locales/en.json`** (and es.json, fr.json, pt.json)
-- Replace pricing section keys: remove premium/gold/platinum, add pro/elite
-- Update prices, descriptions, features
-- Add add-ons section translations
-
-**7. `src/contexts/AuthContext.tsx`**
-- No structural changes needed (plan_key is dynamic from Stripe)
-
-### Add-ons Section
-For now, add-ons will be displayed as a static informational section on the Pricing page and DashboardPromotion page. The actual purchase flow for add-ons can be implemented as a follow-up with individual Stripe products.
-
-### Migration Note
-Existing Stripe products with old plan keys (premium, gold, platinum) will remain in Stripe but won't be offered to new users. The `check-subscription` edge function already reads `plan_key` from Stripe metadata dynamically, so existing subscribers keep their current plan until renewal.
+Static routes (`/pricing`, `/about`, `/auth`, etc.) are registered first. The `/:city` catch-all goes last, just before the `*` 404 route. The City page component validates the slug against known cities and shows 404 if invalid.
 
