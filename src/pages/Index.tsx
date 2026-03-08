@@ -1,10 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { SafetyDisclaimer } from "@/components/legal/SafetyDisclaimer";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { NewsletterSignup } from "@/components/newsletter/NewsletterSignup";
-import { CheckCircle2, Star, ArrowRight, MapPin, Tag, UserPlus, Plane } from "lucide-react";
+import { CityAutocomplete } from "@/components/ui/city-autocomplete";
+import { CheckCircle2, Star, ArrowRight, MapPin, Tag, UserPlus, Plane, Search, Eye, MessageSquare, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ShieldIllustration, CommunityIllustration, GrowthIllustration } from "@/components/icons/IllustrationIcons";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
