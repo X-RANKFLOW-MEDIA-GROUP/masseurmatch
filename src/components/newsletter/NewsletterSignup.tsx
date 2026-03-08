@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,11 +7,15 @@ import { Mail, CheckCircle, Loader2 } from "lucide-react";
 import { TextReveal } from "@/components/animations/TextReveal";
 import { fadeUp } from "@/components/animations/variants";
 
+const RATE_LIMIT_KEY = "newsletter_last_submit";
+const RATE_LIMIT_MS = 30_000; // 30 seconds between submissions
+
 export const NewsletterSignup = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,8 +27,17 @@ export const NewsletterSignup = () => {
       return;
     }
 
+    // Client-side rate limiting
+    const lastSubmit = parseInt(localStorage.getItem(RATE_LIMIT_KEY) || "0", 10);
+    if (Date.now() - lastSubmit < RATE_LIMIT_MS) {
+      setError("Please wait a moment before subscribing again.");
+      return;
+    }
+
     setLoading(true);
     try {
+      localStorage.setItem(RATE_LIMIT_KEY, String(Date.now()));
+
       const { error: insertError } = await supabase
         .from("newsletter_subscribers" as any)
         .insert({ email: trimmed, source: "homepage" } as any);
@@ -61,7 +74,7 @@ export const NewsletterSignup = () => {
             variants={fadeUp}
           >
             <div className="inline-flex items-center gap-2 bg-secondary px-4 py-2 rounded-full mb-6">
-              <Mail className="w-4 h-4 text-muted-foreground" />
+              <Mail className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
               <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Newsletter</span>
             </div>
 
@@ -85,6 +98,7 @@ export const NewsletterSignup = () => {
             </motion.div>
           ) : (
             <motion.form
+              ref={formRef}
               onSubmit={handleSubmit}
               initial="hidden"
               whileInView="visible"
@@ -100,6 +114,7 @@ export const NewsletterSignup = () => {
                 className="flex-1 h-12 bg-secondary border-border"
                 required
                 maxLength={255}
+                aria-label="Email address for newsletter"
               />
               <Button type="submit" disabled={loading} className="h-12 px-8">
                 {loading ? (
@@ -112,7 +127,7 @@ export const NewsletterSignup = () => {
           )}
 
           {error && (
-            <p className="text-destructive text-sm mt-3">{error}</p>
+            <p className="text-destructive text-sm mt-3" role="alert">{error}</p>
           )}
 
           <p className="text-xs text-muted-foreground mt-4">

@@ -15,11 +15,13 @@ import { StepProfile } from "@/components/auth/StepProfile";
 import { CheckCircle, Shield, Camera, User, Chrome } from "lucide-react";
 import { lovable } from "@/integrations/lovable/index";
 import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "react-i18next";
 
 const Auth = () => {
   const { toast } = useToast();
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [ageConfirmed, setAgeConfirmed] = useState(false);
@@ -28,12 +30,12 @@ const Auth = () => {
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
   
   // Signup wizard state
-  const [signupStep, setSignupStep] = useState(0); // 0 = not started, 1 = account, 2 = verification, 3 = profile
+  const [signupStep, setSignupStep] = useState(0);
 
   const steps = [
-    { label: "Conta", icon: User, description: "Criar conta" },
-    { label: "Verificação", icon: Shield, description: "Verificar identidade" },
-    { label: "Perfil & Fotos", icon: Camera, description: "Completar perfil" },
+    { label: t("auth.stepAccount", "Account"), icon: User, description: t("auth.stepAccountDesc", "Create account") },
+    { label: t("auth.stepVerification", "Verification"), icon: Shield, description: t("auth.stepVerificationDesc", "Verify identity") },
+    { label: t("auth.stepProfile", "Profile & Photos"), icon: Camera, description: t("auth.stepProfileDesc", "Complete profile") },
   ];
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -42,9 +44,9 @@ const Auth = () => {
     const { error } = await signIn(loginData.email, loginData.password);
     setIsLoading(false);
     if (error) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
+      toast({ title: t("auth.error", "Error"), description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Bem-vindo de volta!" });
+      toast({ title: t("auth.welcomeBack", "Welcome back!") });
       navigate("/dashboard");
     }
   };
@@ -52,24 +54,24 @@ const Auth = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (signupData.password !== signupData.confirmPassword) {
-      toast({ title: "Erro", description: "As senhas não coincidem", variant: "destructive" });
+      toast({ title: t("auth.error", "Error"), description: t("auth.passwordMismatch", "Passwords do not match"), variant: "destructive" });
       return;
     }
     if (!ageConfirmed) {
-      toast({ title: "Erro", description: "Você precisa confirmar que tem 18 anos ou mais", variant: "destructive" });
+      toast({ title: t("auth.error", "Error"), description: t("auth.ageRequired", "You must confirm you are 18 years or older"), variant: "destructive" });
       return;
     }
     if (!termsAccepted) {
-      toast({ title: "Erro", description: "Você precisa aceitar os Termos de Serviço e Política de Privacidade", variant: "destructive" });
+      toast({ title: t("auth.error", "Error"), description: t("auth.termsRequired", "You must accept the Terms of Service and Privacy Policy"), variant: "destructive" });
       return;
     }
     setIsLoading(true);
     const { error } = await signUp(signupData.email, signupData.password, signupData.name);
     setIsLoading(false);
     if (error) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
+      toast({ title: t("auth.error", "Error"), description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Conta criada!", description: "Verifique seu email para confirmar a conta." });
+      toast({ title: t("auth.accountCreated", "Account created!"), description: t("auth.checkEmail", "Check your email to confirm your account.") });
       setSignupStep(2);
     }
   };
@@ -81,10 +83,10 @@ const Auth = () => {
         redirect_uri: window.location.origin,
       });
       if (error) {
-        toast({ title: "Error", description: error.message, variant: "destructive" });
+        toast({ title: t("auth.error", "Error"), description: error.message, variant: "destructive" });
       }
     } catch (err: any) {
-      toast({ title: "Error", description: err.message || "Something went wrong", variant: "destructive" });
+      toast({ title: t("auth.error", "Error"), description: err.message || "Something went wrong", variant: "destructive" });
     } finally {
       setSocialLoading(null);
     }
@@ -99,8 +101,8 @@ const Auth = () => {
             <Link to="/" className="inline-block mb-6">
               <h1 className="text-3xl font-black gradient-text">MasseurMatch</h1>
             </Link>
-            <h2 className="text-2xl font-bold mb-2">Configuração do Perfil</h2>
-            <p className="text-muted-foreground">Complete os passos abaixo para ativar seu perfil</p>
+            <h2 className="text-2xl font-bold mb-2">{t("auth.profileSetup", "Profile Setup")}</h2>
+            <p className="text-muted-foreground">{t("auth.completeSteps", "Complete the steps below to activate your profile")}</p>
           </div>
 
           {/* Step indicator */}
@@ -131,7 +133,7 @@ const Auth = () => {
             )}
             {signupStep === 3 && (
               <StepProfile onComplete={() => {
-                toast({ title: "Perfil completo!", description: "Seu perfil está em análise e será ativado após verificação." });
+                toast({ title: t("auth.profileComplete", "Profile complete!"), description: t("auth.profileReview", "Your profile is under review and will be activated after verification.") });
                 navigate("/dashboard");
               }} />
             )}
@@ -149,55 +151,59 @@ const Auth = () => {
             <h1 className="text-3xl font-black gradient-text">MasseurMatch</h1>
           </Link>
           <Badge className="mb-4 bg-primary/20 text-primary border-primary/30">
-            Provider Registration
+            {t("auth.providerBadge", "Provider Registration")}
           </Badge>
-          <h2 className="text-3xl font-black mb-2">Welcome</h2>
-          <p className="text-muted-foreground">Sign in to manage your listing or create a new one</p>
+          <h2 className="text-3xl font-black mb-2">{t("auth.welcome", "Welcome")}</h2>
+          <p className="text-muted-foreground">{t("auth.subtitle", "Sign in to manage your listing or create a new one")}</p>
         </div>
 
         <Tabs defaultValue="signin" className="glass-card p-8">
           <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="signin">Sign In</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsTrigger value="signin">{t("auth.signIn", "Sign In")}</TabsTrigger>
+            <TabsTrigger value="signup">{t("auth.signUp", "Sign Up")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="signin">
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold mb-2">Email</label>
+                <label htmlFor="login-email" className="block text-sm font-semibold mb-2">{t("auth.email", "Email")}</label>
                 <Input
+                  id="login-email"
                   type="email"
                   placeholder="your@email.com"
                   value={loginData.email}
                   onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                   required
+                  autoComplete="email"
                   className="bg-white/5 border-white/10"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold mb-2">Password</label>
+                <label htmlFor="login-password" className="block text-sm font-semibold mb-2">{t("auth.password", "Password")}</label>
                 <Input
+                  id="login-password"
                   type="password"
                   placeholder="••••••••"
                   value={loginData.password}
                   onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                   required
+                  autoComplete="current-password"
                   className="bg-white/5 border-white/10"
                 />
               </div>
               <div className="text-right">
                 <Link to="/forgot-password" className="text-sm text-primary hover:underline">
-                  Forgot password?
+                  {t("auth.forgotPassword", "Forgot password?")}
                 </Link>
               </div>
               <Button type="submit" variant="hero" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign In"}
+                {isLoading ? t("auth.signingIn", "Signing in...") : t("auth.signIn", "Sign In")}
               </Button>
 
               <div className="relative my-4">
                 <Separator />
                 <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-3 text-xs text-muted-foreground">
-                  or continue with
+                  {t("auth.orContinueWith", "or continue with")}
                 </span>
               </div>
 
@@ -237,45 +243,53 @@ const Auth = () => {
           <TabsContent value="signup">
             <form onSubmit={handleSignup} className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold mb-2">Full Name</label>
+                <label htmlFor="signup-name" className="block text-sm font-semibold mb-2">{t("auth.fullName", "Full Name")}</label>
                 <Input
+                  id="signup-name"
                   placeholder="John Doe"
                   value={signupData.name}
                   onChange={(e) => setSignupData({ ...signupData, name: e.target.value })}
                   required
+                  autoComplete="name"
                   className="bg-white/5 border-white/10"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold mb-2">Email</label>
+                <label htmlFor="signup-email" className="block text-sm font-semibold mb-2">{t("auth.email", "Email")}</label>
                 <Input
+                  id="signup-email"
                   type="email"
                   placeholder="your@email.com"
                   value={signupData.email}
                   onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
                   required
+                  autoComplete="email"
                   className="bg-white/5 border-white/10"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold mb-2">Password</label>
+                <label htmlFor="signup-password" className="block text-sm font-semibold mb-2">{t("auth.password", "Password")}</label>
                 <Input
+                  id="signup-password"
                   type="password"
                   placeholder="••••••••"
                   value={signupData.password}
                   onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
                   required
+                  autoComplete="new-password"
                   className="bg-white/5 border-white/10"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold mb-2">Confirm Password</label>
+                <label htmlFor="signup-confirm" className="block text-sm font-semibold mb-2">{t("auth.confirmPassword", "Confirm Password")}</label>
                 <Input
+                  id="signup-confirm"
                   type="password"
                   placeholder="••••••••"
                   value={signupData.confirmPassword}
                   onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
                   required
+                  autoComplete="new-password"
                   className="bg-white/5 border-white/10"
                 />
               </div>
@@ -287,7 +301,7 @@ const Auth = () => {
                     onCheckedChange={(checked) => setAgeConfirmed(checked === true)}
                   />
                   <Label htmlFor="age-confirm" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
-                    I confirm that I am <strong className="text-foreground">18 years or older</strong>
+                    {t("auth.ageConfirm", "I confirm that I am")} <strong className="text-foreground">{t("auth.ageConfirmBold", "18 years or older")}</strong>
                   </Label>
                 </div>
                 <div className="flex items-start gap-2">
@@ -297,21 +311,21 @@ const Auth = () => {
                     onCheckedChange={(checked) => setTermsAccepted(checked === true)}
                   />
                   <Label htmlFor="terms-accept" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
-                    I agree to the{" "}
-                    <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
-                    {" "}and{" "}
-                    <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+                    {t("auth.agreeToTerms", "I agree to the")}{" "}
+                    <Link to="/terms" className="text-primary hover:underline">{t("auth.termsLink", "Terms of Service")}</Link>
+                    {" "}{t("auth.and", "and")}{" "}
+                    <Link to="/privacy" className="text-primary hover:underline">{t("auth.privacyLink", "Privacy Policy")}</Link>
                   </Label>
                 </div>
               </div>
               <Button type="submit" variant="hero" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating account..." : "Create Provider Account"}
+                {isLoading ? t("auth.creatingAccount", "Creating account...") : t("auth.createAccount", "Create Provider Account")}
               </Button>
 
               <div className="relative my-4">
                 <Separator />
                 <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-3 text-xs text-muted-foreground">
-                  or sign up with
+                  {t("auth.orSignUpWith", "or sign up with")}
                 </span>
               </div>
 
@@ -350,8 +364,8 @@ const Auth = () => {
         </Tabs>
 
         <div className="text-center mt-6">
-          <Link to="/" className="text-sm text-muted-foreground hover:text-white">
-            ← Back to Home
+          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
+            ← {t("auth.backHome", "Back to Home")}
           </Link>
         </div>
       </div>

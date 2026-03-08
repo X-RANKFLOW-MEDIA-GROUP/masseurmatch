@@ -35,6 +35,7 @@ type ViewMode = "cards" | "list" | "map";
 
 interface TherapistItem {
   id: string;
+  slug?: string;
   name: string;
   city: string;
   lat: number;
@@ -72,6 +73,13 @@ const CITY_COORDS: Record<string, { lat: number; lng: number }> = {
   seattle: { lat: 47.6062, lng: -122.3321 },
 };
 
+/** Build profile URL: prefer slug, fallback to id */
+function profileUrl(t: { city?: string; slug?: string; id: string }) {
+  const citySlug = t.city ? t.city.toLowerCase().replace(/\s+/g, "-") : "";
+  const identifier = t.slug || t.id;
+  return citySlug ? `/${citySlug}/therapist/${identifier}` : `/therapist/${identifier}`;
+}
+
 function mapProfileToTherapist(p: any): TherapistItem {
   const cityLower = (p.city || "").toLowerCase();
   const coords = CITY_COORDS[cityLower] || { lat: 39.8283, lng: -98.5795 };
@@ -92,6 +100,7 @@ function mapProfileToTherapist(p: any): TherapistItem {
 
   return {
     id: p.id,
+    slug: p.slug || undefined,
     name: p.display_name || p.full_name || "Therapist",
     city: p.city || "Unknown",
     lat: coords.lat,
@@ -238,7 +247,7 @@ const SwipeCard = ({
           <p className="text-sm text-muted-foreground mb-3">{therapist.bio}</p>
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold">{therapist.price}</span>
-            <Link to={therapist.city ? `/${therapist.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${therapist.id}` : `/therapist/${therapist.id}`}>
+            <Link to={profileUrl(therapist)}>
               <span className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
                 View Profile →
               </span>
@@ -295,7 +304,7 @@ const Explore = () => {
       const [profilesRes, travelRes, specialsRes] = await Promise.all([
         supabase
           .from("profiles")
-          .select("id, display_name, full_name, bio, city, state, country, specialties, incall_price, outcall_price, avatar_url, is_active, is_verified_profile, is_verified_identity, is_verified_photos, available_now, available_now_expires, created_at, profile_photos(storage_path, is_primary, moderation_status)")
+          .select("id, slug, display_name, full_name, bio, city, state, country, specialties, incall_price, outcall_price, avatar_url, is_active, is_verified_profile, is_verified_identity, is_verified_photos, available_now, available_now_expires, created_at, profile_photos(storage_path, is_primary, moderation_status)")
           .eq("status", "active")
           .eq("is_active", true)
           .not("city", "is", null)
@@ -781,7 +790,7 @@ const Explore = () => {
                   >
                     <X className="w-6 h-6" />
                   </button>
-                  <Link to={filteredTherapists[cardIndex]?.city ? `/${filteredTherapists[cardIndex].city.toLowerCase().replace(/\s+/g, "-")}/therapist/${filteredTherapists[cardIndex].id}` : `/therapist/${filteredTherapists[cardIndex]?.id}`}>
+                  <Link to={filteredTherapists[cardIndex] ? profileUrl(filteredTherapists[cardIndex]) : "#"}>
                     <button className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:border-foreground transition-colors">
                       <ArrowRight className="w-4 h-4" />
                     </button>
@@ -814,7 +823,7 @@ const Explore = () => {
                 >
                   <TiltCard className="glass-card overflow-hidden" maxTilt={8}>
                     <Link
-                      to={therapist.city ? `/${therapist.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${therapist.id}` : `/therapist/${therapist.id}`}
+                      to={profileUrl(therapist)}
                       className="flex flex-col md:flex-row gap-6 p-6 group"
                     >
                       <ImageReveal
@@ -923,7 +932,7 @@ const Explore = () => {
                           className="absolute pointer-events-auto"
                           style={{ left: `${xPct}%`, top: `${yPct}%`, transform: "translate(-50%, -100%)" }}
                         >
-                          <Link to={t.city ? `/${t.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${t.id}` : `/therapist/${t.id}`}>
+                          <Link to={profileUrl(t)}>
                             <div className="relative group cursor-pointer">
                               <div className="w-8 h-8 rounded-full border-2 border-foreground overflow-hidden bg-card shadow-lg hover:scale-110 transition-transform">
                                 <img src={t.image} alt={t.name} className="w-full h-full object-cover" />
@@ -946,7 +955,7 @@ const Explore = () => {
                   {filteredTherapists.map((t) => (
                     <TiltCard key={t.id} className="glass-card overflow-hidden" maxTilt={6}>
                       <Link
-                        to={t.city ? `/${t.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${t.id}` : `/therapist/${t.id}`}
+                        to={profileUrl(t)}
                         className="flex gap-3 p-3 group"
                       >
                         <img src={t.image} alt={t.name} className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
