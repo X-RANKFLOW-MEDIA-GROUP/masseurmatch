@@ -40,8 +40,8 @@ interface TherapistItem {
   lat: number;
   lng: number;
   specialty: string;
-  rating: number;
-  reviews: number;
+  rating: number; // Kept for type compatibility but not displayed
+  reviews: number; // Kept for type compatibility but not displayed
   image: string;
   verified: boolean;
   price: string;
@@ -238,7 +238,7 @@ const SwipeCard = ({
           <p className="text-sm text-muted-foreground mb-3">{therapist.bio}</p>
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold">{therapist.price}</span>
-            <Link to={`/therapist/${therapist.id}`}>
+            <Link to={therapist.city ? `/${therapist.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${therapist.id}` : `/therapist/${therapist.id}`}>
               <span className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
                 View Profile →
               </span>
@@ -781,7 +781,7 @@ const Explore = () => {
                   >
                     <X className="w-6 h-6" />
                   </button>
-                  <Link to={`/therapist/${filteredTherapists[cardIndex]?.id}`}>
+                  <Link to={filteredTherapists[cardIndex]?.city ? `/${filteredTherapists[cardIndex].city.toLowerCase().replace(/\s+/g, "-")}/therapist/${filteredTherapists[cardIndex].id}` : `/therapist/${filteredTherapists[cardIndex]?.id}`}>
                     <button className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:border-foreground transition-colors">
                       <ArrowRight className="w-4 h-4" />
                     </button>
@@ -814,7 +814,7 @@ const Explore = () => {
                 >
                   <TiltCard className="glass-card overflow-hidden" maxTilt={8}>
                     <Link
-                      to={`/therapist/${therapist.id}`}
+                      to={therapist.city ? `/${therapist.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${therapist.id}` : `/therapist/${therapist.id}`}
                       className="flex flex-col md:flex-row gap-6 p-6 group"
                     >
                       <ImageReveal
@@ -923,7 +923,7 @@ const Explore = () => {
                           className="absolute pointer-events-auto"
                           style={{ left: `${xPct}%`, top: `${yPct}%`, transform: "translate(-50%, -100%)" }}
                         >
-                          <Link to={`/therapist/${t.id}`}>
+                          <Link to={t.city ? `/${t.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${t.id}` : `/therapist/${t.id}`}>
                             <div className="relative group cursor-pointer">
                               <div className="w-8 h-8 rounded-full border-2 border-foreground overflow-hidden bg-card shadow-lg hover:scale-110 transition-transform">
                                 <img src={t.image} alt={t.name} className="w-full h-full object-cover" />
@@ -946,7 +946,7 @@ const Explore = () => {
                   {filteredTherapists.map((t) => (
                     <TiltCard key={t.id} className="glass-card overflow-hidden" maxTilt={6}>
                       <Link
-                        to={`/therapist/${t.id}`}
+                        to={t.city ? `/${t.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${t.id}` : `/therapist/${t.id}`}
                         className="flex gap-3 p-3 group"
                       >
                         <img src={t.image} alt={t.name} className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
@@ -984,7 +984,7 @@ const Explore = () => {
               </p>
               <p>
                 Search by city — Los Angeles, San Francisco, New York,
-                Miami, Chicago, Seattle, and 500+ more — to find male massage therapists near you.
+                Miami, Chicago, Seattle, and 200+ more — to find male massage therapists near you.
                 All arrangements are made directly between you and the provider.
               </p>
             </div>
@@ -993,10 +993,10 @@ const Explore = () => {
             <div className="mt-12 space-y-6">
               <h3 className="text-xl font-bold text-foreground">Common Questions</h3>
               {[
-                { q: "How do I choose a massage therapist?", a: "Browse profiles, read reviews, compare specialties and pricing. Contact providers directly through their listing to discuss your needs before booking." },
+                { q: "How do I choose a massage therapist?", a: "Browse profiles, compare specialties and pricing. Contact providers directly through their listing to discuss your needs." },
                 { q: "What massage types are available?", a: "Our directory includes deep tissue, Swedish, sports recovery, hot stone, aromatherapy, Thai, shiatsu, reflexology, and therapeutic wellness bodywork." },
                 { q: "Is MasseurMatch free to browse?", a: "Yes. Browsing the directory is completely free. No account is needed to view listings or contact providers." },
-                { q: "Are the therapists verified?", a: "MasseurMatch does not verify licenses or credentials. 'Verified' badges indicate paid advertising placement. Always do your own research." },
+                { q: "Are the therapists verified?", a: "MasseurMatch does not verify licenses or credentials. 'Verified' badges indicate identity verification only. Always do your own research." },
               ].map((faq, i) => (
                 <div key={i} className="border-b border-border pb-4">
                   <h4 className="font-semibold text-foreground text-sm mb-1">{faq.q}</h4>

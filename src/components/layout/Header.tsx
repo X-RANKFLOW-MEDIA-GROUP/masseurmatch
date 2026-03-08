@@ -90,9 +90,11 @@ export const Header = () => {
         </div>
 
         <button
-          className="md:hidden text-foreground"
+          className="md:hidden text-foreground p-2 -mr-2"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Toggle menu"
+          aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-nav"
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -106,6 +108,9 @@ export const Header = () => {
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
             className="md:hidden border-t border-border bg-background overflow-hidden"
+            id="mobile-nav"
+            role="navigation"
+            aria-label="Mobile navigation"
           >
             <nav className="container mx-auto flex flex-col space-y-4 px-4 py-6">
               {navLinks.map((link) => (

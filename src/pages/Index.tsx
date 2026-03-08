@@ -186,10 +186,10 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
             {[
-              { label: t("home.statTherapists"), end: 10000, suffix: "+" },
-              { label: t("home.statCities"), end: 500, suffix: "+" },
-              { label: t("home.statVerified"), end: 8500, suffix: "+" },
-              { label: t("home.statReviews"), end: 98, suffix: "%" },
+              { label: t("home.statTherapists"), end: 200, suffix: "+" },
+              { label: t("home.statCities"), end: 200, suffix: "+" },
+              { label: t("home.statVerified"), end: 100, suffix: "%" },
+              { label: "Satisfaction", end: 98, suffix: "%" },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -256,7 +256,7 @@ const Index = () => {
             {featuredTherapists.slice(0, 4).map((therapist, i) => (
               <HorizontalPanel key={therapist.id}>
                 <TiltCard className="glass-card overflow-hidden group w-full max-w-lg">
-                  <Link to={`/therapist/${therapist.id}`} className="block">
+                  <Link to={therapist.city ? `/${therapist.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${therapist.id}` : `/therapist/${therapist.id}`} className="block">
                     <ImageReveal
                       direction={i % 2 === 0 ? "bottom" : "top"}
                       duration={1.4}
@@ -407,7 +407,7 @@ const Index = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {specialOfferProfiles.slice(0, 6).map((p, i) => (
                   <motion.div key={p.id + "-" + i} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-                    <Link to={`/therapist/${p.id}`}>
+                    <Link to={p.city ? `/${p.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${p.id}` : `/therapist/${p.id}`}>
                       <TiltCard className="glass-card p-5 group">
                         <div className="flex items-center gap-3 mb-3">
                           <img src={p.image} alt={p.name} className="w-12 h-12 rounded-full object-cover" loading="lazy" />
@@ -453,7 +453,7 @@ const Index = () => {
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                 {newProfiles.slice(0, 6).map((p, i) => (
                   <motion.div key={p.id} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-                    <Link to={`/therapist/${p.id}`}>
+                    <Link to={p.city ? `/${p.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${p.id}` : `/therapist/${p.id}`}>
                       <TiltCard className="glass-card p-4 text-center group">
                         <img src={p.image} alt={p.name} className="w-16 h-16 rounded-full object-cover mx-auto mb-3 grayscale group-hover:grayscale-0 transition-all" loading="lazy" />
                         <h3 className="font-semibold text-sm truncate">{p.name}</h3>
