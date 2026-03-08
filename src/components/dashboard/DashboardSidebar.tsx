@@ -29,6 +29,7 @@ import {
   LogOut,
   LifeBuoy,
   Tag,
+  Radar,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
