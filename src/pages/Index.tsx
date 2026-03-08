@@ -103,6 +103,23 @@ const Index = () => {
       }
     };
     fetchFeatured();
+
+    // Fetch real stats
+    const fetchStats = async () => {
+      const { count: therapistCount } = await supabase
+        .from("profiles")
+        .select("id", { count: "exact", head: true })
+        .eq("is_active", true)
+        .eq("status", "active");
+      const { data: cityData } = await supabase
+        .from("profiles")
+        .select("city")
+        .eq("is_active", true)
+        .not("city", "is", null);
+      const uniqueCities = new Set((cityData || []).map((p: any) => p.city?.toLowerCase()).filter(Boolean));
+      setRealStats({ therapists: therapistCount || 0, cities: uniqueCities.size });
+    };
+    fetchStats();
   }, []);
 
   const marqueeWords = [
