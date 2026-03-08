@@ -1,10 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { SafetyDisclaimer } from "@/components/legal/SafetyDisclaimer";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { NewsletterSignup } from "@/components/newsletter/NewsletterSignup";
-import { CheckCircle2, Star, ArrowRight, MapPin, Tag, UserPlus, Plane } from "lucide-react";
+import { CityAutocomplete } from "@/components/ui/city-autocomplete";
+import { CheckCircle2, Star, ArrowRight, MapPin, Tag, UserPlus, Plane, Search, Eye, MessageSquare, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ShieldIllustration, CommunityIllustration, GrowthIllustration } from "@/components/icons/IllustrationIcons";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -29,11 +30,16 @@ import { supabase } from "@/integrations/supabase/client";
 const Index = () => {
   const scrollRef = useScrollReveal();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  // City search state
+  const [heroCity, setHeroCity] = useState("");
 
   // Fetch featured therapists from database
   const [featuredTherapists, setFeaturedTherapists] = useState<any[]>([]);
   const [specialOfferProfiles, setSpecialOfferProfiles] = useState<any[]>([]);
   const [newProfiles, setNewProfiles] = useState<any[]>([]);
+  const [realStats, setRealStats] = useState({ therapists: 0, cities: 0 });
 
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -97,6 +103,23 @@ const Index = () => {
       }
     };
     fetchFeatured();
+
+    // Fetch real stats
+    const fetchStats = async () => {
+      const { count: therapistCount } = await supabase
+        .from("profiles")
+        .select("id", { count: "exact", head: true })
+        .eq("is_active", true)
+        .eq("status", "active");
+      const { data: cityData } = await supabase
+        .from("profiles")
+        .select("city")
+        .eq("is_active", true)
+        .not("city", "is", null);
+      const uniqueCities = new Set((cityData || []).map((p: any) => p.city?.toLowerCase()).filter(Boolean));
+      setRealStats({ therapists: therapistCount || 0, cities: uniqueCities.size });
+    };
+    fetchStats();
   }, []);
 
   const marqueeWords = [
@@ -148,10 +171,34 @@ const Index = () => {
               {t("home.heroDesc")}
             </motion.p>
 
+            {/* City Search Autocomplete */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 1.5 }}
+              className="max-w-md mx-auto mb-8"
+            >
+              <div className="relative">
+                <CityAutocomplete
+                  value={heroCity}
+                  onChange={(val) => {
+                    setHeroCity(val);
+                    // If user selects from dropdown, navigate
+                    const slug = val.toLowerCase().replace(/\s+/g, "-");
+                    if (val && slug) {
+                      navigate(`/${slug}`);
+                    }
+                  }}
+                  placeholder="Search your city..."
+                  className="w-full"
+                />
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.8 }}
               className="flex flex-col sm:flex-row gap-4 justify-center"
             >
               <MagneticButton>
@@ -181,18 +228,53 @@ const Index = () => {
         <Marquee items={marqueeWords} />
       </section>
 
+      {/* ─── HOW IT WORKS ─── */}
+      <section className="py-20 border-b border-border">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">How It Works</p>
+            <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight">
+              <TextReveal text="Three Simple Steps" />
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {[
+              { icon: Search, num: "01", title: "Browse", desc: "Search verified massage therapists by city, specialty, or availability." },
+              { icon: Eye, num: "02", title: "Contact", desc: "View profiles, compare services, and reach out directly to your therapist." },
+              { icon: MessageSquare, num: "03", title: "Meet", desc: "Schedule your session directly with the therapist. We're a directory — no middleman." },
+            ].map((step, i) => (
+              <motion.div
+                key={step.num}
+                custom={i}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                className="text-center"
+              >
+                <div className="w-16 h-16 rounded-full border border-border flex items-center justify-center mx-auto mb-4">
+                  <step.icon className="w-6 h-6 text-muted-foreground" />
+                </div>
+                <div className="text-4xl font-bold text-foreground/10 mb-2 font-heading">{step.num}</div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">{step.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ─── STATS ─── */}
       <section className="py-28 border-b border-border">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-12">
             {[
-              { label: t("home.statTherapists"), end: 200, suffix: "+" },
-              { label: t("home.statCities"), end: 200, suffix: "+" },
-              { label: t("home.statVerified"), end: 100, suffix: "%" },
-              { label: "Satisfaction", end: 98, suffix: "%" },
+              { label: t("home.statTherapists"), end: realStats.therapists || 0, suffix: "+" },
+              { label: t("home.statCities"), end: realStats.cities || 0, suffix: "" },
+              { label: "Cities Available", end: 200, suffix: "+" },
             ].map((stat, i) => (
               <motion.div
-                key={stat.label}
+                key={stat.label + i}
                 custom={i}
                 initial="hidden"
                 whileInView="visible"

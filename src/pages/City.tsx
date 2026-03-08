@@ -78,8 +78,15 @@ const City = () => {
   }
 
   // Get nearby cities for "Browse Other Cities"
+  // Get nearby cities — prioritize same state, then alphabetical
   const otherCities = US_CITIES
     .filter(c => c.slug !== citySlug)
+    .sort((a, b) => {
+      const aMatch = a.state === cityData?.state ? 0 : 1;
+      const bMatch = b.state === cityData?.state ? 0 : 1;
+      if (aMatch !== bMatch) return aMatch - bMatch;
+      return a.name.localeCompare(b.name);
+    })
     .slice(0, 12);
 
   const cityJsonLd = {
@@ -225,8 +232,9 @@ const City = () => {
 
           {/* Other Cities */}
           {otherCities.length > 0 && (
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-2xl font-bold mb-6">Browse Other Cities</h2>
+            <div className="max-w-4xl mx-auto mt-16">
+              <h2 className="text-2xl font-bold mb-2">Nearby Cities</h2>
+              <p className="text-sm text-muted-foreground mb-6">Find massage therapists in cities near {cityDisplayName}</p>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {otherCities.map(c => (
                   <Link
@@ -242,6 +250,11 @@ const City = () => {
                     </div>
                   </Link>
                 ))}
+              </div>
+              <div className="text-center mt-6">
+                <Link to="/cities" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
+                  View all 200+ cities →
+                </Link>
               </div>
             </div>
           )}

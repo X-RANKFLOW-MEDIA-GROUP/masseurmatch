@@ -41,8 +41,6 @@ interface TherapistItem {
   lat: number;
   lng: number;
   specialty: string;
-  rating: number; // Kept for type compatibility but not displayed
-  reviews: number; // Kept for type compatibility but not displayed
   image: string;
   verified: boolean;
   price: string;
@@ -106,8 +104,6 @@ function mapProfileToTherapist(p: any): TherapistItem {
     lat: coords.lat,
     lng: coords.lng,
     specialty: (p.specialties || []).slice(0, 2).join(" & ") || "Massage Therapy",
-    rating: 5.0,
-    reviews: 0,
     image: avatarUrl,
     verified: p.is_verified_profile || false,
     price: displayPrice ? `$${displayPrice}/hr` : "Contact",
@@ -393,8 +389,6 @@ const Explore = () => {
     .sort((a, b) => {
       if (sortBy === "price-asc") return a.priceNum - b.priceNum;
       if (sortBy === "price-desc") return b.priceNum - a.priceNum;
-      if (sortBy === "rating") return b.rating - a.rating;
-      if (sortBy === "reviews") return b.reviews - a.reviews;
 
       // Default sort: Available Now first (by tier), then regular profiles by tier
       const aIsAN = a.availableNow ? 1 : 0;
