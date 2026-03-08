@@ -30,11 +30,16 @@ import { supabase } from "@/integrations/supabase/client";
 const Index = () => {
   const scrollRef = useScrollReveal();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  // City search state
+  const [heroCity, setHeroCity] = useState("");
 
   // Fetch featured therapists from database
   const [featuredTherapists, setFeaturedTherapists] = useState<any[]>([]);
   const [specialOfferProfiles, setSpecialOfferProfiles] = useState<any[]>([]);
   const [newProfiles, setNewProfiles] = useState<any[]>([]);
+  const [realStats, setRealStats] = useState({ therapists: 0, cities: 0 });
 
   useEffect(() => {
     const fetchFeatured = async () => {
