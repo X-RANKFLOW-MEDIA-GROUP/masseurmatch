@@ -238,7 +238,7 @@ const SwipeCard = ({
           <p className="text-sm text-muted-foreground mb-3">{therapist.bio}</p>
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold">{therapist.price}</span>
-            <Link to={`/therapist/${therapist.id}`}>
+            <Link to={therapist.city ? `/${therapist.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${therapist.id}` : `/therapist/${therapist.id}`}>
               <span className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
                 View Profile →
               </span>
