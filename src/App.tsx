@@ -68,6 +68,7 @@ const AnimatedRoutes = () => {
         {/* ── Static routes (registered first to avoid /:city catch-all conflicts) ── */}
         <Route path="/" element={<PageTransition><Index /></PageTransition>} />
         <Route path="/explore" element={<PageTransition><Explore /></PageTransition>} />
+        <Route path="/cities" element={<PageTransition><CityDirectory /></PageTransition>} />
         <Route path="/pricing" element={<PageTransition><Pricing /></PageTransition>} />
         <Route path="/about" element={<PageTransition><About /></PageTransition>} />
         <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
