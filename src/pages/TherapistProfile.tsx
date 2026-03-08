@@ -114,7 +114,7 @@ const TherapistProfile = () => {
   }, [lookupSlug, lookupId]);
 
 
-  const hasAnyContact = (showCall && profile.phone) || (showText && profile.phone) || showEmail || (showWhatsApp && socialMedia.whatsapp);
+  
 
   const scrollTravel = (dir: "left" | "right") => {
     travelRef.current?.scrollBy({ left: dir === "left" ? -280 : 280, behavior: "smooth" });
