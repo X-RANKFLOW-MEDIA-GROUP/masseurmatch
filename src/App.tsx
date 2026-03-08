@@ -23,6 +23,7 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import City from "./pages/City";
 import CityListing from "./pages/CityListing";
+import CityDirectory from "./pages/CityDirectory";
 import ClaimProfile from "./pages/ClaimProfile";
 import NotFound from "./pages/NotFound";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -67,6 +68,7 @@ const AnimatedRoutes = () => {
         {/* ── Static routes (registered first to avoid /:city catch-all conflicts) ── */}
         <Route path="/" element={<PageTransition><Index /></PageTransition>} />
         <Route path="/explore" element={<PageTransition><Explore /></PageTransition>} />
+        <Route path="/cities" element={<PageTransition><CityDirectory /></PageTransition>} />
         <Route path="/pricing" element={<PageTransition><Pricing /></PageTransition>} />
         <Route path="/about" element={<PageTransition><About /></PageTransition>} />
         <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
