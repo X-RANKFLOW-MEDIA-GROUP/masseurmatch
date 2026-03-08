@@ -64,14 +64,10 @@ const TherapistProfile = () => {
       if (!lookupSlug && !lookupId) { setNotFound(true); setLoading(false); return; }
       setLoading(true);
 
-      let query = supabase.from("profiles").select("*");
-      if (lookupSlug) {
-        query = query.eq("slug" as any, lookupSlug);
-      } else {
-        query = query.eq("id", lookupId!);
-      }
-
-      const { data, error } = await query.single();
+      // Fetch by slug (new URL) or by id (legacy URL)
+      const { data, error } = lookupSlug
+        ? await supabase.from("profiles").select("*").eq("slug" as any, lookupSlug).single()
+        : await supabase.from("profiles").select("*").eq("id", lookupId!).single();
 
       if (error || !data) {
         setNotFound(true);
