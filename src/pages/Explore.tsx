@@ -40,8 +40,8 @@ interface TherapistItem {
   lat: number;
   lng: number;
   specialty: string;
-  rating: number;
-  reviews: number;
+  rating: number; // Kept for type compatibility but not displayed
+  reviews: number; // Kept for type compatibility but not displayed
   image: string;
   verified: boolean;
   price: string;
