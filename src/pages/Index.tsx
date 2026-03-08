@@ -271,8 +271,7 @@ const Index = () => {
             {[
               { label: t("home.statTherapists"), end: realStats.therapists || 0, suffix: "+" },
               { label: t("home.statCities"), end: realStats.cities || 0, suffix: "" },
-              { label: "Cities Available", end: 200, suffix: "+" },
-            ].map((stat, i) => (
+            ].filter(s => s.end > 0).map((stat, i) => (
               <motion.div
                 key={stat.label + i}
                 custom={i}
