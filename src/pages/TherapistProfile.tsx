@@ -108,6 +108,27 @@ const TherapistProfile = () => {
       if (photosRes.data) setPhotos(photosRes.data);
       if (travelRes.data) setTravel(travelRes.data);
       if (specialsRes.data) setWeeklySpecials(specialsRes.data as any);
+
+      // Fetch similar therapists (same city, or same state, excluding current)
+      if (data.city || data.state) {
+        const { data: similar } = await supabase
+          .from("profiles")
+          .select("id, display_name, full_name, slug, city, state, avatar_url, specialties, incall_price, is_verified_identity, is_verified_photos, is_seed_profile")
+          .neq("id", data.id)
+          .eq("is_active", true)
+          .limit(6);
+        
+        if (similar && similar.length > 0) {
+          // Sort: same city first, then same state
+          const sorted = similar.sort((a, b) => {
+            const aCity = a.city === data.city ? 2 : a.state === data.state ? 1 : 0;
+            const bCity = b.city === data.city ? 2 : b.state === data.state ? 1 : 0;
+            return bCity - aCity;
+          });
+          setSimilarProfiles(sorted as Tables<"profiles">[]);
+        }
+      }
+
       setLoading(false);
     };
 
