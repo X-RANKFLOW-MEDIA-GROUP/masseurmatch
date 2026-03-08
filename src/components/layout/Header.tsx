@@ -110,7 +110,7 @@ export const Header = () => {
             className="md:hidden border-t border-border bg-background overflow-hidden"
             id="mobile-nav"
             role="navigation"
-            aria-label="Mobile navigation">
+            aria-label="Mobile navigation"
           >
             <nav className="container mx-auto flex flex-col space-y-4 px-4 py-6">
               {navLinks.map((link) => (
