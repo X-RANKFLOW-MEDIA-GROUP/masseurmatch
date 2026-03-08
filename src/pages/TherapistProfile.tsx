@@ -191,8 +191,8 @@ const TherapistProfile = () => {
       "itemListElement": [
         { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE_URL },
         { "@type": "ListItem", "position": 2, "name": "Explore Therapists", "item": `${BASE_URL}/explore` },
-        ...(profile.city ? [{ "@type": "ListItem", "position": 3, "name": profile.city, "item": `${BASE_URL}/city/${profile.city?.toLowerCase().replace(/\s+/g, "-")}` }] : []),
-        { "@type": "ListItem", "position": profile.city ? 4 : 3, "name": displayName, "item": `${BASE_URL}/therapist/${id}` },
+        ...(profile.city ? [{ "@type": "ListItem", "position": 3, "name": profile.city, "item": `${BASE_URL}/${profile.city?.toLowerCase().replace(/\s+/g, "-")}` }] : []),
+        { "@type": "ListItem", "position": profile.city ? 4 : 3, "name": displayName, "item": `${BASE_URL}/${profile.city ? profile.city.toLowerCase().replace(/\s+/g, "-") + "/therapist/" : "therapist/"}${(profile as any).slug || id || ""}` },
       ],
     });
 
