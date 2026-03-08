@@ -1088,6 +1088,73 @@ const TherapistProfile = () => {
       </motion.div>
 
       <Footer />
+
+      {/* Sticky bottom contact CTA bar – mobile only */}
+      {hasAnyContact && (
+        <div className="fixed bottom-0 inset-x-0 z-50 md:hidden bg-background/95 backdrop-blur-md border-t border-border px-4 py-3 safe-bottom">
+          <div className="flex gap-2">
+            {showCall && profile.phone && (
+              <Button
+                asChild={revealedContacts.call}
+                onClick={!revealedContacts.call ? () => revealContact("call") : undefined}
+                size="sm"
+                className="flex-1"
+              >
+                {revealedContacts.call ? (
+                  <a href={`tel:${profile.phone}`}><Phone className="w-4 h-4 mr-1" />Call</a>
+                ) : (
+                  <><Phone className="w-4 h-4 mr-1" />Call</>
+                )}
+              </Button>
+            )}
+            {showText && profile.phone && (
+              <Button
+                asChild={revealedContacts.text}
+                onClick={!revealedContacts.text ? () => revealContact("text") : undefined}
+                variant="outline"
+                size="sm"
+                className="flex-1"
+              >
+                {revealedContacts.text ? (
+                  <a href={`sms:${profile.phone}`}><MessageSquare className="w-4 h-4 mr-1" />Text</a>
+                ) : (
+                  <><MessageSquare className="w-4 h-4 mr-1" />Text</>
+                )}
+              </Button>
+            )}
+            {showWhatsApp && socialMedia.whatsapp && (
+              <Button
+                asChild={revealedContacts.whatsapp}
+                onClick={!revealedContacts.whatsapp ? () => revealContact("whatsapp") : undefined}
+                variant="outline"
+                size="sm"
+                className="flex-1"
+              >
+                {revealedContacts.whatsapp ? (
+                  <a href={`https://wa.me/${socialMedia.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"><MessageSquare className="w-4 h-4 mr-1" />WhatsApp</a>
+                ) : (
+                  <><MessageSquare className="w-4 h-4 mr-1" />WhatsApp</>
+                )}
+              </Button>
+            )}
+            {showEmail && (
+              <Button
+                asChild={revealedContacts.email}
+                onClick={!revealedContacts.email ? () => revealContact("email") : undefined}
+                variant="outline"
+                size="sm"
+                className="flex-1"
+              >
+                {revealedContacts.email ? (
+                  <a href={`mailto:${socialMedia.email || ""}`}><Mail className="w-4 h-4 mr-1" />Email</a>
+                ) : (
+                  <><Mail className="w-4 h-4 mr-1" />Email</>
+                )}
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
