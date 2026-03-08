@@ -292,6 +292,9 @@ const Auth = () => {
                   <p className="text-xs text-destructive mt-1">Password must be at least 8 characters</p>
                 )}
               </div>
+              <div>
+                <label htmlFor="signup-confirm" className="block text-sm font-semibold mb-2">{t("auth.confirmPassword", "Confirm Password")}</label>
+                <Input
                   id="signup-confirm"
                   type="password"
                   placeholder="••••••••"
