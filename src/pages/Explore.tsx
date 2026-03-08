@@ -14,7 +14,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import {
-  Search, MapPin, CheckCircle2, Star, ArrowRight, Heart, X,
+  Search, MapPin, CheckCircle2, ArrowRight, Heart, X,
   LayoutGrid, List, Map as MapIcon, SlidersHorizontal, ChevronDown, Loader2,
   Sparkles, Plane, Zap, Tag, UserPlus
 } from "lucide-react";

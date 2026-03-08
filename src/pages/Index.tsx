@@ -358,10 +358,15 @@ const Index = () => {
                       )}
                     </ImageReveal>
 
-                    <div className="p-8">
-                      <span className="text-5xl font-bold text-foreground/5 font-heading block mb-2">
-                        0{i + 1}
-                      </span>
+                     <div className="p-8">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-5xl font-bold text-foreground/5 font-heading">
+                          0{i + 1}
+                        </span>
+                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground border border-border rounded px-2 py-0.5">
+                          Advertiser
+                        </span>
+                      </div>
                       <h3 className="text-2xl font-bold text-foreground mb-1">{therapist.name}</h3>
                       <p className="text-sm text-muted-foreground mb-1">{therapist.city}</p>
                       <p className="text-sm text-muted-foreground">{therapist.specialty}</p>

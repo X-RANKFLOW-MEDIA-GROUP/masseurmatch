@@ -9,7 +9,7 @@ import { ScrollProgress } from "@/components/animations/ScrollProgress";
 import { CursorGlow } from "@/components/animations/CursorGlow";
 import { TextReveal } from "@/components/animations/TextReveal";
 import { fadeUp } from "@/components/animations/variants";
-import { BarChart3, Eye, MessageSquare, Star, Settings, CreditCard, ArrowRight, TrendingUp } from "lucide-react";
+import { BarChart3, Eye, MessageSquare, Settings, CreditCard, ArrowRight, TrendingUp } from "lucide-react";
 
 const Dashboard = () => {
   const scrollRef = useScrollReveal();

@@ -47,12 +47,10 @@ const About = () => {
 
       <section className="py-24">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 gap-12 max-w-2xl mx-auto">
             {[
-              { label: t("about.statTherapists"), end: 10000, suffix: "+" },
-              { label: t("about.statCities"), end: 500, suffix: "+" },
-              { label: t("about.statSessions"), end: 2000000, suffix: "+" },
-              { label: t("about.statSatisfaction"), end: 98, suffix: "%" },
+              { label: t("about.statTherapists"), end: 200, suffix: "+" },
+              { label: t("about.statCities"), end: 200, suffix: "+" },
             ].map((stat, i) => (
               <motion.div key={stat.label} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center">
                 <div className="text-3xl md:text-5xl font-bold text-foreground font-heading mb-2">
