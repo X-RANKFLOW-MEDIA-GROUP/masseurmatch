@@ -790,7 +790,7 @@ const Explore = () => {
                   >
                     <X className="w-6 h-6" />
                   </button>
-                  <Link to={filteredTherapists[cardIndex]?.city ? `/${filteredTherapists[cardIndex].city.toLowerCase().replace(/\s+/g, "-")}/therapist/${filteredTherapists[cardIndex].id}` : `/therapist/${filteredTherapists[cardIndex]?.id}`}>
+                  <Link to={filteredTherapists[cardIndex] ? profileUrl(filteredTherapists[cardIndex]) : "#"}>
                     <button className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:border-foreground transition-colors">
                       <ArrowRight className="w-4 h-4" />
                     </button>
