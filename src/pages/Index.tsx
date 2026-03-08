@@ -267,12 +267,11 @@ const Index = () => {
       {/* ─── STATS ─── */}
       <section className="py-28 border-b border-border">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-2 gap-12">
             {[
               { label: t("home.statTherapists"), end: realStats.therapists || 0, suffix: "+" },
               { label: t("home.statCities"), end: realStats.cities || 0, suffix: "" },
-              { label: "Cities Available", end: 200, suffix: "+" },
-            ].map((stat, i) => (
+            ].filter(s => s.end > 0).map((stat, i) => (
               <motion.div
                 key={stat.label + i}
                 custom={i}
@@ -359,10 +358,15 @@ const Index = () => {
                       )}
                     </ImageReveal>
 
-                    <div className="p-8">
-                      <span className="text-5xl font-bold text-foreground/5 font-heading block mb-2">
-                        0{i + 1}
-                      </span>
+                     <div className="p-8">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-5xl font-bold text-foreground/5 font-heading">
+                          0{i + 1}
+                        </span>
+                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground border border-border rounded px-2 py-0.5">
+                          Advertiser
+                        </span>
+                      </div>
                       <h3 className="text-2xl font-bold text-foreground mb-1">{therapist.name}</h3>
                       <p className="text-sm text-muted-foreground mb-1">{therapist.city}</p>
                       <p className="text-sm text-muted-foreground">{therapist.specialty}</p>

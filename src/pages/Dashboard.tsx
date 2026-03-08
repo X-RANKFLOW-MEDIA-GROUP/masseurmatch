@@ -9,15 +9,14 @@ import { ScrollProgress } from "@/components/animations/ScrollProgress";
 import { CursorGlow } from "@/components/animations/CursorGlow";
 import { TextReveal } from "@/components/animations/TextReveal";
 import { fadeUp } from "@/components/animations/variants";
-import { BarChart3, Eye, MessageSquare, Star, Settings, CreditCard, ArrowRight, TrendingUp } from "lucide-react";
+import { BarChart3, Eye, MessageSquare, Settings, CreditCard, ArrowRight, TrendingUp } from "lucide-react";
 
 const Dashboard = () => {
   const scrollRef = useScrollReveal();
 
   const stats = [
     { icon: Eye, label: "Profile Views", value: "1,247", change: "+12%" },
-    { icon: MessageSquare, label: "Messages", value: "34", change: "+8%" },
-    { icon: Star, label: "Avg Rating", value: "4.9", change: "—" },
+    { icon: MessageSquare, label: "Contacts", value: "34", change: "+8%" },
     { icon: TrendingUp, label: "Search Appearances", value: "3,891", change: "+23%" },
   ];
 

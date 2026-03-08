@@ -14,7 +14,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import {
-  Search, MapPin, CheckCircle2, Star, ArrowRight, Heart, X,
+  Search, MapPin, CheckCircle2, ArrowRight, Heart, X,
   LayoutGrid, List, Map as MapIcon, SlidersHorizontal, ChevronDown, Loader2,
   Sparkles, Plane, Zap, Tag, UserPlus
 } from "lucide-react";
@@ -389,6 +389,8 @@ const Explore = () => {
     .sort((a, b) => {
       if (sortBy === "price-asc") return a.priceNum - b.priceNum;
       if (sortBy === "price-desc") return b.priceNum - a.priceNum;
+      if (sortBy === "newest") return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+      if (sortBy === "verified") return (b.verified ? 1 : 0) - (a.verified ? 1 : 0);
 
       // Default sort: Available Now first (by tier), then regular profiles by tier
       const aIsAN = a.availableNow ? 1 : 0;
@@ -644,10 +646,10 @@ const Explore = () => {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="default">Default</SelectItem>
-                            <SelectItem value="rating">Highest Rating</SelectItem>
-                            <SelectItem value="reviews">Most Reviews</SelectItem>
                             <SelectItem value="price-asc">Price: Low → High</SelectItem>
                             <SelectItem value="price-desc">Price: High → Low</SelectItem>
+                            <SelectItem value="newest">Newest First</SelectItem>
+                            <SelectItem value="verified">Verified First</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
