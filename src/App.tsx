@@ -139,6 +139,7 @@ const AnimatedRoutes = () => {
             <Route path="travel" element={<DashboardTravel />} />
             <Route path="specials" element={<DashboardSpecials />} />
             <Route path="support" element={<DashboardSupport />} />
+            <Route path="demand-radar" element={<DashboardDemandRadar />} />
           </Route>
 
           {/* ── Admin ── */}
