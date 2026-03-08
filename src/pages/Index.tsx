@@ -267,7 +267,7 @@ const Index = () => {
       {/* ─── STATS ─── */}
       <section className="py-28 border-b border-border">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-2 gap-12">
             {[
               { label: t("home.statTherapists"), end: realStats.therapists || 0, suffix: "+" },
               { label: t("home.statCities"), end: realStats.cities || 0, suffix: "" },
