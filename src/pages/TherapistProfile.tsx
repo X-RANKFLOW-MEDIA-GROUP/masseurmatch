@@ -492,6 +492,7 @@ const TherapistProfile = () => {
                   </div>
                 )}
 
+                {specialties.length > 0 && (
                   <p className="text-sm text-muted-foreground mb-4">{specialties.slice(0, 3).join(" · ")}</p>
                 )}
 
