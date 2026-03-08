@@ -823,7 +823,7 @@ const Explore = () => {
                 >
                   <TiltCard className="glass-card overflow-hidden" maxTilt={8}>
                     <Link
-                      to={therapist.city ? `/${therapist.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${therapist.id}` : `/therapist/${therapist.id}`}
+                      to={profileUrl(therapist)}
                       className="flex flex-col md:flex-row gap-6 p-6 group"
                     >
                       <ImageReveal
