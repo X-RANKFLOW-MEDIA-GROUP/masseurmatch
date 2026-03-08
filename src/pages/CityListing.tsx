@@ -28,11 +28,7 @@ const CityListing = () => {
 
   const citySlug = city || "";
   const cityData = getCityBySlug(citySlug);
-
-  // If not a known city, show 404
-  if (!isValidCitySlug(citySlug)) {
-    return <NotFound />;
-  }
+  const isValid = isValidCitySlug(citySlug);
 
   const cityDisplayName = cityData?.name || citySlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
   const cityState = cityData?.stateCode || "";
@@ -40,7 +36,7 @@ const CityListing = () => {
 
   useEffect(() => {
     const fetchProfiles = async () => {
-      if (!citySlug) return;
+      if (!citySlug || !isValid) return;
       setLoading(true);
 
       const { data, error } = await supabase
