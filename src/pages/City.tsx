@@ -122,8 +122,8 @@ const City = () => {
   return (
     <div className="min-h-screen bg-background" ref={scrollRef}>
       <SEOHead
-        title={`Male Massage Therapists in ${cityDisplayName}${cityState ? `, ${cityState}` : ""} — MasseurMatch`}
-        description={`Find gay-friendly male massage therapists in ${cityDisplayName}. Browse verified profiles, compare services and prices.`}
+        title={`${profileCount > 0 ? `${profileCount} ` : ""}Male Massage Therapists in ${cityDisplayName}${cityState ? `, ${cityState}` : ""} — MasseurMatch`}
+        description={`${profileCount > 0 ? `Browse ${profileCount} verified` : "Find"} gay-friendly male massage therapists in ${cityDisplayName}. Compare services, prices, and contact therapists directly.`}
         path={`/${citySlug}`}
         jsonLd={cityJsonLd}
       />
