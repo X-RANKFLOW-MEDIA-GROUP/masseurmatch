@@ -10,10 +10,10 @@ export const Footer = () => {
       title: t("footer.directory"),
       links: [
         { to: "/explore", label: t("footer.browseTherapists") },
-        { to: "/city/los-angeles", label: "Los Angeles" },
-        { to: "/city/new-york", label: "New York" },
-        { to: "/city/san-francisco", label: "San Francisco" },
-        { to: "/city/miami", label: "Miami" },
+        { to: "/los-angeles", label: "Los Angeles" },
+        { to: "/new-york", label: "New York" },
+        { to: "/san-francisco", label: "San Francisco" },
+        { to: "/miami", label: "Miami" },
       ],
     },
     {

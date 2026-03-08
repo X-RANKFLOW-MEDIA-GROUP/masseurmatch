@@ -22,6 +22,7 @@ import Safety from "./pages/Safety";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import City from "./pages/City";
+import CityListing from "./pages/CityListing";
 import ClaimProfile from "./pages/ClaimProfile";
 import NotFound from "./pages/NotFound";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -63,9 +64,9 @@ const AnimatedRoutes = () => {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
+        {/* ── Static routes (registered first to avoid /:city catch-all conflicts) ── */}
         <Route path="/" element={<PageTransition><Index /></PageTransition>} />
         <Route path="/explore" element={<PageTransition><Explore /></PageTransition>} />
-        <Route path="/therapist/:id" element={<PageTransition><TherapistProfile /></PageTransition>} />
         <Route path="/pricing" element={<PageTransition><Pricing /></PageTransition>} />
         <Route path="/about" element={<PageTransition><About /></PageTransition>} />
         <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
@@ -77,8 +78,9 @@ const AnimatedRoutes = () => {
         <Route path="/safety" element={<PageTransition><Safety /></PageTransition>} />
         <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
         <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
-        <Route path="/city/:slug" element={<PageTransition><City /></PageTransition>} />
         <Route path="/claim/:slug" element={<PageTransition><ClaimProfile /></PageTransition>} />
+
+        {/* ── Dashboard ── */}
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<DashboardOverview />} />
           <Route path="profile" element={<DashboardProfile />} />
@@ -96,6 +98,8 @@ const AnimatedRoutes = () => {
           <Route path="specials" element={<DashboardSpecials />} />
           <Route path="support" element={<DashboardSupport />} />
         </Route>
+
+        {/* ── Admin ── */}
         <Route path="/admin/login" element={<PageTransition><AdminLogin /></PageTransition>} />
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminOverview />} />
@@ -109,6 +113,17 @@ const AnimatedRoutes = () => {
           <Route path="users" element={<AdminUsers />} />
           <Route path="newsletter" element={<AdminNewsletter />} />
         </Route>
+
+        {/* ── Legacy redirects (old URL patterns still work via these routes) ── */}
+        <Route path="/city/:slug" element={<PageTransition><City /></PageTransition>} />
+        <Route path="/therapist/:id" element={<PageTransition><TherapistProfile /></PageTransition>} />
+
+        {/* ── SEO-friendly dynamic routes (placed AFTER static routes) ── */}
+        <Route path="/:city/massage-therapists" element={<PageTransition><CityListing /></PageTransition>} />
+        <Route path="/:city/therapist/:slug" element={<PageTransition><TherapistProfile /></PageTransition>} />
+        <Route path="/:city" element={<PageTransition><City /></PageTransition>} />
+
+        {/* ── 404 ── */}
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>

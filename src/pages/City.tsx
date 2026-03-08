@@ -13,60 +13,45 @@ import { fadeUp } from "@/components/animations/variants";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { Tables } from "@/integrations/supabase/types";
+import { getCityBySlug, isValidCitySlug, US_CITIES } from "@/data/cities";
+import { buildCityUrl, buildCityListingUrl, buildProfileUrl, cityNameToSlug } from "@/lib/urls";
+import NotFound from "./NotFound";
 
-// Map slugs to display info for SEO city landing pages
-const cityMeta: Record<string, { name: string; state: string; intro: string }> = {
-  "los-angeles": { name: "Los Angeles", state: "CA", intro: "Discover professional male massage therapists across Los Angeles — from West Hollywood to Santa Monica." },
-  "san-francisco": { name: "San Francisco", state: "CA", intro: "San Francisco's Castro district and beyond offer a welcoming environment for men seeking professional massage services." },
-  "new-york": { name: "New York", state: "NY", intro: "From Manhattan to Brooklyn, New York City hosts a diverse community of male massage professionals." },
-  "miami": { name: "Miami", state: "FL", intro: "Miami's warm climate and vibrant culture make it a hub for wellness and bodywork." },
-  "chicago": { name: "Chicago", state: "IL", intro: "Chicago's Boystown neighborhood and surrounding areas are home to many skilled male massage therapists." },
-  "seattle": { name: "Seattle", state: "WA", intro: "Seattle's progressive community and focus on wellness make it an excellent city for finding professional male massage services." },
-  "sao-paulo": { name: "São Paulo", state: "SP", intro: "A maior metrópole da América do Sul oferece uma vasta rede de massoterapeutas profissionais." },
-  "rio-de-janeiro": { name: "Rio de Janeiro", state: "RJ", intro: "Encontre massoterapeutas verificados no Rio de Janeiro, do Leblon à Barra da Tijuca." },
-};
-
-const slugFromCityName = (city: string) =>
-  city.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+const BASE_URL = "https://masseurmatch.com";
 
 const City = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { city: slug } = useParams<{ city: string }>();
   const scrollRef = useScrollReveal();
-  const [profiles, setProfiles] = useState<Tables<"profiles">[]>([]);
+  const [profiles, setProfiles] = useState<any[]>([]);
   const [photoMap, setPhotoMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
-  const [allCities, setAllCities] = useState<{ slug: string; name: string; state: string }[]>([]);
 
-  const meta = slug ? cityMeta[slug] : null;
+  const citySlug = slug || "";
+  const cityData = getCityBySlug(citySlug);
+  const isValid = isValidCitySlug(citySlug);
 
-  // Derive city name from slug if not in meta (dynamic city)
-  const cityDisplayName = meta?.name || (slug ? slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ") : "");
-  const cityState = meta?.state || "";
-  const cityIntro = meta?.intro || `Browse verified massage therapists in ${cityDisplayName}.`;
+  const cityDisplayName = cityData?.name || citySlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  const cityState = cityData?.stateCode || "";
+  const cityIntro = cityData?.intro || `Browse verified massage therapists in ${cityDisplayName}.`;
 
   useEffect(() => {
     const fetchProfiles = async () => {
-      if (!slug) return;
+      if (!citySlug || !isValid) return;
       setLoading(true);
 
-      // Match profiles by city name (case-insensitive via ilike)
-      const searchCity = cityDisplayName;
       const { data, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, slug, display_name, full_name, city, specialties, incall_price, is_verified_identity, avatar_url" as any)
         .eq("is_active", true)
-        .eq("is_verified_identity", true)
-        .eq("is_verified_photos", true)
-        .ilike("city", searchCity)
-        .order("created_at", { ascending: false });
+        .ilike("city", cityDisplayName)
+        .order("created_at", { ascending: false })
+        .limit(6);
 
       if (!error && data) {
         setProfiles(data);
 
-        // Fetch primary photos for each profile
         if (data.length > 0) {
-          const profileIds = data.map(p => p.id);
+          const profileIds = data.map((p: any) => p.id);
           const { data: photos } = await supabase
             .from("profile_photos")
             .select("profile_id, storage_path")
@@ -76,7 +61,7 @@ const City = () => {
 
           if (photos) {
             const map: Record<string, string> = {};
-            photos.forEach(p => { map[p.profile_id] = p.storage_path; });
+            photos.forEach((p: any) => { map[p.profile_id] = p.storage_path; });
             setPhotoMap(map);
           }
         }
@@ -85,58 +70,24 @@ const City = () => {
     };
 
     fetchProfiles();
-  }, [slug, cityDisplayName]);
+  }, [citySlug, cityDisplayName, isValid]);
 
-  // Fetch distinct cities for "Browse Other Cities"
-  useEffect(() => {
-    const fetchCities = async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("city, state")
-        .eq("is_active", true)
-        .eq("is_verified_identity", true)
-        .eq("is_verified_photos", true)
-        .not("city", "is", null);
-
-      if (data) {
-        const seen = new Set<string>();
-        const cities: { slug: string; name: string; state: string }[] = [];
-        data.forEach(p => {
-          if (p.city && !seen.has(p.city.toLowerCase())) {
-            seen.add(p.city.toLowerCase());
-            cities.push({ slug: slugFromCityName(p.city), name: p.city, state: p.state || "" });
-          }
-        });
-        // Also add meta cities that may not have profiles yet
-        Object.entries(cityMeta).forEach(([s, m]) => {
-          if (!seen.has(m.name.toLowerCase())) {
-            cities.push({ slug: s, name: m.name, state: m.state });
-          }
-        });
-        setAllCities(cities);
-      }
-    };
-    fetchCities();
-  }, []);
-
-  if (!slug) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">City Not Found</h1>
-          <Link to="/explore" className="text-muted-foreground underline-sweep hover:text-foreground">Browse all therapists</Link>
-        </div>
-      </div>
-    );
+  // If not a known city, show 404
+  if (!isValid) {
+    return <NotFound />;
   }
+
+  // Get nearby cities for "Browse Other Cities"
+  const otherCities = US_CITIES
+    .filter(c => c.slug !== citySlug)
+    .slice(0, 12);
 
   const cityJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://masseurmatch.com/" },
-      { "@type": "ListItem", "position": 2, "name": "Explore", "item": "https://masseurmatch.com/explore" },
-      { "@type": "ListItem", "position": 3, "name": `${cityDisplayName}${cityState ? `, ${cityState}` : ""}`, "item": `https://masseurmatch.com/city/${slug}` },
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": `${BASE_URL}/` },
+      { "@type": "ListItem", "position": 2, "name": `${cityDisplayName}${cityState ? `, ${cityState}` : ""}`, "item": `${BASE_URL}/${citySlug}` },
     ],
   };
 
@@ -145,7 +96,7 @@ const City = () => {
       <SEOHead
         title={`Male Massage Therapists in ${cityDisplayName}${cityState ? `, ${cityState}` : ""} — MasseurMatch`}
         description={`Find gay-friendly male massage therapists in ${cityDisplayName}. Browse verified profiles, compare services and prices.`}
-        path={`/city/${slug}`}
+        path={`/${citySlug}`}
         jsonLd={cityJsonLd}
       />
       <CursorGlow />
@@ -174,21 +125,32 @@ const City = () => {
             >
               {cityIntro}
             </motion.p>
+
+            {/* CTA to full listing */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="mt-8"
+            >
+              <Link to={buildCityListingUrl(citySlug)}>
+                <Badge className="px-6 py-2 text-sm cursor-pointer hover:bg-primary/90 transition-colors">
+                  Browse All Therapists in {cityDisplayName}
+                  <ArrowRight className="w-3 h-3 ml-2" />
+                </Badge>
+              </Link>
+            </motion.div>
           </div>
 
-          {/* Therapist Cards */}
+          {/* Featured Therapist Cards (preview) */}
           {loading ? (
             <div className="max-w-4xl mx-auto space-y-px bg-border rounded-lg overflow-hidden mb-12">
-              {Array.from({ length: 4 }).map((_, i) => (
+              {Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} className="flex flex-col md:flex-row gap-6 p-6 bg-background animate-pulse">
                   <div className="w-full md:w-40 h-40 md:h-28 rounded-lg bg-secondary flex-shrink-0" />
                   <div className="flex-1 space-y-3">
                     <div className="h-5 bg-secondary rounded w-1/3" />
                     <div className="h-3 bg-secondary rounded w-1/4" />
-                    <div className="h-3 bg-secondary rounded w-1/6" />
-                  </div>
-                  <div className="flex items-center">
-                    <div className="h-3 bg-secondary rounded w-12" />
                   </div>
                 </div>
               ))}
@@ -199,74 +161,83 @@ const City = () => {
               <Link to="/explore" className="text-primary underline-sweep">Browse all therapists</Link>
             </div>
           ) : (
-            <div className="max-w-4xl mx-auto space-y-px bg-border rounded-lg overflow-hidden mb-12">
-              {profiles.map((p, i) => (
-                <motion.div
-                  key={p.id}
-                  custom={i}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  variants={fadeUp}
-                >
-                  <Link
-                    to={`/therapist/${p.id}`}
-                    className="flex flex-col md:flex-row gap-6 p-6 bg-background hover:bg-card transition-colors duration-500 group glow-hover relative"
+            <>
+              <div className="max-w-4xl mx-auto space-y-px bg-border rounded-lg overflow-hidden mb-8">
+                {profiles.map((p: any, i: number) => (
+                  <motion.div
+                    key={p.id}
+                    custom={i}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={fadeUp}
                   >
-                    <div className="relative w-full md:w-40 h-40 md:h-28 rounded-lg overflow-hidden flex-shrink-0 bg-secondary">
-                      {photoMap[p.id] ? (
-                        <img
-                          src={photoMap[p.id]}
-                          alt={`${p.display_name || p.full_name} — massage therapist in ${cityDisplayName}`}
-                          loading="lazy"
-                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-muted-foreground text-2xl font-bold">
-                          {(p.display_name || p.full_name || "?").charAt(0)}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-lg font-semibold">{p.display_name || p.full_name}</h3>
-                        {p.is_verified_identity && <CheckCircle2 className="w-4 h-4 text-muted-foreground" />}
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-1">
-                        {(p.specialties || []).slice(0, 3).join(", ") || "Professional Massage"}
-                      </p>
-                      <div className="flex items-center gap-3 text-sm">
-                        {p.incall_price && (
-                          <span className="font-semibold">${Number(p.incall_price).toFixed(0)}/hr</span>
+                    <Link
+                      to={buildProfileUrl(citySlug, p.slug || p.id)}
+                      className="flex flex-col md:flex-row gap-6 p-6 bg-background hover:bg-card transition-colors duration-500 group glow-hover relative"
+                    >
+                      <div className="relative w-full md:w-40 h-40 md:h-28 rounded-lg overflow-hidden flex-shrink-0 bg-secondary">
+                        {photoMap[p.id] ? (
+                          <img
+                            src={photoMap[p.id]}
+                            alt={`${p.display_name || p.full_name} — massage therapist in ${cityDisplayName}`}
+                            loading="lazy"
+                            className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-muted-foreground text-2xl font-bold">
+                            {(p.display_name || p.full_name || "?").charAt(0)}
+                          </div>
                         )}
                       </div>
-                    </div>
-                    <div className="flex items-center">
-                      <span className="text-xs uppercase tracking-widest text-muted-foreground group-hover:text-foreground transition-colors flex items-center gap-1">
-                        View <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                      </span>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-lg font-semibold">{p.display_name || p.full_name}</h3>
+                          {p.is_verified_identity && <CheckCircle2 className="w-4 h-4 text-muted-foreground" />}
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-1">
+                          {(p.specialties || []).slice(0, 3).join(", ") || "Professional Massage"}
+                        </p>
+                        <div className="flex items-center gap-3 text-sm">
+                          {p.incall_price && (
+                            <span className="font-semibold">${Number(p.incall_price).toFixed(0)}/hr</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="text-xs uppercase tracking-widest text-muted-foreground group-hover:text-foreground transition-colors flex items-center gap-1">
+                          View <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                        </span>
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* View all CTA */}
+              <div className="max-w-4xl mx-auto text-center mb-12">
+                <Link to={buildCityListingUrl(citySlug)} className="text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
+                  View all therapists in {cityDisplayName} →
+                </Link>
+              </div>
+            </>
           )}
 
           {/* Other Cities */}
-          {allCities.length > 1 && (
+          {otherCities.length > 0 && (
             <div className="max-w-4xl mx-auto">
               <h2 className="text-2xl font-bold mb-6">Browse Other Cities</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {allCities.filter(c => c.slug !== slug).map(c => (
+                {otherCities.map(c => (
                   <Link
                     key={c.slug}
-                    to={`/city/${c.slug}`}
+                    to={buildCityUrl(c.slug)}
                     className="border border-border rounded-lg p-4 hover:bg-card transition-colors group"
                   >
                     <div className="flex items-center gap-2 text-sm">
                       <MapPin className="w-3 h-3 text-muted-foreground" />
                       <span className="font-semibold group-hover:text-foreground transition-colors">
-                        {c.name}{c.state ? `, ${c.state}` : ""}
+                        {c.name}{c.stateCode ? `, ${c.stateCode}` : ""}
                       </span>
                     </div>
                   </Link>

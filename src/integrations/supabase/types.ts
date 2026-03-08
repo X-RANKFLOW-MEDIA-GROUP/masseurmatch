@@ -307,6 +307,7 @@ export type Database = {
           seed_slug: string | null
           service_areas: Json | null
           share_email: boolean
+          slug: string | null
           social_media: Json | null
           specialties: string[] | null
           state: string | null
@@ -356,6 +357,7 @@ export type Database = {
           seed_slug?: string | null
           service_areas?: Json | null
           share_email?: boolean
+          slug?: string | null
           social_media?: Json | null
           specialties?: string[] | null
           state?: string | null
@@ -405,6 +407,7 @@ export type Database = {
           seed_slug?: string | null
           service_areas?: Json | null
           share_email?: boolean
+          slug?: string | null
           social_media?: Json | null
           specialties?: string[] | null
           state?: string | null
