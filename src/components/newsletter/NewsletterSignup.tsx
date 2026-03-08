@@ -37,6 +37,10 @@ export const NewsletterSignup = () => {
         }
       } else {
         setSuccess(true);
+        // Send welcome email (fire-and-forget)
+        supabase.functions.invoke("send-notification-email", {
+          body: { email: trimmed, template: "newsletter_welcome", data: {} },
+        }).catch((err) => console.error("[Newsletter welcome email]", err));
       }
       setEmail("");
     } catch (err: any) {
