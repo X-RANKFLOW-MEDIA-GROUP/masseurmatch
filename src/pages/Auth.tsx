@@ -53,8 +53,16 @@ const Auth = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (signupData.password.length < 8) {
+      toast({ title: t("auth.error", "Error"), description: "Password must be at least 8 characters long", variant: "destructive" });
+      return;
+    }
     if (signupData.password !== signupData.confirmPassword) {
       toast({ title: t("auth.error", "Error"), description: t("auth.passwordMismatch", "Passwords do not match"), variant: "destructive" });
+      return;
+    }
+    if (!signupData.name.trim() || signupData.name.trim().length < 2) {
+      toast({ title: t("auth.error", "Error"), description: "Please enter your full name (at least 2 characters)", variant: "destructive" });
       return;
     }
     if (!ageConfirmed) {
@@ -276,9 +284,13 @@ const Auth = () => {
                   value={signupData.password}
                   onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
                   required
+                  minLength={8}
                   autoComplete="new-password"
                   className="bg-white/5 border-white/10"
                 />
+                {signupData.password.length > 0 && signupData.password.length < 8 && (
+                  <p className="text-xs text-destructive mt-1">Password must be at least 8 characters</p>
+                )}
               </div>
               <div>
                 <label htmlFor="signup-confirm" className="block text-sm font-semibold mb-2">{t("auth.confirmPassword", "Confirm Password")}</label>

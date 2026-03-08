@@ -45,7 +45,7 @@ export const Header = () => {
           <span className="text-xl font-bold text-foreground tracking-tight font-heading">MasseurMatch</span>
         </Link>
 
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden md:flex items-center space-x-8" aria-label="Main navigation">
           {navLinks.map((link) => (
             <Link
               key={link.to}

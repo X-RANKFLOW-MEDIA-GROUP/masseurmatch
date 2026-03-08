@@ -62,7 +62,16 @@ const AdminAuditLog = lazy(() => import("./pages/admin/AdminAuditLog"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminNewsletter = lazy(() => import("./pages/admin/AdminNewsletter"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const Loading = () => (
   <div className="min-h-screen flex items-center justify-center">
