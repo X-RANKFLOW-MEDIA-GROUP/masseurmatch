@@ -73,7 +73,6 @@ const CITY_COORDS: Record<string, { lat: number; lng: number }> = {
   seattle: { lat: 47.6062, lng: -122.3321 },
 };
 
-function mapProfileToTherapist(p: any): TherapistItem {
 /** Build profile URL: prefer slug, fallback to id */
 function profileUrl(t: { city?: string; slug?: string; id: string }) {
   const citySlug = t.city ? t.city.toLowerCase().replace(/\s+/g, "-") : "";
