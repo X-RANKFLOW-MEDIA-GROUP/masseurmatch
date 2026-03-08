@@ -541,7 +541,7 @@ const Index = () => {
                 variants={fadeUp}
               >
                 <Link
-                  to={`/city/${city.slug}`}
+                  to={`/${city.slug}`}
                   className="bg-background p-6 group glow-hover block text-center"
                 >
                   <MapPin className="w-5 h-5 text-muted-foreground mx-auto mb-3 group-hover:text-foreground transition-colors" />

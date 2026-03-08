@@ -1015,7 +1015,7 @@ const Explore = () => {
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-4">Browse by City</h3>
               <div className="flex flex-wrap gap-2">
                 {["los-angeles", "new-york", "san-francisco", "miami", "chicago", "seattle"].map(slug => (
-                  <Link key={slug} to={`/city/${slug}`} className="text-xs text-muted-foreground border border-border rounded-md px-3 py-1.5 hover:bg-card transition-colors capitalize">
+                  <Link key={slug} to={`/${slug}`} className="text-xs text-muted-foreground border border-border rounded-md px-3 py-1.5 hover:bg-card transition-colors capitalize">
                     {slug.replace(/-/g, " ")}
                   </Link>
                 ))}
