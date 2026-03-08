@@ -256,7 +256,7 @@ const Index = () => {
             {featuredTherapists.slice(0, 4).map((therapist, i) => (
               <HorizontalPanel key={therapist.id}>
                 <TiltCard className="glass-card overflow-hidden group w-full max-w-lg">
-                  <Link to={`/therapist/${therapist.id}`} className="block">
+                  <Link to={therapist.city ? `/${therapist.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${therapist.id}` : `/therapist/${therapist.id}`} className="block">
                     <ImageReveal
                       direction={i % 2 === 0 ? "bottom" : "top"}
                       duration={1.4}
