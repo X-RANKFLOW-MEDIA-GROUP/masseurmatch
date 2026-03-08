@@ -93,6 +93,7 @@ function mapProfileToTherapist(p: any): TherapistItem {
 
   return {
     id: p.id,
+    slug: p.slug || undefined,
     name: p.display_name || p.full_name || "Therapist",
     city: p.city || "Unknown",
     lat: coords.lat,
