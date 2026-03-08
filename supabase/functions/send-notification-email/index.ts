@@ -456,6 +456,30 @@ function getTemplate(template: string, data: TemplateData): { subject: string; h
         `, "You have a new reply on your support ticket"),
       };
 
+    // ═══════════════════════════════════════
+    // 8. NEWSLETTER
+    // ═══════════════════════════════════════
+    case "newsletter_welcome":
+      return {
+        from: `${BRAND.name} <newsletter@masseurmatch.com>`,
+        subject: `Welcome to the ${BRAND.name} Newsletter! 💆`,
+        html: htmlEmail("Newsletter Welcome", `
+          <h1>You're in! 🎉</h1>
+          <p>Hi there,</p>
+          <p>Thanks for subscribing to the <strong>${BRAND.name}</strong> newsletter. Here's what you can expect:</p>
+          <ul style="font-size:14px;color:#3f3f46;line-height:2">
+            <li>🌟 New therapist spotlights</li>
+            <li>💡 Wellness tips & self-care guides</li>
+            <li>🏙️ City-specific recommendations</li>
+            <li>🎁 Exclusive offers & promotions</li>
+          </ul>
+          <p>We keep it short, useful, and spam-free — just the good stuff.</p>
+          <p style="text-align:center"><a href="${BRAND.url}/explore" class="btn">Explore Therapists</a></p>
+          <hr class="divider">
+          <p class="muted">You can unsubscribe at any time. We respect your privacy.</p>
+        `, "Welcome to the MasseurMatch newsletter"),
+      };
+
     default:
       throw new Error(`Unknown template: ${template}`);
   }
