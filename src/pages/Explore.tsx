@@ -104,8 +104,6 @@ function mapProfileToTherapist(p: any): TherapistItem {
     lat: coords.lat,
     lng: coords.lng,
     specialty: (p.specialties || []).slice(0, 2).join(" & ") || "Massage Therapy",
-    rating: 5.0,
-    reviews: 0,
     image: avatarUrl,
     verified: p.is_verified_profile || false,
     price: displayPrice ? `$${displayPrice}/hr` : "Contact",
