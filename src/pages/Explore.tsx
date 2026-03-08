@@ -923,7 +923,7 @@ const Explore = () => {
                           className="absolute pointer-events-auto"
                           style={{ left: `${xPct}%`, top: `${yPct}%`, transform: "translate(-50%, -100%)" }}
                         >
-                          <Link to={`/therapist/${t.id}`}>
+                          <Link to={t.city ? `/${t.city.toLowerCase().replace(/\s+/g, "-")}/therapist/${t.id}` : `/therapist/${t.id}`}>
                             <div className="relative group cursor-pointer">
                               <div className="w-8 h-8 rounded-full border-2 border-foreground overflow-hidden bg-card shadow-lg hover:scale-110 transition-transform">
                                 <img src={t.image} alt={t.name} className="w-full h-full object-cover" />
