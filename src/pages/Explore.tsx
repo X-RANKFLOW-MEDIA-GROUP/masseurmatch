@@ -389,8 +389,6 @@ const Explore = () => {
     .sort((a, b) => {
       if (sortBy === "price-asc") return a.priceNum - b.priceNum;
       if (sortBy === "price-desc") return b.priceNum - a.priceNum;
-      if (sortBy === "rating") return b.rating - a.rating;
-      if (sortBy === "reviews") return b.reviews - a.reviews;
 
       // Default sort: Available Now first (by tier), then regular profiles by tier
       const aIsAN = a.availableNow ? 1 : 0;

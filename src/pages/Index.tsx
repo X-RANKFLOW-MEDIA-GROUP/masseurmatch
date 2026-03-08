@@ -228,18 +228,53 @@ const Index = () => {
         <Marquee items={marqueeWords} />
       </section>
 
+      {/* ─── HOW IT WORKS ─── */}
+      <section className="py-20 border-b border-border">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">How It Works</p>
+            <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight">
+              <TextReveal text="Three Simple Steps" />
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {[
+              { icon: Search, num: "01", title: "Browse", desc: "Search verified massage therapists by city, specialty, or availability." },
+              { icon: Eye, num: "02", title: "Contact", desc: "View profiles, compare services, and reach out directly to your therapist." },
+              { icon: MessageSquare, num: "03", title: "Meet", desc: "Schedule your session directly with the therapist. We're a directory — no middleman." },
+            ].map((step, i) => (
+              <motion.div
+                key={step.num}
+                custom={i}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                className="text-center"
+              >
+                <div className="w-16 h-16 rounded-full border border-border flex items-center justify-center mx-auto mb-4">
+                  <step.icon className="w-6 h-6 text-muted-foreground" />
+                </div>
+                <div className="text-4xl font-bold text-foreground/10 mb-2 font-heading">{step.num}</div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">{step.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ─── STATS ─── */}
       <section className="py-28 border-b border-border">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-12">
             {[
-              { label: t("home.statTherapists"), end: 200, suffix: "+" },
-              { label: t("home.statCities"), end: 200, suffix: "+" },
-              { label: t("home.statVerified"), end: 100, suffix: "%" },
-              { label: "Satisfaction", end: 98, suffix: "%" },
+              { label: t("home.statTherapists"), end: realStats.therapists || 0, suffix: "+" },
+              { label: t("home.statCities"), end: realStats.cities || 0, suffix: "" },
+              { label: "Cities Available", end: 200, suffix: "+" },
             ].map((stat, i) => (
               <motion.div
-                key={stat.label}
+                key={stat.label + i}
                 custom={i}
                 initial="hidden"
                 whileInView="visible"
