@@ -518,6 +518,13 @@ const TherapistProfile = () => {
                   )}
                 </div>
 
+                {/* Contact Buttons */}
+                {!(showCall && profile.phone) && !(showText && profile.phone) && !showEmail && !(showWhatsApp && socialMedia.whatsapp) ? (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/50 rounded-lg px-4 py-3 mb-2">
+                    <EyeOff className="w-4 h-4 flex-shrink-0" />
+                    <span>This therapist hasn't added contact information yet.</span>
+                  </div>
+                ) : null}
                 <div className="flex flex-wrap gap-3">
                   {showCall && profile.phone && (
                     <MagneticButton>

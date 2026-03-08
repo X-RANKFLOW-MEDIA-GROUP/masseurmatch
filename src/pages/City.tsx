@@ -89,14 +89,35 @@ const City = () => {
     })
     .slice(0, 12);
 
-  const cityJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": `${BASE_URL}/` },
-      { "@type": "ListItem", "position": 2, "name": `${cityDisplayName}${cityState ? `, ${cityState}` : ""}`, "item": `${BASE_URL}/${citySlug}` },
-    ],
-  };
+  // City-specific FAQ
+  const cityFaqs = [
+    { q: `How do I find a massage therapist in ${cityDisplayName}?`, a: `Browse our directory of verified massage therapists in ${cityDisplayName}. Use filters to narrow by specialty, price range, or availability. Contact therapists directly through their profile.` },
+    { q: `Are the massage therapists in ${cityDisplayName} verified?`, a: `MasseurMatch offers optional identity verification through a secure third-party process. Look for the verified badge on profiles. We are an advertising directory and do not verify licenses or credentials.` },
+    { q: `How much does a massage cost in ${cityDisplayName}?`, a: `Massage prices in ${cityDisplayName} vary by therapist, session length, and type. Browse profiles to compare rates — most therapists list their incall and outcall pricing.` },
+    { q: `Can I book a massage directly on MasseurMatch?`, a: `No. MasseurMatch is a directory only. You contact therapists directly through their listed contact methods and arrange sessions independently.` },
+  ];
+
+  const profileCount = profiles.length;
+
+  const cityJsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": `${BASE_URL}/` },
+        { "@type": "ListItem", "position": 2, "name": `${cityDisplayName}${cityState ? `, ${cityState}` : ""}`, "item": `${BASE_URL}/${citySlug}` },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": cityFaqs.map(f => ({
+        "@type": "Question",
+        "name": f.q,
+        "acceptedAnswer": { "@type": "Answer", "text": f.a },
+      })),
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-background" ref={scrollRef}>
