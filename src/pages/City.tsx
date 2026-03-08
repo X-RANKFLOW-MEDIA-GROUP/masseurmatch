@@ -251,6 +251,27 @@ const City = () => {
             </>
           )}
 
+          {/* City FAQ Section */}
+          <div className="max-w-4xl mx-auto mt-20">
+            <h2 className="text-2xl font-bold mb-6">Frequently Asked Questions</h2>
+            <div className="space-y-4">
+              {cityFaqs.map((faq, i) => (
+                <motion.div
+                  key={i}
+                  custom={i}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeUp}
+                  className="border border-border rounded-lg p-5 bg-card"
+                >
+                  <h3 className="text-sm font-semibold text-foreground mb-2">{faq.q}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{faq.a}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
           {/* Other Cities */}
           {otherCities.length > 0 && (
             <div className="max-w-4xl mx-auto mt-16">
