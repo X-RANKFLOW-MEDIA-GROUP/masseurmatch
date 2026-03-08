@@ -90,9 +90,11 @@ export const Header = () => {
         </div>
 
         <button
-          className="md:hidden text-foreground"
+          className="md:hidden text-foreground p-2 -mr-2"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Toggle menu"
+          aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-nav"
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
