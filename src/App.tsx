@@ -23,6 +23,7 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import City from "./pages/City";
 import CityListing from "./pages/CityListing";
+import CityDirectory from "./pages/CityDirectory";
 import ClaimProfile from "./pages/ClaimProfile";
 import NotFound from "./pages/NotFound";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
