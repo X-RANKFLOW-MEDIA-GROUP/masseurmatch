@@ -984,7 +984,7 @@ const Explore = () => {
               </p>
               <p>
                 Search by city — Los Angeles, San Francisco, New York,
-                Miami, Chicago, Seattle, and 500+ more — to find male massage therapists near you.
+                Miami, Chicago, Seattle, and 200+ more — to find male massage therapists near you.
                 All arrangements are made directly between you and the provider.
               </p>
             </div>
