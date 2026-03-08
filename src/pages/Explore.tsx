@@ -644,10 +644,10 @@ const Explore = () => {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="default">Default</SelectItem>
-                            <SelectItem value="rating">Highest Rating</SelectItem>
-                            <SelectItem value="reviews">Most Reviews</SelectItem>
                             <SelectItem value="price-asc">Price: Low → High</SelectItem>
                             <SelectItem value="price-desc">Price: High → Low</SelectItem>
+                            <SelectItem value="newest">Newest First</SelectItem>
+                            <SelectItem value="verified">Verified First</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
