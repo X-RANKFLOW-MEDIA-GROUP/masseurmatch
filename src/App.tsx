@@ -47,6 +47,7 @@ const DashboardFAQ = lazy(() => import("./pages/dashboard/DashboardFAQ"));
 const DashboardTravel = lazy(() => import("./pages/dashboard/DashboardTravel"));
 const DashboardSupport = lazy(() => import("./pages/dashboard/DashboardSupport"));
 const DashboardSpecials = lazy(() => import("./pages/dashboard/DashboardSpecials"));
+const DashboardDemandRadar = lazy(() => import("./pages/dashboard/DashboardDemandRadar"));
 
 // Admin
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
