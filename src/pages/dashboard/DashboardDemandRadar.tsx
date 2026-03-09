@@ -35,6 +35,17 @@ const labelConfig: Record<string, { text: string; class: string; icon: typeof Fl
   ignore: { text: "IGNORE", class: "bg-destructive/10 text-destructive border-destructive/20", icon: Minus },
 };
 
+type TripPlan = {
+  id: string;
+  hub: USCity;
+  cities: Array<USCity & { demand: CityDemandData; hotelCost: number; distanceFromHub: number }>;
+  avgDemand: number;
+  avgHotelCost: number;
+  routeDistance: number;
+  expectedOpportunity: number;
+  tripScore: number;
+};
+
 function TrendIndicator({ value }: { value: number }) {
   if (value > 5) return <span className="flex items-center gap-0.5 text-success text-xs font-medium"><ArrowUpRight className="h-3 w-3" />+{value}%</span>;
   if (value < -5) return <span className="flex items-center gap-0.5 text-destructive text-xs font-medium"><ArrowDownRight className="h-3 w-3" />{value}%</span>;
