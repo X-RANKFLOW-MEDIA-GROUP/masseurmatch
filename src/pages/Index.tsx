@@ -47,7 +47,8 @@ const Index = () => {
 
   // Show location prompt after a small delay if not prompted yet
   useEffect(() => {
-    if (!geoPrompted && !geoLoading) {
+    const dismissed = localStorage.getItem("mm_geo_dismissed");
+    if (!geoPrompted && !geoLoading && !dismissed) {
       const timer = setTimeout(() => setShowLocationPrompt(true), 2500);
       return () => clearTimeout(timer);
     }
