@@ -79,6 +79,7 @@ export default function DashboardDemandRadar() {
 
   const demandData = useMemo(() => generateDemandData(), []);
   const states = useMemo(() => getUniqueStates(), []);
+  const metros = useMemo(() => getUniqueMetros(), []);
 
   // Merge city + demand
   const enriched = useMemo(() => {
