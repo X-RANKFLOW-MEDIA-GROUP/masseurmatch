@@ -160,6 +160,106 @@ export type Database = {
         }
         Relationships: []
       }
+      imported_profile_data: {
+        Row: {
+          ai_summary: string | null
+          created_at: string
+          error_message: string | null
+          extracted_bio: string | null
+          extracted_rating_avg: number | null
+          extracted_review_count: number | null
+          extracted_specialties: string[] | null
+          id: string
+          profile_id: string
+          source_platform: string | null
+          source_url: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          ai_summary?: string | null
+          created_at?: string
+          error_message?: string | null
+          extracted_bio?: string | null
+          extracted_rating_avg?: number | null
+          extracted_review_count?: number | null
+          extracted_specialties?: string[] | null
+          id?: string
+          profile_id: string
+          source_platform?: string | null
+          source_url: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          ai_summary?: string | null
+          created_at?: string
+          error_message?: string | null
+          extracted_bio?: string | null
+          extracted_rating_avg?: number | null
+          extracted_review_count?: number | null
+          extracted_specialties?: string[] | null
+          id?: string
+          profile_id?: string
+          source_platform?: string | null
+          source_url?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "imported_profile_data_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      imported_reviews: {
+        Row: {
+          id: string
+          imported_at: string
+          profile_id: string
+          rating: number | null
+          review_date: string | null
+          review_text: string
+          reviewer_name: string | null
+          source_platform: string | null
+          source_url: string
+        }
+        Insert: {
+          id?: string
+          imported_at?: string
+          profile_id: string
+          rating?: number | null
+          review_date?: string | null
+          review_text: string
+          reviewer_name?: string | null
+          source_platform?: string | null
+          source_url: string
+        }
+        Update: {
+          id?: string
+          imported_at?: string
+          profile_id?: string
+          rating?: number | null
+          review_date?: string | null
+          review_text?: string
+          reviewer_name?: string | null
+          source_platform?: string | null
+          source_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "imported_reviews_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       newsletter_subscribers: {
         Row: {
           email: string

@@ -53,6 +53,8 @@ const TherapistProfile = () => {
   const [travel, setTravel] = useState<TravelEntry[]>([]);
   const [weeklySpecials, setWeeklySpecials] = useState<{ id: string; text: string; expires_at: string }[]>([]);
   const [similarProfiles, setSimilarProfiles] = useState<Tables<"profiles">[]>([]);
+  const [importedReviews, setImportedReviews] = useState<Array<{ id: string; source_platform: string | null; reviewer_name: string | null; review_text: string; rating: number | null; review_date: string | null }>>([]);
+  const [importSummary, setImportSummary] = useState<{ ai_summary: string | null; extracted_rating_avg: number | null; source_platform: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [revealedContacts, setRevealedContacts] = useState<Record<string, boolean>>({});
@@ -108,6 +110,26 @@ const TherapistProfile = () => {
       if (photosRes.data) setPhotos(photosRes.data);
       if (travelRes.data) setTravel(travelRes.data);
       if (specialsRes.data) setWeeklySpecials(specialsRes.data as any);
+
+      // Fetch imported reviews
+      const [reviewsRes, summaryRes] = await Promise.all([
+        supabase
+          .from("imported_reviews")
+          .select("id, source_platform, reviewer_name, review_text, rating, review_date")
+          .eq("profile_id", profileId)
+          .order("imported_at", { ascending: false })
+          .limit(20),
+        supabase
+          .from("imported_profile_data")
+          .select("ai_summary, extracted_rating_avg, source_platform")
+          .eq("profile_id", profileId)
+          .eq("status", "completed")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
+      if (reviewsRes.data) setImportedReviews(reviewsRes.data as any);
+      if (summaryRes.data) setImportSummary(summaryRes.data as any);
 
       // Fetch similar therapists (same city, or same state, excluding current)
       if (data.city || data.state) {
@@ -1018,6 +1040,61 @@ const TherapistProfile = () => {
                     </summary>
                     <div className="px-5 pb-5 pt-0"><p className="text-sm text-muted-foreground leading-relaxed">{faq.answer}</p></div>
                   </details>
+                ))}
+              </div>
+            </motion.section>
+          )}
+
+          {/* Imported Reviews */}
+          {importedReviews.length > 0 && (
+            <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg">
+              <div className="flex items-center gap-3 mb-6">
+                <h2 className="text-2xl font-bold">Reviews</h2>
+                <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">
+                  Imported
+                </Badge>
+                {importSummary?.extracted_rating_avg && (
+                  <span className="flex items-center gap-1 text-sm">
+                    <Star className="h-4 w-4 text-warning fill-warning" />
+                    <span className="font-semibold">{importSummary.extracted_rating_avg}</span>
+                    <span className="text-muted-foreground">from {importSummary.source_platform}</span>
+                  </span>
+                )}
+              </div>
+
+              {importSummary?.ai_summary && (
+                <div className="mb-6 p-4 bg-muted/50 rounded-lg border border-border/50">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <Award className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-semibold text-primary">AI Summary</span>
+                  </div>
+                  <p className="text-sm text-foreground leading-relaxed">{importSummary.ai_summary}</p>
+                </div>
+              )}
+
+              <div className="space-y-4">
+                {importedReviews.slice(0, 10).map((review) => (
+                  <div key={review.id} className="pb-4 border-b border-border/50 last:border-0 last:pb-0">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      {review.reviewer_name && (
+                        <span className="text-sm font-medium">{review.reviewer_name}</span>
+                      )}
+                      {review.rating && (
+                        <span className="flex items-center gap-0.5">
+                          {Array.from({ length: Math.round(review.rating) }).map((_, i) => (
+                            <Star key={i} className="h-3.5 w-3.5 text-warning fill-warning" />
+                          ))}
+                        </span>
+                      )}
+                      <Badge variant="outline" className="text-[9px]">
+                        {review.source_platform || "Imported"}
+                      </Badge>
+                      {review.review_date && (
+                        <span className="text-[10px] text-muted-foreground">{review.review_date}</span>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{review.review_text}</p>
+                  </div>
                 ))}
               </div>
             </motion.section>

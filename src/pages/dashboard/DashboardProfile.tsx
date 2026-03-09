@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ImportedReviewsManager } from "@/components/dashboard/ImportedReviews";
 import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -537,6 +538,14 @@ const DashboardProfile = () => {
           <Input value={form.presentation_video_url} onChange={(e) => setForm((f) => ({ ...f, presentation_video_url: e.target.value }))} placeholder="https://youtube.com/..." />
         </div>
       </section>
+
+      {/* Imported Reviews Section */}
+      {profile?.id && (
+        <section className="space-y-4 pt-6 border-t border-border">
+          <h2 className="text-lg font-semibold">External Reviews</h2>
+          <ImportedReviewsManager profileId={profile.id} />
+        </section>
+      )}
     </div>
   );
 };
