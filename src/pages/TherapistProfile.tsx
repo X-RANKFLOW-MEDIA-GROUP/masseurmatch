@@ -111,6 +111,26 @@ const TherapistProfile = () => {
       if (travelRes.data) setTravel(travelRes.data);
       if (specialsRes.data) setWeeklySpecials(specialsRes.data as any);
 
+      // Fetch imported reviews
+      const [reviewsRes, summaryRes] = await Promise.all([
+        supabase
+          .from("imported_reviews")
+          .select("id, source_platform, reviewer_name, review_text, rating, review_date")
+          .eq("profile_id", profileId)
+          .order("imported_at", { ascending: false })
+          .limit(20),
+        supabase
+          .from("imported_profile_data")
+          .select("ai_summary, extracted_rating_avg, source_platform")
+          .eq("profile_id", profileId)
+          .eq("status", "completed")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
+      if (reviewsRes.data) setImportedReviews(reviewsRes.data as any);
+      if (summaryRes.data) setImportSummary(summaryRes.data as any);
+
       // Fetch similar therapists (same city, or same state, excluding current)
       if (data.city || data.state) {
         const { data: similar } = await supabase
