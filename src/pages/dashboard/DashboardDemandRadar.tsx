@@ -11,7 +11,7 @@ import {
   Radar, TrendingUp, TrendingDown, MapPin, Flame, Eye, Search,
   ArrowUpRight, ArrowDownRight, Minus, AlertTriangle, Zap, Globe, Filter,
   BarChart3, Info, Clock, Target, Navigation, Sparkles, Route, Hotel,
-  DollarSign, ChevronRight, Star, Package, Plane, CheckCircle
+  DollarSign, ChevronRight, Star, Package, Plane, CheckCircle, Calendar, Sun, Snowflake, Leaf, Flower2
 } from "lucide-react";
 import {
   US_METROS,
@@ -23,8 +23,10 @@ import {
   DEMAND_KEYWORDS,
   estimateHotelCost,
   distanceMiles,
+  generateCitySeasonality,
   type CityDemandData,
   type USCity,
+  type CitySeasonality,
 } from "@/data/us-metros-demand";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, LineChart, Line, AreaChart, Area } from "recharts";
 
@@ -67,6 +69,284 @@ function LabelBadge({ label }: { label: CityDemandData["label"] }) {
   );
 }
 
+const SEASON_ICONS: Record<string, typeof Sun> = { Winter: Snowflake, Spring: Flower2, Summer: Sun, Fall: Leaf };
+const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+function SeasonalityPanel({
+  seasonalityData,
+  enriched,
+  onSelectCity,
+}: {
+  seasonalityData: CitySeasonality[];
+  enriched: Array<CityDemandData & { city: USCity }>;
+  onSelectCity: (id: string) => void;
+}) {
+  const [seasonFilter, setSeasonFilter] = useState<string>("all");
+  const [monthFilter, setMonthFilter] = useState<string>("all");
+
+  // Current month recommendation
+  const currentMonth = new Date().getMonth() + 1; // 1-indexed
+
+  // Cities where current month is a best month, sorted by demand
+  const demandMap = new Map(enriched.map((d) => [d.cityId, d]));
+
+  const bestNow = useMemo(() => {
+    return seasonalityData
+      .filter((s) => s.bestMonths.includes(currentMonth))
+      .map((s) => ({ ...s, demand: demandMap.get(s.cityId), city: getCityById(s.cityId)! }))
+      .filter((s) => s.city && s.demand)
+      .sort((a, b) => (b.demand?.travelScore ?? 0) - (a.demand?.travelScore ?? 0));
+  }, [seasonalityData, currentMonth]);
+
+  // All cities with seasonality, filterable
+  const allCities = useMemo(() => {
+    let result = seasonalityData
+      .map((s) => ({ ...s, demand: demandMap.get(s.cityId), city: getCityById(s.cityId)! }))
+      .filter((s) => s.city && s.demand);
+
+    if (seasonFilter !== "all") result = result.filter((s) => s.peakSeason === seasonFilter);
+    if (monthFilter !== "all") {
+      const m = parseInt(monthFilter);
+      result = result.filter((s) => s.bestMonths.includes(m));
+    }
+
+    return result.sort((a, b) => (b.demand?.travelScore ?? 0) - (a.demand?.travelScore ?? 0));
+  }, [seasonalityData, seasonFilter, monthFilter]);
+
+  // Monthly heatmap data for top 15
+  const heatmapCities = allCities.slice(0, 15);
+
+  // Best month distribution
+  const monthDistribution = useMemo(() => {
+    const counts = Array(12).fill(0);
+    seasonalityData.forEach((s) => s.bestMonths.forEach((m) => counts[m - 1]++));
+    return MONTH_NAMES.map((name, i) => ({ month: name, cities: counts[i] }));
+  }, [seasonalityData]);
+
+  return (
+    <div className="space-y-6">
+      {/* Best Cities Right Now */}
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <CardTitle className="text-lg">Best Cities to Visit in {MONTH_NAMES[currentMonth - 1]}</CardTitle>
+            <Badge variant="outline" className="text-[10px] bg-success/10 text-success border-success/30">
+              {bestNow.length} cities in peak season
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+            {bestNow.slice(0, 9).map((s) => {
+              const SeasonIcon = SEASON_ICONS[s.peakSeason] || Sun;
+              const monthData = s.months.find((m) => m.month === currentMonth);
+              return (
+                <div
+                  key={s.cityId}
+                  className="flex items-center justify-between p-3 rounded-lg border cursor-pointer hover:border-primary/40 transition-colors"
+                  onClick={() => onSelectCity(s.cityId)}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex flex-col items-center gap-0.5">
+                      <SeasonIcon className="h-4 w-4 text-primary" />
+                      <span className="text-[9px] text-muted-foreground">{s.peakSeason}</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold">{s.city.city}, {s.city.stateCode}</p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[10px] text-muted-foreground">
+                          ×{monthData?.demandMultiplier.toFixed(2)} demand
+                        </span>
+                        {monthData?.eventBoost && (
+                          <Badge variant="outline" className="text-[9px] bg-accent text-accent-foreground">
+                            🎉 {monthData.eventBoost}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className={`text-lg font-bold ${(s.demand?.travelScore ?? 0) >= 80 ? "text-success" : (s.demand?.travelScore ?? 0) >= 60 ? "text-warning" : "text-muted-foreground"}`}>
+                      {s.demand?.travelScore}
+                    </span>
+                    <p className="text-[9px] text-muted-foreground">score</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Filters */}
+      <div className="flex gap-2 flex-wrap">
+        <Select value={seasonFilter} onValueChange={setSeasonFilter}>
+          <SelectTrigger className="w-[140px] h-9 text-sm">
+            <SelectValue placeholder="Peak Season" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Seasons</SelectItem>
+            <SelectItem value="Winter">❄️ Winter</SelectItem>
+            <SelectItem value="Spring">🌸 Spring</SelectItem>
+            <SelectItem value="Summer">☀️ Summer</SelectItem>
+            <SelectItem value="Fall">🍂 Fall</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={monthFilter} onValueChange={setMonthFilter}>
+          <SelectTrigger className="w-[140px] h-9 text-sm">
+            <SelectValue placeholder="Best Month" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Months</SelectItem>
+            {MONTH_NAMES.map((name, i) => (
+              <SelectItem key={i} value={String(i + 1)}>{name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Badge variant="secondary" className="text-xs self-center">{allCities.length} cities</Badge>
+      </div>
+
+      {/* Best Month Distribution Chart */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm">Cities in Peak Season by Month</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={monthDistribution}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+              <XAxis dataKey="month" tick={{ fontSize: 11 }} className="fill-muted-foreground" />
+              <YAxis tick={{ fontSize: 11 }} className="fill-muted-foreground" />
+              <Bar dataKey="cities" radius={[4, 4, 0, 0]}>
+                {monthDistribution.map((_, i) => (
+                  <Cell key={i} className={i === currentMonth - 1 ? "fill-primary" : "fill-muted-foreground/40"} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Monthly Demand Heatmap */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm">Monthly Demand Multiplier — Top Cities</CardTitle>
+        </CardHeader>
+        <CardContent className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr>
+                <th className="text-left py-2 pr-3 text-muted-foreground font-medium">City</th>
+                {MONTH_NAMES.map((m) => (
+                  <th key={m} className={`text-center px-1.5 py-2 font-medium ${m === MONTH_NAMES[currentMonth - 1] ? "text-primary" : "text-muted-foreground"}`}>{m}</th>
+                ))}
+                <th className="text-center px-2 py-2 text-muted-foreground font-medium">Peak</th>
+              </tr>
+            </thead>
+            <tbody>
+              {heatmapCities.map((s) => (
+                <tr key={s.cityId} className="border-t border-border/50 cursor-pointer hover:bg-muted/30" onClick={() => onSelectCity(s.cityId)}>
+                  <td className="py-2 pr-3 font-medium whitespace-nowrap">{s.city.city}, {s.city.stateCode}</td>
+                  {s.months.map((m) => {
+                    const intensity = Math.round(Math.min(1, (m.demandMultiplier - 0.4) / 1.4) * 100);
+                    return (
+                      <td key={m.month} className="text-center px-1.5 py-2">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div
+                              className="w-7 h-7 rounded mx-auto flex items-center justify-center text-[10px] font-bold"
+                              style={{
+                                backgroundColor: `hsl(var(--primary) / ${intensity / 100})`,
+                                color: intensity > 50 ? "hsl(var(--primary-foreground))" : "hsl(var(--muted-foreground))",
+                              }}
+                            >
+                              {m.demandMultiplier.toFixed(1)}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent className="text-xs">
+                            <p>{s.city.city} — {MONTH_NAMES[m.month - 1]}</p>
+                            <p>Demand ×{m.demandMultiplier}</p>
+                            {m.tourismPeak && <p className="text-primary">Tourism peak</p>}
+                            {m.eventBoost && <p className="text-warning">🎉 {m.eventBoost}</p>}
+                          </TooltipContent>
+                        </Tooltip>
+                      </td>
+                    );
+                  })}
+                  <td className="text-center px-2 py-2">
+                    <Badge variant="outline" className="text-[9px]">{s.peakSeason}</Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
+
+      {/* City Seasonality Cards */}
+      <div className="grid gap-3 md:grid-cols-2">
+        {allCities.slice(0, 12).map((s) => {
+          const SeasonIcon = SEASON_ICONS[s.peakSeason] || Sun;
+          const eventMonths = s.months.filter((m) => m.eventBoost);
+          return (
+            <Card key={s.cityId} className="cursor-pointer hover:border-primary/30 transition-colors" onClick={() => onSelectCity(s.cityId)}>
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-sm">{s.city.city}, {s.city.stateCode}</h3>
+                      <SeasonIcon className="h-3.5 w-3.5 text-primary" />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">{s.notes}</p>
+                  </div>
+                  <span className={`text-xl font-bold ${(s.demand?.travelScore ?? 0) >= 80 ? "text-success" : (s.demand?.travelScore ?? 0) >= 60 ? "text-warning" : "text-muted-foreground"}`}>
+                    {s.demand?.travelScore}
+                  </span>
+                </div>
+
+                {/* Mini monthly bar */}
+                <div className="flex items-end gap-0.5 h-10 mb-2">
+                  {s.months.map((m) => {
+                    const h = Math.round((m.demandMultiplier / 1.8) * 100);
+                    const isBest = s.bestMonths.includes(m.month);
+                    return (
+                      <div key={m.month} className="flex-1 flex flex-col items-center">
+                        <div
+                          className={`w-full rounded-t ${isBest ? "bg-primary" : "bg-muted-foreground/30"}`}
+                          style={{ height: `${h}%` }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="flex gap-0.5 mb-3">
+                  {MONTH_NAMES.map((m, i) => (
+                    <span key={m} className={`flex-1 text-center text-[8px] ${s.bestMonths.includes(i + 1) ? "text-primary font-bold" : "text-muted-foreground"}`}>{m[0]}</span>
+                  ))}
+                </div>
+
+                {/* Best months + Events */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[10px] text-muted-foreground">Best:</span>
+                  {s.bestMonths.map((m) => (
+                    <Badge key={m} variant="outline" className="text-[9px] bg-primary/10 text-primary border-primary/20">{MONTH_NAMES[m - 1]}</Badge>
+                  ))}
+                  {eventMonths.map((m) => (
+                    <Badge key={m.month} variant="outline" className="text-[9px] bg-accent text-accent-foreground">
+                      🎉 {m.eventBoost} ({MONTH_NAMES[m.month - 1]})
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ── Main Component ──
 export default function DashboardDemandRadar() {
   const [stateFilter, setStateFilter] = useState<string>("all");
@@ -79,6 +359,7 @@ export default function DashboardDemandRadar() {
   const [minRouteScore, setMinRouteScore] = useState<string>("60");
 
   const demandData = useMemo(() => generateDemandData(), []);
+  const seasonalityData = useMemo(() => generateCitySeasonality(), []);
   const states = useMemo(() => getUniqueStates(), []);
   const metros = useMemo(() => getUniqueMetros(), []);
 
@@ -345,6 +626,10 @@ export default function DashboardDemandRadar() {
           <TabsTrigger value="route-optimizer" className="text-xs flex items-center gap-1">
             <Route className="h-3 w-3" />
             Route Optimizer
+          </TabsTrigger>
+          <TabsTrigger value="seasonality" className="text-xs flex items-center gap-1">
+            <Calendar className="h-3 w-3" />
+            Seasonality
           </TabsTrigger>
           {selectedDetail && <TabsTrigger value="detail" className="text-xs">City Detail</TabsTrigger>}
         </TabsList>
@@ -944,6 +1229,15 @@ export default function DashboardDemandRadar() {
             </Card>
           </TabsContent>
         )}
+
+        {/* ── Seasonality Tab ── */}
+        <TabsContent value="seasonality" className="space-y-4">
+          <SeasonalityPanel
+            seasonalityData={seasonalityData}
+            enriched={enriched}
+            onSelectCity={setSelectedCityId}
+          />
+        </TabsContent>
       </Tabs>
     </div>
   );
