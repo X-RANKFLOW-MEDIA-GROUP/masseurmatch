@@ -72,6 +72,10 @@ export default function DashboardDemandRadar() {
   const [labelFilter, setLabelFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
+  const [travelOriginId, setTravelOriginId] = useState<string>("nyc");
+  const [travelBudget, setTravelBudget] = useState<string>("all");
+  const [travelRadius, setTravelRadius] = useState<string>("100");
+  const [minRouteScore, setMinRouteScore] = useState<string>("60");
 
   const demandData = useMemo(() => generateDemandData(), []);
   const states = useMemo(() => getUniqueStates(), []);
