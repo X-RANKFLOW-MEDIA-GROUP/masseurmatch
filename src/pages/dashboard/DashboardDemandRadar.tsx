@@ -342,6 +342,10 @@ export default function DashboardDemandRadar() {
           <TabsTrigger value="states" className="text-xs">By State</TabsTrigger>
           <TabsTrigger value="keywords" className="text-xs">Keywords</TabsTrigger>
           <TabsTrigger value="clusters" className="text-xs">Clusters</TabsTrigger>
+          <TabsTrigger value="route-optimizer" className="text-xs flex items-center gap-1">
+            <Route className="h-3 w-3" />
+            Route Optimizer
+          </TabsTrigger>
           {selectedDetail && <TabsTrigger value="detail" className="text-xs">City Detail</TabsTrigger>}
         </TabsList>
 
