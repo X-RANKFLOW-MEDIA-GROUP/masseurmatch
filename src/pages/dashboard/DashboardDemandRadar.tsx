@@ -349,6 +349,10 @@ export default function DashboardDemandRadar() {
             <Route className="h-3 w-3" />
             Route Optimizer
           </TabsTrigger>
+          <TabsTrigger value="seasonality" className="text-xs flex items-center gap-1">
+            <Calendar className="h-3 w-3" />
+            Seasonality
+          </TabsTrigger>
           {selectedDetail && <TabsTrigger value="detail" className="text-xs">City Detail</TabsTrigger>}
         </TabsList>
 
