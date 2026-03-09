@@ -254,6 +254,115 @@ export function findNearbyCities(cityId: string, radiusMiles: number): USCity[] 
   );
 }
 
+// ── Seasonality Profiles ──
+export interface MonthlySeasonality {
+  month: number; // 1-12
+  label: string;
+  demandMultiplier: number; // 0.5 – 1.8
+  tourismPeak: boolean;
+  eventBoost: string | null;
+}
+
+export interface CitySeasonality {
+  cityId: string;
+  months: MonthlySeasonality[];
+  bestMonths: number[];    // top 3 months (1-indexed)
+  worstMonths: number[];   // bottom 2 months
+  peakSeason: string;      // e.g. "Winter" or "Summer"
+  notes: string;
+}
+
+const MONTH_LABELS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+// Climate zone determines seasonal curve shape
+type ClimateZone = "sun_belt" | "northeast" | "midwest" | "pacific" | "mountain" | "tropical" | "desert";
+
+function getClimateZone(city: USCity): ClimateZone {
+  if (city.stateCode === "HI" || city.id === "keywest") return "tropical";
+  if (["AZ","NM"].includes(city.stateCode) || city.id === "pspr" || city.id === "lv") return "desert";
+  if (["CA","OR","WA"].includes(city.stateCode)) return "pacific";
+  if (["CO","UT","ID","MT"].includes(city.stateCode)) return "mountain";
+  if (["FL","TX","LA","GA","SC","NC"].includes(city.stateCode) && city.lat < 34) return "sun_belt";
+  if (["MN","WI","MI","OH","IN","IL","MO","KS","OK","NE","IA","ND","SD"].includes(city.stateCode)) return "midwest";
+  return "northeast";
+}
+
+// Base monthly curves per climate zone (Jan=index 0)
+const CLIMATE_CURVES: Record<ClimateZone, number[]> = {
+  sun_belt:  [1.3, 1.4, 1.5, 1.3, 1.0, 0.7, 0.6, 0.6, 0.8, 1.0, 1.2, 1.4],
+  northeast: [0.6, 0.6, 0.8, 1.0, 1.2, 1.4, 1.5, 1.4, 1.2, 1.0, 0.7, 0.6],
+  midwest:   [0.5, 0.6, 0.8, 1.0, 1.3, 1.5, 1.5, 1.4, 1.2, 1.0, 0.7, 0.5],
+  pacific:   [0.8, 0.9, 1.0, 1.1, 1.3, 1.5, 1.6, 1.5, 1.3, 1.1, 0.9, 0.8],
+  mountain:  [0.9, 0.9, 1.0, 1.1, 1.2, 1.5, 1.6, 1.5, 1.3, 1.1, 0.9, 0.8],
+  tropical:  [1.4, 1.3, 1.5, 1.2, 0.9, 0.7, 0.7, 0.7, 0.8, 1.0, 1.2, 1.5],
+  desert:    [1.3, 1.5, 1.5, 1.3, 0.9, 0.6, 0.5, 0.5, 0.7, 1.0, 1.3, 1.4],
+};
+
+// Known event boosts by city+month
+const EVENT_BOOSTS: Record<string, Record<number, string>> = {
+  nol: { 2: "Mardi Gras", 10: "Halloween/Voodoo Fest" },
+  lv:  { 1: "CES", 3: "March Madness", 12: "NYE" },
+  mia: { 3: "Winter Music Conf", 12: "Art Basel" },
+  sf:  { 6: "Pride Month", 10: "Castro Street Fair" },
+  nyc: { 6: "Pride Month", 12: "Holiday Season" },
+  lax: { 6: "Pride Month", 1: "Awards Season" },
+  pspr:{ 4: "White Party", 11: "Greater Palm Springs Pride" },
+  ptown:{ 7: "Bear Week", 8: "Carnival Week" },
+  keywest:{ 6: "Pride", 10: "Fantasy Fest" },
+  whia:{ 6: "LA Pride", 10: "Halloween Carnival" },
+  orl: { 6: "Gay Days", 10: "Halloween Horror Nights" },
+  atl: { 10: "Atlanta Pride" },
+  chi: { 6: "Pride Month" },
+  den: { 6: "PrideFest" },
+  sea: { 6: "Pride Month" },
+  dc:  { 6: "Capital Pride" },
+  hou: { 6: "Pride Houston" },
+  por: { 6: "Portland Pride" },
+  bos: { 6: "Boston Pride" },
+  fll: { 2: "Wilton Manors Stonewall", 6: "Pride Fort Lauderdale" },
+  tpa: { 3: "Tampa Pride" },
+  nsh: { 6: "Nashville Pride" },
+  aus: { 3: "SXSW", 6: "Austin Pride" },
+};
+
+export function generateCitySeasonality(): CitySeasonality[] {
+  return US_METROS.map((city) => {
+    const zone = getClimateZone(city);
+    const baseCurve = CLIMATE_CURVES[zone];
+    const events = EVENT_BOOSTS[city.id] || {};
+    const rng = seededRandom(city.id.charCodeAt(0) * 137 + city.population % 997);
+
+    const months: MonthlySeasonality[] = baseCurve.map((base, i) => {
+      const monthNum = i + 1;
+      const eventName = events[monthNum] || null;
+      const eventMult = eventName ? 0.15 + rng() * 0.1 : 0;
+      const lgbtBoost = city.isLgbtFriendly ? 0.05 : 0;
+      const tourismBoost = city.isTourism ? 0.08 : 0;
+      const noise = (rng() - 0.5) * 0.1;
+      const multiplier = Math.round(Math.min(1.8, Math.max(0.4, base + eventMult + lgbtBoost + tourismBoost + noise)) * 100) / 100;
+      const tourismPeak = multiplier >= 1.3;
+
+      return { month: monthNum, label: MONTH_LABELS[i], demandMultiplier: multiplier, tourismPeak, eventBoost: eventName };
+    });
+
+    // Best & worst months
+    const sorted = [...months].sort((a, b) => b.demandMultiplier - a.demandMultiplier);
+    const bestMonths = sorted.slice(0, 3).map((m) => m.month);
+    const worstMonths = sorted.slice(-2).map((m) => m.month);
+
+    // Peak season label
+    const avgBestMonth = Math.round(bestMonths.reduce((s, m) => s + m, 0) / bestMonths.length);
+    const peakSeason = avgBestMonth <= 2 || avgBestMonth >= 11 ? "Winter" : avgBestMonth <= 5 ? "Spring" : avgBestMonth <= 8 ? "Summer" : "Fall";
+
+    const eventList = Object.values(events);
+    const notes = eventList.length > 0
+      ? `Key events: ${eventList.join(", ")}. Best visited during ${peakSeason.toLowerCase()} months.`
+      : `Demand peaks during ${peakSeason.toLowerCase()}. ${city.isTourism ? "Tourism destination." : "Non-tourism market."}`;
+
+    return { cityId: city.id, months, bestMonths, worstMonths, peakSeason, notes };
+  });
+}
+
 // Get unique states
 export function getUniqueStates(): string[] {
   return [...new Set(US_METROS.map((c) => c.stateCode))].sort();
