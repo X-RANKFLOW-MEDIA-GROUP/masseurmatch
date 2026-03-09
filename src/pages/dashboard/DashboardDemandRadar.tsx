@@ -13,9 +13,17 @@ import {
   BarChart3, Info, Clock, Target, Navigation, Sparkles
 } from "lucide-react";
 import {
-  US_METROS, generateDemandData, getCityById, findNearbyCities,
-  getUniqueStates, getUniqueMetros, DEMAND_KEYWORDS,
-  type CityDemandData, type USCity
+  US_METROS,
+  generateDemandData,
+  getCityById,
+  findNearbyCities,
+  getUniqueStates,
+  getUniqueMetros,
+  DEMAND_KEYWORDS,
+  estimateHotelCost,
+  distanceMiles,
+  type CityDemandData,
+  type USCity,
 } from "@/data/us-metros-demand";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, LineChart, Line, AreaChart, Area } from "recharts";
 
