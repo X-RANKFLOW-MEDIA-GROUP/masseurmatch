@@ -176,6 +176,74 @@ const Index = () => {
       <ScrollProgress />
       <Header />
 
+      {/* ─── LOCATION PROMPT OVERLAY ─── */}
+      <AnimatePresence>
+        {showLocationPrompt && !geoPrompted && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-background/80 backdrop-blur-xl"
+          >
+            <motion.div
+              initial={{ scale: 0.85, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.85, opacity: 0, y: 30 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="max-w-sm w-full mx-4 p-8 rounded-2xl text-center"
+              style={{
+                background: "hsl(var(--card))",
+                border: "1px solid hsl(var(--border))",
+                boxShadow: "0 40px 100px hsl(0 0% 0% / 0.5)",
+              }}
+            >
+              <motion.div
+                className="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center"
+                style={{
+                  background: "hsl(var(--primary) / 0.1)",
+                  border: "1px solid hsl(var(--primary) / 0.2)",
+                }}
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Navigation className="w-7 h-7 text-primary" />
+              </motion.div>
+
+              <h3 className="text-xl font-bold text-foreground mb-2">Find Therapists Near You</h3>
+              <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
+                Allow location access to discover massage therapists in your area instantly.
+              </p>
+
+              <div className="flex flex-col gap-3">
+                <Button
+                  size="lg"
+                  className="w-full gap-2"
+                  onClick={() => {
+                    setShowLocationPrompt(false);
+                    requestLocation();
+                  }}
+                >
+                  <MapPin className="w-4 h-4" />
+                  Enable Location
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground"
+                  onClick={() => {
+                    setShowLocationPrompt(false);
+                    // Mark as prompted so it doesn't show again
+                    localStorage.setItem("mm_geo_dismissed", "1");
+                  }}
+                >
+                  Maybe Later
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ─── HERO ─── */}
       <section className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
       <GradientMesh />
