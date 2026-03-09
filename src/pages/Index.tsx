@@ -345,6 +345,44 @@ const Index = () => {
         <Marquee items={marqueeWords} />
       </section>
 
+      {/* ─── NEAR YOU ─── */}
+      {detectedCity && nearbyProfiles.length > 0 && (
+        <section className="py-20 border-b border-border">
+          <div className="container mx-auto px-4">
+            <div className="max-w-5xl mx-auto">
+              <div className="flex items-center justify-between mb-10">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-primary mb-2 flex items-center gap-2">
+                    <MapPin className="w-3.5 h-3.5" /> Near You
+                  </p>
+                  <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight">
+                    <TextReveal text={`In ${detectedCity.name}`} />
+                  </h2>
+                </div>
+                <Link to={`/${detectedCity.slug}/massage-therapists`}>
+                  <Button variant="outline" size="sm" className="gap-1">
+                    View All <ArrowRight className="w-3 h-3" />
+                  </Button>
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                {nearbyProfiles.map((p, i) => (
+                  <motion.div key={p.id} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+                    <Link to={`/${detectedCity.slug}/therapist/${p.slug || p.id}`}>
+                      <TiltCard className="glass-card p-4 text-center group">
+                        <img src={p.image} alt={p.name} className="w-16 h-16 rounded-full object-cover mx-auto mb-3 grayscale group-hover:grayscale-0 transition-all" loading="lazy" />
+                        <h3 className="font-semibold text-sm truncate">{p.name}</h3>
+                        <p className="text-xs text-muted-foreground truncate">{p.specialty}</p>
+                      </TiltCard>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ─── HOW IT WORKS ─── */}
       <section className="py-20 border-b border-border">
         <div className="container mx-auto px-4">
