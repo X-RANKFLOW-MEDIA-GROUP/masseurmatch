@@ -53,6 +53,8 @@ const TherapistProfile = () => {
   const [travel, setTravel] = useState<TravelEntry[]>([]);
   const [weeklySpecials, setWeeklySpecials] = useState<{ id: string; text: string; expires_at: string }[]>([]);
   const [similarProfiles, setSimilarProfiles] = useState<Tables<"profiles">[]>([]);
+  const [importedReviews, setImportedReviews] = useState<Array<{ id: string; source_platform: string | null; reviewer_name: string | null; review_text: string; rating: number | null; review_date: string | null }>>([]);
+  const [importSummary, setImportSummary] = useState<{ ai_summary: string | null; extracted_rating_avg: number | null; source_platform: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [revealedContacts, setRevealedContacts] = useState<Record<string, boolean>>({});
