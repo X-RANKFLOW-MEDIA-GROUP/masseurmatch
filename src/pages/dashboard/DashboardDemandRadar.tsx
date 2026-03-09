@@ -951,6 +951,15 @@ export default function DashboardDemandRadar() {
             </Card>
           </TabsContent>
         )}
+
+        {/* ── Seasonality Tab ── */}
+        <TabsContent value="seasonality" className="space-y-4">
+          <SeasonalityPanel
+            seasonalityData={seasonalityData}
+            enriched={enriched}
+            onSelectCity={setSelectedCityId}
+          />
+        </TabsContent>
       </Tabs>
     </div>
   );
