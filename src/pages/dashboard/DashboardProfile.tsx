@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ImportedReviewsManager } from "@/components/dashboard/ImportedReviews";
 import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
