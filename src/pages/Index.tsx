@@ -5,11 +5,11 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { NewsletterSignup } from "@/components/newsletter/NewsletterSignup";
 import { CityAutocomplete } from "@/components/ui/city-autocomplete";
-import { CheckCircle2, Star, ArrowRight, MapPin, Tag, UserPlus, Plane, Search, Eye, MessageSquare, Users } from "lucide-react";
+import { CheckCircle2, Star, ArrowRight, MapPin, Tag, UserPlus, Plane, Search, Eye, MessageSquare, Users, Navigation } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ShieldIllustration, CommunityIllustration, GrowthIllustration } from "@/components/icons/IllustrationIcons";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { AnimatedCounter } from "@/components/animations/AnimatedCounter";
 import { TextReveal } from "@/components/animations/TextReveal";
 import { MagneticButton } from "@/components/animations/MagneticButton";
@@ -26,11 +26,14 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
+import { useGeolocation } from "@/hooks/useGeolocation";
 
 const Index = () => {
   const scrollRef = useScrollReveal();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { city: detectedCity, loading: geoLoading, prompted: geoPrompted, denied: geoDenied, requestLocation } = useGeolocation();
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false);
 
   // City search state
   const [heroCity, setHeroCity] = useState("");
