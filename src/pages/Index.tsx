@@ -5,11 +5,11 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { NewsletterSignup } from "@/components/newsletter/NewsletterSignup";
 import { CityAutocomplete } from "@/components/ui/city-autocomplete";
-import { CheckCircle2, Star, ArrowRight, MapPin, Tag, UserPlus, Plane, Search, Eye, MessageSquare, Users } from "lucide-react";
+import { CheckCircle2, Star, ArrowRight, MapPin, Tag, UserPlus, Plane, Search, Eye, MessageSquare, Users, Navigation } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ShieldIllustration, CommunityIllustration, GrowthIllustration } from "@/components/icons/IllustrationIcons";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { AnimatedCounter } from "@/components/animations/AnimatedCounter";
 import { TextReveal } from "@/components/animations/TextReveal";
 import { MagneticButton } from "@/components/animations/MagneticButton";
@@ -26,11 +26,14 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
+import { useGeolocation } from "@/hooks/useGeolocation";
 
 const Index = () => {
   const scrollRef = useScrollReveal();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { city: detectedCity, loading: geoLoading, prompted: geoPrompted, denied: geoDenied, requestLocation } = useGeolocation();
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false);
 
   // City search state
   const [heroCity, setHeroCity] = useState("");
@@ -39,7 +42,42 @@ const Index = () => {
   const [featuredTherapists, setFeaturedTherapists] = useState<any[]>([]);
   const [specialOfferProfiles, setSpecialOfferProfiles] = useState<any[]>([]);
   const [newProfiles, setNewProfiles] = useState<any[]>([]);
+  const [nearbyProfiles, setNearbyProfiles] = useState<any[]>([]);
   const [realStats, setRealStats] = useState({ therapists: 0, cities: 0 });
+
+  // Show location prompt after a small delay if not prompted yet
+  useEffect(() => {
+    const dismissed = localStorage.getItem("mm_geo_dismissed");
+    if (!geoPrompted && !geoLoading && !dismissed) {
+      const timer = setTimeout(() => setShowLocationPrompt(true), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [geoPrompted, geoLoading]);
+
+  // Fetch nearby therapists when city is detected
+  useEffect(() => {
+    if (!detectedCity) return;
+    const fetchNearby = async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, display_name, full_name, city, avatar_url, specialties, slug")
+        .eq("is_active", true)
+        .eq("status", "active")
+        .ilike("city", detectedCity.name)
+        .limit(6);
+      if (data) {
+        setNearbyProfiles(data.map((p: any) => ({
+          id: p.id,
+          name: p.display_name || p.full_name || "Therapist",
+          city: p.city || "",
+          specialty: (p.specialties || []).slice(0, 2).join(", ") || "Massage Therapy",
+          image: p.avatar_url || "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=800&h=800&fit=crop",
+          slug: p.slug,
+        })));
+      }
+    };
+    fetchNearby();
+  }, [detectedCity]);
 
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -139,20 +177,100 @@ const Index = () => {
       <ScrollProgress />
       <Header />
 
+      {/* ─── LOCATION PROMPT OVERLAY ─── */}
+      <AnimatePresence>
+        {showLocationPrompt && !geoPrompted && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-background/80 backdrop-blur-xl"
+          >
+            <motion.div
+              initial={{ scale: 0.85, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.85, opacity: 0, y: 30 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="max-w-sm w-full mx-4 p-8 rounded-2xl text-center"
+              style={{
+                background: "hsl(var(--card))",
+                border: "1px solid hsl(var(--border))",
+                boxShadow: "0 40px 100px hsl(0 0% 0% / 0.5)",
+              }}
+            >
+              <motion.div
+                className="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center"
+                style={{
+                  background: "hsl(var(--primary) / 0.1)",
+                  border: "1px solid hsl(var(--primary) / 0.2)",
+                }}
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Navigation className="w-7 h-7 text-primary" />
+              </motion.div>
+
+              <h3 className="text-xl font-bold text-foreground mb-2">Find Therapists Near You</h3>
+              <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
+                Allow location access to discover massage therapists in your area instantly.
+              </p>
+
+              <div className="flex flex-col gap-3">
+                <Button
+                  size="lg"
+                  className="w-full gap-2"
+                  onClick={() => {
+                    setShowLocationPrompt(false);
+                    requestLocation();
+                  }}
+                >
+                  <MapPin className="w-4 h-4" />
+                  Enable Location
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground"
+                  onClick={() => {
+                    setShowLocationPrompt(false);
+                    // Mark as prompted so it doesn't show again
+                    localStorage.setItem("mm_geo_dismissed", "1");
+                  }}
+                >
+                  Maybe Later
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ─── HERO ─── */}
       <section className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
       <GradientMesh />
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-5xl mx-auto text-center">
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-xs uppercase tracking-[0.4em] text-muted-foreground mb-8"
-            >
-              {t("home.heroTag")}
-            </motion.p>
+            {detectedCity ? (
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="text-xs uppercase tracking-[0.4em] text-muted-foreground mb-8 flex items-center justify-center gap-2"
+              >
+                <MapPin className="w-3.5 h-3.5 text-primary" />
+                Therapists in {detectedCity.name}, {detectedCity.stateCode}
+              </motion.p>
+            ) : (
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="text-xs uppercase tracking-[0.4em] text-muted-foreground mb-8"
+              >
+                {t("home.heroTag")}
+              </motion.p>
+            )}
 
             <h1 className="text-5xl md:text-7xl lg:text-[6rem] font-bold text-foreground leading-[0.9] tracking-tight mb-8">
               <TextReveal text={t("home.heroTitle1")} delay={0.3} />
@@ -227,6 +345,44 @@ const Index = () => {
       <section className="py-8 border-b border-border overflow-hidden">
         <Marquee items={marqueeWords} />
       </section>
+
+      {/* ─── NEAR YOU ─── */}
+      {detectedCity && nearbyProfiles.length > 0 && (
+        <section className="py-20 border-b border-border">
+          <div className="container mx-auto px-4">
+            <div className="max-w-5xl mx-auto">
+              <div className="flex items-center justify-between mb-10">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-primary mb-2 flex items-center gap-2">
+                    <MapPin className="w-3.5 h-3.5" /> Near You
+                  </p>
+                  <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight">
+                    <TextReveal text={`In ${detectedCity.name}`} />
+                  </h2>
+                </div>
+                <Link to={`/${detectedCity.slug}/massage-therapists`}>
+                  <Button variant="outline" size="sm" className="gap-1">
+                    View All <ArrowRight className="w-3 h-3" />
+                  </Button>
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                {nearbyProfiles.map((p, i) => (
+                  <motion.div key={p.id} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+                    <Link to={`/${detectedCity.slug}/therapist/${p.slug || p.id}`}>
+                      <TiltCard className="glass-card p-4 text-center group">
+                        <img src={p.image} alt={p.name} className="w-16 h-16 rounded-full object-cover mx-auto mb-3 grayscale group-hover:grayscale-0 transition-all" loading="lazy" />
+                        <h3 className="font-semibold text-sm truncate">{p.name}</h3>
+                        <p className="text-xs text-muted-foreground truncate">{p.specialty}</p>
+                      </TiltCard>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ─── HOW IT WORKS ─── */}
       <section className="py-20 border-b border-border">

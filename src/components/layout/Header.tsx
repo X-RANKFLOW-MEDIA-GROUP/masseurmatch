@@ -1,9 +1,10 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Globe } from "lucide-react";
+import { Menu, X, Globe, MapPin, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { useGeolocation } from "@/hooks/useGeolocation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +22,9 @@ const languages = [
 export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const { city, loading } = useGeolocation();
 
   const navLinks = [
     { to: "/explore", label: t("nav.explore") },
@@ -41,9 +44,41 @@ export const Header = () => {
       className="fixed top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-xl"
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center space-x-2">
-          <span className="text-xl font-bold text-foreground tracking-tight font-heading">MasseurMatch</span>
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link to="/" className="flex items-center space-x-2">
+            <span className="text-xl font-bold text-foreground tracking-tight font-heading">MasseurMatch</span>
+          </Link>
+
+          {/* City indicator */}
+          {city && (
+            <motion.button
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4 }}
+              onClick={() => navigate(`/${city.slug}`)}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs text-muted-foreground hover:text-foreground transition-colors"
+              style={{
+                background: "hsl(var(--muted) / 0.5)",
+                border: "1px solid hsl(var(--border))",
+              }}
+            >
+              <MapPin className="w-3 h-3 text-primary" />
+              <span className="font-medium">{city.name}, {city.stateCode}</span>
+              <ChevronDown className="w-3 h-3 opacity-50" />
+            </motion.button>
+          )}
+
+          {loading && (
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs text-muted-foreground">
+              <motion.div
+                className="w-3 h-3 rounded-full border-2 border-muted-foreground border-t-transparent"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+              />
+              <span>Detecting...</span>
+            </div>
+          )}
+        </div>
 
         <nav className="hidden md:flex items-center space-x-8" aria-label="Main navigation">
           {navLinks.map((link) => (
@@ -99,6 +134,18 @@ export const Header = () => {
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
+
+      {/* Mobile city indicator */}
+      {city && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="sm:hidden flex items-center justify-center gap-1.5 py-1.5 text-xs text-muted-foreground border-t border-border bg-background/60"
+        >
+          <MapPin className="w-3 h-3 text-primary" />
+          <span>{city.name}, {city.stateCode}</span>
+        </motion.div>
+      )}
 
       <AnimatePresence>
         {mobileMenuOpen && (
