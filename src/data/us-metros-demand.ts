@@ -226,6 +226,25 @@ export function distanceMiles(lat1: number, lng1: number, lat2: number, lng2: nu
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+function hashStringToUnit(value: string): number {
+  let hash = 0;
+  for (let i = 0; i < value.length; i++) {
+    hash = (hash << 5) - hash + value.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash % 1000) / 1000;
+}
+
+// Estimated average nightly hotel cost (USD) for planning simulations
+export function estimateHotelCost(city: USCity): number {
+  const tourismPremium = city.isTourism ? 38 : 0;
+  const populationPremium = Math.min(70, (city.population / 1_000_000) * 18);
+  const lgbtPremium = city.isLgbtFriendly ? 12 : 0;
+  const variance = Math.round(hashStringToUnit(city.id) * 35);
+
+  return Math.round(95 + tourismPremium + populationPremium + lgbtPremium + variance);
+}
+
 // Find nearby cities within radius
 export function findNearbyCities(cityId: string, radiusMiles: number): USCity[] {
   const origin = getCityById(cityId);
