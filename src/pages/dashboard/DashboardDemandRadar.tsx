@@ -572,7 +572,299 @@ export default function DashboardDemandRadar() {
           })}
         </TabsContent>
 
+        {/* ── Travel Route Optimizer ── */}
+        <TabsContent value="route-optimizer" className="space-y-5">
+          {/* Explainer */}
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="p-4 flex items-start gap-3">
+              <Route className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+              <div>
+                <p className="text-sm font-semibold text-foreground mb-0.5">Travel Route Optimizer</p>
+                <p className="text-xs text-muted-foreground">
+                  Groups nearby high-opportunity cities into optimized multi-city trip plans scored by demand,
+                  hotel cost, route distance, and expected opportunity. Set your origin city and preferences below.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Optimizer Controls */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Filter className="h-4 w-4 text-primary" />
+                Route Preferences
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Origin City</label>
+                <Select value={travelOriginId} onValueChange={setTravelOriginId}>
+                  <SelectTrigger className="h-9 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {US_METROS.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.city}, {c.stateCode}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Max Radius</label>
+                <Select value={travelRadius} onValueChange={setTravelRadius}>
+                  <SelectTrigger className="h-9 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="100">100 miles</SelectItem>
+                    <SelectItem value="200">200 miles</SelectItem>
+                    <SelectItem value="350">350 miles</SelectItem>
+                    <SelectItem value="500">500 miles</SelectItem>
+                    <SelectItem value="9999">Nationwide</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Hotel Budget</label>
+                <Select value={travelBudget} onValueChange={setTravelBudget}>
+                  <SelectTrigger className="h-9 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Any Budget</SelectItem>
+                    <SelectItem value="budget">Budget (≤$120/night)</SelectItem>
+                    <SelectItem value="mid">Mid-range (≤$180/night)</SelectItem>
+                    <SelectItem value="premium">Premium (≤$999/night)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Min Opportunity</label>
+                <Select value={minRouteScore} onValueChange={setMinRouteScore}>
+                  <SelectTrigger className="h-9 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="40">40+ (All)</SelectItem>
+                    <SelectItem value="60">60+ (Watch)</SelectItem>
+                    <SelectItem value="70">70+ (Strong)</SelectItem>
+                    <SelectItem value="80">80+ (Go Now only)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Results Summary */}
+          {tripPlans.length === 0 ? (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <Plane className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-40" />
+                <p className="text-sm font-medium text-muted-foreground">No trip plans found</p>
+                <p className="text-xs text-muted-foreground mt-1">Try expanding radius, relaxing budget, or lowering the minimum opportunity score.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-bold text-foreground">{tripPlans.length}</span> trip plans found from{" "}
+                  <span className="font-bold text-foreground">{US_METROS.find((c) => c.id === travelOriginId)?.city}</span>
+                </p>
+                <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
+                  Ranked by Trip Score
+                </Badge>
+              </div>
+
+              {/* Trip Plan Cards */}
+              {tripPlans.map((plan, planIdx) => {
+                const topLabel = plan.cities[0]?.demand.label;
+                const labelCfg = labelConfig[topLabel] ?? labelConfig.watch;
+                const tripRating =
+                  plan.tripScore >= 80 ? { text: "HIGHLY RECOMMENDED", cls: "text-success", icon: <CheckCircle className="h-4 w-4 text-success" /> } :
+                  plan.tripScore >= 65 ? { text: "GOOD OPPORTUNITY", cls: "text-warning", icon: <Star className="h-4 w-4 text-warning" /> } :
+                  { text: "WORTH CONSIDERING", cls: "text-muted-foreground", icon: <Eye className="h-4 w-4 text-muted-foreground" /> };
+
+                return (
+                  <Card
+                    key={plan.id}
+                    className="border-border hover:border-primary/30 transition-colors"
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between gap-3 flex-wrap">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                            <span className="text-sm font-bold text-primary">#{planIdx + 1}</span>
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3 className="font-bold text-base">{plan.hub.city}, {plan.hub.stateCode}</h3>
+                              <span className="text-muted-foreground text-sm">+ {plan.cities.length - 1} nearby cities</span>
+                              {tripRating.icon}
+                              <span className={`text-[10px] font-bold tracking-wider uppercase ${tripRating.cls}`}>{tripRating.text}</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {plan.hub.metroArea} metro · {plan.hub.isTourism && "✈️ Tourism ·"} {plan.hub.isLgbtFriendly && "🏳️‍🌈 LGBT+ ·"} Pop. {(plan.hub.population / 1000).toFixed(0)}K
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Trip Score Ring */}
+                        <div className="text-center shrink-0">
+                          <div className={`text-4xl font-bold ${plan.tripScore >= 80 ? "text-success" : plan.tripScore >= 65 ? "text-warning" : "text-muted-foreground"}`}>
+                            {plan.tripScore}
+                          </div>
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Trip Score</p>
+                        </div>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="space-y-4">
+                      {/* Score bar breakdown */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {[
+                          { icon: <Target className="h-3 w-3" />, label: "Avg Demand", value: plan.avgDemand, suffix: "/100" },
+                          { icon: <Sparkles className="h-3 w-3" />, label: "Expected Opp.", value: plan.expectedOpportunity, suffix: "/100" },
+                          { icon: <Hotel className="h-3 w-3" />, label: "Avg Hotel/Night", value: null, display: `$${plan.avgHotelCost}` },
+                          { icon: <Route className="h-3 w-3" />, label: "Total Route", value: null, display: `~${plan.routeDistance} mi` },
+                        ].map((stat) => (
+                          <div key={stat.label} className="bg-muted/40 rounded-lg p-3">
+                            <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
+                              {stat.icon}
+                              <span className="text-[10px] uppercase tracking-wider">{stat.label}</span>
+                            </div>
+                            <p className="text-lg font-bold">
+                              {stat.display ?? `${stat.value}${stat.suffix}`}
+                            </p>
+                            {stat.value !== null && (
+                              <Progress value={stat.value} className="h-1 mt-1" />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Route: city-by-city */}
+                      <div>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Route Stops</p>
+                        <div className="flex flex-wrap items-center gap-1">
+                          {/* Origin */}
+                          <div className="flex items-center gap-1 bg-primary/10 border border-primary/20 rounded-full px-3 py-1">
+                            <MapPin className="h-3 w-3 text-primary" />
+                            <span className="text-xs font-semibold text-primary">
+                              {US_METROS.find((c) => c.id === travelOriginId)?.city ?? "Origin"}
+                            </span>
+                          </div>
+                          {plan.cities.map((city, ci) => (
+                            <div key={city.id} className="flex items-center gap-1">
+                              <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                              <div
+                                className="flex items-center gap-1.5 bg-card border border-border hover:border-primary/30 rounded-full px-3 py-1 cursor-pointer transition-colors"
+                                onClick={() => setSelectedCityId(city.id)}
+                              >
+                                <span className="text-xs font-medium">{city.city}, {city.stateCode}</span>
+                                <Badge
+                                  variant="outline"
+                                  className={`text-[9px] py-0 px-1 ${labelConfig[city.demand.label]?.class}`}
+                                >
+                                  {city.demand.travelScore}
+                                </Badge>
+                                {city.distanceFromHub > 0 && (
+                                  <span className="text-[10px] text-muted-foreground">{city.distanceFromHub}mi</span>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Per-city breakdown table */}
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs">
+                          <thead>
+                            <tr className="border-b border-border text-muted-foreground">
+                              <th className="text-left pb-2 font-medium">City</th>
+                              <th className="text-right pb-2 font-medium">Demand</th>
+                              <th className="text-right pb-2 font-medium">Spike</th>
+                              <th className="text-right pb-2 font-medium">Hotel</th>
+                              <th className="text-right pb-2 font-medium">Keywords</th>
+                              <th className="text-right pb-2 font-medium">Distance</th>
+                              <th className="text-right pb-2 font-medium">Label</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {plan.cities.map((city) => (
+                              <tr
+                                key={city.id}
+                                className="border-b border-border/50 last:border-0 hover:bg-muted/30 cursor-pointer transition-colors"
+                                onClick={() => setSelectedCityId(city.id)}
+                              >
+                                <td className="py-2 font-medium">{city.city}, {city.stateCode}</td>
+                                <td className="py-2 text-right">
+                                  <span className={city.demand.travelScore >= 80 ? "text-success font-bold" : city.demand.travelScore >= 60 ? "text-warning font-bold" : ""}>
+                                    {city.demand.travelScore}
+                                  </span>
+                                </td>
+                                <td className="py-2 text-right">{city.demand.spikeScore}</td>
+                                <td className="py-2 text-right font-medium">${city.hotelCost}/night</td>
+                                <td className="py-2 text-right">{city.demand.keywordCount}</td>
+                                <td className="py-2 text-right">
+                                  {city.distanceFromHub === 0 ? "Hub" : `${city.distanceFromHub} mi`}
+                                </td>
+                                <td className="py-2 text-right">
+                                  <Badge
+                                    variant="outline"
+                                    className={`text-[9px] py-0 px-1.5 ${labelConfig[city.demand.label]?.class}`}
+                                  >
+                                    {labelConfig[city.demand.label]?.text}
+                                  </Badge>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                          <tfoot>
+                            <tr className="border-t border-border bg-muted/20">
+                              <td className="py-2 font-semibold text-muted-foreground">TOTALS / AVG</td>
+                              <td className="py-2 text-right font-bold">{plan.avgDemand}</td>
+                              <td className="py-2 text-right font-bold">—</td>
+                              <td className="py-2 text-right font-bold">${plan.avgHotelCost}/night</td>
+                              <td className="py-2 text-right font-bold">—</td>
+                              <td className="py-2 text-right font-bold">~{plan.routeDistance} mi</td>
+                              <td />
+                            </tr>
+                          </tfoot>
+                        </table>
+                      </div>
+
+                      {/* Action footer */}
+                      <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-border/50">
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                          <span><DollarSign className="h-3 w-3 inline" /> Est. {plan.cities.length} nights: <strong className="text-foreground">${plan.avgHotelCost * plan.cities.length}</strong></span>
+                          <span><Package className="h-3 w-3 inline" /> {plan.cities.length} city {plan.cities.length === 1 ? "stop" : "stops"}</span>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-xs h-7 gap-1"
+                          onClick={() => setSelectedCityId(plan.hub.id)}
+                        >
+                          <MapPin className="h-3 w-3" />
+                          View Hub City Detail
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </>
+          )}
+        </TabsContent>
+
         {/* ── City Detail ── */}
+
         {selectedDetail && (
           <TabsContent value="detail" className="space-y-4">
             <Card>
