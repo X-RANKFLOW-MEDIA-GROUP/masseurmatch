@@ -129,6 +129,99 @@ export default function DashboardDemandRadar() {
   const nearbyCities = selectedCityId ? findNearbyCities(selectedCityId, 100) : [];
   const nearbyDemand = nearbyCities.map((nc) => ({ ...nc, demand: enriched.find((d) => d.cityId === nc.id) })).filter((n) => n.demand);
 
+  // ── Travel Route Optimizer ──
+  const tripPlans = useMemo<TripPlan[]>(() => {
+    const originCity = getCityById(travelOriginId);
+    if (!originCity) return [];
+
+    const radius = parseInt(travelRadius);
+    const budgetCap = travelBudget === "budget" ? 120 : travelBudget === "mid" ? 180 : travelBudget === "premium" ? 999 : 999;
+    const minScore = parseInt(minRouteScore);
+
+    // Build enriched map for O(1) lookup
+    const demandById = new Map(enriched.map((d) => [d.cityId, d]));
+
+    // Candidate cities: within radius, above min score
+    const candidates = US_METROS
+      .filter((c) => c.id !== travelOriginId)
+      .map((c) => {
+        const dist = distanceMiles(originCity.lat, originCity.lng, c.lat, c.lng);
+        const demand = demandById.get(c.id);
+        const hotel = estimateHotelCost(c);
+        return { city: c, dist, demand, hotel };
+      })
+      .filter((c) => c.dist <= radius && c.demand && c.hotel <= budgetCap && c.demand.travelScore >= minScore)
+      .sort((a, b) => b.demand!.travelScore - a.demand!.travelScore);
+
+    if (candidates.length === 0) return [];
+
+    // Group into trip clusters: hub = highest-scoring candidate, add others within 150mi
+    const usedIds = new Set<string>();
+    const plans: TripPlan[] = [];
+
+    for (const hub of candidates) {
+      if (usedIds.has(hub.city.id)) continue;
+      usedIds.add(hub.city.id);
+
+      // Find cities within 150mi of hub that are in the candidate pool
+      const hubCities = candidates
+        .filter((c) => !usedIds.has(c.city.id) && distanceMiles(hub.city.lat, hub.city.lng, c.city.lat, c.city.lng) <= 150)
+        .slice(0, 4);
+
+      hubCities.forEach((c) => usedIds.add(c.city.id));
+
+      const allCities = [hub, ...hubCities].map((c) => ({
+        ...c.city,
+        demand: c.demand!,
+        hotelCost: c.hotel,
+        distanceFromHub: Math.round(distanceMiles(hub.city.lat, hub.city.lng, c.city.lat, c.city.lng)),
+      }));
+
+      const avgDemand = Math.round(allCities.reduce((s, c) => s + c.demand.travelScore, 0) / allCities.length);
+      const avgHotelCost = Math.round(allCities.reduce((s, c) => s + c.hotelCost, 0) / allCities.length);
+
+      // Route distance: sum sequential distances between sorted cities
+      const sorted = [...allCities].sort((a, b) => a.distanceFromHub - b.distanceFromHub);
+      let routeDistance = Math.round(distanceMiles(originCity.lat, originCity.lng, sorted[0].lat, sorted[0].lng));
+      for (let i = 0; i < sorted.length - 1; i++) {
+        routeDistance += Math.round(distanceMiles(sorted[i].lat, sorted[i].lng, sorted[i + 1].lat, sorted[i + 1].lng));
+      }
+
+      // Cost efficiency: lower hotel = higher efficiency bonus (0-30 pts)
+      const costEfficiency = Math.round(Math.max(0, ((200 - avgHotelCost) / 200) * 30));
+
+      // Expected opportunity: avg demand × keyword density × confidence factor
+      const avgConf = Math.round(allCities.reduce((s, c) => s + c.demand.confidence, 0) / allCities.length);
+      const avgKeywords = Math.round(allCities.reduce((s, c) => s + c.demand.keywordCount, 0) / allCities.length);
+      const expectedOpportunity = Math.min(100, Math.round(avgDemand * 0.55 + avgConf * 0.25 + avgKeywords * 2.5));
+
+      // Trip Score
+      const tripScore = Math.min(100, Math.round(
+        0.40 * avgDemand +
+        0.25 * expectedOpportunity +
+        0.20 * costEfficiency +
+        0.15 * Math.max(0, 100 - routeDistance / 15)
+      ));
+
+      if (tripScore < minScore) continue;
+
+      plans.push({
+        id: `trip-${hub.city.id}`,
+        hub: hub.city,
+        cities: allCities,
+        avgDemand,
+        avgHotelCost,
+        routeDistance,
+        expectedOpportunity,
+        tripScore,
+      });
+
+      if (plans.length >= 10) break;
+    }
+
+    return plans.sort((a, b) => b.tripScore - a.tripScore);
+  }, [enriched, travelOriginId, travelBudget, travelRadius, minRouteScore]);
+
   return (
     <div className="space-y-6">
       {/* Header */}
