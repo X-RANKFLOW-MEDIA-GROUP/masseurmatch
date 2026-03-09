@@ -11,7 +11,7 @@ import {
   Radar, TrendingUp, TrendingDown, MapPin, Flame, Eye, Search,
   ArrowUpRight, ArrowDownRight, Minus, AlertTriangle, Zap, Globe, Filter,
   BarChart3, Info, Clock, Target, Navigation, Sparkles, Route, Hotel,
-  DollarSign, ChevronRight, Star, Package, Plane, CheckCircle
+  DollarSign, ChevronRight, Star, Package, Plane, CheckCircle, Calendar, Sun, Snowflake, Leaf, Flower2
 } from "lucide-react";
 import {
   US_METROS,
