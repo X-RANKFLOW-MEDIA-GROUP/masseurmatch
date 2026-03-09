@@ -42,7 +42,41 @@ const Index = () => {
   const [featuredTherapists, setFeaturedTherapists] = useState<any[]>([]);
   const [specialOfferProfiles, setSpecialOfferProfiles] = useState<any[]>([]);
   const [newProfiles, setNewProfiles] = useState<any[]>([]);
+  const [nearbyProfiles, setNearbyProfiles] = useState<any[]>([]);
   const [realStats, setRealStats] = useState({ therapists: 0, cities: 0 });
+
+  // Show location prompt after a small delay if not prompted yet
+  useEffect(() => {
+    if (!geoPrompted && !geoLoading) {
+      const timer = setTimeout(() => setShowLocationPrompt(true), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [geoPrompted, geoLoading]);
+
+  // Fetch nearby therapists when city is detected
+  useEffect(() => {
+    if (!detectedCity) return;
+    const fetchNearby = async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, display_name, full_name, city, avatar_url, specialties, slug")
+        .eq("is_active", true)
+        .eq("status", "active")
+        .ilike("city", detectedCity.name)
+        .limit(6);
+      if (data) {
+        setNearbyProfiles(data.map((p: any) => ({
+          id: p.id,
+          name: p.display_name || p.full_name || "Therapist",
+          city: p.city || "",
+          specialty: (p.specialties || []).slice(0, 2).join(", ") || "Massage Therapy",
+          image: p.avatar_url || "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=800&h=800&fit=crop",
+          slug: p.slug,
+        })));
+      }
+    };
+    fetchNearby();
+  }, [detectedCity]);
 
   useEffect(() => {
     const fetchFeatured = async () => {
