@@ -81,6 +81,7 @@ export default function DashboardDemandRadar() {
   const [minRouteScore, setMinRouteScore] = useState<string>("60");
 
   const demandData = useMemo(() => generateDemandData(), []);
+  const seasonalityData = useMemo(() => generateCitySeasonality(), []);
   const states = useMemo(() => getUniqueStates(), []);
   const metros = useMemo(() => getUniqueMetros(), []);
 
