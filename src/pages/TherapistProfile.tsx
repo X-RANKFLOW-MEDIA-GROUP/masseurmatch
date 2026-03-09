@@ -1045,6 +1045,61 @@ const TherapistProfile = () => {
             </motion.section>
           )}
 
+          {/* Imported Reviews */}
+          {importedReviews.length > 0 && (
+            <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg">
+              <div className="flex items-center gap-3 mb-6">
+                <h2 className="text-2xl font-bold">Reviews</h2>
+                <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">
+                  Imported
+                </Badge>
+                {importSummary?.extracted_rating_avg && (
+                  <span className="flex items-center gap-1 text-sm">
+                    <Star className="h-4 w-4 text-warning fill-warning" />
+                    <span className="font-semibold">{importSummary.extracted_rating_avg}</span>
+                    <span className="text-muted-foreground">from {importSummary.source_platform}</span>
+                  </span>
+                )}
+              </div>
+
+              {importSummary?.ai_summary && (
+                <div className="mb-6 p-4 bg-muted/50 rounded-lg border border-border/50">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <Award className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-semibold text-primary">AI Summary</span>
+                  </div>
+                  <p className="text-sm text-foreground leading-relaxed">{importSummary.ai_summary}</p>
+                </div>
+              )}
+
+              <div className="space-y-4">
+                {importedReviews.slice(0, 10).map((review) => (
+                  <div key={review.id} className="pb-4 border-b border-border/50 last:border-0 last:pb-0">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      {review.reviewer_name && (
+                        <span className="text-sm font-medium">{review.reviewer_name}</span>
+                      )}
+                      {review.rating && (
+                        <span className="flex items-center gap-0.5">
+                          {Array.from({ length: Math.round(review.rating) }).map((_, i) => (
+                            <Star key={i} className="h-3.5 w-3.5 text-warning fill-warning" />
+                          ))}
+                        </span>
+                      )}
+                      <Badge variant="outline" className="text-[9px]">
+                        {review.source_platform || "Imported"}
+                      </Badge>
+                      {review.review_date && (
+                        <span className="text-[10px] text-muted-foreground">{review.review_date}</span>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{review.review_text}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.section>
+          )}
+
           {/* Similar Therapists */}
           {similarProfiles.length > 0 && (
             <motion.section initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="border border-border bg-card p-8 md:p-10 mb-8 rounded-lg">
