@@ -23,8 +23,10 @@ import {
   DEMAND_KEYWORDS,
   estimateHotelCost,
   distanceMiles,
+  generateCitySeasonality,
   type CityDemandData,
   type USCity,
+  type CitySeasonality,
 } from "@/data/us-metros-demand";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, LineChart, Line, AreaChart, Area } from "recharts";
 
