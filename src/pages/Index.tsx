@@ -250,14 +250,26 @@ const Index = () => {
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-5xl mx-auto text-center">
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-xs uppercase tracking-[0.4em] text-muted-foreground mb-8"
-            >
-              {t("home.heroTag")}
-            </motion.p>
+            {detectedCity ? (
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="text-xs uppercase tracking-[0.4em] text-muted-foreground mb-8 flex items-center justify-center gap-2"
+              >
+                <MapPin className="w-3.5 h-3.5 text-primary" />
+                Therapists in {detectedCity.name}, {detectedCity.stateCode}
+              </motion.p>
+            ) : (
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="text-xs uppercase tracking-[0.4em] text-muted-foreground mb-8"
+              >
+                {t("home.heroTag")}
+              </motion.p>
+            )}
 
             <h1 className="text-5xl md:text-7xl lg:text-[6rem] font-bold text-foreground leading-[0.9] tracking-tight mb-8">
               <TextReveal text={t("home.heroTitle1")} delay={0.3} />
