@@ -20,6 +20,17 @@ const STATIC_URLS: { path: string; priority: string; changefreq: string }[] = [
   { path: "/safety", priority: "0.5", changefreq: "monthly" },
   { path: "/terms", priority: "0.3", changefreq: "yearly" },
   { path: "/privacy", priority: "0.3", changefreq: "yearly" },
+  { path: "/therapist-agreement", priority: "0.3", changefreq: "yearly" },
+  { path: "/cookies", priority: "0.2", changefreq: "yearly" },
+  { path: "/billing-policy", priority: "0.2", changefreq: "yearly" },
+  { path: "/acceptable-use", priority: "0.2", changefreq: "yearly" },
+  { path: "/photo-policy", priority: "0.2", changefreq: "yearly" },
+  { path: "/dmca", priority: "0.2", changefreq: "yearly" },
+  { path: "/accessibility", priority: "0.2", changefreq: "yearly" },
+  { path: "/marketing-consent", priority: "0.2", changefreq: "yearly" },
+  { path: "/notice-at-collection", priority: "0.2", changefreq: "yearly" },
+  { path: "/governing-law", priority: "0.2", changefreq: "yearly" },
+  { path: "/legal-contact", priority: "0.2", changefreq: "yearly" },
 ];
 
 function toSlug(city: string): string {
