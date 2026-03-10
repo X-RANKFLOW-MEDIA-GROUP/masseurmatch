@@ -278,6 +278,21 @@ function getTemplate(template: string, data: TemplateData): { subject: string; h
         `, "Don't lose your premium features"),
       };
 
+    case "trial_expired":
+      return {
+        from: `${BRAND.name} <billing@masseurmatch.com>`,
+        subject: "Your trial has ended — add payment to stay active",
+        html: htmlEmail("Trial Expired", `
+          <h1>Your free trial has ended</h1>
+          <p>Hi ${n},</p>
+          <p>Your <strong>${data.plan || "Standard"}</strong> trial ended today. Your subscription is now paused and your premium features are no longer active.</p>
+          <p>To reactivate your listing and keep all your features, add a payment method now:</p>
+          <p style="text-align:center"><a href="${dashboardLink}/subscription" class="btn">Add Payment &amp; Reactivate</a></p>
+          <hr class="divider">
+          <p class="muted">If you don't wish to continue, no action is needed. Your account will remain on the Free plan.</p>
+        `, "Your trial has ended — add payment to stay active"),
+      };
+
     case "payment_failed":
       return {
         from: `${BRAND.name} <billing@masseurmatch.com>`,
