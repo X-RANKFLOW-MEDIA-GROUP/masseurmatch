@@ -47,6 +47,12 @@ const Auth = () => {
     if (error) {
       toast({ title: t("auth.error", "Error"), description: error.message, variant: "destructive" });
     } else {
+      // If "remember me" is not checked, set a flag so session is cleared on browser close
+      if (!rememberMe) {
+        sessionStorage.setItem("mm_session_only", "true");
+      } else {
+        sessionStorage.removeItem("mm_session_only");
+      }
       toast({ title: t("auth.welcomeBack", "Welcome back!") });
       navigate("/dashboard");
     }
