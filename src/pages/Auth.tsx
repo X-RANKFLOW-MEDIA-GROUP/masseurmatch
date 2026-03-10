@@ -23,6 +23,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [rememberMe, setRememberMe] = useState(false);
   const [signupData, setSignupData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
