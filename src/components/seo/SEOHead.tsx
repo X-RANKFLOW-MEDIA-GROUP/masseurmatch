@@ -26,6 +26,7 @@ export const SEOHead = ({
   ogImage = `${BASE_URL}/og-default.png`,
   ogType = "website",
   noindex = false,
+  keywords,
   jsonLd,
 }: SEOHeadProps) => {
   const { i18n } = useTranslation();
