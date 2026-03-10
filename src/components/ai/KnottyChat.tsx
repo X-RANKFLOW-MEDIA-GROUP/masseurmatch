@@ -199,30 +199,27 @@ export const KnottyChat = () => {
               }}
             >
               <svg viewBox="0 0 64 64" className="w-full h-full">
-                <motion.ellipse
+                <ellipse
                   cx="22" cy="28"
                   rx={isHovered ? 3.5 : 2.5}
                   ry={isHovered ? 3.5 : 2.5}
                   fill="white"
-                  animate={{ ry: isHovered ? 3.5 : [2.5, 2.5, 0.5, 2.5], rx: isHovered ? 3.5 : 2.5 }}
-                  transition={isHovered ? { duration: 0.2 } : { duration: 4, repeat: Infinity, times: [0, 0.9, 0.95, 1] }}
+                  style={{ transition: "rx 0.3s, ry 0.3s" }}
                 />
-                <motion.ellipse
+                <ellipse
                   cx="42" cy="28"
                   rx={isHovered ? 3.5 : 2.5}
                   ry={isHovered ? 3.5 : 2.5}
                   fill="white"
-                  animate={{ ry: isHovered ? 3.5 : [2.5, 2.5, 0.5, 2.5], rx: isHovered ? 3.5 : 2.5 }}
-                  transition={isHovered ? { duration: 0.2 } : { duration: 4, repeat: Infinity, times: [0, 0.9, 0.95, 1] }}
+                  style={{ transition: "rx 0.3s, ry 0.3s" }}
                 />
-                <motion.path
+                <path
                   d={isHovered ? "M 20 40 Q 32 52 44 40" : "M 24 40 Q 32 46 40 40"}
                   stroke="white"
                   strokeWidth="2"
                   fill="none"
                   strokeLinecap="round"
-                  animate={{ d: isHovered ? "M 20 40 Q 32 52 44 40" : "M 24 40 Q 32 46 40 40" }}
-                  transition={{ duration: 0.3 }}
+                  style={{ transition: "d 0.3s" }}
                 />
               </svg>
             </div>
