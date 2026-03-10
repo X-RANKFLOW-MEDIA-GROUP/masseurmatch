@@ -23,7 +23,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { action, phone, code } = await req.json();
+    const { action, phone: rawPhone, code } = await req.json();
+    // Ensure E.164 format with + prefix
+    const phone = rawPhone.startsWith('+') ? rawPhone : `+${rawPhone}`;
     const twilioAuth = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
 
     if (action === "send") {
@@ -96,12 +98,6 @@ Deno.serve(async (req) => {
           { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-
-      // Generate a magic link token for this user
-      const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
-        type: "magiclink",
-        email: "", // Will be fetched from user
-      });
 
       // Get user email to generate magic link
       const { data: userData, error: userError } = await supabase.auth.admin.getUserById(profile.user_id);
