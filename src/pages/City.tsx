@@ -153,6 +153,7 @@ const City = () => {
         title={`${profileCount > 0 ? `${profileCount} ` : ""}Male Massage Therapists in ${cityDisplayName}${cityState ? `, ${cityState}` : ""} — MasseurMatch`}
         description={`${profileCount > 0 ? `Browse ${profileCount} verified` : "Find"} gay-friendly male massage therapists in ${cityDisplayName}. Compare services, prices, and contact therapists directly.`}
         path={`/${citySlug}`}
+        keywords={cityKeywords}
         jsonLd={cityJsonLd}
       />
       <CursorGlow />
