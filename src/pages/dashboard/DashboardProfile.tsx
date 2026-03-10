@@ -248,6 +248,7 @@ const DashboardProfile = () => {
               placeholder="+1 555 123 4567"
               required
             />
+            <p className="text-xs text-muted-foreground mt-1">Used for SMS login & client contact. Include country code.</p>
           </div>
         </div>
       </section>
