@@ -63,7 +63,14 @@ serve(async (req) => {
         const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(params.email, {
           data: params.user_metadata || {},
         });
-        if (error) throw new Error(error.message);
+        if (error) {
+          if (error.message.includes("already been registered")) {
+            return new Response(JSON.stringify({ error: "This email is already registered." }), {
+              status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+          throw new Error(error.message);
+        }
         result = { user_id: data.user?.id };
         break;
       }
