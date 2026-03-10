@@ -58,23 +58,58 @@ export const Header = () => {
             <span className="text-xl font-bold text-foreground tracking-tight font-heading">MasseurMatch</span>
           </Link>
 
-          {/* City indicator */}
+          {/* City indicator with dropdown */}
           {city && (
-            <motion.button
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4 }}
-              onClick={() => navigate(`/${city.slug}`)}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs text-muted-foreground hover:text-foreground transition-colors"
-              style={{
-                background: "hsl(var(--muted) / 0.5)",
-                border: "1px solid hsl(var(--border))",
-              }}
-            >
-              <MapPin className="w-3 h-3 text-primary" />
-              <span className="font-medium">{city.name}, {city.stateCode}</span>
-              <ChevronDown className="w-3 h-3 opacity-50" />
-            </motion.button>
+            <Popover open={cityPopoverOpen} onOpenChange={(o) => { setCityPopoverOpen(o); if (!o) setCitySearch(""); }}>
+              <PopoverTrigger asChild>
+                <motion.button
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  style={{
+                    background: "hsl(var(--muted) / 0.5)",
+                    border: "1px solid hsl(var(--border))",
+                  }}
+                >
+                  <MapPin className="w-3 h-3 text-primary" />
+                  <span className="font-medium">{city.name}, {city.stateCode}</span>
+                  <ChevronDown className="w-3 h-3 opacity-50" />
+                </motion.button>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-64 p-2">
+                <div className="flex items-center gap-2 px-2 pb-2 border-b border-border mb-1">
+                  <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                  <input
+                    value={citySearch}
+                    onChange={(e) => setCitySearch(e.target.value)}
+                    placeholder="Search cities..."
+                    className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                    autoFocus
+                  />
+                </div>
+                <div className="max-h-48 overflow-y-auto">
+                  {filteredCities.map((c) => (
+                    <button
+                      key={c.slug}
+                      onClick={() => {
+                        setCity(c);
+                        setCityPopoverOpen(false);
+                        setCitySearch("");
+                        navigate(`/${c.slug}`);
+                      }}
+                      className={`w-full text-left px-2 py-1.5 text-sm rounded-sm flex items-center gap-2 transition-colors hover:bg-accent ${c.slug === city.slug ? "bg-accent font-medium" : ""}`}
+                    >
+                      <MapPin className="w-3 h-3 text-muted-foreground shrink-0" />
+                      {c.name}, {c.stateCode}
+                    </button>
+                  ))}
+                  {filteredCities.length === 0 && (
+                    <p className="text-xs text-muted-foreground text-center py-3">No cities found</p>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
           )}
 
           {loading && (
