@@ -234,7 +234,7 @@ serve(async (req) => {
         trial_period_days: 14,
         metadata: { masseurmatch_plan: plan_key, user_id: user.id },
       },
-      payment_method_collection: "always",
+      payment_method_collection: "if_required",
       success_url: `${req.headers.get("origin")}/dashboard/subscription?success=true`,
       cancel_url: `${req.headers.get("origin")}/dashboard/subscription?canceled=true`,
       metadata: { user_id: user.id, plan_key },
