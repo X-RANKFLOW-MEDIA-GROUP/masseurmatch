@@ -139,10 +139,10 @@ function evaluatePhotoResult(result: any): { approved: boolean; reason: string }
   }
 
   // Offensive content
-  if (result.offensive2?.prob > 0.5) reasons.push('offensive content detected');
+  if (result.offensive?.prob > 0.5) reasons.push('offensive content detected');
 
   // Gore
-  if (result.gore2?.prob > 0.5) reasons.push('graphic/violent content detected');
+  if (result.gore?.prob > 0.5) reasons.push('graphic/violent content detected');
 
   // Violence
   if (result.violence?.prob > 0.5) reasons.push('violence detected');
