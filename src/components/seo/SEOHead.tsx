@@ -11,6 +11,7 @@ interface SEOHeadProps {
   ogImage?: string;
   ogType?: string;
   noindex?: boolean;
+  keywords?: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
@@ -25,6 +26,7 @@ export const SEOHead = ({
   ogImage = `${BASE_URL}/og-default.png`,
   ogType = "website",
   noindex = false,
+  keywords,
   jsonLd,
 }: SEOHeadProps) => {
   const { i18n } = useTranslation();
@@ -46,6 +48,14 @@ export const SEOHead = ({
 
     // Description
     setMeta("name", "description", description);
+
+    // Keywords
+    if (keywords) {
+      setMeta("name", "keywords", keywords);
+    } else {
+      const existing = document.querySelector('meta[name="keywords"]');
+      if (existing) existing.remove();
+    }
 
     // Robots
     if (noindex) {
@@ -118,7 +128,7 @@ export const SEOHead = ({
       document.querySelectorAll('link[rel="alternate"][hreflang]').forEach((el) => el.remove());
       document.querySelectorAll('script[data-seo-head="true"]').forEach((el) => el.remove());
     };
-  }, [title, description, path, ogImage, ogType, noindex, jsonLd, i18n.language]);
+  }, [title, description, path, ogImage, ogType, noindex, keywords, jsonLd, i18n.language]);
 
   return null;
 };
