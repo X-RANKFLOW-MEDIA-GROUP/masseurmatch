@@ -445,7 +445,6 @@ const Auth = () => {
                   </>
                 )}
               </div>
-              </div>
             )}
           </TabsContent>
 
