@@ -128,7 +128,7 @@ export const SEOHead = ({
       document.querySelectorAll('link[rel="alternate"][hreflang]').forEach((el) => el.remove());
       document.querySelectorAll('script[data-seo-head="true"]').forEach((el) => el.remove());
     };
-  }, [title, description, path, ogImage, ogType, noindex, jsonLd, i18n.language]);
+  }, [title, description, path, ogImage, ogType, noindex, keywords, jsonLd, i18n.language]);
 
   return null;
 };
