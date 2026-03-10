@@ -99,6 +99,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => authSub.unsubscribe();
   }, [refreshSubscription]);
 
+  // Clear session on browser close if "remember me" was not checked
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (sessionStorage.getItem("mm_session_only") === "true") {
+        supabase.auth.signOut();
+        sessionStorage.removeItem("mm_session_only");
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, []);
+
   // Auto-refresh subscription every 60s
   useEffect(() => {
     if (!user) return;
