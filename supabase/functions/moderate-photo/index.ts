@@ -38,7 +38,7 @@ serve(async (req) => {
       // Use SightEngine URL check
       const params = new URLSearchParams({
         url: image_url,
-        models: 'nudity-2.1,offensive2,gore2,tobacco,recreational_drug,medical,violence,self-harm',
+        models: 'nudity-2.1,offensive,gore,tobacco,recreational_drug,medical,violence,self-harm',
         api_user: apiUser,
         api_secret: apiSecret,
       });
