@@ -161,9 +161,11 @@ const Index = () => {
   }, []);
 
   const marqueeWords = [
-    "Deep Tissue", "Swedish", "Sports Recovery", "Hot Stone", "Aromatherapy",
-    "Thai Massage", "Shiatsu", "Reflexology", "Men's Wellness", "Bodywork",
-    "Relaxation", "Therapeutic", "Gay-Friendly",
+    "Gay Massage", "M4M Massage", "Male Massage Therapist", "Deep Tissue",
+    "Swedish", "Sports Recovery", "Hot Stone", "Aromatherapy", "Thai Massage",
+    "Gay-Friendly Bodywork", "Men's Wellness", "LGBTQ Massage", "Shiatsu",
+    "Reflexology", "Tantric Bodywork", "Male-to-Male Massage", "Relaxation",
+    "Therapeutic", "Sensual Bodywork", "Gay Spa", "Masculine Touch",
   ];
 
   return (
