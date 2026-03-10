@@ -200,7 +200,17 @@ const Auth = () => {
                   className="bg-white/5 border-white/10"
                 />
               </div>
-              <div className="text-right">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="remember-me"
+                    checked={rememberMe}
+                    onCheckedChange={(checked) => setRememberMe(checked === true)}
+                  />
+                  <Label htmlFor="remember-me" className="text-sm text-muted-foreground cursor-pointer">
+                    {t("auth.rememberMe", "Remember me")}
+                  </Label>
+                </div>
                 <Link to="/forgot-password" className="text-sm text-primary hover:underline">
                   {t("auth.forgotPassword", "Forgot password?")}
                 </Link>
