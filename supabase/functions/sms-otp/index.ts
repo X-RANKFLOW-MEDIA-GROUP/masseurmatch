@@ -23,7 +23,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { action, phone, code } = await req.json();
+    const { action, phone: rawPhone, code } = await req.json();
+    // Ensure E.164 format with + prefix
+    const phone = rawPhone.startsWith('+') ? rawPhone : `+${rawPhone}`;
     const twilioAuth = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
 
     if (action === "send") {
