@@ -194,14 +194,13 @@ const AdminUsers = () => {
     if (!inviteForm.email) return;
     setInviteLoading(true);
     try {
-      const { data, error } = await supabase.auth.admin.inviteUserByEmail(inviteForm.email, {
-        data: { full_name: inviteForm.full_name },
+      await callUserLookup("invite_user", {
+        email: inviteForm.email,
+        user_metadata: { full_name: inviteForm.full_name },
       });
-      if (error) throw error;
       toast({ title: "Invitation sent!", description: `Invite sent to ${inviteForm.email}` });
       setInviteDialog(false);
       setInviteForm({ email: "", full_name: "" });
-      // Reload after a delay to allow trigger to create profile
       setTimeout(load, 2000);
     } catch (err: any) {
       toast({ title: "Error sending invite", description: err.message, variant: "destructive" });
