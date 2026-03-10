@@ -12,10 +12,11 @@ import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { StepVerification } from "@/components/auth/StepVerification";
 import { StepProfile } from "@/components/auth/StepProfile";
-import { CheckCircle, Shield, Camera, User, Chrome } from "lucide-react";
+import { CheckCircle, Shield, Camera, User, Chrome, Phone, ArrowRight } from "lucide-react";
 import { lovable } from "@/integrations/lovable/index";
 import { Separator } from "@/components/ui/separator";
 import { useTranslation } from "react-i18next";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
 const Auth = () => {
   const { toast } = useToast();
