@@ -82,27 +82,33 @@ const Pricing = () => {
             </motion.p>
           </div>
 
-          {/* Founder Deal Banner */}
+          {/* Trial Banner */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="max-w-3xl mx-auto mb-12 p-6 rounded-lg border border-primary/20 bg-primary/5 text-center"
+            className="max-w-3xl mx-auto mb-6 p-5 rounded-lg border border-primary/20 bg-primary/5 text-center"
           >
-            <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Shield className="w-5 h-5 text-primary" />
+              <span className="font-bold text-lg text-foreground">14-day free trial — no credit card needed</span>
+            </div>
+            <p className="text-sm text-muted-foreground">Try any plan risk-free. You'll only be asked for payment when your trial ends.</p>
+          </motion.div>
+
+          {/* Founder Deal Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="max-w-3xl mx-auto mb-12 p-5 rounded-lg border border-primary/20 bg-primary/5 text-center"
+          >
+            <div className="flex items-center justify-center gap-2 mb-1">
               <Sparkles className="w-5 h-5 text-primary" />
               <span className="font-bold text-lg text-foreground">Founder Deal — 50% OFF for 3 months</span>
               <Sparkles className="w-5 h-5 text-primary" />
             </div>
-            <p className="text-sm text-muted-foreground">Limited to the first 50 members. All paid plans include a 14-day free trial.</p>
-            <div className="flex items-center justify-center gap-4 mt-3">
-              <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                <CreditCard className="w-3 h-3" /> Card required
-              </span>
-              <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Shield className="w-3 h-3" /> Anti-fraud protection
-              </span>
-            </div>
+            <p className="text-sm text-muted-foreground">Limited to the first 50 members. Discount applies after your 14-day free trial.</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-border max-w-7xl mx-auto">
@@ -121,7 +127,6 @@ const Pricing = () => {
                   <div className="flex items-center gap-2 mb-2">
                     <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{plan.name}</p>
                     {plan.popular && <Badge className="text-[10px]">Most Popular</Badge>}
-                    {plan.isFree && <Badge variant="secondary" className="text-[10px]">14 days</Badge>}
                   </div>
                   <div className="flex items-baseline gap-1 mb-1">
                     <span className="text-5xl font-bold text-foreground font-heading">{plan.price}</span>
@@ -132,11 +137,9 @@ const Pricing = () => {
                       Founder price: {plan.founderPrice}/mo for 3 months
                     </p>
                   )}
-                  {plan.isFree && (
-                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                      <CreditCard className="w-3 h-3" /> Card required to start trial
-                    </p>
-                  )}
+                  <p className="text-xs text-primary/80 flex items-center gap-1 mt-1 font-medium">
+                    <Shield className="w-3 h-3" /> 14 days free · no card required
+                  </p>
                   <p className="text-sm text-muted-foreground mt-2">{plan.description}</p>
                 </div>
                 <ul className="space-y-3 mb-10">
