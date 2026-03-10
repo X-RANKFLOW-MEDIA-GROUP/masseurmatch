@@ -236,8 +236,7 @@ const AdminUsers = () => {
     setStripeData(null);
     setStripeLoading(true);
     try {
-      const { data: userData } = await supabase.auth.admin.getUserById(profile.user_id);
-      const email = userData?.user?.email;
+      const { email } = await callUserLookup("get_user_email", { user_id: profile.user_id });
       if (!email) {
         toast({ title: "Email not found", variant: "destructive" });
         setStripeLoading(false);
