@@ -179,16 +179,48 @@ export const Header = () => {
         </button>
       </div>
 
-      {/* Mobile city indicator */}
+      {/* Mobile city indicator with popover */}
       {city && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="sm:hidden flex items-center justify-center gap-1.5 py-1.5 text-xs text-muted-foreground border-t border-border bg-background/60"
-        >
-          <MapPin className="w-3 h-3 text-primary" />
-          <span>{city.name}, {city.stateCode}</span>
-        </motion.div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="sm:hidden flex items-center justify-center gap-1.5 py-1.5 text-xs text-muted-foreground border-t border-border bg-background/60 w-full"
+            >
+              <MapPin className="w-3 h-3 text-primary" />
+              <span>{city.name}, {city.stateCode}</span>
+              <ChevronDown className="w-3 h-3 opacity-50" />
+            </motion.button>
+          </PopoverTrigger>
+          <PopoverContent align="center" className="w-64 p-2">
+            <div className="flex items-center gap-2 px-2 pb-2 border-b border-border mb-1">
+              <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+              <input
+                value={citySearch}
+                onChange={(e) => setCitySearch(e.target.value)}
+                placeholder="Search cities..."
+                className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              />
+            </div>
+            <div className="max-h-48 overflow-y-auto">
+              {filteredCities.map((c) => (
+                <button
+                  key={c.slug}
+                  onClick={() => {
+                    setCity(c);
+                    setCitySearch("");
+                    navigate(`/${c.slug}`);
+                  }}
+                  className={`w-full text-left px-2 py-1.5 text-sm rounded-sm flex items-center gap-2 transition-colors hover:bg-accent ${c.slug === city.slug ? "bg-accent font-medium" : ""}`}
+                >
+                  <MapPin className="w-3 h-3 text-muted-foreground shrink-0" />
+                  {c.name}, {c.stateCode}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
       )}
 
       <AnimatePresence>
