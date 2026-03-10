@@ -1,10 +1,12 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Globe, MapPin, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { Menu, X, Globe, MapPin, ChevronDown, Search } from "lucide-react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { US_CITIES } from "@/data/cities";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import {
   DropdownMenu,
   DropdownMenuContent,
