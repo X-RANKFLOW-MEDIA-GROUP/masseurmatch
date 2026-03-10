@@ -11,6 +11,7 @@ interface SEOHeadProps {
   ogImage?: string;
   ogType?: string;
   noindex?: boolean;
+  keywords?: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
