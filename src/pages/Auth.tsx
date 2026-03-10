@@ -363,7 +363,7 @@ const Auth = () => {
                       <Input
                         id="phone-number"
                         type="tel"
-                        placeholder="+1 (470) 899-2222"
+                        placeholder="+1 555 123 4567"
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
                         className="bg-white/5 border-white/10"
