@@ -56,7 +56,7 @@ serve(async (req) => {
       const formData = new FormData();
       const binaryData = Uint8Array.from(atob(image_base64), c => c.charCodeAt(0));
       formData.append('media', new Blob([binaryData], { type: 'image/jpeg' }), 'photo.jpg');
-      formData.append('models', 'nudity-2.1,offensive2,gore2,tobacco,recreational_drug,medical,violence,self-harm');
+      formData.append('models', 'nudity-2.1,offensive,gore,tobacco,recreational_drug,medical,violence,self-harm');
       formData.append('api_user', apiUser);
       formData.append('api_secret', apiSecret);
 
