@@ -123,10 +123,24 @@ serve(async (req) => {
 
     const planKey = activeSub.metadata?.masseurmatch_plan || null;
     const isTrial = activeSub.status === "trialing";
-    const subscriptionEnd = new Date(activeSub.current_period_end * 1000).toISOString();
-    const trialEnd = activeSub.trial_end
-      ? new Date(activeSub.trial_end * 1000).toISOString()
-      : null;
+
+    let subscriptionEnd: string | null = null;
+    try {
+      const endTs = Number(activeSub.current_period_end);
+      if (endTs && !isNaN(endTs)) {
+        subscriptionEnd = new Date(endTs * 1000).toISOString();
+      }
+    } catch { /* ignore */ }
+
+    let trialEnd: string | null = null;
+    try {
+      if (activeSub.trial_end) {
+        const trialTs = Number(activeSub.trial_end);
+        if (trialTs && !isNaN(trialTs)) {
+          trialEnd = new Date(trialTs * 1000).toISOString();
+        }
+      }
+    } catch { /* ignore */ }
 
     const hasFounderDiscount = activeSub.discount?.coupon?.id === "FOUNDER50";
 
