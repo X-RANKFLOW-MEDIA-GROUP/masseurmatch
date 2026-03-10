@@ -181,30 +181,42 @@ serve(async (req) => {
       }
     }
 
-    // For free plan: create a setup-intent checkout to collect card, then start a 14-day trial on $0 price
+    // For free plan: create a trial subscription without requiring a credit card
     if (plan.isFree) {
       const priceId = await getOrCreatePrice(stripe, "standard"); // Use standard as the base
 
-      const sessionParams: Stripe.Checkout.SessionCreateParams = {
+      // Create or reuse customer
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          metadata: { user_id: user.id, source: "masseurmatch" },
+        });
+        customerId = customer.id;
+        logStep("Created new customer for cardless trial", { customerId });
+      }
+
+      // Create subscription directly with 14-day trial, no payment method required
+      const subscription = await stripe.subscriptions.create({
         customer: customerId,
-        customer_email: customerId ? undefined : user.email,
-        line_items: [{ price: priceId, quantity: 1 }],
-        mode: "subscription",
-        subscription_data: {
-          trial_period_days: 14,
-          metadata: { masseurmatch_plan: "free", user_id: user.id },
-          // After trial ends, they'll be charged $39/mo (Standard) unless they cancel
+        items: [{ price: priceId }],
+        trial_period_days: 14,
+        payment_behavior: "default_incomplete",
+        payment_settings: {
+          save_default_payment_method: "on_subscription",
         },
-        payment_method_collection: "always",
-        success_url: `${req.headers.get("origin")}/dashboard/subscription?success=true&plan=free`,
-        cancel_url: `${req.headers.get("origin")}/dashboard/subscription?canceled=true`,
-        metadata: { user_id: user.id, plan_key: "free" },
-      };
+        trial_settings: {
+          end_behavior: { missing_payment_method: "pause" },
+        },
+        metadata: { masseurmatch_plan: "free", user_id: user.id },
+      });
 
-      const session = await stripe.checkout.sessions.create(sessionParams);
-      logStep("Free trial checkout created", { sessionId: session.id });
+      logStep("Free trial subscription created (no card)", { subscriptionId: subscription.id });
 
-      return new Response(JSON.stringify({ url: session.url }), {
+      return new Response(JSON.stringify({
+        success: true,
+        subscription_id: subscription.id,
+        trial_end: new Date(subscription.trial_end! * 1000).toISOString(),
+      }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -222,7 +234,7 @@ serve(async (req) => {
         trial_period_days: 14,
         metadata: { masseurmatch_plan: plan_key, user_id: user.id },
       },
-      payment_method_collection: "always",
+      payment_method_collection: "if_required",
       success_url: `${req.headers.get("origin")}/dashboard/subscription?success=true`,
       cancel_url: `${req.headers.get("origin")}/dashboard/subscription?canceled=true`,
       metadata: { user_id: user.id, plan_key },

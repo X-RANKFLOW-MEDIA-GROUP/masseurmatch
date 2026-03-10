@@ -37,8 +37,13 @@ const DashboardSubscription = () => {
         body: { plan_key: planKey },
       });
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
       if (data?.url) {
         window.open(data.url, "_blank");
+      } else if (data?.success) {
+        // Free trial started without checkout redirect (no card required)
+        toast({ title: "Free trial started!", description: "Your 14-day free trial is now active." });
+        await refreshSubscription();
       }
     } catch (err: any) {
       toast({ title: "Checkout error", description: err.message || "Failed to create checkout session", variant: "destructive" });
