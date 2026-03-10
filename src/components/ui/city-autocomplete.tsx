@@ -2,18 +2,24 @@ import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { US_CITIES } from "@/data/cities";
 
-const SUPPORTED_CITIES = [
-  "Los Angeles", "New York", "Miami", "San Francisco", "Chicago", "Seattle",
-  "Houston", "Dallas", "Austin", "San Diego", "Phoenix", "Denver",
-  "Las Vegas", "Atlanta", "Boston", "Portland", "Nashville", "Orlando",
-  "Tampa", "Charlotte", "Minneapolis", "San Antonio", "Philadelphia",
-  "Washington DC", "Detroit", "Salt Lake City", "Honolulu", "New Orleans",
-];
+interface CityOption {
+  name: string;
+  stateCode: string;
+  label: string;
+}
+
+const CITY_OPTIONS: CityOption[] = US_CITIES.map((c) => ({
+  name: c.name,
+  stateCode: c.stateCode,
+  label: `${c.name}, ${c.stateCode}`,
+}));
 
 interface CityAutocompleteProps {
   value: string;
   onChange: (value: string) => void;
+  onCitySelect?: (city: { name: string; stateCode: string }) => void;
   placeholder?: string;
   className?: string;
 }
@@ -21,19 +27,20 @@ interface CityAutocompleteProps {
 export const CityAutocomplete = ({
   value,
   onChange,
+  onCitySelect,
   placeholder = "Start typing a city...",
   className,
 }: CityAutocompleteProps) => {
   const [open, setOpen] = useState(false);
-  const [filtered, setFiltered] = useState<string[]>([]);
+  const [filtered, setFiltered] = useState<CityOption[]>([]);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (value.trim().length > 0) {
       const q = value.toLowerCase();
-      setFiltered(SUPPORTED_CITIES.filter((c) => c.toLowerCase().includes(q)).slice(0, 8));
+      setFiltered(CITY_OPTIONS.filter((c) => c.label.toLowerCase().includes(q)).slice(0, 10));
     } else {
-      setFiltered(SUPPORTED_CITIES.slice(0, 8));
+      setFiltered(CITY_OPTIONS.slice(0, 10));
     }
   }, [value]);
 
@@ -62,16 +69,17 @@ export const CityAutocomplete = ({
         <div className="absolute z-50 top-full mt-1 w-full rounded-md border border-border bg-popover shadow-lg max-h-48 overflow-y-auto">
           {filtered.map((city) => (
             <button
-              key={city}
+              key={city.label}
               type="button"
               className="w-full text-left px-3 py-2 text-sm hover:bg-accent flex items-center gap-2 transition-colors"
               onClick={() => {
-                onChange(city);
+                onChange(city.name);
+                onCitySelect?.({ name: city.name, stateCode: city.stateCode });
                 setOpen(false);
               }}
             >
               <MapPin className="w-3 h-3 text-muted-foreground shrink-0" />
-              {city}
+              {city.label}
             </button>
           ))}
         </div>

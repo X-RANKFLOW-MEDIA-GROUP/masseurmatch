@@ -67,6 +67,7 @@ const AdminModeration = () => {
 
   // Get public URL for a photo
   const getPhotoUrl = (storagePath: string) => {
+    if (storagePath.startsWith('http')) return storagePath;
     const { data } = supabase.storage.from("profile-photos").getPublicUrl(storagePath);
     return data?.publicUrl || "";
   };

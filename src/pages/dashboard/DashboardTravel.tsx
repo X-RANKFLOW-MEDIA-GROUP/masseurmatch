@@ -67,7 +67,6 @@ const DashboardTravel = () => {
       return;
     }
 
-    // Check if this is a new city
     const isNewCity = !activeCities.has(form.destination_city.toLowerCase());
     if (isNewCity && atCityLimit) {
       toast({ title: "City limit reached", description: `Your ${planLabel} plan allows up to ${maxCities} destination cities. Upgrade for more.`, variant: "destructive" });
@@ -162,23 +161,14 @@ const DashboardTravel = () => {
       {showForm && (
         <section className="glass-card p-6 space-y-4">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">New Trip</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Label>Destination City *</Label>
-              <CityAutocomplete
-                value={form.destination_city}
-                onChange={(v) => setForm((f) => ({ ...f, destination_city: v }))}
-                placeholder="e.g. Miami"
-              />
-            </div>
-            <div>
-              <Label>State</Label>
-              <Input
-                value={form.destination_state}
-                onChange={(e) => setForm((f) => ({ ...f, destination_state: e.target.value }))}
-                placeholder="e.g. FL"
-              />
-            </div>
+          <div>
+            <Label>Destination City *</Label>
+            <CityAutocomplete
+              value={form.destination_city}
+              onChange={(v) => setForm((f) => ({ ...f, destination_city: v }))}
+              onCitySelect={(city) => setForm((f) => ({ ...f, destination_city: city.name, destination_state: city.stateCode }))}
+              placeholder="e.g. Miami"
+            />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
