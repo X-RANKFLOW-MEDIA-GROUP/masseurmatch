@@ -234,7 +234,7 @@ export const US_CITIES: CityData[] = [
   { slug: "west-jordan", name: "West Jordan", state: "Utah", stateCode: "UT", intro: "Connect with West Jordan's massage therapists in the Salt Lake Valley." },
   { slug: "evansville", name: "Evansville", state: "Indiana", stateCode: "IN", intro: "Find Evansville's skilled massage therapists in Southwest Indiana." },
   { slug: "orem", name: "Orem", state: "Utah", stateCode: "UT", intro: "Discover Orem's wellness community in Utah Valley." },
-  { slug: "tyler", name: "Tyler", state: "Texas", stateCode: "TX", intro: "Find Tyler's experienced massage therapists in East Texas." },
+  { slug: "el-centro", name: "El Centro", state: "California", stateCode: "CA", intro: "Find El Centro's massage therapists in the Imperial Valley." },
   { slug: "berkeley", name: "Berkeley", state: "California", stateCode: "CA", intro: "Connect with Berkeley's holistic massage therapists in the East Bay." },
   { slug: "palm-coast", name: "Palm Coast", state: "Florida", stateCode: "FL", intro: "Find Palm Coast's trusted massage therapists in Flagler County." },
   { slug: "temecula", name: "Temecula", state: "California", stateCode: "CA", intro: "Discover Temecula's massage therapists in Riverside County wine country." },
