@@ -49,6 +49,14 @@ export const SEOHead = ({
     // Description
     setMeta("name", "description", description);
 
+    // Keywords
+    if (keywords) {
+      setMeta("name", "keywords", keywords);
+    } else {
+      const existing = document.querySelector('meta[name="keywords"]');
+      if (existing) existing.remove();
+    }
+
     // Robots
     if (noindex) {
       setMeta("name", "robots", "noindex, nofollow");
