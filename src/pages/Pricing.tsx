@@ -127,7 +127,6 @@ const Pricing = () => {
                   <div className="flex items-center gap-2 mb-2">
                     <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{plan.name}</p>
                     {plan.popular && <Badge className="text-[10px]">Most Popular</Badge>}
-                    {plan.isFree && <Badge variant="secondary" className="text-[10px]">14 days</Badge>}
                   </div>
                   <div className="flex items-baseline gap-1 mb-1">
                     <span className="text-5xl font-bold text-foreground font-heading">{plan.price}</span>
@@ -138,11 +137,9 @@ const Pricing = () => {
                       Founder price: {plan.founderPrice}/mo for 3 months
                     </p>
                   )}
-                  {plan.isFree && (
-                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                      <CreditCard className="w-3 h-3" /> Card required to start trial
-                    </p>
-                  )}
+                  <p className="text-xs text-primary/80 flex items-center gap-1 mt-1 font-medium">
+                    <Shield className="w-3 h-3" /> 14 days free · no card required
+                  </p>
                   <p className="text-sm text-muted-foreground mt-2">{plan.description}</p>
                 </div>
                 <ul className="space-y-3 mb-10">
