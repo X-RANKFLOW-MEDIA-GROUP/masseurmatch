@@ -99,6 +99,16 @@ const City = () => {
 
   const profileCount = profiles.length;
 
+  const cityKeywords = [
+    `gay massage ${cityDisplayName}`, `male massage therapist ${cityDisplayName}`,
+    `M4M massage ${cityDisplayName}`, `LGBTQ massage ${cityDisplayName}`,
+    `gay-friendly bodywork ${cityDisplayName}`, `men's wellness ${cityDisplayName}`,
+    "male massage therapist near me", "gay-friendly massage", "M4M massage",
+    "LGBTQ massage directory", "men's wellness massage", "gay massage directory",
+    "deep tissue massage", "Swedish massage", "sports recovery massage",
+    "therapeutic bodywork", "relaxation massage",
+  ].join(", ");
+
   const cityJsonLd = [
     {
       "@context": "https://schema.org",
@@ -116,6 +126,24 @@ const City = () => {
         "name": f.q,
         "acceptedAnswer": { "@type": "Answer", "text": f.a },
       })),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": `Male Massage Therapists in ${cityDisplayName}${cityState ? `, ${cityState}` : ""}`,
+      "description": `Browse verified gay-friendly male massage therapists in ${cityDisplayName}. Compare services, read profiles, and contact therapists directly.`,
+      "url": `${BASE_URL}/${citySlug}`,
+      "isPartOf": { "@type": "WebSite", "name": "MasseurMatch", "url": BASE_URL },
+      "about": {
+        "@type": "Service",
+        "name": "Gay-Friendly Massage Directory",
+        "serviceType": "Massage Therapy Directory",
+        "areaServed": {
+          "@type": "City",
+          "name": cityDisplayName,
+          ...(cityState ? { "containedInPlace": { "@type": "State", "name": cityState } } : {}),
+        },
+      },
     },
   ];
 
