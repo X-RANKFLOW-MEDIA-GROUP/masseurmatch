@@ -89,6 +89,14 @@ const AdminUsers = () => {
     return data;
   };
 
+  const callUserLookup = async (action: string, params: Record<string, any> = {}) => {
+    const { data, error } = await supabase.functions.invoke("admin-user-lookup", {
+      body: { action, ...params },
+    });
+    if (error) throw new Error(error.message);
+    return data;
+  };
+
   const handleSuspend = async () => {
     if (!suspendDialog.userId) return;
     const { data: { user: admin } } = await supabase.auth.getUser();
