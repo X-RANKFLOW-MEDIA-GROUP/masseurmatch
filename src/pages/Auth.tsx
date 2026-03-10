@@ -31,6 +31,13 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
   
+  // SMS OTP state
+  const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [otpCode, setOtpCode] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
+  
   // Signup wizard state
   const [signupStep, setSignupStep] = useState(0);
 
