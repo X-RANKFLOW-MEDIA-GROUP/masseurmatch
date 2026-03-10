@@ -143,7 +143,8 @@ export const KnottyChat = () => {
     }
   }, [input, isTyping, messages]);
 
-  const latestAssistantId = messages.filter((m) => m.role === "assistant").at(-1)?.id ?? -1;
+  const assistantMessages = messages.filter((m) => m.role === "assistant");
+  const latestAssistantId = assistantMessages.length > 0 ? assistantMessages[assistantMessages.length - 1].id : -1;
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
