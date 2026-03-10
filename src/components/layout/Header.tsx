@@ -23,10 +23,17 @@ const languages = [
 
 export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [citySearch, setCitySearch] = useState("");
+  const [cityPopoverOpen, setCityPopoverOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const { city, loading } = useGeolocation();
+  const { city, loading, setCity } = useGeolocation();
+
+  const filteredCities = useMemo(() => {
+    const q = citySearch.toLowerCase();
+    return US_CITIES.filter((c) => c.name.toLowerCase().includes(q) || c.stateCode.toLowerCase().includes(q)).slice(0, 12);
+  }, [citySearch]);
 
   const navLinks = [
     { to: "/explore", label: t("nav.explore") },
