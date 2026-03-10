@@ -34,16 +34,32 @@ serve(async (req) => {
 
     let moderationResult = { approved: false, reason: 'Unknown' };
 
-    if (image_url) {
-      // Use SightEngine URL check
-      const params = new URLSearchParams({
-        url: image_url,
-        models: 'nudity-2.1,offensive,gore,tobacco,recreational_drug,medical,violence,self-harm',
-        api_user: apiUser,
-        api_secret: apiSecret,
-      });
+    const MODELS = 'nudity-2.1,offensive,gore,tobacco,recreational_drug,medical,violence,self-harm';
 
-      const seResponse = await fetch(`https://api.sightengine.com/1.0/check.json?${params}`);
+    if (image_url) {
+      // Download the image server-side first, then upload binary to SightEngine.
+      // This avoids SightEngine "media_error" when the hosting server rejects its requests.
+      let imageBlob: Blob;
+      try {
+        const imgResponse = await fetch(image_url);
+        if (!imgResponse.ok) {
+          throw new Error(`Failed to download image: HTTP ${imgResponse.status}`);
+        }
+        imageBlob = await imgResponse.blob();
+      } catch (dlErr) {
+        throw new Error(`Could not download image for moderation: ${dlErr.message}`);
+      }
+
+      const formData = new FormData();
+      formData.append('media', imageBlob, 'photo.jpg');
+      formData.append('models', MODELS);
+      formData.append('api_user', apiUser);
+      formData.append('api_secret', apiSecret);
+
+      const seResponse = await fetch('https://api.sightengine.com/1.0/check.json', {
+        method: 'POST',
+        body: formData,
+      });
       const seResult = await seResponse.json();
 
       if (seResult.status !== 'success') {
@@ -56,7 +72,7 @@ serve(async (req) => {
       const formData = new FormData();
       const binaryData = Uint8Array.from(atob(image_base64), c => c.charCodeAt(0));
       formData.append('media', new Blob([binaryData], { type: 'image/jpeg' }), 'photo.jpg');
-      formData.append('models', 'nudity-2.1,offensive,gore,tobacco,recreational_drug,medical,violence,self-harm');
+      formData.append('models', MODELS);
       formData.append('api_user', apiUser);
       formData.append('api_secret', apiSecret);
 
