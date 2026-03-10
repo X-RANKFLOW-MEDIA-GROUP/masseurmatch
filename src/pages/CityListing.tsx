@@ -107,12 +107,22 @@ const CityListing = () => {
     })),
   } : null;
 
+  const listingKeywords = [
+    `gay massage ${cityDisplayName}`, `male massage therapist ${cityDisplayName}`,
+    `M4M massage ${cityDisplayName}`, `LGBTQ massage ${cityDisplayName}`,
+    `gay-friendly bodywork ${cityDisplayName}`, `men's wellness ${cityDisplayName}`,
+    "male massage therapist near me", "gay-friendly massage", "M4M massage",
+    "LGBTQ massage directory", "men's wellness massage", "gay massage directory",
+    "deep tissue massage", "Swedish massage", "sports recovery massage",
+  ].join(", ");
+
   return (
     <div className="min-h-screen bg-background" ref={scrollRef}>
       <SEOHead
         title={`Massage Therapists in ${cityDisplayName}${cityState ? `, ${cityState}` : ""} — MasseurMatch`}
         description={`Find ${profiles.length || ""} verified massage therapists in ${cityDisplayName}. Browse profiles, compare services and prices. Contact providers directly.`}
         path={`/${citySlug}/massage-therapists`}
+        keywords={listingKeywords}
         jsonLd={[breadcrumbJsonLd, ...(localBusinessListJsonLd ? [localBusinessListJsonLd] : [])]}
       />
       <CursorGlow />
