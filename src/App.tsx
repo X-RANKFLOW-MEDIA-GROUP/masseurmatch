@@ -30,6 +30,19 @@ const CityDirectory = lazy(() => import("./pages/CityDirectory"));
 const ClaimProfile = lazy(() => import("./pages/ClaimProfile"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
+// Legal pages
+const TherapistAgreement = lazy(() => import("./pages/legal/TherapistAgreement"));
+const Cookies = lazy(() => import("./pages/legal/Cookies"));
+const BillingPolicy = lazy(() => import("./pages/legal/BillingPolicy"));
+const AcceptableUse = lazy(() => import("./pages/legal/AcceptableUse"));
+const PhotoPolicy = lazy(() => import("./pages/legal/PhotoPolicy"));
+const DMCA = lazy(() => import("./pages/legal/DMCA"));
+const Accessibility = lazy(() => import("./pages/legal/Accessibility"));
+const MarketingConsent = lazy(() => import("./pages/legal/MarketingConsent"));
+const NoticeAtCollection = lazy(() => import("./pages/legal/NoticeAtCollection"));
+const GoverningLaw = lazy(() => import("./pages/legal/GoverningLaw"));
+const LegalContact = lazy(() => import("./pages/legal/LegalContact"));
+
 // Dashboard
 const DashboardLayout = lazy(() => import("@/components/dashboard/DashboardLayout").then(m => ({ default: m.DashboardLayout })));
 const DashboardOverview = lazy(() => import("./pages/dashboard/DashboardOverview"));
@@ -88,8 +101,6 @@ const LegacyCityRedirect = () => {
 
 /** Redirect /therapist/:id → attempts to build SEO URL, falls back to rendering */
 const LegacyTherapistRedirect = () => {
-  // We can't easily resolve city+slug from just an ID client-side without a query,
-  // so we render TherapistProfile which already handles the legacy /:id pattern.
   return (
     <PageTransition>
       <Suspense fallback={<Loading />}>
@@ -118,8 +129,22 @@ const AnimatedRoutes = () => {
           <Route path="/register" element={<PageTransition><Auth /></PageTransition>} />
           <Route path="/faq" element={<PageTransition><FAQPage /></PageTransition>} />
           <Route path="/safety" element={<PageTransition><Safety /></PageTransition>} />
+
+          {/* ── Legal pages ── */}
           <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
           <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
+          <Route path="/therapist-agreement" element={<PageTransition><TherapistAgreement /></PageTransition>} />
+          <Route path="/cookies" element={<PageTransition><Cookies /></PageTransition>} />
+          <Route path="/billing-policy" element={<PageTransition><BillingPolicy /></PageTransition>} />
+          <Route path="/acceptable-use" element={<PageTransition><AcceptableUse /></PageTransition>} />
+          <Route path="/photo-policy" element={<PageTransition><PhotoPolicy /></PageTransition>} />
+          <Route path="/dmca" element={<PageTransition><DMCA /></PageTransition>} />
+          <Route path="/accessibility" element={<PageTransition><Accessibility /></PageTransition>} />
+          <Route path="/marketing-consent" element={<PageTransition><MarketingConsent /></PageTransition>} />
+          <Route path="/notice-at-collection" element={<PageTransition><NoticeAtCollection /></PageTransition>} />
+          <Route path="/governing-law" element={<PageTransition><GoverningLaw /></PageTransition>} />
+          <Route path="/legal-contact" element={<PageTransition><LegalContact /></PageTransition>} />
+
           <Route path="/claim/:slug" element={<PageTransition><ClaimProfile /></PageTransition>} />
 
           {/* ── Dashboard ── */}
@@ -157,7 +182,7 @@ const AnimatedRoutes = () => {
             <Route path="newsletter" element={<AdminNewsletter />} />
           </Route>
 
-          {/* ── Legacy redirects (301-style client redirect) ── */}
+          {/* ── Legacy redirects ── */}
           <Route path="/city/:slug" element={<LegacyCityRedirect />} />
           <Route path="/therapist/:id" element={<LegacyTherapistRedirect />} />
 

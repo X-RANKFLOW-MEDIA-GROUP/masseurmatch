@@ -28,11 +28,15 @@ export const Footer = () => {
     {
       title: t("footer.legalSafety"),
       links: [
-        { to: "/safety", label: t("footer.safetyGuidelines") },
-        { to: "/faq", label: t("footer.faq") },
         { to: "/terms", label: t("footer.termsOfService") },
         { to: "/privacy", label: t("footer.privacyPolicy") },
-        { to: "/contact", label: t("nav.contact") },
+        { to: "/safety", label: t("footer.safetyGuidelines") },
+        { to: "/billing-policy", label: "Billing & Refunds" },
+        { to: "/acceptable-use", label: "Acceptable Use" },
+        { to: "/cookies", label: "Cookies" },
+        { to: "/dmca", label: "DMCA" },
+        { to: "/accessibility", label: "Accessibility" },
+        { to: "/legal-contact", label: "Legal Contact" },
       ],
     },
   ];
@@ -70,6 +74,9 @@ export const Footer = () => {
         <div className="border-t border-border mt-16 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
             &copy; {currentYear} {t("footer.copyright")}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Operated by XRankFlow Media Group LLC · Dover, DE
           </p>
           <p className="text-xs text-muted-foreground">
             {t("footer.ageNotice")}
