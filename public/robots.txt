@@ -35,4 +35,4 @@ Disallow: /register
 Disallow: /admin
 Disallow: /admin/*
 
-Sitemap: https://cnycelkfbtzfnphbeurd.supabase.co/functions/v1/generate-sitemap
+Sitemap: https://masseurmatch.com/sitemap.xml
