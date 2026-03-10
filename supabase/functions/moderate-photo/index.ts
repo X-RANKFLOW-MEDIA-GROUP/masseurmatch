@@ -38,7 +38,7 @@ serve(async (req) => {
       // Use SightEngine URL check
       const params = new URLSearchParams({
         url: image_url,
-        models: 'nudity-2.1,offensive2,gore2,tobacco,recreational_drug,medical,violence,self-harm',
+        models: 'nudity-2.1,offensive,gore,tobacco,recreational_drug,medical,violence,self-harm',
         api_user: apiUser,
         api_secret: apiSecret,
       });
@@ -56,7 +56,7 @@ serve(async (req) => {
       const formData = new FormData();
       const binaryData = Uint8Array.from(atob(image_base64), c => c.charCodeAt(0));
       formData.append('media', new Blob([binaryData], { type: 'image/jpeg' }), 'photo.jpg');
-      formData.append('models', 'nudity-2.1,offensive2,gore2,tobacco,recreational_drug,medical,violence,self-harm');
+      formData.append('models', 'nudity-2.1,offensive,gore,tobacco,recreational_drug,medical,violence,self-harm');
       formData.append('api_user', apiUser);
       formData.append('api_secret', apiSecret);
 
@@ -139,10 +139,10 @@ function evaluatePhotoResult(result: any): { approved: boolean; reason: string }
   }
 
   // Offensive content
-  if (result.offensive2?.prob > 0.5) reasons.push('offensive content detected');
+  if (result.offensive?.prob > 0.5) reasons.push('offensive content detected');
 
   // Gore
-  if (result.gore2?.prob > 0.5) reasons.push('graphic/violent content detected');
+  if (result.gore?.prob > 0.5) reasons.push('graphic/violent content detected');
 
   // Violence
   if (result.violence?.prob > 0.5) reasons.push('violence detected');
