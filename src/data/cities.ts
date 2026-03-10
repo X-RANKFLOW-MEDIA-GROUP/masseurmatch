@@ -291,7 +291,7 @@ export const US_CITIES: CityData[] = [
   { slug: "santa-fe", name: "Santa Fe", state: "New Mexico", stateCode: "NM", intro: "Find Santa Fe's healing-arts massage therapists in the Land of Enchantment." },
   { slug: "park-city", name: "Park City", state: "Utah", stateCode: "UT", intro: "Discover Park City's elite massage therapists in Utah's ski country." },
   { slug: "aspen", name: "Aspen", state: "Colorado", stateCode: "CO", intro: "Find Aspen's luxury massage therapists in Colorado's premier mountain resort." },
-  { slug: "savannah", name: "Savannah", state: "Georgia", stateCode: "GA", intro: "Browse Savannah's massage therapy community in Georgia's charming coastal city." },
+  { slug: "lake-havasu-city", name: "Lake Havasu City", state: "Arizona", stateCode: "AZ", intro: "Find Lake Havasu City's massage therapists in Western Arizona." },
   { slug: "hilton-head", name: "Hilton Head Island", state: "South Carolina", stateCode: "SC", intro: "Find Hilton Head's resort-quality massage therapists in the Lowcountry." },
   { slug: "myrtle-beach", name: "Myrtle Beach", state: "South Carolina", stateCode: "SC", intro: "Connect with Myrtle Beach's massage therapists along the Grand Strand." },
   { slug: "asheville", name: "Asheville", state: "North Carolina", stateCode: "NC", intro: "Find Asheville's holistic massage therapists in the Blue Ridge Mountains." },
