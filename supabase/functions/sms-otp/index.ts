@@ -99,12 +99,6 @@ Deno.serve(async (req) => {
         );
       }
 
-      // Generate a magic link token for this user
-      const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
-        type: "magiclink",
-        email: "", // Will be fetched from user
-      });
-
       // Get user email to generate magic link
       const { data: userData, error: userError } = await supabase.auth.admin.getUserById(profile.user_id);
       if (userError || !userData?.user?.email) {
