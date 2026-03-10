@@ -8,53 +8,59 @@ const PhotoPolicy = () => (
     path="/photo-policy"
   >
     <h2>1. Purpose</h2>
-    <p>This Photo & Profile Policy governs all visual and written content submitted to therapist listings on MasseurMatch. It supplements the Acceptable Use & Content Standards and the Therapist Subscription Agreement.</p>
+    <p>This policy governs all photographs, images, videos, and profile text submitted by therapists to MasseurMatch. Because MasseurMatch hosts user-generated content (UGC), clear rules are essential to protect therapists, protect the Platform, and ensure the directory remains professional and legally compliant.</p>
 
     <h2>2. Photo Requirements</h2>
-    <p>All photos submitted to your profile must meet the following standards:</p>
+    <p>2a. Permitted Photos</p>
     <ul>
-      <li>Professional quality: clear, well-lit, and in focus</li>
-      <li>Fully clothed: all individuals in the photo must be wearing appropriate professional attire</li>
-      <li>Recent: photos must have been taken within the last 12 months and accurately represent your current appearance</li>
-      <li>Original: you must own the photo or have written permission from the photographer</li>
-      <li>No watermarks, logos, or overlaid text from other platforms</li>
-      <li>No group photos unless all individuals have given written consent</li>
+      <li>Professional headshots and studio portraits</li>
+      <li>Photos of your workspace, massage table, or treatment environment</li>
+      <li>Professional images of massage techniques (fully clothed or appropriately draped client; no identifiable client without written consent)</li>
+      <li>Logo images for business accounts</li>
+      <li>Images for which you own the copyright or hold a valid, written license</li>
     </ul>
 
-    <h2>3. Prohibited Photo Content</h2>
+    <p>2b. Prohibited Photos</p>
     <ul>
-      <li>Nudity, partial nudity, or sexually suggestive imagery — zero tolerance</li>
-      <li>Underwear, swimwear, or sheer clothing</li>
-      <li>Provocative or suggestive poses</li>
+      <li>Photos containing nudity, partial nudity, or sexually suggestive imagery</li>
+      <li>Images of identifiable third parties (including clients) without documented written consent from each individual</li>
       <li>Photos containing minors</li>
-      <li>Stock photos or photos of other people presented as you</li>
-      <li>AI-generated or heavily filtered images that misrepresent your appearance</li>
-      <li>Images containing illegal activity or substances</li>
+      <li>Stock images, AI-generated faces, or images representing a person other than you or your actual workspace</li>
+      <li>Photos that contain misleading or deceptive visual claims</li>
+      <li>Images that infringe the copyright or trademark of any third party</li>
+      <li>Photos containing hate symbols, violent imagery, or illegal content</li>
     </ul>
 
-    <h2>4. Profile Text Standards</h2>
-    <p>Your profile bio, specialties, and all text fields must:</p>
+    <h2>3. Profile Text Requirements</h2>
+    <p>3a. Required Accuracy</p>
     <ul>
-      <li>Be truthful and accurately describe your actual services and qualifications</li>
-      <li>Not contain coded language, innuendo, or euphemisms for sexual services</li>
-      <li>Not make medical claims, diagnosis language, or guarantee therapeutic outcomes</li>
-      <li>Not include personal contact information in free-text fields to bypass platform controls</li>
-      <li>Be written in a professional, respectful tone</li>
+      <li>Your professional name (or DBA) must be accurate and match your license or registration where applicable</li>
+      <li>Location must reflect your actual practice location (city and state)</li>
+      <li>Modalities and specialties must reflect services you actually offer</li>
+      <li>Pricing must reflect your actual rates</li>
+      <li>License or certification numbers, if listed, must be accurate and current</li>
     </ul>
 
-    <h2>5. AI-Assisted Moderation</h2>
-    <p>MasseurMatch uses automated moderation tools to screen photos and text for policy compliance. Content flagged by automated systems is reviewed by a human moderator before any action is taken. You will be notified if content is removed and given an opportunity to submit compliant alternatives.</p>
-
-    <h2>6. Verification Badge</h2>
-    <p>The "Verified" badge indicates that a therapist has completed MasseurMatch's identity verification process through Stripe Identity. It confirms that the person behind the listing matches a government-issued photo ID. It does NOT verify professional licenses, certifications, skills, or service quality.</p>
-
-    <h2>7. Enforcement</h2>
+    <p>3b. Prohibited Text</p>
     <ul>
-      <li>First violation (minor): content removed, warning issued</li>
-      <li>Second violation: temporary account suspension (7–30 days)</li>
-      <li>Serious violations (sexual content, fraud, minors): immediate permanent ban</li>
+      <li>Medical claims, including diagnosis language and disease treatment or cure claims</li>
+      <li>Therapeutic outcome guarantees of any kind</li>
+      <li>Coded, euphemistic, or indirect references to sexual services (examples: 'full service,' 'happy ending,' 'FBSM,' 'incall/outcall with extras,' 'GFE,' or similar)</li>
+      <li>False credential claims (license numbers you do not hold, certifications you have not earned)</li>
+      <li>Impersonation of another therapist or professional</li>
     </ul>
-    <p>Appeals may be submitted to <a href="mailto:support@masseurmatch.com">support@masseurmatch.com</a> within 14 days of the action.</p>
+
+    <h2>4. Copyright & Ownership</h2>
+    <p>By submitting any photo or content, you represent and warrant that you own the content or have the legal right to use it and to grant MasseurMatch the license described in the Therapist Subscription Agreement. If any submitted content infringes a third party's copyright, you are solely responsible for resulting claims.</p>
+
+    <h2>5. Consent for Identifiable Persons</h2>
+    <p>If any photo in your profile includes an identifiable person other than yourself, you must obtain and retain documented written consent from that person authorizing you to use their image on your professional profile. MasseurMatch may request proof of consent and will remove images upon credible claim of lack of consent.</p>
+
+    <h2>6. Content Moderation</h2>
+    <p>MasseurMatch reserves the right to review, remove, or require replacement of any photo or profile text that violates this Policy, our Acceptable Use Policy, or applicable law. Repeated violations will result in account termination. Moderation decisions are made at MasseurMatch's sole discretion.</p>
+
+    <h2>7. Takedown Process</h2>
+    <p>To request removal of content you believe violates this Policy, contact <a href="mailto:legal@masseurmatch.com">legal@masseurmatch.com</a> with a description of the content, its URL on the Platform, and the basis for your removal request. We will review and respond within 5 business days. For copyright-specific takedowns, see the DMCA Policy (Section 8).</p>
   </LegalPageLayout>
 );
 

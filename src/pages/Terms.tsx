@@ -55,19 +55,19 @@ const Terms = () => (
     <p>The Platform may contain links to third-party websites. Such links are provided for convenience only. MasseurMatch has no control over and assumes no responsibility for the content, privacy practices, or conduct of any third-party sites.</p>
 
     <h2>9. Disclaimer of Warranties</h2>
-    <p>THE PLATFORM IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, WE DISCLAIM ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, ACCURACY, TITLE, AND NON-INFRINGEMENT.</p>
+    <p>THE PLATFORM IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, WE DISCLAIM ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, ACCURACY, TITLE, AND NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE PLATFORM WILL BE UNINTERRUPTED, ERROR-FREE, OR FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS. WE MAKE NO WARRANTY AS TO THE ACCURACY, COMPLETENESS, OR RELIABILITY OF ANY THERAPIST PROFILE OR LISTING CONTENT.</p>
 
     <h2>10. Limitation of Liability</h2>
-    <p>TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, XRANKFLOW MEDIA GROUP LLC SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES ARISING OUT OF OR RELATED TO YOUR USE OF THE PLATFORM. IN NO EVENT SHALL OUR TOTAL LIABILITY EXCEED ONE HUNDRED US DOLLARS ($100.00).</p>
+    <p>TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, XRANKFLOW MEDIA GROUP LLC, ITS OFFICERS, DIRECTORS, EMPLOYEES, AGENTS, AND LICENSORS SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES — INCLUDING LOSS OF PROFITS, DATA, GOODWILL, PERSONAL INJURY, OR PROPERTY DAMAGE — ARISING OUT OF OR RELATED TO YOUR USE OF OR INABILITY TO USE THE PLATFORM, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. IN NO EVENT SHALL OUR TOTAL LIABILITY TO YOU EXCEED ONE HUNDRED US DOLLARS ($100.00).</p>
 
     <h2>11. Indemnification</h2>
-    <p>You agree to indemnify, defend, and hold harmless XRankFlow Media Group LLC from and against any and all claims, damages, losses, liabilities, costs, and expenses arising out of: (a) your use of the Platform; (b) your violation of these Terms; (c) your violation of any third-party rights; or (d) any content you submit to the Platform.</p>
+    <p>You agree to indemnify, defend, and hold harmless XRankFlow Media Group LLC, its affiliates, officers, directors, employees, and agents from and against any and all claims, damages, losses, liabilities, costs, and expenses (including reasonable attorneys' fees) arising out of: (a) your use of the Platform; (b) your violation of these Terms; (c) your violation of any third-party rights; or (d) any content you submit to the Platform.</p>
 
     <h2>12. Modifications to These Terms</h2>
-    <p>We reserve the right to modify these Terms at any time. We will notify registered users of material changes via email or Platform notice at least 14 days before the change takes effect. Continued use of the Platform after the effective date constitutes acceptance of the revised Terms.</p>
+    <p>We reserve the right to modify these Terms at any time. We will notify registered users of material changes via email or Platform notice at least 14 days before the change takes effect. Continued use of the Platform after the effective date of any modification constitutes acceptance of the revised Terms. If you do not agree to the modified Terms, you must stop using the Platform.</p>
 
     <h2>13. Acceptance — Clickwrap</h2>
-    <p>For new account registrations, acceptance of these Terms is confirmed by clicking "I agree to the Terms of Use" during the registration process. This constitutes a valid, binding agreement.</p>
+    <p>For new account registrations, acceptance of these Terms is confirmed by clicking "I agree to the Terms of Use" during the registration process. This constitutes a valid, binding agreement. Visitors who browse without registering accept these Terms via continued use (browsewrap), which is disclosed via a persistent banner on first visit.</p>
 
     <h2>14. Contact</h2>
     <p>Legal inquiries: <a href="mailto:legal@masseurmatch.com">legal@masseurmatch.com</a> | Dover, DE, United States</p>
