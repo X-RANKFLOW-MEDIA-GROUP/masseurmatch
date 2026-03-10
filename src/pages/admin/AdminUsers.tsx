@@ -178,24 +178,11 @@ const AdminUsers = () => {
   const resetPassword = async (profile: any) => {
     setResetLoading(profile.id);
     try {
-      // We need the user's email - try auth admin or use profile data
-      const { data, error } = await supabase.functions.invoke("admin-stripe", {
-        body: { action: "lookup_customer", email: profile.phone }, // fallback
+      const result = await callUserLookup("reset_password", {
+        user_id: profile.user_id,
+        redirect_to: `${window.location.origin}/reset-password`,
       });
-      // Use Supabase password reset via email
-      // We need to get the email from auth - use admin API
-      const { data: authData } = await supabase.auth.admin.getUserById(profile.user_id);
-      const email = authData?.user?.email;
-      if (!email) {
-        toast({ title: "Email not found", variant: "destructive" });
-        setResetLoading(null);
-        return;
-      }
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-      if (resetError) throw resetError;
-      toast({ title: "Password reset email sent", description: `Sent to ${email}` });
+      toast({ title: "Password reset email sent", description: `Sent to ${result.email}` });
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     }
