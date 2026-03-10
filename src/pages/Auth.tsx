@@ -115,6 +115,63 @@ const Auth = () => {
     }
   };
 
+  const handleSendOtp = async () => {
+    if (!phoneNumber || phoneNumber.length < 10) {
+      toast({ title: t("auth.error", "Error"), description: "Please enter a valid phone number with country code (e.g. +1...)", variant: "destructive" });
+      return;
+    }
+    setOtpLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("sms-otp", {
+        body: { action: "send", phone: phoneNumber },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setOtpSent(true);
+      toast({ title: "Code sent!", description: `A verification code has been sent to ${phoneNumber}` });
+    } catch (err: any) {
+      toast({ title: t("auth.error", "Error"), description: err.message || "Failed to send code", variant: "destructive" });
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (otpCode.length < 4) {
+      toast({ title: t("auth.error", "Error"), description: "Please enter the full verification code", variant: "destructive" });
+      return;
+    }
+    setOtpLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("sms-otp", {
+        body: { action: "verify", phone: phoneNumber, code: otpCode },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      if (data?.authenticated && data?.token_hash) {
+        // Use the magic link token to sign in
+        const { error: authError } = await supabase.auth.verifyOtp({
+          token_hash: data.token_hash,
+          type: "magiclink",
+        });
+        if (authError) throw authError;
+        
+        if (!rememberMe) {
+          sessionStorage.setItem("mm_session_only", "true");
+        }
+        toast({ title: t("auth.welcomeBack", "Welcome back!") });
+        navigate("/dashboard");
+      } else {
+        toast({ title: t("auth.error", "Error"), description: data?.error || "No account found with this phone number", variant: "destructive" });
+      }
+    } catch (err: any) {
+      toast({ title: t("auth.error", "Error"), description: err.message || "Verification failed", variant: "destructive" });
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
   // If user is logged in and on step 2 or 3, show wizard
   if (user && signupStep >= 2) {
     return (
