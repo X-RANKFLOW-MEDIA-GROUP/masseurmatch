@@ -89,6 +89,14 @@ const AdminUsers = () => {
     return data;
   };
 
+  const callUserLookup = async (action: string, params: Record<string, any> = {}) => {
+    const { data, error } = await supabase.functions.invoke("admin-user-lookup", {
+      body: { action, ...params },
+    });
+    if (error) throw new Error(error.message);
+    return data;
+  };
+
   const handleSuspend = async () => {
     if (!suspendDialog.userId) return;
     const { data: { user: admin } } = await supabase.auth.getUser();
@@ -170,24 +178,11 @@ const AdminUsers = () => {
   const resetPassword = async (profile: any) => {
     setResetLoading(profile.id);
     try {
-      // We need the user's email - try auth admin or use profile data
-      const { data, error } = await supabase.functions.invoke("admin-stripe", {
-        body: { action: "lookup_customer", email: profile.phone }, // fallback
+      const result = await callUserLookup("reset_password", {
+        user_id: profile.user_id,
+        redirect_to: `${window.location.origin}/reset-password`,
       });
-      // Use Supabase password reset via email
-      // We need to get the email from auth - use admin API
-      const { data: authData } = await supabase.auth.admin.getUserById(profile.user_id);
-      const email = authData?.user?.email;
-      if (!email) {
-        toast({ title: "Email not found", variant: "destructive" });
-        setResetLoading(null);
-        return;
-      }
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-      if (resetError) throw resetError;
-      toast({ title: "Password reset email sent", description: `Sent to ${email}` });
+      toast({ title: "Password reset email sent", description: `Sent to ${result.email}` });
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     }
@@ -199,14 +194,13 @@ const AdminUsers = () => {
     if (!inviteForm.email) return;
     setInviteLoading(true);
     try {
-      const { data, error } = await supabase.auth.admin.inviteUserByEmail(inviteForm.email, {
-        data: { full_name: inviteForm.full_name },
+      await callUserLookup("invite_user", {
+        email: inviteForm.email,
+        user_metadata: { full_name: inviteForm.full_name },
       });
-      if (error) throw error;
       toast({ title: "Invitation sent!", description: `Invite sent to ${inviteForm.email}` });
       setInviteDialog(false);
       setInviteForm({ email: "", full_name: "" });
-      // Reload after a delay to allow trigger to create profile
       setTimeout(load, 2000);
     } catch (err: any) {
       toast({ title: "Error sending invite", description: err.message, variant: "destructive" });
@@ -242,8 +236,7 @@ const AdminUsers = () => {
     setStripeData(null);
     setStripeLoading(true);
     try {
-      const { data: userData } = await supabase.auth.admin.getUserById(profile.user_id);
-      const email = userData?.user?.email;
+      const { email } = await callUserLookup("get_user_email", { user_id: profile.user_id });
       if (!email) {
         toast({ title: "Email not found", variant: "destructive" });
         setStripeLoading(false);
