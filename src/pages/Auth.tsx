@@ -445,7 +445,8 @@ const Auth = () => {
                   </>
                 )}
               </div>
-            )
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="signup">
