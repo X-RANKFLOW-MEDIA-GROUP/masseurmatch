@@ -23,6 +23,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [rememberMe, setRememberMe] = useState(false);
   const [signupData, setSignupData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -46,6 +47,12 @@ const Auth = () => {
     if (error) {
       toast({ title: t("auth.error", "Error"), description: error.message, variant: "destructive" });
     } else {
+      // If "remember me" is not checked, set a flag so session is cleared on browser close
+      if (!rememberMe) {
+        sessionStorage.setItem("mm_session_only", "true");
+      } else {
+        sessionStorage.removeItem("mm_session_only");
+      }
       toast({ title: t("auth.welcomeBack", "Welcome back!") });
       navigate("/dashboard");
     }
@@ -199,7 +206,17 @@ const Auth = () => {
                   className="bg-white/5 border-white/10"
                 />
               </div>
-              <div className="text-right">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="remember-me"
+                    checked={rememberMe}
+                    onCheckedChange={(checked) => setRememberMe(checked === true)}
+                  />
+                  <Label htmlFor="remember-me" className="text-sm text-muted-foreground cursor-pointer">
+                    {t("auth.rememberMe", "Remember me")}
+                  </Label>
+                </div>
                 <Link to="/forgot-password" className="text-sm text-primary hover:underline">
                   {t("auth.forgotPassword", "Forgot password?")}
                 </Link>

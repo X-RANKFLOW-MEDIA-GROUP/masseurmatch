@@ -69,6 +69,7 @@ const CityDirectory = () => {
         title="Browse Massage Therapists by City — MasseurMatch Directory"
         description="Find male massage therapists in 200+ US cities. Browse our city directory organized by state to discover professionals near you."
         path="/cities"
+        keywords="gay massage by city, male massage therapist directory, M4M massage near me, LGBTQ massage directory, gay-friendly massage cities, men's wellness massage, massage therapist by state, gay massage directory, deep tissue massage, Swedish massage, therapeutic bodywork"
         jsonLd={jsonLd}
       />
       <CursorGlow />

@@ -174,6 +174,7 @@ const Index = () => {
         title="Gay Massage Directory — Find Male Massage Therapists Near You | MasseurMatch"
         description="The #1 gay massage directory. Browse verified male massage therapists near you. Deep tissue, Swedish, sports & therapeutic massage. Gay-friendly, trusted professionals."
         path="/"
+        keywords="gay massage, male massage therapist, M4M massage, LGBTQ massage, gay-friendly massage, men's wellness massage, gay massage directory, male massage therapist near me, deep tissue massage, Swedish massage, sports recovery massage, therapeutic bodywork, gay-friendly bodywork, relaxation massage"
       />
       <CursorGlow />
       <ScrollProgress />
