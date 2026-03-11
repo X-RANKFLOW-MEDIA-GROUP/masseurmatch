@@ -29,6 +29,7 @@ const CityListing = lazy(() => import("./pages/CityListing"));
 const CityDirectory = lazy(() => import("./pages/CityDirectory"));
 const ClaimProfile = lazy(() => import("./pages/ClaimProfile"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const HomeTest = lazy(() => import("./pages/HomeTest"));
 
 // Legal pages
 const TherapistAgreement = lazy(() => import("./pages/legal/TherapistAgreement"));
