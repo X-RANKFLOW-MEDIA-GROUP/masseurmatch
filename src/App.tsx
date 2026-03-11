@@ -29,6 +29,7 @@ const CityListing = lazy(() => import("./pages/CityListing"));
 const CityDirectory = lazy(() => import("./pages/CityDirectory"));
 const ClaimProfile = lazy(() => import("./pages/ClaimProfile"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const HomeTest = lazy(() => import("./pages/HomeTest"));
 
 // Legal pages
 const TherapistAgreement = lazy(() => import("./pages/legal/TherapistAgreement"));
@@ -129,6 +130,7 @@ const AnimatedRoutes = () => {
           <Route path="/register" element={<PageTransition><Auth /></PageTransition>} />
           <Route path="/faq" element={<PageTransition><FAQPage /></PageTransition>} />
           <Route path="/safety" element={<PageTransition><Safety /></PageTransition>} />
+          <Route path="/home-test" element={<PageTransition><HomeTest /></PageTransition>} />
 
           {/* ── Legal pages ── */}
           <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
