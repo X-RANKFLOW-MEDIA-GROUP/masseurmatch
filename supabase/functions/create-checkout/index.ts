@@ -70,36 +70,6 @@ async function getOrCreatePrice(stripe: Stripe, planKey: string): Promise<string
   return price.id;
 }
 
-async function getOrCreateFounderCoupon(stripe: Stripe): Promise<string | null> {
-  try {
-    const coupon = await stripe.coupons.retrieve(FOUNDER_COUPON_ID);
-    // Check if coupon still has redemptions left
-    if (coupon.max_redemptions && coupon.times_redeemed >= coupon.max_redemptions) {
-      logStep("Founder coupon fully redeemed");
-      return null;
-    }
-    logStep("Found existing founder coupon", { timesRedeemed: coupon.times_redeemed });
-    return coupon.id;
-  } catch {
-    // Create the coupon
-    try {
-      const coupon = await stripe.coupons.create({
-        id: FOUNDER_COUPON_ID,
-        percent_off: 50,
-        duration: "repeating",
-        duration_in_months: 3,
-        max_redemptions: FOUNDER_MAX_REDEMPTIONS,
-        name: "Founder Deal — 50% OFF for 3 months",
-        metadata: { source: "masseurmatch" },
-      });
-      logStep("Created founder coupon", { couponId: coupon.id });
-      return coupon.id;
-    } catch (e) {
-      logStep("Failed to create coupon", { error: String(e) });
-      return null;
-    }
-  }
-}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
