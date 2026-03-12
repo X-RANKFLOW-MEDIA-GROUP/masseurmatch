@@ -9,6 +9,7 @@ import { Upload, X, Trash2, Camera, Loader2, GripVertical, Lock, ArrowRight } fr
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import type { Tables } from "@/integrations/supabase/types";
+import { PhotoGuidelines } from "@/components/dashboard/PhotoGuidelines";
 
 const DashboardPhotos = () => {
   const { user } = useAuth();
@@ -211,15 +212,7 @@ const DashboardPhotos = () => {
         </div>
       )}
 
-      <div className="glass-card p-4">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Quality Guidelines</h3>
-        <ul className="text-xs text-muted-foreground space-y-1">
-          <li>• Clear, well-lit, professional photos</li>
-          <li>• Minimum 500x500px recommended</li>
-          <li>• Explicit content will be automatically rejected</li>
-          <li>• The primary photo appears in the directory listing</li>
-        </ul>
-      </div>
+      <PhotoGuidelines />
     </div>
   );
 };
