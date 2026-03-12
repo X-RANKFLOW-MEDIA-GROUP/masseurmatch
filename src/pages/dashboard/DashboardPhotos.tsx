@@ -9,6 +9,7 @@ import { Upload, X, Trash2, Camera, Loader2, GripVertical, Lock, ArrowRight } fr
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import type { Tables } from "@/integrations/supabase/types";
+import { PhotoGuidelines } from "@/components/dashboard/PhotoGuidelines";
 
 const DashboardPhotos = () => {
   const { user } = useAuth();
