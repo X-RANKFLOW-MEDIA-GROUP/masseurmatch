@@ -20,8 +20,7 @@ const PLANS: Record<string, { name: string; amount: number; features: string; is
   elite:    { name: "Elite",    amount: 9900, features: "Everything in Pro, 2 cities" },
 };
 
-const FOUNDER_COUPON_ID = "FOUNDER50";
-const FOUNDER_MAX_REDEMPTIONS = 50;
+// Promotion codes are now entered by users at checkout (allow_promotion_codes: true)
 
 async function getOrCreatePrice(stripe: Stripe, planKey: string): Promise<string> {
   const plan = PLANS[planKey];
