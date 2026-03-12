@@ -192,7 +192,6 @@ serve(async (req) => {
 
     // ── Paid plan checkout ──
     const priceId = await getOrCreatePrice(stripe, plan_key);
-    const founderCouponId = await getOrCreateFounderCoupon(stripe);
 
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       customer: customerId,
