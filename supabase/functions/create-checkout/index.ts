@@ -235,15 +235,11 @@ serve(async (req) => {
         metadata: { masseurmatch_plan: plan_key, user_id: user.id },
       },
       payment_method_collection: "if_required",
+      allow_promotion_codes: true,
       success_url: `${req.headers.get("origin")}/dashboard/subscription?success=true`,
       cancel_url: `${req.headers.get("origin")}/dashboard/subscription?canceled=true`,
       metadata: { user_id: user.id, plan_key },
     };
-
-    if (founderCouponId) {
-      sessionParams.discounts = [{ coupon: founderCouponId }];
-      logStep("Applying founder coupon (3 months)");
-    }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
     logStep("Checkout session created", { sessionId: session.id, url: session.url });
