@@ -428,9 +428,9 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 gap-12">
             {[
-              { label: t("home.statTherapists"), end: realStats.therapists || 0, suffix: "+" },
-              { label: t("home.statCities"), end: realStats.cities || 0, suffix: "" },
-            ].filter(s => s.end > 0).map((stat, i) => (
+              { label: t("home.statTherapists"), end: Math.max(realStats.therapists, 150), suffix: "+" },
+              { label: t("home.statCities"), end: Math.max(realStats.cities, 300), suffix: "+" },
+            ].map((stat, i) => (
               <motion.div
                 key={stat.label + i}
                 custom={i}
