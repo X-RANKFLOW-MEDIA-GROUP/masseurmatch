@@ -20,8 +20,7 @@ const PLANS: Record<string, { name: string; amount: number; features: string; is
   elite:    { name: "Elite",    amount: 9900, features: "Everything in Pro, 2 cities" },
 };
 
-const FOUNDER_COUPON_ID = "FOUNDER50";
-const FOUNDER_MAX_REDEMPTIONS = 50;
+// Promotion codes are now entered by users at checkout (allow_promotion_codes: true)
 
 async function getOrCreatePrice(stripe: Stripe, planKey: string): Promise<string> {
   const plan = PLANS[planKey];
@@ -71,36 +70,6 @@ async function getOrCreatePrice(stripe: Stripe, planKey: string): Promise<string
   return price.id;
 }
 
-async function getOrCreateFounderCoupon(stripe: Stripe): Promise<string | null> {
-  try {
-    const coupon = await stripe.coupons.retrieve(FOUNDER_COUPON_ID);
-    // Check if coupon still has redemptions left
-    if (coupon.max_redemptions && coupon.times_redeemed >= coupon.max_redemptions) {
-      logStep("Founder coupon fully redeemed");
-      return null;
-    }
-    logStep("Found existing founder coupon", { timesRedeemed: coupon.times_redeemed });
-    return coupon.id;
-  } catch {
-    // Create the coupon
-    try {
-      const coupon = await stripe.coupons.create({
-        id: FOUNDER_COUPON_ID,
-        percent_off: 50,
-        duration: "repeating",
-        duration_in_months: 3,
-        max_redemptions: FOUNDER_MAX_REDEMPTIONS,
-        name: "Founder Deal — 50% OFF for 3 months",
-        metadata: { source: "masseurmatch" },
-      });
-      logStep("Created founder coupon", { couponId: coupon.id });
-      return coupon.id;
-    } catch (e) {
-      logStep("Failed to create coupon", { error: String(e) });
-      return null;
-    }
-  }
-}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -223,7 +192,6 @@ serve(async (req) => {
 
     // ── Paid plan checkout ──
     const priceId = await getOrCreatePrice(stripe, plan_key);
-    const founderCouponId = await getOrCreateFounderCoupon(stripe);
 
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       customer: customerId,
@@ -235,15 +203,11 @@ serve(async (req) => {
         metadata: { masseurmatch_plan: plan_key, user_id: user.id },
       },
       payment_method_collection: "if_required",
+      allow_promotion_codes: true,
       success_url: `${req.headers.get("origin")}/dashboard/subscription?success=true`,
       cancel_url: `${req.headers.get("origin")}/dashboard/subscription?canceled=true`,
       metadata: { user_id: user.id, plan_key },
     };
-
-    if (founderCouponId) {
-      sessionParams.discounts = [{ coupon: founderCouponId }];
-      logStep("Applying founder coupon (3 months)");
-    }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
     logStep("Checkout session created", { sessionId: session.id, url: session.url });
