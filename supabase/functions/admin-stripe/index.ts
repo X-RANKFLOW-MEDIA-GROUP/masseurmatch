@@ -124,6 +124,17 @@ serve(async (req) => {
         break;
       }
 
+      // --- Create promotion code ---
+      case "create_promo_code": {
+        const promoCode = await stripe.promotionCodes.create({
+          coupon: params.coupon_id,
+          code: params.code,
+          ...(params.max_redemptions ? { max_redemptions: params.max_redemptions } : {}),
+        });
+        result = promoCode;
+        break;
+      }
+
       // --- Apply coupon to subscription ---
       case "apply_coupon": {
         const updatedSub = await stripe.subscriptions.update(params.subscription_id, {
