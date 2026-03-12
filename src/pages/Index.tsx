@@ -759,23 +759,40 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ─── FEATURED CITIES ─── */}
+      {/* ─── BROWSE POPULAR CITIES ─── */}
       <section className="py-28 border-t border-border">
         <div className="container mx-auto px-4">
           <div className="reveal mb-16 text-center">
             <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">{t("home.citiesTag")}</p>
             <h2 className="text-4xl md:text-6xl font-bold text-foreground tracking-tight">
-              <TextReveal text={t("home.citiesTitle")} />
+              <TextReveal text="Browse Popular Cities" />
             </h2>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-px bg-border max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-px bg-border max-w-6xl mx-auto">
             {[
-              { slug: "los-angeles", name: "Los Angeles", state: "CA" },
-              { slug: "new-york", name: "New York", state: "NY" },
-              { slug: "san-francisco", name: "San Francisco", state: "CA" },
-              { slug: "miami", name: "Miami", state: "FL" },
+              { slug: "atlanta", name: "Atlanta", state: "GA" },
+              { slug: "austin", name: "Austin", state: "TX" },
+              { slug: "brooklyn", name: "Brooklyn", state: "NY" },
               { slug: "chicago", name: "Chicago", state: "IL" },
+              { slug: "dallas", name: "Dallas", state: "TX" },
+              { slug: "denver", name: "Denver", state: "CO" },
+              { slug: "fort-lauderdale", name: "Fort Lauderdale", state: "FL" },
+              { slug: "houston", name: "Houston", state: "TX" },
+              { slug: "las-vegas", name: "Las Vegas", state: "NV" },
+              { slug: "los-angeles", name: "Los Angeles", state: "CA" },
+              { slug: "miami", name: "Miami", state: "FL" },
+              { slug: "minneapolis", name: "Minneapolis", state: "MN" },
+              { slug: "new-york", name: "New York", state: "NY" },
+              { slug: "orlando", name: "Orlando", state: "FL" },
+              { slug: "palm-springs", name: "Palm Springs", state: "CA" },
+              { slug: "phoenix", name: "Phoenix", state: "AZ" },
+              { slug: "portland", name: "Portland", state: "OR" },
+              { slug: "san-diego", name: "San Diego", state: "CA" },
+              { slug: "san-francisco", name: "San Francisco", state: "CA" },
               { slug: "seattle", name: "Seattle", state: "WA" },
+              { slug: "washington-dc", name: "Washington", state: "DC" },
+              { slug: "west-hollywood", name: "West Hollywood", state: "CA" },
+              { slug: "wilton-manors", name: "Wilton Manors", state: "FL" },
             ].map((city, i) => (
               <motion.div
                 key={city.slug}
@@ -787,14 +804,21 @@ const Index = () => {
               >
                 <Link
                   to={`/${city.slug}`}
-                  className="bg-background p-6 group glow-hover block text-center"
+                  className="bg-background p-5 group glow-hover block text-center"
                 >
-                  <MapPin className="w-5 h-5 text-muted-foreground mx-auto mb-3 group-hover:text-foreground transition-colors" />
-                  <h3 className="text-sm font-semibold">{city.name}</h3>
-                  <p className="text-xs text-muted-foreground">{city.state}</p>
+                  <MapPin className="w-4 h-4 text-muted-foreground mx-auto mb-2 group-hover:text-primary transition-colors" />
+                  <h3 className="text-xs font-semibold leading-tight">{city.name}</h3>
+                  <p className="text-[10px] text-muted-foreground">{city.state}</p>
                 </Link>
               </motion.div>
             ))}
+          </div>
+          <div className="text-center mt-8">
+            <Link to="/cities">
+              <Button variant="outline" size="sm" className="gap-1">
+                View All Cities <ArrowRight className="w-3 h-3" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
