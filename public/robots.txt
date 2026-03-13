@@ -1,3 +1,4 @@
+# ─── Search Engine Crawlers ───
 User-agent: Googlebot
 Allow: /
 Disallow: /dashboard
@@ -20,12 +21,94 @@ Disallow: /register
 Disallow: /admin
 Disallow: /admin/*
 
+User-agent: Yandex
+Allow: /
+Disallow: /dashboard
+Disallow: /dashboard/*
+Disallow: /auth
+Disallow: /admin
+
+User-agent: Baiduspider
+Allow: /
+Disallow: /dashboard
+Disallow: /auth
+Disallow: /admin
+
+# ─── Social Media / Preview Bots ───
 User-agent: Twitterbot
 Allow: /
 
 User-agent: facebookexternalhit
 Allow: /
 
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: Discordbot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+User-agent: TelegramBot
+Allow: /
+
+User-agent: Slackbot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+# ─── AI Crawlers (allowed for visibility) ───
+User-agent: GPTBot
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth
+
+User-agent: Anthropic-AI
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth
+
+User-agent: Bytespider
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth
+
+User-agent: cohere-ai
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth
+
+# ─── Default (all other crawlers) ───
 User-agent: *
 Allow: /
 Disallow: /dashboard
@@ -35,4 +118,6 @@ Disallow: /register
 Disallow: /admin
 Disallow: /admin/*
 
+# ─── Sitemaps ───
+Sitemap: https://masseurmatch.com/sitemap.xml
 Sitemap: https://cnycelkfbtzfnphbeurd.supabase.co/functions/v1/generate-sitemap
