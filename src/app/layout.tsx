@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { Fraunces, IBM_Plex_Mono, Manrope } from "next/font/google";
-import "@/index.css";
+import "../index.css";
 import { SiteFooter } from "@/mm/components/site-footer";
 import { SiteHeader } from "@/mm/components/site-header";
 import { KnottyChatWidget } from "@/mm/components/chat-widget";
