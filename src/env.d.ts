@@ -1,11 +1,15 @@
-// Ambient type shim so the auto-generated Supabase client (which uses
-// import.meta.env) compiles under Next.js / TypeScript without Vite types.
-declare interface ImportMetaEnv {
-  readonly VITE_SUPABASE_URL: string;
-  readonly VITE_SUPABASE_PUBLISHABLE_KEY: string;
-  readonly [key: string]: string | undefined;
-}
+// Shim: import.meta.env for auto-generated Supabase client (Vite compat)
+export {};
 
-declare interface ImportMeta {
-  readonly env: ImportMetaEnv;
+declare global {
+  interface ImportMetaEnv {
+    readonly VITE_SUPABASE_URL: string;
+    readonly VITE_SUPABASE_PUBLISHABLE_KEY: string;
+    readonly VITE_SUPABASE_PROJECT_ID: string;
+    readonly [key: string]: string | undefined;
+  }
+
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
 }
