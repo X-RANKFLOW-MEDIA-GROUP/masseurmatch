@@ -36,7 +36,7 @@
     "src/middleware.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
-    "src/index.css",
+    "src/types/css.d.ts",
     ".next/types/**/*.ts"
   ]
 }
