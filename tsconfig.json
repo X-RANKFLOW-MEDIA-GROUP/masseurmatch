@@ -33,6 +33,7 @@
   ],
   "include": [
     "next-env.d.ts",
+    "import-meta.d.ts",
     "src/env.d.ts",
     "src/types/css.d.ts",
     "src/middleware.ts",
