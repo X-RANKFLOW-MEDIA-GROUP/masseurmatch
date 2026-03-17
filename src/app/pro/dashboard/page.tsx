@@ -1,10 +1,10 @@
 "use client";
 
 import { ProTools } from "@/app/_components/pro-tools";
+import { DashboardFAQ } from "@/components/dashboard/DashboardFAQ";
 import { PhotoGuidelines } from "@/components/dashboard/PhotoGuidelines";
 import { useProfile } from "@/hooks/useProfile";
 import { getProfileCompleteness } from "@/hooks/useProfileCompleteness";
-import DashboardFAQ from "@/legacy-pages/dashboard/DashboardFAQ";
 
 export default function ProDashboardPage() {
   const { profile } = useProfile();

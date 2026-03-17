@@ -21,23 +21,12 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-<<<<<<< HEAD
-node_modules
 dist
 dist-ssr
-.next
-out
 *.local
-.env
-.env.local
-.env.*
-!.env.example
 .lovable/
 
-# Editor directories and files
-=======
 # Editors
->>>>>>> 14f585c6ffaead32cd933636ddd3286e7124f036
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -47,3 +36,5 @@ out
 *.njsproj
 *.sln
 *.sw?
+.vercel
+.env*.local

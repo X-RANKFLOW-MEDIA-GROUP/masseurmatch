@@ -7,7 +7,7 @@ import { parseCookieHeader } from "@/app/api/_lib/http";
 export interface RequestSession {
   userId: string;
   email: string;
-  role: "admin" | "provider" | null;
+  role: "admin" | "provider" | "client" | null;
   expiresAt: string;
 }
 

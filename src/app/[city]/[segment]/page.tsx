@@ -13,6 +13,8 @@ import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd }
 
 type Params = { city: string; segment: string };
 
+export const dynamic = "force-dynamic";
+
 export function generateStaticParams(): Params[] {
   const allCities = getCities();
   return allCities.flatMap((city) => DIRECTORY_SEGMENTS.map((segment) => ({ city: city.slug, segment: segment.slug })));

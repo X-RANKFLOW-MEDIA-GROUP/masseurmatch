@@ -1,10 +1,9 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-<<<<<<< HEAD
     --background: 0 0% 100%;
     --foreground: 214.5 68.1% 13.5%;
     --card: 0 0% 100%;
@@ -122,26 +121,6 @@
     --success-foreground: 0 0% 100%;
     --warning: 38.7 100% 56.3%;
     --warning-foreground: 214.5 68.1% 13.5%;
-=======
-    --background: 45 50% 98%;
-    --foreground: 220 35% 12%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 35% 12%;
-    --primary: 28 94% 56%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 220 30% 18%;
-    --muted: 210 35% 94%;
-    --muted-foreground: 218 16% 42%;
-    --border: 220 18% 87%;
-    --input: 220 18% 82%;
-    --ring: 28 94% 56%;
-    --accent: 202 84% 94%;
-    --accent-foreground: 220 35% 12%;
-    --success: 151 63% 35%;
-    --warning: 32 95% 48%;
-    --destructive: 0 72% 51%;
->>>>>>> 14f585c6ffaead32cd933636ddd3286e7124f036
   }
 
   * {
@@ -153,23 +132,14 @@
   }
 
   body {
-<<<<<<< HEAD
     @apply text-foreground font-body antialiased;
     background-color: var(--color-bg-body);
     background-image:
       radial-gradient(circle at top left, rgb(var(--color-brand-electric-rgb) / 0.08), transparent 30%),
       radial-gradient(circle at top right, rgb(var(--color-brand-accent-rgb) / 0.08), transparent 24%);
-=======
-    @apply bg-background text-foreground antialiased;
-    background-image:
-      radial-gradient(circle at top left, rgba(251, 191, 36, 0.14), transparent 30%),
-      radial-gradient(circle at top right, rgba(14, 165, 233, 0.12), transparent 22%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 252, 1));
->>>>>>> 14f585c6ffaead32cd933636ddd3286e7124f036
     min-height: 100vh;
   }
 
-<<<<<<< HEAD
 
 
   h1, h2, h3, h4, h5, h6 {
@@ -179,16 +149,11 @@
   ::selection {
     background: rgb(var(--color-brand-electric-rgb) / 0.22);
     color: var(--color-brand-primary);
-=======
-  a {
-    @apply transition-colors;
->>>>>>> 14f585c6ffaead32cd933636ddd3286e7124f036
   }
 }
 
 @layer utilities {
   .page-shell {
-<<<<<<< HEAD
     @apply mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-8;
   }
 
@@ -258,9 +223,6 @@
     transform: translateY(60px);
     transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
                 transform 1s cubic-bezier(0.16, 1, 0.3, 1);
-=======
-    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
->>>>>>> 14f585c6ffaead32cd933636ddd3286e7124f036
   }
 
   .hero-panel {
@@ -270,7 +232,6 @@
       linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(240, 249, 255, 0.85));
   }
 
-<<<<<<< HEAD
   .reveal-delay-1 { transition-delay: 0.1s; }
   .reveal-delay-2 { transition-delay: 0.2s; }
   .reveal-delay-3 { transition-delay: 0.3s; }
@@ -325,7 +286,7 @@
     width: 100%;
   }
 
-  /* Glass Card — clean glassmorphism */
+  /* Glass Card - clean glassmorphism */
   .glass-card {
     background: rgb(var(--color-bg-surface-rgb) / 0.76);
     border: 1px solid rgb(var(--color-border-subtle-rgb) / 0.78);
@@ -360,9 +321,9 @@
   }
 }
 
-/* ═══════════════════════════════════════════════
-   PREMIUM ANIMATIONS
-   ═══════════════════════════════════════════════ */
+/* ===============================================
+  PREMIUM ANIMATIONS
+  =============================================== */
 
 /* Text character split animation */
 .char-reveal .char {
@@ -609,9 +570,9 @@
   display: none;
 }
 
-/* ═══════════════════════════════════════════════
-   LEGAL PAGES — Content Styling
-   ═══════════════════════════════════════════════ */
+/* ===============================================
+  LEGAL PAGES - Content Styling
+  =============================================== */
 .legal-content h2 {
   @apply text-xl font-semibold text-foreground mt-10 mb-4 pt-6 border-t border-border first:mt-0 first:pt-0 first:border-t-0;
 }
@@ -645,9 +606,3 @@
 .legal-content td {
   @apply p-3 border-b border-border text-muted-foreground;
 }
-=======
-  .surface-panel {
-    @apply rounded-[28px] border border-border bg-card shadow-soft;
-  }
-}
->>>>>>> 14f585c6ffaead32cd933636ddd3286e7124f036

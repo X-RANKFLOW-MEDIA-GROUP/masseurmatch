@@ -84,15 +84,16 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
       const photo = photos[i];
       try {
         const filePath = `${user!.id}/${Date.now()}_${photo.file.name}`;
+        const photoPayload = {
+          profile_id: profileId,
+          storage_path: filePath,
+          is_primary: i === 0,
+          sort_order: i,
+        };
         
-        const { data: photoRecord, error: insertError } = await supabase
+        const { data: photoRecord, error: insertError } = await (supabase as any)
           .from('profile_photos')
-          .insert({
-            profile_id: profileId,
-            storage_path: filePath,
-            is_primary: i === 0,
-            sort_order: i,
-          })
+          .insert(photoPayload)
           .select()
           .single();
 
@@ -141,7 +142,7 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
     setIsLoading(true);
 
     try {
-      const { data: profileData, error: profileError } = await supabase
+      const { data: profileData, error: profileError } = await (supabase as any)
         .from('profiles')
         .update({
           display_name: profile.display_name || null,

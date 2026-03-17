@@ -4,7 +4,11 @@ import type { Tables } from "@/integrations/supabase/types";
 type ProfileRow = Tables<"profiles">;
 type FeaturedRow = Tables<"featured_masters">;
 type ImportedReviewRow = Tables<"imported_reviews">;
-type UserRoleRow = Tables<"user_roles">;
+type UserRoleRow = {
+  user_id: string;
+  role: "admin" | "provider" | null;
+  created_at?: string | null;
+};
 
 export type AdminImportedReview = Pick<
   ImportedReviewRow,
@@ -83,7 +87,16 @@ export async function loadImportedReviews(): Promise<AdminLoadResult<AdminImport
         throw new Error(profilesError.message);
       }
 
-      for (const profile of profiles || []) {
+        const profileRows = (profiles || []) as Array<{
+          id: string;
+          user_id: string;
+          display_name: string | null;
+          full_name: string | null;
+          city: string | null;
+          status: string;
+        }>;
+
+        for (const profile of profileRows) {
         profileMap.set(profile.id, profile);
       }
     }
@@ -226,8 +239,9 @@ export async function loadUsers(): Promise<AdminLoadResult<AdminUser>> {
       throw new Error(rolesError.message);
     }
 
+    const roleRows = (roles || []) as UserRoleRow[];
     const roleMap = new Map<string, UserRoleRow["role"]>();
-    for (const role of roles || []) {
+    for (const role of roleRows) {
       if (!roleMap.has(role.user_id)) {
         roleMap.set(role.user_id, role.role);
       }
@@ -239,10 +253,10 @@ export async function loadUsers(): Promise<AdminLoadResult<AdminUser>> {
     }
 
     return {
-      items: (profiles || []).map((profile) => ({
+      items: ((profiles || []) as Array<{ id: string; user_id: string; display_name: string | null; full_name: string | null; city: string | null; status: string }>).map((profile) => ({
         profileId: profile.id,
         userId: profile.user_id,
-        fullName: profile.display_name || profile.full_name,
+        fullName: profile.display_name || profile.full_name || "Unknown User",
         city: profile.city,
         status: profile.status,
         role: roleMap.get(profile.user_id) || null,

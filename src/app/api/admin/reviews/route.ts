@@ -33,7 +33,7 @@ async function applyReviewAdminAction(
   adminUserId: string,
   input: z.infer<typeof adminReviewActionSchema>,
 ) {
-  const adminClient = createSupabaseAdminClient();
+  const adminClient = createSupabaseAdminClient() as any;
 
   if (input.action === "delete") {
     const { error } = await adminClient.from("imported_reviews").delete().eq("id", input.reviewId);

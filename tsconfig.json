@@ -28,34 +28,23 @@
       ]
     },
     "strictNullChecks": true,
-    "incremental": true
+    "incremental": false
   },
   "include": [
     "next-env.d.ts",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
-}
-=======
-    "incremental": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
-    "plugins": [{ "name": "next" }]
-  },
-  "include": [
-    "next-env.d.ts",
-    "src/middleware.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/index.css",
+    "src/middleware.ts",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
->>>>>>> 14f585c6ffaead32cd933636ddd3286e7124f036
+  "exclude": [
+    "node_modules",
+    "src/legacy-pages/**",
+    "src/pages/**",
+    "src/views/**",
+    "src/mm/**",
+    "src/App.tsx",
+    "src/main.tsx"
+  ]
 }

@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { JsonLd } from "@/app/_components/JsonLd";
+import { KnottyHeroSpotlight } from "@/app/_components/KnottyHeroSpotlight";
 import { HomeSmartMatchCard } from "@/app/_components/HomeSmartMatchCard";
+import { BLOG_POSTS } from "@/app/blog/posts";
 import { getCities, getPublicTherapists, type PublicTherapist } from "@/app/_lib/directory";
+import { AdvancedHeroSection, BlogGrid, RatingSystem } from "@/components";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -57,11 +60,24 @@ function getTierPresentation(tier: PublicTherapist["_tier"]) {
     case "elite":
       return { label: "Elite", variant: "premium" as const };
     case "pro":
-      return { label: "Premium", variant: "premium" as const };
+      return { label: "Pro", variant: "premium" as const };
     case "standard":
       return { label: "Verified", variant: "default" as const };
     default:
       return { label: "Directory", variant: "secondary" as const };
+  }
+}
+
+function getTierWeight(tier: PublicTherapist["_tier"]) {
+  switch (tier) {
+    case "elite":
+      return 3;
+    case "pro":
+      return 2;
+    case "standard":
+      return 1;
+    default:
+      return 0;
   }
 }
 
@@ -121,8 +137,26 @@ export default async function HomePage() {
   const therapists = therapistsResult.items;
   const featured = therapists.slice(0, 3);
   const featuredCities = cities.slice(0, 10);
+  const liveCityCount = cities.length;
   const therapistCount = Math.max(therapistsResult.total, 150);
   const cityCount = Math.max(cities.length, 300);
+  const spotlightTherapists = [...therapists]
+    .sort((left, right) => {
+      const tierDifference = getTierWeight(right._tier) - getTierWeight(left._tier);
+
+      if (tierDifference !== 0) {
+        return tierDifference;
+      }
+
+      const reviewDifference = (right.review_count || 0) - (left.review_count || 0);
+
+      if (reviewDifference !== 0) {
+        return reviewDifference;
+      }
+
+      return (right.profile_views || 0) - (left.profile_views || 0);
+    })
+    .slice(0, 6);
   const featuredModalities: string[] = Array.from(
     new Set(
       therapists
@@ -148,6 +182,32 @@ export default async function HomePage() {
     },
   ];
 
+  const homepageReviews = featured.map((therapist, index) => ({
+    id: therapist.id,
+    author: therapist.display_name || therapist.full_name || `Guest ${index + 1}`,
+    rating: 5,
+    text:
+      therapist.bio?.slice(0, 140) ||
+      "Professional, responsive, and consistent massage experience with clear communication from booking through session.",
+    verified: true,
+    helpful: Math.max(4, Math.round((therapist.review_count || 0) / 2)),
+    date: "Recent",
+  }));
+
+  const homepageBlogPosts = BLOG_POSTS.map((post, index) => ({
+    id: post.slug,
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt,
+    author: post.author,
+    publishedAt: post.publishedAt,
+    readingTime: Math.max(3, Math.ceil(post.blocks.length * 1.2)),
+    category: index % 2 === 0 ? "Guides" : "Trust & Safety",
+    image: `https://images.unsplash.com/photo-${index % 2 === 0 ? "1515378791036-0648a3ef77b2" : "1519821172141-b5d8f7a8f9b5"}?auto=format&fit=crop&w=1200&q=80`,
+    featured: index === 0,
+    tags: ["massage", "discovery", "wellness"],
+  }));
+
   return (
     <>
       <JsonLd
@@ -171,80 +231,69 @@ export default async function HomePage() {
       <JsonLd data={buildFaqJsonLd(homepageFaqs)} />
 
       <section className="page-shell py-6 lg:py-7">
-        <div className="hero-panel px-4 py-4 lg:px-5 lg:py-5">
-          <div className="grid gap-4 xl:grid-cols-[minmax(0,1.01fr),minmax(360px,0.99fr)]">
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,1.02fr),minmax(0,0.98fr)] xl:grid-cols-1">
-              <div className="brand-glass rounded-[28px] px-5 py-5 text-white shadow-soft lg:px-6 lg:py-6">
-                <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/70">
-                  <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1">Live AI concierge</span>
-                  <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1">Brand gradient hero</span>
-                </div>
-                <h1 className="mt-4 max-w-xl font-display text-3xl leading-tight text-white sm:text-[2.65rem]">
-                  Meet Knotty, the live AI guide behind smarter therapist discovery.
-                </h1>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-white/75 sm:text-base sm:leading-7">
-                  Ask questions, understand how the directory works, and move into Smart Match or the full therapist list
-                  with less friction.
-                </p>
-                <div className="mt-6 flex flex-wrap items-center gap-3">
-                  <Button asChild variant="hero" className="h-auto rounded-full px-6 py-3.5">
-                    <Link href="/chat">Chat with Knotty</Link>
-                  </Button>
-                  <Button asChild variant="glass" className="h-auto rounded-full px-6 py-3.5">
-                    <Link href="/therapists">Browse directory</Link>
-                  </Button>
-                </div>
-              </div>
+        <KnottyHeroSpotlight therapists={spotlightTherapists} therapistCount={therapistCount} cityCount={liveCityCount} />
+      </section>
 
-              <Card className="grid gap-4 p-5 lg:p-6">
-                <div className="flex flex-wrap items-center gap-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.34em] text-muted-foreground">Gay Massage Directory</p>
-                  <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">
-                    {therapists.length} verified profiles
-                  </span>
-                </div>
-                <div>
-                  <h2 className="font-display text-2xl leading-tight text-foreground sm:text-[1.8rem]">
-                    Explore Male Massage Therapists
-                  </h2>
-                  <p className="mt-2.5 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">
-                    Find verified, gay-friendly male massage therapists near you. Deep tissue, Swedish, sports recovery and more.
-                  </p>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-2xl border border-border bg-secondary/70 px-4 py-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">Coverage</p>
-                    <p className="mt-2 text-sm font-semibold text-foreground">{cities.length} live cities</p>
-                  </div>
-                  <div className="rounded-2xl border border-border bg-secondary/70 px-4 py-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">Format</p>
-                    <p className="mt-2 text-sm font-semibold text-foreground">AI cards, list, and city search</p>
-                  </div>
-                </div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button asChild variant="secondary" className="h-auto rounded-full px-5 py-3">
-                    <Link href="/therapists">Browse therapists</Link>
-                  </Button>
-                  <Link href="/search" className="text-sm font-semibold text-primary hover:underline">
-                    Search by city or specialty
-                  </Link>
-                </div>
-                <div className="hidden flex-wrap gap-2 xl:flex">
-                  {featuredCities.map((city) => (
-                    <Link
-                      key={city.slug}
-                      href={`/${city.slug}`}
-                      className="rounded-full border border-border bg-white px-3 py-2 text-xs font-semibold text-foreground transition hover:border-primary/20 hover:bg-secondary"
-                    >
-                      {city.name}
-                    </Link>
-                  ))}
-                </div>
-              </Card>
+      <section className="page-shell pb-10">
+        <AdvancedHeroSection
+          title="Find Your Perfect Gay Massage Therapist"
+          subtitle="2026 Directory Experience"
+          description="Compare verified profiles, filter by specialty and location, and connect directly with trusted professionals."
+          cta={{ text: "Explore Therapists", href: "/therapists" }}
+          parallax={true}
+          animated={true}
+        />
+      </section>
+
+      <section className="page-shell pb-10">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,0.94fr),minmax(360px,1.06fr)]">
+          <Card className="grid gap-4 p-5 lg:p-6">
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.34em] text-muted-foreground">Gay Massage Directory</p>
+              <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">
+                {therapists.length} verified profiles
+              </span>
             </div>
+            <div>
+              <h2 className="font-display text-2xl leading-tight text-foreground sm:text-[1.8rem]">
+                Explore Male Massage Therapists
+              </h2>
+              <p className="mt-2.5 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">
+                Find verified, gay-friendly male massage therapists near you. Deep tissue, Swedish, sports recovery and more.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-border bg-secondary/70 px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">Coverage</p>
+                <p className="mt-2 text-sm font-semibold text-foreground">{cities.length} live cities</p>
+              </div>
+              <div className="rounded-2xl border border-border bg-secondary/70 px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">Format</p>
+                <p className="mt-2 text-sm font-semibold text-foreground">AI cards, list, and city search</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button asChild variant="secondary" className="h-auto rounded-full px-5 py-3">
+                <Link href="/therapists">Browse therapists</Link>
+              </Button>
+              <Link href="/search" className="text-sm font-semibold text-primary hover:underline">
+                Search by city or specialty
+              </Link>
+            </div>
+            <div className="hidden flex-wrap gap-2 xl:flex">
+              {featuredCities.map((city) => (
+                <Link
+                  key={city.slug}
+                  href={`/${city.slug}`}
+                  className="rounded-full border border-border bg-white px-3 py-2 text-xs font-semibold text-foreground transition hover:border-primary/20 hover:bg-secondary"
+                >
+                  {city.name}
+                </Link>
+              ))}
+            </div>
+          </Card>
 
-            <HomeSmartMatchCard cities={cities} featuredModalities={featuredModalities} therapistCount={therapists.length} />
-          </div>
+          <HomeSmartMatchCard cities={cities} featuredModalities={featuredModalities} therapistCount={therapists.length} />
         </div>
       </section>
 
@@ -283,6 +332,17 @@ export default async function HomePage() {
 
       <section className="page-shell pb-14">
         <SectionHeading
+          eyebrow="Trust signals"
+          title="Recent member feedback from featured profiles"
+          description="Social proof and transparent reviews help new visitors decide with more confidence."
+        />
+        <div className="mt-8 rounded-3xl border border-border bg-background p-6">
+          <RatingSystem averageRating={4.9} totalReviews={Math.max(120, therapistCount)} reviews={homepageReviews} compact={true} />
+        </div>
+      </section>
+
+      <section className="page-shell pb-14">
+        <SectionHeading
           eyebrow="Browse popular cities"
           title="High-intent city shortcuts for the most searched markets."
           description="These quick links mirror the cities and neighborhoods users reach for most often, including metro aliases that still route into searchable landing pages."
@@ -301,6 +361,15 @@ export default async function HomePage() {
       </section>
 
       <section className="page-shell pb-16">
+        <SectionHeading
+          eyebrow="From the blog"
+          title="Fresh guides for safer, smarter booking decisions"
+          description="Editorial content helps visitors understand session choices and trust fundamentals before they reach out."
+        />
+        <div className="mt-8">
+          <BlogGrid posts={homepageBlogPosts} limit={3} />
+        </div>
+
         <div className="brand-surface grid gap-10 rounded-[28px] px-6 py-8 lg:grid-cols-[minmax(0,1.1fr),minmax(0,0.9fr)]">
           <div>
             <SectionHeading

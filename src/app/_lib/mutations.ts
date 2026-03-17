@@ -16,7 +16,7 @@ export type AuthMutationResponse = {
     id: string;
     email: string;
   };
-  role: "admin" | "provider" | null;
+  role: "admin" | "provider" | "client" | null;
 };
 
 export type ForgotPasswordMutationResponse = {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/app/_components/JsonLd";
 import { BLOG_POSTS } from "@/app/blog/posts";
+import { BlogGrid } from "@/components";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
@@ -17,6 +18,20 @@ export const metadata: Metadata = createPageMetadata({
 });
 
 export default function BlogPage() {
+  const enhancedPosts = BLOG_POSTS.map((post, index) => ({
+    id: post.slug,
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt,
+    author: post.author,
+    publishedAt: post.publishedAt,
+    readingTime: Math.max(3, Math.ceil(post.blocks.length * 1.2)),
+    category: index % 2 === 0 ? "Guides" : "Directory Tips",
+    image: `https://images.unsplash.com/photo-${index % 2 === 0 ? "1544161515-4ab6ce6db874" : "1477332552946-cfb384aeaf1c"}?auto=format&fit=crop&w=1200&q=80`,
+    featured: index === 0,
+    tags: ["massage", "discovery", "trust"],
+  }));
+
   return (
     <>
       <JsonLd
@@ -50,17 +65,14 @@ export default function BlogPage() {
           across the public directory.
         </p>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          {BLOG_POSTS.map((post) => (
-            <article key={post.slug} className="rounded-3xl border border-border p-5 shadow-sm">
-              <p className="text-xs text-muted-foreground">{post.publishedAt}</p>
-              <h2 className="mt-2 text-xl font-semibold text-foreground">{post.title}</h2>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">{post.excerpt}</p>
-              <Link href={`/blog/${post.slug}`} className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">
-                Read article
-              </Link>
-            </article>
-          ))}
+        <div className="mt-8">
+          <BlogGrid posts={enhancedPosts} />
+        </div>
+
+        <div className="mt-8">
+          <Link href="/search" className="text-sm font-semibold text-primary hover:underline">
+            Continue to therapist search
+          </Link>
         </div>
       </div>
     </>

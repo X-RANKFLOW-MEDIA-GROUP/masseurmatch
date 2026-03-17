@@ -2,6 +2,7 @@
 
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { NewsletterSignup } from "../newsletter/NewsletterSignup";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -71,6 +72,10 @@ export const Footer = () => {
               </ul>
             </div>
           ))}
+        </div>
+
+        <div className="mt-10">
+          <NewsletterSignup />
         </div>
 
         <div className="border-t border-border mt-16 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">

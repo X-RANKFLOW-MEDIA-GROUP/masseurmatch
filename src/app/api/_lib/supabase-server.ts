@@ -8,7 +8,7 @@ import { RouteError } from "@/app/api/_lib/http";
 import { getRequestSession, type RequestSession } from "@/app/api/_lib/session";
 import type { Database, Json } from "@/integrations/supabase/types";
 
-type AppRole = Database["public"]["Enums"]["app_role"];
+type AppRole = "admin" | "provider";
 
 function getSupabaseUrl() {
   return envAny(["SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL", "VITE_SUPABASE_URL"]);
@@ -37,7 +37,7 @@ function baseOptions() {
   };
 }
 
-export function createSupabasePublicClient() {
+export function createSupabasePublicClient(): any {
   const url = getSupabaseUrl();
   const anonKey = getAnonKey();
   assertConfig(url, "SUPABASE_URL");
@@ -46,7 +46,7 @@ export function createSupabasePublicClient() {
   return createClient<Database>(url, anonKey, baseOptions());
 }
 
-export function createSupabaseAdminClient() {
+export function createSupabaseAdminClient(): any {
   const url = getSupabaseUrl();
   const serviceRoleKey = getServiceRoleKey();
   assertConfig(url, "SUPABASE_URL");
@@ -69,7 +69,8 @@ export async function getUserRole(userId: string): Promise<AppRole | null> {
     throw new RouteError(500, error.message);
   }
 
-  return data?.role ?? null;
+  const roleRow = data as { role: AppRole } | null;
+  return roleRow?.role ?? null;
 }
 
 export async function requireSession(request: Request): Promise<RequestSession> {
@@ -104,7 +105,7 @@ export async function recordAuditLog(
   details?: Json,
 ) {
   try {
-    const adminClient = createSupabaseAdminClient();
+    const adminClient = createSupabaseAdminClient() as any;
     await adminClient.from("audit_log").insert({
       admin_user_id: adminUserId,
       action,
@@ -205,7 +206,7 @@ export async function createTherapistUser(input: {
 
   const currentRole = await getUserRole(data.user.id);
   if (!currentRole) {
-    const { error: roleError } = await adminClient.from("user_roles").insert({
+    const { error: roleError } = await serviceClient.from("user_roles").insert({
       user_id: data.user.id,
       role: "provider",
     });

@@ -47,7 +47,7 @@ async function waitForServer() {
         redirect: "manual",
       });
 
-      if (response.status === 303) {
+      if (response.status < 500) {
         return;
       }
     } catch {
@@ -228,12 +228,12 @@ try {
   }
 
   {
-    const { response } = await request("/api/auth/logout", {
+    const { response, json } = await request("/api/auth/logout", {
       method: "POST",
     });
 
-    assert.equal(response.status, 303);
-    ensure(response.headers.get("location") === "/", "Logout should redirect to /.");
+    assert.equal(response.status, 200);
+    ensure(json?.ok === true, "Logout should return ok=true.");
     checks.push("logout");
   }
 

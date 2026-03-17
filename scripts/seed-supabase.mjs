@@ -12,20 +12,12 @@ function loadEnvFile(filePath) {
   }
 
   const lines = readFileSync(filePath, "utf8").split(/\r?\n/);
-<<<<<<< HEAD
-
-=======
->>>>>>> 14f585c6ffaead32cd933636ddd3286e7124f036
   for (const line of lines) {
     if (!line || line.startsWith("#") || !line.includes("=")) {
       continue;
     }
 
     const [key, ...rest] = line.split("=");
-<<<<<<< HEAD
-
-=======
->>>>>>> 14f585c6ffaead32cd933636ddd3286e7124f036
     if (!(key in process.env)) {
       process.env[key] = rest.join("=");
     }
@@ -171,14 +163,7 @@ const keywords = keywordLabels.map((label) => ({
   category:
     label.includes("Friendly") || label.includes("Affirming") || label.includes("Inclusive")
       ? "identity"
-<<<<<<< HEAD
-      : label.includes("Hours") ||
-          label.includes("Contact") ||
-          label.includes("Studio") ||
-          label.includes("Outcall")
-=======
       : label.includes("Hours") || label.includes("Contact") || label.includes("Studio") || label.includes("Outcall")
->>>>>>> 14f585c6ffaead32cd933636ddd3286e7124f036
         ? "intent"
         : "modality",
 }));
@@ -570,20 +555,11 @@ async function main() {
   failOnError(reviewsError, "Upserting reviews failed");
 
   console.log("Supabase seed complete.");
-<<<<<<< HEAD
-  console.log("credenciais de admin: admin@masseurmatch.com / Admin@MM2025!");
-  console.log("credenciais de therapist: therapist@masseurmatch.com / Therapist@MM2025!");
-=======
   console.log("Admin: admin@masseurmatch.com / Admin@MM2025!");
   console.log("Therapist: therapist@masseurmatch.com / Therapist@MM2025!");
->>>>>>> 14f585c6ffaead32cd933636ddd3286e7124f036
 }
 
 main().catch((error) => {
   console.error(error.message || error);
   process.exit(1);
-<<<<<<< HEAD
 });
-=======
-});
->>>>>>> 14f585c6ffaead32cd933636ddd3286e7124f036

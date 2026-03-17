@@ -6,6 +6,7 @@ import {
   getCities,
   getPublicTherapists,
 } from "@/app/_lib/directory";
+import { AdvancedDirectoryFilter } from "@/components";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
@@ -139,6 +140,47 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             </Link>
           ))}
         </div>
+
+        <section className="mt-8 rounded-3xl border border-border bg-background p-5">
+          <h2 className="text-xl font-semibold text-foreground">Advanced filter preview</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Refine by modality, budget, and tier. Applying filters updates live results below.
+          </p>
+          <div className="mt-4">
+            <AdvancedDirectoryFilter
+              groups={[
+                {
+                  id: "modality",
+                  label: "Modality",
+                  type: "checkbox",
+                  options: [
+                    { id: "swedish", label: "Swedish" },
+                    { id: "deep-tissue", label: "Deep Tissue" },
+                    { id: "sports", label: "Sports Recovery" },
+                  ],
+                },
+                {
+                  id: "price",
+                  label: "Price",
+                  type: "range",
+                  min: 50,
+                  max: 500,
+                },
+                {
+                  id: "tier",
+                  label: "Listing tier",
+                  type: "multi-select",
+                  options: [
+                    { id: "standard", label: "Standard" },
+                    { id: "pro", label: "Pro" },
+                    { id: "elite", label: "Elite" },
+                  ],
+                },
+              ]}
+              onFilterChange={() => undefined}
+            />
+          </div>
+        </section>
 
         <SearchPageClient
           cities={cities}

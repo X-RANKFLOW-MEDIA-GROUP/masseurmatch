@@ -3,8 +3,6 @@ import { notFound } from "next/navigation";
 import { CityDirectoryPage } from "@/app/_components/city-directory-page";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
 import {
-  DIRECTORY_SEGMENTS,
-  SPECIALTY_KEYWORDS,
   getKeywordBySlug,
   getSegmentBySlug,
 } from "@/app/_lib/directory-taxonomy";
@@ -13,13 +11,7 @@ import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd }
 
 type Params = { city: string; segment: string; keyword: string };
 
-export function generateStaticParams(): Params[] {
-  return getCities().flatMap((city) =>
-    DIRECTORY_SEGMENTS.flatMap((segment) =>
-      SPECIALTY_KEYWORDS.map((keyword) => ({ city: city.slug, segment: segment.slug, keyword: keyword.slug })),
-    ),
-  );
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const resolvedParams = await params;
