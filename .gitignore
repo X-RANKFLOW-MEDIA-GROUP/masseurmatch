@@ -1,12 +1,27 @@
+# Dependencies
+node_modules
+
+# Next.js
+.next
+out
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Local runtime data
+.runtime
+
 # Logs
-logs
 *.log
+*.tsbuildinfo
 npm-debug.log*
+pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
+<<<<<<< HEAD
 node_modules
 dist
 dist-ssr
@@ -20,6 +35,9 @@ out
 .lovable/
 
 # Editor directories and files
+=======
+# Editors
+>>>>>>> 14f585c6ffaead32cd933636ddd3286e7124f036
 .vscode/*
 !.vscode/extensions.json
 .idea

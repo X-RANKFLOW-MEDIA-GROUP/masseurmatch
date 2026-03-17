@@ -1,4 +1,5 @@
 project_id = "cnycelkfbtzfnphbeurd"
+<<<<<<< HEAD
 
 [functions]
   [functions.admin-stripe]
@@ -35,3 +36,5 @@ project_id = "cnycelkfbtzfnphbeurd"
     verify_jwt = false
   [functions.sms-otp]
     verify_jwt = false
+=======
+>>>>>>> 14f585c6ffaead32cd933636ddd3286e7124f036

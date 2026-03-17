@@ -3,19 +3,11 @@ import tailwindcssAnimate from "tailwindcss-animate";
 
 const withOpacity = (variableName: string) => `rgb(var(${variableName}) / <alpha-value>)`;
 
-export default {
-  darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
-  prefix: "",
+const config: Config = {
+  content: ["./src/app/**/*.{ts,tsx}", "./src/mm/**/*.{ts,tsx}"],
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
     extend: {
+<<<<<<< HEAD
       fontFamily: {
         display: ["var(--font-sora)", "sans-serif"],
         heading: ["var(--font-sora)", "sans-serif"],
@@ -109,13 +101,34 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
+=======
+      colors: {
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        card: "hsl(var(--card))",
+        "card-foreground": "hsl(var(--card-foreground))",
+        primary: "hsl(var(--primary))",
+        "primary-foreground": "hsl(var(--primary-foreground))",
+        secondary: "hsl(var(--secondary))",
+        "secondary-foreground": "hsl(var(--secondary-foreground))",
+        muted: "hsl(var(--muted))",
+        "muted-foreground": "hsl(var(--muted-foreground))",
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        accent: "hsl(var(--accent))",
+        "accent-foreground": "hsl(var(--accent-foreground))",
+        success: "hsl(var(--success))",
+        warning: "hsl(var(--warning))",
+        destructive: "hsl(var(--destructive))"
+>>>>>>> 14f585c6ffaead32cd933636ddd3286e7124f036
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        xl: "1.25rem",
+        "2xl": "1.75rem"
       },
       boxShadow: {
+<<<<<<< HEAD
         soft: "0 24px 60px rgb(11 31 58 / 0.18)",
         brand: "var(--shadow-card)",
       },
@@ -136,12 +149,23 @@ export default {
             height: "0",
           },
         },
+=======
+        soft: "0 20px 50px rgba(15, 23, 42, 0.08)"
+>>>>>>> 14f585c6ffaead32cd933636ddd3286e7124f036
       },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-      },
-    },
+      fontFamily: {
+        sans: ["var(--font-sans)"],
+        display: ["var(--font-display)"],
+        mono: ["var(--font-mono)"]
+      }
+    }
   },
+<<<<<<< HEAD
   plugins: [tailwindcssAnimate],
 } satisfies Config;
+=======
+  plugins: []
+};
+
+export default config;
+>>>>>>> 14f585c6ffaead32cd933636ddd3286e7124f036
