@@ -1,8 +1,11 @@
+"use client";
+
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 const BASE_URL = "https://masseurmatch.com";
 const SUPPORTED_LANGS = ["en", "es", "pt", "fr"];
+const OG_SITE_NAME = "MasseurMatch \u2014 Gay Massage Directory";
 
 interface SEOHeadProps {
   title: string;
@@ -32,10 +35,8 @@ export const SEOHead = ({
   const { i18n } = useTranslation();
 
   useEffect(() => {
-    // Title
     document.title = title;
 
-    // Helper to set/create meta tags
     const setMeta = (attr: string, key: string, content: string) => {
       let el = document.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement | null;
       if (!el) {
@@ -46,10 +47,8 @@ export const SEOHead = ({
       el.setAttribute("content", content);
     };
 
-    // Description
     setMeta("name", "description", description);
 
-    // Keywords
     if (keywords) {
       setMeta("name", "keywords", keywords);
     } else {
@@ -57,15 +56,8 @@ export const SEOHead = ({
       if (existing) existing.remove();
     }
 
-    // Robots
-    if (noindex) {
-      setMeta("name", "robots", "noindex, nofollow");
-    } else {
-      const existing = document.querySelector('meta[name="robots"]');
-      if (existing) existing.remove();
-    }
+    setMeta("name", "robots", noindex ? "noindex, nofollow" : "index, follow");
 
-    // Canonical
     const canonicalUrl = `${BASE_URL}${path}`;
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
     if (!canonical) {
@@ -75,23 +67,29 @@ export const SEOHead = ({
     }
     canonical.setAttribute("href", canonicalUrl);
 
-    // Open Graph
     setMeta("property", "og:title", title);
     setMeta("property", "og:description", description);
     setMeta("property", "og:url", canonicalUrl);
     setMeta("property", "og:type", ogType);
     setMeta("property", "og:image", ogImage);
-    setMeta("property", "og:site_name", "MasseurMatch — Gay Massage Directory");
-    setMeta("property", "og:locale", i18n.language === "pt" ? "pt_BR" : i18n.language === "es" ? "es_ES" : i18n.language === "fr" ? "fr_FR" : "en_US");
+    setMeta("property", "og:site_name", OG_SITE_NAME);
+    setMeta(
+      "property",
+      "og:locale",
+      i18n.language === "pt"
+        ? "pt_BR"
+        : i18n.language === "es"
+          ? "es_ES"
+          : i18n.language === "fr"
+            ? "fr_FR"
+            : "en_US",
+    );
 
-    // Twitter
     setMeta("name", "twitter:card", "summary_large_image");
     setMeta("name", "twitter:title", title);
     setMeta("name", "twitter:description", description);
     setMeta("name", "twitter:image", ogImage);
 
-    // Hreflang tags
-    // Remove old hreflang
     document.querySelectorAll('link[rel="alternate"][hreflang]').forEach((el) => el.remove());
 
     for (const lang of SUPPORTED_LANGS) {
@@ -101,15 +99,13 @@ export const SEOHead = ({
       link.setAttribute("href", `${BASE_URL}${path}?lang=${lang}`);
       document.head.appendChild(link);
     }
-    // x-default
+
     const xdef = document.createElement("link");
     xdef.setAttribute("rel", "alternate");
     xdef.setAttribute("hreflang", "x-default");
     xdef.setAttribute("href", `${BASE_URL}${path}`);
     document.head.appendChild(xdef);
 
-    // JSON-LD
-    // Remove previously injected
     document.querySelectorAll('script[data-seo-head="true"]').forEach((el) => el.remove());
 
     if (jsonLd) {
@@ -124,7 +120,6 @@ export const SEOHead = ({
     }
 
     return () => {
-      // Cleanup dynamic hreflang and JSON-LD on unmount
       document.querySelectorAll('link[rel="alternate"][hreflang]').forEach((el) => el.remove());
       document.querySelectorAll('script[data-seo-head="true"]').forEach((el) => el.remove());
     };

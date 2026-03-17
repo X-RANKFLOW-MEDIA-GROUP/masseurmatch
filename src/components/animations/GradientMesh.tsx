@@ -8,6 +8,7 @@ const blobs = [
     scale: [1, 1.3, 1],
     duration: 20,
     opacity: 0.12,
+    color: "var(--color-brand-secondary-rgb)",
   },
   {
     size: 500,
@@ -16,6 +17,7 @@ const blobs = [
     scale: [1.1, 0.9, 1.1],
     duration: 25,
     opacity: 0.1,
+    color: "var(--color-brand-accent-rgb)",
   },
   {
     size: 400,
@@ -24,6 +26,7 @@ const blobs = [
     scale: [0.9, 1.2, 0.9],
     duration: 18,
     opacity: 0.15,
+    color: "var(--color-brand-primary-rgb)",
   },
   {
     size: 350,
@@ -32,6 +35,7 @@ const blobs = [
     scale: [1, 1.1, 1],
     duration: 22,
     opacity: 0.08,
+    color: "var(--color-brand-accent-rgb)",
   },
 ];
 
@@ -44,7 +48,7 @@ export const GradientMesh = () => (
         style={{
           width: blob.size,
           height: blob.size,
-          background: `radial-gradient(circle, rgba(255,255,255,${blob.opacity}) 0%, transparent 70%)`,
+          background: `radial-gradient(circle, rgb(${blob.color} / ${blob.opacity}) 0%, transparent 70%)`,
           top: `${20 + i * 15}%`,
           left: `${10 + i * 20}%`,
         }}

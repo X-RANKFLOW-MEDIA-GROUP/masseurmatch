@@ -14,6 +14,12 @@ interface StepProfileProps {
   onComplete: () => void;
 }
 
+interface PendingPhoto {
+  file: File;
+  preview: string;
+  status: "pending" | "approved" | "rejected" | "error";
+}
+
 const SPECIALTIES_OPTIONS = [
   "Relaxation Massage", "Therapeutic Massage", "Sports Massage",
   "Shiatsu", "Reflexology", "Lymphatic Drainage", "Tantric Massage",
@@ -27,7 +33,7 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [photos, setPhotos] = useState<{ file: File; preview: string; status: string }[]>([]);
+  const [photos, setPhotos] = useState<PendingPhoto[]>([]);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
 
   const [profile, setProfile] = useState({
@@ -58,7 +64,7 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const newPhotos = files.map(file => ({
+    const newPhotos: PendingPhoto[] = files.map(file => ({
       file,
       preview: URL.createObjectURL(file),
       status: 'pending',
@@ -72,7 +78,7 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
 
   const uploadAndModeratePhotos = async (profileId: string) => {
     setUploadingPhotos(true);
-    const results = [];
+    const results: PendingPhoto[] = [];
 
     for (let i = 0; i < photos.length; i++) {
       const photo = photos[i];
@@ -108,8 +114,8 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
         setPhotos(prev => prev.map((p, idx) => 
           idx === i ? { ...p, status: modResult?.approved ? 'approved' : modResult ? 'rejected' : 'error' } : p
         ));
-      } catch (err: any) {
-        console.error('Photo upload error:', err);
+      } catch (error: unknown) {
+        console.error('Photo upload error:', error);
         results.push({ ...photo, status: 'error' });
       }
     }
@@ -189,8 +195,8 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
       }
 
       onComplete();
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } catch (error: unknown) {
+      toast({ title: "Error", description: error instanceof Error ? error.message : "Failed to save profile", variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -209,26 +215,26 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label>Display Name</Label>
-            <Input value={profile.display_name} onChange={e => setProfile(p => ({ ...p, display_name: e.target.value }))} placeholder="How you want to be called" className="bg-white/5 border-white/10" />
+            <Input value={profile.display_name} onChange={e => setProfile(p => ({ ...p, display_name: e.target.value }))} placeholder="How you want to be called" className="bg-background/80 border-input" />
           </div>
           <div>
             <Label>Phone</Label>
-            <Input value={profile.phone} onChange={e => setProfile(p => ({ ...p, phone: e.target.value }))} placeholder="+1 555 123 4567" className="bg-white/5 border-white/10" />
+            <Input value={profile.phone} onChange={e => setProfile(p => ({ ...p, phone: e.target.value }))} placeholder="+1 555 123 4567" className="bg-background/80 border-input" />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label>City</Label>
-            <Input value={profile.city} onChange={e => setProfile(p => ({ ...p, city: e.target.value }))} placeholder="New York" className="bg-white/5 border-white/10" />
+            <Input value={profile.city} onChange={e => setProfile(p => ({ ...p, city: e.target.value }))} placeholder="New York" className="bg-background/80 border-input" />
           </div>
           <div>
             <Label>State</Label>
-            <Input value={profile.state} onChange={e => setProfile(p => ({ ...p, state: e.target.value }))} placeholder="NY" className="bg-white/5 border-white/10" />
+            <Input value={profile.state} onChange={e => setProfile(p => ({ ...p, state: e.target.value }))} placeholder="NY" className="bg-background/80 border-input" />
           </div>
         </div>
         <div>
           <Label>Bio</Label>
-          <Textarea value={profile.bio} onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))} placeholder="Tell us about yourself and your experience..." className="bg-white/5 border-white/10 min-h-[100px]" />
+          <Textarea value={profile.bio} onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))} placeholder="Tell us about yourself and your experience..." className="bg-background/80 border-input min-h-[100px]" />
         </div>
       </div>
 
@@ -244,7 +250,7 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
               className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
                 profile.specialties.includes(spec)
                   ? 'bg-primary text-primary-foreground border-primary'
-                  : 'bg-white/5 border-white/10 text-muted-foreground hover:border-white/30'
+                  : 'bg-background/80 border-input text-muted-foreground hover:border-primary/30'
               }`}
             >
               {spec}
@@ -265,7 +271,7 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
               className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
                 profile.languages.includes(lang)
                   ? 'bg-primary text-primary-foreground border-primary'
-                  : 'bg-white/5 border-white/10 text-muted-foreground hover:border-white/30'
+                  : 'bg-background/80 border-input text-muted-foreground hover:border-primary/30'
               }`}
             >
               {lang}
@@ -278,7 +284,7 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
       <div className="space-y-3">
         <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Certifications</h4>
         <div className="flex gap-2">
-          <Input value={newCertification} onChange={e => setNewCertification(e.target.value)} placeholder="Add certification..." className="bg-white/5 border-white/10" />
+          <Input value={newCertification} onChange={e => setNewCertification(e.target.value)} placeholder="Add certification..." className="bg-background/80 border-input" />
           <Button type="button" variant="outline" size="sm" onClick={() => {
             if (newCertification.trim()) {
               setProfile(p => ({ ...p, certifications: [...p.certifications, newCertification.trim()] }));
@@ -306,11 +312,11 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label>Incall ($)</Label>
-            <Input type="number" value={profile.incall_price} onChange={e => setProfile(p => ({ ...p, incall_price: e.target.value }))} placeholder="150.00" className="bg-white/5 border-white/10" />
+            <Input type="number" value={profile.incall_price} onChange={e => setProfile(p => ({ ...p, incall_price: e.target.value }))} placeholder="150.00" className="bg-background/80 border-input" />
           </div>
           <div>
             <Label>Outcall ($)</Label>
-            <Input type="number" value={profile.outcall_price} onChange={e => setProfile(p => ({ ...p, outcall_price: e.target.value }))} placeholder="200.00" className="bg-white/5 border-white/10" />
+            <Input type="number" value={profile.outcall_price} onChange={e => setProfile(p => ({ ...p, outcall_price: e.target.value }))} placeholder="200.00" className="bg-background/80 border-input" />
           </div>
         </div>
       </div>
@@ -321,11 +327,11 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label>Instagram</Label>
-            <Input value={profile.social_media.instagram} onChange={e => setProfile(p => ({ ...p, social_media: { ...p.social_media, instagram: e.target.value } }))} placeholder="@youruser" className="bg-white/5 border-white/10" />
+            <Input value={profile.social_media.instagram} onChange={e => setProfile(p => ({ ...p, social_media: { ...p.social_media, instagram: e.target.value } }))} placeholder="@youruser" className="bg-background/80 border-input" />
           </div>
           <div>
             <Label>Website</Label>
-            <Input value={profile.social_media.website} onChange={e => setProfile(p => ({ ...p, social_media: { ...p.social_media, website: e.target.value } }))} placeholder="https://..." className="bg-white/5 border-white/10" />
+            <Input value={profile.social_media.website} onChange={e => setProfile(p => ({ ...p, social_media: { ...p.social_media, website: e.target.value } }))} placeholder="https://..." className="bg-background/80 border-input" />
           </div>
         </div>
       </div>
@@ -335,7 +341,7 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
         <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Presentation Video</h4>
         <div>
           <Label>Video URL (YouTube or Vimeo)</Label>
-          <Input value={profile.presentation_video_url} onChange={e => setProfile(p => ({ ...p, presentation_video_url: e.target.value }))} placeholder="https://youtube.com/..." className="bg-white/5 border-white/10" />
+          <Input value={profile.presentation_video_url} onChange={e => setProfile(p => ({ ...p, presentation_video_url: e.target.value }))} placeholder="https://youtube.com/..." className="bg-background/80 border-input" />
         </div>
       </div>
 
@@ -346,7 +352,7 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
         
         <div className="grid grid-cols-3 gap-3">
           {photos.map((photo, idx) => (
-            <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-white/10">
+            <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-border">
               <img src={photo.preview} alt="" className="w-full h-full object-cover" />
               {photo.status === 'approved' && (
                 <div className="absolute top-1 right-1 bg-primary rounded-full p-1">
@@ -372,7 +378,7 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="aspect-square rounded-lg border-2 border-dashed border-white/20 flex flex-col items-center justify-center gap-2 hover:border-white/40 transition-colors"
+              className="aspect-square rounded-lg border-2 border-dashed border-border-strong flex flex-col items-center justify-center gap-2 hover:border-primary/40 transition-colors"
             >
               <Upload className="w-6 h-6 text-muted-foreground" />
               <span className="text-xs text-muted-foreground">Add</span>

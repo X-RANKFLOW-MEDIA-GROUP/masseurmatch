@@ -11,13 +11,30 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CREATE-CHECKOUT] ${step}${details ? ` - ${JSON.stringify(details)}` : ""}`);
 };
 
-// Plan definitions — prices are created lazily in Stripe on first use
-// "free" is a $0 setup-intent trial (14 days) requiring card on file
+// Plan definitions — prices are created lazily in Stripe on first use.
+// "free" creates a $0 trial-style subscription without a checkout redirect.
 const PLANS: Record<string, { name: string; amount: number; features: string; isFree?: boolean }> = {
-  free:     { name: "Free", amount: 0, features: "1 photo, bottom search, no analytics", isFree: true },
-  standard: { name: "Standard", amount: 3900, features: "6 photos, mid search, Available Now 60min" },
-  pro:      { name: "Pro",      amount: 7900, features: "12 photos + video, top search, Verified badge" },
-  elite:    { name: "Elite",    amount: 9900, features: "Everything in Pro, 2 cities" },
+  free: {
+    name: "Free",
+    amount: 0,
+    features: '1 photo, bottom search placement, no Available Now, 1 travel schedule per month, no analytics, "Basic Listing" watermark',
+    isFree: true,
+  },
+  standard: {
+    name: "Standard",
+    amount: 3900,
+    features: "6 photos, middle search placement, Available Now for 60 minutes, 3 travel schedules per month, views analytics, newsletter chance",
+  },
+  pro: {
+    name: "Pro",
+    amount: 7900,
+    features: "12 photos plus video, top search placement, Available Now for 120 minutes, unlimited travel schedules, views and clicks analytics, homepage rotation, weekly specials, verified badge",
+  },
+  elite: {
+    name: "Elite",
+    amount: 9900,
+    features: "12 photos plus video, top search placement, Available Now for 120 minutes, unlimited travel schedules, views and clicks analytics, homepage rotation, weekly specials, verified badge, 2 active ads across 2 cities",
+  },
 };
 
 // Promotion codes are now entered by users at checkout (allow_promotion_codes: true)

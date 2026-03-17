@@ -1,4 +1,7 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
+
+const withOpacity = (variableName: string) => `rgb(var(${variableName}) / <alpha-value>)`;
 
 export default {
   darkMode: ["class"],
@@ -14,15 +17,52 @@ export default {
     },
     extend: {
       fontFamily: {
-        heading: ['Space Grotesk', 'sans-serif'],
-        body: ['Inter', 'sans-serif'],
+        display: ["var(--font-sora)", "sans-serif"],
+        heading: ["var(--font-sora)", "sans-serif"],
+        body: ["var(--font-inter)", "sans-serif"],
+        mono: ["var(--font-plex-mono)", "monospace"],
       },
       colors: {
-        border: "hsl(var(--border))",
+        border: {
+          DEFAULT: "hsl(var(--border))",
+          subtle: withOpacity("--color-border-subtle-rgb"),
+          strong: withOpacity("--color-border-strong-rgb"),
+        },
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        brand: {
+          primary: withOpacity("--color-brand-primary-rgb"),
+          deep: withOpacity("--color-brand-deep-navy-rgb"),
+          secondary: withOpacity("--color-brand-secondary-rgb"),
+          electric: withOpacity("--color-brand-electric-rgb"),
+          accent: withOpacity("--color-brand-accent-rgb"),
+          soft: withOpacity("--color-brand-soft-accent-rgb"),
+          gold: withOpacity("--color-brand-gold-rgb"),
+        },
+        bg: {
+          body: withOpacity("--color-bg-body-rgb"),
+          surface: withOpacity("--color-bg-surface-rgb"),
+          subtle: withOpacity("--color-bg-subtle-rgb"),
+        },
+        text: {
+          primary: withOpacity("--color-text-primary-rgb"),
+          secondary: withOpacity("--color-text-secondary-rgb"),
+          muted: withOpacity("--color-text-muted-rgb"),
+          inverse: withOpacity("--color-text-inverse-rgb"),
+        },
+        action: {
+          primary: withOpacity("--color-action-primary-rgb"),
+          "primary-hover": withOpacity("--color-action-primary-hover-rgb"),
+          secondary: withOpacity("--color-action-secondary-rgb"),
+          "secondary-hover": withOpacity("--color-action-secondary-hover-rgb"),
+        },
+        feedback: {
+          success: withOpacity("--color-feedback-success-rgb"),
+          error: withOpacity("--color-feedback-error-rgb"),
+          warning: withOpacity("--color-feedback-warning-rgb"),
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -75,6 +115,10 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      boxShadow: {
+        soft: "0 24px 60px rgb(11 31 58 / 0.18)",
+        brand: "var(--shadow-card)",
+      },
       keyframes: {
         "accordion-down": {
           from: {
@@ -99,5 +143,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimate],
 } satisfies Config;

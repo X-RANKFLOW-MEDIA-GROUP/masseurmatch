@@ -25,3 +25,13 @@ project_id = "cnycelkfbtzfnphbeurd"
     verify_jwt = false
   [functions.trial-reminder-emails]
     verify_jwt = false
+  [functions.process-lifecycle-email-queue]
+    verify_jwt = false
+  [functions.lifecycle-unsubscribe]
+    verify_jwt = false
+  [functions.run-lifecycle-campaigns]
+    verify_jwt = false
+  [functions.resend-webhook]
+    verify_jwt = false
+  [functions.sms-otp]
+    verify_jwt = false

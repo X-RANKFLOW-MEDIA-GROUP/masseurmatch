@@ -9,14 +9,19 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-foreground text-background hover:bg-foreground/90",
+        default:
+          "bg-action-primary text-white shadow-[0_14px_32px_rgba(11,31,58,0.12)] hover:bg-action-primary-hover hover:-translate-y-0.5",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-border bg-transparent text-foreground hover:bg-secondary",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-secondary text-foreground",
-        link: "text-foreground underline-offset-4 hover:underline",
-        hero: "bg-foreground text-background font-bold hover:bg-foreground/90 hover:scale-[1.02] transition-transform",
-        glass: "bg-secondary border border-border text-foreground hover:bg-accent",
+        outline: "border border-border bg-white text-foreground hover:border-primary/20 hover:bg-secondary",
+        secondary:
+          "bg-action-secondary text-white shadow-[0_14px_32px_rgba(11,31,58,0.12)] hover:bg-action-secondary-hover hover:-translate-y-0.5",
+        ghost: "text-foreground hover:bg-secondary hover:text-primary",
+        link: "text-primary underline-offset-4 hover:text-brand-deep hover:underline",
+        hero:
+          "bg-action-primary text-white font-bold shadow-[0_18px_40px_rgba(255,138,31,0.28)] hover:bg-action-primary-hover hover:scale-[1.02] transition-transform",
+        glass: "border border-white/20 bg-white/10 text-white hover:bg-white/20",
+        premium:
+          "bg-brand-gold text-white shadow-[0_16px_36px_rgba(231,168,75,0.28)] hover:brightness-[0.98] hover:-translate-y-0.5",
       },
       size: {
         default: "h-11 px-6 py-2",

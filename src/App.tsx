@@ -11,71 +11,71 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 
 // ── Lazy-loaded route components ──
-const Index = lazy(() => import("./pages/Index"));
-const Explore = lazy(() => import("./pages/Explore"));
-const Pricing = lazy(() => import("./pages/Pricing"));
-const About = lazy(() => import("./pages/About"));
-const Contact = lazy(() => import("./pages/Contact"));
-const Auth = lazy(() => import("./pages/Auth"));
-const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
-const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-const TherapistProfile = lazy(() => import("./pages/TherapistProfile"));
-const FAQPage = lazy(() => import("./pages/FAQ"));
-const Safety = lazy(() => import("./pages/Safety"));
-const Terms = lazy(() => import("./pages/Terms"));
-const Privacy = lazy(() => import("./pages/Privacy"));
-const City = lazy(() => import("./pages/City"));
-const CityListing = lazy(() => import("./pages/CityListing"));
-const CityDirectory = lazy(() => import("./pages/CityDirectory"));
-const ClaimProfile = lazy(() => import("./pages/ClaimProfile"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const HomeTest = lazy(() => import("./pages/HomeTest"));
+const Index = lazy(() => import("./legacy-pages/Index"));
+const Explore = lazy(() => import("./legacy-pages/Explore"));
+const Pricing = lazy(() => import("./legacy-pages/Pricing"));
+const About = lazy(() => import("./legacy-pages/About"));
+const Contact = lazy(() => import("./legacy-pages/Contact"));
+const Auth = lazy(() => import("./legacy-pages/Auth"));
+const ForgotPassword = lazy(() => import("./legacy-pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./legacy-pages/ResetPassword"));
+const TherapistProfile = lazy(() => import("./legacy-pages/TherapistProfile"));
+const FAQPage = lazy(() => import("./legacy-pages/FAQ"));
+const Safety = lazy(() => import("./legacy-pages/Safety"));
+const Terms = lazy(() => import("./legacy-pages/Terms"));
+const Privacy = lazy(() => import("./legacy-pages/Privacy"));
+const City = lazy(() => import("./legacy-pages/City"));
+const CityListing = lazy(() => import("./legacy-pages/CityListing"));
+const CityDirectory = lazy(() => import("./legacy-pages/CityDirectory"));
+const ClaimProfile = lazy(() => import("./legacy-pages/ClaimProfile"));
+const NotFound = lazy(() => import("./legacy-pages/NotFound"));
+const HomeTest = lazy(() => import("./legacy-pages/HomeTest"));
 
 // Legal pages
-const TherapistAgreement = lazy(() => import("./pages/legal/TherapistAgreement"));
-const Cookies = lazy(() => import("./pages/legal/Cookies"));
-const BillingPolicy = lazy(() => import("./pages/legal/BillingPolicy"));
-const AcceptableUse = lazy(() => import("./pages/legal/AcceptableUse"));
-const PhotoPolicy = lazy(() => import("./pages/legal/PhotoPolicy"));
-const DMCA = lazy(() => import("./pages/legal/DMCA"));
-const Accessibility = lazy(() => import("./pages/legal/Accessibility"));
-const MarketingConsent = lazy(() => import("./pages/legal/MarketingConsent"));
-const NoticeAtCollection = lazy(() => import("./pages/legal/NoticeAtCollection"));
-const GoverningLaw = lazy(() => import("./pages/legal/GoverningLaw"));
-const LegalContact = lazy(() => import("./pages/legal/LegalContact"));
+const TherapistAgreement = lazy(() => import("./legacy-pages/legal/TherapistAgreement"));
+const Cookies = lazy(() => import("./legacy-pages/legal/Cookies"));
+const BillingPolicy = lazy(() => import("./legacy-pages/legal/BillingPolicy"));
+const AcceptableUse = lazy(() => import("./legacy-pages/legal/AcceptableUse"));
+const PhotoPolicy = lazy(() => import("./legacy-pages/legal/PhotoPolicy"));
+const DMCA = lazy(() => import("./legacy-pages/legal/DMCA"));
+const Accessibility = lazy(() => import("./legacy-pages/legal/Accessibility"));
+const MarketingConsent = lazy(() => import("./legacy-pages/legal/MarketingConsent"));
+const NoticeAtCollection = lazy(() => import("./legacy-pages/legal/NoticeAtCollection"));
+const GoverningLaw = lazy(() => import("./legacy-pages/legal/GoverningLaw"));
+const LegalContact = lazy(() => import("./legacy-pages/legal/LegalContact"));
 
 // Dashboard
 const DashboardLayout = lazy(() => import("@/components/dashboard/DashboardLayout").then(m => ({ default: m.DashboardLayout })));
-const DashboardOverview = lazy(() => import("./pages/dashboard/DashboardOverview"));
-const DashboardProfile = lazy(() => import("./pages/dashboard/DashboardProfile"));
-const DashboardPhotos = lazy(() => import("./pages/dashboard/DashboardPhotos"));
-const DashboardLocation = lazy(() => import("./pages/dashboard/DashboardLocation"));
-const DashboardPricing = lazy(() => import("./pages/dashboard/DashboardPricing"));
-const DashboardAvailability = lazy(() => import("./pages/dashboard/DashboardAvailability"));
-const DashboardVerification = lazy(() => import("./pages/dashboard/DashboardVerification"));
-const DashboardSubscription = lazy(() => import("./pages/dashboard/DashboardSubscription"));
-const DashboardSettings = lazy(() => import("./pages/dashboard/DashboardSettings"));
-const DashboardSeo = lazy(() => import("./pages/dashboard/DashboardSeo"));
-const DashboardPromotion = lazy(() => import("./pages/dashboard/DashboardPromotion"));
-const DashboardFAQ = lazy(() => import("./pages/dashboard/DashboardFAQ"));
-const DashboardTravel = lazy(() => import("./pages/dashboard/DashboardTravel"));
-const DashboardSupport = lazy(() => import("./pages/dashboard/DashboardSupport"));
-const DashboardSpecials = lazy(() => import("./pages/dashboard/DashboardSpecials"));
-const DashboardDemandRadar = lazy(() => import("./pages/dashboard/DashboardDemandRadar"));
+const DashboardOverview = lazy(() => import("./legacy-pages/dashboard/DashboardOverview"));
+const DashboardProfile = lazy(() => import("./legacy-pages/dashboard/DashboardProfile"));
+const DashboardPhotos = lazy(() => import("./legacy-pages/dashboard/DashboardPhotos"));
+const DashboardLocation = lazy(() => import("./legacy-pages/dashboard/DashboardLocation"));
+const DashboardPricing = lazy(() => import("./legacy-pages/dashboard/DashboardPricing"));
+const DashboardAvailability = lazy(() => import("./legacy-pages/dashboard/DashboardAvailability"));
+const DashboardVerification = lazy(() => import("./legacy-pages/dashboard/DashboardVerification"));
+const DashboardSubscription = lazy(() => import("./legacy-pages/dashboard/DashboardSubscription"));
+const DashboardSettings = lazy(() => import("./legacy-pages/dashboard/DashboardSettings"));
+const DashboardSeo = lazy(() => import("./legacy-pages/dashboard/DashboardSeo"));
+const DashboardPromotion = lazy(() => import("./legacy-pages/dashboard/DashboardPromotion"));
+const DashboardFAQ = lazy(() => import("./legacy-pages/dashboard/DashboardFAQ"));
+const DashboardTravel = lazy(() => import("./legacy-pages/dashboard/DashboardTravel"));
+const DashboardSupport = lazy(() => import("./legacy-pages/dashboard/DashboardSupport"));
+const DashboardSpecials = lazy(() => import("./legacy-pages/dashboard/DashboardSpecials"));
+const DashboardDemandRadar = lazy(() => import("./legacy-pages/dashboard/DashboardDemandRadar"));
 
 // Admin
-const AdminLogin = lazy(() => import("./pages/AdminLogin"));
+const AdminLogin = lazy(() => import("./legacy-pages/AdminLogin"));
 const AdminLayout = lazy(() => import("@/components/admin/AdminLayout").then(m => ({ default: m.AdminLayout })));
-const AdminOverview = lazy(() => import("./pages/admin/AdminOverview"));
-const AdminMailbox = lazy(() => import("./pages/admin/AdminMailbox"));
-const AdminModeration = lazy(() => import("./pages/admin/AdminModeration"));
-const AdminAIPrecheck = lazy(() => import("./pages/admin/AdminAIPrecheck"));
-const AdminFlags = lazy(() => import("./pages/admin/AdminFlags"));
-const AdminFeatured = lazy(() => import("./pages/admin/AdminFeatured"));
-const AdminCityOps = lazy(() => import("./pages/admin/AdminCityOps"));
-const AdminAuditLog = lazy(() => import("./pages/admin/AdminAuditLog"));
-const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
-const AdminNewsletter = lazy(() => import("./pages/admin/AdminNewsletter"));
+const AdminOverview = lazy(() => import("./legacy-pages/admin/AdminOverview"));
+const AdminMailbox = lazy(() => import("./legacy-pages/admin/AdminMailbox"));
+const AdminModeration = lazy(() => import("./legacy-pages/admin/AdminModeration"));
+const AdminAIPrecheck = lazy(() => import("./legacy-pages/admin/AdminAIPrecheck"));
+const AdminFlags = lazy(() => import("./legacy-pages/admin/AdminFlags"));
+const AdminFeatured = lazy(() => import("./legacy-pages/admin/AdminFeatured"));
+const AdminCityOps = lazy(() => import("./legacy-pages/admin/AdminCityOps"));
+const AdminAuditLog = lazy(() => import("./legacy-pages/admin/AdminAuditLog"));
+const AdminUsers = lazy(() => import("./legacy-pages/admin/AdminUsers"));
+const AdminNewsletter = lazy(() => import("./legacy-pages/admin/AdminNewsletter"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -208,7 +208,9 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AnimatedRoutes />
+          <div id="main-content" tabIndex={-1}>
+            <AnimatedRoutes />
+          </div>
           <KnottyChat />
         </BrowserRouter>
       </TooltipProvider>

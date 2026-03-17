@@ -68,9 +68,8 @@ export const DashboardSidebar = () => {
   const planColorMap: Record<string, string> = {
     free: "border-muted-foreground/40 text-muted-foreground",
     standard: "border-primary/40 text-primary",
-    premium: "border-accent/60 text-accent-foreground bg-accent/20",
-    gold: "border-warning/40 text-warning bg-warning/10",
-    platinum: "border-chart-4/40 text-chart-4 bg-chart-4/10",
+    pro: "border-accent/60 text-accent-foreground bg-accent/20",
+    elite: "border-warning/40 text-warning bg-warning/10",
   };
   const badgeClass = planColorMap[planKey || "free"] || planColorMap.free;
   const showUpgrade = !planKey || planKey === "free" || planKey === "standard";

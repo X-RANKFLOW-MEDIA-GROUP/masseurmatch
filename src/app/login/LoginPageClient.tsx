@@ -1,0 +1,25 @@
+"use client";
+
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { AuthForms } from "@/app/_components/auth-forms";
+
+function LoginPageContent() {
+  const searchParams = useSearchParams();
+  const params = new URLSearchParams(searchParams?.toString() ?? "");
+  const redirectTo = params.get("redirect") || "/pro/dashboard";
+
+  return (
+    <div className="container mx-auto px-4 py-10">
+      <AuthForms mode="login" redirectTo={redirectTo} />
+    </div>
+  );
+}
+
+export default function LoginPageClient() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-10" />}>
+      <LoginPageContent />
+    </Suspense>
+  );
+}

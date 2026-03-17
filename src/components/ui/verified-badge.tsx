@@ -17,7 +17,7 @@ export const VerifiedBadge = ({ size = "md", className }: VerifiedBadgeProps) =>
       className={cn(
         "relative inline-flex items-center gap-1.5 rounded-full font-semibold select-none",
         isSmall ? "px-2 py-0.5 text-[10px]" : "px-3 py-1 text-xs",
-        "bg-sky-500/15 text-sky-400 border border-sky-500/30",
+        "bg-primary/10 text-primary border border-primary/25",
         "backdrop-blur-sm",
         className,
       )}
@@ -26,7 +26,7 @@ export const VerifiedBadge = ({ size = "md", className }: VerifiedBadgeProps) =>
       <span
         className="absolute -inset-[2px] rounded-full pointer-events-none"
         style={{
-          boxShadow: "0 0 10px 2px hsl(200 80% 50% / 0.3), 0 0 20px 4px hsl(200 80% 50% / 0.12)",
+          boxShadow: "0 0 10px 2px hsl(var(--primary) / 0.24), 0 0 20px 4px hsl(var(--primary) / 0.12)",
         }}
       />
 

@@ -17,7 +17,7 @@ export const SpecialOfferBadge = ({ size = "md", className }: SpecialOfferBadgeP
       className={cn(
         "relative inline-flex items-center gap-1.5 rounded-full font-semibold select-none",
         isSmall ? "px-2 py-0.5 text-[10px]" : "px-3 py-1 text-xs",
-        "bg-amber-500/15 text-amber-400 border border-amber-500/30",
+        "bg-accent/10 text-accent-foreground border border-accent/30",
         "backdrop-blur-sm",
         className,
       )}
@@ -26,7 +26,7 @@ export const SpecialOfferBadge = ({ size = "md", className }: SpecialOfferBadgeP
       <span
         className="absolute -inset-[2px] rounded-full pointer-events-none"
         style={{
-          boxShadow: "0 0 10px 2px hsl(38 90% 50% / 0.3), 0 0 20px 4px hsl(38 90% 50% / 0.12)",
+          boxShadow: "0 0 10px 2px hsl(var(--accent) / 0.28), 0 0 20px 4px hsl(var(--accent) / 0.14)",
         }}
       />
 

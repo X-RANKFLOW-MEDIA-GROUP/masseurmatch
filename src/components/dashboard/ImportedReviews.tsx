@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,7 +40,7 @@ export function ImportedReviewsManager({ profileId }: { profileId: string }) {
   const [reviews, setReviews] = useState<ImportedReview[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     const [importsRes, reviewsRes] = await Promise.all([
       supabase
@@ -58,11 +58,11 @@ export function ImportedReviewsManager({ profileId }: { profileId: string }) {
     if (importsRes.data) setImports(importsRes.data as unknown as ImportedProfileData[]);
     if (reviewsRes.data) setReviews(reviewsRes.data as unknown as ImportedReview[]);
     setLoading(false);
-  };
+  }, [profileId]);
 
   useEffect(() => {
-    fetchData();
-  }, [profileId]);
+    void fetchData();
+  }, [fetchData]);
 
   const handleImport = async () => {
     if (!url.trim()) return;
@@ -91,7 +91,7 @@ export function ImportedReviewsManager({ profileId }: { profileId: string }) {
           description: `Imported ${data.reviews_count} reviews from ${data.platform}`,
         });
         setUrl("");
-        fetchData();
+        void fetchData();
       }
     } catch (err) {
       toast({
@@ -110,12 +110,12 @@ export function ImportedReviewsManager({ profileId }: { profileId: string }) {
       supabase.from("imported_reviews").delete().eq("profile_id", profileId).eq("source_url", sourceUrl),
     ]);
     toast({ title: "Import removed" });
-    fetchData();
+    void fetchData();
   };
 
   const handleDeleteReview = async (reviewId: string) => {
     await supabase.from("imported_reviews").delete().eq("id", reviewId);
-    fetchData();
+    void fetchData();
   };
 
   return (

@@ -1,11 +1,16 @@
 {
-  "name": "MasseurMatch — Gay Massage Directory",
+  "id": "/",
+  "name": "MasseurMatch - City-First Massage Directory",
   "short_name": "MasseurMatch",
-  "description": "Find male massage therapists near you. The #1 gay massage directory.",
+  "description": "Find massage therapists by city, specialty, and profile quality through a city-first public directory.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0a0a0a",
+  "orientation": "portrait-primary",
+  "background_color": "#f7f4ee",
   "theme_color": "#c8a97e",
+  "lang": "en-US",
+  "categories": ["health", "lifestyle", "business"],
   "icons": [
     {
       "src": "/favicon.ico",

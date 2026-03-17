@@ -33,8 +33,58 @@ const STATIC_URLS: { path: string; priority: string; changefreq: string }[] = [
   { path: "/legal-contact", priority: "0.2", changefreq: "yearly" },
 ];
 
+type SitemapProfile = {
+  id: string;
+  slug: string | null;
+  display_name: string | null;
+  full_name: string | null;
+  bio: string | null;
+  city: string | null;
+  updated_at: string | null;
+  is_seed_profile: boolean;
+  status: string | null;
+  specialties: string[] | null;
+  incall_price: number | null;
+  outcall_price: number | null;
+  custom_faq: unknown[] | null;
+};
+
 function toSlug(city: string): string {
   return city.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-");
+}
+
+function looksLikeDemoSlug(value: string | null): boolean {
+  const normalized = (value || "").trim().toLowerCase();
+
+  if (!normalized) return false;
+
+  return (
+    normalized === "demo" ||
+    normalized.startsWith("demo-") ||
+    normalized.endsWith("-demo") ||
+    normalized.includes("-demo-")
+  );
+}
+
+function isSeoRichProfile(profile: SitemapProfile): boolean {
+  const hasName = !!(profile.display_name || profile.full_name)?.trim();
+  const hasCity = !!profile.city?.trim();
+  const hasCanonicalIdentifier = !!(profile.slug || profile.id);
+  const hasIndexableSlug = !looksLikeDemoSlug(profile.slug);
+  const bioLength = (profile.bio || "").trim().length;
+  const hasMeaningfulBio = bioLength >= 80;
+  const hasSpecialties = Array.isArray(profile.specialties) && profile.specialties.length > 0;
+  const hasPricing = Number(profile.incall_price) > 0 || Number(profile.outcall_price) > 0;
+  const hasFaq = Array.isArray(profile.custom_faq) && profile.custom_faq.length > 0;
+
+  return (
+    hasName &&
+    hasCity &&
+    hasCanonicalIdentifier &&
+    hasIndexableSlug &&
+    hasMeaningfulBio &&
+    (hasSpecialties || hasPricing || hasFaq)
+  );
 }
 
 function buildHreflangLinks(path: string): string {
@@ -66,19 +116,15 @@ serve(async (req) => {
 
     const { data: profiles, error } = await supabase
       .from("profiles")
-      .select("id, slug, display_name, full_name, bio, city, updated_at, is_seed_profile")
+      .select("id, slug, display_name, full_name, bio, city, updated_at, is_seed_profile, status, specialties, incall_price, outcall_price, custom_faq")
       .eq("is_active", true)
+      .eq("status", "active")
       .eq("is_seed_profile", false)
       .not("city", "is", null);
 
     if (error) { console.error("DB error:", error); throw new Error("Failed to query profiles"); }
 
-    const qualifiedProfiles = (profiles || []).filter((p) => {
-      const hasName = !!(p.display_name || p.full_name);
-      const hasBio = !!(p.bio && p.bio.length >= 50);
-      const hasCity = !!p.city;
-      return hasName && hasBio && hasCity;
-    });
+    const qualifiedProfiles = ((profiles || []) as SitemapProfile[]).filter(isSeoRichProfile);
 
     const dynamicCitySlugs = new Set<string>();
     for (const p of qualifiedProfiles) { dynamicCitySlugs.add(toSlug(p.city)); }

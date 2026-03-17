@@ -1,73 +1,64 @@
-# Welcome to your Lovable project
+# MasseurMatch
 
-## Project info
+MasseurMatch is a directory for gay-friendly and male massage therapists. Visitors browse listings, compare providers by city and specialty, and contact therapists directly.
 
-**URL**: https://lovable.dev/projects/804bd328-dd64-40ac-b825-214828198ce6
+## Stack
 
-## How can I edit this code?
+- Vite
+- React
+- TypeScript
+- Tailwind CSS
+- Supabase
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/804bd328-dd64-40ac-b825-214828198ce6) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Local Development
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Production Build
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```sh
+npm run build
+```
 
-**Use GitHub Codespaces**
+The build now generates `public/sitemap.xml` automatically before Vite runs.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+To regenerate only the sitemap:
 
-## What technologies are used for this project?
+```sh
+npm run generate:sitemap
+```
 
-This project is built with:
+## Environment
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Copy `.env.example` to `.env.local` and provide the required values before connecting live services.
 
-## How can I deploy this project?
+For the most complete sitemap, set one server-side key for the sitemap script: `SITEMAP_SUPABASE_KEY` (preferred), `SUPABASE_SECRET_KEY`, or `SUPABASE_SERVICE_ROLE_KEY`.
 
-Simply open [Lovable](https://lovable.dev/projects/804bd328-dd64-40ac-b825-214828198ce6) and click on Share -> Publish.
+Use a key from the same Supabase project as `NEXT_PUBLIC_SUPABASE_URL`. Public keys (`NEXT_PUBLIC_SUPABASE_ANON_KEY` / `VITE_SUPABASE_PUBLISHABLE_KEY`) can run the query but may return fewer profiles because of RLS.
 
-## Can I connect a custom domain to my Lovable project?
+### Keys For Verification And OTP
 
-Yes, you can!
+The repository already includes the following integrations:
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- Photo moderation: `supabase/functions/moderate-photo` using `SIGHTENGINE_API_USER` and `SIGHTENGINE_API_SECRET`
+- Text moderation: `supabase/functions/moderate-text` using `SIGHTENGINE_API_USER` and `SIGHTENGINE_API_SECRET`
+- SMS OTP (Twilio Verify): `supabase/functions/sms-otp` using `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_VERIFY_SERVICE_SID`
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Additional API keys tracked in `.env.example`:
+
+- `SERPAPI_API_KEY`
+- `FIRECRAWL_API_KEY`
+
+To set secrets for Supabase Edge Functions in a hosted project:
+
+```sh
+supabase secrets set TWILIO_ACCOUNT_SID=... TWILIO_AUTH_TOKEN=... TWILIO_VERIFY_SERVICE_SID=... SIGHTENGINE_API_USER=... SIGHTENGINE_API_SECRET=...
+```
+
+## Deployment
+
+The repository includes a `vercel.json` rewrite so client-side routes work correctly on Vercel for SPA deployment.
+

@@ -1,5 +1,8 @@
+"use client";
+
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
+import { loginMutation, logoutMutation, registerMutation } from "@/app/_lib/mutations";
 import { supabase } from '@/integrations/supabase/client';
 
 interface SubscriptionState {
@@ -119,23 +122,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [user, refreshSubscription]);
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName },
-        emailRedirectTo: window.location.origin,
-      },
-    });
-    return { error: error as Error | null };
+    try {
+      await registerMutation({
+        email,
+        password,
+        fullName,
+      });
+
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      return { error: error as Error | null };
+    } catch (error) {
+      return { error: error as Error };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error as Error | null };
+    try {
+      await loginMutation({
+        email,
+        password,
+      });
+
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      return { error: error as Error | null };
+    } catch (error) {
+      return { error: error as Error };
+    }
   };
 
   const signOut = async () => {
+    await logoutMutation().catch(() => null);
     await supabase.auth.signOut();
   };
 

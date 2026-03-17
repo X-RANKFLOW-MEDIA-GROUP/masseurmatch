@@ -1,3 +1,5 @@
+"use client";
+
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Globe, MapPin, ChevronDown, Search } from "lucide-react";
