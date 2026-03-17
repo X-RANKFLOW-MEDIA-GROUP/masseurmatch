@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "test:api": "node scripts/test-api-routes.mjs",
     "preview": "next start",
-    "typecheck": "tsc --noEmit --project tsconfig.typecheck.json"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
