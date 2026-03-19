@@ -24,17 +24,17 @@ const SEARCH_FAQS = [
   {
     question: "How do I search massage therapists on MasseurMatch?",
     answer:
-      "Use city, specialty, and listing tier filters to narrow the directory, then open a profile to compare bio, pricing, and contact details.",
+      "Use city, Deep Tissue, Home Visit, and Verified filters to narrow results instantly, then open a profile and use Call or Message to contact directly.",
   },
   {
     question: "Can I browse therapists by city?",
     answer:
-      "Yes. MasseurMatch is organized around city landing pages so visitors can find local massage therapists and move into specialty pages from there.",
+      "Yes. MasseurMatch is organized around city and subcategory pages so visitors can find local options near me and move into specialty pages from there.",
   },
   {
     question: "Does the search page show live therapist listings?",
     answer:
-      "Yes. The search page renders public therapist listings directly and updates the results when you apply new filters.",
+      "Yes. The search page renders public therapist listings directly and updates results with no page refresh when filters change.",
   },
 ];
 
@@ -57,16 +57,18 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
   const params = await searchParams;
   const city = resolveCityName(getFirstParam(params.city));
   const modality = getFirstParam(params.modality);
+  const keyword = getFirstParam(params.keyword);
+  const verified = getFirstParam(params.verified) === "1";
   const tierValue = getFirstParam(params.tier);
-  const hasFilters = Boolean(city || modality || tierValue || getFirstParam(params.goal) || getFirstParam(params.session));
+  const hasFilters = Boolean(city || modality || keyword || verified || tierValue || getFirstParam(params.goal) || getFirstParam(params.session));
 
   return createPageMetadata({
-    title: city ? `Search massage therapists in ${city}` : "Search massage therapists",
+    title: city ? `Massage therapists near ${city}` : "Search massage therapists near me",
     description: city
-      ? `Browse massage therapist listings in ${city}, compare specialties, and connect directly with providers.`
-      : "Search massage therapists by city, specialty, and listing tier through a crawlable public directory.",
+      ? `Browse massage therapist listings in ${city}, compare specialties and verification signals, and contact providers directly.`
+      : "Search massage therapists by city, specialty, and listing tier through a crawlable public directory optimized for local near-me intent.",
     path: "/search",
-    keywords: ["search massage therapists", city, modality, tierValue],
+    keywords: ["search massage therapists", "massage near me", city, modality, keyword, verified ? "verified massage therapist" : "", tierValue],
     noIndex: hasFilters,
   });
 }
@@ -76,13 +78,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const cities = getCities();
   const city = resolveCityName(getFirstParam(params.city));
   const modality = getFirstParam(params.modality);
+  const keyword = getFirstParam(params.keyword);
   const session = getFirstParam(params.session);
   const goal = getFirstParam(params.goal);
+  const verified = getFirstParam(params.verified) === "1";
   const tierValue = getFirstParam(params.tier);
   const tier = isTier(tierValue) ? tierValue : "";
   const results = await getPublicTherapists({
     city: city || undefined,
     modality: modality || undefined,
+    keyword: keyword || undefined,
+    session: session === "home-visit" ? "home-visit" : session === "incall" ? "incall" : undefined,
+    verified,
     tier: tier || undefined,
     page: 1,
     pageSize: 12,
@@ -121,11 +128,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <div className="max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">Explore and search</p>
           <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground">
-            Search massage therapists by city, specialty, and intent.
+            Find the right therapist fast and make the handshake.
           </h1>
           <p className="mt-4 text-base leading-7 text-muted-foreground">
-            This search page is built for both users and crawlers: clear landing copy, crawlable therapist cards,
-            and filters that help visitors narrow the directory without losing context.
+            This directory is designed for confidence-first discovery: instant faceted filters, trusted profile signals,
+            and direct contact options that move users from browsing to calling or messaging in seconds.
           </p>
         </div>
 
@@ -177,7 +184,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                   ],
                 },
               ]}
-              onFilterChange={() => undefined}
             />
           </div>
         </section>
@@ -189,8 +195,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           filters={{
             city,
             modality,
+            keyword,
             session,
             goal,
+            verified,
             tier,
           }}
         />

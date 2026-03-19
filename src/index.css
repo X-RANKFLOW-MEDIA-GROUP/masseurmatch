@@ -133,10 +133,8 @@
 
   body {
     @apply text-foreground font-body antialiased;
-    background-color: var(--color-bg-body);
-    background-image:
-      radial-gradient(circle at top left, rgb(var(--color-brand-electric-rgb) / 0.08), transparent 30%),
-      radial-gradient(circle at top right, rgb(var(--color-brand-accent-rgb) / 0.08), transparent 24%);
+    background-color: #f4f6fa;
+    background-image: linear-gradient(180deg, #f7f8fc 0%, #f3f5f9 100%);
     min-height: 100vh;
   }
 
@@ -144,6 +142,7 @@
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading font-bold tracking-tight;
+    letter-spacing: -0.02em;
   }
 
   ::selection {
@@ -319,6 +318,55 @@
     transform: translateY(-4px);
     box-shadow: var(--shadow-card);
   }
+
+  .live-dot {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 9999px;
+    background: #1ecb6b;
+    box-shadow: 0 0 0 0 rgb(30 203 107 / 0.65);
+    animation: livePulse 1.8s ease-out infinite;
+  }
+
+  .featured-listing-shimmer {
+    position: relative;
+    border: 1px solid rgb(var(--color-brand-gold-rgb) / 0.55);
+    overflow: hidden;
+  }
+
+  .featured-listing-shimmer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-120%);
+    background: linear-gradient(100deg, transparent 10%, rgb(255 230 179 / 0.65) 50%, transparent 90%);
+    animation: shimmerSweep 3.2s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .blur-nav-link {
+    position: relative;
+    z-index: 1;
+  }
+
+  body.route-dissolve-out main,
+  body.route-dissolve-out .page-shell,
+  body.route-dissolve-out .container {
+    animation: dissolveOut 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body.route-dissolve-out main,
+    body.route-dissolve-out .page-shell,
+    body.route-dissolve-out .container {
+      animation: none;
+    }
+
+    .live-dot,
+    .featured-listing-shimmer::before {
+      animation: none;
+    }
+  }
 }
 
 /* ===============================================
@@ -391,6 +439,43 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes dissolveOut {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.75;
+    filter: blur(8px);
+    transform: scale(0.992);
+  }
+}
+
+@keyframes livePulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(30 203 107 / 0.58);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgb(30 203 107 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(30 203 107 / 0);
+  }
+}
+
+@keyframes shimmerSweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  50% {
+    transform: translateX(140%);
+  }
+  100% {
+    transform: translateX(140%);
   }
 }
 

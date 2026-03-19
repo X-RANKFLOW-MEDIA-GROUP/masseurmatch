@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { PublicTherapist } from "@/app/_lib/directory";
+import { buildFaqJsonLd } from "@/app/_lib/structured-data";
 import { JsonLd } from "@/app/_components/json-ld";
 import { EmptyState, PageSection, Surface } from "@/app/_components/primitives";
 import { TherapistCard } from "@/app/_components/therapist-card";
@@ -17,6 +18,11 @@ type LinkSection = {
   items: LinkItem[];
 };
 
+type FaqItem = {
+  question: string;
+  answer: string;
+};
+
 export function CityDirectoryPage({
   eyebrow,
   title,
@@ -31,6 +37,8 @@ export function CityDirectoryPage({
   listingDescription,
   emptyTitle,
   emptyDescription,
+  faqTitle,
+  faqItems = [],
 }: {
   eyebrow: string;
   title: string;
@@ -45,12 +53,15 @@ export function CityDirectoryPage({
   listingDescription: string;
   emptyTitle: string;
   emptyDescription: string;
+  faqTitle?: string;
+  faqItems?: FaqItem[];
 }) {
   return (
     <>
       <JsonLd data={breadcrumbJsonLd} />
       <JsonLd data={collectionJsonLd} />
       <JsonLd data={itemListJsonLd} />
+      {faqItems.length > 0 ? <JsonLd data={buildFaqJsonLd(faqItems)} /> : null}
 
       <div className="container mx-auto px-4 py-10">
         <PageSection
@@ -115,6 +126,20 @@ export function CityDirectoryPage({
               <EmptyState className="mt-6" title={emptyTitle} description={emptyDescription} />
             )}
           </section>
+
+          {faqItems.length > 0 ? (
+            <section className="mt-10 rounded-3xl border border-border bg-background p-6 shadow-sm">
+              <h2 className="text-2xl font-semibold text-foreground">{faqTitle || "Common questions"}</h2>
+              <div className="mt-4 space-y-4">
+                {faqItems.map((item) => (
+                  <article key={item.question} className="rounded-2xl border border-border bg-secondary/20 p-4">
+                    <h3 className="font-semibold text-foreground">{item.question}</h3>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.answer}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
         </div>
       </div>
     </>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import { CityDirectoryPage } from "@/app/_components/city-directory-page";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
@@ -14,6 +15,11 @@ import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd }
 type Params = { city: string; segment: string };
 
 export const dynamic = "force-dynamic";
+
+const fetchSegmentTherapists = cache(
+  (cityName: string, modality: string | undefined) =>
+    getPublicTherapists({ city: cityName, modality, page: 1, pageSize: 9 }),
+);
 
 export function generateStaticParams(): Params[] {
   const allCities = getCities();
@@ -34,11 +40,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     });
   }
 
+  const modalityFilter = IDENTITY_SEGMENT_SLUGS.has(segment.slug) ? undefined : segment.shortLabel;
+  const { total } = await fetchSegmentTherapists(city.name, modalityFilter);
+
   return createPageMetadata({
     title: `${city.name} ${segment.label}`,
     description: `${segment.intro} Browse local listings, city context, and specialty paths in ${city.name}.`,
     path: `/${city.slug}/${segment.slug}`,
     keywords: [city.name, segment.label, `${city.name} ${segment.shortLabel}`],
+    noIndex: total === 0,
   });
 }
 
@@ -52,12 +62,21 @@ export default async function CitySegmentPage({ params }: { params: Promise<Para
   }
 
   const modalityFilter = IDENTITY_SEGMENT_SLUGS.has(segment.slug) ? undefined : segment.shortLabel;
-  const therapists = await getPublicTherapists({
-    city: city.name,
-    modality: modalityFilter,
-    page: 1,
-    pageSize: 9,
-  });
+  const therapists = await fetchSegmentTherapists(city.name, modalityFilter);
+  const segmentFaqs = [
+    {
+      question: `What does ${segment.shortLabel} mean on MasseurMatch?`,
+      answer: `This category highlights profiles that align with ${segment.shortLabel.toLowerCase()} preferences in ${city.name}, making local discovery faster.`,
+    },
+    {
+      question: `How do I contact providers from this ${city.name} page?`,
+      answer: `Open any profile and use the direct call or message actions. MasseurMatch is directory-first and does not process bookings on-site.`,
+    },
+    {
+      question: `Are these listings updated for near-me search intent?`,
+      answer: `Yes. Segment pages are built as crawlable local doors so users can land directly on category + city combinations.`,
+    },
+  ];
 
   return (
     <CityDirectoryPage
@@ -105,6 +124,8 @@ export default async function CitySegmentPage({ params }: { params: Promise<Para
       }
       emptyTitle="No listings matched this segment yet."
       emptyDescription="Use the specialty links above or return to the city page for broader therapist coverage."
+      faqTitle={`Common Questions About ${segment.shortLabel} Massage in ${city.name}`}
+      faqItems={segmentFaqs}
     />
   );
 }

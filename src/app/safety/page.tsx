@@ -13,7 +13,7 @@ const SAFETY_FAQS = [
   {
     question: "Does MasseurMatch verify therapist licenses?",
     answer:
-      "No. MasseurMatch is a discovery directory and does not verify licenses or guarantee services. Visitors should do their own screening before booking.",
+      "No. MasseurMatch is a discovery directory and does not verify licenses or guarantee services. Visitors should do their own screening before contacting a provider.",
   },
   {
     question: "What should I confirm before scheduling?",

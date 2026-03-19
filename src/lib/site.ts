@@ -8,12 +8,15 @@ const runtimeProcess = globalThis as {
 
 const processEnv = runtimeProcess.process?.env ?? {};
 
+const isVercelProduction = processEnv.VERCEL_ENV === "production";
+
 export const SITE_URL =
-  (
-    processEnv.NEXT_PUBLIC_APP_URL ||
-    processEnv.SITE_URL ||
-    processEnv.VITE_PUBLIC_APP_URL ||
-    DEFAULT_APP_URL
+  (isVercelProduction
+    ? DEFAULT_APP_URL
+    : processEnv.NEXT_PUBLIC_APP_URL ||
+      processEnv.SITE_URL ||
+      processEnv.VITE_PUBLIC_APP_URL ||
+      DEFAULT_APP_URL
   ).replace(/\/+$/, "");
 
 export const siteUrl = (path = "/"): string => {

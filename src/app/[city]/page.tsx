@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CityDirectoryPage as CityDirectoryPageShell } from "@/app/_components/city-directory-page";
-import { getCities, getPublicTherapists } from "@/app/_lib/directory";
+import { getCities, getCityInventoryCount, getPublicTherapists } from "@/app/_lib/directory";
 import { DIRECTORY_SEGMENTS, SPECIALTY_KEYWORDS } from "@/app/_lib/directory-taxonomy";
 import { createPageMetadata } from "@/app/_lib/metadata";
 import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd } from "@/app/_lib/structured-data";
@@ -28,6 +28,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   const cityIntro = `Explore verified massage therapists in ${city.name}, with public profiles, specialties, and transparent service details.`;
 
+  const inventoryCount = await getCityInventoryCount(city.name);
+
   return createPageMetadata({
     title: `${city.name} massage therapists`,
     description: cityIntro,
@@ -37,6 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       `${city.name} wellness`,
       `${city.name} massage directory`,
     ],
+    noIndex: inventoryCount === 0,
   });
 }
 
@@ -77,6 +80,20 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
       profile: true,
     },
   }));
+  const cityFaqs = [
+    {
+      question: `How do I find a trusted massage therapist in ${city.name}?`,
+      answer: `Use Verified and specialty filters first, then compare profile details, session format, and direct contact options before you call or message.`,
+    },
+    {
+      question: `Can I find home-visit massage options in ${city.name}?`,
+      answer: `Yes. Look for therapists with outcall pricing and Home Visit tags so you can quickly identify providers who travel.`,
+    },
+    {
+      question: `Does MasseurMatch support booking in ${city.name}?`,
+      answer: `No. MasseurMatch is a discovery directory. You contact providers directly by phone, WhatsApp, or SMS to confirm availability.`,
+    },
+  ];
 
   return (
     <>
@@ -137,9 +154,11 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
         ]}
         therapists={therapists.items}
         listingTitle={`Therapist listings in ${city.name}`}
-        listingDescription="Public therapist cards help this city page work as both a user entry point and a crawlable local landing page for search."
+        listingDescription="Public therapist cards help this city page work as both a user entry point and a crawlable local near-me landing page for search."
         emptyTitle={`No public listings yet for ${city.name}.`}
         emptyDescription="Visitors can still use the broader search page, city category pages, and specialty links while this city grows."
+        faqTitle={`Common Questions About Massage in ${city.name}`}
+        faqItems={cityFaqs}
       />
 
       {comparisonProfiles.length > 1 ? (

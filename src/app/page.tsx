@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { JsonLd } from "@/app/_components/JsonLd";
+import { EnterpriseStyleHero } from "@/app/_components/EnterpriseStyleHero";
 import { KnottyHeroSpotlight } from "@/app/_components/KnottyHeroSpotlight";
 import { HomeSmartMatchCard } from "@/app/_components/HomeSmartMatchCard";
 import { BLOG_POSTS } from "@/app/blog/posts";
 import { getCities, getPublicTherapists, type PublicTherapist } from "@/app/_lib/directory";
-import { AdvancedHeroSection, BlogGrid, RatingSystem } from "@/components";
+import { BlogGrid, RatingSystem } from "@/components";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -188,7 +189,7 @@ export default async function HomePage() {
     rating: 5,
     text:
       therapist.bio?.slice(0, 140) ||
-      "Professional, responsive, and consistent massage experience with clear communication from booking through session.",
+      "Professional, responsive, and consistent massage experience with clear communication from first contact through session.",
     verified: true,
     helpful: Math.max(4, Math.round((therapist.review_count || 0) / 2)),
     date: "Recent",
@@ -230,19 +231,10 @@ export default async function HomePage() {
       />
       <JsonLd data={buildFaqJsonLd(homepageFaqs)} />
 
+      <EnterpriseStyleHero therapistCount={therapistCount} cityCount={liveCityCount} />
+
       <section className="page-shell py-6 lg:py-7">
         <KnottyHeroSpotlight therapists={spotlightTherapists} therapistCount={therapistCount} cityCount={liveCityCount} />
-      </section>
-
-      <section className="page-shell pb-10">
-        <AdvancedHeroSection
-          title="Find Your Perfect Gay Massage Therapist"
-          subtitle="2026 Directory Experience"
-          description="Compare verified profiles, filter by specialty and location, and connect directly with trusted professionals."
-          cta={{ text: "Explore Therapists", href: "/therapists" }}
-          parallax={true}
-          animated={true}
-        />
       </section>
 
       <section className="page-shell pb-10">
@@ -363,7 +355,7 @@ export default async function HomePage() {
       <section className="page-shell pb-16">
         <SectionHeading
           eyebrow="From the blog"
-          title="Fresh guides for safer, smarter booking decisions"
+          title="Fresh guides for safer, smarter contact decisions"
           description="Editorial content helps visitors understand session choices and trust fundamentals before they reach out."
         />
         <div className="mt-8">

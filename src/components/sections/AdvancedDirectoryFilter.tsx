@@ -22,13 +22,13 @@ export interface FilterGroup {
 
 export interface AdvancedDirectoryFilterProps {
   groups: FilterGroup[];
-  onFilterChange: (filters: Record<string, any>) => void;
+  onFilterChange?: (filters: Record<string, any>) => void;
   onReset?: () => void;
 }
 
 export function AdvancedDirectoryFilter({
   groups,
-  onFilterChange,
+  onFilterChange = () => undefined,
   onReset,
 }: AdvancedDirectoryFilterProps) {
   const [expanded, setExpanded] = useState<string | null>(groups[0]?.id || null);

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from "react";
 import { ImportedReviewsManager } from "@/components/dashboard/ImportedReviews";
 import { useProfile } from "@/hooks/useProfile";

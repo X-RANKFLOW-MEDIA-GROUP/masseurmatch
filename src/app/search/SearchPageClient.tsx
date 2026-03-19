@@ -11,8 +11,10 @@ type SearchPageClientProps = {
   filters: {
     city: string;
     modality: string;
+    keyword: string;
     session: string;
     goal: string;
+    verified: boolean;
     tier: TherapistTier | "";
   };
 };

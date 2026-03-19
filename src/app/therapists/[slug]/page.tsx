@@ -67,6 +67,14 @@ function normalizeHours(value: unknown): { incall: HoursMap; outcall: HoursMap }
   };
 }
 
+function normalizePhone(phone: string | null): string {
+  if (!phone) {
+    return "";
+  }
+
+  return phone.replace(/[^\d+]/g, "");
+}
+
 export async function generateStaticParams() {
   const res = await getPublicTherapists({ page: 1, pageSize: 200 });
   return res.items.map((item) => ({ slug: item.slug || item.id }));
@@ -122,6 +130,16 @@ export default async function TherapistPage({ params }: { params: Promise<Params
   const hours = normalizeHours(profile.business_hours);
   const gallery = photos.length > 0 ? photos.map((photo) => photo.storage_path) : [profile.avatar_url].filter(Boolean) as string[];
   const hasHours = Object.keys(hours.incall).length > 0 || Object.keys(hours.outcall).length > 0;
+  const normalizedPhone = normalizePhone(profile.phone);
+  const callHref = normalizedPhone ? `tel:${normalizedPhone}` : null;
+  const messageHref = normalizedPhone ? `https://wa.me/${normalizedPhone.replace(/[^\d]/g, "")}` : null;
+  const smsHref = normalizedPhone ? `sms:${normalizedPhone.replace(/[^\d+]/g, "")}` : null;
+  const isVerified =
+    profile._tier === "standard" ||
+    profile._tier === "pro" ||
+    profile._tier === "elite" ||
+    Boolean(profile.is_verified_identity) ||
+    Boolean(profile.is_verified_profile);
 
   return (
     <>
@@ -153,14 +171,14 @@ export default async function TherapistPage({ params }: { params: Promise<Params
         })}
       />
 
-      <div className="container mx-auto max-w-4xl px-4 py-10">
+      <div className="container mx-auto max-w-4xl px-4 py-10 pb-28 md:pb-10">
         <div className="grid gap-6 md:grid-cols-[220px_1fr]">
           <Image
             src={
               profile.avatar_url ||
               "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&h=800&fit=crop"
             }
-            alt={name}
+            alt={`${name} - ${profile.city || "US"} Massage Therapist`}
             width={220}
             height={220}
             className="h-[220px] w-[220px] rounded-lg object-cover"
@@ -177,12 +195,21 @@ export default async function TherapistPage({ params }: { params: Promise<Params
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <a className="text-sm font-semibold text-primary hover:underline" href={`mailto:contact+${profile.id}@masseurmatch.com`}>
-                Direct contact
-              </a>
-              <a className="text-sm font-semibold text-primary hover:underline" href="tel:+10000000000">
-                Call
-              </a>
+              {callHref ? (
+                <a className="rounded-full bg-action-primary px-5 py-3 text-sm font-semibold text-white" href={callHref}>
+                  Call Now
+                </a>
+              ) : null}
+              {messageHref ? (
+                <a className="rounded-full border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground" href={messageHref} target="_blank" rel="noreferrer">
+                  Message via WhatsApp
+                </a>
+              ) : null}
+              {smsHref ? (
+                <a className="rounded-full border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground" href={smsHref}>
+                  Message via SMS
+                </a>
+              ) : null}
               <Link className="text-sm font-semibold text-primary hover:underline" href={cityPath}>
                 Browse city page
               </Link>
@@ -192,6 +219,9 @@ export default async function TherapistPage({ params }: { params: Promise<Params
               <div className="rounded-2xl border border-border bg-secondary/30 p-4 text-sm text-muted-foreground">
                 <p className="font-semibold text-foreground">Specialties</p>
                 <p className="mt-2">{(profile.specialties || []).join(", ") || "Massage therapy"}</p>
+                <p className="mt-2 text-xs uppercase tracking-[0.15em] text-muted-foreground">
+                  {isVerified ? "Verified profile signal active" : "Verification pending"}
+                </p>
               </div>
               <div className="rounded-2xl border border-border bg-secondary/30 p-4 text-sm text-muted-foreground">
                 <p className="font-semibold text-foreground">Pricing snapshot</p>
@@ -258,7 +288,7 @@ export default async function TherapistPage({ params }: { params: Promise<Params
                   <h2 className="text-xl font-semibold text-foreground">What this profile emphasizes</h2>
                   <p className="mt-3 text-sm leading-7 text-muted-foreground">
                     The active profile focuses on clean presentation, city relevance, specialties, and direct communication.
-                    Visitors can use these details to decide whether to reach out and ask for more specifics before booking.
+                    Visitors can use these details to decide whether to reach out and ask for more specifics before scheduling directly.
                   </p>
                 </div>
               </div>
@@ -270,7 +300,7 @@ export default async function TherapistPage({ params }: { params: Promise<Params
                   <div key={`${image}-${index}`} className="overflow-hidden rounded-2xl border border-border bg-secondary/20">
                     <Image
                       src={image}
-                      alt={`${name} gallery image ${index + 1}`}
+                      alt={`${name} - ${profile.city || "US"} Massage Therapist image ${index + 1}`}
                       width={640}
                       height={640}
                       className="h-64 w-full object-cover"
@@ -349,16 +379,46 @@ export default async function TherapistPage({ params }: { params: Promise<Params
             MasseurMatch is a discovery directory. Review profile details carefully, confirm boundaries directly, and
             read the trust and safety guidance before scheduling with any provider.
           </p>
+          <details className="mt-4 rounded-2xl border border-border bg-secondary/20 p-4">
+            <summary className="cursor-pointer text-sm font-semibold text-foreground">Verification documents (hidden by default)</summary>
+            <div className="mt-3 space-y-2 text-sm text-muted-foreground">
+              <p>Identity verification: {profile.is_verified_identity ? "Submitted and reviewed" : "Not verified"}</p>
+              <p>Profile verification: {profile.is_verified_profile ? "Verified" : "Not verified"}</p>
+              <p>Photo verification: {profile.is_verified_photos ? "Verified" : "Not verified"}</p>
+              <p className="text-xs">Documents are reviewed for trust and safety. Sensitive files are not publicly exposed.</p>
+            </div>
+          </details>
           <div className="mt-4 flex flex-wrap gap-3 text-sm font-semibold">
             <Link href="/safety" className="text-primary hover:underline">
               Read safety guidance
             </Link>
-            <Link href="/contact" className="text-primary hover:underline">
+            <Link href={`/contact?report=${encodeURIComponent(profile.slug || profile.id)}`} className="text-primary hover:underline">
               Report an issue
             </Link>
           </div>
         </section>
       </div>
+
+      {(callHref || messageHref || smsHref) ? (
+        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 p-3 backdrop-blur md:hidden">
+          <div className="mx-auto flex max-w-4xl gap-2">
+            {callHref ? (
+              <a href={callHref} className="flex-1 rounded-xl bg-action-primary px-3 py-3 text-center text-xs font-semibold uppercase tracking-[0.12em] text-white">
+                Call Now
+              </a>
+            ) : null}
+            {messageHref ? (
+              <a href={messageHref} target="_blank" rel="noreferrer" className="flex-1 rounded-xl border border-border bg-background px-3 py-3 text-center text-xs font-semibold uppercase tracking-[0.12em] text-foreground">
+                WhatsApp
+              </a>
+            ) : smsHref ? (
+              <a href={smsHref} className="flex-1 rounded-xl border border-border bg-background px-3 py-3 text-center text-xs font-semibold uppercase tracking-[0.12em] text-foreground">
+                SMS
+              </a>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 export type TherapistTier = "free" | "standard" | "pro" | "elite";
 
 const PUBLIC_PROFILE_SELECT =
-  "id, slug, city, display_name, full_name, bio, avatar_url, specialties, _tier, modality, status, profile_views, review_count, incall_price, outcall_price, business_hours, custom_faq, pricing_sessions";
+  "id, slug, city, display_name, full_name, bio, avatar_url, phone, specialties, _tier, modality, status, profile_views, review_count, incall_price, outcall_price, business_hours, custom_faq, pricing_sessions, available_now, available_now_expires, is_verified_identity, is_verified_profile, is_verified_photos";
 
 export interface ProfileFaqItem {
   question: string;
@@ -32,6 +32,7 @@ export interface PublicTherapist {
   full_name: string | null;
   bio: string | null;
   avatar_url: string | null;
+  phone: string | null;
   specialties: string[] | null;
   _tier: TherapistTier | null;
   modality: string | null;
@@ -43,6 +44,11 @@ export interface PublicTherapist {
   business_hours: Record<string, unknown> | null;
   custom_faq: ProfileFaqItem[] | null;
   pricing_sessions: PricingSessionItem[] | null;
+  available_now: boolean | null;
+  available_now_expires: string | null;
+  is_verified_identity: boolean | null;
+  is_verified_profile: boolean | null;
+  is_verified_photos: boolean | null;
 }
 
 export interface ImportedReview {
@@ -61,12 +67,15 @@ const buildPublicTherapistsQuery = () =>
     .select(PUBLIC_PROFILE_SELECT, {
       count: "exact",
     })
-    .eq("is_active", true)
-    .eq("status", "active");
+    .or("is_active.eq.true,is_active.is.null")
+    .in("status", ["active", "approved"]);
 
 export const getPublicTherapists = async (filters?: {
   city?: string;
   modality?: string;
+  keyword?: string;
+  session?: "home-visit" | "incall";
+  verified?: boolean;
   tier?: TherapistTier;
   page?: number;
   pageSize?: number;
@@ -87,6 +96,23 @@ export const getPublicTherapists = async (filters?: {
     query = query.ilike("modality", `%${filters.modality}%`);
   }
 
+  if (filters?.keyword) {
+    const keyword = `%${filters.keyword}%`;
+    query = query.or(`modality.ilike.${keyword},bio.ilike.${keyword},display_name.ilike.${keyword},full_name.ilike.${keyword}`);
+  }
+
+  if (filters?.session === "home-visit") {
+    query = query.not("outcall_price", "is", null);
+  }
+
+  if (filters?.session === "incall") {
+    query = query.not("incall_price", "is", null);
+  }
+
+  if (filters?.verified) {
+    query = query.or("_tier.eq.standard,_tier.eq.pro,_tier.eq.elite,is_verified_profile.eq.true,is_verified_identity.eq.true");
+  }
+
   if (filters?.tier) {
     query = query.eq("_tier", filters.tier);
   }
@@ -95,6 +121,38 @@ export const getPublicTherapists = async (filters?: {
 
   if (error) {
     return { items: [] as PublicTherapist[], total: 0, page, pageSize };
+  }
+
+  if ((count || 0) === 0) {
+    // Legacy fallback: some older imports may have null/variant status values.
+    let relaxedQuery: any = (supabase as any)
+      .from("profiles")
+      .select(PUBLIC_PROFILE_SELECT, { count: "exact" })
+      .or("is_active.eq.true,is_active.is.null")
+      .range(from, to);
+
+    if (filters?.city) {
+      relaxedQuery = relaxedQuery.ilike("city", filters.city);
+    }
+
+    if (filters?.modality) {
+      relaxedQuery = relaxedQuery.ilike("modality", `%${filters.modality}%`);
+    }
+
+    if (filters?.tier) {
+      relaxedQuery = relaxedQuery.eq("_tier", filters.tier);
+    }
+
+    const relaxedResult = await relaxedQuery;
+
+    if (!relaxedResult.error) {
+      return {
+        items: ((relaxedResult.data || []) as unknown) as PublicTherapist[],
+        total: relaxedResult.count || 0,
+        page,
+        pageSize,
+      };
+    }
   }
 
   return {
@@ -160,3 +218,34 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
     (photo) => typeof photo.storage_path === "string" && photo.storage_path.startsWith("http"),
   );
 };
+
+/** Returns the number of active public profiles in a given city. */
+export async function getCityInventoryCount(cityName: string): Promise<number> {
+  const { count } = await (supabase as any)
+    .from("profiles")
+    .select("id", { count: "exact", head: true })
+    .or("is_active.eq.true,is_active.is.null")
+    .in("status", ["active", "approved"])
+    .ilike("city", cityName);
+  return count ?? 0;
+}
+
+/**
+ * Returns a lowercase-city-name → listing-count map for all active profiles.
+ * Used by sitemap builders to filter empty cities.
+ */
+export async function getCityInventoryMap(): Promise<Map<string, number>> {
+  const { data } = await (supabase as any)
+    .from("profiles")
+    .select("city")
+    .or("is_active.eq.true,is_active.is.null")
+    .in("status", ["active", "approved"])
+    .not("city", "is", null);
+
+  const map = new Map<string, number>();
+  for (const row of data ?? []) {
+    const key = (row.city as string).toLowerCase().trim();
+    map.set(key, (map.get(key) ?? 0) + 1);
+  }
+  return map;
+}
