@@ -259,7 +259,7 @@ export default function ProBillingPage() {
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  {option.popular ? <Badge>Most popular</Badge> : null}
+                  {option.popular ? <Badge>Most Popular</Badge> : null}
                   {isCurrent ? <Badge variant="secondary">Current plan</Badge> : null}
                 </div>
                 <p className="mt-3 text-sm uppercase tracking-[0.2em] text-muted-foreground">{option.tier}</p>

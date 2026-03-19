@@ -1,72 +1,94 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { JsonLd } from "@/app/_components/JsonLd";
-import { EnterpriseStyleHero } from "@/app/_components/EnterpriseStyleHero";
-import { KnottyHeroSpotlight } from "@/app/_components/KnottyHeroSpotlight";
+import { ArrowRight, BadgeCheck, ChevronRight, MapPin, Search, ShieldCheck, Sparkles } from "lucide-react";
 import { HomeSmartMatchCard } from "@/app/_components/HomeSmartMatchCard";
+import { JsonLd } from "@/app/_components/json-ld";
 import { BLOG_POSTS } from "@/app/blog/posts";
 import { getCities, getPublicTherapists, type PublicTherapist } from "@/app/_lib/directory";
-import { BlogGrid, RatingSystem } from "@/components";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   buildCollectionPageJsonLd,
   buildFaqJsonLd,
   buildItemListJsonLd,
   createPageMetadata,
 } from "@/app/_lib/seo";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = createPageMetadata({
-  title: "Direct therapist discovery",
+  title: "Gay massage therapists near you",
   description:
-    "Browse Austin, Dallas, and Houston therapist profiles, compare modalities, and contact providers directly through a cleaner city-first directory.",
+    "Browse verified male massage therapists in major U.S. cities, compare specialties and rates, and contact providers directly.",
   path: "/",
-  keywords: ["therapist directory", "massage discovery", "city massage listings", "wellness profiles"],
+  keywords: [
+    "gay massage therapists near me",
+    "male massage therapist",
+    "verified massage therapists",
+    "massage by city",
+    "direct therapist contact",
+  ],
 });
 
 const HOMEPAGE_CITY_LINKS = [
-  { label: "Atlanta", href: "/atlanta" },
-  { label: "Austin", href: "/austin" },
-  { label: "Brooklyn", href: "/search?city=Brooklyn" },
-  { label: "Chicago", href: "/chicago" },
   { label: "Dallas", href: "/dallas" },
-  { label: "Denver", href: "/denver" },
-  { label: "Fort Lauderdale", href: "/fort-lauderdale" },
   { label: "Houston", href: "/houston" },
-  { label: "Las Vegas", href: "/las-vegas" },
-  { label: "London", href: "/search?city=London" },
+  { label: "Austin", href: "/austin" },
+  { label: "New York", href: "/new-york" },
   { label: "Los Angeles", href: "/los-angeles" },
   { label: "Miami", href: "/miami" },
-  { label: "Minneapolis", href: "/minneapolis" },
-  { label: "New York", href: "/new-york" },
-  { label: "Orlando", href: "/orlando" },
-  { label: "Palm Springs", href: "/search?city=Palm+Springs" },
-  { label: "Phoenix", href: "/phoenix" },
-  { label: "Portland", href: "/portland" },
-  { label: "San Diego", href: "/san-diego" },
+  { label: "Chicago", href: "/chicago" },
+  { label: "Atlanta", href: "/atlanta" },
+  { label: "Las Vegas", href: "/las-vegas" },
   { label: "San Francisco", href: "/san-francisco" },
-  { label: "Seattle", href: "/seattle" },
-  { label: "Washington DC", href: "/washington-dc" },
-  { label: "West Hollywood", href: "/search?city=West+Hollywood" },
-  { label: "Wilton Manors", href: "/search?city=Wilton+Manors" },
+  { label: "Denver", href: "/denver" },
 ];
 
-function Card({ className, children }: { className?: string; children: ReactNode }) {
-  return <div className={`brand-surface rounded-[24px] ${className || ""}`}>{children}</div>;
+const HERO_TRUST_POINTS = ["Verified profiles", "Direct contact", "No booking fees"];
+
+const EDITORIAL_LABELS = ["Guide", "Safety", "Beginner"];
+
+type TierVariant = "default" | "secondary" | "premium" | "outline";
+
+function FramedSection({
+  step,
+  label,
+  children,
+}: {
+  step: string;
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="page-shell py-3 sm:py-4">
+      <div className="rounded-[30px] border border-[#efc28d] bg-white/90 p-4 shadow-[0_18px_48px_rgba(11,31,58,0.06)] sm:p-5">
+        <div className="mb-4 flex items-center gap-3 border-b border-[#edf1f6] pb-4">
+          <span className="inline-flex rounded-md bg-action-primary px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-white">
+            {step}
+          </span>
+          <p className="text-sm font-semibold text-[#10223f]">{label}</p>
+        </div>
+        {children}
+      </div>
+    </section>
+  );
 }
 
-function getTierPresentation(tier: PublicTherapist["_tier"]) {
-  switch (tier) {
-    case "elite":
-      return { label: "Elite", variant: "premium" as const };
-    case "pro":
-      return { label: "Pro", variant: "premium" as const };
-    case "standard":
-      return { label: "Verified", variant: "default" as const };
-    default:
-      return { label: "Directory", variant: "secondary" as const };
-  }
+function SectionHeading({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="max-w-3xl">
+      <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.24em] text-[#5f6f86]">{eyebrow}</p>
+      <h2 className="mt-3 font-display text-3xl leading-tight text-[#10223f] sm:text-[2.2rem]">{title}</h2>
+      <p className="mt-3 text-sm leading-7 text-[#5f6f86] sm:text-base">{description}</p>
+    </div>
+  );
 }
 
 function getTierWeight(tier: PublicTherapist["_tier"]) {
@@ -82,66 +104,155 @@ function getTierWeight(tier: PublicTherapist["_tier"]) {
   }
 }
 
-function SectionHeading({
-  eyebrow,
-  title,
-  description,
-}: {
-  eyebrow: string;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.34em] text-muted-foreground">{eyebrow}</p>
-      <h2 className="mt-2 font-display text-2xl text-foreground sm:text-3xl">{title}</h2>
-      <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">{description}</p>
-    </div>
-  );
+function getTierPresentation(tier: PublicTherapist["_tier"]): { label: string; variant: TierVariant } {
+  switch (tier) {
+    case "elite":
+      return { label: "Elite", variant: "premium" };
+    case "pro":
+      return { label: "Pro", variant: "premium" };
+    case "standard":
+      return { label: "Verified", variant: "default" };
+    default:
+      return { label: "Directory", variant: "secondary" };
+  }
 }
 
-function TherapistCard({ therapist }: { therapist: PublicTherapist }) {
+function getTherapistInitials(therapist: PublicTherapist) {
   const name = therapist.display_name || therapist.full_name || "Therapist";
-  const city = therapist.city || "US";
+
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((segment) => segment.charAt(0).toUpperCase())
+    .join("");
+}
+
+function formatBlogDate(value: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(value));
+}
+
+function TherapistSpotlightCard({ therapist }: { therapist: PublicTherapist }) {
+  const name = therapist.display_name || therapist.full_name || "Therapist";
+  const city = therapist.city || "United States";
   const tier = getTierPresentation(therapist._tier);
+  const specialties = (therapist.specialties || []).slice(0, 2);
+  const profilePath = `/therapists/${therapist.slug || therapist.id}`;
 
   return (
-    <Card className="card-hover p-5">
+    <article className="rounded-[24px] border border-[#dde4ef] bg-white p-5 shadow-[0_14px_34px_rgba(11,31,58,0.06)]">
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h3 className="text-lg font-semibold text-foreground">{name}</h3>
-          <p className="mt-1 text-sm text-muted-foreground">{city}</p>
+        <div className="flex items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#18345f] text-base font-semibold text-white">
+            {getTherapistInitials(therapist)}
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-[#10223f]">
+              <Link href={profilePath} className="hover:text-primary">
+                {name}
+              </Link>
+            </h3>
+            <p className="mt-1 text-sm text-[#6b7a90]">{city}</p>
+          </div>
         </div>
         <Badge variant={tier.variant}>{tier.label}</Badge>
       </div>
-      <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">
-        {therapist.bio || "Profile in progress. Visit to view details and contact preferences."}
-      </p>
-      <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
-        {(therapist.specialties || []).slice(0, 3).map((item) => (
-          <span key={item} className="rounded-full border border-border bg-secondary/80 px-3 py-1.5 text-foreground">
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        {therapist.modality ? (
+          <span className="rounded-full bg-[#eef3fb] px-3 py-1 text-xs font-medium text-[#35527d]">{therapist.modality}</span>
+        ) : null}
+        {specialties.map((item) => (
+          <span key={item} className="rounded-full border border-[#d8e2ee] bg-white px-3 py-1 text-xs font-medium text-[#52627a]">
             {item}
           </span>
         ))}
       </div>
-      <div className="mt-4">
-        <Link href={`/therapists/${therapist.slug || therapist.id}`} className="text-sm font-semibold text-primary hover:underline">
+
+      <p className="mt-4 min-h-[72px] text-sm leading-6 text-[#5f6f86]">
+        {therapist.bio || "Profile details are being refreshed. Open the full profile to see specialties, pricing, and direct contact options."}
+      </p>
+
+      <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#edf1f6] pt-4">
+        <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-[#6b7a90]">
+          {therapist.review_count ? <span>{therapist.review_count} reviews</span> : null}
+          {therapist.available_now ? <span className="text-[#1f9758]">Available now</span> : null}
+        </div>
+        <Link href={profilePath} className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:gap-2">
           View profile
+          <ChevronRight className="h-4 w-4" />
         </Link>
       </div>
-    </Card>
+    </article>
+  );
+}
+
+function EditorialCard({
+  slug,
+  title,
+  excerpt,
+  publishedAt,
+  readingTime,
+  label,
+}: {
+  slug: string;
+  title: string;
+  excerpt: string;
+  publishedAt: string;
+  readingTime: number;
+  label: string;
+}) {
+  return (
+    <article className="rounded-[24px] border border-[#dde4ef] bg-white p-5 shadow-[0_14px_34px_rgba(11,31,58,0.05)]">
+      <span className="inline-flex rounded-full bg-[#f4f7fb] px-3 py-1 text-xs font-semibold text-[#52627a]">{label}</span>
+      <h3 className="mt-4 text-lg font-semibold leading-snug text-[#10223f]">
+        <Link href={`/blog/${slug}`} className="hover:text-primary">
+          {title}
+        </Link>
+      </h3>
+      <p className="mt-3 text-sm leading-6 text-[#5f6f86]">{excerpt}</p>
+      <div className="mt-5 flex items-center justify-between gap-4 border-t border-[#edf1f6] pt-4 text-xs font-medium text-[#6b7a90]">
+        <span>
+          {readingTime} min read
+        </span>
+        <span>{formatBlogDate(publishedAt)}</span>
+      </div>
+    </article>
+  );
+}
+
+function FaqItem({ question, answer }: { question: string; answer: string }) {
+  return (
+    <details className="group rounded-[22px] border border-[#dde4ef] bg-white px-5 py-4 shadow-[0_12px_28px_rgba(11,31,58,0.04)]">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left text-base font-semibold text-[#10223f]">
+        <span>{question}</span>
+        <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#d7e0ec] text-[#6b7a90]">
+          +
+        </span>
+      </summary>
+      <p className="pt-3 text-sm leading-7 text-[#5f6f86]">{answer}</p>
+    </details>
   );
 }
 
 export default async function HomePage() {
   const [cities, therapistsResult] = await Promise.all([getCities(), getPublicTherapists()]);
   const therapists = therapistsResult.items;
-  const featured = therapists.slice(0, 3);
-  const featuredCities = cities.slice(0, 10);
-  const liveCityCount = cities.length;
   const therapistCount = Math.max(therapistsResult.total, 150);
-  const cityCount = Math.max(cities.length, 300);
-  const spotlightTherapists = [...therapists]
+  const liveCityCount = cities.length;
+  const featuredModalities: string[] = Array.from(
+    new Set(
+      therapists
+        .map((therapist) => therapist.modality)
+        .filter((item): item is string => typeof item === "string" && item.length > 0),
+    ),
+  ).slice(0, 6);
+
+  const featuredTherapists = [...therapists]
     .sort((left, right) => {
       const tierDifference = getTierWeight(right._tier) - getTierWeight(left._tier);
 
@@ -157,56 +268,38 @@ export default async function HomePage() {
 
       return (right.profile_views || 0) - (left.profile_views || 0);
     })
-    .slice(0, 6);
-  const featuredModalities: string[] = Array.from(
-    new Set(
-      therapists
-        .map((therapist) => therapist.modality)
-        .filter((item): item is string => typeof item === "string" && item.length > 0),
-    ),
-  ).slice(0, 6);
+    .slice(0, 3);
+
   const homepageFaqs = [
     {
       question: "What is MasseurMatch?",
       answer:
-        "MasseurMatch is a city-first directory for discovering massage therapists, comparing specialties, and contacting providers directly.",
+        "MasseurMatch is a discovery directory for finding and contacting verified male massage therapists directly in major U.S. cities.",
     },
     {
-      question: "Can I search massage therapists by city and specialty?",
+      question: "How do I find a gay massage therapist near me?",
       answer:
-        "Yes. You can browse city pages, search by modality, and use therapist listing filters to compare specialties and pricing.",
+        "Start with Smart Match or browse by city. You can narrow by massage type, session style, and goals before opening therapist profiles.",
     },
     {
-      question: "Does MasseurMatch handle bookings and payments?",
+      question: "Does MasseurMatch charge booking fees?",
       answer:
-        "No. MasseurMatch focuses on discovery. Clients and therapists arrange contact, scheduling, and payment directly.",
+        "No. MasseurMatch focuses on discovery only. Contact, scheduling, and payment happen directly between you and the therapist.",
+    },
+    {
+      question: "Are therapist profiles verified?",
+      answer:
+        "Yes. Verified and premium profiles go through stronger review signals, and each public listing shows its tier clearly so visitors can compare with confidence.",
     },
   ];
 
-  const homepageReviews = featured.map((therapist, index) => ({
-    id: therapist.id,
-    author: therapist.display_name || therapist.full_name || `Guest ${index + 1}`,
-    rating: 5,
-    text:
-      therapist.bio?.slice(0, 140) ||
-      "Professional, responsive, and consistent massage experience with clear communication from first contact through session.",
-    verified: true,
-    helpful: Math.max(4, Math.round((therapist.review_count || 0) / 2)),
-    date: "Recent",
-  }));
-
-  const homepageBlogPosts = BLOG_POSTS.map((post, index) => ({
-    id: post.slug,
+  const editorialCards = BLOG_POSTS.slice(0, 3).map((post, index) => ({
     slug: post.slug,
     title: post.title,
     excerpt: post.excerpt,
-    author: post.author,
     publishedAt: post.publishedAt,
     readingTime: Math.max(3, Math.ceil(post.blocks.length * 1.2)),
-    category: index % 2 === 0 ? "Guides" : "Trust & Safety",
-    image: `https://images.unsplash.com/photo-${index % 2 === 0 ? "1515378791036-0648a3ef77b2" : "1519821172141-b5d8f7a8f9b5"}?auto=format&fit=crop&w=1200&q=80`,
-    featured: index === 0,
-    tags: ["massage", "discovery", "wellness"],
+    label: EDITORIAL_LABELS[index] || "Guide",
   }));
 
   return (
@@ -215,7 +308,7 @@ export default async function HomePage() {
         data={buildCollectionPageJsonLd({
           name: "MasseurMatch homepage",
           description:
-            "Discover massage therapists, explore city landing pages, and compare specialties through a city-first directory.",
+            "Discover verified massage therapists, explore city pages, and compare specialties through a city-first directory.",
           path: "/",
         })}
       />
@@ -223,7 +316,7 @@ export default async function HomePage() {
         data={buildItemListJsonLd({
           name: "Featured therapist profiles",
           path: "/",
-          items: featured.map((therapist) => ({
+          items: featuredTherapists.map((therapist) => ({
             name: therapist.display_name || therapist.full_name || "Therapist",
             path: `/therapists/${therapist.slug || therapist.id}`,
           })),
@@ -231,166 +324,204 @@ export default async function HomePage() {
       />
       <JsonLd data={buildFaqJsonLd(homepageFaqs)} />
 
-      <EnterpriseStyleHero therapistCount={therapistCount} cityCount={liveCityCount} />
-
-      <section className="page-shell py-6 lg:py-7">
-        <KnottyHeroSpotlight therapists={spotlightTherapists} therapistCount={therapistCount} cityCount={liveCityCount} />
-      </section>
-
-      <section className="page-shell pb-10">
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,0.94fr),minmax(360px,1.06fr)]">
-          <Card className="grid gap-4 p-5 lg:p-6">
-            <div className="flex flex-wrap items-center gap-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.34em] text-muted-foreground">Gay Massage Directory</p>
-              <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">
-                {therapists.length} verified profiles
+      <FramedSection step="01" label="Hero">
+        <div className="rounded-[28px] bg-[#10223f] px-6 py-10 text-center text-white shadow-[0_30px_70px_rgba(11,31,58,0.22)] sm:px-10 sm:py-14">
+          <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-2">
+            {HERO_TRUST_POINTS.map((item) => (
+              <span
+                key={item}
+                className="rounded-full border border-white/[0.14] bg-white/[0.08] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/80"
+              >
+                {item}
               </span>
-            </div>
-            <div>
-              <h2 className="font-display text-2xl leading-tight text-foreground sm:text-[1.8rem]">
-                Explore Male Massage Therapists
-              </h2>
-              <p className="mt-2.5 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">
-                Find verified, gay-friendly male massage therapists near you. Deep tissue, Swedish, sports recovery and more.
-              </p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-border bg-secondary/70 px-4 py-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">Coverage</p>
-                <p className="mt-2 text-sm font-semibold text-foreground">{cities.length} live cities</p>
-              </div>
-              <div className="rounded-2xl border border-border bg-secondary/70 px-4 py-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">Format</p>
-                <p className="mt-2 text-sm font-semibold text-foreground">AI cards, list, and city search</p>
-              </div>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <Button asChild variant="secondary" className="h-auto rounded-full px-5 py-3">
-                <Link href="/therapists">Browse therapists</Link>
-              </Button>
-              <Link href="/search" className="text-sm font-semibold text-primary hover:underline">
-                Search by city or specialty
+            ))}
+          </div>
+
+          <h1 className="mx-auto mt-6 max-w-4xl font-display text-4xl leading-[0.94] text-white sm:text-5xl lg:text-[4rem]">
+            Gay Massage Therapists Near You
+            <span className="mt-2 block text-[#ff9a2b]">Verified. Direct. No Middleman.</span>
+          </h1>
+
+          <p className="mx-auto mt-5 max-w-3xl text-base leading-8 text-white/[0.72] sm:text-lg">
+            Browse verified male massage therapists in {liveCityCount}+ cities. Compare specialties, pricing, and contact
+            providers directly.
+          </p>
+
+          <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Button asChild variant="hero" size="lg" className="rounded-full px-8">
+              <Link href="#smart-match-form">
+                Find My Therapist
+                <ArrowRight className="h-4 w-4" />
               </Link>
+            </Button>
+            <Button asChild variant="glass" size="lg" className="rounded-full px-8">
+              <Link href="/explore">Browse All Cities</Link>
+            </Button>
+          </div>
+
+          <div className="mx-auto mt-10 grid max-w-2xl gap-3 sm:grid-cols-3">
+            <div className="rounded-[20px] border border-white/10 bg-white/[0.08] px-4 py-4">
+              <p className="text-3xl font-semibold text-[#ff9a2b]">{therapistCount}+</p>
+              <p className="mt-1 text-xs font-medium uppercase tracking-[0.18em] text-white/[0.68]">Active profiles</p>
             </div>
-            <div className="hidden flex-wrap gap-2 xl:flex">
-              {featuredCities.map((city) => (
-                <Link
-                  key={city.slug}
-                  href={`/${city.slug}`}
-                  className="rounded-full border border-border bg-white px-3 py-2 text-xs font-semibold text-foreground transition hover:border-primary/20 hover:bg-secondary"
-                >
-                  {city.name}
-                </Link>
-              ))}
+            <div className="rounded-[20px] border border-white/10 bg-white/[0.08] px-4 py-4">
+              <p className="text-3xl font-semibold text-[#ff9a2b]">{liveCityCount}</p>
+              <p className="mt-1 text-xs font-medium uppercase tracking-[0.18em] text-white/[0.68]">Live cities</p>
             </div>
-          </Card>
-
-          <HomeSmartMatchCard cities={cities} featuredModalities={featuredModalities} therapistCount={therapists.length} />
+            <div className="rounded-[20px] border border-white/10 bg-white/[0.08] px-4 py-4">
+              <p className="text-3xl font-semibold text-[#ff9a2b]">Direct</p>
+              <p className="mt-1 text-xs font-medium uppercase tracking-[0.18em] text-white/[0.68]">No booking fees</p>
+            </div>
+          </div>
         </div>
-      </section>
+      </FramedSection>
 
-      <section className="page-shell py-14">
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card className="p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-muted-foreground">Directory scale</p>
-            <p className="mt-3 font-display text-4xl text-foreground">{therapistCount}+</p>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">Male therapist profiles presented with city context and direct contact paths.</p>
-          </Card>
-          <Card className="p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-muted-foreground">Coverage</p>
-            <p className="mt-3 font-display text-4xl text-foreground">{cityCount}+</p>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">Cities and metro search terms supported across the directory architecture.</p>
-          </Card>
-          <Card className="p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-muted-foreground">Discovery model</p>
-            <p className="mt-3 font-display text-4xl text-foreground">Direct</p>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">Visitors compare specialties, pricing, and availability before reaching out to therapists.</p>
-          </Card>
-        </div>
+      <FramedSection step="02" label="Smart Match Quiz">
+        <HomeSmartMatchCard cities={cities} featuredModalities={featuredModalities} therapistCount={therapistCount} />
+      </FramedSection>
 
-        <div className="mt-12">
-        <SectionHeading
-          eyebrow="Featured profiles"
-          title="Profiles with direct contact details and strong city context."
-          description="Every listing is built around discovery, not marketplace friction. Visitors can compare styles, neighborhoods, and contact preferences before they reach out."
-        />
-        <div className="mt-10 grid gap-6 lg:grid-cols-3">
-          {featured.map((therapist) => (
-            <TherapistCard key={therapist.id} therapist={therapist} />
-          ))}
-        </div>
-        </div>
-      </section>
+      <FramedSection step="03" label="Featured Therapist Profiles">
+        <div className="flex flex-col gap-8">
+          <SectionHeading
+            eyebrow="Verified profiles"
+            title="Verified male massage therapists with clear specialties and direct contact."
+            description="Featured listings surface the strongest profiles first so visitors can compare location, session style, and fit without marketplace friction."
+          />
 
-      <section className="page-shell pb-14">
-        <SectionHeading
-          eyebrow="Trust signals"
-          title="Recent member feedback from featured profiles"
-          description="Social proof and transparent reviews help new visitors decide with more confidence."
-        />
-        <div className="mt-8 rounded-3xl border border-border bg-background p-6">
-          <RatingSystem averageRating={4.9} totalReviews={Math.max(120, therapistCount)} reviews={homepageReviews} compact={true} />
-        </div>
-      </section>
+          <div className="grid gap-4 lg:grid-cols-3">
+            {featuredTherapists.map((therapist) => (
+              <TherapistSpotlightCard key={therapist.id} therapist={therapist} />
+            ))}
+          </div>
 
-      <section className="page-shell pb-14">
-        <SectionHeading
-          eyebrow="Browse popular cities"
-          title="High-intent city shortcuts for the most searched markets."
-          description="These quick links mirror the cities and neighborhoods users reach for most often, including metro aliases that still route into searchable landing pages."
-        />
-        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
-          {HOMEPAGE_CITY_LINKS.map((city) => (
-            <Link
-              key={city.label}
-              href={city.href}
-              className="rounded-2xl border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground transition hover:border-primary/20 hover:bg-secondary"
-            >
-              {city.label}
+          <div className="flex justify-center">
+            <Link href="/therapists" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3">
+              View all verified therapists
+              <ArrowRight className="h-4 w-4" />
             </Link>
-          ))}
+          </div>
         </div>
-      </section>
+      </FramedSection>
 
-      <section className="page-shell pb-16">
-        <SectionHeading
-          eyebrow="From the blog"
-          title="Fresh guides for safer, smarter contact decisions"
-          description="Editorial content helps visitors understand session choices and trust fundamentals before they reach out."
-        />
-        <div className="mt-8">
-          <BlogGrid posts={homepageBlogPosts} limit={3} />
+      <FramedSection step="04" label="City Directory">
+        <div className="flex flex-col gap-8">
+          <SectionHeading
+            eyebrow="Browse by city"
+            title="Gay massage therapists by city."
+            description={`Jump into the cities visitors search most often, then go deeper into therapist profiles and specialty pages from there.`}
+          />
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {HOMEPAGE_CITY_LINKS.map((city) => (
+              <Link
+                key={city.label}
+                href={city.href}
+                className="flex items-center justify-between rounded-[18px] border border-[#d9e2ee] bg-white px-4 py-3 text-sm font-semibold text-[#1a365d] transition hover:border-primary/20 hover:bg-[#f7f9fc]"
+              >
+                <span>{city.label}</span>
+                <MapPin className="h-4 w-4 text-[#8aa0bc]" />
+              </Link>
+            ))}
+            <Link
+              href="/explore"
+              className="flex items-center justify-between rounded-[18px] border border-[#d9e2ee] bg-[#f7f9fc] px-4 py-3 text-sm font-semibold text-[#1a365d] transition hover:border-primary/20 hover:bg-white"
+            >
+              <span>Explore all cities</span>
+              <ChevronRight className="h-4 w-4 text-[#8aa0bc]" />
+            </Link>
+          </div>
+
+          <div className="rounded-[22px] border border-[#e6edf5] bg-[#f7f9fc] px-5 py-4 text-sm leading-7 text-[#5f6f86]">
+            Browse {liveCityCount} live city pages with internal links into therapist profiles, specialties, and direct discovery flows.
+          </div>
         </div>
+      </FramedSection>
 
-        <div className="brand-surface grid gap-10 rounded-[28px] px-6 py-8 lg:grid-cols-[minmax(0,1.1fr),minmax(0,0.9fr)]">
+      <FramedSection step="05" label="Editorial Preview">
+        <div className="flex flex-col gap-8">
+          <SectionHeading
+            eyebrow="Editorial"
+            title="Guides for safer, smarter massage discovery."
+            description="Short editorial content helps visitors understand etiquette, session options, and how to choose the right therapist before making contact."
+          />
+
+          <div className="grid gap-4 lg:grid-cols-3">
+            {editorialCards.map((post) => (
+              <EditorialCard key={post.slug} {...post} />
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between gap-4 rounded-[24px] border border-[#e6edf5] bg-[#f7f9fc] px-5 py-5">
+            <div>
+              <p className="font-semibold text-[#10223f]">Build trust before the first message.</p>
+              <p className="mt-1 text-sm text-[#5f6f86]">Editorial content adds topical depth and gives new visitors better decision support.</p>
+            </div>
+            <Button asChild variant="outline" className="rounded-full">
+              <Link href="/blog">
+                Visit the blog
+                <ChevronRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </FramedSection>
+
+      <FramedSection step="06" label="FAQ">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr),minmax(0,1.1fr)] lg:items-start">
           <div>
             <SectionHeading
-              eyebrow="City-first SEO"
-              title="Local landing pages, therapist profiles, and category pages built to rank cleanly."
-              description="The directory is organized around cities, therapist detail pages, specialty discovery, and editorial content so search engines can understand intent and users can move deeper into the site."
+              eyebrow="Frequently asked questions"
+              title="Answers that remove friction before contact."
+              description="This section covers how the directory works, what verification means, and what to expect when you use MasseurMatch."
             />
+
             <div className="mt-6 flex flex-wrap gap-2">
-              {featuredCities.map((city) => (
-                <Link
-                  key={city.slug}
-                  href={`/${city.slug}`}
-                  className="rounded-full border border-border bg-white px-3 py-2 text-xs font-semibold text-foreground transition hover:border-primary/20 hover:bg-secondary"
-                >
-                  {city.name}
-                </Link>
-              ))}
+              <span className="inline-flex items-center gap-2 rounded-full bg-[#eef5ff] px-3 py-2 text-xs font-semibold text-[#35527d]">
+                <Search className="h-3.5 w-3.5" />
+                Search-first discovery
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-[#fdf0df] px-3 py-2 text-xs font-semibold text-[#925814]">
+                <Sparkles className="h-3.5 w-3.5" />
+                Direct contact flow
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-[#eaf8ef] px-3 py-2 text-xs font-semibold text-[#206c47]">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Clear trust signals
+              </span>
             </div>
           </div>
 
-          <div>
-            <h2 className="text-2xl font-semibold text-foreground">Common questions</h2>
-            <div className="mt-5 space-y-4">
-              {homepageFaqs.map((item) => (
-                <article key={item.question} className="rounded-2xl border border-border bg-secondary/30 p-4">
-                  <h3 className="font-semibold text-foreground">{item.question}</h3>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.answer}</p>
-                </article>
-              ))}
+          <div className="grid gap-3">
+            {homepageFaqs.map((item) => (
+              <FaqItem key={item.question} question={item.question} answer={item.answer} />
+            ))}
+          </div>
+        </div>
+      </FramedSection>
+
+      <section className="page-shell pb-8 pt-2">
+        <div className="rounded-[30px] bg-[#10223f] px-6 py-8 text-white shadow-[0_24px_60px_rgba(11,31,58,0.18)] sm:px-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/60">Ready to browse?</p>
+              <h2 className="mt-2 font-display text-3xl text-white">Start with verified listings, then contact therapists directly.</h2>
+              <p className="mt-3 text-sm leading-7 text-white/[0.72]">
+                MasseurMatch helps visitors move from search intent to real therapist profiles without booking fees or marketplace detours.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button asChild variant="hero" className="rounded-full px-6">
+                <Link href="/search">
+                  Search therapists
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+              <Button asChild variant="glass" className="rounded-full px-6">
+                <Link href="/pro/join">
+                  <BadgeCheck className="h-4 w-4" />
+                  Claim your profile
+                </Link>
+              </Button>
             </div>
           </div>
         </div>

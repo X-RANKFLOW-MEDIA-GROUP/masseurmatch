@@ -19,6 +19,7 @@ const config: Config = {
           DEFAULT: "hsl(var(--border))",
           subtle: withOpacity("--color-border-subtle-rgb"),
           strong: withOpacity("--color-border-strong-rgb"),
+          tertiary: withOpacity("--color-border-tertiary-rgb"),
         },
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -37,7 +38,9 @@ const config: Config = {
           body: withOpacity("--color-bg-body-rgb"),
           surface: withOpacity("--color-bg-surface-rgb"),
           subtle: withOpacity("--color-bg-subtle-rgb"),
+          primary: withOpacity("--color-background-primary-rgb"),
         },
+          sans: ["var(--font-sans)", "sans-serif"],
         text: {
           primary: withOpacity("--color-text-primary-rgb"),
           secondary: withOpacity("--color-text-secondary-rgb"),

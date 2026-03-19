@@ -12,8 +12,8 @@ export function EnterpriseStyleHero({ therapistCount, cityCount }: EnterpriseSty
       <div className="rounded-[28px] border border-border/70 bg-[#f6f7fb] px-5 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.05fr),minmax(360px,0.95fr)] lg:items-center">
           <div>
-            <span className="inline-flex items-center rounded-full border border-[#d8deea] bg-[#eef2fb] px-3 py-1 text-[11px] font-medium text-[#264a81]">
-              Voice-inspired booking flow
+            <span className="inline-flex items-center rounded-full border border-[#d8deea] bg-[#eef2fb] px-3.5 py-1.5 text-xs font-semibold text-[#264a81]">
+              Diretório com foco em confiança local
             </span>
             <h1 className="mt-6 max-w-2xl text-balance font-heading text-4xl leading-[1.12] text-[#0b2345] sm:text-5xl lg:text-[56px]">
               Converta buscas em contatos com uma vitrine premium e objetiva.
@@ -36,7 +36,7 @@ export function EnterpriseStyleHero({ therapistCount, cityCount }: EnterpriseSty
           </div>
 
           <div className="rounded-3xl border border-[#d4dbea] bg-white p-5 shadow-[0_10px_40px_rgba(13,35,68,0.08)] sm:p-6">
-            <p className="text-sm font-semibold text-[#1f4d86]">Painel em tempo real</p>
+            <p className="text-sm font-semibold tracking-tight text-[#1f4d86]">Painel em tempo real</p>
             <div className="mt-4 rounded-2xl border border-[#e5eaf3] bg-[#f8faff] px-4 py-4 sm:px-5">
               <dl className="space-y-3">
                 <div className="flex items-center justify-between gap-6">
@@ -58,16 +58,16 @@ export function EnterpriseStyleHero({ therapistCount, cityCount }: EnterpriseSty
       </div>
 
       <div className="border-x border-b border-border/70 bg-[#f2f4f8] px-6 py-8 sm:px-8">
-        <p className="text-center font-mono text-[11px] uppercase tracking-[0.34em] text-[#707b8b]">
-          integra com suas ferramentas favoritas
+        <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-[#707b8b]">
+          cidades com maior demanda hoje
         </p>
-        <div className="mt-7 grid grid-cols-2 gap-4 text-center font-mono text-xs font-medium uppercase tracking-[0.24em] text-[#adb6c3] sm:grid-cols-3 lg:grid-cols-6">
-          <span>Google</span>
-          <span>HubSpot</span>
-          <span>Stripe</span>
-          <span>Calendly</span>
-          <span>WhatsApp</span>
-          <span>Meta Ads</span>
+        <div className="mt-7 grid grid-cols-2 gap-4 text-center text-sm font-medium text-[#8b96a8] sm:grid-cols-3 lg:grid-cols-6">
+          <span>Austin</span>
+          <span>Dallas</span>
+          <span>Houston</span>
+          <span>Miami</span>
+          <span>Los Angeles</span>
+          <span>New York</span>
         </div>
       </div>
     </section>

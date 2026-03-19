@@ -138,7 +138,7 @@ const HomeTest = () => {
         path="/home-test"
       />
 
-      <div className="theme-voxmation min-h-screen bg-bg-body text-text-primary">
+      <div className="theme-masseurmatch min-h-screen bg-bg-body text-text-primary">
         <div className="relative overflow-hidden">
           <div
             className="pointer-events-none absolute inset-0"
@@ -182,7 +182,7 @@ const HomeTest = () => {
                   asChild
                   className="rounded-xl bg-action-primary text-brand-primary shadow-sm transition-colors hover:bg-action-primary-hover"
                 >
-                  <Link to="/contact">Book a demo</Link>
+                  <Link to="/search">Buscar massagistas</Link>
                 </Button>
               </div>
             </div>
@@ -446,10 +446,10 @@ const HomeTest = () => {
                     <div className="max-w-2xl">
                       <p className="text-sm font-semibold uppercase tracking-[0.28em] text-brand-accent">Ready for a polished client experience?</p>
                       <h2 className="mt-4 font-heading text-4xl font-bold tracking-tight md:text-5xl">
-                        Launch a portal your clients trust at first glance.
+                        Destaque seu perfil com uma vitrine profissional e confiavel.
                       </h2>
                       <p className="mt-5 text-lg leading-relaxed text-text-inverse/76">
-                        Use the updated palette across the homepage, dashboards, pricing, and reporting screens so the brand feels consistent from the first visit through the client portal.
+                        Mantenha cores, tipografia e espacamentos consistentes em toda a experiencia para fortalecer a marca desde a primeira busca ate o contato direto.
                       </p>
                     </div>
 

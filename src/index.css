@@ -85,9 +85,20 @@
     --color-feedback-warning: #FFB020;
     --color-feedback-warning-rgb: 255 176 32;
     --gradient-brand: linear-gradient(135deg, #0B1F3A 0%, #1E4B8F 60%, #2F6FE4 100%);
+    /* ── font alias tokens ── */
+    --font-sans: var(--font-inter);
+    --font-mono: var(--font-plex-mono);
+    /* ── semantic background tokens ── */
+    --color-background-primary: #FFFFFF;
+    --color-background-primary-rgb: 255 255 255;
+    --color-background-secondary: #F4F6F9;
+    --color-background-secondary-rgb: 244 246 249;
+    /* ── border tier: tertiary (lightest, for hairline dividers) ── */
+    --color-border-tertiary: #EBF0F7;
+    --color-border-tertiary-rgb: 235 240 247;
   }
 
-  .theme-voxmation {
+  .theme-masseurmatch {
     --background: 0 0% 100%;
     --foreground: 214.5 68.1% 13.5%;
     --card: 0 0% 100%;
@@ -132,8 +143,9 @@
   }
 
   body {
-    @apply text-foreground font-body antialiased;
-    background-color: #f4f6fa;
+    font-family: var(--font-sans);
+    @apply text-foreground antialiased;
+    background-color: var(--color-background-secondary);
     background-image: linear-gradient(180deg, #f7f8fc 0%, #f3f5f9 100%);
     min-height: 100vh;
   }
@@ -142,7 +154,7 @@
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading font-bold tracking-tight;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.015em;
   }
 
   ::selection {

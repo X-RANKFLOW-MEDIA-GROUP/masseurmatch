@@ -21,7 +21,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-[#e6eaf2] bg-white/95 backdrop-blur-xl">
       <div className="mx-auto flex h-[74px] w-full max-w-[1320px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="font-mono text-[15px] font-semibold uppercase tracking-[0.22em] text-[#10223f]">
+        <Link href="/" className="font-heading text-xl font-bold tracking-tight text-[#10223f]">
           MasseurMatch
         </Link>
         <div className="flex items-center gap-3">
@@ -30,7 +30,7 @@ export function SiteHeader() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-full px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#5b6574] transition hover:bg-white hover:text-[#10223f]"
+                className="rounded-full px-4 py-2 text-sm font-medium text-[#5b6574] transition hover:bg-white hover:text-[#10223f]"
               >
                 {link.label}
               </Link>
@@ -38,12 +38,12 @@ export function SiteHeader() {
           </nav>
           <Link
             href="/search"
-            className="hidden items-center rounded-full border border-[#d7dfec] bg-white px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8f9cb0] transition hover:border-[#c5d0e1] hover:text-[#3a4f6f] sm:inline-flex"
+            className="hidden items-center rounded-full border border-[#d7dfec] bg-white px-4 py-2 text-sm font-medium text-[#5b6a80] transition hover:border-[#c5d0e1] hover:text-[#3a4f6f] sm:inline-flex"
           >
-            Client Portal
+            Buscar Profissionais
           </Link>
-          <AppButton asChild size="sm" className="hidden h-10 rounded-full bg-[#082145] px-5 text-[11px] font-bold uppercase tracking-[0.12em] text-white hover:bg-[#0d2e5d] sm:inline-flex">
-            <Link href="/search">Book a Demo</Link>
+          <AppButton asChild size="sm" className="hidden h-10 rounded-full bg-[#082145] px-5 text-sm font-semibold text-white hover:bg-[#0d2e5d] sm:inline-flex">
+            <Link href="/search">Encontrar Massagista</Link>
           </AppButton>
           <button
             type="button"
@@ -66,7 +66,7 @@ export function SiteHeader() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="rounded-2xl border border-transparent px-4 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[#43566f] transition hover:border-[#dbe2ef] hover:bg-[#f7f9fc]"
+                  className="rounded-2xl border border-transparent px-4 py-3 text-sm font-medium text-[#43566f] transition hover:border-[#dbe2ef] hover:bg-[#f7f9fc]"
                   onClick={closeMobileMenu}
                 >
                   {link.label}
@@ -74,17 +74,17 @@ export function SiteHeader() {
               ))}
               <Link
                 href="/search"
-                className="rounded-2xl border border-transparent px-4 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[#43566f] transition hover:border-[#dbe2ef] hover:bg-[#f7f9fc]"
+                className="rounded-2xl border border-transparent px-4 py-3 text-sm font-medium text-[#43566f] transition hover:border-[#dbe2ef] hover:bg-[#f7f9fc]"
                 onClick={closeMobileMenu}
               >
-                Client Portal
+                Buscar Profissionais
               </Link>
               <Link
                 href="/search"
-                className="rounded-2xl bg-[#082145] px-4 py-3 text-center font-mono text-[11px] uppercase tracking-[0.14em] text-white transition hover:bg-[#0d2e5d]"
+                className="rounded-2xl bg-[#082145] px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#0d2e5d]"
                 onClick={closeMobileMenu}
               >
-                Book a Demo
+                Encontrar Massagista
               </Link>
             </nav>
           </div>
