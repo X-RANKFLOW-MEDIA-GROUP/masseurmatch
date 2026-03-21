@@ -132,6 +132,7 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
         leadLinks={[
           { href: "/search", label: "Search all cities" },
           { href: "/therapists", label: "Browse therapist directory" },
+          { href: "/compare", label: "Compare top directory alternatives" },
         ]}
         linkSections={[
           {
@@ -150,6 +151,24 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
               href: `/${city.slug}/wellness/${keyword.slug}`,
               label: keyword.label,
             })),
+          },
+          {
+            title: "Compare major directory alternatives",
+            layout: "chips",
+            items: [
+              {
+                href: "/compare",
+                label: "All comparisons",
+              },
+              {
+                href: "/compare/masseurmatch-vs-masseurfinder",
+                label: "vs MasseurFinder",
+              },
+              {
+                href: "/compare/masseurmatch-vs-rentmasseur",
+                label: "vs RentMasseur",
+              },
+            ],
           },
         ]}
         therapists={therapists.items}

@@ -8,6 +8,7 @@ const FOOTER_GROUPS = [
       { href: "/search", label: "Search therapists" },
       { href: "/therapists", label: "Browse listings" },
       { href: "/explore", label: "Explore by city" },
+      { href: "/compare", label: "Compare platforms" },
     ],
   },
   {

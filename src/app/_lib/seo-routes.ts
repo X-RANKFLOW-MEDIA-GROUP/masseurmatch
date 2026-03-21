@@ -3,6 +3,7 @@ import { BLOG_POSTS } from "@/app/blog/posts";
 import { DIRECTORY_SEGMENTS, SPECIALTY_KEYWORDS } from "@/app/_lib/directory-taxonomy";
 import { getCities, getCityInventoryMap, getPublicTherapists } from "@/app/_lib/directory";
 import { appUrl } from "@/app/_lib/metadata";
+import { competitorSlugs } from "@/lib/competitors";
 import { uniqueStrings } from "@/app/_lib/utils";
 
 type StaticSitemapRoute = {
@@ -85,6 +86,12 @@ const CORE_STATIC_ROUTES: StaticSitemapRoute[] = [
   { path: "/terms",               changeFrequency: "monthly", priority: 0.5 },
   { path: "/cookie-policy",       changeFrequency: "monthly", priority: 0.4 },
   { path: "/therapist-agreement", changeFrequency: "monthly", priority: 0.4 },
+  { path: "/compare",             changeFrequency: "monthly", priority: 0.7 },
+  ...competitorSlugs.map((slug) => ({
+    path: `/compare/${slug}`,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  })),
 ];
 
 export function buildRobotsRules(): MetadataRoute.Robots["rules"] {
