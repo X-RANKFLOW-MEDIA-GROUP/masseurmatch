@@ -1,0 +1,14 @@
+{
+  "header": {
+    "language": "Sprache",
+    "therapists": "Therapeuten",
+    "pricing": "Preise",
+    "blog": "Blog",
+    "safety": "Sicherheit",
+    "contact": "Kontakt",
+    "searchProfessionals": "Fachkraefte suchen",
+    "findMasseur": "Masseur finden",
+    "openMenu": "Menue oeffnen",
+    "closeMenu": "Menue schliessen"
+  }
+}

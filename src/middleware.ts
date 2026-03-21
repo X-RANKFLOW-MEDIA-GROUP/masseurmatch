@@ -1,5 +1,9 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import {
+  canonicalCategoryToLegacyParts,
+  resolveCitySlug,
+} from "@/app/_lib/city-routing";
 
 const SESSION_COOKIE_NAME = "mm_session";
 const encoder = new TextEncoder();
@@ -94,6 +98,60 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   const pathname = request.nextUrl.pathname;
   const session = await readSessionCookie(request);
 
+  const canonicalNeighborhoods = new Set([
+    "oak-lawn",
+    "turtle-creek",
+    "uptown",
+    "medical-district",
+    "love-field",
+    "dfw-airport",
+    "highland-park",
+    "university-park",
+    "downtown",
+    "design-district",
+  ]);
+
+  if (pathname.startsWith("/city/")) {
+    const parts = pathname.split("/").filter(Boolean);
+    const cityCandidate = parts[1] || "";
+    const citySlug = resolveCitySlug(cityCandidate);
+
+    if (citySlug) {
+      const legacyParts = parts.slice(2);
+      const destinationPath = legacyParts.length ? `/${citySlug}/${legacyParts.join("/")}` : `/${citySlug}`;
+      const destination = new URL(destinationPath, request.url);
+      return NextResponse.redirect(destination, 301);
+    }
+  }
+
+  if (pathname.startsWith("/cities/")) {
+    const parts = pathname.split("/").filter(Boolean);
+    const canonicalCityCandidate = parts[1] || "";
+    const citySlug = resolveCitySlug(canonicalCityCandidate);
+
+    if (citySlug) {
+      const incomingCategory = parts[2];
+      if (!incomingCategory) {
+        const destination = new URL(`/${citySlug}`, request.url);
+        return NextResponse.redirect(destination, 301);
+      }
+
+      if (canonicalNeighborhoods.has(incomingCategory)) {
+        const destination = new URL(`/${citySlug}/areas/${incomingCategory}`, request.url);
+        return NextResponse.redirect(destination, 301);
+      }
+
+      const mappedLegacy = canonicalCategoryToLegacyParts(incomingCategory);
+      if (mappedLegacy) {
+        const destination = new URL(`/${citySlug}/${mappedLegacy.join("/")}`, request.url);
+        return NextResponse.redirect(destination, 301);
+      }
+
+      const destination = new URL(`/${citySlug}/${incomingCategory}`, request.url);
+      return NextResponse.redirect(destination, 301);
+    }
+  }
+
   if (pathname.startsWith("/pro")) {
     if (!session || session.role !== "provider") {
       const loginUrl = new URL("/login", request.url);
@@ -114,5 +172,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 }
 
 export const config = {
-  matcher: ["/pro/:path*", "/admin/:path*"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.json|api|.*\\..*).*)",
+  ],
 };

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AlertTriangle, Phone, ShieldCheck, UserCheck } from "lucide-react";
+import { AlertTriangle, BadgeCheck, Camera, Phone, ShieldCheck, UserCheck } from "lucide-react";
 import { JsonLd } from "@/app/_components/JsonLd";
 import {
   buildBreadcrumbJsonLd,
@@ -11,14 +11,19 @@ import {
 
 const SAFETY_FAQS = [
   {
+    question: "What do MasseurMatch verification badges mean?",
+    answer:
+      "Badges reflect the reviews completed by MasseurMatch when shown, such as identity review, profile review, or photo review. They are trust signals, not a guarantee of service quality, licensure, or session outcome.",
+  },
+  {
     question: "Does MasseurMatch verify therapist licenses?",
     answer:
-      "No. MasseurMatch is a discovery directory and does not verify licenses or guarantee services. Visitors should do their own screening before contacting a provider.",
+      "Not universally. Unless a profile explicitly states otherwise, you should still confirm licenses, certifications, boundaries, pricing, and location details directly with the provider.",
   },
   {
     question: "What should I confirm before scheduling?",
     answer:
-      "Confirm boundaries, location details, pricing, timing, and contact methods directly with the provider before meeting.",
+      "Confirm boundaries, location details, pricing, timing, session format, and contact methods directly with the provider before meeting.",
   },
   {
     question: "How do I report a safety concern?",
@@ -30,21 +35,21 @@ const SAFETY_FAQS = [
 const safetyTips = [
   {
     icon: UserCheck,
-    title: "Confirm identity and expectations",
+    title: "Review the profile before you reach out",
     description:
-      "Review the public profile carefully and ask clear questions about services, rates, and boundaries before meeting.",
+      "Use the public listing to check specialties, rates, session format, reviews, and any visible verification signals before first contact.",
   },
   {
     icon: Phone,
     title: "Keep communication on record",
     description:
-      "Use written communication when possible so pricing, timing, and directions are easy to reference later.",
+      "Use written communication when possible so pricing, timing, directions, and expectations are easy to reference later.",
   },
   {
     icon: ShieldCheck,
-    title: "Use your own judgment",
+    title: "Use badges as signals, not guarantees",
     description:
-      "MasseurMatch helps with discovery, but you should always verify the situation independently and leave if something feels wrong.",
+      "MasseurMatch helps with discovery, but you should still verify the situation independently and leave if something feels wrong.",
   },
   {
     icon: AlertTriangle,
@@ -54,12 +59,30 @@ const safetyTips = [
   },
 ];
 
+const badgeMeanings = [
+  {
+    icon: BadgeCheck,
+    title: "Profile reviewed",
+    description: "The listing content was reviewed for presentation quality and trust and safety fit.",
+  },
+  {
+    icon: UserCheck,
+    title: "Identity reviewed",
+    description: "The provider submitted identity information for trust and safety review.",
+  },
+  {
+    icon: Camera,
+    title: "Photos reviewed",
+    description: "The visible photos were reviewed as part of the profile-quality process.",
+  },
+];
+
 export const metadata: Metadata = createPageMetadata({
   title: "Trust and safety",
   description:
-    "Read the MasseurMatch trust and safety guidance before contacting therapists or scheduling a session.",
+    "Understand what MasseurMatch trust badges mean, how to contact providers more safely, and how to report a concern.",
   path: "/safety",
-  keywords: ["trust and safety", "massage directory safety", "report a listing", "safety guidance"],
+  keywords: ["trust and safety", "massage directory safety", "verification badges", "report a listing", "safety guidance"],
 });
 
 export default function SafetyPage() {
@@ -75,19 +98,19 @@ export default function SafetyPage() {
         data={buildCollectionPageJsonLd({
           name: "Trust and safety",
           description:
-            "Safety guidance for using the MasseurMatch directory, reviewing therapist profiles, and reporting concerns.",
+            "Safety guidance for using the MasseurMatch directory, understanding verification badges, and reporting concerns.",
           path: "/safety",
         })}
       />
       <JsonLd data={buildFaqJsonLd(SAFETY_FAQS)} />
 
-      <div className="container mx-auto px-4 py-10">
+      <div className="page-shell py-10">
         <div className="max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">Trust and safety</p>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground">Safety guidance for using the directory responsibly.</h1>
+          <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground">How MasseurMatch handles trust and safety.</h1>
           <p className="mt-4 text-base leading-7 text-muted-foreground">
-            MasseurMatch is a discovery platform, not a booking or verification service. Use these guidelines when
-            reviewing therapist profiles, starting contact, and deciding whether a listing is right for you.
+            MasseurMatch is a discovery platform, not a booking intermediary. We make trust signals more visible, but
+            users should still review each profile carefully and confirm details directly before scheduling.
           </p>
         </div>
 
@@ -100,6 +123,22 @@ export default function SafetyPage() {
             </article>
           ))}
         </div>
+
+        <section className="mt-10 rounded-3xl border border-border bg-background p-6 shadow-sm">
+          <h2 className="text-2xl font-semibold text-foreground">What the badges mean</h2>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            Trust badges are there to reduce ambiguity, not to replace personal judgment. Here is what they are intended to communicate.
+          </p>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            {badgeMeanings.map((badge) => (
+              <article key={badge.title} className="rounded-2xl border border-border bg-secondary/20 p-4">
+                <badge.icon className="h-5 w-5 text-muted-foreground" />
+                <h3 className="mt-3 font-semibold text-foreground">{badge.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{badge.description}</p>
+              </article>
+            ))}
+          </div>
+        </section>
 
         <section className="mt-10 rounded-3xl border border-border bg-background p-6 shadow-sm">
           <h2 className="text-2xl font-semibold text-foreground">Need to report something?</h2>

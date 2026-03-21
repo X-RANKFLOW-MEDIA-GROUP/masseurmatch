@@ -34,8 +34,10 @@ export function NewsletterSignup({
   return (
     <div
       className={cn(
-        "rounded-2xl border p-5",
-        isDark ? "border-white/15 bg-white/5" : "border-border bg-bg-surface shadow-[0_12px_28px_rgb(var(--color-brand-primary-rgb)/0.05)]",
+        "rounded-[1.75rem] border p-5",
+        isDark
+          ? "border-white/14 bg-white/[0.055] shadow-[0_22px_52px_rgb(0_0_0_/_0.16)] backdrop-blur-xl"
+          : "premium-surface border-border bg-bg-surface shadow-brand",
         className,
       )}
     >
@@ -48,7 +50,7 @@ export function NewsletterSignup({
           placeholder="you@email.com"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className={cn(isDark ? "border-white/20 bg-brand-deep text-white placeholder:text-white/50" : "")}
+          className={cn(isDark ? "border-white/16 bg-white/[0.08] text-white placeholder:text-white/45" : "")}
         />
         <Button type="submit" variant={isDark ? "hero" : "default"}>Sign up</Button>
       </form>

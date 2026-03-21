@@ -1,16 +1,18 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import type { PublicTherapist, TherapistTier } from "@/app/_lib/directory";
 import { withSearchParams } from "@/app/_lib/request";
-import { EmptyState, Surface } from "@/app/_components/primitives";
+import { Surface } from "@/app/_components/primitives";
 import { TherapistCard } from "@/app/_components/therapist-card";
 import type { CityData } from "@/data/cities";
 
 const MATCHMAKER_TAGS = [
   { id: "deep-tissue", label: "Deep Tissue" },
-  { id: "home-visit", label: "Home Visit" },
+  { id: "outcall", label: "Outcall" },
+  { id: "incall", label: "Incall" },
   { id: "verified", label: "Verified" },
 ] as const;
 
@@ -96,7 +98,11 @@ export function SearchDirectory({
             : true;
       const matchesVerified =
         verified
-          ? item._tier === "standard" || item._tier === "pro" || item._tier === "elite" || Boolean(item.is_verified_identity) || Boolean(item.is_verified_profile)
+          ? item._tier === "standard" ||
+            item._tier === "pro" ||
+            item._tier === "elite" ||
+            Boolean(item.is_verified_identity) ||
+            Boolean(item.is_verified_profile)
           : true;
 
       return matchesModality && matchesKeyword && matchesSession && matchesVerified;
@@ -112,8 +118,13 @@ export function SearchDirectory({
       return;
     }
 
-    if (tagId === "home-visit") {
+    if (tagId === "outcall") {
       setSession((prev) => (prev === "home-visit" ? "" : "home-visit"));
+      return;
+    }
+
+    if (tagId === "incall") {
+      setSession((prev) => (prev === "incall" ? "" : "incall"));
       return;
     }
 
@@ -152,9 +163,11 @@ export function SearchDirectory({
           const active =
             tag.id === "deep-tissue"
               ? keyword.toLowerCase().includes("deep") || modality.toLowerCase().includes("deep")
-              : tag.id === "home-visit"
+              : tag.id === "outcall"
                 ? session === "home-visit"
-                : verified;
+                : tag.id === "incall"
+                  ? session === "incall"
+                  : verified;
 
           return (
             <button
@@ -190,14 +203,14 @@ export function SearchDirectory({
 
         <input
           className="rounded-md border border-border bg-background px-3 py-2"
-          placeholder="Massage specialty"
+          placeholder="Specialty or modality"
           value={modality}
           onChange={(event) => setModality(event.target.value)}
         />
 
         <input
           className="rounded-md border border-border bg-background px-3 py-2"
-          placeholder="Keyword (deep tissue, thai, recovery)"
+          placeholder="Keyword (male, gay, recovery)"
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
         />
@@ -245,11 +258,32 @@ export function SearchDirectory({
           ))}
         </div>
       ) : (
-        <EmptyState
-          className="mt-6"
-          title="No therapist listings matched this search."
-          description="Try a nearby city, a broader specialty term, or clear the current filters to see the full directory."
-        />
+        <div className="mt-6 rounded-3xl border border-border bg-background p-6 text-center shadow-sm">
+          <h3 className="text-lg font-semibold text-foreground">No therapist listings matched this search.</h3>
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+            Try a nearby city, a broader specialty term, or clear the current trust filters. You can also jump to the compare hub or safety page while inventory grows.
+          </p>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+            <Link
+              href="/search"
+              className="rounded-full border border-border bg-secondary/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition hover:bg-secondary"
+            >
+              Reset to all listings
+            </Link>
+            <Link
+              href="/compare"
+              className="rounded-full border border-border bg-secondary/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition hover:bg-secondary"
+            >
+              Compare competitors
+            </Link>
+            <Link
+              href="/safety"
+              className="rounded-full border border-border bg-secondary/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition hover:bg-secondary"
+            >
+              Read safety guidance
+            </Link>
+          </div>
+        </div>
       )}
     </section>
   );

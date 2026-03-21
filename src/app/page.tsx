@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Cormorant_Garamond } from "next/font/google";
-import type { ComponentType, ReactNode } from "react";
+import type { ReactNode } from "react";
 import {
   ArrowRight,
   BadgeCheck,
@@ -24,18 +23,15 @@ import {
   Star,
   Users,
   Waves,
+  type LucideIcon,
 } from "lucide-react";
 import { JsonLd } from "@/app/_components/json-ld";
 import { getCities, getPublicTherapists, type PublicTherapist } from "@/app/_lib/directory";
 import { buildCollectionPageJsonLd, buildItemListJsonLd, createPageMetadata } from "@/app/_lib/seo";
+import { PremiumIcon as PremiumGlyph } from "@/components/icons/PremiumIcon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
-const editorialSerif = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  style: ["normal", "italic"],
-});
+import { cn } from "@/lib/utils";
 
 const compactNumberFormatter = new Intl.NumberFormat("en-US", {
   notation: "compact",
@@ -44,13 +40,13 @@ const compactNumberFormatter = new Intl.NumberFormat("en-US", {
 
 const fullNumberFormatter = new Intl.NumberFormat("en-US");
 
-type PremiumIcon = ComponentType<{ className?: string }>;
+type IconGlyph = LucideIcon;
 
 type SpecialtyCardData = {
   label: string;
   count: number;
   href: string;
-  icon: PremiumIcon;
+  icon: IconGlyph;
 };
 
 type CityCardData = {
@@ -58,24 +54,23 @@ type CityCardData = {
   slug: string;
   stateCode: string;
   count: number;
-  icon: PremiumIcon;
+  icon: IconGlyph;
 };
 
-const HERO_TAGS = ["Deep Tissue", "Swedish", "Sports Recovery", "Thai Massage", "LGBTQ+ Affirming", "Direct Contact"];
-
-const TRUST_BAR_ITEMS: Array<{ icon: PremiumIcon; label: string }> = [
-  { icon: ShieldCheck, label: "Verified credentials and profile review" },
-  { icon: Star, label: "Visible social proof and stronger trust signals" },
-  { icon: LockKeyhole, label: "Private discovery without booking fees" },
-  { icon: HeartHandshake, label: "Inclusive language and affirming profiles" },
-  { icon: CircleDollarSign, label: "Direct pricing and contact clarity" },
+const HERO_TAGS = ["Deep Tissue", "Swedish", "Sports Recovery", "Thai Massage", "Verified Profiles", "Direct Contact"];
+const TRUST_BAR_ITEMS: Array<{ icon: IconGlyph; label: string }> = [
+  { icon: ShieldCheck, label: "Visible verification and safer first-contact signals" },
+  { icon: Star, label: "Reviews, profile quality, and stronger editorial trust" },
+  { icon: LockKeyhole, label: "Private discovery without booking-platform friction" },
+  { icon: HeartHandshake, label: "Inclusive language with clearer respect and boundaries" },
+  { icon: CircleDollarSign, label: "Direct pricing and contact clarity on mobile" },
 ];
 
-const HOW_IT_WORKS: Array<{ step: string; title: string; body: string; icon: PremiumIcon }> = [
+const HOW_IT_WORKS: Array<{ step: string; title: string; body: string; icon: IconGlyph }> = [
   {
     step: "01",
-    title: "Search by specialty or city",
-    body: "Start with modality, location, or therapist name. The homepage routes visitors into real search and city pages already wired into the app.",
+    title: "Search by city and intent",
+    body: "Start with modality, location, or verification intent. The homepage routes visitors into real search and local landing pages already wired into the app.",
     icon: Search,
   },
   {
@@ -86,14 +81,14 @@ const HOW_IT_WORKS: Array<{ step: string; title: string; body: string; icon: Pre
   },
   {
     step: "03",
-    title: "Choose the right fit",
-    body: "Scan specialties, pricing, and profile voice to find someone whose session style, boundaries, and pace match what you need.",
+    title: "Choose the safer fit",
+    body: "Scan specialties, pricing, profile voice, and session format to find someone whose style and boundaries match what you need.",
     icon: Users,
   },
   {
     step: "04",
     title: "Reach out directly",
-    body: "MasseurMatch handles discovery. Therapists and clients connect directly, with no middleman booking flow getting in the way.",
+    body: "MasseurMatch handles trusted discovery. Therapists and clients connect directly, with no middleman booking flow getting in the way.",
     icon: ArrowRight,
   },
 ];
@@ -104,21 +99,21 @@ const TESTIMONIALS = [
     name: "Alex Kim",
     meta: "Dallas client",
     quote:
-      "The new directory flow feels calm and premium. I could compare specialties fast, spot verified profiles immediately, and message with confidence.",
+      "The new directory flow feels calm and premium. I could spot verified profiles immediately and message with more confidence.",
   },
   {
     initials: "JR",
     name: "Jordan Rivera",
     meta: "Houston client",
     quote:
-      "What stood out most was the clarity. Pricing, profile quality, and contact expectations were all visible before I ever reached out.",
+      "What stood out most was the clarity. Pricing, profile quality, and contact expectations were visible before I ever reached out.",
   },
   {
     initials: "SM",
     name: "Sam Martinez, LMT",
     meta: "Austin therapist",
     quote:
-      "The homepage finally matches the level of care therapists want to project. It feels editorial, polished, and built for trust instead of noise.",
+      "The homepage finally matches the level of care therapists want to project. It feels polished, trusted, and built for quality instead of noise.",
   },
 ];
 
@@ -133,19 +128,19 @@ const FALLBACK_SPECIALTIES = [
   { label: "Lymphatic Drainage", count: 0, href: "/search?keyword=lymphatic", icon: ShieldCheck },
 ] satisfies SpecialtyCardData[];
 
-const CITY_ICON_ROTATION: PremiumIcon[] = [Building2, MapPin, Sparkles, Gem, Waves, Leaf];
+const CITY_ICON_ROTATION: IconGlyph[] = [Building2, MapPin, Sparkles, Gem, Waves, Leaf];
 
 export const metadata: Metadata = createPageMetadata({
-  title: "Find your perfect massage therapist",
+  title: "The safest and most trusted premium male massage directory",
   description:
-    "Discover verified massage therapists, browse by city or specialty, and connect directly through a cleaner premium directory experience.",
+    "Discover verified male massage therapists, browse local intent pages, and connect directly through a safer premium directory experience.",
   path: "/",
   keywords: [
-    "massage therapists near me",
-    "verified massage therapist directory",
-    "massage by city",
+    "male massage near me",
+    "verified male massage directory",
+    "male massage by city",
     "direct therapist contact",
-    "inclusive massage therapists",
+    "trusted premium massage directory",
   ],
 });
 
@@ -246,7 +241,7 @@ function normalizeSpecialty(value: string) {
     .join(" ");
 }
 
-function getSpecialtyIcon(label: string): PremiumIcon {
+function getSpecialtyIcon(label: string): IconGlyph {
   const normalized = label.toLowerCase();
 
   if (normalized.includes("deep") || normalized.includes("sports") || normalized.includes("stretch")) return Dumbbell;
@@ -315,35 +310,69 @@ function getCityCards(
     .slice(0, 6);
 }
 
+function EyebrowChip({
+  children,
+  tone = "default",
+  className,
+}: {
+  children: ReactNode;
+  tone?: "default" | "inverse";
+  className?: string;
+}) {
+  return <div className={cn("eyebrow-chip", tone === "inverse" && "eyebrow-chip-inverse", className)}>{children}</div>;
+}
+
+function IconFrame({
+  icon,
+  tone = "default",
+  size = "md",
+  className,
+  iconClassName,
+}: {
+  icon: IconGlyph;
+  tone?: "default" | "accent" | "inverse" | "soft" | "glass";
+  size?: "sm" | "md" | "lg";
+  className?: string;
+  iconClassName?: string;
+}) {
+  return (
+    <PremiumGlyph
+      icon={icon}
+      tone={tone}
+      size={size}
+      className={cn("rounded-[1.15rem]", className)}
+      iconClassName={iconClassName}
+    />
+  );
+}
+
 function SectionHeading({
   eyebrow,
   title,
   body,
   align = "left",
+  tone = "default",
   actions,
 }: {
   eyebrow: string;
   title: ReactNode;
   body: string;
   align?: "left" | "center";
+  tone?: "default" | "inverse";
   actions?: ReactNode;
 }) {
   const alignment = align === "center" ? "mx-auto text-center" : "";
+  const inverse = tone === "inverse";
 
   return (
     <div className={`max-w-3xl ${alignment}`}>
-      <div
-        className={`inline-flex items-center gap-3 rounded-full border border-[#efdbc2] bg-white/80 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#a56b21] ${
-          align === "center" ? "justify-center" : ""
-        }`}
-      >
-        <span className="h-1.5 w-1.5 rounded-full bg-[#ff8a1f]" />
+      <EyebrowChip tone={inverse ? "inverse" : "default"} className={align === "center" ? "justify-center" : ""}>
         {eyebrow}
-      </div>
-      <h2 className={`${editorialSerif.className} mt-6 text-4xl font-light leading-[0.96] text-brand-primary sm:text-5xl lg:text-[3.85rem]`}>
+      </EyebrowChip>
+      <h2 className={cn("font-display mt-6 text-4xl font-light leading-[0.96] sm:text-5xl lg:text-[3.85rem]", inverse ? "text-white" : "text-brand-primary")}>
         {title}
       </h2>
-      <p className="mt-5 text-base leading-8 text-text-secondary sm:text-lg">{body}</p>
+      <p className={cn("mt-5 text-base leading-8 sm:text-lg", inverse ? "text-white/68" : "text-text-secondary")}>{body}</p>
       {actions ? <div className={`mt-6 flex flex-wrap gap-3 ${align === "center" ? "justify-center" : ""}`}>{actions}</div> : null}
     </div>
   );
@@ -368,15 +397,15 @@ function TherapistSpotlightCard({ therapist }: { therapist: PublicTherapist }) {
   ].filter((value): value is string => Boolean(value));
 
   return (
-    <article className="group overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.045] text-white shadow-[0_20px_50px_rgba(3,10,20,0.25)] transition duration-300 hover:-translate-y-1 hover:border-[#ff8a1f]/40 hover:bg-white/[0.075]">
-      <div className="relative isolate aspect-[4/3] overflow-hidden border-b border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(255,179,71,0.22),transparent_32%),linear-gradient(160deg,rgba(47,111,228,0.32),rgba(11,31,58,0.96))]">
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,31,58,0.05),rgba(11,31,58,0.78))]" />
+    <article className="group overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.05] text-white shadow-[0_20px_50px_rgb(3_10_20_/_0.25)] transition duration-300 hover:-translate-y-1 hover:border-brand-accent/40 hover:bg-white/[0.075]">
+      <div className="relative isolate aspect-[4/3] overflow-hidden border-b border-white/10 bg-[radial-gradient(circle_at_top_left,rgb(var(--color-brand-soft-accent-rgb)/0.22),transparent_32%),linear-gradient(160deg,rgb(var(--color-brand-secondary-rgb)/0.32),rgb(var(--color-brand-primary-rgb)/0.96))]">
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(var(--color-brand-primary-rgb)/0.05),rgb(var(--color-brand-primary-rgb)/0.82))]" />
         <div className="absolute left-5 top-5">
           <Badge variant={tier.variant} className="border-0 px-3 py-1 text-[11px] uppercase tracking-[0.18em]">
             {tier.label}
           </Badge>
         </div>
-        <div className="absolute right-5 top-5 flex h-14 w-14 items-center justify-center rounded-[18px] border border-white/15 bg-white/10 text-lg font-semibold tracking-[0.08em] text-white">
+        <div className="absolute right-5 top-5 flex h-14 w-14 items-center justify-center rounded-[18px] border border-white/15 bg-white/10 text-lg font-semibold tracking-[0.08em] text-white backdrop-blur-xl">
           {getInitials(name)}
         </div>
         <div className="absolute inset-x-5 bottom-5">
@@ -384,7 +413,7 @@ function TherapistSpotlightCard({ therapist }: { therapist: PublicTherapist }) {
             <MapPin className="h-3.5 w-3.5" />
             {city}
           </div>
-          <h3 className={`${editorialSerif.className} mt-3 text-[2rem] font-light leading-none`}>
+          <h3 className={`font-display mt-3 text-[2rem] font-light leading-none`}>
             <Link href={profileHref} className="transition hover:text-brand-soft">
               {name}
             </Link>
@@ -418,7 +447,7 @@ function TherapistSpotlightCard({ therapist }: { therapist: PublicTherapist }) {
 
         <div className="mt-6 flex items-end justify-between gap-4 border-t border-white/10 pt-5">
           <div>
-            <p className={`${editorialSerif.className} text-3xl font-light text-white`}>
+            <p className={`font-display text-3xl font-light text-white`}>
               {price ? `$${fullNumberFormatter.format(price)}` : "Direct"}
             </p>
             <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/46">
@@ -482,7 +511,7 @@ export default async function HomePage() {
         data={buildCollectionPageJsonLd({
           name: "MasseurMatch homepage",
           description:
-            "Discover verified massage therapists, compare specialties, and explore premium city pages built for direct therapist discovery.",
+            "Discover verified male massage therapists, compare trust signals, and explore premium city pages built for direct therapist discovery.",
           path: "/",
         })}
       />
@@ -497,26 +526,25 @@ export default async function HomePage() {
         })}
       />
 
-      <div className="bg-[#fcfaf6] text-text-primary">
+      <div className="bg-bg-body text-text-primary">
         <section className="relative isolate overflow-hidden bg-brand-primary text-white">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,179,71,0.16),transparent_24%),radial-gradient(circle_at_80%_20%,rgba(47,111,228,0.22),transparent_30%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgb(var(--color-brand-soft-accent-rgb)/0.16),transparent_24%),radial-gradient(circle_at_80%_20%,rgb(var(--color-brand-secondary-rgb)/0.22),transparent_30%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:72px_72px] opacity-35 [mask-image:radial-gradient(ellipse_at_center,black_42%,transparent_88%)]" />
           <div className="page-shell relative py-14 sm:py-16 lg:py-24">
             <div className="grid gap-10 lg:grid-cols-[minmax(0,1.1fr),minmax(320px,0.9fr)] lg:items-center">
               <div className="max-w-3xl">
-                <div className="inline-flex items-center gap-3 rounded-full border border-[#ff8a1f]/25 bg-[#ff8a1f]/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#ffb570]">
-                  <span className="h-2 w-2 rounded-full bg-[#ff8a1f]" />
-                  Verified therapists across live U.S. cities
-                </div>
+                <EyebrowChip tone="inverse">
+                  Trusted premium male massage directory
+                </EyebrowChip>
 
-                <h1 className={`${editorialSerif.className} mt-8 max-w-4xl text-5xl font-light leading-[0.9] text-white sm:text-6xl lg:text-[5.5rem]`}>
-                  Find your
-                  <em className="px-3 font-light italic text-[#ffb570]">perfect</em>
-                  massage therapist
+                <h1 className={`font-display mt-8 max-w-4xl text-5xl font-light leading-[0.9] text-white sm:text-6xl lg:text-[5.5rem]`}>
+                  The safest and most trusted
+                  <em className="px-3 font-light italic text-brand-soft">premium</em>
+                  directory for direct connection
                 </h1>
 
                 <p className="mt-6 max-w-2xl text-base leading-8 text-white/72 sm:text-lg">
-                  A calmer, more premium directory experience for discovering verified massage professionals, comparing specialties, and reaching out on your terms.
+                  MasseurMatch is built to win on trust before scale: verified signals, cleaner local intent pages, and a faster mobile contact flow for discovering male massage therapists.
                 </p>
 
                 <form
@@ -528,7 +556,7 @@ export default async function HomePage() {
                     <input
                       name="keyword"
                       type="text"
-                      placeholder="Specialty, technique, therapist name"
+                      placeholder="Specialty, trust signal, therapist name"
                       className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/38"
                     />
                   </label>
@@ -554,7 +582,7 @@ export default async function HomePage() {
                     <Link
                       key={tag}
                       href={`/search?keyword=${encodeURIComponent(tag)}`}
-                      className="rounded-full border border-white/10 bg-white/[0.045] px-4 py-2 text-xs font-medium text-white/64 transition hover:border-[#ff8a1f]/35 hover:bg-[#ff8a1f]/10 hover:text-[#ffb570]"
+                      className="motion-premium rounded-full border border-white/10 bg-white/[0.045] px-4 py-2 text-xs font-medium text-white/64 transition hover:border-brand-accent/35 hover:bg-brand-accent/10 hover:text-brand-soft"
                     >
                       {tag}
                     </Link>
@@ -562,17 +590,17 @@ export default async function HomePage() {
                 </div>
 
                 <div className="mt-10 grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-[24px] border border-white/10 bg-white/[0.06] p-5 backdrop-blur-sm">
-                    <p className={`${editorialSerif.className} text-4xl font-light text-[#ffb570]`}>{formatCompactNumber(therapistCount)}+</p>
-                    <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/54">Active profiles</p>
+                  <div className="premium-stat rounded-[24px] p-5">
+                    <p className={`font-display text-4xl font-light text-brand-soft`}>{formatCompactNumber(therapistCount)}+</p>
+                    <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/54">Profiles live</p>
                   </div>
-                  <div className="rounded-[24px] border border-white/10 bg-white/[0.06] p-5 backdrop-blur-sm">
-                    <p className={`${editorialSerif.className} text-4xl font-light text-[#ffb570]`}>{formatCompactNumber(liveCityCount)}</p>
-                    <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/54">Live cities</p>
+                  <div className="premium-stat rounded-[24px] p-5">
+                    <p className={`font-display text-4xl font-light text-brand-soft`}>{formatCompactNumber(liveCityCount)}</p>
+                    <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/54">Cities indexed</p>
                   </div>
-                  <div className="rounded-[24px] border border-white/10 bg-white/[0.06] p-5 backdrop-blur-sm">
-                    <p className={`${editorialSerif.className} text-4xl font-light text-[#ffb570]`}>{formatCompactNumber(verifiedCount)}+</p>
-                    <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/54">Verified signals</p>
+                  <div className="premium-stat rounded-[24px] p-5">
+                    <p className={`font-display text-4xl font-light text-brand-soft`}>{formatCompactNumber(verifiedCount)}+</p>
+                    <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/54">Trust signals visible</p>
                   </div>
                 </div>
               </div>
@@ -581,22 +609,20 @@ export default async function HomePage() {
                 <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-4">
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/48">Curated spotlight</p>
-                    <p className={`${editorialSerif.className} mt-2 text-3xl font-light text-white`}>Discovery with trust built in</p>
+                    <p className={`font-display mt-2 text-3xl font-light text-white`}>Search first. Trust first.</p>
                   </div>
-                  <div className="flex h-12 w-12 items-center justify-center rounded-[18px] border border-[#ff8a1f]/25 bg-[#ff8a1f]/12 text-[#ffb570]">
-                    <Sparkles className="h-5 w-5" />
-                  </div>
+                  <IconFrame icon={Sparkles} tone="glass" />
                 </div>
 
                 {heroTherapist ? (
                   <div className="mt-5 rounded-[28px] border border-white/10 bg-[linear-gradient(160deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))] p-5">
                     <div className="flex items-center gap-4">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#ff8a1f]/12 text-lg font-semibold text-[#ffb570]">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-brand-accent/12 text-lg font-semibold text-brand-soft">
                         {getInitials(getDisplayName(heroTherapist))}
                       </div>
                       <div>
                         <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/46">Featured profile</p>
-                        <h2 className={`${editorialSerif.className} mt-1 text-3xl font-light text-white`}>{getDisplayName(heroTherapist)}</h2>
+                        <h2 className={`font-display mt-1 text-3xl font-light text-white`}>{getDisplayName(heroTherapist)}</h2>
                         <p className="mt-1 flex items-center gap-2 text-sm text-white/62">
                           <MapPin className="h-4 w-4" />
                           {heroTherapist.city || "United States"}
@@ -621,7 +647,7 @@ export default async function HomePage() {
 
                     <Link
                       href={`/therapists/${heroTherapist.slug || heroTherapist.id}`}
-                      className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#ffb570] transition hover:gap-3"
+                      className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-soft transition hover:gap-3"
                     >
                       Open spotlight profile
                       <ChevronRight className="h-4 w-4" />
@@ -637,27 +663,25 @@ export default async function HomePage() {
                   {[
                     {
                       icon: BadgeCheck,
-                      title: "Hand-checked presentation",
-                      body: "Tiered listings and profile review create clearer quality signals up front.",
+                      title: "Verification you can see",
+                      body: "Tiered listings and profile review create clearer quality signals before contact happens.",
                     },
                     {
                       icon: Clock3,
-                      title: "Faster first decisions",
-                      body: "Visitors can compare specialty, city, and price range without hopping across pages.",
+                      title: "Faster mobile decisions",
+                      body: "Visitors can compare specialty, city, session format, and price range without hopping across pages.",
                     },
                     {
                       icon: CircleDollarSign,
                       title: "Contact-first flow",
-                      body: "No marketplace detour. Discovery happens here, booking stays direct.",
+                      body: "No marketplace detour. Discovery happens here and contact stays direct.",
                     },
                   ].map((item) => {
                     const Icon = item.icon;
 
                     return (
                       <div key={item.title} className="rounded-[24px] border border-white/10 bg-white/[0.045] p-4">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-[16px] border border-[#ff8a1f]/25 bg-[#ff8a1f]/10 text-[#ffb570]">
-                          <Icon className="h-[18px] w-[18px]" />
-                        </div>
+                        <IconFrame icon={Icon} tone="glass" size="sm" />
                         <p className="mt-4 text-sm font-semibold text-white">{item.title}</p>
                         <p className="mt-2 text-sm leading-6 text-white/58">{item.body}</p>
                       </div>
@@ -669,16 +693,14 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="border-y border-[#efe6d8] bg-[#f6f1e8]">
+        <section className="border-y border-border-subtle bg-[rgb(var(--color-bg-subtle-rgb)/0.78)]">
           <div className="page-shell grid gap-4 py-6 sm:grid-cols-2 lg:grid-cols-5">
             {TRUST_BAR_ITEMS.map((item) => {
               const Icon = item.icon;
 
               return (
-                <div key={item.label} className="flex items-center gap-3 rounded-[22px] border border-white/70 bg-white/80 px-4 py-4 shadow-[0_10px_24px_rgba(11,31,58,0.04)]">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-brand-primary text-white">
-                    <Icon className="h-[18px] w-[18px]" />
-                  </div>
+                <div key={item.label} className="premium-surface motion-premium flex items-center gap-3 rounded-[22px] border border-white/70 px-4 py-4 shadow-[0_10px_24px_rgb(var(--color-brand-primary-rgb)/0.04)]">
+                  <IconFrame icon={Icon} tone="inverse" size="sm" className="shrink-0" />
                   <p className="text-sm leading-6 text-text-secondary">{item.label}</p>
                 </div>
               );
@@ -690,15 +712,15 @@ export default async function HomePage() {
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
               <SectionHeading
-                eyebrow="Browse by specialty"
+                eyebrow="Search by intent"
                 title={
                   <>
-                    Every technique,
+                    Local intent pages,
                     <br />
-                    one premium directory
+                    one trusted directory
                   </>
                 }
-                body="The homepage now pulls its specialty cards from real therapist data, so the most visible categories track with what the directory actually offers."
+                body="The homepage pulls these cards from real therapist data, giving MasseurMatch stronger search-first entry points instead of a generic browse-only experience."
               />
               <Button asChild variant="outline" className="h-12 rounded-full px-6">
                 <Link href="/search">
@@ -716,16 +738,14 @@ export default async function HomePage() {
                   <Link
                     key={specialty.label}
                     href={specialty.href}
-                    className="group overflow-hidden rounded-[28px] border border-[#eadfcd] bg-white p-6 shadow-[0_18px_40px_rgba(11,31,58,0.05)] transition duration-300 hover:-translate-y-1 hover:border-[#ff8a1f]/35 hover:shadow-[0_22px_48px_rgba(11,31,58,0.08)]"
+                    className="premium-surface premium-shimmer group overflow-hidden rounded-[28px] border border-border-subtle p-6 shadow-[0_18px_40px_rgb(var(--color-brand-primary-rgb)/0.05)] transition duration-300 hover:border-brand-accent/35 hover:shadow-[0_22px_48px_rgb(var(--color-brand-primary-rgb)/0.08)]"
                   >
-                    <div className="flex h-14 w-14 items-center justify-center rounded-[18px] bg-brand-primary/5 text-brand-secondary transition group-hover:bg-[#ff8a1f]/10 group-hover:text-[#a56b21]">
-                      <Icon className="h-5 w-5" />
-                    </div>
+                    <IconFrame icon={Icon} tone="soft" />
                     <h3 className="mt-5 text-lg font-semibold text-brand-primary">{specialty.label}</h3>
                     <p className="mt-2 text-sm text-text-muted">
                       {specialty.count > 0 ? `${formatCompactNumber(specialty.count)} therapists` : "Live specialty search"}
                     </p>
-                    <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#a56b21] transition group-hover:gap-3">
+                    <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-action-secondary transition group-hover:gap-3">
                       Explore specialty
                       <ArrowRight className="h-4 w-4" />
                     </div>
@@ -742,14 +762,15 @@ export default async function HomePage() {
               <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                 <SectionHeading
                   eyebrow="Featured professionals"
+                  tone="inverse"
                   title={
                     <>
-                      Meet your next
+                      Profiles built to win
                       <br />
-                      therapist
+                      the first second
                     </>
                   }
-                  body="Top listings are sorted with tier, reviews, and profile momentum in mind so the strongest pages lead the first impression."
+                  body="Top listings are sorted with tier, reviews, and profile momentum in mind so the strongest trust-led pages shape the first impression."
                 />
                 <Button asChild variant="glass" className="h-12 rounded-full px-6">
                   <Link href="/therapists">
@@ -768,7 +789,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="bg-[#f3ede2] py-20 sm:py-24">
+        <section className="bg-[rgb(var(--color-bg-subtle-rgb)/0.72)] py-20 sm:py-24">
           <div className="page-shell">
             <SectionHeading
               eyebrow="Simple process"
@@ -776,27 +797,25 @@ export default async function HomePage() {
                 <>
                   How MasseurMatch
                   <br />
-                  now flows
+                  now earns trust
                 </>
               }
-              body="The redesign keeps the browsing path simple: search, compare, contact, and move forward without friction."
+              body="The flow stays simple: search, compare, contact, and move forward without friction or marketplace confusion."
             />
 
-            <div className="mt-10 grid gap-px overflow-hidden rounded-[32px] border border-[#e7dbc6] bg-[#e7dbc6] lg:grid-cols-4">
+            <div className="mt-10 grid gap-px overflow-hidden rounded-[32px] border border-border-subtle bg-border-subtle lg:grid-cols-4">
               {HOW_IT_WORKS.map((item) => {
                 const Icon = item.icon;
 
                 return (
-                  <div key={item.step} className="bg-[#f8f4ec] p-8 sm:p-10">
+                  <div key={item.step} className="premium-surface p-8 sm:p-10">
                     <div className="flex items-start justify-between gap-4">
-                      <span className={`${editorialSerif.className} text-6xl font-light leading-none text-brand-primary/10`}>
+                      <span className={`font-display text-6xl font-light leading-none text-brand-primary/10`}>
                         {item.step}
                       </span>
-                      <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-brand-primary text-white">
-                        <Icon className="h-5 w-5" />
-                      </div>
+                      <IconFrame icon={Icon} tone="inverse" />
                     </div>
-                    <h3 className={`${editorialSerif.className} mt-8 text-3xl font-light leading-tight text-brand-primary`}>{item.title}</h3>
+                    <h3 className={`font-display mt-8 text-3xl font-light leading-tight text-brand-primary`}>{item.title}</h3>
                     <p className="mt-4 text-sm leading-7 text-text-secondary">{item.body}</p>
                   </div>
                 );
@@ -812,12 +831,12 @@ export default async function HomePage() {
                 eyebrow="Coverage area"
                 title={
                   <>
-                    Browse cities with
+                    City pages built for
                     <br />
-                    stronger local pages
+                    local intent
                   </>
                 }
-                body="City cards stay tied to the real directory footprint, so the homepage can spotlight where visitors already have inventory to explore."
+                body="City cards stay tied to the real directory footprint so the homepage can spotlight where users already have inventory, trust signals, and long-tail entry pages to explore."
               />
               <Button asChild variant="outline" className="h-12 rounded-full px-6">
                 <Link href="/explore">
@@ -835,11 +854,9 @@ export default async function HomePage() {
                   <Link
                     key={city.slug}
                     href={`/${city.slug}`}
-                    className="group rounded-[28px] border border-[#eadfcd] bg-white p-6 shadow-[0_16px_36px_rgba(11,31,58,0.04)] transition duration-300 hover:-translate-y-1 hover:border-[#ff8a1f]/35 hover:shadow-[0_22px_48px_rgba(11,31,58,0.08)]"
+                    className="premium-surface premium-shimmer group rounded-[28px] border border-border-subtle p-6 shadow-[0_16px_36px_rgb(var(--color-brand-primary-rgb)/0.04)] transition duration-300 hover:border-brand-accent/35 hover:shadow-[0_22px_48px_rgb(var(--color-brand-primary-rgb)/0.08)]"
                   >
-                    <div className="flex h-14 w-14 items-center justify-center rounded-[18px] bg-[#eff4fb] text-brand-secondary transition group-hover:bg-[#ff8a1f]/10 group-hover:text-[#a56b21]">
-                      <Icon className="h-5 w-5" />
-                    </div>
+                    <IconFrame icon={Icon} tone="soft" />
                     <div className="mt-5 flex items-start justify-between gap-4">
                       <div>
                         <h3 className="text-lg font-semibold text-brand-primary">{city.name}</h3>
@@ -847,11 +864,11 @@ export default async function HomePage() {
                           {city.count > 0 ? `${formatCompactNumber(city.count)} therapists` : `${city.stateCode} city page`}
                         </p>
                       </div>
-                      <span className="rounded-full border border-[#ede3d5] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8a98aa]">
+                      <span className="rounded-full border border-border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
                         {city.stateCode}
                       </span>
                     </div>
-                    <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#a56b21] transition group-hover:gap-3">
+                    <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-action-secondary transition group-hover:gap-3">
                       Open city page
                       <ArrowRight className="h-4 w-4" />
                     </div>
@@ -862,41 +879,36 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="bg-[linear-gradient(135deg,#17345d_0%,#0b1f3a_100%)] py-20 text-white sm:py-24">
+        <section className="bg-[linear-gradient(135deg,rgb(var(--color-brand-deep-navy-rgb))_0%,rgb(var(--color-brand-primary-rgb))_100%)] py-20 text-white sm:py-24">
           <div className="page-shell">
-            <div className="mx-auto max-w-4xl rounded-[36px] border border-white/10 bg-white/[0.06] px-6 py-10 text-center shadow-[0_24px_70px_rgba(0,0,0,0.22)] backdrop-blur-xl sm:px-10">
+            <div className="mx-auto max-w-4xl rounded-[36px] border border-white/10 bg-white/[0.06] px-6 py-10 text-center shadow-[0_24px_70px_rgb(0_0_0_/_0.22)] backdrop-blur-xl sm:px-10">
               <div className="flex flex-wrap items-center justify-center gap-3">
                 {[ShieldCheck, HeartHandshake, HandHeart].map((Icon, index) => (
-                  <div
-                    key={index}
-                    className="flex h-14 w-14 items-center justify-center rounded-[20px] border border-white/12 bg-white/[0.08] text-[#ffb570]"
-                  >
-                    <Icon className="h-5 w-5" />
-                  </div>
+                  <IconFrame key={index} icon={Icon} tone="glass" size="lg" className="rounded-[1.35rem]" />
                 ))}
               </div>
 
-              <h2 className={`${editorialSerif.className} mt-8 text-4xl font-light leading-[0.96] text-white sm:text-5xl lg:text-[3.7rem]`}>
-                Every body.
+              <h2 className={`font-display mt-8 text-4xl font-light leading-[0.96] text-white sm:text-5xl lg:text-[3.7rem]`}>
+                Safe.
                 <br />
-                Every identity.
+                Respectful.
                 <br />
-                Every need.
+                Direct.
               </h2>
               <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-white/70 sm:text-lg">
                 Inclusivity stays central to the brand. Verified, respectful profiles and stronger trust signals help more clients feel safe, seen, and ready to reach out.
               </p>
               <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-white/62">
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2">
-                  <Check className="h-4 w-4 text-[#ffb570]" />
+                  <Check className="h-4 w-4 text-brand-soft" />
                   Welcoming profile language
                 </span>
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2">
-                  <Check className="h-4 w-4 text-[#ffb570]" />
+                  <Check className="h-4 w-4 text-brand-soft" />
                   Direct contact expectations
                 </span>
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2">
-                  <Check className="h-4 w-4 text-[#ffb570]" />
+                  <Check className="h-4 w-4 text-brand-soft" />
                   Verification where available
                 </span>
               </div>
@@ -917,27 +929,27 @@ export default async function HomePage() {
               <>
                 What the new
                 <br />
-                experience communicates
+                position communicates
               </>
             }
-            body="The goal of the redesign is simple: make MasseurMatch feel more premium, more trustworthy, and easier to understand at a glance."
+            body="The goal of the redesign is simple: make MasseurMatch feel more premium, more trustworthy, and easier to trust at a glance."
           />
 
           <div className="mt-10 grid gap-5 lg:grid-cols-3">
             {TESTIMONIALS.map((item, index) => (
-              <article key={item.name} className="rounded-[28px] border border-[#eadfcd] bg-white p-7 shadow-[0_16px_36px_rgba(11,31,58,0.05)]">
-                <div className="flex items-center gap-1 text-[#ff8a1f]">
+              <article key={item.name} className="premium-surface rounded-[28px] border border-border-subtle p-7 shadow-[0_16px_36px_rgb(var(--color-brand-primary-rgb)/0.05)]">
+                <div className="flex items-center gap-1 text-brand-accent">
                   {Array.from({ length: 5 }).map((_, starIndex) => (
                     <Star key={starIndex} className="h-4 w-4 fill-current" />
                   ))}
                 </div>
-                <p className={`${editorialSerif.className} mt-6 text-2xl font-light leading-[1.4] text-brand-primary`}>
+                <p className={`font-display mt-6 text-2xl font-light leading-[1.4] text-brand-primary`}>
                   "{item.quote}"
                 </p>
                 <div className="mt-8 flex items-center gap-4">
                   <div
                     className={`flex h-12 w-12 items-center justify-center rounded-full text-sm font-semibold ${
-                      index === 0 ? "bg-brand-secondary text-white" : index === 1 ? "bg-[#ffcf9a] text-brand-primary" : "bg-[#ecf2fb] text-brand-primary"
+                      index === 0 ? "bg-brand-secondary text-white" : index === 1 ? "bg-brand-soft/55 text-brand-primary" : "bg-bg-subtle text-brand-primary"
                     }`}
                   >
                     {item.initials}
@@ -952,20 +964,19 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="bg-[#f3ede2] py-20 sm:py-24">
+        <section className="bg-[rgb(var(--color-bg-subtle-rgb)/0.72)] py-20 sm:py-24">
           <div className="page-shell">
             <div className="mx-auto max-w-4xl text-center">
-              <div className="inline-flex items-center gap-3 rounded-full border border-[#ead9bf] bg-white/80 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#a56b21]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#ff8a1f]" />
+              <EyebrowChip className="justify-center">
                 Get started
-              </div>
-              <h2 className={`${editorialSerif.className} mt-8 text-5xl font-light leading-[0.92] text-brand-primary sm:text-6xl lg:text-[4.8rem]`}>
-                Your next session
+              </EyebrowChip>
+              <h2 className={`font-display mt-8 text-5xl font-light leading-[0.92] text-brand-primary sm:text-6xl lg:text-[4.8rem]`}>
+                Start with the
                 <br />
-                starts here
+                directory you trust
               </h2>
               <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-text-secondary sm:text-lg">
-                Browse verified therapists, compare specialties with less friction, and give the brand a first impression that feels as premium as the service.
+                Browse verified therapists, compare trust signals with less friction, and use local intent pages that feel premium from the very first click.
               </p>
               <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
                 <Button asChild variant="default" size="lg" className="rounded-full px-8">
@@ -975,8 +986,8 @@ export default async function HomePage() {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="rounded-full px-8">
-                  <Link href="/pro/join">
-                    List your practice
+                  <Link href="/compare">
+                    Compare the market
                     <ChevronRight className="h-4 w-4" />
                   </Link>
                 </Button>
@@ -988,3 +999,4 @@ export default async function HomePage() {
     </>
   );
 }
+

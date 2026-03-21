@@ -1,16 +1,26 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CityDirectoryPage as CityDirectoryPageShell } from "@/app/_components/city-directory-page";
+import { buildAreaCopyInput, buildSuburbIntro } from "@/app/_lib/area-copy";
 import { getCities, getCityInventoryCount, getPublicTherapists } from "@/app/_lib/directory";
-import { DIRECTORY_SEGMENTS, SPECIALTY_KEYWORDS } from "@/app/_lib/directory-taxonomy";
+import { getKeywordBySlug, getSegmentBySlug, formatSlugLabel } from "@/app/_lib/directory-taxonomy";
+import { getLaunchCityPaths, getLaunchKeywordPaths, getLaunchSegmentPaths, isLaunchUrl } from "@/app/_lib/launch-urls";
 import { createPageMetadata } from "@/app/_lib/metadata";
 import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd } from "@/app/_lib/structured-data";
-import { AdvancedHeroSection, TherapistComparison, type ComparisonTherapistProfile } from "@/components";
+import { TherapistComparison, type ComparisonTherapistProfile } from "@/components";
 
 type Params = { city: string };
 
+export const revalidate = 60;
+
+// DFW suburb slugs — these cities are served by Dallas therapists and get suburb-specific copy
+const DFW_SUBURB_SLUGS = new Set([
+  "plano", "irving", "richardson", "fort-worth", "frisco",
+  "addison", "carrollton", "arlington", "grand-prairie",
+]);
+
 export function generateStaticParams(): Params[] {
-  return getCities().map((city) => ({ city: city.slug }));
+  return getLaunchCityPaths().map((path) => ({ city: path.split("/").filter(Boolean)[0] || "" }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -26,18 +36,18 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     });
   }
 
-  const cityIntro = `Explore verified massage therapists in ${city.name}, with public profiles, specialties, and transparent service details.`;
+  const cityIntro = `Browse verified male massage therapists in ${city.name} with visible trust signals, direct contact paths, and premium local discovery pages.`;
 
   const inventoryCount = await getCityInventoryCount(city.name);
 
   return createPageMetadata({
-    title: `${city.name} massage therapists`,
+    title: `Verified male massage therapists in ${city.name}`,
     description: cityIntro,
     path: `/${city.slug}`,
     keywords: [
-      `${city.name} massage therapist`,
-      `${city.name} wellness`,
-      `${city.name} massage directory`,
+      `${city.name} male massage`,
+      `${city.name} verified massage therapist`,
+      `${city.name} premium massage directory`,
     ],
     noIndex: inventoryCount === 0,
   });
@@ -51,9 +61,41 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
     notFound();
   }
 
-  const cityIntro = `Browse public therapist listings in ${city.name}. Compare specialties, availability, and profile details in one place.`;
+  if (!isLaunchUrl(`/${city.slug}`)) {
+    notFound();
+  }
+
+  const canonicalCityPath = `/${city.slug}`;
+  const citySegmentLinks = getLaunchSegmentPaths()
+    .filter((path) => path.startsWith(`${canonicalCityPath}/`))
+    .map((path) => {
+      const parts = path.split("/").filter(Boolean);
+      const segmentSlug = parts[1] || "";
+      const segment = getSegmentBySlug(segmentSlug);
+      return {
+        href: path,
+        label: segment?.shortLabel || formatSlugLabel(segmentSlug),
+        description: segment?.intro || `High-intent ${formatSlugLabel(segmentSlug).toLowerCase()} route for ${city.name}.`,
+      };
+    });
+  const cityKeywordLinks = getLaunchKeywordPaths()
+    .filter((path) => path.startsWith(`${canonicalCityPath}/`))
+    .map((path) => {
+      const keywordSlug = path.split("/").filter(Boolean)[2] || "";
+      const keyword = getKeywordBySlug(keywordSlug);
+
+      return {
+        href: path,
+        label: keyword?.shortLabel || formatSlugLabel(keywordSlug),
+      };
+    });
 
   const therapists = await getPublicTherapists({ city: city.name, page: 1, pageSize: 9 });
+
+  const cityIntro = DFW_SUBURB_SLUGS.has(city.slug)
+    ? buildSuburbIntro(buildAreaCopyInput({ area: city.name, city: "DFW", therapists: therapists.items }))
+    : `Search-first city page for trusted male massage discovery in ${city.name}. Compare verified profiles, outcall and incall options, specialties, and direct contact in one cleaner flow.`;
+
   const comparisonProfiles: ComparisonTherapistProfile[] = therapists.items.slice(0, 3).map((item, idx) => ({
     id: item.id,
     name: item.display_name || item.full_name || `Therapist ${idx + 1}`,
@@ -82,75 +124,62 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
   }));
   const cityFaqs = [
     {
-      question: `How do I find a trusted massage therapist in ${city.name}?`,
-      answer: `Use Verified and specialty filters first, then compare profile details, session format, and direct contact options before you call or message.`,
+      question: `How do I find a trusted male massage therapist in ${city.name}?`,
+      answer: `Start with verified profiles, then compare specialties, incall or outcall options, photo quality, and direct contact methods before you reach out.`,
     },
     {
-      question: `Can I find home-visit massage options in ${city.name}?`,
-      answer: `Yes. Look for therapists with outcall pricing and Home Visit tags so you can quickly identify providers who travel.`,
+      question: `Can I find outcall massage options in ${city.name}?`,
+      answer: `Yes. Use outcall pages and listing badges to quickly identify therapists who travel to a home, hotel, or requested location.`,
     },
     {
-      question: `Does MasseurMatch support booking in ${city.name}?`,
-      answer: `No. MasseurMatch is a discovery directory. You contact providers directly by phone, WhatsApp, or SMS to confirm availability.`,
+      question: `Does MasseurMatch handle booking in ${city.name}?`,
+      answer: `No. MasseurMatch is a trusted discovery directory. You contact therapists directly by phone, WhatsApp, or SMS to confirm fit, timing, and availability.`,
     },
   ];
 
   return (
     <>
-      <section className="page-shell py-6 lg:py-7">
-        <AdvancedHeroSection
-          title={`${city.name} massage therapists`}
-          subtitle="City Directory"
-          description={cityIntro}
-          cta={{ text: "Search all cities", href: "/search" }}
-          parallax={true}
-          animated={true}
-        />
-      </section>
-
       <CityDirectoryPageShell
         eyebrow="City directory"
-        title={`${city.name} massage therapists`}
+        title={`Verified male massage therapists in ${city.name}`}
         intro={cityIntro}
         breadcrumbJsonLd={buildBreadcrumbJsonLd([
           { name: "Home", path: "/" },
-          { name: city.name, path: `/${city.slug}` },
+          { name: city.name, path: canonicalCityPath },
         ])}
         collectionJsonLd={buildCollectionPageJsonLd({
-          name: `${city.name} massage therapists`,
+          name: `Verified male massage therapists in ${city.name}`,
           description: cityIntro,
-          path: `/${city.slug}`,
+          path: canonicalCityPath,
         })}
         itemListJsonLd={buildItemListJsonLd({
-          name: `${city.name} therapist listings`,
-          path: `/${city.slug}`,
+          name: `${city.name} verified therapist listings`,
+          path: canonicalCityPath,
           items: therapists.items.map((item) => ({
             name: item.display_name || item.full_name || "Therapist",
             path: `/therapists/${item.slug || item.id}`,
           })),
         })}
         leadLinks={[
+          { href: `/search?city=${city.slug}&verified=1`, label: `Browse verified in ${city.name}` },
           { href: "/search", label: "Search all cities" },
-          { href: "/therapists", label: "Browse therapist directory" },
+          { href: "/safety", label: "Read safety policy" },
           { href: "/compare", label: "Compare top directory alternatives" },
         ]}
         linkSections={[
           {
-            title: "Explore by category",
+            title: `High-intent pages in ${city.name}`,
             layout: "grid",
-            items: DIRECTORY_SEGMENTS.slice(0, 3).map((segment) => ({
-              href: `/${city.slug}/${segment.slug}`,
-              label: segment.shortLabel,
-              description: segment.intro,
-            })),
+            description:
+              "These city-plus-intent pages are designed to feel stronger than a generic directory landing page and to capture more local search demand.",
+            items: citySegmentLinks,
           },
           {
-            title: `Popular specialties in ${city.name}`,
+            title: `Popular service intents in ${city.name}`,
             layout: "chips",
-            items: SPECIALTY_KEYWORDS.map((keyword) => ({
-              href: `/${city.slug}/wellness/${keyword.slug}`,
-              label: keyword.label,
-            })),
+            description:
+              "Jump into the service combinations people search most often when they already know the type of session they want.",
+            items: cityKeywordLinks,
           },
           {
             title: "Compare major directory alternatives",
@@ -172,11 +201,11 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
           },
         ]}
         therapists={therapists.items}
-        listingTitle={`Therapist listings in ${city.name}`}
-        listingDescription="Public therapist cards help this city page work as both a user entry point and a crawlable local near-me landing page for search."
-        emptyTitle={`No public listings yet for ${city.name}.`}
-        emptyDescription="Visitors can still use the broader search page, city category pages, and specialty links while this city grows."
-        faqTitle={`Common Questions About Massage in ${city.name}`}
+        listingTitle={`Trusted listings in ${city.name}`}
+        listingDescription="Each card combines visual quality, verification status, and direct-contact clarity so this city page performs as both a better user journey and a stronger local SEO landing page."
+        emptyTitle={`No public listings are live in ${city.name} yet.`}
+        emptyDescription="You can still explore verified intent pages, broader city routes, and comparison content while this market grows."
+        faqTitle={`Common Questions About Male Massage in ${city.name}`}
         faqItems={cityFaqs}
       />
 

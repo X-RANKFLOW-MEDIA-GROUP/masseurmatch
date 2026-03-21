@@ -22,8 +22,11 @@ export function ScrollProgress() {
   }, []);
 
   return (
-    <div className="fixed left-0 top-0 z-[60] h-1 w-full bg-transparent">
-      <div className="h-full bg-primary transition-[width] duration-150" style={{ width: `${progress}%` }} />
+    <div className="pointer-events-none fixed left-0 top-0 z-[70] h-[3px] w-full overflow-hidden bg-transparent">
+      <div
+        className="h-full rounded-r-full bg-[linear-gradient(90deg,rgb(var(--color-action-primary-rgb)),rgb(var(--color-brand-soft-accent-rgb)),rgb(var(--color-brand-secondary-rgb)))] shadow-[0_0_24px_rgb(var(--color-action-primary-rgb)/0.4)] transition-[width] duration-150"
+        style={{ width: `${progress}%` }}
+      />
     </div>
   );
 }

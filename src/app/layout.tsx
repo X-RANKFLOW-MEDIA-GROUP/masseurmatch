@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Inter, Sora } from "next/font/google";
+import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { AppMotionShell } from "@/app/_components/app-motion-shell";
 import { JsonLd } from "@/app/_components/json-ld";
 import { SiteFooter } from "@/app/_components/site-footer";
 import { SiteHeader } from "@/app/_components/site-header";
@@ -9,20 +10,29 @@ import { AppProviders } from "@/app/providers";
 import { SITE_URL } from "@/lib/site";
 import "@/index.css";
 
-const sora = Sora({
+const fontSans = Inter({
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
-  variable: "--font-sora",
+  variable: "--font-sans",
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const plexMono = IBM_Plex_Mono({
+
+const fontDisplay = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-plex-mono",
+  variable: "--font-display",
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+
+const fontMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
 const rootMetadata = createPageMetadata({
-  title: "Find massage therapists near you",
+  title: "The safest and most trusted premium male massage directory",
   description: SITE_DESCRIPTION,
   path: "/",
 });
@@ -43,13 +53,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${sora.variable} ${inter.variable} ${plexMono.variable} min-h-screen font-body text-foreground`}>
+      <body
+        className={`${fontSans.variable} ${fontDisplay.variable} ${fontMono.variable} theme-masseurmatch noise-bg min-h-screen overflow-x-hidden font-sans text-foreground`}
+      >
         <AppProviders>
           <JsonLd data={buildOrganizationJsonLd()} />
           <JsonLd data={buildWebsiteJsonLd()} />
           <SiteHeader />
-
-          <main className="pt-16">{children}</main>
+          <AppMotionShell>{children}</AppMotionShell>
           <SiteFooter />
         </AppProviders>
       </body>

@@ -8,11 +8,11 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        display: ["var(--font-sora)", "sans-serif"],
-        heading: ["var(--font-sora)", "sans-serif"],
-        body: ["var(--font-inter)", "sans-serif"],
-        mono: ["var(--font-plex-mono)", "monospace"],
-        sans: ["var(--font-sans)"],
+        display: ["var(--font-display)", "sans-serif"],
+        heading: ["var(--font-display)", "sans-serif"],
+        body: ["var(--font-sans)", "sans-serif"],
+        mono: ["var(--font-mono)", "monospace"],
+        sans: ["var(--font-sans)", "sans-serif"],
       },
       colors: {
         border: {
@@ -40,7 +40,6 @@ const config: Config = {
           subtle: withOpacity("--color-bg-subtle-rgb"),
           primary: withOpacity("--color-background-primary-rgb"),
         },
-          sans: ["var(--font-sans)", "sans-serif"],
         text: {
           primary: withOpacity("--color-text-primary-rgb"),
           secondary: withOpacity("--color-text-secondary-rgb"),
@@ -110,7 +109,7 @@ const config: Config = {
         "2xl": "1.75rem",
       },
       boxShadow: {
-        soft: "0 24px 60px rgb(11 31 58 / 0.18)",
+        soft: "var(--shadow-subtle)",
         brand: "var(--shadow-card)",
       },
       keyframes: {

@@ -8,3 +8,4 @@ export {
   type TherapistComparisonProps,
 } from "@/components/sections/TherapistComparison";
 export { BlogGrid, BlogPostCard, BlogPostDetail, type BlogPost } from "@/components/sections/EnhancedBlog";
+export { PremiumIcon } from "@/components/icons/PremiumIcon";

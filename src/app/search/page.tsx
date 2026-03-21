@@ -22,19 +22,19 @@ type SearchPageProps = {
 
 const SEARCH_FAQS = [
   {
-    question: "How do I search massage therapists on MasseurMatch?",
+    question: "How do I search trusted massage therapists on MasseurMatch?",
     answer:
-      "Use city, Deep Tissue, Home Visit, and Verified filters to narrow results instantly, then open a profile and use Call or Message to contact directly.",
+      "Use city, Deep Tissue, Outcall, Incall, and Verified filters to narrow results instantly, then open a profile and use the direct call or message actions.",
   },
   {
-    question: "Can I browse therapists by city?",
+    question: "Can I browse trusted therapists by city?",
     answer:
-      "Yes. MasseurMatch is organized around city and subcategory pages so visitors can find local options near me and move into specialty pages from there.",
+      "Yes. MasseurMatch is organized around city, category, and service-intent pages so visitors can find local options and move into more specific listings from there.",
   },
   {
-    question: "Does the search page show live therapist listings?",
+    question: "Does the search page show live profile data?",
     answer:
-      "Yes. The search page renders public therapist listings directly and updates results with no page refresh when filters change.",
+      "Yes. The search page renders public therapist listings directly and updates the visible results without a full page refresh when filters change.",
   },
 ];
 
@@ -60,15 +60,17 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
   const keyword = getFirstParam(params.keyword);
   const verified = getFirstParam(params.verified) === "1";
   const tierValue = getFirstParam(params.tier);
-  const hasFilters = Boolean(city || modality || keyword || verified || tierValue || getFirstParam(params.goal) || getFirstParam(params.session));
+  const hasFilters = Boolean(
+    city || modality || keyword || verified || tierValue || getFirstParam(params.goal) || getFirstParam(params.session),
+  );
 
   return createPageMetadata({
-    title: city ? `Massage therapists near ${city}` : "Search massage therapists near me",
+    title: city ? `Verified male massage therapists in ${city}` : "Search verified male massage therapists",
     description: city
-      ? `Browse massage therapist listings in ${city}, compare specialties and verification signals, and contact providers directly.`
-      : "Search massage therapists by city, specialty, and listing tier through a crawlable public directory optimized for local near-me intent.",
+      ? `Browse therapist listings in ${city}, compare specialties and verification signals, and contact providers directly through a safer premium directory flow.`
+      : "Search verified male massage therapists by city, specialty, and listing tier through a crawlable public directory optimized for local near-me intent.",
     path: "/search",
-    keywords: ["search massage therapists", "massage near me", city, modality, keyword, verified ? "verified massage therapist" : "", tierValue],
+    keywords: ["search massage therapists", "male massage near me", city, modality, keyword, verified ? "verified massage therapist" : "", tierValue],
     noIndex: hasFilters,
   });
 }
@@ -106,9 +108,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       />
       <JsonLd
         data={buildCollectionPageJsonLd({
-          name: "Search massage therapists",
+          name: "Search verified massage therapists",
           description:
-            "Search massage therapist listings by city, specialty, and listing tier through the public MasseurMatch directory.",
+            "Search massage therapist listings by city, specialty, session format, and listing tier through the public MasseurMatch directory.",
           path: "/search",
         })}
       />
@@ -124,15 +126,15 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       />
       <JsonLd data={buildFaqJsonLd(SEARCH_FAQS)} />
 
-      <div className="container mx-auto px-4 py-10">
+      <div className="page-shell py-10">
         <div className="max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">Explore and search</p>
           <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground">
-            Find the right therapist fast and make the handshake.
+            Find trusted therapists fast.
           </h1>
           <p className="mt-4 text-base leading-7 text-muted-foreground">
-            This directory is designed for confidence-first discovery: instant faceted filters, trusted profile signals,
-            and direct contact options that move users from browsing to calling or messaging in seconds.
+            Search is built for confidence-first discovery: visible verification, cleaner local intent pages, and direct
+            contact options that move users from browsing to calling or messaging in seconds.
           </p>
         </div>
 
@@ -148,10 +150,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           ))}
         </div>
 
-        <section className="mt-8 rounded-3xl border border-border bg-background p-5">
-          <h2 className="text-xl font-semibold text-foreground">Advanced filter preview</h2>
+        <section className="mt-8 rounded-3xl border border-border bg-background p-5 shadow-sm">
+          <h2 className="text-xl font-semibold text-foreground">Trust-first filter preview</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Refine by modality, budget, and tier. Applying filters updates live results below.
+            Refine by modality, budget, and tier. The goal is to make verified, outcall, and premium listings easier to find without noise.
           </p>
           <div className="mt-4">
             <AdvancedDirectoryFilter
@@ -205,17 +207,17 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
         <section className="mt-12 grid gap-6 rounded-3xl border border-border bg-background p-6 shadow-sm lg:grid-cols-2">
           <div>
-            <h2 className="text-2xl font-semibold text-foreground">Built to support crawl depth</h2>
+            <h2 className="text-2xl font-semibold text-foreground">Built to support safer discovery at scale</h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              Search points visitors into city pages, therapist detail pages, specialty landing pages, and editorial
-              content so the site has meaningful internal links instead of one thin results screen.
+              Search points visitors into city pages, therapist detail pages, specialty landing pages, and trust content
+              so the site has meaningful internal links instead of one thin results screen.
             </p>
             <div className="mt-5 flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/blog" className="text-primary hover:underline">
                 Visit the blog
               </Link>
-              <Link href="/chat" className="text-primary hover:underline">
-                Meet Knotty AI
+              <Link href="/compare" className="text-primary hover:underline">
+                Compare competitors
               </Link>
               <Link href="/safety" className="text-primary hover:underline">
                 Read trust and safety

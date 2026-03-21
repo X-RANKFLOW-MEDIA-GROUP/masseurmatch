@@ -13,6 +13,12 @@ import {
   type ProfileFaqItem,
 } from "@/app/_lib/directory";
 import {
+  getPublicContactLinks,
+  getPublicProfileName,
+  getPublicTrustHighlights,
+  isVerifiedDirectoryProfile,
+} from "@/app/_lib/public-profile";
+import {
   buildBreadcrumbJsonLd,
   buildProfilePageJsonLd,
   createPageMetadata,
@@ -21,6 +27,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Params = { slug: string };
+
+export const revalidate = 60;
 
 type HoursMap = Record<string, string>;
 
@@ -67,14 +75,6 @@ function normalizeHours(value: unknown): { incall: HoursMap; outcall: HoursMap }
   };
 }
 
-function normalizePhone(phone: string | null): string {
-  if (!phone) {
-    return "";
-  }
-
-  return phone.replace(/[^\d+]/g, "");
-}
-
 export async function generateStaticParams() {
   const res = await getPublicTherapists({ page: 1, pageSize: 200 });
   return res.items.map((item) => ({ slug: item.slug || item.id }));
@@ -93,10 +93,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     });
   }
 
-  const name = profile.display_name || profile.full_name || "Therapist";
+  const name = getPublicProfileName(profile);
   const description =
     profile.bio ||
-    `Browse ${name}'s public therapist profile on MasseurMatch and review specialties, pricing, and city context.`;
+    `Browse ${name}'s public therapist profile on MasseurMatch and review specialties, pricing, trust signals, and direct contact options.`;
 
   return createPageMetadata({
     title: `${name} therapist profile`,
@@ -121,25 +121,18 @@ export default async function TherapistPage({ params }: { params: Promise<Params
     getImportedReviews(profile.id, 5),
     getProfilePhotos(profile.id, 6),
   ]);
-  const name = profile.display_name || profile.full_name || "Therapist";
+  const name = getPublicProfileName(profile);
   const profilePath = `/therapists/${profile.slug || profile.id}`;
   const matchedCity = getCities().find((city) => city.name.toLowerCase() === (profile.city || "").toLowerCase());
   const cityPath = matchedCity ? `/${matchedCity.slug}` : profile.city ? `/search?city=${encodeURIComponent(profile.city)}` : "/search";
   const faqItems = normalizeFaqItems(profile.custom_faq);
   const pricingSessions = normalizePricingSessions(profile.pricing_sessions);
   const hours = normalizeHours(profile.business_hours);
-  const gallery = photos.length > 0 ? photos.map((photo) => photo.storage_path) : [profile.avatar_url].filter(Boolean) as string[];
+  const gallery = photos.length > 0 ? photos.map((photo) => photo.storage_path) : ([profile.avatar_url].filter(Boolean) as string[]);
   const hasHours = Object.keys(hours.incall).length > 0 || Object.keys(hours.outcall).length > 0;
-  const normalizedPhone = normalizePhone(profile.phone);
-  const callHref = normalizedPhone ? `tel:${normalizedPhone}` : null;
-  const messageHref = normalizedPhone ? `https://wa.me/${normalizedPhone.replace(/[^\d]/g, "")}` : null;
-  const smsHref = normalizedPhone ? `sms:${normalizedPhone.replace(/[^\d+]/g, "")}` : null;
-  const isVerified =
-    profile._tier === "standard" ||
-    profile._tier === "pro" ||
-    profile._tier === "elite" ||
-    Boolean(profile.is_verified_identity) ||
-    Boolean(profile.is_verified_profile);
+  const { callHref, whatsappHref: messageHref, smsHref } = getPublicContactLinks(profile.phone);
+  const isVerified = isVerifiedDirectoryProfile(profile);
+  const trustHighlights = getPublicTrustHighlights(profile);
 
   return (
     <>
@@ -190,24 +183,64 @@ export default async function TherapistPage({ params }: { params: Promise<Params
             </p>
             <h1 className="mt-2 text-4xl font-bold text-foreground">{name}</h1>
             <p className="mt-2 text-sm text-muted-foreground">{profile.city || "United States"}</p>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {isVerified ? (
+                <span className="rounded-full border border-border bg-secondary/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-foreground">
+                  Verified profile
+                </span>
+              ) : null}
+              {profile.is_verified_identity ? (
+                <span className="rounded-full border border-border bg-secondary/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-foreground">
+                  Identity reviewed
+                </span>
+              ) : null}
+              {profile.is_verified_photos ? (
+                <span className="rounded-full border border-border bg-secondary/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-foreground">
+                  Photos reviewed
+                </span>
+              ) : null}
+              {profile.available_now ? (
+                <span className="rounded-full border border-border bg-secondary/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-foreground">
+                  Available now
+                </span>
+              ) : null}
+            </div>
+
             <p className="mt-5 text-sm leading-7 text-muted-foreground">
               {profile.bio || "This therapist profile is still being expanded with more details."}
             </p>
 
+            <div className="mt-5 rounded-2xl border border-border bg-secondary/30 p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Why this profile feels safer
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {trustHighlights.map((highlight) => (
+                  <span
+                    key={highlight}
+                    className="rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-medium text-foreground"
+                  >
+                    {highlight}
+                  </span>
+                ))}
+              </div>
+            </div>
+
             <div className="mt-6 flex flex-wrap gap-3">
               {callHref ? (
                 <a className="rounded-full bg-action-primary px-5 py-3 text-sm font-semibold text-white" href={callHref}>
-                  Call Now
+                  Call now
                 </a>
               ) : null}
               {messageHref ? (
                 <a className="rounded-full border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground" href={messageHref} target="_blank" rel="noreferrer">
-                  Message via WhatsApp
+                  WhatsApp
                 </a>
               ) : null}
               {smsHref ? (
                 <a className="rounded-full border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground" href={smsHref}>
-                  Message via SMS
+                  SMS
                 </a>
               ) : null}
               <Link className="text-sm font-semibold text-primary hover:underline" href={cityPath}>
@@ -220,7 +253,7 @@ export default async function TherapistPage({ params }: { params: Promise<Params
                 <p className="font-semibold text-foreground">Specialties</p>
                 <p className="mt-2">{(profile.specialties || []).join(", ") || "Massage therapy"}</p>
                 <p className="mt-2 text-xs uppercase tracking-[0.15em] text-muted-foreground">
-                  {isVerified ? "Verified profile signal active" : "Verification pending"}
+                  {isVerified ? "Trust signals visible" : "Review the full trust section before contact"}
                 </p>
               </div>
               <div className="rounded-2xl border border-border bg-secondary/30 p-4 text-sm text-muted-foreground">
@@ -287,8 +320,8 @@ export default async function TherapistPage({ params }: { params: Promise<Params
                 <div className="rounded-2xl border border-border bg-secondary/20 p-5">
                   <h2 className="text-xl font-semibold text-foreground">What this profile emphasizes</h2>
                   <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                    The active profile focuses on clean presentation, city relevance, specialties, and direct communication.
-                    Visitors can use these details to decide whether to reach out and ask for more specifics before scheduling directly.
+                    The active profile focuses on clean presentation, city relevance, specialties, visible trust signals,
+                    and direct communication. Use these details to decide whether to reach out and ask for more specifics before scheduling directly.
                   </p>
                 </div>
               </div>
@@ -376,16 +409,16 @@ export default async function TherapistPage({ params }: { params: Promise<Params
         <section className="mt-10 rounded-3xl border border-border bg-background p-6 shadow-sm">
           <h2 className="text-2xl font-semibold text-foreground">Trust and safety</h2>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            MasseurMatch is a discovery directory. Review profile details carefully, confirm boundaries directly, and
-            read the trust and safety guidance before scheduling with any provider.
+            MasseurMatch is a discovery directory. The badges on this page help reduce ambiguity, but you should still
+            confirm boundaries, location details, pricing, and timing directly before scheduling with any provider.
           </p>
           <details className="mt-4 rounded-2xl border border-border bg-secondary/20 p-4">
-            <summary className="cursor-pointer text-sm font-semibold text-foreground">Verification documents (hidden by default)</summary>
+            <summary className="cursor-pointer text-sm font-semibold text-foreground">See badge details</summary>
             <div className="mt-3 space-y-2 text-sm text-muted-foreground">
               <p>Identity verification: {profile.is_verified_identity ? "Submitted and reviewed" : "Not verified"}</p>
               <p>Profile verification: {profile.is_verified_profile ? "Verified" : "Not verified"}</p>
               <p>Photo verification: {profile.is_verified_photos ? "Verified" : "Not verified"}</p>
-              <p className="text-xs">Documents are reviewed for trust and safety. Sensitive files are not publicly exposed.</p>
+              <p className="text-xs">Sensitive documents are reviewed for trust and safety and are not publicly exposed.</p>
             </div>
           </details>
           <div className="mt-4 flex flex-wrap gap-3 text-sm font-semibold">
@@ -404,7 +437,7 @@ export default async function TherapistPage({ params }: { params: Promise<Params
           <div className="mx-auto flex max-w-4xl gap-2">
             {callHref ? (
               <a href={callHref} className="flex-1 rounded-xl bg-action-primary px-3 py-3 text-center text-xs font-semibold uppercase tracking-[0.12em] text-white">
-                Call Now
+                Call now
               </a>
             ) : null}
             {messageHref ? (

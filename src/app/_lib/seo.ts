@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { SITE_URL, siteUrl } from "@/lib/site";
 
 export const SITE_NAME = "MasseurMatch";
-export const SITE_TAGLINE = "Massage therapist discovery with city-first SEO";
+export const SITE_TAGLINE = "The safest and most trusted premium male massage directory for direct connection";
 export const SITE_DESCRIPTION =
-  "Find massage therapists in major US cities, compare specialties, and contact providers directly through a city-first wellness directory.";
+  "Find verified male massage therapists in major US cities, compare trust signals and specialties, and connect directly through a safer premium directory.";
 export const DEFAULT_SOCIAL_HANDLE = "@masseurmatch";
 export const appUrl = SITE_URL;
 
@@ -12,12 +12,14 @@ export const DEFAULT_KEYWORDS = [
   "massage therapists",
   "massage therapist directory",
   "male massage therapist",
+  "verified male massage therapist",
   "gay massage directory",
   "massage near me",
+  "trusted male massage directory",
   "sports massage",
   "deep tissue massage",
   "swedish massage",
-  "wellness directory",
+  "premium wellness directory",
   "city massage listings",
 ];
 

@@ -1,10 +1,16 @@
 import type { MetadataRoute } from "next";
-import { BLOG_POSTS } from "@/app/blog/posts";
-import { DIRECTORY_SEGMENTS, SPECIALTY_KEYWORDS } from "@/app/_lib/directory-taxonomy";
-import { getCities, getCityInventoryMap, getPublicTherapists } from "@/app/_lib/directory";
+import {
+  FIRST_30_URLS_IN_ORDER,
+  getLaunchAreaPaths,
+  getLaunchCityPaths,
+  getLaunchKeywordPaths,
+  getLaunchSegmentPaths,
+} from "@/app/_lib/launch-urls";
+import { GUIDES } from "@/app/guides/data";
 import { appUrl } from "@/app/_lib/metadata";
-import { competitorSlugs } from "@/lib/competitors";
+import { absoluteUrl, getSeoTherapists } from "@/app/_lib/seo-data";
 import { uniqueStrings } from "@/app/_lib/utils";
+import { competitorSlugs } from "@/lib/competitors";
 
 type StaticSitemapRoute = {
   path: string;
@@ -31,7 +37,7 @@ export const PRIVATE_ROBOTS_PATHS = uniqueStrings([
  * Query-parameter patterns that generate near-infinite faceted navigation
  * duplicates with no unique indexable content. Blocking these prevents crawl
  * budget waste on filter variants. Canonical SEO landers live at
- * /{city}/{service} paths — not at parameterised /search URLs.
+ * /{city}/{segment-or-service} paths — not at parameterised /search URLs.
  */
 export const FILTER_ROBOTS_PATHS = [
   "/search?*",
@@ -71,7 +77,7 @@ export const AI_CRAWLER_BOTS = [
  * Core canonical pages for the sitemap.
  * /search excluded: live filter hub, not a canonical SEO lander.
  * /chat excluded: AI tool, not a crawlable landing page.
- * Programmatic SEO targets use /{city}/{service} paths.
+ * Programmatic SEO targets use /{city}/{segment-or-service} paths.
  */
 const CORE_STATIC_ROUTES: StaticSitemapRoute[] = [
   { path: "/",                    changeFrequency: "daily",   priority: 1.0 },
@@ -86,7 +92,7 @@ const CORE_STATIC_ROUTES: StaticSitemapRoute[] = [
   { path: "/terms",               changeFrequency: "monthly", priority: 0.5 },
   { path: "/cookie-policy",       changeFrequency: "monthly", priority: 0.4 },
   { path: "/therapist-agreement", changeFrequency: "monthly", priority: 0.4 },
-  { path: "/compare",             changeFrequency: "monthly", priority: 0.7 },
+  { path: "/compare",            changeFrequency: "monthly", priority: 0.7 },
   ...competitorSlugs.map((slug) => ({
     path: `/compare/${slug}`,
     changeFrequency: "monthly" as const,
@@ -131,69 +137,56 @@ export function buildCoreSitemapEntries(now = new Date()): MetadataRoute.Sitemap
 
 // ─── City sitemap (only cities with real inventory) ───────────────────────────
 export async function buildCitiesSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
-  const cityMap = await getCityInventoryMap();
-  return getCities()
-    .filter((city) => (cityMap.get(city.name.toLowerCase()) ?? 0) > 0)
-    .map((city) => ({
-      url: `${appUrl}/${city.slug}`,
-      lastModified: now,
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    }));
+  return getLaunchCityPaths().map((path) => ({
+    url: `${appUrl}${path}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: path === "/dallas" ? 0.8 : 0.7,
+  }));
 }
 
 // ─── Service-in-city sitemap (city + segment, inventory-gated) ────────────────
-export async function buildServicesCitySitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
-  const cityMap = await getCityInventoryMap();
-  const activeCities = getCities().filter(
-    (city) => (cityMap.get(city.name.toLowerCase()) ?? 0) > 0,
+export async function buildServicesSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
+  const launchSegmentPaths = new Set(getLaunchSegmentPaths());
+  const launchKeywordPaths = new Set(getLaunchKeywordPaths());
+  const orderedServicePaths = FIRST_30_URLS_IN_ORDER.filter(
+    (path) => launchSegmentPaths.has(path) || launchKeywordPaths.has(path),
   );
-  return activeCities.flatMap((city) =>
-    DIRECTORY_SEGMENTS.map((segment) => ({
-      url: `${appUrl}/${city.slug}/${segment.slug}`,
-      lastModified: now,
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    })),
-  );
+  return orderedServicePaths.map((path) => ({
+    url: `${appUrl}${path}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: path.startsWith("/dallas") ? 0.72 : 0.66,
+  }));
 }
 
-// ─── Keyword sitemap (city + segment + keyword, inventory-gated) ──────────────
-export async function buildKeywordsSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
-  const cityMap = await getCityInventoryMap();
-  const activeCities = getCities().filter(
-    (city) => (cityMap.get(city.name.toLowerCase()) ?? 0) > 0,
-  );
-  return activeCities.flatMap((city) =>
-    DIRECTORY_SEGMENTS.flatMap((segment) =>
-      SPECIALTY_KEYWORDS.map((keyword) => ({
-        url: `${appUrl}/${city.slug}/${segment.slug}/${keyword.slug}`,
-        lastModified: now,
-        changeFrequency: "weekly" as const,
-        priority: 0.6,
-      })),
-    ),
-  );
+export function buildNeighborhoodsSitemapEntries(now = new Date()): MetadataRoute.Sitemap {
+  return getLaunchAreaPaths().map((path) => ({
+    url: `${appUrl}${path}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  }));
 }
 
 // ─── Profiles sitemap (only profiles with stable slugs) ──────────────────────
 export async function buildProfilesSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
-  const therapistData = await getPublicTherapists({ page: 1, pageSize: 500 });
-  return therapistData.items
-    .filter((t) => t.slug)
+  const therapistData = await getSeoTherapists();
+  return therapistData
+    .filter((therapist) => therapist.slug)
     .map((therapist) => ({
-      url: `${appUrl}/therapists/${therapist.slug}`,
-      lastModified: now,
+      url: absoluteUrl(`/therapists/${therapist.slug}`),
+      lastModified: therapist.updated_at ? new Date(therapist.updated_at) : now,
       changeFrequency: "weekly" as const,
       priority: 0.7,
     }));
 }
 
-// ─── Blog sitemap ─────────────────────────────────────────────────────────────
-export function buildBlogSitemapEntries(now = new Date()): MetadataRoute.Sitemap {
-  return BLOG_POSTS.map((post) => ({
-    url: `${appUrl}/blog/${post.slug}`,
-    lastModified: new Date(post.publishedAt),
+// ─── Guides sitemap ───────────────────────────────────────────────────────────
+export function buildGuidesSitemapEntries(now = new Date()): MetadataRoute.Sitemap {
+  return GUIDES.map((guide) => ({
+    url: `${appUrl}/guides/${guide.slug}`,
+    lastModified: new Date(guide.publishedAt),
     changeFrequency: "monthly" as const,
     priority: 0.6,
   }));
@@ -207,13 +200,32 @@ export function buildStaticSitemapEntries(now = new Date()): MetadataRoute.Sitem
 
 /** @deprecated Used by scripts; prefer the segmented sitemap.ts. */
 export async function buildSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
-  const [core, cities, services, keywords, profiles, blog] = await Promise.all([
+  const [core, cities, services, profiles] = await Promise.all([
     buildCoreSitemapEntries(now),
     buildCitiesSitemapEntries(now),
-    buildServicesCitySitemapEntries(now),
-    buildKeywordsSitemapEntries(now),
+    buildServicesSitemapEntries(now),
     buildProfilesSitemapEntries(now),
-    buildBlogSitemapEntries(now),
   ]);
-  return [...core, ...cities, ...services, ...keywords, ...profiles, ...blog];
+  const neighborhoods = buildNeighborhoodsSitemapEntries(now);
+  const guides = buildGuidesSitemapEntries(now);
+  return [...core, ...cities, ...services, ...neighborhoods, ...profiles, ...guides];
+}
+
+export function buildLaunchOrderList(): string[] {
+  return [...FIRST_30_URLS_IN_ORDER];
+}
+
+/** @deprecated Use buildServicesSitemapEntries. */
+export async function buildServicesCitySitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
+  return buildServicesSitemapEntries(now);
+}
+
+/** @deprecated Use buildNeighborhoodsSitemapEntries. */
+export async function buildKeywordsSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
+  return buildNeighborhoodsSitemapEntries(now);
+}
+
+/** @deprecated Use buildGuidesSitemapEntries. */
+export function buildBlogSitemapEntries(now = new Date()): MetadataRoute.Sitemap {
+  return buildGuidesSitemapEntries(now);
 }

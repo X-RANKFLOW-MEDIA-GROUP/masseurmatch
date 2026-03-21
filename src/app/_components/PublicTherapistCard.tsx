@@ -4,6 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { PublicTherapist } from "@/app/_lib/directory";
+import {
+  getDirectoryTierLabel,
+  getPublicContactLinks,
+  getPublicProfileName,
+  getPublicTrustHighlights,
+  isVerifiedDirectoryProfile,
+} from "@/app/_lib/public-profile";
 import { Badge } from "@/components/ui/badge";
 
 const formatCurrency = (value: number | null) => {
@@ -19,21 +26,16 @@ const formatCurrency = (value: number | null) => {
 };
 
 export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist }) {
-  const name = therapist.display_name || therapist.full_name || "Therapist";
+  const name = getPublicProfileName(therapist);
   const profilePath = `/therapists/${therapist.slug || therapist.id}`;
   const incall = formatCurrency(therapist.incall_price);
   const outcall = formatCurrency(therapist.outcall_price);
   const isPremium = therapist._tier === "pro" || therapist._tier === "elite";
   const isFeatured = therapist._tier === "elite";
-  const isVerified =
-    therapist._tier === "standard" ||
-    therapist._tier === "pro" ||
-    therapist._tier === "elite" ||
-    Boolean(therapist.is_verified_profile) ||
-    Boolean(therapist.is_verified_identity);
-  const phoneHref = therapist.phone ? `tel:${therapist.phone.replace(/[^\d+]/g, "")}` : null;
-  const messageHref = therapist.phone ? `https://wa.me/${therapist.phone.replace(/[^\d]/g, "")}` : null;
-  const tierLabel = isPremium ? "Premium" : therapist._tier === "standard" ? "Verified" : "Directory";
+  const isVerified = isVerifiedDirectoryProfile(therapist);
+  const { callHref, whatsappHref } = getPublicContactLinks(therapist.phone);
+  const tierLabel = getDirectoryTierLabel(therapist);
+  const trustHighlights = getPublicTrustHighlights(therapist);
   const [parallax, setParallax] = useState({ x: 0, y: 0 });
 
   const profileImage = useMemo(
@@ -82,7 +84,29 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
               {name}
             </Link>
           </h3>
-          <p className="mt-1 text-sm text-muted-foreground">{therapist.city || "United States"}</p>
+          {(() => {
+            const neighborhood = therapist.neighborhood_name ?? therapist.primary_area ?? null;
+            const yearsExperience =
+              therapist.years_experience ??
+              (therapist.start_year ? new Date().getFullYear() - therapist.start_year : null);
+            return (
+              <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
+                <span>{therapist.city || "United States"}</span>
+                {neighborhood ? (
+                  <>
+                    <span aria-hidden="true" className="text-border">·</span>
+                    <span>{neighborhood}</span>
+                  </>
+                ) : null}
+                {yearsExperience ? (
+                  <>
+                    <span aria-hidden="true" className="text-border">·</span>
+                    <span>{yearsExperience}+ yrs exp</span>
+                  </>
+                ) : null}
+              </div>
+            );
+          })()}
         </div>
         {therapist.review_count ? (
           <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">
@@ -96,6 +120,7 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
           {tierLabel}
         </Badge>
         {isVerified ? <Badge variant="outline">Verified</Badge> : null}
+        {therapist.available_now ? <Badge variant="outline">Available now</Badge> : null}
       </div>
 
       <p className="mt-4 text-sm leading-6 text-muted-foreground">
@@ -124,15 +149,31 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
         {therapist.profile_views ? <span>{therapist.profile_views} profile views</span> : null}
       </div>
 
+      <div className="mt-5 rounded-2xl border border-border bg-secondary/30 p-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          Why this profile feels safer
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {trustHighlights.map((highlight) => (
+            <span
+              key={highlight}
+              className="rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-medium text-foreground"
+            >
+              {highlight}
+            </span>
+          ))}
+        </div>
+      </div>
+
       <div className="mt-5 flex flex-wrap gap-2">
-        {phoneHref ? (
-          <a href={phoneHref} className="rounded-full bg-action-primary px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white">
-            Call Now
+        {callHref ? (
+          <a href={callHref} className="rounded-full bg-action-primary px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white">
+            Call now
           </a>
         ) : null}
-        {messageHref ? (
-          <a href={messageHref} target="_blank" rel="noreferrer" className="rounded-full border border-border bg-background px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-foreground">
-            Message
+        {whatsappHref ? (
+          <a href={whatsappHref} target="_blank" rel="noreferrer" className="rounded-full border border-border bg-background px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-foreground">
+            WhatsApp
           </a>
         ) : null}
         <Link
@@ -147,6 +188,13 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
         >
           View Profile
         </Link>
+      </div>
+
+      <div className="mt-4 flex items-center justify-between gap-3 text-xs text-muted-foreground">
+        <Link href="/safety" className="font-semibold text-primary hover:underline">
+          Safety guide
+        </Link>
+        <span>{isVerified ? "Verification visible" : "Review the full profile before contact"}</span>
       </div>
     </article>
   );
