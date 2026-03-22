@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { rmSync } from "node:fs";
+import { mkdirSync, readdirSync, rmSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -8,6 +8,7 @@ const rootDir = path.resolve(__dirname, "..");
 const nextDir = path.join(rootDir, ".next");
 
 const OVERRIDE_ENV = "FORCE_CLEAN_NEXT";
+const appDir = path.join(rootDir, "src", "app");
 
 const normalizeCommand = (value) => value.toLowerCase().replace(/["']/g, "").replace(/\s+/g, " ").trim();
 
@@ -72,6 +73,26 @@ const findRunningNextServerProcesses = () => {
 	}
 };
 
+const ensureChunkDirectories = () => {
+	mkdirSync(path.join(nextDir, "server", "chunks"), { recursive: true });
+	mkdirSync(path.join(nextDir, "static", "chunks", "app"), { recursive: true });
+
+	const queue = [appDir];
+
+	while (queue.length > 0) {
+		const currentDir = queue.pop();
+
+		for (const entry of readdirSync(currentDir, { withFileTypes: true })) {
+			if (!entry.isDirectory()) continue;
+
+			const sourceDir = path.join(currentDir, entry.name);
+			const relativeDir = path.relative(appDir, sourceDir);
+			queue.push(sourceDir);
+			mkdirSync(path.join(nextDir, "static", "chunks", "app", relativeDir), { recursive: true });
+		}
+	}
+};
+
 if (process.env[OVERRIDE_ENV] !== "1") {
 	const serverProcesses = findRunningNextServerProcesses();
 
@@ -89,3 +110,4 @@ if (process.env[OVERRIDE_ENV] !== "1") {
 }
 
 rmSync(nextDir, { recursive: true, force: true });
+ensureChunkDirectories();
