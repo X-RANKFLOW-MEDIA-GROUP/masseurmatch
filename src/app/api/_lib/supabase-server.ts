@@ -126,7 +126,7 @@ export async function getUserByEmail(email: string): Promise<User | null> {
   while (page > 0) {
     const { data, error } = await adminClient.auth.admin.listUsers({
       page,
-      perPage: 200,
+      perPage: 20,
     });
 
     if (error) {

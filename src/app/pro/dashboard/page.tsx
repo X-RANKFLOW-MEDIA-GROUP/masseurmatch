@@ -1,5 +1,6 @@
 "use client";
 
+import { ProviderGrowthQuickPicks } from "@/app/_components/provider-growth-marketplace";
 import { ProTools } from "@/app/_components/pro-tools";
 import { DashboardFAQ } from "@/components/dashboard/DashboardFAQ";
 import { PhotoGuidelines } from "@/components/dashboard/PhotoGuidelines";
@@ -29,6 +30,8 @@ export default function ProDashboardPage() {
             link: item.link,
           }))}
         />
+
+        <ProviderGrowthQuickPicks />
 
         <div className="grid gap-8 xl:grid-cols-[minmax(0,0.9fr),minmax(0,1.1fr)]">
           <div className="space-y-6">

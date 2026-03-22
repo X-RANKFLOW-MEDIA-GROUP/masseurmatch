@@ -80,7 +80,7 @@ export function buildAreaFaq(
 ): Array<{ question: string; answer: string }> {
   const nearbyText =
     input.nearbyAreas.slice(0, 2).join(" and ") ||
-    "surrounding Dallas neighborhoods";
+    `surrounding neighborhoods in ${input.city}`;
 
   return [
     {
@@ -113,7 +113,7 @@ export function buildAreaFaq(
 
 // ─── Data derivation helpers ──────────────────────────────────────────────────
 
-/** Static nearby-area lookup for Dallas neighborhoods and DFW suburbs. */
+/** Static nearby-area lookup for neighborhood and suburb support pages. */
 export const AREA_NEARBY_MAP: Record<string, string[]> = {
   "oak-lawn": ["Uptown", "Turtle Creek", "Medical District"],
   uptown: ["Oak Lawn", "Design District", "Turtle Creek"],
@@ -135,6 +135,15 @@ export const AREA_NEARBY_MAP: Record<string, string[]> = {
   carrollton: ["Addison", "Dallas", "Grand Prairie"],
   arlington: ["Fort Worth", "Grand Prairie", "Irving"],
   "grand-prairie": ["Arlington", "Irving", "Dallas"],
+  // Houston
+  montrose: ["Downtown Houston", "Midtown", "Museum District"],
+  "downtown-houston": ["Montrose", "Midtown", "EaDo"],
+  // Austin
+  "south-congress": ["Downtown Austin", "Zilker", "East Austin"],
+  // Chicago
+  "river-north": ["Streeterville", "Gold Coast", "West Loop"],
+  // Miami
+  brickell: ["Downtown Miami", "Edgewater", "Miami Beach"],
 };
 
 /** Derive available session modes from real therapist data. */

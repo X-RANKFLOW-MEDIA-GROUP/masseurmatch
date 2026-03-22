@@ -3,37 +3,36 @@ import { NewsletterSignup } from "../../components/newsletter/NewsletterSignup";
 
 const FOOTER_GROUPS = [
   {
-    title: "Directory",
+    title: "Explore",
     links: [
-      { href: "/search", label: "Search therapists" },
+      { href: "/explore", label: "Explore providers" },
       { href: "/therapists", label: "Browse listings" },
-      { href: "/explore", label: "Explore by city" },
-      { href: "/compare", label: "Compare platforms" },
+      { href: "/search", label: "Search directory" },
     ],
   },
   {
-    title: "For Therapists",
+    title: "Sign Up",
     links: [
+      { href: "/signup", label: "Get Listed" },
       { href: "/pricing", label: "Pricing" },
-      { href: "/advertise", label: "Advertise" },
-      { href: "/pro/join", label: "Therapist portal" },
+      { href: "/login", label: "Login" },
     ],
   },
   {
     title: "Company",
     links: [
       { href: "/about", label: "About MasseurMatch" },
-      { href: "/blog", label: "Blog" },
       { href: "/contact", label: "Contact" },
+      { href: "/blog", label: "Blog" },
     ],
   },
   {
     title: "Legal",
     links: [
-      { href: "/safety", label: "Safety" },
+      { href: "/accessibility", label: "Accessibility" },
       { href: "/terms", label: "Terms" },
       { href: "/privacy", label: "Privacy" },
-      { href: "/therapist-agreement", label: "Therapist agreement" },
+      { href: "/contact", label: "Contact" },
     ],
   },
 ];

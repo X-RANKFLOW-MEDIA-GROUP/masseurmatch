@@ -21,7 +21,11 @@ export const revalidate = 60;
 export function generateStaticParams(): Params[] {
   return getLaunchKeywordPaths().map((path) => {
     const [city, segment, keyword] = path.split("/").filter(Boolean);
-    return { city: city || "", segment: segment || "", keyword: keyword || "" };
+    return {
+      city: city || "",
+      segment: segment || "",
+      keyword: keyword || "",
+    };
   });
 }
 
@@ -43,12 +47,13 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const city = getCities().find((entry) => entry.slug === resolvedParams.city);
   const segment = getSegmentBySlug(resolvedParams.segment);
   const keyword = getKeywordBySlug(resolvedParams.keyword);
+  const routePath = `/${resolvedParams.city}/${resolvedParams.segment}/${resolvedParams.keyword}`;
 
-  if (!city || !segment || !keyword) {
+  if (!city || !segment || !keyword || !isLaunchUrl(routePath)) {
     return createPageMetadata({
       title: "Specialty page",
       description: "Keyword directory page.",
-      path: `/${resolvedParams.city}/${resolvedParams.segment}/${resolvedParams.keyword}`,
+      path: routePath,
       noIndex: true,
     });
   }
@@ -69,12 +74,9 @@ export default async function CityKeywordPage({ params }: { params: Promise<Para
   const city = getCities().find((entry) => entry.slug === resolvedParams.city);
   const segment = getSegmentBySlug(resolvedParams.segment);
   const keyword = getKeywordBySlug(resolvedParams.keyword);
+  const routePath = `/${resolvedParams.city}/${resolvedParams.segment}/${resolvedParams.keyword}`;
 
-  if (!city || !segment || !keyword) {
-    notFound();
-  }
-
-  if (!isLaunchUrl(`/${city.slug}/${segment.slug}/${keyword.slug}`)) {
+  if (!city || !segment || !keyword || !isLaunchUrl(routePath)) {
     notFound();
   }
 

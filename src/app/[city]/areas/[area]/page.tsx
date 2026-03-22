@@ -16,6 +16,15 @@ type Params = { city: string; area: string };
 
 export const revalidate = 60;
 
+const AREA_GUIDE_MAP: Record<string, string> = {
+  "oak-lawn": "/guides/oak-lawn-male-massage-guide",
+  montrose: "/guides/montrose-male-massage-guide",
+  "south-congress": "/guides/south-congress-massage-guide",
+  "river-north": "/guides/river-north-deep-tissue-guide",
+  brickell: "/guides/brickell-hotel-outcall-guide",
+  "downtown-houston": "/guides/outcall-massage-in-houston-what-to-check",
+};
+
 export function generateStaticParams(): Params[] {
   return getLaunchAreaPaths().map((path) => {
     const [city, , area] = path.split("/").filter(Boolean);
@@ -46,7 +55,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const areaLabel = formatAreaLabel(resolved.area);
   const { total } = await getPublicTherapists({ city: city.name, keyword: areaLabel, page: 1, pageSize: 2 });
   // noindex if fewer than 2 profiles — prevents thin-content indexation
-  const noIndex = total < 2;
+  const noIndex = total === 0;
 
   return createPageMetadata({
     title: `Gay Massage in ${areaLabel}, ${city.name} | Verified Male Therapists | MasseurMatch`,
@@ -93,12 +102,16 @@ export default async function CityAreaPage({ params }: { params: Promise<Params>
 
   // Sibling service-type links
   const siblingServiceLinks = [
-    { href: `/${city.slug}/wellness/outcall`,       label: "Outcall" },
-    { href: `/${city.slug}/wellness/incall`,        label: "Incall" },
-    { href: `/${city.slug}/wellness/deep-tissue`,   label: "Deep tissue" },
+    { href: `/${city.slug}/wellness/outcall`, label: "Outcall" },
+    { href: `/${city.slug}/wellness/incall`, label: "Incall" },
+    { href: `/${city.slug}/wellness/deep-tissue`, label: "Deep tissue" },
+    { href: `/${city.slug}/wellness/swedish`, label: "Swedish" },
+    { href: `/${city.slug}/wellness/thai`, label: "Thai" },
+    { href: `/${city.slug}/wellness/sports-recovery`, label: "Sports recovery" },
     { href: `/${city.slug}/wellness/mobile-massage`, label: "Mobile" },
     { href: `/${city.slug}/wellness/hotel-massage`, label: "Hotel sessions" },
   ].filter((link) => isLaunchUrl(link.href));
+  const guideHref = AREA_GUIDE_MAP[resolved.area] || "/guides/oak-lawn-male-massage-guide";
 
   return (
     <CityDirectoryPage
@@ -126,7 +139,7 @@ export default async function CityAreaPage({ params }: { params: Promise<Params>
       leadLinks={[
         { href: `/${city.slug}`, label: `Back to ${city.name}` },
         ...(siblingServiceLinks.length ? [siblingServiceLinks[0]] : []),
-        { href: "/guides/oak-lawn-male-massage-guide", label: "Neighborhood guide" },
+        { href: guideHref, label: "Neighborhood guide" },
       ]}
       linkSections={[
         ...(nearbyLinks.length
@@ -153,7 +166,7 @@ export default async function CityAreaPage({ params }: { params: Promise<Params>
           : `Listings for ${areaLabel} are actively growing. The nearby area and service pages above have broader coverage while this neighborhood expands.`
       }
       emptyTitle={`No listings matched ${areaLabel} yet.`}
-      emptyDescription="This page remains published to consolidate neighborhood intent and direct search traffic to the broader Dallas routes while local inventory grows."
+      emptyDescription={`This page remains published to consolidate neighborhood intent and route visitors into broader ${city.name} service pages while local inventory grows.`}
       faqTitle={`${areaLabel} Massage — Common Questions`}
       faqItems={faq}
     />

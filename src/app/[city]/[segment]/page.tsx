@@ -38,12 +38,13 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const resolvedParams = await params;
   const city = getCities().find((entry) => entry.slug === resolvedParams.city);
   const segment = getSegmentBySlug(resolvedParams.segment);
+  const routePath = `/${resolvedParams.city}/${resolvedParams.segment}`;
 
-  if (!city || !segment) {
+  if (!city || !segment || !isLaunchUrl(routePath)) {
     return createPageMetadata({
       title: "Directory",
       description: "City segment directory page.",
-      path: `/${resolvedParams.city}/${resolvedParams.segment}`,
+      path: routePath,
       noIndex: true,
     });
   }
@@ -63,12 +64,9 @@ export default async function CitySegmentPage({ params }: { params: Promise<Para
   const resolvedParams = await params;
   const city = getCities().find((entry) => entry.slug === resolvedParams.city);
   const segment = getSegmentBySlug(resolvedParams.segment);
+  const routePath = `/${resolvedParams.city}/${resolvedParams.segment}`;
 
-  if (!city || !segment) {
-    notFound();
-  }
-
-  if (!isLaunchUrl(`/${city.slug}/${segment.slug}`)) {
+  if (!city || !segment || !isLaunchUrl(routePath)) {
     notFound();
   }
 
@@ -77,12 +75,12 @@ export default async function CitySegmentPage({ params }: { params: Promise<Para
   const launchServiceLinks = getLaunchKeywordPaths()
     .filter((path) => path.startsWith(`${canonicalCityPath}/${segment.slug}/`))
     .map((path) => {
-      const keywordSlug = path.split("/").filter(Boolean)[2] || "";
-      const keyword = getKeywordBySlug(keywordSlug);
+      const [, , keywordSlug] = path.split("/").filter(Boolean);
+      const keyword = getKeywordBySlug(keywordSlug || "");
 
       return {
         href: path,
-        label: keyword?.shortLabel || formatSlugLabel(keywordSlug),
+        label: keyword?.shortLabel || formatSlugLabel(keywordSlug || "service"),
       };
     });
   const segmentFaqs = [
@@ -128,15 +126,19 @@ export default async function CitySegmentPage({ params }: { params: Promise<Para
         { href: `/search?city=${city.slug}&verified=1`, label: `Verified in ${city.name}` },
         { href: "/safety", label: "Safety guidance" },
       ]}
-      linkSections={[
-        {
-          title: `Service pages inside ${segment.shortLabel}`,
-          layout: "chips",
-          description:
-            "Use these city-plus-service routes to narrow the directory by both intent and modality without losing the trust context.",
-          items: launchServiceLinks,
-        },
-      ]}
+      linkSections={
+        launchServiceLinks.length
+          ? [
+              {
+                title: `Service pages inside ${segment.shortLabel}`,
+                layout: "chips" as const,
+                description:
+                  "Use these city-plus-service routes to narrow the directory by both intent and modality without losing the trust context.",
+                items: launchServiceLinks,
+              },
+            ]
+          : []
+      }
       therapists={therapists.items}
       listingTitle="Listings on this page"
       listingDescription={`These listings reflect the ${segment.shortLabel.toLowerCase()} focus in ${city.name} and are structured to feel more premium, more trustworthy, and easier to scan on mobile.`}

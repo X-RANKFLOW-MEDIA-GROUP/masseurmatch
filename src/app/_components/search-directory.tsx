@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import type { PublicTherapist, TherapistTier } from "@/app/_lib/directory";
+import { GeoAreaCallout } from "@/app/_components/geo-area-callout";
 import { withSearchParams } from "@/app/_lib/request";
 import { Surface } from "@/app/_components/primitives";
 import { TherapistCard } from "@/app/_components/therapist-card";
@@ -157,6 +158,13 @@ export function SearchDirectory({
           ) : null}
         </div>
       ) : null}
+
+      <GeoAreaCallout
+        className="mb-4"
+        compact
+        source="search-directory-geolocation"
+        onResolved={(resolvedCity) => setCity(resolvedCity.name)}
+      />
 
       <div className="mb-4 flex flex-wrap gap-2">
         {MATCHMAKER_TAGS.map((tag) => {

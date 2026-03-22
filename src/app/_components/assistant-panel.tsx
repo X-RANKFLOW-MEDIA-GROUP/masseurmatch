@@ -12,7 +12,7 @@ const DEFAULT_PROMPTS = [
 
 export function AssistantPanel({
   title = "Knotty AI assistant",
-  description = "Ask Knotty to help with therapist discovery, listing questions, billing context, and directory navigation.",
+  description = "Ask Knotty to narrow intent, recommend the strongest match, and guide the next click with clearer context.",
   prompts = DEFAULT_PROMPTS,
 }: {
   title?: string;

@@ -75,6 +75,15 @@ type ArticleJsonLdInput = {
   author: string;
 };
 
+type LocalBusinessJsonLdInput = {
+  cityName: string;
+  stateName: string;
+  path: string;
+  therapistCount: number;
+  averageRating?: number | null;
+  reviewCount?: number;
+};
+
 const dedupeStrings = (values: Array<string | null | undefined>) =>
   Array.from(new Set(values.map((value) => value?.trim()).filter((value): value is string => Boolean(value))));
 
@@ -362,3 +371,34 @@ export const buildProfilePageJsonLd = ({
     },
   };
 };
+
+export const buildLocalBusinessJsonLd = ({
+  cityName,
+  stateName,
+  path,
+  therapistCount,
+  averageRating,
+  reviewCount,
+}: LocalBusinessJsonLdInput) => ({
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  name: `${SITE_NAME} — ${cityName}`,
+  description: `Browse ${therapistCount} verified male massage therapists in ${cityName}, ${stateName}. Transparent pricing, real availability, and direct contact.`,
+  url: siteUrl(path),
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: cityName,
+    addressRegion: stateName,
+    addressCountry: "US",
+  },
+  ...(averageRating != null && reviewCount
+    ? {
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: Number(averageRating.toFixed(1)),
+          reviewCount,
+          bestRating: 5,
+        },
+      }
+    : {}),
+});

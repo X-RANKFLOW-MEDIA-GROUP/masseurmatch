@@ -57,6 +57,8 @@ export function CityDirectoryPage({
   faqTitle?: string;
   faqItems?: FaqItem[];
 }) {
+  const visibleLinkSections = linkSections.filter((section) => section.items.length > 0);
+
   return (
     <>
       <JsonLd data={breadcrumbJsonLd} />
@@ -155,7 +157,7 @@ export function CityDirectoryPage({
         </div>
 
         <div className="mt-8 space-y-8">
-          {linkSections.map((section) => (
+          {visibleLinkSections.map((section) => (
             <section key={section.title} className="mt-8">
               <h2 className="text-2xl font-semibold text-foreground">{section.title}</h2>
               {section.description ? <p className="mt-3 text-sm leading-7 text-muted-foreground">{section.description}</p> : null}

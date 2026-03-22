@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 const BASE_URL = "https://masseurmatch.com";
 const SUPPORTED_LANGS = ["en", "es", "pt", "fr"];
-const OG_SITE_NAME = "MasseurMatch \u2014 Gay Massage Directory";
+const OG_SITE_NAME = "MasseurMatch — Gay Massage Directory";
 
 interface SEOHeadProps {
   title: string;

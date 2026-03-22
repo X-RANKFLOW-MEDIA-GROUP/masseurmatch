@@ -6,9 +6,9 @@ import { createPageMetadata } from "@/app/_lib/metadata";
 import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd } from "@/app/_lib/structured-data";
 
 export const metadata: Metadata = createPageMetadata({
-  title: "Knotty AI directory assistant",
+  title: "Knotty AI concierge closer",
   description:
-    "Meet Knotty AI, the MasseurMatch assistant for therapist discovery, directory guidance, and product support.",
+    "Meet Knotty AI, the MasseurMatch concierge layer for therapist discovery, stronger matches, and faster profile clicks.",
   path: "/chat",
   keywords: ["knotty ai", "directory assistant", "massage search assistant", "ai chat"],
 });
@@ -34,10 +34,10 @@ export default function ChatPage() {
       <div className="container mx-auto px-4 py-10">
         <div className="max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">AI support</p>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground">Knotty AI helps users move deeper into the directory.</h1>
+          <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground">Knotty AI turns indecision into a clear next step.</h1>
           <p className="mt-4 text-base leading-7 text-muted-foreground">
-            Knotty is part of the public discovery layer. It helps visitors understand city pages, therapist listings,
-            and common product questions without forcing them to leave the search journey.
+            Knotty works like a concierge closer for the directory. It detects intent, ranks the strongest matches first,
+            and gives visitors a fast reason to open the right profile instead of browsing cold lists.
           </p>
           <div className="mt-5 flex flex-wrap gap-3 text-sm font-semibold">
             <Link href="/search" className="text-primary hover:underline">

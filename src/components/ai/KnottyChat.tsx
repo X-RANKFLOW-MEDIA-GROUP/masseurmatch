@@ -1,18 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Send, X } from "lucide-react";
-import ReactMarkdown from "react-markdown";
-
-import { postJson } from "@/app/_lib/client-api";
+import { ArrowUpRight, Clock3, MapPinned, Send, ShieldCheck, Sparkles, X } from "lucide-react";
+import { useKnotty } from "@/hooks/useKnotty";
 import { cn } from "@/lib/utils";
-
-type Message = {
-  id: number;
-  role: "user" | "assistant";
-  content: string;
-};
+import type { KnottyRecommendation } from "@/lib/knotty/types";
 
 type KnottyChatProps = {
   mode?: "floating" | "embedded";
@@ -20,85 +14,205 @@ type KnottyChatProps = {
   className?: string;
 };
 
-const DEFAULT_PROMPTS = [
-  "Find therapists in Miami",
-  "What do Pro tiers mean?",
-  "How do I contact someone?",
-];
-
-function ChatBubble({ message }: { message: Message }) {
-  const isUser = message.role === "user";
-
+function TypingDots() {
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
-      <div
-        className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-          isUser
-            ? "rounded-br-sm bg-primary text-primary-foreground"
-            : "rounded-bl-sm border border-border bg-card text-foreground"
-        }`}
-      >
-        {isUser ? (
-          message.content
-        ) : (
-          <div className="prose prose-sm max-w-none text-foreground [&>p]:m-0">
-            <ReactMarkdown>{message.content}</ReactMarkdown>
-          </div>
-        )}
+    <div className="flex items-center gap-1">
+      {[0, 1, 2].map((index) => (
+        <span
+          key={index}
+          className="h-2 w-2 animate-pulse rounded-full bg-white/70"
+          style={{ animationDelay: `${index * 120}ms` }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function RecommendationCard({
+  recommendation,
+  featured = false,
+  onOpen,
+}: {
+  recommendation: KnottyRecommendation;
+  featured?: boolean;
+  onOpen: (recommendation: KnottyRecommendation) => void;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-[20px] border px-4 py-4 backdrop-blur-2xl",
+        featured
+          ? "border-white/18 bg-white/14 text-white shadow-[0_22px_48px_rgba(0,0,0,0.18)]"
+          : "border-white/12 bg-white/[0.08] text-white/88",
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55">
+            {featured ? "Top Match" : `Alternative ${recommendation.position}`}
+          </p>
+          <h3 className="mt-1 text-lg font-semibold">{recommendation.name}</h3>
+          <p className="mt-1 text-sm text-white/72">
+            {recommendation.neighborhood || recommendation.city || "Local area"} · {recommendation.specialty}
+          </p>
+        </div>
+        {recommendation.verified ? (
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/18 bg-white/12 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            Verified
+          </span>
+        ) : null}
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/72">
+        {recommendation.availableNow ? (
+          <span className="rounded-full border border-white/14 bg-white/10 px-3 py-1">
+            <Clock3 className="mr-1 inline h-3.5 w-3.5" />
+            Available now
+          </span>
+        ) : null}
+        {typeof recommendation.distanceMiles === "number" ? (
+          <span className="rounded-full border border-white/14 bg-white/10 px-3 py-1">
+            <MapPinned className="mr-1 inline h-3.5 w-3.5" />
+            {recommendation.distanceMiles < 10
+              ? `${recommendation.distanceMiles.toFixed(1)} mi`
+              : `${Math.round(recommendation.distanceMiles)} mi`}
+          </span>
+        ) : null}
+        {typeof recommendation.priceFrom === "number" ? (
+          <span className="rounded-full border border-white/14 bg-white/10 px-3 py-1">
+            From ${recommendation.priceFrom}
+          </span>
+        ) : null}
+      </div>
+
+      <ul className="mt-3 space-y-2 text-sm leading-6 text-white/78">
+        {recommendation.why.map((reason) => (
+          <li key={`${recommendation.therapistId}-${reason}`}>• {reason}</li>
+        ))}
+      </ul>
+
+      <div className="mt-4">
+        <Link
+          href={recommendation.profilePath}
+          onClick={() => onOpen(recommendation)}
+          className={cn(
+            "inline-flex min-h-11 items-center justify-center rounded-full px-4 text-sm font-semibold uppercase tracking-[0.12em] transition",
+            featured
+              ? "bg-white text-slate-900 hover:bg-white/90"
+              : "border border-white/18 bg-white/10 text-white hover:bg-white/16",
+          )}
+        >
+          View profile
+          <ArrowUpRight className="ml-2 h-4 w-4" />
+        </Link>
       </div>
     </div>
   );
 }
 
-function KnottyChatPanel({
-  className,
-  close,
-  input,
-  isEmbedded,
-  isTyping,
-  messages,
-  onInputChange,
-  onPromptSelect,
-  onSubmit,
-  promptExamples,
+function ChatBubble({
+  message,
+  onRecommendationOpen,
 }: {
-  className?: string;
-  close?: () => void;
-  input: string;
-  isEmbedded: boolean;
-  isTyping: boolean;
-  messages: Message[];
-  onInputChange: (value: string) => void;
-  onPromptSelect: (prompt: string) => void;
-  onSubmit: (event: React.FormEvent) => void;
-  promptExamples: string[];
+  message: ReturnType<typeof useKnotty>["messages"][number];
+  onRecommendationOpen: (recommendation: KnottyRecommendation) => void;
 }) {
+  const isUser = message.role === "user";
+
+  if (isUser) {
+    return (
+      <div className="flex justify-end">
+        <div className="max-w-[82%] rounded-[20px] rounded-br-sm bg-white px-4 py-3 text-sm leading-relaxed text-slate-900 shadow-[0_18px_40px_rgba(0,0,0,0.12)]">
+          {message.content}
+        </div>
+      </div>
+    );
+  }
+
+  const recommendations = [message.response?.primary, ...(message.response?.alternatives || [])].filter(
+    (item): item is KnottyRecommendation => Boolean(item),
+  );
+
+  return (
+    <div className="flex justify-start">
+      <div className="w-full max-w-[88%] space-y-3 rounded-[24px] rounded-bl-sm border border-white/12 bg-white/[0.08] px-4 py-4 text-sm leading-relaxed text-white/92 shadow-[0_18px_40px_rgba(0,0,0,0.12)] backdrop-blur-2xl">
+        <p>{message.content}</p>
+
+        {recommendations.length > 0 ? (
+          <div className="space-y-3">
+            {recommendations.map((recommendation, index) => (
+              <RecommendationCard
+                key={`${recommendation.therapistId}-${recommendation.position}`}
+                recommendation={recommendation}
+                featured={index === 0}
+                onOpen={onRecommendationOpen}
+              />
+            ))}
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+export const KnottyChat = ({
+  mode = "floating",
+  promptExamples,
+  className,
+}: KnottyChatProps) => {
+  const isEmbedded = mode === "embedded";
+  const [isOpen, setIsOpen] = useState(isEmbedded);
+  const { input, isTyping, messages, quickActions, sendMessage, setInput, trackOpen, trackRecommendationClick } =
+    useKnotty();
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  return (
+  useEffect(() => {
+    if (isEmbedded) {
+      trackOpen();
+    }
+  }, [isEmbedded, trackOpen]);
+
+  const quickActionButtons = quickActions.map((action) => (
+    <button
+      key={action.key}
+      type="button"
+      onClick={() => void sendMessage({ quickAction: action.key })}
+      className="rounded-full border border-white/14 bg-white/[0.08] px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/82 transition hover:border-white/24 hover:bg-white/[0.12]"
+    >
+      {action.label}
+    </button>
+  ));
+
+  const panel = (
     <div
       className={cn(
-        "flex flex-col overflow-hidden rounded-[24px] border border-border bg-background shadow-2xl",
-        isEmbedded ? "h-[560px] w-full" : "h-[540px] w-[380px]",
+        "relative flex flex-col overflow-hidden rounded-[28px] border border-white/12 bg-[linear-gradient(180deg,rgba(10,24,42,0.94),rgba(9,18,34,0.9))] shadow-[0_30px_90px_rgba(0,0,0,0.32)] backdrop-blur-3xl",
+        isEmbedded ? "h-[620px] w-full" : "h-[620px] w-[396px]",
         className,
       )}
     >
-      <div className="flex items-center justify-between border-b border-border px-4 py-4">
-        <div>
-          <p className="text-sm font-semibold">Knotty</p>
-          <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
-            Directory Assistant
-          </p>
+      <div className="pointer-events-none absolute inset-x-10 top-0 h-32 rounded-full bg-[radial-gradient(circle,rgba(122,198,255,0.2),transparent_70%)] blur-3xl" />
+
+      <div className="relative flex items-center justify-between border-b border-white/10 px-5 py-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/14 bg-white/[0.08] text-white">
+            <Sparkles className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-white">Knotty</p>
+            <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">AI concierge closer</p>
+          </div>
         </div>
-        {!isEmbedded && close ? (
+        {!isEmbedded ? (
           <button
             type="button"
-            onClick={close}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:text-foreground"
+            onClick={() => setIsOpen(false)}
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/12 bg-white/[0.06] text-white/70 transition hover:bg-white/[0.12] hover:text-white"
             aria-label="Close Knotty chat"
           >
             <X className="h-4 w-4" />
@@ -106,48 +220,52 @@ function KnottyChatPanel({
         ) : null}
       </div>
 
-      <div className="border-b border-border px-4 py-3">
+      <div className="relative border-b border-white/10 px-4 py-3">
         <div className="flex flex-wrap gap-2">
-          {promptExamples.map((prompt) => (
-            <button
-              key={prompt}
-              type="button"
-              onClick={() => onPromptSelect(prompt)}
-              className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition hover:bg-accent hover:text-foreground"
-            >
-              {prompt}
-            </button>
-          ))}
+          {quickActionButtons}
+          {(promptExamples || []).slice(0, 0).map(() => null)}
         </div>
       </div>
 
-      <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4">
+      <div className="relative flex-1 space-y-4 overflow-y-auto px-4 py-4">
         {messages.map((message) => (
-          <ChatBubble key={message.id} message={message} />
+          <ChatBubble
+            key={message.id}
+            message={message}
+            onRecommendationOpen={(recommendation) => trackRecommendationClick(recommendation)}
+          />
         ))}
+
         {isTyping ? (
           <div className="flex justify-start">
-            <div className="rounded-2xl rounded-bl-sm border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
-              Thinking...
+            <div className="rounded-[20px] rounded-bl-sm border border-white/12 bg-white/[0.08] px-4 py-3 text-sm text-white/82 backdrop-blur-2xl">
+              <TypingDots />
             </div>
           </div>
         ) : null}
+
         <div ref={endRef} />
       </div>
 
-      <form onSubmit={onSubmit} className="border-t border-border px-3 py-3">
-        <div className="flex items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2">
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          void sendMessage({ content: input });
+        }}
+        className="relative border-t border-white/10 px-4 py-4"
+      >
+        <div className="flex items-center gap-2 rounded-[22px] border border-white/12 bg-white/[0.08] px-3 py-2.5 backdrop-blur-2xl">
           <input
             type="text"
             value={input}
-            onChange={(event) => onInputChange(event.target.value)}
-            placeholder="Ask Knotty anything..."
-            className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+            onChange={(event) => setInput(event.target.value)}
+            placeholder="Tell Knotty what matters most..."
+            className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/45"
           />
           <button
             type="submit"
             disabled={!input.trim() || isTyping}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground transition disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-900 transition disabled:cursor-not-allowed disabled:opacity-35"
             aria-label="Send message"
           >
             <Send className="h-4 w-4" />
@@ -155,91 +273,6 @@ function KnottyChatPanel({
         </div>
       </form>
     </div>
-  );
-}
-
-export const KnottyChat = ({
-  mode = "floating",
-  promptExamples = DEFAULT_PROMPTS,
-  className,
-}: KnottyChatProps) => {
-  const isEmbedded = mode === "embedded";
-  const [isOpen, setIsOpen] = useState(isEmbedded);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 0,
-      role: "assistant",
-      content: "Hey, I'm Knotty. Ask about cities, pricing, tiers, or how to contact a therapist.",
-    },
-  ]);
-  const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-
-  const handleSend = async (forcedPrompt?: string) => {
-    const content = (forcedPrompt ?? input).trim();
-    if (!content || isTyping) {
-      return;
-    }
-
-    const userMessage: Message = {
-      id: Date.now(),
-      role: "user",
-      content,
-    };
-
-    const nextMessages = [...messages, userMessage];
-    setMessages(nextMessages);
-    setInput("");
-    setIsTyping(true);
-
-    try {
-      const data = await postJson<{ ok: boolean; reply: string }>("/api/chat", {
-        messages: nextMessages
-          .filter((message) => message.id !== 0)
-          .map((message) => ({
-            role: message.role,
-            content: message.content,
-          })),
-      });
-
-      setMessages((current) => [
-        ...current,
-        {
-          id: Date.now() + 1,
-          role: "assistant",
-          content: data.reply || "I couldn't find an answer for that yet.",
-        },
-      ]);
-    } catch {
-      setMessages((current) => [
-        ...current,
-        {
-          id: Date.now() + 1,
-          role: "assistant",
-          content: "I hit a connection problem. Please try again.",
-        },
-      ]);
-    } finally {
-      setIsTyping(false);
-    }
-  };
-
-  const panel = (
-    <KnottyChatPanel
-      className={className}
-      close={isEmbedded ? undefined : () => setIsOpen(false)}
-      input={input}
-      isEmbedded={isEmbedded}
-      isTyping={isTyping}
-      messages={messages}
-      onInputChange={setInput}
-      onPromptSelect={(prompt) => void handleSend(prompt)}
-      onSubmit={(event) => {
-        event.preventDefault();
-        void handleSend();
-      }}
-      promptExamples={promptExamples}
-    />
   );
 
   if (isEmbedded) {
@@ -251,31 +284,32 @@ export const KnottyChat = ({
       <AnimatePresence mode="wait">
         {!isOpen ? (
           <motion.button
-            key="launcher"
+            key="knotty-launcher"
             type="button"
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.86 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
+            exit={{ opacity: 0, scale: 0.86 }}
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            onClick={() => setIsOpen(true)}
-            className="group relative h-16 w-16 rounded-full border border-border bg-card shadow-xl"
+            onClick={() => {
+              setIsOpen(true);
+              trackOpen();
+            }}
+            className="group relative h-16 w-16 rounded-full border border-white/18 bg-[linear-gradient(180deg,rgba(9,18,34,0.96),rgba(18,44,73,0.96))] shadow-[0_20px_48px_rgba(0,0,0,0.3)]"
             aria-label="Open Knotty chat"
           >
-            <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.18),transparent_60%)]" />
-            <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-foreground">
-              AI
-            </div>
-            <div className="absolute -right-1 -top-1 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
-              Knotty
+            <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.18),transparent_58%)]" />
+            <div className="absolute -inset-2 rounded-full bg-[radial-gradient(circle,rgba(122,198,255,0.22),transparent_65%)] opacity-75 blur-2xl transition group-hover:opacity-100" />
+            <div className="relative flex h-full w-full items-center justify-center text-white">
+              <Sparkles className="h-6 w-6" />
             </div>
           </motion.button>
         ) : (
           <motion.div
-            key="panel"
-            initial={{ opacity: 0, y: 24, scale: 0.95 }}
+            key="knotty-panel"
+            initial={{ opacity: 0, y: 28, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 24, scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 240, damping: 24 }}
+            exit={{ opacity: 0, y: 28, scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 240, damping: 26 }}
             className="origin-bottom-right"
           >
             {panel}

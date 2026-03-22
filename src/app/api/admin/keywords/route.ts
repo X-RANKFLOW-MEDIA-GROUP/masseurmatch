@@ -8,6 +8,7 @@ import {
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { requireAdminSession, recordAuditLog } from "@/app/api/_lib/supabase-server";
 import { slugify } from "@/app/api/_lib/text";
+import { buildKeywordRevalidatePaths, triggerRevalidate } from "@/app/_lib/revalidate";
 
 const keywordSchema = z.object({
   slug: z.string().min(1).optional(),
@@ -54,6 +55,12 @@ export async function POST(request: Request) {
     await recordAuditLog(admin.userId, "save_keyword", "keyword", keyword.slug, {
       term: keyword.term,
       city: keyword.city,
+    });
+
+    await triggerRevalidate(await buildKeywordRevalidatePaths(keyword.slug, keyword.city), {
+      request,
+    }).catch((error) => {
+      console.error("[api/admin/keywords] Revalidation failed:", error);
     });
 
     return json({

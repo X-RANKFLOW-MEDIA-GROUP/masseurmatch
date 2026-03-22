@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 
-import { AppButton } from "@/app/_components/primitives";
 import { supportedLocales, useI18n, type Locale } from "@/app/_lib/i18n";
 
 export function SiteHeader() {
@@ -14,12 +13,11 @@ export function SiteHeader() {
   const closeMobileMenu = () => setMobileOpen(false);
 
   const headerLinks = [
-    { href: "/therapists", label: t("header.therapists", "Therapists") },
-    { href: "/compare", label: "Compare" },
-    { href: "/pricing", label: t("header.pricing", "Pricing") },
-    { href: "/blog", label: t("header.blog", "Blog") },
-    { href: "/safety", label: t("header.safety", "Safety") },
-    { href: "/contact", label: t("header.contact", "Contact") },
+    { href: "/", label: "Home" },
+    { href: "/explore", label: "Explore" },
+    { href: "/signup", label: "Sign Up" },
+    { href: "/about", label: "About" },
+    { href: "/login", label: "Login" },
   ];
 
   const localeLabels: Record<Locale, string> = {
@@ -68,18 +66,6 @@ export function SiteHeader() {
               </Link>
             ))}
           </nav>
-
-          <Link
-            href="/search"
-            className="motion-premium hidden items-center rounded-full border border-border-strong bg-white/88 px-4 py-2 text-sm font-medium text-text-secondary shadow-[inset_0_1px_0_rgb(255_255_255/_0.92)] transition hover:border-action-secondary/20 hover:text-brand-secondary sm:inline-flex"
-          >
-            Search verified therapists
-          </Link>
-
-          <AppButton asChild size="sm" variant="default" className="hidden h-10 rounded-full px-5 text-sm font-semibold sm:inline-flex">
-            <Link href="/search">Find trusted therapists</Link>
-          </AppButton>
-
           <button
             type="button"
             className="motion-premium inline-flex h-10 w-10 items-center justify-center rounded-full border border-border-subtle bg-white/88 text-foreground shadow-[inset_0_1px_0_rgb(255_255_255/_0.92)] transition hover:border-border-strong hover:text-text-primary lg:hidden"
@@ -125,22 +111,6 @@ export function SiteHeader() {
                   {link.label}
                 </Link>
               ))}
-
-              <Link
-                href="/search"
-                className="motion-premium rounded-[1.35rem] border border-transparent px-4 py-3 text-sm font-medium text-text-secondary transition hover:border-border-subtle hover:bg-bg-subtle"
-                onClick={closeMobileMenu}
-              >
-                Search verified therapists
-              </Link>
-
-              <Link
-                href="/search"
-                className="motion-premium rounded-[1.35rem] bg-action-primary px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-action-primary-hover"
-                onClick={closeMobileMenu}
-              >
-                Find trusted therapists
-              </Link>
             </nav>
           </div>
         </div>

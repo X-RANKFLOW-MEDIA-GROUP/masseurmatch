@@ -171,7 +171,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background" ref={scrollRef}>
       <SEOHead
-        title="Gay Massage Directory \u2014 Find Male Massage Therapists Near You"
+        title="Gay Massage Directory — Find Male Massage Therapists Near You"
         description="The #1 gay massage directory. Find male massage therapists for men. Browse gay-friendly massage professionals, compare services, deep tissue, Swedish, sports & therapeutic massage near you."
         path="/"
         keywords="gay massage, male massage therapist, massage for men, gay-friendly massage, m4m massage, male bodywork, gay massage near me, male massage therapist near me, gay spa, men's massage, deep tissue massage for men, sports massage gay, Swedish massage men, gay massage directory, LGBTQ massage, queer massage therapist, professional male massage, gay massage reviews, body work for men, male to male massage, gay massage services, outcall massage for men, incall gay massage, therapeutic massage for men, trusted male massage, gay wellness, men's bodywork directory, find gay massage therapist, best gay massage"

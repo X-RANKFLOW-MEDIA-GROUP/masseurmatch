@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
+import { buildTherapistRevalidatePaths, triggerRevalidate } from "@/app/_lib/revalidate";
 import {
   createSupabaseAdminClient,
   recordAuditLog,
@@ -226,6 +227,17 @@ export async function POST(request: Request) {
     const admin = await requireAdminSession(request);
     const body = await parseJsonBody(request, adminTherapistActionSchema);
     const result = await applyTherapistAdminAction(admin.userId, body);
+
+    await triggerRevalidate(
+      await buildTherapistRevalidatePaths({
+        id: result.profile?.id,
+        slug: result.profile?.slug,
+        city: result.profile?.city,
+      }),
+      { request },
+    ).catch((error) => {
+      console.error("[api/admin/therapists] Revalidation failed:", error);
+    });
 
     return json({
       ok: true,

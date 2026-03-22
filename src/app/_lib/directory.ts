@@ -1,14 +1,40 @@
 import { US_CITIES } from "@/data/cities";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  getFallbackPublicTherapistBySlug,
+  getFallbackPublicTherapists,
+} from "@/app/_lib/directory-fallback";
 
 export type TherapistTier = "free" | "standard" | "pro" | "elite";
 
 const PUBLIC_PROFILE_SELECT =
-  "id, slug, city, display_name, full_name, bio, avatar_url, phone, specialties, _tier, modality, status, profile_views, review_count, incall_price, outcall_price, business_hours, custom_faq, pricing_sessions, available_now, available_now_expires, is_verified_identity, is_verified_profile, is_verified_photos";
+  "id, slug, city, display_name, full_name, bio, avatar_url, phone, specialties, _tier, modality, status, profile_views, review_count, incall_price, outcall_price, business_hours, custom_faq, pricing_sessions, available_now, available_now_expires, is_verified_identity, is_verified_profile, is_verified_photos, neighborhood_name, primary_area, years_experience, start_year, add_ons, promotions, travel_schedule, areas_served, training, outcall_radius_miles, contact_clicks, education";
 
 export interface ProfileFaqItem {
   question: string;
   answer: string;
+}
+
+export interface ProfileAddOn {
+  name: string;
+  price: number;
+}
+
+export interface ProfilePromotion {
+  title: string;
+  description: string;
+}
+
+export interface ProfileTravelEntry {
+  city: string;
+  state?: string;
+  start_date: string;
+  end_date: string;
+}
+
+export interface ProfileTrainingEntry {
+  label: string;
+  detail?: string;
 }
 
 export interface PricingSessionItem {
@@ -49,6 +75,26 @@ export interface PublicTherapist {
   is_verified_identity: boolean | null;
   is_verified_profile: boolean | null;
   is_verified_photos: boolean | null;
+  /** Fine-grained neighborhood name from the profile (e.g. "Oak Lawn"). */
+  neighborhood_name: string | null;
+  /** Broader area tag (e.g. "Uptown"), used as fallback when neighborhood_name is absent. */
+  primary_area: string | null;
+  /** Self-reported years of professional experience. */
+  years_experience: number | null;
+  /** Year the therapist started practice — used to derive experience when years_experience is absent. */
+  start_year: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  zip_code?: string | null;
+  special_offer_text?: string | null;
+  add_ons?: ProfileAddOn[] | null;
+  promotions?: ProfilePromotion[] | null;
+  travel_schedule?: ProfileTravelEntry[] | null;
+  areas_served?: string[] | null;
+  training?: ProfileTrainingEntry[] | null;
+  outcall_radius_miles?: number | null;
+  contact_clicks?: number | null;
+  education?: string | null;
 }
 
 export interface ImportedReview {
@@ -84,6 +130,16 @@ export const getPublicTherapists = async (filters?: {
   const pageSize = Math.max(1, Math.min(500, filters?.pageSize ?? 12));
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
+  const fallbackResult = getFallbackPublicTherapists({
+    city: filters?.city,
+    modality: filters?.modality,
+    keyword: filters?.keyword,
+    session: filters?.session,
+    verified: filters?.verified,
+    tier: filters?.tier,
+    page,
+    pageSize,
+  });
 
   let query: any = buildPublicTherapistsQuery()
     .range(from, to);
@@ -120,7 +176,7 @@ export const getPublicTherapists = async (filters?: {
   const { data, error, count } = await query;
 
   if (error) {
-    return { items: [] as PublicTherapist[], total: 0, page, pageSize };
+    return fallbackResult;
   }
 
   if ((count || 0) === 0) {
@@ -146,6 +202,10 @@ export const getPublicTherapists = async (filters?: {
     const relaxedResult = await relaxedQuery;
 
     if (!relaxedResult.error) {
+      if ((relaxedResult.count || 0) === 0) {
+        return fallbackResult;
+      }
+
       return {
         items: ((relaxedResult.data || []) as unknown) as PublicTherapist[],
         total: relaxedResult.count || 0,
@@ -153,6 +213,8 @@ export const getPublicTherapists = async (filters?: {
         pageSize,
       };
     }
+
+    return fallbackResult;
   }
 
   return {
@@ -181,10 +243,14 @@ export const getPublicTherapistBySlug = async (slug: string) => {
     .maybeSingle();
 
   if (idResult.error) {
-    return null;
+    return getFallbackPublicTherapistBySlug(slug);
   }
 
-  return idResult.data ? ((idResult.data as unknown) as PublicTherapist) : null;
+  if (idResult.data) {
+    return (idResult.data as unknown) as PublicTherapist;
+  }
+
+  return getFallbackPublicTherapistBySlug(slug);
 };
 
 export const getImportedReviews = async (profileId: string, limit = 5) => {
@@ -221,13 +287,19 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
 
 /** Returns the number of active public profiles in a given city. */
 export async function getCityInventoryCount(cityName: string): Promise<number> {
-  const { count } = await (supabase as any)
+  const fallbackCount = getFallbackPublicTherapists({ city: cityName, pageSize: 500 }).total;
+  const { count, error } = await (supabase as any)
     .from("profiles")
     .select("id", { count: "exact", head: true })
     .or("is_active.eq.true,is_active.is.null")
     .in("status", ["active", "approved"])
     .ilike("city", cityName);
-  return count ?? 0;
+
+  if (error) {
+    return fallbackCount;
+  }
+
+  return count && count > 0 ? count : fallbackCount;
 }
 
 /**
@@ -235,14 +307,26 @@ export async function getCityInventoryCount(cityName: string): Promise<number> {
  * Used by sitemap builders to filter empty cities.
  */
 export async function getCityInventoryMap(): Promise<Map<string, number>> {
-  const { data } = await (supabase as any)
+  const map = new Map<string, number>();
+
+  for (const city of getCities()) {
+    const fallbackCount = getFallbackPublicTherapists({ city: city.name, pageSize: 500 }).total;
+    if (fallbackCount > 0) {
+      map.set(city.name.toLowerCase().trim(), fallbackCount);
+    }
+  }
+
+  const { data, error } = await (supabase as any)
     .from("profiles")
     .select("city")
     .or("is_active.eq.true,is_active.is.null")
     .in("status", ["active", "approved"])
     .not("city", "is", null);
 
-  const map = new Map<string, number>();
+  if (error) {
+    return map;
+  }
+
   for (const row of data ?? []) {
     const key = (row.city as string).toLowerCase().trim();
     map.set(key, (map.get(key) ?? 0) + 1);

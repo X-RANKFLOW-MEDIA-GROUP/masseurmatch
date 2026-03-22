@@ -114,19 +114,19 @@ const keywords: Keyword[] = keywordLabels.map((label, index) => ({
 const users: User[] = [
   {
     id: "user-admin",
-    email: "admin@masseurmatch.com",
+    email: process.env.SEED_ADMIN_EMAIL || "admin@masseurmatch.com",
     fullName: "MasseurMatch Admin",
     role: "admin",
-    passwordHash: hashPassword("Admin@MM2025!"),
+    passwordHash: hashPassword(process.env.SEED_ADMIN_PASSWORD || "CHANGEME-admin"),
     createdAt: now,
     emailConfirmed: true,
   },
   {
     id: "user-therapist",
-    email: "therapist@masseurmatch.com",
+    email: process.env.SEED_THERAPIST_EMAIL || "therapist@masseurmatch.com",
     fullName: "Leo Martinez",
     role: "therapist",
-    passwordHash: hashPassword("Therapist@MM2025!"),
+    passwordHash: hashPassword(process.env.SEED_THERAPIST_PASSWORD || "CHANGEME-therapist"),
     createdAt: now,
     emailConfirmed: true,
   },

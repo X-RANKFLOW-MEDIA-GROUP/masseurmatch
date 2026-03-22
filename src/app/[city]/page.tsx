@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CityDirectoryPage as CityDirectoryPageShell } from "@/app/_components/city-directory-page";
+import { JsonLd } from "@/app/_components/json-ld";
 import { buildAreaCopyInput, buildSuburbIntro } from "@/app/_lib/area-copy";
 import { getCities, getCityInventoryCount, getPublicTherapists } from "@/app/_lib/directory";
-import { getKeywordBySlug, getSegmentBySlug, formatSlugLabel } from "@/app/_lib/directory-taxonomy";
-import { getLaunchCityPaths, getLaunchKeywordPaths, getLaunchSegmentPaths, isLaunchUrl } from "@/app/_lib/launch-urls";
+import {
+  formatSlugLabel,
+  getKeywordBySlug,
+  getSegmentBySlug,
+} from "@/app/_lib/directory-taxonomy";
+import { getLaunchAreaPaths, getLaunchKeywordPaths, getLaunchSegmentPaths } from "@/app/_lib/launch-urls";
 import { createPageMetadata } from "@/app/_lib/metadata";
-import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd } from "@/app/_lib/structured-data";
+import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd, buildLocalBusinessJsonLd } from "@/app/_lib/structured-data";
 import { TherapistComparison, type ComparisonTherapistProfile } from "@/components";
 
 type Params = { city: string };
@@ -20,7 +25,7 @@ const DFW_SUBURB_SLUGS = new Set([
 ]);
 
 export function generateStaticParams(): Params[] {
-  return getLaunchCityPaths().map((path) => ({ city: path.split("/").filter(Boolean)[0] || "" }));
+  return getCities().map((city) => ({ city: city.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -61,32 +66,40 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
     notFound();
   }
 
-  if (!isLaunchUrl(`/${city.slug}`)) {
-    notFound();
-  }
-
   const canonicalCityPath = `/${city.slug}`;
   const citySegmentLinks = getLaunchSegmentPaths()
     .filter((path) => path.startsWith(`${canonicalCityPath}/`))
     .map((path) => {
-      const parts = path.split("/").filter(Boolean);
-      const segmentSlug = parts[1] || "";
-      const segment = getSegmentBySlug(segmentSlug);
+      const [, segmentSlug] = path.split("/").filter(Boolean);
+      const segment = getSegmentBySlug(segmentSlug || "");
+
       return {
         href: path,
-        label: segment?.shortLabel || formatSlugLabel(segmentSlug),
-        description: segment?.intro || `High-intent ${formatSlugLabel(segmentSlug).toLowerCase()} route for ${city.name}.`,
+        label: segment?.shortLabel || formatSlugLabel(segmentSlug || "segment"),
+        description:
+          segment?.intro ||
+          `High-intent ${formatSlugLabel(segmentSlug || "segment").toLowerCase()} route for ${city.name}.`,
       };
     });
   const cityKeywordLinks = getLaunchKeywordPaths()
     .filter((path) => path.startsWith(`${canonicalCityPath}/`))
     .map((path) => {
-      const keywordSlug = path.split("/").filter(Boolean)[2] || "";
-      const keyword = getKeywordBySlug(keywordSlug);
+      const [, , keywordSlug] = path.split("/").filter(Boolean);
+      const keyword = getKeywordBySlug(keywordSlug || "");
 
       return {
         href: path,
-        label: keyword?.shortLabel || formatSlugLabel(keywordSlug),
+        label: keyword?.shortLabel || formatSlugLabel(keywordSlug || "service"),
+      };
+    });
+  const cityAreaLinks = getLaunchAreaPaths()
+    .filter((path) => path.startsWith(`${canonicalCityPath}/`))
+    .map((path) => {
+      const [, , areaSlug] = path.split("/").filter(Boolean);
+
+      return {
+        href: path,
+        label: formatSlugLabel(areaSlug || "area"),
       };
     });
 
@@ -139,6 +152,14 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
 
   return (
     <>
+      <JsonLd
+        data={buildLocalBusinessJsonLd({
+          cityName: city.name,
+          stateName: city.stateName,
+          path: canonicalCityPath,
+          therapistCount: therapists.items.length,
+        })}
+      />
       <CityDirectoryPageShell
         eyebrow="City directory"
         title={`Verified male massage therapists in ${city.name}`}
@@ -167,20 +188,33 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
           { href: "/compare", label: "Compare top directory alternatives" },
         ]}
         linkSections={[
-          {
-            title: `High-intent pages in ${city.name}`,
-            layout: "grid",
-            description:
-              "These city-plus-intent pages are designed to feel stronger than a generic directory landing page and to capture more local search demand.",
-            items: citySegmentLinks,
-          },
-          {
-            title: `Popular service intents in ${city.name}`,
-            layout: "chips",
-            description:
-              "Jump into the service combinations people search most often when they already know the type of session they want.",
-            items: cityKeywordLinks,
-          },
+          ...(citySegmentLinks.length
+            ? [{
+                title: `High-intent pages in ${city.name}`,
+                layout: "grid" as const,
+                description:
+                  "These city-plus-intent pages are designed to feel stronger than a generic directory landing page and to capture more local search demand.",
+                items: citySegmentLinks,
+              }]
+            : []),
+          ...(cityKeywordLinks.length
+            ? [{
+                title: `Popular service intents in ${city.name}`,
+                layout: "chips" as const,
+                description:
+                  "Jump into the service combinations people search most often when they already know the type of session they want.",
+                items: cityKeywordLinks,
+              }]
+            : []),
+          ...(cityAreaLinks.length
+            ? [{
+                title: `Neighborhood pages in ${city.name}`,
+                layout: "chips" as const,
+                description:
+                  "These neighborhood landers cluster local intent around the areas already covered by live therapist inventory.",
+                items: cityAreaLinks,
+              }]
+            : []),
           {
             title: "Compare major directory alternatives",
             layout: "chips",

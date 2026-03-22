@@ -1,236 +1,259 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { JsonLd } from "@/app/_components/JsonLd";
+import Script from "next/script";
+import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
+
+import { ProviderGrowthMarketplace } from "@/app/_components/provider-growth-marketplace";
+import { SIGNUP_PLANS } from "@/app/signup/_lib/plans";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, createPageMetadata } from "@/app/_lib/seo";
 
-type PricingPlan = {
-  tier: "free" | "standard" | "pro" | "elite";
-  name: string;
-  price: string;
-  description: string;
-  features: string[];
-  ctaHref: string;
-  ctaLabel: string;
-  founderPrice?: string;
-  featured?: boolean;
+export const metadata: Metadata = {
+  title: "Pricing | Listing Plans & Growth Add-Ons - MasseurMatch",
+  description:
+    "Compare Free, Standard, Pro, and Elite listing plans plus stackable visibility boosts, trust upgrades, geo discovery, and premium exposure add-ons.",
+  openGraph: {
+    title: "MasseurMatch Pricing for Massage Therapists",
+    description:
+      "Base listing plans plus market-aligned add-ons for visibility, trust, geo discovery, and premium exposure.",
+    url: "https://masseurmatch.com/pricing",
+    siteName: "MasseurMatch",
+    type: "website",
+  },
+  alternates: { canonical: "https://masseurmatch.com/pricing" },
 };
 
-type AddOn = {
-  name: string;
-  price: string;
-  description: string;
+const pricingSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "MasseurMatch Pricing",
+  url: "https://masseurmatch.com/pricing",
+  mainEntity: SIGNUP_PLANS.map((plan) => ({
+    "@type": "Offer",
+    name: `${plan.name} Listing`,
+    price: String(plan.price / 100),
+    priceCurrency: "USD",
+    description: plan.description,
+    eligibleCustomerType: "https://schema.org/BusinessEntityType",
+  })),
 };
 
-const PLANS: PricingPlan[] = [
+const strategyCards = [
   {
-    tier: "free",
-    name: "Free",
-    price: "$0",
-    description: "A basic listing for getting discovered without a monthly cost.",
-    features: [
-      "1 photo",
-      "Bottom search placement",
-      "Available Now not included",
-      "1 travel schedule/month",
-      "No analytics",
-      '"Basic Listing" watermark',
-    ],
-    ctaHref: "/register",
-    ctaLabel: "Start Free",
+    icon: TrendingUp,
+    title: "Visibility first",
+    body: "Low-ticket boosts make it easy to buy fast, while mid-ticket placements capture therapists ready for a bigger demand push.",
   },
   {
-    tier: "standard",
-    name: "Standard",
-    price: "$39",
-    description: "A stronger everyday plan with better placement and light analytics.",
-    features: [
-      "6 photos",
-      "Middle search placement",
-      "Available Now (60 min)",
-      "3 travel schedules/month",
-      "Views analytics",
-      "Newsletter chance",
-    ],
-    founderPrice: "$19.50/mo for 3 months",
-    ctaHref: "/register",
-    ctaLabel: "Choose Standard",
+    icon: ShieldCheck,
+    title: "Trust converts",
+    body: "Verification, reviews, and proof badges improve first-contact conversion and support higher pricing confidence.",
   },
   {
-    tier: "pro",
-    name: "Pro",
-    price: "$79",
-    description: "Our most popular growth tier for therapists who want top exposure.",
-    features: [
-      "12 photos + video",
-      "Top search placement",
-      "Available Now (120 min)",
-      "Unlimited travel schedules",
-      "Views + clicks analytics",
-      "Homepage rotation",
-      "Weekly specials",
-      "Verified badge",
-    ],
-    founderPrice: "$39.50/mo for 3 months",
-    featured: true,
-    ctaHref: "/register",
-    ctaLabel: "Choose Pro",
-  },
-  {
-    tier: "elite",
-    name: "Elite",
-    price: "$99",
-    description: "Everything in Pro plus a second active city for broader reach.",
-    features: [
-      "12 photos + video",
-      "Top search placement",
-      "Available Now (120 min)",
-      "Unlimited travel schedules",
-      "Views + clicks analytics",
-      "Homepage rotation",
-      "Weekly specials",
-      "Verified badge",
-      "2 active ads (2 cities)",
-    ],
-    founderPrice: "$49.50/mo for 3 months",
-    ctaHref: "/register",
-    ctaLabel: "Choose Elite",
+    icon: Sparkles,
+    title: "Stack for margin",
+    body: "Recurring analytics and geo tools create software-style revenue, while scarce premium slots protect higher-margin inventory.",
   },
 ];
 
-const ADD_ONS: AddOn[] = [
+const faqs = [
   {
-    name: "Masseur of the Day",
-    price: "$15/day",
-    description: "Daily spotlight placement for short-term visibility boosts.",
+    q: "Can I start with Free and upgrade later?",
+    a: "Yes. Start with Free, then move into Standard, Pro, or Elite whenever you want stronger placement and richer profile tools.",
   },
   {
-    name: "Sponsor Profile",
-    price: "$99/month",
-    description: "Sponsored profile placement for sustained promotion.",
+    q: "Do paid plans include a trial?",
+    a: "Yes. Paid tiers include a 14-day free trial, and the first 50 members keep the founder discount for the first 3 months after trial.",
   },
   {
-    name: "Extra Travel Schedules",
-    price: "$5 each",
-    description: "Available for Standard members who need more travel slots.",
+    q: "How do the add-ons work?",
+    a: "Add-ons are stackable upgrades for visibility, trust, geo discovery, analytics, and premium exposure. Each add-on clearly shows its impact preview, duration, placement, and best bundle so it is easy to compare before purchase.",
   },
   {
-    name: "Homepage Banner",
-    price: "$120/month",
-    description: "Homepage banner placement for broader brand exposure.",
+    q: "What does Featured, Boosted, or Trending mean?",
+    a: "Those are paid advertising placements and labels. They do not imply endorsement, credential verification, or recommendation by MasseurMatch.",
   },
   {
-    name: "Credits/Cards",
-    price: "Secure communication",
-    description: "Planned secure communication add-on for future rollout.",
+    q: "What payment methods do you accept?",
+    a: "We accept major credit and debit cards through Stripe for listing plans, and provider billing is managed securely through Stripe.",
   },
 ];
-
-export const metadata: Metadata = createPageMetadata({
-  title: "Pricing",
-  description: "Compare Free, Standard, Pro, and Elite advertising plans for MasseurMatch, plus upcoming add-ons for extra visibility.",
-  path: "/pricing",
-  keywords: ["pricing", "therapist plans", "directory advertising", "pro plan", "elite plan"],
-});
 
 export default function PricingPage() {
   return (
     <>
-      <JsonLd
-        data={buildBreadcrumbJsonLd([
-          { name: "Home", path: "/" },
-          { name: "Pricing", path: "/pricing" },
-        ])}
-      />
-      <JsonLd
-        data={buildCollectionPageJsonLd({
-          name: "Pricing plans",
-          description: "Four public pricing tiers for therapists advertising on MasseurMatch.",
-          path: "/pricing",
-        })}
+      <Script
+        id="pricing-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingSchema) }}
       />
 
-      <div className="container mx-auto px-4 py-10">
-        <div className="max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">Pricing</p>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground">Four visibility tiers built for therapist growth.</h1>
-          <p className="mt-4 text-base leading-7 text-muted-foreground">
-            Compare Free, Standard, Pro, and Elite placements based on media limits, search visibility, Available Now access,
-            and how much reach you want across cities.
-          </p>
-        </div>
+      <main className="bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.1),transparent_35%),linear-gradient(180deg,#fffef9_0%,#f8fbff_54%,#ffffff_100%)]">
+        <section className="container mx-auto px-4 pb-10 pt-14 sm:pt-20">
+          <div className="mx-auto max-w-4xl text-center">
+            <Badge variant="premium">Pricing</Badge>
+            <h1 className="font-display mt-6 text-4xl font-semibold tracking-tight text-foreground sm:text-6xl">
+              Plans and add-ons built for maximum visibility and conversion
+            </h1>
+            <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">
+              Start with a base listing, then stack market-aligned boosts, credibility layers, geo targeting, and
+              limited premium exposure to increase demand without forcing every therapist into the same plan.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+              <Button asChild size="lg" variant="hero">
+                <Link href="/signup/plan">
+                  Choose a plan
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <Link href="/pro/billing#addons">See add-ons</Link>
+              </Button>
+            </div>
+          </div>
 
-        <section className="mt-8 rounded-3xl border border-primary/20 bg-primary/5 p-6">
-          <div className="grid gap-4 md:grid-cols-2">
-            <article>
-              <h2 className="text-lg font-semibold text-foreground">14-day free trial</h2>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Paid plans start with a 14-day free trial so therapists can test visibility before billing begins.
-              </p>
-            </article>
-            <article>
-              <h2 className="text-lg font-semibold text-foreground">Founder deal</h2>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                The first 50 members receive 50% off paid plans for the first 3 months after the trial period.
-              </p>
-            </article>
+          <div className="mx-auto mt-10 grid max-w-5xl gap-4 md:grid-cols-3">
+            <div className="rounded-[1.8rem] border border-border bg-white/92 p-5 text-left shadow-[0_18px_48px_rgba(15,23,42,0.05)]">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Trial</p>
+              <p className="mt-3 text-2xl font-semibold text-foreground">14 days on paid tiers</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">Let therapists experience the visibility lift before the first paid cycle starts.</p>
+            </div>
+            <div className="rounded-[1.8rem] border border-border bg-white/92 p-5 text-left shadow-[0_18px_48px_rgba(15,23,42,0.05)]">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Founder offer</p>
+              <p className="mt-3 text-2xl font-semibold text-foreground">50% off first 3 months</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">A strong pricing anchor that improves early conversion without discounting the full catalog long term.</p>
+            </div>
+            <div className="rounded-[1.8rem] border border-border bg-white/92 p-5 text-left shadow-[0_18px_48px_rgba(15,23,42,0.05)]">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Monetization mix</p>
+              <p className="mt-3 text-2xl font-semibold text-foreground">$6 to $59 add-ons</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">Low-ticket impulse buys, recurring SaaS upgrades, and premium scarce inventory are all designed to stack.</p>
+            </div>
           </div>
         </section>
 
-        <div className="mt-10 grid gap-5 xl:grid-cols-4">
-          {PLANS.map((plan) => (
-            <section
-              key={plan.name}
-              className={`rounded-3xl border p-6 shadow-sm ${plan.featured ? "border-primary bg-primary/5" : "border-border bg-background"}`}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <h2 className="text-xl font-semibold text-foreground">{plan.name}</h2>
-                {plan.featured ? <Badge>Most Popular</Badge> : null}
-              </div>
-              <p className="mt-4 text-3xl font-bold text-foreground">{plan.price}<span className="text-sm font-medium text-muted-foreground">/mo</span></p>
-              {plan.founderPrice ? (
-                <p className="mt-1 text-xs font-semibold text-primary">{plan.founderPrice}</p>
-              ) : null}
-              {plan.tier !== "free" ? (
-                <p className="mt-1 text-xs text-muted-foreground">14-day free trial included</p>
-              ) : null}
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">{plan.description}</p>
-              <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
-                {plan.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              <Button asChild className="mt-6 w-full" variant={plan.featured ? "hero" : "outline"}>
-                <Link href={plan.ctaHref}>{plan.ctaLabel}</Link>
-              </Button>
-            </section>
-          ))}
-        </div>
-
-        <section className="mt-10 rounded-3xl border border-border bg-secondary/20 p-6">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-2xl font-semibold text-foreground">Add-ons</h2>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Informational only for now. Individual Stripe purchase flows can be added next.
+        <section className="container mx-auto px-4 py-8">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="max-w-3xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Base plans</p>
+              <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+                Choose the right plan foundation
+              </h2>
+              <p className="mt-4 text-base leading-7 text-muted-foreground">
+                Free and Standard keep the barrier low. Pro and Elite give therapists the stronger media, placement,
+                and analytics foundation that makes the add-on catalog even more effective.
               </p>
             </div>
-            <Badge variant="outline">Coming Next</Badge>
           </div>
-          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {ADD_ONS.map((addon) => (
-              <article key={addon.name} className="rounded-2xl border border-border bg-background p-5">
-                <div className="flex items-center justify-between gap-3">
-                  <h3 className="font-semibold text-foreground">{addon.name}</h3>
-                  <Badge variant="secondary">{addon.price}</Badge>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {SIGNUP_PLANS.map((plan) => (
+              <section
+                key={plan.tier}
+                className={`rounded-[1.9rem] border p-5 text-left shadow-[0_18px_50px_rgba(15,23,42,0.05)] ${
+                  plan.popular
+                    ? "border-brand-secondary/25 bg-[linear-gradient(180deg,rgba(241,248,255,0.95),rgba(255,255,255,0.98))]"
+                    : "border-border bg-white/92"
+                }`}
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  {plan.popular ? <Badge>Most Popular</Badge> : null}
+                  <Badge variant="secondary">{plan.tier === "free" ? "No trial needed" : "14-day free trial"}</Badge>
                 </div>
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">{addon.description}</p>
-              </article>
+
+                <p className="mt-4 text-sm uppercase tracking-[0.18em] text-muted-foreground">{plan.tier}</p>
+                <h3 className="font-display mt-2 text-2xl font-semibold tracking-tight text-foreground">{plan.name}</h3>
+                <p className="mt-2 text-3xl font-semibold text-foreground">{plan.priceDisplay}</p>
+                {plan.founderPrice ? <p className="mt-2 text-sm font-medium text-brand-secondary">{plan.founderPrice}</p> : null}
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">{plan.description}</p>
+
+                <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-start gap-2">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Button asChild className="mt-6 w-full" variant={plan.popular ? "hero" : "outline"}>
+                  <Link href={`/signup/plan?selected=${plan.tier}`}>
+                    {plan.tier === "free" ? "Start free" : "Start 14-day trial"}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </section>
             ))}
           </div>
         </section>
-      </div>
+
+        <section className="container mx-auto px-4 py-8">
+          <div className="grid gap-4 lg:grid-cols-3">
+            {strategyCards.map((card) => (
+              <div
+                key={card.title}
+                className="rounded-[1.8rem] border border-border bg-white/92 p-6 shadow-[0_18px_48px_rgba(15,23,42,0.05)]"
+              >
+                <card.icon className="h-5 w-5 text-brand-secondary" />
+                <h3 className="font-display mt-4 text-2xl font-semibold tracking-tight text-foreground">{card.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">{card.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="container mx-auto px-4 py-8">
+          <ProviderGrowthMarketplace source="pricing" />
+        </section>
+
+        <section className="container mx-auto px-4 py-10">
+          <div className="mx-auto max-w-3xl rounded-[2rem] border border-border bg-white/92 p-8 shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">FAQ</p>
+            <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight text-foreground">Pricing questions</h2>
+            <div className="mt-6 space-y-4">
+              {faqs.map((item) => (
+                <details key={item.q} className="rounded-[1.4rem] border border-border/80 bg-slate-950/[0.02] px-5 py-4">
+                  <summary className="cursor-pointer list-none text-base font-semibold text-foreground">
+                    {item.q}
+                  </summary>
+                  <p className="mt-3 text-sm leading-7 text-muted-foreground">{item.a}</p>
+                </details>
+              ))}
+            </div>
+
+            <div className="mt-6 rounded-[1.5rem] border border-dashed border-border/80 bg-white/70 px-5 py-4">
+              <p className="text-sm leading-7 text-muted-foreground">
+                All plans and add-ons are advertising products. Featured placement, boosted visibility, verified labels,
+                and similar signals do not imply endorsement, qualification, or recommendation by MasseurMatch.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="container mx-auto px-4 pb-16 pt-4">
+          <div className="rounded-[2.4rem] border border-brand-secondary/15 bg-[linear-gradient(135deg,rgba(12,28,51,0.98),rgba(18,53,88,0.95))] px-8 py-12 text-white shadow-[0_28px_80px_rgba(15,23,42,0.22)]">
+            <div className="mx-auto max-w-3xl text-center">
+              <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+                Start with the right plan and add only the upgrades that move revenue
+              </h2>
+              <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-white/72">
+                Keep entry friction low with Free or Standard, then use Pro, Elite, and stackable add-ons to scale
+                visibility, trust, and premium exposure as demand grows.
+              </p>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                <Button asChild size="lg" variant="premium">
+                  <Link href="/signup/plan">
+                    Choose your plan
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="glass">
+                  <Link href="/contact">Talk to us first</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
     </>
   );
 }

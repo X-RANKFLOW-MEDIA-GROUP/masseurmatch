@@ -15,9 +15,11 @@
     "lint": "eslint .",
     "test:api": "node scripts/test-api-routes.mjs",
     "preview": "next start",
-    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json"
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
+    "test:redirects": "playwright test tests/redirects.spec.ts"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
@@ -59,6 +61,7 @@
     "i18next-browser-languagedetector": "^8.2.1",
     "input-otp": "^1.4.2",
     "jose": "^6.2.1",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.462.0",
     "next": "^15.3.0",
     "next-themes": "^0.3.0",
@@ -80,6 +83,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
+    "@playwright/test": "^1.55.0",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^22.16.5",
     "@types/react": "^18.3.23",

@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { JsonLd } from "@/app/_components/JsonLd";
 import {
@@ -9,71 +7,36 @@ import {
   getProfilePhotos,
   getPublicTherapistBySlug,
   getPublicTherapists,
-  type PricingSessionItem,
-  type ProfileFaqItem,
 } from "@/app/_lib/directory";
-import {
-  getPublicContactLinks,
-  getPublicProfileName,
-  getPublicTrustHighlights,
-  isVerifiedDirectoryProfile,
-} from "@/app/_lib/public-profile";
+import { getPublicProfileName } from "@/app/_lib/public-profile";
 import {
   buildBreadcrumbJsonLd,
+  buildFaqJsonLd,
   buildProfilePageJsonLd,
   createPageMetadata,
 } from "@/app/_lib/seo";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { galleryLimit } from "./_components/galleryLimit";
+import { ProfileHero } from "./_components/ProfileHero";
+import { ProfileGallery } from "./_components/ProfileGallery";
+import { ProfileQuickInfo } from "./_components/ProfileQuickInfo";
+import { ProfileAvailability } from "./_components/ProfileAvailability";
+import { ProfileAbout } from "./_components/ProfileAbout";
+import { ProfileServices } from "./_components/ProfileServices";
+import { ProfilePricing } from "./_components/ProfilePricing";
+import { ProfileAddOns } from "./_components/ProfileAddOns";
+import { ProfilePromotions } from "./_components/ProfilePromotions";
+import { ProfileTravel } from "./_components/ProfileTravel";
+import { ProfileAreasServed } from "./_components/ProfileAreasServed";
+import { ProfileTraining } from "./_components/ProfileTraining";
+import { ProfileFaq } from "./_components/ProfileFaq";
+import { ProfileContact } from "./_components/ProfileContact";
+import { ProfileRelatedLocations } from "./_components/ProfileRelatedLocations";
+import { ProfileStickyFooter } from "./_components/ProfileStickyFooter";
+import { KnottyProfileTracker } from "./_components/KnottyProfileTracker";
 
 type Params = { slug: string };
 
 export const revalidate = 60;
-
-type HoursMap = Record<string, string>;
-
-function normalizeFaqItems(value: unknown): ProfileFaqItem[] {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
-  return value.filter(
-    (item): item is ProfileFaqItem =>
-      typeof item === "object" &&
-      item !== null &&
-      typeof (item as ProfileFaqItem).question === "string" &&
-      typeof (item as ProfileFaqItem).answer === "string",
-  );
-}
-
-function normalizePricingSessions(value: unknown): PricingSessionItem[] {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
-  return value.filter(
-    (item): item is PricingSessionItem => typeof item === "object" && item !== null,
-  );
-}
-
-function normalizeHours(value: unknown): { incall: HoursMap; outcall: HoursMap } {
-  if (!value || typeof value !== "object") {
-    return { incall: {}, outcall: {} };
-  }
-
-  if ("incall" in value || "outcall" in value) {
-    const structured = value as { incall?: HoursMap; outcall?: HoursMap };
-    return {
-      incall: structured.incall || {},
-      outcall: structured.outcall || {},
-    };
-  }
-
-  return {
-    incall: value as HoursMap,
-    outcall: {},
-  };
-}
 
 export async function generateStaticParams() {
   const res = await getPublicTherapists({ page: 1, pageSize: 200 });
@@ -94,18 +57,38 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
 
   const name = getPublicProfileName(profile);
+  const city = profile.city || "US";
+  const neighborhood = profile.neighborhood_name || profile.primary_area;
+  const topTechnique = profile.specialties?.[0] || profile.modality || "Massage";
+  const yearsExp =
+    profile.years_experience ?? (profile.start_year ? new Date().getFullYear() - profile.start_year : null);
+
+  const titleParts = [`${name}`, neighborhood ? `${neighborhood}` : null, city, "Massage Therapist"]
+    .filter(Boolean)
+    .join(" | ");
+
   const description =
     profile.bio ||
-    `Browse ${name}'s public therapist profile on MasseurMatch and review specialties, pricing, trust signals, and direct contact options.`;
+    `${name} is a${yearsExp ? ` ${yearsExp}+ year` : ""} professional massage therapist in ${
+      neighborhood ? `${neighborhood}, ` : ""
+    }${city} specializing in ${topTechnique}. View rates, availability, and book directly.`;
 
   return createPageMetadata({
-    title: `${name} therapist profile`,
+    title: titleParts,
     description,
     path: `/therapists/${profile.slug || profile.id}`,
     type: "profile",
-    keywords: [profile.city, profile.modality, ...(profile.specialties || [])].filter(
-      (value): value is string => Boolean(value),
-    ),
+    image: profile.avatar_url || undefined,
+    keywords: [
+      profile.city,
+      neighborhood,
+      profile.modality,
+      ...(profile.specialties || []),
+      "massage therapist",
+      "massage near me",
+      neighborhood ? `massage ${neighborhood}` : null,
+      profile.city ? `massage ${profile.city}` : null,
+    ].filter((value): value is string => Boolean(value)),
   });
 }
 
@@ -117,22 +100,34 @@ export default async function TherapistPage({ params }: { params: Promise<Params
     notFound();
   }
 
+  const photoLimit = galleryLimit(profile._tier);
   const [reviews, photos] = await Promise.all([
     getImportedReviews(profile.id, 5),
-    getProfilePhotos(profile.id, 6),
+    getProfilePhotos(profile.id, photoLimit),
   ]);
+
   const name = getPublicProfileName(profile);
   const profilePath = `/therapists/${profile.slug || profile.id}`;
   const matchedCity = getCities().find((city) => city.name.toLowerCase() === (profile.city || "").toLowerCase());
-  const cityPath = matchedCity ? `/${matchedCity.slug}` : profile.city ? `/search?city=${encodeURIComponent(profile.city)}` : "/search";
-  const faqItems = normalizeFaqItems(profile.custom_faq);
-  const pricingSessions = normalizePricingSessions(profile.pricing_sessions);
-  const hours = normalizeHours(profile.business_hours);
-  const gallery = photos.length > 0 ? photos.map((photo) => photo.storage_path) : ([profile.avatar_url].filter(Boolean) as string[]);
-  const hasHours = Object.keys(hours.incall).length > 0 || Object.keys(hours.outcall).length > 0;
-  const { callHref, whatsappHref: messageHref, smsHref } = getPublicContactLinks(profile.phone);
-  const isVerified = isVerifiedDirectoryProfile(profile);
-  const trustHighlights = getPublicTrustHighlights(profile);
+  const cityPath = matchedCity
+    ? `/${matchedCity.slug}`
+    : profile.city
+      ? `/search?city=${encodeURIComponent(profile.city)}`
+      : "/search";
+
+  const faqItems =
+    Array.isArray(profile.custom_faq) && profile.custom_faq.length > 0
+      ? (profile.custom_faq as { question: string; answer: string }[])
+      : [];
+
+  const anchorLinks = [
+    { href: "#gallery", label: "Gallery" },
+    { href: "#about", label: "About" },
+    { href: "#services", label: "Services" },
+    { href: "#pricing", label: "Rates" },
+    { href: "#faq", label: "FAQ" },
+    { href: "#contact", label: "Contact" },
+  ];
 
   return (
     <>
@@ -140,6 +135,7 @@ export default async function TherapistPage({ params }: { params: Promise<Params
         data={buildBreadcrumbJsonLd([
           { name: "Home", path: "/" },
           { name: "Therapists", path: "/therapists" },
+          ...(matchedCity ? [{ name: matchedCity.name, path: `/${matchedCity.slug}` }] : []),
           { name, path: profilePath },
         ])}
       />
@@ -163,295 +159,71 @@ export default async function TherapistPage({ params }: { params: Promise<Params
           })),
         })}
       />
+      {faqItems.length > 0 ? <JsonLd data={buildFaqJsonLd(faqItems)} /> : null}
 
-      <div className="container mx-auto max-w-4xl px-4 py-10 pb-28 md:pb-10">
-        <div className="grid gap-6 md:grid-cols-[220px_1fr]">
-          <Image
-            src={
-              profile.avatar_url ||
-              "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&h=800&fit=crop"
-            }
-            alt={`${name} - ${profile.city || "US"} Massage Therapist`}
-            width={220}
-            height={220}
-            className="h-[220px] w-[220px] rounded-lg object-cover"
-          />
+      <div className="profile-page-shell page-shell py-10 pb-28 md:pb-14">
+        <KnottyProfileTracker
+          therapistId={profile.id}
+          city={profile.city}
+          neighborhood={profile.neighborhood_name || profile.primary_area || null}
+        />
 
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-              {profile._tier || "free"} listing
-            </p>
-            <h1 className="mt-2 text-4xl font-bold text-foreground">{name}</h1>
-            <p className="mt-2 text-sm text-muted-foreground">{profile.city || "United States"}</p>
+        <div className="space-y-10">
+          <ProfileHero profile={profile} cityPath={cityPath} />
 
-            <div className="mt-4 flex flex-wrap gap-2">
-              {isVerified ? (
-                <span className="rounded-full border border-border bg-secondary/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-foreground">
-                  Verified profile
-                </span>
-              ) : null}
-              {profile.is_verified_identity ? (
-                <span className="rounded-full border border-border bg-secondary/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-foreground">
-                  Identity reviewed
-                </span>
-              ) : null}
-              {profile.is_verified_photos ? (
-                <span className="rounded-full border border-border bg-secondary/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-foreground">
-                  Photos reviewed
-                </span>
-              ) : null}
-              {profile.available_now ? (
-                <span className="rounded-full border border-border bg-secondary/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-foreground">
-                  Available now
-                </span>
-              ) : null}
-            </div>
-
-            <p className="mt-5 text-sm leading-7 text-muted-foreground">
-              {profile.bio || "This therapist profile is still being expanded with more details."}
-            </p>
-
-            <div className="mt-5 rounded-2xl border border-border bg-secondary/30 p-4">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Why this profile feels safer
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {trustHighlights.map((highlight) => (
-                  <span
-                    key={highlight}
-                    className="rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-medium text-foreground"
-                  >
-                    {highlight}
-                  </span>
+          <div className="grid gap-8 xl:grid-cols-[minmax(0,1.25fr)_22rem] xl:items-start">
+            <div className="space-y-8">
+              <nav className="profile-panel sticky top-4 z-20 flex flex-wrap gap-2 px-3 py-3">
+                {anchorLinks.map((link) => (
+                  <a key={link.href} href={link.href} className="profile-toolbar-link">
+                    {link.label}
+                  </a>
                 ))}
-              </div>
+              </nav>
+
+              <ProfileGallery profile={profile} photos={photos} />
+              <ProfileAbout profile={profile} />
+              <ProfileServices profile={profile} />
+              <ProfilePricing profile={profile} />
+              <ProfileAddOns profile={profile} />
+              <ProfilePromotions profile={profile} />
+              <ProfileFaq profile={profile} />
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-3">
-              {callHref ? (
-                <a className="rounded-full bg-action-primary px-5 py-3 text-sm font-semibold text-white" href={callHref}>
-                  Call now
-                </a>
-              ) : null}
-              {messageHref ? (
-                <a className="rounded-full border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground" href={messageHref} target="_blank" rel="noreferrer">
-                  WhatsApp
-                </a>
-              ) : null}
-              {smsHref ? (
-                <a className="rounded-full border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground" href={smsHref}>
-                  SMS
-                </a>
-              ) : null}
-              <Link className="text-sm font-semibold text-primary hover:underline" href={cityPath}>
-                Browse city page
-              </Link>
-            </div>
+            <aside className="space-y-8 xl:sticky xl:top-24">
+              <ProfileQuickInfo profile={profile} />
+              <ProfileContact profile={profile} />
+              <ProfileAvailability profile={profile} />
+              <ProfileTravel profile={profile} />
+              <ProfileAreasServed profile={profile} />
+              <ProfileTraining profile={profile} />
+            </aside>
+          </div>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-border bg-secondary/30 p-4 text-sm text-muted-foreground">
-                <p className="font-semibold text-foreground">Specialties</p>
-                <p className="mt-2">{(profile.specialties || []).join(", ") || "Massage therapy"}</p>
-                <p className="mt-2 text-xs uppercase tracking-[0.15em] text-muted-foreground">
-                  {isVerified ? "Trust signals visible" : "Review the full trust section before contact"}
-                </p>
-              </div>
-              <div className="rounded-2xl border border-border bg-secondary/30 p-4 text-sm text-muted-foreground">
-                <p className="font-semibold text-foreground">Pricing snapshot</p>
-                <p className="mt-2">
-                  {profile.incall_price ? `Incall $${profile.incall_price}` : "Incall pricing on request"}
-                  {" · "}
-                  {profile.outcall_price ? `Outcall $${profile.outcall_price}` : "Outcall pricing on request"}
-                </p>
-              </div>
-            </div>
+          <div className="space-y-10">
+            <ProfileRelatedLocations profile={profile} />
+
+            {reviews.length > 0 ? (
+              <section className="profile-panel p-6 md:p-7">
+                <h2 className="text-2xl font-semibold text-foreground">Reviews</h2>
+                <div className="mt-4 space-y-3">
+                  {reviews.map((review) => (
+                    <article key={review.id} className="profile-panel-soft rounded-[1.5rem] p-4">
+                      <p className="text-sm leading-6 text-muted-foreground">{review.review_text}</p>
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        Rating: {review.rating ?? "N/A"}
+                        {review.reviewer_name ? ` · ${review.reviewer_name}` : ""}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ) : null}
           </div>
         </div>
-
-        <section className="mt-10 rounded-3xl border border-border bg-background p-6 shadow-sm">
-          <Tabs defaultValue="about">
-            <TabsList className="h-auto w-full flex-wrap justify-start gap-2 rounded-2xl bg-secondary/60 p-2">
-              <TabsTrigger value="about" className="rounded-xl px-4 py-2.5">About</TabsTrigger>
-              <TabsTrigger value="services" className="rounded-xl px-4 py-2.5">Services</TabsTrigger>
-              <TabsTrigger value="gallery" className="rounded-xl px-4 py-2.5">Gallery</TabsTrigger>
-              <TabsTrigger value="hours" className="rounded-xl px-4 py-2.5">Hours</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="about" className="mt-6">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-2xl border border-border bg-secondary/20 p-5">
-                  <h2 className="text-xl font-semibold text-foreground">About {name}</h2>
-                  <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                    {profile.bio || "This therapist is still building out the public profile description."}
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-border bg-secondary/20 p-5">
-                  <h2 className="text-xl font-semibold text-foreground">Profile snapshot</h2>
-                  <div className="mt-4 space-y-3 text-sm text-muted-foreground">
-                    <p><span className="font-semibold text-foreground">City:</span> {profile.city || "United States"}</p>
-                    <p><span className="font-semibold text-foreground">Modality:</span> {profile.modality || "Massage therapy"}</p>
-                    <p><span className="font-semibold text-foreground">Specialties:</span> {(profile.specialties || []).join(", ") || "General wellness massage"}</p>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="services" className="mt-6">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-2xl border border-border bg-secondary/20 p-5">
-                  <h2 className="text-xl font-semibold text-foreground">Services and rates</h2>
-                  <div className="mt-4 space-y-3 text-sm text-muted-foreground">
-                    {pricingSessions.length > 0 ? (
-                      pricingSessions.map((session, index) => (
-                        <div key={`${session.name || "session"}-${index}`} className="rounded-2xl border border-border bg-background px-4 py-3">
-                          <p className="font-semibold text-foreground">{session.name || `${session.duration || 60} minute session`}</p>
-                          <p className="mt-1">Incall: {session.incall ? `$${session.incall}` : "On request"}</p>
-                          <p>Outcall: {session.outcall ? `$${session.outcall}` : "On request"}</p>
-                        </div>
-                      ))
-                    ) : (
-                      <>
-                        <p>Incall: {profile.incall_price ? `$${profile.incall_price}` : "On request"}</p>
-                        <p>Outcall: {profile.outcall_price ? `$${profile.outcall_price}` : "On request"}</p>
-                      </>
-                    )}
-                  </div>
-                </div>
-                <div className="rounded-2xl border border-border bg-secondary/20 p-5">
-                  <h2 className="text-xl font-semibold text-foreground">What this profile emphasizes</h2>
-                  <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                    The active profile focuses on clean presentation, city relevance, specialties, visible trust signals,
-                    and direct communication. Use these details to decide whether to reach out and ask for more specifics before scheduling directly.
-                  </p>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="gallery" className="mt-6">
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {gallery.map((image, index) => (
-                  <div key={`${image}-${index}`} className="overflow-hidden rounded-2xl border border-border bg-secondary/20">
-                    <Image
-                      src={image}
-                      alt={`${name} - ${profile.city || "US"} Massage Therapist image ${index + 1}`}
-                      width={640}
-                      height={640}
-                      className="h-64 w-full object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="hours" className="mt-6">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-2xl border border-border bg-secondary/20 p-5">
-                  <h2 className="text-xl font-semibold text-foreground">Incall hours</h2>
-                  <div className="mt-4 space-y-2 text-sm text-muted-foreground">
-                    {Object.entries(hours.incall).length > 0 ? Object.entries(hours.incall).map(([day, value]) => (
-                      <div key={day} className="flex items-center justify-between gap-4">
-                        <span className="font-medium text-foreground">{day}</span>
-                        <span>{value}</span>
-                      </div>
-                    )) : <p>Schedule shared directly with clients.</p>}
-                  </div>
-                </div>
-                <div className="rounded-2xl border border-border bg-secondary/20 p-5">
-                  <h2 className="text-xl font-semibold text-foreground">Outcall hours</h2>
-                  <div className="mt-4 space-y-2 text-sm text-muted-foreground">
-                    {Object.entries(hours.outcall).length > 0 ? Object.entries(hours.outcall).map(([day, value]) => (
-                      <div key={day} className="flex items-center justify-between gap-4">
-                        <span className="font-medium text-foreground">{day}</span>
-                        <span>{value}</span>
-                      </div>
-                    )) : <p>{hasHours ? "Outcall hours are not listed separately." : "Hours available by appointment."}</p>}
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </section>
-
-        {faqItems.length > 0 ? (
-          <section className="mt-10 rounded-3xl border border-border bg-background p-6 shadow-sm">
-            <h2 className="text-2xl font-semibold text-foreground">Frequently asked questions</h2>
-            <Accordion type="single" collapsible className="mt-4">
-              {faqItems.map((item, index) => (
-                <AccordionItem key={`${item.question}-${index}`} value={`faq-${index}`}>
-                  <AccordionTrigger className="text-left text-foreground">{item.question}</AccordionTrigger>
-                  <AccordionContent className="text-sm leading-6 text-muted-foreground">{item.answer}</AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </section>
-        ) : null}
-
-        <section className="mt-10">
-          <h2 className="text-2xl font-semibold text-foreground">Reviews and trust signals</h2>
-          <div className="mt-4 space-y-3">
-            {reviews.length === 0 ? (
-              <p className="rounded-2xl border border-dashed border-border p-4 text-sm text-muted-foreground">
-                No imported reviews are available yet for this therapist profile.
-              </p>
-            ) : null}
-            {reviews.map((review) => (
-              <article key={review.id} className="rounded-2xl border border-border p-4">
-                <p className="text-sm leading-6 text-muted-foreground">{review.review_text}</p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Rating: {review.rating ?? "N/A"}
-                  {review.reviewer_name ? ` · ${review.reviewer_name}` : ""}
-                </p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-10 rounded-3xl border border-border bg-background p-6 shadow-sm">
-          <h2 className="text-2xl font-semibold text-foreground">Trust and safety</h2>
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            MasseurMatch is a discovery directory. The badges on this page help reduce ambiguity, but you should still
-            confirm boundaries, location details, pricing, and timing directly before scheduling with any provider.
-          </p>
-          <details className="mt-4 rounded-2xl border border-border bg-secondary/20 p-4">
-            <summary className="cursor-pointer text-sm font-semibold text-foreground">See badge details</summary>
-            <div className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <p>Identity verification: {profile.is_verified_identity ? "Submitted and reviewed" : "Not verified"}</p>
-              <p>Profile verification: {profile.is_verified_profile ? "Verified" : "Not verified"}</p>
-              <p>Photo verification: {profile.is_verified_photos ? "Verified" : "Not verified"}</p>
-              <p className="text-xs">Sensitive documents are reviewed for trust and safety and are not publicly exposed.</p>
-            </div>
-          </details>
-          <div className="mt-4 flex flex-wrap gap-3 text-sm font-semibold">
-            <Link href="/safety" className="text-primary hover:underline">
-              Read safety guidance
-            </Link>
-            <Link href={`/contact?report=${encodeURIComponent(profile.slug || profile.id)}`} className="text-primary hover:underline">
-              Report an issue
-            </Link>
-          </div>
-        </section>
       </div>
 
-      {(callHref || messageHref || smsHref) ? (
-        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 p-3 backdrop-blur md:hidden">
-          <div className="mx-auto flex max-w-4xl gap-2">
-            {callHref ? (
-              <a href={callHref} className="flex-1 rounded-xl bg-action-primary px-3 py-3 text-center text-xs font-semibold uppercase tracking-[0.12em] text-white">
-                Call now
-              </a>
-            ) : null}
-            {messageHref ? (
-              <a href={messageHref} target="_blank" rel="noreferrer" className="flex-1 rounded-xl border border-border bg-background px-3 py-3 text-center text-xs font-semibold uppercase tracking-[0.12em] text-foreground">
-                WhatsApp
-              </a>
-            ) : smsHref ? (
-              <a href={smsHref} className="flex-1 rounded-xl border border-border bg-background px-3 py-3 text-center text-xs font-semibold uppercase tracking-[0.12em] text-foreground">
-                SMS
-              </a>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
+      <ProfileStickyFooter profile={profile} />
     </>
   );
 }

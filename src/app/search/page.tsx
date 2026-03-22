@@ -60,10 +60,6 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
   const keyword = getFirstParam(params.keyword);
   const verified = getFirstParam(params.verified) === "1";
   const tierValue = getFirstParam(params.tier);
-  const hasFilters = Boolean(
-    city || modality || keyword || verified || tierValue || getFirstParam(params.goal) || getFirstParam(params.session),
-  );
-
   return createPageMetadata({
     title: city ? `Verified male massage therapists in ${city}` : "Search verified male massage therapists",
     description: city
@@ -71,7 +67,7 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
       : "Search verified male massage therapists by city, specialty, and listing tier through a crawlable public directory optimized for local near-me intent.",
     path: "/search",
     keywords: ["search massage therapists", "male massage near me", city, modality, keyword, verified ? "verified massage therapist" : "", tierValue],
-    noIndex: hasFilters,
+    noIndex: true,
   });
 }
 

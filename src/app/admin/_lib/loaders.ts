@@ -197,7 +197,7 @@ async function listAllAuthUsers() {
   while (page > 0) {
     const { data, error } = await adminClient.auth.admin.listUsers({
       page,
-      perPage: 200,
+      perPage: 20,
     });
 
     if (error) {

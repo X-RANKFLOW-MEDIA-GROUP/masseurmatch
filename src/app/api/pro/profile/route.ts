@@ -1,4 +1,5 @@
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
+import { buildTherapistRevalidatePaths, triggerRevalidate } from "@/app/_lib/revalidate";
 import { assertRateLimit, sanitizeOptionalText, sanitizeStringArray, sanitizeText } from "@/app/_lib/security";
 import { requireRequestSession } from "@/app/_lib/session";
 import { getProfileByUserId, recordAuditLog, updateProfileByUserId } from "@/app/_lib/store";
@@ -45,6 +46,17 @@ export async function POST(request: Request) {
 
     await recordAuditLog(session.userId, "provider.profile.update", "profile", profile.id, {
       fields: ["display_name", "bio", "city", "state", "phone", "specialties", "incall_price", "outcall_price"],
+    });
+
+    await triggerRevalidate(
+      await buildTherapistRevalidatePaths({
+        id: nextProfile?.id || profile.id,
+        slug: nextProfile?.slug || profile.slug,
+        city: nextProfile?.city || profile.city,
+      }),
+      { request },
+    ).catch((error) => {
+      console.error("[api/pro/profile] Revalidation failed:", error);
     });
 
     return json({

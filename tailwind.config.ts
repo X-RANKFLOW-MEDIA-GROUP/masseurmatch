@@ -13,6 +13,7 @@ const config: Config = {
         body: ["var(--font-sans)", "sans-serif"],
         mono: ["var(--font-mono)", "monospace"],
         sans: ["var(--font-sans)", "sans-serif"],
+        serif: ["var(--font-serif)", "Georgia", "serif"],
       },
       colors: {
         border: {

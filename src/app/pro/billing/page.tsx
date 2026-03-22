@@ -2,8 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowRight, ExternalLink, Loader2 } from "lucide-react";
+import { ArrowRight, ExternalLink, Loader2, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
 
+import { PageSection, Surface } from "@/app/_components/primitives";
+import { ProviderGrowthMarketplace } from "@/app/_components/provider-growth-marketplace";
+import { SIGNUP_PLANS, type SignupPlanTier } from "@/app/signup/_lib/plans";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -11,93 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { normalizePlanKey } from "@/hooks/usePlanLimits";
 import { supabase } from "@/integrations/supabase/client";
 
-type Tier = "free" | "standard" | "pro" | "elite";
-
-const TIER_OPTIONS: Array<{
-  tier: Tier;
-  title: string;
-  price: string;
-  description: string;
-  features: string[];
-  founderPrice?: string | null;
-  isFree?: boolean;
-  popular?: boolean;
-}> = [
-  {
-    tier: "free",
-    title: "Free",
-    price: "$0/mo",
-    description: "Keep a basic listing and stay visible in the directory.",
-    features: [
-      "1 photo",
-      "Bottom search placement",
-      "Available Now not included",
-      "1 travel schedule/month",
-      "No analytics",
-      '"Basic Listing" watermark',
-    ],
-    isFree: true,
-  },
-  {
-    tier: "standard",
-    title: "Standard",
-    price: "$39/mo",
-    description: "A stronger everyday plan with better placement and light analytics.",
-    features: [
-      "6 photos",
-      "Middle search placement",
-      "Available Now (60 min)",
-      "3 travel schedules/month",
-      "Views analytics",
-      "Newsletter chance",
-    ],
-    founderPrice: "$19.50/mo for 3 months",
-  },
-  {
-    tier: "pro",
-    title: "Pro",
-    price: "$79/mo",
-    description: "Our most popular growth tier for therapists who want top exposure.",
-    features: [
-      "12 photos + video",
-      "Top search placement",
-      "Available Now (120 min)",
-      "Unlimited travel schedules",
-      "Views + clicks analytics",
-      "Homepage rotation",
-      "Weekly specials",
-      "Verified badge",
-    ],
-    founderPrice: "$39.50/mo for 3 months",
-    popular: true,
-  },
-  {
-    tier: "elite",
-    title: "Elite",
-    price: "$99/mo",
-    description: "Everything in Pro plus a second active city for broader reach.",
-    features: [
-      "12 photos + video",
-      "Top search placement",
-      "Available Now (120 min)",
-      "Unlimited travel schedules",
-      "Views + clicks analytics",
-      "Homepage rotation",
-      "Weekly specials",
-      "Verified badge",
-      "2 active ads across 2 cities",
-    ],
-    founderPrice: "$49.50/mo for 3 months",
-  },
-];
-
-function normalizeTier(value: string | null | undefined): Tier {
-  if (value === "standard" || value === "pro" || value === "elite") {
-    return value;
-  }
-
-  return "free";
-}
+type Tier = SignupPlanTier;
 
 function toTier(value: string | null): Tier | null {
   if (value === "free" || value === "standard" || value === "pro" || value === "elite") {
@@ -119,7 +36,8 @@ export default function ProBillingPage() {
   const handleCheckoutRef = useRef<((tier: Tier) => Promise<void>) | null>(null);
   const handleManageBillingRef = useRef<(() => Promise<void>) | null>(null);
 
-  const currentTier = normalizePlanKey(subscription.plan_key) || normalizeTier(subscription.status) || "free";
+  const currentTier = normalizePlanKey(subscription.plan_key) || (subscription.subscribed ? "standard" : "free");
+  const currentPlan = SIGNUP_PLANS.find((plan) => plan.tier === currentTier) || SIGNUP_PLANS[0];
 
   const handleCheckout = async (tier: Tier) => {
     if (!user) {
@@ -194,11 +112,15 @@ export default function ProBillingPage() {
   useEffect(() => {
     if (!searchParams) return;
 
-    if (!autoHandledCheckout.current && user) {
+    if (!autoHandledCheckout.current) {
       const checkoutTier = toTier(searchParams.get("checkout"));
       if (checkoutTier) {
         autoHandledCheckout.current = true;
-        void handleCheckoutRef.current?.(checkoutTier);
+        if (user) {
+          void handleCheckoutRef.current?.(checkoutTier);
+        } else {
+          router.push(`/auth?mode=signup&redirect=${encodeURIComponent(`/pro/billing?checkout=${checkoutTier}`)}`);
+        }
       }
     }
 
@@ -223,84 +145,170 @@ export default function ProBillingPage() {
         variant: "destructive",
       });
     }
-  }, [searchParams, user, refreshSubscription, toast]);
+  }, [searchParams, user, refreshSubscription, router, toast]);
 
   return (
     <div className="container mx-auto px-4 py-10">
-      <div className="max-w-4xl space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Billing</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Choose a plan and continue through Stripe checkout. You can manage renewals anytime in Stripe Portal.
-          </p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Account: {user?.email || "Not authenticated"} · Current tier: {currentTier}
-          </p>
+      <div className="space-y-8">
+        <PageSection
+          eyebrow="Billing & Growth"
+          title="Plans, billing, and stackable growth add-ons"
+          description="Choose your base listing plan, then layer in targeted boosts, trust upgrades, geo visibility, and premium exposure from one place."
+          actions={
+            <>
+              <Button type="button" variant="outline" onClick={() => void handleManageBilling()} disabled={!user || portalLoading}>
+                {portalLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
+                Manage in Stripe
+              </Button>
+              {!user ? <p className="text-sm text-muted-foreground">Sign in to start checkout or manage billing.</p> : null}
+            </>
+          }
+        />
+
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr),minmax(320px,0.75fr)]">
+          <Surface className="rounded-[2rem] border-brand-secondary/15 bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(247,249,252,0.92))]">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <Badge variant="premium">Current Plan</Badge>
+                <h2 className="font-display mt-4 text-3xl font-semibold tracking-tight text-foreground">{currentPlan.name}</h2>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {currentPlan.description}
+                </p>
+              </div>
+              <div className="rounded-[1.6rem] border border-border bg-white/92 px-5 py-4 text-right shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Account</p>
+                <p className="mt-2 text-sm font-semibold text-foreground">{user?.email || "Not authenticated"}</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Status: {subscription.subscribed ? "Subscribed" : "Not subscribed"}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              <div className="rounded-[1.6rem] border border-border bg-white/88 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Price</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground">{currentPlan.priceDisplay}</p>
+                {currentPlan.founderPrice ? (
+                  <p className="mt-2 text-sm text-brand-secondary">{currentPlan.founderPrice}</p>
+                ) : null}
+              </div>
+              <div className="rounded-[1.6rem] border border-border bg-white/88 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Trial</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground">
+                  {subscription.trial_end ? new Date(subscription.trial_end).toLocaleDateString() : "14 days"}
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">Paid tiers include a 14-day free trial.</p>
+              </div>
+              <div className="rounded-[1.6rem] border border-border bg-white/88 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Focus</p>
+                <p className="mt-2 text-2xl font-semibold text-foreground">
+                  {currentTier === "free" ? "Foundation" : currentTier === "standard" ? "Consistency" : currentTier === "pro" ? "Growth" : "Scale"}
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Use add-ons to stack extra visibility without waiting for a full plan change.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center gap-3 text-sm">
+              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-4 py-2 text-emerald-800">
+                <ShieldCheck className="h-4 w-4" />
+                Impact preview shown on every add-on
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-sky-500/10 px-4 py-2 text-sky-800">
+                <TrendingUp className="h-4 w-4" />
+                Duration and placement always visible
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 px-4 py-2 text-amber-800">
+                <Sparkles className="h-4 w-4" />
+                Premium slots stay capped for scarcity
+              </div>
+            </div>
+          </Surface>
+
+          <Surface className="rounded-[2rem] border-brand-secondary/15 bg-[linear-gradient(180deg,rgba(12,28,51,0.98),rgba(18,53,88,0.95))] text-white">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/58">Conversion Rules</p>
+            <h2 className="font-display mt-4 text-2xl font-semibold tracking-tight">How this catalog is built to convert</h2>
+            <ul className="mt-5 space-y-3 text-sm leading-6 text-white/74">
+              <li>Lead with fast, low-friction boosts between $10 and $22 to drive impulse revenue.</li>
+              <li>Use mid-ticket featured placements to capture therapists ready for a bigger visibility push.</li>
+              <li>Anchor recurring value with trust, geo, and analytics products that stack month over month.</li>
+              <li>Protect premium margins with limited-inventory placements and bundle recommendations.</li>
+            </ul>
+
+            {!subscription.subscribed ? (
+              <div className="mt-6 rounded-[1.6rem] border border-white/10 bg-white/6 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/58">Founder Deal</p>
+                <p className="mt-2 text-lg font-semibold text-white">50% off for the first 3 months after trial</p>
+                <p className="mt-2 text-sm text-white/70">
+                  The first 50 members keep the lower paid rate after their 14-day free trial.
+                </p>
+              </div>
+            ) : null}
+          </Surface>
         </div>
 
-        {!subscription.subscribed ? (
-          <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-muted-foreground">
-            <p className="font-semibold text-foreground">Founder deal: 50% off for 3 months</p>
-            <p className="mt-1">The first 50 members get discounted paid pricing after the 14-day free trial.</p>
+        <section id="plans" className="space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Base plans</p>
+              <h2 className="font-display mt-2 text-3xl font-semibold tracking-tight text-foreground">
+                Pick the right foundation, then stack add-ons on top
+              </h2>
+            </div>
           </div>
-        ) : null}
 
-        <div className="grid gap-4 md:grid-cols-2">
-          {TIER_OPTIONS.map((option) => {
-            const isCurrent = currentTier === option.tier;
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {SIGNUP_PLANS.map((plan) => {
+              const isCurrent = currentTier === plan.tier;
+              const isBusy = checkoutLoading === plan.tier;
 
-            return (
-              <section
-                key={option.tier}
-                className={`rounded-xl border p-5 text-left transition ${
-                  isCurrent
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/40 hover:bg-accent"
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  {option.popular ? <Badge>Most Popular</Badge> : null}
-                  {isCurrent ? <Badge variant="secondary">Current plan</Badge> : null}
-                </div>
-                <p className="mt-3 text-sm uppercase tracking-[0.2em] text-muted-foreground">{option.tier}</p>
-                <h2 className="mt-2 text-xl font-semibold">{option.title}</h2>
-                <p className="mt-1 text-lg font-semibold text-foreground">{option.price}</p>
-                {option.founderPrice ? (
-                  <p className="mt-1 text-xs font-semibold text-primary">Founder price: {option.founderPrice}</p>
-                ) : null}
-                {!option.isFree ? (
-                  <p className="mt-1 text-xs text-muted-foreground">14-day free trial included</p>
-                ) : null}
-                <p className="mt-2 text-sm text-muted-foreground">{option.description}</p>
-                <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-                  {option.features.map((feature) => (
-                    <li key={feature}>{feature}</li>
-                  ))}
-                </ul>
-
-                <Button
-                  type="button"
-                  className="mt-6 w-full"
-                  variant={option.popular ? "hero" : "outline"}
-                  onClick={() => void handleCheckout(option.tier)}
-                  disabled={!user || !!checkoutLoading}
+              return (
+                <section
+                  key={plan.tier}
+                  className={`rounded-[1.9rem] border p-5 text-left transition ${
+                    isCurrent
+                      ? "border-brand-secondary/30 bg-brand-secondary/5 shadow-[0_18px_50px_rgba(15,23,42,0.06)]"
+                      : "border-border bg-white/92 hover:border-brand-secondary/20 hover:bg-white"
+                  }`}
                 >
-                  {checkoutLoading === option.tier ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                  {isCurrent ? "Switch plan" : option.isFree ? "Start free" : "Start free trial"}
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </section>
-            );
-          })}
-        </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {plan.popular ? <Badge>Most Popular</Badge> : null}
+                    {isCurrent ? <Badge variant="secondary">Current plan</Badge> : null}
+                  </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <Button type="button" variant="outline" onClick={() => void handleManageBilling()} disabled={!user || portalLoading}>
-            {portalLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
-            Manage in Stripe
-          </Button>
-          {!user ? <p className="text-sm text-muted-foreground">Sign in to start checkout or manage billing.</p> : null}
-        </div>
+                  <p className="mt-4 text-sm uppercase tracking-[0.18em] text-muted-foreground">{plan.tier}</p>
+                  <h3 className="font-display mt-2 text-2xl font-semibold tracking-tight text-foreground">{plan.name}</h3>
+                  <p className="mt-2 text-3xl font-semibold text-foreground">{plan.priceDisplay}</p>
+                  {plan.founderPrice ? (
+                    <p className="mt-2 text-sm font-medium text-brand-secondary">{plan.founderPrice}</p>
+                  ) : null}
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">{plan.description}</p>
+
+                  <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
+                    {plan.features.map((feature) => (
+                      <li key={feature}>{feature}</li>
+                    ))}
+                  </ul>
+
+                  <Button
+                    type="button"
+                    className="mt-6 w-full"
+                    variant={plan.popular ? "hero" : "outline"}
+                    onClick={() => void handleCheckout(plan.tier)}
+                    disabled={!!checkoutLoading}
+                  >
+                    {isBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                    {isCurrent ? "Switch plan" : plan.tier === "free" ? "Start free" : "Start 14-day trial"}
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </section>
+              );
+            })}
+          </div>
+        </section>
+
+        <ProviderGrowthMarketplace source="billing" currentPlan={currentTier} />
       </div>
     </div>
   );

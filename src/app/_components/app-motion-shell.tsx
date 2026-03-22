@@ -57,6 +57,7 @@ export function AppMotionShell({ children }: { children: React.ReactNode }) {
         <motion.main
           key={pathname}
           className="page-transition-shell relative z-[1] pt-16"
+          suppressHydrationWarning
           initial={reduceMotion ? undefined : { opacity: 0, y: 24, filter: "blur(12px)" }}
           animate={reduceMotion ? undefined : { opacity: 1, y: 0, filter: "blur(0px)" }}
           exit={reduceMotion ? undefined : { opacity: 0, y: -12, filter: "blur(8px)" }}

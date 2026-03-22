@@ -68,9 +68,7 @@ export const DIRECTORY_SEGMENTS: DirectorySegment[] = [
     shortLabel: "Wellness",
     intro:
       "Browse calm, premium wellness-focused listings with stronger editorial consistency and straightforward contact flow.",
-    search: {
-      keyword: "wellness",
-    },
+    search: {},
   },
 ];
 
