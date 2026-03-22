@@ -1,24 +1,14 @@
-import { RegisterForm } from "@/mm/components/auth-forms";
-import { SectionHeading } from "@/mm/components/primitives";
-import { buildMetadata } from "@/mm/lib/metadata";
+import type { Metadata } from "next";
+import { createPageMetadata } from "@/app/_lib/seo";
+import RegisterPageClient from "./RegisterPageClient";
 
-export const metadata = buildMetadata({
+export const metadata: Metadata = createPageMetadata({
   title: "Register",
-  description: "Create a therapist account on MasseurMatch and move into the onboarding flow.",
+  description: "Private therapist registration.",
   path: "/register",
+  noIndex: true,
 });
 
 export default function RegisterPage() {
-  return (
-    <section className="page-shell py-14">
-      <SectionHeading
-        eyebrow="Therapist registration"
-        title="Create your therapist account."
-        description="Registration is for therapists only. After signup you will continue into the profile onboarding flow."
-      />
-      <div className="mt-10">
-        <RegisterForm />
-      </div>
-    </section>
-  );
+  return <RegisterPageClient />;
 }

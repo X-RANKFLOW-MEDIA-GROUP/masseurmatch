@@ -21,6 +21,11 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+dist
+dist-ssr
+*.local
+.lovable/
+
 # Editors
 .vscode/*
 !.vscode/extensions.json
@@ -31,3 +36,5 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+.vercel
+.env*.local

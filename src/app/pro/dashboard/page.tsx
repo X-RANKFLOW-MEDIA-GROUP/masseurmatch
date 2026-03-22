@@ -1,62 +1,46 @@
-import { ProfileEditor } from "@/mm/components/pro-tools";
-import { Card, SectionHeading } from "@/mm/components/primitives";
-import { getCities, getSubscriptionForUser, getTherapistForUser, getTherapistReviews } from "@/mm/lib/directory";
-import { buildMetadata } from "@/mm/lib/metadata";
-import { getSessionUser } from "@/mm/lib/session";
+"use client";
 
-export const metadata = buildMetadata({
-  title: "Therapist dashboard",
-  description: "Review profile completeness, listing status, views, reviews, and profile editing tools.",
-  path: "/pro/dashboard",
-});
+import { ProviderGrowthQuickPicks } from "@/app/_components/provider-growth-marketplace";
+import { ProTools } from "@/app/_components/pro-tools";
+import { DashboardFAQ } from "@/components/dashboard/DashboardFAQ";
+import { PhotoGuidelines } from "@/components/dashboard/PhotoGuidelines";
+import { useProfile } from "@/hooks/useProfile";
+import { getProfileCompleteness } from "@/hooks/useProfileCompleteness";
 
-export default async function ProDashboardPage() {
-  const session = await getSessionUser();
+export default function ProDashboardPage() {
+  const { profile } = useProfile();
+  const completeness = getProfileCompleteness(profile, 0);
 
-  if (!session) {
-    return null;
-  }
-
-  const [therapist, cities, subscription] = await Promise.all([
-    getTherapistForUser(session.id),
-    getCities(),
-    getSubscriptionForUser(session.id),
-  ]);
-
-  if (!therapist || !subscription) {
-    return null;
-  }
-
-  const reviews = await getTherapistReviews(therapist.id);
+  const cards = [
+    { label: "Completeness", value: `${completeness.score}%` },
+    { label: "Status", value: profile?.status || "Draft" },
+    { label: "Views", value: String((profile as any)?.profile_views || 0) },
+    { label: "Reviews", value: String((profile as any)?.review_count || 0) },
+  ];
 
   return (
-    <section className="page-shell py-14">
-      <SectionHeading
-        eyebrow="Dashboard"
-        title="Monitor your listing and keep the profile sharp."
-        description="This dashboard shows profile completeness, listing status, view count, and approved review coverage."
-      />
-      <div className="mt-10 grid gap-6 lg:grid-cols-4">
-        <Card>
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">Completeness</p>
-          <p className="mt-4 font-display text-4xl">{therapist.profileCompleteness}%</p>
-        </Card>
-        <Card>
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">Status</p>
-          <p className="mt-4 font-display text-4xl">{therapist.status}</p>
-        </Card>
-        <Card>
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">Views</p>
-          <p className="mt-4 font-display text-4xl">{therapist.viewCount}</p>
-        </Card>
-        <Card>
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">Approved reviews</p>
-          <p className="mt-4 font-display text-4xl">{reviews.length}</p>
-        </Card>
+    <div className="container mx-auto px-4 py-10">
+      <div className="space-y-8">
+        <ProTools
+          stats={cards}
+          isPublishReady={completeness.isPublishReady}
+          missing={completeness.missingRequired.map((item) => ({
+            key: item.key,
+            label: item.label,
+            link: item.link,
+          }))}
+        />
+
+        <ProviderGrowthQuickPicks />
+
+        <div className="grid gap-8 xl:grid-cols-[minmax(0,0.9fr),minmax(0,1.1fr)]">
+          <div className="space-y-6">
+            <PhotoGuidelines />
+          </div>
+
+          <DashboardFAQ />
+        </div>
       </div>
-      <div className="mt-10">
-        <ProfileEditor cities={cities} therapist={therapist} />
-      </div>
-    </section>
+    </div>
   );
 }

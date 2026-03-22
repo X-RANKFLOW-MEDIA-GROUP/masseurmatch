@@ -1,27 +1,23 @@
-import { AdminTherapistsTable } from "@/mm/components/admin-tools";
-import { SectionHeading } from "@/mm/components/primitives";
-import { getCities, getDirectorySnapshot } from "@/mm/lib/directory";
-import { buildMetadata } from "@/mm/lib/metadata";
-
-export const metadata = buildMetadata({
-  title: "Admin therapists",
-  description: "Approve, suspend, search, filter, and delete therapist listings from the MasseurMatch admin console.",
-  path: "/admin/therapists",
-});
+import AdminTherapistsManager from "@/app/admin/_components/AdminTherapistsManager";
+import { loadTherapists } from "@/app/admin/_lib/loaders";
 
 export default async function AdminTherapistsPage() {
-  const [cities, snapshot] = await Promise.all([getCities(), getDirectorySnapshot()]);
+  const { items, error } = await loadTherapists();
 
   return (
-    <section className="page-shell py-14">
-      <SectionHeading
-        eyebrow="Admin"
-        title="Therapist moderation and status control."
-        description="Filter by city, tier, and listing state, then approve, suspend, or delete therapist records."
-      />
-      <div className="mt-10">
-        <AdminTherapistsTable cities={cities} therapists={snapshot.therapists} />
-      </div>
-    </section>
+    <div className="container mx-auto px-4 py-10">
+      <h1 className="mb-2 text-3xl font-bold">Admin Therapists</h1>
+      <p className="mb-6 text-sm text-muted-foreground">
+        Moderate therapist profiles, verification state, availability, and featured placement.
+      </p>
+
+      {error ? (
+        <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-muted-foreground">
+          Therapists could not be loaded from Supabase admin right now: {error}
+        </div>
+      ) : null}
+
+      <AdminTherapistsManager initialTherapists={items} />
+    </div>
   );
 }

@@ -9,10 +9,10 @@ import { TherapistCard } from "@/mm/components/therapist-card";
 export function SearchDirectory({ cities, therapists }: { cities: City[]; therapists: Therapist[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [query, setQuery] = useState(searchParams.get("q") || "");
-  const [city, setCity] = useState(searchParams.get("city") || "");
-  const [modality, setModality] = useState(searchParams.get("modality") || "");
-  const [tier, setTier] = useState(searchParams.get("tier") || "");
+  const [query, setQuery] = useState(searchParams?.get("q") || "");
+  const [city, setCity] = useState(searchParams?.get("city") || "");
+  const [modality, setModality] = useState(searchParams?.get("modality") || "");
+  const [tier, setTier] = useState(searchParams?.get("tier") || "");
   const deferredQuery = useDeferredValue(query);
 
   useEffect(() => {

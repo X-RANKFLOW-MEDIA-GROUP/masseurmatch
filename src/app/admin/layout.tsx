@@ -1,18 +1,44 @@
-import type { ReactNode } from "react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { readSessionToken } from "@/mm/lib/auth-token";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+import { RouteError } from "@/app/api/_lib/http";
+import { createPageMetadata } from "@/app/_lib/seo";
+import { requireAdminSession } from "@/app/api/_lib/supabase-server";
 
-export default async function AdminLayout({ children }: { children: ReactNode }) {
+export const metadata: Metadata = createPageMetadata({
+  title: "Admin dashboard",
+  description: "Private admin dashboard.",
+  path: "/admin",
+  noIndex: true,
+});
+
+async function ensureAdminAccess() {
   const cookieStore = await cookies();
-  const session = await readSessionToken(cookieStore.get("mm_session")?.value);
+  const cookieHeader = cookieStore.toString();
 
-  if (!session || session.role !== "admin") {
-    redirect("/login?redirect=%2Fadmin");
+  try {
+    await requireAdminSession(
+      new Request("http://localhost/admin", {
+        headers: {
+          cookie: cookieHeader,
+        },
+      }),
+    );
+  } catch (error) {
+    if (error instanceof RouteError && error.status === 401) {
+      redirect("/login?redirect=%2Fadmin");
+    }
+
+    redirect("/");
   }
+}
 
-  return children;
+export default async function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  await ensureAdminAccess();
+  return <>{children}</>;
 }

@@ -1,29 +1,42 @@
-import { NextResponse } from "next/server";
-import { getUserByEmail } from "@/mm/lib/directory";
-import { verifyPassword } from "@/mm/lib/security";
-import { setSessionCookie } from "@/mm/lib/session";
-import { loginSchema } from "@/mm/lib/validation";
+import { errorResponse, json, parseJsonBody, RouteError, withSetCookie } from "@/app/api/_lib/http";
+import { setSessionCookie } from "@/app/api/_lib/session";
+import { authLoginSchema } from "@/app/_lib/validation";
+import {
+  getUserByEmail,
+  getUserRole,
+  verifyPassword,
+} from "@/app/api/_lib/supabase-server";
 
 export async function POST(request: Request) {
-  const payload = await request.json();
-  const parsed = loginSchema.safeParse(payload);
+  try {
+    const body = await parseJsonBody(request, authLoginSchema);
+    const user = await getUserByEmail(body.email);
 
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Please enter a valid email and password." }, { status: 400 });
+    if (!user?.email) {
+      throw new RouteError(401, "Invalid email or password.");
+    }
+
+    await verifyPassword(body.email, body.password);
+    const role = await getUserRole(user.id);
+
+    const response = json({
+      ok: true,
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+      role,
+    });
+
+    return withSetCookie(
+      response,
+      setSessionCookie({
+        userId: user.id,
+        email: user.email,
+        role,
+      }),
+    );
+  } catch (error) {
+    return errorResponse(error);
   }
-
-  const user = await getUserByEmail(parsed.data.email);
-
-  if (!user || !verifyPassword(parsed.data.password, user.passwordHash)) {
-    return NextResponse.json({ error: "Incorrect email or password." }, { status: 401 });
-  }
-
-  const response = NextResponse.json({ ok: true, role: user.role });
-  await setSessionCookie(response, {
-    id: user.id,
-    email: user.email,
-    fullName: user.fullName,
-    role: user.role,
-  });
-  return response;
 }

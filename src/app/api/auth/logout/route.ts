@@ -1,8 +1,11 @@
-import { NextResponse } from "next/server";
-import { clearSessionCookie } from "@/mm/lib/session";
+import { json, withSetCookie } from "@/app/api/_lib/http";
+import { clearSessionCookie } from "@/app/api/_lib/session";
 
-export async function POST(request: Request) {
-  const response = NextResponse.redirect(new URL("/", request.url), { status: 303 });
-  clearSessionCookie(response);
-  return response;
+export async function POST() {
+  return withSetCookie(
+    json({
+      ok: true,
+    }),
+    clearSessionCookie(),
+  );
 }

@@ -1,18 +1,40 @@
-import type { ReactNode } from "react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { readSessionToken } from "@/mm/lib/auth-token";
+import { RouteError } from "@/app/api/_lib/http";
+import { createPageMetadata } from "@/app/_lib/metadata";
+import { requireRequestSession } from "@/app/_lib/session";
+import ProLayoutClient from "./ProLayoutClient";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const metadata: Metadata = createPageMetadata({
+  title: "Pro dashboard",
+  description: "Private therapist dashboard.",
+  path: "/pro",
+  noIndex: true,
+});
 
-export default async function ProLayout({ children }: { children: ReactNode }) {
+async function ensureProAccess() {
   const cookieStore = await cookies();
-  const session = await readSessionToken(cookieStore.get("mm_session")?.value);
+  const cookieHeader = cookieStore.toString();
 
-  if (!session || session.role !== "therapist") {
-    redirect("/login?redirect=%2Fpro%2Fdashboard");
+  try {
+    requireRequestSession(
+      new Request("http://localhost/pro", {
+        headers: {
+          cookie: cookieHeader,
+        },
+      }),
+    );
+  } catch (error) {
+    if (error instanceof RouteError && error.status === 401) {
+      redirect("/login?redirect=%2Fpro%2Fdashboard");
+    }
+
+    redirect("/");
   }
+}
 
-  return children;
+export default async function ProLayout({ children }: { children: React.ReactNode }) {
+  await ensureProAccess();
+  return <ProLayoutClient>{children}</ProLayoutClient>;
 }

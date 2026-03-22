@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "plugins": []
+  },
+  "include": [
+    "next-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "src/legacy-pages/**",
+    "src/pages/**",
+    "src/views/**",
+    "src/mm/**",
+    "src/App.tsx",
+    "src/main.tsx"
+  ]
+}

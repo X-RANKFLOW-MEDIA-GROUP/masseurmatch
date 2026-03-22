@@ -1,18 +1,16 @@
 import Link from "next/link";
 
-export default function NotFound() {
+export default function NotFoundPage() {
   return (
-    <section className="page-shell py-20">
-      <div className="surface-panel max-w-2xl px-6 py-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.32em] text-muted-foreground">404</p>
-        <h1 className="mt-4 font-display text-4xl">That page is not in the directory.</h1>
-        <p className="mt-4 text-sm leading-7 text-muted-foreground">
-          Try the main therapist search, a city page, or head back to the homepage.
-        </p>
-        <Link href="/" className="mt-6 inline-flex text-sm font-semibold text-foreground underline underline-offset-4">
-          Return home
-        </Link>
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="max-w-md text-center">
+        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">404</p>
+        <h1 className="text-4xl font-bold mt-2">Page not found</h1>
+        <p className="text-muted-foreground mt-3">The page you requested does not exist or was moved.</p>
+        <div className="mt-5">
+          <Link href="/" className="underline">Return to homepage</Link>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }

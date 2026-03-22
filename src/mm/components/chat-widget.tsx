@@ -9,7 +9,7 @@ import { Button } from "@/mm/components/primitives";
 const hiddenPrefixes = ["/admin", "/pro", "/login", "/register", "/forgot-password"];
 
 export function KnottyChatWidget() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   const [open, setOpen] = useState(false);
 
   if (hiddenPrefixes.some((prefix) => pathname.startsWith(prefix))) {

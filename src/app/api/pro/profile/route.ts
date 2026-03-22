@@ -1,39 +1,69 @@
-import { NextResponse } from "next/server";
-import { completeTherapistOnboarding, updateTherapistProfile } from "@/mm/lib/mutations";
-import { getRequestSession } from "@/mm/lib/request";
-import { onboardingSchema, profileUpdateSchema } from "@/mm/lib/validation";
+import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
+import { buildTherapistRevalidatePaths, triggerRevalidate } from "@/app/_lib/revalidate";
+import { assertRateLimit, sanitizeOptionalText, sanitizeStringArray, sanitizeText } from "@/app/_lib/security";
+import { requireRequestSession } from "@/app/_lib/session";
+import { getProfileByUserId, recordAuditLog, updateProfileByUserId } from "@/app/_lib/store";
+import { proProfileSchema } from "@/app/_lib/validation";
+
+export async function GET(request: Request) {
+  try {
+    const session = requireRequestSession(request);
+    const profile = await getProfileByUserId(session.userId);
+
+    return json({
+      ok: true,
+      profile,
+    });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
 
 export async function POST(request: Request) {
-  const session = await getRequestSession(request);
-
-  if (!session || session.role !== "therapist") {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  }
-
-  const payload = await request.json();
-
   try {
-    if (payload.mode === "onboard") {
-      const parsed = onboardingSchema.safeParse(payload);
+    assertRateLimit(request, "pro-profile", { limit: 20, windowMs: 60_000 });
 
-      if (!parsed.success) {
-        return NextResponse.json({ error: "Please complete every onboarding step." }, { status: 400 });
-      }
+    const session = requireRequestSession(request);
+    const profile = await getProfileByUserId(session.userId);
 
-      const therapist = await completeTherapistOnboarding(session.id, parsed.data);
-      return NextResponse.json({ ok: true, therapist });
+    if (!profile) {
+      throw new RouteError(404, "Profile not found.");
     }
 
-    const parsed = profileUpdateSchema.safeParse(payload);
+    const body = await parseJsonBody(request, proProfileSchema);
+    const nextProfile = await updateProfileByUserId(session.userId, {
+      display_name: sanitizeText(body.displayName),
+      bio: sanitizeText(body.bio),
+      city: sanitizeText(body.city),
+      state: sanitizeOptionalText(body.state),
+      phone: sanitizeOptionalText(body.phone),
+      specialties: sanitizeStringArray(body.specialties),
+      incall_price: body.incallPrice ?? null,
+      outcall_price: body.outcallPrice ?? null,
+      status: profile.status === "active" ? "pending_approval" : profile.status,
+      is_active: profile.status === "active" ? false : profile.is_active,
+    });
 
-    if (!parsed.success) {
-      return NextResponse.json({ error: "Please complete the profile fields correctly." }, { status: 400 });
-    }
+    await recordAuditLog(session.userId, "provider.profile.update", "profile", profile.id, {
+      fields: ["display_name", "bio", "city", "state", "phone", "specialties", "incall_price", "outcall_price"],
+    });
 
-    const therapist = await updateTherapistProfile(session.id, parsed.data);
-    return NextResponse.json({ ok: true, therapist });
+    await triggerRevalidate(
+      await buildTherapistRevalidatePaths({
+        id: nextProfile?.id || profile.id,
+        slug: nextProfile?.slug || profile.slug,
+        city: nextProfile?.city || profile.city,
+      }),
+      { request },
+    ).catch((error) => {
+      console.error("[api/pro/profile] Revalidation failed:", error);
+    });
+
+    return json({
+      ok: true,
+      profile: nextProfile,
+    });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unable to update profile.";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return errorResponse(error);
   }
 }

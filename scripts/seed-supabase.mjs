@@ -19,7 +19,11 @@ function loadEnvFile(filePath) {
 
     const [key, ...rest] = line.split("=");
     if (!(key in process.env)) {
-      process.env[key] = rest.join("=");
+      let value = rest.join("=");
+      if (value.startsWith('"') && value.endsWith('"')) {
+        value = value.slice(1, -1);
+      }
+      process.env[key] = value;
     }
   }
 }
@@ -33,12 +37,13 @@ function slugify(value) {
 }
 
 loadEnvFile(path.join(rootDir, ".env.local"));
+loadEnvFile(path.join(rootDir, ".env"));
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !serviceRoleKey) {
-  console.error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in .env.local.");
+  console.error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in .env.local or .env.");
   process.exit(1);
 }
 
@@ -170,18 +175,26 @@ const keywords = keywordLabels.map((label) => ({
 
 const seedUsers = [
   {
-    email: "admin@masseurmatch.com",
-    password: "Admin@MM2025!",
+    email: process.env.SEED_ADMIN_EMAIL || "admin@masseurmatch.com",
+    password: process.env.SEED_ADMIN_PASSWORD,
     fullName: "MasseurMatch Admin",
     role: "admin",
   },
   {
-    email: "therapist@masseurmatch.com",
-    password: "Therapist@MM2025!",
+    email: process.env.SEED_THERAPIST_EMAIL || "therapist@masseurmatch.com",
+    password: process.env.SEED_THERAPIST_PASSWORD,
     fullName: "Leo Martinez",
     role: "therapist",
   },
 ];
+
+for (const u of seedUsers) {
+  if (!u.password) {
+    throw new Error(
+      `Missing password env var for ${u.role}. Set SEED_ADMIN_PASSWORD and SEED_THERAPIST_PASSWORD.`,
+    );
+  }
+}
 
 const therapists = [
   {
@@ -390,47 +403,59 @@ const blogPosts = [
 ];
 
 async function ensureAuthUser({ email, fullName, password, role }) {
-  const { data: existingUsersData, error: existingUsersError } = await supabase.auth.admin.listUsers({
-    page: 1,
-    perPage: 1000,
+  // Try to create the user first; if they already exist, find and update them.
+  const { data: createData, error: createError } = await supabase.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    app_metadata: { role },
+    user_metadata: { full_name: fullName },
   });
 
-  if (existingUsersError) {
-    throw existingUsersError;
+  if (!createError && createData?.user) {
+    console.log(`  Created ${role}: ${email}`);
+    return createData.user;
   }
 
-  let user = existingUsersData.users.find((entry) => entry.email?.toLowerCase() === email.toLowerCase());
+  // User already exists — find them by paginating in small batches.
+  if (createError.status === 422 || createError.message?.toLowerCase().includes("already")) {
+    let page = 1;
+    while (page > 0) {
+      const { data, error } = await supabase.auth.admin.listUsers({
+        page,
+        perPage: 20,
+      });
 
-  if (!user) {
-    const { data, error } = await supabase.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      app_metadata: { role },
-      user_metadata: { full_name: fullName },
-    });
+      if (error) {
+        throw error;
+      }
 
-    if (error) {
-      throw error;
+      const users = Array.isArray(data.users) ? data.users : [];
+      const match = users.find((entry) => entry.email?.toLowerCase() === email.toLowerCase());
+
+      if (match) {
+        const { data: updateData, error: updateError } = await supabase.auth.admin.updateUserById(match.id, {
+          password,
+          email_confirm: true,
+          app_metadata: { role },
+          user_metadata: { full_name: fullName },
+        });
+
+        if (updateError) {
+          throw updateError;
+        }
+
+        console.log(`  Updated ${role}: ${email}`);
+        return updateData.user;
+      }
+
+      page = data.nextPage ?? 0;
     }
 
-    user = data.user;
-  } else {
-    const { data, error } = await supabase.auth.admin.updateUserById(user.id, {
-      password,
-      email_confirm: true,
-      app_metadata: { role },
-      user_metadata: { full_name: fullName },
-    });
-
-    if (error) {
-      throw error;
-    }
-
-    user = data.user;
+    throw new Error(`User ${email} reportedly exists but was not found in any page.`);
   }
 
-  return user;
+  throw createError;
 }
 
 function failOnError(error, context) {
@@ -440,7 +465,10 @@ function failOnError(error, context) {
 }
 
 async function main() {
-  const ensuredUsers = await Promise.all(seedUsers.map(ensureAuthUser));
+  const ensuredUsers = [];
+  for (const seedUser of seedUsers) {
+    ensuredUsers.push(await ensureAuthUser(seedUser));
+  }
   const userIdByEmail = new Map(ensuredUsers.map((user) => [user.email.toLowerCase(), user.id]));
 
   const { error: storageError } = await supabase.storage.createBucket("therapist-photos", { public: true });
@@ -555,8 +583,8 @@ async function main() {
   failOnError(reviewsError, "Upserting reviews failed");
 
   console.log("Supabase seed complete.");
-  console.log("Admin: admin@masseurmatch.com / Admin@MM2025!");
-  console.log("Therapist: therapist@masseurmatch.com / Therapist@MM2025!");
+  console.log(`Admin: ${seedUsers[0].email}`);
+  console.log(`Therapist: ${seedUsers[1].email}`);
 }
 
 main().catch((error) => {

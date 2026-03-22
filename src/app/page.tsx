@@ -1,81 +1,184 @@
-import Link from "next/link";
-import { JsonLd } from "@/mm/components/json-ld";
-import { ButtonLink, Card, SectionHeading } from "@/mm/components/primitives";
-import { TherapistCard } from "@/mm/components/therapist-card";
-import { getCities, getPublicTherapists } from "@/mm/lib/directory";
-import { buildMetadata } from "@/mm/lib/metadata";
-import { buildOrganizationJsonLd } from "@/mm/lib/structured-data";
+import type { Metadata } from "next";
+import { JsonLd } from "@/app/_components/json-ld";
+import { WorldClassHomepage } from "@/components/homepage/WorldClassHomepage";
+import { getCities, getPublicTherapists } from "@/app/_lib/directory";
+import { getLaunchAreaPaths, getLaunchCityPaths, getLaunchKeywordPaths, getLaunchSegmentPaths } from "@/app/_lib/launch-urls";
+import {
+  buildCollectionPageJsonLd,
+  buildFaqJsonLd,
+  buildItemListJsonLd,
+  createPageMetadata,
+} from "@/app/_lib/seo";
+import { siteUrl } from "@/lib/site";
 
-export const metadata = buildMetadata({
-  title: "Direct therapist discovery",
+export const revalidate = 1800;
+
+const homeMetadata = createPageMetadata({
+  title: "Verified male massage therapists in Dallas, Miami, Chicago, Houston and top US cities",
   description:
-    "Browse Austin, Dallas, and Houston therapist profiles, compare modalities, and contact providers directly through a cleaner city-first directory.",
+    "Discover verified male massage therapists in Dallas, Miami, Chicago, Houston, Austin, and other major US cities. Compare outcall, incall, deep tissue, Swedish, and direct-contact profiles.",
   path: "/",
+  keywords: [
+    "male massage near me",
+    "verified male massage directory",
+    "dallas male massage",
+    "outcall male massage",
+    "deep tissue male massage",
+    "swedish massage men",
+    "trusted premium massage directory",
+    "male massage by city",
+  ],
 });
 
+export const metadata: Metadata = {
+  ...homeMetadata,
+  alternates: {
+    canonical: siteUrl("/"),
+    languages: {
+      en: siteUrl("/"),
+      "pt-BR": siteUrl("/pt-br"),
+    },
+  },
+};
+
 export default async function HomePage() {
-  const [cities, therapists] = await Promise.all([getCities(), getPublicTherapists()]);
-  const featured = therapists.slice(0, 3);
+  const cities = getCities();
+  const therapistsResult = await getPublicTherapists({ pageSize: 60 });
+  const therapists = therapistsResult.items;
+
+  const featuredTherapists = therapists
+    .filter(
+      (therapist) =>
+        therapist._tier === "elite" ||
+        therapist._tier === "pro" ||
+        Boolean(therapist.is_verified_identity || therapist.is_verified_profile),
+    )
+    .slice(0, 6);
+
+  const cityCounts = new Map<string, number>();
+  const cityHighlights = new Map<string, Set<string>>();
+
+  therapists.forEach((therapist) => {
+    const cityKey = therapist.city?.toLowerCase().trim();
+
+    if (!cityKey) {
+      return;
+    }
+
+    cityCounts.set(cityKey, (cityCounts.get(cityKey) || 0) + 1);
+
+    const highlights = cityHighlights.get(cityKey) || new Set<string>();
+    (therapist.specialties || []).slice(0, 3).forEach((specialty) => highlights.add(specialty));
+
+    if (therapist.available_now) {
+      highlights.add("Available now");
+    }
+
+    if (therapist.outcall_price) {
+      highlights.add("Outcall");
+    }
+
+    if (therapist.incall_price) {
+      highlights.add("Incall");
+    }
+
+    cityHighlights.set(cityKey, highlights);
+  });
+
+  const launchSegmentPaths = getLaunchSegmentPaths();
+  const launchKeywordPaths = getLaunchKeywordPaths();
+  const launchAreaPaths = getLaunchAreaPaths();
+
+  const launchCities = getLaunchCityPaths()
+    .map((path) => {
+      const citySlug = path.split("/").filter(Boolean)[0] || "";
+      const city = cities.find((entry) => entry.slug === citySlug);
+
+      if (!city) {
+        return null;
+      }
+
+      const cityKey = city.name.toLowerCase();
+      const highlightValues = Array.from(cityHighlights.get(cityKey) || []);
+      const routeCount = [
+        path,
+        ...launchSegmentPaths.filter((entry) => entry.startsWith(`${path}/`)),
+        ...launchKeywordPaths.filter((entry) => entry.startsWith(`${path}/`)),
+        ...launchAreaPaths.filter((entry) => entry.startsWith(`${path}/`)),
+      ].length;
+
+      return {
+        href: path,
+        city,
+        listingCount: cityCounts.get(cityKey) || 0,
+        routeCount,
+        highlights: (highlightValues.length > 0
+          ? highlightValues
+          : ["Verified", "City page", "Direct contact"]).slice(0, 3),
+      };
+    })
+    .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
+
+  const homeFaqs = [
+    {
+      question: "How do I find verified male massage therapists near me?",
+      answer:
+        "Start with a city page, then compare specialties, incall or outcall options, visible pricing, reviews, and profile quality before contacting a therapist directly.",
+    },
+    {
+      question: "Which cities have live MasseurMatch landing pages?",
+      answer:
+        "Current launch pages include Dallas, Plano, Irving, Highland Park, Houston, Austin, Miami, and Chicago, with local service and neighborhood clusters expanding alongside therapist coverage.",
+    },
+    {
+      question: "Can I compare deep tissue, Swedish, hotel, and outcall options?",
+      answer:
+        "Yes. The directory includes city-plus-service routes for deep tissue, Swedish, sports recovery, hotel massage, mobile massage, incall, and outcall discovery.",
+    },
+    {
+      question: "Does MasseurMatch handle booking or payments?",
+      answer:
+        "No. MasseurMatch is a discovery directory. Users review profiles and contact therapists directly to confirm rates, boundaries, timing, location, and availability.",
+    },
+  ];
 
   return (
     <>
-      <JsonLd data={buildOrganizationJsonLd()} />
-      <section className="page-shell py-12 lg:py-16">
-        <div className="hero-panel grid gap-10 px-6 py-10 lg:grid-cols-[1.15fr,0.85fr] lg:px-10 lg:py-14">
-          <div>
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.32em] text-muted-foreground">
-              Directory first
-            </p>
-            <h1 className="font-display text-5xl leading-tight text-foreground sm:text-6xl">
-              Find massage therapists through city pages that actually help.
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-              MasseurMatch is a profile directory for independent therapists. Browse city pages, compare modalities,
-              review trust signals, and contact providers directly.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <ButtonLink href="/therapists">Browse therapists</ButtonLink>
-              <ButtonLink href="/register" variant="secondary">
-                List your practice
-              </ButtonLink>
-            </div>
-          </div>
+      <JsonLd
+        data={buildCollectionPageJsonLd({
+          name: "MasseurMatch Premium Massage Directory",
+          description:
+            "Discover verified male massage therapists nearby with real availability, transparent pricing, and direct contact.",
+          path: "/",
+        })}
+      />
+      <JsonLd
+        data={buildItemListJsonLd({
+          name: "Top MasseurMatch city pages",
+          path: "/",
+          items: launchCities.map((city) => ({
+            name: `Verified male massage therapists in ${city.city.name}`,
+            path: city.href,
+          })),
+        })}
+      />
+      <JsonLd
+        data={buildItemListJsonLd({
+          name: "Featured MasseurMatch therapists",
+          path: "/",
+          items: featuredTherapists.map((therapist) => ({
+            name: therapist.display_name || therapist.full_name || "Therapist",
+            path: `/therapists/${therapist.slug || therapist.id}`,
+          })),
+        })}
+      />
+      <JsonLd data={buildFaqJsonLd(homeFaqs)} />
 
-          <Card className="grid gap-4 bg-white/85 p-6">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">Live cities</p>
-              <div className="mt-4 grid gap-3">
-                {cities.map((city) => (
-                  <Link
-                    key={city.slug}
-                    href={`/${city.slug}`}
-                    className="surface-panel flex items-center justify-between px-4 py-4 text-sm font-semibold text-foreground"
-                  >
-                    <span>
-                      {city.name}, {city.stateCode}
-                    </span>
-                    <span className="text-muted-foreground">View city</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </Card>
-        </div>
-      </section>
-
-      <section className="page-shell py-14">
-        <SectionHeading
-          eyebrow="Featured profiles"
-          title="Profiles with direct contact details and strong city context."
-          description="Every listing is built around discovery, not marketplace friction. Visitors can compare styles, neighborhoods, and contact preferences before they reach out."
-        />
-        <div className="mt-10 grid gap-6 lg:grid-cols-3">
-          {featured.map((therapist) => {
-            const city = cities.find((item) => item.slug === therapist.citySlug);
-            return <TherapistCard key={therapist.id} therapist={therapist} city={city} />;
-          })}
-        </div>
-      </section>
+      <WorldClassHomepage
+        featuredTherapists={featuredTherapists}
+        totalTherapists={therapistsResult.total}
+        cityCount={launchCities.length}
+      />
     </>
   );
 }

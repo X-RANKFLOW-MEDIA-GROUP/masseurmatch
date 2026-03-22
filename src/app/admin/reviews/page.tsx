@@ -1,28 +1,23 @@
-import { AdminReviewsQueue } from "@/mm/components/admin-tools";
-import { SectionHeading } from "@/mm/components/primitives";
-import { getDirectorySnapshot, getPendingReviews } from "@/mm/lib/directory";
-import { buildMetadata } from "@/mm/lib/metadata";
-
-export const metadata = buildMetadata({
-  title: "Admin reviews",
-  description: "Approve or remove therapist reviews from the moderation queue.",
-  path: "/admin/reviews",
-});
+import AdminReviewsManager from "@/app/admin/_components/AdminReviewsManager";
+import { loadImportedReviews } from "@/app/admin/_lib/loaders";
 
 export default async function AdminReviewsPage() {
-  const [reviews, snapshot] = await Promise.all([getPendingReviews(), getDirectorySnapshot()]);
-  const therapistMap = Object.fromEntries(snapshot.therapists.map((therapist) => [therapist.id, therapist]));
+  const { items, error } = await loadImportedReviews();
 
   return (
-    <section className="page-shell py-14">
-      <SectionHeading
-        eyebrow="Admin"
-        title="Review moderation queue."
-        description="Approve the reviews you want visible on public profiles and remove the rest."
-      />
-      <div className="mt-10">
-        <AdminReviewsQueue reviews={reviews} therapistMap={therapistMap} />
-      </div>
-    </section>
+    <div className="container mx-auto px-4 py-10">
+      <h1 className="mb-2 text-3xl font-bold">Admin Reviews</h1>
+      <p className="mb-6 text-sm text-muted-foreground">
+        Review imported testimonials, fix metadata, or remove bad entries.
+      </p>
+
+      {error ? (
+        <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-muted-foreground">
+          Reviews could not be loaded from Supabase admin right now: {error}
+        </div>
+      ) : null}
+
+      <AdminReviewsManager initialReviews={items} />
+    </div>
   );
 }

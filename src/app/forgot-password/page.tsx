@@ -1,24 +1,14 @@
-import { ForgotPasswordForm } from "@/mm/components/auth-forms";
-import { SectionHeading } from "@/mm/components/primitives";
-import { buildMetadata } from "@/mm/lib/metadata";
+import type { Metadata } from "next";
+import { createPageMetadata } from "@/app/_lib/seo";
+import ForgotPasswordPageClient from "./ForgotPasswordPageClient";
 
-export const metadata = buildMetadata({
+export const metadata: Metadata = createPageMetadata({
   title: "Forgot password",
-  description: "Request password reset instructions for a therapist or admin account.",
+  description: "Private password reset flow.",
   path: "/forgot-password",
+  noIndex: true,
 });
 
 export default function ForgotPasswordPage() {
-  return (
-    <section className="page-shell py-14">
-      <SectionHeading
-        eyebrow="Account help"
-        title="Reset your password."
-        description="Enter the email attached to your therapist or admin account and we will process the reset request."
-      />
-      <div className="mt-10">
-        <ForgotPasswordForm />
-      </div>
-    </section>
-  );
+  return <ForgotPasswordPageClient />;
 }

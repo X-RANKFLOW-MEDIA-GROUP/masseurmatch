@@ -19,7 +19,7 @@ export const AdminRoute = () => {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace(getLegacyAdminDestination(pathname));
+    router.replace(getLegacyAdminDestination(pathname ?? "/admin"));
   }, [pathname, router]);
 
   return null;

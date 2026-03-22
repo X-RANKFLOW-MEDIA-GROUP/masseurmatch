@@ -1,23 +1,31 @@
-import { NextResponse } from "next/server";
-import { createTherapistUser } from "@/mm/lib/mutations";
-import { setSessionCookie } from "@/mm/lib/session";
-import { registerSchema } from "@/mm/lib/validation";
+import { errorResponse, json, parseJsonBody, withSetCookie } from "@/app/api/_lib/http";
+import { setSessionCookie } from "@/app/api/_lib/session";
+import { authRegisterSchema } from "@/app/_lib/validation";
+import { createTherapistUser } from "@/app/api/_lib/supabase-server";
 
 export async function POST(request: Request) {
-  const payload = await request.json();
-  const parsed = registerSchema.safeParse(payload);
-
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Please complete the required fields." }, { status: 400 });
-  }
-
   try {
-    const user = await createTherapistUser(parsed.data);
-    const response = NextResponse.json({ ok: true });
-    await setSessionCookie(response, user);
-    return response;
+    const body = await parseJsonBody(request, authRegisterSchema);
+    const result = await createTherapistUser(body);
+
+    const response = json({
+      ok: true,
+      user: {
+        id: result.user.id,
+        email: result.user.email,
+      },
+      role: result.role,
+    });
+
+    return withSetCookie(
+      response,
+      setSessionCookie({
+        userId: result.user.id,
+        email: result.user.email || body.email,
+        role: result.role,
+      }),
+    );
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unable to create account.";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return errorResponse(error);
   }
 }

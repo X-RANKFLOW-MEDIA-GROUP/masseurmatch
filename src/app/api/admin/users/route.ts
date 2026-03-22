@@ -1,27 +1,59 @@
-import { NextResponse } from "next/server";
-import { getRequestSession } from "@/mm/lib/request";
-import { updateUserRole } from "@/mm/lib/mutations";
-import { adminUserActionSchema } from "@/mm/lib/validation";
+import { z } from "zod";
+
+import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
+import {
+  createSupabaseAdminClient,
+  recordAuditLog,
+  requireAdminSession,
+} from "@/app/api/_lib/supabase-server";
+
+const adminUserActionSchema = z.object({
+  userId: z.string().min(1),
+  role: z.enum(["admin", "provider"]),
+});
+
+async function updateUserRole(
+  adminUserId: string,
+  input: z.infer<typeof adminUserActionSchema>,
+) {
+  const adminClient = createSupabaseAdminClient() as any;
+
+  const { error: deleteError } = await adminClient.from("user_roles").delete().eq("user_id", input.userId);
+  if (deleteError) {
+    throw new RouteError(500, deleteError.message);
+  }
+
+  const { data, error } = await adminClient
+    .from("user_roles")
+    .insert({
+      user_id: input.userId,
+      role: input.role,
+    })
+    .select("user_id, role")
+    .single();
+
+  if (error) {
+    throw new RouteError(500, error.message);
+  }
+
+  await recordAuditLog(adminUserId, "update_user_role", "user", input.userId, {
+    role: input.role,
+  });
+
+  return data;
+}
 
 export async function POST(request: Request) {
-  const session = await getRequestSession(request);
-
-  if (!session || session.role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  }
-
-  const payload = await request.json();
-  const parsed = adminUserActionSchema.safeParse(payload);
-
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid user update." }, { status: 400 });
-  }
-
   try {
-    await updateUserRole(parsed.data.userId, parsed.data.role);
-    return NextResponse.json({ ok: true });
+    const admin = await requireAdminSession(request);
+    const body = await parseJsonBody(request, adminUserActionSchema);
+    const result = await updateUserRole(admin.userId, body);
+
+    return json({
+      ok: true,
+      role: result,
+    });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unable to update user role.";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return errorResponse(error);
   }
 }

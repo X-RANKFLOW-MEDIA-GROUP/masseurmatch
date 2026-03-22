@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lifecyle Email - Paleta e Aplicacao</title>
+    <style>
+      :root {
+        --brand-primary: #0b1f3a;
+        --brand-accent: #ff8a1f;
+        --action-secondary: #1e4b8f;
+        --bg-subtle: #eef2fa;
+        --bg-body: #fcfbf8;
+        --bg-surface: #ffffff;
+        --border: #ece4e4;
+        --benefit-icon: #e2e6f0;
+        --text-secondary: #4a4f5c;
+        --urgency: #fff5ec;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(180deg, #f6f1ea 0%, #fcfbf8 100%);
+        color: #1c2230;
+        padding: 24px;
+      }
+
+      .wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: 28px;
+      }
+
+      .sub {
+        margin: 0 0 18px;
+        color: #5f6674;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .tab {
+        border: 1px solid #d9d0c4;
+        background: #fff8ef;
+        color: #3f2f20;
+        padding: 10px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      .tab.active {
+        background: #1f3f6b;
+        border-color: #1f3f6b;
+        color: #ffffff;
+      }
+
+      .panel {
+        display: none;
+        background: #ffffff;
+        border: 1px solid #ddd4c8;
+        border-radius: 14px;
+        padding: 18px;
+      }
+
+      .panel.active {
+        display: block;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid #ece4e4;
+        text-align: left;
+        padding: 10px 8px;
+        font-size: 14px;
+      }
+
+      th {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #666f7f;
+      }
+
+      .swatch {
+        display: inline-block;
+        width: 28px;
+        height: 20px;
+        border-radius: 6px;
+        border: 1px solid #d7d7d7;
+        vertical-align: middle;
+        margin-right: 8px;
+      }
+
+      .email-frame {
+        border: 1px solid #d9d2c7;
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--bg-body);
+      }
+
+      .hero {
+        background: var(--brand-primary);
+        color: #ffffff;
+        padding: 22px;
+      }
+
+      .badge,
+      .cta,
+      .coupon {
+        background: var(--brand-accent);
+        color: #ffffff;
+      }
+
+      .badge {
+        display: inline-block;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 6px 10px;
+      }
+
+      .offer {
+        margin: 16px 22px 0;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .offer-head {
+        background: var(--action-secondary);
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 10px 12px;
+      }
+
+      .offer-body {
+        background: var(--bg-subtle);
+        color: var(--text-secondary);
+        padding: 12px;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .urgency {
+        margin: 14px 22px 0;
+        background: var(--urgency);
+        border: 1px solid #ffd8b6;
+        color: #7d4b1e;
+        border-radius: 8px;
+        padding: 9px 12px;
+        font-size: 13px;
+      }
+
+      .content {
+        padding: 18px 22px 8px;
+      }
+
+      .benefit {
+        display: grid;
+        grid-template-columns: 24px 1fr;
+        gap: 10px;
+        margin-bottom: 10px;
+        color: var(--text-secondary);
+        font-size: 14px;
+        line-height: 1.55;
+      }
+
+      .icon {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--benefit-icon);
+        color: var(--brand-primary);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+      }
+
+      .benefit strong {
+        color: var(--brand-primary);
+      }
+
+      .actions {
+        text-align: center;
+        padding: 8px 22px 14px;
+      }
+
+      .cta {
+        display: inline-block;
+        text-decoration: none;
+        font-weight: 700;
+        border-radius: 8px;
+        padding: 11px 17px;
+      }
+
+      .coupon {
+        display: inline-block;
+        margin-top: 10px;
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .footer {
+        border-top: 1px solid var(--benefit-icon);
+        margin: 0 22px;
+        padding: 12px 0 18px;
+        color: var(--text-secondary);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .footer a {
+        color: var(--action-secondary);
+      }
+
+      @media (max-width: 780px) {
+        body {
+          padding: 14px;
+        }
+
+        .panel {
+          padding: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Email Lifecycle - Paleta e Aplicacao</h1>
+      <p class="sub">Duas abas para validacao visual: paleta completa e composicao final do email.</p>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="palette" type="button">Paleta completa</button>
+        <button class="tab" data-tab="email" type="button">Email aplicado</button>
+        <button class="tab" data-tab="compact" type="button">Email compacto</button>
+      </div>
+
+      <section class="panel active" id="palette-panel">
+        <table>
+          <thead>
+            <tr>
+              <th>Elemento</th>
+              <th>Token</th>
+              <th>Cor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Hero background</td><td>brand.primary</td><td><span class="swatch" style="background:#0B1F3A"></span>#0B1F3A</td></tr>
+            <tr><td>Eyebrow badge + CTA + coupon</td><td>brand.accent</td><td><span class="swatch" style="background:#FF8A1F"></span>#FF8A1F</td></tr>
+            <tr><td>Offer box header</td><td>action.secondary</td><td><span class="swatch" style="background:#1E4B8F"></span>#1E4B8F</td></tr>
+            <tr><td>Offer box body</td><td>bg.subtle</td><td><span class="swatch" style="background:#EEF2FA"></span>#EEF2FA</td></tr>
+            <tr><td>Urgency stripe</td><td>derivado de accent</td><td><span class="swatch" style="background:#FFF5EC"></span>#FFF5EC</td></tr>
+            <tr><td>Background body</td><td>bg.body</td><td><span class="swatch" style="background:#FCFBF8"></span>#FCFBF8</td></tr>
+            <tr><td>Card surface</td><td>bg.surface</td><td><span class="swatch" style="background:#FFFFFF"></span>#FFFFFF</td></tr>
+            <tr><td>Borders</td><td>border</td><td><span class="swatch" style="background:#ECE4E4"></span>#ECE4E4</td></tr>
+            <tr><td>Benefit icons</td><td>bg.subtle</td><td><span class="swatch" style="background:#E2E6F0"></span>#E2E6F0</td></tr>
+            <tr><td>Titulos dos benefits</td><td>brand.primary</td><td><span class="swatch" style="background:#0B1F3A"></span>#0B1F3A</td></tr>
+            <tr><td>Body copy</td><td>text.secondary</td><td><span class="swatch" style="background:#4A4F5C"></span>#4A4F5C</td></tr>
+            <tr><td>Footer border</td><td>border.subtle</td><td><span class="swatch" style="background:#E2E6F0"></span>#E2E6F0</td></tr>
+            <tr><td>Links footer</td><td>action.secondary</td><td><span class="swatch" style="background:#1E4B8F"></span>#1E4B8F</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="panel" id="email-panel">
+        <article class="email-frame">
+          <header class="hero">
+            <span class="badge">Weekly Boost</span>
+            <h2 style="margin:10px 0 8px;font-size:28px;line-height:1.2">Finish your profile and go live</h2>
+            <p style="margin:0;color:#DCE6FF;line-height:1.6;font-size:15px">Hi Bruno, your profile is close to complete. Finish these items to increase visibility in Sao Paulo.</p>
+          </header>
+
+          <div class="urgency">Offer expires soon. Keep your profile momentum active this week.</div>
+
+          <section class="offer">
+            <div class="offer-head">Featured Offer</div>
+            <div class="offer-body">Upgrade your visibility and keep your listing competitive in your city this week.</div>
+          </section>
+
+          <section class="content">
+            <div class="benefit"><span class="icon">+</span><span><strong>Benefit:</strong> Bio still needs attention.</span></div>
+            <div class="benefit"><span class="icon">+</span><span><strong>Benefit:</strong> Photos still need attention.</span></div>
+            <div class="benefit"><span class="icon">+</span><span><strong>Benefit:</strong> Identity verification still needs attention.</span></div>
+          </section>
+
+          <section class="actions">
+            <a class="cta" href="#">Complete Profile</a><br />
+            <span class="coupon">Coupon: WELCOME10</span>
+          </section>
+
+          <footer class="footer">
+            You are receiving marketing updates from MasseurMatch.<br />
+            <a href="#">Unsubscribe</a> or manage preferences in your dashboard.
+          </footer>
+        </article>
+      </section>
+
+      <section class="panel" id="compact-panel">
+        <article class="email-frame" style="max-width:480px;margin:0 auto;">
+          <header class="hero" style="padding:14px 16px 16px;">
+            <span class="badge" style="font-size:10px;padding:6px 8px;">Weekly Boost</span>
+            <h2 style="margin:10px 0 8px;font-size:23px;line-height:1.2">Finish your profile and go live</h2>
+            <p style="margin:0;color:#DCE6FF;line-height:1.5;font-size:14px">Hi Bruno, your profile is close to complete. Finish these items to increase visibility in Sao Paulo.</p>
+          </header>
+
+          <div class="urgency" style="margin:10px 16px 0;font-size:12px;padding:8px 9px;">Offer expires soon. Keep your profile momentum active this week.</div>
+
+          <section class="offer" style="margin:10px 16px 0;">
+            <div class="offer-head" style="font-size:11px;padding:8px 10px;">Featured Offer</div>
+            <div class="offer-body" style="font-size:13px;line-height:1.45;padding:9px 10px;">Upgrade your visibility and keep your listing competitive in your city this week.</div>
+          </section>
+
+          <section class="content" style="padding:12px 16px 2px;">
+            <div class="benefit" style="grid-template-columns:20px 1fr;font-size:14px;line-height:1.45;margin-bottom:9px;"><span class="icon" style="width:18px;height:18px;font-size:11px;">+</span><span><strong>Benefit:</strong> Bio still needs attention.</span></div>
+            <div class="benefit" style="grid-template-columns:20px 1fr;font-size:14px;line-height:1.45;margin-bottom:9px;"><span class="icon" style="width:18px;height:18px;font-size:11px;">+</span><span><strong>Benefit:</strong> Photos still need attention.</span></div>
+            <div class="benefit" style="grid-template-columns:20px 1fr;font-size:14px;line-height:1.45;margin-bottom:9px;"><span class="icon" style="width:18px;height:18px;font-size:11px;">+</span><span><strong>Benefit:</strong> Identity verification still needs attention.</span></div>
+          </section>
+
+          <section class="actions" style="padding:8px 16px 8px;">
+            <a class="cta" href="#" style="display:block;padding:11px 12px;">Complete Profile</a>
+          </section>
+
+          <section class="actions" style="padding:0 16px 12px;">
+            <span class="coupon" style="margin-top:0;font-size:11px;padding:6px 8px;">Coupon: WELCOME10</span>
+          </section>
+
+          <footer class="footer" style="margin:0 16px;padding:10px 0 14px;font-size:11px;line-height:1.5;">
+            You are receiving marketing updates from MasseurMatch.<br />
+            <a href="#">Unsubscribe</a> or manage preferences in your dashboard.
+          </footer>
+        </article>
+      </section>
+    </div>
+
+    <script>
+      const tabs = document.querySelectorAll('.tab');
+      const palettePanel = document.getElementById('palette-panel');
+      const emailPanel = document.getElementById('email-panel');
+      const compactPanel = document.getElementById('compact-panel');
+
+      tabs.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          tabs.forEach((t) => t.classList.remove('active'));
+          btn.classList.add('active');
+
+          const selected = btn.dataset.tab;
+          palettePanel.classList.toggle('active', selected === 'palette');
+          emailPanel.classList.toggle('active', selected === 'email');
+          compactPanel.classList.toggle('active', selected === 'compact');
+        });
+      });
+    </script>
+  </body>
+</html>

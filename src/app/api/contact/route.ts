@@ -1,28 +1,28 @@
-import { NextResponse } from "next/server";
-import { Resend } from "resend";
-import { resendConfigured } from "@/mm/lib/env";
-import { contactSchema } from "@/mm/lib/validation";
+import { errorResponse, json, parseJsonBody } from "@/app/api/_lib/http";
+import { assertRateLimit, sanitizeText } from "@/app/_lib/security";
+import { contactFormSchema } from "@/app/_lib/validation";
+import { sendSupportEmail } from "@/app/api/_lib/resend";
 
 export async function POST(request: Request) {
-  const payload = await request.json();
-  const parsed = contactSchema.safeParse(payload);
+  try {
+    assertRateLimit(request, "contact-form", { limit: 8, windowMs: 60_000 });
+    const body = await parseJsonBody(request, contactFormSchema);
+    const payload = {
+      name: sanitizeText(body.name),
+      email: body.email.trim().toLowerCase(),
+      subject: sanitizeText(body.subject),
+      message: sanitizeText(body.message),
+    };
+    const delivery = await sendSupportEmail(payload);
 
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Please complete all contact fields." }, { status: 400 });
-  }
-
-  if (resendConfigured) {
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    await resend.emails.send({
-      from: "MasseurMatch <hello@masseurmatch.com>",
-      to: ["support@masseurmatch.com"],
-      replyTo: parsed.data.email,
-      subject: `Directory contact from ${parsed.data.name}`,
-      text: parsed.data.message,
+    return json({
+      ok: true,
+      to: "support@masseurmatch.com",
+      resendId: delivery.id,
+      mock: delivery.mock,
+      subject: payload.subject,
     });
+  } catch (error) {
+    return errorResponse(error);
   }
-
-  return NextResponse.json({
-    message: resendConfigured ? "Message sent to the directory team." : "Message saved. Configure Resend to forward production email.",
-  });
 }

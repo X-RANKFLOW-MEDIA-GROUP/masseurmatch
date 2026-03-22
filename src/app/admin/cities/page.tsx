@@ -1,31 +1,30 @@
-import { AdminCitiesManager } from "@/mm/components/admin-tools";
-import { SectionHeading } from "@/mm/components/primitives";
-import { getDirectorySnapshot } from "@/mm/lib/directory";
-import { buildMetadata } from "@/mm/lib/metadata";
-
-export const metadata = buildMetadata({
-  title: "Admin cities",
-  description: "Manage city records and view therapist counts per city.",
-  path: "/admin/cities",
-});
+import AdminCitiesManager from "@/app/admin/_components/AdminCitiesManager";
+import { readContentStore } from "@/app/api/_lib/content-store";
+import { getPublicTherapists } from "@/app/_lib/directory";
 
 export default async function AdminCitiesPage() {
-  const snapshot = await getDirectorySnapshot();
-  const therapistCounts = snapshot.therapists.reduce<Record<string, number>>((accumulator, therapist) => {
-    accumulator[therapist.citySlug] = (accumulator[therapist.citySlug] || 0) + 1;
+  const [store, therapists] = await Promise.all([
+    readContentStore(),
+    getPublicTherapists({ page: 1, pageSize: 50 }),
+  ]);
+
+  const therapistCounts = therapists.items.reduce<Record<string, number>>((accumulator, therapist) => {
+    const key = therapist.city?.toLowerCase();
+    if (!key) {
+      return accumulator;
+    }
+
+    accumulator[key] = (accumulator[key] || 0) + 1;
     return accumulator;
   }, {});
 
   return (
-    <section className="page-shell py-14">
-      <SectionHeading
-        eyebrow="Admin"
-        title="City coverage management."
-        description="Track how many therapists are attached to each city and add new city records as coverage expands."
-      />
-      <div className="mt-10">
-        <AdminCitiesManager cities={snapshot.cities} therapistCounts={therapistCounts} />
-      </div>
-    </section>
+    <div className="container mx-auto px-4 py-10">
+      <h1 className="mb-2 text-3xl font-bold">Admin Cities</h1>
+      <p className="mb-6 text-sm text-muted-foreground">
+        Manage custom city copy and compare it against the current public therapist footprint.
+      </p>
+      <AdminCitiesManager initialCities={store.cities} therapistCounts={therapistCounts} />
+    </div>
   );
 }
