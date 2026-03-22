@@ -41,18 +41,28 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     });
   }
 
-  const cityIntro = `Browse verified male massage therapists in ${city.name} with visible trust signals, direct contact paths, and premium local discovery pages.`;
-
   const inventoryCount = await getCityInventoryCount(city.name);
+  const cityLabel = `${city.name}, ${city.stateCode}`;
+
+  const title = inventoryCount > 0
+    ? `${inventoryCount}+ Verified Male Massage Therapists in ${cityLabel}`
+    : `Verified Male Massage Therapists in ${cityLabel}`;
+
+  const description = `Find trusted, verified male massage therapists in ${cityLabel}. LGBTQ+-friendly directory with identity-verified professionals, real reviews, and direct booking. Compare rates, specialties & availability.`;
 
   return createPageMetadata({
-    title: `Verified male massage therapists in ${city.name}`,
-    description: cityIntro,
+    title,
+    description,
     path: `/${city.slug}`,
     keywords: [
       `${city.name} male massage`,
+      `gay massage ${city.name}`,
+      `${city.name} LGBTQ massage therapist`,
       `${city.name} verified massage therapist`,
-      `${city.name} premium massage directory`,
+      `male massage near me ${city.name}`,
+      `${city.name} deep tissue massage`,
+      `${city.name} sports massage`,
+      `mobile massage ${city.name}`,
     ],
     noIndex: inventoryCount === 0,
   });

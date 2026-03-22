@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { PublicTherapist } from "@/app/_lib/directory";
+import { ScrambleText } from "@/components/animations/ScrambleText";
+import { TextReveal } from "@/components/animations/TextReveal";
 import "./world-class.css";
 
 /* ─── Types ─── */
@@ -341,6 +343,7 @@ export function WorldClassHomepage({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [nlSuccess, setNlSuccess] = useState(false);
+  const [heroButtonScrambleKey, setHeroButtonScrambleKey] = useState(0);
 
   const nbhdScrollRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -510,14 +513,20 @@ export function WorldClassHomepage({
             </div>
 
             <h1 className="wc-hero-h1">
-              Find your <em>perfect</em>
-              <br />
-              <span className="wc-sub-line">gay-affirming therapist</span>
+              <span className="wc-hero-line">
+                <TextReveal text="Find your" delay={0.04} />
+                <span className="wc-hero-accent">
+                  <TextReveal text="perfect" delay={0.14} />
+                </span>
+              </span>
+              <span className="wc-sub-line">
+                <TextReveal text="gay-affirming therapist" delay={0.24} />
+              </span>
             </h1>
 
             <p className="wc-hero-p">
-              The <strong>LGBTQ+-inclusive</strong> directory connecting you with{" "}
-              <strong>verified, certified</strong> massage professionals who truly welcome every body
+              The <strong>LGBTQ+-inclusive</strong> directory built for precision:
+              <strong> verified credentials</strong>, visible starting rates, and neighborhood-level coverage
               — from Oak Lawn to Montrose to South Congress.
             </p>
 
@@ -549,8 +558,14 @@ export function WorldClassHomepage({
                   <LocationPinIcon />
                   <span>Dallas, TX</span>
                 </div>
-                <button type="button" className="wc-btn-search" onClick={doSearch}>
-                  Search
+                <button
+                  type="button"
+                  className="wc-btn-search"
+                  onClick={doSearch}
+                  onMouseEnter={() => setHeroButtonScrambleKey((value) => value + 1)}
+                  onFocus={() => setHeroButtonScrambleKey((value) => value + 1)}
+                >
+                  <ScrambleText text="Search" playKey={heroButtonScrambleKey} />
                 </button>
 
                 {showSuggestions && (

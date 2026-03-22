@@ -1,15 +1,16 @@
 "use client";
 
-import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { ScrollProgress } from "@/components/animations/ScrollProgress";
+import { useHydratedReducedMotion } from "@/hooks/useHydratedReducedMotion";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 export function AppMotionShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useHydratedReducedMotion();
   const pointerX = useMotionValue(-999);
   const pointerY = useMotionValue(-999);
   const pointerOpacity = useMotionValue(0);

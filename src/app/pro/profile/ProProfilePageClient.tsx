@@ -5,6 +5,7 @@ import { AppButton, AppInput, AppTextarea, PageSection, Surface } from "@/app/_c
 import { updateProfileMutation, type ProProfileMutationResponse } from "@/app/_lib/mutations";
 import { requestJson } from "@/app/_lib/request";
 import { useToast } from "@/hooks/use-toast";
+import { BODY_TYPE_OPTIONS, normalizeBodyTypeValue } from "@/lib/physical-profile";
 
 type ProfileResponse = {
   ok: boolean;
@@ -20,6 +21,9 @@ type FormState = {
   specialties: string;
   incallPrice: string;
   outcallPrice: string;
+  heightInches: string;
+  weightLb: string;
+  bodyType: string;
 };
 
 const EMPTY_FORM: FormState = {
@@ -31,6 +35,9 @@ const EMPTY_FORM: FormState = {
   specialties: "",
   incallPrice: "",
   outcallPrice: "",
+  heightInches: "",
+  weightLb: "",
+  bodyType: "",
 };
 
 function mapProfileToForm(profile: ProfileResponse["profile"]): FormState {
@@ -47,6 +54,9 @@ function mapProfileToForm(profile: ProfileResponse["profile"]): FormState {
     specialties: (profile.specialties || []).join(", "),
     incallPrice: profile.incall_price ? String(profile.incall_price) : "",
     outcallPrice: profile.outcall_price ? String(profile.outcall_price) : "",
+    heightInches: typeof profile.height_inches === "number" ? String(profile.height_inches) : "",
+    weightLb: typeof profile.weight_lb === "number" ? String(profile.weight_lb) : "",
+    bodyType: normalizeBodyTypeValue(profile.body_type) || "",
   };
 }
 
@@ -59,6 +69,17 @@ function parsePrice(value: string) {
 
   const parsed = Number(trimmed);
   return Number.isFinite(parsed) ? Math.max(0, Math.round(parsed)) : null;
+}
+
+function parseWholeNumber(value: string) {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return null;
+  }
+
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) ? Math.round(parsed) : null;
 }
 
 export default function ProProfilePageClient() {
@@ -116,6 +137,9 @@ export default function ProProfilePageClient() {
           .filter(Boolean),
         incallPrice: parsePrice(form.incallPrice),
         outcallPrice: parsePrice(form.outcallPrice),
+        heightInches: parseWholeNumber(form.heightInches),
+        weightLb: parseWholeNumber(form.weightLb),
+        bodyType: normalizeBodyTypeValue(form.bodyType),
       });
 
       setForm(mapProfileToForm(response.profile));
@@ -189,6 +213,34 @@ export default function ProProfilePageClient() {
                 value={form.outcallPrice}
                 onChange={(event) => setForm((current) => ({ ...current, outcallPrice: event.target.value }))}
               />
+              <AppInput
+                type="number"
+                min="48"
+                max="96"
+                placeholder={`Height (in) - 72 = 6'0"`}
+                value={form.heightInches}
+                onChange={(event) => setForm((current) => ({ ...current, heightInches: event.target.value }))}
+              />
+              <AppInput
+                type="number"
+                min="80"
+                max="450"
+                placeholder="Weight (lb)"
+                value={form.weightLb}
+                onChange={(event) => setForm((current) => ({ ...current, weightLb: event.target.value }))}
+              />
+              <select
+                value={form.bodyType}
+                onChange={(event) => setForm((current) => ({ ...current, bodyType: event.target.value }))}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="">Body type</option>
+                {BODY_TYPE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <AppTextarea

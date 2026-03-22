@@ -1,85 +1,79 @@
 import Link from "next/link";
-import { NewsletterSignup } from "../../components/newsletter/NewsletterSignup";
-
-const FOOTER_GROUPS = [
-  {
-    title: "Explore",
-    links: [
-      { href: "/explore", label: "Explore providers" },
-      { href: "/therapists", label: "Browse listings" },
-      { href: "/search", label: "Search directory" },
-    ],
-  },
-  {
-    title: "Sign Up",
-    links: [
-      { href: "/signup", label: "Get Listed" },
-      { href: "/pricing", label: "Pricing" },
-      { href: "/login", label: "Login" },
-    ],
-  },
-  {
-    title: "Company",
-    links: [
-      { href: "/about", label: "About MasseurMatch" },
-      { href: "/contact", label: "Contact" },
-      { href: "/blog", label: "Blog" },
-    ],
-  },
-  {
-    title: "Legal",
-    links: [
-      { href: "/accessibility", label: "Accessibility" },
-      { href: "/terms", label: "Terms" },
-      { href: "/privacy", label: "Privacy" },
-      { href: "/contact", label: "Contact" },
-    ],
-  },
-];
+import { ShieldCheck, ArrowUpRight } from "lucide-react";
 
 export function SiteFooter() {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer className="relative mt-20 overflow-hidden border-t border-white/10 bg-[linear-gradient(145deg,rgb(var(--color-brand-primary-rgb)),rgb(var(--color-brand-deep-navy-rgb))_45%,rgb(var(--color-brand-secondary-rgb)))] text-white">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-soft/80 to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(255,179,71,0.16),transparent_26%)]" />
-      <div className="page-shell relative py-12">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1.3fr),repeat(4,minmax(0,0.75fr))]">
-          <div>
-            <span className="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/70">
-              Trusted premium discovery
-            </span>
-            <h2 className="mt-4 font-display text-3xl font-semibold tracking-[-0.04em] text-white">MasseurMatch</h2>
-            <p className="mt-4 max-w-xl text-sm leading-6 text-white/70">
-              Find verified male massage therapists through a cleaner directory built around trust, local intent,
-              and direct contact.
+    <footer className="bg-slate-950 text-slate-400 pt-20 pb-10 border-t border-slate-900">
+      <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 lg:gap-8 mb-16">
+
+          {/* Brand Column */}
+          <div className="lg:col-span-2 space-y-6">
+            <Link href="/" className="font-display text-2xl font-bold tracking-tighter text-white inline-block">
+              Masseur<span className="text-slate-500">Match</span>
+            </Link>
+            <p className="font-sans text-sm leading-relaxed max-w-sm">
+              The world&apos;s leading directory for high-performance massage therapy and elite holistic wellness professionals.
             </p>
-            <NewsletterSignup
-              className="mt-5"
-              theme="dark"
-              title="Join the MasseurMatch newsletter"
-              description="New cities, growth tips, and platform updates."
-            />
+            <div className="flex items-center gap-2 mt-4">
+              <ShieldCheck className="w-5 h-5 text-emerald-500" />
+              <span className="font-mono text-[10px] uppercase tracking-widest text-slate-300">Verified Secure Network</span>
+            </div>
           </div>
 
-          {FOOTER_GROUPS.map((group) => (
-            <div key={group.title}>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-white/60">{group.title}</h3>
-              <div className="mt-4 flex flex-col gap-3 text-sm text-white/70">
-                {group.links.map((link) => (
-                  <Link key={link.href} href={link.href} className="motion-premium underline-sweep transition-colors hover:text-brand-soft">
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ))}
+          {/* Links: Explore */}
+          <div className="space-y-6">
+            <h4 className="font-mono text-xs uppercase tracking-widest text-white">Explore</h4>
+            <ul className="space-y-4 font-sans text-sm">
+              <li><Link href="/search" className="hover:text-white transition-colors">Find a Therapist</Link></li>
+              <li><Link href="/near-me" className="hover:text-white transition-colors">Therapists Near Me</Link></li>
+              <li><Link href="/cities" className="hover:text-white transition-colors">Browse by City</Link></li>
+              <li><Link href="/blog" className="hover:text-white transition-colors">Wellness Journal</Link></li>
+            </ul>
+          </div>
+
+          {/* Links: For Professionals */}
+          <div className="space-y-6">
+            <h4 className="font-mono text-xs uppercase tracking-widest text-white">For Professionals</h4>
+            <ul className="space-y-4 font-sans text-sm">
+              <li><Link href="/for-therapists" className="hover:text-white transition-colors">Join the Network</Link></li>
+              <li><Link href="/pricing" className="hover:text-white transition-colors">Plans &amp; Pricing</Link></li>
+              <li><Link href="/login" className="hover:text-white transition-colors">Provider Login</Link></li>
+              <li><Link href="/trust" className="hover:text-white transition-colors">Quality Guidelines</Link></li>
+            </ul>
+          </div>
+
+          {/* Links: Trust & Legal */}
+          <div className="space-y-6">
+            <h4 className="font-mono text-xs uppercase tracking-widest text-white">Trust &amp; Legal</h4>
+            <ul className="space-y-4 font-sans text-sm">
+              <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
+              <li><Link href="/trust" className="hover:text-white transition-colors">Trust &amp; Safety</Link></li>
+              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition-colors">Contact Support</Link></li>
+            </ul>
+          </div>
+
         </div>
 
-        <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-white/60 md:flex-row md:items-center md:justify-between">
-          <p>Copyright {new Date().getFullYear()} MasseurMatch</p>
-          <p>Search by city, compare trust signals, and contact therapists directly.</p>
-          <p>MasseurMatch handles trusted discovery, not bookings.</p>
+        {/* Bottom Bar: Copyright & Location */}
+        <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-slate-900 gap-4">
+          <p className="font-sans text-xs">
+            &copy; {currentYear} MasseurMatch. All rights reserved.
+          </p>
+          <div className="flex items-center gap-6 font-mono text-[10px] uppercase tracking-widest">
+            <Link href="/cookie-policy" className="hover:text-white transition-colors">Cookies</Link>
+            <Link href="/accessibility" className="hover:text-white transition-colors">Accessibility</Link>
+            <span className="flex items-center gap-1">
+              Made in <ArrowUpRight className="w-3 h-3 text-slate-600" /> Dallas, TX
+            </span>
+          </div>
         </div>
+
       </div>
     </footer>
   );

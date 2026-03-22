@@ -40,12 +40,27 @@ export async function POST(request: Request) {
       specialties: sanitizeStringArray(body.specialties),
       incall_price: body.incallPrice ?? null,
       outcall_price: body.outcallPrice ?? null,
+      height_inches: body.heightInches ?? null,
+      weight_lb: body.weightLb ?? null,
+      body_type: sanitizeOptionalText(body.bodyType),
       status: profile.status === "active" ? "pending_approval" : profile.status,
       is_active: profile.status === "active" ? false : profile.is_active,
     });
 
     await recordAuditLog(session.userId, "provider.profile.update", "profile", profile.id, {
-      fields: ["display_name", "bio", "city", "state", "phone", "specialties", "incall_price", "outcall_price"],
+      fields: [
+        "display_name",
+        "bio",
+        "city",
+        "state",
+        "phone",
+        "specialties",
+        "incall_price",
+        "outcall_price",
+        "height_inches",
+        "weight_lb",
+        "body_type",
+      ],
     });
 
     await triggerRevalidate(

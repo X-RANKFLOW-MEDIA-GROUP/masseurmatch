@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 const LEGAL_LINKS = [
+  { href: "/legal", label: "Legal Center" },
   { href: "/terms", label: "Terms" },
   { href: "/privacy", label: "Privacy" },
   { href: "/therapist-agreement", label: "Therapist Agreement" },

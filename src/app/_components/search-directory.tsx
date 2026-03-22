@@ -5,17 +5,39 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import type { PublicTherapist, TherapistTier } from "@/app/_lib/directory";
 import { GeoAreaCallout } from "@/app/_components/geo-area-callout";
+import { PublicTherapistCard } from "@/app/_components/PublicTherapistCard";
 import { withSearchParams } from "@/app/_lib/request";
-import { Surface } from "@/app/_components/primitives";
-import { TherapistCard } from "@/app/_components/therapist-card";
+import {
+  AdvancedDirectoryFilter,
+  getDirectoryObjectiveSearchValue,
+  type AdvancedDirectoryFilterState,
+  type DirectorySession,
+} from "@/components/sections/AdvancedDirectoryFilter";
 import type { CityData } from "@/data/cities";
+import {
+  buildPhysicalSearchTerms,
+  matchBodyTypeKeyword,
+  normalizeBodyTypeValue,
+} from "@/lib/physical-profile";
 
-const MATCHMAKER_TAGS = [
-  { id: "deep-tissue", label: "Deep Tissue" },
-  { id: "outcall", label: "Outcall" },
-  { id: "incall", label: "Incall" },
-  { id: "verified", label: "Verified" },
-] as const;
+const normalizeText = (value: string | null | undefined) =>
+  (value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+const getYearsExperience = (therapist: PublicTherapist) => {
+  if (typeof therapist.years_experience === "number" && therapist.years_experience > 0) {
+    return therapist.years_experience;
+  }
+
+  if (typeof therapist.start_year === "number" && therapist.start_year > 0) {
+    return new Date().getFullYear() - therapist.start_year;
+  }
+
+  return null;
+};
 
 export function SearchDirectory({
   cities,
@@ -26,15 +48,7 @@ export function SearchDirectory({
   cities: CityData[];
   items: PublicTherapist[];
   total: number;
-  filters: {
-    city: string;
-    modality: string;
-    keyword: string;
-    session: string;
-    goal: string;
-    verified: boolean;
-    tier: TherapistTier | "";
-  };
+  filters: AdvancedDirectoryFilterState;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -42,10 +56,13 @@ export function SearchDirectory({
   const [city, setCity] = useState(filters.city);
   const [modality, setModality] = useState(filters.modality);
   const [keyword, setKeyword] = useState(filters.keyword);
-  const [session, setSession] = useState(filters.session);
+  const [session, setSession] = useState<DirectorySession>(filters.session);
   const [goal, setGoal] = useState(filters.goal);
   const [verified, setVerified] = useState(filters.verified);
+  const [availableToday, setAvailableToday] = useState(filters.availableToday);
+  const [masterOnly, setMasterOnly] = useState(filters.masterOnly);
   const [tier, setTier] = useState<TherapistTier | "">(filters.tier);
+  const [lgbtqAffirming, setLgbtqAffirming] = useState(filters.lgbtqAffirming);
 
   useEffect(() => {
     setCity(filters.city);
@@ -54,8 +71,22 @@ export function SearchDirectory({
     setSession(filters.session);
     setGoal(filters.goal);
     setVerified(filters.verified);
+    setAvailableToday(filters.availableToday);
+    setMasterOnly(filters.masterOnly);
     setTier(filters.tier);
-  }, [filters.city, filters.goal, filters.keyword, filters.modality, filters.session, filters.tier, filters.verified]);
+    setLgbtqAffirming(filters.lgbtqAffirming);
+  }, [
+    filters.availableToday,
+    filters.city,
+    filters.goal,
+    filters.keyword,
+    filters.lgbtqAffirming,
+    filters.masterOnly,
+    filters.modality,
+    filters.session,
+    filters.tier,
+    filters.verified,
+  ]);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -67,16 +98,35 @@ export function SearchDirectory({
         goal,
         verified: verified ? "1" : "",
         tier,
+        available: availableToday ? "1" : "",
+        master: masterOnly ? "1" : "",
+        lgbtq: lgbtqAffirming ? "1" : "",
       });
+
       startTransition(() => {
         router.replace(nextUrl);
       });
     }, 180);
 
     return () => window.clearTimeout(timeout);
-  }, [city, goal, keyword, modality, pathname, router, session, tier, verified]);
+  }, [
+    availableToday,
+    city,
+    goal,
+    keyword,
+    lgbtqAffirming,
+    masterOnly,
+    modality,
+    pathname,
+    router,
+    session,
+    tier,
+    verified,
+  ]);
 
   const visibleItems = useMemo(() => {
+    const objectiveSearchValue = normalizeText(getDirectoryObjectiveSearchValue(goal, modality));
+
     return items.filter((item) => {
       const searchable = [
         item.display_name,
@@ -84,13 +134,27 @@ export function SearchDirectory({
         item.bio,
         item.modality,
         ...(item.specialties || []),
+        item.neighborhood_name,
+        item.primary_area,
+        ...buildPhysicalSearchTerms({
+          heightInches: item.height_inches,
+          weightLb: item.weight_lb,
+          bodyType: item.body_type,
+        }),
       ]
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
 
-      const matchesModality = modality ? searchable.includes(modality.toLowerCase()) : true;
-      const matchesKeyword = keyword ? searchable.includes(keyword.toLowerCase()) : true;
+      const yearsExperience = getYearsExperience(item);
+      const bodyTypeKeyword = matchBodyTypeKeyword(keyword);
+      const matchesCity = city ? normalizeText(item.city) === normalizeText(city) : true;
+      const matchesModality = modality ? searchable.includes(normalizeText(modality)) : true;
+      const matchesGoal = objectiveSearchValue ? searchable.includes(objectiveSearchValue) : true;
+      const matchesKeyword = keyword
+        ? searchable.includes(normalizeText(keyword)) ||
+          (bodyTypeKeyword ? normalizeBodyTypeValue(item.body_type) === bodyTypeKeyword : false)
+        : true;
       const matchesSession =
         session === "home-visit"
           ? Boolean(item.outcall_price)
@@ -105,164 +169,107 @@ export function SearchDirectory({
             Boolean(item.is_verified_identity) ||
             Boolean(item.is_verified_profile)
           : true;
+      const matchesTier = tier ? item._tier === tier : true;
+      const matchesAvailable = availableToday ? Boolean(item.available_now) : true;
+      const matchesMaster = masterOnly ? Boolean(yearsExperience && yearsExperience >= 10) : true;
+      const matchesLgbtq = lgbtqAffirming ? Boolean(item.lgbtq_affirming) : true;
 
-      return matchesModality && matchesKeyword && matchesSession && matchesVerified;
+      return (
+        matchesCity &&
+        matchesModality &&
+        matchesGoal &&
+        matchesKeyword &&
+        matchesSession &&
+        matchesVerified &&
+        matchesTier &&
+        matchesAvailable &&
+        matchesMaster &&
+        matchesLgbtq
+      );
     });
-  }, [items, keyword, modality, session, verified]);
+  }, [availableToday, city, goal, items, keyword, lgbtqAffirming, masterOnly, modality, session, tier, verified]);
 
-  const toggleTag = (tagId: (typeof MATCHMAKER_TAGS)[number]["id"]) => {
-    if (tagId === "deep-tissue") {
-      const nextKeyword = keyword.toLowerCase().includes("deep") ? "" : "deep tissue";
-      const nextModality = modality.toLowerCase().includes("deep") ? "" : modality || "deep tissue";
-      setKeyword(nextKeyword);
-      setModality(nextModality);
-      return;
+  const handleFilterChange = (updates: Partial<AdvancedDirectoryFilterState>) => {
+    if (updates.city !== undefined) {
+      setCity(updates.city);
     }
-
-    if (tagId === "outcall") {
-      setSession((prev) => (prev === "home-visit" ? "" : "home-visit"));
-      return;
+    if (updates.modality !== undefined) {
+      setModality(updates.modality);
     }
-
-    if (tagId === "incall") {
-      setSession((prev) => (prev === "incall" ? "" : "incall"));
-      return;
+    if (updates.keyword !== undefined) {
+      setKeyword(updates.keyword);
     }
+    if (updates.session !== undefined) {
+      setSession(updates.session);
+    }
+    if (updates.goal !== undefined) {
+      setGoal(updates.goal);
+    }
+    if (updates.verified !== undefined) {
+      setVerified(updates.verified);
+    }
+    if (updates.availableToday !== undefined) {
+      setAvailableToday(updates.availableToday);
+    }
+    if (updates.masterOnly !== undefined) {
+      setMasterOnly(updates.masterOnly);
+    }
+    if (updates.tier !== undefined) {
+      setTier(updates.tier);
+    }
+    if (updates.lgbtqAffirming !== undefined) {
+      setLgbtqAffirming(updates.lgbtqAffirming);
+    }
+  };
 
-    setVerified((prev) => !prev);
+  const resetSearch = () => {
+    setCity("");
+    setModality("");
+    setKeyword("");
+    setSession("");
+    setGoal("");
+    setVerified(false);
+    setAvailableToday(false);
+    setMasterOnly(false);
+    setTier("");
+    setLgbtqAffirming(false);
+    router.push(pathname || "/search");
   };
 
   return (
     <section className="mt-8">
-      {(session || goal || verified || keyword) ? (
-        <div className="mb-6 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          {session ? (
-            <span className="rounded-full border border-border bg-secondary/60 px-3 py-2 text-foreground">
-              Session: {session.replace(/-/g, " ")}
-            </span>
-          ) : null}
-          {verified ? (
-            <span className="rounded-full border border-border bg-secondary/60 px-3 py-2 text-foreground">
-              Verified only
-            </span>
-          ) : null}
-          {keyword ? (
-            <span className="rounded-full border border-border bg-secondary/60 px-3 py-2 text-foreground">
-              Keyword: {keyword}
-            </span>
-          ) : null}
-          {goal ? (
-            <span className="rounded-full border border-border bg-secondary/60 px-3 py-2 text-foreground">
-              Goal: {goal.replace(/-/g, " ")}
-            </span>
-          ) : null}
-        </div>
-      ) : null}
+      <AdvancedDirectoryFilter
+        cities={cities}
+        filters={{
+          city,
+          keyword,
+          modality,
+          goal,
+          session,
+          verified,
+          availableToday,
+          masterOnly,
+          tier,
+          lgbtqAffirming,
+        }}
+        resultCount={visibleItems.length}
+        totalCount={total}
+        isPending={isPending}
+        onChange={handleFilterChange}
+        onReset={resetSearch}
+      />
 
       <GeoAreaCallout
-        className="mb-4"
+        className="mt-5"
         compact
         source="search-directory-geolocation"
         onResolved={(resolvedCity) => setCity(resolvedCity.name)}
       />
 
-      <div className="mb-4 flex flex-wrap gap-2">
-        {MATCHMAKER_TAGS.map((tag) => {
-          const active =
-            tag.id === "deep-tissue"
-              ? keyword.toLowerCase().includes("deep") || modality.toLowerCase().includes("deep")
-              : tag.id === "outcall"
-                ? session === "home-visit"
-                : tag.id === "incall"
-                  ? session === "incall"
-                  : verified;
-
-          return (
-            <button
-              key={tag.id}
-              type="button"
-              onClick={() => toggleTag(tag.id)}
-              aria-pressed={active}
-              className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] transition ${
-                active
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border bg-background text-muted-foreground hover:bg-secondary"
-              }`}
-            >
-              {tag.label}
-            </button>
-          );
-        })}
-      </div>
-
-      <Surface className="grid gap-3 p-5 md:grid-cols-4">
-        <select
-          className="rounded-md border border-border bg-background px-3 py-2"
-          value={city}
-          onChange={(event) => setCity(event.target.value)}
-        >
-          <option value="">All cities</option>
-          {cities.slice(0, 200).map((item) => (
-            <option key={item.slug} value={item.name}>
-              {item.name}, {item.stateCode}
-            </option>
-          ))}
-        </select>
-
-        <input
-          className="rounded-md border border-border bg-background px-3 py-2"
-          placeholder="Specialty or modality"
-          value={modality}
-          onChange={(event) => setModality(event.target.value)}
-        />
-
-        <input
-          className="rounded-md border border-border bg-background px-3 py-2"
-          placeholder="Keyword (male, gay, recovery)"
-          value={keyword}
-          onChange={(event) => setKeyword(event.target.value)}
-        />
-
-        <select
-          className="rounded-md border border-border bg-background px-3 py-2"
-          value={tier}
-          onChange={(event) => setTier((event.target.value as TherapistTier | "") || "")}
-        >
-          <option value="">All tiers</option>
-          <option value="free">Free</option>
-          <option value="standard">Standard</option>
-          <option value="pro">Pro</option>
-          <option value="elite">Elite</option>
-        </select>
-      </Surface>
-
-      <div className="mt-6 flex items-center justify-between gap-4">
-        <p className="text-sm text-muted-foreground">
-          {visibleItems.length} therapist {visibleItems.length === 1 ? "listing" : "listings"} matching now
-          {total !== visibleItems.length ? ` · ${total} indexed` : ""}
-          {isPending ? " · updating" : ""}
-        </p>
-        <button
-          className="text-sm font-semibold text-primary hover:underline"
-          onClick={() => {
-            setCity("");
-            setModality("");
-            setKeyword("");
-            setSession("");
-            setGoal("");
-            setVerified(false);
-            setTier("");
-            router.push(pathname || "/search");
-          }}
-        >
-          Reset search
-        </button>
-      </div>
-
       {visibleItems.length > 0 ? (
         <div className="stagger-grid mt-6 grid gap-4 lg:grid-cols-2">
           {visibleItems.map((item) => (
-            <TherapistCard key={item.id} therapist={item} />
+            <PublicTherapistCard key={item.id} therapist={item} />
           ))}
         </div>
       ) : (

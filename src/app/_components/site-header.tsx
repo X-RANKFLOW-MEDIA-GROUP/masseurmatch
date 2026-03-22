@@ -1,120 +1,53 @@
+// src/app/_components/SiteHeader.tsx
 "use client";
 
-import { useState } from "react";
+import { motion } from "framer-motion";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
-import { supportedLocales, useI18n, type Locale } from "@/app/_lib/i18n";
-
-export function SiteHeader() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const { locale, setLocale, t } = useI18n();
-
-  const closeMobileMenu = () => setMobileOpen(false);
-
-  const headerLinks = [
-    { href: "/", label: "Home" },
-    { href: "/explore", label: "Explore" },
-    { href: "/signup", label: "Sign Up" },
-    { href: "/about", label: "About" },
-    { href: "/login", label: "Login" },
-  ];
-
-  const localeLabels: Record<Locale, string> = {
-    en: "English (US)",
-    es: "Espanol",
-    fr: "Francais",
-    pt: "Portugues",
-    de: "Deutsch",
-    it: "Italiano",
-    nl: "Nederlands",
-    ja: "Japanese",
-    zh: "Chinese",
-  };
-
+export default function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-border/80 bg-[rgb(var(--color-bg-surface-rgb)/0.84)] shadow-[0_10px_28px_rgb(var(--color-brand-primary-rgb)/0.05)] backdrop-blur-2xl">
-      <div className="mx-auto flex h-[74px] w-full max-w-[1320px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="font-display text-xl font-semibold tracking-[-0.04em] text-text-primary transition-colors hover:text-brand-secondary">
-          MasseurMatch
+    <motion.header 
+      // Shrink and expand from center animation on load
+      initial={{ width: "40%", opacity: 0, y: -20 }}
+      animate={{ width: "100%", opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-4 px-4 pointer-events-none"
+    >
+      <div className="w-full max-w-7xl bg-slate-950/80 backdrop-blur-xl border border-slate-800 rounded-2xl px-6 py-4 flex items-center justify-between pointer-events-auto shadow-2xl">
+        
+        {/* Logo */}
+        <Link href="/" className="font-display text-xl font-bold tracking-tighter text-white">
+          Masseur<span className="text-slate-500">Match</span>
         </Link>
-        <div className="flex items-center gap-3">
-          <label className="hidden items-center gap-2 rounded-full border border-border-strong bg-white/88 px-3 py-1.5 text-xs font-medium text-text-secondary shadow-[inset_0_1px_0_rgb(255_255_255/_0.92)] md:flex">
-            <span>{t("header.language", "Language")}</span>
-            <select
-              value={locale}
-              onChange={(event) => setLocale(event.target.value as Locale)}
-              className="bg-transparent text-xs font-semibold text-text-primary outline-none"
-              aria-label={t("header.language", "Language")}
-            >
-              {supportedLocales.map((item) => (
-                <option key={item} value={item}>
-                  {localeLabels[item]}
-                </option>
-              ))}
-            </select>
-          </label>
 
-          <nav className="hidden items-center gap-1 rounded-full border border-border-tertiary bg-white/84 p-1 shadow-[inset_0_1px_0_rgb(255_255_255/_0.82)] lg:flex">
-            {headerLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="motion-premium rounded-full px-4 py-2 text-sm font-medium text-text-secondary transition hover:bg-bg-subtle hover:text-text-primary"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-          <button
-            type="button"
-            className="motion-premium inline-flex h-10 w-10 items-center justify-center rounded-full border border-border-subtle bg-white/88 text-foreground shadow-[inset_0_1px_0_rgb(255_255_255/_0.92)] transition hover:border-border-strong hover:text-text-primary lg:hidden"
-            aria-expanded={mobileOpen}
-            aria-controls="site-mobile-menu"
-            aria-label={mobileOpen ? t("header.closeMenu", "Close menu") : t("header.openMenu", "Open menu")}
-            onClick={() => setMobileOpen((current) => !current)}
-          >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
-      </div>
-
-      {mobileOpen ? (
-        <div id="site-mobile-menu" className="border-t border-border-tertiary bg-[rgb(var(--color-bg-surface-rgb)/0.94)] backdrop-blur-2xl lg:hidden">
-          <div className="mx-auto w-full max-w-[1320px] px-4 py-4 sm:px-6">
-            <div className="mb-3 rounded-[1.5rem] border border-border-tertiary bg-white/88 px-4 py-3 shadow-brand">
-              <label className="flex items-center justify-between gap-3 text-sm font-medium text-text-secondary">
-                <span>{t("header.language", "Language")}</span>
-                <select
-                  value={locale}
-                  onChange={(event) => setLocale(event.target.value as Locale)}
-                  className="rounded-md border border-border-strong bg-white px-2 py-1 text-sm font-semibold text-text-primary outline-none"
-                  aria-label={t("header.language", "Language")}
-                >
-                  {supportedLocales.map((item) => (
-                    <option key={item} value={item}>
-                      {localeLabels[item]}
-                    </option>
-                  ))}
-                </select>
-              </label>
+        {/* Center Navigation (Hidden on mobile for now) */}
+        <nav className="hidden md:flex items-center gap-8">
+          <div className="relative group">
+            <button className="flex items-center gap-1 font-sans text-sm text-slate-300 hover:text-white transition-colors">
+              Explore <ChevronDown className="w-3 h-3 opacity-50 group-hover:rotate-180 transition-transform" />
+            </button>
+            {/* Submenu */}
+            <div className="absolute top-full left-0 mt-4 w-48 bg-slate-900 border border-slate-800 rounded-xl p-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all shadow-xl">
+              <Link href="/cities" className="block px-4 py-2 font-sans text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg">Cities</Link>
+              <Link href="/therapists" className="block px-4 py-2 font-sans text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg">All Therapists</Link>
             </div>
-
-            <nav className="flex flex-col gap-2 text-sm font-semibold text-foreground">
-              {headerLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="motion-premium rounded-[1.35rem] border border-transparent px-4 py-3 text-sm font-medium text-text-secondary transition hover:border-border-subtle hover:bg-bg-subtle"
-                  onClick={closeMobileMenu}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
           </div>
+          <Link href="/blog" className="font-sans text-sm text-slate-300 hover:text-white transition-colors">Journal</Link>
+          <Link href="/trust" className="font-sans text-sm text-slate-300 hover:text-white transition-colors">Trust & Safety</Link>
+        </nav>
+
+        {/* Right CTAs */}
+        <div className="flex items-center gap-4">
+          <Link href="/login" className="font-sans text-sm text-slate-300 hover:text-white transition-colors hidden sm:block">
+            Log In
+          </Link>
+          <Link href="/signup" className="h-10 px-5 bg-white text-slate-950 flex items-center justify-center rounded-lg font-sans text-sm font-semibold hover:bg-slate-200 transition-colors active:scale-95">
+            Sign Up
+          </Link>
         </div>
-      ) : null}
-    </header>
+
+      </div>
+    </motion.header>
   );
 }

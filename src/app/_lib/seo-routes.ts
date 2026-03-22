@@ -8,7 +8,7 @@ import {
 } from "@/app/_lib/launch-urls";
 import { GUIDES } from "@/app/guides/data";
 import { appUrl } from "@/app/_lib/metadata";
-import { absoluteUrl, getSeoTherapists } from "@/app/_lib/seo-data";
+import { absoluteUrl, getSeoBlogPosts, getSeoCities, getSeoTherapists } from "@/app/_lib/seo-data";
 import { uniqueStrings } from "@/app/_lib/utils";
 import { competitorSlugs } from "@/lib/competitors";
 
@@ -88,8 +88,11 @@ const CORE_STATIC_ROUTES: StaticSitemapRoute[] = [
   { path: "/advertise",           changeFrequency: "monthly", priority: 0.7 },
   { path: "/safety",              changeFrequency: "monthly", priority: 0.7 },
   { path: "/contact",             changeFrequency: "monthly", priority: 0.6 },
+  { path: "/legal",               changeFrequency: "monthly", priority: 0.5 },
   { path: "/privacy",             changeFrequency: "monthly", priority: 0.5 },
   { path: "/terms",               changeFrequency: "monthly", priority: 0.5 },
+  { path: "/community-guidelines", changeFrequency: "monthly", priority: 0.4 },
+  { path: "/platform-disclaimer",  changeFrequency: "monthly", priority: 0.4 },
   { path: "/cookie-policy",       changeFrequency: "monthly", priority: 0.4 },
   { path: "/therapist-agreement", changeFrequency: "monthly", priority: 0.4 },
   { path: "/compare",            changeFrequency: "monthly", priority: 0.7 },
@@ -135,8 +138,19 @@ export function buildCoreSitemapEntries(now = new Date()): MetadataRoute.Sitemap
   }));
 }
 
-// ─── City sitemap (only cities with real inventory) ───────────────────────────
+// ─── City sitemap (dynamic from Supabase with fallback to static list) ────────
 export async function buildCitiesSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
+  const dbCities = await getSeoCities();
+
+  if (dbCities.length > 0) {
+    return dbCities.map((city) => ({
+      url: absoluteUrl(`/${city.slug}`),
+      lastModified: city.updated_at ? new Date(city.updated_at) : now,
+      changeFrequency: "weekly" as const,
+      priority: city.slug === "dallas" ? 0.8 : 0.7,
+    }));
+  }
+
   return getLaunchCityPaths().map((path) => ({
     url: `${appUrl}${path}`,
     lastModified: now,
@@ -189,6 +203,17 @@ export function buildGuidesSitemapEntries(now = new Date()): MetadataRoute.Sitem
     lastModified: new Date(guide.publishedAt),
     changeFrequency: "monthly" as const,
     priority: 0.6,
+  }));
+}
+
+// ─── Blog posts sitemap (dynamic from Supabase) ──────────────────────────────
+export async function buildBlogPostsSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
+  const dbPosts = await getSeoBlogPosts();
+  return dbPosts.map((post) => ({
+    url: absoluteUrl(`/blog/${post.slug}`),
+    lastModified: post.updated_at ? new Date(post.updated_at) : post.published_at ? new Date(post.published_at) : now,
+    changeFrequency: "weekly" as const,
+    priority: 0.65,
   }));
 }
 

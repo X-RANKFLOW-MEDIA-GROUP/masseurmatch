@@ -6,7 +6,8 @@ import {
   getCities,
   getPublicTherapists,
 } from "@/app/_lib/directory";
-import { AdvancedDirectoryFilter } from "@/components";
+import { TextReveal } from "@/components/animations/TextReveal";
+import type { DirectorySession } from "@/components/sections/AdvancedDirectoryFilter";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
@@ -77,18 +78,25 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const city = resolveCityName(getFirstParam(params.city));
   const modality = getFirstParam(params.modality);
   const keyword = getFirstParam(params.keyword);
-  const session = getFirstParam(params.session);
+  const sessionParam = getFirstParam(params.session);
+  const session: DirectorySession =
+    sessionParam === "home-visit" ? "home-visit" : sessionParam === "incall" ? "incall" : "";
   const goal = getFirstParam(params.goal);
   const verified = getFirstParam(params.verified) === "1";
+  const availableToday = getFirstParam(params.available) === "1";
+  const masterOnly = getFirstParam(params.master) === "1";
   const tierValue = getFirstParam(params.tier);
   const tier = isTier(tierValue) ? tierValue : "";
+  const lgbtqAffirming = getFirstParam(params.lgbtq) === "1";
   const results = await getPublicTherapists({
     city: city || undefined,
     modality: modality || undefined,
     keyword: keyword || undefined,
-    session: session === "home-visit" ? "home-visit" : session === "incall" ? "incall" : undefined,
+    session: session || undefined,
     verified,
+    availableToday,
     tier: tier || undefined,
+    lgbtqAffirming: lgbtqAffirming || undefined,
     page: 1,
     pageSize: 12,
   });
@@ -123,12 +131,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       <JsonLd data={buildFaqJsonLd(SEARCH_FAQS)} />
 
       <div className="page-shell py-10">
-        <div className="max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">Explore and search</p>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground">
-            Find trusted therapists fast.
+        <div className="rounded-[2.2rem] border border-slate-800 bg-slate-950 px-6 py-8 shadow-[0_28px_80px_rgba(15,23,42,0.22)] sm:px-8 sm:py-10">
+          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.32em] text-slate-400">Explore and search</p>
+          <h1 className="mt-4 max-w-4xl font-display text-5xl font-medium tracking-tight text-white sm:text-6xl lg:text-7xl">
+            <TextReveal text="Find trusted therapists fast." delay={0.05} />
           </h1>
-          <p className="mt-4 text-base leading-7 text-muted-foreground">
+          <p className="mt-5 max-w-2xl font-sans text-lg font-light leading-relaxed text-slate-300">
             Search is built for confidence-first discovery: visible verification, cleaner local intent pages, and direct
             contact options that move users from browsing to calling or messaging in seconds.
           </p>
@@ -139,52 +147,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <Link
               key={entry.slug}
               href={`/${entry.slug}`}
-              className="rounded-full border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground hover:bg-secondary"
+              className="rounded-full border border-slate-200 bg-white px-3 py-2 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
             >
               {entry.name}
             </Link>
           ))}
         </div>
-
-        <section className="mt-8 rounded-3xl border border-border bg-background p-5 shadow-sm">
-          <h2 className="text-xl font-semibold text-foreground">Trust-first filter preview</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Refine by modality, budget, and tier. The goal is to make verified, outcall, and premium listings easier to find without noise.
-          </p>
-          <div className="mt-4">
-            <AdvancedDirectoryFilter
-              groups={[
-                {
-                  id: "modality",
-                  label: "Modality",
-                  type: "checkbox",
-                  options: [
-                    { id: "swedish", label: "Swedish" },
-                    { id: "deep-tissue", label: "Deep Tissue" },
-                    { id: "sports", label: "Sports Recovery" },
-                  ],
-                },
-                {
-                  id: "price",
-                  label: "Price",
-                  type: "range",
-                  min: 50,
-                  max: 500,
-                },
-                {
-                  id: "tier",
-                  label: "Listing tier",
-                  type: "multi-select",
-                  options: [
-                    { id: "standard", label: "Standard" },
-                    { id: "pro", label: "Pro" },
-                    { id: "elite", label: "Elite" },
-                  ],
-                },
-              ]}
-            />
-          </div>
-        </section>
 
         <SearchPageClient
           cities={cities}
@@ -197,7 +165,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             session,
             goal,
             verified,
+            availableToday,
+            masterOnly,
             tier,
+            lgbtqAffirming,
           }}
         />
 

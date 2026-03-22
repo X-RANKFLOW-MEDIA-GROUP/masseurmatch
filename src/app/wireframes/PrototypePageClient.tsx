@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
   ArrowRight,
@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { useHydratedReducedMotion } from "@/hooks/useHydratedReducedMotion";
 import styles from "./wireframes.module.css";
 import {
   PROTOTYPE_FLOW,
@@ -424,7 +425,7 @@ function PrototypeCanvas({
 }
 
 export function PrototypePageClient() {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useHydratedReducedMotion();
   const [activeStepId, setActiveStepId] = useState<PrototypeStepId>("home");
   const [viewportId, setViewportId] = useState<WireframeViewportId>("desktop");
   const [authStateId, setAuthStateId] = useState<WireframeStateId>("logged-out");

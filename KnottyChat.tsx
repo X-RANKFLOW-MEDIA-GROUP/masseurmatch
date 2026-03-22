@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, X } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 
 interface Message {
@@ -117,17 +116,44 @@ export const KnottyChat = () => {
     setIsTyping(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke("knotty-chat", {
-        body: {
+      const response = await fetch("/api/knotty", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: `knotty-${Date.now()}`,
           messages: newMessages
             .filter((m) => m.id !== 0)
             .map((m) => ({ role: m.role, content: m.content })),
-        },
+          context: {
+            pagePath: typeof window !== "undefined" ? window.location.pathname : "/",
+            pageQuery: typeof window !== "undefined" ? window.location.search : "",
+          },
+        }),
       });
 
-      const reply = error
-        ? "Hmm, I'm having trouble connecting. Try again! 🔄"
-        : data?.reply || "Sorry, I couldn't process that. Try again!";
+      const data = response.ok ? await response.json() : null;
+
+      // Build reply with recommendation cards if available
+      let reply = data?.reply || "Sorry, I couldn't process that. Try again!";
+
+      if (data?.primary) {
+        const rec = data.primary;
+        reply += `\n\n**Top Match: [${rec.name}](${rec.profilePath})**`;
+        if (rec.specialty) reply += `\n${rec.specialty}`;
+        if (rec.priceFrom) reply += ` · From $${rec.priceFrom}`;
+        if (rec.verified) reply += ` · ✓ Verified`;
+        if (rec.availableNow) reply += ` · 🟢 Available Now`;
+        if (rec.why?.length) reply += `\n_${rec.why.join(", ")}_`;
+      }
+
+      if (data?.alternatives?.length) {
+        reply += "\n\n**Also consider:**";
+        for (const alt of data.alternatives.slice(0, 2)) {
+          reply += `\n• [${alt.name}](${alt.profilePath})`;
+          if (alt.specialty) reply += ` — ${alt.specialty}`;
+          if (alt.verified) reply += " ✓";
+        }
+      }
 
       setMessages((prev) => [
         ...prev,

@@ -10,7 +10,7 @@ import type { Database } from "@/integrations/supabase/types";
 type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 
 const PROFILE_SELECT =
-  "id, user_id, slug, display_name, full_name, bio, city, state, phone, specialties, incall_price, outcall_price, status, is_active, updated_at";
+  "id, user_id, slug, display_name, full_name, bio, city, state, phone, specialties, incall_price, outcall_price, height_inches, weight_lb, body_type, status, is_active, updated_at";
 
 export { createSupabaseAdminClient, createSupabasePublicClient, getUserRole, recordAuditLog };
 

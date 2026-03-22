@@ -1,4 +1,9 @@
 import type { PublicTherapist } from "@/app/_lib/directory";
+import {
+  formatHeightInches,
+  formatWeightLb,
+  getBodyTypeLabel,
+} from "@/lib/physical-profile";
 
 interface Props {
   profile: PublicTherapist;
@@ -8,9 +13,15 @@ export function ProfileQuickInfo({ profile }: Props) {
   const yearsExp = profile.years_experience ?? (profile.start_year ? new Date().getFullYear() - profile.start_year : null);
   const techniqueCount = profile.specialties?.length ?? 0;
   const isPro = profile._tier === "pro" || profile._tier === "elite";
+  const height = formatHeightInches(profile.height_inches);
+  const weight = formatWeightLb(profile.weight_lb);
+  const bodyType = getBodyTypeLabel(profile.body_type);
 
   const items: { label: string; value: string | number; proOnly?: boolean }[] = [
     ...(yearsExp ? [{ label: "Years Experience", value: `${yearsExp}+` }] : []),
+    ...(height ? [{ label: "Height", value: height }] : []),
+    ...(weight ? [{ label: "Weight", value: weight }] : []),
+    ...(bodyType ? [{ label: "Body Type", value: bodyType }] : []),
     ...(techniqueCount > 0 ? [{ label: "Techniques", value: techniqueCount }] : []),
     ...(isPro && profile.profile_views ? [{ label: "Views", value: profile.profile_views.toLocaleString(), proOnly: true }] : []),
     ...(isPro && profile.contact_clicks ? [{ label: "Contacts", value: profile.contact_clicks.toLocaleString(), proOnly: true }] : []),

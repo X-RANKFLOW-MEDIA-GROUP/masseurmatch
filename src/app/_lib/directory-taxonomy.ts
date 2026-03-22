@@ -3,6 +3,7 @@ export type DirectorySearchConfig = {
   modality?: string;
   session?: "home-visit" | "incall";
   verified?: boolean;
+  lgbtqAffirming?: boolean;
 };
 
 export type DirectorySegment = {
@@ -50,6 +51,18 @@ export const DIRECTORY_SEGMENTS: DirectorySegment[] = [
       "Explore welcoming profiles built for respectful, inclusive discovery with visible trust and safety guidance.",
     search: {
       keyword: "gay",
+      lgbtqAffirming: true,
+    },
+  },
+  {
+    slug: "gay-massage",
+    label: "Gay massage therapists",
+    shortLabel: "Gay massage",
+    intro:
+      "Find verified, LGBTQ+-affirming male massage therapists who create genuinely safe therapeutic experiences for gay and queer clients.",
+    search: {
+      keyword: "gay",
+      lgbtqAffirming: true,
     },
   },
   {
@@ -184,6 +197,7 @@ export function resolveDirectoryFilters(...configs: DirectorySearchConfig[]): Di
       modality: config.modality ?? accumulator.modality,
       session: config.session ?? accumulator.session,
       verified: accumulator.verified || Boolean(config.verified),
+      lgbtqAffirming: accumulator.lgbtqAffirming || Boolean(config.lgbtqAffirming),
     }),
     {},
   );

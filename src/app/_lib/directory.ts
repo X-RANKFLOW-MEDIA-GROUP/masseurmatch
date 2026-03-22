@@ -4,11 +4,12 @@ import {
   getFallbackPublicTherapistBySlug,
   getFallbackPublicTherapists,
 } from "@/app/_lib/directory-fallback";
+import { matchBodyTypeKeyword } from "@/lib/physical-profile";
 
 export type TherapistTier = "free" | "standard" | "pro" | "elite";
 
 const PUBLIC_PROFILE_SELECT =
-  "id, slug, city, display_name, full_name, bio, avatar_url, phone, specialties, _tier, modality, status, profile_views, review_count, incall_price, outcall_price, business_hours, custom_faq, pricing_sessions, available_now, available_now_expires, is_verified_identity, is_verified_profile, is_verified_photos, neighborhood_name, primary_area, years_experience, start_year, add_ons, promotions, travel_schedule, areas_served, training, outcall_radius_miles, contact_clicks, education";
+  "id, slug, city, display_name, full_name, bio, avatar_url, phone, specialties, _tier, modality, status, profile_views, review_count, incall_price, outcall_price, business_hours, custom_faq, pricing_sessions, available_now, available_now_expires, is_verified_identity, is_verified_profile, is_verified_photos, neighborhood_name, primary_area, years_experience, start_year, add_ons, promotions, travel_schedule, areas_served, training, outcall_radius_miles, contact_clicks, education, lgbtq_affirming, accepts_all_genders, languages_spoken, accessibility_features, height_inches, weight_lb, body_type";
 
 export interface ProfileFaqItem {
   question: string;
@@ -95,6 +96,13 @@ export interface PublicTherapist {
   outcall_radius_miles?: number | null;
   contact_clicks?: number | null;
   education?: string | null;
+  lgbtq_affirming?: boolean | null;
+  accepts_all_genders?: boolean | null;
+  languages_spoken?: string[] | null;
+  accessibility_features?: string[] | null;
+  height_inches?: number | null;
+  weight_lb?: number | null;
+  body_type?: string | null;
 }
 
 export interface ImportedReview {
@@ -122,7 +130,10 @@ export const getPublicTherapists = async (filters?: {
   keyword?: string;
   session?: "home-visit" | "incall";
   verified?: boolean;
+  availableToday?: boolean;
   tier?: TherapistTier;
+  lgbtqAffirming?: boolean;
+  language?: string;
   page?: number;
   pageSize?: number;
 }) => {
@@ -136,6 +147,7 @@ export const getPublicTherapists = async (filters?: {
     keyword: filters?.keyword,
     session: filters?.session,
     verified: filters?.verified,
+    availableToday: filters?.availableToday,
     tier: filters?.tier,
     page,
     pageSize,
@@ -154,7 +166,17 @@ export const getPublicTherapists = async (filters?: {
 
   if (filters?.keyword) {
     const keyword = `%${filters.keyword}%`;
-    query = query.or(`modality.ilike.${keyword},bio.ilike.${keyword},display_name.ilike.${keyword},full_name.ilike.${keyword}`);
+    const bodyTypeKeyword = matchBodyTypeKeyword(filters.keyword);
+    const conditions = [
+      `modality.ilike.${keyword}`,
+      `bio.ilike.${keyword}`,
+      `display_name.ilike.${keyword}`,
+      `full_name.ilike.${keyword}`,
+      `body_type.ilike.${keyword}`,
+      ...(bodyTypeKeyword ? [`body_type.eq.${bodyTypeKeyword}`] : []),
+    ];
+
+    query = query.or(conditions.join(","));
   }
 
   if (filters?.session === "home-visit") {
@@ -169,8 +191,20 @@ export const getPublicTherapists = async (filters?: {
     query = query.or("_tier.eq.standard,_tier.eq.pro,_tier.eq.elite,is_verified_profile.eq.true,is_verified_identity.eq.true");
   }
 
+  if (filters?.availableToday) {
+    query = query.eq("available_now", true);
+  }
+
   if (filters?.tier) {
     query = query.eq("_tier", filters.tier);
+  }
+
+  if (filters?.lgbtqAffirming) {
+    query = query.eq("lgbtq_affirming", true);
+  }
+
+  if (filters?.language) {
+    query = query.contains("languages_spoken", [filters.language]);
   }
 
   const { data, error, count } = await query;

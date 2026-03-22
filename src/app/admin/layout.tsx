@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { RouteError } from "@/app/api/_lib/http";
 import { createPageMetadata } from "@/app/_lib/seo";
 import { requireAdminSession } from "@/app/api/_lib/supabase-server";
+import AdminLayoutShell from "@/app/admin/_components/AdminLayoutShell";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Admin dashboard",
@@ -40,5 +41,5 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   await ensureAdminAccess();
-  return <>{children}</>;
+  return <AdminLayoutShell>{children}</AdminLayoutShell>;
 }

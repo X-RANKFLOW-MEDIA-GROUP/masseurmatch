@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, DM_Sans, Inter, JetBrains_Mono, Sora, Space_Grotesk, Syne } from "next/font/google";
+import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { AppMotionShell } from "@/app/_components/app-motion-shell";
 import { JsonLd } from "@/app/_components/json-ld";
 import { SiteFooter } from "@/app/_components/site-footer";
-import { SiteHeader } from "@/app/_components/site-header";
+import SiteHeader from "@/app/_components/site-header";
 import { SITE_DESCRIPTION, SITE_NAME, createPageMetadata } from "@/app/_lib/metadata";
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/app/_lib/structured-data";
 import { AppProviders } from "@/app/providers";
@@ -13,16 +13,18 @@ import "@/index.css";
 
 const fontSans = Inter({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-inter",
   weight: ["300", "400", "500", "600", "700"],
   display: "swap",
+  preload: true,
 });
 
-const fontDisplay = Sora({
+const fontDisplay = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-display",
-  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-space",
+  weight: ["400", "500", "600", "700"],
   display: "swap",
+  preload: true,
 });
 
 const fontMono = JetBrains_Mono({
@@ -30,27 +32,7 @@ const fontMono = JetBrains_Mono({
   variable: "--font-mono",
   weight: ["400", "500", "600", "700", "800"],
   display: "swap",
-});
-
-const fontWcSerif = Cormorant_Garamond({
-  subsets: ["latin"],
-  variable: "--font-wc-serif",
-  weight: ["300", "400", "500", "600", "700"],
-  display: "swap",
-});
-
-const fontWcDisplay = Syne({
-  subsets: ["latin"],
-  variable: "--font-wc-display",
-  weight: ["400", "500", "600", "700", "800"],
-  display: "swap",
-});
-
-const fontWcSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-wc-sans",
-  weight: ["300", "400", "500", "600", "700"],
-  display: "swap",
+  preload: true,
 });
 
 const rootMetadata = createPageMetadata({
@@ -76,7 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body
-        className={`${fontSans.variable} ${fontDisplay.variable} ${fontMono.variable} ${fontWcSerif.variable} ${fontWcDisplay.variable} ${fontWcSans.variable} theme-masseurmatch noise-bg min-h-screen overflow-x-hidden font-sans text-foreground`}
+        className={`${fontSans.variable} ${fontDisplay.variable} ${fontMono.variable} theme-masseurmatch noise-bg min-h-screen overflow-x-hidden font-sans text-foreground`}
       >
         <AppProviders>
           <JsonLd data={buildOrganizationJsonLd()} />

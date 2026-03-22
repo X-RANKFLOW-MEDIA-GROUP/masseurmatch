@@ -5,6 +5,12 @@ import {
   isKnottyLearningEnabled,
   normalizeLearningScore,
 } from "@/lib/knotty/learning";
+import {
+  formatHeightInches,
+  formatWeightLb,
+  getBodyTypeLabel,
+  normalizeBodyTypeValue,
+} from "@/lib/physical-profile";
 import type {
   KnottyCandidate,
   KnottyIntent,
@@ -12,6 +18,15 @@ import type {
   KnottyRecommendation,
   KnottyScoreBreakdown,
 } from "@/lib/knotty/types";
+
+const BODY_TYPE_MESSAGE_TERMS: Record<string, string[]> = {
+  slim: ["slim", "lean", "slender", "thin", "magro"],
+  athletic: ["athletic", "fit", "toned", "atletico"],
+  average: ["average", "regular build", "medium build", "medio", "normal"],
+  muscular: ["muscular", "muscle", "buff", "built", "jacked", "musculoso", "forte"],
+  stocky: ["stocky", "solid", "thick", "encorpado"],
+  large: ["large", "big", "heavier", "heavyset", "bigger", "grande", "grandao", "maior"],
+};
 
 type RankedCandidate = {
   candidate: KnottyCandidate;
@@ -26,6 +41,13 @@ type RankedCandidate = {
 
 function clamp(value: number, min = 0, max = 1) {
   return Math.min(max, Math.max(min, value));
+}
+
+function normalizeSearchText(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
 function computePriceFrom(candidate: KnottyCandidate) {
@@ -68,6 +90,8 @@ function computeProfileQuality(candidate: KnottyCandidate, priceFrom: number | n
     typeof priceFrom === "number",
     Boolean(candidate.specialties?.length || candidate.modality),
     Boolean(getYearsExperience(candidate) || candidate.training?.length),
+    Boolean(candidate.body_type),
+    typeof candidate.height_inches === "number" || typeof candidate.weight_lb === "number",
   ];
 
   return checks.filter(Boolean).length / checks.length;
@@ -158,6 +182,142 @@ function normalizeBoostScore(candidate: KnottyCandidate) {
   return clamp((candidate.boost_score || 0) / 100);
 }
 
+function extractExactHeightInches(message: string) {
+  const footInchMatch = message.match(/(\d)\s*(?:'|ft|feet)\s*(\d{1,2})?/i);
+
+  if (footInchMatch) {
+    const feet = Number(footInchMatch[1]);
+    const inches = Number(footInchMatch[2] || "0");
+
+    if (Number.isFinite(feet) && Number.isFinite(inches)) {
+      return feet * 12 + inches;
+    }
+  }
+
+  const inchMatch = message.match(/(\d{2})\s*(?:in|inch|inches|pol|polegadas)\b/i);
+
+  if (inchMatch) {
+    const inches = Number(inchMatch[1]);
+    return Number.isFinite(inches) ? inches : null;
+  }
+
+  return null;
+}
+
+function extractExactWeightLb(message: string) {
+  const weightMatch = message.match(/(\d{2,3})\s*(?:lb|lbs|pounds?|libras?)\b/i);
+
+  if (!weightMatch) {
+    return null;
+  }
+
+  const weight = Number(weightMatch[1]);
+  return Number.isFinite(weight) ? weight : null;
+}
+
+function computePhysicalPreference(input: {
+  candidate: KnottyCandidate;
+  message: string;
+}) {
+  const normalizedMessage = normalizeSearchText(input.message);
+  const reasons: string[] = [];
+  const scores: number[] = [];
+
+  const requestedBodyType = Object.entries(BODY_TYPE_MESSAGE_TERMS).find(([, terms]) =>
+    terms.some((term) => normalizedMessage.includes(term)),
+  )?.[0] || null;
+
+  if (requestedBodyType) {
+    const candidateBodyType = normalizeBodyTypeValue(input.candidate.body_type);
+
+    if (!candidateBodyType) {
+      scores.push(0.25);
+    } else if (candidateBodyType === requestedBodyType) {
+      scores.push(1);
+      reasons.push(`Matches requested ${getBodyTypeLabel(requestedBodyType)?.toLowerCase()} build`);
+    } else {
+      scores.push(0.05);
+    }
+  }
+
+  const requestedHeight = extractExactHeightInches(normalizedMessage);
+  if (requestedHeight && typeof input.candidate.height_inches === "number") {
+    const delta = Math.abs(input.candidate.height_inches - requestedHeight);
+
+    if (delta <= 1) {
+      scores.push(1);
+      reasons.push(`Matches requested ${formatHeightInches(requestedHeight)} height`);
+    } else if (delta <= 3) {
+      scores.push(0.7);
+    } else if (delta <= 5) {
+      scores.push(0.35);
+    } else {
+      scores.push(0.05);
+    }
+  } else if (requestedHeight) {
+    scores.push(0.2);
+  } else if (normalizedMessage.includes("tall") || normalizedMessage.includes("alto")) {
+    if (typeof input.candidate.height_inches === "number") {
+      scores.push(input.candidate.height_inches >= 72 ? 1 : input.candidate.height_inches >= 70 ? 0.65 : 0.05);
+      if (input.candidate.height_inches >= 72) {
+        reasons.push("Taller profile match");
+      }
+    } else {
+      scores.push(0.2);
+    }
+  }
+
+  const requestedWeight = extractExactWeightLb(normalizedMessage);
+  if (requestedWeight && typeof input.candidate.weight_lb === "number") {
+    const delta = Math.abs(input.candidate.weight_lb - requestedWeight);
+
+    if (delta <= 10) {
+      scores.push(1);
+      reasons.push(`Close to requested ${formatWeightLb(requestedWeight)} range`);
+    } else if (delta <= 20) {
+      scores.push(0.7);
+    } else if (delta <= 35) {
+      scores.push(0.35);
+    } else {
+      scores.push(0.05);
+    }
+  } else if (requestedWeight) {
+    scores.push(0.2);
+  }
+
+  if (
+    !requestedWeight &&
+    (
+      normalizedMessage.includes("bigger") ||
+      normalizedMessage.includes("heavier") ||
+      normalizedMessage.includes("big guy") ||
+      normalizedMessage.includes("maior") ||
+      normalizedMessage.includes("mais pesado")
+    )
+  ) {
+    if (typeof input.candidate.weight_lb === "number") {
+      scores.push(input.candidate.weight_lb >= 210 ? 1 : input.candidate.weight_lb >= 190 ? 0.65 : 0.05);
+      if (input.candidate.weight_lb >= 210) {
+        reasons.push("Closer to a bigger build");
+      }
+    } else {
+      scores.push(0.2);
+    }
+  }
+
+  if (scores.length === 0) {
+    return {
+      score: null,
+      reason: null,
+    };
+  }
+
+  return {
+    score: scores.reduce((sum, value) => sum + value, 0) / scores.length,
+    reason: reasons[0] || null,
+  };
+}
+
 function buildWhyLines(input: {
   candidate: KnottyCandidate;
   availableNow: boolean;
@@ -166,11 +326,16 @@ function buildWhyLines(input: {
   priceFrom: number | null;
   intent: KnottyIntent;
   profileQuality: number;
+  physicalReason: string | null;
 }) {
   const reasons: string[] = [];
 
   if (input.availableNow) {
     reasons.push("Available right now");
+  }
+
+  if (input.physicalReason) {
+    reasons.push(input.physicalReason);
   }
 
   if (input.intent === "mobile" && (input.candidate.outcall_price || input.candidate.outcall_radius_miles)) {
@@ -241,6 +406,10 @@ export function rankKnottyCandidates(input: {
     );
     const profileQuality = computeProfileQuality(candidate, priceFrom);
     const pricingVisibility = typeof priceFrom === "number" ? 1 : 0;
+    const physicalPreference = computePhysicalPreference({
+      candidate,
+      message: input.message,
+    });
     const intentMatch = computeIntentMatch({
       intent: input.intent,
       candidate,
@@ -261,6 +430,7 @@ export function rankKnottyCandidates(input: {
       intentMatch * 0.16 +
       pricingVisibility * 0.1 +
       profileQuality * 0.07 +
+      (physicalPreference.score ?? 0) * 0.08 +
       normalizeBoostScore(candidate) * 0.05;
     const final = learningEnabled
       ? base * 0.6 + learning * 0.3 + exploration * 0.1
@@ -281,6 +451,7 @@ export function rankKnottyCandidates(input: {
         priceFrom,
         intent: input.intent,
         profileQuality,
+        physicalReason: physicalPreference.reason,
       }),
       score: {
         base,
@@ -294,6 +465,7 @@ export function rankKnottyCandidates(input: {
           intentMatch,
           pricingVisibility,
           profileQuality,
+          physicalMatch: physicalPreference.score ?? 0,
           boost: normalizeBoostScore(candidate),
         },
       },

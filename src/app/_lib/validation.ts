@@ -5,6 +5,9 @@ import {
   KNOTTY_INTENTS,
   KNOTTY_QUICK_ACTIONS,
 } from "@/lib/knotty/types";
+import { BODY_TYPES } from "@/lib/physical-profile";
+
+const trimString = (value: unknown) => (typeof value === "string" ? value.trim() : value);
 
 export const authLoginSchema = z.object({
   email: z.string().email(),
@@ -22,11 +25,37 @@ export const forgotPasswordSchema = z.object({
   redirectTo: z.string().url().optional(),
 });
 
+export const CONTACT_AUDIENCE_VALUES = ["client", "massage-professional", "other"] as const;
+
+export const contactAudienceSchema = z.enum(CONTACT_AUDIENCE_VALUES);
+
 export const contactFormSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  subject: z.string().min(3),
-  message: z.string().min(10),
+  name: z.preprocess(trimString, z.string().min(1)),
+  email: z.preprocess(trimString, z.string().email()),
+  phone: z.preprocess(
+    (value) => {
+      if (typeof value !== "string") {
+        return value;
+      }
+
+      const cleaned = value.trim();
+      return cleaned.length === 0 ? undefined : cleaned;
+    },
+    z.string().max(40).optional(),
+  ),
+  audience: z.preprocess(
+    (value) => {
+      if (typeof value !== "string") {
+        return value;
+      }
+
+      const cleaned = value.trim();
+      return cleaned.length === 0 ? undefined : cleaned;
+    },
+    contactAudienceSchema.optional(),
+  ),
+  subject: z.preprocess(trimString, z.string().min(1)),
+  message: z.preprocess(trimString, z.string().min(3)),
 });
 
 export const billingTierSchema = z.enum(["free", "standard", "pro", "elite"]);
@@ -91,11 +120,15 @@ export const proProfileSchema = z.object({
   specialties: z.array(z.string().min(2).max(60)).max(12).default([]),
   incallPrice: z.number().int().min(0).nullable().optional(),
   outcallPrice: z.number().int().min(0).nullable().optional(),
+  heightInches: z.number().int().min(48).max(96).nullable().optional(),
+  weightLb: z.number().int().min(80).max(450).nullable().optional(),
+  bodyType: z.enum(BODY_TYPES).nullable().optional(),
 });
 
 export type AuthLoginInput = z.infer<typeof authLoginSchema>;
 export type AuthRegisterInput = z.infer<typeof authRegisterSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ContactAudience = z.infer<typeof contactAudienceSchema>;
 export type ContactFormInput = z.infer<typeof contactFormSchema>;
 export type ProBillingInput = z.infer<typeof proBillingSchema>;
 export type ChatRequestInput = z.infer<typeof chatRequestSchema>;

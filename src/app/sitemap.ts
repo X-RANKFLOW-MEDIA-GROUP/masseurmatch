@@ -6,6 +6,7 @@ import {
   buildNeighborhoodsSitemapEntries,
   buildProfilesSitemapEntries,
   buildGuidesSitemapEntries,
+  buildBlogPostsSitemapEntries,
 } from "@/app/_lib/seo-routes";
 
 /**
@@ -18,9 +19,10 @@ import {
  * 3 = neighborhoods
  * 4 = profiles
  * 5 = guides
+ * 6 = blog posts (dynamic from Supabase)
  */
 export async function generateSitemaps() {
-  return [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }];
+  return [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }];
 }
 
 export default async function sitemap({ id }: { id: number }): Promise<MetadataRoute.Sitemap> {
@@ -32,6 +34,7 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
     case 3: return buildNeighborhoodsSitemapEntries(now);
     case 4: return buildProfilesSitemapEntries(now);
     case 5: return buildGuidesSitemapEntries(now);
+    case 6: return buildBlogPostsSitemapEntries(now);
     default: return [];
   }
 }

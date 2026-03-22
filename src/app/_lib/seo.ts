@@ -75,6 +75,20 @@ type ArticleJsonLdInput = {
   author: string;
 };
 
+type HealthAndBeautyBusinessJsonLdInput = {
+  name: string;
+  slug: string;
+  description: string;
+  city?: string | null;
+  stateCode?: string | null;
+  specialty: string;
+  image?: string | null;
+  phone?: string | null;
+  incallPrice?: number | null;
+  outcallPrice?: number | null;
+  reviews?: ProfileReview[];
+};
+
 type LocalBusinessJsonLdInput = {
   cityName: string;
   stateName: string;
@@ -368,6 +382,67 @@ export const buildProfilePageJsonLd = ({
                   : undefined,
             }))
           : undefined,
+    },
+  };
+};
+
+export const buildHealthAndBeautyBusinessJsonLd = ({
+  name,
+  slug,
+  description,
+  city,
+  stateCode,
+  specialty,
+  image,
+  phone,
+  incallPrice,
+  outcallPrice,
+  reviews = [],
+}: HealthAndBeautyBusinessJsonLdInput) => {
+  const profileUrl = siteUrl(`/therapists/${slug}`);
+  const ratedReviews = reviews.filter((r) => typeof r.rating === "number");
+  const averageRating =
+    ratedReviews.length > 0
+      ? ratedReviews.reduce((sum, r) => sum + (r.rating || 0), 0) / ratedReviews.length
+      : null;
+
+  const priceRange =
+    (incallPrice ?? 0) >= 200 || (outcallPrice ?? 0) >= 200 ? "$$$" : (incallPrice ?? 0) >= 100 ? "$$" : "$";
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "HealthAndBeautyBusiness",
+    name,
+    image: image || buildOgImageUrl({ title: name, label: "Profile" }),
+    "@id": profileUrl,
+    url: profileUrl,
+    ...(phone ? { telephone: phone } : {}),
+    priceRange,
+    description,
+    address: city
+      ? {
+          "@type": "PostalAddress",
+          addressLocality: city,
+          ...(stateCode ? { addressRegion: stateCode } : {}),
+          addressCountry: "US",
+        }
+      : undefined,
+    ...(averageRating !== null
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: Number(averageRating.toFixed(1)),
+            reviewCount: ratedReviews.length,
+            bestRating: 5,
+          },
+        }
+      : {}),
+    makesOffer: {
+      "@type": "Offer",
+      itemOffered: {
+        "@type": "Service",
+        name: specialty,
+      },
     },
   };
 };

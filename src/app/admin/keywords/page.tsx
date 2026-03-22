@@ -1,6 +1,7 @@
 import AdminKeywordsManager from "@/app/admin/_components/AdminKeywordsManager";
 import { readContentStore } from "@/app/api/_lib/content-store";
 import { getPublicTherapists } from "@/app/_lib/directory";
+import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";
 
 export default async function AdminKeywordsPage() {
   const [store, therapists] = await Promise.all([
@@ -23,12 +24,14 @@ export default async function AdminKeywordsPage() {
     .map(([term, count]) => ({ term, count }));
 
   return (
-    <div className="container mx-auto px-4 py-10">
-      <h1 className="mb-2 text-3xl font-bold">Admin Keywords</h1>
-      <p className="mb-6 text-sm text-muted-foreground">
-        Save curated keyword targets and seed them from the specialties already showing up in public profiles.
-      </p>
-      <AdminKeywordsManager initialKeywords={store.keywords} suggestions={suggestions} />
+    <div className="space-y-6">
+      <AdminPageHeader
+        title="Keywords"
+        description="Save curated keyword targets and seed them from the specialties already showing up in public profiles."
+      />
+      <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+        <AdminKeywordsManager initialKeywords={store.keywords} suggestions={suggestions} />
+      </div>
     </div>
   );
 }
