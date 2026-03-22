@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { checkRateLimit, rateLimitResponse, getClientKey } from "../_shared/rate-limit.ts";
 
 const BASE_URL = "https://masseurmatch.com";
 const LANGS = ["en", "es", "pt", "fr"];
@@ -20,6 +21,8 @@ const STATIC_URLS: { path: string; priority: string; changefreq: string }[] = [
   { path: "/safety", priority: "0.5", changefreq: "monthly" },
   { path: "/terms", priority: "0.3", changefreq: "yearly" },
   { path: "/privacy", priority: "0.3", changefreq: "yearly" },
+  { path: "/community-guidelines", priority: "0.3", changefreq: "yearly" },
+  { path: "/platform-disclaimer", priority: "0.3", changefreq: "yearly" },
   { path: "/therapist-agreement", priority: "0.3", changefreq: "yearly" },
   { path: "/cookies", priority: "0.2", changefreq: "yearly" },
   { path: "/billing-policy", priority: "0.2", changefreq: "yearly" },
@@ -108,6 +111,9 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "*" } });
   }
+
+  const rl = checkRateLimit(getClientKey(req), { limit: 10, windowMs: 60_000 });
+  if (!rl.allowed) return rateLimitResponse(rl);
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;

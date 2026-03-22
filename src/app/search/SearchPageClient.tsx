@@ -2,6 +2,7 @@
 
 import { SearchDirectory } from "@/app/_components/search-directory";
 import type { PublicTherapist, TherapistTier } from "@/app/_lib/directory";
+import type { DirectorySession } from "@/components/sections/AdvancedDirectoryFilter";
 import type { CityData } from "@/data/cities";
 
 type SearchPageClientProps = {
@@ -12,10 +13,13 @@ type SearchPageClientProps = {
     city: string;
     modality: string;
     keyword: string;
-    session: string;
+    session: DirectorySession;
     goal: string;
     verified: boolean;
+    availableToday: boolean;
+    masterOnly: boolean;
     tier: TherapistTier | "";
+    lgbtqAffirming: boolean;
   };
 };
 

@@ -52,6 +52,9 @@ const PROFILE_SELECT = [
   "boost_score",
   "outcall_radius_miles",
   "travel_schedule",
+  "height_inches",
+  "weight_lb",
+  "body_type",
   "featured_until",
 ].join(", ");
 
@@ -146,6 +149,9 @@ function toCandidate(item: Record<string, unknown>) {
     travel_schedule: Array.isArray(item.travel_schedule)
       ? (item.travel_schedule as Array<Record<string, unknown>>)
       : null,
+    height_inches: typeof item.height_inches === "number" ? item.height_inches : null,
+    weight_lb: typeof item.weight_lb === "number" ? item.weight_lb : null,
+    body_type: typeof item.body_type === "string" ? item.body_type : null,
     featured_until: typeof item.featured_until === "string" ? item.featured_until : null,
     distance_miles: typeof item.distance_miles === "number" ? item.distance_miles : null,
   } satisfies KnottyCandidate;

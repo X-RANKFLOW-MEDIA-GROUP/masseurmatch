@@ -22,6 +22,8 @@ const STATIC_URLS = [
   { path: "/safety", priority: "0.5", changefreq: "monthly" },
   { path: "/terms", priority: "0.3", changefreq: "yearly" },
   { path: "/privacy", priority: "0.3", changefreq: "yearly" },
+  { path: "/community-guidelines", priority: "0.3", changefreq: "yearly" },
+  { path: "/platform-disclaimer", priority: "0.3", changefreq: "yearly" },
   { path: "/therapist-agreement", priority: "0.3", changefreq: "yearly" },
   { path: "/cookies", priority: "0.2", changefreq: "yearly" },
   { path: "/billing-policy", priority: "0.2", changefreq: "yearly" },

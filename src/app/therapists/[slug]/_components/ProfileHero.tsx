@@ -9,6 +9,7 @@ import {
   MapPin,
   MessageSquare,
   Phone,
+  Ruler,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
@@ -20,6 +21,7 @@ import {
   getPublicTrustHighlights,
   isVerifiedDirectoryProfile,
 } from "@/app/_lib/public-profile";
+import { buildPhysicalProfileSummary } from "@/lib/physical-profile";
 import { useKnottyProfileAttribution } from "./useKnottyProfileAttribution";
 
 function statusConfig(profile: PublicTherapist) {
@@ -77,6 +79,11 @@ export function ProfileHero({ profile, cityPath }: Props) {
   const startingAt = profile.incall_price ?? profile.outcall_price;
   const trustHighlights = getPublicTrustHighlights(profile).slice(0, 4);
   const tierLabel = getDirectoryTierLabel(profile);
+  const physicalProfile = buildPhysicalProfileSummary({
+    heightInches: profile.height_inches,
+    weightLb: profile.weight_lb,
+    bodyType: profile.body_type,
+  });
 
   return (
     <section className="overflow-hidden rounded-[2.25rem] border border-white/10 bg-gradient-to-br from-brand-primary via-brand-deep to-brand-secondary text-white shadow-brand">
@@ -134,6 +141,12 @@ export function ProfileHero({ profile, cityPath }: Props) {
               <Clock3 className="h-4 w-4" />
               {getSessionLabel(profile)}
             </span>
+            {physicalProfile ? (
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/8 px-4 py-2 text-sm font-medium text-white/80 backdrop-blur">
+                <Ruler className="h-4 w-4" />
+                {physicalProfile}
+              </span>
+            ) : null}
           </div>
 
           {/* Trust highlights */}

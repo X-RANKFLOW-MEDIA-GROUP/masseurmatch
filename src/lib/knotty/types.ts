@@ -77,6 +77,7 @@ export type KnottyScoreBreakdown = {
     intentMatch: number;
     pricingVisibility: number;
     profileQuality: number;
+    physicalMatch: number;
     boost: number;
   };
 };
@@ -181,6 +182,9 @@ export type KnottyCandidate = {
   boost_score: number | null;
   outcall_radius_miles: number | null;
   travel_schedule: Array<Record<string, unknown>> | null;
+  height_inches: number | null;
+  weight_lb: number | null;
+  body_type: string | null;
   featured_until?: string | null;
   special_offer_text?: string | null;
   distance_miles?: number | null;

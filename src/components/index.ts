@@ -1,6 +1,12 @@
 export { AdvancedHeroSection, type AdvancedHeroSectionProps } from "@/components/sections/AdvancedHeroSection";
 export { RatingSystem, type Review, type RatingSystemProps } from "@/components/sections/RatingSystem";
-export { AdvancedDirectoryFilter, type FilterGroup, type AdvancedDirectoryFilterProps } from "@/components/sections/AdvancedDirectoryFilter";
+export {
+  AdvancedDirectoryFilter,
+  type AdvancedDirectoryFilterProps,
+  type AdvancedDirectoryFilterState,
+  type DirectoryObjectiveId,
+  type DirectorySession,
+} from "@/components/sections/AdvancedDirectoryFilter";
 export {
   TherapistComparison,
   CompareButton,

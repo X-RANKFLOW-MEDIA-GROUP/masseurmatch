@@ -12,6 +12,7 @@ import { getPublicProfileName } from "@/app/_lib/public-profile";
 import {
   buildBreadcrumbJsonLd,
   buildFaqJsonLd,
+  buildHealthAndBeautyBusinessJsonLd,
   buildProfilePageJsonLd,
   createPageMetadata,
 } from "@/app/_lib/seo";
@@ -62,16 +63,31 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const topTechnique = profile.specialties?.[0] || profile.modality || "Massage";
   const yearsExp =
     profile.years_experience ?? (profile.start_year ? new Date().getFullYear() - profile.start_year : null);
+  const verified = profile.is_verified_identity || profile.is_verified_profile;
+  const priceFrom = [profile.incall_price, profile.outcall_price]
+    .filter((p): p is number => typeof p === "number" && p > 0)
+    .sort((a, b) => a - b)[0];
 
-  const titleParts = [`${name}`, neighborhood ? `${neighborhood}` : null, city, "Massage Therapist"]
+  const titleParts = [
+    name,
+    [verified ? "Verified" : null, topTechnique, "Therapist"].filter(Boolean).join(" "),
+    [neighborhood, city].filter(Boolean).join(", "),
+  ]
     .filter(Boolean)
     .join(" | ");
 
-  const description =
-    profile.bio ||
-    `${name} is a${yearsExp ? ` ${yearsExp}+ year` : ""} professional massage therapist in ${
-      neighborhood ? `${neighborhood}, ` : ""
-    }${city} specializing in ${topTechnique}. View rates, availability, and book directly.`;
+  const descParts = [
+    `${name} is a${yearsExp ? ` ${yearsExp}+ year` : ""} professional massage therapist`,
+    neighborhood ? `in ${neighborhood}, ${city}` : `in ${city}`,
+    `specializing in ${topTechnique}.`,
+    priceFrom ? `Sessions from $${priceFrom}.` : null,
+    verified ? "Identity verified." : null,
+    "View rates, availability & book directly.",
+  ].filter(Boolean);
+
+  const description = profile.bio
+    ? profile.bio.length > 160 ? profile.bio.slice(0, 157) + "..." : profile.bio
+    : descParts.join(" ");
 
   return createPageMetadata({
     title: titleParts,
@@ -85,9 +101,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       profile.modality,
       ...(profile.specialties || []),
       "massage therapist",
-      "massage near me",
+      "male massage therapist",
+      "verified massage therapist",
       neighborhood ? `massage ${neighborhood}` : null,
-      profile.city ? `massage ${profile.city}` : null,
+      profile.city ? `gay massage ${profile.city}` : null,
+      profile.city ? `LGBTQ massage ${profile.city}` : null,
     ].filter((value): value is string => Boolean(value)),
   });
 }
@@ -150,6 +168,27 @@ export default async function TherapistPage({ params }: { params: Promise<Params
           specialties: profile.specialties,
           image: profile.avatar_url,
           tier: profile._tier,
+          incallPrice: profile.incall_price,
+          outcallPrice: profile.outcall_price,
+          reviews: reviews.map((review) => ({
+            rating: review.rating,
+            reviewText: review.review_text,
+            reviewerName: review.reviewer_name,
+          })),
+        })}
+      />
+      <JsonLd
+        data={buildHealthAndBeautyBusinessJsonLd({
+          name,
+          slug: profile.slug || profile.id,
+          description:
+            profile.bio ||
+            `${name} is a professional massage therapist in ${profile.city || "the US"} specializing in ${profile.specialties?.[0] || profile.modality || "Massage"}.`,
+          city: profile.city,
+          stateCode: matchedCity?.stateCode,
+          specialty: profile.specialties?.[0] || profile.modality || "Massage",
+          image: profile.avatar_url,
+          phone: profile.phone,
           incallPrice: profile.incall_price,
           outcallPrice: profile.outcall_price,
           reviews: reviews.map((review) => ({

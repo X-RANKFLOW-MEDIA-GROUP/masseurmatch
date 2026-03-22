@@ -51,11 +51,32 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   const { total } = await fetchSegmentTherapists(city.name, segment.slug);
 
+  const isGayMassageSegment = segment.slug === "gay-massage" || segment.slug === "lgbtq-friendly";
+  const cityLabel = `${city.name}, ${city.stateCode}`;
+  const title = isGayMassageSegment
+    ? `Gay Massage Therapists in ${cityLabel} | Verified LGBTQ+-Affirming`
+    : `${city.name} ${segment.label}`;
+  const description = isGayMassageSegment
+    ? `Find verified, LGBTQ+-affirming male massage therapists in ${cityLabel}. Browse gay-friendly profiles with identity verification, affirming practice standards, and direct booking on MasseurMatch.`
+    : `${segment.intro} Compare trusted local listings, direct contact options, and stronger city-intent pages in ${city.name}.`;
+  const keywords = isGayMassageSegment
+    ? [
+        `gay massage ${city.name}`,
+        `gay massage therapist ${city.name}`,
+        `LGBTQ massage ${city.name}`,
+        `gay-friendly massage near me`,
+        `male massage therapist ${city.name}`,
+        `queer massage ${city.name}`,
+        `${city.name} gay bodywork`,
+        `LGBTQ affirming massage ${city.stateCode}`,
+      ]
+    : [city.name, segment.label, `${city.name} verified massage`, `${city.name} ${segment.shortLabel}`];
+
   return createPageMetadata({
-    title: `${city.name} ${segment.label}`,
-    description: `${segment.intro} Compare trusted local listings, direct contact options, and stronger city-intent pages in ${city.name}.`,
+    title,
+    description,
     path: `/${city.slug}/${segment.slug}`,
-    keywords: [city.name, segment.label, `${city.name} verified massage`, `${city.name} ${segment.shortLabel}`],
+    keywords,
     noIndex: total === 0,
   });
 }

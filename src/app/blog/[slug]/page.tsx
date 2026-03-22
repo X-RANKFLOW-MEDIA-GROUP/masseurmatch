@@ -2,156 +2,21 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface BlogPost {
-  slug: string;
-  title: string;
-  excerpt: string;
-  content: BlogSection[];
-  category: string;
-  tags: string[];
-  author: Author;
-  publishedAt: string;
-  updatedAt: string;
-  readTimeMinutes: number;
-  coverImage?: string;
-  coverAlt?: string;
-}
-
-interface Author {
-  name: string;
-  title: string;
-  bio: string;
-}
-
-interface BlogSection {
-  type: "paragraph" | "h2" | "h3" | "ul" | "ol" | "blockquote" | "callout";
-  content: string | string[];
-}
-
-// ─── Data Layer ───────────────────────────────────────────────────────────────
-// TODO: Replace with Supabase query:
-//   const { data } = await supabase
-//     .from("blog_posts")
-//     .select("*")
-//     .eq("slug", slug)
-//     .eq("published", true)
-//     .single();
-
-async function getPost(slug: string): Promise<BlogPost | null> {
-  const posts: Record<string, BlogPost> = {
-    "what-to-expect-first-massage": {
-      slug: "what-to-expect-first-massage",
-      title: "What to Expect at Your First Massage Appointment",
-      excerpt:
-        "First-time clients often have questions about etiquette, comfort levels, and how to communicate with their therapist. Here's everything you need to arrive confident.",
-      category: "Wellness Tips",
-      tags: ["first massage", "massage tips", "new clients", "wellness"],
-      publishedAt: "2025-03-15T09:00:00Z",
-      updatedAt: "2025-03-15T09:00:00Z",
-      readTimeMinutes: 6,
-      author: {
-        name: "MasseurMatch Editorial",
-        title: "Wellness & Inclusivity Editor",
-        bio: "The MasseurMatch editorial team produces evidence-based wellness content for LGBTQ+-inclusive audiences.",
-      },
-      content: [
-        {
-          type: "paragraph",
-          content:
-            "Booking your first massage can come with questions — what do I wear? What do I say? What if I'm uncomfortable? These are completely normal concerns, and having clear answers makes the experience significantly better for everyone.",
-        },
-        { type: "h2", content: "Before Your Appointment" },
-        {
-          type: "paragraph",
-          content:
-            "Arrive 10–15 minutes early for your first appointment. This buffer gives you time to complete intake forms, use the restroom, and begin to decompress. Rushing in stressed is counterproductive.",
-        },
-        {
-          type: "paragraph",
-          content:
-            "Hydrate well beforehand and avoid eating a heavy meal within 90 minutes of your session. Light eating is fine — arriving hungry can make it hard to relax.",
-        },
-        { type: "h2", content: "What to Wear (and What Happens to It)" },
-        {
-          type: "paragraph",
-          content:
-            "Most full-body massage modalities are performed with the client unclothed or in underwear, under a draping sheet. You will only ever be uncovered in the area being actively worked on — professional therapists follow strict draping protocols at all times.",
-        },
-        {
-          type: "callout",
-          content:
-            "You are always in control. You can ask to remain fully clothed, request specific areas not be worked on, or stop the session at any point — a good therapist will never make you feel awkward for any of these requests.",
-        },
-        { type: "h2", content: "Communicating with Your Therapist" },
-        {
-          type: "paragraph",
-          content:
-            "Good communication is the single biggest factor in massage quality. Tell your therapist about injuries, areas of tension, and your pressure preferences at the outset. Don't white-knuckle through pressure that's too intense — speaking up gets you a better result.",
-        },
-        {
-          type: "ul",
-          content: [
-            '"Can we focus more on my shoulders and less on my legs?"',
-            '"The pressure is a bit too deep — can you lighten up?"',
-            '"I\'d prefer not to have my abdomen worked on today."',
-            '"This is my first time, so I might need guidance."',
-          ],
-        },
-        { type: "h2", content: "For LGBTQ+ Clients Specifically" },
-        {
-          type: "paragraph",
-          content:
-            "Therapeutic massage involves a level of physical vulnerability that can feel different depending on your relationship with your body, your history, and whether you feel genuinely safe with the person treating you. You deserve a therapist who creates real safety — not just tolerance.",
-        },
-        {
-          type: "paragraph",
-          content:
-            "Every therapist on MasseurMatch has committed to our LGBTQ+-Inclusive Practice Standards. You can filter by therapists with specific training in affirming care for transgender clients, clients with trauma histories, and others with specialized needs.",
-        },
-        { type: "h2", content: "After Your Session" },
-        {
-          type: "paragraph",
-          content:
-            "Drink extra water after your session — massage mobilizes metabolic waste in muscle tissue and hydration helps clear it. Some soreness in the 24 hours following a deep tissue session is normal. A warm bath or light stretching can help.",
-        },
-        {
-          type: "paragraph",
-          content:
-            "Give feedback to your therapist — what worked, what didn't. This information shapes your next session and helps them serve you better over time.",
-        },
-      ],
-    },
-  };
-
-  return posts[slug] ?? null;
-}
-
-async function getRelatedPosts(currentSlug: string) {
-  // TODO: Replace with Supabase query
-  return [
-    {
-      slug: "lgbtq-affirming-massage-guide",
-      title: "How to Find an LGBTQ+-Affirming Massage Therapist",
-      category: "LGBTQ+ Health",
-      date: "March 8, 2025",
-    },
-    {
-      slug: "deep-tissue-vs-swedish",
-      title: "Deep Tissue vs Swedish Massage: Which Is Right for You?",
-      category: "Wellness Tips",
-      date: "February 28, 2025",
-    },
-  ].filter((p) => p.slug !== currentSlug);
-}
+import {
+  type BlogPost,
+  type BlogSection,
+  getBlogPost,
+  getBlogSlugs,
+  getRelatedPosts,
+} from "@/app/_lib/blog-data";
 
 // ─── Static Params ────────────────────────────────────────────────────────────
 export async function generateStaticParams() {
-  // TODO: const { data } = await supabase.from("blog_posts").select("slug").eq("published", true);
-  return [{ slug: "what-to-expect-first-massage" }];
+  const slugs = await getBlogSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
+
+export const revalidate = 3600; // Re-check for new posts hourly
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 export async function generateMetadata({
@@ -160,7 +25,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPost(slug);
+  const post = await getBlogPost(slug);
   if (!post) return { title: "Post Not Found | MasseurMatch Blog" };
 
   return {
@@ -321,7 +186,7 @@ function Section({ s }: { s: BlogSection }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = await getPost(slug);
+  const post = await getBlogPost(slug);
   if (!post) notFound();
 
   const related = await getRelatedPosts(post.slug);

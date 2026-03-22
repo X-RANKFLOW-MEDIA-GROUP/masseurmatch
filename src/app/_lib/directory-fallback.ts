@@ -290,6 +290,7 @@ type BasicDirectoryFilters = {
   keyword?: string;
   session?: "home-visit" | "incall";
   verified?: boolean;
+  availableToday?: boolean;
   tier?: TherapistTier;
   page?: number;
   pageSize?: number;
@@ -369,6 +370,14 @@ function matchesVerified(profile: FallbackTherapist, verified?: boolean) {
   );
 }
 
+function matchesAvailableToday(profile: FallbackTherapist, availableToday?: boolean) {
+  if (!availableToday) {
+    return true;
+  }
+
+  return Boolean(profile.available_now);
+}
+
 function matchesTier(profile: FallbackTherapist, tier?: TherapistTier) {
   if (!tier) {
     return true;
@@ -394,6 +403,7 @@ export function getFallbackPublicTherapists(filters: BasicDirectoryFilters = {})
     .filter((profile) => matchesKeyword(profile, filters.keyword))
     .filter((profile) => matchesSession(profile, filters.session))
     .filter((profile) => matchesVerified(profile, filters.verified))
+    .filter((profile) => matchesAvailableToday(profile, filters.availableToday))
     .filter((profile) => matchesTier(profile, filters.tier))
     .sort((left, right) => {
       if (Boolean(left.available_now) !== Boolean(right.available_now)) {

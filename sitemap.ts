@@ -17,7 +17,12 @@ export default async function sitemap(): Promise<SitemapEntry[]> {
 		{ url: `${appUrl}/search`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
 		{ url: `${appUrl}/therapists`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
 		{ url: `${appUrl}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+		{ url: `${appUrl}/about`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
 		{ url: `${appUrl}/contact`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+		{ url: `${appUrl}/terms`, lastModified: now, changeFrequency: "monthly", priority: 0.4 },
+		{ url: `${appUrl}/privacy`, lastModified: now, changeFrequency: "monthly", priority: 0.4 },
+		{ url: `${appUrl}/community-guidelines`, lastModified: now, changeFrequency: "monthly", priority: 0.4 },
+		{ url: `${appUrl}/platform-disclaimer`, lastModified: now, changeFrequency: "monthly", priority: 0.4 },
 	];
 
 	const cityRoutes: SitemapEntry[] = getCities().map((city) => ({

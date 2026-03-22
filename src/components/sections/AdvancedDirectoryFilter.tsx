@@ -1,330 +1,461 @@
-﻿"use client";
+"use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { MapPin, Search, SlidersHorizontal, X } from "lucide-react";
 import { useState } from "react";
-import { SlidersIcon, FilterX } from "lucide-react";
-import { fadeInUp } from "@/components/animations/MicroInteractions";
+import type { TherapistTier } from "@/app/_lib/directory";
+import type { CityData } from "@/data/cities";
 
-interface FilterOption {
-  id: string;
+export type DirectorySession = "" | "home-visit" | "incall";
+export type DirectoryObjectiveId =
+  | "all"
+  | "deep-recovery"
+  | "sports-clinical"
+  | "stress-relief"
+  | "pre-natal";
+
+type DirectoryObjective = {
+  id: DirectoryObjectiveId;
   label: string;
-  count?: number;
+  searchValue: string;
+  aliases: string[];
+};
+
+const PANEL_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+const TIER_LABELS: Record<TherapistTier, string> = {
+  free: "Access",
+  standard: "Verified",
+  pro: "Pro",
+  elite: "Elite",
+};
+
+export const DIRECTORY_OBJECTIVES: DirectoryObjective[] = [
+  {
+    id: "all",
+    label: "All",
+    searchValue: "",
+    aliases: [],
+  },
+  {
+    id: "deep-recovery",
+    label: "Deep Recovery",
+    searchValue: "deep tissue",
+    aliases: ["deep", "recovery", "myofascial"],
+  },
+  {
+    id: "sports-clinical",
+    label: "Sports Clinical",
+    searchValue: "sports",
+    aliases: ["sports", "clinical", "mobility", "stretch"],
+  },
+  {
+    id: "stress-relief",
+    label: "Stress Relief",
+    searchValue: "relaxation",
+    aliases: ["relaxation", "stress", "swedish", "lymphatic"],
+  },
+  {
+    id: "pre-natal",
+    label: "Pre-Natal",
+    searchValue: "prenatal",
+    aliases: ["prenatal", "pre natal", "pre-natal", "maternal"],
+  },
+];
+
+const OBJECTIVE_LOOKUP = new Map(DIRECTORY_OBJECTIVES.map((objective) => [objective.id, objective]));
+
+const normalizeValue = (value: string | null | undefined) => (value || "").trim().toLowerCase();
+
+export function resolveDirectoryObjective(
+  goal: string,
+  modality: string,
+): DirectoryObjective {
+  const normalizedGoal = normalizeValue(goal) as DirectoryObjectiveId;
+  if (normalizedGoal && OBJECTIVE_LOOKUP.has(normalizedGoal)) {
+    return OBJECTIVE_LOOKUP.get(normalizedGoal) || DIRECTORY_OBJECTIVES[0];
+  }
+
+  const normalizedModality = normalizeValue(modality);
+  const matchedObjective = DIRECTORY_OBJECTIVES.find(
+    (objective) =>
+      objective.id !== "all" &&
+      objective.aliases.some((alias) => normalizedModality.includes(alias)),
+  );
+
+  return matchedObjective || DIRECTORY_OBJECTIVES[0];
 }
 
-export interface FilterGroup {
-  id: string;
-  label: string;
-  type: "checkbox" | "range" | "multi-select";
-  options?: FilterOption[];
-  min?: number;
-  max?: number;
+export function getDirectoryObjectiveSearchValue(goal: string, modality = "") {
+  return resolveDirectoryObjective(goal, modality).searchValue;
+}
+
+export interface AdvancedDirectoryFilterState {
+  city: string;
+  keyword: string;
+  modality: string;
+  goal: string;
+  session: DirectorySession;
+  verified: boolean;
+  availableToday: boolean;
+  masterOnly: boolean;
+  tier: TherapistTier | "";
+  lgbtqAffirming: boolean;
 }
 
 export interface AdvancedDirectoryFilterProps {
-  groups: FilterGroup[];
-  onFilterChange?: (filters: Record<string, any>) => void;
-  onReset?: () => void;
+  cities: CityData[];
+  filters: AdvancedDirectoryFilterState;
+  resultCount: number;
+  totalCount: number;
+  isPending?: boolean;
+  onChange: (updates: Partial<AdvancedDirectoryFilterState>) => void;
+  onReset: () => void;
 }
 
-export function AdvancedDirectoryFilter({
-  groups,
-  onFilterChange = () => undefined,
-  onReset,
-}: AdvancedDirectoryFilterProps) {
-  const [expanded, setExpanded] = useState<string | null>(groups[0]?.id || null);
-  const [filters, setFilters] = useState<Record<string, any>>({});
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleFilterChange = (groupId: string, value: any) => {
-    const newFilters = { ...filters, [groupId]: value };
-    setFilters(newFilters);
-    onFilterChange(newFilters);
-  };
-
-  const activeCount = Object.values(filters).filter((v) => v !== null && v !== undefined).length;
-
+function FilterMetric({
+  label,
+  value,
+  compact = false,
+}: {
+  label: string;
+  value: string;
+  compact?: boolean;
+}) {
   return (
-    <motion.div
-      className="h-full flex flex-col"
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4 }}
+    <div
+      className={`min-w-[158px] rounded-[1.2rem] border border-slate-200/80 bg-white/72 px-4 py-3 shadow-[0_16px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl ${
+        compact ? "min-w-[142px]" : ""
+      }`}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
-        <div className="flex items-center gap-2">
-          <SlidersIcon size={20} className="text-brand-primary" />
-          <h3 className="font-semibold text-foreground">Filters</h3>
-          {activeCount > 0 && (
-            <motion.span
-              className="px-2 py-1 rounded-full bg-brand-electric/10 text-brand-electric text-xs font-semibold"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-            >
-              {activeCount}
-            </motion.span>
-          )}
-        </div>
-        {activeCount > 0 && (
-          <motion.button
-            onClick={() => {
-              setFilters({});
-              onReset?.();
-            }}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <FilterX size={14} />
-            Clear
-          </motion.button>
-        )}
-      </div>
-
-      {/* Filter Groups */}
-      <motion.div className="space-y-3 flex-1 overflow-y-auto">
-        <AnimatePresence mode="wait">
-          {groups.map((group) => (
-            <FilterGroupComponent
-              key={group.id}
-              group={group}
-              isExpanded={expanded === group.id}
-              onToggle={() =>
-                setExpanded(expanded === group.id ? null : group.id)
-              }
-              value={filters[group.id]}
-              onChange={(value) => handleFilterChange(group.id, value)}
-            />
-          ))}
-        </AnimatePresence>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-function FilterGroupComponent({
-  group,
-  isExpanded,
-  onToggle,
-  value,
-  onChange,
-}: {
-  group: FilterGroup;
-  isExpanded: boolean;
-  onToggle: () => void;
-  value: any;
-  onChange: (value: any) => void;
-}) {
-  return (
-    <motion.div
-      className="border border-border rounded-lg overflow-hidden bg-card/40 backdrop-blur-sm hover:border-brand-electric/30 transition-colors"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-    >
-      <motion.button
-        onClick={onToggle}
-        className="w-full px-4 py-3 flex items-center justify-between hover:bg-card/60 transition-colors"
-        whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
-      >
-        <span className="font-medium text-foreground">{group.label}</span>
-        <motion.div
-          animate={{ rotate: isExpanded ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <svg
-            className="w-5 h-5 text-muted-foreground"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 14l-7 7m0 0l-7-7m7 7V3"
-            />
-          </svg>
-        </motion.div>
-      </motion.button>
-
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="border-t border-border overflow-hidden"
-          >
-            <div className="p-4 space-y-3">
-              {group.type === "checkbox" && group.options && (
-                <CheckboxGroup
-                  options={group.options}
-                  value={value || []}
-                  onChange={onChange}
-                />
-              )}
-              {group.type === "range" && (
-                <RangeFilter
-                  min={group.min || 0}
-                  max={group.max || 1000}
-                  value={value || [group.min, group.max]}
-                  onChange={onChange}
-                />
-              )}
-              {group.type === "multi-select" && group.options && (
-                <MultiSelect
-                  options={group.options}
-                  value={value || []}
-                  onChange={onChange}
-                />
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-}
-
-function CheckboxGroup({
-  options,
-  value,
-  onChange,
-}: {
-  options: FilterOption[];
-  value: string[];
-  onChange: (value: string[]) => void;
-}) {
-  return (
-    <motion.div className="space-y-2">
-      {options.map((option) => (
-        <motion.label
-          key={option.id}
-          className="flex items-center gap-3 cursor-pointer group"
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          whileHover={{ x: 4 }}
-        >
-          <div className="relative">
-            <input
-              type="checkbox"
-              checked={value.includes(option.id)}
-              onChange={(e) => {
-                const newValue = e.target.checked
-                  ? [...value, option.id]
-                  : value.filter((id) => id !== option.id);
-                onChange(newValue);
-              }}
-              className="w-4 h-4 appearance-none border-2 border-border rounded bg-white checked:bg-brand-electric checked:border-brand-electric cursor-pointer transition-all"
-            />
-            {value.includes(option.id) && (
-              <motion.svg
-                className="absolute inset-0 w-4 h-4 text-white pointer-events-none"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={3}
-                  d="M5 13l4 4L19 7"
-                />
-              </motion.svg>
-            )}
-          </div>
-          <span className="text-sm text-foreground group-hover:text-brand-primary transition-colors">
-            {option.label}
-          </span>
-          {option.count !== undefined && (
-            <span className="ml-auto text-xs text-muted-foreground">
-              ({option.count})
-            </span>
-          )}
-        </motion.label>
-      ))}
-    </motion.div>
-  );
-}
-
-function RangeFilter({
-  min,
-  max,
-  value,
-  onChange,
-}: {
-  min: number;
-  max: number;
-  value: [number, number];
-  onChange: (value: [number, number]) => void;
-}) {
-  return (
-    <div className="space-y-4">
-      <input
-        type="range"
-        min={min}
-        max={max}
-        value={value[0]}
-        onChange={(e) =>
-          onChange([Math.min(parseInt(e.target.value), value[1]), value[1]])
-        }
-        className="w-full accent-brand-electric"
-      />
-      <input
-        type="range"
-        min={min}
-        max={max}
-        value={value[1]}
-        onChange={(e) =>
-          onChange([value[0], Math.max(parseInt(e.target.value), value[0])])
-        }
-        className="w-full accent-brand-electric"
-      />
-      <div className="flex justify-between text-sm">
-        <span className="font-medium text-foreground">${value[0]}</span>
-        <span className="text-muted-foreground">-</span>
-        <span className="font-medium text-foreground">${value[1]}</span>
-      </div>
+      <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">{label}</p>
+      <p className="mt-1.5 font-sans text-sm font-medium text-slate-900">{value}</p>
     </div>
   );
 }
 
-function MultiSelect({
-  options,
-  value,
+function FilterToggle({
+  label,
+  checked,
   onChange,
 }: {
-  options: FilterOption[];
-  value: string[];
-  onChange: (value: string[]) => void;
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-2">
-      {options.map((option) => (
-        <motion.button
-          key={option.id}
-          onClick={() => {
-            const newValue = value.includes(option.id)
-              ? value.filter((id) => id !== option.id)
-              : [...value, option.id];
-            onChange(newValue);
-          }}
-          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
-            value.includes(option.id)
-              ? "bg-brand-electric text-white shadow-lg"
-              : "bg-border/50 text-foreground hover:bg-border"
-          }`}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          {option.label}
-        </motion.button>
-      ))}
+    <label className="group flex cursor-pointer items-center justify-between gap-4">
+      <span className="font-sans text-sm font-light text-slate-700 transition-colors group-hover:text-slate-950">
+        {label}
+      </span>
+      <span className="relative flex h-5 w-5 items-center justify-center">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(event) => onChange(event.target.checked)}
+          className="h-5 w-5 appearance-none rounded-none border border-slate-300 bg-white text-slate-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] transition-colors focus:outline-none focus:ring-2 focus:ring-slate-300 checked:border-slate-950 checked:bg-slate-950"
+        />
+        {checked ? <span className="pointer-events-none absolute h-1.5 w-1.5 bg-white" /> : null}
+      </span>
+    </label>
+  );
+}
+
+export function AdvancedDirectoryFilter({
+  cities,
+  filters,
+  resultCount,
+  totalCount,
+  isPending = false,
+  onChange,
+  onReset,
+}: AdvancedDirectoryFilterProps) {
+  const [isExpanded, setIsExpanded] = useState(
+    Boolean(
+      filters.goal ||
+        filters.session ||
+        filters.verified ||
+        filters.availableToday ||
+        filters.masterOnly ||
+        filters.tier ||
+        filters.lgbtqAffirming,
+    ),
+  );
+
+  const activeObjective = resolveDirectoryObjective(filters.goal, filters.modality);
+  const matchedCity = cities.find(
+    (city) => normalizeValue(city.name) === normalizeValue(filters.city) || city.slug === normalizeValue(filters.city),
+  );
+  const cityLabel = matchedCity ? `${matchedCity.name}, ${matchedCity.stateCode}` : filters.city || "All cities";
+  const sessionLabel =
+    filters.session === "home-visit"
+      ? "Home Visit"
+      : filters.session === "incall"
+        ? "Studio"
+        : "Any format";
+  const tierLabel = filters.tier ? TIER_LABELS[filters.tier] : "All tiers";
+  const trustLabel = filters.verified ? "Verified only" : "Open index";
+  const activeCount = [
+    filters.keyword,
+    filters.city,
+    activeObjective.id !== "all" ? activeObjective.id : "",
+    filters.session,
+    filters.tier,
+    filters.verified ? "verified" : "",
+    filters.availableToday ? "available" : "",
+    filters.masterOnly ? "master" : "",
+    filters.lgbtqAffirming ? "lgbtq" : "",
+  ].filter(Boolean).length;
+
+  return (
+    <div className="sticky top-[86px] z-40">
+      <div className="relative overflow-hidden rounded-[2rem] border border-slate-200/70 bg-[rgba(255,255,255,0.82)] shadow-[0_24px_64px_rgba(15,23,42,0.1)] backdrop-blur-2xl">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(15,23,42,0.06),transparent_34%),radial-gradient(circle_at_top_right,rgba(148,163,184,0.14),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.94),rgba(248,250,252,0.86))]" />
+
+        <div className="relative px-4 py-4 md:px-6 md:py-5">
+          <div className="overflow-x-auto scrollbar-none">
+            <div className="flex min-w-max items-stretch gap-3">
+              <div className="flex min-w-[300px] flex-1 items-center gap-3 rounded-[1.35rem] border border-slate-200/80 bg-white/76 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.86)] backdrop-blur-xl md:min-w-[440px]">
+                <Search className="h-4 w-4 shrink-0 text-slate-400" />
+                <div className="min-w-0 flex-1">
+                  <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                    Search Vector
+                  </p>
+                  <input
+                    type="text"
+                    value={filters.keyword}
+                    onChange={(event) => onChange({ keyword: event.target.value })}
+                    placeholder="Specialty, therapist name, or pain point"
+                    className="mt-1 w-full border-none bg-transparent p-0 font-sans text-sm font-medium text-slate-950 outline-none placeholder:font-light placeholder:text-slate-400 focus:ring-0 md:text-base"
+                  />
+                </div>
+              </div>
+
+              <div className="hidden min-w-[190px] items-center gap-3 rounded-[1.35rem] border border-slate-200/80 bg-white/72 px-4 py-3 shadow-[0_16px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl sm:flex">
+                <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
+                <div className="min-w-0">
+                  <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                    Location
+                  </p>
+                  <p className="mt-1 truncate font-sans text-sm font-medium text-slate-900">{cityLabel}</p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsExpanded((current) => !current)}
+                className="inline-flex min-w-[172px] items-center justify-between gap-3 rounded-[1.35rem] border border-slate-900 bg-slate-950 px-4 py-3 text-left text-white shadow-[0_20px_44px_rgba(15,23,42,0.18)] transition hover:bg-slate-800"
+              >
+                <div className="flex items-center gap-3">
+                  <SlidersHorizontal className="h-4 w-4" />
+                  <div>
+                    <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                      Control
+                    </p>
+                    <p className="mt-1 font-sans text-sm font-medium">
+                      {isExpanded ? "Close Parameters" : "Open Parameters"}
+                    </p>
+                  </div>
+                </div>
+                <span className="rounded-full border border-white/16 bg-white/10 px-2.5 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-white">
+                  {activeCount}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-4 overflow-x-auto scrollbar-none">
+            <div className="flex min-w-max gap-3">
+              <FilterMetric label="Objective" value={activeObjective.label} />
+              <FilterMetric label="Session" value={sessionLabel} compact />
+              <FilterMetric label="Tier" value={tierLabel} compact />
+              <FilterMetric label="Trust" value={trustLabel} compact />
+              {filters.availableToday ? <FilterMetric label="Availability" value="Today" compact /> : null}
+              {filters.masterOnly ? <FilterMetric label="Experience" value="10+ Years" compact /> : null}
+              {filters.lgbtqAffirming ? <FilterMetric label="Inclusivity" value="LGBTQ+" compact /> : null}
+            </div>
+          </div>
+        </div>
+
+        <AnimatePresence initial={false}>
+          {isExpanded ? (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.4, ease: PANEL_EASE }}
+              className="relative overflow-hidden border-t border-slate-200/80"
+            >
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(248,250,252,0.82),rgba(255,255,255,0.94))]" />
+              <div className="relative grid gap-8 px-4 py-6 md:grid-cols-[minmax(0,1.65fr)_minmax(280px,1fr)] md:px-6 md:py-7">
+                <div className="space-y-7">
+                  <div>
+                    <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                      Treatment Objective
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {DIRECTORY_OBJECTIVES.map((objective) => {
+                        const isActive = activeObjective.id === objective.id;
+                        return (
+                          <button
+                            key={objective.id}
+                            type="button"
+                            onClick={() =>
+                              onChange({
+                                goal: objective.id === "all" ? "" : objective.id,
+                                modality: objective.searchValue,
+                              })
+                            }
+                            className={`px-5 py-2.5 font-sans text-sm font-medium transition-all duration-300 ${
+                              isActive
+                                ? "bg-slate-950 text-white shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
+                                : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-950"
+                            }`}
+                          >
+                            {objective.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="grid gap-5 md:grid-cols-3">
+                    <label className="space-y-2">
+                      <span className="block font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                        City
+                      </span>
+                      <select
+                        value={filters.city}
+                        onChange={(event) => onChange({ city: event.target.value })}
+                        className="min-h-12 w-full rounded-none border border-slate-200 bg-white px-4 py-3 font-sans text-sm font-medium text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                      >
+                        <option value="">All cities</option>
+                        {cities.slice(0, 200).map((city) => (
+                          <option key={city.slug} value={city.name}>
+                            {city.name}, {city.stateCode}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <div className="space-y-2">
+                      <span className="block font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                        Session Format
+                      </span>
+                      <div className="grid min-h-12 grid-cols-3 overflow-hidden border border-slate-200 bg-white">
+                        {[
+                          { value: "", label: "Any" },
+                          { value: "incall", label: "Studio" },
+                          { value: "home-visit", label: "Outcall" },
+                        ].map((option) => (
+                          <button
+                            key={option.label}
+                            type="button"
+                            onClick={() => onChange({ session: option.value as DirectorySession })}
+                            className={`font-sans text-sm font-medium transition-colors ${
+                              filters.session === option.value
+                                ? "bg-slate-950 text-white"
+                                : "border-l border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-950 first:border-l-0"
+                            }`}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <label className="space-y-2">
+                      <span className="block font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                        Listing Tier
+                      </span>
+                      <select
+                        value={filters.tier}
+                        onChange={(event) => onChange({ tier: (event.target.value as TherapistTier | "") || "" })}
+                        className="min-h-12 w-full rounded-none border border-slate-200 bg-white px-4 py-3 font-sans text-sm font-medium text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                      >
+                        <option value="">All tiers</option>
+                        <option value="free">Access</option>
+                        <option value="standard">Verified</option>
+                        <option value="pro">Pro</option>
+                        <option value="elite">Elite</option>
+                      </select>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="space-y-5">
+                  <div className="border border-slate-200 bg-white/82 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                          Availability & Tier
+                        </p>
+                        <p className="mt-2 max-w-xs font-sans text-sm font-light leading-6 text-slate-600">
+                          Reveal the higher-intent listings first without drowning the page in options.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={onReset}
+                        className="inline-flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-slate-500 transition hover:text-slate-950"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                        Reset
+                      </button>
+                    </div>
+
+                    <div className="mt-6 space-y-4">
+                      <FilterToggle
+                        label="Available Today"
+                        checked={filters.availableToday}
+                        onChange={(checked) => onChange({ availableToday: checked })}
+                      />
+                      <div className="h-px bg-slate-100" />
+                      <FilterToggle
+                        label="Master Level (10+ Yrs Exp)"
+                        checked={filters.masterOnly}
+                        onChange={(checked) => onChange({ masterOnly: checked })}
+                      />
+                      <div className="h-px bg-slate-100" />
+                      <FilterToggle
+                        label="Verified Profiles Only"
+                        checked={filters.verified}
+                        onChange={(checked) => onChange({ verified: checked })}
+                      />
+                      <div className="h-px bg-slate-100" />
+                      <FilterToggle
+                        label="LGBTQ+ Affirming"
+                        checked={filters.lgbtqAffirming}
+                        onChange={(checked) => onChange({ lgbtqAffirming: checked })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="border border-slate-200 bg-slate-950 p-5 text-white shadow-[0_24px_54px_rgba(15,23,42,0.18)]">
+                    <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                      Match State
+                    </p>
+                    <p className="mt-4 font-display text-4xl font-medium tracking-[-0.04em] text-white">
+                      {resultCount}
+                    </p>
+                    <p className="mt-2 font-sans text-sm font-light text-slate-300">
+                      {resultCount === 1 ? "listing" : "listings"} matching now.
+                    </p>
+                    <div className="mt-5 flex flex-wrap gap-2">
+                      <span className="rounded-full border border-white/14 bg-white/10 px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-white">
+                        {isPending ? "Refreshing query" : "URL synced"}
+                      </span>
+                      <span className="rounded-full border border-white/14 bg-white/10 px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-white">
+                        {totalCount} indexed
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

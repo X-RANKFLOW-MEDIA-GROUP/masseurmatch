@@ -1,6 +1,7 @@
 import AdminCitiesManager from "@/app/admin/_components/AdminCitiesManager";
 import { readContentStore } from "@/app/api/_lib/content-store";
 import { getPublicTherapists } from "@/app/_lib/directory";
+import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";
 
 export default async function AdminCitiesPage() {
   const [store, therapists] = await Promise.all([
@@ -19,12 +20,14 @@ export default async function AdminCitiesPage() {
   }, {});
 
   return (
-    <div className="container mx-auto px-4 py-10">
-      <h1 className="mb-2 text-3xl font-bold">Admin Cities</h1>
-      <p className="mb-6 text-sm text-muted-foreground">
-        Manage custom city copy and compare it against the current public therapist footprint.
-      </p>
-      <AdminCitiesManager initialCities={store.cities} therapistCounts={therapistCounts} />
+    <div className="space-y-6">
+      <AdminPageHeader
+        title="Cities"
+        description="Manage custom city copy and compare it against the current public therapist footprint."
+      />
+      <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+        <AdminCitiesManager initialCities={store.cities} therapistCounts={therapistCounts} />
+      </div>
     </div>
   );
 }

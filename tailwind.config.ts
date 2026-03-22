@@ -1,21 +1,41 @@
 import type { Config } from "tailwindcss";
+import tailwindcssForms from "@tailwindcss/forms";
 import tailwindcssAnimate from "tailwindcss-animate";
 
 const withOpacity = (variableName: string) => `rgb(var(${variableName}) / <alpha-value>)`;
 
 const config: Config = {
-  content: ["./src/app/**/*.{ts,tsx}", "./src/mm/**/*.{ts,tsx}", "./src/components/**/*.{ts,tsx}"],
+  content: [
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/_components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/mm/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
   theme: {
     extend: {
       fontFamily: {
-        display: ["var(--font-display)", "sans-serif"],
-        heading: ["var(--font-display)", "sans-serif"],
-        body: ["var(--font-sans)", "sans-serif"],
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        display: ["var(--font-space)", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)", "monospace"],
-        sans: ["var(--font-sans)", "sans-serif"],
+        heading: ["var(--font-space)", "system-ui", "sans-serif"],
+        body: ["var(--font-inter)", "system-ui", "sans-serif"],
         serif: ["var(--font-serif)", "Georgia", "serif"],
       },
       colors: {
+        slate: {
+          50: "#F8FAFC",
+          100: "#F1F5F9",
+          200: "#E2E8F0",
+          300: "#CBD5E1",
+          400: "#94A3B8",
+          500: "#64748B",
+          600: "#475569",
+          700: "#334155",
+          800: "#1E293B",
+          900: "#0F172A",
+          950: "#020617",
+        },
         border: {
           DEFAULT: "hsl(var(--border))",
           subtle: withOpacity("--color-border-subtle-rgb"),
@@ -129,7 +149,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [tailwindcssForms, tailwindcssAnimate],
 };
 
 export default config;

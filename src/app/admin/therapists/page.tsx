@@ -1,23 +1,26 @@
 import AdminTherapistsManager from "@/app/admin/_components/AdminTherapistsManager";
 import { loadTherapists } from "@/app/admin/_lib/loaders";
+import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";
 
 export default async function AdminTherapistsPage() {
   const { items, error } = await loadTherapists();
 
   return (
-    <div className="container mx-auto px-4 py-10">
-      <h1 className="mb-2 text-3xl font-bold">Admin Therapists</h1>
-      <p className="mb-6 text-sm text-muted-foreground">
-        Moderate therapist profiles, verification state, availability, and featured placement.
-      </p>
+    <div className="space-y-6">
+      <AdminPageHeader
+        title="Therapists"
+        description="Moderate therapist profiles, verification state, availability, and featured placement."
+      />
 
       {error ? (
-        <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-muted-foreground">
+        <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-muted-foreground">
           Therapists could not be loaded from Supabase admin right now: {error}
         </div>
       ) : null}
 
-      <AdminTherapistsManager initialTherapists={items} />
+      <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+        <AdminTherapistsManager initialTherapists={items} />
+      </div>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import type { PublicTherapist } from "@/app/_lib/directory";
 import { buildFaqJsonLd } from "@/app/_lib/structured-data";
 import { JsonLd } from "@/app/_components/json-ld";
 import { EmptyState, Surface } from "@/app/_components/primitives";
-import { TherapistCard } from "@/app/_components/therapist-card";
+import { PublicTherapistCard } from "@/app/_components/PublicTherapistCard";
 
 type LinkItem = {
   href: string;
@@ -203,7 +203,7 @@ export function CityDirectoryPage({
             {therapists.length > 0 ? (
               <div className="mt-6 grid gap-4 lg:grid-cols-2">
                 {therapists.map((therapist) => (
-                  <TherapistCard key={therapist.id} therapist={therapist} />
+                  <PublicTherapistCard key={therapist.id} therapist={therapist} />
                 ))}
               </div>
             ) : (

@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useHydratedReducedMotion } from "@/hooks/useHydratedReducedMotion";
 import { cn } from "@/lib/utils";
 
 type TextRevealProps = {
@@ -9,18 +10,19 @@ type TextRevealProps = {
   className?: string;
 };
 
-const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export function TextReveal({ text, delay = 0, className }: TextRevealProps) {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useHydratedReducedMotion();
   const words = text.split(" ");
+  const wrapperClassName = cn("inline-flex flex-wrap", className);
 
   if (reduceMotion) {
-    return <span className={className}>{text}</span>;
+    return <span className={wrapperClassName}>{text}</span>;
   }
 
   return (
-    <span className={cn("inline-flex flex-wrap", className)} aria-label={text}>
+    <span className={wrapperClassName} aria-label={text}>
       {words.map((word, index) => (
         <span key={`${word}-${index}`} className="overflow-hidden">
           <motion.span
@@ -29,7 +31,7 @@ export function TextReveal({ text, delay = 0, className }: TextRevealProps) {
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{
               delay: delay + index * 0.045,
-              duration: 0.72,
+              duration: 0.6,
               ease: EASE,
             }}
           >

@@ -159,3 +159,22 @@ export async function getSeoTherapists(): Promise<SeoTherapist[]> {
 
   return (profileRows ?? []).filter((therapist) => typeof therapist.slug === "string" && therapist.slug.length > 0);
 }
+
+export type SeoBlogPost = {
+  slug: string;
+  updated_at?: string | null;
+  published_at?: string | null;
+};
+
+export async function getSeoBlogPosts(): Promise<SeoBlogPost[]> {
+  const dbPosts = await tryFetchAllRows<SeoBlogPost>(
+    "blog_posts",
+    "slug, updated_at, published_at",
+    (query) =>
+      query
+        .not("slug", "is", null)
+        .order("published_at", { ascending: false }),
+  );
+
+  return (dbPosts ?? []).filter((post) => typeof post.slug === "string" && post.slug.length > 0);
+}

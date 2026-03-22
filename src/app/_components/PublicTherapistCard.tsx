@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import {
   getDirectoryTierLabel,
@@ -12,6 +12,8 @@ import {
   isVerifiedDirectoryProfile,
 } from "@/app/_lib/public-profile";
 import { handleProfileCardTilt, resetProfileCardTilt } from "@/app/_components/profile-card-tilt";
+import { ScrambleText } from "@/components/animations/ScrambleText";
+import { buildPhysicalProfileSummary } from "@/lib/physical-profile";
 
 const formatCurrency = (value: number | null) => {
   if (typeof value !== "number" || value <= 0) {
@@ -46,6 +48,7 @@ const beginRouteTransition = () => {
 };
 
 export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist }) {
+  const [ctaScrambleKey, setCtaScrambleKey] = useState(0);
   const name = getPublicProfileName(therapist);
   const profilePath = `/therapists/${therapist.slug || therapist.id}`;
   const incall = formatCurrency(therapist.incall_price);
@@ -65,6 +68,11 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
   const startingLabel = startingValue ? `Starting at ${startingValue}` : "Price on request";
   const availabilityLabel = therapist.available_now ? "Available Now" : "Book Today";
   const locationLabel = neighborhood || therapist.city || "Local area";
+  const physicalSummary = buildPhysicalProfileSummary({
+    heightInches: therapist.height_inches,
+    weightLb: therapist.weight_lb,
+    bodyType: therapist.body_type,
+  });
   const tertiaryStat = outcall
     ? { label: "Outcall", value: outcall }
     : therapist.profile_views
@@ -98,7 +106,7 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
 
         <div className="absolute left-4 top-4 flex flex-wrap gap-2 profile-card-plane-soft">
           <span
-            className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] backdrop-blur-xl ${
+            className={`rounded-full border px-3 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.18em] backdrop-blur-xl ${
               isPremium
                 ? "border-white/18 bg-[rgb(var(--color-brand-secondary-rgb)/0.38)] text-white"
                 : "border-white/18 bg-white/14 text-white"
@@ -107,7 +115,7 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
             {tierLabel}
           </span>
           {isVerified ? (
-            <span className="rounded-full border border-white/18 bg-white/14 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-xl">
+            <span className="rounded-full border border-white/18 bg-white/14 px-3 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-white backdrop-blur-xl">
               Verified
             </span>
           ) : null}
@@ -127,13 +135,13 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
 
       <div className="profile-card-plane mt-5 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="text-[1.55rem] font-semibold leading-tight text-text-primary">
+          <h3 className="font-display text-[1.45rem] font-medium leading-tight tracking-[-0.02em] text-text-primary">
             <Link href={profilePath} onClick={beginRouteTransition} className="transition hover:text-brand-secondary">
               {name}
             </Link>
           </h3>
 
-          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text-secondary">
+          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 font-sans text-sm font-light text-text-secondary">
             <span>{therapist.city || "United States"}</span>
             {neighborhood && neighborhood !== therapist.city ? (
               <>
@@ -151,13 +159,13 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
         </div>
 
         {therapist.review_count ? (
-          <span className="shrink-0 rounded-full border border-border-subtle bg-white/78 px-3 py-1.5 text-xs font-semibold text-brand-secondary shadow-[0_10px_24px_rgb(var(--color-brand-primary-rgb)/0.06)]">
+          <span className="shrink-0 rounded-full border border-border-subtle bg-white/78 px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-brand-secondary shadow-[0_10px_24px_rgb(var(--color-brand-primary-rgb)/0.06)]">
             {therapist.review_count} reviews
           </span>
         ) : null}
       </div>
 
-      <p className="profile-card-plane mt-4 text-sm leading-7 text-text-secondary">
+      <p className="profile-card-plane mt-4 font-sans text-[15px] font-light leading-relaxed text-text-secondary">
         {therapist.bio || "Profile details are still being completed. Visit the full listing for contact preferences and specialties."}
       </p>
 
@@ -165,42 +173,47 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
         {(therapist.specialties || []).slice(0, 4).map((specialty) => (
           <span
             key={specialty}
-            className="rounded-full border border-border-subtle bg-white/76 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-secondary shadow-[inset_0_1px_0_rgb(255_255_255/_0.9)]"
+            className="rounded-full border border-border-subtle bg-white/76 px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-brand-secondary shadow-[inset_0_1px_0_rgb(255_255_255/_0.9)]"
           >
             {specialty}
           </span>
         ))}
         {therapist.modality ? (
-          <span className="rounded-full border border-border-subtle bg-[rgb(var(--color-brand-secondary-rgb)/0.08)] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-secondary">
+          <span className="rounded-full border border-border-subtle bg-[rgb(var(--color-brand-secondary-rgb)/0.08)] px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-brand-secondary">
             {therapist.modality}
+          </span>
+        ) : null}
+        {physicalSummary ? (
+          <span className="rounded-full border border-border-subtle bg-[rgb(var(--color-brand-secondary-rgb)/0.08)] px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-brand-secondary">
+            {physicalSummary}
           </span>
         ) : null}
       </div>
 
       <div className="profile-card-plane mt-5 grid gap-3 rounded-[1.35rem] border border-white/55 bg-white/58 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/_0.84)] backdrop-blur-xl sm:grid-cols-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">Starting</p>
-          <p className="mt-2 text-sm font-semibold text-text-primary">{startingValue || "Request"}</p>
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-text-muted">Starting</p>
+          <p className="mt-2 font-mono text-sm font-medium text-text-primary">{startingValue || "Request"}</p>
         </div>
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">Incall</p>
-          <p className="mt-2 text-sm font-semibold text-text-primary">{incall || "Ask"}</p>
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-text-muted">Incall</p>
+          <p className="mt-2 font-mono text-sm font-medium text-text-primary">{incall || "Ask"}</p>
         </div>
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">{tertiaryStat.label}</p>
-          <p className="mt-2 text-sm font-semibold text-text-primary">{tertiaryStat.value}</p>
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-text-muted">{tertiaryStat.label}</p>
+          <p className="mt-2 font-mono text-sm font-medium text-text-primary">{tertiaryStat.value}</p>
         </div>
       </div>
 
       <div className="profile-card-plane mt-5 rounded-[1.35rem] border border-white/55 bg-white/58 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/_0.84)] backdrop-blur-xl">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-text-muted">
           Why this profile feels safer
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           {trustHighlights.map((highlight) => (
             <span
               key={highlight}
-              className="rounded-full border border-border-subtle bg-[rgb(var(--color-brand-secondary-rgb)/0.08)] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-secondary"
+              className="rounded-full border border-border-subtle bg-[rgb(var(--color-brand-secondary-rgb)/0.08)] px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-brand-secondary"
             >
               {highlight}
             </span>
@@ -212,7 +225,7 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
         {callHref ? (
           <a
             href={callHref}
-            className="profile-card-secondary-action inline-flex min-h-12 items-center justify-center rounded-2xl px-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-primary"
+            className="profile-card-secondary-action inline-flex min-h-12 items-center justify-center rounded-2xl px-4 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-text-primary"
           >
             Call now
           </a>
@@ -222,7 +235,7 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
             href={whatsappHref}
             target="_blank"
             rel="noreferrer"
-            className="profile-card-secondary-action inline-flex min-h-12 items-center justify-center rounded-2xl px-4 text-xs font-semibold uppercase tracking-[0.12em] text-text-primary"
+            className="profile-card-secondary-action inline-flex min-h-12 items-center justify-center rounded-2xl px-4 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-text-primary"
           >
             WhatsApp
           </a>
@@ -230,14 +243,16 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
         <Link
           href={profilePath}
           onClick={beginRouteTransition}
+          onMouseEnter={() => setCtaScrambleKey((value) => value + 1)}
+          onFocus={() => setCtaScrambleKey((value) => value + 1)}
           className="profile-card-cta blur-nav-link flex-1 px-5 text-sm uppercase tracking-[0.12em]"
         >
-          View Profile
+          <ScrambleText text="View Profile" playKey={ctaScrambleKey} />
         </Link>
       </div>
 
-      <div className="profile-card-plane mt-4 flex items-center justify-between gap-3 text-xs text-text-muted">
-        <Link href="/safety" className="font-semibold text-brand-secondary hover:underline">
+      <div className="profile-card-plane mt-4 flex items-center justify-between gap-3 font-mono text-[10px] uppercase tracking-[0.16em] text-text-muted">
+        <Link href="/safety" className="font-medium text-brand-secondary hover:underline">
           Safety guide
         </Link>
         <span>{isVerified ? "Verification visible" : "Review the full profile before contact"}</span>

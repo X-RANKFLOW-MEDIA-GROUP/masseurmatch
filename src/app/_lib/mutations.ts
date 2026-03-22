@@ -61,6 +61,9 @@ export type ProProfileMutationResponse = {
     specialties: string[] | null;
     incall_price: number | null;
     outcall_price: number | null;
+    height_inches: number | null;
+    weight_lb: number | null;
+    body_type: string | null;
     status: string;
     updated_at: string;
   } | null;

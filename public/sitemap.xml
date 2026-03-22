@@ -57,6 +57,28 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://masseurmatch.com/about" />
   </url>
   <url>
+    <loc>https://masseurmatch.com/community-guidelines</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <lastmod>2026-03-22</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://masseurmatch.com/community-guidelines?lang=en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://masseurmatch.com/community-guidelines?lang=es" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://masseurmatch.com/community-guidelines?lang=pt" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://masseurmatch.com/community-guidelines?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://masseurmatch.com/community-guidelines" />
+  </url>
+  <url>
+    <loc>https://masseurmatch.com/platform-disclaimer</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <lastmod>2026-03-22</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://masseurmatch.com/platform-disclaimer?lang=en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://masseurmatch.com/platform-disclaimer?lang=es" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://masseurmatch.com/platform-disclaimer?lang=pt" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://masseurmatch.com/platform-disclaimer?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://masseurmatch.com/platform-disclaimer" />
+  </url>
+  <url>
     <loc>https://masseurmatch.com/faq</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
