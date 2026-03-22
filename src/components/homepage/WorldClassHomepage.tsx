@@ -678,7 +678,7 @@ export function WorldClassHomepage({
                         setKnottyTyping(false);
                         setKnottyMessages((prev) => [
                           ...prev,
-                          { id: `a-${Date.now()}`, role: "assistant", text: `Let me find the best options for \"${q}\"…` },
+                          { id: `a-${Date.now()}`, role: "assistant", text: `Let me find the best options for "${q}"...` },
                         ]);
                         setTimeout(() => {
                           router.push(`/search?keyword=${encodeURIComponent(q)}`);
@@ -704,7 +704,7 @@ export function WorldClassHomepage({
                       setKnottyTyping(false);
                       setKnottyMessages((prev) => [
                         ...prev,
-                        { id: `a-${Date.now()}`, role: "assistant", text: `Let me find the best options for \"${q}\"…` },
+                        { id: `a-${Date.now()}`, role: "assistant", text: `Let me find the best options for "${q}"...` },
                       ]);
                       setTimeout(() => {
                         router.push(`/search?keyword=${encodeURIComponent(q)}`);
