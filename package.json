@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "packageManager": "pnpm@9.15.4",
+  "packageManager": "pnpm@10.32.1",
   "scripts": {
     "dev": "next dev",
     "clean:next": "node scripts/clean-next.mjs",
@@ -68,6 +68,7 @@
     "lucide-react": "^0.462.0",
     "next": "^15.3.0",
     "next-themes": "^0.3.0",
+    "postgres": "^3.4.8",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",

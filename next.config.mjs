@@ -1,3 +1,5 @@
+import path from "node:path";
+
 /**
  * Redirect manifest — mirrors src/app/_lib/redirects-manifest.ts.
  * Source of truth for intent: the TypeScript file.
@@ -65,11 +67,29 @@ const LEGACY_REDIRECTS = [
 const nextConfig = {
   typedRoutes: false,
   allowedDevOrigins: ["100.69.207.7", "localhost", "127.0.0.1", "::1"],
+  experimental: {
+    webpackBuildWorker: true,
+    webpackMemoryOptimizations: true,
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "*.supabase.co" },
     ],
+  },
+  webpack(config, { dev }) {
+    if (config.cache && !dev) {
+      config.cache = Object.freeze({
+        type: "memory",
+      });
+    }
+
+    config.resolve.alias = {
+      ...(config.resolve.alias ?? {}),
+      "lucide-react$": path.resolve(process.cwd(), "node_modules/lucide-react/dist/esm/lucide-react.js"),
+    };
+
+    return config;
   },
   async redirects() {
     return LEGACY_REDIRECTS;
