@@ -1,0 +1,154 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MassageTherapistProfile",
+  "type": "object",
+  "properties": {
+    "full_name": { "type": "string" },
+    "display_name": { "type": "string" },
+    "headline": { "type": "string" },
+    "bio_short": { "type": "string" },
+    "bio_full": { "type": "string" },
+    "experience_start": { "type": "string", "format": "date" },
+    "languages": { "type": "array", "items": { "type": "string" } },
+    "city": { "type": "string" },
+    "state": { "type": "string" },
+    "neighborhood": { "type": "string" },
+    "location_description": { "type": "string" },
+    "zip_code": { "type": "string" },
+    "is_mappable": { "type": "boolean" },
+    "landmarks": { "type": "array", "items": { "type": "string" } },
+    "offers_incall": { "type": "boolean" },
+    "offers_outcall": { "type": "boolean" },
+    "outcall_radius": { "type": "number" },
+    "service_area_cities": { "type": "array", "items": { "type": "string" } },
+    "massage_techniques": { "type": "array", "items": { "type": "string" } },
+    "specialties": { "type": "array", "items": { "type": "string" } },
+    "massage_setup": { "type": "array", "items": { "type": "string" } },
+    "mobile_extras": { "type": "array", "items": { "type": "string" } },
+    "incall_amenities": { "type": "array", "items": { "type": "string" } },
+    "additional_services": { "type": "array", "items": { "type": "string" } },
+    "products_used": { "type": "array", "items": { "type": "string" } },
+    "products_sold": { "type": "array", "items": { "type": "string" } },
+    "starting_rate": { "type": "number" },
+    "rates_incall": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "duration_minutes": { "type": "number" },
+          "price": { "type": "number" },
+          "display_note": { "type": "string" }
+        },
+        "required": ["duration_minutes", "price"]
+      }
+    },
+    "rates_outcall": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "duration_minutes": { "type": "number" },
+          "price_or_label": { "type": "string" },
+          "display_note": { "type": "string" }
+        },
+        "required": ["duration_minutes", "price_or_label"]
+      }
+    },
+    "discounts": { "type": "string" },
+    "weekly_specials": { "type": "string" },
+    "rate_disclaimer": { "type": "string" },
+    "payment_methods": { "type": "array", "items": { "type": "string" } },
+    "incall_hours": {
+      "type": "object",
+      "patternProperties": {
+        "^(monday|tuesday|wednesday|thursday|friday|saturday|sunday)$": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "start": { "type": "string" },
+            "end": { "type": "string" }
+          },
+          "required": ["enabled", "start", "end"]
+        }
+      }
+    },
+    "outcall_hours": {
+      "type": "object",
+      "patternProperties": {
+        "^(monday|tuesday|wednesday|thursday|friday|saturday|sunday)$": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "start": { "type": "string" },
+            "end": { "type": "string" }
+          },
+          "required": ["enabled", "start", "end"]
+        }
+      }
+    },
+    "available_now": { "type": "boolean" },
+    "available_today": { "type": "boolean" },
+    "same_day_booking": { "type": "boolean" },
+    "is_traveling": { "type": "boolean" },
+    "travel_cities": { "type": "array", "items": { "type": "string" } },
+    "travel_dates": {
+      "type": "object",
+      "properties": {
+        "start": { "type": "string", "format": "date" },
+        "end": { "type": "string", "format": "date" }
+      },
+      "required": ["start", "end"]
+    },
+    "travel_note": { "type": "string" },
+    "years_experience": { "type": "number" },
+    "education": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "school_name": { "type": "string" },
+          "program_name": { "type": "string" },
+          "city": { "type": "string" },
+          "country": { "type": "string" },
+          "start_date": { "type": "string", "format": "date" },
+          "end_date": { "type": "string", "format": "date" }
+        },
+        "required": ["school_name", "program_name", "city", "country", "start_date", "end_date"]
+      }
+    },
+    "licenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "issuer": { "type": "string" },
+          "year": { "type": "string" }
+        },
+        "required": ["title", "issuer", "year"]
+      }
+    },
+    "affiliations": { "type": "array", "items": { "type": "string" } },
+    "phone_number": { "type": "string" },
+    "show_email_button": { "type": "boolean" },
+    "email_address": { "type": "string" },
+    "booking_link": { "type": "string" },
+    "whatsapp_number": { "type": "string" },
+    "telegram_handle": { "type": "string" },
+    "profile_photo": { "type": "string" },
+    "gallery_photos": { "type": "array", "items": { "type": "string" } },
+    "cover_photo": { "type": "string" },
+    "video_intro": { "type": "string" },
+    "tier": { "type": "string", "enum": ["Free", "Standard", "Pro", "Elite"] },
+    "is_verified_profile": { "type": "boolean" },
+    "lgbtq_friendly": { "type": "boolean" },
+    "visiting_soon": { "type": "boolean" },
+    "top_rated": { "type": "boolean" },
+    "seo_title": { "type": "string" },
+    "seo_description": { "type": "string" },
+    "seo_keywords": { "type": "array", "items": { "type": "string" } },
+    "slug": { "type": "string" },
+    "canonical_city": { "type": "string" }
+  },
+  "required": ["full_name", "display_name", "headline", "bio_short", "bio_full", "experience_start", "languages", "city", "state", "neighborhood", "location_description", "is_mappable", "landmarks", "offers_incall", "offers_outcall", "service_area_cities", "massage_techniques", "specialties", "massage_setup", "mobile_extras", "incall_amenities", "additional_services", "products_used", "products_sold", "starting_rate", "rates_incall", "rates_outcall", "payment_methods", "incall_hours", "outcall_hours", "available_now", "available_today", "same_day_booking", "is_traveling", "travel_cities", "years_experience", "education", "licenses", "affiliations", "phone_number", "show_email_button", "profile_photo", "gallery_photos", "tier", "is_verified_profile", "lgbtq_friendly", "visiting_soon", "top_rated", "slug"]
+}

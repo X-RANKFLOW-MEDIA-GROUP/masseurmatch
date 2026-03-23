@@ -22,6 +22,12 @@ const config: Config = {
         body: ["var(--font-inter)", "system-ui", "sans-serif"],
         serif: ["var(--font-serif)", "Georgia", "serif"],
       },
+      colors: {
+        foreground: 'hsl(var(--foreground))',
+        card: 'hsl(var(--card))',
+        'muted-foreground': 'hsl(var(--muted-foreground))',
+        primary: 'hsl(var(--primary))',
+      },
       theme: {
         extend: {
           colors: {
