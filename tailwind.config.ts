@@ -22,25 +22,32 @@ const config: Config = {
         body: ["var(--font-inter)", "system-ui", "sans-serif"],
         serif: ["var(--font-serif)", "Georgia", "serif"],
       },
-      colors: {
-        slate: {
-          50: "#F8FAFC",
-          100: "#F1F5F9",
-          200: "#E2E8F0",
-          300: "#CBD5E1",
-          400: "#94A3B8",
-          500: "#64748B",
-          600: "#475569",
-          700: "#334155",
-          800: "#1E293B",
-          900: "#0F172A",
-          950: "#020617",
-        },
-        border: {
-          DEFAULT: "hsl(var(--border))",
-          subtle: withOpacity("--color-border-subtle-rgb"),
-          strong: withOpacity("--color-border-strong-rgb"),
-          tertiary: withOpacity("--color-border-tertiary-rgb"),
+      theme: {
+        extend: {
+          colors: {
+            // ...existing code...
+          },
+          keyframes: {
+            "accordion-down": {
+              from: { height: "0" },
+              to: { height: "var(--radix-accordion-content-height)" },
+            },
+            "accordion-up": {
+              from: { height: "var(--radix-accordion-content-height)" },
+              to: { height: "0" },
+            },
+            blob: {
+              '0%': { transform: 'translateY(0px) scale(1)' },
+              '33%': { transform: 'translateY(-20px) scale(1.08)' },
+              '66%': { transform: 'translateY(10px) scale(0.98)' },
+              '100%': { transform: 'translateY(0px) scale(1)' },
+            },
+          },
+          animation: {
+            "accordion-down": "accordion-down 0.2s ease-out",
+            "accordion-up": "accordion-up 0.2s ease-out",
+            blob: "blob 7s infinite",
+          },
         },
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

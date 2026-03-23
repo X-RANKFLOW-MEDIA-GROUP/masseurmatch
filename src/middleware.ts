@@ -142,7 +142,12 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname, searchParams } = request.nextUrl;
   const session = await readSessionCookie(request);
 
-  // ── 1. /explore?city=X  →  301 /explore/usa/{slug} ───────────────────────
+  // ── 1. /wireframes* → 301 / (internal page should not be public) ───────
+  if (pathname === "/wireframes" || pathname.startsWith("/wireframes/")) {
+    return NextResponse.redirect(new URL("/", request.url), 301);
+  }
+
+  // ── 2. /explore?city=X  →  301 /explore/usa/{slug} ───────────────────────
   // Cleans up parameterized browse URLs that Google indexed.
   if (pathname === "/explore" && searchParams.has("city")) {
     const slug = exploreCityToSlug(searchParams.get("city")!);
@@ -157,12 +162,14 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.redirect(destination, 301);
   }
 
-  // ── 3. /search  →  noindex header ────────────────────────────────────────
-  // Prevents the raw OpenSearch template URL from being indexed.
+  // ── 4. /search → 301 /explore (unified search + explore) ──────────────
   if (pathname === "/search") {
-    const response = NextResponse.next();
-    response.headers.set("X-Robots-Tag", "noindex, nofollow");
-    return response;
+    const destination = new URL("/explore", request.url);
+    // Carry over any search params
+    for (const [key, value] of searchParams.entries()) {
+      destination.searchParams.set(key, value);
+    }
+    return NextResponse.redirect(destination, 301);
   }
 
   // ── 4. /explore/*  →  noindex, follow header ─────────────────────────────

@@ -14,12 +14,17 @@ import { siteUrl } from "@/lib/site";
 export const revalidate = 1800;
 
 const homeMetadata = createPageMetadata({
-  title: "Verified male massage therapists in Dallas, Miami, Chicago, Houston and top US cities",
+  title: "Gay massage therapists & male massage near me — verified LGBTQ+ directory",
   description:
-    "Discover verified male massage therapists in Dallas, Miami, Chicago, Houston, Austin, and other major US cities. Compare outcall, incall, deep tissue, Swedish, and direct-contact profiles.",
+    "Find verified gay massage therapists and male massage near you. LGBTQ+-affirming directory covering Dallas, Miami, Chicago, Houston, Austin and 100+ US cities. Compare outcall, incall, deep tissue, Swedish, and direct-contact profiles.",
   path: "/",
   keywords: [
+    "gay massage near me",
+    "gay massage therapist",
     "male massage near me",
+    "male massage therapist",
+    "lgbt massage",
+    "lgbtq massage directory",
     "verified male massage directory",
     "dallas male massage",
     "outcall male massage",
@@ -27,6 +32,7 @@ const homeMetadata = createPageMetadata({
     "swedish massage men",
     "trusted premium massage directory",
     "male massage by city",
+    "gay affirming massage",
   ],
 });
 

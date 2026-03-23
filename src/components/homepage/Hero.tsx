@@ -77,9 +77,19 @@ export function Hero({ neighborhood, city, searchInputRef }: HeroProps) {
               transition={{ duration: 0.5 }}
               className="font-display text-5xl font-light leading-[0.92] text-white sm:text-6xl lg:text-[5.5rem]"
             >
-              Find your perfect
-              <br />
-              <em className="px-2 font-light italic text-brand-soft">massage</em> therapist
+              {city ? (
+                <>
+                  Gay massage therapists
+                  <br />
+                  in <em className="px-2 font-light italic text-brand-soft">{city}</em>
+                </>
+              ) : (
+                <>
+                  Find your perfect
+                  <br />
+                  <em className="px-2 font-light italic text-brand-soft">massage</em> therapist
+                </>
+              )}
             </motion.h1>
 
             <motion.p
@@ -93,7 +103,7 @@ export function Hero({ neighborhood, city, searchInputRef }: HeroProps) {
 
             {/* Smart Search Bar */}
             <motion.form
-              action="/search"
+              action="/explore"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
@@ -175,7 +185,7 @@ export function Hero({ neighborhood, city, searchInputRef }: HeroProps) {
               {SMART_CHIPS.map((chip) => (
                 <Link
                   key={chip.label}
-                  href={`/search?keyword=${encodeURIComponent(chip.query)}${city ? `&city=${encodeURIComponent(city)}` : ""}`}
+                  href={`/explore?keyword=${encodeURIComponent(chip.query)}${city ? `&city=${encodeURIComponent(city)}` : ""}`}
                   className={`group inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-medium transition-all ${
                     chip.highlight
                       ? "border-green-400/30 bg-green-500/10 text-green-300 hover:border-green-400/50 hover:bg-green-500/20 hover:text-green-200"
