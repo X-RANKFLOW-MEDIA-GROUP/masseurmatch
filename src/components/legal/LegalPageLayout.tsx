@@ -1,125 +1,75 @@
 "use client";
 
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
-import { TextReveal } from "@/components/animations/TextReveal";
-import { ScrollProgress } from "@/components/animations/ScrollProgress";
-import { SEOHead } from "@/components/seo/SEOHead";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface LegalPageLayoutProps {
   title: string;
-  seoTitle: string;
-  seoDescription: string;
-  path: string;
   lastUpdated?: string;
   children: React.ReactNode;
 }
 
 const legalNav = [
-  { to: "/terms", label: "Terms" },
-  { to: "/therapist-agreement", label: "Subscription" },
-  { to: "/privacy", label: "Privacy" },
-  { to: "/cookies", label: "Cookies" },
-  { to: "/billing-policy", label: "Billing" },
-  { to: "/acceptable-use", label: "Use" },
-  { to: "/photo-policy", label: "Photos" },
-  { to: "/dmca", label: "DMCA" },
-  { to: "/accessibility", label: "Accessibility" },
-  { to: "/legal-contact", label: "Contact" },
+  { href: "/terms", label: "Terms of Service" },
+  { href: "/privacy", label: "Privacy Policy" },
+  { href: "/cookie-policy", label: "Cookie Policy" },
+  { href: "/therapist-agreement", label: "Therapist Agreement" },
+  { href: "/community-guidelines", label: "Community Guidelines" },
+  { href: "/billing-policy", label: "Billing & Refunds" },
+  { href: "/acceptable-use", label: "Acceptable Use" },
+  { href: "/photo-policy", label: "Photo Policy" },
+  { href: "/dmca", label: "DMCA" },
+  { href: "/accessibility", label: "Accessibility" },
+  { href: "/legal-contact", label: "Legal Contact" },
 ];
 
-export const LegalPageLayout = ({
-  title,
-  seoTitle,
-  seoDescription,
-  path,
-  lastUpdated = "March 10, 2026",
-  children,
-}: LegalPageLayoutProps) => {
-  const scrollRef = useScrollReveal();
+export default function LegalPageLayout({ title, lastUpdated = "March 10, 2026", children }: LegalPageLayoutProps) {
+  const pathname = usePathname();
 
   return (
-    <div className="min-h-screen bg-background" ref={scrollRef}>
-      <SEOHead title={seoTitle} description={seoDescription} path={path} />
-      <ScrollProgress />
-      <Header />
-
-      <section className="pt-28 pb-20">
-        <div className="container mx-auto px-4">
-          {/* Legal nav */}
-          <div className="max-w-4xl mx-auto mb-10">
-            <nav className="flex flex-wrap gap-2 justify-center">
-              {legalNav.map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
-                    path === item.to
-                      ? "border-primary/30 bg-primary/10 text-foreground"
-                      : "border-border bg-background text-muted-foreground hover:border-primary/20 hover:text-foreground"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
+    <div className="min-h-screen bg-gray-50 pt-32 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-8">
+        {/* Sidebar de Navegação */}
+        <aside className="md:w-72 flex-shrink-0">
+          <div className="sticky top-28 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            {/* Busca Interna */}
+            <div className="relative mb-6">
+              <svg className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+              <input 
+                type="text" 
+                placeholder="Search legal docs..." 
+                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                // Not wired up yet
+              />
+            </div>
+            <nav className="space-y-2">
+              {legalNav.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link 
+                    key={item.href} 
+                    href={item.href}
+                    className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                      isActive ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                )
+              })}
             </nav>
           </div>
+        </aside>
 
-          {/* Header */}
-          <div className="max-w-3xl mx-auto text-center mb-12">
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4"
-            >
-              Legal
-            </motion.p>
-            <h1 className="text-3xl md:text-5xl font-bold mb-4">
-              <TextReveal text={title} delay={0.1} />
-            </h1>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="flex items-center justify-center gap-4 text-xs text-muted-foreground"
-            >
-              <span>Last updated: {lastUpdated}</span>
-              <span className="hidden sm:inline">·</span>
-              <span className="hidden sm:inline">XRankFlow Media Group LLC — Dover, DE</span>
-            </motion.div>
-          </div>
-
-          {/* Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="max-w-3xl mx-auto legal-content"
-          >
+        {/* Conteúdo Legal */}
+        <main className="flex-1 bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-gray-100">
+          <h1 className="text-3xl font-extrabold text-gray-900 mb-2">{title}</h1>
+          <p className="text-sm text-gray-500 mb-8 border-b pb-4">Last Updated: {lastUpdated}</p>
+          <div className="prose prose-gray max-w-none">
             {children}
-          </motion.div>
-
-          {/* Bottom nav */}
-          <div className="max-w-3xl mx-auto mt-12 pt-8 border-t border-border">
-            <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-              {legalNav.filter((n) => n.to !== path).slice(0, 6).map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className="underline-sweep hover:text-foreground transition-colors"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
           </div>
-        </div>
-      </section>
-
-      <Footer />
+        </main>
+      </div>
     </div>
   );
-};
+}

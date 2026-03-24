@@ -1,0 +1,79 @@
+// Prisma schema para o perfil do massagista
+model MassageTherapistProfile {
+  id                 String   @id @default(uuid())
+  full_name          String
+  display_name       String
+  headline           String
+  bio_short          String
+  bio_full           String
+  experience_start   DateTime
+  languages          String[]
+  city               String
+  state              String
+  neighborhood       String
+  location_description String
+  zip_code           String?
+  is_mappable        Boolean
+  landmarks          String[]
+  offers_incall      Boolean
+  offers_outcall     Boolean
+  outcall_radius     Int?
+  service_area_cities String[]
+  massage_techniques String[]
+  specialties        String[]
+  massage_setup      String[]
+  mobile_extras      String[]
+  incall_amenities   String[]
+  additional_services String[]
+  products_used      String[]
+  products_sold      String[]
+  starting_rate      Int
+  rates_incall       Json
+  rates_outcall      Json
+  discounts          String?
+  weekly_specials    String?
+  rate_disclaimer    String?
+  payment_methods    String[]
+  incall_hours       Json
+  outcall_hours      Json
+  available_now      Boolean
+  available_today    Boolean
+  same_day_booking   Boolean
+  is_traveling       Boolean
+  travel_cities      String[]
+  travel_dates       Json?
+  travel_note        String?
+  years_experience   Int
+  education          Json
+  licenses           Json
+  affiliations       String[]
+  phone_number       String
+  show_email_button  Boolean
+  email_address      String?
+  booking_link       String?
+  whatsapp_number    String?
+  telegram_handle    String?
+  profile_photo      String
+  gallery_photos     String[]
+  cover_photo        String?
+  video_intro        String?
+  tier               String
+  is_verified_profile Boolean
+  lgbtq_friendly     Boolean
+  visiting_soon      Boolean
+  top_rated          Boolean
+  seo_title          String?
+  seo_description    String?
+  seo_keywords       String[]
+  slug               String
+  canonical_city     String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+    ranking_score        Float      @default(0)
+    last_activity_at     DateTime?  @default(now())
+    profile_completeness Float      @default(0)
+    description_quality  Float      @default(0)
+    engagement_score     Float      @default(0)
+    city_demand_score    Float      @default(0)
+    photos_score         Float      @default(0)
+}

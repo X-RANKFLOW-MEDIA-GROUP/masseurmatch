@@ -183,91 +183,93 @@ export function KnottyGlassAI({ city }: KnottyGlassAIProps) {
   }, [input, city]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 30 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-      className="flex w-full max-w-sm flex-col overflow-hidden rounded-[24px] border border-white/[0.12] bg-white/[0.05] shadow-[0_24px_60px_rgba(0,0,0,0.25)] backdrop-blur-2xl"
-    >
-      {/* Header */}
-      <div className="flex items-center gap-2.5 border-b border-white/[0.08] px-4 py-3">
-        <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-brand-accent to-brand-soft">
-          <Sparkles className="h-4 w-4 text-brand-primary" />
-          <span className="absolute -right-0.5 -top-0.5 flex h-2.5 w-2.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
-          </span>
+    <div className="relative">
+      <motion.div
+        initial={{ opacity: 0, x: 30 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+        className="flex w-full max-w-sm flex-col overflow-hidden glass-card-light"
+      >
+        {/* Header */}
+        <div className="flex items-center gap-2.5 border-b border-white/20 px-4 py-3">
+          <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-blue-500 text-white font-bold text-lg shadow-md">
+            K
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-gray-900 leading-tight">Meet Knotty</p>
+            <p className="text-[10px] text-green-500 font-medium flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Online AI Assistant
+            </p>
+          </div>
         </div>
-        <div>
-          <p className="text-xs font-semibold text-white/90">Knotty AI</p>
-          <p className="text-[10px] text-white/40">Your massage concierge</p>
-        </div>
-      </div>
 
-      {/* Messages area */}
-      <div ref={scrollRef} className="flex flex-col gap-2 overflow-y-auto px-3 py-3" style={{ maxHeight: 220, minHeight: 140 }}>
-        <AnimatePresence mode="popLayout">
-          {messages.map((msg, i) => (
-            <ChatBubble
-              key={msg.id}
-              message={msg}
-              isLast={i === messages.length - 1}
-            />
-          ))}
+        {/* Messages area */}
+        <div ref={scrollRef} className="flex flex-col gap-2 overflow-y-auto px-3 py-3" style={{ maxHeight: 220, minHeight: 140 }}>
+          <AnimatePresence mode="popLayout">
+            {messages.map((msg, i) => (
+              <ChatBubble
+                key={msg.id}
+                message={msg}
+                isLast={i === messages.length - 1}
+              />
+            ))}
+          </AnimatePresence>
+
+          {isTyping && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex justify-start"
+            >
+              <div className="rounded-2xl rounded-bl-sm bg-gray-100 text-gray-800 px-3.5 py-2.5">
+                <TypingDots />
+              </div>
+            </motion.div>
+          )}
+        </div>
+
+        {/* Quick actions */}
+        <AnimatePresence>
+          {!showGreeting && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="flex flex-wrap gap-1.5 border-t border-white/20 px-3 py-2.5"
+            >
+              {QUICK_ACTIONS.map((action) => (
+                <button
+                  key={action.label}
+                  onClick={() => handleQuickAction(action.query)}
+                  className="rounded-full border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3 py-1.5 text-xs font-medium transition"
+                >
+                  {action.label}
+                </button>
+              ))}
+            </motion.div>
+          )}
         </AnimatePresence>
 
-        {isTyping && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex justify-start"
+        {/* Input */}
+        <div className="flex items-center gap-2 border-t border-white/20 px-3 py-2.5">
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            placeholder="Ask Knotty anything…"
+            className="min-w-0 flex-1 bg-transparent text-xs text-gray-900 outline-none placeholder:text-gray-400"
+          />
+          <button
+            onClick={handleSend}
+            disabled={!input.trim()}
+            className="flex h-7 w-7 items-center justify-center rounded-full bg-black text-white transition hover:bg-gray-800 disabled:opacity-30"
           >
-            <div className="rounded-2xl rounded-bl-md bg-white/[0.08] px-3.5 py-2.5">
-              <TypingDots />
-            </div>
-          </motion.div>
-        )}
-      </div>
-
-      {/* Quick actions */}
-      <AnimatePresence>
-        {!showGreeting && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="flex flex-wrap gap-1.5 border-t border-white/[0.06] px-3 py-2.5"
-          >
-            {QUICK_ACTIONS.map((action) => (
-              <button
-                key={action.label}
-                onClick={() => handleQuickAction(action.query)}
-                className="rounded-full border border-white/[0.1] bg-white/[0.06] px-3 py-1.5 text-[11px] font-medium text-white/70 transition-all hover:border-brand-accent/40 hover:bg-brand-accent/15 hover:text-white"
-              >
-                {action.label}
-              </button>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Input */}
-      <div className="flex items-center gap-2 border-t border-white/[0.08] px-3 py-2.5">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          placeholder="Ask Knotty anything…"
-          className="min-w-0 flex-1 bg-transparent text-xs text-white outline-none placeholder:text-white/30"
-        />
-        <button
-          onClick={handleSend}
-          disabled={!input.trim()}
-          className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-accent/80 text-white transition hover:bg-brand-accent disabled:opacity-30"
-        >
-          <Send className="h-3 w-3" />
-        </button>
-      </div>
-    </motion.div>
+            <Send className="h-3 w-3" />
+          </button>
+        </div>
+      </motion.div>
+      {/* Decorative shadow behind card */}
+      <div className="absolute -bottom-6 -right-6 w-full h-full bg-gradient-to-br from-gray-200 to-gray-50 rounded-3xl -z-10 transform rotate-3"></div>
+    </div>
   );
 }

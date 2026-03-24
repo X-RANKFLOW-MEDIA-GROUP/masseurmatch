@@ -32,24 +32,33 @@ export function LoginForm({ redirectPath }: { redirectPath?: string }) {
     setIsLoading(true);
     setServerError("");
 
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
-    });
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
 
-    const payload = (await response.json()) as { error?: string };
+      const payload = (await response.json()) as { error?: string };
 
-    if (!response.ok) {
-      setServerError(payload.error || "Unable to sign in.");
+      if (!response.ok) {
+        if (payload.error?.includes("provider not enabled")) {
+          setServerError("Login provider not enabled. Peça para o administrador ativar o provedor no Supabase.");
+        } else {
+          setServerError(payload.error || "Unable to sign in. Tente novamente ou use outro método.");
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      startTransition(() => {
+        router.push(redirectPath || "/pro/dashboard");
+        router.refresh();
+      });
+    } catch (err) {
+      setServerError("Erro de rede ou servidor. Tente novamente mais tarde.");
       setIsLoading(false);
-      return;
     }
-
-    startTransition(() => {
-      router.push(redirectPath || "/pro/dashboard");
-      router.refresh();
-    });
   });
 
   return (
@@ -95,24 +104,35 @@ export function RegisterForm() {
     setIsLoading(true);
     setServerError("");
 
-    const response = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
-    });
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
 
-    const payload = (await response.json()) as { error?: string };
+      const payload = (await response.json()) as { error?: string; code?: string };
 
-    if (!response.ok) {
-      setServerError(payload.error || "Unable to create account.");
+      if (!response.ok) {
+        if (payload.code === "USER_EXISTS") {
+          setServerError("Já existe uma conta com este email. Faça login ou recupere sua senha.");
+        } else if (payload.error?.includes("provider not enabled")) {
+          setServerError("Provedor de autenticação não está ativado. Peça para o administrador ativar no Supabase.");
+        } else {
+          setServerError(payload.error || "Não foi possível criar a conta. Tente novamente.");
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      startTransition(() => {
+        router.push("/pro/onboard");
+        router.refresh();
+      });
+    } catch (err) {
+      setServerError("Erro de rede ou servidor. Tente novamente mais tarde.");
       setIsLoading(false);
-      return;
     }
-
-    startTransition(() => {
-      router.push("/pro/onboard");
-      router.refresh();
-    });
   });
 
   return (

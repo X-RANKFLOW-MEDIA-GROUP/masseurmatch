@@ -3,7 +3,7 @@ import { buildTherapistRevalidatePaths, triggerRevalidate } from "@/app/_lib/rev
 import { assertRateLimit, sanitizeOptionalText, sanitizeStringArray, sanitizeText } from "@/app/_lib/security";
 import { requireRequestSession } from "@/app/_lib/session";
 import { getProfileByUserId, recordAuditLog, updateProfileByUserId } from "@/app/_lib/store";
-import { proProfileSchema } from "@/app/_lib/validation";
+import { massageTherapistProfileSchema } from "@/app/_lib/validation.massagist";
 
 export async function GET(request: Request) {
   try {
@@ -30,37 +30,22 @@ export async function POST(request: Request) {
       throw new RouteError(404, "Profile not found.");
     }
 
-    const body = await parseJsonBody(request, proProfileSchema);
+    const body = await parseJsonBody(request, massageTherapistProfileSchema);
     const nextProfile = await updateProfileByUserId(session.userId, {
-      display_name: sanitizeText(body.displayName),
-      bio: sanitizeText(body.bio),
+      display_name: sanitizeText(body.display_name),
+      bio: sanitizeText(body.bio_full),
       city: sanitizeText(body.city),
       state: sanitizeOptionalText(body.state),
-      phone: sanitizeOptionalText(body.phone),
+      phone: sanitizeOptionalText(body.phone_number),
       specialties: sanitizeStringArray(body.specialties),
-      incall_price: body.incallPrice ?? null,
-      outcall_price: body.outcallPrice ?? null,
-      height_inches: body.heightInches ?? null,
-      weight_lb: body.weightLb ?? null,
       body_type: sanitizeOptionalText(body.bodyType),
       status: profile.status === "active" ? "pending_approval" : profile.status,
       is_active: profile.status === "active" ? false : profile.is_active,
+      updated_at: new Date().toISOString(),
     });
 
     await recordAuditLog(session.userId, "provider.profile.update", "profile", profile.id, {
-      fields: [
-        "display_name",
-        "bio",
-        "city",
-        "state",
-        "phone",
-        "specialties",
-        "incall_price",
-        "outcall_price",
-        "height_inches",
-        "weight_lb",
-        "body_type",
-      ],
+      fields: Object.keys(body),
     });
 
     await triggerRevalidate(

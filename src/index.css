@@ -1,3 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+body {
+  background: var(--cream);
+  color: var(--navy);
+  font-family: 'Outfit', sans-serif;
+}
+/* Global variables for MasseurProfile */
+:root {
+  --navy:   #0B1F3A;
+  --navy2:  #122846;
+  --navy3:  #1a3560;
+  --orange: #FF8A1F;
+  --orange2:#e67a10;
+  --blue:   #1E4B8F;
+  --cream:  #FCFBF8;
+  --cream2: #F0EEE8;
+  --muted:  rgba(252,251,248,0.5);
+  --line:   rgba(252,251,248,0.08);
+}
+/* Glassmorphism light utility */
+.glass-card-light {
+  background: rgb(255 255 255 / 0.60);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgb(255 255 255 / 0.40);
+  box-shadow: 0 8px 32px 0 rgb(31 38 135 / 0.10);
+  border-radius: 1.5rem;
+}
+
+/* Blob animation delay utilities */
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -140,8 +177,9 @@
     --warning-foreground: 0 0% 100%;
   }
 
+  /* Removed @apply border-border due to missing class in Tailwind config */
   * {
-    @apply border-border;
+    /* Add any global border styles here if needed */
   }
 
   html {
@@ -433,7 +471,7 @@
   }
 
   .hero-panel {
-    @apply overflow-hidden rounded-[32px] border border-border bg-card shadow-soft;
+    @apply overflow-hidden rounded-[32px] border bg-card shadow-soft;
     background-image:
       radial-gradient(circle at top left, rgb(var(--color-brand-soft-accent-rgb) / 0.16), transparent 34%),
       radial-gradient(circle at 85% 8%, rgb(var(--color-brand-secondary-rgb) / 0.12), transparent 24%),
@@ -1106,7 +1144,7 @@
   LEGAL PAGES - Content Styling
   =============================================== */
 .legal-content h2 {
-  @apply text-xl font-semibold text-foreground mt-10 mb-4 pt-6 border-t border-border first:mt-0 first:pt-0 first:border-t-0;
+  @apply text-xl font-semibold text-foreground mt-10 mb-4 pt-6 border-t first:mt-0 first:pt-0 first:border-t-0;
 }
 .legal-content h3 {
   @apply text-base font-semibold text-foreground/90 mt-6 mb-3;
@@ -1127,16 +1165,16 @@
   @apply my-6 p-5 rounded-lg border border-primary/20 bg-primary/5 text-sm text-foreground/80 leading-relaxed;
 }
 .legal-content .legal-snippet {
-  @apply my-6 p-5 rounded-lg border border-border bg-muted/30 text-sm text-muted-foreground italic leading-relaxed;
+  @apply my-6 p-5 rounded-lg border bg-muted text-sm text-muted-foreground italic leading-relaxed;
 }
 .legal-content table {
   @apply w-full text-sm border-collapse my-6;
 }
 .legal-content th {
-  @apply text-left p-3 border-b border-border text-foreground font-semibold text-xs uppercase tracking-wider;
+  @apply text-left p-3 border-b text-foreground font-semibold text-xs uppercase tracking-wider;
 }
 .legal-content td {
-  @apply p-3 border-b border-border text-muted-foreground;
+  @apply p-3 border-b text-muted-foreground;
 }
 
 /* ===============================================

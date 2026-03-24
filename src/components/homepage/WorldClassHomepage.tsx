@@ -178,7 +178,7 @@ const TESTIMONIALS: Testimonial[] = [
     color: "var(--n4)",
   },
   {
-    body: "The verified credentials gave me confidence before I even made contact. This is exactly what the queer wellness space has been missing for years.",
+    body: "The identity verification and detailed profiles gave me confidence before I even made contact. This is exactly what the queer wellness space has been missing for years.",
     stars: 5,
     name: "Jordan Rivera",
     initials: "JR",
@@ -209,7 +209,7 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     question: "Are all therapists on MasseurMatch verified?",
     answer:
-      "Yes. Every therapist goes through credential verification including license check, ID verification, and profile review before being published. LGBTQ+-affirming status is also separately verified and requires therapist confirmation.",
+      "Every therapist completes identity verification via Stripe Identity and a profile review before being published. We do NOT verify professional licenses or credentials against state boards. MasseurMatch is a discovery directory — clients should confirm licensing independently. LGBTQ+-affirming status is self-reported by therapists.",
   },
   {
     question: "Is there a free trial for therapists listing on MasseurMatch?",
@@ -1019,8 +1019,20 @@ export function WorldClassHomepage({
                     <option>Dallas, TX</option>
                     <option>Houston, TX</option>
                     <option>Austin, TX</option>
-                    <option>San Antonio, TX</option>
+                    <option>Miami, FL</option>
+                    <option>Chicago, IL</option>
+                    <option>Los Angeles, CA</option>
+                    <option>New York, NY</option>
+                    <option>Atlanta, GA</option>
+                    <option>San Francisco, CA</option>
+                    <option>Seattle, WA</option>
+                    <option>Denver, CO</option>
+                    <option>Phoenix, AZ</option>
+                    <option>San Diego, CA</option>
                     <option>Fort Worth, TX</option>
+                    <option>San Antonio, TX</option>
+                    <option>Portland, OR</option>
+                    <option>Nashville, TN</option>
                     <option>Other</option>
                   </select>
                   <button type="submit" className="wc-btn-nl">
@@ -1056,7 +1068,7 @@ export function WorldClassHomepage({
             are verified and highlighted across Oak Lawn, Montrose, South Congress, and 100+ cities
             — so you always feel safe, seen, and celebrated from your very first search.
           </p>
-          <Link href="/search?keyword=LGBTQ%2B+affirming" className="wc-btn-inc">
+          <Link href="/explore?keyword=LGBTQ%2B+affirming" className="wc-btn-inc">
             Find LGBTQ+ Affirming Therapists <ArrowRightIcon size={16} />
           </Link>
         </div>

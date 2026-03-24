@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { ShieldCheck, Bot, Lock, CheckCircle2, UserCheck, EyeOff } from "lucide-react";
+import { ShieldCheck, Bot, Lock, CheckCircle2, UserCheck, EyeOff, ShieldAlert } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Trust & Safety | How MasseurMatch Protects You",
@@ -63,6 +63,19 @@ export default function TrustPage() {
           </p>
         </section>
 
+        {/* Platform Disclaimer - Legal Notice */}
+        <section className="container mx-auto px-4 md:px-6 max-w-3xl mb-16">
+          <div className="flex items-start gap-4 bg-orange-50 border border-orange-200 rounded-2xl p-6 md:p-8 shadow-sm">
+            <ShieldAlert className="w-10 h-10 text-orange-500 flex-shrink-0 mt-1" />
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Important Platform Disclaimer</h3>
+              <p className="text-gray-700 font-medium">
+                <strong>We do not verify licenses.</strong> MasseurMatch provides a directory only. Users are solely responsible for verifying the credentials, legality, and safety of any professional they choose to contact or book outside of this platform.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Security Features Grid */}
         <section className="container mx-auto px-4 md:px-6 max-w-5xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -89,7 +102,8 @@ export default function TrustPage() {
               <UserCheck className="w-8 h-8 text-slate-900 mb-6" />
               <h3 className="font-display text-2xl font-medium text-slate-900 mb-3">Identity Verification</h3>
               <p className="font-sans text-sm text-slate-600 leading-relaxed mb-6">
-                Powered by Stripe Identity, we require therapists to provide valid government-issued documents. Look for the blue &ldquo;Verified&rdquo; badge for professionals who have passed our strictest audit.
+                Powered by Stripe Identity, we require therapists to provide valid government-issued documents. Look for the blue &ldquo;Verified&rdquo; badge for professionals who have passed our strictest audit.<br />
+                <span className="block mt-2 text-orange-700 font-semibold">Note: Identity verification confirms a person's legal identity, <u>not</u> their professional licensure.</span>
               </p>
               <div className="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full">
                 <ShieldCheck className="w-4 h-4 text-emerald-500" />

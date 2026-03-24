@@ -311,11 +311,23 @@ export function AuthForms({
     setLoading(false);
 
     if (result.error) {
+      const errorMsg = result.error.message || "";
+      const isUserExists =
+        errorMsg.includes("already exists") ||
+        errorMsg.includes("USER_EXISTS") ||
+        (typeof (result.error as any)?.code === "string" && (result.error as any).code === "USER_EXISTS");
+
       toast({
         title: isLogin ? "Login failed" : "Could not register",
-        description: result.error.message,
+        description: isUserExists
+          ? "An account with this email already exists. Please sign in instead."
+          : errorMsg,
         variant: "destructive",
       });
+
+      if (isUserExists) {
+        router.push("/login");
+      }
       return;
     }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "react-router-dom";
+import Link from 'next/link';
 import { useTranslation } from "react-i18next";
 import { NewsletterSignup } from "../newsletter/NewsletterSignup";
 
@@ -45,7 +45,9 @@ export const Footer = () => {
   ];
 
   return (
-    <footer className="border-t border-border mt-0" role="contentinfo" aria-label="Site footer">
+    <footer className="relative bg-white border-t border-gray-100 overflow-hidden" role="contentinfo" aria-label="Site footer">
+      {/* Decorative Blur Background */}
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-50 rounded-full mix-blend-multiply filter blur-3xl opacity-50 -z-10 translate-y-1/2 translate-x-1/2"></div>
       <div className="container mx-auto px-4 py-20">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           <div>
@@ -64,7 +66,7 @@ export const Footer = () => {
               <ul className="space-y-3 text-sm">
                 {group.links.map((link) => (
                   <li key={link.to}>
-                    <Link to={link.to} className="text-muted-foreground hover:text-foreground transition-colors duration-300 underline-sweep">
+                    <Link href={link.to} className="text-muted-foreground hover:text-foreground transition-colors duration-300 underline-sweep">
                       {link.label}
                     </Link>
                   </li>
@@ -74,7 +76,8 @@ export const Footer = () => {
           ))}
         </div>
 
-        <div className="mt-10">
+        {/* Glass Newsletter Widget */}
+        <div className="mt-10 bg-white/60 backdrop-blur-md border border-gray-200 p-2 rounded-2xl flex items-center shadow-sm max-w-md">
           <NewsletterSignup />
         </div>
 
