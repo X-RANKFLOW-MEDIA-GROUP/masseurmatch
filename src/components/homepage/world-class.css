@@ -436,13 +436,12 @@
   margin-bottom: 0;
 }
 .wc-hero-line {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: .24em;
+  display: inline;
+  word-spacing: 0.1em;
 }
 .wc-hero-accent {
   color: var(--a1);
+  white-space: nowrap;
 }
 .wc-hero-h1 .wc-sub-line {
   display: block;
@@ -1605,6 +1604,7 @@
   .wc-nl-inner { grid-template-columns: 1fr; gap: 48px }
   .wc-how-grid { grid-template-columns: 1fr 1fr }
 }
+
 @media (max-width: 768px) {
   .wc-hero,
   .wc-spec-sec,
@@ -1618,6 +1618,149 @@
   .wc-nbhd-head { padding: 0 20px }
   .wc-nbhd-scroll { padding: 0 20px 20px }
   .wc-how-grid { grid-template-columns: 1fr }
-  .wc-hero-stats { flex-wrap: wrap }
   .wc-hero { padding: 80px 20px 60px }
+
+  /* Hero heading - stack properly on mobile */
+  .wc-hero-h1 {
+    font-size: clamp(36px, 10vw, 56px);
+    text-align: center;
+  }
+  .wc-hero-line {
+    display: block;
+  }
+  .wc-hero-h1 .wc-sub-line {
+    font-size: clamp(28px, 7vw, 42px);
+    margin-top: 8px;
+  }
+
+  /* Hero paragraph */
+  .wc-hero-p {
+    font-size: 15px;
+    line-height: 1.7;
+    margin: 20px auto 32px;
+    text-align: center;
+  }
+
+  /* Geo bar */
+  .wc-geo-bar {
+    margin-bottom: 28px;
+    font-size: 9px;
+    padding: 8px 16px;
+  }
+
+  /* Search bar - stack vertically on mobile */
+  .wc-search-wrap {
+    max-width: 100%;
+  }
+  .wc-search-outer {
+    flex-direction: column;
+    padding: 12px;
+    border-radius: 20px;
+    gap: 12px;
+  }
+  .wc-search-outer input {
+    width: 100%;
+    padding: 12px 0;
+    font-size: 14px;
+  }
+  .wc-si {
+    position: absolute;
+    left: 20px;
+    top: 22px;
+  }
+  .wc-search-outer input {
+    padding-left: 32px;
+  }
+  .wc-s-sep {
+    display: none;
+  }
+  .wc-s-loc {
+    width: 100%;
+    justify-content: center;
+    padding: 10px 0;
+    border-top: 1px solid rgba(148,163,184,.12);
+    border-bottom: 1px solid rgba(148,163,184,.12);
+  }
+  .wc-btn-search {
+    width: 100%;
+    padding: 14px 24px;
+    border-radius: 14px;
+  }
+
+  /* Hero tags */
+  .wc-hero-tags {
+    margin-top: 20px;
+    gap: 6px;
+    justify-content: center;
+  }
+  .wc-htag {
+    font-size: 9px;
+    padding: 5px 10px;
+  }
+
+  /* Hero stats - 2x2 grid on mobile */
+  .wc-hero-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding-top: 32px;
+    margin-top: 40px;
+    max-width: 100%;
+  }
+  .wc-hstat {
+    padding: 0;
+    text-align: center;
+  }
+  .wc-hstat + .wc-hstat {
+    border-left: none;
+  }
+  .wc-hstat:nth-child(2),
+  .wc-hstat:nth-child(4) {
+    border-left: 1px solid rgba(255,255,255,.07);
+    padding-left: 20px;
+  }
+  .wc-hstat-n {
+    font-size: 28px;
+  }
+  .wc-hstat-l {
+    font-size: 9px;
+    letter-spacing: .12em;
+  }
+}
+
+@media (max-width: 480px) {
+  .wc-hero { padding: 70px 16px 50px }
+
+  .wc-hero-h1 {
+    font-size: clamp(32px, 11vw, 44px);
+  }
+  .wc-hero-h1 .wc-sub-line {
+    font-size: clamp(24px, 7vw, 32px);
+  }
+
+  .wc-hero-p {
+    font-size: 14px;
+  }
+
+  .wc-geo-bar {
+    font-size: 8px;
+    padding: 7px 14px;
+    gap: 8px;
+  }
+  .wc-geo-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .wc-hstat-n {
+    font-size: 24px;
+  }
+
+  .wc-hero-tags {
+    gap: 5px;
+  }
+  .wc-htag {
+    font-size: 8px;
+    padding: 4px 8px;
+  }
 }

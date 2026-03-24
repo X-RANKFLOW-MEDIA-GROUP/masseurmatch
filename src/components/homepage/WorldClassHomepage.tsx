@@ -514,7 +514,7 @@ export function WorldClassHomepage({
 
             <h1 className="wc-hero-h1">
               <span className="wc-hero-line">
-                <TextReveal text="Find your" delay={0.04} />
+                <TextReveal text="Find your" delay={0.04} />{" "}
                 <span className="wc-hero-accent">
                   <TextReveal text="perfect" delay={0.14} />
                 </span>
