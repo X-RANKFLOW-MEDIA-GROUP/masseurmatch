@@ -396,7 +396,6 @@
   border: 1px solid rgba(148,163,184,.18);
   padding: 9px 20px;
   border-radius: 999px;
-  margin-bottom: 44px;
   font-family: var(--wc-display);
   font-size: 10px;
   font-weight: 500;
@@ -405,6 +404,14 @@
   color: var(--c1);
   cursor: pointer;
   transition: all .25s;
+  /* Position fixed on left side */
+  position: fixed;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  transform-origin: center center;
+  z-index: 100;
+  white-space: nowrap;
 }
 .wc-geo-bar:hover {
   background: rgba(148,163,184,.14);
@@ -450,6 +457,8 @@
   font-weight: 500;
   letter-spacing: -.05em;
   margin-top: 10px;
+  word-break: keep-all;
+  overflow-wrap: normal;
 }
 .wc-hero-p {
   font-family: var(--wc-sans);
@@ -1603,6 +1612,7 @@
 @media (max-width: 1024px) {
   .wc-nl-inner { grid-template-columns: 1fr; gap: 48px }
   .wc-how-grid { grid-template-columns: 1fr 1fr }
+  .wc-geo-bar { display: none }
 }
 
 @media (max-width: 768px) {
@@ -1641,11 +1651,9 @@
     text-align: center;
   }
 
-  /* Geo bar */
+  /* Geo bar - hide on mobile since it's positioned fixed on left */
   .wc-geo-bar {
-    margin-bottom: 28px;
-    font-size: 9px;
-    padding: 8px 16px;
+    display: none;
   }
 
   /* Search bar - stack vertically on mobile */
@@ -1743,13 +1751,7 @@
   }
 
   .wc-geo-bar {
-    font-size: 8px;
-    padding: 7px 14px;
-    gap: 8px;
-  }
-  .wc-geo-dot {
-    width: 6px;
-    height: 6px;
+    display: none;
   }
 
   .wc-hstat-n {
