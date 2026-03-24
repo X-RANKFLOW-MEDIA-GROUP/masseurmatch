@@ -10,6 +10,7 @@ import {
   createPageMetadata,
 } from "@/app/_lib/seo";
 import { siteUrl } from "@/lib/site";
+import MasseurProfile from "@/app/_components/MasseurProfileClient";
 
 export const revalidate = 1800;
 

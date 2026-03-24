@@ -1,7 +1,7 @@
 // src/app/_components/SiteHeader.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -23,15 +23,15 @@ import {
 /* ── nav data ─────────────────────────────────────────── */
 
 const exploreItems = [
+  { href: "/explore", label: "Explore", icon: Navigation },
+  { href: "/therapists", label: "Therapists", icon: Users },
   { href: "/cities", label: "Cities", icon: MapPin },
-  { href: "/therapists", label: "All Therapists", icon: Users },
-  { href: "/explore", label: "Near Me", icon: Navigation },
 ];
 
 const navLinks = [
   { href: "/blog", label: "Blog" },
   { href: "/for-therapists", label: "For Therapists" },
-  { href: "/how-it-works", label: "How It Works" },
+  { href: "/how-it-works", label: "How it Works" },
   { href: "/trust", label: "Trust & Safety" },
   { href: "/faq", label: "FAQ" },
   { href: "/contact", label: "Contact" },
@@ -98,9 +98,15 @@ function MobileNav() {
 
   const allLinks = [
     { href: "/explore", label: "Explore" },
+    { href: "/therapists", label: "Therapists" },
     { href: "/cities", label: "Cities" },
-    { href: "/therapists", label: "All Therapists" },
-    ...navLinks,
+    { href: "/blog", label: "Blog" },
+    { href: "/for-therapists", label: "For Therapists" },
+    { href: "/how-it-works", label: "How it Works" },
+    { href: "/trust", label: "Trust & Safety" },
+    { href: "/faq", label: "FAQ" },
+    { href: "/contact", label: "Contact" },
+    { href: "/login", label: "Login / Sign up" },
   ];
 
   return (

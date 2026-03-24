@@ -1,5 +1,5 @@
 import React from 'react';
-import { fetchProfiles } from '../../mm/utils/fetchProfiles';
+import { fetchProfiles } from '../../../mm/utils/fetchProfiles';
 
 export function DebugProfilesButton() {
   const handleClick = async () => {

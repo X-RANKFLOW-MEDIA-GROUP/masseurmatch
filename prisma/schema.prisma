@@ -69,4 +69,11 @@ model MassageTherapistProfile {
   canonical_city     String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+    ranking_score        Float      @default(0)
+    last_activity_at     DateTime?  @default(now())
+    profile_completeness Float      @default(0)
+    description_quality  Float      @default(0)
+    engagement_score     Float      @default(0)
+    city_demand_score    Float      @default(0)
+    photos_score         Float      @default(0)
 }

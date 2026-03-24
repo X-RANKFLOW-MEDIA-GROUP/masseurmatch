@@ -1,3 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+body {
+  background: var(--cream);
+  color: var(--navy);
+  font-family: 'Outfit', sans-serif;
+}
+/* Global variables for MasseurProfile */
+:root {
+  --navy:   #0B1F3A;
+  --navy2:  #122846;
+  --navy3:  #1a3560;
+  --orange: #FF8A1F;
+  --orange2:#e67a10;
+  --blue:   #1E4B8F;
+  --cream:  #FCFBF8;
+  --cream2: #F0EEE8;
+  --muted:  rgba(252,251,248,0.5);
+  --line:   rgba(252,251,248,0.08);
+}
 /* Glassmorphism light utility */
 .glass-card-light {
   background: rgb(255 255 255 / 0.60);

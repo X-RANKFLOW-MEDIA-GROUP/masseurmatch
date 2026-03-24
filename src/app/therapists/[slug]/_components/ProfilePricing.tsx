@@ -21,6 +21,16 @@ export function ProfilePricing({ profile }: Props) {
   const hasIncall = sessions.some((s) => s.incall) || !!profile.incall_price;
   const hasOutcall = sessions.some((s) => s.outcall) || !!profile.outcall_price;
 
+  // Função para checar se valor está acima de +33.33% do valor base
+  function isOverLimit(base: number | undefined, value: number | undefined) {
+    if (!base || !value) return false;
+    return value > base * 1.3333;
+  }
+
+  // Encontrar o menor valor base para referência (60min in-call, se existir)
+  const baseIncall = sessions.find((s) => s.duration === 60 && s.incall) ? sessions.find((s) => s.duration === 60)?.incall : undefined;
+  const baseOutcall = sessions.find((s) => s.duration === 60 && s.outcall) ? sessions.find((s) => s.duration === 60)?.outcall : undefined;
+
   return (
     <section id="pricing" className="profile-panel scroll-mt-24 p-6 md:p-7">
       <h2 className="text-2xl font-semibold text-foreground">Massage Rates in {city}</h2>
@@ -44,17 +54,26 @@ export function ProfilePricing({ profile }: Props) {
                 {s.name || `${s.duration || 60} min`}
               </span>
               {hasIncall && (
-                <span className="text-right text-foreground">
+                <span
+                  className={`text-right text-foreground ${isOverLimit(baseIncall, s.incall) ? 'bg-yellow-100 text-orange-700 font-bold px-1 rounded' : ''}`}
+                  title={isOverLimit(baseIncall, s.incall) ? 'Exceeds +33.33% of base price' : ''}
+                >
                   {s.incall ? `$${s.incall}` : "Ask me"}
                 </span>
               )}
               {hasOutcall && (
-                <span className="text-right text-foreground">
+                <span
+                  className={`text-right text-foreground ${isOverLimit(baseOutcall, s.outcall) ? 'bg-yellow-100 text-orange-700 font-bold px-1 rounded' : ''}`}
+                  title={isOverLimit(baseOutcall, s.outcall) ? 'Exceeds +33.33% of base price' : ''}
+                >
                   {s.outcall ? `$${s.outcall}` : "Ask me"}
                 </span>
               )}
             </div>
           ))}
+          <div className="text-xs text-orange-700 mt-2 px-4">
+            * Valores destacados excedem +33.33% do valor base de 60min.
+          </div>
         </div>
       ) : (
         <div className="mt-4 space-y-3">

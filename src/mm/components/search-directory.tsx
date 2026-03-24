@@ -48,7 +48,8 @@ export function SearchDirectory({ cities, therapists }: { cities: City[]; therap
 
   return (
     <div className="space-y-8">
-      <div className="grid gap-4 rounded-[28px] border border-border bg-card p-5 shadow-soft md:grid-cols-[1.5fr,1fr,1fr,1fr]">
+      {/* Filtros */}
+      <div className="grid gap-4 rounded-[28px] border border-border bg-card p-5 shadow-soft md:grid-cols-4 sm:grid-cols-2 lg:grid-cols-5">
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
@@ -79,7 +80,8 @@ export function SearchDirectory({ cities, therapists }: { cities: City[]; therap
         </Select>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      {/* Cards responsivos */}
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {results.map((therapist) => {
           const cityRecord = cities.find((item) => item.slug === therapist.citySlug);
           return <TherapistCard key={therapist.id} therapist={therapist} city={cityRecord} />;

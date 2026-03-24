@@ -13,6 +13,16 @@ const config: Config = {
     "./src/mm/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    colors: {
+      muted: {
+        DEFAULT: "hsl(var(--muted))",
+        foreground: "hsl(var(--muted-foreground))",
+      },
+      foreground: 'hsl(var(--foreground))',
+      card: 'hsl(var(--card))',
+      'muted-foreground': 'hsl(var(--muted-foreground))',
+      primary: 'hsl(var(--primary))',
+    },
     extend: {
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
@@ -21,12 +31,6 @@ const config: Config = {
         heading: ["var(--font-space)", "system-ui", "sans-serif"],
         body: ["var(--font-inter)", "system-ui", "sans-serif"],
         serif: ["var(--font-serif)", "Georgia", "serif"],
-      },
-      colors: {
-        foreground: 'hsl(var(--foreground))',
-        card: 'hsl(var(--card))',
-        'muted-foreground': 'hsl(var(--muted-foreground))',
-        primary: 'hsl(var(--primary))',
       },
       theme: {
         extend: {

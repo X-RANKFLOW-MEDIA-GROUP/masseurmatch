@@ -39,6 +39,7 @@ type HeroProps = {
 };
 
 
+export function Hero({ neighborhood, city, searchInputRef }: HeroProps) {
   const localRef = useRef<HTMLInputElement>(null);
   const inputRef = searchInputRef ?? (localRef as React.RefObject<HTMLInputElement>);
   const [inputValue, setInputValue] = useState("");
@@ -64,7 +65,7 @@ type HeroProps = {
       }
     }, typingSpeed);
     return () => clearTimeout(timeout);
-  }, [text, isDeleting, phraseIndex]);
+  }, [text, isDeleting, phraseIndex, phrases]);
 
   const filteredSuggestions = inputValue.length > 0
     ? AUTOCOMPLETE_SUGGESTIONS.filter((s) =>
@@ -95,29 +96,34 @@ type HeroProps = {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center gap-12">
         {/* Texto e Busca (Esquerda) */}
         <div className="flex-1 text-center lg:text-left">
-          <h1 className="text-5xl lg:text-7xl font-extrabold tracking-tight text-gray-900 mb-6">
+          <motion.h1
+            className="text-5xl lg:text-7xl font-extrabold tracking-tight text-gray-900 mb-6 premium-fade-up"
+            initial={{ opacity: 0, y: 32 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          >
             Find <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 min-h-[1.2em] inline-block">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 min-h-[1.2em] inline-block animate-gradient-x">
               {text}<span className="animate-pulse">|</span>
             </span>
-          </h1>
+          </motion.h1>
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0">
             The premium directory to connect with top-rated professionals. Discover tailored experiences based on your location and preferences.
           </p>
 
-          {/* Search Bar Rápida */}
+          {/* Search Bar Rápida - now glass effect */}
           <div className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto lg:mx-0">
-            <div className="relative flex-1">
+            <div className="relative flex-1 glass-card-light backdrop-blur-xl border border-white/40">
               <MapPin className="absolute left-4 top-3.5 text-gray-400 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Enter your city..."
-                className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 shadow-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
+                className="w-full pl-12 pr-4 py-3 rounded-full bg-transparent border-none shadow-none focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
               />
             </div>
-            <button className="bg-black text-white px-8 py-3 rounded-full font-semibold hover:bg-gray-800 transition flex items-center justify-center gap-2">
+            <Button variant="premium" size="lg" className="rounded-full px-8 flex items-center gap-2">
               <Search className="w-5 h-5" /> Search
-            </button>
+            </Button>
           </div>
         </div>
 

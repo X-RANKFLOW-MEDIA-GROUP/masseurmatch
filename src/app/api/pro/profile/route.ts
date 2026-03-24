@@ -32,7 +32,7 @@ export async function POST(request: Request) {
 
     const body = await parseJsonBody(request, massageTherapistProfileSchema);
     const nextProfile = await updateProfileByUserId(session.userId, {
-      display_name: sanitizeText(body.displayName),
+      display_name: sanitizeText(body.display_name),
       bio: sanitizeText(body.bio),
       city: sanitizeText(body.city),
       state: sanitizeOptionalText(body.state),

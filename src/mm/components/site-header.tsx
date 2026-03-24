@@ -13,19 +13,31 @@ export async function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
-          <Link href="/therapists" className="transition hover:text-foreground">
+          <Link href="/explore" className="transition hover:text-foreground focus:text-foreground">
+            Explore
+          </Link>
+          <Link href="/therapists" className="transition hover:text-foreground focus:text-foreground">
             Therapists
           </Link>
-          <Link href="/search" className="transition hover:text-foreground">
-            Search
+          <Link href="/cities" className="transition hover:text-foreground focus:text-foreground">
+            Cities
           </Link>
-          <Link href="/blog" className="transition hover:text-foreground">
+          <Link href="/blog" className="transition hover:text-foreground focus:text-foreground">
             Blog
           </Link>
-          <Link href="/advertise" className="transition hover:text-foreground">
-            Advertise
+          <Link href="/for-therapists" className="transition hover:text-foreground focus:text-foreground">
+            For Therapists
           </Link>
-          <Link href="/contact" className="transition hover:text-foreground">
+          <Link href="/how-it-works" className="transition hover:text-foreground focus:text-foreground">
+            How it Works
+          </Link>
+          <Link href="/trust" className="transition hover:text-foreground focus:text-foreground">
+            Trust & Safety
+          </Link>
+          <Link href="/faq" className="transition hover:text-foreground focus:text-foreground">
+            FAQ
+          </Link>
+          <Link href="/contact" className="transition hover:text-foreground focus:text-foreground">
             Contact
           </Link>
         </nav>
@@ -48,7 +60,7 @@ export async function SiteHeader() {
               <ButtonLink href="/login" variant="ghost">
                 Log in
               </ButtonLink>
-              <ButtonLink href="/register">List your practice</ButtonLink>
+              <ButtonLink href="/register">Sign up</ButtonLink>
             </>
           )}
         </div>

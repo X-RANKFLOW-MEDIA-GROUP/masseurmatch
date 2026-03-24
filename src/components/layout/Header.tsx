@@ -39,6 +39,11 @@ export const Header = () => {
 
   const navLinks = [
     { to: "/explore", label: t("nav.explore") },
+    { to: "/how-it-works", label: "How it works" },
+    { to: "/faq", label: "FAQ" },
+    { to: "/legal", label: "Legal" },
+    { to: "/guides", label: "Guides" },
+    { to: "/for-therapists", label: "For Therapists" },
     { to: "/safety", label: t("nav.safety") },
     { to: "/pricing", label: t("nav.pricing") },
     { to: "/about", label: t("nav.about") },

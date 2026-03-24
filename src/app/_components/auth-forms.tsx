@@ -315,7 +315,7 @@ export function AuthForms({
       const isUserExists =
         errorMsg.includes("already exists") ||
         errorMsg.includes("USER_EXISTS") ||
-        result.error.code === "USER_EXISTS";
+        (typeof (result.error as any)?.code === "string" && (result.error as any).code === "USER_EXISTS");
 
       toast({
         title: isLogin ? "Login failed" : "Could not register",
