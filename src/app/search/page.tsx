@@ -1,3 +1,7 @@
+import { getCities } from "@/app/_lib/directory";
+type SearchPageProps = {
+  searchParams: any;
+};
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const cities = getCities();

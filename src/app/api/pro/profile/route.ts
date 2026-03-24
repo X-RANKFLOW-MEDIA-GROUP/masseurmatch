@@ -33,15 +33,11 @@ export async function POST(request: Request) {
     const body = await parseJsonBody(request, massageTherapistProfileSchema);
     const nextProfile = await updateProfileByUserId(session.userId, {
       display_name: sanitizeText(body.display_name),
-      bio: sanitizeText(body.bio),
+      bio: sanitizeText(body.bio_full),
       city: sanitizeText(body.city),
       state: sanitizeOptionalText(body.state),
-      phone: sanitizeOptionalText(body.phone),
+      phone: sanitizeOptionalText(body.phone_number),
       specialties: sanitizeStringArray(body.specialties),
-      incall_price: body.incallPrice ?? null,
-      outcall_price: body.outcallPrice ?? null,
-      height_inches: body.heightInches ?? null,
-      weight_lb: body.weightLb ?? null,
       body_type: sanitizeOptionalText(body.bodyType),
       status: profile.status === "active" ? "pending_approval" : profile.status,
       is_active: profile.status === "active" ? false : profile.is_active,

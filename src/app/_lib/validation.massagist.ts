@@ -2,6 +2,9 @@ import { z } from "zod";
 
 // Novo schema para o perfil completo do massagista
 export const massageTherapistProfileSchema = z.object({
+    heightInches: z.number().int().min(48).max(96).nullable().optional(),
+    weightLb: z.number().int().min(80).max(450).nullable().optional(),
+    bodyType: z.string().max(60).nullable().optional(),
   full_name: z.string().min(2).max(80),
   display_name: z.string().min(2).max(80),
   headline: z.string().max(120),
