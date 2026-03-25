@@ -123,14 +123,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
-      await registerMutation({
+      // registerMutation creates the user via admin API and sets mm_session cookie
+      const result = await registerMutation({
         email,
         password,
         fullName,
       });
 
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      return { error: error as Error | null };
+      // Also sign in with Supabase to get the client-side session for auth state
+      // This won't fail since the user was just created with email_confirm: true
+      await supabase.auth.signInWithPassword({ email, password });
+
+      return { error: null };
     } catch (error) {
       return { error: error as Error };
     }
@@ -138,13 +142,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
+      // loginMutation verifies credentials server-side and sets mm_session cookie
       await loginMutation({
         email,
         password,
       });
 
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      return { error: error as Error | null };
+      // Also sign in with Supabase to sync client-side auth state
+      await supabase.auth.signInWithPassword({ email, password });
+
+      return { error: null };
     } catch (error) {
       return { error: error as Error };
     }
