@@ -350,7 +350,7 @@ export function WorldClassHomepage({
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   /* --- Geolocation --- */
-  const { city: geoCity, loading: geoLoading, requestLocation, status: geoStatus } = useGeolocation({ autoLocate: true });
+  const { city: geoCity, loading: geoLoading, requestLocation } = useGeolocation({ autoLocate: false });
   const locationLabel = geoCity ? `${geoCity.name}, ${geoCity.stateCode}` : "Find my location";
 
   /* --- Knotty chat simulation --- */

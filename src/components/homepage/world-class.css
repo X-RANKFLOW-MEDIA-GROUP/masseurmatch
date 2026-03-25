@@ -422,10 +422,18 @@
 .wc-geo-dot {
   width: 7px;
   height: 7px;
-  background: #4ADE80;
+  background: rgba(148,163,184,.5);
   border-radius: 50%;
   flex-shrink: 0;
+  transition: background .3s, box-shadow .3s;
+}
+.wc-geo-dot-active {
+  background: #4ADE80;
   animation: wcLivePulse 2s ease infinite;
+}
+.wc-geo-bar:disabled {
+  opacity: 0.7;
+  cursor: wait;
 }
 .wc-geo-detect { color: var(--a0); font-weight: 500 }
 
@@ -539,6 +547,8 @@
   cursor: pointer;
   transition: color .2s;
   padding: 0 14px;
+  background: none;
+  border: none;
 }
 .wc-s-loc:hover { color: var(--a1) }
 .wc-s-loc svg { width: 13px; height: 13px }
