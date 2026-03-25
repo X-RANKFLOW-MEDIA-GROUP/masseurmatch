@@ -1769,4 +1769,167 @@
     font-size: 8px;
     padding: 4px 8px;
   }
+
+  /* Section padding on smallest screens */
+  .wc-spec-sec,
+  .wc-ther-sec,
+  .wc-how-sec,
+  .wc-inc-sec,
+  .wc-test-sec,
+  .wc-faq-sec,
+  .wc-cta-sec,
+  .wc-nl-sec {
+    padding: 60px 16px;
+  }
+
+  /* Section headings */
+  .wc-sh1 {
+    font-size: clamp(28px, 7vw, 42px);
+  }
+  .wc-sl {
+    font-size: 14px;
+  }
+
+  /* Therapist cards on mobile */
+  .wc-tc-body {
+    padding: 16px 14px 14px;
+  }
+  .wc-tc-nm {
+    font-size: 18px;
+  }
+  .wc-tc-loc {
+    font-size: 11px;
+  }
+  .wc-tc-tag {
+    font-size: 8px;
+    padding: 3px 7px;
+  }
+  .wc-tc-price {
+    font-size: 15px;
+  }
+  .wc-tc-badge {
+    font-size: 8px;
+    padding: 3px 8px;
+    top: 10px;
+    left: 10px;
+  }
+
+  /* Specialty cards */
+  .wc-tilt-inner {
+    padding: 20px 16px 18px;
+  }
+  .wc-spec-icon {
+    width: 42px;
+    height: 42px;
+    margin-bottom: 14px;
+  }
+  .wc-spec-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  .wc-spec-nm {
+    font-size: 15px;
+  }
+  .wc-spec-ct {
+    font-size: 11px;
+  }
+
+  /* Neighborhood cards */
+  .wc-nbhd-card {
+    width: 200px;
+    padding: 20px 16px 18px;
+  }
+  .wc-nbhd-name {
+    font-size: 18px;
+  }
+  .wc-nbhd-city {
+    font-size: 9px;
+  }
+  .wc-nbhd-cnt {
+    font-size: 11px;
+  }
+
+  /* How it works */
+  .wc-how-step {
+    padding: 24px 16px;
+  }
+  .wc-how-num {
+    font-size: 48px;
+  }
+  .wc-how-t {
+    font-size: 16px;
+  }
+  .wc-how-p {
+    font-size: 13px;
+  }
+
+  /* Testimonials */
+  .wc-test-card {
+    padding: 24px 20px;
+  }
+  .wc-test-body {
+    font-size: 15px;
+  }
+
+  /* FAQ */
+  .wc-faq-q {
+    font-size: 15px;
+    padding: 18px 0;
+  }
+  .wc-faq-a {
+    font-size: 14px;
+    padding-bottom: 18px;
+  }
+
+  /* CTA section */
+  .wc-cta-h {
+    font-size: clamp(28px, 8vw, 48px);
+  }
+  .wc-btn-cta {
+    padding: 14px 28px;
+    font-size: 11px;
+  }
+
+  /* Newsletter */
+  .wc-nl-form {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .wc-nl-form input {
+    width: 100%;
+  }
+  .wc-nl-form button {
+    width: 100%;
+  }
+}
+
+/* Ticker mobile styles */
+@media (max-width: 768px) {
+  .wc-ticker {
+    padding: 14px 0;
+  }
+  .wc-ti {
+    font-size: 10px;
+  }
+}
+
+/* Specialty grid responsive */
+@media (max-width: 600px) {
+  .wc-spec-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+/* Therapist section padding */
+@media (max-width: 768px) {
+  .wc-ther-sec {
+    padding: 60px 20px;
+  }
+  .wc-ther-head {
+    margin-bottom: 32px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
 }

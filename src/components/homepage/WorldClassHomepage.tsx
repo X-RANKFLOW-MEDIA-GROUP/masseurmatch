@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import { ScrambleText } from "@/components/animations/ScrambleText";
 import { TextReveal } from "@/components/animations/TextReveal";
+import { useGeolocation } from "@/hooks/useGeolocation";
 import "./world-class.css";
 
 /* ─── Types ─── */
@@ -348,6 +349,10 @@ export function WorldClassHomepage({
   const nbhdScrollRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  /* --- Geolocation --- */
+  const { city: geoCity, loading: geoLoading, requestLocation, status: geoStatus } = useGeolocation({ autoLocate: true });
+  const locationLabel = geoCity ? `${geoCity.name}, ${geoCity.stateCode}` : "Find my location";
+
   /* --- Knotty chat simulation --- */
   const [knottyMessages, setKnottyMessages] = useState<{ id: string; role: "assistant" | "user"; text: string }[]>([]);
   const [knottyTyping, setKnottyTyping] = useState(false);
@@ -472,9 +477,13 @@ export function WorldClassHomepage({
   const doSearch = useCallback(() => {
     const q = searchValue.trim();
     if (q) {
-      router.push(`/search?keyword=${encodeURIComponent(q)}`);
+      const params = new URLSearchParams({ keyword: q });
+      if (geoCity) {
+        params.set("city", geoCity.name);
+      }
+      router.push(`/search?${params.toString()}`);
     }
-  }, [searchValue, router]);
+  }, [searchValue, router, geoCity]);
 
   const quickSearch = useCallback(
     (tag: string) => {
@@ -507,10 +516,21 @@ export function WorldClassHomepage({
         <div className="wc-hero-split">
           {/* LEFT — content */}
           <div className="wc-hero-content wc-hero-left">
-            <div className="wc-geo-bar">
-              <span className="wc-geo-dot" />
-              <span>Detect my location — find therapists nearby</span>
-            </div>
+            <button
+              type="button"
+              className="wc-geo-bar"
+              onClick={() => void requestLocation(true)}
+              disabled={geoLoading}
+            >
+              <span className={`wc-geo-dot ${geoCity ? "wc-geo-dot-active" : ""}`} />
+              <span>
+                {geoLoading
+                  ? "Detecting location..."
+                  : geoCity
+                    ? `Located: ${geoCity.name}, ${geoCity.stateCode}`
+                    : "Detect my location — find therapists nearby"}
+              </span>
+            </button>
 
             <h1 className="wc-hero-h1">
               <span className="wc-hero-line">
@@ -554,10 +574,14 @@ export function WorldClassHomepage({
                   }}
                 />
                 <div className="wc-s-sep" />
-                <div className="wc-s-loc">
+                <button
+                  type="button"
+                  className="wc-s-loc"
+                  onClick={() => void requestLocation(true)}
+                >
                   <LocationPinIcon />
-                  <span>Dallas, TX</span>
-                </div>
+                  <span>{geoLoading ? "Locating..." : locationLabel}</span>
+                </button>
                 <button
                   type="button"
                   className="wc-btn-search"

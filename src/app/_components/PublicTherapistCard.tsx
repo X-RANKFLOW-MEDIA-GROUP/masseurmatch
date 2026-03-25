@@ -100,7 +100,8 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
           alt={imageAlt}
           width={900}
           height={700}
-          className="profile-card-image h-56 w-full object-cover"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="profile-card-image h-48 w-full object-cover sm:h-56"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[rgba(11,31,58,0.56)] via-transparent to-[rgba(255,255,255,0.14)]" />
 
