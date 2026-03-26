@@ -6,15 +6,10 @@ import { createTherapistUser, getUserByEmail } from "@/app/api/_lib/supabase-ser
 
 export async function POST(request: Request) {
   try {
-    console.log("[v0] register: parsing body");
     const body = await parseJsonBody(request, authRegisterSchema);
-    console.log("[v0] register: body parsed", { email: body.email, fullName: body.fullName });
 
-    // Check if user already exists before attempting to create
-    console.log("[v0] register: checking if user exists");
     const existingUser = await getUserByEmail(body.email);
     if (existingUser) {
-      console.log("[v0] register: user already exists");
       return json(
         {
           ok: false,
@@ -25,9 +20,7 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log("[v0] register: creating therapist user");
     const result = await createTherapistUser(body);
-    console.log("[v0] register: user created", { userId: result.user.id, role: result.role });
 
     const response = json({
       ok: true,
@@ -47,7 +40,6 @@ export async function POST(request: Request) {
       }),
     );
   } catch (error) {
-    console.error("[v0] register: error", error);
     return errorResponse(error);
   }
 }

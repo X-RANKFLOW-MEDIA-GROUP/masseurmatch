@@ -396,23 +396,17 @@
   gap: 10px;
   background: rgba(148,163,184,.08);
   border: 1px solid rgba(148,163,184,.18);
-  padding: 9px 20px;
+  padding: 10px 22px;
   border-radius: 999px;
   font-family: var(--wc-display);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
-  letter-spacing: .18em;
+  letter-spacing: .14em;
   text-transform: uppercase;
   color: var(--c1);
   cursor: pointer;
   transition: all .25s;
-  /* Position fixed on left side */
-  position: fixed;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%) rotate(-90deg);
-  transform-origin: center center;
-  z-index: 100;
+  margin-bottom: 32px;
   white-space: nowrap;
 }
 .wc-geo-bar:hover {
@@ -420,8 +414,8 @@
   border-color: rgba(148,163,184,.3);
 }
 .wc-geo-dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   background: rgba(148,163,184,.5);
   border-radius: 50%;
   flex-shrink: 0;
@@ -444,30 +438,32 @@
 
 /* Headline */
 .wc-hero-h1 {
-  font-family: var(--wc-serif);
-  font-size: clamp(32px, 8vw, 116px);
-  font-weight: 500;
-  line-height: .92;
-  letter-spacing: -.04em;
+  font-family: var(--wc-display);
+  font-size: clamp(40px, 7vw, 88px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -.02em;
   color: var(--c0);
   margin-bottom: 0;
   width: 100%;
-  overflow-wrap: break-word;
 }
 .wc-hero-line {
   display: block;
-  word-spacing: 0.08em;
 }
 .wc-hero-accent {
   color: var(--a1);
+  background: linear-gradient(135deg, var(--a1), var(--a0));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 .wc-hero-h1 .wc-sub-line {
   display: block;
-  font-size: clamp(28px, 6vw, 76px);
-  color: rgba(226,232,240,.64);
-  font-weight: 500;
-  letter-spacing: -.03em;
-  margin-top: 10px;
+  font-size: clamp(32px, 5.5vw, 64px);
+  color: rgba(226,232,240,.72);
+  font-weight: 600;
+  letter-spacing: -.01em;
+  margin-top: 8px;
 }
 .wc-hero-p {
   font-family: var(--wc-sans);
@@ -1630,7 +1626,6 @@
 @media (max-width: 1024px) {
   .wc-nl-inner { grid-template-columns: 1fr; gap: 48px }
   .wc-how-grid { grid-template-columns: 1fr 1fr }
-  .wc-geo-bar { display: none }
 }
 
 @media (max-width: 768px) {
@@ -1672,9 +1667,11 @@
     text-align: center;
   }
 
-  /* Geo bar - hide on mobile since it's positioned fixed on left */
+  /* Geo bar - smaller on mobile */
   .wc-geo-bar {
-    display: none;
+    font-size: 9px;
+    padding: 8px 16px;
+    margin-bottom: 24px;
   }
 
   /* Search bar - stack vertically on mobile */
