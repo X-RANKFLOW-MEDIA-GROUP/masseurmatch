@@ -7,7 +7,6 @@ import type { PublicTherapist } from "@/app/_lib/directory";
 import {
   getPublicContactLinks,
   getPublicProfileName,
-  isVerifiedDirectoryProfile,
 } from "@/app/_lib/public-profile";
 import { useKnottyProfileAttribution } from "./useKnottyProfileAttribution";
 
@@ -29,7 +28,6 @@ export function PremiumProfileHero({ profile, cityPath, reviews = [] }: Props) {
   
   const city = profile.city || "United States";
   const yearsExp = profile.years_experience ?? (profile.start_year ? new Date().getFullYear() - profile.start_year : null);
-  const isVerified = isVerifiedDirectoryProfile(profile);
   const avgRating = reviews.length > 0 
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
     : "5.0";
@@ -65,14 +63,9 @@ export function PremiumProfileHero({ profile, cityPath, reviews = [] }: Props) {
           {profile.available_now && (
             <span className="pp-badge pp-badge-available">Available Now</span>
           )}
-          {isVerified && (
-            <span className="pp-badge pp-badge-verified">
-              <Shield className="w-3 h-3" /> Verified
-            </span>
-          )}
           {Number(avgRating) >= 4.8 && (
             <span className="pp-badge pp-badge-top">
-              <Star className="w-3 h-3" /> Top Rated
+              <Star className="w-3 h-3" /> Highly Rated
             </span>
           )}
           {travelingSoon && (
@@ -92,13 +85,13 @@ export function PremiumProfileHero({ profile, cityPath, reviews = [] }: Props) {
             {neighborhood ? `${neighborhood}, ${city}` : city}
           </span>
           <span style={{ color: "var(--text-muted)" }}>·</span>
-          <span>Gay Massage Therapist in {city}</span>
+          <span>Massage Therapist</span>
         </div>
 
         {/* Meta Stats */}
         <div className="pp-hero-meta">
           <div className="pp-meta-item">
-            <div className="pp-meta-val">{yearsExp || 5}</div>
+            <div className="pp-meta-val">{yearsExp || 5}+</div>
             <div className="pp-meta-label">Years exp.</div>
           </div>
           <div className="pp-meta-item">
@@ -107,7 +100,7 @@ export function PremiumProfileHero({ profile, cityPath, reviews = [] }: Props) {
           </div>
           <div className="pp-meta-item">
             <div className="pp-meta-val">{sessionCount}</div>
-            <div className="pp-meta-label">Sessions</div>
+            <div className="pp-meta-label">Connections</div>
           </div>
         </div>
 

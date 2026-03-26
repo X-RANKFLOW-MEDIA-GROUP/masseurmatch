@@ -34,7 +34,7 @@ export function ProfileAIChat({ profile }: Props) {
     `What are ${name}'s rates?`,
     `Does ${name} offer outcall?`,
     `What specialties does ${name} have?`,
-    `How do I book a session?`,
+    `Is ${name} LGBTQ+ affirming?`,
   ];
 
   // Generate AI response based on profile data
@@ -76,20 +76,20 @@ export function ProfileAIChat({ profile }: Props) {
     }
     
     if (q.includes("book") || q.includes("schedule") || q.includes("appointment") || q.includes("reserve")) {
-      return `To book a session with ${name}, you can:\n\n1. Send a text message using the "Contact" button\n2. Call directly using the phone button\n3. Message on WhatsApp\n\nSame-day appointments are often available. Just let ${name} know your preferred date, time, and session type.`;
+      return `To contact ${name}, you can:\n\n1. Send a text message using the "Contact" button\n2. Call directly using the phone button\n3. Message on WhatsApp\n\nReach out to discuss availability and services directly with ${name}.`;
     }
     
     if (q.includes("experience") || q.includes("how long") || q.includes("years")) {
       const years = profile.years_experience || (profile.start_year ? new Date().getFullYear() - profile.start_year : null);
       if (years) {
-        return `${name} has ${years}+ years of professional massage experience. They are ${profile.lgbtq_affirming ? "LGBTQ+ affirming and " : ""}dedicated to providing a safe, professional environment for all clients.`;
+        return `${name} has ${years}+ years of professional massage experience. They provide a safe, professional environment for all clients.`;
       }
       return `${name} is an experienced massage therapist committed to providing high-quality bodywork. Check their About section for more details on their background and training.`;
     }
     
     if (q.includes("available") || q.includes("open") || q.includes("when")) {
       if (profile.available_now) {
-        return `${name} is currently available! You can reach out now to book a same-day session. Their typical hours are shown in the Availability section on this page.`;
+        return `${name} is currently available! You can reach out now. Their typical hours are shown in the Availability section on this page.`;
       }
       return `Check the Availability section on this page for ${name}'s current open slots. You can also contact them directly to check real-time availability.`;
     }
@@ -98,15 +98,15 @@ export function ProfileAIChat({ profile }: Props) {
       if (profile.lgbtq_affirming) {
         return `Yes! ${name} is an LGBTQ+ affirming therapist who provides a welcoming, judgment-free environment for all clients. Your comfort and safety are their priority.`;
       }
-      return `${name} welcomes all clients and maintains a professional, respectful environment. Contact them directly if you have specific questions.`;
+      return `${name} maintains a professional, respectful environment for all clients. Contact them directly if you have specific questions.`;
     }
     
     if (q.includes("cancel") || q.includes("policy") || q.includes("reschedule")) {
-      return `Most therapists, including ${name}, appreciate 24 hours notice for cancellations. For ${name}'s specific cancellation policy, please ask them directly when booking.`;
+      return `For ${name}'s cancellation policy and other details, please ask them directly when contacting them.`;
     }
     
     // Default response
-    return `Great question! For specific details about ${name}'s services, I'd recommend reaching out to them directly using the contact buttons above. They'll be happy to answer any questions about sessions, availability, or special requests. Is there anything else I can help with based on their profile?`;
+    return `Great question! For specific details about ${name}'s services, I'd recommend reaching out to them directly using the contact buttons above. They'll be happy to answer any questions about their services and availability. Is there anything else I can help with based on their profile?`;
   }, [name, profile, city, neighborhood]);
 
   const handleSend = useCallback(() => {

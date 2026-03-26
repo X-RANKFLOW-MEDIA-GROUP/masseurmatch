@@ -23,8 +23,8 @@ export function PremiumProfileCTA({ profile }: Props) {
       {/* Orange line accent */}
       <div className="w-10 h-0.5 bg-[var(--orange)] rounded mx-auto mb-6" />
       
-      <h2>Book Your Session Today</h2>
-      <p>Text {name} now to check availability · Same-day sessions available most weekdays</p>
+      <h2>Connect With {name}</h2>
+      <p>Reach out directly to learn more about their services and availability</p>
       
       <div className="pp-cta-buttons">
         {smsHref && (
@@ -34,7 +34,7 @@ export function PremiumProfileCTA({ profile }: Props) {
             className="pp-btn pp-btn-primary"
           >
             <MessageCircle className="w-4 h-4" />
-            Text Me Now
+            Text
           </a>
         )}
         <a
@@ -53,10 +53,14 @@ export function PremiumProfileCTA({ profile }: Props) {
             className="pp-btn pp-btn-outline"
           >
             <Phone className="w-4 h-4" />
-            Call Now
+            Call
           </a>
         )}
       </div>
+
+      <p className="text-xs text-white/40 mt-6">
+        MasseurMatch is a directory service. All transactions and services are arranged directly between you and the therapist.
+      </p>
     </div>
   );
 }

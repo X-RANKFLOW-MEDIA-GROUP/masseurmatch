@@ -16,22 +16,22 @@ export function PremiumProfileFaq({ profile }: Props) {
   // Generate default FAQ items if none provided
   const defaultFaqs: ProfileFaqItem[] = [
     {
-      question: `How much does a session with ${name} cost in ${city}?`,
-      answer: `${profile.incall_price ? `Incall sessions start at $${profile.incall_price} for 60 minutes.` : ""} ${profile.outcall_price ? `Outcall sessions start at $${profile.outcall_price} for 60 minutes plus a travel fee based on your neighborhood.` : ""} Deep tissue and specialty sessions are slightly higher. Contact ${name} directly for detailed pricing.`
+      question: `What are ${name}'s rates in ${city}?`,
+      answer: `${profile.incall_price ? `Incall sessions start at $${profile.incall_price} for 60 minutes.` : ""} ${profile.outcall_price ? `Outcall sessions start at $${profile.outcall_price} for 60 minutes plus travel fees based on location.` : ""} Contact ${name} directly for detailed pricing and custom session rates.`
     },
     {
       question: `Does ${name} offer outcall massage in ${city}?`,
       answer: profile.outcall_price 
-        ? `Yes. Outcall is available across ${profile.neighborhood_name || city} and surrounding neighborhoods. The travel fee is calculated based on your location.`
-        : `${name} currently focuses on incall sessions at their location. Contact them directly to inquire about outcall availability.`
+        ? `Yes. Outcall is available throughout ${profile.neighborhood_name || city} and surrounding areas. Travel fees apply based on location.`
+        : `${name} currently focuses on incall sessions. Contact them directly to inquire about potential outcall availability.`
     },
     {
-      question: `Is ${name} a licensed and certified massage therapist?`,
-      answer: `${name} is a professional massage therapist${profile.years_experience ? ` with ${profile.years_experience}+ years of experience` : ""}. Documentation is available upon request.`
+      question: `What specialties does ${name} offer?`,
+      answer: `${name} specializes in ${profile.specialties?.join(", ") || "various massage techniques"}. Each session is customized to your specific needs and preferences. Contact ${name} to discuss which services would be best for you.`
     },
     {
-      question: `How do I book a session with ${name}?`,
-      answer: `Booking is done directly via SMS, WhatsApp, or phone call using the contact buttons on this page. Same-day sessions are available most weekdays. Check the availability table above for open slots.`
+      question: `How do I reach out to ${name}?`,
+      answer: `Use the contact buttons on this page to text, call, or message on WhatsApp. You can also ask Knotty AI questions about their services and availability. ${name} handles all communication directly.`
     },
   ];
   

@@ -3,13 +3,13 @@ import Script from "next/script";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "How It Works | Finding a Massage Therapist on MasseurMatch",
+  title: "How It Works | MasseurMatch Directory",
   description:
-    "Learn how MasseurMatch works — search verified therapists, review profiles, connect directly, and book on your terms. Free for clients, LGBTQ+-inclusive always.",
+    "Learn how MasseurMatch works — search massage therapists, review profiles, connect directly. Free directory service.",
   openGraph: {
     title: "How MasseurMatch Works",
     description:
-      "Search, discover, and connect with verified LGBTQ+-inclusive massage therapists in minutes.",
+      "Search and discover LGBTQ+-inclusive massage therapists.",
     url: "https://masseurmatch.com/how-it-works",
     siteName: "MasseurMatch",
     type: "website",
@@ -46,8 +46,8 @@ const howItWorksSchema = {
     {
       "@type": "HowToStep",
       position: 4,
-      name: "Book Your Session",
-      text: "Coordinate your appointment directly with the therapist on the schedule and terms that work for both of you.",
+      name: "Connect Directly",
+      text: "Reach out to your chosen therapist using the contact buttons. All communication is direct.",
     },
   ],
   totalTime: "PT5M",
@@ -61,26 +61,26 @@ const clientSteps = [
   {
     n: "01",
     title: "Search your city",
-    body: "Enter your city or ZIP. Filter by modality — Swedish, deep tissue, sports, prenatal, and more. Set your price range.",
+    body: "Enter your city or ZIP. Filter by modality — Swedish, deep tissue, sports, and more. Set your price range.",
     detail: "104 cities covered across the US",
   },
   {
     n: "02",
     title: "Review detailed profiles",
-    body: "See credentials, services, rates, photos, and verified reviews. The therapist's LGBTQ+ commitment is displayed clearly on every profile.",
-    detail: "All licenses manually verified",
+    body: "See services, rates, photos, and client reviews. The therapist's LGBTQ+ affirmation is displayed clearly on every profile.",
+    detail: "Transparent therapist information",
   },
   {
     n: "03",
     title: "Connect directly",
-    body: "Message or call your therapist directly — no platform intermediary, no booking fee taken. 100% of your payment goes to your therapist.",
-    detail: "Zero booking commissions",
+    body: "Message or call your therapist directly using the contact buttons. No intermediary, direct communication.",
+    detail: "Direct therapist contact",
   },
   {
     n: "04",
     title: "Experience & review",
-    body: "After your session, leave a review to help the community. Your feedback shapes who gets visibility and keeps quality high.",
-    detail: "Reviews manually moderated",
+    body: "After connecting with a therapist, share your experience. Your feedback helps the community.",
+    detail: "Community feedback",
   },
 ];
 
@@ -88,41 +88,41 @@ const therapistSteps = [
   {
     n: "01",
     title: "Create your profile",
-    body: "Add your bio, services, rates, availability, photos, and training. Build a profile that represents your full practice.",
+    body: "Add your bio, services, rates, availability, photos, and background. Build a profile that represents your practice.",
   },
   {
     n: "02",
-    title: "License verification",
-    body: "Submit your state license. We cross-check with licensing boards and activate your listing within 1–2 business days.",
+    title: "Go live & get discovered",
+    body: "Your profile is indexed by search engines and appears in local searches. Potential clients find you directly.",
   },
   {
     n: "03",
-    title: "Go live & get discovered",
-    body: "Your profile is indexed by Google and appears in local searches. Clients find you on their terms.",
+    title: "Clients reach out",
+    body: "Manage your own schedule and communication. Clients contact you directly using the contact buttons on your profile.",
   },
   {
     n: "04",
-    title: "Clients contact you",
-    body: "No booking system to manage. Clients reach you directly and you coordinate sessions your way.",
+    title: "Build your reputation",
+    body: "Help clients understand your services by maintaining a complete, accurate profile. Reviews help build community trust.",
   },
 ];
 
 const questions = [
   {
-    q: "Is MasseurMatch free for clients?",
-    a: "Yes. Searching, browsing, and contacting therapists is completely free for clients.",
+    q: "Is MasseurMatch free?",
+    a: "Yes. MasseurMatch is a free directory for browsing and contacting therapists.",
   },
   {
-    q: "Does MasseurMatch take a booking fee?",
-    a: "No. We never take a percentage of your session payment. Clients pay therapists directly.",
+    q: "Does MasseurMatch collect payments or take fees?",
+    a: "No. MasseurMatch is a directory service only. We do not collect payments, process transactions, or take commissions. All communication and arrangements are made directly between you and the therapist.",
   },
   {
     q: "How is MasseurMatch different from Soothe or Zeel?",
-    a: "Soothe and Zeel are on-demand service companies — they employ therapists and take a cut of every booking. MasseurMatch is a pure directory: we connect you with independent professionals. You deal directly with the therapist.",
+    a: "Soothe and Zeel are on-demand service platforms. MasseurMatch is a directory: we connect you directly with independent therapists. All communication and arrangements happen directly.",
   },
   {
-    q: "Are all therapists really LGBTQ+-affirming?",
-    a: "Yes. Every therapist agrees to our LGBTQ+-Inclusive Practice Standards before their profile goes live. It's not a filter — it's a prerequisite.",
+    q: "Is my information private?",
+    a: "Yes. Your information is kept private and is only used to facilitate direct contact with therapists you choose to reach out to.",
   },
 ];
 
@@ -189,8 +189,8 @@ export default function HowItWorksPage() {
               fontWeight: 300,
             }}
           >
-            MasseurMatch is a directory, not a booking platform. We connect you
-            with verified professionals and then step aside.
+            MasseurMatch is a directory service. We connect you
+            with massage therapists and step aside.
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
             <Link
@@ -249,9 +249,9 @@ export default function HowItWorksPage() {
               lineHeight: 1.6,
             }}
           >
-            <strong>MasseurMatch is a directory, not a service company.</strong>{" "}
-            We don't employ therapists, take booking fees, or insert ourselves
-            into your session. We just make the right connection.
+            <strong>MasseurMatch is a directory service.</strong>{" "}
+            We connect you with therapists and facilitate direct contact.
+            All arrangements happen between you and the therapist.
           </p>
         </section>
 
@@ -279,7 +279,7 @@ export default function HowItWorksPage() {
                 lineHeight: 1.25,
               }}
             >
-              From search to session in four steps
+              Connect directly in four steps
             </h2>
             <div
               style={{ display: "flex", flexDirection: "column", gap: 0 }}
@@ -407,12 +407,12 @@ export default function HowItWorksPage() {
                 </div>
                 {[
                   "Free to search & browse",
-                  "0% booking commission",
+                  "Direct therapist contact",
                   "Independent therapists",
-                  "Direct client–therapist contact",
-                  "You choose your price",
-                  "LGBTQ+-inclusive by design",
-                  "Licensed & verified professionals",
+                  "No intermediary in communication",
+                  "Therapist sets their rates",
+                  "LGBTQ+-inclusive therapists available",
+                  "Transparent therapist profiles",
                 ].map((item) => (
                   <div
                     key={item}

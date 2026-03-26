@@ -1,13 +1,12 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Mail, MessageSquare, Phone, ShieldCheck } from "lucide-react";
+import { Mail, MessageSquare, Phone } from "lucide-react";
 import Image from "next/image";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import {
   getPublicContactLinks,
   getPublicProfileName,
-  isVerifiedDirectoryProfile,
 } from "@/app/_lib/public-profile";
 import { useKnottyProfileAttribution } from "./useKnottyProfileAttribution";
 
@@ -31,7 +30,6 @@ export function ProfileStickyFooter({ profile }: Props) {
   if (!callHref && !whatsappHref && !smsHref) return null;
 
   const displayName = getPublicProfileName(profile);
-  const verified = isVerifiedDirectoryProfile(profile);
   const avatarSrc =
     profile.avatar_url ||
     "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&h=800&fit=crop";
@@ -58,14 +56,6 @@ export function ProfileStickyFooter({ profile }: Props) {
               <span className="font-display text-sm font-medium text-slate-900 leading-none">
                 {displayName}
               </span>
-              {verified && (
-                <span className="flex items-center gap-1 mt-1 text-emerald-600">
-                  <ShieldCheck className="w-3 h-3" />
-                  <span className="font-mono text-[9px] uppercase tracking-widest">
-                    Verified
-                  </span>
-                </span>
-              )}
             </div>
           </div>
 

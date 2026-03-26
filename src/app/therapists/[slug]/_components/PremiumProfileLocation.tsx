@@ -36,7 +36,7 @@ export function PremiumProfileLocation({ profile }: Props) {
             }}
           />
           <span className="mt-3 text-sm text-[var(--cream)]">{neighborhood || city}</span>
-          <span className="text-xs">Exact address shared after booking</span>
+          <span className="text-xs">Location details shared upon contact</span>
         </div>
       </div>
 
@@ -52,7 +52,7 @@ export function PremiumProfileLocation({ profile }: Props) {
         </div>
 
         <p className="text-xs text-[var(--text-dim)] mb-4">
-          Exact address shared after booking confirmation. Private studio, discreet entrance, parking available.
+          Location details are shared when you contact the therapist. Private studio with discreet entrance.
         </p>
 
         {/* Outcall radius */}
