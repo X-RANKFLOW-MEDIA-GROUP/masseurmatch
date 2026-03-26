@@ -540,14 +540,13 @@ export function WorldClassHomepage({
                 </span>
               </span>
               <span className="wc-sub-line">
-                <TextReveal text="gay-affirming therapist" delay={0.24} />
+                <TextReveal text="gay-affirming massage" delay={0.24} />
               </span>
             </h1>
 
             <p className="wc-hero-p">
-              The <strong>LGBTQ+-inclusive</strong> directory built for precision:
-              <strong> verified credentials</strong>, visible starting rates, and neighborhood-level coverage
-              — from Oak Lawn to Montrose to South Congress.
+              The premier LGBTQ+-inclusive directory with verified credentials, 
+              transparent pricing, and neighborhood-level coverage across major cities.
             </p>
 
             <div className="wc-search-wrap">
