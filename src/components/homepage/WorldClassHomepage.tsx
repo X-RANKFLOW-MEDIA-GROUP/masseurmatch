@@ -260,7 +260,7 @@ function therapistBadge(t: PublicTherapist) {
 
 function therapistPrice(t: PublicTherapist) {
   const price = t.incall_price || t.outcall_price;
-  return price ? `$${price}` : "Contact";
+  return price ? `starts at $${price}` : "Contact for pricing";
 }
 
 /* ─── Sub-components ─── */
@@ -873,13 +873,14 @@ export function WorldClassHomepage({
                 className={`wc-tc wc-cr2 wc-d${(i % 3) + 1}`}
               >
                 <div className="wc-tc-img">
-                  {t.avatar_url ? (
+                  {t.avatar_url && t.avatar_url.startsWith("http") ? (
                     <Image
                       src={t.avatar_url}
                       alt={therapistName(t)}
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, 33vw"
+                      unoptimized={t.avatar_url.includes("supabase")}
                     />
                   ) : (
                     <div className={`wc-tc-bg ${GRADIENTS[i % 3]}`}>
@@ -895,12 +896,9 @@ export function WorldClassHomepage({
                     <LocationPinIcon />
                     <span>{therapistLocation(t)}</span>
                   </div>
-                  <div className="wc-tc-tags">
-                    {(t.specialties || []).slice(0, 3).map((s) => (
-                      <span key={s} className="wc-tc-tag">
-                        {s}
-                      </span>
-                    ))}
+                  <div className="wc-tc-view-profile">
+                    <span>View Profile</span>
+                    <ArrowRightIcon size={14} />
                   </div>
                   <div className="wc-tc-foot">
                     <div className="wc-tc-rating">
@@ -908,7 +906,6 @@ export function WorldClassHomepage({
                     </div>
                     <div className="wc-tc-price">
                       {therapistPrice(t)}
-                      <small>/hr</small>
                     </div>
                   </div>
                 </div>

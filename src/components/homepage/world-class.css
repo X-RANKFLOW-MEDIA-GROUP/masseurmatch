@@ -1052,18 +1052,30 @@
   gap: 5px;
 }
 .wc-tc-loc svg { width: 11px; height: 11px; flex-shrink: 0 }
-.wc-tc-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px }
-.wc-tc-tag {
+.wc-tc-view-profile {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-family: var(--wc-display);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
-  letter-spacing: .16em;
+  letter-spacing: .14em;
   text-transform: uppercase;
-  color: var(--c2);
-  background: rgba(148,163,184,.08);
-  border: 1px solid rgba(148,163,184,.14);
-  padding: 4px 10px;
-  border-radius: 100px;
+  color: var(--a1);
+  margin-bottom: 18px;
+  transition: color .2s, gap .2s;
+}
+.wc-tc-view-profile svg {
+  width: 14px;
+  height: 14px;
+  transition: transform .2s;
+}
+.wc-tc:hover .wc-tc-view-profile {
+  gap: 10px;
+  color: var(--a0);
+}
+.wc-tc:hover .wc-tc-view-profile svg {
+  transform: translateX(2px);
 }
 .wc-tc-foot {
   display: flex;
@@ -1086,16 +1098,11 @@
 }
 .wc-tc-price {
   font-family: var(--wc-display);
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: -.02em;
-  color: var(--c0);
-}
-.wc-tc-price small {
-  font-family: var(--wc-sans);
   font-size: 12px;
-  font-weight: 300;
-  color: var(--c2);
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--c0);
 }
 
 /* ══════════════════════════════════════
