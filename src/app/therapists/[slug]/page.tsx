@@ -35,13 +35,147 @@ import { ProfileRelatedLocations } from "./_components/ProfileRelatedLocations";
 import { ProfileStickyFooter } from "./_components/ProfileStickyFooter";
 import { KnottyProfileTracker } from "./_components/KnottyProfileTracker";
 
+// Demo/fallback profiles for SEO and testing
+const DEMO_PROFILES: Record<string, any> = {
+  'bruno-dallas-tx': {
+    id: 'bruno-demo-001',
+    slug: 'bruno-dallas-tx',
+    display_name: 'Bruno',
+    full_name: 'Bruno Martinez',
+    city: 'Dallas',
+    state: 'Texas',
+    neighborhood_name: 'Oak Lawn',
+    primary_area: 'Uptown Dallas',
+    bio: 'Professional licensed massage therapist with 8 years of experience specializing in deep tissue and therapeutic massage. I create a welcoming, judgment-free environment for all clients. My approach combines traditional Swedish techniques with targeted deep tissue work to address your specific needs, whether that\'s stress relief, muscle recovery, or chronic pain management.',
+    avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop&crop=face',
+    photo_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop&crop=face',
+    modality: 'Licensed Massage Therapist',
+    specialties: ['Deep Tissue', 'Swedish', 'Sports Massage', 'Therapeutic'],
+    languages: ['English', 'Spanish'],
+    contact_email: 'bruno@masseurmatch.com',
+    phone: '214-555-0123',
+    website: 'https://masseurmatch.com',
+    incall_price: 120,
+    outcall_price: 150,
+    years_experience: 8,
+    lgbtq_affirming: true,
+    gay_friendly: true,
+    inclusive: true,
+    is_verified_identity: true,
+    is_verified_profile: true,
+    _tier: 'pro',
+    custom_faq: [
+      {
+        question: 'What should I expect during my first session?',
+        answer: 'During your first visit, we will discuss your goals, any areas of concern, and your preferred pressure level. The session is tailored entirely to your needs.'
+      },
+      {
+        question: 'Do you offer outcall services?',
+        answer: 'Yes, I offer mobile massage services throughout the Dallas area including Oak Lawn, Uptown, Downtown, and surrounding neighborhoods.'
+      },
+      {
+        question: 'What is your cancellation policy?',
+        answer: 'I require 24 hours notice for cancellations. Late cancellations may be subject to a fee.'
+      }
+    ]
+  }
+};
+
 type Params = { slug: string };
 
 export const revalidate = 60;
 
 export async function generateStaticParams() {
-  const res = await getPublicTherapists({ page: 1, pageSize: 200 });
-  return res.items.map((item) => ({ slug: item.slug || item.id }));
+  try {
+    const res = await getPublicTherapists({ page: 1, pageSize: 200 });
+    const dbParams = res.items.map((item) => ({ slug: item.slug || item.id }));
+    
+    // Always include demo profiles
+    const demoParams = Object.keys(DEMO_PROFILES).map(slug => ({ slug }));
+    
+    // Merge and deduplicate
+    const allParams = [...demoParams, ...dbParams];
+    const seen = new Set<string>();
+    return allParams.filter(p => {
+      if (seen.has(p.slug)) return false;
+      seen.add(p.slug);
+      return true;
+    });
+  } catch {
+    // If DB fails, return demo profiles
+    return Object.keys(DEMO_PROFILES).map(slug => ({ slug }));
+  }
+}
+
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  let profile = await getPublicTherapistBySlug(resolvedParams.slug);
+
+  // Use demo profile as fallback
+  if (!profile && DEMO_PROFILES[resolvedParams.slug]) {
+    profile = DEMO_PROFILES[resolvedParams.slug];
+  }
+
+  if (!profile) {
+    return createPageMetadata({
+      title: "Therapist profile",
+      description: "Public massage therapist profile.",
+      path: `/therapists/${resolvedParams.slug}`,
+      noIndex: true,
+    });
+  }
+
+  const name = getPublicProfileName(profile);
+  const city = profile.city || "US";
+  const neighborhood = profile.neighborhood_name || profile.primary_area;
+  const topTechnique = profile.specialties?.[0] || profile.modality || "Massage";
+  const yearsExp =
+    profile.years_experience ?? (profile.start_year ? new Date().getFullYear() - profile.start_year : null);
+  const verified = profile.is_verified_identity || profile.is_verified_profile;
+  const priceFrom = [profile.incall_price, profile.outcall_price]
+    .filter((p): p is number => typeof p === "number" && p > 0)
+    .sort((a, b) => a - b)[0];
+
+  const titleParts = [
+    name,
+    [verified ? "Verified" : null, topTechnique, "Therapist"].filter(Boolean).join(" "),
+    [neighborhood, city].filter(Boolean).join(", "),
+  ]
+    .filter(Boolean)
+    .join(" | ");
+
+  const descParts = [
+    `${name} is a${yearsExp ? ` ${yearsExp}+ year` : ""} professional massage therapist`,
+    neighborhood ? `in ${neighborhood}, ${city}` : `in ${city}`,
+    `specializing in ${topTechnique}.`,
+    priceFrom ? `Sessions from $${priceFrom}.` : null,
+    verified ? "Identity verified." : null,
+    "View rates, availability & book directly.",
+  ].filter(Boolean);
+
+  const description = profile.bio
+    ? profile.bio.length > 160 ? profile.bio.slice(0, 157) + "..." : profile.bio
+    : descParts.join(" ");
+
+  return createPageMetadata({
+    title: titleParts,
+    description,
+    path: `/therapists/${profile.slug || profile.id}`,
+    type: "profile",
+    image: profile.avatar_url || undefined,
+    keywords: [
+      profile.city,
+      neighborhood,
+      profile.modality,
+      ...(profile.specialties || []),
+      "massage therapist",
+      "male massage therapist",
+      "verified massage therapist",
+      neighborhood ? `massage ${neighborhood}` : null,
+      profile.city ? `gay massage ${profile.city}` : null,
+      profile.city ? `LGBTQ massage ${profile.city}` : null,
+    ].filter((value): value is string => Boolean(value)),
+  });
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -112,7 +246,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 export default async function TherapistPage({ params }: { params: Promise<Params> }) {
   const resolvedParams = await params;
-  const profile = await getPublicTherapistBySlug(resolvedParams.slug);
+  let profile = await getPublicTherapistBySlug(resolvedParams.slug);
+
+  // Use demo profile as fallback
+  if (!profile && DEMO_PROFILES[resolvedParams.slug]) {
+    profile = DEMO_PROFILES[resolvedParams.slug];
+  }
 
   if (!profile) {
     notFound();
