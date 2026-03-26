@@ -123,36 +123,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
+      console.log("[v0] signUp: starting registration for", email);
       // registerMutation creates the user via admin API and sets mm_session cookie
       const result = await registerMutation({
         email,
         password,
         fullName,
       });
+      console.log("[v0] signUp: registerMutation completed", result);
 
       // Also sign in with Supabase to get the client-side session for auth state
       // This won't fail since the user was just created with email_confirm: true
-      await supabase.auth.signInWithPassword({ email, password });
+      const { data, error: supabaseError } = await supabase.auth.signInWithPassword({ email, password });
+      console.log("[v0] signUp: supabase signIn result", { data, error: supabaseError?.message });
 
       return { error: null };
     } catch (error) {
+      console.error("[v0] signUp: error", error);
       return { error: error as Error };
     }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log("[v0] signIn: starting login for", email);
       // loginMutation verifies credentials server-side and sets mm_session cookie
-      await loginMutation({
+      const result = await loginMutation({
         email,
         password,
       });
+      console.log("[v0] signIn: loginMutation completed", result);
 
       // Also sign in with Supabase to sync client-side auth state
-      await supabase.auth.signInWithPassword({ email, password });
+      const { data, error: supabaseError } = await supabase.auth.signInWithPassword({ email, password });
+      console.log("[v0] signIn: supabase signIn result", { data, error: supabaseError?.message });
 
       return { error: null };
     } catch (error) {
+      console.error("[v0] signIn: error", error);
       return { error: error as Error };
     }
   };

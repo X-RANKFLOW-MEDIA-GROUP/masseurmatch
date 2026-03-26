@@ -293,6 +293,7 @@ export function AuthForms({
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    console.log("[v0] auth-forms onSubmit: starting", { isLogin, email, fullName: fullName || "(login)" });
     setLoading(true);
 
     // Remember me logic
@@ -306,9 +307,11 @@ export function AuthForms({
       }
     }
 
+    console.log("[v0] auth-forms onSubmit: calling auth function");
     const result = isLogin
       ? await signIn(email, password)
       : await signUp(email, password, fullName);
+    console.log("[v0] auth-forms onSubmit: result", result);
 
     setLoading(false);
 
