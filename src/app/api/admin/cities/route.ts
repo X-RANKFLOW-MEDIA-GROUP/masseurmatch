@@ -46,6 +46,26 @@ async function saveCity(input: z.infer<typeof citySchema>): Promise<StoredCity> 
   return city;
 }
 
+export async function GET(request: Request) {
+  try {
+    await requireAdminSession(request);
+    const store = await readContentStore();
+    const { getPublicTherapists } = await import("@/app/_lib/directory");
+    const therapists = await getPublicTherapists({ page: 1, pageSize: 50 });
+
+    const therapistCounts = therapists.items.reduce<Record<string, number>>((accumulator, therapist) => {
+      const key = therapist.city?.toLowerCase();
+      if (!key) return accumulator;
+      accumulator[key] = (accumulator[key] || 0) + 1;
+      return accumulator;
+    }, {});
+
+    return json({ cities: store.cities, therapistCounts });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const admin = await requireAdminSession(request);

@@ -46,6 +46,32 @@ async function saveKeyword(input: z.infer<typeof keywordSchema>): Promise<Stored
   return keyword;
 }
 
+export async function GET(request: Request) {
+  try {
+    await requireAdminSession(request);
+    const store = await readContentStore();
+    const { getPublicTherapists } = await import("@/app/_lib/directory");
+    const therapists = await getPublicTherapists({ page: 1, pageSize: 50 });
+
+    const keywordCounts = therapists.items.reduce<Record<string, number>>((accumulator, therapist) => {
+      for (const specialty of therapist.specialties || []) {
+        const key = specialty.toLowerCase();
+        accumulator[key] = (accumulator[key] || 0) + 1;
+      }
+      return accumulator;
+    }, {});
+
+    const suggestions = Object.entries(keywordCounts)
+      .sort((left, right) => right[1] - left[1])
+      .slice(0, 24)
+      .map(([term, count]) => ({ term, count }));
+
+    return json({ keywords: store.keywords, suggestions });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const admin = await requireAdminSession(request);

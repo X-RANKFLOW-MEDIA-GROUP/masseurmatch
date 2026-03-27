@@ -88,6 +88,17 @@ async function applyReviewAdminAction(
   };
 }
 
+export async function GET(request: Request) {
+  try {
+    await requireAdminSession(request);
+    const { loadImportedReviews } = await import("@/app/admin/_lib/loaders");
+    const result = await loadImportedReviews();
+    return json(result);
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const admin = await requireAdminSession(request);

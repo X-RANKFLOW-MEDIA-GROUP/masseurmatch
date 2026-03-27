@@ -1,5 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getCities, getPublicTherapists } from "@/app/_lib/directory";
 import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,25 +15,71 @@ import {
   Newspaper,
   Tag,
   ArrowUpRight,
+  Loader2,
 } from "lucide-react";
 
-async function getAdminStats() {
-  const [therapists, cities] = await Promise.all([
-    getPublicTherapists({ page: 1, pageSize: 50 }),
-    Promise.resolve(getCities()),
-  ]);
+type RecentTherapist = {
+  id: string;
+  display_name: string | null;
+  full_name: string | null;
+  city: string | null;
+  specialties: string[] | null;
+  status: string | null;
+};
 
-  return {
-    therapists: therapists.total,
-    mrr: therapists.total * 29,
-    cities: cities.length,
-    pendingReviews: Math.max(2, Math.floor(therapists.total / 5)),
-    recentTherapists: therapists.items.slice(0, 5),
-  };
-}
+type AdminStats = {
+  therapists: number;
+  mrr: number;
+  cities: number;
+  pendingReviews: number;
+  recentTherapists: RecentTherapist[];
+};
 
-export default async function AdminOverviewPage() {
-  const stats = await getAdminStats();
+export default function AdminOverviewPage() {
+  const [stats, setStats] = useState<AdminStats | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/stats")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to load stats");
+        return res.json();
+      })
+      .then((data) => setStats(data))
+      .catch((err) => setError(err.message));
+  }, []);
+
+  const quickLinks = [
+    { href: "/admin/therapists", label: "Therapists", description: "Approve, suspend, verify, and feature provider profiles.", icon: HeartHandshake },
+    { href: "/admin/users", label: "Users", description: "Manage provider and admin roles.", icon: Users },
+    { href: "/admin/moderation", label: "Moderation", description: "Review queued listing drafts flagged by Sightengine.", icon: ShieldAlert },
+    { href: "/admin/reviews", label: "Reviews", description: "Review imported reviews and moderation status.", icon: ShieldCheck },
+    { href: "/admin/cities", label: "Cities", description: "Edit local landing page copy and city coverage.", icon: MapPin },
+    { href: "/admin/keywords", label: "Keywords", description: "Manage specialty and SEO keyword surfaces.", icon: Tag },
+    { href: "/admin/blog", label: "Blog", description: "Publish and maintain editorial content.", icon: Newspaper },
+  ];
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <AdminPageHeader title="Dashboard" description="Admin overview — monitor platform health at a glance." />
+        <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-muted-foreground">
+          Dashboard could not be loaded: {error}
+        </div>
+      </div>
+    );
+  }
+
+  if (!stats) {
+    return (
+      <div className="space-y-6">
+        <AdminPageHeader title="Dashboard" description="Admin overview — monitor platform health at a glance." />
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
 
   const cards = [
     {
@@ -68,21 +116,10 @@ export default async function AdminOverviewPage() {
     },
   ];
 
-  const quickLinks = [
-    { href: "/admin/therapists", label: "Therapists", description: "Approve, suspend, verify, and feature provider profiles.", icon: HeartHandshake },
-    { href: "/admin/users", label: "Users", description: "Manage provider and admin roles.", icon: Users },
-    { href: "/admin/moderation", label: "Moderation", description: "Review queued listing drafts flagged by Sightengine.", icon: ShieldAlert },
-    { href: "/admin/reviews", label: "Reviews", description: "Review imported reviews and moderation status.", icon: ShieldCheck },
-    { href: "/admin/cities", label: "Cities", description: "Edit local landing page copy and city coverage.", icon: MapPin },
-    { href: "/admin/keywords", label: "Keywords", description: "Manage specialty and SEO keyword surfaces.", icon: Tag },
-    { href: "/admin/blog", label: "Blog", description: "Publish and maintain editorial content.", icon: Newspaper },
-  ];
-
   return (
     <div className="space-y-6">
       <AdminPageHeader title="Dashboard" description="Admin overview — monitor platform health at a glance." />
 
-      {/* Stat Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
           <div
@@ -102,7 +139,6 @@ export default async function AdminOverviewPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Recent Therapist Activity */}
         <Card className="lg:col-span-2 border-border bg-white shadow-sm">
           <CardHeader>
             <CardTitle className="font-display text-base">Recent Therapist Activity</CardTitle>
@@ -129,7 +165,6 @@ export default async function AdminOverviewPage() {
           </CardContent>
         </Card>
 
-        {/* Quick Links */}
         <Card className="border-border bg-white shadow-sm">
           <CardHeader>
             <CardTitle className="font-display text-base">Quick Actions</CardTitle>

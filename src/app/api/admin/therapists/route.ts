@@ -222,6 +222,17 @@ async function applyTherapistAdminAction(
   };
 }
 
+export async function GET(request: Request) {
+  try {
+    await requireAdminSession(request);
+    const { loadTherapists } = await import("@/app/admin/_lib/loaders");
+    const result = await loadTherapists();
+    return json(result);
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const admin = await requireAdminSession(request);

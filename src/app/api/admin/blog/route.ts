@@ -94,6 +94,16 @@ async function deleteBlogPost(slug: string) {
   };
 }
 
+export async function GET(request: Request) {
+  try {
+    await requireAdminSession(request);
+    const store = await readContentStore();
+    return json({ blogPosts: store.blogPosts });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const admin = await requireAdminSession(request);
