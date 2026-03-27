@@ -1,0 +1,55 @@
+# MasseurMatch
+
+A directory platform for independent massage therapists. Visitors browse city pages, compare therapist profiles, read editorial content, and contact providers directly. The platform does not process appointments or visitor logins.
+
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS + Radix UI
+- **Database/Auth**: Supabase
+- **Payments**: Stripe
+- **Email**: Resend + React Email
+- **AI**: Google Gemini
+- **Package Manager**: pnpm
+
+## Project Structure
+
+- `src/app/` - Next.js App Router pages and API routes
+- `src/components/` - Shared React components
+- `src/lib/` - Utility libraries
+- `src/hooks/` - Custom React hooks
+- `src/contexts/` - React context providers
+- `src/emails/` - React Email templates
+- `public/` - Static assets
+- `prisma/` - Prisma schema (if used)
+- `supabase/` - Supabase migrations and config
+- `scripts/` - Utility scripts
+
+## Running the App
+
+```bash
+pnpm run dev       # Development server on port 5000
+pnpm run build     # Production build
+pnpm run start     # Production server on port 5000
+```
+
+## Replit Configuration
+
+- Dev server runs on port **5000** bound to `0.0.0.0` for Replit preview compatibility
+- Workflow: "Start application" runs `pnpm run dev`
+- Allowed dev origins include `*.replit.dev` and `*.repl.co`
+
+## Environment Variables Required
+
+See `.env.example` for the full list. Key variables:
+
+- `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
+- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` - Stripe public key
+- `STRIPE_SECRET_KEY` - Stripe secret key
+- `STRIPE_WEBHOOK_SECRET` - Stripe webhook secret
+- `RESEND_API_KEY` - Email sending API key
+- `GEMINI_API_KEY` - Google Gemini API key
+- `SESSION_SECRET` - Session signing secret

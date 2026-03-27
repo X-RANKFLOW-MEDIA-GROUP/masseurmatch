@@ -66,7 +66,7 @@ const LEGACY_REDIRECTS = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typedRoutes: false,
-  allowedDevOrigins: ["100.69.207.7", "localhost", "127.0.0.1", "::1"],
+  allowedDevOrigins: ["100.69.207.7", "localhost", "127.0.0.1", "::1", "*.replit.dev", "*.repl.co"],
   experimental: {
     webpackBuildWorker: true,
     webpackMemoryOptimizations: true,
