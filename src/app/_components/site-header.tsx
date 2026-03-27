@@ -12,6 +12,7 @@ import {
   MapPin,
   Users,
   Navigation,
+  ArrowUpRight,
 } from "lucide-react";
 import {
   Sheet,
@@ -29,12 +30,10 @@ const exploreItems = [
 ];
 
 const navLinks = [
-  { href: "/blog", label: "Blog" },
-  { href: "/for-therapists", label: "For Therapists" },
+  { href: "/therapists", label: "Therapists" },
   { href: "/how-it-works", label: "How it Works" },
-  { href: "/trust", label: "Trust & Safety" },
-  { href: "/faq", label: "FAQ" },
-  { href: "/contact", label: "Contact" },
+  { href: "/for-therapists", label: "For Therapists" },
+  { href: "/trust", label: "Trust" },
 ];
 
 /* ── Explore dropdown (desktop) ───────────────────────── */
@@ -192,6 +191,9 @@ function MobileNav() {
 
 export default function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
+  const isHomepage = pathname === "/";
+
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
@@ -200,50 +202,53 @@ export default function SiteHeader() {
 
   return (
     <motion.header
-      initial={{ width: "40%", opacity: 0, y: -20 }}
-      animate={{ width: "100%", opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none transition-all duration-300 ${isScrolled ? 'pt-0' : 'pt-4'}`}
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        isScrolled 
+          ? 'bg-slate-950/95 backdrop-blur-xl border-b border-white/5' 
+          : 'bg-transparent'
+      }`}
     >
-      <div className={`w-full max-w-7xl pointer-events-auto flex items-center justify-between px-5 py-3 rounded-2xl shadow-2xl border ${isScrolled
-        ? 'bg-white/70 backdrop-blur-md border-white/20 shadow-sm'
-        : 'bg-transparent border-transparent'} transition-all duration-300`}>
+      <div className="w-full max-w-[1400px] mx-auto flex items-center justify-between px-6 lg:px-10 py-4">
         {/* Logo */}
         <Link
           href="/"
-          className={`font-display text-xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 select-none`}
+          className="group flex items-center gap-2"
         >
-          Masseur<span className="text-brand-secondary">Match</span>
+          <span className="font-serif text-[22px] font-medium tracking-tight text-white">
+            Masseur<span className="text-white/50">Match</span>
+          </span>
         </Link>
 
         {/* Center Navigation — desktop */}
-        <nav className="hidden md:flex items-center gap-6">
-          <ExploreDropdown />
+        <nav className="hidden lg:flex items-center gap-1">
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
-              className={`font-sans text-sm font-medium transition-colors relative group ${isScrolled ? 'text-gray-700 hover:text-black' : 'text-white hover:text-gray-200'}`}
+              className="px-4 py-2 text-[13px] font-medium text-white/70 hover:text-white transition-colors rounded-lg hover:bg-white/5"
             >
               {label}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-black transition-all group-hover:w-full"></span>
             </Link>
           ))}
         </nav>
 
         {/* Right CTAs — desktop + mobile hamburger */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Link
             href="/login"
-            className={`font-sans text-sm font-medium transition-colors hidden md:block ${isScrolled ? 'text-gray-700 hover:text-black' : 'text-white hover:text-brand-secondary'}`}
+            className="hidden md:flex px-4 py-2 text-[13px] font-medium text-white/70 hover:text-white transition-colors"
           >
-            Log In
+            Log in
           </Link>
           <Link
             href="/signup"
-            className="hidden sm:flex h-9 px-4 bg-black text-white items-center justify-center rounded-full font-sans text-sm font-semibold hover:bg-gray-800 transition-colors active:scale-95 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            className="hidden sm:flex h-10 px-5 items-center justify-center rounded-full text-[13px] font-semibold transition-all duration-300 bg-white text-slate-950 hover:bg-white/90 hover:scale-[1.02]"
           >
-            Sign Up
+            Get Started
+            <ArrowUpRight className="ml-1.5 w-3.5 h-3.5" />
           </Link>
           <MobileNav />
         </div>

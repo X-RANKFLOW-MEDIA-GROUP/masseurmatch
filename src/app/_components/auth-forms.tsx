@@ -133,8 +133,9 @@ function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
     }
     setLoading(false);
     toast({ title: isLogin ? "Welcome back" : "Account created" });
-    router.push(isLogin ? redirectTo : "/pro/onboard");
-    router.refresh();
+    // Use window.location for a full page navigation to ensure cookies are read properly
+    const destination = isLogin ? redirectTo : "/pro/onboard";
+    window.location.href = destination;
   };
 
   return (
@@ -216,8 +217,9 @@ function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
     }
     setLoading(false);
     toast({ title: isLogin ? "Welcome back" : "Account created" });
-    router.push(isLogin ? redirectTo : "/pro/onboard");
-    router.refresh();
+    // Use window.location for a full page navigation to ensure cookies are read properly
+    const destination = isLogin ? redirectTo : "/pro/onboard";
+    window.location.href = destination;
   };
 
   return (
@@ -336,8 +338,9 @@ export function AuthForms({
       description: isLogin ? undefined : "You can continue into onboarding now.",
     });
 
-    router.push(isLogin ? redirectTo : "/pro/onboard");
-    router.refresh();
+    // Use window.location for a full page navigation to ensure cookies are read properly
+    const destination = isLogin ? redirectTo : "/pro/onboard";
+    window.location.href = destination;
   };
 
   return (

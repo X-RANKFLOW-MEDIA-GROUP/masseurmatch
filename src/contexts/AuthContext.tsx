@@ -123,14 +123,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
-      await registerMutation({
-        email,
-        password,
-        fullName,
-      });
-
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      return { error: error as Error | null };
+      await registerMutation({ email, password, fullName });
+      await supabase.auth.signInWithPassword({ email, password });
+      return { error: null };
     } catch (error) {
       return { error: error as Error };
     }
@@ -138,13 +133,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      await loginMutation({
-        email,
-        password,
-      });
-
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      return { error: error as Error | null };
+      await loginMutation({ email, password });
+      await supabase.auth.signInWithPassword({ email, password });
+      return { error: null };
     } catch (error) {
       return { error: error as Error };
     }

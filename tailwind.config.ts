@@ -25,12 +25,12 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
-        display: ["var(--font-space)", "system-ui", "sans-serif"],
-        mono: ["var(--font-mono)", "monospace"],
-        heading: ["var(--font-space)", "system-ui", "sans-serif"],
+        sans: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
+        display: ["var(--font-playfair)", "Georgia", "serif"],
+        serif: ["var(--font-playfair)", "Georgia", "serif"],
+        heading: ["var(--font-playfair)", "Georgia", "serif"],
         body: ["var(--font-inter)", "system-ui", "sans-serif"],
-        serif: ["var(--font-serif)", "Georgia", "serif"],
+        mono: ["ui-monospace", "monospace"],
       },
       theme: {
         extend: {

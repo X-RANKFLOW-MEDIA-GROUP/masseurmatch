@@ -47,15 +47,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }
 
-  // Get role
-  const { data: roleRow } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  const role = (roleRow as any)?.role ?? null;
-
   // Ensure profile exists (for new OTP users)
   const { data: existingProfile } = await supabase
     .from("profiles")
@@ -80,13 +71,23 @@ export async function POST(request: NextRequest) {
       contact_methods: [],
       share_email: false,
     });
+  }
 
-    if (!roleRow) {
-      await supabase.from("user_roles").insert({
-        user_id: user.id,
-        role: "provider",
-      });
-    }
+  // Get role (check after profile creation to ensure consistency)
+  const { data: roleRow } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  // Create role if it doesn't exist (for new OTP users)
+  let role = (roleRow as any)?.role ?? null;
+  if (!role) {
+    await supabase.from("user_roles").insert({
+      user_id: user.id,
+      role: "provider",
+    });
+    role = "provider";
   }
 
   const cookie = setSessionCookie({

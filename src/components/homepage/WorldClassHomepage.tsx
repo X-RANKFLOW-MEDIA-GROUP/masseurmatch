@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import { ScrambleText } from "@/components/animations/ScrambleText";
 import { TextReveal } from "@/components/animations/TextReveal";
+import { useGeolocation } from "@/hooks/useGeolocation";
 import "./world-class.css";
 
 /* ─── Types ─── */
@@ -259,7 +260,7 @@ function therapistBadge(t: PublicTherapist) {
 
 function therapistPrice(t: PublicTherapist) {
   const price = t.incall_price || t.outcall_price;
-  return price ? `$${price}` : "Contact";
+  return price ? `starts at $${price}` : "Contact for pricing";
 }
 
 /* ─── Sub-components ─── */
@@ -347,6 +348,10 @@ export function WorldClassHomepage({
 
   const nbhdScrollRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  /* --- Geolocation --- */
+  const { city: geoCity, loading: geoLoading, requestLocation } = useGeolocation({ autoLocate: false });
+  const locationLabel = geoCity ? `${geoCity.name}, ${geoCity.stateCode}` : "Find my location";
 
   /* --- Knotty chat simulation --- */
   const [knottyMessages, setKnottyMessages] = useState<{ id: string; role: "assistant" | "user"; text: string }[]>([]);
@@ -472,9 +477,13 @@ export function WorldClassHomepage({
   const doSearch = useCallback(() => {
     const q = searchValue.trim();
     if (q) {
-      router.push(`/search?keyword=${encodeURIComponent(q)}`);
+      const params = new URLSearchParams({ keyword: q });
+      if (geoCity) {
+        params.set("city", geoCity.name);
+      }
+      router.push(`/search?${params.toString()}`);
     }
-  }, [searchValue, router]);
+  }, [searchValue, router, geoCity]);
 
   const quickSearch = useCallback(
     (tag: string) => {
@@ -507,27 +516,37 @@ export function WorldClassHomepage({
         <div className="wc-hero-split">
           {/* LEFT — content */}
           <div className="wc-hero-content wc-hero-left">
-            <div className="wc-geo-bar">
-              <span className="wc-geo-dot" />
-              <span>Detect my location — find therapists nearby</span>
-            </div>
+            <button
+              type="button"
+              className="wc-geo-bar"
+              onClick={() => void requestLocation(true)}
+              disabled={geoLoading}
+            >
+              <span className={`wc-geo-dot ${geoCity ? "wc-geo-dot-active" : ""}`} />
+              <span>
+                {geoLoading
+                  ? "Detecting location..."
+                  : geoCity
+                    ? `Located: ${geoCity.name}, ${geoCity.stateCode}`
+                    : "Detect my location — find therapists nearby"}
+              </span>
+            </button>
 
             <h1 className="wc-hero-h1">
               <span className="wc-hero-line">
-                <TextReveal text="Find your" delay={0.04} />
+                <TextReveal text="Find your" delay={0.04} />{" "}
                 <span className="wc-hero-accent">
                   <TextReveal text="perfect" delay={0.14} />
                 </span>
               </span>
               <span className="wc-sub-line">
-                <TextReveal text="gay-affirming therapist" delay={0.24} />
+                <TextReveal text="gay-affirming massage" delay={0.24} />
               </span>
             </h1>
 
             <p className="wc-hero-p">
-              The <strong>LGBTQ+-inclusive</strong> directory built for precision:
-              <strong> verified credentials</strong>, visible starting rates, and neighborhood-level coverage
-              — from Oak Lawn to Montrose to South Congress.
+              The premier LGBTQ+-inclusive directory with verified credentials, 
+              transparent pricing, and neighborhood-level coverage across major cities.
             </p>
 
             <div className="wc-search-wrap">
@@ -554,10 +573,14 @@ export function WorldClassHomepage({
                   }}
                 />
                 <div className="wc-s-sep" />
-                <div className="wc-s-loc">
+                <button
+                  type="button"
+                  className="wc-s-loc"
+                  onClick={() => void requestLocation(true)}
+                >
                   <LocationPinIcon />
-                  <span>Dallas, TX</span>
-                </div>
+                  <span>{geoLoading ? "Locating..." : locationLabel}</span>
+                </button>
                 <button
                   type="button"
                   className="wc-btn-search"
@@ -849,13 +872,14 @@ export function WorldClassHomepage({
                 className={`wc-tc wc-cr2 wc-d${(i % 3) + 1}`}
               >
                 <div className="wc-tc-img">
-                  {t.avatar_url ? (
+                  {t.avatar_url && t.avatar_url.startsWith("http") ? (
                     <Image
                       src={t.avatar_url}
                       alt={therapistName(t)}
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, 33vw"
+                      unoptimized={t.avatar_url.includes("supabase")}
                     />
                   ) : (
                     <div className={`wc-tc-bg ${GRADIENTS[i % 3]}`}>
@@ -871,12 +895,9 @@ export function WorldClassHomepage({
                     <LocationPinIcon />
                     <span>{therapistLocation(t)}</span>
                   </div>
-                  <div className="wc-tc-tags">
-                    {(t.specialties || []).slice(0, 3).map((s) => (
-                      <span key={s} className="wc-tc-tag">
-                        {s}
-                      </span>
-                    ))}
+                  <div className="wc-tc-view-profile">
+                    <span>View Profile</span>
+                    <ArrowRightIcon size={14} />
                   </div>
                   <div className="wc-tc-foot">
                     <div className="wc-tc-rating">
@@ -884,7 +905,6 @@ export function WorldClassHomepage({
                     </div>
                     <div className="wc-tc-price">
                       {therapistPrice(t)}
-                      <small>/hr</small>
                     </div>
                   </div>
                 </div>

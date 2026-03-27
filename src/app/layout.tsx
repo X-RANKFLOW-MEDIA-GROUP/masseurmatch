@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { Inter, Playfair_Display, DM_Sans } from "next/font/google";
 import { AppMotionShell } from "@/app/_components/app-motion-shell";
 import { JsonLd } from "@/app/_components/json-ld";
 import { SiteFooter } from "@/app/_components/site-footer";
@@ -11,26 +11,26 @@ import { SITE_URL } from "@/lib/site";
 import "leaflet/dist/leaflet.css";
 import "@/index.css";
 
-const fontSans = Inter({
+const fontSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-dm-sans",
   weight: ["300", "400", "500", "600", "700"],
   display: "swap",
   preload: true,
 });
 
-const fontDisplay = Space_Grotesk({
+const fontSerif = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-space",
+  variable: "--font-playfair",
   weight: ["400", "500", "600", "700"],
   display: "swap",
   preload: true,
 });
 
-const fontMono = JetBrains_Mono({
+const fontBody = Inter({
   subsets: ["latin"],
-  variable: "--font-mono",
-  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-inter",
+  weight: ["300", "400", "500", "600"],
   display: "swap",
   preload: true,
 });
@@ -58,7 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body
-        className={`${fontSans.variable} ${fontDisplay.variable} ${fontMono.variable} theme-masseurmatch noise-bg min-h-screen overflow-x-hidden font-sans text-foreground`}
+        className={`${fontSans.variable} ${fontSerif.variable} ${fontBody.variable} theme-masseurmatch min-h-screen overflow-x-hidden font-sans text-foreground antialiased`}
       >
         <AppProviders>
           <JsonLd data={buildOrganizationJsonLd()} />

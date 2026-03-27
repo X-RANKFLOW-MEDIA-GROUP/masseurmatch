@@ -94,6 +94,19 @@ const nextConfig = {
   async redirects() {
     return LEGACY_REDIRECTS;
   },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: "frame-src 'self' http://localhost:* https://*.vusercontent.net/ https://*.lite.vusercontent.net/ https://generated.vusercontent.net/ https://*.vercel.run/ https://*.vercel.app/ https://*.vercel.sh/ https://vercel.live/ https://vercel.com https://vercel.fides-cdn.ethyca.com/ https://js.stripe.com/ https://*.accounts.dev https://*.clerk.accounts.dev https://ops.askchapter.org https://*.supabase.co/; connect-src 'self' https://*.supabase.co;",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

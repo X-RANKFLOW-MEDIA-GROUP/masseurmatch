@@ -8,7 +8,6 @@ export async function POST(request: Request) {
   try {
     const body = await parseJsonBody(request, authRegisterSchema);
 
-    // Check if user already exists before attempting to create
     const existingUser = await getUserByEmail(body.email);
     if (existingUser) {
       return json(
