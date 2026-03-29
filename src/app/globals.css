@@ -5,11 +5,11 @@
   --navy3:  #1a3560;
   --orange: #FF8A1F;
   --orange2:#e67a10;
-  --blue:   #1E4B8F;
-  --cream:  #FCFBF8;
-  --cream2: #F0EEE8;
-  --muted:  rgba(252,251,248,0.5);
-  --line:   rgba(252,251,248,0.08);
+  --blue:   #2B5182;
+  --cream:  #F3F3F7;
+  --cream2: #E2E4EE;
+  --muted:  rgba(243,243,247,0.5);
+  --line:   rgba(243,243,247,0.08);
 }
 
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
