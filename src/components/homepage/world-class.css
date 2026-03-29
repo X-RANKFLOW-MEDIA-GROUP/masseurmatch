@@ -754,78 +754,41 @@
   text-decoration: none;
 }
 .wc-more-link:hover { gap: 16px; color: var(--a0) }
-.wc-spec-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 14px;
+.wc-spec-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid rgba(11,31,58,.08);
 }
-
-/* 3D tilt card */
-.wc-tilt-card { perspective: 800px; cursor: pointer }
-.wc-tilt-inner {
-  background: var(--c0);
-  border: 1px solid rgba(11,31,58,.08);
-  border-radius: 20px;
-  padding: 32px 26px 28px;
-  position: relative;
-  overflow: hidden;
-  transform-style: preserve-3d;
-  transition: box-shadow .4s var(--ease), transform .15s var(--ease2);
-  will-change: transform;
-}
-.wc-tilt-inner::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 20px;
-  background: linear-gradient(135deg, rgba(255,255,255,.35) 0%, transparent 50%, rgba(0,0,0,.04) 100%);
-  opacity: 0;
-  transition: opacity .4s;
-  pointer-events: none;
-}
-.wc-tilt-card:hover .wc-tilt-inner {
-  box-shadow: 0 32px 64px rgba(11,31,58,.14);
-}
-.wc-tilt-card:hover .wc-tilt-inner::after { opacity: 1 }
-.wc-spec-bot-bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--a0);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform .35s var(--ease);
-}
-.wc-tilt-card:hover .wc-spec-bot-bar { transform: scaleX(1) }
-.wc-spec-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: rgba(11,31,58,.06);
+.wc-spec-list-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  transition: background .28s;
+  justify-content: space-between;
+  padding: 22px 8px;
+  border-bottom: 1px solid rgba(11,31,58,.08);
+  text-decoration: none;
+  transition: background .2s, padding-left .25s var(--ease);
 }
-.wc-spec-icon svg { width: 24px; height: 24px; color: var(--n4); transition: color .28s }
-.wc-tilt-card:hover .wc-spec-icon { background: rgba(255,138,31,.1) }
-.wc-tilt-card:hover .wc-spec-icon svg { color: var(--a0) }
+.wc-spec-list-item:hover {
+  background: rgba(11,31,58,.03);
+  padding-left: 18px;
+}
 .wc-spec-nm {
   font-family: var(--wc-serif);
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 500;
   letter-spacing: -.03em;
   color: var(--n1);
-  margin-bottom: 5px;
 }
 .wc-spec-ct {
   font-family: var(--wc-sans);
   font-size: 13px;
-  font-weight: 300;
+  font-weight: 400;
   color: #64748b;
+  letter-spacing: .02em;
 }
 
 /* ══════════════════════════════════════
@@ -1913,21 +1876,8 @@
     left: 10px;
   }
 
-  /* Specialty cards */
-  .wc-tilt-inner {
-    padding: 20px 16px 18px;
-  }
-  .wc-spec-icon {
-    width: 42px;
-    height: 42px;
-    margin-bottom: 14px;
-  }
-  .wc-spec-icon svg {
-    width: 20px;
-    height: 20px;
-  }
   .wc-spec-nm {
-    font-size: 15px;
+    font-size: 16px;
   }
   .wc-spec-ct {
     font-size: 11px;
@@ -2012,13 +1962,6 @@
   }
 }
 
-/* Specialty grid responsive */
-@media (max-width: 600px) {
-  .wc-spec-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-}
 
 /* Therapist section padding */
 @media (max-width: 768px) {

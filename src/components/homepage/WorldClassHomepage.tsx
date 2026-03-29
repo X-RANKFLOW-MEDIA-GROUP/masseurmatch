@@ -14,7 +14,6 @@ import "./world-class.css";
 type Specialty = {
   name: string;
   count: string;
-  icon: React.ReactNode;
 };
 
 type Neighborhood = {
@@ -76,47 +75,10 @@ const TICKER_ITEMS: TickerItem[] = [
 ];
 
 const SPECIALTIES: Specialty[] = [
-  {
-    name: "Deep Tissue",
-    count: "348 therapists",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <path d="M9 12c1.5 2 4.5 2 6 0" />
-        <path d="M8 8c0-2 2-3 4-3s4 1 4 3" />
-        <path d="M5 20c0-3 3-5 7-5s7 2 7 5" />
-      </svg>
-    ),
-  },
-  {
-    name: "Swedish Massage",
-    count: "512 therapists",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <circle cx="12" cy="8" r="5" />
-        <path d="M5.8 16.5c.4-2.5 3-4.5 6.2-4.5s5.8 2 6.2 4.5" />
-        <path d="M2 20h20" />
-      </svg>
-    ),
-  },
-  {
-    name: "Sports Recovery",
-    count: "189 therapists",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-      </svg>
-    ),
-  },
-  {
-    name: "Hot Stone Therapy",
-    count: "156 therapists",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <circle cx="12" cy="12" r="3" />
-        <path d="M12 5V3M12 21v-2M5 12H3M21 12h-2M7.05 7.05L5.64 5.64M18.36 18.36l-1.41-1.41M7.05 16.95l-1.41 1.41M18.36 5.64l-1.41 1.41" />
-      </svg>
-    ),
-  },
+  { name: "Deep Tissue", count: "348 therapists" },
+  { name: "Swedish Massage", count: "512 therapists" },
+  { name: "Sports Recovery", count: "189 therapists" },
+  { name: "Hot Stone Therapy", count: "156 therapists" },
 ];
 
 const MAJOR_CITIES = [
@@ -422,34 +384,6 @@ export function WorldClassHomepage({
     };
   }, []);
 
-  /* --- Tilt cards --- */
-  useEffect(() => {
-    const cards = document.querySelectorAll<HTMLElement>(".wc-tilt-card");
-    const handlers: Array<{ el: HTMLElement; move: (e: MouseEvent) => void; leave: () => void }> =
-      [];
-    cards.forEach((card) => {
-      const inner = card.querySelector<HTMLElement>(".wc-tilt-inner");
-      if (!inner) return;
-      const move = (e: MouseEvent) => {
-        const r = card.getBoundingClientRect();
-        const x = ((e.clientX - r.left) / r.width - 0.5) * 18;
-        const y = ((e.clientY - r.top) / r.height - 0.5) * -18;
-        inner.style.transform = `perspective(800px) rotateY(${x}deg) rotateX(${y}deg) scale(1.02)`;
-      };
-      const leave = () => {
-        inner.style.transform = "perspective(800px) rotateY(0) rotateX(0) scale(1)";
-      };
-      card.addEventListener("mousemove", move);
-      card.addEventListener("mouseleave", leave);
-      handlers.push({ el: card, move, leave });
-    });
-    return () => {
-      handlers.forEach(({ el, move, leave }) => {
-        el.removeEventListener("mousemove", move);
-        el.removeEventListener("mouseleave", leave);
-      });
-    };
-  }, []);
 
   /* --- Handlers --- */
   const doSearch = useCallback(() => {
@@ -765,22 +699,19 @@ export function WorldClassHomepage({
               All specialties <ArrowRightIcon />
             </Link>
           </div>
-          <div className="wc-spec-grid">
+          <ul className="wc-spec-list">
             {SPECIALTIES.map((spec, i) => (
-              <Link
-                key={spec.name}
-                href={`/search?keyword=${encodeURIComponent(spec.name)}`}
-                className={`wc-tilt-card wc-cr2 wc-d${(i % 4) + 1}`}
-              >
-                <div className="wc-tilt-inner">
-                  <div className="wc-spec-bot-bar" />
-                  <div className="wc-spec-icon">{spec.icon}</div>
-                  <div className="wc-spec-nm">{spec.name}</div>
-                  <div className="wc-spec-ct">{spec.count}</div>
-                </div>
-              </Link>
+              <li key={spec.name} className={`wc-cr2 wc-d${(i % 4) + 1}`}>
+                <Link
+                  href={`/search?keyword=${encodeURIComponent(spec.name)}`}
+                  className="wc-spec-list-item"
+                >
+                  <span className="wc-spec-nm">{spec.name}</span>
+                  <span className="wc-spec-ct">{spec.count}</span>
+                </Link>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
 
