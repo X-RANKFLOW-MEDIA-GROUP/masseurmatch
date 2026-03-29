@@ -38,7 +38,7 @@ export function KnottyIntroBanner() {
 
     try {
       if (localStorage.getItem(STORAGE_KEY)) return;
-    } catch {
+    } catch (_) {
       return;
     }
 
