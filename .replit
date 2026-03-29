@@ -39,5 +39,5 @@ timeoutMs = 120000
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["bash", "-c", "pnpm run start"]
-build = ["bash", "-c", "pnpm run build"]
+run = ["npm", "run", "start"]
+build = ["npm", "run", "build"]
