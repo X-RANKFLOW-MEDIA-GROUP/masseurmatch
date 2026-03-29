@@ -524,8 +524,8 @@ export function WorldClassHomepage({
 
             <p className="wc-hero-p">
               {geoCity
-                ? `Find verified, LGBTQ+-affirming massage therapists near you in ${geoCity.name}, ${geoCity.stateCode}. Browse profiles, compare pricing, and connect directly.`
-                : "The premier LGBTQ+-inclusive directory with verified credentials, transparent pricing, and neighborhood-level coverage across major cities."}
+                ? `Find LGBTQ+-affirming massage therapists near you in ${geoCity.name}, ${geoCity.stateCode}. Browse profiles, compare pricing, and connect directly.`
+                : "The premier LGBTQ+-inclusive directory with transparent pricing, real availability, and neighborhood-level coverage across major cities."}
             </p>
 
             <div className="wc-search-wrap">

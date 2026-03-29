@@ -28,10 +28,10 @@ const DEMO_PROFILES: Record<string, any> = {
     state: 'Texas',
     neighborhood_name: 'Oak Lawn',
     primary_area: 'Uptown Dallas',
-    bio: 'Professional licensed massage therapist with 8 years of experience specializing in deep tissue and therapeutic massage. I create a welcoming, judgment-free environment for all clients. My approach combines traditional Swedish techniques with targeted deep tissue work to address your specific needs, whether that\'s stress relief, muscle recovery, or chronic pain management.',
+    bio: 'Professional massage therapist with 8 years of experience specializing in deep tissue and therapeutic massage. I create a welcoming, judgment-free environment for all clients. My approach combines traditional Swedish techniques with targeted deep tissue work to address your specific needs, whether that\'s stress relief, muscle recovery, or chronic pain management.',
     avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop&crop=face',
     photo_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop&crop=face',
-    modality: 'Licensed Massage Therapist',
+    modality: 'Massage Therapist',
     specialties: ['Deep Tissue', 'Swedish', 'Sports Massage', 'Therapeutic'],
     languages: ['English', 'Spanish'],
     contact_email: 'bruno@masseurmatch.com',
@@ -45,7 +45,7 @@ const DEMO_PROFILES: Record<string, any> = {
     inclusive: true,
     available_now: true,
     is_verified_identity: true,
-    is_verified_profile: true,
+    is_verified_profile: false,
     _tier: 'pro',
     travel_schedule: [
       { city: 'Austin', start_date: '2026-04-01', end_date: '2026-04-04' },
@@ -118,14 +118,14 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const topTechnique = profile.specialties?.[0] || profile.modality || "Massage";
   const yearsExp =
     profile.years_experience ?? (profile.start_year ? new Date().getFullYear() - profile.start_year : null);
-  const verified = profile.is_verified_identity || profile.is_verified_profile;
+  const verified = profile.is_verified_identity;
   const priceFrom = [profile.incall_price, profile.outcall_price]
     .filter((p): p is number => typeof p === "number" && p > 0)
     .sort((a, b) => a - b)[0];
 
   const titleParts = [
     name,
-    [verified ? "Verified" : null, topTechnique, "Therapist"].filter(Boolean).join(" "),
+    [verified ? "ID Verified" : null, topTechnique, "Therapist"].filter(Boolean).join(" "),
     [neighborhood, city].filter(Boolean).join(", "),
   ]
     .filter(Boolean)
@@ -157,7 +157,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       ...(profile.specialties || []),
       "massage therapist",
       "male massage therapist",
-      "verified massage therapist",
+      "massage therapist near me",
       neighborhood ? `massage ${neighborhood}` : null,
       profile.city ? `gay massage ${profile.city}` : null,
       profile.city ? `LGBTQ massage ${profile.city}` : null,

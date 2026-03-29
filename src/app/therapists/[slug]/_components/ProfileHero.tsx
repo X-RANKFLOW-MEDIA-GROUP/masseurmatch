@@ -19,7 +19,6 @@ import {
   getPublicContactLinks,
   getPublicProfileName,
   getPublicTrustHighlights,
-  isVerifiedDirectoryProfile,
 } from "@/app/_lib/public-profile";
 import { buildPhysicalProfileSummary } from "@/lib/physical-profile";
 import { useKnottyProfileAttribution } from "./useKnottyProfileAttribution";
@@ -103,10 +102,10 @@ export function ProfileHero({ profile, cityPath }: Props) {
               <Sparkles className="h-4 w-4" />
               {tierLabel} profile
             </span>
-            {isVerifiedDirectoryProfile(profile) ? (
+            {profile.is_verified_identity ? (
               <span className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/8 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/84 backdrop-blur">
                 <BadgeCheck className="h-4 w-4" />
-                Verified listing
+                ID Verified
               </span>
             ) : null}
           </div>

@@ -30,7 +30,7 @@ export function PremiumProfileHero({ profile, reviews = [] }: Props) {
   const validPrices = [profile.incall_price, profile.outcall_price].filter((p): p is number => typeof p === "number" && p > 0);
   const startingRate = validPrices.length > 0 ? Math.min(...validPrices) : 120;
   const outcallRadius = profile.outcall_radius_miles || 10;
-  const isVerified = profile.is_verified_identity || profile.is_verified_profile;
+  const isVerified = profile.is_verified_identity;
   const phoneFormatted = profile.phone
     ? profile.phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3")
     : null;
@@ -57,7 +57,7 @@ export function PremiumProfileHero({ profile, reviews = [] }: Props) {
             </div>
           )}
           {isVerified && (
-            <div className="pp-verified-badge">✓ Verified</div>
+            <div className="pp-verified-badge">✓ ID Verified</div>
           )}
         </div>
 
@@ -70,7 +70,7 @@ export function PremiumProfileHero({ profile, reviews = [] }: Props) {
               <span className="pp-ptag pp-ptag-mobile">📍 {profile.incall_price ? "In-Studio + Mobile" : "Mobile"}</span>
             )}
             {isVerified && (
-              <span className="pp-ptag pp-ptag-verified">Verified</span>
+              <span className="pp-ptag pp-ptag-verified">ID Verified</span>
             )}
           </div>
 
@@ -78,7 +78,7 @@ export function PremiumProfileHero({ profile, reviews = [] }: Props) {
             Massage<br /><em>by {firstName}</em>
           </h1>
           <div className="pp-hero-subtitle pp-anim-2">
-            {profile.modality || "Licensed Massage Therapist"} · {city}
+            {profile.modality || "Massage Therapist"} · {city}
             {neighborhood ? ` · ${neighborhood}` : ""}
           </div>
 
@@ -87,7 +87,7 @@ export function PremiumProfileHero({ profile, reviews = [] }: Props) {
               <span key={i} className="pp-star">{s}</span>
             ))}
             <span className="pp-review-count">
-              {reviews.length > 0 ? `${reviews.length} verified reviews` : "New listing"}
+              {reviews.length > 0 ? `${reviews.length} reviews` : "New listing"}
             </span>
           </div>
 

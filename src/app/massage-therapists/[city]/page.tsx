@@ -60,7 +60,7 @@ const CITIES: Record<string, CityData> = {
     ],
     modalities: ["Swedish Massage", "Deep Tissue", "Sports Massage", "Hot Stone", "Prenatal Massage", "Trigger Point Therapy", "Thai Massage", "Lymphatic Drainage"],
     seoBlurb:
-      "Dallas is home to one of the most vibrant LGBTQ+ communities in the South, centered around Oak Lawn and the Cedar Springs strip. MasseurMatch connects Dallas-area clients with licensed massage therapists who understand the importance of a judgment-free, affirming environment — whether you're in Uptown, Deep Ellum, or anywhere across the Metroplex.",
+      "Dallas is home to one of the most vibrant LGBTQ+ communities in the South, centered around Oak Lawn and the Cedar Springs strip. MasseurMatch connects Dallas-area clients with massage therapists who understand the importance of a judgment-free, affirming environment — whether you're in Uptown, Deep Ellum, or anywhere across the Metroplex.",
     therapistCount: 87,
   },
   "houston-tx": {
@@ -78,7 +78,7 @@ const CITIES: Record<string, CityData> = {
     ],
     modalities: ["Swedish Massage", "Deep Tissue", "Sports Massage", "Prenatal Massage", "Cupping Therapy", "Myofascial Release", "Hot Stone", "Shiatsu"],
     seoBlurb:
-      "Houston's Montrose neighborhood is the cultural heart of the city's LGBTQ+ community — one of the largest and most established in Texas. MasseurMatch connects Houston clients with licensed massage therapists committed to inclusive, affirming care across all of Houston's diverse neighborhoods.",
+      "Houston's Montrose neighborhood is the cultural heart of the city's LGBTQ+ community — one of the largest and most established in Texas. MasseurMatch connects Houston clients with massage therapists committed to inclusive, affirming care across all of Houston's diverse neighborhoods.",
     therapistCount: 112,
   },
   "austin-tx": {
@@ -96,7 +96,7 @@ const CITIES: Record<string, CityData> = {
     ],
     modalities: ["Swedish Massage", "Deep Tissue", "Sports Massage", "Prenatal Massage", "Ashiatsu", "Hot Stone", "Trigger Point Therapy", "Reflexology"],
     seoBlurb:
-      "Austin has long been known for its progressive culture and welcoming LGBTQ+ community. From East Austin studios to South Congress wellness centers, MasseurMatch helps Austin clients find massage therapists who match their values — inclusive, professional, and fully licensed.",
+      "Austin has long been known for its progressive culture and welcoming LGBTQ+ community. From East Austin studios to South Congress wellness centers, MasseurMatch helps Austin clients find massage therapists who match their values — inclusive, professional, and welcoming.",
     therapistCount: 64,
   },
   "new-york-ny": {
@@ -132,7 +132,7 @@ const CITIES: Record<string, CityData> = {
     ],
     modalities: ["Swedish Massage", "Deep Tissue", "Sports Massage", "Thai Massage", "Prenatal Massage", "CBD Massage", "Hot Stone", "Reflexology"],
     seoBlurb:
-      "Los Angeles — especially West Hollywood and Silver Lake — is one of the most LGBTQ+-affirming cities in the world. MasseurMatch connects LA clients with licensed massage therapists across the Basin who bring genuine inclusivity, not just lip service.",
+      "Los Angeles — especially West Hollywood and Silver Lake — is one of the most LGBTQ+-affirming cities in the world. MasseurMatch connects LA clients with massage therapists across the Basin who bring genuine inclusivity, not just lip service.",
     therapistCount: 198,
   },
 };
@@ -176,10 +176,10 @@ export async function generateMetadata({
 
   return {
     title: `LGBTQ+-Inclusive Massage Therapists in ${city.displayName} | MasseurMatch`,
-    description: `Find verified, LGBTQ+-affirming massage therapists in ${city.displayName}. Browse ${city.therapistCount}+ licensed professionals offering Swedish, deep tissue, sports massage, and more.`,
+    description: `Find LGBTQ+-affirming massage therapists in ${city.displayName}. Browse ${city.therapistCount}+ professionals offering Swedish, deep tissue, sports massage, and more.`,
     openGraph: {
       title: `Massage Therapists in ${city.displayName} | MasseurMatch`,
-      description: `${city.therapistCount}+ verified, LGBTQ+-inclusive massage therapists in ${city.displayName}.`,
+      description: `${city.therapistCount}+ LGBTQ+-inclusive massage therapists in ${city.displayName}.`,
       url: `https://masseurmatch.com/massage-therapists/${city.slug}`,
       siteName: "MasseurMatch",
       type: "website",
@@ -350,13 +350,13 @@ export default async function CityHubPage({ params }: { params: Promise<{ city: 
 
           <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative" }}>
             <p style={{ fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "#FF8A1F", marginBottom: 16, fontFamily: "system-ui, sans-serif" }}>
-              {city.stateCode} · {city.therapistCount}+ Verified Therapists
+              {city.stateCode} · {city.therapistCount}+ Therapists
             </p>
             <h1 style={{ fontSize: "clamp(30px, 5.5vw, 58px)", fontWeight: 400, lineHeight: 1.1, marginBottom: 20, maxWidth: 680 }}>
               LGBTQ+-Inclusive Massage Therapists in {city.displayName}
             </h1>
             <p style={{ fontSize: 17, lineHeight: 1.7, opacity: 0.65, fontFamily: "system-ui, sans-serif", fontWeight: 300, maxWidth: 540, marginBottom: 36 }}>
-              Verified, licensed professionals committed to inclusive, affirming care — across every neighborhood in {city.name}.
+              Professional massage therapists committed to inclusive, affirming care — across every neighborhood in {city.name}.
             </p>
 
             {/* Inline search */}
@@ -384,7 +384,7 @@ export default async function CityHubPage({ params }: { params: Promise<{ city: 
               { value: `${city.therapistCount}+`, label: "Active Therapists" },
               { value: city.neighborhoods.length.toString(), label: "Neighborhoods Covered" },
               { value: city.modalities.length.toString(), label: "Modalities Available" },
-              { value: "100%", label: "License Verified" },
+              { value: "100%", label: "Direct Contact" },
             ].map((s) => (
               <div key={s.label} style={{ textAlign: "center" }}>
                 <div style={{ fontSize: 28, fontWeight: 700, color: "#FF8A1F", fontFamily: "system-ui, sans-serif" }}>{s.value}</div>
@@ -422,10 +422,10 @@ export default async function CityHubPage({ params }: { params: Promise<{ city: 
                 {city.seoBlurb}
               </p>
               <p style={{ fontSize: 16, lineHeight: 1.85, color: "#374151", fontFamily: "system-ui, sans-serif", marginBottom: 20 }}>
-                All therapists listed on MasseurMatch in {city.displayName} are manually verified against the {city.stateName} massage therapy licensing board. Our review process checks license status, confirms identity, and ensures each professional meets our LGBTQ+-Inclusive Practice Standards before their profile goes live.
+                MasseurMatch is a directory platform — we do not verify licenses or credentials. Therapists self-report their qualifications. We encourage clients to independently confirm any practitioner's credentials before booking. Our platform prioritizes transparency, direct contact, and LGBTQ+-inclusive care standards.
               </p>
               <p style={{ fontSize: 16, lineHeight: 1.85, color: "#374151", fontFamily: "system-ui, sans-serif" }}>
-                Whether you're looking for deep tissue work after a long week, prenatal massage support, or a Swedish session purely for relaxation — MasseurMatch makes it easy to find the right licensed therapist in {city.name} with the profile detail you need to choose confidently.
+                Whether you're looking for deep tissue work after a long week, prenatal massage support, or a Swedish session purely for relaxation — MasseurMatch makes it easy to find the right therapist in {city.name} with the profile detail you need to choose confidently.
               </p>
             </section>
 
@@ -472,8 +472,8 @@ export default async function CityHubPage({ params }: { params: Promise<{ city: 
               </h2>
               {[
                 {
-                  q: `Are all massage therapists in ${city.displayName} on MasseurMatch licensed?`,
-                  a: `Yes. Every therapist listed on MasseurMatch in ${city.displayName} holds a valid ${city.stateName} massage therapy license, manually verified before their profile is activated.`,
+                  q: `Does MasseurMatch verify therapist licenses in ${city.displayName}?`,
+                  a: `No. MasseurMatch is a directory — we do not verify licenses or credentials. Therapists self-report their qualifications. We recommend clients independently verify any practitioner's credentials before booking.`,
                 },
                 {
                   q: `Is MasseurMatch free to use in ${city.name}?`,

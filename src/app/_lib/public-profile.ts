@@ -4,13 +4,12 @@ export function getPublicProfileName(profile: Pick<PublicTherapist, "display_nam
   return profile.display_name || profile.full_name || "Therapist";
 }
 
-export function isVerifiedDirectoryProfile(profile: Pick<PublicTherapist, "_tier" | "is_verified_identity" | "is_verified_profile">) {
+export function isVerifiedDirectoryProfile(profile: Pick<PublicTherapist, "_tier" | "is_verified_identity">) {
   return (
     profile._tier === "standard" ||
     profile._tier === "pro" ||
     profile._tier === "elite" ||
-    Boolean(profile.is_verified_identity) ||
-    Boolean(profile.is_verified_profile)
+    Boolean(profile.is_verified_identity)
   );
 }
 

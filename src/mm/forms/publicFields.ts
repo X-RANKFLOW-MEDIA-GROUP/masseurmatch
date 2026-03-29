@@ -53,7 +53,6 @@ export const MASSAGE_THERAPIST_PUBLIC_FIELDS = [
   'cover_photo',
   'video_intro',
   'tier',
-  'is_verified_profile',
   'lgbtq_friendly',
   'visiting_soon',
   'top_rated',

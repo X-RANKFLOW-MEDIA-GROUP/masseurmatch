@@ -131,7 +131,7 @@ export function PremiumProfileSidebar({ profile }: Props) {
       )}
 
       <div className="pp-info-card pp-anim-4">
-        <div className="pp-info-card-title">Credentials</div>
+        <div className="pp-info-card-title">Training & Experience</div>
         {profile.education && (
           <div className="pp-info-row">
             <span className="pp-info-icon">🎓</span>
@@ -155,8 +155,8 @@ export function PremiumProfileSidebar({ profile }: Props) {
             <div className="pp-info-row">
               <span className="pp-info-icon">🏅</span>
               <div className="pp-info-text">
-                <strong>Licensed Massage Therapist</strong>
-                {profile.modality || "Professional Certification"}
+                <strong>Massage Therapist</strong>
+                {profile.modality || "Professional Training"}
               </div>
             </div>
             {profile.years_experience && (

@@ -128,7 +128,7 @@ function MasseurProfile() {
               <span className="ptag ptag-namt">NAMT Member</span>
             </div>
             <h1 className="anim-2">Massage<br /><em>by Bruno</em></h1>
-            <div className="subtitle anim-2">Licensed Massage Therapist · Dallas, TX · Oak Lawn & Uptown</div>
+            <div className="subtitle anim-2">Massage Therapist · Dallas, TX · Oak Lawn & Uptown</div>
             <div className="stars anim-3">
               {Array(5).fill(0).map((_, i) => <span key={i} className="star">★</span>)}
               <span className="review-count">12 verified reviews</span>

@@ -183,7 +183,7 @@ function buildWelcomeHtml(name: string): string {
           <ol style="padding-left:20px;font-size:14px;line-height:1.8">
             <li><strong>Complete your profile</strong> — Add photos, bio, and services</li>
             <li><strong>Set your availability</strong> — Let clients know when you're available</li>
-            <li><strong>Get verified</strong> — Build trust with identity verification</li>
+            <li><strong>Add your details</strong> — Build trust with a complete profile</li>
             <li><strong>Choose a plan</strong> — Boost visibility with a paid plan</li>
           </ol>
         </td></tr>

@@ -8,7 +8,7 @@ export function StepTrust({ values, onChange }: {
 }) {
   return (
     <div className="space-y-4">
-      {['tier', 'is_verified_profile', 'lgbtq_friendly', 'visiting_soon', 'top_rated'].map((field) => {
+      {['tier', 'lgbtq_friendly', 'visiting_soon', 'top_rated'].map((field) => {
         const def = MASSAGE_THERAPIST_FIELDS[field];
         if (!def) return null;
         if (def.type === 'select') {

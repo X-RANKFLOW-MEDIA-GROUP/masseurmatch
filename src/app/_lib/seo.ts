@@ -4,7 +4,7 @@ import { SITE_URL, siteUrl } from "@/lib/site";
 export const SITE_NAME = "MasseurMatch";
 export const SITE_TAGLINE = "The safest and most trusted premium male massage directory for direct connection";
 export const SITE_DESCRIPTION =
-  "Find verified male massage therapists in major US cities, compare trust signals and specialties, and connect directly through a safer premium directory.";
+  "Find male massage therapists in major US cities, compare trust signals and specialties, and connect directly through a safer premium directory.";
 export const DEFAULT_SOCIAL_HANDLE = "@masseurmatch";
 export const appUrl = SITE_URL;
 
@@ -12,7 +12,7 @@ export const DEFAULT_KEYWORDS = [
   "massage therapists",
   "massage therapist directory",
   "male massage therapist",
-  "verified male massage therapist",
+  "massage therapist near me",
   "gay massage directory",
   "massage near me",
   "trusted male massage directory",
@@ -458,7 +458,7 @@ export const buildLocalBusinessJsonLd = ({
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   name: `${SITE_NAME} — ${cityName}`,
-  description: `Browse ${therapistCount} verified male massage therapists in ${cityName}, ${stateName}. Transparent pricing, real availability, and direct contact.`,
+  description: `Browse ${therapistCount} male massage therapists in ${cityName}, ${stateName}. Transparent pricing, real availability, and direct contact.`,
   url: siteUrl(path),
   address: {
     "@type": "PostalAddress",

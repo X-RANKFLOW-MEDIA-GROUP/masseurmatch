@@ -6,7 +6,7 @@ const TRUST_ITEMS = [
     icon: ShieldCheck,
     label: "Verified Profiles",
     stat: "100%",
-    desc: "Identity & credential verified",
+    desc: "Identity verified",
     color: "text-blue-500",
     bg: "bg-blue-500/8",
     border: "border-blue-500/15",

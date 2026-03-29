@@ -121,7 +121,6 @@ export const MASSAGE_THERAPIST_ONBOARDING_STEPS = [
     label: 'Profile Visibility',
     fields: [
       'tier',
-      'is_verified_profile',
       'lgbtq_friendly',
       'visiting_soon',
       'top_rated',
