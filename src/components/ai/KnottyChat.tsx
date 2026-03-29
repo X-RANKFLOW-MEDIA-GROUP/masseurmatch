@@ -177,6 +177,16 @@ export const KnottyChat = ({
     }
   }, [isEmbedded, trackOpen]);
 
+  useEffect(() => {
+    if (isEmbedded) return;
+    const handler = () => {
+      setIsOpen(true);
+      trackOpen();
+    };
+    window.addEventListener("knotty:open", handler);
+    return () => window.removeEventListener("knotty:open", handler);
+  }, [isEmbedded, trackOpen]);
+
   const quickActionButtons = quickActions.map((action) => (
     <button
       key={action.key}

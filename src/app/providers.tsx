@@ -17,6 +17,13 @@ const ChatWidget = dynamic(
   },
 );
 
+const KnottyIntroBanner = dynamic(
+  () => import("@/app/_components/knotty-intro-banner").then((module) => module.KnottyIntroBanner),
+  {
+    ssr: false,
+  },
+);
+
 export function AppProviders({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
 
@@ -29,6 +36,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
             <Toaster />
             <Sonner />
             <ChatWidget />
+            <KnottyIntroBanner />
           </TooltipProvider>
         </AuthProvider>
       </I18nProvider>
