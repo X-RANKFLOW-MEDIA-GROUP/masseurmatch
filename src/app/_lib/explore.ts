@@ -333,7 +333,7 @@ function isProviderAvailableNow(profile: PublicTherapist) {
 
 function deriveTrustSignals(profile: PublicTherapist, yearsExperience: number | null) {
   const signals = [
-    isVerifiedDirectoryProfile(profile) ? "Verified" : null,
+    isVerifiedDirectoryProfile(profile) ? "ID Verified" : null,
     isProviderAvailableNow(profile) ? "Available now" : null,
     typeof yearsExperience === "number" ? `${yearsExperience} years` : null,
     profile.review_count ? `${profile.review_count} reviews` : null,
