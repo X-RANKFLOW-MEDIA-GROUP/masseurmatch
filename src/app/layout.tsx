@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Inter, Space_Grotesk, JetBrains_Mono, Cormorant_Garamond, Outfit, DM_Mono } from "next/font/google";
 import { AppMotionShell } from "@/app/_components/app-motion-shell";
 import { JsonLd } from "@/app/_components/json-ld";
 import { SiteFooter } from "@/app/_components/site-footer";
@@ -38,6 +38,31 @@ const fontMono = JetBrains_Mono({
   preload: true,
 });
 
+const fontCormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  variable: "--font-cormorant",
+  weight: ["300", "400", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+  preload: false,
+});
+
+const fontOutfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+  weight: ["300", "400", "500", "600"],
+  display: "swap",
+  preload: false,
+});
+
+const fontDmMono = DM_Mono({
+  subsets: ["latin"],
+  variable: "--font-dm-mono",
+  weight: ["400", "500"],
+  display: "swap",
+  preload: false,
+});
+
 const rootMetadata = createPageMetadata({
   title: "The safest and most trusted premium male massage directory",
   description: SITE_DESCRIPTION,
@@ -61,7 +86,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body
-        className={`${fontSans.variable} ${fontDisplay.variable} ${fontMono.variable} theme-masseurmatch min-h-screen overflow-x-hidden font-sans text-foreground antialiased`}
+        className={`${fontSans.variable} ${fontDisplay.variable} ${fontMono.variable} ${fontCormorant.variable} ${fontOutfit.variable} ${fontDmMono.variable} theme-masseurmatch min-h-screen overflow-x-hidden font-sans text-foreground antialiased`}
       >
         <AppProviders>
           <JsonLd data={buildOrganizationJsonLd()} />

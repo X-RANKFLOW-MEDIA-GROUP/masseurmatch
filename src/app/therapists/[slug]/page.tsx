@@ -4,7 +4,6 @@ import { JsonLd } from "@/app/_components/JsonLd";
 import {
   getCities,
   getImportedReviews,
-  getProfilePhotos,
   getPublicTherapistBySlug,
   getPublicTherapists,
 } from "@/app/_lib/directory";
@@ -16,7 +15,6 @@ import {
   buildProfilePageJsonLd,
   createPageMetadata,
 } from "@/app/_lib/seo";
-import { galleryLimit } from "./_components/galleryLimit";
 import { PremiumProfilePage } from "./_components/PremiumProfilePage";
 
 // Demo/fallback profiles for SEO and testing
@@ -180,11 +178,7 @@ export default async function TherapistPage({ params }: { params: Promise<Params
     notFound();
   }
 
-  const photoLimit = galleryLimit(profile._tier);
-  const [reviews, photos] = await Promise.all([
-    getImportedReviews(profile.id, 5),
-    getProfilePhotos(profile.id, photoLimit),
-  ]);
+  const reviews = await getImportedReviews(profile.id, 5);
 
   const name = getPublicProfileName(profile);
   const profilePath = `/therapists/${profile.slug || profile.id}`;
@@ -255,7 +249,6 @@ export default async function TherapistPage({ params }: { params: Promise<Params
 
       <PremiumProfilePage
         profile={profile}
-        photos={photos}
         reviews={reviews}
         cityPath={cityPath}
       />

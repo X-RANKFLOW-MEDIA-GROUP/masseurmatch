@@ -64,3 +64,12 @@ See `.env.example` for the full list. Key variables:
 - **Dev origins**: `*.spock.replit.dev` added to `allowedDevOrigins` in `next.config.mjs`
 - **Supabase profiles table**: Uses `_tier` column (not `tier`) for subscription tier
 - **Admin pages**: All 7 admin pages use `"use client"` with client-side data fetching
+
+## Public Profile Page Design (Redesigned)
+
+The `/therapists/[slug]` profile page uses a new design system with:
+- **Fonts**: Cormorant Garamond (serif headings), Outfit (body sans), DM Mono (labels/monospace) — loaded via next/font/google in layout.tsx
+- **Layout**: Navy hero section (with grid/radial-gradient background) + cream (#FCFBF8) main content area with 2-column grid (left content + 340px right sticky sidebar)
+- **Components**: Breadcrumb bar (DM Mono), hero with photo frame/badges/tags/quick stats/CTAs, About section, Techniques (pills), Rate cards (navy with large serif prices), Payment chips, Reviews (orange left-border accent cards), Booking sidebar card (orange header + navy body), Location/Amenities/Credentials info cards, SEO related search links footer
+- **Key files**: `src/app/therapists/[slug]/_components/PremiumProfile*.tsx`, `premium-profile.css`
+- **Color tokens**: navy (#0B1F3A), orange (#FF8A1F), cream (#FCFBF8), blue (#1E4B8F)
