@@ -36,3 +36,8 @@ externalPort = 80
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 120000
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["bash", "-c", "pnpm run start"]
+build = ["bash", "-c", "pnpm run build"]
