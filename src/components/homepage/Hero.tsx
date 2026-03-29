@@ -1,5 +1,5 @@
 import { Search, MapPin, ArrowRight, Zap, Clock, Navigation } from "lucide-react";
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
@@ -45,8 +45,7 @@ export function Hero({ neighborhood, city, searchInputRef }: HeroProps) {
   const [inputValue, setInputValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // Typing effect for headline
-  const phrases = ["a massage therapist", "relaxation near you", "a premium experience"];
+  const phrases = useMemo(() => ["a massage therapist", "relaxation near you", "a premium experience"], []);
   const [text, setText] = useState("");
   const [phraseIndex, setPhraseIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);

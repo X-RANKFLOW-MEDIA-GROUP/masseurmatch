@@ -50,7 +50,7 @@ export function KnottyIntroBanner() {
     setVisible(false);
     try {
       localStorage.setItem(STORAGE_KEY, "1");
-    } catch {}
+    } catch (_) { /* localStorage may be unavailable */ }
   }
 
   function handleCta() {
