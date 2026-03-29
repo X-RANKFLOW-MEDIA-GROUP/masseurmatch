@@ -772,9 +772,14 @@
   text-decoration: none;
   transition: background .2s, padding-left .25s var(--ease);
 }
-.wc-spec-list-item:hover {
+.wc-spec-list-item:hover,
+.wc-spec-list-item:focus-visible {
   background: rgba(11,31,58,.03);
   padding-left: 18px;
+  outline: none;
+}
+.wc-spec-list-item:focus-visible {
+  box-shadow: inset 3px 0 0 var(--a0);
 }
 .wc-spec-nm {
   font-family: var(--wc-serif);
