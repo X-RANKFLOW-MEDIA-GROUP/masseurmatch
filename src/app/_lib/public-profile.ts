@@ -19,7 +19,7 @@ export function getDirectoryTierLabel(profile: Pick<PublicTherapist, "_tier">) {
   }
 
   if (profile._tier === "standard") {
-    return "Verified";
+    return "Standard";
   }
 
   return "Directory";

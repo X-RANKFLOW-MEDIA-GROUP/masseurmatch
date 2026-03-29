@@ -43,7 +43,6 @@ export const MASSAGE_THERAPIST_PUBLIC_FIELDS = [
   'travel_note',
   'years_experience',
   'education',
-  'licenses',
   'affiliations',
   'show_email_button',
   'booking_link',

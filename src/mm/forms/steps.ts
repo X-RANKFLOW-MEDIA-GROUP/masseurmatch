@@ -90,7 +90,6 @@ export const MASSAGE_THERAPIST_ONBOARDING_STEPS = [
     fields: [
       'years_experience',
       'education',
-      'licenses',
       'affiliations',
     ],
   },

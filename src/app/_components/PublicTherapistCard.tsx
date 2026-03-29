@@ -9,7 +9,6 @@ import {
   getPublicContactLinks,
   getPublicProfileName,
   getPublicTrustHighlights,
-  isVerifiedDirectoryProfile,
 } from "@/app/_lib/public-profile";
 import { handleProfileCardTilt, resetProfileCardTilt } from "@/app/_components/profile-card-tilt";
 import { ScrambleText } from "@/components/animations/ScrambleText";
@@ -55,7 +54,7 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
   const outcall = formatCurrency(therapist.outcall_price);
   const isPremium = therapist._tier === "pro" || therapist._tier === "elite";
   const isFeatured = therapist._tier === "elite";
-  const isVerified = isVerifiedDirectoryProfile(therapist);
+  const isVerified = Boolean(therapist.is_verified_identity);
   const { callHref, whatsappHref } = getPublicContactLinks(therapist.phone);
   const tierLabel = getDirectoryTierLabel(therapist);
   const trustHighlights = getPublicTrustHighlights(therapist);
@@ -77,7 +76,7 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
     ? { label: "Outcall", value: outcall }
     : therapist.profile_views
       ? { label: "Views", value: `${therapist.profile_views}` }
-      : { label: "Trust", value: isVerified ? "Verified" : "Review profile" };
+      : { label: "Trust", value: isVerified ? "ID Verified" : "Review profile" };
 
   const profileImage = useMemo(
     () =>
@@ -117,7 +116,7 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
           </span>
           {isVerified ? (
             <span className="rounded-full border border-white/18 bg-white/14 px-3 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-white backdrop-blur-xl">
-              Verified
+              ID Verified
             </span>
           ) : null}
         </div>
@@ -256,7 +255,7 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
         <Link href="/safety" className="font-medium text-brand-secondary hover:underline">
           Safety guide
         </Link>
-        <span>{isVerified ? "Verification visible" : "Review the full profile before contact"}</span>
+        <span>{isVerified ? "Identity verified" : "Review the full profile before contact"}</span>
       </div>
     </article>
   );
