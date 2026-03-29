@@ -53,26 +53,50 @@ export async function GET(request: NextRequest) {
 
   const user = data.session.user;
 
+  let isNewUser = false;
+
+  if (!serviceKey) {
+    console.error("[OAuth callback] SUPABASE_SERVICE_ROLE_KEY is not configured");
+    return NextResponse.redirect(new URL("/login?error=config", origin));
+  }
+
+  const adminClient = createClient(supabaseUrl, serviceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
   // Ensure profile + role exist (for new OAuth users)
-  if (serviceKey) {
-    const adminClient = createClient(supabaseUrl, serviceKey, {
-      auth: { autoRefreshToken: false, persistSession: false },
+  const { data: existingProfile, error: profileLookupError } = await adminClient
+    .from("profiles")
+    .select("id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (profileLookupError) {
+    console.error("[OAuth callback] Failed to query existing profile:", profileLookupError);
+    return NextResponse.redirect(new URL("/login?error=profile_setup_failed", origin));
+  }
+
+  if (!existingProfile) {
+    isNewUser = true;
+    const fullName =
+      user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      user.email?.split("@")[0] ||
+      "User";
+
+    const { error: profileError } = await adminClient.from("profiles").insert({
+      user_id: user.id,
+      full_name: fullName,
+      display_name: fullName,
+      status: "draft",
+      is_active: false,
+      contact_methods: [],
+      share_email: false,
     });
 
-    const { data: existingProfile } = await adminClient
-      .from("profiles")
-      .select("id")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    if (!existingProfile) {
-      const fullName =
-        user.user_metadata?.full_name ||
-        user.user_metadata?.name ||
-        user.email?.split("@")[0] ||
-        "User";
-
-      await adminClient.from("profiles").insert({
+    if (profileError) {
+      console.error("[OAuth callback] Failed to insert profile (attempt 1):", profileError);
+      const { error: retryError } = await adminClient.from("profiles").upsert({
         user_id: user.id,
         full_name: fullName,
         display_name: fullName,
@@ -80,44 +104,66 @@ export async function GET(request: NextRequest) {
         is_active: false,
         contact_methods: [],
         share_email: false,
-      });
+      }, { onConflict: "user_id" });
+
+      if (retryError) {
+        console.error("[OAuth callback] Failed to insert profile (retry):", retryError);
+        return NextResponse.redirect(new URL("/login?error=profile_setup_failed", origin));
+      }
     }
+  }
 
-    const { data: existingRole } = await adminClient
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .maybeSingle();
+  const { data: existingRole, error: roleLookupError } = await adminClient
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", user.id)
+    .maybeSingle();
 
-    if (!existingRole) {
-      await adminClient.from("user_roles").insert({
+  if (roleLookupError) {
+    console.error("[OAuth callback] Failed to query existing role:", roleLookupError);
+  }
+
+  if (!existingRole) {
+    const { error: roleError } = await adminClient.from("user_roles").insert({
+      user_id: user.id,
+      role: "provider",
+    });
+
+    if (roleError) {
+      console.error("[OAuth callback] Failed to insert user role (attempt 1):", roleError);
+      const { error: retryError } = await adminClient.from("user_roles").upsert({
         user_id: user.id,
         role: "provider",
-      });
-    }
+      }, { onConflict: "user_id" });
 
-    // Queue welcome email for new OAuth users
-    if (!existingProfile) {
-      try {
-        await adminClient.from("lifecycle_email_queue").insert({
-          user_id: user.id,
-          recipient_email: user.email,
-          recipient_name: user.user_metadata?.full_name || user.email?.split("@")[0],
-          segment: "new_signup",
-          campaign_key: "welcome_post_signup",
-          flow_key: "post_signup",
-          template_key: "welcome_v1",
-          send_category: "transactional",
-          subject: "Welcome to MasseurMatch! 🎉",
-          body_html: buildWelcomeHtml(user.user_metadata?.full_name || "there"),
-          body_text: `Welcome to MasseurMatch! Complete your profile to start getting discovered.`,
-          scheduled_for: new Date().toISOString(),
-          status: "pending",
-          idempotency_key: `welcome:${user.id}:${new Date().toISOString().slice(0, 10)}`,
-        });
-      } catch {
-        // Best effort — don't block the auth flow
+      if (retryError) {
+        console.error("[OAuth callback] Failed to insert user role (retry):", retryError);
+        return NextResponse.redirect(new URL("/login?error=profile_setup_failed", origin));
       }
+    }
+  }
+
+  // Queue welcome email for new OAuth users
+  if (isNewUser) {
+    try {
+      await adminClient.from("lifecycle_email_queue").insert({
+        user_id: user.id,
+        recipient_email: user.email,
+        recipient_name: user.user_metadata?.full_name || user.email?.split("@")[0],
+        segment: "new_signup",
+        campaign_key: "welcome_post_signup",
+        flow_key: "post_signup",
+        template_key: "welcome_v1",
+        send_category: "transactional",
+        subject: "Welcome to MasseurMatch! 🎉",
+        body_html: buildWelcomeHtml(user.user_metadata?.full_name || "there"),
+        body_text: `Welcome to MasseurMatch! Complete your profile to start getting discovered.`,
+        scheduled_for: new Date().toISOString(),
+        status: "pending",
+        idempotency_key: `welcome:${user.id}:${new Date().toISOString().slice(0, 10)}`,
+      });
+    } catch {
+      // Best effort — don't block the auth flow
     }
   }
 
@@ -129,20 +175,22 @@ export async function GET(request: NextRequest) {
     process.env.SESSION_SECRET ||
     "dev-only-masseurmatch-session-secret";
 
-  const role =
-    serviceKey
-      ? await (async () => {
-          const admin = createClient(supabaseUrl, serviceKey, {
-            auth: { autoRefreshToken: false, persistSession: false },
-          });
-          const { data: roleRow } = await admin
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", user.id)
-            .maybeSingle();
-          return (roleRow as any)?.role ?? null;
-        })()
-      : null;
+  const { data: roleRow, error: finalRoleFetchError } = await adminClient
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", user.id)
+    .maybeSingle<{ role: string }>();
+
+  if (finalRoleFetchError) {
+    console.error("[OAuth callback] Failed to fetch role for session cookie:", finalRoleFetchError);
+  }
+
+  const role = roleRow?.role ?? (isNewUser ? "provider" : null);
+
+  if (!role) {
+    console.error("[OAuth callback] Could not resolve role for user:", user.id);
+    return NextResponse.redirect(new URL("/login?error=role_not_found", origin));
+  }
 
   const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
   const payload = Buffer.from(
@@ -162,7 +210,8 @@ export async function GET(request: NextRequest) {
   ];
   if (isProduction) cookieParts.push("Secure");
 
-  const response = NextResponse.redirect(new URL(next, origin));
+  const redirectPath = isNewUser ? "/pro/onboard" : next;
+  const response = NextResponse.redirect(new URL(redirectPath, origin));
   response.headers.append("Set-Cookie", cookieParts.join("; "));
   return response;
 }
