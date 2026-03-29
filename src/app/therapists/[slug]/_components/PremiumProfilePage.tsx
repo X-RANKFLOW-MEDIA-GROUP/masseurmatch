@@ -14,6 +14,7 @@ import { PremiumProfileAvailability } from "./PremiumProfileAvailability";
 import { PremiumProfileFaq } from "./PremiumProfileFaq";
 import { ProfileTravel } from "./ProfileTravel";
 import { PremiumProfileLocation } from "./PremiumProfileLocation";
+import { ProfileAreasServed } from "./ProfileAreasServed";
 import { KnottyProfileTracker } from "./KnottyProfileTracker";
 import "./premium-profile.css";
 
@@ -49,7 +50,7 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
         </nav>
 
         {/* Hero */}
-        <PremiumProfileHero profile={profile} cityPath={cityPath} reviews={reviews} />
+        <PremiumProfileHero profile={profile} cityPath={cityPath} reviews={reviews.filter((r): r is ImportedReview & { rating: number } => r.rating != null)} />
 
         {/* Gallery */}
         <section className="pp-section pp-fade-in" id="gallery">
@@ -63,7 +64,7 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
         </section>
 
         {/* About */}
-        <PremiumProfileAbout profile={profile} reviews={reviews} />
+        <PremiumProfileAbout profile={profile} reviews={reviews.filter((r): r is ImportedReview & { rating: number } => r.rating != null)} />
 
         {/* Services */}
         <PremiumProfileServices profile={profile} />

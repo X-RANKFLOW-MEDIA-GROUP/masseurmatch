@@ -8,8 +8,11 @@ import { SITE_DESCRIPTION, SITE_NAME, createPageMetadata } from "@/app/_lib/meta
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/app/_lib/structured-data";
 import { AppProviders } from "@/app/providers";
 import { SITE_URL } from "@/lib/site";
+import { logEnvStatus } from "@/app/_lib/env-validation";
 import "leaflet/dist/leaflet.css";
 import "@/index.css";
+
+logEnvStatus();
 
 const fontSans = DM_Sans({
   subsets: ["latin"],

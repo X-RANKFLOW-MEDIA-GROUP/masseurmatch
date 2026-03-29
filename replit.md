@@ -53,3 +53,14 @@ See `.env.example` for the full list. Key variables:
 - `RESEND_API_KEY` - Email sending API key
 - `GEMINI_API_KEY` - Google Gemini API key
 - `SESSION_SECRET` - Session signing secret
+
+## Production Hardening (Completed)
+
+- **Env validation**: `src/app/_lib/env-validation.ts` validates all required env vars at startup; imported in root layout
+- **Available Now tier enforcement**: Server-side validation in `src/app/api/_lib/available-now.ts` with per-tier limits (Standard: 2hr/1day, Pro: 3hr/2day, Elite: 4hr/unlimited)
+- **Security**: Hardcoded API keys removed from `.env.example`; Resend throws on missing key instead of using placeholder
+- **Redirect loop fix**: Removed case-insensitive `/Auth`→`/auth` and `/Privacy`→`/privacy` redirects from `next.config.mjs` (Next.js matches redirects case-insensitively, causing 308 loops)
+- **Line endings**: All source files normalized from `\r\n` to `\n` (Windows→Unix)
+- **Dev origins**: `*.spock.replit.dev` added to `allowedDevOrigins` in `next.config.mjs`
+- **Supabase profiles table**: Uses `_tier` column (not `tier`) for subscription tier
+- **Admin pages**: All 7 admin pages use `"use client"` with client-side data fetching

@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bruno — Licensed Massage Therapist in Dallas, TX | MasseurMatch</title>
+<meta name="description" content="Bruno is a Brazilian massage therapist with 14 years of experience in Dallas, TX. Specializing in Deep Tissue, Shiatsu, and Sports Recovery. LGBT+ welcoming. Book now.">
+
+<!-- SEO structured data -->
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Male Massage by Bruno",
+  "description": "Brazilian therapeutic bodywork in Dallas. Deep Tissue, Shiatsu, Swedish. LGBT+ welcoming.",
+  "address": { "@type": "PostalAddress", "addressLocality": "Dallas", "addressRegion": "TX", "postalCode": "75219" },
+  "telephone": "+17623345300",
+  "priceRange": "$160–$250",
+  "openingHours": "Mo-Su 00:00-23:00"
+}
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --navy:   #0B1F3A;
+  --navy2:  #122846;
+  --navy3:  #1a3560;
+  --orange: #FF8A1F;
+  --orange2:#e67a10;
+  --blue:   #1E4B8F;
+  --cream:  #FCFBF8;
+  --cream2: #F0EEE8;
+  --muted:  rgba(252,251,248,0.5);
+  --line:   rgba(252,251,248,0.08);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--cream);
+  color: var(--navy);
+  font-family: 'Outfit', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--navy);
+  padding: 0 40px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+}
+
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--cream);
+  letter-spacing: -0.01em;
+}
+.nav-logo span { color: var(--orange); }
+
+.nav-links {
+  display: flex; gap: 32px; list-style: none;
+}
+.nav-links a {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(252,251,248,0.55);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--cream); }
+
+.nav-cta {
+  background: var(--orange);
+  color: var(--navy) !important;
+  font-weight: 600 !important;
+  color: var(--navy);
+  padding: 8px 20px;
+  border-radius: 2px;
+  transition: background 0.2s !important;
+}
+.nav-cta:hover { background: #ffaa50 !important; color: var(--navy) !important; }
+
+/* ─── BREADCRUMB ─── */
+.breadcrumb {
+  background: var(--navy2);
+  padding: 12px 40px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: rgba(252,251,248,0.35);
+  letter-spacing: 0.08em;
+}
+.breadcrumb a { color: rgba(252,251,248,0.45); text-decoration: none; }
+.breadcrumb a:hover { color: var(--orange); }
+.breadcrumb span { color: var(--orange); }
+
+/* ─── HERO ─── */
+.hero {
+  background: var(--navy);
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+}
+
+.hero-bg {
+  position: absolute; inset: 0;
+  background: 
+    radial-gradient(ellipse 60% 80% at 75% 50%, rgba(30,75,143,0.4) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 20% 80%, rgba(255,138,31,0.08) 0%, transparent 60%);
+}
+
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.hero-inner {
+  position: relative; z-index: 2;
+  max-width: 1100px; margin: 0 auto;
+  padding: 64px 40px 56px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 56px;
+  align-items: start;
+  animation: fadeUp 0.8s ease both;
+}
+
+/* Photo */
+.photo-col { position: relative; }
+
+.photo-frame {
+  position: relative;
+  width: 260px; height: 320px;
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+}
+
+.photo-placeholder {
+  width: 100%; height: 100%;
+  background: linear-gradient(145deg, var(--navy3) 0%, var(--navy2) 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px;
+}
+
+.photo-placeholder svg { opacity: 0.3; }
+
+.photo-placeholder span {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: rgba(252,251,248,0.3);
+  text-transform: uppercase;
+}
+
+.photo-badge {
+  position: absolute;
+  bottom: 16px; left: 16px;
+  background: var(--orange);
+  color: var(--navy);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.1em;
+  padding: 5px 10px;
+  border-radius: 2px;
+}
+
+.verified-badge {
+  position: absolute;
+  top: 16px; right: -12px;
+  background: var(--navy);
+  border: 1px solid var(--orange);
+  color: var(--orange);
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: 2px;
+  display: flex; align-items: center; gap: 5px;
+}
+
+/* Info column */
+.info-col { color: var(--cream); }
+
+.profile-tags {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-bottom: 20px;
+}
+
+.ptag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 2px;
+  border: 1px solid;
+}
+
+.ptag-lgbt { border-color: rgba(255,138,31,0.4); color: var(--orange); background: rgba(255,138,31,0.08); }
+.ptag-mobile { border-color: rgba(255,255,255,0.15); color: rgba(252,251,248,0.5); }
+.ptag-namt { border-color: rgba(30,75,143,0.6); color: rgba(100,160,255,0.8); background: rgba(30,75,143,0.15); }
+
+h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 52px;
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+
+h1 em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--orange);
+}
+
+.subtitle {
+  font-size: 15px;
+  font-weight: 400;
+  color: rgba(252,251,248,0.55);
+  margin-bottom: 28px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.subtitle::before {
+  content: '';
+  display: inline-block;
+  width: 20px; height: 1px;
+  background: var(--orange);
+  flex-shrink: 0;
+}
+
+.stars {
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 28px;
+}
+
+.star { color: var(--orange); font-size: 16px; }
+
+.review-count {
+  font-size: 13px;
+  color: rgba(252,251,248,0.45);
+  font-family: 'DM Mono', monospace;
+}
+
+/* Quick stats */
+.quick-stats {
+  display: flex; gap: 0; margin-bottom: 36px;
+}
+
+.qs {
+  padding: 16px 24px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-right: none;
+}
+.qs:last-child { border-right: 1px solid rgba(255,255,255,0.06); }
+.qs:first-child { border-radius: 2px 0 0 2px; }
+.qs:last-child { border-radius: 0 2px 2px 0; }
+
+.qs-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--cream);
+  line-height: 1;
+}
+
+.qs-val span { font-size: 14px; font-weight: 400; color: var(--orange); }
+
+.qs-label {
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.08em;
+  color: rgba(252,251,248,0.35);
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+/* CTA buttons */
+.hero-ctas { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.btn-primary {
+  background: var(--orange);
+  color: var(--navy);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: all 0.25s;
+  letter-spacing: 0.02em;
+}
+.btn-primary:hover { background: #ffaa50; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,138,31,0.3); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--cream);
+  font-weight: 500;
+  font-size: 14px;
+  padding: 13px 24px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 2px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: all 0.25s;
+}
+.btn-secondary:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.06); }
+
+/* ─── MAIN CONTENT ─── */
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 56px 40px;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 48px;
+  align-items: start;
+}
+
+/* ─── LEFT COLUMN ─── */
+.left-col > * + * { margin-top: 48px; }
+
+/* Section headers */
+.sec-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 10px;
+}
+
+.sec-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--navy);
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+/* About */
+.about-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #2a3d55;
+  font-weight: 300;
+}
+
+.about-text p + p { margin-top: 16px; }
+
+.about-text strong { color: var(--navy); font-weight: 600; }
+
+/* Techniques */
+.techniques-grid {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+
+.technique-pill {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 16px;
+  background: rgba(11,31,58,0.05);
+  border: 1px solid rgba(11,31,58,0.1);
+  border-radius: 2px;
+  color: var(--navy2);
+  transition: all 0.2s;
+  cursor: default;
+}
+
+.technique-pill:hover {
+  background: var(--navy);
+  color: var(--cream);
+  border-color: var(--navy);
+}
+
+.technique-pill.featured {
+  background: var(--navy);
+  color: var(--cream);
+  border-color: var(--navy);
+}
+
+/* Rates */
+.rates-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+}
+
+.rate-card {
+  background: var(--navy);
+  padding: 28px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.2s;
+}
+.rate-card:hover { background: var(--navy2); }
+
+.rate-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--orange);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
+}
+.rate-card:hover::before { transform: scaleX(1); }
+
+.rate-duration {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: rgba(252,251,248,0.4);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.rate-price {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 40px;
+  font-weight: 600;
+  color: var(--cream);
+  line-height: 1;
+}
+
+.rate-price sup { font-size: 20px; vertical-align: super; }
+
+.rate-name {
+  font-size: 13px;
+  color: rgba(252,251,248,0.5);
+  margin-top: 8px;
+  line-height: 1.4;
+}
+
+.rate-discount {
+  display: inline-block;
+  margin-top: 12px;
+  background: rgba(255,138,31,0.15);
+  color: var(--orange);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+
+/* Payments */
+.payment-methods {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 16px;
+}
+
+.pay-chip {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  background: var(--cream2);
+  border: 1px solid rgba(11,31,58,0.1);
+  border-radius: 2px;
+  color: #2a3d55;
+}
+
+/* Reviews */
+.review-list { display: flex; flex-direction: column; gap: 24px; }
+
+.review-card {
+  background: var(--cream2);
+  border-left: 3px solid var(--orange);
+  padding: 24px 24px 24px 28px;
+  border-radius: 0 2px 2px 0;
+  transition: transform 0.2s;
+}
+.review-card:hover { transform: translateX(4px); }
+
+.review-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.review-location {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(11,31,58,0.4);
+}
+
+.review-date {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: rgba(11,31,58,0.35);
+}
+
+.review-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.review-body {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #3a4f6a;
+  font-weight: 300;
+}
+
+.review-more {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.link-more {
+  font-size: 13px;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.1em;
+  color: var(--blue);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+  transition: color 0.2s;
+}
+.link-more:hover { color: var(--orange); }
+
+/* ─── RIGHT SIDEBAR ─── */
+.sidebar { position: sticky; top: 80px; }
+.sidebar > * + * { margin-top: 16px; }
+
+/* Booking card */
+.book-card {
+  background: var(--navy);
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(11,31,58,0.25);
+}
+
+.book-header {
+  background: var(--orange);
+  padding: 20px 24px;
+  color: var(--navy);
+}
+
+.book-header h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+}
+.book-header p { font-size: 13px; font-weight: 500; opacity: 0.7; margin-top: 2px; }
+
+.book-body { padding: 24px; color: var(--cream); }
+
+.avail-row {
+  display: flex; justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.avail-row:last-of-type { border-bottom: none; }
+
+.avail-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(252,251,248,0.4);
+}
+.avail-val { font-weight: 500; font-size: 13px; color: var(--cream); }
+.avail-val.green { color: #5ddd8a; }
+
+.book-cta {
+  display: block; width: 100%;
+  background: var(--orange);
+  color: var(--navy);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 15px;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  margin-top: 20px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+.book-cta:hover { background: #ffaa50; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,138,31,0.3); }
+
+.book-tel {
+  display: block; width: 100%;
+  text-align: center;
+  margin-top: 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: rgba(252,251,248,0.45);
+  text-decoration: none;
+}
+.book-tel:hover { color: var(--orange); }
+
+/* Info card */
+.info-card {
+  background: white;
+  border: 1px solid rgba(11,31,58,0.08);
+  border-radius: 2px;
+  padding: 24px;
+}
+
+.info-card-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(11,31,58,0.4);
+  margin-bottom: 16px;
+}
+
+.info-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(11,31,58,0.06);
+  font-size: 13px;
+}
+.info-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+.info-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.info-text { color: #2a3d55; line-height: 1.4; }
+.info-text strong { color: var(--navy); font-weight: 600; display: block; }
+
+/* Amenities */
+.amenity-grid {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+
+.amenity-tag {
+  font-size: 11px;
+  padding: 5px 10px;
+  background: rgba(11,31,58,0.05);
+  border: 1px solid rgba(11,31,58,0.08);
+  border-radius: 2px;
+  color: #2a3d55;
+  display: flex; align-items: center; gap: 4px;
+}
+
+/* SEO footer breadcrumb */
+.seo-footer {
+  background: var(--navy);
+  padding: 40px;
+  margin-top: 0;
+}
+
+.seo-footer-inner {
+  max-width: 1100px; margin: 0 auto;
+}
+
+.seo-footer h4 {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(252,251,248,0.3);
+  margin-bottom: 16px;
+}
+
+.seo-links {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+
+.seo-link {
+  font-size: 12px;
+  color: rgba(252,251,248,0.4);
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.07);
+  padding: 5px 12px;
+  border-radius: 2px;
+  transition: all 0.2s;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.05em;
+}
+.seo-link:hover { color: var(--orange); border-color: rgba(255,138,31,0.3); }
+
+/* Site footer */
+footer {
+  background: #060f1c;
+  padding: 24px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--cream);
+}
+.footer-logo span { color: var(--orange); }
+.footer-copy {
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  color: rgba(252,251,248,0.2);
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.anim-1 { animation: fadeUp 0.7s 0.1s ease both; }
+.anim-2 { animation: fadeUp 0.7s 0.2s ease both; }
+.anim-3 { animation: fadeUp 0.7s 0.3s ease both; }
+.anim-4 { animation: fadeUp 0.7s 0.4s ease both; }
+
+/* ─── DIVIDER ─── */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(11,31,58,0.1), transparent);
+  margin: 0;
+}
+
+/* ─── MOBILE ─── */
+@media (max-width: 768px) {
+  nav { padding: 0 20px; }
+  nav ul { display: none; }
+  .breadcrumb { padding: 12px 20px; }
+  .hero-inner { grid-template-columns: 1fr; padding: 40px 20px; gap: 32px; }
+  .photo-frame { width: 100%; height: 240px; }
+  h1 { font-size: 40px; }
+  .quick-stats { flex-wrap: wrap; }
+  .main { grid-template-columns: 1fr; padding: 40px 20px; }
+  .sidebar { position: static; }
+  .rates-grid { grid-template-columns: 1fr; }
+  .seo-footer { padding: 32px 20px; }
+  footer { flex-direction: column; gap: 8px; text-align: center; padding: 20px; }
+}
+</style>
+
+</head>
+<body>
+
+<!-- NAV -->
+
+<nav>
+  <div class="nav-logo">Masseur<span>Match</span></div>
+  <ul class="nav-links">
+    <li><a href="#">Find Therapists</a></li>
+    <li><a href="#">Cities</a></li>
+    <li><a href="#">For Therapists</a></li>
+    <li><a href="#" class="nav-cta">Book Now</a></li>
+  </ul>
+</nav>
+
+<!-- BREADCRUMB -->
+
+<div class="breadcrumb">
+  <a href="#">Home</a> / <a href="#">Dallas, TX</a> / <a href="#">Gay Massage Dallas</a> / <span>Bruno</span>
+</div>
+
+<!-- HERO -->
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+
+```
+<!-- Photo -->
+<div class="photo-col anim-1">
+  <div class="photo-frame">
+    <div class="photo-placeholder">
+      <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+        <circle cx="28" cy="22" r="11" stroke="white" stroke-width="1.5"/>
+        <path d="M8 48c0-11 9-20 20-20s20 9 20 20" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span>Profile Photo</span>
+    </div>
+  </div>
+  <div class="photo-badge">🇧🇷 Brazilian</div>
+  <div class="verified-badge">✓ Verified</div>
+</div>
+
+<!-- Info -->
+<div class="info-col">
+  <div class="profile-tags anim-1">
+    <span class="ptag ptag-lgbt">🏳️‍🌈 LGBT+ Welcoming</span>
+    <span class="ptag ptag-mobile">📍 In-Studio + Mobile</span>
+    <span class="ptag ptag-namt">NAMT Member</span>
+  </div>
+
+  <h1 class="anim-2">Massage<br><em>by Bruno</em></h1>
+  <div class="subtitle anim-2">Licensed Massage Therapist · Dallas, TX · Oak Lawn & Uptown</div>
+
+  <div class="stars anim-3">
+    <span class="star">★</span><span class="star">★</span><span class="star">★</span>
+    <span class="star">★</span><span class="star">★</span>
+    <span class="review-count">12 verified reviews</span>
+  </div>
+
+  <div class="quick-stats anim-3">
+    <div class="qs">
+      <div class="qs-val">14<span>yrs</span></div>
+      <div class="qs-label">Experience</div>
+    </div>
+    <div class="qs">
+      <div class="qs-val">8<span> techniques</span></div>
+      <div class="qs-label">Specialties</div>
+    </div>
+    <div class="qs">
+      <div class="qs-val"><span>from </span>$160</div>
+      <div class="qs-label">Starting rate</div>
+    </div>
+    <div class="qs">
+      <div class="qs-val">10<span>mi</span></div>
+      <div class="qs-label">Mobile radius</div>
+    </div>
+  </div>
+
+  <div class="hero-ctas anim-4">
+    <a href="sms:+17623345300" class="btn-primary">💬 Text to Book</a>
+    <a href="tel:+17623345300" class="btn-secondary">📞 (762) 334-5300</a>
+  </div>
+</div>
+```
+
+  </div>
+</section>
+
+<!-- MAIN CONTENT -->
+
+<div class="main">
+
+  <!-- LEFT -->
+
+  <div class="left-col">
+
+```
+<!-- About -->
+<section class="anim-1">
+  <div class="sec-label">About</div>
+  <div class="sec-title">Brazilian Therapeutic<br>Bodywork in Dallas</div>
+  <div class="about-text">
+    <p>My name is <strong>Bruno</strong> — a Brazilian massage therapist with <strong>14 years of experience</strong> providing professional therapeutic bodywork in a respectful, inclusive environment.</p>
+    <p>Every session is <strong>LGBT+ welcoming</strong> and focuses on physical recovery and stress relief through specialized Deep Tissue therapy for chronic tension, a rhythmic Brazilian Touch for body balance, and Sports Recovery to enhance performance.</p>
+    <p>I work from a <strong>private studio in Oak Lawn and Uptown Dallas</strong>, and also offer high-end mobile outcall services to homes and hotels. I directly serve <strong>Highland Park, University Park, Downtown Dallas,</strong> and Turtle Creek.</p>
+    <p>Each session delivers a specialized therapeutic experience tailored to your wellness goals.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Techniques -->
+<section>
+  <div class="sec-label">Specialties</div>
+  <div class="sec-title">8 Massage Techniques</div>
+  <div class="techniques-grid">
+    <span class="technique-pill featured">Deep Tissue</span>
+    <span class="technique-pill featured">Shiatsu</span>
+    <span class="technique-pill featured">Swedish</span>
+    <span class="technique-pill">AMMA Therapy</span>
+    <span class="technique-pill">Hot Stone</span>
+    <span class="technique-pill">Lymphatic Drainage</span>
+    <span class="technique-pill">Myofascial Release</span>
+    <span class="technique-pill">Zero Balancing</span>
+    <span class="technique-pill">Cupping</span>
+    <span class="technique-pill">Fitness Training</span>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Rates -->
+<section>
+  <div class="sec-label">Rates & Pricing</div>
+  <div class="sec-title">Bruno's Signature Massage</div>
+  <div class="rates-grid">
+    <div class="rate-card">
+      <div class="rate-duration">60 minutes</div>
+      <div class="rate-price"><sup>$</sup>160</div>
+      <div class="rate-name">Spa-quality bodywork, tailored to you — blending techniques from AMMA Therapy to Zero Balancing.</div>
+      <span class="rate-discount">10% off Mondays</span>
+    </div>
+    <div class="rate-card">
+      <div class="rate-duration">90 minutes</div>
+      <div class="rate-price"><sup>$</sup>250</div>
+      <div class="rate-name">Extended session for deeper therapeutic work, full-body recovery, and complete stress release.</div>
+      <span class="rate-discount">Best value</span>
+    </div>
+  </div>
+  <div style="margin-top:16px; font-size:13px; color:#3a4f6a;">
+    Discounts available for <strong>active military</strong>, <strong>law enforcement</strong>, and <strong>repeat clients</strong>. Ask Bruno for details.
+  </div>
+  <div class="payment-methods">
+    <span class="pay-chip">Apple Pay</span>
+    <span class="pay-chip">Venmo</span>
+    <span class="pay-chip">Zelle</span>
+    <span class="pay-chip">Visa / MC</span>
+    <span class="pay-chip">Cash</span>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Reviews -->
+<section>
+  <div class="sec-label">Client Testimonials</div>
+  <div class="sec-title">What Clients Say</div>
+  <div class="review-list">
+
+    <div class="review-card">
+      <div class="review-meta">
+        <span class="review-location">📍 Dallas, TX · In-studio</span>
+        <span class="review-date">Oct 23, 2025</span>
+      </div>
+      <div class="review-title">"The best massage therapist in Dallas I've had."</div>
+      <div class="review-body">His warm smile, sense of humor and strong, confident hands delivered the perfect deep-tissue pressure. The energy was very relaxing, and I left feeling completely recharged. Truly one of a kind, I can't recommend Bruno enough — he's A+!</div>
+    </div>
+
+    <div class="review-card">
+      <div class="review-meta">
+        <span class="review-location">📍 Dallas, TX · In-studio</span>
+        <span class="review-date">Jul 2, 2025</span>
+      </div>
+      <div class="review-title">"He's in a league of his own."</div>
+      <div class="review-body">Bruno is not only incredibly skilled at deep tissue and relaxation massage, but also one of the sweetest and most charming people you'll ever meet. He always makes me feel at ease and gives great advice on how to keep my body feeling good between sessions.</div>
+    </div>
+
+    <div class="review-card">
+      <div class="review-meta">
+        <span class="review-location">📍 Dallas, TX · In-studio</span>
+        <span class="review-date">Jul 2, 2024</span>
+      </div>
+      <div class="review-title">"A master in his prime doing his best work."</div>
+      <div class="review-body">His place is clean, purposely dimly lit, quiet except for great music at just the right volume. He's super calm and explains what he's doing. What he's doing is so imaginative and creative that just calling it massage seems inadequate.</div>
+    </div>
+
+  </div>
+  <div class="review-more">
+    <a href="#" class="link-more">View all 12 reviews →</a>
+  </div>
+</section>
+```
+
+  </div>
+
+  <!-- SIDEBAR -->
+
+  <aside class="sidebar">
+
+```
+<!-- Booking card -->
+<div class="book-card anim-2">
+  <div class="book-header">
+    <h3>Book a Session</h3>
+    <p>Text or call to schedule</p>
+  </div>
+  <div class="book-body">
+    <div class="avail-row">
+      <span class="avail-label">Availability</span>
+      <span class="avail-val green">● Open today</span>
+    </div>
+    <div class="avail-row">
+      <span class="avail-label">Hours</span>
+      <span class="avail-val">12am – 11pm daily</span>
+    </div>
+    <div class="avail-row">
+      <span class="avail-label">Response</span>
+      <span class="avail-val">Usually within 1hr</span>
+    </div>
+    <div class="avail-row">
+      <span class="avail-label">Starting at</span>
+      <span class="avail-val" style="color:var(--orange); font-size:18px; font-family:'Cormorant Garamond',serif; font-weight:600;">$160 / 60 min</span>
+    </div>
+    <a href="sms:+17623345300" class="book-cta">💬 Text to Book Now</a>
+    <a href="tel:+17623345300" class="book-tel">(762) 334-5300 — tap to call</a>
+  </div>
+</div>
+
+<!-- Location info -->
+<div class="info-card anim-3">
+  <div class="info-card-title">Location & Service Area</div>
+  <div class="info-row">
+    <span class="info-icon">📍</span>
+    <div class="info-text">
+      <strong>Studio</strong>
+      Oak Lawn & Uptown Dallas, TX 75219
+    </div>
+  </div>
+  <div class="info-row">
+    <span class="info-icon">🚗</span>
+    <div class="info-text">
+      <strong>Mobile radius</strong>
+      Up to 10 miles — homes & hotels
+    </div>
+  </div>
+  <div class="info-row">
+    <span class="info-icon">🗺️</span>
+    <div class="info-text">
+      Highland Park · University Park · Downtown Dallas · Turtle Creek
+    </div>
+  </div>
+</div>
+
+<!-- Amenities -->
+<div class="info-card anim-3">
+  <div class="info-card-title">Studio Amenities</div>
+  <div class="amenity-grid">
+    <span class="amenity-tag">🚿 Shower</span>
+    <span class="amenity-tag">🚽 Private Restroom</span>
+    <span class="amenity-tag">💧 Bottled Water</span>
+    <span class="amenity-tag">🔥 Hot Towels</span>
+    <span class="amenity-tag">🎵 Music</span>
+  </div>
+  <div style="height:12px;"></div>
+  <div class="info-card-title">Mobile Extras</div>
+  <div class="amenity-grid">
+    <span class="amenity-tag">🛏 Massage Table</span>
+    <span class="amenity-tag">🔥 Hot Towels</span>
+    <span class="amenity-tag">🎵 Music</span>
+  </div>
+</div>
+
+<!-- Education / affiliation -->
+<div class="info-card anim-4">
+  <div class="info-card-title">Credentials</div>
+  <div class="info-row">
+    <span class="info-icon">🎓</span>
+    <div class="info-text">
+      <strong>UFRJ — Rio de Janeiro, BR</strong>
+      Accounting & Business · 2000–2003
+    </div>
+  </div>
+  <div class="info-row">
+    <span class="info-icon">🏅</span>
+    <div class="info-text">
+      <strong>NAMT Member</strong>
+      National Association of Massage Therapists
+    </div>
+  </div>
+</div>
+```
+
+  </aside>
+</div>
+
+<!-- SEO FOOTER -->
+
+<div class="seo-footer">
+  <div class="seo-footer-inner">
+    <h4>Related Searches</h4>
+    <div class="seo-links">
+      <a href="#" class="seo-link">Gay massage Dallas TX</a>
+      <a href="#" class="seo-link">Deep tissue massage Oak Lawn</a>
+      <a href="#" class="seo-link">Brazilian massage therapist Dallas</a>
+      <a href="#" class="seo-link">LGBT massage Dallas</a>
+      <a href="#" class="seo-link">Male massage therapist Dallas</a>
+      <a href="#" class="seo-link">Sports massage Uptown Dallas</a>
+      <a href="#" class="seo-link">Mobile massage Dallas TX</a>
+      <a href="#" class="seo-link">Shiatsu massage Highland Park</a>
+      <a href="#" class="seo-link">Massage therapist near Oak Lawn</a>
+      <a href="#" class="seo-link">Deep tissue massage near me Dallas</a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+
+<footer>
+  <div class="footer-logo">Masseur<span>Match</span></div>
+  <div class="footer-copy">© 2026 XRankFlow Media Group LLC · Dallas, TX · MasseurMatch.com</div>
+</footer>
+
+</body>
+</html>

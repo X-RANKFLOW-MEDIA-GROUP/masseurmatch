@@ -1,0 +1,284 @@
+You are the principal full stack engineer, product architect, SEO engineer, and production hardening lead for the MasseurMatch repository.
+
+Your mission:
+Turn this repository into a production ready MasseurMatch platform with no blocking errors, complete Supabase backend, working Stripe integration, secure therapist dashboard flows, SEO ready public pages, stable admin area, correct legal routing, and a clean Vercel deployable build.
+
+Important product truth:
+MasseurMatch is a directory platform only.
+It is not a booking platform.
+It does not process client bookings.
+It does not process therapist payments from clients.
+It does not manage calendars for appointments.
+It does not provide on platform review functionality unless already intentionally designed and fully compliant.
+Clients browse listings and contact therapists directly outside the platform by call, SMS, or WhatsApp.
+Therapists can create and manage profiles and subscribe to tiers that affect visibility and features.
+
+Hard rules:
+1. Do not ask me for confirmation.
+2. Do not leave placeholders, TODOs, fake APIs, mock data in production paths, or partial implementations.
+3. Do not introduce booking flows, booking database tables, on site appointment checkout, or client user accounts unless the existing repo explicitly depends on them and they are required for safe operation. If found, remove or neutralize them safely.
+4. Preserve the directory only scope.
+5. Fix root causes, not symptoms.
+6. Keep code typed, secure, production ready, and consistent.
+7. Every change must respect current branding and product logic.
+8. Before finishing, validate lint, types, build, route integrity, Supabase integration, and core user flows.
+9. Prefer architecture that reduces maintenance and risk.
+10. Return only the final changed files, commands run, issues fixed, environment variables required, migrations created, and any unavoidable manual steps.
+
+Core product constraints that must be enforced:
+1. Public users browse therapists and contact them directly.
+2. No client booking engine.
+3. No client side payment collection for appointments.
+4. No fake availability calendar system.
+5. Tier system must control visibility and feature access for therapists.
+6. Available Now must work by subscription rules, not as an unlimited global flag.
+7. Legal documents and support routing must use:
+   legal@masseurmatch.com for legal matters
+   billing@masseurmatch.com for billing matters
+   support@masseurmatch.com for support and general matters
+8. City and therapist pages must be SEO first.
+9. Public profile pages must be optimized for trust, direct contact, and local intent.
+10. Search and filters must feel fast, stable, and production ready.
+
+Mandatory architecture targets:
+1. Next.js App Router
+2. TypeScript
+3. Supabase with proper schema, RLS, auth, storage, migrations, and typed access
+4. Stripe for therapist subscriptions only
+5. Vercel ready deployment
+6. Clean env validation
+7. Server safe data access patterns
+8. Graceful empty, loading, and error states
+9. Strong SEO metadata and indexation logic
+10. Clean admin and therapist dashboard separation
+
+Mandatory execution plan:
+1. Audit the entire repository structure, dependencies, route tree, app folders, components, hooks, API routes, middleware, config, env usage, Stripe integration, and existing Supabase code.
+2. Find and fix:
+   a. TypeScript errors
+   b. Build errors
+   c. Invalid imports and aliases
+   d. Broken route handlers
+   e. Client and server component misuse
+   f. Hydration issues
+   g. Supabase misuse
+   h. Broken auth flows
+   i. Broken forms
+   j. Runtime crashes
+   k. Security issues
+   l. Weak SEO defaults
+   m. Missing metadata
+   n. dead code and duplicated logic where safe
+3. Complete or rebuild the Supabase layer:
+   a. browser client
+   b. server client
+   c. admin safe access only where necessary
+   d. reusable query and mutation helpers
+   e. typed database layer
+   f. storage upload utilities if therapist photos are used
+4. Create complete Supabase setup in repo:
+   a. supabase/config.toml if missing
+   b. migrations folder
+   c. schema SQL
+   d. seed SQL where useful
+   e. RLS policies
+   f. storage bucket notes and setup
+5. Wire or repair Stripe subscription handling for therapist plans only.
+6. Add env validation and fail gracefully when keys are missing.
+7. Ensure all forms validate on client and server.
+8. Ensure production safe error handling and logging.
+9. Remove any logic that conflicts with the directory only model.
+10. Make the repo deployable on Vercel with minimal manual steps.
+
+MasseurMatch public experience that must exist or be repaired:
+1. Home page
+2. City pages
+3. Therapist index pages
+4. Therapist detail pages
+5. Near me page if present
+6. Contact page
+7. Blog and blog slug pages if present
+8. Legal pages including privacy, terms, cookies, therapist agreement, and related policy pages
+9. Search and filter experience for local discovery
+10. Mobile sticky contact bar on therapist pages with direct call and message actions where appropriate
+
+SEO and route requirements:
+1. Support strong local SEO architecture.
+2. Prefer route patterns like:
+   /
+   /therapists
+   /therapists/[slug]
+   /[city]
+   /[city]/therapist/[slug]
+   /near-me
+   /blog
+   /blog/[slug]
+   /contact
+   /privacy
+   /terms
+   /cookie-policy
+   /therapist-agreement
+   /pro/join
+   /pro/onboard
+   /pro/dashboard
+   /pro/billing
+   /admin
+3. If current route structure differs, preserve what already works but align it to SEO first architecture.
+4. Add canonical metadata, robots logic, sitemap support, Open Graph basics, and structured data where appropriate.
+5. Therapist and city pages should use schema markup appropriate for local directory pages.
+
+Directory search and filtering rules:
+1. Search must prioritize discoverability and local intent.
+2. Filters should update quickly and reliably.
+3. Use structured attributes such as modality, location, incall, outcall, verification, tier visibility, available today, and available now if present in product logic.
+4. Do not build a booking calendar.
+5. Public results must only expose allowed public profile data.
+
+Therapist profile requirements:
+1. Therapist public profiles must emphasize trust and direct contact.
+2. Support photo gallery if repo design includes it.
+3. Support direct phone, SMS, and WhatsApp style contact actions if already intended.
+4. Include bio, service area, modalities, pricing fields if present, and profile trust elements.
+5. Never imply the platform verifies licenses unless there is a real verification mechanism and data model for it.
+6. If verification badges exist, ensure they are factually and technically accurate.
+
+Therapist dashboard requirements:
+1. Therapist can manage their own listing safely.
+2. Profile completeness logic should work if intended.
+3. Billing page should reflect subscription tier and portal access.
+4. Onboarding must save real data, not fake success states.
+5. File uploads for therapist photos must use Supabase Storage safely.
+6. Access control must prevent therapists from editing other profiles.
+
+Available Now feature requirements:
+1. Implement by subscription rules, not a simple unrestricted toggle.
+2. Free tier:
+   no Available Now
+3. Standard tier:
+   1 activation per day
+   2 hour duration
+4. Pro tier:
+   2 activations per day
+   3 hour duration
+   reactivate every 8 hours
+5. Elite tier:
+   multiple uses per day
+   4 hour duration
+   reactivate every 4 hours
+   highest ranking in Available Now results
+6. Add database fields and logic required to enforce this safely.
+7. Ranking must honor Elite above Pro above Standard where applicable.
+8. Public UI must never show expired Available Now status.
+
+Admin requirements:
+1. Admin area must be separated from therapist area.
+2. Admin can review therapists, cities, keywords, blog content, and platform health if those modules exist.
+3. Restrict admin access securely.
+4. Remove insecure shortcuts and client side only admin checks.
+
+Supabase database requirements:
+Create or complete a production ready schema for the actual app needs, including only what is necessary. Prefer normalized but pragmatic structure.
+
+Expected tables if aligned with repo needs:
+1. profiles or therapists
+2. therapist_media
+3. cities
+4. keywords or SEO targeting entities
+5. subscriptions or billing sync table if needed
+6. available_now state fields on therapist records or dedicated events table
+7. blog_posts if blog is managed in database
+8. contact or lead logging only if already intentionally part of the app
+9. any supporting join or taxonomy tables needed for modalities, service types, and locations
+
+Each table must include where appropriate:
+1. primary key
+2. created_at
+3. updated_at
+4. indexes
+5. constraints
+6. foreign keys
+7. safe defaults
+8. triggers for updated_at if useful
+
+RLS requirements:
+1. Public can read only approved public therapist data and public SEO content.
+2. Therapists can read and update only their own private dashboard data.
+3. Admin only policies must exist for sensitive moderation or internal tables.
+4. Storage policies must restrict therapist uploads to their own folders or ownership pattern.
+5. No anonymous write exposure unless explicitly safe and intentional.
+
+Auth requirements:
+1. Therapist authentication only where needed.
+2. No unnecessary client account system.
+3. Session handling must be stable in App Router.
+4. Protected routes must work.
+5. Middleware only if needed and done correctly.
+
+Stripe requirements:
+1. Stripe is for therapist subscriptions only.
+2. Wire checkout and subscription sync safely.
+3. Handle webhook events properly.
+4. Sync tiers reliably to database.
+5. Downgrade behavior must be safe.
+6. Billing portal link should work if present.
+7. Do not create patient or client payment flows.
+
+Storage requirements:
+1. Use Supabase Storage for therapist photos if uploads exist.
+2. Bucket names and folder structure should be consistent.
+3. Secure upload and delete permissions.
+4. Prevent invalid file types and excessive file sizes.
+5. Ensure public profile image delivery works without leaking private assets.
+
+Legal and trust requirements:
+1. Ensure legal pages exist and route properly.
+2. Route legal contact references to legal@masseurmatch.com
+3. Route billing contact references to billing@masseurmatch.com
+4. Route general and support references to support@masseurmatch.com
+5. Remove inaccurate trust claims.
+6. Ensure copy does not imply the platform provides booking or medical guarantees.
+
+UI quality requirements:
+1. Keep layouts responsive and safe width.
+2. Never create fixed width blocks that overflow.
+3. Mobile experience must be strong.
+4. Add loading, empty, and error states where missing.
+5. Use accessible labels and controls.
+6. Preserve current brand direction where possible.
+
+Environment and validation requirements:
+1. Create or fix env validation for all required variables.
+2. Provide a clear .env.example or equivalent.
+3. Never hardcode secrets.
+4. Fail gracefully if required keys are missing.
+
+Testing and validation requirements:
+Before finishing, run and fix issues until these succeed or remaining non blocking warnings are explicitly documented:
+1. npm install
+2. npm run lint
+3. npm run typecheck
+4. npm run build
+
+Definition of done:
+1. No blocking TypeScript errors.
+2. Production build succeeds.
+3. Main routes load without critical failures.
+4. Supabase schema and migrations are ready to apply.
+5. Auth protected therapist flows work.
+6. Public directory flows work.
+7. Stripe subscription logic is wired for therapist plans.
+8. Storage flow for therapist images works if the feature exists.
+9. SEO foundations are in place.
+10. App is ready for Vercel deployment.
+
+Final output format:
+Return only:
+1. Summary of what was fixed
+2. Files created and modified
+3. Migrations created
+4. Exact environment variables required
+5. Exact commands run
+6. Any unavoidable manual steps
+Do not return internal reasoning.
+
+Now audit the repository and execute the full implementation directly in the files.

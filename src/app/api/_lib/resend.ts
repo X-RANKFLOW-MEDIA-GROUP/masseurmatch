@@ -7,7 +7,11 @@ import type { ContactAudience } from "@/app/_lib/validation";
 let _resend: Resend | null = null;
 function getResend() {
   if (!_resend) {
-    _resend = new Resend(process.env.RESEND_API_KEY || "re_placeholder");
+    const key = process.env.RESEND_API_KEY;
+    if (!key) {
+      throw new Error("RESEND_API_KEY is required for email delivery.");
+    }
+    _resend = new Resend(key);
   }
   return _resend;
 }

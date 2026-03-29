@@ -15,7 +15,11 @@ const COOKIE_NAME = "mm_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
 
 function sessionSecret() {
-  return envAny(["MM_SESSION_SECRET", "SESSION_SECRET"], "dev-only-masseurmatch-session-secret");
+  const secret = envAny(["MM_SESSION_SECRET", "SESSION_SECRET"]);
+  if (!secret) {
+    throw new Error("SESSION_SECRET or MM_SESSION_SECRET must be set. Sessions cannot be signed without a secret.");
+  }
+  return secret;
 }
 
 function encodeBase64Url(value: string): string {

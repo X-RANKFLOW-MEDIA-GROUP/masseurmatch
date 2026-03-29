@@ -1,11 +1,53 @@
-import { getCities } from "@/app/_lib/directory";
+import Link from "next/link";
+import { type TherapistTier, getCities, getPublicTherapists } from "@/app/_lib/directory";
+import { JsonLd } from "@/app/_components/JsonLd";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildItemListJsonLd,
+  buildFaqJsonLd,
+} from "@/app/_lib/seo";
+import { TextReveal } from "@/components/animations/TextReveal";
+import SearchPageClient from "./SearchPageClient";
+
+type DirectorySession = "" | "home-visit" | "incall";
+
+const isTier = (value: string): value is TherapistTier =>
+  value === "free" || value === "standard" || value === "pro" || value === "elite";
+
+const getFirstParam = (value: string | string[] | undefined) =>
+  Array.isArray(value) ? (value[0] || "") : (value || "");
+
+const SEARCH_FAQS = [
+  {
+    question: "How do I find a massage therapist near me?",
+    answer:
+      "Use the search filters to select your city, preferred modality, and session type. Results are ranked by verification status and listing tier.",
+  },
+  {
+    question: "Are these therapists verified?",
+    answer:
+      "Therapists with a verified badge have completed identity verification. All listings are reviewed before going live.",
+  },
+  {
+    question: "Can I book directly on MasseurMatch?",
+    answer:
+      "MasseurMatch is a directory platform. You contact therapists directly by phone, SMS, or WhatsApp to arrange your session.",
+  },
+  {
+    question: "What does the Available Now badge mean?",
+    answer:
+      "Therapists marked as Available Now are currently accepting new clients. This feature is available to subscribed therapists based on their plan.",
+  },
+];
+
 type SearchPageProps = {
-  searchParams: any;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const cities = getCities();
-  const city = resolveCityName(getFirstParam(params.city));
+  const city = getFirstParam(params.city);
   const modality = getFirstParam(params.modality);
   const keyword = getFirstParam(params.keyword);
   const sessionParam = getFirstParam(params.session);

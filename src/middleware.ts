@@ -16,8 +16,12 @@ type MiddlewareSession = {
   expiresAt: string;
 };
 
-function getSessionSecret() {
-  return process.env.MM_SESSION_SECRET || process.env.SESSION_SECRET || "dev-only-masseurmatch-session-secret";
+function getSessionSecret(): string {
+  const secret = process.env.MM_SESSION_SECRET || process.env.SESSION_SECRET;
+  if (!secret) {
+    throw new Error("SESSION_SECRET or MM_SESSION_SECRET must be set.");
+  }
+  return secret;
 }
 
 function toBase64Url(bytes: Uint8Array): string {

@@ -192,7 +192,7 @@ export const getPublicTherapists = async (filters?: {
   }
 
   if (filters?.availableToday) {
-    query = query.eq("available_now", true);
+    query = query.eq("available_now", true).gt("available_now_expires", new Date().toISOString());
   }
 
   if (filters?.tier) {

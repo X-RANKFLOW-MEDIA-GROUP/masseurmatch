@@ -58,15 +58,12 @@ const LEGACY_REDIRECTS = [
   { source: "/cities/dallas-tx/sports-massage", destination: "/dallas/wellness/sports-recovery", permanent: true },
   { source: "/cities/dallas-tx/mobile",         destination: "/dallas/wellness/mobile-massage", permanent: true },
   { source: "/cities/dallas-tx/hotel",          destination: "/dallas/wellness/hotel-massage", permanent: true },
-  // Legacy SPA routes → App Router
-  { source: "/Auth",    destination: "/auth",    permanent: true },
-  { source: "/Privacy", destination: "/privacy", permanent: true },
 ];
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typedRoutes: false,
-  allowedDevOrigins: ["100.69.207.7", "localhost", "127.0.0.1", "::1", "*.replit.dev", "*.repl.co"],
+  allowedDevOrigins: ["100.69.207.7", "localhost", "127.0.0.1", "::1", "*.replit.dev", "*.repl.co", "*.spock.replit.dev"],
   experimental: {
     webpackBuildWorker: true,
     webpackMemoryOptimizations: true,
