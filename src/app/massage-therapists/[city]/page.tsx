@@ -114,7 +114,7 @@ const CITIES: Record<string, CityData> = {
     ],
     modalities: ["Swedish Massage", "Deep Tissue", "Sports Massage", "Shiatsu", "Thai Massage", "Prenatal Massage", "Lymphatic Drainage", "Hot Stone"],
     seoBlurb:
-      "New York City is home to the largest LGBTQ+ population in the United States. From Chelsea to Hell's Kitchen, Brooklyn to Queens, MasseurMatch connects NYC clients with verified, LGBTQ+-inclusive massage therapists who bring professional standards and genuine affirming care.",
+      "New York City is home to the largest LGBTQ+ population in the United States. From Chelsea to Hell's Kitchen, Brooklyn to Queens, MasseurMatch connects NYC clients with LGBTQ+-inclusive massage therapists who bring professional standards and genuine affirming care.",
     therapistCount: 241,
   },
   "los-angeles-ca": {
@@ -195,7 +195,7 @@ function buildSchemas(city: CityData) {
     "@type": "LocalBusiness",
     "@id": `https://masseurmatch.com/massage-therapists/${city.slug}`,
     name: `Massage Therapists in ${city.displayName} – MasseurMatch`,
-    description: `LGBTQ+-inclusive massage therapist directory for ${city.displayName}. ${city.therapistCount}+ verified professionals.`,
+    description: `LGBTQ+-inclusive massage therapist directory for ${city.displayName}. ${city.therapistCount}+ professionals.`,
     url: `https://masseurmatch.com/massage-therapists/${city.slug}`,
     areaServed: {
       "@type": "City",
@@ -234,7 +234,7 @@ function buildSchemas(city: CityData) {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: `Top Massage Therapists in ${city.displayName}`,
-    description: `LGBTQ+-inclusive, verified massage therapists in ${city.displayName}`,
+    description: `LGBTQ+-inclusive massage therapists in ${city.displayName}`,
     numberOfItems: city.therapistCount,
     url: `https://masseurmatch.com/massage-therapists/${city.slug}`,
   };
@@ -307,7 +307,7 @@ function TherapistCardUI({ t }: { t: TherapistCard }) {
           {t.rating} ({t.reviewCount})
         </span>
         {t.verified && (
-          <span style={{ fontSize: 10, fontFamily: "system-ui, sans-serif", color: "#1E4B8F", marginLeft: "auto" }}>✓ Verified</span>
+          <span style={{ fontSize: 10, fontFamily: "system-ui, sans-serif", color: "#1E4B8F", marginLeft: "auto" }}>✓ ID Verified</span>
         )}
       </div>
     </Link>
@@ -539,10 +539,10 @@ export default async function CityHubPage({ params }: { params: Promise<{ city: 
             {/* Trust signal */}
             <div style={{ background: "#1E4B8F", color: "#FCFBF8", padding: "24px", marginTop: 16 }}>
               <p style={{ fontSize: 13, lineHeight: 1.65, fontFamily: "system-ui, sans-serif", opacity: 0.8, margin: 0 }}>
-                Every therapist in {city.name} is manually verified and has committed to LGBTQ+-Inclusive Practice Standards.
+                Every therapist in {city.name} has committed to LGBTQ+-Inclusive Practice Standards.
               </p>
               <Link href="/trust" style={{ display: "block", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: "system-ui, sans-serif", color: "#FF8A1F", textDecoration: "none", marginTop: 14 }}>
-                How We Verify →
+                Learn More →
               </Link>
             </div>
           </aside>

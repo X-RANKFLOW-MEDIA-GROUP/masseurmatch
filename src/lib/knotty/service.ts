@@ -61,7 +61,7 @@ const PROFILE_SELECT = [
 const QUICK_ACTION_MESSAGES: Record<KnottyQuickAction, string> = {
   available_now: "Find Available Now",
   mobile: "Find Mobile Massage",
-  verified: "Show Verified",
+  verified: "Show ID Verified",
   help_choose: "Help Me Choose",
 };
 
@@ -425,7 +425,7 @@ export async function handleKnottyRequest(
       alternatives: [],
       reply: guardrails.safeReply,
       nextStep: {
-        label: "Browse verified therapists",
+        label: "Browse therapists",
         href: "/search?verified=1",
       },
       tracking: {

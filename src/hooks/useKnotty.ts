@@ -83,7 +83,7 @@ export function useKnotty() {
           : options.quickAction === "mobile"
             ? "Find Mobile Massage"
             : options.quickAction === "verified"
-              ? "Show Verified"
+              ? "Show ID Verified"
               : options.quickAction === "help_choose"
                 ? "Help Me Choose"
                 : "";
@@ -171,7 +171,7 @@ export function useKnotty() {
     quickActions: [
       { key: "available_now" as const, label: "Find Available Now" },
       { key: "mobile" as const, label: "Find Mobile Massage" },
-      { key: "verified" as const, label: "Show Verified" },
+      { key: "verified" as const, label: "Show ID Verified" },
       { key: "help_choose" as const, label: "Help Me Choose" },
     ],
     setInput,

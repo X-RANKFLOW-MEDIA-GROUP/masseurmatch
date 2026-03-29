@@ -117,7 +117,7 @@ function MasseurProfile() {
               </div>
             </div>
             <div className="photo-badge">🇧🇷 Brazilian</div>
-            <div className="verified-badge">✓ Verified</div>
+            <div className="verified-badge">✓ ID Verified</div>
           </div>
 
           {/* Info */}
@@ -131,7 +131,7 @@ function MasseurProfile() {
             <div className="subtitle anim-2">Massage Therapist · Dallas, TX · Oak Lawn & Uptown</div>
             <div className="stars anim-3">
               {Array(5).fill(0).map((_, i) => <span key={i} className="star">★</span>)}
-              <span className="review-count">12 verified reviews</span>
+              <span className="review-count">12 reviews</span>
             </div>
             <div className="quick-stats anim-3">
               <div className="qs"><div className="qs-val">14<span>yrs</span></div><div className="qs-label">Experience</div></div>
@@ -328,7 +328,7 @@ function MasseurProfile() {
           </div>
           {/* Education / affiliation */}
           <div className="info-card anim-4">
-            <div className="info-card-title">Credentials</div>
+            <div className="info-card-title">Training & Experience</div>
             <div className="info-row">
               <span className="info-icon">🎓</span>
               <div className="info-text">

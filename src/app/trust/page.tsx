@@ -107,7 +107,7 @@ export default function TrustPage() {
               </p>
               <div className="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full">
                 <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                <span className="font-mono text-[10px] uppercase tracking-widest text-slate-600 font-semibold">Verified Therapists</span>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-slate-600 font-semibold">Identity Verified Therapists</span>
               </div>
             </div>
 

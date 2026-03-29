@@ -140,14 +140,14 @@ const MAJOR_CITIES = [
 
 const NEIGHBORHOODS: Neighborhood[] = [
   { city: "Dallas, TX", name: "Oak Lawn", count: "84 gay-affirming therapists", tags: ["Deep Tissue", "LGBTQ+", "Sports"], href: "/dallas/oak-lawn" },
-  { city: "Dallas, TX", name: "Uptown", count: "62 verified therapists", tags: ["Swedish", "Hot Stone", "Couples"], href: "/dallas/uptown" },
-  { city: "Dallas, TX", name: "Deep Ellum", count: "38 verified therapists", tags: ["CBD Body Work", "Myofascial"], href: "/dallas/deep-ellum" },
+  { city: "Dallas, TX", name: "Uptown", count: "62 therapists", tags: ["Swedish", "Hot Stone", "Couples"], href: "/dallas/uptown" },
+  { city: "Dallas, TX", name: "Deep Ellum", count: "38 therapists", tags: ["CBD Body Work", "Myofascial"], href: "/dallas/deep-ellum" },
   { city: "Houston, TX", name: "Montrose", count: "106 gay-affirming therapists", tags: ["Deep Tissue", "Queer", "Swedish"], href: "/houston/montrose" },
-  { city: "Houston, TX", name: "The Heights", count: "57 verified therapists", tags: ["Sports", "Lymphatic"], href: "/houston/the-heights" },
-  { city: "Houston, TX", name: "Midtown", count: "73 verified therapists", tags: ["Couples", "Hot Stone", "LGBTQ+"], href: "/houston/midtown" },
+  { city: "Houston, TX", name: "The Heights", count: "57 therapists", tags: ["Sports", "Lymphatic"], href: "/houston/the-heights" },
+  { city: "Houston, TX", name: "Midtown", count: "73 therapists", tags: ["Couples", "Hot Stone", "LGBTQ+"], href: "/houston/midtown" },
   { city: "Austin, TX", name: "South Congress", count: "71 gay-affirming therapists", tags: ["Deep Tissue", "CBD Work", "Queer"], href: "/austin/south-congress" },
-  { city: "Austin, TX", name: "East Austin", count: "44 verified therapists", tags: ["Swedish", "Myofascial", "LGBTQ+"], href: "/austin/east-austin" },
-  { city: "San Antonio, TX", name: "King William", count: "31 verified therapists", tags: ["Hot Stone", "Swedish"], href: "/san-antonio/king-william" },
+  { city: "Austin, TX", name: "East Austin", count: "44 therapists", tags: ["Swedish", "Myofascial", "LGBTQ+"], href: "/austin/east-austin" },
+  { city: "San Antonio, TX", name: "King William", count: "31 therapists", tags: ["Hot Stone", "Swedish"], href: "/san-antonio/king-william" },
 ];
 
 const TESTIMONIALS: Testimonial[] = [
@@ -172,7 +172,7 @@ const TESTIMONIALS: Testimonial[] = [
     stars: 5,
     name: "Sam O., LMT",
     initials: "SO",
-    meta: "South Congress, Austin TX \u00b7 Verified Therapist",
+    meta: "South Congress, Austin TX \u00b7 Therapist",
     color: "rgba(11,31,58,.09)",
   },
 ];
@@ -181,12 +181,12 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     question: "Is MasseurMatch specifically for LGBTQ+ clients?",
     answer:
-      "MasseurMatch was built with LGBTQ+ inclusivity at its foundation. Every therapist is vetted, and those who explicitly identify as gay-affirming or queer-welcoming are highlighted with verified badges. Every body and identity is welcome here.",
+      "MasseurMatch was built with LGBTQ+ inclusivity at its foundation. Therapists who explicitly identify as gay-affirming or queer-welcoming are highlighted on the platform. Every body and identity is welcome here.",
   },
   {
     question: "How do I find a gay-affirming massage therapist near me?",
     answer:
-      'Use our search to enter your city or neighborhood — including specific areas like Oak Lawn in Dallas or Montrose in Houston — and filter by "LGBTQ+ Affirming". Results show verified, reviewed therapists closest to you with their certifications and client reviews.',
+      'Use our search to enter your city or neighborhood — including specific areas like Oak Lawn in Dallas or Montrose in Houston — and filter by "LGBTQ+ Affirming". Results show therapists closest to you with their profiles and client reviews.',
   },
   {
     question: "Are all therapists on MasseurMatch verified?",
@@ -604,7 +604,7 @@ export function WorldClassHomepage({
                 <div className="wc-hstat-n">
                   <b>{totalTherapists.toLocaleString()}</b>+
                 </div>
-                <div className="wc-hstat-l">Verified Therapists</div>
+                <div className="wc-hstat-l">Therapists</div>
               </div>
               <div className="wc-hstat">
                 <div className="wc-hstat-n">
@@ -944,7 +944,7 @@ export function WorldClassHomepage({
               {
                 n: "01",
                 title: "Search your neighborhood",
-                body: "Filter by specialty, LGBTQ+ affirming, neighborhood, and price. Every profile is verified before publishing.",
+                body: "Filter by specialty, LGBTQ+ affirming, neighborhood, and price. Browse detailed profiles with photos and reviews.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <circle cx="11" cy="11" r="7" />
@@ -954,8 +954,8 @@ export function WorldClassHomepage({
               },
               {
                 n: "02",
-                title: "Review credentials",
-                body: "Read verified reviews, licenses, certifications, and full profiles. Know exactly who you'll be working with.",
+                title: "Review profiles",
+                body: "Read reviews, training details, and full profiles. Know exactly who you'll be working with.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
@@ -1008,7 +1008,7 @@ export function WorldClassHomepage({
               delivered to you
             </h2>
             <p className="wc-nl-body">
-              New verified therapists in your area, LGBTQ+ wellness guides, and exclusive early
+              New therapists in your area, LGBTQ+ wellness guides, and exclusive early
               access — straight to your inbox. No spam, ever.
             </p>
             <ul className="wc-nl-perks">
@@ -1099,7 +1099,7 @@ export function WorldClassHomepage({
           </h2>
           <p className="wc-inc-body">
             MasseurMatch was built with LGBTQ+ inclusivity at its core. Gay-affirming therapists
-            are verified and highlighted across Oak Lawn, Montrose, South Congress, and 100+ cities
+            are highlighted across Oak Lawn, Montrose, South Congress, and 100+ cities
             — so you always feel safe, seen, and celebrated from your very first search.
           </p>
           <Link href="/explore?keyword=LGBTQ%2B+affirming" className="wc-btn-inc">
@@ -1180,7 +1180,7 @@ export function WorldClassHomepage({
             starts <em>here</em>
           </h2>
           <p className="wc-cta-b">
-            Join thousands of clients who found their perfect gay-affirming match. Browse verified
+            Join thousands of clients who found their perfect gay-affirming match. Browse
             therapists in your neighborhood — free, always.
           </p>
           <div className="wc-cta-note">

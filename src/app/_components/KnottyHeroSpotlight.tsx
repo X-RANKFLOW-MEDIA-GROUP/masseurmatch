@@ -274,7 +274,7 @@ export function KnottyHeroSpotlight({ therapists, therapistCount, cityCount }: K
             <div className="relative flex h-full flex-col justify-between">
               <div>
                 <div className="inline-flex rounded-full border border-white/14 bg-white/8 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.26em] text-white/74">
-                  Premium Verified Professionals
+                  Premium Professionals
                 </div>
 
                 <h1 className="mt-6 max-w-[10ch] text-5xl font-black leading-[0.88] tracking-tight text-white sm:text-6xl lg:text-[5.4rem]">

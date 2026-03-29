@@ -20,7 +20,7 @@ const BLOCK_PATTERNS: Array<{ label: string; pattern: RegExp }> = [
 ];
 
 export const KNOTTY_SAFE_REDIRECT =
-  "I can help you find verified therapists, availability, and pricing, but I can’t assist with that request.";
+  "I can help you find therapists, availability, and pricing, but I can’t assist with that request.";
 
 export function runKnottyGuardrails(message: string) {
   const normalized = sanitizeText(message);

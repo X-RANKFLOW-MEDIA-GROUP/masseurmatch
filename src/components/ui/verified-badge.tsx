@@ -31,7 +31,7 @@ export const VerifiedBadge = ({ size = "md", className }: VerifiedBadgeProps) =>
       />
 
       <CheckCircle2 className={cn("shrink-0", isSmall ? "w-2.5 h-2.5" : "w-3.5 h-3.5")} />
-      <span className="relative z-10 tracking-wide uppercase">Verified</span>
+      <span className="relative z-10 tracking-wide uppercase">ID Verified</span>
     </motion.div>
   );
 };

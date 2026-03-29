@@ -295,7 +295,7 @@ function ProfileCardPreview() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#61758A]">Featured profile</p>
           <h4 className="mt-2 text-xl font-semibold text-[#102A43]">Jordan Lane</h4>
-          <p className="mt-1 text-sm text-[#334E68]">Dallas, TX · Verified · Outcall</p>
+          <p className="mt-1 text-sm text-[#334E68]">Dallas, TX · ID Verified · Outcall</p>
         </div>
         <span className={cn(styles.pill, styles.pillAvailable)}>
           <span className={styles.liveDot} aria-hidden="true" />
@@ -356,7 +356,7 @@ function ChatPreview() {
       </div>
       <div className={styles.chatTranscript}>
         <div className={styles.chatBubbleAssistant}>I can help narrow by city, availability, pricing, or provider plans.</div>
-        <div className={styles.chatBubbleUser}>Show verified therapists in Dallas.</div>
+        <div className={styles.chatBubbleUser}>Show therapists in Dallas.</div>
         <div className={styles.chatBubbleAssistant}>I’d start in Explore with the verified filter on and Knotty suggested chips above the result grid.</div>
       </div>
       <div className="border-t border-[#E7E0D6] p-4">

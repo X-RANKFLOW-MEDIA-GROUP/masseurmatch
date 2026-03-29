@@ -45,10 +45,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const cityLabel = `${city.name}, ${city.stateCode}`;
 
   const title = inventoryCount > 0
-    ? `${inventoryCount}+ Verified Male Massage Therapists in ${cityLabel}`
-    : `Verified Male Massage Therapists in ${cityLabel}`;
+    ? `${inventoryCount}+ Male Massage Therapists in ${cityLabel}`
+    : `Male Massage Therapists in ${cityLabel}`;
 
-  const description = `Find trusted, verified male massage therapists in ${cityLabel}. LGBTQ+-friendly directory with identity-verified professionals, real reviews, and direct booking. Compare rates, specialties & availability.`;
+  const description = `Find trusted male massage therapists in ${cityLabel}. LGBTQ+-friendly directory with real reviews and direct booking. Compare rates, specialties & availability.`;
 
   return createPageMetadata({
     title,
@@ -184,7 +184,7 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
           path: canonicalCityPath,
         })}
         itemListJsonLd={buildItemListJsonLd({
-          name: `${city.name} verified therapist listings`,
+          name: `${city.name} therapist listings`,
           path: canonicalCityPath,
           items: therapists.items.map((item) => ({
             name: item.display_name || item.full_name || "Therapist",

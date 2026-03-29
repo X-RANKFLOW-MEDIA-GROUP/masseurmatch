@@ -188,7 +188,7 @@ const CityListing = () => {
             </div>
           ) : profiles.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-muted-foreground mb-4">No verified therapists found in {cityDisplayName} yet.</p>
+              <p className="text-muted-foreground mb-4">No therapists found in {cityDisplayName} yet.</p>
               <Link to="/explore" className="text-primary underline-sweep">Browse all therapists</Link>
             </div>
           ) : (

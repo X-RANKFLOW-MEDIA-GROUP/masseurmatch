@@ -4,7 +4,7 @@ import { KnottyChat } from "@/components/ai/KnottyChat";
 import { Surface } from "@/app/_components/primitives";
 
 const DEFAULT_PROMPTS = [
-  "Find verified therapists in Dallas",
+  "Find therapists in Dallas",
   "Show Pro tier therapists with outcall",
   "How do I update my profile completeness?",
   "Open billing portal and manage my plan",

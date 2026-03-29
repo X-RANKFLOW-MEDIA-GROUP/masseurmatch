@@ -23,7 +23,7 @@ const faqs = [
     items: [
       {
         q: "What is MasseurMatch?",
-        a: "MasseurMatch is a directory platform that connects clients with verified, professional massage therapists across the United States. We specialize in creating a safe, LGBTQ+-inclusive environment where every client feels welcome and respected.",
+        a: "MasseurMatch is a directory platform that connects clients with professional massage therapists across the United States. We specialize in creating a safe, LGBTQ+-inclusive environment where every client feels welcome and respected.",
       },
       {
         q: "Is MasseurMatch LGBTQ+-friendly?",
@@ -31,11 +31,11 @@ const faqs = [
       },
       {
         q: "How do I find a massage therapist near me?",
-        a: "Use our search bar to enter your city or ZIP code. You can filter results by massage modality, pricing, availability, and LGBTQ+ certifications. Each profile includes the therapist's credentials, services, rates, and client reviews.",
+        a: "Use our search bar to enter your city or ZIP code. You can filter results by massage modality, pricing, availability, and LGBTQ+ affirming status. Each profile includes the therapist's training, services, rates, and client reviews.",
       },
       {
-        q: "Are the therapists on MasseurMatch licensed?",
-        a: "Yes. We require every therapist to submit their state massage therapy license during onboarding. Our team manually verifies licenses against state licensing boards before any profile goes live.",
+        q: "Does MasseurMatch verify therapist licenses?",
+        a: "No. MasseurMatch is a directory platform — we do not verify professional licenses or credentials against state boards. Therapists self-report their qualifications. We encourage clients to independently confirm any practitioner's licensing before booking.",
       },
       {
         q: "Is my information private when I search?",
@@ -60,7 +60,7 @@ const faqs = [
     items: [
       {
         q: "How do I list my massage practice on MasseurMatch?",
-        a: "Click 'List Your Practice' in the top navigation and follow the onboarding steps. You'll need your state massage therapy license, a profile photo, a description of your services, and your service areas and rates. Our team typically reviews new applications within 2–3 business days.",
+        a: "Click 'List Your Practice' in the top navigation and follow the onboarding steps. You'll need a profile photo, a description of your services, and your service areas and rates. Our team typically reviews new applications within 2–3 business days.",
       },
       {
         q: "What does it cost to list on MasseurMatch?",
@@ -68,11 +68,11 @@ const faqs = [
       },
       {
         q: "Do I need to be LGBTQ+ to list on MasseurMatch?",
-        a: "No. Any licensed massage therapist who is committed to providing a respectful, inclusive experience for all clients is welcome to list on MasseurMatch. LGBTQ+ identity is not required — commitment to inclusivity is.",
+        a: "No. Any massage therapist who is committed to providing a respectful, inclusive experience for all clients is welcome to list on MasseurMatch. LGBTQ+ identity is not required — commitment to inclusivity is.",
       },
       {
-        q: "How does MasseurMatch verify my license?",
-        a: "During onboarding, you'll submit your license number and issuing state. Our team cross-references this information with the relevant state licensing board. The process typically takes 1–2 business days.",
+        q: "How does identity verification work on MasseurMatch?",
+        a: "During onboarding, you can complete identity verification through Stripe Identity. This confirms your identity but does not verify professional licenses or credentials. The process typically takes a few minutes.",
       },
       {
         q: "Can I control who contacts me through my listing?",
