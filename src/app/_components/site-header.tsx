@@ -223,7 +223,7 @@ export default function SiteHeader() {
         </Link>
 
         {/* Center Navigation — desktop */}
-        <nav className="hidden lg:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-1">
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}

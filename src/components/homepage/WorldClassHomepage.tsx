@@ -117,44 +117,25 @@ const SPECIALTIES: Specialty[] = [
       </svg>
     ),
   },
-  {
-    name: "Myofascial Release",
-    count: "97 therapists",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-      </svg>
-    ),
-  },
-  {
-    name: "Lymphatic Drainage",
-    count: "78 therapists",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <path d="M9.5 2A2.5 2.5 0 017 4.5v0A2.5 2.5 0 009.5 7h5A2.5 2.5 0 0017 4.5v0A2.5 2.5 0 0014.5 2h-5z" />
-        <path d="M7 7v4m10-4v4M3 17c0-3 2-6 5-6m8 0c3 0 5 3 5 6" />
-      </svg>
-    ),
-  },
-  {
-    name: "Couples Massage",
-    count: "203 therapists",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
-      </svg>
-    ),
-  },
-  {
-    name: "CBD Body Work",
-    count: "114 therapists",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <circle cx="12" cy="12" r="9" />
-        <path d="M8 12h8M12 8v8" />
-      </svg>
-    ),
-  },
+];
+
+const MAJOR_CITIES = [
+  { name: "Dallas", state: "TX", href: "/dallas", count: "120+" },
+  { name: "Houston", state: "TX", href: "/houston", count: "95+" },
+  { name: "Austin", state: "TX", href: "/austin", count: "78+" },
+  { name: "Miami", state: "FL", href: "/miami", count: "110+" },
+  { name: "Los Angeles", state: "CA", href: "/los-angeles", count: "145+" },
+  { name: "New York", state: "NY", href: "/new-york", count: "160+" },
+  { name: "Chicago", state: "IL", href: "/chicago", count: "88+" },
+  { name: "Atlanta", state: "GA", href: "/atlanta", count: "72+" },
+  { name: "San Francisco", state: "CA", href: "/san-francisco", count: "92+" },
+  { name: "Seattle", state: "WA", href: "/seattle", count: "65+" },
+  { name: "Denver", state: "CO", href: "/denver", count: "58+" },
+  { name: "Phoenix", state: "AZ", href: "/phoenix", count: "54+" },
+  { name: "San Diego", state: "CA", href: "/san-diego", count: "67+" },
+  { name: "Portland", state: "OR", href: "/portland", count: "48+" },
+  { name: "Nashville", state: "TN", href: "/nashville", count: "42+" },
+  { name: "Fort Worth", state: "TX", href: "/fort-worth", count: "38+" },
 ];
 
 const NEIGHBORHOODS: Neighborhood[] = [
@@ -225,14 +206,11 @@ const FAQ_ITEMS: FaqItem[] = [
 ];
 
 const HERO_TAGS = [
-  "Deep Tissue",
   "Gay-Affirming",
+  "Deep Tissue",
   "Swedish Massage",
   "Sports Recovery",
   "LGBTQ+ Friendly",
-  "Hot Stone",
-  "Queer Wellness",
-  "CBD Body Work",
 ];
 
 /* ─── Helpers ─── */
@@ -350,7 +328,7 @@ export function WorldClassHomepage({
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   /* --- Geolocation --- */
-  const { city: geoCity, loading: geoLoading, requestLocation } = useGeolocation({ autoLocate: false });
+  const { city: geoCity, loading: geoLoading, requestLocation } = useGeolocation({ autoLocate: true });
   const locationLabel = geoCity ? `${geoCity.name}, ${geoCity.stateCode}` : "Find my location";
 
   /* --- Knotty chat simulation --- */
@@ -534,19 +512,20 @@ export function WorldClassHomepage({
 
             <h1 className="wc-hero-h1">
               <span className="wc-hero-line">
-                <TextReveal text="Find your" delay={0.04} />{" "}
-                <span className="wc-hero-accent">
-                  <TextReveal text="perfect" delay={0.14} />
-                </span>
+                <TextReveal text="Gay massage therapists" delay={0.04} />
               </span>
               <span className="wc-sub-line">
-                <TextReveal text="gay-affirming massage" delay={0.24} />
+                <TextReveal text="in your" delay={0.14} />{" "}
+                <span className="wc-hero-accent">
+                  <TextReveal text={geoCity ? geoCity.name : "neighborhood"} delay={0.24} />
+                </span>
               </span>
             </h1>
 
             <p className="wc-hero-p">
-              The premier LGBTQ+-inclusive directory with verified credentials, 
-              transparent pricing, and neighborhood-level coverage across major cities.
+              {geoCity
+                ? `Find verified, LGBTQ+-affirming massage therapists near you in ${geoCity.name}, ${geoCity.stateCode}. Browse profiles, compare pricing, and connect directly.`
+                : "The premier LGBTQ+-inclusive directory with verified credentials, transparent pricing, and neighborhood-level coverage across major cities."}
             </p>
 
             <div className="wc-search-wrap">
@@ -841,6 +820,41 @@ export function WorldClassHomepage({
             <path d="M3 8h10M9 4l4 4-4 4" />
           </svg>
           Drag to explore more neighborhoods
+        </div>
+      </section>
+
+      {/* ─── MAJOR CITIES ─── */}
+      <section className="wc-cities-sec" id="cities">
+        <div className="wc-cities-inner">
+          <div className="wc-cities-head wc-cr2">
+            <div>
+              <div className="wc-ey">Browse by city</div>
+              <h2 className="wc-sh1 dark">
+                Gay massage therapists
+                <br />
+                <em>across the US</em>
+              </h2>
+            </div>
+            <Link href="/cities" className="wc-more-link">
+              All cities <ArrowRightIcon />
+            </Link>
+          </div>
+          <div className="wc-cities-grid">
+            {MAJOR_CITIES.map((c) => (
+              <Link key={c.href} href={c.href} className="wc-city-card wc-cr2">
+                <div className="wc-city-pin">
+                  <LocationPinIcon />
+                </div>
+                <div className="wc-city-info">
+                  <div className="wc-city-name">{c.name}, {c.state}</div>
+                  <div className="wc-city-count">{c.count} therapists</div>
+                </div>
+                <div className="wc-city-arrow">
+                  <ArrowRightIcon size={14} />
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
