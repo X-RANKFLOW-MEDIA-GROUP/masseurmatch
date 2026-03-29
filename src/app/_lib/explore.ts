@@ -48,10 +48,13 @@ export type ExploreProvider = {
   availabilityUpdatedAt: string | null;
   incall: boolean;
   outcall: boolean;
+  incallPrice: number | null;
+  outcallPrice: number | null;
   featured: boolean;
   offers: boolean;
   offerText: string | null;
   reviewCount: number;
+  averageRating: number | null;
   profileViews: number;
   latitude: number;
   longitude: number;
@@ -59,6 +62,7 @@ export type ExploreProvider = {
   phone: string | null;
   modality: string | null;
   tier: string;
+  lgbtqAffirming: boolean;
   trustSignals: string[];
   missingFields: string[];
   overlaySummary: string;
@@ -421,10 +425,13 @@ function normalizeProvider(profile: PublicTherapist, origin: ExplorePoint): Expl
     availabilityUpdatedAt: profile.available_now_expires || null,
     incall: Boolean(profile.incall_price),
     outcall: Boolean(profile.outcall_price),
+    incallPrice: typeof profile.incall_price === "number" && profile.incall_price > 0 ? profile.incall_price : null,
+    outcallPrice: typeof profile.outcall_price === "number" && profile.outcall_price > 0 ? profile.outcall_price : null,
     featured: profile._tier === "elite" || profile._tier === "pro",
     offers: Boolean(profile.special_offer_text),
     offerText: profile.special_offer_text || null,
     reviewCount: profile.review_count || 0,
+    averageRating: null,
     profileViews: profile.profile_views || 0,
     latitude: location.latitude,
     longitude: location.longitude,
@@ -434,6 +441,7 @@ function normalizeProvider(profile: PublicTherapist, origin: ExplorePoint): Expl
     phone: profile.phone,
     modality: profile.modality,
     tier: profile._tier || "free",
+    lgbtqAffirming: Boolean(profile.lgbtq_affirming),
     trustSignals,
     missingFields,
     profilePath: `/therapists/${profile.slug || profile.id}`,

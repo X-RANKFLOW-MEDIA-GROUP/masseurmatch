@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  type ReactNode,
   useCallback,
   useDeferredValue,
   useEffect,
@@ -16,10 +17,12 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   CheckCircle2,
   Filter,
+  GitCompareArrows,
   Heart,
   Layers3,
   LocateFixed,
   MapPinned,
+  Plus,
   RefreshCw,
   SlidersHorizontal,
   Sparkles,
@@ -44,6 +47,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
 import { handleProfileCardTilt, resetProfileCardTilt } from "@/app/_components/profile-card-tilt";
@@ -68,6 +72,7 @@ type FilterBooleanKey = "available" | "incall" | "outcall" | "verified" | "featu
 const STORAGE_KEY = "mm:explore:filters";
 const SESSION_KEY = "mm:explore:session";
 const SWIPE_KEY = "mm:explore:swipes";
+const COMPARE_KEY = "mm:explore:compare";
 const PAGE_BATCH = 12;
 
 const FILTER_CHIPS: Array<{ key: FilterBooleanKey; label: string }> = [
@@ -317,14 +322,22 @@ function ViewToggle({
   );
 }
 
+const MAX_COMPARE = 3;
+
 function ProviderCard({
   provider,
   onOpen,
   onSelect,
+  isCompared,
+  onToggleCompare,
+  compareCount,
 }: {
   provider: ExploreProvider;
   onOpen: (provider: ExploreProvider) => void;
   onSelect: (providerId: string) => void;
+  isCompared: boolean;
+  onToggleCompare: (providerId: string) => void;
+  compareCount: number;
 }) {
   return (
     <motion.div
@@ -342,9 +355,10 @@ function ProviderCard({
         className={cn(
           "profile-card-glass group h-full",
           provider.featured && "ring-1 ring-[rgb(var(--color-brand-soft-accent-rgb)/0.28)]",
+          isCompared && "ring-2 ring-brand-secondary/40",
         )}
       >
-      <div className="profile-card-media">
+      <div className="profile-card-media relative">
         <div className="aspect-[4/3] overflow-hidden rounded-[1.25rem]">
           <Image
             src={provider.photoUrl}
@@ -375,6 +389,29 @@ function ProviderCard({
           ) : null}
         </div>
         <DecisionOverlay provider={provider} />
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleCompare(provider.id);
+          }}
+          disabled={!isCompared && compareCount >= MAX_COMPARE}
+          className={cn(
+            "absolute right-4 bottom-4 z-10 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] backdrop-blur-xl transition profile-card-plane-soft",
+            isCompared
+              ? "border border-brand-secondary/30 bg-brand-secondary/90 text-white shadow-[0_8px_20px_rgb(var(--color-brand-secondary-rgb)/0.3)]"
+              : "border border-white/18 bg-white/14 text-white hover:bg-white/24",
+            !isCompared && compareCount >= MAX_COMPARE && "cursor-not-allowed opacity-40",
+          )}
+          aria-label={isCompared ? `Remove ${provider.name} from comparison` : `Add ${provider.name} to comparison`}
+        >
+          {isCompared ? (
+            <CheckCircle2 className="h-3.5 w-3.5" />
+          ) : (
+            <Plus className="h-3.5 w-3.5" />
+          )}
+          Compare
+        </button>
       </div>
 
       <div className="profile-card-plane mt-5">
@@ -809,6 +846,330 @@ function MapCanvas({
   );
 }
 
+function CompareBar({
+  compareIds,
+  allProviders,
+  onRemove,
+  onClear,
+  onCompare,
+}: {
+  compareIds: string[];
+  allProviders: ExploreProvider[];
+  onRemove: (id: string) => void;
+  onClear: () => void;
+  onCompare: () => void;
+}) {
+  const selected = compareIds
+    .map((id) => allProviders.find((p) => p.id === id))
+    .filter((p): p is ExploreProvider => Boolean(p));
+
+  return (
+    <AnimatePresence>
+      {selected.length >= 2 ? (
+        <motion.div
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 100, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          className="fixed inset-x-0 bottom-0 z-50 border-t border-border-subtle bg-white/95 shadow-[0_-12px_40px_rgb(var(--color-brand-primary-rgb)/0.12)] backdrop-blur-2xl"
+        >
+          <div className="page-shell flex items-center justify-between gap-4 py-3">
+            <div className="flex items-center gap-3">
+              <div className="flex -space-x-2">
+                {selected.map((provider) => (
+                  <button
+                    key={provider.id}
+                    type="button"
+                    onClick={() => onRemove(provider.id)}
+                    className="group/avatar relative h-10 w-10 overflow-hidden rounded-full border-2 border-white shadow-md transition hover:z-10 hover:scale-110"
+                    aria-label={`Remove ${provider.name} from comparison`}
+                  >
+                    <Image
+                      src={provider.photoUrl}
+                      alt={provider.name}
+                      width={40}
+                      height={40}
+                      className="h-full w-full object-cover"
+                    />
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition group-hover/avatar:opacity-100">
+                      <X className="h-4 w-4 text-white" />
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <span className="text-sm font-semibold text-text-secondary">
+                {selected.length} of {MAX_COMPARE} selected
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full"
+                onClick={onClear}
+              >
+                Clear
+              </Button>
+              <Button
+                size="sm"
+                className="rounded-full gap-2"
+                onClick={onCompare}
+              >
+                <GitCompareArrows className="h-4 w-4" />
+                Compare Now
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
+  );
+}
+
+function CompareModal({
+  open,
+  onOpenChange,
+  compareIds,
+  allProviders,
+  onRemove,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  compareIds: string[];
+  allProviders: ExploreProvider[];
+  onRemove: (id: string) => void;
+}) {
+  const selected = compareIds
+    .map((id) => allProviders.find((p) => p.id === id))
+    .filter((p): p is ExploreProvider => Boolean(p));
+
+  if (selected.length === 0) {
+    return null;
+  }
+
+  const rows: Array<{
+    label: string;
+    render: (provider: ExploreProvider) => ReactNode;
+  }> = [
+    {
+      label: "Photo",
+      render: (p) => (
+        <div className="relative mx-auto aspect-[4/3] w-full overflow-hidden rounded-2xl">
+          <Image src={p.photoUrl} alt={p.name} fill className="object-cover" sizes="280px" />
+        </div>
+      ),
+    },
+    {
+      label: "Name",
+      render: (p) => <span className="text-base font-semibold text-text-primary">{p.name}</span>,
+    },
+    {
+      label: "Neighborhood",
+      render: (p) => <span>{p.neighborhood}</span>,
+    },
+    {
+      label: "Incall Price",
+      render: (p) =>
+        typeof p.incallPrice === "number"
+          ? formatCurrency(p.incallPrice)
+          : "N/A",
+    },
+    {
+      label: "Outcall Price",
+      render: (p) =>
+        typeof p.outcallPrice === "number"
+          ? formatCurrency(p.outcallPrice)
+          : "N/A",
+    },
+    {
+      label: "Modalities",
+      render: (p) => p.modality || p.specialty || "—",
+    },
+    {
+      label: "Years of Experience",
+      render: (p) =>
+        typeof p.yearsExperience === "number"
+          ? `${p.yearsExperience} years`
+          : "On profile",
+    },
+    {
+      label: "Reviews",
+      render: (p) => {
+        if (p.reviewCount === 0) return "No reviews yet";
+        if (typeof p.averageRating === "number") {
+          return `${p.averageRating.toFixed(1)} ★ · ${p.reviewCount} reviews`;
+        }
+        return `${p.reviewCount} reviews`;
+      },
+    },
+    {
+      label: "LGBTQ+ Affirming",
+      render: (p) => (
+        <span className={cn("inline-flex items-center gap-1.5", p.lgbtqAffirming ? "text-brand-secondary font-semibold" : "")}>
+          {p.lgbtqAffirming ? (
+            <>
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Yes
+            </>
+          ) : (
+            "Not specified"
+          )}
+        </span>
+      ),
+    },
+    {
+      label: "Availability",
+      render: (p) => (
+        <span className="inline-flex items-center gap-1.5">
+          <span className={p.availableNow ? "live-dot" : "h-2 w-2 rounded-full bg-text-muted/40"} />
+          {p.availableNow ? "Available Now" : "Book Today"}
+        </span>
+      ),
+    },
+    {
+      label: "Verified Status",
+      render: (p) => getVerificationLabel(p),
+    },
+    {
+      label: "Session Formats",
+      render: (p) => {
+        const modes = [p.incall ? "Incall" : null, p.outcall ? "Outcall" : null].filter(Boolean);
+        return modes.length > 0 ? modes.join(", ") : "Ask provider";
+      },
+    },
+    {
+      label: "Distance",
+      render: (p) =>
+        typeof p.distance === "number"
+          ? `${p.distance.toFixed(1)} mi`
+          : "Near you",
+    },
+  ];
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] max-w-5xl overflow-y-auto rounded-[28px] border-border-subtle bg-[rgb(var(--color-bg-body-rgb))] p-0">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border-subtle bg-white/95 px-6 py-4 backdrop-blur-2xl">
+          <div>
+            <DialogTitle className="text-xl font-semibold text-text-primary">
+              Compare Therapists
+            </DialogTitle>
+            <p className="mt-1 text-sm text-text-secondary">
+              Side-by-side comparison of {selected.length} providers
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => onOpenChange(false)}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle bg-white/90 text-text-secondary transition hover:text-text-primary"
+            aria-label="Close comparison"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="hidden md:block">
+          <div className="p-6">
+            <div
+              className="grid gap-4"
+              style={{ gridTemplateColumns: `160px repeat(${selected.length}, minmax(0, 1fr))` }}
+            >
+              {rows.map((row) => {
+                const cells = [
+                  <div key={`label-${row.label}`} className="flex items-center text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+                    {row.label}
+                  </div>,
+                  ...selected.map((provider) => (
+                    <div
+                      key={`${row.label}-${provider.id}`}
+                      className="flex items-center text-sm text-text-secondary"
+                    >
+                      {row.render(provider)}
+                    </div>
+                  )),
+                ];
+                return cells;
+              })}
+
+              <div className="flex items-center text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+                Actions
+              </div>
+              {selected.map((provider) => (
+                <div key={`actions-${provider.id}`} className="flex flex-col gap-2">
+                  <Button asChild size="sm" className="rounded-full">
+                    <Link href={provider.profilePath}>View Profile</Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full"
+                    onClick={() => onRemove(provider.id)}
+                  >
+                    <X className="mr-1 h-3 w-3" />
+                    Remove
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="block md:hidden">
+          <div className="space-y-6 p-4">
+            {selected.map((provider) => (
+              <div
+                key={provider.id}
+                className="overflow-hidden rounded-[20px] border border-border-subtle bg-white/80 shadow-[0_8px_24px_rgb(var(--color-brand-primary-rgb)/0.06)]"
+              >
+                <div className="relative aspect-[16/9] overflow-hidden">
+                  <Image
+                    src={provider.photoUrl}
+                    alt={provider.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[rgba(11,31,58,0.46)] to-transparent" />
+                  <div className="absolute bottom-3 left-3 right-3 text-white">
+                    <h3 className="text-lg font-semibold">{provider.name}</h3>
+                    <p className="text-sm text-white/80">{provider.neighborhood}</p>
+                  </div>
+                </div>
+                <div className="space-y-3 p-4">
+                  {rows.slice(3).map((row) => (
+                    <div key={row.label} className="flex items-center justify-between gap-3">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-text-muted">
+                        {row.label}
+                      </span>
+                      <span className="text-right text-sm text-text-secondary">
+                        {row.render(provider)}
+                      </span>
+                    </div>
+                  ))}
+                  <div className="flex gap-2 pt-2">
+                    <Button asChild size="sm" className="flex-1 rounded-full">
+                      <Link href={provider.profilePath}>View Profile</Link>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full"
+                      onClick={() => onRemove(provider.id)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function ExplorePageClient({
   cities,
   hasExplicitLocation,
@@ -827,6 +1188,8 @@ export default function ExplorePageClient({
   const [selectedProviderId, setSelectedProviderId] = useState<string | null>(initialBaseItems[0]?.id || null);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [swipeState, setSwipeState] = useState<SwipeState>({ liked: [], skipped: [], saved: [] });
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+  const [compareModalOpen, setCompareModalOpen] = useState(false);
   const [geoOrigin, setGeoOrigin] = useState<ExplorePoint | null>(null);
   const [invalidProviderCount, setInvalidProviderCount] = useState(initialInvalidProviderCount);
   const [serverLoading, setServerLoading] = useState(false);
@@ -924,6 +1287,18 @@ export default function ExplorePageClient({
         setSwipeState(JSON.parse(storedSwipe) as SwipeState);
       }
 
+      const storedCompare = window.sessionStorage.getItem(COMPARE_KEY);
+      if (storedCompare) {
+        try {
+          const parsed = JSON.parse(storedCompare) as unknown;
+          if (Array.isArray(parsed)) {
+            setCompareIds(parsed.filter((v): v is string => typeof v === "string").slice(0, MAX_COMPARE));
+          }
+        } catch {
+          // Ignore corrupted compare data.
+        }
+      }
+
       if (storedSession) {
         const parsed = JSON.parse(storedSession) as {
           path: string;
@@ -957,7 +1332,8 @@ export default function ExplorePageClient({
 
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(filters));
     window.sessionStorage.setItem(SWIPE_KEY, JSON.stringify(swipeState));
-  }, [filters, swipeState]);
+    window.sessionStorage.setItem(COMPARE_KEY, JSON.stringify(compareIds));
+  }, [filters, swipeState, compareIds]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -1090,6 +1466,19 @@ export default function ExplorePageClient({
   }, [providers]);
 
   useEffect(() => {
+    setCompareIds((current) => {
+      const validIds = current.filter((id) => baseProviders.some((p) => p.id === id));
+      if (validIds.length !== current.length) {
+        if (validIds.length < 2) {
+          setCompareModalOpen(false);
+        }
+        return validIds;
+      }
+      return current;
+    });
+  }, [baseProviders]);
+
+  useEffect(() => {
     visibleProviders.forEach((provider) => {
       if (!impressionRef.current.has(provider.id)) {
         impressionRef.current.add(provider.id);
@@ -1211,6 +1600,42 @@ export default function ExplorePageClient({
       });
     }
   }, [applyFilters, filters, requestLocation, requestPreciseLocation]);
+
+  const handleToggleCompare = useCallback(
+    (providerId: string) => {
+      setCompareIds((current) => {
+        if (current.includes(providerId)) {
+          return current.filter((id) => id !== providerId);
+        }
+        if (current.length >= MAX_COMPARE) {
+          return current;
+        }
+        return [...current, providerId];
+      });
+      trackExploreEvent("explore_compare_toggle", { provider_id: providerId });
+    },
+    [],
+  );
+
+  const handleClearCompare = useCallback(() => {
+    setCompareIds([]);
+    setCompareModalOpen(false);
+  }, []);
+
+  const handleOpenCompareModal = useCallback(() => {
+    setCompareModalOpen(true);
+    trackExploreEvent("explore_compare_open", { count: compareIds.length });
+  }, [compareIds.length]);
+
+  const handleRemoveCompare = useCallback((providerId: string) => {
+    setCompareIds((current) => {
+      const next = current.filter((id) => id !== providerId);
+      if (next.length < 2) {
+        setCompareModalOpen(false);
+      }
+      return next;
+    });
+  }, []);
 
   const handleSwipeAction = useCallback(
     (provider: ExploreProvider, action: "like" | "skip" | "save") => {
@@ -1480,6 +1905,9 @@ export default function ExplorePageClient({
                       provider={provider}
                       onOpen={handleProfileOpen}
                       onSelect={setSelectedProviderId}
+                      isCompared={compareIds.includes(provider.id)}
+                      onToggleCompare={handleToggleCompare}
+                      compareCount={compareIds.length}
                     />
                   ))}
 
@@ -1538,6 +1966,22 @@ export default function ExplorePageClient({
           </div>
         </section>
       </div>
+
+      <CompareBar
+        compareIds={compareIds}
+        allProviders={baseProviders}
+        onRemove={handleRemoveCompare}
+        onClear={handleClearCompare}
+        onCompare={handleOpenCompareModal}
+      />
+
+      <CompareModal
+        open={compareModalOpen}
+        onOpenChange={setCompareModalOpen}
+        compareIds={compareIds}
+        allProviders={baseProviders}
+        onRemove={handleRemoveCompare}
+      />
 
       <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
         <SheetContent
