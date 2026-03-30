@@ -13,6 +13,7 @@ import {
   Sparkles,
   MapPin,
   BarChart,
+  BookUser,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -22,6 +23,7 @@ const navItems = [
   { name: "Fotos", href: "/pro/photos", icon: ImageIcon },
   { name: "Performance", href: "/pro/analytics", icon: BarChart },
   { name: "Viagens & Raio", href: "/pro/travel", icon: MapPin },
+  { name: "Perfis", href: "/pro/profiles", icon: BookUser },
   { name: "Configurações", href: "/pro/settings", icon: Settings },
 ];
 
