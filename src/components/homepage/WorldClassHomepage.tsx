@@ -550,11 +550,12 @@ export function WorldClassHomepage({
             </p>
 
             <div className="wc-search-wrap">
-              <div className="wc-search-outer">
+              <div className="wc-search-outer" suppressHydrationWarning>
                 <div className="wc-si">
                   <SearchIcon />
                 </div>
                 <input
+                  suppressHydrationWarning
                   ref={searchInputRef}
                   type="search"
                   placeholder="Deep tissue, therapist name, neighborhood…"
@@ -698,8 +699,9 @@ export function WorldClassHomepage({
               )}
 
               {/* Input */}
-              <div className="wc-kg-input">
+              <div className="wc-kg-input" suppressHydrationWarning>
                 <input
+                  suppressHydrationWarning
                   placeholder="Ask Knotty anything…"
                   value={knottyInput}
                   onChange={(e) => setKnottyInput(e.target.value)}
@@ -984,9 +986,9 @@ export function WorldClassHomepage({
       </section>
 
       {/* ─── NEWSLETTER ─── */}
-      <section className="wc-nl-sec" id="newsletter">
-        <div className="wc-nl-inner">
-          <div className="wc-cr2">
+      <section className="wc-nl-sec" id="newsletter" suppressHydrationWarning>
+        <div className="wc-nl-inner" suppressHydrationWarning>
+          <div className="wc-cr2" suppressHydrationWarning>
             <div className="wc-ey">Stay connected</div>
             <h2 className="wc-nl-title">
               Get the <em>best therapists</em>
@@ -1013,26 +1015,28 @@ export function WorldClassHomepage({
               </li>
             </ul>
           </div>
-          <div className="wc-cr2 wc-d3">
+          <div className="wc-cr2 wc-d3" suppressHydrationWarning>
             <div className="wc-nl-card">
               {!nlSuccess ? (
-                <form onSubmit={handleNlSubmit}>
+                <form onSubmit={handleNlSubmit} suppressHydrationWarning>
                   <div className="wc-nl-card-title">Join the community</div>
                   <div className="wc-nl-card-sub">Free. Unsubscribe anytime.</div>
                   <input
+                    suppressHydrationWarning
                     className="wc-nl-field"
                     type="text"
                     placeholder="Your name"
                     name="name"
                   />
                   <input
+                    suppressHydrationWarning
                     className="wc-nl-field"
                     type="email"
                     placeholder="Email address"
                     name="email"
                     required
                   />
-                  <select className="wc-nl-select" name="city" defaultValue="">
+                  <select suppressHydrationWarning className="wc-nl-select" name="city" defaultValue="">
                     <option value="" disabled>
                       Your city
                     </option>
