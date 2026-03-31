@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useHydratedReducedMotion } from "@/hooks/useHydratedReducedMotion";
 import { cn } from "@/lib/utils";
 
 type TextRevealProps = {
@@ -13,13 +12,8 @@ type TextRevealProps = {
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export function TextReveal({ text, delay = 0, className }: TextRevealProps) {
-  const reduceMotion = useHydratedReducedMotion();
   const words = text.split(" ");
   const wrapperClassName = cn("inline-flex flex-wrap", className);
-
-  if (reduceMotion) {
-    return <span className={wrapperClassName}>{text}</span>;
-  }
 
   return (
     <span className={wrapperClassName} aria-label={text}>
