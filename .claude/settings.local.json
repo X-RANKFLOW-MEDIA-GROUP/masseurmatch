@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm build:*)",
+      "Bash(FORCE_CLEAN_NEXT=1 pnpm build)",
+      "Bash(pnpm typecheck:*)"
+    ]
+  }
+}
