@@ -23,10 +23,16 @@ const isBrowser = typeof window !== "undefined";
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<any>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {
-    storage: browserStorage,
-    persistSession: isBrowser,
-    autoRefreshToken: isBrowser,
+// Guard against missing env vars (e.g. CI builds without secrets configured).
+// All DB calls in the app handle the resulting empty responses gracefully.
+export const supabase = createClient<any>(
+  SUPABASE_URL || "http://placeholder.supabase.invalid",
+  SUPABASE_PUBLISHABLE_KEY || "placeholder-key",
+  {
+    auth: {
+      storage: browserStorage,
+      persistSession: isBrowser,
+      autoRefreshToken: isBrowser,
+    },
   }
-});
+);
