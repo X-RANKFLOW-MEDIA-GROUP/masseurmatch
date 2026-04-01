@@ -39,3 +39,6 @@ dist-ssr
 *.sw?
 .vercel
 .env*.local
+
+# Pasted/uploaded user assets
+attached_assets/

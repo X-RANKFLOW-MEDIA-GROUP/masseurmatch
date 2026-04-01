@@ -24,9 +24,9 @@ const contactCards: Array<{
 }> = [
   {
     icon: UserRound,
-    eyebrow: "Clients",
-    title: "Client Support",
-    description: "Need help navigating the directory or managing your account?",
+    eyebrow: "Visitors",
+    title: "General Support",
+    description: "Need help finding a therapist or navigating the directory?",
     cta: "Email Support",
     email: "support@masseurmatch.com",
     href: buildMailto("support@masseurmatch.com", "Client Support"),
@@ -37,8 +37,8 @@ const contactCards: Array<{
     title: "Professional Support",
     description: "Questions about your profile, subscriptions, or premium placements?",
     cta: "Provider Support",
-    email: "therapists@masseurmatch.com",
-    href: buildMailto("therapists@masseurmatch.com", "Professional Support"),
+    email: "support@masseurmatch.com",
+    href: buildMailto("support@masseurmatch.com", "Professional Support"),
   },
   {
     icon: BriefcaseBusiness,
@@ -46,8 +46,8 @@ const contactCards: Array<{
     title: "General Inquiries & Partnerships",
     description: "For business partnerships, press, or general MasseurMatch questions.",
     cta: "Get in Touch",
-    email: "hello@masseurmatch.com",
-    href: buildMailto("hello@masseurmatch.com", "General Inquiry & Partnership"),
+    email: "support@masseurmatch.com",
+    href: buildMailto("support@masseurmatch.com", "General Inquiry & Partnership"),
   },
 ];
 

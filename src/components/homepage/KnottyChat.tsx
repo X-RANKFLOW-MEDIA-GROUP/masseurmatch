@@ -31,7 +31,11 @@ type KnottyChatProps = {
 /* Constants                                                          */
 /* ------------------------------------------------------------------ */
 
-const INITIAL_MESSAGE = "Hey — looking for a massage near you?";
+const INTRO_MESSAGES = [
+  "Hey there! I'm Knotty, your personal massage concierge.",
+  "I can help you find the perfect therapist based on what you're looking for.",
+  "What brings you here today?"
+];
 
 const QUICK_OPTIONS: QuickOption[] = [
   { label: "Find Available Now", action: "available_now" },
@@ -41,11 +45,11 @@ const QUICK_OPTIONS: QuickOption[] = [
 
 const RESPONSES: Record<string, string> = {
   available_now:
-    "Got it. Showing therapists available right now near you.",
+    "Great choice! Let me show you therapists who are available right now near you.",
   mobile:
-    "Looking for mobile massage options. Let me filter those for you.",
+    "Perfect! I'll find mobile massage therapists who can come to you.",
   help:
-    "No problem! I'd recommend starting with 'Available Now' to see who's ready, or you can search by specialty using the search bar above.",
+    "No problem! Tell me what you're looking for — deep tissue, relaxation, sports recovery? Or I can show you who's available now!",
 };
 
 /* ------------------------------------------------------------------ */
@@ -130,8 +134,15 @@ export function KnottyChat({
     setIsOpen(true);
     if (!hasInteracted) {
       setHasInteracted(true);
-      setPendingText(INITIAL_MESSAGE);
-      setShowOptions(false);
+      // Play intro messages sequence
+      INTRO_MESSAGES.forEach((msg, i) => {
+        setTimeout(() => {
+          setPendingText(msg);
+        }, i * 1800 + 300);
+      });
+      setTimeout(() => {
+        setShowOptions(true);
+      }, INTRO_MESSAGES.length * 1800 + 500);
     }
     trackEvent("knotty_interaction", { action: "open" });
   }, [hasInteracted]);
@@ -173,10 +184,11 @@ export function KnottyChat({
       {!isOpen && (
         <button
           onClick={open}
-          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-brand-primary shadow-[0_8px_30px_rgba(0,0,0,0.25)] transition hover:scale-105 hover:shadow-[0_12px_40px_rgba(0,0,0,0.3)] sm:h-16 sm:w-16"
+          className="fixed bottom-6 right-6 z-50 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-brand-accent to-brand-secondary shadow-[0_8px_30px_rgba(255,138,31,0.4)] transition hover:scale-110 hover:shadow-[0_12px_40px_rgba(255,138,31,0.5)] sm:h-18 sm:w-18 animate-pulse"
           aria-label="Open Knotty AI Chat"
         >
-          <Sparkles className="h-6 w-6 text-white" />
+          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-brand-accent to-brand-secondary animate-ping opacity-30" />
+          <Sparkles className="h-7 w-7 text-white relative z-10" />
         </button>
       )}
 
@@ -187,42 +199,45 @@ export function KnottyChat({
             "fixed z-50 flex flex-col",
             // Mobile: full screen
             "inset-0 sm:inset-auto",
-            // Desktop: bottom-right card
-            "sm:bottom-6 sm:right-6 sm:h-[480px] sm:w-[380px]",
-            // Glass UI
-            "rounded-none border border-white/15 bg-brand-primary/80 shadow-[0_24px_70px_rgba(0,0,0,0.35)] backdrop-blur-2xl sm:rounded-[28px]",
+            // Desktop: bottom-right card - BIGGER
+            "sm:bottom-6 sm:right-6 sm:h-[560px] sm:w-[420px]",
+            // Glass UI with lighter background
+            "rounded-none border border-brand-accent/20 bg-slate-900/95 shadow-[0_24px_70px_rgba(0,0,0,0.45),0_0_60px_rgba(255,138,31,0.15)] backdrop-blur-2xl sm:rounded-[32px]",
           )}
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+          <div className="flex items-center justify-between border-b border-brand-accent/20 bg-gradient-to-r from-brand-accent/10 to-transparent px-5 py-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-accent/20">
-                <Sparkles className="h-4 w-4 text-brand-soft" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-brand-accent to-brand-secondary shadow-lg">
+                <Sparkles className="h-5 w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-white">Knotty AI</p>
-                <p className="text-[11px] text-white/50">Your massage assistant</p>
+                <p className="text-base font-bold text-white">Knotty AI</p>
+                <p className="text-xs text-brand-soft flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  Online now
+                </p>
               </div>
             </div>
             <button
               onClick={close}
-              className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-white/10"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 transition hover:bg-white/10 hover:border-white/20"
               aria-label="Close chat"
             >
-              <X className="h-4 w-4 text-white/60" />
+              <X className="h-4 w-4 text-white/70" />
             </button>
           </div>
 
           {/* Messages */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
             {messages.map((msg) => (
               <div
                 key={msg.id}
                 className={cn(
-                  "max-w-[85%] rounded-[18px] px-4 py-2.5 text-sm leading-relaxed",
+                  "max-w-[85%] rounded-[20px] px-4 py-3 text-[15px] leading-relaxed shadow-sm",
                   msg.role === "knotty"
-                    ? "mr-auto bg-white/10 text-white"
-                    : "ml-auto bg-brand-soft/20 text-brand-soft",
+                    ? "mr-auto bg-slate-800/80 text-white/95 border border-white/5"
+                    : "ml-auto bg-gradient-to-r from-brand-accent to-brand-secondary text-white font-medium",
                 )}
               >
                 {msg.text}
@@ -231,24 +246,25 @@ export function KnottyChat({
 
             {/* Typing indicator */}
             {pendingText && isTyping && (
-              <div className="mr-auto max-w-[85%] rounded-[18px] bg-white/10 px-4 py-2.5 text-sm leading-relaxed text-white">
+              <div className="mr-auto max-w-[85%] rounded-[20px] bg-slate-800/80 border border-white/5 px-4 py-3 text-[15px] leading-relaxed text-white/95">
                 {typedText}
-                <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-white/60" />
+                <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-brand-accent" />
               </div>
             )}
           </div>
 
           {/* Quick options */}
           {showOptions && (
-            <div className="border-t border-white/10 px-5 py-4 space-y-2">
+            <div className="border-t border-brand-accent/20 px-5 py-4 space-y-2.5 bg-slate-900/50">
+              <p className="text-xs text-white/50 mb-3 uppercase tracking-wider">Quick actions</p>
               {QUICK_OPTIONS.map((option) => (
                 <button
                   key={option.action}
                   onClick={() => handleOption(option)}
-                  className="flex w-full items-center justify-between rounded-[14px] border border-white/10 bg-white/[0.06] px-4 py-3 text-sm font-medium text-white transition hover:border-brand-accent/30 hover:bg-white/10"
+                  className="flex w-full items-center justify-between rounded-[16px] border border-brand-accent/20 bg-slate-800/60 px-4 py-3.5 text-[15px] font-semibold text-white transition hover:border-brand-accent/50 hover:bg-slate-800"
                 >
                   {option.label}
-                  <ChevronRight className="h-4 w-4 text-white/40" />
+                  <ChevronRight className="h-5 w-5 text-brand-accent" />
                 </button>
               ))}
             </div>

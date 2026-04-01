@@ -16,8 +16,13 @@ type MiddlewareSession = {
   expiresAt: string;
 };
 
-function getSessionSecret() {
-  return process.env.MM_SESSION_SECRET || process.env.SESSION_SECRET || "dev-only-masseurmatch-session-secret";
+function getSessionSecret(): string {
+  const secret = process.env.MM_SESSION_SECRET ?? process.env.SESSION_SECRET;
+  if (secret) return secret;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('MM_SESSION_SECRET is required in production.');
+  }
+  return 'dev-only-masseurmatch-session-secret';
 }
 
 function toBase64Url(bytes: Uint8Array): string {
@@ -142,9 +147,29 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname, searchParams } = request.nextUrl;
   const session = await readSessionCookie(request);
 
-  // ── 1. /wireframes* → 301 / (internal page should not be public) ───────
+  // ── 1. Removed routes → 301 redirects ───────────────────────────────────
   if (pathname === "/wireframes" || pathname.startsWith("/wireframes/")) {
     return NextResponse.redirect(new URL("/", request.url), 301);
+  }
+
+  if (pathname === "/chat" || pathname.startsWith("/chat/")) {
+    return NextResponse.redirect(new URL("/explore", request.url), 301);
+  }
+
+  if (pathname === "/pro/travel" || pathname.startsWith("/pro/travel/")) {
+    return NextResponse.redirect(new URL("/pro/dashboard", request.url), 301);
+  }
+
+  if (pathname === "/Auth") {
+    return NextResponse.redirect(new URL("/auth", request.url), 301);
+  }
+
+  if (pathname === "/Privacy") {
+    return NextResponse.redirect(new URL("/privacy", request.url), 301);
+  }
+
+  if (pathname === "/admin/reviews" || pathname.startsWith("/admin/reviews/")) {
+    return NextResponse.redirect(new URL("/admin/moderation", request.url), 301);
   }
 
   // ── 2. /explore?city=X  →  301 /explore/usa/{slug} ───────────────────────
@@ -162,15 +187,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.redirect(destination, 301);
   }
 
-  // ── 4. /search → 301 /explore (unified search + explore) ──────────────
-  if (pathname === "/search") {
-    const destination = new URL("/explore", request.url);
-    // Carry over any search params
-    for (const [key, value] of searchParams.entries()) {
-      destination.searchParams.set(key, value);
-    }
-    return NextResponse.redirect(destination, 301);
-  }
 
   // ── 4. /explore/*  →  noindex, follow header ─────────────────────────────
   // Browse/directory pages are navigation aids, not SEO targets.
@@ -241,19 +257,27 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   }
 
   // ── 7. Auth guards ────────────────────────────────────────────────────────
+  // Unauthenticated → /login (with redirect param)
+  // Authenticated but wrong role → / (home, no redirect param)
   if (pathname.startsWith("/pro")) {
-    if (!session || session.role !== "provider") {
+    if (!session) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
+    if (session.role !== "provider") {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
   }
 
   if (pathname.startsWith("/admin")) {
-    if (!session || session.role !== "admin") {
+    if (!session) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
+    }
+    if (session.role !== "admin") {
+      return NextResponse.redirect(new URL("/", request.url));
     }
   }
 

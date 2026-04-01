@@ -1,7 +1,7 @@
 import { Buffer } from "node:buffer";
 import { createHmac, timingSafeEqual } from "node:crypto";
 
-import { envAny } from "@/app/api/_lib/env";
+import { envAny, envOptional } from "@/app/api/_lib/env";
 import { parseCookieHeader } from "@/app/api/_lib/http";
 
 export interface RequestSession {
@@ -14,8 +14,13 @@ export interface RequestSession {
 const COOKIE_NAME = "mm_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
 
-function sessionSecret() {
-  return envAny(["MM_SESSION_SECRET", "SESSION_SECRET"], "dev-only-masseurmatch-session-secret");
+function sessionSecret(): string {
+  const secret = envOptional(["MM_SESSION_SECRET", "SESSION_SECRET"]);
+  if (secret) return secret;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("MM_SESSION_SECRET is required in production. Set it in your environment variables.");
+  }
+  return "dev-only-masseurmatch-session-secret";
 }
 
 function encodeBase64Url(value: string): string {

@@ -33,9 +33,6 @@ export function SiteFooter() {
           <Link href="/advertise" className="block transition hover:text-foreground">
             Advertise
           </Link>
-          <Link href="/chat" className="block transition hover:text-foreground">
-            Directory Assistant
-          </Link>
           <Link href="/near-me" className="block transition hover:text-foreground">
             Near Me
           </Link>

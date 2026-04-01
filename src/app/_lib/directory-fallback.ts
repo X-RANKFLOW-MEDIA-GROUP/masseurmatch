@@ -375,7 +375,11 @@ function matchesAvailableToday(profile: FallbackTherapist, availableToday?: bool
     return true;
   }
 
-  return Boolean(profile.available_now);
+  if (!profile.available_now) return false;
+  if (profile.available_now_expires) {
+    return new Date(profile.available_now_expires) > new Date();
+  }
+  return true;
 }
 
 function matchesTier(profile: FallbackTherapist, tier?: TherapistTier) {
@@ -406,8 +410,11 @@ export function getFallbackPublicTherapists(filters: BasicDirectoryFilters = {})
     .filter((profile) => matchesAvailableToday(profile, filters.availableToday))
     .filter((profile) => matchesTier(profile, filters.tier))
     .sort((left, right) => {
-      if (Boolean(left.available_now) !== Boolean(right.available_now)) {
-        return Number(Boolean(right.available_now)) - Number(Boolean(left.available_now));
+      const now = new Date();
+      const leftActive = Boolean(left.available_now) && (!left.available_now_expires || new Date(left.available_now_expires) > now);
+      const rightActive = Boolean(right.available_now) && (!right.available_now_expires || new Date(right.available_now_expires) > now);
+      if (leftActive !== rightActive) {
+        return Number(rightActive) - Number(leftActive);
       }
 
       const leftTier = TIER_PRIORITY[left._tier || "free"];

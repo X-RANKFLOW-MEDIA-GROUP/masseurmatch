@@ -258,7 +258,7 @@ export function KnottyHeroSpotlight({ therapists, therapistCount, cityCount }: K
       params.set("prompt", message.trim());
     }
 
-    router.push(params.toString() ? `/chat?${params.toString()}` : "/chat");
+    router.push(params.toString() ? `/explore?${params.toString()}` : "/explore");
   };
 
   return (

@@ -4,7 +4,7 @@ import { createSupabaseAdminClient, requireAdminSession } from "@/app/api/_lib/s
 export async function GET(request: Request) {
   try {
     await requireAdminSession(request);
-    const adminClient = createSupabaseAdminClient() as any;
+    const adminClient = createSupabaseAdminClient();
 
     const { data: logs, error } = await adminClient
       .from("audit_log")

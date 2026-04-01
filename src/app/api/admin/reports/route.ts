@@ -4,7 +4,7 @@ import { createSupabaseAdminClient, requireAdminSession } from "@/app/api/_lib/s
 export async function GET(request: Request) {
   try {
     await requireAdminSession(request);
-    const adminClient = createSupabaseAdminClient() as any;
+    const adminClient = createSupabaseAdminClient();
 
     // Fetch aggregate learning scores (top therapists by performance)
     const { data: topTherapists, error: scoresError } = await adminClient

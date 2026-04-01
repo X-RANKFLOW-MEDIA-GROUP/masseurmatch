@@ -4,7 +4,7 @@ export default function AdminFlags() {
   return (
     <LegacyAdminView
       description="Flag review and moderation tools were consolidated into the current admin console."
-      href="/admin/reviews"
+      href="/admin/moderation"
       title="Admin Flags"
     />
   );

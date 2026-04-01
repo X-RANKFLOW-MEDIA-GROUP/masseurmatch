@@ -72,7 +72,6 @@ export default async function AdminOverviewPage() {
     { href: "/admin/therapists", label: "Therapists", description: "Approve, suspend, verify, and feature provider profiles.", icon: HeartHandshake },
     { href: "/admin/users", label: "Users", description: "Manage provider and admin roles.", icon: Users },
     { href: "/admin/moderation", label: "Moderation", description: "Review queued listing drafts flagged by Sightengine.", icon: ShieldAlert },
-    { href: "/admin/reviews", label: "Reviews", description: "Review imported reviews and moderation status.", icon: ShieldCheck },
     { href: "/admin/cities", label: "Cities", description: "Edit local landing page copy and city coverage.", icon: MapPin },
     { href: "/admin/keywords", label: "Keywords", description: "Manage specialty and SEO keyword surfaces.", icon: Tag },
     { href: "/admin/blog", label: "Blog", description: "Publish and maintain editorial content.", icon: Newspaper },

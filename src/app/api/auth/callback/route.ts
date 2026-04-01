@@ -125,9 +125,11 @@ export async function GET(request: NextRequest) {
   // We redirect with a token that the client can pick up
   const { createHmac } = await import("node:crypto");
   const sessionSecret =
-    process.env.MM_SESSION_SECRET ||
-    process.env.SESSION_SECRET ||
-    "dev-only-masseurmatch-session-secret";
+    process.env.MM_SESSION_SECRET ??
+    process.env.SESSION_SECRET ??
+    (process.env.NODE_ENV === "production"
+      ? (() => { throw new Error("MM_SESSION_SECRET is required in production."); })()
+      : "dev-only-masseurmatch-session-secret");
 
   const role =
     serviceKey
@@ -140,7 +142,8 @@ export async function GET(request: NextRequest) {
             .select("role")
             .eq("user_id", user.id)
             .maybeSingle();
-          return (roleRow as any)?.role ?? null;
+          const typedRow = roleRow as { role: string } | null;
+          return (typedRow?.role as "admin" | "provider" | "client" | null) ?? null;
         })()
       : null;
 

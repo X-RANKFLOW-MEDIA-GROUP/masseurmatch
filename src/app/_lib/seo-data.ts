@@ -34,7 +34,7 @@ export async function fetchAllRows<T>(
   columns: string,
   queryBuilder?: (query: any) => any,
 ): Promise<T[]> {
-  const supabase = createSupabasePublicClient() as any;
+  const supabase = createSupabasePublicClient();
   const rows: T[] = [];
   let from = 0;
 
@@ -130,6 +130,11 @@ export async function getSeoKeywords(): Promise<SeoKeyword[]> {
   }));
 }
 
+// Featured profiles that should always appear in sitemap
+const FEATURED_PROFILE_SLUGS = [
+  "bruno-dallas-tx",
+];
+
 export async function getSeoTherapists(): Promise<SeoTherapist[]> {
   const therapistsTableRows = await tryFetchAllRows<SeoTherapist>(
     "therapists",
@@ -142,8 +147,16 @@ export async function getSeoTherapists(): Promise<SeoTherapist[]> {
         .order("slug"),
   );
 
-  if (therapistsTableRows) {
-    return therapistsTableRows.filter((therapist) => typeof therapist.slug === "string" && therapist.slug.length > 0);
+  if (therapistsTableRows && therapistsTableRows.length > 0) {
+    const slugSet = new Set(therapistsTableRows.map((t) => t.slug));
+    // Ensure featured profiles are always included
+    const featuredToAdd = FEATURED_PROFILE_SLUGS
+      .filter((slug) => !slugSet.has(slug))
+      .map((slug) => ({ slug, updated_at: new Date().toISOString() }));
+    return [
+      ...therapistsTableRows.filter((therapist) => typeof therapist.slug === "string" && therapist.slug.length > 0),
+      ...featuredToAdd,
+    ];
   }
 
   const profileRows = await tryFetchAllRows<SeoTherapist>(
@@ -157,7 +170,15 @@ export async function getSeoTherapists(): Promise<SeoTherapist[]> {
         .order("slug"),
   );
 
-  return (profileRows ?? []).filter((therapist) => typeof therapist.slug === "string" && therapist.slug.length > 0);
+  const profiles = (profileRows ?? []).filter((therapist) => typeof therapist.slug === "string" && therapist.slug.length > 0);
+  
+  // Ensure featured profiles are always included
+  const slugSet = new Set(profiles.map((t) => t.slug));
+  const featuredToAdd = FEATURED_PROFILE_SLUGS
+    .filter((slug) => !slugSet.has(slug))
+    .map((slug) => ({ slug, updated_at: new Date().toISOString() }));
+  
+  return [...profiles, ...featuredToAdd];
 }
 
 export type SeoBlogPost = {

@@ -63,15 +63,15 @@ function resolveContactRecipient(subject: string, audience?: ContactAudience) {
     normalized.includes("business") ||
     normalized.includes("sponsorship")
   ) {
-    return "hello@masseurmatch.com";
+    return "support@masseurmatch.com";
   }
 
   if (audience === "massage-professional") {
-    return "therapists@masseurmatch.com";
+    return "support@masseurmatch.com";
   }
 
   if (audience === "other") {
-    return "hello@masseurmatch.com";
+    return "support@masseurmatch.com";
   }
 
   return "support@masseurmatch.com";

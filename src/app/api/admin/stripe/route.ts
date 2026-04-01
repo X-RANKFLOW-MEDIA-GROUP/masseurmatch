@@ -5,7 +5,7 @@ import { requireAdminSession } from "@/app/api/_lib/supabase-server";
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) return null;
-  return new Stripe(key, { apiVersion: "2025-02-24.acacia" as any });
+  return new Stripe(key, { apiVersion: "2025-08-27.basil" });
 }
 
 export async function GET(request: NextRequest) {
@@ -54,8 +54,6 @@ export async function GET(request: NextRequest) {
       const product = item?.price?.product;
       const productName = (product && typeof product !== "string" && !("deleted" in product)) ? product.name : null;
       const planKey = s.metadata?.masseurmatch_plan ?? productName ?? "Unknown";
-      const raw = s as any;
-
       return {
         id: s.id,
         status: s.status,
@@ -65,10 +63,10 @@ export async function GET(request: NextRequest) {
         userId: s.metadata?.user_id ?? null,
         amount: (item?.price?.unit_amount ?? 0) / 100,
         currency: item?.price?.currency ?? "usd",
-        currentPeriodStart: raw.current_period_start ? new Date(raw.current_period_start * 1000).toISOString() : null,
-        currentPeriodEnd: raw.current_period_end ? new Date(raw.current_period_end * 1000).toISOString() : null,
-        trialEnd: raw.trial_end ? new Date(raw.trial_end * 1000).toISOString() : null,
-        canceledAt: raw.canceled_at ? new Date(raw.canceled_at * 1000).toISOString() : null,
+        currentPeriodStart: null, // Removed in Stripe Basil API — use subscription.billing_cycle_anchor
+        currentPeriodEnd: null, // Removed in Stripe Basil API
+        trialEnd: (typeof s.trial_end === "number") ? new Date(s.trial_end * 1000).toISOString() : null,
+        canceledAt: s.canceled_at ? new Date(s.canceled_at * 1000).toISOString() : null,
         created: new Date(s.created * 1000).toISOString(),
       };
     });

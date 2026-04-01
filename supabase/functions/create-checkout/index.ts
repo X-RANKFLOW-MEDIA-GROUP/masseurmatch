@@ -24,17 +24,17 @@ const PLANS: Record<string, { name: string; amount: number; features: string; is
   standard: {
     name: "Standard",
     amount: 3900,
-    features: "6 photos, middle search placement, Available Now for 60 minutes, 3 travel schedules per month, views analytics, newsletter chance",
+    features: "6 photos, middle search placement, Available Now for 2 hours, 3 travel schedules per month, views analytics, newsletter chance",
   },
   pro: {
     name: "Pro",
     amount: 7900,
-    features: "12 photos plus video, top search placement, Available Now for 120 minutes, unlimited travel schedules, views and clicks analytics, homepage rotation, weekly specials, verified badge",
+    features: "12 photos plus video, top search placement, Available Now for 3 hours, unlimited travel schedules, views and clicks analytics, homepage rotation, weekly specials, verified badge",
   },
   elite: {
     name: "Elite",
     amount: 9900,
-    features: "12 photos plus video, top search placement, Available Now for 120 minutes, unlimited travel schedules, views and clicks analytics, homepage rotation, weekly specials, verified badge, 2 active ads across 2 cities",
+    features: "12 photos plus video, top search placement, Available Now for 4 hours, unlimited travel schedules, views and clicks analytics, homepage rotation, weekly specials, verified badge, 2 active ads across 2 cities",
   },
 };
 
@@ -225,8 +225,8 @@ serve(async (req) => {
       },
       payment_method_collection: "if_required",
       allow_promotion_codes: true,
-      success_url: `${req.headers.get("origin")}/dashboard/subscription?success=true`,
-      cancel_url: `${req.headers.get("origin")}/dashboard/subscription?canceled=true`,
+      success_url: `${req.headers.get("origin")}/pro/billing?success=true`,
+      cancel_url: `${req.headers.get("origin")}/pro/billing?canceled=true`,
       metadata: { user_id: user.id, plan_key },
     };
 

@@ -26,7 +26,7 @@ const jsonLd = {
     "@type": "Organization",
     name: "MasseurMatch",
     url: "https://masseurmatch.com",
-    email: "hello@masseurmatch.com",
+    email: "support@masseurmatch.com",
     address: {
       "@type": "PostalAddress",
       addressLocality: "Dallas",
@@ -43,13 +43,13 @@ const jsonLd = {
       {
         "@type": "ContactPoint",
         contactType: "professional support",
-        email: "therapists@masseurmatch.com",
+        email: "support@masseurmatch.com",
         availableLanguage: ["English", "Portuguese"],
       },
       {
         "@type": "ContactPoint",
         contactType: "general inquiries and partnerships",
-        email: "hello@masseurmatch.com",
+        email: "support@masseurmatch.com",
       },
     ],
   },

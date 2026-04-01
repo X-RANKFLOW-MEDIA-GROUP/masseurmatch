@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
     const nextProfile = await updateProfileByUserId(session.userId, {
       current_status: body.status,
-      service_radius_km: body.radius ?? (profile as any).service_radius_km ?? 15,
+      service_radius_km: body.radius ?? 15,
       travel_destination: body.travelDestination ?? null,
     });
 
