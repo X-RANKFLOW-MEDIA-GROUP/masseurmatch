@@ -192,7 +192,7 @@ const TESTIMONIALS: Testimonial[] = [
     name: "Sam O., LMT",
     initials: "SO",
     meta: "South Congress, Austin TX \u00b7 Verified Therapist",
-    color: "rgba(11,31,58,.09)",
+    color: "#0B1F3A",
   },
 ];
 
@@ -861,7 +861,7 @@ export function WorldClassHomepage({
             <Link
               href="/therapists"
               className="wc-more-link"
-              style={{ color: "rgba(255,181,112,.8)" }}
+              style={{ color: "rgba(255,138,31,.8)" }}
             >
               Browse all therapists <ArrowRightIcon />
             </Link>
