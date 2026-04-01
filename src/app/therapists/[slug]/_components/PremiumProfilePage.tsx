@@ -15,6 +15,7 @@ import { PremiumProfileFaq } from "./PremiumProfileFaq";
 import { ProfileTravel } from "./ProfileTravel";
 import { PremiumProfileLocation } from "./PremiumProfileLocation";
 import { KnottyProfileTracker } from "./KnottyProfileTracker";
+import { ProfileAreasServed } from "./ProfileAreasServed";
 import "./premium-profile.css";
 
 interface Props {

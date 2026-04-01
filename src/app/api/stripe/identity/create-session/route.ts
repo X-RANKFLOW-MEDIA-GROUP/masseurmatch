@@ -5,7 +5,7 @@ import { createSupabaseAdminClient, requireAdminSession } from "@/app/api/_lib/s
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) throw new Error("STRIPE_SECRET_KEY not configured");
-  return new Stripe(key, { apiVersion: "2025-02-24.acacia" as any });
+  return new Stripe(key, { apiVersion: "2025-08-27.basil" });
 }
 
 export async function POST(request: NextRequest) {
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Record in identity_verifications table
-    const adminClient = createSupabaseAdminClient() as any;
+    const adminClient = createSupabaseAdminClient();
     await adminClient.from("identity_verifications").upsert({
       user_id: userId,
       stripe_session_id: session.id,

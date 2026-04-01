@@ -51,7 +51,7 @@ const EDITORIAL_AUTHOR: BlogAuthor = {
  * Fetch all published blog post slugs for generateStaticParams.
  */
 export async function getBlogSlugs(): Promise<string[]> {
-  const { data } = await (supabase as any)
+  const { data } = await supabase
     .from("blog_posts")
     .select("slug")
     .order("published_at", { ascending: false });
@@ -68,7 +68,7 @@ export async function getBlogSlugs(): Promise<string[]> {
  * Fetch a single blog post by slug.
  */
 export async function getBlogPost(slug: string): Promise<BlogPost | null> {
-  const { data } = await (supabase as any)
+  const { data } = await supabase
     .from("blog_posts")
     .select("*")
     .eq("slug", slug)
@@ -92,7 +92,7 @@ export async function getBlogListItems(options?: {
 }): Promise<{ featured: BlogListItem | null; posts: BlogListItem[] }> {
   const limit = options?.limit ?? 20;
 
-  let query = (supabase as any)
+  let query = supabase
     .from("blog_posts")
     .select("slug, title, excerpt, tags, published_at, seo_description")
     .order("published_at", { ascending: false })
@@ -132,7 +132,7 @@ export async function getRelatedPosts(
   currentSlug: string,
   limit = 3,
 ): Promise<BlogListItem[]> {
-  const { data } = await (supabase as any)
+  const { data } = await supabase
     .from("blog_posts")
     .select("slug, title, excerpt, tags, published_at")
     .neq("slug", currentSlug)

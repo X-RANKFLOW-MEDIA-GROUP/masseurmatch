@@ -81,7 +81,8 @@ export async function POST(request: NextRequest) {
     .maybeSingle();
 
   // Create role if it doesn't exist (for new OTP users)
-  let role = (roleRow as any)?.role ?? null;
+  const typedRoleRow = roleRow as { role: string } | null;
+  let role: "admin" | "provider" | "client" | null = (typedRoleRow?.role as "admin" | "provider" | "client" | null) ?? null;
   if (!role) {
     await supabase.from("user_roles").insert({
       user_id: user.id,

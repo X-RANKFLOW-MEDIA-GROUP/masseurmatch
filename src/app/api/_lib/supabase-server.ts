@@ -37,7 +37,7 @@ function baseOptions() {
   };
 }
 
-export function createSupabasePublicClient(): any {
+export function createSupabasePublicClient() {
   const url = getSupabaseUrl();
   const anonKey = getAnonKey();
   assertConfig(url, "SUPABASE_URL");
@@ -46,7 +46,7 @@ export function createSupabasePublicClient(): any {
   return createClient<Database>(url, anonKey, baseOptions());
 }
 
-export function createSupabaseAdminClient(): any {
+export function createSupabaseAdminClient() {
   const url = getSupabaseUrl();
   const serviceRoleKey = getServiceRoleKey();
   assertConfig(url, "SUPABASE_URL");
@@ -105,7 +105,7 @@ export async function recordAuditLog(
   details?: Json,
 ) {
   try {
-    const adminClient = createSupabaseAdminClient() as any;
+    const adminClient = createSupabaseAdminClient();
     await adminClient.from("audit_log").insert({
       admin_user_id: adminUserId,
       action,
@@ -180,16 +180,16 @@ export async function createTherapistUser(input: {
     throw new RouteError(400, error?.message ?? "Could not create user.");
   }
 
-  const serviceClient = adminClient as any;
+  
 
-  const existingProfile = await serviceClient
+  const existingProfile = await adminClient
     .from("profiles")
     .select("id")
     .eq("user_id", data.user.id)
     .maybeSingle();
 
   if (!existingProfile.data) {
-    const { error: profileError } = await serviceClient.from("profiles").insert({
+    const { error: profileError } = await adminClient.from("profiles").insert({
       user_id: data.user.id,
       full_name: input.fullName,
       display_name: input.fullName,
@@ -206,7 +206,7 @@ export async function createTherapistUser(input: {
 
   const currentRole = await getUserRole(data.user.id);
   if (!currentRole) {
-    const { error: roleError } = await serviceClient.from("user_roles").insert({
+    const { error: roleError } = await adminClient.from("user_roles").insert({
       user_id: data.user.id,
       role: "provider",
     });
@@ -219,26 +219,5 @@ export async function createTherapistUser(input: {
   return {
     user: data.user,
     role: "provider" as const,
-  };
-}
-
-export async function updateSubscriptionTier(
-  userId: string,
-  tier: "free" | "standard" | "pro" | "elite",
-) {
-  const adminClient = createSupabaseAdminClient() as any;
-
-  const { error } = await adminClient
-    .from("profiles")
-    .update({ _tier: tier })
-    .eq("user_id", userId);
-
-  if (error) {
-    throw new RouteError(500, error.message);
-  }
-
-  return {
-    userId,
-    tier,
   };
 }

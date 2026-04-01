@@ -1,7 +1,74 @@
-import { getCities } from "@/app/_lib/directory";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { JsonLd } from "@/app/_components/json-ld";
+import {
+  type TherapistTier,
+  getCities,
+  getPublicTherapists,
+} from "@/app/_lib/directory";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildFaqJsonLd,
+  buildItemListJsonLd,
+  createPageMetadata,
+} from "@/app/_lib/seo";
+import type { DirectorySession } from "@/components/sections/AdvancedDirectoryFilter";
+import { TextReveal } from "@/components/animations/TextReveal";
+import SearchPageClient from "./SearchPageClient";
+
 type SearchPageProps = {
-  searchParams: any;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
+
+const getFirstParam = (value: string | string[] | undefined): string =>
+  Array.isArray(value) ? (value[0] || "") : (value || "");
+
+const isTier = (value: string): value is TherapistTier =>
+  value === "free" || value === "standard" || value === "pro" || value === "elite";
+
+const resolveCityName = (raw: string): string => raw.trim();
+
+const SEARCH_FAQS = [
+  {
+    question: "How do I find a therapist near me?",
+    answer:
+      "Use the city filter to narrow results to your area. Then compare specialties, verification badges, and pricing before contacting a therapist directly.",
+  },
+  {
+    question: "Does MasseurMatch handle booking or payments?",
+    answer:
+      "No. MasseurMatch is a discovery directory only. You review profiles and contact therapists directly to confirm availability, rates, and location.",
+  },
+  {
+    question: "What does the verified badge mean?",
+    answer:
+      "Verified therapists have completed one or more identity checks. This signals a higher level of trust — not a licensing guarantee.",
+  },
+  {
+    question: "Can I filter by specialty or session type?",
+    answer:
+      "Yes. Use the modality and session filters to narrow results by deep tissue, Swedish, outcall, incall, and more.",
+  },
+];
+
+export async function generateMetadata({ searchParams }: SearchPageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const city = getFirstParam(params.city);
+  const modality = getFirstParam(params.modality);
+  const tier = getFirstParam(params.tier);
+  const hasFilters = Boolean(city || modality || tier);
+
+  return createPageMetadata({
+    title: city ? `${city} massage therapists — directory search` : "Search verified massage therapists",
+    description: city
+      ? `Search verified massage therapists in ${city}. Compare specialties, availability, and pricing — then contact directly.`
+      : "Search the MasseurMatch directory by city, specialty, session format, and tier. Find verified massage therapists and contact them directly.",
+    path: "/search",
+    noIndex: hasFilters,
+  });
+}
+
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const cities = getCities();
@@ -112,9 +179,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <div className="mt-5 flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/blog" className="text-primary hover:underline">
                 Visit the blog
-              </Link>
-              <Link href="/compare" className="text-primary hover:underline">
-                Compare competitors
               </Link>
               <Link href="/safety" className="text-primary hover:underline">
                 Read trust and safety

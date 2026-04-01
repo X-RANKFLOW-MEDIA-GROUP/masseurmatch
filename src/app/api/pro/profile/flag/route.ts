@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     }
 
     const body = await parseJsonBody(request, flaggedProfileSchema);
-    const adminClient = createSupabaseAdminClient() as any;
+    const adminClient = createSupabaseAdminClient();
     const snapshot = {
       displayName: sanitizeText(body.displayName),
       bio: sanitizeText(body.bio),

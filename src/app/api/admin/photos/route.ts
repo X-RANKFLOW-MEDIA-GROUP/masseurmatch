@@ -11,7 +11,7 @@ const moderatePhotoSchema = z.object({
 export async function GET(request: Request) {
   try {
     await requireAdminSession(request);
-    const adminClient = createSupabaseAdminClient() as any;
+    const adminClient = createSupabaseAdminClient();
 
     const { data: photos, error } = await adminClient
       .from("profile_photos")
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
   try {
     const admin = await requireAdminSession(request);
     const body = await parseJsonBody(request, moderatePhotoSchema);
-    const adminClient = createSupabaseAdminClient() as any;
+    const adminClient = createSupabaseAdminClient();
 
     const { data: photo, error: fetchError } = await adminClient
       .from("profile_photos")

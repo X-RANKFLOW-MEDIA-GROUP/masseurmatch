@@ -1,4 +1,27 @@
 import { z } from "zod";
+type ProfileRow = {
+  id: string;
+  user_id: string;
+  slug: string | null;
+  city: string | null;
+  status: string;
+  is_active: boolean | null;
+  is_verified_profile: boolean | null;
+  is_verified_identity: boolean | null;
+  is_verified_phone: boolean | null;
+  display_name: string | null;
+  full_name: string;
+  [key: string]: unknown;
+};
+
+type FeaturedRow = {
+  id: string;
+  profile_id: string;
+  display_order: number | null;
+  is_active: boolean;
+  [key: string]: unknown;
+};
+
 
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { buildTherapistRevalidatePaths, triggerRevalidate } from "@/app/_lib/revalidate";
@@ -29,12 +52,13 @@ async function applyTherapistAdminAction(
   adminUserId: string,
   input: z.infer<typeof adminTherapistActionSchema>,
 ) {
-  const adminClient = createSupabaseAdminClient() as any;
-  const { data: profile, error: profileError } = await adminClient
+  const adminClient = createSupabaseAdminClient();
+  const { data: rawProfile, error: profileError } = await adminClient
     .from("profiles")
     .select("*")
     .eq("id", input.therapistId)
     .maybeSingle();
+  const profile = rawProfile as ProfileRow | null;
 
   if (profileError) {
     throw new RouteError(500, profileError.message);
@@ -44,7 +68,7 @@ async function applyTherapistAdminAction(
     throw new RouteError(404, "Therapist not found.");
   }
 
-  let updatedProfile = profile;
+  let updatedProfile: ProfileRow = profile;
   let featureRecord: unknown = null;
 
   switch (input.action) {
@@ -65,7 +89,7 @@ async function applyTherapistAdminAction(
         throw new RouteError(500, error.message);
       }
 
-      updatedProfile = data;
+      updatedProfile = data as ProfileRow;
       break;
     }
     case "reject": {
@@ -84,7 +108,7 @@ async function applyTherapistAdminAction(
         throw new RouteError(500, error.message);
       }
 
-      updatedProfile = data;
+      updatedProfile = data as ProfileRow;
       break;
     }
     case "suspend":
@@ -121,7 +145,7 @@ async function applyTherapistAdminAction(
         throw new RouteError(500, error.message);
       }
 
-      updatedProfile = data;
+      updatedProfile = data as ProfileRow;
       break;
     }
     case "verify_identity": {
@@ -139,7 +163,7 @@ async function applyTherapistAdminAction(
         throw new RouteError(500, error.message);
       }
 
-      updatedProfile = data;
+      updatedProfile = data as ProfileRow;
       break;
     }
     case "feature": {
@@ -159,9 +183,9 @@ async function applyTherapistAdminAction(
           .update({
             is_active: true,
             city: profile.city || null,
-            display_order: input.displayOrder ?? existing.data.display_order ?? 0,
+            display_order: input.displayOrder ?? (existing.data as FeaturedRow).display_order ?? 0,
           })
-          .eq("id", existing.data.id)
+          .eq("id", (existing.data as FeaturedRow).id)
           .select("*")
           .single();
 

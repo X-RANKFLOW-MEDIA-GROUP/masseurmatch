@@ -7,7 +7,7 @@ import { getPublicProfileName } from "@/app/_lib/public-profile";
 
 interface Props {
   profile: PublicTherapist;
-  reviews?: { rating: number }[];
+  reviews?: { rating: number | null }[];
 }
 
 export function PremiumProfileAbout({ profile, reviews = [] }: Props) {
@@ -16,8 +16,9 @@ export function PremiumProfileAbout({ profile, reviews = [] }: Props) {
   const neighborhood = profile.neighborhood_name || profile.primary_area || "";
   const yearsExp = profile.years_experience || (profile.start_year ? new Date().getFullYear() - profile.start_year : 5);
   const specialties = profile.specialties || [];
-  const avgRating = reviews.length > 0 
-    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+  const ratedReviews = reviews.filter((r) => typeof r.rating === "number");
+  const avgRating = ratedReviews.length > 0 
+    ? (ratedReviews.reduce((sum, r) => sum + (r.rating as number), 0) / ratedReviews.length).toFixed(1)
     : "4.9";
   
   // Generate SEO keywords

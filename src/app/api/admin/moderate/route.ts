@@ -34,7 +34,7 @@ const moderationSnapshotSchema = z.object({
 export async function GET(request: Request) {
   try {
     await requireAdminSession(request);
-    const adminClient = createSupabaseAdminClient() as any;
+    const adminClient = createSupabaseAdminClient();
 
     const { data: queueItems, error: queueError } = await adminClient
       .from("moderation_queue")
@@ -157,7 +157,7 @@ export async function POST(request: Request) {
 
     const admin = await requireAdminSession(request);
     const body = await parseJsonBody(request, moderateActionSchema);
-    const adminClient = createSupabaseAdminClient() as any;
+    const adminClient = createSupabaseAdminClient();
 
     const { data: queueItem, error: queueError } = await adminClient
       .from("moderation_queue")

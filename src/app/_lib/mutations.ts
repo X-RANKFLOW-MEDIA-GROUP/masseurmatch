@@ -6,7 +6,6 @@ import type {
   AuthRegisterInput,
   ContactFormInput,
   ForgotPasswordInput,
-  ProBillingInput,
   ProProfileInput,
 } from "@/app/_lib/validation";
 
@@ -36,14 +35,6 @@ export type ContactMutationResponse = {
   to: string;
   resendId: string;
   mock: boolean;
-};
-
-export type BillingMutationResponse = {
-  ok: boolean;
-  subscription: {
-    userId: string;
-    tier: "free" | "standard" | "pro" | "elite";
-  };
 };
 
 export type ProProfileMutationResponse = {
@@ -89,10 +80,6 @@ export function forgotPasswordMutation(input: ForgotPasswordInput) {
 
 export function sendContactMessage(input: ContactFormInput) {
   return postJson<ContactMutationResponse>("/api/contact", input);
-}
-
-export function updateBillingTier(input: ProBillingInput) {
-  return postJson<BillingMutationResponse>("/api/pro/billing", input);
 }
 
 export function updateProfileMutation(input: ProProfileInput) {

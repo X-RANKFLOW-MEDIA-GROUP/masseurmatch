@@ -13,7 +13,7 @@ import { useKnottyProfileAttribution } from "./useKnottyProfileAttribution";
 interface Props {
   profile: PublicTherapist;
   cityPath: string;
-  reviews?: { rating: number }[];
+  reviews?: { rating: number | null }[];
 }
 
 export function PremiumProfileHero({ profile, cityPath, reviews = [] }: Props) {
@@ -28,8 +28,9 @@ export function PremiumProfileHero({ profile, cityPath, reviews = [] }: Props) {
   
   const city = profile.city || "United States";
   const yearsExp = profile.years_experience ?? (profile.start_year ? new Date().getFullYear() - profile.start_year : null);
-  const avgRating = reviews.length > 0 
-    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+  const ratedReviews = reviews.filter((r) => typeof r.rating === "number");
+  const avgRating = ratedReviews.length > 0 
+    ? (ratedReviews.reduce((sum, r) => sum + (r.rating as number), 0) / ratedReviews.length).toFixed(1)
     : "5.0";
   const sessionCount = profile.profile_views ? Math.floor(profile.profile_views / 3) : 127;
   

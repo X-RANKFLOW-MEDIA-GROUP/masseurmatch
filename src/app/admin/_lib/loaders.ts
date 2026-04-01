@@ -118,7 +118,7 @@ export async function loadImportedReviews(): Promise<AdminLoadResult<AdminImport
 
 export async function loadTherapists(): Promise<AdminLoadResult<AdminTherapist>> {
   try {
-    const adminClient = createSupabaseAdminClient() as any;
+    const adminClient = createSupabaseAdminClient();
     const { data, error } = await adminClient
       .from("profiles")
       .select("id, user_id, display_name, full_name, city, status, is_active, is_verified_profile, is_verified_identity, _tier, updated_at")

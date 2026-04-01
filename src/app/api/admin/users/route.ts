@@ -16,7 +16,7 @@ async function updateUserRole(
   adminUserId: string,
   input: z.infer<typeof adminUserActionSchema>,
 ) {
-  const adminClient = createSupabaseAdminClient() as any;
+  const adminClient = createSupabaseAdminClient();
 
   const { error: deleteError } = await adminClient.from("user_roles").delete().eq("user_id", input.userId);
   if (deleteError) {

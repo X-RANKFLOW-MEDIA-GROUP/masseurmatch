@@ -44,7 +44,6 @@ const navSections = [
       { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
       { href: "/admin/users", label: "Users", icon: Users },
       { href: "/admin/therapists", label: "Therapists", icon: HeartHandshake },
-      { href: "/admin/reviews", label: "Reviews", icon: ShieldCheck },
       { href: "/admin/photos", label: "Photos", icon: ImageIcon },
       { href: "/admin/moderation", label: "Moderation", icon: ShieldAlert },
     ],

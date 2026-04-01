@@ -116,7 +116,7 @@ export interface ImportedReview {
 export const getCities = () => US_CITIES;
 
 const buildPublicTherapistsQuery = () =>
-  (supabase as any)
+  supabase
     .from("profiles")
     .select(PUBLIC_PROFILE_SELECT, {
       count: "exact",
@@ -153,7 +153,7 @@ export const getPublicTherapists = async (filters?: {
     pageSize,
   });
 
-  let query: any = buildPublicTherapistsQuery()
+  let query = buildPublicTherapistsQuery()
     .range(from, to);
 
   if (filters?.city) {
@@ -192,7 +192,9 @@ export const getPublicTherapists = async (filters?: {
   }
 
   if (filters?.availableToday) {
-    query = query.eq("available_now", true);
+    // Enforce expiry: available_now must be true AND available_now_expires must be in the future (or null)
+    const nowIso = new Date().toISOString();
+    query = query.eq("available_now", true).or(`available_now_expires.is.null,available_now_expires.gt.${nowIso}`);
   }
 
   if (filters?.tier) {
@@ -207,7 +209,29 @@ export const getPublicTherapists = async (filters?: {
     query = query.contains("languages_spoken", [filters.language]);
   }
 
-  const { data, error, count } = await query;
+  const { data: rawData, error, count } = await query;
+  // Sort post-fetch: tier-first, then available-now (expiry-aware) within the same tier,
+  // then profile_views desc. PostgREST cannot sort by computed expressions (expiry),
+  // so the comparator runs in JavaScript after the DB returns results.
+  const nowMs = Date.now();
+  const TIER_RANK: Record<string, number> = { elite: 4, pro: 3, standard: 2, free: 1 };
+  const isActivelyAvailable = (p: PublicTherapist): boolean =>
+    p.available_now === true &&
+    (p.available_now_expires == null || new Date(p.available_now_expires).getTime() > nowMs);
+  const data = rawData
+    ? [...rawData].sort((a, b) => {
+        // 1. Tier descending (elite > pro > standard > free)
+        const aTier = TIER_RANK[a._tier ?? "free"] ?? 0;
+        const bTier = TIER_RANK[b._tier ?? "free"] ?? 0;
+        if (bTier !== aTier) return bTier - aTier;
+        // 2. Available Now (unexpired) first within the same tier
+        const aAvail = isActivelyAvailable(a) ? 1 : 0;
+        const bAvail = isActivelyAvailable(b) ? 1 : 0;
+        if (bAvail !== aAvail) return bAvail - aAvail;
+        // 3. Profile views descending as tiebreaker
+        return (b.profile_views ?? 0) - (a.profile_views ?? 0);
+      })
+    : rawData;
 
   if (error) {
     return fallbackResult;
@@ -215,7 +239,7 @@ export const getPublicTherapists = async (filters?: {
 
   if ((count || 0) === 0) {
     // Legacy fallback: some older imports may have null/variant status values.
-    let relaxedQuery: any = (supabase as any)
+    let relaxedQuery = supabase
       .from("profiles")
       .select(PUBLIC_PROFILE_SELECT, { count: "exact" })
       .or("is_active.eq.true,is_active.is.null")
@@ -288,7 +312,7 @@ export const getPublicTherapistBySlug = async (slug: string) => {
 };
 
 export const getImportedReviews = async (profileId: string, limit = 5) => {
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from("imported_reviews")
     .select("id, review_text, rating, reviewer_name, review_date")
     .eq("profile_id", profileId)
@@ -303,7 +327,7 @@ export const getImportedReviews = async (profileId: string, limit = 5) => {
 };
 
 export const getProfilePhotos = async (profileId: string, limit = 6) => {
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from("profile_photos")
     .select("id, storage_path, is_primary")
     .eq("profile_id", profileId)
@@ -322,7 +346,7 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
 /** Returns the number of active public profiles in a given city. */
 export async function getCityInventoryCount(cityName: string): Promise<number> {
   const fallbackCount = getFallbackPublicTherapists({ city: cityName, pageSize: 500 }).total;
-  const { count, error } = await (supabase as any)
+  const { count, error } = await supabase
     .from("profiles")
     .select("id", { count: "exact", head: true })
     .or("is_active.eq.true,is_active.is.null")
@@ -350,7 +374,7 @@ export async function getCityInventoryMap(): Promise<Map<string, number>> {
     }
   }
 
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from("profiles")
     .select("city")
     .or("is_active.eq.true,is_active.is.null")

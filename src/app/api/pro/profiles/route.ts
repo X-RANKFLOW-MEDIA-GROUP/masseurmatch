@@ -8,7 +8,7 @@ export async function GET(request: Request) {
     const technique = url.searchParams.get("technique");
     const tier = url.searchParams.get("tier");
     const available = url.searchParams.get("available");
-    const adminClient = createSupabaseAdminClient() as any;
+    const adminClient = createSupabaseAdminClient();
     let query = adminClient.from("profiles").select("*", { head: false });
     if (city) query = query.eq("city", city);
     if (technique) query = query.contains("massage_techniques", [technique]);

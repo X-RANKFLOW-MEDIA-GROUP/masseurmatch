@@ -34,7 +34,7 @@ export async function fetchAllRows<T>(
   columns: string,
   queryBuilder?: (query: any) => any,
 ): Promise<T[]> {
-  const supabase = createSupabasePublicClient() as any;
+  const supabase = createSupabasePublicClient();
   const rows: T[] = [];
   let from = 0;
 

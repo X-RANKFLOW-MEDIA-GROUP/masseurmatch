@@ -12,7 +12,10 @@ const encoder = new TextEncoder();
 
 function getSigningKey() {
   return encoder.encode(
-    envOptional(["MM_JWT_SECRET", "JWT_SECRET", "MM_SESSION_SECRET"]) || "dev-only-masseurmatch-jwt-secret",
+    envOptional(["MM_JWT_SECRET", "JWT_SECRET", "MM_SESSION_SECRET"]) ??
+    (process.env.NODE_ENV === "production"
+      ? (() => { throw new Error("MM_JWT_SECRET is required in production."); })()
+      : "dev-only-masseurmatch-jwt-secret"),
   );
 }
 

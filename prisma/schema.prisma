@@ -1,3 +1,8 @@
+// ARCHIVED: This schema is retained as a data-model reference only.
+// MasseurMatch uses Supabase as the authoritative database layer.
+// No Prisma client is used in runtime application code.
+// Do NOT run prisma generate or prisma migrate against this file.
+
 // Prisma schema para o perfil do massagista
 model MassageTherapistProfile {
   id                 String   @id @default(uuid())
