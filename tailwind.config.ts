@@ -25,12 +25,9 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
-        display: ["var(--font-playfair)", "Georgia", "serif"],
-        serif: ["var(--font-playfair)", "Georgia", "serif"],
-        heading: ["var(--font-playfair)", "Georgia", "serif"],
-        body: ["var(--font-inter)", "system-ui", "sans-serif"],
-        mono: ["ui-monospace", "monospace"],
+        sans: ["Inter", "system-ui", "sans-serif"],
+        display: ["Space Grotesk", "sans-serif"],
+        mono: ["JetBrains Mono", "monospace"],
       },
       theme: {
         extend: {
