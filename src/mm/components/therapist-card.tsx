@@ -5,6 +5,7 @@ import { Card, Pill } from "@/mm/components/primitives";
 import { motion } from "framer-motion";
 
 export function TherapistCard({ city, therapist }: { city?: City; therapist: Therapist }) {
+  const isAvailableNow = therapist.keywordSlugs.includes("available-now");
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -15,7 +16,7 @@ export function TherapistCard({ city, therapist }: { city?: City; therapist: The
         <div className="relative aspect-[4/3] overflow-hidden">
           <Image src={therapist.photoUrl} alt={therapist.displayName} fill className="object-cover object-center" sizes="(max-width: 768px) 100vw, 33vw" />
           {/* Badge Available Now com animação pulse */}
-          {therapist.availableNow && (
+          {isAvailableNow && (
             <span className="absolute top-3 left-3 z-10 rounded-full bg-green-500 px-3 py-1 text-xs font-bold text-white shadow-lg animate-pulse">
               Available Now
             </span>
