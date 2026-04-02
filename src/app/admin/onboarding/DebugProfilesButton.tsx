@@ -1,10 +1,13 @@
 import React from 'react';
-import { fetchProfiles } from '../../../mm/utils/fetchProfiles';
 
 export function DebugProfilesButton() {
   const handleClick = async () => {
     try {
-      const profiles = await fetchProfiles({ city: 'São Paulo', technique: 'Deep Tissue' });
+      const response = await fetch('/api/pro/profiles?city=S%C3%A3o%20Paulo&technique=Deep%20Tissue');
+      if (!response.ok) {
+        throw new Error('Request failed');
+      }
+      const profiles = (await response.json()) as unknown[];
       alert(`Perfis encontrados: ${profiles.length}`);
       console.log(profiles);
     } catch (e) {

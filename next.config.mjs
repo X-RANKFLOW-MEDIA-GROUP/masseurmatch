@@ -68,7 +68,6 @@ const nextConfig = {
   typedRoutes: false,
   allowedDevOrigins: ["100.69.207.7", "localhost", "127.0.0.1", "::1", "*.replit.dev", "*.janeway.replit.dev"],
   experimental: {
-    webpackBuildWorker: true,
     webpackMemoryOptimizations: true,
   },
   images: {
