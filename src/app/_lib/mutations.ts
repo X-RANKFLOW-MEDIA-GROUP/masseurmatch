@@ -21,13 +21,6 @@ export type AuthMutationResponse = {
 export type ForgotPasswordMutationResponse = {
   ok: boolean;
   message: string;
-  reset: {
-    mock: boolean;
-    email: string;
-    redirectTo: string;
-    requestedAt: string;
-    previewToken?: string;
-  };
 };
 
 export type ContactMutationResponse = {
