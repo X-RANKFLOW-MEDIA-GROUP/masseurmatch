@@ -130,8 +130,8 @@ export async function getSeoKeywords(): Promise<SeoKeyword[]> {
   }));
 }
 
-// Featured profiles that should always appear in sitemap
-const FEATURED_PROFILE_SLUGS = [
+// Featured profiles that should always appear in sitemap (exported for priority boost)
+export const FEATURED_PROFILE_SLUGS = [
   "bruno-dallas-tx",
 ];
 
