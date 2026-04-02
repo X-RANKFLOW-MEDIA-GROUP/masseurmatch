@@ -12,9 +12,11 @@ import {
   Star,
   ShieldCheck,
   Sparkles,
+  UserCircle,
 } from "lucide-react";
-import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const statusOptions = [
   { key: "available", label: "Available Now", icon: Zap, color: "emerald" },
@@ -65,7 +67,16 @@ const metrics = [
 const fadeUp = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
 
 export default function DashboardHome() {
+  const { user } = useAuth();
   const [activeStatus, setActiveStatus] = useState<AvailabilityStatus>("available");
+
+  // Derive a short display name from the auth user
+  const displayName = (() => {
+    const meta = (user as { user_metadata?: { full_name?: string; name?: string } } | null)?.user_metadata;
+    const name = meta?.full_name || meta?.name || user?.email?.split("@")[0] || "Pro";
+    // Show first name only, up to 20 chars
+    return name.split(" ")[0].slice(0, 20);
+  })();
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 p-6 md:p-10">
@@ -80,9 +91,12 @@ export default function DashboardHome() {
           </p>
         </div>
         <div className="flex gap-3">
-          <button className="border border-slate-200 bg-white px-4 py-2 font-mono text-xs uppercase tracking-wider text-slate-600 shadow-sm transition-colors hover:bg-slate-50">
+          <Link
+            href="/pro/listing"
+            className="border border-slate-200 bg-white px-4 py-2 font-mono text-xs uppercase tracking-wider text-slate-600 shadow-sm transition-colors hover:bg-slate-50"
+          >
             Ver Perfil Público
-          </button>
+          </Link>
         </div>
       </header>
 
@@ -97,19 +111,12 @@ export default function DashboardHome() {
             className="relative overflow-hidden border border-slate-200/60 bg-white p-6 shadow-sm"
           >
             <div className="flex items-center gap-4">
-              <div className="relative h-16 w-16 rounded-full bg-gradient-to-tr from-emerald-400 to-emerald-600 p-1">
+              <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-tr from-emerald-400 to-emerald-600">
                 <div className="absolute inset-0 animate-ping rounded-full border-2 border-emerald-400 opacity-20" />
-                <div className="relative h-full w-full overflow-hidden rounded-full border-2 border-white bg-slate-100">
-                  <Image
-                    src="https://i.pravatar.cc/150?img=32"
-                    alt="Perfil"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+                <UserCircle className="relative h-10 w-10 text-white" />
               </div>
               <div>
-                <h2 className="font-display text-xl font-medium text-slate-900">Alex M.</h2>
+                <h2 className="font-display text-xl font-medium text-slate-900">{displayName}</h2>
                 <div className="mt-0.5 flex items-center gap-1">
                   <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
                   <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">
