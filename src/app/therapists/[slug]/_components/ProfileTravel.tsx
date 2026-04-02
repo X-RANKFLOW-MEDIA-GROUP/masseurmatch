@@ -29,22 +29,23 @@ export function ProfileTravel({ profile }: Props) {
         : "Up to 2 trips/month";
 
   return (
-    <section className="profile-panel p-6 md:p-7">
-      <h2 className="text-2xl font-semibold text-foreground">Travel Schedule</h2>
-      <p className="mt-1 text-xs text-muted-foreground">{tierLabel}</p>
-
-      <div className="mt-4 space-y-2">
+    <div>
+      <p className="text-xs text-[var(--text-muted)] mb-4">{tierLabel}</p>
+      <div className="space-y-2">
         {trips.map((trip, i) => (
-          <div key={`trip-${i}`} className="profile-panel-soft flex items-center justify-between rounded-2xl px-4 py-3 text-sm">
-            <span className="font-medium text-foreground">
+          <div
+            key={`trip-${i}`}
+            className="flex items-center justify-between rounded-lg border border-[var(--glass-border)] bg-[var(--cream-dim)] px-4 py-3 text-sm"
+          >
+            <span className="font-medium text-[var(--cream)]">
               {trip.city}{trip.state ? `, ${trip.state}` : ""}
             </span>
-            <span className="text-muted-foreground">
+            <span className="text-[var(--text-muted)]">
               {formatDate(trip.start_date)} – {formatDate(trip.end_date)}
             </span>
           </div>
         ))}
       </div>
-    </section>
+    </div>
   );
 }

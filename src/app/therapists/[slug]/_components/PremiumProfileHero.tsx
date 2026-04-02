@@ -139,17 +139,20 @@ export function PremiumProfileHero({ profile, cityPath, reviews = [] }: Props) {
         </div>
 
         {/* Promo Banner */}
-        {profile._tier === "pro" && (
-          <div className="pp-promo-banner">
-            <div className="pp-promo-text">
-              <strong>20% off your first session</strong><br />
-              <span style={{ fontSize: "12px", color: "var(--text-dim)" }}>
-                Valid for new clients · Use code WELCOME20
-              </span>
+        {profile._tier === "pro" && (() => {
+          const promo = profile.promotions?.[0];
+          return (
+            <div className="pp-promo-banner">
+              <div className="pp-promo-text">
+                <strong>{promo ? promo.title : "Special Offer"}</strong><br />
+                <span style={{ fontSize: "12px", color: "var(--text-dim)" }}>
+                  {promo ? promo.description : "Contact for current deals"}
+                </span>
+              </div>
+              <PromoCountdown />
             </div>
-            <PromoCountdown />
-          </div>
-        )}
+          );
+        })()}
       </div>
     </section>
   );
