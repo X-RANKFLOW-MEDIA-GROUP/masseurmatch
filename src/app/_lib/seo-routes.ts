@@ -8,7 +8,7 @@ import {
 } from "@/app/_lib/launch-urls";
 import { GUIDES } from "@/app/guides/data";
 import { appUrl } from "@/app/_lib/metadata";
-import { absoluteUrl, getSeoBlogPosts, getSeoCities, getSeoTherapists } from "@/app/_lib/seo-data";
+import { absoluteUrl, getSeoBlogPosts, getSeoCities, getSeoTherapists, FEATURED_PROFILE_SLUGS } from "@/app/_lib/seo-data";
 import { uniqueStrings } from "@/app/_lib/utils";
 import { competitorSlugs } from "@/lib/competitors";
 
@@ -186,13 +186,14 @@ export function buildNeighborhoodsSitemapEntries(now = new Date()): MetadataRout
 // ─── Profiles sitemap (only profiles with stable slugs) ──────────────────────
 export async function buildProfilesSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
   const therapistData = await getSeoTherapists();
+  const featuredSet = new Set(FEATURED_PROFILE_SLUGS);
   return therapistData
     .filter((therapist) => therapist.slug)
     .map((therapist) => ({
       url: absoluteUrl(`/therapists/${therapist.slug}`),
       lastModified: therapist.updated_at ? new Date(therapist.updated_at) : now,
       changeFrequency: "weekly" as const,
-      priority: 0.7,
+      priority: featuredSet.has(therapist.slug!) ? 0.9 : 0.7,
     }));
 }
 
