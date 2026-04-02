@@ -26,6 +26,7 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
+        heading: ["Space Grotesk", "sans-serif"],
         display: ["Space Grotesk", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
