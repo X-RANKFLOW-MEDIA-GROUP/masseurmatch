@@ -125,11 +125,16 @@ function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
     }
     // Sync the mm_session cookie so middleware recognises the user
     if (data.session?.access_token) {
-      await fetch("/api/auth/sync-session", {
+      const syncResp = await fetch("/api/auth/sync-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ access_token: data.session.access_token }),
       });
+      if (!syncResp.ok) {
+        setLoading(false);
+        toast({ title: "Session error", description: "Could not establish session. Please try again.", variant: "destructive" });
+        return;
+      }
     }
     setLoading(false);
     toast({ title: isLogin ? "Welcome back" : "Account created" });
@@ -209,11 +214,16 @@ function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
     }
     // Sync the mm_session cookie so middleware recognises the user
     if (data.session?.access_token) {
-      await fetch("/api/auth/sync-session", {
+      const syncResp = await fetch("/api/auth/sync-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ access_token: data.session.access_token }),
       });
+      if (!syncResp.ok) {
+        setLoading(false);
+        toast({ title: "Session error", description: "Could not establish session. Please try again.", variant: "destructive" });
+        return;
+      }
     }
     setLoading(false);
     toast({ title: isLogin ? "Welcome back" : "Account created" });

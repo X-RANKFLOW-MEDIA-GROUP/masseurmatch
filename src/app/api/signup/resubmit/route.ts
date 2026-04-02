@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getRequestSession } from "@/app/api/_lib/session";
+import { persistSubmittedProfile } from "../_lib/profile-submission";
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,11 +11,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing profile data." }, { status: 400 });
     }
 
-    // TODO: Persist updated profile to Supabase:
-    // 1. Update profile fields
-    // 2. Re-upload any new photos
-    // 3. Set submission_status = 'submitted'
-    // 4. Re-add to moderation queue
+    // Require an authenticated session to persist the resubmission
+    const session = getRequestSession(request);
+    if (!session) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
+    const persistError = await persistSubmittedProfile(session.userId, profile);
+    if (persistError) {
+      console.error("[signup/resubmit] Profile update failed:", persistError);
+      return NextResponse.json({ error: "Could not update your profile. Please try again." }, { status: 500 });
+    }
 
     return NextResponse.json({ success: true });
   } catch {

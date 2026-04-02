@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getRequestSession } from "@/app/api/_lib/session";
+import { persistSubmittedProfile } from "../_lib/profile-submission";
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,14 +26,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Persist submission to Supabase:
-    // 1. Update user profile with profile data
-    // 2. Set submission_status = 'submitted'
-    // 3. Set moderation_status = 'under_review'
-    // 4. Store plan selection (planTier)
-    // 5. Add to moderation queue
-    // 6. Upload photos to Supabase storage
-    // 7. Send confirmation email
+    // Require an authenticated session to persist the submission
+    const session = getRequestSession(request);
+    if (!session) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
+    const persistError = await persistSubmittedProfile(session.userId, profile, planTier);
+    if (persistError) {
+      console.error("[signup/submit] Profile update failed:", persistError);
+      return NextResponse.json({ error: "Could not save your profile. Please try again." }, { status: 500 });
+    }
 
     return NextResponse.json({ success: true });
   } catch {
