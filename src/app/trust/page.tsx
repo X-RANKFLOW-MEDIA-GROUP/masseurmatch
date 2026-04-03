@@ -70,7 +70,7 @@ export default function TrustPage() {
             <div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Important Platform Disclaimer</h3>
               <p className="text-gray-700 font-medium">
-                <strong>We do not verify licenses.</strong> MasseurMatch provides a directory only. Users are solely responsible for verifying the credentials, legality, and safety of any professional they choose to contact or book outside of this platform.
+                <strong>MasseurMatch verifies therapists&apos; identities but not their professional licenses.</strong> Users are solely responsible for verifying the credentials, legality, and safety of any professional they choose to contact or book outside of this platform.
               </p>
             </div>
           </div>

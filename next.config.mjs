@@ -61,6 +61,8 @@ const LEGACY_REDIRECTS = [
   // Legacy SPA routes → App Router
   { source: "/Auth",    destination: "/auth",    permanent: true },
   { source: "/Privacy", destination: "/privacy", permanent: true },
+  // Legacy alias for the therapists directory
+  { source: "/massage-therapists", destination: "/therapists", permanent: true },
 ];
 
 const isDev = process.env.NODE_ENV !== "production";
