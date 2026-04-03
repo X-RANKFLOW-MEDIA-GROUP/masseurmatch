@@ -1,7 +1,8 @@
 import { Search, MapPin, ArrowRight, Zap, Clock, Navigation } from "lucide-react";
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { KnottyGlassAI } from "@/components/homepage/KnottyGlassAI";
@@ -40,13 +41,17 @@ type HeroProps = {
 
 
 export function Hero({ neighborhood, city, searchInputRef }: HeroProps) {
+  const router = useRouter();
   const localRef = useRef<HTMLInputElement>(null);
   const inputRef = searchInputRef ?? (localRef as React.RefObject<HTMLInputElement>);
   const [inputValue, setInputValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   // Typing effect for headline
-  const phrases = ["a massage therapist", "relaxation near you", "a premium experience"];
+  const phrases = useMemo(
+    () => ["a massage therapist", "relaxation near you", "a premium experience"],
+    [],
+  );
   const [text, setText] = useState("");
   const [phraseIndex, setPhraseIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -86,6 +91,17 @@ export function Hero({ neighborhood, city, searchInputRef }: HeroProps) {
         ? `Showing results near ${city}`
         : "Discover therapists near you";
 
+  const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const normalizedCity = inputValue.trim();
+    if (normalizedCity.length > 0) {
+      router.push(`/search?city=${encodeURIComponent(normalizedCity)}`);
+      return;
+    }
+
+    router.push("/search");
+  };
+
   return (
     <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-gray-50">
       {/* Animated blob orbs */}
@@ -112,19 +128,27 @@ export function Hero({ neighborhood, city, searchInputRef }: HeroProps) {
           </p>
 
           {/* Search Bar Rápida - now glass effect */}
-          <div className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto lg:mx-0">
+          <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto lg:mx-0">
             <div className="relative flex-1 glass-card-light backdrop-blur-xl border border-white/40">
-              <MapPin className="absolute left-4 top-3.5 text-gray-400 w-5 h-5" />
+              <label htmlFor="hero-city-search" className="sr-only">
+                Enter your city
+              </label>
+              <MapPin className="absolute left-4 top-3.5 text-gray-400 w-5 h-5" aria-hidden="true" />
               <input
+                id="hero-city-search"
+                ref={inputRef}
                 type="text"
+                value={inputValue}
+                onChange={(event) => setInputValue(event.target.value)}
                 placeholder="Enter your city..."
+                autoComplete="address-level2"
                 className="w-full pl-12 pr-4 py-3 rounded-full bg-transparent border-none shadow-none focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
               />
             </div>
-            <Button variant="premium" size="lg" className="rounded-full px-8 flex items-center gap-2">
-              <Search className="w-5 h-5" /> Search
+            <Button type="submit" variant="premium" size="lg" className="rounded-full px-8 flex items-center gap-2" aria-label="Search therapists by city">
+              <Search className="w-5 h-5" aria-hidden="true" /> Search
             </Button>
-          </div>
+          </form>
         </div>
 
         {/* Knotty AI Interface (Direita) */}

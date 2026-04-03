@@ -63,48 +63,61 @@ export default function TherapistsPageClient({
   return (
     <section className="mt-8">
       <div className="grid gap-3 rounded-3xl border border-border bg-background p-5 shadow-sm md:grid-cols-3">
-        <input
-          value={city}
-          onChange={(event) => {
-            const value = event.target.value;
-            setCity(value);
-            setParam("city", value);
-          }}
-          placeholder="Filter by city"
-          className="rounded-md border border-border bg-background px-3 py-2"
-        />
-        <input
-          value={modality}
-          onChange={(event) => {
-            const value = event.target.value;
-            setModality(value);
-            setParam("modality", value);
-          }}
-          placeholder="Filter by specialty"
-          className="rounded-md border border-border bg-background px-3 py-2"
-        />
-        <select
-          value={tier}
-          onChange={(event) => {
-            const value = (event.target.value as TherapistTier | "") || "";
-            setTier(value);
-            setParam("tier", value);
-          }}
-          className="rounded-md border border-border bg-background px-3 py-2"
-        >
-          <option value="">All tiers</option>
-          <option value="free">Free</option>
-          <option value="standard">Standard</option>
-          <option value="pro">Pro</option>
-          <option value="elite">Elite</option>
-        </select>
+        <div>
+          <label htmlFor="therapists-filter-city" className="sr-only">Filter by city</label>
+          <input
+            id="therapists-filter-city"
+            value={city}
+            onChange={(event) => {
+              const value = event.target.value;
+              setCity(value);
+              setParam("city", value);
+            }}
+            placeholder="Filter by city"
+            className="rounded-md border border-border bg-background px-3 py-2"
+          />
+        </div>
+        <div>
+          <label htmlFor="therapists-filter-specialty" className="sr-only">Filter by specialty</label>
+          <input
+            id="therapists-filter-specialty"
+            value={modality}
+            onChange={(event) => {
+              const value = event.target.value;
+              setModality(value);
+              setParam("modality", value);
+            }}
+            placeholder="Filter by specialty"
+            className="rounded-md border border-border bg-background px-3 py-2"
+          />
+        </div>
+        <div>
+          <label htmlFor="therapists-filter-tier" className="sr-only">Filter by tier</label>
+          <select
+            id="therapists-filter-tier"
+            value={tier}
+            onChange={(event) => {
+              const value = (event.target.value as TherapistTier | "") || "";
+              setTier(value);
+              setParam("tier", value);
+            }}
+            className="rounded-md border border-border bg-background px-3 py-2"
+          >
+            <option value="">All tiers</option>
+            <option value="free">Free</option>
+            <option value="standard">Standard</option>
+            <option value="pro">Pro</option>
+            <option value="elite">Elite</option>
+          </select>
+        </div>
       </div>
 
       <div className="mt-6 flex items-center justify-between gap-4">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground" aria-live="polite">
           {total} public therapist {total === 1 ? "listing" : "listings"}
         </p>
         <button
+          type="button"
           className="text-sm font-semibold text-primary hover:underline"
           onClick={() => {
             setCity("");
@@ -134,7 +147,9 @@ export default function TherapistsPageClient({
 
       <div className="mt-8 flex items-center gap-3">
         <button
+          type="button"
           disabled={page <= 1}
+          aria-label="Go to previous directory page"
           onClick={() => setParam("page", String(Math.max(1, page - 1)))}
           className="rounded border border-border px-3 py-1.5 disabled:opacity-50"
         >
@@ -144,7 +159,9 @@ export default function TherapistsPageClient({
           Page {page} of {totalPages}
         </span>
         <button
+          type="button"
           disabled={page >= totalPages}
+          aria-label="Go to next directory page"
           onClick={() => setParam("page", String(Math.min(totalPages, page + 1)))}
           className="rounded border border-border px-3 py-1.5 disabled:opacity-50"
         >

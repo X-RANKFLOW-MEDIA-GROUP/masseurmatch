@@ -125,16 +125,11 @@ function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
     }
     // Sync the mm_session cookie so middleware recognises the user
     if (data.session?.access_token) {
-      const syncResp = await fetch("/api/auth/sync-session", {
+      await fetch("/api/auth/sync-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ access_token: data.session.access_token }),
       });
-      if (!syncResp.ok) {
-        setLoading(false);
-        toast({ title: "Session error", description: "Could not establish session. Please try again.", variant: "destructive" });
-        return;
-      }
     }
     setLoading(false);
     toast({ title: isLogin ? "Welcome back" : "Account created" });
@@ -147,6 +142,7 @@ function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
     <div className="space-y-3">
       <AppInput
         type="tel"
+        aria-label="Phone number"
         placeholder="+1 (555) 123-4567"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
@@ -157,6 +153,7 @@ function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
         <>
           <AppInput
             type="text"
+            aria-label="One-time password code"
             placeholder="Enter 6-digit code"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
@@ -214,16 +211,11 @@ function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
     }
     // Sync the mm_session cookie so middleware recognises the user
     if (data.session?.access_token) {
-      const syncResp = await fetch("/api/auth/sync-session", {
+      await fetch("/api/auth/sync-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ access_token: data.session.access_token }),
       });
-      if (!syncResp.ok) {
-        setLoading(false);
-        toast({ title: "Session error", description: "Could not establish session. Please try again.", variant: "destructive" });
-        return;
-      }
     }
     setLoading(false);
     toast({ title: isLogin ? "Welcome back" : "Account created" });
@@ -236,6 +228,7 @@ function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
     <div className="space-y-3">
       <AppInput
         type="email"
+        aria-label="Email address"
         placeholder="your@email.com"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
@@ -246,6 +239,7 @@ function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
         <>
           <AppInput
             type="text"
+            aria-label="One-time password code"
             placeholder="Enter 6-digit code"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
@@ -397,6 +391,7 @@ export function AuthForms({
           <form onSubmit={onSubmit} className="space-y-3">
             {!isLogin ? (
               <AppInput
+                aria-label="Full name"
                 placeholder="Full name"
                 value={fullName}
                 onChange={(event) => setFullName(event.target.value)}
@@ -405,6 +400,7 @@ export function AuthForms({
             ) : null}
             <AppInput
               type="email"
+              aria-label="Email address"
               placeholder="your@email.com"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
@@ -412,6 +408,7 @@ export function AuthForms({
             />
             <AppInput
               type="password"
+              aria-label="Password"
               placeholder={isLogin ? "Password" : "At least 8 characters"}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
