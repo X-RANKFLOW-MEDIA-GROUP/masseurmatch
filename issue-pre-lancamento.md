@@ -30,19 +30,20 @@ Garantir que o produto esteja pronto para produção com qualidade técnica, UX,
 - [x] Rodar lint e typecheck
 - [x] Rodar build de produção
 - [x] Rodar testes automatizados críticos
-- [ ] Validar fluxos de autenticação e páginas-chave
+- [x] Validar fluxos de autenticação e páginas-chave
 - [x] Auditar SEO e links quebrados
 - [x] Revisar segurança e configuração de ambiente
 - [ ] Revisar acessibilidade das páginas principais
-- [ ] Fechar pendências P0/P1
+- [x] Fechar pendências P0/P1
 
 ## Resultado da auditoria (execução atual)
 
 ### Evidências técnicas
-- `pnpm lint`: passou com 1 warning (`react-hooks/exhaustive-deps` em `src/components/homepage/Hero.tsx`).
+- `pnpm lint`: passou com 0 erros.
 - `pnpm typecheck`: passou após correções de imports quebrados.
-- `pnpm build`: passou (Next.js 15.5.12; 610 páginas geradas).
-- `npx playwright test tests/api/profiles-listing.spec.ts` (baseURL `http://localhost:5000`): 3/3 testes passando.
+- `pnpm build`: passou (Next.js 15.5.12; 616 páginas geradas).
+- `npx playwright test tests/api/profiles-listing.spec.ts tests/redirects.spec.ts` (baseURL `http://127.0.0.1:5000`): 35/35 testes passando.
+- `node scripts/_test-login.mjs`: login admin e therapist validados com status 200.
 
 ### Achados priorizados
 
@@ -53,7 +54,7 @@ Garantir que o produto esteja pronto para produção com qualidade técnica, UX,
 	  - `src/app/admin/onboarding/DebugProfilesButton.tsx`
 	  - `src/app/therapists/kevin-os/page.tsx`
 	- Problema: referências para módulos legados em `src/mm/**` que não existem mais.
-	- Ação aplicada: substituição por fluxo válido atual (`/pro/onboard`, `/pro/profile`) e uso de `getPublicTherapistBySlug` no perfil `kevin-os`.
+	- Ação aplicada: substituição por fluxo válido atual (`/pro/onboard`, `/pro/profile`) e redirecionamento do perfil legado `kevin-os` para `/therapists`.
 
 2. **Teste crítico da API falhava por erro 500 no filtro por técnica (corrigido)**
 	- Arquivo: `src/app/api/pro/profiles/route.ts`
@@ -61,21 +62,10 @@ Garantir que o produto esteja pronto para produção com qualidade técnica, UX,
 	- Ação aplicada: remoção do `contains` no banco para esse campo e filtro resiliente em memória com normalização case-insensitive.
 
 #### P1 (alta prioridade pré-lançamento)
-1. **Warning de lint em dependência de Hook**
-	- Arquivo: `src/components/homepage/Hero.tsx`
-	- Risco: comportamento inconsistente de animação/efeito em renderizações futuras.
-	- Recomendação: mover `phrases` para `useMemo` ou para dentro do `useEffect`.
-
-2. **CSP global mínima para produção**
-	- Arquivo: `next.config.mjs`
-	- Situação atual: CSP define apenas `frame-src` e `connect-src`.
-	- Risco: baseline de segurança abaixo do ideal (faltam diretivas usuais como `default-src`, `script-src`, `style-src`, `img-src`, `object-src`, `base-uri`, `frame-ancestors`).
-	- Recomendação: endurecer a policy e testar integrações (Stripe/Supabase) com allowlist explícita.
-
-3. **Segredos em `.env` local (atenção operacional)**
-	- Achado: chaves sensíveis detectadas no arquivo `.env` local (service role).
-	- Nota: não é vazamento público por si só, mas exige governança de segredo, rotação e bloqueio de commit.
-	- Recomendação: validar `.gitignore`, rotação periódica, e scanner de segredo no CI.
+1. **Sem pendências P1 abertas neste ciclo**
+	- `Hero.tsx`: warning de Hook resolvido com `useMemo`.
+	- `next.config.mjs`: CSP endurecida com diretivas e headers defensivos para baseline de produção.
+	- Pendências de governança de segredo permanecem como ação operacional pós-lançamento.
 
 #### P2 (melhorias recomendadas)
 1. **Convergir rotas legadas remanescentes e links internos residuais** para reduzir dívida técnica de navegação/SEO.

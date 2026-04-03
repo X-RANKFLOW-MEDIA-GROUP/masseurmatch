@@ -12,13 +12,22 @@ import { defineConfig, devices } from "@playwright/test";
  *   npx playwright test tests/auth/
  */
 
-const DEFAULT_BASE_URL = "http://localhost:3000";
+const DEFAULT_BASE_URL = "http://127.0.0.1:5000";
+const shouldManageWebServer = !process.env.PLAYWRIGHT_BASE_URL;
 
 export default defineConfig({
   testDir: "./tests",
   timeout: 30_000,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["list"]] : [["list"]],
+  webServer: shouldManageWebServer
+    ? {
+        command: "pnpm dev",
+        url: DEFAULT_BASE_URL,
+        reuseExistingServer: true,
+        timeout: 120_000,
+      }
+    : undefined,
   use: {
     baseURL: process.env.PLAYWRIGHT_BASE_URL ?? DEFAULT_BASE_URL,
     extraHTTPHeaders: {
