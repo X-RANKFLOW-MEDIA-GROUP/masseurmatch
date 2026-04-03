@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import {
+  SITEMAP_SEGMENT_IDS,
   buildCoreSitemapEntries,
   buildCitiesSitemapEntries,
   buildServicesSitemapEntries,
@@ -9,20 +10,14 @@ import {
   buildBlogPostsSitemapEntries,
 } from "@/app/_lib/seo-routes";
 
+export const revalidate = 3600;
+
 /**
- * Segmented sitemap index.
- * Next.js serves /sitemap.xml as the index pointing to /sitemap/[id].xml
- * IDs:
- * 0 = core canonical routes and compare pages
- * 1 = cities
- * 2 = services
- * 3 = neighborhoods
- * 4 = profiles
- * 5 = guides
- * 6 = blog posts (dynamic from Supabase)
+ * Segmented sitemap entries served by Next.js at /sitemap/[id].xml.
+ * A dedicated index is exposed from src/app/sitemap.xml/route.ts.
  */
 export async function generateSitemaps() {
-  return [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }];
+  return SITEMAP_SEGMENT_IDS.map((id) => ({ id }));
 }
 
 export default async function sitemap({ id }: { id: number }): Promise<MetadataRoute.Sitemap> {
