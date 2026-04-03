@@ -191,7 +191,12 @@ function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
   const sendOtp = async () => {
     if (!email.trim()) return;
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({ email: email.trim() });
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: {
+        emailRedirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(isLogin ? redirectTo : "/pro/onboard")}`,
+      },
+    });
     setLoading(false);
     if (error) {
       toast({ title: "Could not send OTP", description: error.message, variant: "destructive" });
