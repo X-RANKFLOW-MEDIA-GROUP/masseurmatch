@@ -59,7 +59,7 @@ test.describe("Auth pages smoke", () => {
   test("/login links to /register", async ({ page }) => {
     await page.goto("/login");
 
-    const signUpLink = page.getByRole("link", { name: /sign up/i });
+    const signUpLink = page.locator('a[href="/register"]').filter({ hasText: /sign up/i }).first();
     await expect(signUpLink).toBeVisible();
     await expect(signUpLink).toHaveAttribute("href", "/register");
   });
@@ -67,7 +67,7 @@ test.describe("Auth pages smoke", () => {
   test("/register links to /login", async ({ page }) => {
     await page.goto("/register");
 
-    const signInLink = page.getByRole("link", { name: /sign in/i });
+    const signInLink = page.locator('a[href="/login"]').filter({ hasText: /sign in/i }).first();
     await expect(signInLink).toBeVisible();
     await expect(signInLink).toHaveAttribute("href", "/login");
   });

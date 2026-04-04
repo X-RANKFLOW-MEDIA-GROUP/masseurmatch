@@ -201,7 +201,7 @@ export function CityDirectoryPage({
             </div>
 
             {therapists.length > 0 ? (
-              <div className="mt-6 grid gap-4 lg:grid-cols-2">
+              <div className="mt-6 grid gap-5 lg:grid-cols-2">
                 {therapists.map((therapist) => (
                   <PublicTherapistCard key={therapist.id} therapist={therapist} />
                 ))}

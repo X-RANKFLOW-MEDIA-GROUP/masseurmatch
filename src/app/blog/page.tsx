@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import Link from "next/link";
+import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "Blog | Massage Therapy Tips, Wellness & LGBTQ+ Resources – MasseurMatch",
+  title: "Blog | Massage Therapy Tips, Wellness & LGBTQ+ Resources - MasseurMatch",
   description:
     "Expert massage therapy advice, wellness guides, LGBTQ+ health resources, and industry insights from the MasseurMatch editorial team.",
   openGraph: {
@@ -132,7 +132,6 @@ export default function BlogPage() {
           minHeight: "100vh",
         }}
       >
-        {/* ── Header ── */}
         <section
           style={{
             background: "#0B1F3A",
@@ -174,12 +173,11 @@ export default function BlogPage() {
               lineHeight: 1.7,
             }}
           >
-            Wellness insight, LGBTQ+ health resources, and industry expertise
-            — curated for clients and therapists alike.
+            Wellness insight, LGBTQ+ health resources, and industry expertise -
+            curated for clients and therapists alike.
           </p>
         </section>
 
-        {/* ── Categories ── */}
         <nav
           aria-label="Blog categories"
           style={{
@@ -196,9 +194,9 @@ export default function BlogPage() {
               margin: "0 auto",
             }}
           >
-            {categories.map((cat, i) => (
+            {categories.map((category, index) => (
               <button
-                key={cat}
+                key={category}
                 style={{
                   padding: "18px 24px",
                   fontSize: 12,
@@ -207,20 +205,20 @@ export default function BlogPage() {
                   fontFamily: "system-ui, sans-serif",
                   background: "transparent",
                   border: "none",
-                  borderBottom: i === 0 ? "2px solid #FF8A1F" : "2px solid transparent",
-                  color: i === 0 ? "#FF8A1F" : "#6B7280",
+                  borderBottom:
+                    index === 0 ? "2px solid #FF8A1F" : "2px solid transparent",
+                  color: index === 0 ? "#FF8A1F" : "#6B7280",
                   cursor: "pointer",
                   whiteSpace: "nowrap",
                 }}
               >
-                {cat}
+                {category}
               </button>
             ))}
           </div>
         </nav>
 
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "64px 24px" }}>
-          {/* ── Featured ── */}
           <article
             style={{
               display: "grid",
@@ -231,7 +229,6 @@ export default function BlogPage() {
               color: "#FCFBF8",
             }}
           >
-            {/* image placeholder */}
             <div
               style={{
                 background: "linear-gradient(135deg, #1E4B8F 0%, #0B1F3A 100%)",
@@ -269,14 +266,7 @@ export default function BlogPage() {
                   transform: "translate(-50%,-50%)",
                 }}
               />
-              <span
-                style={{
-                  fontSize: 48,
-                  opacity: 0.3,
-                }}
-              >
-                ✦
-              </span>
+              <span style={{ fontSize: 48, opacity: 0.3 }}>*</span>
             </div>
             <div
               style={{
@@ -286,7 +276,9 @@ export default function BlogPage() {
                 justifyContent: "center",
               }}
             >
-              <div style={{ display: "flex", gap: 12, marginBottom: 24, alignItems: "center" }}>
+              <div
+                style={{ display: "flex", gap: 12, marginBottom: 24, alignItems: "center" }}
+              >
                 <span
                   style={{
                     fontSize: 10,
@@ -347,7 +339,7 @@ export default function BlogPage() {
                     opacity: 0.45,
                   }}
                 >
-                  {featuredPost.date} · {featuredPost.readTime}
+                  {featuredPost.date} | {featuredPost.readTime}
                 </span>
                 <Link
                   href={`/blog/${featuredPost.slug}`}
@@ -362,13 +354,12 @@ export default function BlogPage() {
                     paddingBottom: 2,
                   }}
                 >
-                  Read Article →
+                  Read Article -&gt;
                 </Link>
               </div>
             </div>
           </article>
 
-          {/* ── Grid ── */}
           <div
             style={{
               display: "grid",
@@ -437,7 +428,7 @@ export default function BlogPage() {
                       color: "#9CA3AF",
                     }}
                   >
-                    {post.date} · {post.readTime}
+                    {post.date} | {post.readTime}
                   </span>
                   <Link
                     href={`/blog/${post.slug}`}
@@ -450,14 +441,13 @@ export default function BlogPage() {
                       fontFamily: "system-ui, sans-serif",
                     }}
                   >
-                    Read →
+                    Read -&gt;
                   </Link>
                 </div>
               </article>
             ))}
           </div>
 
-          {/* ── Load More ── */}
           <div style={{ textAlign: "center", marginTop: 60 }}>
             <button
               style={{
@@ -477,7 +467,6 @@ export default function BlogPage() {
           </div>
         </div>
 
-        {/* ── Newsletter ── */}
         <section
           style={{
             background: "#1E4B8F",
@@ -503,7 +492,7 @@ export default function BlogPage() {
               fontFamily: "system-ui, sans-serif",
             }}
           >
-            New articles, wellness tips, and LGBTQ+ resources — delivered monthly.
+            New articles, wellness tips, and LGBTQ+ resources - delivered monthly.
           </p>
           <div
             style={{

@@ -1,21 +1,21 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  Zap,
   Car,
-  Plane,
-  EyeOff,
-  TrendingUp,
-  Users,
   Eye,
-  Star,
+  EyeOff,
+  Plane,
   ShieldCheck,
   Sparkles,
+  Star,
+  TrendingUp,
   UserCircle,
+  Users,
+  Zap,
 } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const statusOptions = [
@@ -29,13 +29,10 @@ type AvailabilityStatus = (typeof statusOptions)[number]["key"];
 
 const statusMessages: Record<AvailabilityStatus, string> = {
   available:
-    "Você está visível no topo das buscas locais com o selo 'Disponível Agora'. (Timer: 90 min)",
-  mobile:
-    "Modo In-Call/Out-Call ativado. Edite seu Service Radius (Raio de Atendimento).",
-  traveling:
-    "Defina sua cidade de destino e datas para atrair reservas antecipadas.",
-  hidden:
-    "Modo Invisível. Seu perfil foi removido das buscas temporariamente.",
+    "Voce esta visivel no topo das buscas locais com o selo 'Disponivel Agora'. (Timer: 90 min)",
+  mobile: "Modo In-Call/Out-Call ativado. Edite seu raio de atendimento.",
+  traveling: "Defina sua cidade de destino e datas para atrair reservas antecipadas.",
+  hidden: "Modo Invisivel. Seu perfil foi removido das buscas temporariamente.",
 };
 
 const colorMap: Record<string, { active: string; idle: string }> = {
@@ -59,32 +56,34 @@ const colorMap: Record<string, { active: string; idle: string }> = {
 
 const metrics = [
   { label: "Views (30d)", value: "1,248", icon: Eye, trend: "+12%" },
-  { label: "Impressões", value: "8,402", icon: TrendingUp, trend: "+5%" },
+  { label: "Impressoes", value: "8,402", icon: TrendingUp, trend: "+5%" },
   { label: "Contatos", value: "42", icon: Users, trend: "+18%" },
-  { label: "Avaliação", value: "4.9", icon: Star, trend: "Top 5%" },
+  { label: "Avaliacao", value: "4.9", icon: Star, trend: "Top 5%" },
 ];
 
-const fadeUp = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 },
+};
 
 export default function DashboardHome() {
   const { user } = useAuth();
   const [activeStatus, setActiveStatus] = useState<AvailabilityStatus>("available");
 
-  // Derive a short display name from the auth user
   const displayName = (() => {
-    const meta = (user as { user_metadata?: { full_name?: string; name?: string } } | null)?.user_metadata;
+    const meta = (
+      user as { user_metadata?: { full_name?: string; name?: string } } | null
+    )?.user_metadata;
     const name = meta?.full_name || meta?.name || user?.email?.split("@")[0] || "Pro";
-    // Show first name only, up to 20 chars
     return name.split(" ")[0].slice(0, 20);
   })();
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 p-6 md:p-10">
-      {/* Header */}
       <header className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
           <h1 className="font-display text-3xl font-semibold tracking-tight text-slate-900">
-            Visão Geral
+            Visao Geral
           </h1>
           <p className="mt-1 font-sans text-sm text-slate-500">
             Acompanhe sua performance e gerencie sua disponibilidade.
@@ -95,15 +94,13 @@ export default function DashboardHome() {
             href="/pro/listing"
             className="border border-slate-200 bg-white px-4 py-2 font-mono text-xs uppercase tracking-wider text-slate-600 shadow-sm transition-colors hover:bg-slate-50"
           >
-            Ver Perfil Público
+            Editar Perfil
           </Link>
         </div>
       </header>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* LEFT COLUMN: Profile & Availability */}
         <div className="space-y-6 lg:col-span-1">
-          {/* Profile Card */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -116,7 +113,9 @@ export default function DashboardHome() {
                 <UserCircle className="relative h-10 w-10 text-white" />
               </div>
               <div>
-                <h2 className="font-display text-xl font-medium text-slate-900">{displayName}</h2>
+                <h2 className="font-display text-xl font-medium text-slate-900">
+                  {displayName}
+                </h2>
                 <div className="mt-0.5 flex items-center gap-1">
                   <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
                   <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">
@@ -126,7 +125,6 @@ export default function DashboardHome() {
               </div>
             </div>
 
-            {/* Profile completeness */}
             <div className="mt-6">
               <div className="mb-2 flex justify-between text-xs">
                 <span className="font-mono uppercase tracking-wider text-slate-500">
@@ -145,7 +143,6 @@ export default function DashboardHome() {
             </div>
           </motion.div>
 
-          {/* Availability Control */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -158,19 +155,20 @@ export default function DashboardHome() {
             </h3>
 
             <div className="grid grid-cols-2 gap-3">
-              {statusOptions.map((opt) => {
-                const isActive = activeStatus === opt.key;
-                const colors = colorMap[opt.color];
+              {statusOptions.map((option) => {
+                const isActive = activeStatus === option.key;
+                const colors = colorMap[option.color];
+
                 return (
                   <button
-                    key={opt.key}
-                    onClick={() => setActiveStatus(opt.key)}
+                    key={option.key}
+                    onClick={() => setActiveStatus(option.key)}
                     className={`flex flex-col items-center justify-center gap-2 border p-4 transition-all duration-300 ${
                       isActive ? colors.active : colors.idle
                     }`}
                   >
-                    <opt.icon className="h-6 w-6" />
-                    <span className="font-sans text-xs font-medium">{opt.label}</span>
+                    <option.icon className="h-6 w-6" />
+                    <span className="font-sans text-xs font-medium">{option.label}</span>
                   </button>
                 );
               })}
@@ -182,9 +180,7 @@ export default function DashboardHome() {
           </motion.div>
         </div>
 
-        {/* RIGHT COLUMN: Metrics & Feed */}
         <div className="space-y-6 lg:col-span-2">
-          {/* Smart Alert */}
           <div className="flex items-start gap-3 border-l-4 border-indigo-500 bg-indigo-50 p-4">
             <Sparkles className="mt-0.5 h-5 w-5 text-indigo-500" />
             <div>
@@ -192,22 +188,23 @@ export default function DashboardHome() {
                 Dica Knotty AI: Adicione Especialidades
               </h4>
               <p className="mt-1 font-sans text-xs text-indigo-700">
-                Terapeutas que listam &ldquo;Deep Tissue&rdquo; recebem 30% mais mensagens na sua
-                região.{" "}
-                <button className="ml-1 font-semibold underline">Editar Serviços</button>
+                Terapeutas que listam &ldquo;Deep Tissue&rdquo; recebem 30% mais
+                mensagens na sua regiao.{" "}
+                <Link href="/pro/listing" className="ml-1 font-semibold underline">
+                  Editar servicos
+                </Link>
               </p>
             </div>
           </div>
 
-          {/* Performance Metrics */}
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {metrics.map((metric, i) => (
+            {metrics.map((metric, index) => (
               <motion.div
                 key={metric.label}
                 variants={fadeUp}
                 initial="hidden"
                 animate="show"
-                transition={{ delay: 0.2 + i * 0.1 }}
+                transition={{ delay: 0.2 + index * 0.1 }}
                 className="flex flex-col gap-2 border border-slate-200/60 bg-white p-4 shadow-sm"
               >
                 <div className="flex items-start justify-between text-slate-400">
@@ -228,7 +225,6 @@ export default function DashboardHome() {
             ))}
           </div>
 
-          {/* Recent Activity Feed */}
           <div className="border border-slate-200/60 bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-slate-100 p-5">
               <h3 className="font-sans font-semibold text-slate-900">Atividade Recente</h3>
@@ -241,23 +237,23 @@ export default function DashboardHome() {
                 <div className="flex items-center gap-3">
                   <div className="h-2 w-2 rounded-full bg-emerald-500" />
                   <span className="text-slate-600">
-                    Alguém salvou seu perfil nos favoritos.
+                    Alguem salvou seu perfil nos favoritos.
                   </span>
                 </div>
-                <span className="font-mono text-xs text-slate-400">Há 2 min</span>
+                <span className="font-mono text-xs text-slate-400">Ha 2 min</span>
               </div>
               <div className="flex items-center justify-between font-sans text-sm">
                 <div className="flex items-center gap-3">
                   <div className="h-2 w-2 rounded-full bg-indigo-500" />
                   <span className="text-slate-600">Nova mensagem recebida.</span>
                 </div>
-                <span className="font-mono text-xs text-slate-400">Há 1 hora</span>
+                <span className="font-mono text-xs text-slate-400">Ha 1 hora</span>
               </div>
               <div className="flex items-center justify-between font-sans text-sm">
                 <div className="flex items-center gap-3">
                   <div className="h-2 w-2 rounded-full bg-slate-300" />
                   <span className="text-slate-600">
-                    Você subiu para o 3º lugar na busca por &ldquo;Relaxante&rdquo;.
+                    Voce subiu para o 3o lugar na busca por &ldquo;Relaxante&rdquo;.
                   </span>
                 </div>
                 <span className="font-mono text-xs text-slate-400">Ontem</span>
