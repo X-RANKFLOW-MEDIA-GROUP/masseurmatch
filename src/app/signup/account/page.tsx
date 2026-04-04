@@ -13,7 +13,13 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function SignupAccountPage() {
   const router = useRouter();
-  const { state, setAccountInfo, markAccountCreated, setTermsAccepted } = useSignup();
+  const {
+    state,
+    setAccountInfo,
+    markAccountCreated,
+    setTermsAccepted,
+    setComplianceAcknowledged,
+  } = useSignup();
   const { signUp } = useAuth();
 
   const [form, setForm] = useState({
@@ -25,7 +31,7 @@ export default function SignupAccountPage() {
     confirmPassword: "",
   });
   const [termsChecked, setTermsChecked] = useState(state.termsAccepted);
-  const [complianceChecked, setComplianceChecked] = useState(false);
+  const [complianceChecked, setComplianceChecked] = useState(state.complianceAcknowledged);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -74,6 +80,10 @@ export default function SignupAccountPage() {
       setError("You must accept the Terms of Service.");
       return;
     }
+    if (!complianceChecked) {
+      setError("You must acknowledge the Therapist Agreement and platform policies.");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -92,6 +102,7 @@ export default function SignupAccountPage() {
       });
       markAccountCreated();
       setTermsAccepted(termsChecked);
+      setComplianceAcknowledged(complianceChecked);
 
       router.push("/signup/verify");
     } catch {

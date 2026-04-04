@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -72,9 +73,9 @@ export default function ResetPasswordPageClient() {
       <div className="container mx-auto max-w-lg px-4 py-10">
         <div className="rounded-lg border border-border p-6 text-center text-sm text-muted-foreground">
           Validating your reset link… If nothing happens, please{" "}
-          <a href="/forgot-password" className="underline">
+          <Link href="/forgot-password" className="underline">
             request a new link
-          </a>
+          </Link>
           .
         </div>
       </div>
