@@ -158,15 +158,15 @@ const SPECIALTIES: Specialty[] = [
 ];
 
 const NEIGHBORHOODS: Neighborhood[] = [
-  { city: "Dallas, TX", name: "Oak Lawn", count: "84 gay-affirming therapists", tags: ["Deep Tissue", "LGBTQ+", "Sports"], href: "/dallas/oak-lawn" },
-  { city: "Dallas, TX", name: "Uptown", count: "62 verified therapists", tags: ["Swedish", "Hot Stone", "Couples"], href: "/dallas/uptown" },
-  { city: "Dallas, TX", name: "Deep Ellum", count: "38 verified therapists", tags: ["CBD Body Work", "Myofascial"], href: "/dallas/deep-ellum" },
-  { city: "Houston, TX", name: "Montrose", count: "106 gay-affirming therapists", tags: ["Deep Tissue", "Queer", "Swedish"], href: "/houston/montrose" },
-  { city: "Houston, TX", name: "The Heights", count: "57 verified therapists", tags: ["Sports", "Lymphatic"], href: "/houston/the-heights" },
-  { city: "Houston, TX", name: "Midtown", count: "73 verified therapists", tags: ["Couples", "Hot Stone", "LGBTQ+"], href: "/houston/midtown" },
-  { city: "Austin, TX", name: "South Congress", count: "71 gay-affirming therapists", tags: ["Deep Tissue", "CBD Work", "Queer"], href: "/austin/south-congress" },
-  { city: "Austin, TX", name: "East Austin", count: "44 verified therapists", tags: ["Swedish", "Myofascial", "LGBTQ+"], href: "/austin/east-austin" },
-  { city: "San Antonio, TX", name: "King William", count: "31 verified therapists", tags: ["Hot Stone", "Swedish"], href: "/san-antonio/king-william" },
+  { city: "Dallas, TX", name: "Oak Lawn", count: "84 gay-affirming therapists", tags: ["Deep Tissue", "LGBTQ+", "Sports"], href: "/dallas/areas/oak-lawn" },
+  { city: "Dallas, TX", name: "Uptown", count: "62 verified therapists", tags: ["Swedish", "Hot Stone", "Couples"], href: "/dallas/areas/uptown" },
+  { city: "Dallas, TX", name: "Deep Ellum", count: "38 verified therapists", tags: ["CBD Body Work", "Myofascial"], href: "/dallas/areas/deep-ellum" },
+  { city: "Houston, TX", name: "Montrose", count: "106 gay-affirming therapists", tags: ["Deep Tissue", "Queer", "Swedish"], href: "/houston/areas/montrose" },
+  { city: "Houston, TX", name: "The Heights", count: "57 verified therapists", tags: ["Sports", "Lymphatic"], href: "/houston/areas/the-heights" },
+  { city: "Houston, TX", name: "Midtown", count: "73 verified therapists", tags: ["Couples", "Hot Stone", "LGBTQ+"], href: "/houston/areas/midtown" },
+  { city: "Austin, TX", name: "South Congress", count: "71 gay-affirming therapists", tags: ["Deep Tissue", "CBD Work", "Queer"], href: "/austin/areas/south-congress" },
+  { city: "Austin, TX", name: "East Austin", count: "44 verified therapists", tags: ["Swedish", "Myofascial", "LGBTQ+"], href: "/austin/areas/east-austin" },
+  { city: "San Antonio, TX", name: "King William", count: "31 verified therapists", tags: ["Hot Stone", "Swedish"], href: "/san-antonio/areas/king-william" },
 ];
 
 const TESTIMONIALS: Testimonial[] = [
