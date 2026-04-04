@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 
 export function DebugProfilesButton() {
@@ -10,7 +12,7 @@ export function DebugProfilesButton() {
       const profiles = (await response.json()) as unknown[];
       alert(`Perfis encontrados: ${profiles.length}`);
       console.log(profiles);
-    } catch (e) {
+    } catch {
       alert('Erro ao buscar perfis');
     }
   };

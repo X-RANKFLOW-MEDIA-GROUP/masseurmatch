@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { logoutMutation, registerMutation } from "@/app/_lib/mutations";
+import { loginMutation, logoutMutation, registerMutation } from "@/app/_lib/mutations";
 import { supabase } from '@/integrations/supabase/client';
 
 interface SubscriptionState {
@@ -111,28 +111,6 @@ async function establishClientSession(
   }
 }
 
-async function syncServerSessionFromBrowser() {
-  const { data } = await supabase.auth.getSession();
-  const accessToken = data.session?.access_token;
-
-  if (!accessToken) {
-    throw new Error("Authentication session was not created.");
-  }
-
-  const response = await fetch("/api/auth/sync-session", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ access_token: accessToken }),
-  });
-
-  if (response.ok) {
-    return;
-  }
-
-  const payload = await response.json().catch(() => ({}));
-  throw new Error(typeof payload?.error === "string" ? payload.error : "Could not sync login session.");
-}
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -237,8 +215,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      await establishClientSession(email, password);
-      await syncServerSessionFromBrowser();
+      const result = await loginMutation({ email, password });
+
+      // Login API already sets the server session cookie.
+      // Mirror the Supabase browser session so client auth state hydrates immediately.
+      await establishClientSession(email, password, result.session);
 
       return { error: null };
     } catch (error) {

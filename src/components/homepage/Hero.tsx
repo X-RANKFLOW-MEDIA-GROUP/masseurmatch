@@ -1,37 +1,11 @@
-import { Search, MapPin, ArrowRight, Zap, Clock, Navigation } from "lucide-react";
-import { useRef, useState, useCallback, useEffect, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Search, MapPin } from "lucide-react";
+import { useRef, useState, useEffect, useMemo } from "react";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { KnottyGlassAI } from "@/components/homepage/KnottyGlassAI";
-
-type SmartChip = {
-  label: string;
-  icon: string | null;
-  query: string;
-  highlight?: boolean;
-  gps?: boolean;
-};
-
-const SMART_CHIPS: SmartChip[] = [
-  { label: "Deep Tissue", icon: "💆", query: "Deep Tissue" },
-  { label: "Outcall", icon: "🚗", query: "Outcall" },
-  { label: "Available Now", icon: null, query: "Available Now", highlight: true },
-  { label: "Near Me", icon: null, query: "Near Me", gps: true },
-  { label: "Swedish", icon: "🧘", query: "Swedish" },
-  { label: "Sports Recovery", icon: "🏃", query: "Sports Recovery" },
-];
-
-const AUTOCOMPLETE_SUGGESTIONS = [
-  "Deep tissue massage",
-  "Swedish relaxation massage",
-  "Sports recovery massage",
-  "Mobile outcall massage",
-  "Couples massage",
-  "Hot stone massage",
-];
 
 type HeroProps = {
   neighborhood: string | null;
@@ -39,13 +13,11 @@ type HeroProps = {
   searchInputRef?: React.RefObject<HTMLInputElement>;
 };
 
-
 export function Hero({ neighborhood, city, searchInputRef }: HeroProps) {
   const router = useRouter();
   const localRef = useRef<HTMLInputElement>(null);
   const inputRef = searchInputRef ?? (localRef as React.RefObject<HTMLInputElement>);
   const [inputValue, setInputValue] = useState("");
-  const [showSuggestions, setShowSuggestions] = useState(false);
 
   // Typing effect for headline
   const phrases = useMemo(
@@ -59,9 +31,14 @@ export function Hero({ neighborhood, city, searchInputRef }: HeroProps) {
   useEffect(() => {
     const currentPhrase = phrases[phraseIndex];
     const typingSpeed = isDeleting ? 50 : 100;
+    
+    // We declare the inner timeout variable so we can clean it up
+    let innerTimeout: NodeJS.Timeout;
+
     const timeout = setTimeout(() => {
       if (!isDeleting && text === currentPhrase) {
-        setTimeout(() => setIsDeleting(true), 1500);
+        // Assign the inner timeout
+        innerTimeout = setTimeout(() => setIsDeleting(true), 1500);
       } else if (isDeleting && text === "") {
         setIsDeleting(false);
         setPhraseIndex((prev) => (prev + 1) % phrases.length);
@@ -69,27 +46,13 @@ export function Hero({ neighborhood, city, searchInputRef }: HeroProps) {
         setText(currentPhrase.substring(0, text.length + (isDeleting ? -1 : 1)));
       }
     }, typingSpeed);
-    return () => clearTimeout(timeout);
+    
+    // Clean up BOTH timeouts on unmount or re-render to prevent memory leaks
+    return () => {
+      clearTimeout(timeout);
+      if (innerTimeout) clearTimeout(innerTimeout);
+    };
   }, [text, isDeleting, phraseIndex, phrases]);
-
-  const filteredSuggestions = inputValue.length > 0
-    ? AUTOCOMPLETE_SUGGESTIONS.filter((s) =>
-        s.toLowerCase().includes(inputValue.toLowerCase()),
-      )
-    : [];
-
-  const handleSuggestionClick = useCallback((suggestion: string) => {
-    setInputValue(suggestion);
-    setShowSuggestions(false);
-    inputRef.current?.form?.submit();
-  }, [inputRef]);
-
-  const locationLine =
-    neighborhood && city
-      ? `Showing results near ${neighborhood}, ${city}`
-      : city
-        ? `Showing results near ${city}`
-        : "Discover therapists near you";
 
   const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -110,7 +73,7 @@ export function Hero({ neighborhood, city, searchInputRef }: HeroProps) {
         <div className="absolute top-[20%] left-[-10%] w-72 h-72 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center gap-12">
-        {/* Texto e Busca (Esquerda) */}
+        {/* Text and Search (Left) */}
         <div className="flex-1 text-center lg:text-left">
           <motion.h1
             className="text-5xl lg:text-7xl font-extrabold tracking-tight text-gray-900 mb-6 premium-fade-up"
@@ -127,7 +90,7 @@ export function Hero({ neighborhood, city, searchInputRef }: HeroProps) {
             The premium directory to connect with top-rated professionals. Discover tailored experiences based on your location and preferences.
           </p>
 
-          {/* Search Bar Rápida - now glass effect */}
+          {/* Quick Search Bar - glass effect */}
           <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto lg:mx-0">
             <div className="relative flex-1 glass-card-light backdrop-blur-xl border border-white/40">
               <label htmlFor="hero-city-search" className="sr-only">
@@ -151,12 +114,12 @@ export function Hero({ neighborhood, city, searchInputRef }: HeroProps) {
           </form>
         </div>
 
-        {/* Knotty AI Interface (Direita) */}
+        {/* Knotty AI Interface (Right) */}
         <div className="flex-1 w-full max-w-md relative">
           <div className="glass-card-light p-6 rounded-3xl shadow-2xl relative z-10">
             <KnottyGlassAI city={city} />
           </div>
-          {/* Sombra de base para o Widget */}
+          {/* Base Shadow for the Widget */}
           <div className="absolute -bottom-6 -right-6 w-full h-full bg-gradient-to-br from-gray-200 to-gray-50 rounded-3xl -z-10 transform rotate-3"></div>
         </div>
       </div>
@@ -182,4 +145,3 @@ function _LegacyChipLinks({ city }: { city: string | null }) {
     </div>
   );
 }
-

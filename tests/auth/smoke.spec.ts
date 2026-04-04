@@ -71,4 +71,37 @@ test.describe("Auth pages smoke", () => {
     await expect(signInLink).toBeVisible();
     await expect(signInLink).toHaveAttribute("href", "/login");
   });
+
+  // --- NOVOS TESTES DE REGRESSÃO: RESET E PRO ONBOARDING ---
+
+  test("/forgot-password renders reset form", async ({ page }) => {
+    await page.goto("/forgot-password");
+    
+    await expect(page).not.toHaveURL(/\/(404|500)/);
+
+    // Email field
+    await expect(
+      page.locator('input[type="email"], input[aria-label*="email" i]').first(),
+    ).toBeVisible();
+
+    // Submit button
+    await expect(
+      page.locator('button[type="submit"]').first(),
+    ).toBeVisible();
+  });
+
+  test("/pro/join renders marketing/join page for signed out users", async ({ page }) => {
+    await page.goto("/pro/join");
+    
+    await expect(page).not.toHaveURL(/\/(404|500)/);
+    // Garante que a tag main renderizou corretamente sem quebrar
+    await expect(page.locator('main')).toBeVisible();
+  });
+
+  test("/pro/dashboard redirects unauthenticated users to login", async ({ page }) => {
+    await page.goto("/pro/dashboard");
+    
+    // Verifica o client auth gate (deve redirecionar para o login passando a rota de origem no query param)
+    await expect(page).toHaveURL(/.*\/login\?redirect=.*pro.*dashboard/i);
+  });
 });

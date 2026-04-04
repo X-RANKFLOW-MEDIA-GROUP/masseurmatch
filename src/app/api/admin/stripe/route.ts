@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     const subscriptions = await stripe.subscriptions.list({
       limit: 50,
       status: "all",
-      expand: ["data.customer", "data.items.data.price.product"],
+      expand: ["data.customer"],
     });
 
     // Fetch recent payments
@@ -52,8 +52,15 @@ export async function GET(request: NextRequest) {
       const customer = typeof s.customer === "string" ? null : s.customer;
       const item = s.items?.data?.[0];
       const product = item?.price?.product;
-      const productName = (product && typeof product !== "string" && !("deleted" in product)) ? product.name : null;
-      const planKey = s.metadata?.masseurmatch_plan ?? productName ?? "Unknown";
+      const productName =
+        product && typeof product !== "string" && !("deleted" in product)
+          ? product.name
+          : null;
+      const fallbackPlanKey =
+        item?.price?.nickname ||
+        (typeof product === "string" ? product : null) ||
+        null;
+      const planKey = s.metadata?.masseurmatch_plan ?? productName ?? fallbackPlanKey ?? "Unknown";
       return {
         id: s.id,
         status: s.status,
