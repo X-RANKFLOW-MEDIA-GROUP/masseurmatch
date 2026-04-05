@@ -8,6 +8,7 @@ import type { PublicTherapist } from "@/app/_lib/directory";
 import { ScrambleText } from "@/components/animations/ScrambleText";
 import { TextReveal } from "@/components/animations/TextReveal";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { HeroBackground } from "./HeroBackground";
 import "./world-class.css";
 
 /* ─── Types ─── */
@@ -512,6 +513,7 @@ export function WorldClassHomepage({
     <div className="wc-home">
       {/* ─── HERO ─── */}
       <section className="wc-hero">
+        <HeroBackground />
         <div className="wc-hero-grid-bg" />
         <div className="wc-hero-split">
           {/* LEFT — content */}

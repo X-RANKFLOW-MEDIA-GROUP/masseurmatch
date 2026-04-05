@@ -122,10 +122,7 @@
   align-items: center;
   justify-content: center;
   padding: 100px 24px 60px;
-  background:
-    radial-gradient(ellipse 80% 55% at 50% 0%, rgba(255,138,31,.09) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(255,138,31,.04) 0%, transparent 60%),
-    linear-gradient(180deg, var(--n0) 0%, var(--n-deep) 100%);
+  background: transparent;
 }
 
 /* CSS Grid Pattern background */
@@ -1551,7 +1548,7 @@
 
 /* ══════════════════════════════════════
    FAQ
-══════════════════════════════════════ */
+═══════════���══════════════════════════ */
 .wc-faq-sec { background: var(--n0); padding: 108px 52px }
 .wc-faq-inner { max-width: 900px; margin: 0 auto }
 .wc-faq-list { margin-top: 52px }
