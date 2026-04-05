@@ -122,7 +122,7 @@ function MobileNav() {
 
       <SheetContent
         side="right"
-        className="w-[280px] bg-card border-border p-0"
+        className="w-[280px] bg-background border-border p-0"
       >
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
@@ -207,8 +207,8 @@ export default function SiteHeader() {
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled 
-          ? 'bg-card/95 backdrop-blur-xl border-b border-border' 
-          : 'bg-transparent'
+          ? 'bg-background/95 backdrop-blur-xl border-b border-border' 
+          : 'bg-background/50 backdrop-blur-sm'
       }`}
     >
       <div className="w-full max-w-[1400px] mx-auto flex items-center justify-between px-6 lg:px-10 py-4">
