@@ -59,7 +59,7 @@ test.describe("Auth pages smoke", () => {
   test("/login links to /register", async ({ page }) => {
     await page.goto("/login");
 
-    const signUpLink = page.getByRole("link", { name: /sign up/i });
+    const signUpLink = page.locator('a[href="/register"]').filter({ hasText: /sign up/i }).first();
     await expect(signUpLink).toBeVisible();
     await expect(signUpLink).toHaveAttribute("href", "/register");
   });
@@ -67,8 +67,41 @@ test.describe("Auth pages smoke", () => {
   test("/register links to /login", async ({ page }) => {
     await page.goto("/register");
 
-    const signInLink = page.getByRole("link", { name: /sign in/i });
+    const signInLink = page.locator('a[href="/login"]').filter({ hasText: /sign in/i }).first();
     await expect(signInLink).toBeVisible();
     await expect(signInLink).toHaveAttribute("href", "/login");
+  });
+
+  // --- NOVOS TESTES DE REGRESSÃO: RESET E PRO ONBOARDING ---
+
+  test("/forgot-password renders reset form", async ({ page }) => {
+    await page.goto("/forgot-password");
+    
+    await expect(page).not.toHaveURL(/\/(404|500)/);
+
+    // Email field
+    await expect(
+      page.locator('input[type="email"], input[aria-label*="email" i]').first(),
+    ).toBeVisible();
+
+    // Submit button
+    await expect(
+      page.locator('button[type="submit"]').first(),
+    ).toBeVisible();
+  });
+
+  test("/pro/join renders marketing/join page for signed out users", async ({ page }) => {
+    await page.goto("/pro/join");
+    
+    await expect(page).not.toHaveURL(/\/(404|500)/);
+    // Garante que a tag main renderizou corretamente sem quebrar
+    await expect(page.locator('main')).toBeVisible();
+  });
+
+  test("/pro/dashboard redirects unauthenticated users to login", async ({ page }) => {
+    await page.goto("/pro/dashboard");
+    
+    // Verifica o client auth gate (deve redirecionar para o login passando a rota de origem no query param)
+    await expect(page).toHaveURL(/.*\/login\?redirect=.*pro.*dashboard/i);
   });
 });

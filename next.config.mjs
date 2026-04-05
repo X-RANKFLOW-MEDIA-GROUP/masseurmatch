@@ -80,16 +80,13 @@ const CONTENT_SECURITY_POLICY = [
   "connect-src 'self' https://*.supabase.co https://api.stripe.com https://vercel.live https://*.vercel.app https://*.vercel.sh",
   "frame-src 'self' http://localhost:* https://*.vusercontent.net https://*.lite.vusercontent.net https://generated.vusercontent.net https://*.vercel.run https://*.vercel.app https://*.vercel.sh https://vercel.live https://vercel.com https://vercel.fides-cdn.ethyca.com https://js.stripe.com https://hooks.stripe.com https://*.accounts.dev https://*.clerk.accounts.dev https://ops.askchapter.org https://*.supabase.co",
   "worker-src 'self' blob:",
+  "upgrade-insecure-requests" // Adicionado para forçar HTTPS em todas as requisições em produção
 ].join("; ");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typedRoutes: false,
   allowedDevOrigins: ["100.69.207.7", "localhost", "127.0.0.1", "::1", "*.replit.dev", "*.janeway.replit.dev"],
-  experimental: {
-    webpackBuildWorker: true,
-    webpackMemoryOptimizations: true,
-  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },

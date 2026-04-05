@@ -42,3 +42,7 @@ dist-ssr
 
 # Pasted/uploaded user assets
 attached_assets/
+
+# Local temporary debug artifacts
+.tmp-dev.*
+tmp/

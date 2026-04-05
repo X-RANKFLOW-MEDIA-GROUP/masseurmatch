@@ -4,7 +4,12 @@
       "Bash(pnpm lint:*)",
       "Bash(pnpm build:*)",
       "Bash(FORCE_CLEAN_NEXT=1 pnpm build)",
-      "Bash(pnpm typecheck:*)"
+      "Bash(pnpm typecheck:*)",
+      "Bash(gh variable:*)",
+      "Bash(gh auth:*)",
+      "mcp__claude_ai_Supabase__list_projects",
+      "mcp__claude_ai_Supabase__execute_sql",
+      "mcp__claude_ai_Supabase__apply_migration"
     ]
   }
 }

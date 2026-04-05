@@ -15,7 +15,13 @@ const COOKIE_NAME = "mm_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
 
 function sessionSecret(): string {
-  const secret = envOptional(["MM_SESSION_SECRET", "SESSION_SECRET"]);
+  const secret = envOptional([
+    "MM_SESSION_SECRET",
+    "SESSION_SECRET",
+    "MM_JWT_SECRET",
+    "JWT_SECRET",
+    "SUPABASE_SERVICE_ROLE_KEY",
+  ]);
   if (secret) return secret;
   if (process.env.NODE_ENV === "production") {
     throw new Error("MM_SESSION_SECRET is required in production. Set it in your environment variables.");

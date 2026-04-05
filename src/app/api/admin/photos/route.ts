@@ -15,7 +15,7 @@ export async function GET(request: Request) {
 
     const { data: photos, error } = await adminClient
       .from("profile_photos")
-      .select("id, profile_id, url, storage_path, position, sort_order, moderation_status, moderation_reason, created_at, profiles!profile_photos_profile_id_fkey(id, display_name, full_name, city)")
+      .select("id, profile_id, storage_path, is_primary, sort_order, moderation_status, moderation_reason, created_at, profiles!profile_photos_profile_id_fkey(id, display_name, full_name, city)")
       .order("created_at", { ascending: false })
       .limit(100);
 
@@ -23,7 +23,7 @@ export async function GET(request: Request) {
       // If foreign key join fails, fall back to photos only
       const { data: fallbackPhotos, error: fallbackError } = await adminClient
         .from("profile_photos")
-        .select("id, profile_id, url, storage_path, position, sort_order, moderation_status, moderation_reason, created_at")
+        .select("id, profile_id, storage_path, is_primary, sort_order, moderation_status, moderation_reason, created_at")
         .order("created_at", { ascending: false })
         .limit(100);
 
@@ -34,8 +34,8 @@ export async function GET(request: Request) {
         photos: (fallbackPhotos ?? []).map((p: any) => ({
           id: p.id,
           profileId: p.profile_id,
-          url: p.url || p.storage_path || "",
-          position: p.position ?? p.sort_order ?? 0,
+          url: p.storage_path || "",
+          position: p.sort_order ?? 0,
           moderationStatus: p.moderation_status,
           moderationReason: p.moderation_reason,
           createdAt: p.created_at,
@@ -49,8 +49,8 @@ export async function GET(request: Request) {
       photos: (photos ?? []).map((p: any) => ({
         id: p.id,
         profileId: p.profile_id,
-        url: p.url || p.storage_path || "",
-        position: p.position ?? p.sort_order ?? 0,
+        url: p.storage_path || "",
+        position: p.sort_order ?? 0,
         moderationStatus: p.moderation_status,
         moderationReason: p.moderation_reason,
         createdAt: p.created_at,

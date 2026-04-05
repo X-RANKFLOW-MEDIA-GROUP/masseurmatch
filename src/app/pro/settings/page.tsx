@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Bell, Key, LogOut, Save, Shield, User } from "lucide-react";
+import Link from "next/link";
 
 type PasswordState = { current: string; next: string; confirm: string };
 const EMPTY_PW: PasswordState = { current: "", next: "", confirm: "" };
@@ -173,7 +174,7 @@ export default function ProSettingsPage() {
             Caso tenha esquecido a sua palavra-passe, pode redefiní-la via e-mail.
           </p>
           <Button variant="outline" asChild>
-            <a href="/forgot-password">Redefinir via e-mail</a>
+            <Link href="/forgot-password">Redefinir via e-mail</Link>
           </Button>
         </div>
       </section>

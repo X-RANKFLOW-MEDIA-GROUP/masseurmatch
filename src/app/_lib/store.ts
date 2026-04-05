@@ -12,17 +12,13 @@ type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 const PROFILE_SELECT =
   "id, user_id, slug, display_name, full_name, bio, city, state, phone, specialties, incall_price, outcall_price, height_inches, weight_lb, body_type, status, is_active, updated_at";
 
-const AVAILABLE_NOW_SELECT =
-  "id, _tier, available_now, available_now_expires, available_now_activations_today, available_now_last_activation, available_now_day_start";
+const AVAILABLE_NOW_SELECT = "id, _tier, available_now, available_now_expires";
 
 export type AvailableNowProfile = {
   id: string;
   _tier: string | null;
   available_now: boolean | null;
   available_now_expires: string | null;
-  available_now_activations_today: number | null;
-  available_now_last_activation: string | null;
-  available_now_day_start: string | null;
 };
 
 export { createSupabaseAdminClient, createSupabasePublicClient, getUserRole, recordAuditLog };
@@ -62,9 +58,6 @@ export async function setAvailableNow(
   fields: Partial<{
     available_now: boolean;
     available_now_expires: string | null;
-    available_now_activations_today: number;
-    available_now_last_activation: string;
-    available_now_day_start: string;
   }>,
 ): Promise<void> {
   const adminClient = createSupabaseAdminClient();

@@ -2,12 +2,16 @@ import { errorResponse, json, parseJsonBody, withSetCookie } from "@/app/api/_li
 import { RouteError } from "@/app/api/_lib/http";
 import { setSessionCookie } from "@/app/api/_lib/session";
 import { authRegisterSchema } from "@/app/_lib/validation";
-import { createTherapistUser } from "@/app/api/_lib/supabase-server";
+import {
+  createTherapistUser,
+  verifyPasswordWithRetry,
+} from "@/app/api/_lib/supabase-server";
 
 export async function POST(request: Request) {
   try {
     const body = await parseJsonBody(request, authRegisterSchema);
     const result = await createTherapistUser(body);
+    const signInResult = await verifyPasswordWithRetry(body.email, body.password, 5);
 
     const response = json({
       ok: true,
@@ -16,6 +20,12 @@ export async function POST(request: Request) {
         email: result.user.email,
       },
       role: result.role,
+      session: signInResult.session
+        ? {
+            access_token: signInResult.session.access_token,
+            refresh_token: signInResult.session.refresh_token,
+          }
+        : null,
     });
 
     return withSetCookie(

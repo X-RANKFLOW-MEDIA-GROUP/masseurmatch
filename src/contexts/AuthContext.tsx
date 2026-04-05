@@ -42,6 +42,75 @@ const defaultSubscription: SubscriptionState = {
   config_error: null,
 };
 
+type SubscriptionResponse = {
+  ok: boolean;
+  subscribed?: boolean;
+  plan_key?: string | null;
+  plan_name?: string | null;
+  subscription_end?: string | null;
+  trial_end?: string | null;
+  is_trial?: boolean;
+  has_founder_discount?: boolean;
+  status?: string | null;
+  config_error?: string | null;
+};
+
+async function wait(ms: number) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function signInWithRetry(email: string, password: string, attempts = 5) {
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (!error) {
+      return null;
+    }
+
+    lastError = error;
+
+    if (attempt < attempts - 1) {
+      await wait(750 * (attempt + 1));
+    }
+  }
+
+  return lastError;
+}
+
+async function establishClientSession(
+  email: string,
+  password: string,
+  sessionTokens?: {
+    access_token: string;
+    refresh_token: string;
+  } | null,
+) {
+  const accessToken = sessionTokens?.access_token;
+  const refreshToken = sessionTokens?.refresh_token;
+
+  if (accessToken && refreshToken) {
+    try {
+      const result = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+
+      if (!result.error) {
+        return;
+      }
+    } catch {
+      // Fall back to a direct browser sign-in below.
+    }
+  }
+
+  const signInError = await signInWithRetry(email, password);
+  if (signInError) {
+    throw signInError;
+  }
+}
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -52,12 +121,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshSubscription = useCallback(async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('check-subscription');
-      if (error) {
-        console.error('Subscription check error:', error);
-        setSubscription(prev => ({ ...prev, loading: false }));
+      const response = await fetch("/api/pro/subscription", {
+        method: "GET",
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        setSubscription((prev) => ({ ...prev, loading: false }));
         return;
       }
+
+      const data = (await response.json()) as SubscriptionResponse;
+
       setSubscription({
         subscribed: data.subscribed ?? false,
         plan_key: data.plan_key ?? null,
@@ -71,7 +146,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         config_error: data.config_error ?? null,
       });
     } catch {
-      setSubscription(prev => ({ ...prev, loading: false }));
+      setSubscription((prev) => ({ ...prev, loading: false }));
     }
   }, []);
 
@@ -123,8 +198,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
-      await registerMutation({ email, password, fullName });
-      await supabase.auth.signInWithPassword({ email, password });
+      const result = await registerMutation({ email, password, fullName });
+
+      // Registration API already sets the server session cookie.
+      // Try to establish the browser Supabase session, but do not block signup flow on it.
+      await Promise.race([
+        establishClientSession(email, password, result.session),
+        wait(8000),
+      ]).catch(() => null);
+
       return { error: null };
     } catch (error) {
       return { error: error as Error };
@@ -133,8 +215,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      await loginMutation({ email, password });
-      await supabase.auth.signInWithPassword({ email, password });
+      const result = await loginMutation({ email, password });
+
+      // Login API already sets the server session cookie.
+      // Mirror the Supabase browser session so client auth state hydrates immediately.
+      await establishClientSession(email, password, result.session);
+
       return { error: null };
     } catch (error) {
       return { error: error as Error };

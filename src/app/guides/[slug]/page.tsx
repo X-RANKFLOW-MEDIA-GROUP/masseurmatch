@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { JsonLd } from "@/app/_components/json-ld";
-import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "@/app/_lib/seo";
 import { createPageMetadata } from "@/app/_lib/metadata";
 import { formatSlugLabel } from "@/app/_lib/directory-taxonomy";
+import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "@/app/_lib/seo";
 import { GUIDES, getGuideBySlug } from "@/app/guides/data";
 
 type Params = { slug: string };
@@ -15,9 +15,7 @@ function formatGuideLinkLabel(href: string) {
   const cleanHref = href.replace(/\/+$/, "");
   const parts = cleanHref.split("/").filter(Boolean);
 
-  if (parts.length === 0) {
-    return "Home";
-  }
+  if (parts.length === 0) return "Home";
 
   if (parts.length === 1) {
     if (parts[0] === "compare") return "Compare";
@@ -36,7 +34,11 @@ export function generateStaticParams(): Params[] {
   return GUIDES.map((guide) => ({ slug: guide.slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<Params>;
+}): Promise<Metadata> {
   const resolved = await params;
   const guide = getGuideBySlug(resolved.slug);
 
@@ -57,7 +59,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   });
 }
 
-export default async function GuidePage({ params }: { params: Promise<Params> }) {
+export default async function GuidePage({
+  params,
+}: {
+  params: Promise<Params>;
+}) {
   const resolved = await params;
   const guide = getGuideBySlug(resolved.slug);
 
@@ -87,11 +93,15 @@ export default async function GuidePage({ params }: { params: Promise<Params> })
       <article className="page-shell py-10">
         <div className="mx-auto max-w-3xl space-y-8">
           <header className="rounded-3xl border border-border bg-background p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Guide</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              Guide
+            </p>
             <h1 className="mt-2 text-3xl font-semibold text-foreground">{guide.h1}</h1>
-            <p className="mt-3 text-sm leading-7 text-muted-foreground">{guide.description}</p>
+            <p className="mt-3 text-sm leading-7 text-muted-foreground">
+              {guide.description}
+            </p>
             <p className="mt-4 text-xs uppercase tracking-[0.15em] text-muted-foreground">
-              {guide.readMinutes} min read · Published {guide.publishedAt}
+              {guide.readMinutes} min read | Published {guide.publishedAt}
             </p>
           </header>
 
@@ -107,16 +117,26 @@ export default async function GuidePage({ params }: { params: Promise<Params> })
             <h2 className="text-xl font-semibold text-foreground">Related City Pages</h2>
             <div className="mt-3 flex flex-wrap gap-2">
               {guide.cityLinks.map((href) => (
-                <Link key={href} href={href} className="rounded-full border border-border px-3 py-2 text-xs font-semibold text-foreground">
+                <Link
+                  key={href}
+                  href={href}
+                  className="rounded-full border border-border px-3 py-2 text-xs font-semibold text-foreground"
+                >
                   {formatGuideLinkLabel(href)}
                 </Link>
               ))}
             </div>
 
-            <h2 className="mt-6 text-xl font-semibold text-foreground">Related Internal Links</h2>
+            <h2 className="mt-6 text-xl font-semibold text-foreground">
+              Related Internal Links
+            </h2>
             <div className="mt-3 flex flex-wrap gap-2">
               {guide.relatedLinks.map((href) => (
-                <Link key={href} href={href} className="rounded-full border border-border px-3 py-2 text-xs font-semibold text-foreground">
+                <Link
+                  key={href}
+                  href={href}
+                  className="rounded-full border border-border px-3 py-2 text-xs font-semibold text-foreground"
+                >
                   {formatGuideLinkLabel(href)}
                 </Link>
               ))}

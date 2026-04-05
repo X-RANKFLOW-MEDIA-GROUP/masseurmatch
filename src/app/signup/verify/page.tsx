@@ -1,27 +1,41 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
   Mail,
   Phone,
   ShieldCheck,
-  CheckCircle2,
-  AlertCircle,
-  Loader2,
 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSignup } from "../_lib/signup-context";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+
+async function syncServerSession(accessToken: string | undefined) {
+  if (!accessToken) return;
+
+  await fetch("/api/auth/sync-session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ access_token: accessToken }),
+  });
+}
 
 export default function SignupVerifyPage() {
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const {
     state,
+    setAccountInfo,
     markEmailVerified,
     markPhoneVerified,
     setIdentityStatus,
@@ -37,23 +51,111 @@ export default function SignupVerifyPage() {
   const [idLoading, setIdLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /* ------------------------------------------------------------------ */
-  /*  Email verification                                                 */
-  /* ------------------------------------------------------------------ */
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (!user) {
+      router.replace("/login?redirect=%2Fsignup%2Fverify");
+      return;
+    }
+
+    const metadata = user.user_metadata as Record<string, unknown> | undefined;
+    const derivedFullName =
+      state.fullName ||
+      (typeof metadata?.full_name === "string"
+        ? metadata.full_name.trim()
+        : typeof metadata?.name === "string"
+          ? metadata.name.trim()
+          : user.email?.split("@")[0] || "User");
+
+    setAccountInfo({
+      fullName: derivedFullName,
+      displayName: state.displayName || derivedFullName,
+      email: state.email || user.email?.trim() || "",
+      phone: state.phone || user.phone?.trim() || "",
+    });
+
+    if (user.email_confirmed_at) {
+      markEmailVerified();
+    }
+
+    if (user.phone_confirmed_at) {
+      markPhoneVerified();
+    }
+  }, [
+    authLoading,
+    markEmailVerified,
+    markPhoneVerified,
+    router,
+    setAccountInfo,
+    state.displayName,
+    state.email,
+    state.fullName,
+    state.phone,
+    user,
+  ]);
+
+  const checkIdentityStatus = useCallback(async () => {
+    if (!state.stripeIdentitySessionId) return;
+
+    setIdLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `/api/stripe/identity/check-status?sessionId=${encodeURIComponent(state.stripeIdentitySessionId)}`,
+      );
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error ?? "Failed to check verification status.");
+      }
+
+      const { status } = await response.json();
+
+      if (status === "verified") {
+        setIdentityStatus("verified");
+      } else if (status === "requires_input") {
+        setIdentityStatus("requires_input");
+      } else if (status === "canceled") {
+        setIdentityStatus("failed");
+      } else {
+        setIdentityStatus("processing");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to check verification status.");
+    } finally {
+      setIdLoading(false);
+    }
+  }, [setIdentityStatus, state.stripeIdentitySessionId]);
+
+  useEffect(() => {
+    if (state.identityVerificationStatus !== "processing" || !state.stripeIdentitySessionId) {
+      return;
+    }
+
+    void checkIdentityStatus();
+  }, [checkIdentityStatus, state.identityVerificationStatus, state.stripeIdentitySessionId]);
 
   async function sendEmailCode() {
+    if (!state.email) {
+      setError("An email address is required to verify your account.");
+      return;
+    }
+
     setEmailLoading(true);
     setError(null);
+
     try {
-      // In production, call an API route that sends an OTP email
       const { error: resendError } = await supabase.auth.resend({
         type: "signup",
         email: state.email,
       });
+
       if (resendError) throw resendError;
       setEmailSent(true);
-    } catch (err: any) {
-      setError(err.message ?? "Failed to send email verification code.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send email verification code.");
     } finally {
       setEmailLoading(false);
     }
@@ -62,37 +164,40 @@ export default function SignupVerifyPage() {
   async function verifyEmailCode() {
     setEmailLoading(true);
     setError(null);
+
     try {
-      const { error: verifyError } = await supabase.auth.verifyOtp({
+      const { data, error: verifyError } = await supabase.auth.verifyOtp({
         email: state.email,
         token: emailOtp,
         type: "email",
       });
+
       if (verifyError) throw verifyError;
+
+      await syncServerSession(data.session?.access_token);
       markEmailVerified();
-    } catch (err: any) {
-      setError(err.message ?? "Invalid email verification code.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Invalid email verification code.");
     } finally {
       setEmailLoading(false);
     }
   }
 
-  /* ------------------------------------------------------------------ */
-  /*  Phone verification                                                 */
-  /* ------------------------------------------------------------------ */
-
   async function sendPhoneCode() {
     if (!state.phone) return;
+
     setPhoneLoading(true);
     setError(null);
+
     try {
       const { error: otpError } = await supabase.auth.signInWithOtp({
         phone: state.phone,
       });
+
       if (otpError) throw otpError;
       setPhoneSent(true);
-    } catch (err: any) {
-      setError(err.message ?? "Failed to send SMS verification code.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send SMS verification code.");
     } finally {
       setPhoneLoading(false);
     }
@@ -101,102 +206,78 @@ export default function SignupVerifyPage() {
   async function verifyPhoneCode() {
     setPhoneLoading(true);
     setError(null);
+
     try {
-      const { error: verifyError } = await supabase.auth.verifyOtp({
+      const { data, error: verifyError } = await supabase.auth.verifyOtp({
         phone: state.phone,
         token: phoneOtp,
         type: "sms",
       });
+
       if (verifyError) throw verifyError;
+
+      await syncServerSession(data.session?.access_token);
       markPhoneVerified();
-    } catch (err: any) {
-      setError(err.message ?? "Invalid phone verification code.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Invalid phone verification code.");
     } finally {
       setPhoneLoading(false);
     }
   }
 
-  /* ------------------------------------------------------------------ */
-  /*  Stripe Identity verification                                       */
-  /* ------------------------------------------------------------------ */
-
   const startIdentityVerification = useCallback(async () => {
     setIdLoading(true);
     setError(null);
+
     try {
-      // Call backend to create a Stripe Identity VerificationSession
-      const res = await fetch("/api/stripe/identity/create-session", {
+      const response = await fetch("/api/stripe/identity/create-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: state.email }),
+        body: JSON.stringify({}),
       });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
         throw new Error(body.error ?? "Failed to create verification session.");
       }
-      const { sessionId, clientSecret, url } = await res.json();
+
+      const { sessionId, url } = await response.json();
       setStripeIdentitySessionId(sessionId);
       setIdentityStatus("processing");
 
-      // Redirect to Stripe-hosted verification page
       if (url) {
         window.location.href = url;
       }
-    } catch (err: any) {
-      setError(err.message ?? "Identity verification failed to start.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Identity verification failed to start.");
       setIdentityStatus("failed");
     } finally {
       setIdLoading(false);
     }
-  }, [state.email, setStripeIdentitySessionId, setIdentityStatus]);
+  }, [setIdentityStatus, setStripeIdentitySessionId]);
 
-  const checkIdentityStatus = useCallback(async () => {
-    if (!state.stripeIdentitySessionId) return;
-    setIdLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(
-        `/api/stripe/identity/check-status?sessionId=${encodeURIComponent(state.stripeIdentitySessionId)}`,
-      );
-      if (!res.ok) throw new Error("Failed to check verification status.");
-      const { status } = await res.json();
-      // Map Stripe status to our status
-      if (status === "verified") setIdentityStatus("verified");
-      else if (status === "requires_input") setIdentityStatus("requires_input");
-      else if (status === "canceled") setIdentityStatus("failed");
-      else setIdentityStatus("processing");
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setIdLoading(false);
-    }
-  }, [state.stripeIdentitySessionId, setIdentityStatus]);
-
-  /* ------------------------------------------------------------------ */
-  /*  Navigation guard                                                   */
-  /* ------------------------------------------------------------------ */
-
-  const canContinue =
-    state.emailVerified && state.identityVerificationStatus === "verified";
+  const canContinue = state.emailVerified && state.identityVerificationStatus === "verified";
 
   function handleContinue() {
     if (!canContinue) return;
     router.push("/signup/profile");
   }
 
-  /* ------------------------------------------------------------------ */
-  /*  Identity button state                                              */
-  /* ------------------------------------------------------------------ */
-
   function renderIdButton() {
-    const s = state.identityVerificationStatus;
-    if (s === "verified")
+    const status = state.identityVerificationStatus;
+
+    if (status === "verified") {
       return (
-        <Badge variant="secondary" className="gap-1.5 py-1.5 text-green-700 border-green-200 bg-green-50">
+        <Badge
+          variant="secondary"
+          className="gap-1.5 border-green-200 bg-green-50 py-1.5 text-green-700"
+        >
           <CheckCircle2 className="h-3.5 w-3.5" /> Verification Complete
         </Badge>
       );
-    if (s === "processing")
+    }
+
+    if (status === "processing") {
       return (
         <div className="flex gap-2">
           <Button variant="outline" onClick={checkIdentityStatus} disabled={idLoading}>
@@ -208,12 +289,14 @@ export default function SignupVerifyPage() {
           </Button>
         </div>
       );
-    if (s === "requires_input" || s === "failed")
+    }
+
+    if (status === "requires_input" || status === "failed") {
       return (
         <div className="space-y-2">
           <Badge variant="destructive" className="gap-1.5">
             <AlertCircle className="h-3.5 w-3.5" />
-            {s === "failed" ? "Verification Failed" : "Additional Input Required"}
+            {status === "failed" ? "Verification Failed" : "Additional Input Required"}
           </Badge>
           <Button onClick={startIdentityVerification} disabled={idLoading}>
             {idLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
@@ -221,12 +304,18 @@ export default function SignupVerifyPage() {
           </Button>
         </div>
       );
+    }
+
     return (
       <Button onClick={startIdentityVerification} disabled={idLoading}>
         {idLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
         Start ID Verification
       </Button>
     );
+  }
+
+  if (!authLoading && !user) {
+    return null;
   }
 
   return (
@@ -236,8 +325,8 @@ export default function SignupVerifyPage() {
           Verify Your Identity
         </h1>
         <p className="mt-3 text-muted-foreground">
-          To help maintain trust and safety on MasseurMatch, identity
-          verification is required before your profile can be reviewed.
+          To help maintain trust and safety on MasseurMatch, identity verification is required
+          before your profile can be reviewed.
         </p>
       </div>
 
@@ -247,14 +336,16 @@ export default function SignupVerifyPage() {
         </p>
       )}
 
-      {/* A — Email Verification */}
       <Card>
         <CardContent className="space-y-4 p-6">
           <div className="flex items-center gap-2">
             <Mail className="h-5 w-5 text-brand-secondary" />
             <h2 className="font-display text-lg font-semibold">Email Verification</h2>
             {state.emailVerified && (
-              <Badge variant="secondary" className="ml-auto gap-1 text-green-700 border-green-200 bg-green-50">
+              <Badge
+                variant="secondary"
+                className="ml-auto gap-1 border-green-200 bg-green-50 text-green-700"
+              >
                 <CheckCircle2 className="h-3 w-3" /> Verified
               </Badge>
             )}
@@ -274,7 +365,7 @@ export default function SignupVerifyPage() {
                     <Input
                       id="emailOtp"
                       value={emailOtp}
-                      onChange={(e) => setEmailOtp(e.target.value)}
+                      onChange={(event) => setEmailOtp(event.target.value)}
                       placeholder="000000"
                       maxLength={6}
                     />
@@ -298,7 +389,6 @@ export default function SignupVerifyPage() {
         </CardContent>
       </Card>
 
-      {/* B — Phone Verification (conditional) */}
       {state.phone && (
         <Card>
           <CardContent className="space-y-4 p-6">
@@ -306,7 +396,10 @@ export default function SignupVerifyPage() {
               <Phone className="h-5 w-5 text-brand-secondary" />
               <h2 className="font-display text-lg font-semibold">Phone Verification</h2>
               {state.phoneVerified && (
-                <Badge variant="secondary" className="ml-auto gap-1 text-green-700 border-green-200 bg-green-50">
+                <Badge
+                  variant="secondary"
+                  className="ml-auto gap-1 border-green-200 bg-green-50 text-green-700"
+                >
                   <CheckCircle2 className="h-3 w-3" /> Verified
                 </Badge>
               )}
@@ -326,7 +419,7 @@ export default function SignupVerifyPage() {
                       <Input
                         id="phoneOtp"
                         value={phoneOtp}
-                        onChange={(e) => setPhoneOtp(e.target.value)}
+                        onChange={(event) => setPhoneOtp(event.target.value)}
                         placeholder="000000"
                         maxLength={6}
                       />
@@ -351,7 +444,6 @@ export default function SignupVerifyPage() {
         </Card>
       )}
 
-      {/* C — Stripe Identity Verification */}
       <Card>
         <CardContent className="space-y-4 p-6">
           <div className="flex items-center gap-2">
@@ -359,25 +451,18 @@ export default function SignupVerifyPage() {
             <h2 className="font-display text-lg font-semibold">Secure ID Check</h2>
           </div>
           <p className="text-sm text-muted-foreground">
-            You will complete a secure identity verification powered by Stripe.
-            This helps confirm authenticity and supports a safer experience for
-            clients and providers.
+            You will complete a secure identity verification powered by Stripe. This helps
+            confirm authenticity and supports a safer experience for clients and providers.
           </p>
           <p className="text-xs text-muted-foreground">
-            A government-issued ID is required. Verification is handled securely
-            by Stripe Identity. MasseurMatch does not store your ID documents.
+            A government-issued ID is required. Verification is handled securely by Stripe
+            Identity. MasseurMatch does not store your ID documents.
           </p>
           {renderIdButton()}
         </CardContent>
       </Card>
 
-      {/* Continue */}
-      <Button
-        size="lg"
-        className="w-full"
-        disabled={!canContinue}
-        onClick={handleContinue}
-      >
+      <Button size="lg" className="w-full" disabled={!canContinue} onClick={handleContinue}>
         Continue to Profile
       </Button>
 

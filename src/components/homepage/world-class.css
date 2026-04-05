@@ -128,6 +128,88 @@
     linear-gradient(180deg, var(--n0) 0%, var(--n-deep) 100%);
 }
 
+/* Animated gradient blobs */
+.wc-hero-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.6;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.wc-hero-blob-1 {
+  width: 600px;
+  height: 600px;
+  top: -15%;
+  left: -10%;
+  background: radial-gradient(circle, rgba(255,138,31,0.25) 0%, rgba(255,138,31,0.05) 50%, transparent 70%);
+  animation: blob1 20s ease-in-out infinite;
+}
+
+.wc-hero-blob-2 {
+  width: 500px;
+  height: 500px;
+  top: 20%;
+  right: -15%;
+  background: radial-gradient(circle, rgba(255,179,71,0.2) 0%, rgba(255,138,31,0.05) 50%, transparent 70%);
+  animation: blob2 25s ease-in-out infinite;
+}
+
+.wc-hero-blob-3 {
+  width: 400px;
+  height: 400px;
+  bottom: 10%;
+  left: 30%;
+  background: radial-gradient(circle, rgba(255,138,31,0.15) 0%, rgba(255,138,31,0.03) 50%, transparent 70%);
+  animation: blob3 18s ease-in-out infinite;
+}
+
+@keyframes blob1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(40px, 30px) scale(1.05);
+  }
+  50% {
+    transform: translate(20px, -20px) scale(0.95);
+  }
+  75% {
+    transform: translate(-30px, 20px) scale(1.02);
+  }
+}
+
+@keyframes blob2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-50px, 40px) scale(1.08);
+  }
+  66% {
+    transform: translate(30px, -30px) scale(0.92);
+  }
+}
+
+@keyframes blob3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  20% {
+    transform: translate(-20px, -40px) scale(1.1);
+  }
+  40% {
+    transform: translate(40px, 20px) scale(0.9);
+  }
+  60% {
+    transform: translate(10px, -30px) scale(1.05);
+  }
+  80% {
+    transform: translate(-30px, 10px) scale(0.95);
+  }
+}
+
 /* CSS Grid Pattern background */
 .wc-hero-grid-bg {
   position: absolute;
@@ -1551,7 +1633,7 @@
 
 /* ══════════════════════════════════════
    FAQ
-══════════════════════════════════════ */
+═══════════���══════════════════════════ */
 .wc-faq-sec { background: var(--n0); padding: 108px 52px }
 .wc-faq-inner { max-width: 900px; margin: 0 auto }
 .wc-faq-list { margin-top: 52px }

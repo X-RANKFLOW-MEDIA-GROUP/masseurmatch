@@ -201,19 +201,19 @@ export function KnottyChat({
             "inset-0 sm:inset-auto",
             // Desktop: bottom-right card - BIGGER
             "sm:bottom-6 sm:right-6 sm:h-[560px] sm:w-[420px]",
-            // Glass UI with lighter background
-            "rounded-none border border-brand-accent/20 bg-slate-900/95 shadow-[0_24px_70px_rgba(0,0,0,0.45),0_0_60px_rgba(255,138,31,0.15)] backdrop-blur-2xl sm:rounded-[32px]",
+            // Glass UI with light background
+            "rounded-none border border-border bg-card shadow-[0_24px_70px_rgba(0,0,0,0.12),0_0_60px_rgba(255,138,31,0.08)] backdrop-blur-2xl sm:rounded-[32px]",
           )}
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-brand-accent/20 bg-gradient-to-r from-brand-accent/10 to-transparent px-5 py-4">
+          <div className="flex items-center justify-between border-b border-border bg-gradient-to-r from-brand-accent/10 to-transparent px-5 py-4">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-brand-accent to-brand-secondary shadow-lg">
                 <Sparkles className="h-5 w-5 text-white" />
               </div>
               <div>
-                <p className="text-base font-bold text-white">Knotty AI</p>
-                <p className="text-xs text-brand-soft flex items-center gap-1.5">
+                <p className="text-base font-bold text-foreground">Knotty AI</p>
+                <p className="text-xs text-muted-foreground flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                   Online now
                 </p>
@@ -221,22 +221,22 @@ export function KnottyChat({
             </div>
             <button
               onClick={close}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 transition hover:bg-white/10 hover:border-white/20"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-border transition hover:bg-muted hover:border-border"
               aria-label="Close chat"
             >
-              <X className="h-4 w-4 text-white/70" />
+              <X className="h-4 w-4 text-muted-foreground" />
             </button>
           </div>
 
           {/* Messages */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-5 space-y-4 bg-background">
             {messages.map((msg) => (
               <div
                 key={msg.id}
                 className={cn(
                   "max-w-[85%] rounded-[20px] px-4 py-3 text-[15px] leading-relaxed shadow-sm",
                   msg.role === "knotty"
-                    ? "mr-auto bg-slate-800/80 text-white/95 border border-white/5"
+                    ? "mr-auto bg-muted text-foreground border border-border"
                     : "ml-auto bg-gradient-to-r from-brand-accent to-brand-secondary text-white font-medium",
                 )}
               >
@@ -246,7 +246,7 @@ export function KnottyChat({
 
             {/* Typing indicator */}
             {pendingText && isTyping && (
-              <div className="mr-auto max-w-[85%] rounded-[20px] bg-slate-800/80 border border-white/5 px-4 py-3 text-[15px] leading-relaxed text-white/95">
+              <div className="mr-auto max-w-[85%] rounded-[20px] bg-muted border border-border px-4 py-3 text-[15px] leading-relaxed text-foreground">
                 {typedText}
                 <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-brand-accent" />
               </div>
@@ -255,13 +255,13 @@ export function KnottyChat({
 
           {/* Quick options */}
           {showOptions && (
-            <div className="border-t border-brand-accent/20 px-5 py-4 space-y-2.5 bg-slate-900/50">
-              <p className="text-xs text-white/50 mb-3 uppercase tracking-wider">Quick actions</p>
+            <div className="border-t border-border px-5 py-4 space-y-2.5 bg-card">
+              <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">Quick actions</p>
               {QUICK_OPTIONS.map((option) => (
                 <button
                   key={option.action}
                   onClick={() => handleOption(option)}
-                  className="flex w-full items-center justify-between rounded-[16px] border border-brand-accent/20 bg-slate-800/60 px-4 py-3.5 text-[15px] font-semibold text-white transition hover:border-brand-accent/50 hover:bg-slate-800"
+                  className="flex w-full items-center justify-between rounded-[16px] border border-border bg-background px-4 py-3.5 text-[15px] font-semibold text-foreground transition hover:border-brand-accent/50 hover:bg-muted"
                 >
                   {option.label}
                   <ChevronRight className="h-5 w-5 text-brand-accent" />

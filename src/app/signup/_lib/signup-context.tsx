@@ -3,11 +3,13 @@
 import {
   createContext,
   useContext,
-  useState,
   useCallback,
+  useEffect,
+  useState,
   type ReactNode,
 } from "react";
 import type { SignupPlanTier } from "./plans";
+import { useAuth } from "@/contexts/AuthContext";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -133,6 +135,20 @@ const initialState: SignupState = {
   complianceAcknowledged: false,
 };
 
+export const SIGNUP_BOOTSTRAP_STORAGE_KEY = "mm_signup_bootstrap";
+const SIGNUP_STATE_STORAGE_KEY = "mm_signup_state";
+
+function createPersistedStateSnapshot(state: SignupState): SignupState {
+  return {
+    ...state,
+    profile: {
+      ...state.profile,
+      profilePhoto: null,
+      galleryPhotos: [],
+    },
+  };
+}
+
 /* ------------------------------------------------------------------ */
 /*  Context                                                            */
 /* ------------------------------------------------------------------ */
@@ -165,7 +181,82 @@ interface SignupContextType {
 const SignupContext = createContext<SignupContextType | undefined>(undefined);
 
 export function SignupProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const [state, setState] = useState<SignupState>(initialState);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const persisted = window.sessionStorage.getItem(SIGNUP_STATE_STORAGE_KEY);
+    const bootstrap = window.sessionStorage.getItem(SIGNUP_BOOTSTRAP_STORAGE_KEY);
+
+    if (!persisted && !bootstrap) {
+      return;
+    }
+
+    try {
+      const nextState = persisted ? (JSON.parse(persisted) as Partial<SignupState>) : {};
+      const bootstrapState = bootstrap ? (JSON.parse(bootstrap) as Partial<SignupState>) : {};
+
+      setState((current) => ({
+        ...current,
+        ...nextState,
+        ...bootstrapState,
+      }));
+    } catch {
+      // Ignore malformed persisted state from older builds.
+    } finally {
+      window.sessionStorage.removeItem(SIGNUP_BOOTSTRAP_STORAGE_KEY);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    window.sessionStorage.setItem(
+      SIGNUP_STATE_STORAGE_KEY,
+      JSON.stringify(createPersistedStateSnapshot(state)),
+    );
+  }, [state]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const metadata = user.user_metadata as Record<string, unknown> | undefined;
+    const derivedFullName = typeof metadata?.full_name === "string"
+      ? metadata.full_name.trim()
+      : typeof metadata?.name === "string"
+        ? metadata.name.trim()
+        : "";
+    const derivedEmail = user.email?.trim() ?? "";
+    const derivedPhone = user.phone?.trim() ?? "";
+
+    setState((current) => {
+      const nextFullName = current.fullName || derivedFullName;
+      const nextDisplayName = current.displayName || nextFullName;
+      const nextEmail = current.email || derivedEmail;
+      const nextPhone = current.phone || derivedPhone;
+
+      if (
+        current.accountCreated &&
+        current.fullName === nextFullName &&
+        current.displayName === nextDisplayName &&
+        current.email === nextEmail &&
+        current.phone === nextPhone
+      ) {
+        return current;
+      }
+
+      return {
+        ...current,
+        accountCreated: true,
+        fullName: nextFullName,
+        displayName: nextDisplayName,
+        email: nextEmail,
+        phone: nextPhone,
+      };
+    });
+  }, [user]);
 
   const setPlan = useCallback(
     (tier: SignupPlanTier) => setState((s) => ({ ...s, selectedPlanTier: tier })),
@@ -245,7 +336,14 @@ export function SignupProvider({ children }: { children: ReactNode }) {
     [],
   );
 
-  const reset = useCallback(() => setState(initialState), []);
+  const reset = useCallback(() => {
+    if (typeof window !== "undefined") {
+      window.sessionStorage.removeItem(SIGNUP_BOOTSTRAP_STORAGE_KEY);
+      window.sessionStorage.removeItem(SIGNUP_STATE_STORAGE_KEY);
+    }
+
+    setState(initialState);
+  }, []);
 
   return (
     <SignupContext.Provider

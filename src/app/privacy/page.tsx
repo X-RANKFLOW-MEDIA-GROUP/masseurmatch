@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  name: "Privacy Policy – MasseurMatch",
+  name: "Privacy Policy - MasseurMatch",
   url: "https://masseurmatch.com/privacy",
   description: "MasseurMatch privacy policy: data collection, use, and your rights.",
   publisher: {
@@ -36,12 +36,12 @@ We do not collect health information, sensitive personal data, or any informatio
     id: "how-we-use-information",
     title: "2. How We Use Your Information",
     content: `We use your information to:
-    
-• Operate and maintain the MasseurMatch directory
-• Verify therapist credentials with state licensing boards
-• Send transactional communications (account confirmations, support responses)
-• Improve platform functionality and user experience
-• Detect and prevent fraud, abuse, or policy violations
+
+- Operate and maintain the MasseurMatch directory
+- Verify therapist credentials with state licensing boards
+- Send transactional communications (account confirmations, support responses)
+- Improve platform functionality and user experience
+- Detect and prevent fraud, abuse, or policy violations
 
 We do not use your information for advertising profiling or behavioral targeting. We do not send unsolicited marketing communications without your explicit consent.`,
   },
@@ -52,10 +52,10 @@ We do not use your information for advertising profiling or behavioral targeting
 
 We share limited data only with:
 
-• State licensing boards (therapist license numbers only, for verification purposes)
-• Payment processors (Stripe) for handling subscription payments — we never store payment card data
-• Hosting and infrastructure providers (Vercel, Supabase) who process data solely on our behalf under strict data processing agreements
-• Law enforcement when required by valid legal process
+- State licensing boards (therapist license numbers only, for verification purposes)
+- Payment processors (Stripe) for handling subscription payments - we never store payment card data
+- Hosting and infrastructure providers (Vercel, Supabase) who process data solely on our behalf under strict data processing agreements
+- Law enforcement when required by valid legal process
 
 Any third-party service provider we use is contractually prohibited from using your data for their own purposes.`,
   },
@@ -71,11 +71,11 @@ You can disable cookies in your browser settings. Disabling cookies may affect y
     title: "5. Your Rights",
     content: `Depending on your location, you may have rights including:
 
-• Access: Request a copy of the personal data we hold about you
-• Correction: Request that we correct inaccurate data
-• Deletion: Request deletion of your personal data ("right to be forgotten")
-• Portability: Request your data in a machine-readable format
-• Objection: Object to certain types of processing
+- Access: Request a copy of the personal data we hold about you
+- Correction: Request that we correct inaccurate data
+- Deletion: Request deletion of your personal data ("right to be forgotten")
+- Portability: Request your data in a machine-readable format
+- Objection: Object to certain types of processing
 
 To exercise any of these rights, email privacy@masseurmatch.com. We respond to all requests within 30 days.`,
   },
@@ -129,7 +129,6 @@ export default function PrivacyPage() {
           minHeight: "100vh",
         }}
       >
-        {/* ── Header ── */}
         <section
           style={{
             background: "#0B1F3A",
@@ -181,12 +180,11 @@ export default function PrivacyPage() {
             >
               MasseurMatch is operated by XRankFlow Media Group LLC. This policy
               explains how we collect, use, and protect your information. We
-              believe in radical transparency — and we never sell your data.
+              believe in radical transparency - and we never sell your data.
             </p>
           </div>
         </section>
 
-        {/* ── Content ── */}
         <div
           style={{
             maxWidth: 820,
@@ -198,7 +196,6 @@ export default function PrivacyPage() {
             alignItems: "start",
           }}
         >
-          {/* Sidebar nav */}
           <nav
             aria-label="Privacy policy sections"
             style={{
@@ -218,10 +215,10 @@ export default function PrivacyPage() {
             >
               Sections
             </p>
-            {sections.map((s) => (
+            {sections.map((section) => (
               <a
-                key={s.id}
-                href={`#${s.id}`}
+                key={section.id}
+                href={`#${section.id}`}
                 style={{
                   display: "block",
                   fontSize: 12,
@@ -232,17 +229,16 @@ export default function PrivacyPage() {
                   lineHeight: 1.4,
                 }}
               >
-                {s.title}
+                {section.title}
               </a>
             ))}
           </nav>
 
-          {/* Body */}
           <div>
-            {sections.map((s) => (
+            {sections.map((section) => (
               <section
-                key={s.id}
-                id={s.id}
+                key={section.id}
+                id={section.id}
                 style={{ marginBottom: 52, scrollMarginTop: 100 }}
               >
                 <h2
@@ -254,7 +250,7 @@ export default function PrivacyPage() {
                     borderBottom: "1px solid rgba(11,31,58,0.1)",
                   }}
                 >
-                  {s.title}
+                  {section.title}
                 </h2>
                 <div
                   style={{
@@ -265,7 +261,7 @@ export default function PrivacyPage() {
                     whiteSpace: "pre-line",
                   }}
                 >
-                  {s.content}
+                  {section.content}
                 </div>
               </section>
             ))}

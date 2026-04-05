@@ -17,7 +17,12 @@ type MiddlewareSession = {
 };
 
 function getSessionSecret(): string {
-  const secret = process.env.MM_SESSION_SECRET ?? process.env.SESSION_SECRET;
+  const secret =
+    process.env.MM_SESSION_SECRET ??
+    process.env.SESSION_SECRET ??
+    process.env.MM_JWT_SECRET ??
+    process.env.JWT_SECRET ??
+    process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (secret) return secret;
   if (process.env.NODE_ENV === 'production') {
     throw new Error('MM_SESSION_SECRET is required in production.');
@@ -259,7 +264,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // ── 7. Auth guards ────────────────────────────────────────────────────────
   // Unauthenticated → /login (with redirect param)
   // Authenticated but wrong role → / (home, no redirect param)
-  if (pathname.startsWith("/pro")) {
+  if (pathname === "/pro" || pathname.startsWith("/pro/")) {
     if (!session) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
@@ -270,7 +275,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
   }
 
-  if (pathname.startsWith("/admin")) {
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
     if (!session) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
