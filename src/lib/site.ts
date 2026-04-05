@@ -1,21 +1,12 @@
 const DEFAULT_APP_URL = "https://masseurmatch.com";
 
-const runtimeProcess = globalThis as {
-  process?: {
-    env?: Record<string, string | undefined>;
-  };
-};
-
-const processEnv = runtimeProcess.process?.env ?? {};
-
-const isVercelProduction = processEnv.VERCEL_ENV === "production";
+const isVercelProduction = process.env.VERCEL_ENV === "production";
 
 export const SITE_URL =
   (isVercelProduction
     ? DEFAULT_APP_URL
-    : processEnv.NEXT_PUBLIC_APP_URL ||
-      processEnv.SITE_URL ||
-      processEnv.VITE_PUBLIC_APP_URL ||
+    : process.env.NEXT_PUBLIC_APP_URL ||
+      process.env.SITE_URL ||
       DEFAULT_APP_URL
   ).replace(/\/+$/, "");
 
