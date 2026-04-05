@@ -8,7 +8,7 @@ import {
 } from "@/app/_lib/launch-urls";
 import { GUIDES } from "@/app/guides/data";
 import { appUrl } from "@/app/_lib/metadata";
-import { absoluteUrl, FEATURED_PROFILE_SLUGS, getSeoBlogPosts, getSeoCities, getSeoTherapists } from "@/app/_lib/seo-data";
+import { absoluteUrl, getSeoBlogPosts, getSeoCities, getSeoTherapists, FEATURED_PROFILE_SLUGS } from "@/app/_lib/seo-data";
 import { uniqueStrings } from "@/app/_lib/utils";
 import { competitorSlugs } from "@/lib/competitors";
 
