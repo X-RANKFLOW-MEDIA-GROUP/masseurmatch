@@ -512,6 +512,10 @@ export function WorldClassHomepage({
     <div className="wc-home">
       {/* ─── HERO ─── */}
       <section className="wc-hero">
+        {/* Animated gradient blobs */}
+        <div className="wc-hero-blob wc-hero-blob-1" />
+        <div className="wc-hero-blob wc-hero-blob-2" />
+        <div className="wc-hero-blob wc-hero-blob-3" />
         <div className="wc-hero-grid-bg" />
         <div className="wc-hero-split">
           {/* LEFT — content */}
