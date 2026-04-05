@@ -169,6 +169,31 @@ const NEIGHBORHOODS: Neighborhood[] = [
   { city: "San Antonio, TX", name: "King William", count: "31 verified therapists", tags: ["Hot Stone", "Swedish"], href: "/san-antonio/areas/king-william" },
 ];
 
+type TopCity = {
+  name: string;
+  state: string;
+  count: string;
+  href: string;
+};
+
+const TOP_CITIES: TopCity[] = [
+  { name: "New York", state: "NY", count: "320+ therapists", href: "/new-york" },
+  { name: "Los Angeles", state: "CA", count: "285+ therapists", href: "/los-angeles" },
+  { name: "Chicago", state: "IL", count: "198+ therapists", href: "/chicago" },
+  { name: "Houston", state: "TX", count: "156+ therapists", href: "/houston" },
+  { name: "Dallas", state: "TX", count: "142+ therapists", href: "/dallas" },
+  { name: "Miami", state: "FL", count: "134+ therapists", href: "/miami" },
+  { name: "San Francisco", state: "CA", count: "128+ therapists", href: "/san-francisco" },
+  { name: "Austin", state: "TX", count: "115+ therapists", href: "/austin" },
+  { name: "Atlanta", state: "GA", count: "98+ therapists", href: "/atlanta" },
+  { name: "Seattle", state: "WA", count: "92+ therapists", href: "/seattle" },
+  { name: "Denver", state: "CO", count: "87+ therapists", href: "/denver" },
+  { name: "Phoenix", state: "AZ", count: "76+ therapists", href: "/phoenix" },
+  { name: "San Diego", state: "CA", count: "72+ therapists", href: "/san-diego" },
+  { name: "Portland", state: "OR", count: "68+ therapists", href: "/portland" },
+  { name: "Las Vegas", state: "NV", count: "64+ therapists", href: "/las-vegas" },
+];
+
 const TESTIMONIALS: Testimonial[] = [
   {
     body: "Finally a directory where I can filter for therapists who are actually affirming. Found Marcus in Oak Lawn on my first search — couldn't be happier.",
@@ -347,11 +372,21 @@ export function WorldClassHomepage({
   const [heroButtonScrambleKey, setHeroButtonScrambleKey] = useState(0);
 
   const nbhdScrollRef = useRef<HTMLDivElement>(null);
+  const specScrollRef = useRef<HTMLDivElement>(null);
+  const citiesScrollRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   /* --- Geolocation --- */
-  const { city: geoCity, loading: geoLoading, requestLocation } = useGeolocation({ autoLocate: false });
+  const { city: geoCity, loading: geoLoading, requestLocation, status: geoStatus } = useGeolocation({ autoLocate: false });
   const locationLabel = geoCity ? `${geoCity.name}, ${geoCity.stateCode}` : "Find my location";
+
+  /* --- Auto-request location on mount --- */
+  useEffect(() => {
+    // Request location permission on first visit
+    if (geoStatus === "idle" && !geoLoading) {
+      void requestLocation(true);
+    }
+  }, [geoStatus, geoLoading, requestLocation]);
 
   /* --- Knotty chat simulation --- */
   const [knottyMessages, setKnottyMessages] = useState<{ id: string; role: "assistant" | "user"; text: string }[]>([]);
@@ -407,41 +442,46 @@ export function WorldClassHomepage({
     });
   }, [knottyMessages, knottyTyping]);
 
-  /* --- Drag scroll for neighborhoods --- */
+  /* --- Drag scroll for horizontal scroll areas --- */
   useEffect(() => {
-    const sc = nbhdScrollRef.current;
-    if (!sc) return;
+    const scrollContainers = [nbhdScrollRef.current, specScrollRef.current, citiesScrollRef.current].filter(Boolean) as HTMLDivElement[];
+    
+    const cleanupFns: (() => void)[] = [];
+    
+    scrollContainers.forEach((sc) => {
+      let down = false;
+      let startX = 0;
+      let scrollL = 0;
 
-    let down = false;
-    let startX = 0;
-    let scrollL = 0;
+      const onDown = (e: MouseEvent) => {
+        down = true;
+        startX = e.pageX - sc.offsetLeft;
+        scrollL = sc.scrollLeft;
+        sc.classList.add("dragging");
+      };
+      const onUp = () => {
+        down = false;
+        sc.classList.remove("dragging");
+      };
+      const onMove = (e: MouseEvent) => {
+        if (!down) return;
+        e.preventDefault();
+        const x = e.pageX - sc.offsetLeft;
+        sc.scrollLeft = scrollL - (x - startX) * 1.5;
+      };
 
-    const onDown = (e: MouseEvent) => {
-      down = true;
-      startX = e.pageX - sc.offsetLeft;
-      scrollL = sc.scrollLeft;
-      sc.classList.add("dragging");
-    };
-    const onUp = () => {
-      down = false;
-      sc.classList.remove("dragging");
-    };
-    const onMove = (e: MouseEvent) => {
-      if (!down) return;
-      e.preventDefault();
-      const x = e.pageX - sc.offsetLeft;
-      sc.scrollLeft = scrollL - (x - startX) * 1.5;
-    };
+      sc.addEventListener("mousedown", onDown);
+      document.addEventListener("mouseup", onUp);
+      sc.addEventListener("mousemove", onMove);
 
-    sc.addEventListener("mousedown", onDown);
-    document.addEventListener("mouseup", onUp);
-    sc.addEventListener("mousemove", onMove);
+      cleanupFns.push(() => {
+        sc.removeEventListener("mousedown", onDown);
+        document.removeEventListener("mouseup", onUp);
+        sc.removeEventListener("mousemove", onMove);
+      });
+    });
 
-    return () => {
-      sc.removeEventListener("mousedown", onDown);
-      document.removeEventListener("mouseup", onUp);
-      sc.removeEventListener("mousemove", onMove);
-    };
+    return () => cleanupFns.forEach((fn) => fn());
   }, []);
 
   /* --- Tilt cards --- */
@@ -780,34 +820,59 @@ export function WorldClassHomepage({
 
       {/* ─── SPECIALTIES ─── */}
       <section className="wc-spec-sec" id="specialties">
-        <div className="wc-spec-inner">
-          <div className="wc-spec-top wc-cr2">
-            <div>
-              <div className="wc-ey">Browse by specialty</div>
-              <h2 className="wc-sh1 dark">
-                Modalities for <em>every body</em>
-              </h2>
-            </div>
-            <Link href="/search" className="wc-more-link">
-              All specialties <ArrowRightIcon />
+        <div className="wc-spec-head wc-cr2">
+          <div className="wc-ey">Browse by specialty</div>
+          <h2 className="wc-sh1 dark">
+            Modalities for <em>every body</em>
+          </h2>
+        </div>
+        <div className="wc-spec-scroll" ref={specScrollRef}>
+          {SPECIALTIES.map((spec) => (
+            <Link
+              key={spec.name}
+              href={`/search?keyword=${encodeURIComponent(spec.name)}`}
+              className="wc-spec-card"
+            >
+              <div className="wc-spec-icon">{spec.icon}</div>
+              <div className="wc-spec-nm">{spec.name}</div>
+              <div className="wc-spec-ct">{spec.count}</div>
             </Link>
-          </div>
-          <div className="wc-spec-grid">
-            {SPECIALTIES.map((spec, i) => (
-              <Link
-                key={spec.name}
-                href={`/search?keyword=${encodeURIComponent(spec.name)}`}
-                className={`wc-tilt-card wc-cr2 wc-d${(i % 4) + 1}`}
-              >
-                <div className="wc-tilt-inner">
-                  <div className="wc-spec-bot-bar" />
-                  <div className="wc-spec-icon">{spec.icon}</div>
-                  <div className="wc-spec-nm">{spec.name}</div>
-                  <div className="wc-spec-ct">{spec.count}</div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          ))}
+        </div>
+        <div className="wc-spec-scroll-hint">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M3 8h10M9 4l4 4-4 4" />
+          </svg>
+          Swipe to explore more modalities
+        </div>
+      </section>
+
+      {/* ─── TOP CITIES ─── */}
+      <section className="wc-cities-sec" id="cities">
+        <div className="wc-cities-head wc-cr2">
+          <div className="wc-ey">By top cities</div>
+          <h2 className="wc-sh1 dark">
+            Explore <em>top cities</em>
+          </h2>
+        </div>
+        <div className="wc-cities-scroll" ref={citiesScrollRef}>
+          {TOP_CITIES.map((city) => (
+            <Link
+              key={city.name}
+              href={city.href}
+              className="wc-city-card"
+            >
+              <div className="wc-city-name">{city.name}</div>
+              <div className="wc-city-state">{city.state}</div>
+              <div className="wc-city-count">{city.count}</div>
+            </Link>
+          ))}
+        </div>
+        <div className="wc-cities-scroll-hint">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M3 8h10M9 4l4 4-4 4" />
+          </svg>
+          Swipe to explore more cities
         </div>
       </section>
 
@@ -863,11 +928,11 @@ export function WorldClassHomepage({
               </h2>
             </div>
             <Link
-              href="/therapists"
+              href="/explore"
               className="wc-more-link"
               style={{ color: "var(--a0)" }}
             >
-              Browse all therapists <ArrowRightIcon />
+              Explore all therapists <ArrowRightIcon />
             </Link>
           </div>
           <div className="wc-t-grid">

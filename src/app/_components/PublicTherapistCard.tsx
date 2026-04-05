@@ -16,7 +16,7 @@ import { handleProfileCardTilt, resetProfileCardTilt } from "@/app/_components/p
 import { ScrambleText } from "@/components/animations/ScrambleText";
 import { buildPhysicalProfileSummary } from "@/lib/physical-profile";
 
-const FACE_FOCUS_OBJECT_POSITION = "50% 18%";
+const FACE_FOCUS_OBJECT_POSITION = "50% 50%";
 
 const formatCurrency = (value: number | null) => {
   if (typeof value !== "number" || value <= 0) {
