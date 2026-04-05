@@ -11,7 +11,7 @@ import { SIGNUP_BOOTSTRAP_STORAGE_KEY } from "@/app/signup/_lib/signup-context";
 
 type AuthMethod = "email" | "phone" | "email-otp";
 
-const SIGNUP_DESTINATION = "/signup/plan";
+const SIGNUP_DESTINATION = "/signup/verify";
 
 function primeSignupBootstrap(payload: {
   fullName?: string;
@@ -330,7 +330,7 @@ function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
 
 export function AuthForms({
   mode,
-  redirectTo = "/pro/dashboard",
+  redirectTo = "/pro/profile",
 }: {
   mode: "login" | "register";
   redirectTo?: string;
@@ -503,7 +503,7 @@ export function AuthForms({
           Sign in
         </Link>
         <Link
-          href="/register"
+          href="/signup/account"
           className={`rounded-full px-4 py-2 transition ${!isLogin ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
         >
           Sign up
@@ -644,7 +644,7 @@ export function AuthForms({
         {isLogin ? (
           <>
             Don&apos;t have an account?{" "}
-            <Link href="/register" className="font-semibold text-primary hover:underline">
+            <Link href="/signup/account" className="font-semibold text-primary hover:underline">
               Sign up
             </Link>
           </>

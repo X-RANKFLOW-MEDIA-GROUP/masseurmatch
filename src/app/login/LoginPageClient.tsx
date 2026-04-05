@@ -1,8 +1,7 @@
 "use client";
 
 import { Suspense, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AuthForms } from "@/app/_components/auth-forms";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -11,7 +10,7 @@ function LoginPageContent() {
   const { user, loading } = useAuth();
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams?.toString() ?? "");
-  const redirectTo = params.get("redirect") || "/pro/dashboard";
+  const redirectTo = params.get("redirect") || "/pro/profile";
 
   useEffect(() => {
     if (loading || !user) {
