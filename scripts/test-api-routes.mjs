@@ -139,8 +139,10 @@ try {
 
     assert.equal(response.status, 200);
     ensure(json?.ok === true, "Forgot password should return ok=true.");
-    ensure(json?.reset?.mock === true, "Forgot password should stay in mock mode.");
-    ensure(json?.reset?.email === "therapist@example.com", "Forgot password should echo the email.");
+    ensure(
+      typeof json?.message === "string" && json.message.length > 0,
+      "Forgot password should return a non-empty success message.",
+    );
     checks.push("forgot-password");
   }
 
@@ -188,14 +190,13 @@ try {
   }
 
   {
-    const { response, json } = await request("/api/pro/billing", {
-      method: "POST",
-      body: JSON.stringify({ tier: "pro" }),
+    const { response, json } = await request("/api/pro/profile", {
+      method: "GET",
     });
 
     assert.equal(response.status, 401);
-    ensure(json?.error === "Authentication required.", "Billing should reject missing sessions.");
-    checks.push("billing-unauthorized");
+    ensure(json?.error === "Authentication required.", "Pro profile should reject missing sessions.");
+    checks.push("pro-profile-unauthorized");
   }
 
   {

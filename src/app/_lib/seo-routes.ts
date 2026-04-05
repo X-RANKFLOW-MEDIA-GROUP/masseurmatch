@@ -18,6 +18,8 @@ type StaticSitemapRoute = {
   priority: number;
 };
 
+export const SITEMAP_SEGMENT_IDS = [0, 1, 2, 3, 4, 5, 6] as const;
+
 export const PRIVATE_ROBOTS_PATHS = uniqueStrings([
   "/admin",
   "/admin/",
@@ -83,14 +85,20 @@ const CORE_STATIC_ROUTES: StaticSitemapRoute[] = [
   { path: "/",                    changeFrequency: "daily",   priority: 1.0 },
   { path: "/therapists",          changeFrequency: "daily",   priority: 0.9 },
   { path: "/blog",                changeFrequency: "weekly",  priority: 0.8 },
+  { path: "/guides",              changeFrequency: "weekly",  priority: 0.76 },
   { path: "/pricing",             changeFrequency: "monthly", priority: 0.7 },
+  { path: "/how-it-works",        changeFrequency: "monthly", priority: 0.7 },
   { path: "/about",               changeFrequency: "monthly", priority: 0.7 },
   { path: "/advertise",           changeFrequency: "monthly", priority: 0.7 },
+  { path: "/for-therapists",      changeFrequency: "weekly",  priority: 0.7 },
   { path: "/safety",              changeFrequency: "monthly", priority: 0.7 },
+  { path: "/trust",               changeFrequency: "monthly", priority: 0.7 },
   { path: "/contact",             changeFrequency: "monthly", priority: 0.6 },
+  { path: "/faq",                 changeFrequency: "monthly", priority: 0.6 },
   { path: "/legal",               changeFrequency: "monthly", priority: 0.5 },
   { path: "/privacy",             changeFrequency: "monthly", priority: 0.5 },
   { path: "/terms",               changeFrequency: "monthly", priority: 0.5 },
+  { path: "/accessibility",       changeFrequency: "monthly", priority: 0.4 },
   { path: "/community-guidelines", changeFrequency: "monthly", priority: 0.4 },
   { path: "/platform-disclaimer",  changeFrequency: "monthly", priority: 0.4 },
   { path: "/cookie-policy",       changeFrequency: "monthly", priority: 0.4 },
@@ -126,6 +134,10 @@ export function buildRobotsRules(): MetadataRoute.Robots["rules"] {
       disallow: searchEngineDisallow,
     },
   ];
+}
+
+export function buildSitemapSegmentUrls(): string[] {
+  return SITEMAP_SEGMENT_IDS.map((id) => absoluteUrl(`/sitemap/${id}.xml`));
 }
 
 // ─── Core sitemap (stable canonical pages) ────────────────────────────────────

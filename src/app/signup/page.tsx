@@ -84,7 +84,7 @@ export default function SignupEntryPage() {
         </h2>
         <ol className="mx-auto mt-8 grid max-w-3xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {HOW_IT_WORKS.map((step, idx) => (
-            <li key={idx} className="flex items-start gap-3 rounded-xl border border-border/60 bg-white px-5 py-4">
+            <li key={idx} className="flex items-start gap-3 rounded-xl border border-border/60 bg-card px-5 py-4">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-secondary/10 text-xs font-bold text-brand-secondary">
                 {idx + 1}
               </span>
@@ -152,7 +152,7 @@ export default function SignupEntryPage() {
           {WHY_SIGN_UP.map((item) => (
             <div
               key={item.text}
-              className="flex items-center gap-3 rounded-xl border border-border/60 bg-white px-5 py-4 text-left"
+              className="flex items-center gap-3 rounded-xl border border-border/60 bg-card px-5 py-4 text-left"
             >
               <item.icon className="h-5 w-5 shrink-0 text-brand-secondary" />
               <span className="text-sm font-medium text-foreground">{item.text}</span>

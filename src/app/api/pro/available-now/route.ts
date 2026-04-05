@@ -12,15 +12,13 @@ type SubscriptionTier = "free" | "standard" | "pro" | "elite";
 
 type TierRule = {
   durationHours: number;
-  maxActivationsPerDay: number;
-  reactivationHours: number;
 };
 
 const TIER_RULES: Record<SubscriptionTier, TierRule | null> = {
   free: null,
-  standard: { durationHours: 2, maxActivationsPerDay: 1, reactivationHours: 24 },
-  pro: { durationHours: 3, maxActivationsPerDay: 2, reactivationHours: 8 },
-  elite: { durationHours: 4, maxActivationsPerDay: 4, reactivationHours: 4 },
+  standard: { durationHours: 2 },
+  pro: { durationHours: 3 },
+  elite: { durationHours: 4 },
 };
 
 const VALID_TIERS = new Set<SubscriptionTier>(["free", "standard", "pro", "elite"]);
@@ -30,11 +28,6 @@ function toTier(value: string | null | undefined): SubscriptionTier {
     return value as SubscriptionTier;
   }
   return "free";
-}
-
-function getMidnightUTC(): Date {
-  const now = new Date();
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
 }
 
 export async function POST(request: Request) {
@@ -64,36 +57,18 @@ export async function POST(request: Request) {
     }
 
     const now = new Date();
-    const midnight = getMidnightUTC();
+    const currentExpiry = profile.available_now_expires ? new Date(profile.available_now_expires) : null;
+    const hasValidExpiry = currentExpiry !== null && !Number.isNaN(currentExpiry.getTime());
 
-    const dayStart = profile.available_now_day_start
-      ? new Date(profile.available_now_day_start)
-      : midnight;
-    const isNewDay = dayStart.getTime() < midnight.getTime();
-
-    const activationsToday = isNewDay ? 0 : (profile.available_now_activations_today ?? 0);
-
-    if (activationsToday >= rules.maxActivationsPerDay) {
-      throw new RouteError(
-        429,
-        `You have reached the maximum of ${rules.maxActivationsPerDay} Available Now activation(s) per day for your ${tier} plan. Try again tomorrow.`,
-      );
+    if (profile.available_now && hasValidExpiry && currentExpiry > now) {
+      throw new RouteError(409, "Available Now is already active for your profile.");
     }
 
-    if (!isNewDay && profile.available_now_last_activation) {
-      const lastActivation = new Date(profile.available_now_last_activation);
-      const reactivationAllowedAt = new Date(
-        lastActivation.getTime() + rules.reactivationHours * 3_600_000,
-      );
-      if (now < reactivationAllowedAt) {
-        const minutesLeft = Math.ceil(
-          (reactivationAllowedAt.getTime() - now.getTime()) / 60_000,
-        );
-        throw new RouteError(
-          429,
-          `Please wait ${minutesLeft} more minute(s) before reactivating Available Now.`,
-        );
-      }
+    if (profile.available_now && (!hasValidExpiry || (currentExpiry !== null && currentExpiry <= now))) {
+      await setAvailableNow(session.userId, {
+        available_now: false,
+        available_now_expires: null,
+      });
     }
 
     const expiresAt = new Date(now.getTime() + rules.durationHours * 3_600_000);
@@ -101,11 +76,6 @@ export async function POST(request: Request) {
     await setAvailableNow(session.userId, {
       available_now: true,
       available_now_expires: expiresAt.toISOString(),
-      available_now_activations_today: activationsToday + 1,
-      available_now_last_activation: now.toISOString(),
-      available_now_day_start: isNewDay
-        ? midnight.toISOString()
-        : dayStart.toISOString(),
     });
 
     await recordAuditLog(session.userId, "provider.available_now.activate", "profile", profile.id, {

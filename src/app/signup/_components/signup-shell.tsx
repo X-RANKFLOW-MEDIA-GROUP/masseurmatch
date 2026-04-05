@@ -36,7 +36,7 @@ function ProgressStepper() {
                   "mx-auto flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors",
                   isComplete && "border-green-500 bg-green-500 text-white",
                   isCurrent && "border-brand-secondary bg-brand-secondary/10 text-brand-secondary",
-                  !isComplete && !isCurrent && "border-border bg-white text-muted-foreground",
+                  !isComplete && !isCurrent && "border-border bg-card text-muted-foreground",
                 )}
               >
                 {isComplete ? "✓" : idx + 1}

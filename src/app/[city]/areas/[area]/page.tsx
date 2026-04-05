@@ -111,7 +111,7 @@ export default async function CityAreaPage({ params }: { params: Promise<Params>
     { href: `/${city.slug}/wellness/mobile-massage`, label: "Mobile" },
     { href: `/${city.slug}/wellness/hotel-massage`, label: "Hotel sessions" },
   ].filter((link) => isLaunchUrl(link.href));
-  const guideHref = AREA_GUIDE_MAP[resolved.area] || "/guides/oak-lawn-male-massage-guide";
+  const guideHref = AREA_GUIDE_MAP[resolved.area];
 
   return (
     <CityDirectoryPage
@@ -139,7 +139,7 @@ export default async function CityAreaPage({ params }: { params: Promise<Params>
       leadLinks={[
         { href: `/${city.slug}`, label: `Back to ${city.name}` },
         ...(siblingServiceLinks.length ? [siblingServiceLinks[0]] : []),
-        { href: guideHref, label: "Neighborhood guide" },
+        ...(guideHref ? [{ href: guideHref, label: "Neighborhood guide" }] : []),
       ]}
       linkSections={[
         ...(nearbyLinks.length

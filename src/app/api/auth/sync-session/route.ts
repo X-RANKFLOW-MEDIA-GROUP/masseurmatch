@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { setSessionCookie } from "@/app/api/_lib/session";
 import { withSetCookie } from "@/app/api/_lib/http";
 import { envAny } from "@/app/api/_lib/env";
+import { ensureUserProfileAndRole } from "@/app/api/_lib/supabase-server";
 
 /**
  * POST /api/auth/sync-session
@@ -47,49 +48,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }
 
-  // Ensure profile exists (for new OTP users)
-  const { data: existingProfile } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (!existingProfile) {
-    const fullName =
-      user.user_metadata?.full_name ||
-      user.user_metadata?.name ||
-      user.email?.split("@")[0] ||
-      user.phone ||
-      "User";
-
-    await supabase.from("profiles").insert({
-      user_id: user.id,
-      full_name: fullName,
-      display_name: fullName,
-      status: "draft",
-      is_active: false,
-      contact_methods: [],
-      share_email: false,
-    });
-  }
-
-  // Get role (check after profile creation to ensure consistency)
-  const { data: roleRow } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  // Create role if it doesn't exist (for new OTP users)
-  const typedRoleRow = roleRow as { role: string } | null;
-  let role: "admin" | "provider" | "client" | null = (typedRoleRow?.role as "admin" | "provider" | "client" | null) ?? null;
-  if (!role) {
-    await supabase.from("user_roles").insert({
-      user_id: user.id,
-      role: "provider",
-    });
-    role = "provider";
-  }
+  const { role } = await ensureUserProfileAndRole(user, {
+    defaultRole: "provider",
+  });
 
   const cookie = setSessionCookie({
     userId: user.id,

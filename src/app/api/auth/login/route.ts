@@ -1,23 +1,18 @@
-import { errorResponse, json, parseJsonBody, RouteError, withSetCookie } from "@/app/api/_lib/http";
+import { errorResponse, json, parseJsonBody, withSetCookie } from "@/app/api/_lib/http";
 import { setSessionCookie } from "@/app/api/_lib/session";
 import { authLoginSchema } from "@/app/_lib/validation";
 import {
-  getUserByEmail,
-  getUserRole,
-  verifyPassword,
+  ensureUserProfileAndRole,
+  verifyPasswordWithRetry,
 } from "@/app/api/_lib/supabase-server";
 
 export async function POST(request: Request) {
   try {
     const body = await parseJsonBody(request, authLoginSchema);
-    const user = await getUserByEmail(body.email);
-
-    if (!user?.email) {
-      throw new RouteError(401, "Invalid email or password.");
-    }
-
-    await verifyPassword(body.email, body.password);
-    const role = await getUserRole(user.id);
+    const { user, session } = await verifyPasswordWithRetry(body.email, body.password, 5);
+    const { role } = await ensureUserProfileAndRole(user, {
+      defaultRole: "provider",
+    });
 
     const response = json({
       ok: true,
@@ -26,13 +21,19 @@ export async function POST(request: Request) {
         email: user.email,
       },
       role,
+      session: session
+        ? {
+            access_token: session.access_token,
+            refresh_token: session.refresh_token,
+          }
+        : null,
     });
 
     return withSetCookie(
       response,
       setSessionCookie({
         userId: user.id,
-        email: user.email,
+        email: user.email ?? body.email,
         role,
       }),
     );

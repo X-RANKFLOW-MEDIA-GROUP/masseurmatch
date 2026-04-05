@@ -160,6 +160,124 @@ export async function verifyPassword(email: string, password: string) {
   return data;
 }
 
+async function wait(ms: number) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export async function verifyPasswordWithRetry(email: string, password: string, attempts = 1) {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      return await verifyPassword(email, password);
+    } catch (error) {
+      lastError = error;
+
+      if (attempt < attempts - 1) {
+        await wait(500 * (attempt + 1));
+      }
+    }
+  }
+
+  throw lastError;
+}
+
+function deriveUserDisplayName(user: User, fallbackName?: string) {
+  const metadata = user.user_metadata as Record<string, unknown> | undefined;
+  const candidates = [
+    fallbackName,
+    typeof metadata?.full_name === "string" ? metadata.full_name : null,
+    typeof metadata?.name === "string" ? metadata.name : null,
+    user.email?.split("@")[0],
+    user.phone,
+    "User",
+  ];
+
+  for (const candidate of candidates) {
+    const normalized = candidate?.trim();
+    if (normalized) {
+      return normalized;
+    }
+  }
+
+  return "User";
+}
+
+export async function ensureUserProfileAndRole(
+  user: User,
+  options: {
+    defaultRole?: AppRole;
+    fallbackName?: string;
+  } = {},
+) {
+  const adminClient = createSupabaseAdminClient();
+  const defaultRole = options.defaultRole ?? "provider";
+  const fullName = deriveUserDisplayName(user, options.fallbackName);
+
+  const { data: existingProfile, error: existingProfileError } = await adminClient
+    .from("profiles")
+    .select("id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (existingProfileError) {
+    throw new RouteError(500, existingProfileError.message);
+  }
+
+  let profileCreated = false;
+  if (!existingProfile) {
+    const { error: profileError } = await adminClient.from("profiles").insert({
+      user_id: user.id,
+      full_name: fullName,
+      display_name: fullName,
+      status: "pending_approval",
+      is_active: false,
+    });
+
+    if (profileError) {
+      throw new RouteError(500, profileError.message);
+    }
+
+    profileCreated = true;
+  }
+
+  let role = await getUserRole(user.id);
+  if (!role) {
+    const { error: roleError } = await adminClient.from("user_roles").insert({
+      user_id: user.id,
+      role: defaultRole,
+    });
+
+    if (roleError) {
+      throw new RouteError(500, roleError.message);
+    }
+
+    role = defaultRole;
+  }
+
+  if (user.email) {
+    try {
+      await adminClient.from("users").upsert(
+        {
+          id: user.id,
+          email: user.email,
+          full_name: fullName,
+          role: role === "admin" ? "admin" : "therapist",
+        },
+        { onConflict: "id" },
+      );
+    } catch {
+      // Legacy public.users sync is best-effort only.
+    }
+  }
+
+  return {
+    role,
+    profileCreated,
+    fullName,
+  };
+}
+
 export async function createTherapistUser(input: {
   fullName: string;
   email: string;
@@ -180,44 +298,13 @@ export async function createTherapistUser(input: {
     throw new RouteError(400, error?.message ?? "Could not create user.");
   }
 
-  
-
-  const existingProfile = await adminClient
-    .from("profiles")
-    .select("id")
-    .eq("user_id", data.user.id)
-    .maybeSingle();
-
-  if (!existingProfile.data) {
-    const { error: profileError } = await adminClient.from("profiles").insert({
-      user_id: data.user.id,
-      full_name: input.fullName,
-      display_name: input.fullName,
-      status: "draft",
-      is_active: false,
-      contact_methods: [],
-      share_email: false,
-    });
-
-    if (profileError) {
-      throw new RouteError(500, profileError.message);
-    }
-  }
-
-  const currentRole = await getUserRole(data.user.id);
-  if (!currentRole) {
-    const { error: roleError } = await adminClient.from("user_roles").insert({
-      user_id: data.user.id,
-      role: "provider",
-    });
-
-    if (roleError) {
-      throw new RouteError(500, roleError.message);
-    }
-  }
+  const { role } = await ensureUserProfileAndRole(data.user, {
+    defaultRole: "provider",
+    fallbackName: input.fullName,
+  });
 
   return {
     user: data.user,
-    role: "provider" as const,
+    role,
   };
 }

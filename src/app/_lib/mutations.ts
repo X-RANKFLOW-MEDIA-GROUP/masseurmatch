@@ -16,18 +16,15 @@ export type AuthMutationResponse = {
     email: string;
   };
   role: "admin" | "provider" | "client" | null;
+  session?: {
+    access_token: string;
+    refresh_token: string;
+  } | null;
 };
 
 export type ForgotPasswordMutationResponse = {
   ok: boolean;
   message: string;
-  reset: {
-    mock: boolean;
-    email: string;
-    redirectTo: string;
-    requestedAt: string;
-    previewToken?: string;
-  };
 };
 
 export type ContactMutationResponse = {
