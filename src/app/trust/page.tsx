@@ -66,11 +66,9 @@ export default function TrustPage() {
           <div className="flex items-start gap-4 rounded-2xl border border-orange-200 bg-orange-50 p-6 shadow-sm md:p-8">
             <ShieldAlert className="mt-1 h-10 w-10 flex-shrink-0 text-orange-500" />
             <div>
-              <h3 className="mb-2 text-lg font-bold text-gray-900">Important Platform Disclaimer</h3>
-              <p className="font-medium text-gray-700">
-                <strong>We do not verify licenses.</strong> MasseurMatch provides a directory
-                only. Users are solely responsible for verifying the credentials, legality, and
-                safety of any professional they choose to contact or book outside of this platform.
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Important Platform Disclaimer</h3>
+              <p className="text-gray-700 font-medium">
+                <strong>MasseurMatch verifies therapists&apos; identities but not their professional licenses.</strong> Users are solely responsible for verifying the credentials, legality, and safety of any professional they choose to contact or book outside of this platform.
               </p>
             </div>
           </div>
