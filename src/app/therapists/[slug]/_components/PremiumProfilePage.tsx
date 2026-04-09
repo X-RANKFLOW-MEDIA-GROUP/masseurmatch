@@ -16,6 +16,7 @@ import { ProfileTravel } from "./ProfileTravel";
 import { PremiumProfileLocation } from "./PremiumProfileLocation";
 import { KnottyProfileTracker } from "./KnottyProfileTracker";
 import { ProfileAreasServed } from "./ProfileAreasServed";
+import { PremiumProfileContact } from "./PremiumProfileContact";
 import "./premium-profile.css";
 
 interface Props {
@@ -71,6 +72,9 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
 
         {/* Pricing */}
         <PremiumProfilePricing profile={profile} />
+
+        {/* Contact */}
+        <PremiumProfileContact profile={profile} />
 
         {/* Availability */}
         <section className="pp-section pp-fade-in" id="availability">
