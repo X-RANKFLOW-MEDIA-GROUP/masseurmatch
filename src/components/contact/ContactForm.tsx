@@ -86,7 +86,6 @@ export function ContactForm({
       }
 
       setSuccess(true);
-      toast.success(`Message sent successfully! ${therapistName} will respond soon.`);
       setFormData({
         clientName: '',
         clientEmail: '',
@@ -98,9 +97,7 @@ export function ContactForm({
       // Reset success message after 5 seconds
       setTimeout(() => setSuccess(false), 5000);
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'An error occurred';
-      setError(errorMsg);
-      toast.error(errorMsg);
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -116,6 +113,22 @@ export function ContactForm({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {success && (
+            <Alert>
+              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+              <AlertDescription className="text-emerald-800">
+                Message sent successfully! {therapistName} will respond soon.
+              </AlertDescription>
+            </Alert>
+          )}
+
           {/* Name */}
           <div>
             <label htmlFor="clientName" className="text-sm font-medium">

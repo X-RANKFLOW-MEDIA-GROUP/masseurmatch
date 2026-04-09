@@ -54,12 +54,6 @@ export function ProTools({
           <Link href="/pro/billing#addons" className="text-primary hover:underline">
             Boost visibility
           </Link>
-          <Link href="/pro/inquiries" className="text-primary hover:underline">
-            View inquiries
-          </Link>
-          <Link href="/pro/contact-preferences" className="text-primary hover:underline">
-            Contact settings
-          </Link>
           <Link href="/pro/dashboard" className="text-primary hover:underline">
             Open full dashboard
           </Link>
