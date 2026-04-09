@@ -849,6 +849,12 @@
   position: relative;
   z-index: 1;
 }
+@media (max-width: 768px) {
+  .wc-spec-head {
+    padding: 0 16px;
+    margin-bottom: 24px;
+  }
+}
 .wc-spec-scroll {
   display: flex;
   gap: 16px;
@@ -860,6 +866,12 @@
   -ms-overflow-style: none;
   position: relative;
   z-index: 1;
+}
+@media (max-width: 768px) {
+  .wc-spec-scroll {
+    padding: 0 16px 24px;
+    gap: 12px;
+  }
 }
 .wc-spec-scroll::-webkit-scrollbar { display: none }
 .wc-spec-scroll.dragging { cursor: grabbing }
@@ -876,6 +888,12 @@
   position: relative;
   overflow: hidden;
   text-decoration: none;
+}
+@media (max-width: 640px) {
+  .wc-spec-card {
+    width: 160px;
+    padding: 24px 20px 22px;
+  }
 }
 .wc-spec-card:hover {
   border-color: rgba(255,138,31,.2);
@@ -896,6 +914,71 @@
   animation: wcScrollHint 2s ease infinite;
   position: relative;
   z-index: 1;
+}
+@media (max-width: 768px) {
+  .wc-spec-scroll-hint {
+    padding-left: 16px;
+    font-size: 11px;
+  }
+}
+.wc-spec-scroll-hint svg { width: 16px; height: 16px }
+
+/* ══════════════════════════════════════
+   TOP CITIES - RESPONSIVE FIX
+══════════════════════════════════════ */
+.wc-cities-head {
+  padding: 0 52px;
+  margin-bottom: 40px;
+  max-width: 1220px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 768px) {
+  .wc-cities-head {
+    padding: 0 16px;
+    margin-bottom: 24px;
+  }
+}
+.wc-cities-scroll {
+  display: flex;
+  gap: 16px;
+  padding: 0 52px 24px;
+  overflow-x: auto;
+  cursor: grab;
+  user-select: none;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 768px) {
+  .wc-cities-scroll {
+    padding: 0 16px 24px;
+    gap: 12px;
+  }
+}
+.wc-cities-scroll::-webkit-scrollbar { display: none }
+.wc-cities-scroll.dragging { cursor: grabbing }
+.wc-city-card {
+  flex-shrink: 0;
+  width: 180px;
+  background: linear-gradient(135deg, var(--n0) 0%, var(--n3) 100%);
+  border: 1px solid rgba(252,251,248,.12);
+  border-radius: 20px;
+  padding: 28px 22px 24px;
+  cursor: pointer;
+  transition: all .3s var(--ease);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+}
+@media (max-width: 640px) {
+  .wc-city-card {
+    width: 150px;
+    padding: 22px 18px 20px;
+  }
 }
 .wc-spec-scroll-hint svg { width: 16px; height: 16px }
 .wc-more-link {
@@ -1087,6 +1170,12 @@
   animation: wcScrollHint 2s ease infinite;
   position: relative;
   z-index: 1;
+}
+@media (max-width: 768px) {
+  .wc-cities-scroll-hint {
+    padding-left: 16px;
+    font-size: 11px;
+  }
 }
 .wc-cities-scroll-hint svg { width: 16px; height: 16px }
 
