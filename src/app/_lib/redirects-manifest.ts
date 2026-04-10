@@ -71,6 +71,9 @@ export const legacyRedirects: LegacyRedirect[] = [
   { source: "/cities/dallas-tx/sports-massage",     destination: "/dallas/wellness/sports-recovery", permanent: true },
   { source: "/cities/dallas-tx/mobile",             destination: "/dallas/wellness/mobile-massage", permanent: true },
   { source: "/cities/dallas-tx/hotel",              destination: "/dallas/wellness/hotel-massage", permanent: true },
+
+  // ── Global legacy aliases ────────────────────────────────────────────────────
+  { source: "/massage-therapists", destination: "/therapists", permanent: true },
 ];
 
 /** Convenience lookup: source path → destination. */
