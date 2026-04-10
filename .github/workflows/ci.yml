@@ -47,7 +47,7 @@ jobs:
           fetch-depth: 0
       - name: Install gitleaks (OSS)
         run: |
-          curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/master/install.sh | sh -s -- -b /usr/local/bin v8.24.2
+          curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/main/install.sh | sh -s -- -b /usr/local/bin v8.24.2
       - name: Scan for secrets (gitleaks)
         run: gitleaks git --redact --verbose --exit-code 1
 

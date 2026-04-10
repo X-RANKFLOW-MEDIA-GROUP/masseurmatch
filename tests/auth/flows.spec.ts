@@ -55,7 +55,7 @@ test.skip(
   "Supabase service-role credentials are required to run auth launch E2E coverage.",
 );
 
-const adminClient = createClient(supabaseUrl, serviceRoleKey, {
+const adminClient = createClient(supabaseUrl || "http://localhost:54321", serviceRoleKey || "placeholder-key", {
   auth: {
     autoRefreshToken: false,
     persistSession: false,

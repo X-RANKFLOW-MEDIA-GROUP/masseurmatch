@@ -4,6 +4,7 @@ import {
   canonicalCategoryToLegacyParts,
   resolveCitySlug,
 } from "@/app/_lib/city-routing";
+import { containsLangParam, removeLangSearchParam } from "@/app/_lib/route-normalization";
 
 const SESSION_COOKIE_NAME = "mm_session";
 const encoder = new TextEncoder();
@@ -223,6 +224,10 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
     if (citySlug) {
       const legacyParts = parts.slice(2);
+      if (legacyParts[0] === "massage-therapists") {
+        const destination = new URL(`/${citySlug}`, request.url);
+        return NextResponse.redirect(destination, 301);
+      }
       const destinationPath = legacyParts.length
         ? `/${citySlug}/${legacyParts.join("/")}`
         : `/${citySlug}`;
@@ -245,6 +250,11 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
         return NextResponse.redirect(destination, 301);
       }
 
+      if (incomingCategory === "massage-therapists") {
+        const destination = new URL(`/${citySlug}`, request.url);
+        return NextResponse.redirect(destination, 301);
+      }
+
       if (canonicalNeighborhoods.has(incomingCategory)) {
         const destination = new URL(`/${citySlug}/areas/${incomingCategory}`, request.url);
         return NextResponse.redirect(destination, 301);
@@ -261,7 +271,25 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
   }
 
-  // ── 7. Auth guards ────────────────────────────────────────────────────────
+  // ── 7. Legacy /{city}/massage-therapists → /{city} ───────────────────────
+  const topLevelParts = pathname.split("/").filter(Boolean);
+  if (topLevelParts.length === 2 && topLevelParts[1] === "massage-therapists") {
+    const citySlug = resolveCitySlug(topLevelParts[0] || "");
+    if (citySlug) {
+      const destination = new URL(`/${citySlug}`, request.url);
+      return NextResponse.redirect(destination, 301);
+    }
+  }
+
+  // ── 8. Strip crawlable language query variants (?lang=*) ──────────────────
+  if (containsLangParam(searchParams)) {
+    const destination = new URL(pathname, request.url);
+    const cleaned = removeLangSearchParam(searchParams);
+    destination.search = cleaned.toString();
+    return NextResponse.redirect(destination, 301);
+  }
+
+  // ── 9. Auth guards ────────────────────────────────────────────────────────
   // Unauthenticated → /login (with redirect param)
   // Authenticated but wrong role → / (home, no redirect param)
   if (pathname === "/pro" || pathname.startsWith("/pro/")) {
