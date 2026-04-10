@@ -401,6 +401,7 @@ export function AuthForms({
                 placeholder="Full name"
                 value={fullName}
                 onChange={(event) => setFullName(event.target.value)}
+                autoComplete="name"
                 required
               />
             ) : null}
@@ -410,6 +411,7 @@ export function AuthForms({
               placeholder="your@email.com"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
+              autoComplete="email"
               required
             />
             <AppInput
@@ -418,6 +420,7 @@ export function AuthForms({
               placeholder={isLogin ? "Password" : "At least 8 characters"}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
+              autoComplete={isLogin ? "current-password" : "new-password"}
               minLength={8}
               required
             />

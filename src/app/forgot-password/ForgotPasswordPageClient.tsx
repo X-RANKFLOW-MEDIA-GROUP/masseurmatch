@@ -51,6 +51,7 @@ export default function ForgotPasswordPageClient() {
             placeholder="you@example.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
+            autoComplete="email"
             required
           />
           <Button type="submit" className="w-full" disabled={loading}>
