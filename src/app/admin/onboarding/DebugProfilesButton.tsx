@@ -8,7 +8,8 @@ export function DebugProfilesButton() {
         throw new Error("Request failed");
       }
 
-      const profiles = (await response.json()) as unknown[];
+      const data = (await response.json()) as { profiles?: unknown[] };
+      const profiles = data.profiles ?? [];
       alert(`Perfis encontrados: ${profiles.length}`);
       console.log(profiles);
     } catch {
