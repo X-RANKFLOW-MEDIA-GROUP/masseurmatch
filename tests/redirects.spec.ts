@@ -49,6 +49,8 @@ const REDIRECT_CASES: RedirectCase[] = [
   ["/cities/dallas-tx/sports-massage", "/dallas/wellness/sports-recovery"],
   ["/cities/dallas-tx/mobile",         "/dallas/wellness/mobile-massage"],
   ["/cities/dallas-tx/hotel",          "/dallas/wellness/hotel-massage"],
+  // Global legacy aliases
+  ["/massage-therapists", "/therapists"],
 ];
 
 for (const [source, destination] of REDIRECT_CASES) {
