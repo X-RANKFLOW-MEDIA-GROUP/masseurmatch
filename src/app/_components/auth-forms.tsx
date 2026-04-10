@@ -95,7 +95,6 @@ function MethodTabs({ method, onChange }: { method: AuthMethod; onChange: (m: Au
 /* ─────────── Phone OTP Form ─────────── */
 
 function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: string }) {
-  const router = useRouter();
   const { toast } = useToast();
   const [phone, setPhone] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -181,7 +180,6 @@ function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
 /* ─────────── Email OTP Form ─────────── */
 
 function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: string }) {
-  const router = useRouter();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [otpSent, setOtpSent] = useState(false);
