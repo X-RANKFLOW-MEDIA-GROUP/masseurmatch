@@ -25,10 +25,11 @@ export function removeLangSearchParam(searchParams: URLSearchParams): URLSearchP
 
 export function sanitizeCanonicalSearchParams(searchParams: URLSearchParams): URLSearchParams {
   const normalized = removeLangSearchParam(searchParams);
-  for (const [key] of normalized.entries()) {
-    if (TRACKING_PARAMS.has(key.toLowerCase())) {
-      normalized.delete(key);
-    }
+  const keysToDelete = Array.from(normalized.keys()).filter((key) =>
+    TRACKING_PARAMS.has(key.toLowerCase()),
+  );
+  for (const key of keysToDelete) {
+    normalized.delete(key);
   }
   return normalized;
 }
