@@ -317,8 +317,8 @@ export function AuthForms({
     }
 
     const result = isLogin
-      ? await signIn(email, password)
-      : await signUp(email, password, fullName);
+      ? await signIn(email.trim(), password)
+      : await signUp(email.trim(), password, fullName.trim());
 
     setLoading(false);
 
@@ -371,11 +371,11 @@ export function AuthForms({
         </Link>
       </div>
 
-      <h1 className="text-2xl font-bold">{isLogin ? "Login" : "Register"}</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
+      <h1 className="font-display text-3xl font-semibold tracking-tight mt-6">{isLogin ? "Sign in" : "Create account"}</h1>
+      <p className="mt-3 text-base leading-6 text-muted-foreground">
         {isLogin
-          ? "Sign in to your therapist account."
-          : "Create your therapist account and continue into onboarding."}
+          ? "Welcome back. Sign in to your therapist account."
+          : "Create your therapist account and get started with onboarding."}
       </p>
 
       {/* Social login/signup */}
@@ -401,7 +401,8 @@ export function AuthForms({
                 placeholder="Full name"
                 value={fullName}
                 onChange={(event) => setFullName(event.target.value)}
-                autoComplete="name"
+                minLength={2}
+                maxLength={120}
                 required
               />
             ) : null}

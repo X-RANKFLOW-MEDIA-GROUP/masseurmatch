@@ -166,18 +166,9 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
             alt={imageAlt}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="profile-card-image object-cover opacity-55"
+            className="profile-card-image h-full w-full object-cover"
             style={{ objectPosition: FACE_FOCUS_OBJECT_POSITION }}
-          />
-          <Image
-            src={profileImage}
-            alt=""
-            width={960}
-            height={1200}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="relative z-[1] h-full w-full object-contain px-2 pt-3 sm:px-3 sm:pt-4"
-            style={{ objectPosition: FACE_FOCUS_OBJECT_POSITION }}
-            aria-hidden="true"
+            priority={false}
           />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.24),transparent_28%),linear-gradient(180deg,rgba(11,31,58,0.04)_0%,rgba(11,31,58,0.2)_48%,rgba(11,31,58,0.82)_100%)]" />
 
