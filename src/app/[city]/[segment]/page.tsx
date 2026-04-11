@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { cache } from "react";
 import { notFound } from "next/navigation";
 import { CityDirectoryPage } from "@/app/_components/city-directory-page";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
@@ -17,15 +16,14 @@ type Params = { city: string; segment: string };
 
 export const revalidate = 60;
 
-const fetchSegmentTherapists = cache(
-  (cityName: string, segmentSlug: string) =>
-    getPublicTherapists({
-      city: cityName,
-      page: 1,
-      pageSize: 9,
-      ...getSegmentSearchFilters(segmentSlug),
-    }),
-);
+async function fetchSegmentTherapists(cityName: string, segmentSlug: string) {
+  return getPublicTherapists({
+    city: cityName,
+    page: 1,
+    pageSize: 9,
+    ...getSegmentSearchFilters(segmentSlug),
+  });
+}
 
 export function generateStaticParams(): Params[] {
   return getLaunchSegmentPaths().map((path) => {

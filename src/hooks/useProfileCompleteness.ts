@@ -21,11 +21,11 @@ type CompletenessResult = {
 };
 
 const REQUIRED_FIELDS: Array<{ key: string; label: string; description: string; link: string }> = [
-  { key: "display_name", label: "Display name", description: "Choose the public name clients will see.", link: "/dashboard/profile" },
-  { key: "bio", label: "Bio", description: "Add a clear, trustworthy service summary.", link: "/dashboard/profile" },
-  { key: "city", label: "City", description: "Set your main service location.", link: "/dashboard/location" },
-  { key: "specialties", label: "Specialties", description: "List your massage techniques and focus areas.", link: "/dashboard/profile" },
-  { key: "photos", label: "Photos", description: "Upload at least one quality profile photo.", link: "/dashboard/photos" },
+  { key: "display_name", label: "Display name", description: "Choose the public name clients will see.", link: "/pro/listing" },
+  { key: "bio", label: "Bio", description: "Add a clear, trustworthy service summary.", link: "/pro/listing" },
+  { key: "city", label: "City", description: "Set your main service location.", link: "/pro/listing" },
+  { key: "specialties", label: "Specialties", description: "List your massage techniques and focus areas.", link: "/pro/listing" },
+  { key: "photos", label: "Photos", description: "Upload at least one quality profile photo.", link: "/pro/photos" },
 ];
 
 export function getProfileCompleteness(profile: Record<string, unknown> | null | undefined, base = 0): CompletenessResult {

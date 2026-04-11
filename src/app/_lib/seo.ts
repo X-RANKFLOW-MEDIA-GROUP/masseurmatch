@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SITE_URL, siteUrl } from "@/lib/site";
+import { buildCanonicalPath } from "@/app/_lib/route-normalization";
 
 export const SITE_NAME = "MasseurMatch";
 export const SITE_TAGLINE = "The safest and most trusted premium male massage directory for direct connection";
@@ -123,7 +124,7 @@ export const createPageMetadata = ({
   type = "website",
   noIndex = false,
 }: PageMetadataInput): Metadata => {
-  const canonical = siteUrl(path);
+  const canonical = siteUrl(buildCanonicalPath(path));
   const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
   const socialImage = image || buildOgImageUrl({ title, label: SITE_NAME });
 

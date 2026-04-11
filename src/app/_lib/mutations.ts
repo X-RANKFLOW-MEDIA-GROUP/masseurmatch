@@ -16,6 +16,10 @@ export type AuthMutationResponse = {
     email: string;
   };
   role: "admin" | "provider" | "client" | null;
+  session?: {
+    access_token: string;
+    refresh_token: string;
+  } | null;
 };
 
 export type ForgotPasswordMutationResponse = {

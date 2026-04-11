@@ -19,6 +19,7 @@ export function buildAreaIntro(input: AreaCopyInput): string {
   const modes = input.serviceModes.length ? input.serviceModes.join(", ") : "incall and outcall";
   const specialties = input.specialties.slice(0, 4).join(", ");
   const nearby = input.nearbyAreas.slice(0, 3).join(", ");
+  const nearbyLine = nearby ? ` and nearby areas like ${nearby}` : "";
 
   const priceLine =
     input.avgStartingPrice
@@ -32,7 +33,7 @@ export function buildAreaIntro(input: AreaCopyInput): string {
 
   return (
     `${input.area} is one of the most searched areas for male massage in ${input.city}. ` +
-    `MasseurMatch highlights therapists who serve ${input.area} and nearby areas like ${nearby}, ` +
+    `MasseurMatch highlights therapists who serve ${input.area}${nearbyLine}, ` +
     `with options that may include ${modes}. ` +
     (specialties
       ? `Common specialties in this part of ${input.city} include ${specialties}. `
@@ -49,6 +50,7 @@ export function buildSuburbIntro(input: AreaCopyInput): string {
   const modes = input.serviceModes.length ? input.serviceModes.join(", ") : "incall and outcall";
   const specialties = input.specialties.slice(0, 3).join(", ");
   const nearby = input.nearbyAreas.slice(0, 3).join(", ");
+  const nearbyLine = nearby ? ` often cover nearby areas including ${nearby}, ` : " may also cover nearby neighborhoods across DFW, ";
 
   const priceLine =
     input.avgStartingPrice
@@ -64,7 +66,7 @@ export function buildSuburbIntro(input: AreaCopyInput): string {
 
   return (
     `${input.area} is a growing node in the DFW male massage market within the MasseurMatch Dallas-first strategy. ` +
-    `Therapists serving ${input.area} often cover nearby areas including ${nearby}, ` +
+    `Therapists serving ${input.area}${nearbyLine}` +
     `with session formats that may include ${modes}. ` +
     (specialties ? `Popular specialties in ${input.area} include ${specialties}. ` : "") +
     `This page exists to capture direct local intent and to route ${input.area} searches into a trusted verification-first directory rather than lower-quality generic listings.` +
@@ -117,6 +119,7 @@ export function buildAreaFaq(
 export const AREA_NEARBY_MAP: Record<string, string[]> = {
   "oak-lawn": ["Uptown", "Turtle Creek", "Medical District"],
   uptown: ["Oak Lawn", "Design District", "Turtle Creek"],
+  "deep-ellum": ["Downtown", "Uptown", "Design District"],
   "turtle-creek": ["Oak Lawn", "Highland Park", "Uptown"],
   "medical-district": ["Uptown", "Love Field", "Downtown"],
   "highland-park": ["University Park", "Oak Lawn", "Uptown"],
@@ -137,9 +140,14 @@ export const AREA_NEARBY_MAP: Record<string, string[]> = {
   "grand-prairie": ["Arlington", "Irving", "Dallas"],
   // Houston
   montrose: ["Downtown Houston", "Midtown", "Museum District"],
+  "the-heights": ["Montrose", "Midtown", "Downtown Houston"],
+  midtown: ["Downtown Houston", "Montrose", "Museum District"],
   "downtown-houston": ["Montrose", "Midtown", "EaDo"],
   // Austin
   "south-congress": ["Downtown Austin", "Zilker", "East Austin"],
+  "east-austin": ["South Congress", "Downtown Austin", "Zilker"],
+  // San Antonio
+  "king-william": ["Downtown San Antonio", "Southtown", "Alamo Heights"],
   // Chicago
   "river-north": ["Streeterville", "Gold Coast", "West Loop"],
   // Miami
