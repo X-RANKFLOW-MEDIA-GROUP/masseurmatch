@@ -45,11 +45,19 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+<<<<<<< copilot/fix-gitleaks-error
+=======
       - name: Install gitleaks (OSS)
         run: |
           curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/main/install.sh | sh -s -- -b /usr/local/bin v8.24.2
+>>>>>>> main
       - name: Scan for secrets (gitleaks)
-        run: gitleaks git --redact --verbose --exit-code 1
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          fail: true
+          redact: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   typecheck:
     name: Typecheck
