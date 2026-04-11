@@ -95,7 +95,6 @@ function MethodTabs({ method, onChange }: { method: AuthMethod; onChange: (m: Au
 /* ─────────── Phone OTP Form ─────────── */
 
 function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: string }) {
-  const router = useRouter();
   const { toast } = useToast();
   const [phone, setPhone] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -181,7 +180,6 @@ function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
 /* ─────────── Email OTP Form ─────────── */
 
 function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: string }) {
-  const router = useRouter();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -414,6 +412,7 @@ export function AuthForms({
               placeholder="your@email.com"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
+              autoComplete="email"
               required
             />
             <AppInput
@@ -422,6 +421,7 @@ export function AuthForms({
               placeholder={isLogin ? "Password" : "At least 8 characters"}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
+              autoComplete={isLogin ? "current-password" : "new-password"}
               minLength={8}
               required
             />

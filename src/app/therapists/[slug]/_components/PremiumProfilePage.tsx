@@ -45,7 +45,7 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
         <nav className="pp-breadcrumb" aria-label="Breadcrumb">
           <Link href={cityPath}>{city}</Link>
           <span>{">"}</span>
-          <Link href={`${cityPath}/massage-therapists`}>Massage Therapists</Link>
+          <Link href={cityPath}>Massage Therapists</Link>
           <span>{">"}</span>
           <span className="text-[var(--cream)]">{profile.display_name || profile.full_name}</span>
         </nav>

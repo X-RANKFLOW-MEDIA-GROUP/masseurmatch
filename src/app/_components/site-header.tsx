@@ -224,6 +224,7 @@ export default function SiteHeader() {
 
         {/* Center Navigation — desktop */}
         <nav className="hidden lg:flex items-center gap-1">
+          <ExploreDropdown />
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}
