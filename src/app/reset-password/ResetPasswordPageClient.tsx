@@ -115,6 +115,7 @@ export default function ResetPasswordPageClient() {
             placeholder="New password (min 8 characters)"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
             required
             minLength={8}
           />
@@ -123,6 +124,7 @@ export default function ResetPasswordPageClient() {
             placeholder="Confirm new password"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
+            autoComplete="new-password"
             required
           />
           {error && (

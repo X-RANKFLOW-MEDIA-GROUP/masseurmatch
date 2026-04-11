@@ -54,3 +54,22 @@ After the fixes:
 1. Keep build-critical assets local or bundled to avoid hard external runtime/build dependencies.
 2. Add lint rule coverage for duplicate imports (`no-duplicate-imports`) if not already enforced.
 3. Keep this incident record for future triage of environment-specific deployment failures.
+
+
+## Follow-up deployment failure (Vercel build log)
+A later Vercel build (iad1, 2026-04-10) failed with module resolution errors:
+
+- `Module not found: Can't resolve '@/lib/supabase/client'`
+- `Module not found: Can't resolve '@/components/ui/alert'`
+
+### Root causes
+1. Some app pages/components referenced a legacy Supabase import path (`@/lib/supabase/client`) while the active implementation lived at `@/integrations/supabase/client`.
+2. Some pages imported a shadcn-style alert component file (`@/components/ui/alert`) that was missing from the codebase.
+
+### Corrective actions
+- Added compatibility shim: `src/lib/supabase/client.ts` that re-exports `supabase` from `@/integrations/supabase/client`.
+- Added `src/components/ui/alert.tsx` with `Alert`, `AlertTitle`, and `AlertDescription` exports compatible with existing UI imports.
+
+### Verification after follow-up fixes
+- `pnpm build` succeeded (no unresolved module errors).
+- `pnpm lint` succeeded.
