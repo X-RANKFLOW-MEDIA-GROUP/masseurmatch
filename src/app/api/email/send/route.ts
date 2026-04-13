@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 interface EmailData {
   to: string;
   template: string;
@@ -22,6 +20,16 @@ export async function POST(request: NextRequest) {
     }
 
     const htmlContent = renderTemplate(template, data);
+    const apiKey = process.env.RESEND_API_KEY;
+
+    if (!apiKey) {
+      return NextResponse.json(
+        { message: 'Email service not configured', id: `mock-${Date.now()}` },
+        { status: 200 }
+      );
+    }
+
+    const resend = new Resend(apiKey);
 
     const result = await resend.emails.send({
       from: 'notifications@masseurmatch.com',

@@ -11,6 +11,8 @@ interface PremiumProfileContactProps {
 
 export function PremiumProfileContact({ profile }: PremiumProfileContactProps) {
   const [showForm, setShowForm] = useState(false);
+  const contactEmail = `${profile.slug ?? "profile"}@masseurmatch.com`;
+  const therapistName = profile.display_name || profile.full_name || "Therapist";
 
   // Default to showing email and phone
   const allowedMethods = {
@@ -32,13 +34,13 @@ export function PremiumProfileContact({ profile }: PremiumProfileContactProps) {
 
           {/* Email */}
           <a
-            href={`mailto:${profile.contact_email}`}
+            href={`mailto:${contactEmail}`}
             className="flex items-start gap-4 p-4 rounded-lg border border-[var(--glass-border)] bg-[var(--cream-dim)] hover:bg-[var(--cream)] transition-colors"
           >
             <Mail className="w-5 h-5 text-[var(--orange)] flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-medium">Email</p>
-              <p className="text-sm text-[var(--text-muted)]">{profile.contact_email}</p>
+              <p className="text-sm text-[var(--text-muted)]">{contactEmail}</p>
             </div>
           </a>
 
@@ -71,8 +73,8 @@ export function PremiumProfileContact({ profile }: PremiumProfileContactProps) {
           <div>
             <ContactForm
               therapistId={profile.id}
-              therapistName={profile.display_name || profile.full_name}
-              therapistEmail={profile.contact_email}
+              therapistName={therapistName}
+              therapistEmail={contactEmail}
               allowedMethods={allowedMethods}
             />
           </div>

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Container, Head, Hr, Html, Img, Link, Preview, Row, Section, Text } from '@react-email/components';
+import { Body, Button, Container, Head, Hr, Html, Preview, Section, Text } from '@react-email/components';
 
 interface InquiryReceivedEmailProps {
   clientName: string;

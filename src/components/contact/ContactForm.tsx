@@ -1,13 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
 
 interface ContactFormProps {
   therapistId: string;
@@ -23,10 +22,8 @@ interface ContactFormProps {
 export function ContactForm({
   therapistId,
   therapistName,
-  therapistEmail,
   allowedMethods,
 }: ContactFormProps) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -36,7 +33,7 @@ export function ContactForm({
     clientEmail: '',
     clientPhone: '',
     message: '',
-    preferredContact: 'email' as const,
+    preferredContact: 'email' as 'email' | 'phone' | 'whatsapp',
   });
 
   const handleChange = (
@@ -91,7 +88,7 @@ export function ContactForm({
         clientEmail: '',
         clientPhone: '',
         message: '',
-        preferredContact: 'email',
+        preferredContact: 'email' as 'email' | 'phone' | 'whatsapp',
       });
 
       // Reset success message after 5 seconds
