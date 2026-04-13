@@ -1,6 +1,6 @@
 // src/emails/WelcomeEmail.tsx
 import * as React from 'react';
-import { Button, Container, Head, Hr, Html, Preview, Section, Text } from '@react-email/components';
+import { Body, Button, Container, Head, Hr, Html, Preview, Section, Text } from '@react-email/components';
 
 interface WelcomeEmailProps {
   name: string;

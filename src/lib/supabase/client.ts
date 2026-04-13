@@ -1,1 +1,7 @@
-export { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
+
+export function createClient() {
+  return supabase;
+}
+
+export { supabase };
