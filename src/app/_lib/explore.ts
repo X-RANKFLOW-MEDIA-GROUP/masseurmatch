@@ -11,7 +11,7 @@ export const EXPLORE_DEFAULT_RADIUS = 25;
 export const EXPLORE_DEFAULT_PRICE_MAX = 300;
 export const EXPLORE_PAGE_SIZE = 24;
 
-export type ExploreView = "grid" | "map" | "swipe";
+export type ExploreView = "grid" | "map" | "swipe" | "cards";
 export type ExploreSort = "distance" | "featured" | "price" | "reviews";
 
 export type ExploreFilters = {
@@ -143,7 +143,7 @@ const ZIP_TO_CITY: Record<string, string> = {
 };
 
 const SORT_OPTIONS = new Set<ExploreSort>(["distance", "featured", "price", "reviews"]);
-const VIEW_OPTIONS = new Set<ExploreView>(["grid", "map", "swipe"]);
+const VIEW_OPTIONS = new Set<ExploreView>(["grid", "map", "swipe", "cards"]);
 
 export function getExploreDefaults(): ExploreFilters {
   return {
