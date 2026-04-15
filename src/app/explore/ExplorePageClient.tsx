@@ -52,6 +52,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { Slider } from "@/components/ui/slider";
 import { handleProfileCardTilt, resetProfileCardTilt } from "@/app/_components/profile-card-tilt";
 import { CompactTherapistCard } from "@/components/explore/CompactTherapistCard";
+import { AdvancedFiltersPanel } from "@/components/explore/AdvancedFiltersPanel";
 
 type ExplorePageClientProps = {
   cities: CityData[];
@@ -1676,13 +1677,22 @@ export default function ExplorePageClient({
             </div>
 
             <div className="relative flex-1 overflow-hidden px-5 py-5">
-              <SidebarFilters
-                draft={draftFilters}
-                onDraftChange={setDraftFilters}
-                onReset={handleSidebarReset}
-                onApply={handleSidebarApply}
-                compact
-              />
+              <div className="space-y-6">
+                {/* Advanced Filters Panel */}
+                <AdvancedFiltersPanel
+                  filters={draftFilters}
+                  onFilterChange={setDraftFilters}
+                />
+
+                {/* Standard Sidebar Filters */}
+                <SidebarFilters
+                  draft={draftFilters}
+                  onDraftChange={setDraftFilters}
+                  onReset={handleSidebarReset}
+                  onApply={handleSidebarApply}
+                  compact
+                />
+              </div>
             </div>
           </div>
         </SheetContent>

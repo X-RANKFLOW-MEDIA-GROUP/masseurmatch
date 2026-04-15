@@ -17,6 +17,8 @@ import { PremiumProfileLocation } from "./PremiumProfileLocation";
 import { KnottyProfileTracker } from "./KnottyProfileTracker";
 import { ProfileAreasServed } from "./ProfileAreasServed";
 import { PremiumProfileContact } from "./PremiumProfileContact";
+import { ReviewsDisplaySection } from "@/components/reviews/ReviewsDisplaySection";
+import { SocialProofBadges } from "@/components/social/SocialProofBadges";
 import "./premium-profile.css";
 
 interface Props {
@@ -63,6 +65,37 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
           </div>
           <PremiumProfileGallery profile={profile} photos={photos} />
         </section>
+
+        {/* Social Proof Badges */}
+        <section className="pp-section pp-fade-in">
+          <SocialProofBadges
+            reviewCount={reviews.length}
+            averageRating={reviews.length > 0 ? (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length) : 0}
+            isVerified={profile.is_verified_identity}
+            isPremium={profile.subscription_tier === 'pro' || profile.subscription_tier === 'elite'}
+          />
+        </section>
+
+        {/* Reviews */}
+        {reviews.length > 0 && (
+          <section className="pp-section pp-fade-in" id="reviews">
+            <div className="pp-section-header">
+              <h2 className="pp-section-title">Client Reviews</h2>
+              <span className="text-sm text-slate-500">{reviews.length} verified reviews</span>
+            </div>
+            <ReviewsDisplaySection
+              reviews={reviews.map(r => ({
+                id: r.id,
+                author_name: r.author_name,
+                rating: r.rating,
+                body: r.body,
+                created_at: r.created_at
+              }))}
+              averageRating={reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length}
+              totalReviews={reviews.length}
+            />
+          </section>
+        )}
 
         {/* About */}
         <PremiumProfileAbout profile={profile} reviews={reviews} />
