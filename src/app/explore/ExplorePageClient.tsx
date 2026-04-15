@@ -28,6 +28,7 @@ import {
   Sparkles,
   Star,
   X,
+  Grid2x2,
 } from "lucide-react";
 import type { CityData } from "@/data/cities";
 import {
@@ -50,6 +51,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
 import { handleProfileCardTilt, resetProfileCardTilt } from "@/app/_components/profile-card-tilt";
+import { CompactTherapistCard } from "@/components/explore/CompactTherapistCard";
 
 type ExplorePageClientProps = {
   cities: CityData[];
@@ -92,6 +94,7 @@ const SORT_OPTIONS = [
 
 const VIEW_OPTIONS = [
   { value: "grid", label: "Grid", icon: Layers3 },
+  { value: "cards", label: "Cards", icon: Grid2x2 },
   { value: "map", label: "Map", icon: MapPinned },
   { value: "swipe", label: "Swipe", icon: Sparkles },
 ] as const;
@@ -1586,6 +1589,29 @@ export default function ExplorePageClient({
                       >
                         <div className="shimmer h-full rounded-[24px]" />
                       </div>
+                    ))
+                  ) : null}
+                </div>
+                <div ref={listSentinelRef} className="h-12" />
+              </>
+            ) : null}
+
+            {providers.length > 0 && filters.view === "cards" ? (
+              <>
+                <div className="mt-6 grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                  {visibleProviders.map((provider) => (
+                    <CompactTherapistCard
+                      key={provider.id}
+                      provider={provider}
+                    />
+                  ))}
+
+                  {(serverLoading || isPending) ? (
+                    Array.from({ length: 6 }).map((_, index) => (
+                      <div
+                        key={`skeleton-${index}`}
+                        className="aspect-[3/4] rounded-xl border border-slate-200 bg-slate-100 animate-pulse"
+                      />
                     ))
                   ) : null}
                 </div>
