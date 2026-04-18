@@ -1,46 +1,41 @@
 #!/usr/bin/env python3
 """
-MasseurMatch Migration Runner
-Automatically executes all SQL migrations in the correct order.
+MasseurMatch Migration Runner - Standalone Version
+Executes all SQL migrations using HTTP API directly
 """
 
 import os
 import sys
 import glob
+import json
 from pathlib import Path
-from typing import Optional
+import urllib.request
+import urllib.error
 import time
-
-# Try to import supabase, if not available, show instructions
-try:
-    from supabase import create_client, Client
-except ImportError:
-    print("❌ Supabase client not installed.")
-    print("Install it with: pip install supabase")
-    sys.exit(1)
-
 
 class MigrationRunner:
     def __init__(self, supabase_url: str, supabase_key: str):
-        """Initialize Supabase client"""
-        self.supabase: Client = create_client(supabase_url, supabase_key)
+        """Initialize with Supabase credentials"""
+        self.supabase_url = supabase_url.rstrip('/')
+        self.supabase_key = supabase_key
         self.migrations_dir = Path(__file__).parent.parent / "supabase" / "migrations"
         self.executed = 0
         self.skipped = 0
         self.errors = 0
+        self.failed_migrations = []
 
-    def get_migration_files(self) -> list[str]:
+    def get_migration_files(self):
         """Get all migration files in correct order"""
         migrations = sorted(glob.glob(str(self.migrations_dir / "*.sql")))
         return migrations
 
-    def read_migration(self, filepath: str) -> str:
+    def read_migration(self, filepath):
         """Read migration SQL file"""
         with open(filepath, 'r', encoding='utf-8') as f:
             return f.read()
 
-    def execute_migration(self, filepath: str) -> bool:
-        """Execute a single migration file"""
+    def execute_migration(self, filepath):
+        """Execute a single migration file using Supabase REST API"""
         filename = Path(filepath).name
         
         try:
@@ -51,90 +46,93 @@ class MigrationRunner:
                 self.skipped += 1
                 return True
             
-            print(f"⏳ Executing {filename}...", end=" ", flush=True)
+            # Execute via Supabase REST API
+            url = f"{self.supabase_url}/rest/v1/rpc/exec_sql"
+            headers = {
+                'Authorization': f'Bearer {self.supabase_key}',
+                'Content-Type': 'application/json',
+                'apikey': self.supabase_key
+            }
             
-            # Execute the SQL
-            result = self.supabase.postgrest.auth(self.supabase.auth.get_session().access_token).execute_sql(sql_content)
+            # Split into individual statements
+            statements = [s.strip() for s in sql_content.split(';') if s.strip()]
             
-            print(f"✅ Success")
+            for stmt in statements:
+                if not stmt.strip():
+                    continue
+                    
+                data = json.dumps({'sql': stmt}).encode('utf-8')
+                req = urllib.request.Request(url, data=data, headers=headers, method='POST')
+                
+                try:
+                    with urllib.request.urlopen(req, timeout=30) as response:
+                        result = response.read().decode('utf-8')
+                        if response.status not in [200, 201]:
+                            print(f"⚠️  Warning in {filename}: {result}")
+                except urllib.error.HTTPError as e:
+                    error_msg = e.read().decode('utf-8')
+                    # Ignore "already exists" errors
+                    if 'already exists' in error_msg.lower() or 'duplicate' in error_msg.lower():
+                        print(f"✓ {filename} (already exists - skipped)")
+                        self.skipped += 1
+                        return True
+                    else:
+                        print(f"❌ Error in {filename}: {error_msg}")
+                        self.errors += 1
+                        self.failed_migrations.append(filename)
+                        return False
+            
+            print(f"✓ {filename}")
             self.executed += 1
             return True
             
         except Exception as e:
-            error_msg = str(e)
-            
-            # Check for common non-fatal errors
-            if "already exists" in error_msg.lower():
-                print(f"⏭️  Already exists (skipped)")
-                self.skipped += 1
-                return True
-            elif "relation" in error_msg.lower() and "does not exist" in error_msg.lower():
-                print(f"⏭️  Dependency not ready (skipped)")
-                self.skipped += 1
-                return True
-            else:
-                print(f"❌ Error: {error_msg}")
-                self.errors += 1
-                return False
+            print(f"❌ Failed {filename}: {str(e)}")
+            self.errors += 1
+            self.failed_migrations.append(filename)
+            return False
 
     def run_all(self):
-        """Run all migrations"""
+        """Execute all migrations"""
         migrations = self.get_migration_files()
         
         if not migrations:
             print("❌ No migration files found!")
-            print(f"Looking in: {self.migrations_dir}")
             return False
         
-        print(f"🚀 MasseurMatch Migration Runner")
-        print(f"📁 Found {len(migrations)} migration files")
-        print(f"🔗 Connecting to Supabase...")
+        print(f"Found {len(migrations)} migrations")
         print("=" * 60)
         
-        for i, migration_file in enumerate(migrations, 1):
-            print(f"\n[{i}/{len(migrations)}]", end=" ")
-            self.execute_migration(migration_file)
-            time.sleep(0.5)  # Small delay between executions
+        for filepath in migrations:
+            self.execute_migration(filepath)
+            time.sleep(0.5)  # Rate limiting
         
-        print("\n" + "=" * 60)
-        print(f"\n📊 Migration Summary:")
-        print(f"   ✅ Executed: {self.executed}")
-        print(f"   ⏭️  Skipped:  {self.skipped}")
-        print(f"   ❌ Errors:   {self.errors}")
+        print("=" * 60)
+        print(f"\n✓ Executed: {self.executed}")
+        print(f"⏭️  Skipped: {self.skipped}")
+        print(f"❌ Errors: {self.errors}")
         
-        if self.errors == 0:
-            print(f"\n✨ All migrations completed successfully!")
-            return True
-        else:
-            print(f"\n⚠️  Some migrations failed. Please review the errors above.")
-            return False
-
+        if self.failed_migrations:
+            print(f"\nFailed migrations:")
+            for m in self.failed_migrations:
+                print(f"  - {m}")
+        
+        return self.errors == 0
 
 def main():
-    """Main entry point"""
     # Get credentials from environment
-    supabase_url = os.environ.get("SUPABASE_URL")
-    supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+    supabase_url = os.getenv('SUPABASE_URL')
+    supabase_key = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
     
     if not supabase_url or not supabase_key:
         print("❌ Missing environment variables!")
-        print("\nSet these first:")
-        print("   export SUPABASE_URL=your_url")
-        print("   export SUPABASE_SERVICE_ROLE_KEY=your_key")
-        print("\nOr use a .env file in the project root.")
+        print("Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY")
         sys.exit(1)
     
-    try:
-        runner = MigrationRunner(supabase_url, supabase_key)
-        success = runner.run_all()
-        sys.exit(0 if success else 1)
-    except KeyboardInterrupt:
-        print("\n\n❌ Migration cancelled by user")
-        sys.exit(1)
-    except Exception as e:
-        print(f"\n❌ Fatal error: {e}")
-        sys.exit(1)
+    runner = MigrationRunner(supabase_url, supabase_key)
+    success = runner.run_all()
+    
+    sys.exit(0 if success else 1)
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
