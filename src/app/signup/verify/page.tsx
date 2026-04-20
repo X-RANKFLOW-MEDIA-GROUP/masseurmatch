@@ -44,6 +44,7 @@ export default function SignupVerifyPage() {
 
   const [emailOtp, setEmailOtp] = useState("");
   const [phoneOtp, setPhoneOtp] = useState("");
+  const [phoneInputValue, setPhoneInputValue] = useState("");
   const [emailSent, setEmailSent] = useState(false);
   const [phoneSent, setPhoneSent] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
@@ -183,6 +184,21 @@ export default function SignupVerifyPage() {
     }
   }
 
+  function handleSetPhone() {
+    if (!phoneInputValue.trim()) return;
+    
+    // Format phone number - ensure it has a + prefix
+    let formattedPhone = phoneInputValue.trim();
+    if (!formattedPhone.startsWith("+")) {
+      formattedPhone = "+1" + formattedPhone.replace(/\D/g, "");
+    }
+    
+    setAccountInfo({
+      ...state,
+      phone: formattedPhone,
+    });
+  }
+
   async function sendPhoneCode() {
     if (!state.phone) return;
 
@@ -256,7 +272,7 @@ export default function SignupVerifyPage() {
     }
   }, [setIdentityStatus, setStripeIdentitySessionId]);
 
-  const canContinue = state.emailVerified && state.identityVerificationStatus === "verified";
+  const canContinue = state.emailVerified && state.phoneVerified && state.identityVerificationStatus === "verified";
 
   function handleContinue() {
     if (!canContinue) return;
@@ -389,60 +405,87 @@ export default function SignupVerifyPage() {
         </CardContent>
       </Card>
 
-      {state.phone && (
-        <Card>
-          <CardContent className="space-y-4 p-6">
-            <div className="flex items-center gap-2">
-              <Phone className="h-5 w-5 text-brand-secondary" />
-              <h2 className="font-display text-lg font-semibold">Phone Verification</h2>
-              {state.phoneVerified && (
-                <Badge
-                  variant="secondary"
-                  className="ml-auto gap-1 border-green-200 bg-green-50 text-green-700"
-                >
-                  <CheckCircle2 className="h-3 w-3" /> Verified
-                </Badge>
-              )}
-            </div>
+      <Card>
+        <CardContent className="space-y-4 p-6">
+          <div className="flex items-center gap-2">
+            <Phone className="h-5 w-5 text-brand-secondary" />
+            <h2 className="font-display text-lg font-semibold">Phone Verification</h2>
+            <Badge variant="secondary" className="ml-auto gap-1 border-amber-200 bg-amber-50 text-amber-700">
+              Required
+            </Badge>
+            {state.phoneVerified && (
+              <Badge
+                variant="secondary"
+                className="gap-1 border-green-200 bg-green-50 text-green-700"
+              >
+                <CheckCircle2 className="h-3 w-3" /> Verified
+              </Badge>
+            )}
+          </div>
 
-            {!state.phoneVerified && (
-              <>
-                {!phoneSent ? (
+          {!state.phoneVerified && (
+            <>
+              {!state.phone ? (
+                <div className="space-y-3">
+                  <Label htmlFor="phoneInput">Enter your phone number</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="phoneInput"
+                      type="tel"
+                      value={phoneInputValue}
+                      onChange={(event) => setPhoneInputValue(event.target.value)}
+                      placeholder="+1 (555) 123-4567"
+                    />
+                    <Button 
+                      onClick={handleSetPhone} 
+                      disabled={phoneLoading || !phoneInputValue.trim()}
+                      variant="outline"
+                    >
+                      Set Phone
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Include country code (e.g., +1 for US)
+                  </p>
+                </div>
+              ) : !phoneSent ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">Phone: {state.phone}</p>
                   <Button onClick={sendPhoneCode} disabled={phoneLoading} variant="outline">
                     {phoneLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                     Send SMS Code
                   </Button>
-                ) : (
-                  <div className="space-y-3">
-                    <Label htmlFor="phoneOtp">Enter the code sent to {state.phone}</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="phoneOtp"
-                        value={phoneOtp}
-                        onChange={(event) => setPhoneOtp(event.target.value)}
-                        placeholder="000000"
-                        maxLength={6}
-                      />
-                      <Button onClick={verifyPhoneCode} disabled={phoneLoading || phoneOtp.length < 4}>
-                        {phoneLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                        Verify
-                      </Button>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={sendPhoneCode}
-                      className="text-xs text-brand-secondary underline"
-                      disabled={phoneLoading}
-                    >
-                      Resend code
-                    </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <Label htmlFor="phoneOtp">Enter the code sent to {state.phone}</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="phoneOtp"
+                      value={phoneOtp}
+                      onChange={(event) => setPhoneOtp(event.target.value)}
+                      placeholder="000000"
+                      maxLength={6}
+                    />
+                    <Button onClick={verifyPhoneCode} disabled={phoneLoading || phoneOtp.length < 4}>
+                      {phoneLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      Verify
+                    </Button>
                   </div>
-                )}
-              </>
-            )}
-          </CardContent>
-        </Card>
-      )}
+                  <button
+                    type="button"
+                    onClick={sendPhoneCode}
+                    className="text-xs text-brand-secondary underline"
+                    disabled={phoneLoading}
+                  >
+                    Resend code
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardContent className="space-y-4 p-6">
@@ -468,7 +511,7 @@ export default function SignupVerifyPage() {
 
       {!canContinue && (
         <p className="text-center text-xs text-muted-foreground">
-          Complete email and identity verification above to continue.
+          Complete email, phone, and identity verification above to continue.
         </p>
       )}
     </div>
