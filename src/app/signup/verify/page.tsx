@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { useSignup } from "../_lib/signup-context";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -185,17 +186,12 @@ export default function SignupVerifyPage() {
   }
 
   function handleSetPhone() {
-    if (!phoneInputValue.trim()) return;
+    if (!phoneInputValue.trim() || phoneInputValue.length < 10) return;
     
-    // Format phone number - ensure it has a + prefix
-    let formattedPhone = phoneInputValue.trim();
-    if (!formattedPhone.startsWith("+")) {
-      formattedPhone = "+1" + formattedPhone.replace(/\D/g, "");
-    }
-    
+    // PhoneInput already formats with country code
     setAccountInfo({
       ...state,
-      phone: formattedPhone,
+      phone: phoneInputValue,
     });
   }
 
@@ -428,24 +424,22 @@ export default function SignupVerifyPage() {
               {!state.phone ? (
                 <div className="space-y-3">
                   <Label htmlFor="phoneInput">Enter your phone number</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="phoneInput"
-                      type="tel"
-                      value={phoneInputValue}
-                      onChange={(event) => setPhoneInputValue(event.target.value)}
-                      placeholder="+1 (555) 123-4567"
-                    />
-                    <Button 
-                      onClick={handleSetPhone} 
-                      disabled={phoneLoading || !phoneInputValue.trim()}
-                      variant="outline"
-                    >
-                      Set Phone
-                    </Button>
-                  </div>
+                  <PhoneInput
+                    id="phoneInput"
+                    value={phoneInputValue}
+                    onChange={setPhoneInputValue}
+                    placeholder="(555) 123-4567"
+                  />
+                  <Button 
+                    onClick={handleSetPhone} 
+                    disabled={phoneLoading || !phoneInputValue.trim() || phoneInputValue.length < 10}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    Continue with this number
+                  </Button>
                   <p className="text-xs text-muted-foreground">
-                    Include country code (e.g., +1 for US)
+                    Select your country code from the dropdown
                   </p>
                 </div>
               ) : !phoneSent ? (
