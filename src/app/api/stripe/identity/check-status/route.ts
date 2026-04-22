@@ -16,7 +16,8 @@ function shouldUseMockStripe(request: NextRequest) {
 }
 
 function getStripe(request: NextRequest) {
-  const key = process.env.STRIPE_SECRET_KEY;
+  // Check multiple possible env var names for Stripe secret key
+  const key = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_MCP_KEY;
   if (!key) {
     if (!shouldUseMockStripe(request)) {
       throw new Error("STRIPE_SECRET_KEY not configured");
