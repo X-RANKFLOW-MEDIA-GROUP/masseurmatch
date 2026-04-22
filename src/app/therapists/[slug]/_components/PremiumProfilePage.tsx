@@ -17,7 +17,7 @@ import { PremiumProfileLocation } from "./PremiumProfileLocation";
 import { KnottyProfileTracker } from "./KnottyProfileTracker";
 import { ProfileAreasServed } from "./ProfileAreasServed";
 import { PremiumProfileContact } from "./PremiumProfileContact";
-import { ReviewsDisplaySection } from "@/components/reviews/ReviewsDisplaySection";
+import { ReviewsDisplay as ReviewsDisplaySection } from "@/components/reviews/ReviewsDisplaySection";
 import { SocialProofBadges } from "@/components/social/SocialProofBadges";
 import "./premium-profile.css";
 
@@ -31,8 +31,11 @@ interface Props {
 export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props) {
   useFadeInOnScroll();
   
+  const FALLBACK_REVIEW_DATE = "1970-01-01T00:00:00.000Z";
   const city = profile.city || "United States";
   const neighborhood = profile.neighborhood_name || profile.primary_area;
+  const averageRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + (r.rating ?? 0), 0) / reviews.length : 0;
+  const viewCount = profile.profile_views ?? 0;
 
   return (
     <div className="premium-profile min-h-screen">
@@ -69,10 +72,12 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
         {/* Social Proof Badges */}
         <section className="pp-section pp-fade-in">
           <SocialProofBadges
+            isTopRated={reviews.length >= 3 && averageRating >= 4.5}
+            isMostReviewed={reviews.length >= 10}
+            isRising={viewCount >= 100}
             reviewCount={reviews.length}
-            averageRating={reviews.length > 0 ? (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length) : 0}
-            isVerified={profile.is_verified_identity}
-            isPremium={profile.subscription_tier === 'pro' || profile.subscription_tier === 'elite'}
+            averageRating={averageRating}
+            viewCount={viewCount}
           />
         </section>
 
@@ -84,14 +89,14 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
               <span className="text-sm text-slate-500">{reviews.length} verified reviews</span>
             </div>
             <ReviewsDisplaySection
-              reviews={reviews.map(r => ({
+              reviews={reviews.map((r: ImportedReview) => ({
                 id: r.id,
-                author_name: r.author_name,
-                rating: r.rating,
-                body: r.body,
-                created_at: r.created_at
+                author_name: r.reviewer_name ?? "Anonymous",
+                rating: r.rating ?? 0,
+                body: r.review_text,
+                created_at: r.review_date ?? FALLBACK_REVIEW_DATE
               }))}
-              averageRating={reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length}
+              averageRating={averageRating}
               totalReviews={reviews.length}
             />
           </section>
