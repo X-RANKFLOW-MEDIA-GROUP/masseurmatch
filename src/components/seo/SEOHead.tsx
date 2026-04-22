@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 const BASE_URL = "https://masseurmatch.com";
-const SUPPORTED_LANGS = ["en", "es", "pt", "fr"];
 const OG_SITE_NAME = "MasseurMatch — Gay Massage Directory";
 
 interface SEOHeadProps {
@@ -20,7 +19,7 @@ interface SEOHeadProps {
 
 /**
  * Sets document <head> meta tags for SEO.
- * Manages title, description, canonical, OG, Twitter, hreflang.
+ * Manages title, description, canonical, OG, Twitter, and JSON-LD.
  */
 export const SEOHead = ({
   title,
@@ -90,22 +89,6 @@ export const SEOHead = ({
     setMeta("name", "twitter:description", description);
     setMeta("name", "twitter:image", ogImage);
 
-    document.querySelectorAll('link[rel="alternate"][hreflang]').forEach((el) => el.remove());
-
-    for (const lang of SUPPORTED_LANGS) {
-      const link = document.createElement("link");
-      link.setAttribute("rel", "alternate");
-      link.setAttribute("hreflang", lang);
-      link.setAttribute("href", `${BASE_URL}${path}?lang=${lang}`);
-      document.head.appendChild(link);
-    }
-
-    const xdef = document.createElement("link");
-    xdef.setAttribute("rel", "alternate");
-    xdef.setAttribute("hreflang", "x-default");
-    xdef.setAttribute("href", `${BASE_URL}${path}`);
-    document.head.appendChild(xdef);
-
     document.querySelectorAll('script[data-seo-head="true"]').forEach((el) => el.remove());
 
     if (jsonLd) {
@@ -120,7 +103,6 @@ export const SEOHead = ({
     }
 
     return () => {
-      document.querySelectorAll('link[rel="alternate"][hreflang]').forEach((el) => el.remove());
       document.querySelectorAll('script[data-seo-head="true"]').forEach((el) => el.remove());
     };
   }, [title, description, path, ogImage, ogType, noindex, keywords, jsonLd, i18n.language]);

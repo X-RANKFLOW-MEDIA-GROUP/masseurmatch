@@ -1,20 +1,33 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * Playwright config — focused on redirect CI validation.
- * Run: npx playwright test tests/redirects.spec.ts
+ * Playwright config — E2E, API, and redirect validation tests.
  *
- * In CI, set PLAYWRIGHT_BASE_URL to the deployed preview URL.
- * Locally, start `npm run dev` then run the tests with DEFAULT_BASE_URL.
+ * Locally: start `pnpm dev` then run `npx playwright test`
+ * In CI: set PLAYWRIGHT_BASE_URL (GitHub secret/var) to the deployed URL.
+ *
+ * Run specific suites:
+ *   npx playwright test tests/redirects.spec.ts
+ *   npx playwright test tests/api/
+ *   npx playwright test tests/auth/
  */
 
-const DEFAULT_BASE_URL = "http://localhost:3000";
+const DEFAULT_BASE_URL = "http://127.0.0.1:5000";
+const shouldManageWebServer = !process.env.PLAYWRIGHT_BASE_URL;
 
 export default defineConfig({
   testDir: "./tests",
-  timeout: 20_000,
+  timeout: 30_000,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["list"]] : [["list"]],
+  webServer: shouldManageWebServer
+    ? {
+        command: "pnpm dev",
+        url: DEFAULT_BASE_URL,
+        reuseExistingServer: true,
+        timeout: 120_000,
+      }
+    : undefined,
   use: {
     baseURL: process.env.PLAYWRIGHT_BASE_URL ?? DEFAULT_BASE_URL,
     extraHTTPHeaders: {
@@ -24,7 +37,7 @@ export default defineConfig({
   },
   projects: [
     {
-      name: "redirect-validation",
+      name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
   ],

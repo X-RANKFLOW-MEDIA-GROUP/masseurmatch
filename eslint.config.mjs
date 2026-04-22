@@ -5,7 +5,10 @@ import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist", ".next", "next-env.d.ts", "src/legacy-pages/**/*"] },
+  { ignores: ["dist", ".next", "next-env.d.ts", "src/legacy-pages/**/*", "test-results", "playwright-report"] },
+  // Next.js flat config (recommended + core-web-vitals)
+  nextPlugin.flatConfig.recommended,
+  nextPlugin.flatConfig.coreWebVitals,
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
@@ -17,12 +20,9 @@ export default tseslint.config(
       },
     },
     plugins: {
-      "@next/next": nextPlugin,
       "react-hooks": reactHooks,
     },
     rules: {
-      ...nextPlugin.configs.recommended.rules,
-      ...nextPlugin.configs["core-web-vitals"].rules,
       ...reactHooks.configs.recommended.rules,
       "@next/next/no-img-element": "off",
       "@typescript-eslint/no-explicit-any": "off",

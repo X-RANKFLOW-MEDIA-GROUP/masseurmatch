@@ -1,0 +1,145 @@
+/* ═══════════════════════════════════════════════════════
+   GLOBAL MOBILE RESPONSIVE FIXES
+   Ensures all pages work flawlessly on mobile devices
+═══════════════════════════════════════════════════════ */
+
+/* TYPOGRAPHY - Responsive font sizes */
+@media (max-width: 768px) {
+  h1, .text-4xl { @apply text-3xl; }
+  h2, .text-3xl { @apply text-2xl; }
+  h3, .text-2xl { @apply text-xl; }
+  h4, .text-xl { @apply text-lg; }
+  p, .text-base { @apply text-sm; }
+  .font-display { @apply text-xl sm:text-2xl; }
+}
+
+@media (max-width: 640px) {
+  h1 { @apply text-2xl; }
+  h2 { @apply text-xl; }
+  h3 { @apply text-lg; }
+}
+
+/* PADDING/MARGINS - Responsive spacing */
+@media (max-width: 768px) {
+  .section-padding { @apply px-4 py-6 sm:px-6 sm:py-8; }
+  .container-pad { @apply px-4 sm:px-6; }
+}
+
+@media (max-width: 640px) {
+  .section-padding { @apply px-3 py-4; }
+  .container-pad { @apply px-3; }
+}
+
+/* GRID - Responsive column layout */
+@media (max-width: 1024px) {
+  .grid-auto-3 { @apply grid-cols-2; }
+}
+
+@media (max-width: 768px) {
+  .grid-auto-3 { @apply grid-cols-1; }
+  .grid-auto-2 { @apply grid-cols-1; }
+}
+
+/* FLEXBOX - Responsive direction */
+@media (max-width: 768px) {
+  .flex-row-md { @apply flex-col; }
+  .flex-row-lg { @apply flex-col; }
+}
+
+/* IMAGES - Responsive scaling */
+@media (max-width: 768px) {
+  img { @apply max-w-full h-auto; }
+}
+
+/* BUTTONS - Touch-friendly sizing */
+@media (max-width: 768px) {
+  button, a.button, input[type="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* CARDS - Responsive gap and padding */
+@media (max-width: 768px) {
+  .card-container { @apply gap-3; }
+  .card-grid { @apply grid-cols-1; }
+}
+
+@media (max-width: 1024px) {
+  .card-grid { @apply grid-cols-2; }
+}
+
+/* NAVIGATION - Responsive menu */
+@media (max-width: 768px) {
+  .nav-desktop { @apply hidden; }
+  .nav-mobile { @apply flex; }
+}
+
+/* MODALS/DIALOGS - Full width on mobile */
+@media (max-width: 640px) {
+  [role="dialog"], .modal { 
+    @apply fixed inset-0 max-w-full rounded-b-2xl rounded-t-3xl;
+    bottom: 0;
+    top: auto;
+  }
+}
+
+/* INPUTS - Larger touch targets */
+@media (max-width: 768px) {
+  input, textarea, select {
+    font-size: 16px;
+    min-height: 44px;
+  }
+}
+
+/* TABLES - Scrollable on mobile */
+@media (max-width: 768px) {
+  table { @apply overflow-x-auto; }
+  th, td { @apply text-xs sm:text-sm px-2 sm:px-3; }
+}
+
+/* LANDSCAPE MODE - Adjust for smaller viewport height */
+@media (max-height: 500px) and (orientation: landscape) {
+  .section-padding { @apply py-3 sm:py-4; }
+  h1 { @apply text-lg sm:text-xl; }
+}
+
+/* SAFE AREAS - iPhone X/12+ notch support */
+@supports (padding: max(0px)) {
+  body { padding-left: max(1rem, env(safe-area-inset-left)); padding-right: max(1rem, env(safe-area-inset-right)); }
+}
+
+/* PREVENT ZOOM ON INPUT FOCUS (iOS) */
+input, textarea, select {
+  font-size: 16px !important;
+}
+
+/* FIX FOR MOBILE SAFARI */
+@media (max-width: 768px) {
+  body { -webkit-text-size-adjust: 100%; }
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  textarea { -webkit-appearance: none; border-radius: 8px; }
+}
+
+/* FLEX WRAP - Prevent overflow */
+@media (max-width: 640px) {
+  .flex-no-wrap { @apply flex-wrap; }
+}
+
+/* FULL WIDTH SECTIONS */
+@media (max-width: 768px) {
+  .section-full { width: 100vw; margin-left: calc(-50vw + 50%); }
+}
+
+/* STICKY HEADERS - Don't cover too much */
+@media (max-width: 768px) {
+  header, .sticky-top { max-height: 25vh; }
+}
+
+/* Z-INDEX ADJUSTMENTS FOR MOBILE */
+@media (max-width: 768px) {
+  .modal, [role="dialog"] { z-index: 999; }
+  .dropdown { z-index: 100; }
+}

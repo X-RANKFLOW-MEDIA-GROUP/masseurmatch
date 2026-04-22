@@ -34,6 +34,14 @@ export default function SignupReviewPage() {
     setLoading(true);
 
     try {
+      if (!state.termsAccepted) {
+        throw new Error("You must accept the Terms of Service before submitting.");
+      }
+
+      if (!state.complianceAcknowledged) {
+        throw new Error("You must acknowledge the Therapist Agreement and platform policies.");
+      }
+
       // Submit the profile for moderation
       const res = await fetch("/api/signup/submit", {
         method: "POST",
@@ -41,6 +49,10 @@ export default function SignupReviewPage() {
         body: JSON.stringify({
           planTier: state.selectedPlanTier,
           profile: {
+            fullName: state.fullName,
+            displayName: state.displayName || state.fullName,
+            email: state.email,
+            phone: state.phone,
             tagline: p.tagline,
             bio: p.bio,
             yearsExperience: p.yearsExperience,
@@ -57,12 +69,6 @@ export default function SignupReviewPage() {
             startingPrice: p.startingPrice,
             addOns: p.addOns,
             availableNow: p.availableNow,
-          },
-          verification: {
-            emailVerified: state.emailVerified,
-            phoneVerified: state.phoneVerified,
-            identityVerificationStatus: state.identityVerificationStatus,
-            stripeIdentitySessionId: state.stripeIdentitySessionId,
           },
           termsAccepted: state.termsAccepted,
           complianceAcknowledged: state.complianceAcknowledged,
@@ -228,7 +234,7 @@ export default function SignupReviewPage() {
             </li>
             <li className="flex items-center gap-2">
               <CheckCircle2
-                className={`h-4 w-4 ${p.mediaCompliance ? "text-green-500" : "text-muted-foreground"}`}
+                className={`h-4 w-4 ${state.complianceAcknowledged ? "text-green-500" : "text-muted-foreground"}`}
               />
               Content compliance acknowledged
             </li>

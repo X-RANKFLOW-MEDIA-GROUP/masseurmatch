@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Bell, Key, LogOut, Save, Shield, User } from "lucide-react";
+import Link from "next/link";
 
 type PasswordState = { current: string; next: string; confirm: string };
 const EMPTY_PW: PasswordState = { current: "", next: "", confirm: "" };
@@ -21,9 +22,34 @@ export default function ProSettingsPage() {
 
   const [notifEmail, setNotifEmail] = useState(true);
   const [notifSms, setNotifSms] = useState(false);
+  const [notifPush, setNotifPush] = useState(false);
+  const [smsPhone, setSmsPhone] = useState("");
+  const [notifLoading, setNotifLoading] = useState(false);
 
-  // NOTE: Notification preferences are stored in local UI state only.
-  // A `user_notifications` settings table is needed to persist these server-side.
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const loadPreferences = async () => {
+      try {
+        setNotifLoading(true);
+        const res = await fetch(`/api/notifications/preferences?userId=${user.id}`);
+        if (!res.ok) throw new Error("Failed to load preferences");
+        const data = await res.json();
+        const prefs = data.preferences;
+
+        setNotifEmail(Boolean(prefs?.email_enabled));
+        setNotifSms(Boolean(prefs?.sms_enabled));
+        setNotifPush(Boolean(prefs?.push_enabled));
+        setSmsPhone(prefs?.phone_e164 ?? "");
+      } catch (error) {
+        console.error("Failed to load notification preferences", error);
+      } finally {
+        setNotifLoading(false);
+      }
+    };
+
+    void loadPreferences();
+  }, [user?.id]);
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +92,28 @@ export default function ProSettingsPage() {
     setPwForm(EMPTY_PW);
   };
 
-  const handleSaveNotifications = () => {
+  const handleSaveNotifications = async () => {
+    if (!user?.id) return;
+
+    setNotifLoading(true);
+    const res = await fetch("/api/notifications/preferences", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: user.id,
+        emailEnabled: notifEmail,
+        smsEnabled: notifSms,
+        pushEnabled: notifPush,
+        phoneE164: smsPhone || null,
+      }),
+    });
+    setNotifLoading(false);
+
+    if (!res.ok) {
+      toast({ title: "Erro", description: "Não foi possível guardar preferências." });
+      return;
+    }
+
     toast({ title: "Preferences saved", description: "Notification settings updated." });
   };
 
@@ -173,7 +220,7 @@ export default function ProSettingsPage() {
             Caso tenha esquecido a sua palavra-passe, pode redefiní-la via e-mail.
           </p>
           <Button variant="outline" asChild>
-            <a href="/forgot-password">Redefinir via e-mail</a>
+            <Link href="/forgot-password">Redefinir via e-mail</Link>
           </Button>
         </div>
       </section>
@@ -209,9 +256,33 @@ export default function ProSettingsPage() {
               className="h-4 w-4 rounded border-slate-300"
             />
           </label>
+          <label className="flex cursor-pointer items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-900">Notificações Push</p>
+              <p className="text-xs text-slate-500">Alertas no navegador para atualizações em tempo real</p>
+            </div>
+            <input
+              type="checkbox"
+              checked={notifPush}
+              onChange={(e) => setNotifPush(e.target.checked)}
+              className="h-4 w-4 rounded border-slate-300"
+            />
+          </label>
+          <div className="grid gap-2">
+            <label htmlFor="sms-phone" className="text-xs font-medium uppercase tracking-wider text-slate-500">
+              Telefone SMS (E.164)
+            </label>
+            <Input
+              id="sms-phone"
+              type="tel"
+              value={smsPhone}
+              onChange={(e) => setSmsPhone(e.target.value)}
+              placeholder="+15551234567"
+            />
+          </div>
           <Button onClick={handleSaveNotifications} className="gap-2">
             <Save className="h-4 w-4" />
-            Guardar Preferências
+            {notifLoading ? "A guardar..." : "Guardar Preferências"}
           </Button>
         </div>
       </section>

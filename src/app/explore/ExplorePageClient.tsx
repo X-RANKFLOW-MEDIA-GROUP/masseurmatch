@@ -14,17 +14,21 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  ArrowUpRight,
   CheckCircle2,
+  Clock3,
   Filter,
   Heart,
   Layers3,
   LocateFixed,
+  MapPin,
   MapPinned,
   RefreshCw,
   SlidersHorizontal,
   Sparkles,
   Star,
   X,
+  Grid2x2,
 } from "lucide-react";
 import type { CityData } from "@/data/cities";
 import {
@@ -47,6 +51,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
 import { handleProfileCardTilt, resetProfileCardTilt } from "@/app/_components/profile-card-tilt";
+import { CompactTherapistCard } from "@/components/explore/CompactTherapistCard";
+import { AdvancedFiltersPanel } from "@/components/explore/AdvancedFiltersPanel";
 
 type ExplorePageClientProps = {
   cities: CityData[];
@@ -69,6 +75,7 @@ const STORAGE_KEY = "mm:explore:filters";
 const SESSION_KEY = "mm:explore:session";
 const SWIPE_KEY = "mm:explore:swipes";
 const PAGE_BATCH = 12;
+const FACE_FOCUS_OBJECT_POSITION = "50% 18%";
 
 const FILTER_CHIPS: Array<{ key: FilterBooleanKey; label: string }> = [
   { key: "available", label: "Available Now" },
@@ -88,6 +95,7 @@ const SORT_OPTIONS = [
 
 const VIEW_OPTIONS = [
   { value: "grid", label: "Grid", icon: Layers3 },
+  { value: "cards", label: "Cards", icon: Grid2x2 },
   { value: "map", label: "Map", icon: MapPinned },
   { value: "swipe", label: "Swipe", icon: Sparkles },
 ] as const;
@@ -118,6 +126,24 @@ function getVerificationLabel(provider: ExploreProvider) {
   }
 
   return "Directory";
+}
+
+function getCompactVerificationLabel(provider: ExploreProvider) {
+  if (provider.verifiedStatus === "elite") {
+    return "Elite";
+  }
+
+  if (provider.verifiedStatus === "verified") {
+    return "Verified";
+  }
+
+  return "Directory";
+}
+
+function getServiceModes(provider: ExploreProvider) {
+  return [provider.incall ? "Incall" : null, provider.outcall ? "Outcall" : null].filter(
+    (value): value is string => Boolean(value),
+  );
 }
 
 function getPriceFloor(providers: ExploreProvider[]) {
@@ -178,7 +204,11 @@ function DecisionOverlay({ provider }: { provider: ExploreProvider }) {
 
 function getDisplayTrustSignals(provider: ExploreProvider) {
   const filteredSignals = provider.trustSignals.filter(
-    (signal) => !/^verified$/i.test(signal) && !/^available now$/i.test(signal),
+    (signal) =>
+      !/^verified$/i.test(signal) &&
+      !/^available now$/i.test(signal) &&
+      !/\byears?\b/i.test(signal) &&
+      !/\breviews?\b/i.test(signal),
   );
 
   if (provider.featured) {
@@ -227,33 +257,38 @@ function ServiceModeSummary({
   provider: ExploreProvider;
   inverse?: boolean;
 }) {
-  const modes = [provider.incall ? "Incall" : null, provider.outcall ? "Outcall" : null].filter(
-    (value): value is string => Boolean(value),
-  );
+  const modes = getServiceModes(provider);
 
   if (modes.length === 0 && !provider.offers) {
     return null;
   }
 
   return (
-      <div
-        className={cn(
-          "mt-3 flex flex-wrap items-center gap-2 text-sm",
-          inverse ? "text-white/80" : "text-text-secondary",
-        )}
-      >
-        {modes.length > 0 ? <span>{modes.join(" \u00B7 ")}</span> : null}
-        {provider.offers ? (
-          <span
-            className={cn(
-              "rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]",
-              inverse
-                ? "border border-white/18 bg-white/12 text-white"
-                : "border border-border-subtle bg-[rgb(var(--color-brand-secondary-rgb)/0.08)] text-brand-secondary",
-            )}
-          >
-            Offer
-          </span>
+    <div className="mt-3 flex flex-wrap items-center gap-2">
+      {modes.map((mode) => (
+        <span
+          key={`${provider.id}-${mode}`}
+          className={cn(
+            "rounded-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em]",
+            inverse
+              ? "border border-white/18 bg-white/12 text-white/88 backdrop-blur-xl"
+              : "border border-border-subtle bg-white/82 text-text-secondary shadow-[inset_0_1px_0_rgb(255_255_255/_0.9)]",
+          )}
+        >
+          {mode}
+        </span>
+      ))}
+      {provider.offers ? (
+        <span
+          className={cn(
+            "rounded-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em]",
+            inverse
+              ? "border border-white/18 bg-[rgb(var(--color-brand-soft-accent-rgb)/0.22)] text-white"
+              : "border border-[rgb(var(--color-brand-soft-accent-rgb)/0.4)] bg-[rgb(var(--color-brand-soft-accent-rgb)/0.16)] text-brand-primary",
+          )}
+        >
+          Offer
+        </span>
       ) : null}
     </div>
   );
@@ -326,6 +361,16 @@ function ProviderCard({
   onOpen: (provider: ExploreProvider) => void;
   onSelect: (providerId: string) => void;
 }) {
+  const serviceModes = getServiceModes(provider);
+  const tertiaryLabel =
+    provider.reviewCount > 0 ? "Reviews" : provider.profileViews > 0 ? "Views" : "Trust";
+  const tertiaryValue =
+    provider.reviewCount > 0
+      ? `${provider.reviewCount}`
+      : provider.profileViews > 0
+        ? `${provider.profileViews}`
+        : getVerificationLabel(provider);
+
   return (
     <motion.div
       layout
@@ -340,101 +385,147 @@ function ProviderCard({
         onMouseMove={handleProfileCardTilt}
         onMouseLeave={(event) => resetProfileCardTilt(event.currentTarget)}
         className={cn(
-          "profile-card-glass group h-full",
+          "profile-card-glass group flex h-full flex-col",
           provider.featured && "ring-1 ring-[rgb(var(--color-brand-soft-accent-rgb)/0.28)]",
         )}
       >
-      <div className="profile-card-media">
-        <div className="aspect-[4/3] overflow-hidden rounded-[1.25rem]">
-          <Image
-            src={provider.photoUrl}
-            alt={`${provider.name} in ${provider.neighborhood}`}
-            width={960}
-            height={720}
-            className="profile-card-image h-full w-full object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-[rgba(11,31,58,0.56)] via-transparent to-[rgba(255,255,255,0.14)]" />
-        <div className="absolute left-4 top-4 flex flex-wrap gap-2 profile-card-plane-soft">
-          {provider.verifiedStatus !== "directory" ? (
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/18 bg-white/14 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-xl">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              {getVerificationLabel(provider)}
-            </span>
-          ) : null}
-          {provider.featured ? (
-            <span className="rounded-full border border-white/18 bg-[rgb(var(--color-brand-secondary-rgb)/0.42)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-xl">
-              Featured
-            </span>
-          ) : null}
-          {provider.offers ? (
-            <span className="rounded-full border border-white/18 bg-white/14 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-xl">
-              Offer
-            </span>
-          ) : null}
-        </div>
-        <DecisionOverlay provider={provider} />
-      </div>
+        <div className="profile-card-media">
+          <div className="relative aspect-[5/6] overflow-hidden rounded-[1.45rem] sm:aspect-[4/5]">
+            <Image
+              src={provider.photoUrl}
+              alt={`${provider.name} in ${provider.neighborhood}`}
+              width={960}
+              height={1200}
+              className="profile-card-image h-full w-full object-cover"
+              style={{ objectPosition: FACE_FOCUS_OBJECT_POSITION }}
+              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.24),transparent_28%),linear-gradient(180deg,rgba(11,31,58,0.04)_0%,rgba(11,31,58,0.2)_48%,rgba(11,31,58,0.82)_100%)]" />
+            <div className="absolute left-4 right-4 top-4 flex items-start justify-between gap-3 profile-card-plane-soft">
+              <div className="flex flex-wrap gap-2">
+                {provider.verifiedStatus !== "directory" ? (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-white/18 bg-white/14 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-xl sm:px-3 sm:text-[11px]">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    <span className="sm:hidden">{getCompactVerificationLabel(provider)}</span>
+                    <span className="hidden sm:inline">{getVerificationLabel(provider)}</span>
+                  </span>
+                ) : null}
+                {provider.featured ? (
+                  <span className="rounded-full border border-white/18 bg-[rgb(var(--color-brand-secondary-rgb)/0.42)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-xl sm:px-3 sm:text-[11px]">
+                    Featured
+                  </span>
+                ) : null}
+              </div>
+              {provider.reviewCount > 0 ? (
+                <span className="shrink-0 rounded-full border border-white/18 bg-white/14 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-xl sm:px-3 sm:text-[11px]">
+                  {provider.reviewCount} reviews
+                </span>
+              ) : null}
+            </div>
 
-      <div className="profile-card-plane mt-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h2 className="text-[1.45rem] font-semibold leading-tight text-text-primary">{provider.name}</h2>
-            <p className="mt-2 text-sm font-medium text-text-secondary">{provider.neighborhood}</p>
-            <p className="mt-1 text-sm text-text-muted">
-              {provider.yearsExperience ? `${provider.yearsExperience} years experience` : "Experience on profile"}
+            <div className="absolute inset-x-4 bottom-4 profile-card-plane-strong">
+              <div className="rounded-[1.5rem] border border-white/16 bg-[linear-gradient(135deg,rgba(9,24,45,0.88),rgba(20,59,108,0.68))] p-3.5 text-white shadow-[0_20px_48px_rgba(11,31,58,0.26)] backdrop-blur-2xl sm:p-4">
+                <div className="flex flex-wrap items-center gap-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/88 sm:text-[10px]">
+                  <span className={provider.availableNow ? "live-dot" : "h-2.5 w-2.5 rounded-full bg-white/45"} />
+                  <span>{provider.availableNow ? "Available now" : "Book today"}</span>
+                  {typeof provider.distance === "number" ? (
+                    <>
+                      <span className="h-1 w-1 rounded-full bg-white/45" />
+                      <span>{provider.distance.toFixed(1)} mi</span>
+                    </>
+                  ) : null}
+                </div>
+
+                <div className="mt-3 flex items-end justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-white/72 sm:text-[10px]">
+                      Starting from
+                    </p>
+                    <p className="mt-1 font-display text-[2rem] leading-none tracking-[-0.05em] text-white sm:text-[2.1rem]">
+                      {typeof provider.priceFrom === "number" ? formatCurrency(provider.priceFrom) : "Request"}
+                    </p>
+                  </div>
+                  <div className="rounded-full border border-white/16 bg-white/10 px-3 py-2 text-right shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]">
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/72 sm:text-[10px]">Session</p>
+                    <p className="mt-1 flex items-center justify-end gap-1.5 text-sm font-semibold text-white">
+                      <Clock3 className="h-3.5 w-3.5" />
+                      {provider.sessionDurationMinutes} min
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="profile-card-plane relative mx-2 -mt-8 rounded-[1.6rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,246,250,0.92))] p-5 shadow-[0_24px_48px_rgb(var(--color-brand-primary-rgb)/0.1)] backdrop-blur-2xl">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-secondary">
+            {provider.specialty}
+          </p>
+
+          <div className="mt-3 flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h2 className="font-display text-[2rem] leading-[0.95] tracking-[-0.05em] text-text-primary">
+                {provider.name}
+              </h2>
+              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-text-secondary">
+                <span className="inline-flex items-center gap-1.5">
+                  <MapPin className="h-3.5 w-3.5 text-brand-secondary" />
+                  {provider.neighborhood}
+                </span>
+                <span className="rounded-full border border-border-subtle bg-white/70 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-text-muted">
+                  {provider.yearsExperience
+                    ? `${provider.yearsExperience} years experience`
+                    : "Experience on profile"}
+                </span>
+              </div>
+            </div>
+
+            <div className="shrink-0 rounded-[1.15rem] border border-border-subtle bg-white/78 px-3 py-2 text-right shadow-[inset_0_1px_0_rgb(255_255_255/_0.9)]">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-text-muted">Trust</p>
+              <p className="mt-1 text-xs font-semibold text-brand-secondary">{getVerificationLabel(provider)}</p>
+            </div>
+          </div>
+
+          <ServiceModeSummary provider={provider} />
+          <p className="mt-4 line-clamp-3 text-[15px] leading-6 text-text-secondary">{provider.bio}</p>
+        </div>
+
+        <div className="profile-card-plane mt-5 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-[1.35rem] border border-white/60 bg-white/68 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/_0.84)] backdrop-blur-xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">City</p>
+            <p className="mt-2 text-sm font-semibold text-text-primary">{provider.city}</p>
+          </div>
+          <div className="rounded-[1.35rem] border border-white/60 bg-white/68 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/_0.84)] backdrop-blur-xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">Service</p>
+            <p className="mt-2 text-sm font-semibold text-text-primary">
+              {serviceModes.length > 0 ? serviceModes.join(" / ") : "See profile"}
             </p>
           </div>
-          {provider.reviewCount > 0 ? (
-            <span className="shrink-0 rounded-full border border-border-subtle bg-white/78 px-3 py-1.5 text-xs font-semibold text-brand-secondary shadow-[0_10px_24px_rgb(var(--color-brand-primary-rgb)/0.06)]">
-              {provider.reviewCount} reviews
-            </span>
-          ) : null}
+          <div className="rounded-[1.35rem] border border-white/60 bg-white/68 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/_0.84)] backdrop-blur-xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">{tertiaryLabel}</p>
+            <p className="mt-2 text-sm font-semibold text-text-primary">{tertiaryValue}</p>
+          </div>
         </div>
 
-        <TrustPills provider={provider} />
-        <p className="mt-4 text-sm font-medium text-text-primary">{provider.specialty}</p>
-        <p className="mt-2 line-clamp-2 text-sm leading-6 text-text-secondary">{provider.bio}</p>
-
-        <ServiceModeSummary provider={provider} />
-      </div>
-
-      <div className="profile-card-plane mt-5 grid gap-3 rounded-[1.35rem] border border-white/55 bg-white/58 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/_0.84)] backdrop-blur-xl sm:grid-cols-3">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">Distance</p>
-          <p className="mt-2 text-sm font-semibold text-text-primary">
-            {typeof provider.distance === "number" ? `${provider.distance.toFixed(1)} mi` : "Near you"}
-          </p>
+        <div className="profile-card-plane-strong mt-5 flex flex-col items-stretch gap-3 rounded-[1.45rem] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(255,255,255,0.62))] p-4 shadow-[inset_0_1px_0_rgb(255_255_255/_0.84)] sm:flex-row sm:items-center">
+          <div className="flex-1">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+              {provider.offerText ? "Current Offer" : "Profile Snapshot"}
+            </p>
+            <p className="mt-1 text-sm leading-6 text-text-secondary">
+              {provider.offerText || "Photo, pricing, trust signals, and contact path stay readable at a glance."}
+            </p>
+          </div>
+          <Link
+            href={provider.profilePath}
+            onClick={() => onOpen(provider)}
+            className="profile-card-cta w-full justify-center gap-2 px-5 text-sm uppercase tracking-[0.12em] sm:w-auto"
+          >
+            View Profile
+            <ArrowUpRight className="h-4 w-4" />
+          </Link>
         </div>
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">Starting</p>
-          <p className="mt-2 text-sm font-semibold text-text-primary">
-            {typeof provider.priceFrom === "number" ? formatCurrency(provider.priceFrom) : "Request"}
-          </p>
-        </div>
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
-            {provider.profileViews > 0 ? "Views" : "Trust"}
-          </p>
-          <p className="mt-2 text-sm font-semibold text-text-primary">
-            {provider.profileViews > 0 ? `${provider.profileViews}` : getVerificationLabel(provider)}
-          </p>
-        </div>
-      </div>
-
-      <div className="profile-card-plane-strong mt-5 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-        <p className="flex-1 text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
-          {provider.offerText || "Availability, distance, and price stay visible on the image."}
-        </p>
-        <Link
-          href={provider.profilePath}
-          onClick={() => onOpen(provider)}
-          className="profile-card-cta w-full justify-center px-5 text-sm uppercase tracking-[0.12em] sm:w-auto"
-        >
-          View Profile
-        </Link>
-      </div>
       </article>
     </motion.div>
   );
@@ -481,9 +572,10 @@ function SwipeDeck({
                       alt={provider.name}
                       fill
                       className="object-cover"
+                      style={{ objectPosition: FACE_FOCUS_OBJECT_POSITION }}
                       sizes="(max-width: 768px) 100vw, 420px"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[rgba(11,31,58,0.76)] via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.18),transparent_28%),linear-gradient(180deg,rgba(11,31,58,0.05)_0%,rgba(11,31,58,0.16)_42%,rgba(11,31,58,0.82)_100%)]" />
                   </div>
                   <div className="absolute left-4 right-4 top-4 flex flex-wrap gap-2">
                     {provider.verifiedStatus !== "directory" ? (
@@ -784,7 +876,14 @@ function MapCanvas({
         <div className="pointer-events-none absolute inset-x-4 bottom-4 z-[500] md:inset-x-auto md:bottom-6 md:left-6 md:w-[320px]">
           <article className="pointer-events-auto overflow-hidden rounded-[24px] border border-white/40 bg-white/92 shadow-[0_24px_56px_rgba(11,31,58,0.18)] backdrop-blur-2xl">
             <div className="relative aspect-[16/9]">
-              <Image src={selected.photoUrl} alt={selected.name} fill className="object-cover" sizes="320px" />
+              <Image
+                src={selected.photoUrl}
+                alt={selected.name}
+                fill
+                className="object-cover"
+                style={{ objectPosition: FACE_FOCUS_OBJECT_POSITION }}
+                sizes="320px"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-[rgba(11,31,58,0.46)] to-transparent" />
               <DecisionOverlay provider={selected} />
             </div>
@@ -1473,7 +1572,7 @@ export default function ExplorePageClient({
 
             {providers.length > 0 && filters.view === "grid" ? (
               <>
-                <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                <div className="mt-6 grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
                   {visibleProviders.map((provider) => (
                     <ProviderCard
                       key={provider.id}
@@ -1487,10 +1586,33 @@ export default function ExplorePageClient({
                     Array.from({ length: 3 }).map((_, index) => (
                       <div
                         key={`skeleton-${index}`}
-                        className="h-[440px] rounded-[28px] border border-border-subtle bg-white/80 p-3 shadow-[0_24px_56px_rgb(var(--color-brand-primary-rgb)/0.05)]"
+                        className="h-[640px] rounded-[28px] border border-border-subtle bg-white/80 p-3 shadow-[0_24px_56px_rgb(var(--color-brand-primary-rgb)/0.05)]"
                       >
                         <div className="shimmer h-full rounded-[24px]" />
                       </div>
+                    ))
+                  ) : null}
+                </div>
+                <div ref={listSentinelRef} className="h-12" />
+              </>
+            ) : null}
+
+            {providers.length > 0 && filters.view === "cards" ? (
+              <>
+                <div className="mt-6 grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                  {visibleProviders.map((provider) => (
+                    <CompactTherapistCard
+                      key={provider.id}
+                      provider={provider}
+                    />
+                  ))}
+
+                  {(serverLoading || isPending) ? (
+                    Array.from({ length: 6 }).map((_, index) => (
+                      <div
+                        key={`skeleton-${index}`}
+                        className="aspect-[3/4] rounded-xl border border-slate-200 bg-slate-100 animate-pulse"
+                      />
                     ))
                   ) : null}
                 </div>
@@ -1555,13 +1677,22 @@ export default function ExplorePageClient({
             </div>
 
             <div className="relative flex-1 overflow-hidden px-5 py-5">
-              <SidebarFilters
-                draft={draftFilters}
-                onDraftChange={setDraftFilters}
-                onReset={handleSidebarReset}
-                onApply={handleSidebarApply}
-                compact
-              />
+              <div className="space-y-6">
+                {/* Advanced Filters Panel */}
+                <AdvancedFiltersPanel
+                  filters={draftFilters}
+                  onFilterChange={setDraftFilters}
+                />
+
+                {/* Standard Sidebar Filters */}
+                <SidebarFilters
+                  draft={draftFilters}
+                  onDraftChange={setDraftFilters}
+                  onReset={handleSidebarReset}
+                  onApply={handleSidebarApply}
+                  compact
+                />
+              </div>
             </div>
           </div>
         </SheetContent>

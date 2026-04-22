@@ -264,10 +264,10 @@ export function HomeSeoLanding({
           </div>
 
           <Link
-            href="/therapists"
+            href="/explore"
             className="inline-flex items-center gap-2 text-sm font-semibold text-action-secondary transition hover:gap-3"
           >
-            Browse all listings
+            Explore all listings
             <ChevronRight className="h-4 w-4" />
           </Link>
         </div>

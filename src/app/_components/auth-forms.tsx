@@ -95,7 +95,6 @@ function MethodTabs({ method, onChange }: { method: AuthMethod; onChange: (m: Au
 /* ─────────── Phone OTP Form ─────────── */
 
 function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: string }) {
-  const router = useRouter();
   const { toast } = useToast();
   const [phone, setPhone] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -125,16 +124,11 @@ function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
     }
     // Sync the mm_session cookie so middleware recognises the user
     if (data.session?.access_token) {
-      const syncResp = await fetch("/api/auth/sync-session", {
+      await fetch("/api/auth/sync-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ access_token: data.session.access_token }),
       });
-      if (!syncResp.ok) {
-        setLoading(false);
-        toast({ title: "Session error", description: "Could not establish session. Please try again.", variant: "destructive" });
-        return;
-      }
     }
     setLoading(false);
     toast({ title: isLogin ? "Welcome back" : "Account created" });
@@ -147,6 +141,7 @@ function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
     <div className="space-y-3">
       <AppInput
         type="tel"
+        aria-label="Phone number"
         placeholder="+1 (555) 123-4567"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
@@ -157,6 +152,7 @@ function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
         <>
           <AppInput
             type="text"
+            aria-label="One-time password code"
             placeholder="Enter 6-digit code"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
@@ -184,7 +180,6 @@ function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
 /* ─────────── Email OTP Form ─────────── */
 
 function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: string }) {
-  const router = useRouter();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -194,7 +189,15 @@ function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
   const sendOtp = async () => {
     if (!email.trim()) return;
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({ email: email.trim() });
+    const destination = isLogin ? redirectTo : "/pro/onboard";
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: {
+        // Ensure clicking the magic link in the email redirects to the correct
+        // destination rather than the bare site URL (which would land on the homepage).
+        emailRedirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(destination)}`,
+      },
+    });
     setLoading(false);
     if (error) {
       toast({ title: "Could not send OTP", description: error.message, variant: "destructive" });
@@ -214,16 +217,11 @@ function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
     }
     // Sync the mm_session cookie so middleware recognises the user
     if (data.session?.access_token) {
-      const syncResp = await fetch("/api/auth/sync-session", {
+      await fetch("/api/auth/sync-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ access_token: data.session.access_token }),
       });
-      if (!syncResp.ok) {
-        setLoading(false);
-        toast({ title: "Session error", description: "Could not establish session. Please try again.", variant: "destructive" });
-        return;
-      }
     }
     setLoading(false);
     toast({ title: isLogin ? "Welcome back" : "Account created" });
@@ -236,6 +234,7 @@ function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
     <div className="space-y-3">
       <AppInput
         type="email"
+        aria-label="Email address"
         placeholder="your@email.com"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
@@ -246,6 +245,7 @@ function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
         <>
           <AppInput
             type="text"
+            aria-label="One-time password code"
             placeholder="Enter 6-digit code"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
@@ -317,8 +317,8 @@ export function AuthForms({
     }
 
     const result = isLogin
-      ? await signIn(email, password)
-      : await signUp(email, password, fullName);
+      ? await signIn(email.trim(), password)
+      : await signUp(email.trim(), password, fullName.trim());
 
     setLoading(false);
 
@@ -371,11 +371,11 @@ export function AuthForms({
         </Link>
       </div>
 
-      <h1 className="text-2xl font-bold">{isLogin ? "Login" : "Register"}</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
+      <h1 className="font-display text-3xl font-semibold tracking-tight mt-6">{isLogin ? "Sign in" : "Create account"}</h1>
+      <p className="mt-3 text-base leading-6 text-muted-foreground">
         {isLogin
-          ? "Sign in to your therapist account."
-          : "Create your therapist account and continue into onboarding."}
+          ? "Welcome back. Sign in to your therapist account."
+          : "Create your therapist account and get started with onboarding."}
       </p>
 
       {/* Social login/signup */}
@@ -397,24 +397,31 @@ export function AuthForms({
           <form onSubmit={onSubmit} className="space-y-3">
             {!isLogin ? (
               <AppInput
+                aria-label="Full name"
                 placeholder="Full name"
                 value={fullName}
                 onChange={(event) => setFullName(event.target.value)}
+                minLength={2}
+                maxLength={120}
                 required
               />
             ) : null}
             <AppInput
               type="email"
+              aria-label="Email address"
               placeholder="your@email.com"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
+              autoComplete="email"
               required
             />
             <AppInput
               type="password"
+              aria-label="Password"
               placeholder={isLogin ? "Password" : "At least 8 characters"}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
+              autoComplete={isLogin ? "current-password" : "new-password"}
               minLength={8}
               required
             />

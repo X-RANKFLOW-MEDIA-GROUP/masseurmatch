@@ -182,7 +182,7 @@ export const KnottyChat = ({
       key={action.key}
       type="button"
       onClick={() => void sendMessage({ quickAction: action.key })}
-      className="rounded-full border border-white/14 bg-white/[0.08] px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/82 transition hover:border-white/24 hover:bg-white/[0.12]"
+      className="rounded-full border border-[#2f6098] bg-[#0f315b]/72 px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#bfdcff] transition hover:border-[#4f85c2] hover:bg-[#174273] hover:text-[#e4f2ff]"
     >
       {action.label}
     </button>
@@ -191,28 +191,29 @@ export const KnottyChat = ({
   const panel = (
     <div
       className={cn(
-        "relative flex flex-col overflow-hidden rounded-[28px] border border-white/12 bg-[linear-gradient(180deg,rgba(10,24,42,0.94),rgba(9,18,34,0.9))] shadow-[0_30px_90px_rgba(0,0,0,0.32)] backdrop-blur-3xl",
+        "relative flex flex-col overflow-hidden rounded-[28px] border border-[#1b4678] bg-[linear-gradient(180deg,#0b2447_0%,#091b37_52%,#07162f_100%)] shadow-[0_32px_96px_rgba(1,10,28,0.62)] backdrop-blur-3xl",
         isEmbedded ? "h-[620px] w-full" : "h-[620px] w-[396px]",
         className,
       )}
     >
-      <div className="pointer-events-none absolute inset-x-10 top-0 h-32 rounded-full bg-[radial-gradient(circle,rgba(122,198,255,0.2),transparent_70%)] blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(58,126,207,0.26),transparent_38%),radial-gradient(circle_at_bottom_left,rgba(18,52,94,0.5),transparent_56%)]" />
+      <div className="pointer-events-none absolute inset-x-10 top-0 h-32 rounded-full bg-[radial-gradient(circle,rgba(98,166,238,0.22),transparent_70%)] blur-3xl" />
 
-      <div className="relative flex items-center justify-between border-b border-white/10 px-5 py-4">
+      <div className="relative flex items-center justify-between border-b border-[#204e83] bg-[#0d2a4f]/72 px-5 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/14 bg-white/[0.08] text-white">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#2a5b95] bg-[#12335d] text-[#8ec2f6]">
             <Sparkles className="h-4 w-4" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-white">Knotty</p>
-            <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">AI concierge closer</p>
+            <p className="text-sm font-semibold text-[#a9d4ff]">Knotty</p>
+            <p className="text-[11px] uppercase tracking-[0.24em] text-[#6f9dcb]">AI concierge closer</p>
           </div>
         </div>
         {!isEmbedded ? (
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/12 bg-white/[0.06] text-white/70 transition hover:bg-white/[0.12] hover:text-white"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-[#2a5a93] bg-[#12355f] text-[#94bde7] transition hover:bg-[#174273] hover:text-[#d3e8ff]"
             aria-label="Close Knotty chat"
           >
             <X className="h-4 w-4" />
@@ -220,7 +221,7 @@ export const KnottyChat = ({
         ) : null}
       </div>
 
-      <div className="relative border-b border-white/10 px-4 py-3">
+      <div className="relative border-b border-[#204e83] px-4 py-3">
         <div className="flex flex-wrap gap-2">
           {quickActionButtons}
           {(promptExamples || []).slice(0, 0).map(() => null)}
@@ -252,20 +253,20 @@ export const KnottyChat = ({
           event.preventDefault();
           void sendMessage({ content: input });
         }}
-        className="relative border-t border-white/10 px-4 py-4"
+        className="relative border-t border-[#204e83] px-4 py-4"
       >
-        <div className="flex items-center gap-2 rounded-[22px] border border-white/12 bg-white/[0.08] px-3 py-2.5 backdrop-blur-2xl">
+        <div className="flex items-center gap-2 rounded-[22px] border border-[#28568b] bg-[#0c2a4f]/75 px-3 py-2.5 backdrop-blur-2xl">
           <input
             type="text"
             value={input}
             onChange={(event) => setInput(event.target.value)}
             placeholder="Tell Knotty what matters most..."
-            className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/45"
+            className="flex-1 bg-transparent text-sm text-[#d7e8fa] outline-none placeholder:text-[#9fbedf]"
           />
           <button
             type="submit"
             disabled={!input.trim() || isTyping}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-900 transition disabled:cursor-not-allowed disabled:opacity-35"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#3f6ea6] bg-[#194679] text-[#e6f3ff] transition hover:bg-[#245890] disabled:cursor-not-allowed disabled:opacity-35"
             aria-label="Send message"
           >
             <Send className="h-4 w-4" />
