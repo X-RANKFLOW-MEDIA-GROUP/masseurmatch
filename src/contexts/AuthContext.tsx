@@ -221,12 +221,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Login API already sets the server session cookie.
       // Mirror the Supabase browser session so client auth state hydrates immediately,
       // but don't block login when this sync fails (server cookie is already valid).
-      await Promise.race([
-        establishClientSession(email, password, result.session),
-        wait(CLIENT_SESSION_SYNC_TIMEOUT_MS),
-      ]).catch((sessionError) => {
+      const sessionSyncPromise = establishClientSession(email, password, result.session).catch((sessionError) => {
         console.warn("Client session sync failed after login.", sessionError);
       });
+      await Promise.race([
+        sessionSyncPromise,
+        wait(CLIENT_SESSION_SYNC_TIMEOUT_MS),
+      ]);
 
       return { error: null };
     } catch (error) {

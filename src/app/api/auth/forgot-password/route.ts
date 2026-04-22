@@ -9,10 +9,20 @@ export async function POST(request: Request) {
       const supabase = createSupabasePublicClient();
       const requestUrl = new URL(request.url);
       const redirectPath = body.redirectTo || "/reset-password";
-      const redirectTo =
-        /^https?:\/\//i.test(redirectPath)
-          ? redirectPath
-          : new URL(redirectPath, requestUrl.origin).toString();
+      let redirectTo = new URL("/reset-password", requestUrl.origin).toString();
+
+      if (/^https?:\/\//i.test(redirectPath)) {
+        try {
+          const externalUrl = new URL(redirectPath);
+          if (externalUrl.origin === requestUrl.origin) {
+            redirectTo = externalUrl.toString();
+          }
+        } catch {
+          // Keep the default safe redirect.
+        }
+      } else {
+        redirectTo = new URL(redirectPath, requestUrl.origin).toString();
+      }
 
       const { error } = await supabase.auth.resetPasswordForEmail(body.email, {
         redirectTo,
