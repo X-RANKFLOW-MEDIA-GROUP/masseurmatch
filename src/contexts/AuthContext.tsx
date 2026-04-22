@@ -41,6 +41,7 @@ const defaultSubscription: SubscriptionState = {
   loading: true,
   config_error: null,
 };
+const CLIENT_SESSION_SYNC_TIMEOUT_MS = 8000;
 
 type SubscriptionResponse = {
   ok: boolean;
@@ -222,8 +223,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // but don't block login when this sync fails (server cookie is already valid).
       await Promise.race([
         establishClientSession(email, password, result.session),
-        wait(8000),
-      ]).catch(() => null);
+        wait(CLIENT_SESSION_SYNC_TIMEOUT_MS),
+      ]).catch((sessionError) => {
+        console.warn("Client session sync failed after login.", sessionError);
+      });
 
       return { error: null };
     } catch (error) {
