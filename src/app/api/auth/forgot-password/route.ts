@@ -2,14 +2,16 @@ import { errorResponse, json, parseJsonBody } from "@/app/api/_lib/http";
 import { createSupabasePublicClient } from "@/app/api/_lib/supabase-server";
 import { forgotPasswordSchema } from "@/app/_lib/validation";
 
+const DEFAULT_RESET_PATH = "/reset-password";
+
 export async function POST(request: Request) {
   try {
     const body = await parseJsonBody(request, forgotPasswordSchema);
     try {
       const supabase = createSupabasePublicClient();
       const requestUrl = new URL(request.url);
-      const redirectPath = body.redirectTo || "/reset-password";
-      let redirectTo = new URL("/reset-password", requestUrl.origin).toString();
+      const redirectPath = body.redirectTo || DEFAULT_RESET_PATH;
+      let redirectTo = new URL(DEFAULT_RESET_PATH, requestUrl.origin).toString();
 
       if (/^https?:\/\//i.test(redirectPath)) {
         try {
