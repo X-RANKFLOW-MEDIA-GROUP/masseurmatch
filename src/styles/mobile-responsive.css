@@ -10,7 +10,7 @@
   h3, .text-2xl { @apply text-xl; }
   h4, .text-xl { @apply text-lg; }
   p, .text-base { @apply text-sm; }
-  .font-display { @apply text-xl sm:text-2xl; }
+  .font-display { @apply text-xl; }
 }
 
 @media (max-width: 640px) {
@@ -21,8 +21,8 @@
 
 /* PADDING/MARGINS - Responsive spacing */
 @media (max-width: 768px) {
-  .section-padding { @apply px-4 py-6 sm:px-6 sm:py-8; }
-  .container-pad { @apply px-4 sm:px-6; }
+  .section-padding { @apply px-4 py-6; }
+  .container-pad { @apply px-4; }
 }
 
 @media (max-width: 640px) {
@@ -95,13 +95,13 @@
 /* TABLES - Scrollable on mobile */
 @media (max-width: 768px) {
   table { @apply overflow-x-auto; }
-  th, td { @apply text-xs sm:text-sm px-2 sm:px-3; }
+  th, td { @apply text-xs px-2; }
 }
 
 /* LANDSCAPE MODE - Adjust for smaller viewport height */
 @media (max-height: 500px) and (orientation: landscape) {
-  .section-padding { @apply py-3 sm:py-4; }
-  h1 { @apply text-lg sm:text-xl; }
+  .section-padding { @apply py-3; }
+  h1 { @apply text-lg; }
 }
 
 /* SAFE AREAS - iPhone X/12+ notch support */
