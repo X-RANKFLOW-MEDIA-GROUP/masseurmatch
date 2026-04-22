@@ -16,7 +16,7 @@ import { handleProfileCardTilt, resetProfileCardTilt } from "@/app/_components/p
 import { ScrambleText } from "@/components/animations/ScrambleText";
 import { buildPhysicalProfileSummary } from "@/lib/physical-profile";
 
-const FACE_FOCUS_OBJECT_POSITION = "50% 18%";
+const FACE_FOCUS_OBJECT_POSITION = "50% 50%";
 
 const formatCurrency = (value: number | null) => {
   if (typeof value !== "number" || value <= 0) {
@@ -155,225 +155,111 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
 
   return (
     <article
-      className={`profile-card-glass group flex h-full flex-col ${isFeatured ? "ring-1 ring-[rgb(var(--color-brand-soft-accent-rgb)/0.28)]" : ""}`}
+      className={`profile-card-glass group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/50 shadow-lg transition-all duration-300 hover:shadow-2xl hover:border-orange-300/50 ${isFeatured ? "ring-2 ring-orange-400/30 bg-gradient-to-br from-white to-orange-50/30" : "bg-white"}`}
       onMouseMove={handleProfileCardTilt}
       onMouseLeave={(event) => resetProfileCardTilt(event.currentTarget)}
     >
-      <div className="profile-card-media">
-        <div className="relative aspect-[5/6] overflow-hidden rounded-[1.45rem] sm:aspect-[4/5]">
+      {/* PREMIUM PHOTO SECTION */}
+      <div className="profile-card-media relative overflow-hidden">
+        <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-b from-slate-200 to-slate-100">
           <Image
             src={profileImage}
             alt={imageAlt}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="profile-card-image object-cover opacity-55"
+            className="profile-card-image h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             style={{ objectPosition: FACE_FOCUS_OBJECT_POSITION }}
+            priority={false}
           />
-          <Image
-            src={profileImage}
-            alt=""
-            width={960}
-            height={1200}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="relative z-[1] h-full w-full object-contain px-2 pt-3 sm:px-3 sm:pt-4"
-            style={{ objectPosition: FACE_FOCUS_OBJECT_POSITION }}
-            aria-hidden="true"
-          />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.24),transparent_28%),linear-gradient(180deg,rgba(11,31,58,0.04)_0%,rgba(11,31,58,0.2)_48%,rgba(11,31,58,0.82)_100%)]" />
-
-          <div className="absolute left-4 right-4 top-4 flex items-start justify-between gap-3 profile-card-plane-soft">
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+          
+          {/* Status Badges - Top */}
+          <div className="absolute left-3 right-3 top-3 flex items-start justify-between gap-2 z-10">
             <div className="flex flex-wrap gap-2">
-              <span
-                className={`rounded-full border px-2.5 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.18em] backdrop-blur-xl sm:px-3 ${
-                  isPremium
-                    ? "border-white/18 bg-[rgb(var(--color-brand-secondary-rgb)/0.38)] text-white"
-                    : "border-white/18 bg-white/14 text-white"
-                }`}
-              >
+              <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 font-sans text-xs font-semibold backdrop-blur-md transition-colors ${
+                isPremium
+                  ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white border border-orange-400/50"
+                  : "bg-white/90 text-slate-900 border border-slate-200/50"
+              }`}>
                 {tierLabel}
               </span>
-              {isVerified ? (
-                <span className="inline-flex items-center gap-1 rounded-full border border-white/18 bg-white/14 px-2.5 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-white backdrop-blur-xl sm:px-3">
+              {isVerified && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/90 text-white px-3 py-1 font-sans text-xs font-semibold backdrop-blur-md border border-emerald-400/50">
                   <CheckCircle2 className="h-3.5 w-3.5" />
-                  <span className="sm:hidden">{compactVerificationLabel}</span>
                   <span className="hidden sm:inline">{verificationLabel}</span>
                 </span>
-              ) : null}
+              )}
             </div>
 
             {therapist.review_count ? (
-              <span className="shrink-0 rounded-full border border-white/18 bg-white/14 px-2.5 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-white backdrop-blur-xl sm:px-3">
-                {therapist.review_count} reviews
+              <span className="inline-flex items-center gap-1 rounded-full bg-yellow-500/90 text-white px-3 py-1 font-sans text-xs font-semibold backdrop-blur-md border border-yellow-400/50">
+                ★ {therapist.review_count}
               </span>
             ) : null}
-          </div>
-
-          <div className="absolute inset-x-4 bottom-4 profile-card-plane-strong">
-            <div className="rounded-[1.5rem] border border-white/16 bg-[linear-gradient(135deg,rgba(9,24,45,0.88),rgba(20,59,108,0.68))] p-3.5 text-white shadow-[0_20px_48px_rgba(11,31,58,0.26)] backdrop-blur-2xl sm:p-4">
-              <div className="flex flex-wrap items-center gap-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/88 sm:text-[10px]">
-                <span className={therapist.available_now ? "live-dot" : "h-2.5 w-2.5 rounded-full bg-white/45"} />
-                <span>{availabilityLabel}</span>
-                <span className="h-1 w-1 rounded-full bg-white/45" />
-                <span>{locationLabel}</span>
-              </div>
-
-              <div className="mt-3 flex items-end justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-white/72 sm:text-[10px]">
-                    Starting from
-                  </p>
-                  <p className="mt-1 font-display text-[2rem] leading-none tracking-[-0.05em] text-white sm:text-[2.1rem]">
-                    {startingValue || "Request"}
-                  </p>
-                </div>
-
-                <div className="rounded-full border border-white/16 bg-white/10 px-3 py-2 text-right shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]">
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/72 sm:text-[10px]">
-                    Session
-                  </p>
-                  <p className="mt-1 flex items-center justify-end gap-1.5 text-sm font-semibold text-white">
-                    <Clock3 className="h-3.5 w-3.5" />
-                    {sessionDuration} min
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
-      <div className="profile-card-plane relative mx-2 -mt-8 rounded-[1.6rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,246,250,0.92))] p-5 shadow-[0_24px_48px_rgb(var(--color-brand-primary-rgb)/0.1)] backdrop-blur-2xl">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-secondary">
-          {specialtyLabel}
-        </p>
+      {/* CONTENT SECTION */}
+      <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
+        {/* Name and Specialty */}
+        <div>
+          <h3 className="font-display text-lg font-semibold text-slate-900 line-clamp-2 hover:text-orange-600 transition-colors">
+            <Link href={profilePath} onClick={beginRouteTransition}>
+              {name}
+            </Link>
+          </h3>
+          <p className="text-xs font-medium text-slate-500 mt-1">{specialtyLabel}</p>
+        </div>
 
-        <div className="mt-3 flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <h3 className="font-display text-[2rem] leading-[0.95] tracking-[-0.05em] text-text-primary">
-              <Link href={profilePath} onClick={beginRouteTransition} className="transition hover:text-brand-secondary">
-                {name}
-              </Link>
-            </h3>
+        {/* Location and Experience */}
+        <div className="flex items-center gap-2 text-sm text-slate-600">
+          <MapPin className="h-4 w-4 text-orange-500 flex-shrink-0" />
+          <span className="line-clamp-1">{locationLabel}</span>
+          {yearsExperience && <span className="text-xs text-slate-400">•</span>}
+          {yearsExperience && <span className="text-xs text-slate-600">{yearsExperience}y exp</span>}
+        </div>
 
-            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-text-secondary">
-              <span className="inline-flex items-center gap-1.5">
-                <MapPin className="h-3.5 w-3.5 text-brand-secondary" />
-                {locationLabel}
+        {/* Service Tags */}
+        {serviceModes.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {serviceModes.map((mode) => (
+              <span key={mode} className="inline-flex text-xs font-medium px-2.5 py-1 rounded-full bg-orange-100 text-orange-700">
+                {mode}
               </span>
-              {yearsExperience ? (
-                <span className="rounded-full border border-border-subtle bg-white/70 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-text-muted">
-                  {yearsExperience} years experience
-                </span>
-              ) : null}
-            </div>
+            ))}
           </div>
+        )}
 
-          <div className="shrink-0 rounded-[1.15rem] border border-border-subtle bg-white/78 px-3 py-2 text-right shadow-[inset_0_1px_0_rgb(255_255_255/_0.9)]">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-text-muted">Trust</p>
-            <p className="mt-1 text-xs font-semibold text-brand-secondary">
-              {isVerified ? compactVerificationLabel : "Profile live"}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-3 flex flex-wrap gap-2">
-          {serviceModes.map((mode) => (
-            <span
-              key={`${therapist.id}-${mode}`}
-              className="rounded-full border border-border-subtle bg-white/82 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-text-secondary shadow-[inset_0_1px_0_rgb(255_255_255/_0.9)]"
-            >
-              {mode}
-            </span>
-          ))}
-        </div>
-
-        {supportingTags.length > 0 ? (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {supportingTags.map((tag) => (
-              <span
-                key={`${therapist.id}-${tag}`}
-                className="rounded-full border border-border-subtle bg-[rgb(var(--color-brand-secondary-rgb)/0.08)] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-secondary"
-              >
+        {/* Specialties */}
+        {supportingTags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {supportingTags.slice(0, 2).map((tag) => (
+              <span key={tag} className="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-600">
                 {tag}
               </span>
             ))}
           </div>
-        ) : null}
+        )}
 
-        <p className="mt-4 line-clamp-3 text-[15px] leading-6 text-text-secondary">
-          {therapist.bio || "Profile details are still being completed. Visit the full listing for contact preferences and specialties."}
-        </p>
-      </div>
+        {/* Spacer */}
+        <div className="flex-1" />
 
-      <div className="profile-card-plane mt-5 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-[1.35rem] border border-white/60 bg-white/68 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/_0.84)] backdrop-blur-xl">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">City</p>
-          <p className="mt-2 text-sm font-semibold text-text-primary">{therapist.city || "United States"}</p>
-        </div>
-        <div className="rounded-[1.35rem] border border-white/60 bg-white/68 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/_0.84)] backdrop-blur-xl">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">Contact</p>
-          <p className="mt-2 text-sm font-semibold text-text-primary">
-            {callHref || whatsappHref ? "Direct" : "Profile"}
-          </p>
-        </div>
-        <div className="rounded-[1.35rem] border border-white/60 bg-white/68 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/_0.84)] backdrop-blur-xl">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">{tertiaryStat.label}</p>
-          <p className="mt-2 text-sm font-semibold text-text-primary">{tertiaryStat.value}</p>
-        </div>
-      </div>
-
-      <div className="profile-card-plane mt-5 rounded-[1.35rem] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(255,255,255,0.62))] p-4 shadow-[inset_0_1px_0_rgb(255_255_255/_0.84)] backdrop-blur-xl">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
-          Why it stands out
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {displayTrustHighlights.map((highlight) => (
-            <span
-              key={highlight}
-              className="rounded-full border border-border-subtle bg-[rgb(var(--color-brand-secondary-rgb)/0.08)] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-secondary"
-            >
-              {highlight}
-            </span>
-          ))}
-          {displayTrustHighlights.length === 0 ? (
-            <span className="rounded-full border border-border-subtle bg-[rgb(var(--color-brand-secondary-rgb)/0.08)] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-secondary">
-              Full profile published
-            </span>
-          ) : null}
-        </div>
-      </div>
-
-      <div className="profile-card-plane-strong mt-5 flex flex-wrap gap-2">
-        {callHref ? (
-          <a
-            href={callHref}
-            className="profile-card-secondary-action inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl px-4 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-text-primary"
+        {/* Price and CTA */}
+        <div className="border-t border-slate-100 pt-3 flex items-center justify-between">
+          <div>
+            <p className="text-xs font-semibold text-slate-400">Starting</p>
+            <p className="font-display text-xl font-bold text-slate-900">{startingValue || "Contact"}</p>
+          </div>
+          <Link
+            href={profilePath}
+            onClick={beginRouteTransition}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white font-medium text-sm hover:from-orange-600 hover:to-orange-700 transition-all shadow-md hover:shadow-lg"
           >
-            <Phone className="h-4 w-4" />
-            Call
-          </a>
-        ) : null}
-        {whatsappHref ? (
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noreferrer"
-            className="profile-card-secondary-action inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl px-4 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-text-primary"
-          >
-            <MessageCircle className="h-4 w-4" />
-            WhatsApp
-          </a>
-        ) : null}
-        <Link
-          href={profilePath}
-          onClick={beginRouteTransition}
-          onMouseEnter={() => setCtaScrambleKey((value) => value + 1)}
-          onFocus={() => setCtaScrambleKey((value) => value + 1)}
-          className="profile-card-cta blur-nav-link flex-1 gap-2 px-5 text-sm uppercase tracking-[0.12em]"
-        >
-          <ScrambleText text="View Profile" playKey={ctaScrambleKey} />
-          <ArrowUpRight className="h-4 w-4" />
-        </Link>
+            View <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
       </div>
     </article>
   );

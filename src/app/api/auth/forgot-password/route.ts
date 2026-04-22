@@ -5,15 +5,20 @@ import { forgotPasswordSchema } from "@/app/_lib/validation";
 export async function POST(request: Request) {
   try {
     const body = await parseJsonBody(request, forgotPasswordSchema);
-    const supabase = createSupabaseAdminClient();
+    try {
+      const supabase = createSupabaseAdminClient();
+      const { error } = await supabase.auth.resetPasswordForEmail(body.email, {
+        redirectTo: `${new URL(request.url).origin}${body.redirectTo || "/reset-password"}`,
+      });
 
-    const { error } = await supabase.auth.resetPasswordForEmail(body.email, {
-      redirectTo: `${new URL(request.url).origin}${body.redirectTo || "/reset-password"}`,
-    });
-
-    if (error) {
-      // Still return a generic success to prevent email enumeration
-      console.error("Password reset error:", error.message);
+      if (error) {
+        // Still return a generic success to prevent email enumeration
+        console.error("Password reset error:", error.message);
+      }
+    } catch (error) {
+      // Keep route stable for local/test environments that do not provide Supabase admin keys.
+      const message = error instanceof Error ? error.message : String(error);
+      console.error("Password reset skipped:", message);
     }
 
     return json({

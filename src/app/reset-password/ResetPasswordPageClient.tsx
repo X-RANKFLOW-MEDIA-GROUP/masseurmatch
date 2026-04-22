@@ -17,20 +17,39 @@ export default function ResetPasswordPageClient() {
   const [sessionReady, setSessionReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Supabase sends the user to this page with a token_hash fragment or
-  // via PKCE code exchange. We listen for the PASSWORD_RECOVERY event
-  // which fires after the link is clicked and session is established.
+  // Supabase sends the user to this page with either:
+  // - A PKCE code in the query string (?code=…)   — must be exchanged explicitly
+  // - A token_hash in the URL fragment (#…)        — handled by the Supabase client automatically
+  //
+  // We first register the auth-state listener (so we never miss the event),
+  // then exchange the PKCE code when present, and finally fall back to checking
+  // for an already-active recovery session (handles page reloads).
   useEffect(() => {
+    // 1. Register listener before any async work so PASSWORD_RECOVERY is not missed.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
         setSessionReady(true);
       }
     });
 
-    // Also check if there is an active session already (e.g. page reload)
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const init = async () => {
+      // 2. PKCE flow: exchange the code from the URL for a recovery session.
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get("code");
+      if (code) {
+        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        if (!exchangeError) {
+          // Remove the one-time code from the URL so a refresh doesn't fail.
+          window.history.replaceState({}, "", window.location.pathname);
+        }
+      }
+
+      // 3. Implicit / already-exchanged flow: check for an active session.
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) setSessionReady(true);
-    });
+    };
+
+    init();
 
     return () => subscription.unsubscribe();
   }, []);
@@ -96,6 +115,7 @@ export default function ResetPasswordPageClient() {
             placeholder="New password (min 8 characters)"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
             required
             minLength={8}
           />
@@ -104,6 +124,7 @@ export default function ResetPasswordPageClient() {
             placeholder="Confirm new password"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
+            autoComplete="new-password"
             required
           />
           {error && (

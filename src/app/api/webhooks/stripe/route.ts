@@ -76,7 +76,7 @@ function resolveTier(obj: StripeEventObject, subscriptionStatus?: string): Subsc
 }
 
 function getStripeClient() {
-  const key = process.env.STRIPE_SECRET_KEY || "";
+  const key = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_MCP_KEY || "";
   return new Stripe(key, { apiVersion: "2025-08-27.basil" });
 }
 
@@ -99,7 +99,7 @@ async function updateTier(userId: string, tier: SubscriptionTier) {
 
 export async function GET() {
   return NextResponse.json({
-    configured: Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET),
+    configured: Boolean((process.env.STRIPE_SECRET_KEY || process.env.STRIPE_MCP_KEY) && process.env.STRIPE_WEBHOOK_SECRET),
     endpoint: "/api/webhooks/stripe",
   });
 }
