@@ -1,14 +1,21 @@
 import { errorResponse, json, parseJsonBody } from "@/app/api/_lib/http";
-import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import { createSupabasePublicClient } from "@/app/api/_lib/supabase-server";
 import { forgotPasswordSchema } from "@/app/_lib/validation";
 
 export async function POST(request: Request) {
   try {
     const body = await parseJsonBody(request, forgotPasswordSchema);
     try {
-      const supabase = createSupabaseAdminClient();
+      const supabase = createSupabasePublicClient();
+      const requestUrl = new URL(request.url);
+      const redirectPath = body.redirectTo || "/reset-password";
+      const redirectTo =
+        /^https?:\/\//i.test(redirectPath)
+          ? redirectPath
+          : new URL(redirectPath, requestUrl.origin).toString();
+
       const { error } = await supabase.auth.resetPasswordForEmail(body.email, {
-        redirectTo: `${new URL(request.url).origin}${body.redirectTo || "/reset-password"}`,
+        redirectTo,
       });
 
       if (error) {

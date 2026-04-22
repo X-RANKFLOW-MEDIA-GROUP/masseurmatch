@@ -218,8 +218,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const result = await loginMutation({ email, password });
 
       // Login API already sets the server session cookie.
-      // Mirror the Supabase browser session so client auth state hydrates immediately.
-      await establishClientSession(email, password, result.session);
+      // Mirror the Supabase browser session so client auth state hydrates immediately,
+      // but don't block login when this sync fails (server cookie is already valid).
+      await Promise.race([
+        establishClientSession(email, password, result.session),
+        wait(8000),
+      ]).catch(() => null);
 
       return { error: null };
     } catch (error) {
