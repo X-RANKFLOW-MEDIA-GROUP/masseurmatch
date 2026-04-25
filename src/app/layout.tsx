@@ -10,6 +10,7 @@ import { SITE_URL } from "@/lib/site";
 import "leaflet/dist/leaflet.css";
 import "@/index.css";
 import "@/styles/mobile-responsive.css";
+import "@/styles/homepage-mobile-hotfix.css";
 
 const rootMetadata = createPageMetadata({
   title: "The safest and most trusted premium male massage directory",
