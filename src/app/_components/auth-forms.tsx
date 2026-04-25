@@ -345,11 +345,11 @@ export function AuthForms({
 
     toast({
       title: isLogin ? "Welcome back" : "Account created",
-      description: isLogin ? undefined : "You can continue into onboarding now.",
     });
 
     // Use window.location for a full page navigation to ensure cookies are read properly
-    const destination = isLogin ? redirectTo : "/pro/onboard";
+    // New users go to plan selection, existing users go to their redirect or dashboard
+    const destination = isLogin ? redirectTo : "/signup/plan";
     window.location.href = destination;
   };
 

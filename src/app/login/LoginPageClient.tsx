@@ -10,7 +10,7 @@ function LoginPageContent() {
   const { user, loading } = useAuth();
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams?.toString() ?? "");
-  const redirectTo = params.get("redirect") || "/pro/profile";
+  const redirectTo = params.get("redirect") || "/pro/dashboard";
 
   useEffect(() => {
     if (loading || !user) {
