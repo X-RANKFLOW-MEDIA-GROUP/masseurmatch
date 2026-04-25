@@ -2230,6 +2230,156 @@
   }
 }
 
+/* ══════════════════════════════════════
+   MOBILE UI OVERFLOW + CLIPPING FIXES
+   (PR #66 follow-up hardening)
+══════════════════════════════════════ */
+
+/* 1) Hero headline overlap on mobile */
+@media (max-width: 768px) {
+  .wc-hero-h1 {
+    line-height: 1.14;
+    margin-bottom: 0;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+  .wc-hero-h1 .wc-hero-line,
+  .wc-hero-h1 .wc-sub-line {
+    position: relative;
+    z-index: 1;
+  }
+  .wc-hero-h1 .wc-sub-line {
+    line-height: 1.18;
+    margin-top: 6px;
+    padding-bottom: 0.08em;
+  }
+}
+
+/* 2) Search/filter panel horizontal overflow */
+@media (max-width: 768px) {
+  .wc-search-wrap,
+  .wc-search-outer,
+  .wc-s-suggestions {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .wc-search-outer {
+    overflow: hidden;
+    padding-inline: 12px;
+  }
+  .wc-search-outer input {
+    max-width: 100%;
+  }
+  .wc-s-loc,
+  .wc-btn-search {
+    min-width: 0;
+  }
+  .wc-s-suggestions {
+    left: 0;
+    right: 0;
+  }
+}
+
+/* 3) Therapist card clipping, especially CONTACT FOR PRICING */
+@media (max-width: 768px) {
+  .wc-t-grid {
+    gap: 14px;
+  }
+  .wc-tc {
+    min-width: 0;
+  }
+  .wc-tc-body {
+    min-width: 0;
+  }
+  .wc-tc-foot {
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .wc-tc-rating {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .wc-tc-price {
+    flex: 0 1 auto;
+    min-width: 0;
+    text-align: right;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    line-height: 1.35;
+  }
+}
+
+/* 4) FAQ accordion ghost text + clipped answers */
+.wc-faq-a {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    max-height .45s var(--ease),
+    opacity .25s var(--ease2),
+    visibility .25s var(--ease2);
+  will-change: max-height;
+}
+.wc-faq-item.open .wc-faq-a {
+  max-height: 900px;
+  opacity: 1;
+  visibility: visible;
+}
+.wc-faq-a p {
+  margin: 0;
+}
+@media (max-width: 768px) {
+  .wc-faq-a p {
+    padding: 0 0 22px;
+    line-height: 1.72;
+  }
+}
+
+/* 5) Knotty chat contrast, mobile height, and scroll behavior */
+.wc-kg-status {
+  color: rgba(255,255,255,.62);
+}
+.wc-kg-messages {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.25) transparent;
+  overscroll-behavior: contain;
+}
+@media (max-width: 768px) {
+  .wc-knotty-glass {
+    max-width: 100%;
+    min-height: 360px;
+  }
+  .wc-kg-messages {
+    min-height: 190px;
+    max-height: min(46vh, 360px);
+    -webkit-overflow-scrolling: touch;
+  }
+  .wc-kg-bubble {
+    max-width: 92%;
+  }
+}
+
+/* 6) Global .wc-home mobile overflow safety */
+@media (max-width: 768px) {
+  .wc-home {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  .wc-home *,
+  .wc-home *::before,
+  .wc-home *::after {
+    max-width: 100%;
+  }
+  .wc-home img,
+  .wc-home svg,
+  .wc-home video,
+  .wc-home canvas {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
 /* Therapist section padding */
 @media (max-width: 768px) {
   .wc-ther-sec {
