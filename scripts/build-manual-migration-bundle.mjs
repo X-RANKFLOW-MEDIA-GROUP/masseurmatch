@@ -3,8 +3,13 @@ import path from 'node:path';
 
 const repoRoot = process.cwd();
 const migrationsDir = path.join(repoRoot, 'supabase', 'migrations');
-const outputDir = path.join(repoRoot, 'supabase', 'manual');
-const outputFile = path.join(outputDir, 'apply_all_migrations.sql');
+const defaultOutputFile = path.join(repoRoot, 'supabase', 'manual', 'apply_all_migrations.sql');
+
+const outputArg = process.argv.find((arg) => arg.startsWith('--output='));
+const outputFile = outputArg
+  ? path.resolve(repoRoot, outputArg.replace('--output=', ''))
+  : defaultOutputFile;
+const outputDir = path.dirname(outputFile);
 
 const migrationFiles = (await fs.readdir(migrationsDir))
   .filter((file) => file.endsWith('.sql'))

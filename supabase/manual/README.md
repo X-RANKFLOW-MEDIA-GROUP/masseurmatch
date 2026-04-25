@@ -12,10 +12,16 @@ Este diretório contém utilitários para executar migrações manualmente no **
 node scripts/build-manual-migration-bundle.mjs
 ```
 
+Ou definir um caminho de saída customizado:
+
+```bash
+node scripts/build-manual-migration-bundle.mjs --output=tmp/supabase-migrations.sql
+```
+
 ## Como executar no Dashboard
 
 1. Acesse **Supabase Dashboard → SQL Editor**.
-2. Abra `supabase/manual/apply_all_migrations.sql`.
+2. Abra o SQL gerado (padrão: `supabase/manual/apply_all_migrations.sql`).
 3. Copie todo o conteúdo e execute.
 4. Rode as queries de verificação abaixo (separadamente):
 
