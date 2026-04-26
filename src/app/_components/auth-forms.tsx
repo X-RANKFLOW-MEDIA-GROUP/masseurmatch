@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AppButton, AppInput, Surface } from "@/app/_components/primitives";
+import { PasswordInput } from "@/components/ui/password-input";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -415,14 +416,14 @@ export function AuthForms({
               autoComplete="email"
               required
             />
-            <AppInput
-              type="password"
+            <PasswordInput
               aria-label="Password"
               placeholder={isLogin ? "Password" : "At least 8 characters"}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoComplete={isLogin ? "current-password" : "new-password"}
               minLength={8}
+              showStrength={!isLogin}
               required
             />
 

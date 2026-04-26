@@ -69,12 +69,12 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
         {/* Social Proof Badges */}
         <section className="pp-section pp-fade-in">
           <SocialProofBadges
-            isTopRated={reviews.length > 0 && (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length) >= 4.7}
-            isMostReviewed={reviews.length >= 10}
-            isRising={Boolean(profile.profile_views && profile.profile_views > 100)}
+            isTopRated={(reviews.length > 0 ? reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length : 0) >= 4.7}
+            isMostReviewed={reviews.length >= 20}
+            isRising={Boolean(profile.available_now)}
             reviewCount={reviews.length}
             averageRating={reviews.length > 0 ? (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length) : 0}
-            viewCount={profile.profile_views || 0}
+            viewCount={profile.profile_views ?? 0}
           />
         </section>
 
