@@ -35,7 +35,7 @@ const howItWorksSchema = {
       "@type": "HowToStep",
       position: 2,
       name: "Review Profiles",
-      text: "Browse detailed therapist profiles including credentials, services offered, rates, photos, and verified client reviews.",
+      text: "Browse detailed therapist profiles including services offered, rates, photos, and verified client reviews.",
     },
     {
       "@type": "HowToStep",
@@ -46,8 +46,8 @@ const howItWorksSchema = {
     {
       "@type": "HowToStep",
       position: 4,
-      name: "Connect Directly",
-      text: "Reach out to your chosen therapist using the contact buttons. All communication is direct.",
+      name: "Book confidently",
+      text: "Use contact options to confirm details directly, then finalize the session with your selected therapist.",
     },
   ],
   totalTime: "PT5M",

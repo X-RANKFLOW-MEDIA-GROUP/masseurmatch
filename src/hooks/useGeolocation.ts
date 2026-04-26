@@ -14,6 +14,11 @@ type ReverseGeocodeResponse = {
 
 type GeolocationStatus = "idle" | "checking" | "ready" | "unsupported" | "denied" | "error";
 
+type IpCityResponse = {
+  city?: string | null;
+  stateCode?: string | null;
+};
+
 type UseGeolocationOptions = {
   autoLocate?: boolean;
   timeout?: number;
@@ -117,6 +122,22 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
     }
   }, [storageKey]);
 
+  const resolveCityFromIpFallback = useCallback(async () => {
+    try {
+      const response = await requestJson<IpCityResponse>("https://ipapi.co/json/", { cache: "no-store" });
+      const matchedCity = matchCity(response.city ?? null, response.stateCode ?? null);
+
+      if (matchedCity) {
+        setCity(matchedCity);
+        return matchedCity;
+      }
+    } catch {
+      // Ignore IP fallback failures and keep graceful defaults.
+    }
+
+    return null;
+  }, [setCity]);
+
   const requestLocation = useCallback(async (userInitiated = true) => {
     if (typeof window === "undefined") {
       return null;
@@ -179,13 +200,14 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
           if (geoError.code === geoError.PERMISSION_DENIED) {
             setDenied(true);
             setStatus("denied");
-            setError("Location permission was denied.");
-          } else {
-            setStatus("error");
-            setError("We could not get your location right now.");
+            setError("Location permission was denied. We are using an approximate city instead.");
+            resolveCityFromIpFallback().then(resolve);
+            return;
           }
 
-          resolve(null);
+          setStatus("error");
+          setError("We could not get your location right now. We are using an approximate city instead.");
+          resolveCityFromIpFallback().then(resolve);
         },
         {
           enableHighAccuracy: false,
@@ -196,7 +218,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
     });
 
     return requestRef.current;
-  }, [city, maximumAge, setCity, timeout]);
+  }, [city, maximumAge, resolveCityFromIpFallback, setCity, timeout]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
