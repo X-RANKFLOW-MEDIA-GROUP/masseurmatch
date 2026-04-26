@@ -192,7 +192,9 @@ export const KnottyChat = ({
     <div
       className={cn(
         "relative flex flex-col overflow-hidden rounded-[28px] border border-[#1b4678] bg-[linear-gradient(180deg,#0b2447_0%,#091b37_52%,#07162f_100%)] shadow-[0_32px_96px_rgba(1,10,28,0.62)] backdrop-blur-3xl",
-        isEmbedded ? "h-[620px] w-full" : "h-[620px] w-[396px]",
+        isEmbedded
+          ? "h-[620px] w-full"
+          : "w-[396px] max-w-[calc(100vw-2rem)] h-[min(620px,calc(100svh-5rem))]",
         className,
       )}
     >
@@ -261,7 +263,7 @@ export const KnottyChat = ({
             value={input}
             onChange={(event) => setInput(event.target.value)}
             placeholder="Tell Knotty what matters most..."
-            className="flex-1 bg-transparent text-sm text-[#d7e8fa] outline-none placeholder:text-[#9fbedf]"
+            className="flex-1 bg-transparent text-sm text-[#d7e8fa] outline-none placeholder:text-[#b8d4f0]"
           />
           <button
             type="submit"
@@ -281,7 +283,7 @@ export const KnottyChat = ({
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-4 right-4 z-50 sm:bottom-6 sm:right-6">
       <AnimatePresence mode="wait">
         {!isOpen ? (
           <motion.button
