@@ -1,29 +1,29 @@
-# Execução manual de migrações Supabase
+# Manual Supabase Migration Execution
 
-Este diretório contém utilitários para executar migrações manualmente no **Supabase Dashboard → SQL Editor** quando o CLI não está disponível.
+This directory contains utilities for running migrations manually via the **Supabase Dashboard → SQL Editor** when the CLI is unavailable.
 
-## Arquivos
+## Files
 
-- `apply_all_migrations.sql`: bundle único com todas as migrações em `supabase/migrations`, em ordem lexicográfica (timestamp).
+- `apply_all_migrations.sql`: single bundle with all migrations from `supabase/migrations`, sorted in lexicographic (timestamp) order.
 
-## Como gerar novamente
+## Regenerating the bundle
 
 ```bash
 node scripts/build-manual-migration-bundle.mjs
 ```
 
-Ou definir um caminho de saída customizado:
+Or specify a custom output path:
 
 ```bash
 node scripts/build-manual-migration-bundle.mjs --output=tmp/supabase-migrations.sql
 ```
 
-## Como executar no Dashboard
+## Running in the Dashboard
 
-1. Acesse **Supabase Dashboard → SQL Editor**.
-2. Abra o SQL gerado (padrão: `supabase/manual/apply_all_migrations.sql`).
-3. Copie todo o conteúdo e execute.
-4. Rode as queries de verificação abaixo (separadamente):
+1. Go to **Supabase Dashboard → SQL Editor**.
+2. Open the generated SQL file (default: `supabase/manual/apply_all_migrations.sql`).
+3. Copy the entire contents and execute.
+4. Run the verification queries below (separately):
 
 ```sql
 SELECT COUNT(*) AS total_tables
@@ -36,7 +36,7 @@ ORDER BY version DESC
 LIMIT 20;
 ```
 
-## Observações
+## Notes
 
-- O bundle é gerado com `BEGIN; ... COMMIT;` para manter execução transacional.
-- Sempre prefira validar em staging antes de executar em produção.
+- The bundle is generated with `BEGIN; ... COMMIT;` for transactional execution.
+- Always validate on staging before running in production.
