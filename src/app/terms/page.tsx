@@ -213,7 +213,7 @@ export default function TermsPage() {
           {/* Sidebar nav */}
           <nav
             aria-label="Terms sections"
-            className="md:sticky md:top-24" style={{ position: "relative" }}
+            className="md:sticky md:top-24"
           >
             <p
               style={{

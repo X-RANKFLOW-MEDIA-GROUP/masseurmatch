@@ -1711,7 +1711,12 @@ export default function ExplorePageClient({
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" onClick={() => setCompareSelection([])}>Clear</Button>
               <Button size="sm" asChild disabled={compareSelection.length < 2}>
-                <Link href={compareHref}>Compare {compareSelection.length} profiles</Link>
+                <Link
+                  href={compareHref}
+                  onClick={compareSelection.length < 2 ? (e) => e.preventDefault() : undefined}
+                >
+                  Compare {compareSelection.length} profiles
+                </Link>
               </Button>
             </div>
           </div>

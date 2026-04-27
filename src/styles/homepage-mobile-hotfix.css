@@ -1,0 +1,330 @@
+/*
+  MasseurMatch homepage mobile UI hotfix
+  Scope: targeted overrides for hero text, search, cards, FAQ, and Knotty.
+  This file is imported after the base styles so it can patch the current UI
+  without redesigning the brand system.
+*/
+
+.wc-home,
+.wc-home * ,
+.wc-home *::before,
+.wc-home *::after {
+  box-sizing: border-box;
+}
+
+.wc-home {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.wc-home :is(section, main, article, aside, header, footer, nav, div, form) {
+  min-width: 0;
+}
+
+.wc-home :is(img, video, canvas, svg, iframe, input, button, select, textarea) {
+  max-width: 100%;
+}
+
+.wc-home :is(button, input, select, textarea, a) {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Hero headline safety */
+.wc-home .wc-hero,
+.wc-home .wc-hero-split,
+.wc-home .wc-hero-content,
+.wc-home .wc-hero-left {
+  max-width: 100%;
+}
+
+.wc-home .wc-hero-h1 {
+  line-height: 1.05;
+  overflow-wrap: normal;
+  text-wrap: balance;
+}
+
+.wc-home .wc-hero-line,
+.wc-home .wc-hero-h1 .wc-sub-line {
+  display: block;
+  max-width: 100%;
+}
+
+.wc-home .wc-hero-h1 .wc-sub-line {
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.wc-home .wc-hero-accent {
+  display: inline-block;
+  line-height: 1;
+}
+
+.wc-home .wc-geo-bar {
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+  justify-content: center;
+}
+
+/* Search and filter safety */
+.wc-home .wc-search-wrap,
+.wc-home .wc-search-outer,
+.wc-home .wc-s-suggestions {
+  width: 100%;
+  max-width: 100%;
+}
+
+.wc-home .wc-search-outer input {
+  min-width: 0;
+  width: 100%;
+}
+
+.wc-home .wc-s-loc,
+.wc-home .wc-btn-search {
+  min-height: 44px;
+}
+
+/* Therapist card safety */
+.wc-home :is(
+  [class*="ther-card"],
+  [class*="therapist-card"],
+  [class*="profile-card"],
+  [class*="tc-card"],
+  [class*="card"]
+) {
+  max-width: 100%;
+}
+
+.wc-home :is(
+  [class*="ther-card"],
+  [class*="therapist-card"],
+  [class*="profile-card"],
+  [class*="tc-card"]
+) {
+  overflow: hidden;
+}
+
+.wc-home :is(
+  [class*="price"],
+  [class*="pricing"],
+  [class*="contact"],
+  [class*="cta"]
+) {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+/* FAQ accordion safety */
+.wc-home .wc-faq-sec {
+  overflow: hidden;
+}
+
+.wc-home .wc-faq-sec :is(button, h2, h3, p, div) {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.wc-home .wc-faq-sec button[aria-expanded="false"] + *,
+.wc-home .wc-faq-sec button[aria-expanded="false"] ~ [class*="answer"],
+.wc-home .wc-faq-sec button[aria-expanded="false"] ~ [class*="content"],
+.wc-home .wc-faq-sec [data-state="closed"] :is([class*="answer"], [class*="content"], [class*="body"]),
+.wc-home .wc-faq-sec [aria-hidden="true"] {
+  display: block;
+  max-height: 0 !important;
+  min-height: 0 !important;
+  opacity: 0 !important;
+  overflow: hidden !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  visibility: hidden !important;
+}
+
+.wc-home .wc-faq-sec button[aria-expanded="true"] + *,
+.wc-home .wc-faq-sec button[aria-expanded="true"] ~ [class*="answer"],
+.wc-home .wc-faq-sec button[aria-expanded="true"] ~ [class*="content"],
+.wc-home .wc-faq-sec [data-state="open"] :is([class*="answer"], [class*="content"], [class*="body"]) {
+  max-height: none !important;
+  opacity: 1 !important;
+  overflow: visible !important;
+  visibility: visible !important;
+}
+
+/* Knotty chat safety */
+.wc-home .wc-knotty-glass {
+  max-width: min(380px, 100%);
+  max-height: 85dvh;
+  background: rgba(7, 28, 52, .82);
+}
+
+.wc-home .wc-kg-header,
+.wc-home .wc-kg-quick,
+.wc-home .wc-kg-input {
+  flex-shrink: 0;
+}
+
+.wc-home .wc-kg-messages {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.wc-home .wc-kg-bubble {
+  overflow-wrap: anywhere;
+}
+
+.wc-home .wc-kg-status,
+.wc-home .wc-kg-chip,
+.wc-home .wc-kg-input input::placeholder {
+  color: rgba(255, 255, 255, .72);
+}
+
+.wc-home .wc-kg-input input {
+  color: #fff;
+}
+
+@media (max-width: 960px) {
+  .wc-home .wc-hero {
+    min-height: auto;
+    padding: 88px 18px 52px;
+  }
+
+  .wc-home .wc-hero-split {
+    width: 100%;
+    max-width: 720px;
+  }
+}
+
+@media (max-width: 720px) {
+  .wc-home .wc-search-wrap {
+    width: 100%;
+    max-width: calc(100vw - 32px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .wc-home .wc-search-outer {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding: 14px;
+    border-radius: 24px;
+  }
+
+  .wc-home .wc-si {
+    margin-right: 0;
+  }
+
+  .wc-home .wc-s-sep {
+    display: none;
+  }
+
+  .wc-home .wc-s-loc,
+  .wc-home .wc-btn-search {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-content: center;
+    padding: 12px 16px;
+    letter-spacing: .1em;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .wc-home .wc-s-loc span,
+  .wc-home .wc-btn-search span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .wc-home .wc-s-suggestions {
+    left: 0;
+    right: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .wc-home .wc-hero {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .wc-home .wc-hero-h1 {
+    font-size: clamp(42px, 13vw, 62px);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+  }
+
+  .wc-home .wc-hero-line {
+    line-height: 1.05;
+  }
+
+  .wc-home .wc-hero-h1 .wc-sub-line {
+    font-size: clamp(34px, 10.5vw, 48px);
+    line-height: 1.1;
+    margin-top: 8px;
+  }
+
+  .wc-home .wc-hero-accent {
+    display: block;
+    margin-top: 2px;
+  }
+
+  .wc-home .wc-hero-p {
+    font-size: 16px;
+    line-height: 1.65;
+    margin-top: 24px;
+    margin-bottom: 32px;
+  }
+
+  .wc-home .wc-geo-bar {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 10px;
+    letter-spacing: .08em;
+  }
+
+  .wc-home .wc-hero-tags {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .wc-home .wc-htag {
+    letter-spacing: .08em;
+  }
+
+  .wc-home :is(
+    [class*="price"],
+    [class*="pricing"],
+    [class*="contact"],
+    [class*="cta"]
+  ) {
+    letter-spacing: .08em !important;
+    white-space: normal !important;
+  }
+
+  .wc-home .wc-knotty-glass {
+    width: 100%;
+    max-width: calc(100vw - 32px);
+    max-height: 82dvh;
+    border-radius: 22px;
+  }
+
+  .wc-home .wc-kg-messages {
+    max-height: none;
+    flex: 1 1 auto;
+  }
+
+  .wc-home .wc-kg-quick {
+    gap: 8px;
+  }
+
+  .wc-home .wc-kg-chip {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
