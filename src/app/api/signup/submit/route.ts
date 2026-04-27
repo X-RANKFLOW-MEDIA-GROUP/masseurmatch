@@ -16,6 +16,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
     }
 
+    if (!profile.neighborhood?.trim()) {
+      return NextResponse.json({ error: "Neighborhood is required." }, { status: 400 });
+    }
+
+    if (!profile.yearsExperience?.trim()) {
+      return NextResponse.json({ error: "Years of experience is required." }, { status: 400 });
+    }
+
+    if (!profile.startingPrice?.trim()) {
+      return NextResponse.json({ error: "Starting price is required." }, { status: 400 });
+    }
+
     if (!termsAccepted) {
       return NextResponse.json({ error: "Terms must be accepted." }, { status: 400 });
     }
@@ -38,9 +50,11 @@ export async function POST(request: NextRequest) {
       .update({
         bio: profile.bio || null,
         city: profile.city || null,
+        neighborhood_name: profile.neighborhood?.trim() || null,
         state: profile.state || null,
         specialties: profile.serviceCategories?.length ? profile.serviceCategories : null,
         incall_price: profile.startingPrice ? Number(profile.startingPrice) : null,
+        years_experience: profile.yearsExperience ? Number(profile.yearsExperience) : null,
         _tier: planTier ?? null,
         status: "pending_approval",
         is_active: false,

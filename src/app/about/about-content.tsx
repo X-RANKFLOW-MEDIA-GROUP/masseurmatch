@@ -63,7 +63,7 @@ export default function AboutContent() {
           <ValueCard
             icon={Shield}
             title="Rigorous Curation"
-            text="We don't accept everyone. Each therapist on our platform undergoes identity verification to confirm who they are; users should verify the therapist's license themselves."
+            text="We don't accept everyone. Each therapist on our platform goes through identity and profile verification before being published."
           />
           <ValueCard
             icon={Star}

@@ -276,6 +276,8 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
         if (permission.state === "denied") {
           setDenied(true);
           setStatus("denied");
+          setError("Location permission is denied. Using an approximate city fallback.");
+          await resolveCityFromIpFallback();
           setLoading(false);
           return;
         }
@@ -295,7 +297,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
     return () => {
       cancelled = true;
     };
-  }, [autoLocate, maximumAge, requestLocation, storageKey, timeout]);
+  }, [autoLocate, maximumAge, requestLocation, resolveCityFromIpFallback, storageKey, timeout]);
 
   return {
     city,

@@ -34,11 +34,15 @@ export function CompactTherapistCard({
   onOpen,
 }: CompactTherapistCardProps) {
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_32px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-0.5 hover:border-orange-300 hover:shadow-[0_18px_44px_rgba(15,23,42,0.14)]">
+    <article
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_32px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-0.5 hover:border-orange-300 hover:shadow-[0_18px_44px_rgba(15,23,42,0.14)]"
+      itemScope
+      itemType="https://schema.org/Person"
+    >
       <div className="relative aspect-[4/5] overflow-hidden bg-slate-100">
         <Image
           src={provider.photoUrl}
-          alt={`${provider.name} profile photo`}
+          alt={`${provider.name} massage therapist profile`}
           fill
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           style={{ objectPosition: FACE_FOCUS_OBJECT_POSITION }}
@@ -72,7 +76,7 @@ export function CompactTherapistCard({
         </div>
 
         <div className="absolute bottom-3 left-3 right-3">
-          <h3 className="line-clamp-1 text-lg font-semibold text-white drop-shadow">{provider.name}</h3>
+          <h3 className="line-clamp-1 text-lg font-semibold text-white drop-shadow" itemProp="name">{provider.name}</h3>
           <p className="line-clamp-1 text-xs text-white/80">{provider.specialty}</p>
           <div className="mt-1.5 inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/30 px-2 py-1 text-[11px] text-white/90 backdrop-blur-sm">
             <MapPin className="h-3 w-3" />
@@ -94,6 +98,9 @@ export function CompactTherapistCard({
           <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-slate-500">Starting at</p>
           <p className="text-base font-semibold text-slate-900">{formatCurrency(provider.priceFrom)}</p>
         </div>
+        <p className="line-clamp-2 text-xs leading-5 text-slate-600" itemProp="description">
+          {provider.bio}
+        </p>
 
         <div className="mt-auto grid grid-cols-2 gap-2">
           <Button asChild size="sm" className="rounded-full" onClick={() => onOpen?.(provider)}>
