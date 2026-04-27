@@ -70,6 +70,11 @@ export default function SignupReviewPage() {
             addOns: p.addOns,
             availableNow: p.availableNow,
           },
+          verification: {
+            emailVerified: state.emailVerified,
+            phoneVerified: state.phoneVerified,
+            identityVerificationStatus: state.identityVerificationStatus,
+          },
           termsAccepted: state.termsAccepted,
           complianceAcknowledged: state.complianceAcknowledged,
         }),
@@ -273,11 +278,28 @@ export default function SignupReviewPage() {
       </Card>
 
       {/* CTAs */}
+      {(!state.emailVerified || state.identityVerificationStatus !== "verified") && (
+        <p className="rounded-lg bg-amber-50 px-4 py-2.5 text-sm text-amber-700 border border-amber-200">
+          Complete email and identity verification on the{" "}
+          <Link href="/signup/verify" className="underline font-medium">Verify step</Link>{" "}
+          before submitting.
+        </p>
+      )}
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
         <Button asChild variant="outline">
           <Link href="/signup/profile">Back to Edit Profile</Link>
         </Button>
-        <Button size="lg" onClick={handleSubmit} disabled={loading}>
+        <Button
+          size="lg"
+          onClick={handleSubmit}
+          disabled={
+            loading ||
+            !state.emailVerified ||
+            state.identityVerificationStatus !== "verified" ||
+            !state.termsAccepted ||
+            !state.complianceAcknowledged
+          }
+        >
           {loading ? "Submitting…" : "Submit for Review"}
         </Button>
       </div>
