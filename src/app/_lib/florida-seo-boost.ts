@@ -9,20 +9,27 @@ export const FLORIDA_PRIORITY_CITIES = [
   "jacksonville"
 ] as const;
 
-export const FLORIDA_SEO_KEYWORDS = [
+export const FLORIDA_SEO_SEGMENT_SLUGS = [
   "gay-massage",
   "male-massage",
-  "lgbtq-friendly",
+  "lgbtq-friendly"
+] as const;
+
+export const FLORIDA_SEO_SPECIALTY_SLUGS = [
   "outcall",
   "incall"
 ] as const;
 
 export function buildFloridaSeoPaths() {
   const paths: string[] = [];
+  const seoSlugs = [
+    ...FLORIDA_SEO_SEGMENT_SLUGS,
+    ...FLORIDA_SEO_SPECIALTY_SLUGS
+  ] as const;
 
   for (const city of FLORIDA_PRIORITY_CITIES) {
-    for (const keyword of FLORIDA_SEO_KEYWORDS) {
-      paths.push(`/${city}/${keyword}`);
+    for (const slug of seoSlugs) {
+      paths.push(`/${city}/${slug}`);
     }
   }
 
