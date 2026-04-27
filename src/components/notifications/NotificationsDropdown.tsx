@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -41,9 +41,27 @@ export function NotificationsDropdown() {
   const [open, setOpen] = useState(false);
   const supabase = createClient();
 
+  const fetchNotifications = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/notifications?userId=${user.id}&limit=20`);
+      const data = await res.json();
+      setNotifications(data.notifications ?? []);
+      setUnreadCount(data.unreadCount ?? 0);
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+    }
+    setLoading(false);
+  }, [supabase]);
+
   useEffect(() => {
     fetchNotifications();
-    
+
     // Set up real-time subscription
     const channel = supabase
       .channel("notifications")
@@ -60,25 +78,8 @@ export function NotificationsDropdown() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [fetchNotifications, supabase]);
 
-  async function fetchNotifications() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const res = await fetch(`/api/notifications?userId=${user.id}&limit=20`);
-      const data = await res.json();
-      setNotifications(data.notifications ?? []);
-      setUnreadCount(data.unreadCount ?? 0);
-    } catch (error) {
-      console.error("Failed to fetch notifications:", error);
-    }
-    setLoading(false);
-  }
 
   async function markAsRead(notificationId: string) {
     const { data: { user } } = await supabase.auth.getUser();
