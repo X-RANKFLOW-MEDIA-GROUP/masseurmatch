@@ -31,11 +31,11 @@ const faqs = [
       },
       {
         q: "How do I find a massage therapist near me?",
-        a: "Use our search bar to enter your city or ZIP code. You can filter results by massage modality, pricing, availability, and LGBTQ+ certifications. Each profile includes the therapist's credentials, services, rates, and client reviews.",
+        a: "Use our search bar to enter your city or ZIP code. You can filter results by massage modality, pricing, availability, and LGBTQ+ certifications. Each profile includes the therapist's services, rates, and client reviews.",
       },
       {
-        q: "Are the therapists on MasseurMatch licensed?",
-        a: "Yes. We require every therapist to submit their state massage therapy license during onboarding. Our team manually verifies licenses against state licensing boards before any profile goes live.",
+        q: "How are therapists reviewed on MasseurMatch?",
+        a: "Profiles go through identity and quality checks before publication. Clients should still confirm service fit, boundaries, and session details directly with each therapist.",
       },
       {
         q: "Is my information private when I search?",
@@ -60,7 +60,7 @@ const faqs = [
     items: [
       {
         q: "How do I list my massage practice on MasseurMatch?",
-        a: "Click 'List Your Practice' in the top navigation and follow the onboarding steps. You'll need your state massage therapy license, a profile photo, a description of your services, and your service areas and rates. Our team typically reviews new applications within 2–3 business days.",
+        a: "Click 'List Your Practice' in the top navigation and follow the onboarding steps. You'll need a profile photo, a description of your services, and your service areas and rates. Our team typically reviews new applications within 2–3 business days.",
       },
       {
         q: "What does it cost to list on MasseurMatch?",
@@ -71,8 +71,8 @@ const faqs = [
         a: "No. Any licensed massage therapist who is committed to providing a respectful, inclusive experience for all clients is welcome to list on MasseurMatch. LGBTQ+ identity is not required — commitment to inclusivity is.",
       },
       {
-        q: "How does MasseurMatch verify my license?",
-        a: "During onboarding, you'll submit your license number and issuing state. Our team cross-references this information with the relevant state licensing board. The process typically takes 1–2 business days.",
+        q: "How long does profile review take?",
+        a: "Most new profiles are reviewed within 1–2 business days. Keeping your bio, rates, neighborhood, and photos complete helps speed approval.",
       },
       {
         q: "Can I control who contacts me through my listing?",

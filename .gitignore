@@ -46,3 +46,6 @@ attached_assets/
 # Local temporary debug artifacts
 .tmp-dev.*
 tmp/
+
+# Generated Supabase manual migration bundle
+supabase/manual/apply_all_migrations.sql
