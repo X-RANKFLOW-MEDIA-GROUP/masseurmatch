@@ -16,6 +16,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [cities, services, profiles, blogPosts, neighborhoods, guides] = await Promise.all([
     buildCitiesSitemapEntries(now),
     buildServicesSitemapEntries(now),
+    buildNeighborhoodsSitemapEntries(now),
     buildProfilesSitemapEntries(now),
     buildBlogPostsSitemapEntries(now),
     buildNeighborhoodsSitemapEntries(now),
