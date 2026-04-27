@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -43,11 +43,7 @@ export function ReviewsList({ therapistId, averageRating = 0, totalReviews = 0 }
   const [totalPages, setTotalPages] = useState(1);
   const [distribution, setDistribution] = useState<RatingDistribution[]>([]);
 
-  useEffect(() => {
-    fetchReviews();
-  }, [therapistId, sortBy, page]);
-
-  async function fetchReviews() {
+  const fetchReviews = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(
@@ -61,7 +57,11 @@ export function ReviewsList({ therapistId, averageRating = 0, totalReviews = 0 }
       console.error("Failed to fetch reviews:", error);
     }
     setLoading(false);
-  }
+  }, [page, sortBy, therapistId]);
+
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
 
   async function markHelpful(reviewId: string) {
     try {
