@@ -52,7 +52,7 @@ function ExploreDropdown() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="flex items-center gap-1 font-sans text-sm text-muted-foreground hover:text-foreground transition-colors"
+        className="flex items-center gap-1 font-sans text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
       >
         Explore
         <ChevronDown
@@ -68,7 +68,7 @@ function ExploreDropdown() {
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.15 }}
             role="menu"
-            className="absolute top-full left-0 mt-3 w-52 bg-card/95 backdrop-blur-xl border border-border rounded-xl p-1.5 shadow-xl"
+            className="absolute top-full left-0 mt-3 w-52 bg-white/95 backdrop-blur-xl border border-slate-200 rounded-xl p-1.5 shadow-xl"
           >
             {exploreItems.map(({ href, label, icon: Icon }) => (
               <Link
@@ -76,7 +76,7 @@ function ExploreDropdown() {
                 href={href}
                 role="menuitem"
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg transition-colors"
+                className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-lg transition-colors"
               >
                 <Icon className="w-4 h-4 opacity-60" />
                 {label}
@@ -207,8 +207,8 @@ export default function SiteHeader() {
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled 
-          ? 'bg-background/95 backdrop-blur-xl border-b border-border' 
-          : 'bg-background/50 backdrop-blur-sm'
+          ? 'bg-white/90 backdrop-blur-xl border-b border-slate-200 shadow-sm' 
+          : 'bg-white/50 backdrop-blur-sm'
       }`}
     >
       <div className="w-full max-w-[1400px] mx-auto flex items-center justify-between px-6 lg:px-10 py-4">
@@ -217,8 +217,8 @@ export default function SiteHeader() {
           href="/"
           className="group flex items-center gap-2"
         >
-          <span className="font-serif text-[22px] font-medium tracking-tight text-foreground">
-            Masseur<span className="text-muted-foreground">Match</span>
+          <span className="font-display text-[24px] font-bold tracking-tight bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            MasseurMatch
           </span>
         </Link>
 
@@ -229,7 +229,7 @@ export default function SiteHeader() {
             <Link
               key={href}
               href={href}
-              className="px-4 py-2 text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted"
+              className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors rounded-lg"
             >
               {label}
             </Link>
@@ -237,19 +237,19 @@ export default function SiteHeader() {
         </nav>
 
         {/* Right CTAs — desktop + mobile hamburger */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <Link
             href="/login"
-            className="hidden md:flex px-4 py-2 text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="hidden md:flex px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
           >
             Log in
           </Link>
           <Link
             href="/signup"
-            className="hidden sm:flex h-10 px-5 items-center justify-center rounded-full text-[13px] font-semibold transition-all duration-300 bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-[1.02]"
+            className="hidden sm:flex h-10 px-6 items-center justify-center rounded-full text-sm font-semibold transition-all duration-300 bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg hover:scale-[1.02]"
           >
             Get Started
-            <ArrowUpRight className="ml-1.5 w-3.5 h-3.5" />
+            <ArrowUpRight className="ml-2 w-4 h-4" />
           </Link>
           <MobileNav />
         </div>
