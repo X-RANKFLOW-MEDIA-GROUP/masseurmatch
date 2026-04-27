@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Sora, Inter, Space_Grotesk } from "next/font/google";
 import { AppMotionShell } from "@/app/_components/app-motion-shell";
 import { JsonLd } from "@/app/_components/json-ld";
 import { SiteFooter } from "@/app/_components/site-footer";
@@ -11,6 +12,26 @@ import "leaflet/dist/leaflet.css";
 import "@/index.css";
 import "@/styles/mobile-responsive.css";
 import "@/styles/homepage-mobile-hotfix.css";
+
+const sora = Sora({
+  subsets: ["latin"],
+  variable: "--font-sora",
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
 
 const rootMetadata = createPageMetadata({
   title: "The safest and most trusted premium male massage directory",
@@ -33,7 +54,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${sora.variable} ${inter.variable} ${spaceGrotesk.variable}`}>
       <body className="theme-masseurmatch min-h-screen overflow-x-hidden font-sans text-foreground antialiased">
         <AppProviders>
           <JsonLd data={buildOrganizationJsonLd()} />

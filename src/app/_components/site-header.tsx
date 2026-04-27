@@ -38,7 +38,7 @@ const navLinks = [
 
 /* ── Explore dropdown (desktop) ───────────────────────── */
 
-function ExploreDropdown() {
+function ExploreDropdown({ isDarkHero = false }: { isDarkHero?: boolean }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -52,7 +52,11 @@ function ExploreDropdown() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="flex items-center gap-1 font-sans text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+        className={`flex items-center gap-1 font-sans text-sm font-medium transition-colors ${
+          isDarkHero 
+            ? 'text-white/80 hover:text-white' 
+            : 'text-[#4A4F5C] hover:text-[#0B1F3A]'
+        }`}
       >
         Explore
         <ChevronDown
@@ -200,6 +204,9 @@ export default function SiteHeader() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Determine if we're on a dark hero page (homepage)
+  const isDarkHero = isHomepage && !isScrolled;
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -10 }}
@@ -207,8 +214,10 @@ export default function SiteHeader() {
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled 
-          ? 'bg-white/90 backdrop-blur-xl border-b border-slate-200 shadow-sm' 
-          : 'bg-white/50 backdrop-blur-sm'
+          ? 'bg-white/95 backdrop-blur-xl border-b border-[#E2E6F0] shadow-sm' 
+          : isDarkHero
+            ? 'bg-transparent'
+            : 'bg-white/50 backdrop-blur-sm'
       }`}
     >
       <div className="w-full max-w-[1400px] mx-auto flex items-center justify-between px-6 lg:px-10 py-4">
@@ -217,19 +226,25 @@ export default function SiteHeader() {
           href="/"
           className="group flex items-center gap-2"
         >
-          <span className="font-display text-[24px] font-bold tracking-tight bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            MasseurMatch
+          <span className={`font-heading text-[24px] font-bold tracking-tight transition-colors ${
+            isDarkHero ? 'text-white' : 'text-[#0B1F3A]'
+          }`}>
+            Masseur<span className={isDarkHero ? 'text-[#FF8A1F]' : 'text-[#1E4B8F]'}>Match</span>
           </span>
         </Link>
 
         {/* Center Navigation — desktop */}
         <nav className="hidden lg:flex items-center gap-1">
-          <ExploreDropdown />
+          <ExploreDropdown isDarkHero={isDarkHero} />
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
-              className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors rounded-lg"
+              className={`px-4 py-2 text-sm font-medium transition-colors rounded-lg ${
+                isDarkHero 
+                  ? 'text-white/80 hover:text-white hover:bg-white/10' 
+                  : 'text-[#4A4F5C] hover:text-[#0B1F3A] hover:bg-[#F4F6F9]'
+              }`}
             >
               {label}
             </Link>
@@ -240,13 +255,15 @@ export default function SiteHeader() {
         <div className="flex items-center gap-3">
           <Link
             href="/login"
-            className="hidden md:flex px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+            className={`hidden md:flex px-4 py-2 text-sm font-medium transition-colors ${
+              isDarkHero ? 'text-white/80 hover:text-white' : 'text-[#4A4F5C] hover:text-[#0B1F3A]'
+            }`}
           >
             Log in
           </Link>
           <Link
             href="/signup"
-            className="hidden sm:flex h-10 px-6 items-center justify-center rounded-full text-sm font-semibold transition-all duration-300 bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg hover:scale-[1.02]"
+            className="hidden sm:flex h-10 px-6 items-center justify-center rounded-full text-sm font-semibold transition-all duration-300 bg-gradient-to-r from-[#FF8A1F] to-[#FF9E45] text-white hover:shadow-lg hover:shadow-[#FF8A1F]/30 hover:scale-[1.02]"
           >
             Get Started
             <ArrowUpRight className="ml-2 w-4 h-4" />
