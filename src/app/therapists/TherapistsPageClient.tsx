@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { PublicTherapistCard } from "@/app/_components/PublicTherapistCard";
-import type { PublicTherapist, TherapistTier } from "@/app/_lib/directory";
+import type { PublicTherapist } from "@/app/_lib/directory";
 
 type TherapistsPageClientProps = {
   items: PublicTherapist[];
@@ -13,7 +13,6 @@ type TherapistsPageClientProps = {
   filters: {
     city: string;
     modality: string;
-    tier: TherapistTier | "";
   };
 };
 
@@ -28,13 +27,11 @@ export default function TherapistsPageClient({
   const router = useRouter();
   const [city, setCity] = useState(filters.city);
   const [modality, setModality] = useState(filters.modality);
-  const [tier, setTier] = useState<TherapistTier | "">(filters.tier);
 
   useEffect(() => {
     setCity(filters.city);
     setModality(filters.modality);
-    setTier(filters.tier);
-  }, [filters.city, filters.modality, filters.tier]);
+  }, [filters.city, filters.modality]);
 
   const setParam = (key: string, value: string) => {
     const next = new URLSearchParams();
@@ -62,7 +59,7 @@ export default function TherapistsPageClient({
 
   return (
     <section className="mt-8">
-      <div className="grid gap-3 rounded-3xl border border-border bg-background p-5 shadow-sm md:grid-cols-3">
+      <div className="grid gap-3 rounded-2xl border border-border bg-background p-4 shadow-sm md:grid-cols-2">
         <div>
           <label htmlFor="therapists-filter-city" className="sr-only">Filter by city</label>
           <input
@@ -74,7 +71,7 @@ export default function TherapistsPageClient({
               setParam("city", value);
             }}
             placeholder="Filter by city"
-            className="rounded-md border border-border bg-background px-3 py-2"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
           />
         </div>
         <div>
@@ -88,27 +85,8 @@ export default function TherapistsPageClient({
               setParam("modality", value);
             }}
             placeholder="Filter by specialty"
-            className="rounded-md border border-border bg-background px-3 py-2"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
           />
-        </div>
-        <div>
-          <label htmlFor="therapists-filter-tier" className="sr-only">Filter by tier</label>
-          <select
-            id="therapists-filter-tier"
-            value={tier}
-            onChange={(event) => {
-              const value = (event.target.value as TherapistTier | "") || "";
-              setTier(value);
-              setParam("tier", value);
-            }}
-            className="rounded-md border border-border bg-background px-3 py-2"
-          >
-            <option value="">All tiers</option>
-            <option value="free">Free</option>
-            <option value="standard">Standard</option>
-            <option value="pro">Pro</option>
-            <option value="elite">Elite</option>
-          </select>
         </div>
       </div>
 
@@ -122,7 +100,6 @@ export default function TherapistsPageClient({
           onClick={() => {
             setCity("");
             setModality("");
-            setTier("");
             router.push(pathname || "/therapists");
           }}
         >
@@ -131,7 +108,7 @@ export default function TherapistsPageClient({
       </div>
 
       {items.length > 0 ? (
-        <div className="mt-6 grid gap-5 lg:grid-cols-2">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {items.map((item) => (
             <PublicTherapistCard key={item.id} therapist={item} />
           ))}
