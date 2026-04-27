@@ -147,7 +147,7 @@ export default function HowItWorksPage() {
           style={{
             background: "#0B1F3A",
             color: "#FCFBF8",
-            padding: "100px 24px 90px",
+            padding: "clamp(64px, 10vw, 100px) 20px clamp(56px, 8vw, 90px)",
             textAlign: "center",
           }}
         >
@@ -180,7 +180,7 @@ export default function HowItWorksPage() {
           </h1>
           <p
             style={{
-              fontSize: 17,
+              fontSize: "clamp(15px, 2.6vw, 17px)",
               lineHeight: 1.7,
               maxWidth: 500,
               margin: "0 auto 44px",
@@ -234,7 +234,7 @@ export default function HowItWorksPage() {
         <section
           style={{
             background: "#FF8A1F",
-            padding: "40px 24px",
+            padding: "clamp(28px, 5vw, 40px) 20px",
             textAlign: "center",
           }}
         >
@@ -256,7 +256,7 @@ export default function HowItWorksPage() {
         </section>
 
         {/* ── Client Steps ── */}
-        <section style={{ padding: "100px 24px" }}>
+        <section style={{ padding: "clamp(56px, 9vw, 100px) 20px" }}>
           <div style={{ maxWidth: 1060, margin: "0 auto" }}>
             <p
               style={{

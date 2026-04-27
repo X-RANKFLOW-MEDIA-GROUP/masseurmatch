@@ -146,7 +146,7 @@ export default function TermsPage() {
           style={{
             background: "#0B1F3A",
             color: "#FCFBF8",
-            padding: "80px 24px 72px",
+            padding: "clamp(56px, 8vw, 80px) 20px clamp(48px, 7vw, 72px)",
           }}
         >
           <div style={{ maxWidth: 820, margin: "0 auto" }}>
@@ -174,16 +174,16 @@ export default function TermsPage() {
             </h1>
             <p
               style={{
-                fontSize: 14,
+                fontSize: "clamp(12px, 2.5vw, 14px)",
                 opacity: 0.5,
                 fontFamily: "system-ui, sans-serif",
               }}
             >
-              Last Updated: March 1, 2025 — Effective immediately
+              Last Updated: April 27, 2026 — Effective immediately
             </p>
             <p
               style={{
-                fontSize: 16,
+                fontSize: "clamp(14px, 2.8vw, 16px)",
                 opacity: 0.65,
                 marginTop: 16,
                 fontFamily: "system-ui, sans-serif",
@@ -203,7 +203,7 @@ export default function TermsPage() {
           style={{
             maxWidth: 820,
             margin: "0 auto",
-            padding: "48px 16px 84px",
+            padding: "clamp(32px, 6vw, 48px) 16px clamp(56px, 8vw, 84px)",
             display: "grid",
             gridTemplateColumns: "minmax(0, 1fr)",
             gap: 28,
@@ -233,7 +233,7 @@ export default function TermsPage() {
                 href={`#${s.id}`}
                 style={{
                   display: "block",
-                  fontSize: 12,
+                  fontSize: 13,
                   fontFamily: "system-ui, sans-serif",
                   color: "#6B7280",
                   textDecoration: "none",
@@ -252,7 +252,7 @@ export default function TermsPage() {
               style={{
                 background: "#1E4B8F",
                 color: "#FCFBF8",
-                padding: "20px 24px",
+                padding: "18px 18px",
                 marginBottom: 48,
                 fontSize: 14,
                 fontFamily: "system-ui, sans-serif",
@@ -273,7 +273,7 @@ export default function TermsPage() {
               >
                 <h2
                   style={{
-                    fontSize: 19,
+                    fontSize: "clamp(18px, 3.2vw, 19px)",
                     fontWeight: 400,
                     marginBottom: 16,
                     paddingBottom: 12,
@@ -284,7 +284,7 @@ export default function TermsPage() {
                 </h2>
                 <div
                   style={{
-                    fontSize: 15,
+                    fontSize: "clamp(14px, 2.9vw, 15px)",
                     lineHeight: 1.85,
                     color: "#374151",
                     fontFamily: "system-ui, sans-serif",

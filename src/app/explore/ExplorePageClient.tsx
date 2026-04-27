@@ -1570,9 +1570,19 @@ export default function ExplorePageClient({
                   </p>
                 ) : null}
                 {geoDenied ? (
-                  <p className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-amber-600">
-                    Location permission denied — showing an approximate city fallback.
-                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-600">
+                      Location permission denied — showing an approximate city fallback.
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full"
+                      onClick={() => void requestLocation(true)}
+                    >
+                      Retry location
+                    </Button>
+                  </div>
                 ) : null}
               </div>
 
