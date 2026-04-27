@@ -7,24 +7,26 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   BarChart,
   BookUser,
+  CreditCard,
   Image as ImageIcon,
   LayoutDashboard,
   Loader2,
+  Mail,
   Menu,
   Settings,
-  Sparkles,
   UserCircle,
   X,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
-  { name: "Visao Geral", href: "/pro/dashboard", icon: LayoutDashboard },
-  { name: "Meu Perfil", href: "/pro/listing", icon: UserCircle },
-  { name: "Fotos", href: "/pro/photos", icon: ImageIcon },
-  { name: "Performance", href: "/pro/analytics", icon: BarChart },
-  { name: "Perfis", href: "/pro/profiles", icon: BookUser },
-  { name: "Configuracoes", href: "/pro/settings", icon: Settings },
+  { name: "Dashboard", href: "/pro/dashboard", icon: LayoutDashboard },
+  { name: "My Profile", href: "/pro/listing", icon: UserCircle },
+  { name: "Photos", href: "/pro/photos", icon: ImageIcon },
+  { name: "Inquiries", href: "/pro/inquiries", icon: Mail },
+  { name: "Analytics", href: "/pro/analytics", icon: BarChart },
+  { name: "Subscription", href: "/pro/subscription", icon: CreditCard },
+  { name: "Settings", href: "/pro/settings", icon: Settings },
 ];
 
 export default function ProLayoutClient({
@@ -99,18 +101,12 @@ export default function ProLayoutClient({
       </nav>
 
       <div className="m-4 rounded-xl border border-indigo-500/20 bg-gradient-to-b from-indigo-900/20 to-transparent p-4">
-        <div className="mb-2 flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-indigo-400" />
-          <span className="font-mono text-[10px] uppercase tracking-widest text-indigo-300">
-            Knotty AI
-          </span>
-        </div>
-        <p className="mb-3 font-sans text-xs text-slate-400">
-          Seu perfil esta 85% completo. Deixe a IA otimizar sua bio.
+        <p className="font-sans text-xs text-slate-400">
+          Need help?{" "}
+          <a href="mailto:support@masseurmatch.com" className="text-indigo-300 underline">
+            Contact support
+          </a>
         </p>
-        <button className="w-full rounded border border-indigo-500/20 bg-indigo-500/10 py-2 font-mono text-[10px] uppercase tracking-wider text-indigo-300 transition-colors hover:bg-indigo-500/20">
-          Otimizar Agora
-        </button>
       </div>
     </>
   );
@@ -130,7 +126,7 @@ export default function ProLayoutClient({
         </Link>
         <button
           onClick={() => setMobileOpen((prev) => !prev)}
-          aria-label={mobileOpen ? "Fechar menu" : "Abrir menu"}
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
           className="rounded-md p-1.5 text-slate-300 transition-colors hover:bg-slate-800"
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
