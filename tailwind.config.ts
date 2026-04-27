@@ -103,11 +103,11 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
-        serif: ["var(--font-playfair)", "Georgia", "serif"],
-        heading: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
-        display: ["var(--font-playfair)", "Georgia", "serif"],
-        mono: ["var(--font-dm-mono)", "monospace"],
+        sans: ["var(--font-dm-sans, 'DM Sans')", "system-ui", "sans-serif"],
+        serif: ["var(--font-playfair, 'Playfair Display')", "Georgia", "serif"],
+        heading: ["var(--font-dm-sans, 'DM Sans')", "system-ui", "sans-serif"],
+        display: ["var(--font-playfair, 'Playfair Display')", "Georgia", "serif"],
+        mono: ["var(--font-dm-mono, 'DM Mono')", "monospace"],
       },
       borderRadius: {
         xl: "1.25rem",

@@ -187,10 +187,10 @@ export default function SignupVerifyPage() {
 
   function handleSetPhone() {
     if (!phoneInputValue.trim() || phoneInputValue.length < 10) return;
-    
-    // PhoneInput already formats with country code
     setAccountInfo({
-      ...state,
+      fullName: state.fullName,
+      displayName: state.displayName,
+      email: state.email,
       phone: phoneInputValue,
     });
   }
