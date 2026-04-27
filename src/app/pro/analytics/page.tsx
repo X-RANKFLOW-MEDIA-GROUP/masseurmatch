@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, MousePointerClick, Heart, TrendingUp } from "lucide-react";
+import { BarChart2, Eye, Heart, MousePointerClick } from "lucide-react";
 
 export default function AnalyticsPage() {
   return (
@@ -8,64 +8,25 @@ export default function AnalyticsPage() {
       <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
           <h1 className="font-display text-3xl font-medium tracking-tight text-slate-900">
-            Performance
+            Analytics
           </h1>
-          <p className="mt-2 font-sans text-slate-500">Dados dos últimos 30 dias.</p>
+          <p className="mt-2 font-sans text-slate-500">Profile performance over time.</p>
         </div>
-        <select className="border border-slate-200 bg-white px-4 py-2 font-sans text-sm text-slate-700 outline-none">
-          <option>Últimos 30 Dias</option>
-          <option>Este Ano</option>
-        </select>
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <StatCard title="Impressões nas Buscas" value="8,402" trend="+12.5%" icon={Eye} />
-        <StatCard
-          title="Visualizações de Perfil"
-          value="1,248"
-          trend="+5.2%"
-          icon={MousePointerClick}
-        />
-        <StatCard
-          title="Guardado nos Favoritos"
-          value="142"
-          trend="+18.1%"
-          icon={Heart}
-          highlight
-        />
+        <StatCard title="Search Impressions" icon={Eye} />
+        <StatCard title="Profile Views" icon={MousePointerClick} />
+        <StatCard title="Saved to Favorites" icon={Heart} highlight />
       </div>
 
-      {/* CSS-only bar chart */}
-      <div className="mt-8 border border-slate-200/60 bg-white p-6 shadow-sm sm:p-8">
-        <div className="mb-8 flex items-center justify-between">
-          <h3 className="font-display text-xl font-medium text-slate-900">Tráfego do Perfil</h3>
-          <span className="flex items-center gap-1 bg-emerald-50 px-2 py-1 font-mono text-xs text-emerald-600">
-            <TrendingUp className="h-3 w-3" /> Em Crescimento
-          </span>
-        </div>
-
-        <div className="flex h-64 w-full items-end justify-between gap-2 pt-10 sm:gap-4">
-          {[40, 25, 45, 30, 60, 85, 55, 75, 100, 80, 95, 65].map((height, i) => (
-            <div
-              key={i}
-              className="group relative flex w-full justify-center bg-slate-100 transition-colors hover:bg-slate-200"
-              style={{ height: `${height}%` }}
-            >
-              <div className="absolute -top-8 font-mono text-[10px] text-slate-600 opacity-0 transition-opacity group-hover:opacity-100">
-                {height * 10}
-              </div>
-              <div
-                className="mt-auto w-full bg-slate-900"
-                style={{ height: `${height * 0.4}%` }}
-              />
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 flex justify-between border-t border-slate-100 pt-4 font-mono text-[10px] uppercase text-slate-400">
-          <span>Dia 1</span>
-          <span>Dia 15</span>
-          <span>Hoje</span>
-        </div>
+      <div className="mt-8 flex flex-col items-center justify-center gap-4 rounded-xl border border-slate-200 bg-white py-20 text-center shadow-sm">
+        <BarChart2 className="h-10 w-10 text-slate-300" />
+        <h2 className="font-display text-xl font-medium text-slate-700">Analytics coming soon</h2>
+        <p className="max-w-sm text-sm text-slate-500">
+          Detailed profile traffic reports will be available here. Check back after your listing
+          has been live for a few days.
+        </p>
       </div>
     </div>
   );
@@ -73,14 +34,10 @@ export default function AnalyticsPage() {
 
 function StatCard({
   title,
-  value,
-  trend,
   icon: Icon,
   highlight = false,
 }: {
   title: string;
-  value: string;
-  trend: string;
   icon: React.ComponentType<{ className?: string }>;
   highlight?: boolean;
 }) {
@@ -103,13 +60,15 @@ function StatCard({
       <div className="flex items-end gap-3">
         <span
           className={`font-display text-4xl font-medium ${
-            highlight ? "text-white" : "text-slate-900"
+            highlight ? "text-slate-400" : "text-slate-400"
           }`}
         >
-          {value}
+          —
         </span>
-        <span className="mb-1 font-mono text-xs text-emerald-500">{trend}</span>
       </div>
+      <p className={`mt-1 text-xs italic ${highlight ? "text-slate-500" : "text-slate-400"}`}>
+        Coming soon
+      </p>
     </div>
   );
 }
