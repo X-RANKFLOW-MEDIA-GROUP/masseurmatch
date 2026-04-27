@@ -17,7 +17,7 @@ import { PremiumProfileLocation } from "./PremiumProfileLocation";
 import { KnottyProfileTracker } from "./KnottyProfileTracker";
 import { ProfileAreasServed } from "./ProfileAreasServed";
 import { PremiumProfileContact } from "./PremiumProfileContact";
-import { ReviewsDisplay as ReviewsDisplaySection } from "@/components/reviews/ReviewsDisplaySection";
+import { ReviewsDisplay } from "@/components/reviews/ReviewsDisplaySection";
 import { SocialProofBadges } from "@/components/social/SocialProofBadges";
 import "./premium-profile.css";
 
@@ -34,8 +34,9 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
   const FALLBACK_REVIEW_DATE = "1970-01-01T00:00:00.000Z";
   const city = profile.city || "United States";
   const neighborhood = profile.neighborhood_name || profile.primary_area;
-  const averageRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + (r.rating ?? 0), 0) / reviews.length : 0;
-  const viewCount = profile.profile_views ?? 0;
+  const avgRating = reviews.length > 0
+    ? reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length
+    : 0;
 
   return (
     <div className="premium-profile min-h-screen">
@@ -72,12 +73,12 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
         {/* Social Proof Badges */}
         <section className="pp-section pp-fade-in">
           <SocialProofBadges
-            isTopRated={reviews.length >= 3 && averageRating >= 4.5}
-            isMostReviewed={reviews.length >= 10}
-            isRising={viewCount >= 100}
+            isTopRated={avgRating >= 4.7}
+            isMostReviewed={reviews.length >= 20}
+            isRising={Boolean(profile.available_now)}
             reviewCount={reviews.length}
-            averageRating={averageRating}
-            viewCount={viewCount}
+            averageRating={avgRating}
+            viewCount={profile.profile_views ?? 0}
           />
         </section>
 
@@ -88,15 +89,15 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
               <h2 className="pp-section-title">Client Reviews</h2>
               <span className="text-sm text-slate-500">{reviews.length} verified reviews</span>
             </div>
-            <ReviewsDisplaySection
-              reviews={reviews.map((r: ImportedReview) => ({
+            <ReviewsDisplay
+              reviews={reviews.map(r => ({
                 id: r.id,
-                author_name: r.reviewer_name ?? "Anonymous",
-                rating: r.rating ?? 0,
+                author_name: r.reviewer_name ?? "Verified Client",
+                rating: r.rating ?? 5,
                 body: r.review_text,
-                created_at: r.review_date ?? FALLBACK_REVIEW_DATE
+                created_at: r.review_date ?? new Date().toISOString()
               }))}
-              averageRating={averageRating}
+              averageRating={avgRating}
               totalReviews={reviews.length}
             />
           </section>

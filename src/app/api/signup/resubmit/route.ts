@@ -1,26 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getRequestSession } from "@/app/api/_lib/session";
-import { persistSubmittedProfile } from "../_lib/profile-submission";
+import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 
 export async function POST(request: NextRequest) {
   try {
+    const session = getRequestSession(request as unknown as Request);
+    if (!session) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
     const body = await request.json();
-    const { profile, stripeIdentitySessionId } = body;
+    const { profile } = body;
 
     if (!profile) {
       return NextResponse.json({ error: "Missing profile data." }, { status: 400 });
     }
 
-    // Require an authenticated session to persist the resubmission
-    const session = getRequestSession(request);
-    if (!session) {
-      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
-    }
+    const adminClient = createSupabaseAdminClient();
 
-    const persistError = await persistSubmittedProfile(session.userId, profile);
-    if (persistError) {
-      console.error("[signup/resubmit] Profile update failed:", persistError);
-      return NextResponse.json({ error: "Could not update your profile. Please try again." }, { status: 500 });
+    const { error: updateError } = await adminClient
+      .from("profiles")
+      .update({
+        bio: profile.bio || null,
+        city: profile.city || null,
+        state: profile.state || null,
+        specialties: profile.serviceCategories?.length ? profile.serviceCategories : null,
+        incall_price: profile.startingPrice ? Number(profile.startingPrice) : null,
+        status: "pending_approval",
+        is_active: false,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("user_id", session.userId);
+
+    if (updateError) {
+      console.error("[signup/resubmit] profile update failed:", updateError.message);
+      return NextResponse.json({ error: "Failed to update profile." }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
