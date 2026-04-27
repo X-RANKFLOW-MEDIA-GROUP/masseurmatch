@@ -17,7 +17,7 @@ import { PremiumProfileLocation } from "./PremiumProfileLocation";
 import { KnottyProfileTracker } from "./KnottyProfileTracker";
 import { ProfileAreasServed } from "./ProfileAreasServed";
 import { PremiumProfileContact } from "./PremiumProfileContact";
-import { ReviewsDisplaySection } from "@/components/reviews/ReviewsDisplaySection";
+import { ReviewsDisplay } from "@/components/reviews/ReviewsDisplaySection";
 import { SocialProofBadges } from "@/components/social/SocialProofBadges";
 import "./premium-profile.css";
 
@@ -71,8 +71,10 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
           <SocialProofBadges
             reviewCount={reviews.length}
             averageRating={reviews.length > 0 ? (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length) : 0}
-            isVerified={profile.is_verified_identity}
-            isPremium={profile.subscription_tier === 'pro' || profile.subscription_tier === 'elite'}
+            isTopRated={reviews.length > 0 && (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length) >= 4.5}
+            isMostReviewed={reviews.length >= 10}
+            isRising={false}
+            viewCount={profile.profile_views ?? 0}
           />
         </section>
 
@@ -83,13 +85,13 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
               <h2 className="pp-section-title">Client Reviews</h2>
               <span className="text-sm text-slate-500">{reviews.length} verified reviews</span>
             </div>
-            <ReviewsDisplaySection
+            <ReviewsDisplay
               reviews={reviews.map(r => ({
                 id: r.id,
-                author_name: r.author_name,
-                rating: r.rating,
-                body: r.body,
-                created_at: r.created_at
+                author_name: r.reviewer_name ?? "Anonymous",
+                rating: r.rating ?? 0,
+                body: r.review_text,
+                created_at: r.review_date ?? new Date().toISOString()
               }))}
               averageRating={reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length}
               totalReviews={reviews.length}
