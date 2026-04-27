@@ -145,6 +145,7 @@ export function PremiumHomepage({ featuredTherapists, totalTherapists, cityCount
                     <div className="mb-4 rounded-lg overflow-hidden h-64 bg-gradient-to-br from-purple-400 to-pink-400 relative">
                       {therapist.avatar_url ? (
                         <img src={therapist.avatar_url ?? undefined} alt={therapist.display_name || "Therapist"} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        <img src={therapist.avatar_url} alt={therapist.display_name || "Therapist"} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <Users className="w-16 h-16 text-white opacity-50" />
