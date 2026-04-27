@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import Link from "next/link";
+import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "List Your Massage Practice | For Therapists – MasseurMatch",
+  title: "List Your Massage Practice | For Therapists - MasseurMatch",
   description:
     "Grow your massage therapy practice with MasseurMatch. Get discovered by LGBTQ+-affirming clients, manage your profile, and build a sustainable independent business.",
   openGraph: {
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  name: "List Your Massage Practice – MasseurMatch",
+  name: "List Your Massage Practice - MasseurMatch",
   url: "https://masseurmatch.com/for-therapists",
   description:
     "MasseurMatch helps independent massage therapists grow their practices by connecting them with LGBTQ+-affirming clients across the United States.",
@@ -31,41 +31,41 @@ const jsonLd = {
   },
   potentialAction: {
     "@type": "RegisterAction",
-    target: "https://masseurmatch.com/therapists/register",
+    target: "https://masseurmatch.com/register",
     name: "List Your Practice",
   },
 };
 
 const benefits = [
   {
-    icon: "◎",
+    icon: "01",
     title: "Reach clients who value you",
     body: "Our community actively seeks inclusive, affirming therapists. Every client browsing MasseurMatch is already aligned with your values.",
   },
   {
-    icon: "◈",
+    icon: "02",
     title: "Own your professional identity",
-    body: "Build a profile that represents your full practice — modalities, training, rates, availability, and photos. No generic templates.",
+    body: "Build a profile that represents your full practice - modalities, training, rates, availability, and photos. No generic templates.",
   },
   {
-    icon: "✦",
+    icon: "03",
     title: "No bookings taken from you",
-    body: "Clients contact you directly. We don't insert ourselves into the transaction or take a booking fee. Your business stays your business.",
+    body: "Clients contact you directly. We do not insert ourselves into the transaction or take a booking fee. Your business stays your business.",
   },
   {
-    icon: "⬡",
+    icon: "04",
     title: "Verified badge builds trust",
-    body: "Our verification process signals to clients that you're licensed and committed to professional standards — before they even read your bio.",
+    body: "Our verification process signals to clients that you are committed to professional standards before they even read your bio.",
   },
   {
-    icon: "◑",
+    icon: "05",
     title: "Built for independent therapists",
     body: "No employer. No franchise. No commission. Just a high-quality directory that sends you clients and gets out of the way.",
   },
   {
-    icon: "▲",
+    icon: "06",
     title: "SEO-powered visibility",
-    body: "Your profile is indexed by Google and optimized for local searches like 'LGBTQ+ massage therapist Dallas.' We do the SEO work so you don't have to.",
+    body: "Your profile is indexed by Google and optimized for local searches like 'LGBTQ+ massage therapist Dallas.' We do the SEO work so you do not have to.",
   },
 ];
 
@@ -77,8 +77,8 @@ const steps = [
   },
   {
     n: "02",
-    title: "Submit your license",
-    body: "Our team verifies your state massage therapy license within 1–2 business days.",
+    title: "Submit your profile details",
+    body: "Our team reviews profile quality and safety details within 1-2 business days.",
   },
   {
     n: "03",
@@ -102,14 +102,14 @@ const testimonials = [
   },
   {
     quote:
-      "I tried other directories but the client base here is completely different — more intentional, more respectful. My cancellation rate dropped significantly.",
+      "I tried other directories but the client base here is completely different - more intentional, more respectful. My cancellation rate dropped significantly.",
     name: "Marcus R.",
     location: "Chicago, IL",
     years: "LMT, 5 years",
   },
   {
     quote:
-      "Setting up was fast and the verification gave me credibility I couldn't build on my own website alone. Clients trust the badge.",
+      "Setting up was fast and the verification gave me credibility I could not build on my own website alone. Clients trust the badge.",
     name: "Elena V.",
     location: "Miami, FL",
     years: "LMT, 11 years",
@@ -132,7 +132,7 @@ export default function ForTherapistsPage() {
           fontFamily: "'Georgia', 'Times New Roman', serif",
         }}
       >
-        {/* ── Hero ── */}
+        {/* Hero */}
         <section
           style={{
             background: "#0B1F3A",
@@ -143,7 +143,6 @@ export default function ForTherapistsPage() {
             overflow: "hidden",
           }}
         >
-          {/* background pattern */}
           {[420, 580, 740].map((size) => (
             <div
               key={size}
@@ -185,8 +184,7 @@ export default function ForTherapistsPage() {
               position: "relative",
             }}
           >
-            Your practice deserves
-            <br />
+            Your practice deserves{" "}
             <em style={{ color: "#FF8A1F", fontStyle: "italic" }}>
               the right clients.
             </em>
@@ -217,7 +215,7 @@ export default function ForTherapistsPage() {
             }}
           >
             <Link
-              href="/therapists/register"
+              href="/register"
               style={{
                 display: "inline-block",
                 padding: "16px 40px",
@@ -231,7 +229,7 @@ export default function ForTherapistsPage() {
                 fontWeight: 700,
               }}
             >
-              List Your Practice — Free
+              List Your Practice - Free
             </Link>
             <Link
               href="/pricing"
@@ -253,7 +251,7 @@ export default function ForTherapistsPage() {
           </div>
         </section>
 
-        {/* ── Social Proof Bar ── */}
+        {/* Social Proof Bar */}
         <section
           style={{
             background: "#1E4B8F",
@@ -276,8 +274,8 @@ export default function ForTherapistsPage() {
               { value: "104", label: "Cities" },
               { value: "$0", label: "Booking Commission" },
               { value: "48h", label: "Average Verification Time" },
-            ].map((s) => (
-              <div key={s.label} style={{ textAlign: "center" }}>
+            ].map((stat) => (
+              <div key={stat.label} style={{ textAlign: "center" }}>
                 <div
                   style={{
                     fontSize: 28,
@@ -286,7 +284,7 @@ export default function ForTherapistsPage() {
                     fontFamily: "system-ui, sans-serif",
                   }}
                 >
-                  {s.value}
+                  {stat.value}
                 </div>
                 <div
                   style={{
@@ -298,14 +296,14 @@ export default function ForTherapistsPage() {
                     fontFamily: "system-ui, sans-serif",
                   }}
                 >
-                  {s.label}
+                  {stat.label}
                 </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* ── Benefits ── */}
+        {/* Benefits */}
         <section style={{ padding: "100px 24px" }}>
           <div style={{ maxWidth: 1100, margin: "0 auto" }}>
             <p
@@ -329,7 +327,7 @@ export default function ForTherapistsPage() {
                 lineHeight: 1.25,
               }}
             >
-              Everything you need. Nothing you don't.
+              Everything you need. Nothing you do not.
             </h2>
             <div
               style={{
@@ -338,15 +336,15 @@ export default function ForTherapistsPage() {
                 gap: 2,
               }}
             >
-              {benefits.map((b) => (
+              {benefits.map((benefit) => (
                 <div
-                  key={b.title}
+                  key={benefit.title}
                   style={{ background: "#fff", padding: "40px 36px" }}
                 >
                   <div
                     style={{ fontSize: 26, color: "#FF8A1F", marginBottom: 18 }}
                   >
-                    {b.icon}
+                    {benefit.icon}
                   </div>
                   <h3
                     style={{
@@ -356,7 +354,7 @@ export default function ForTherapistsPage() {
                       lineHeight: 1.3,
                     }}
                   >
-                    {b.title}
+                    {benefit.title}
                   </h3>
                   <p
                     style={{
@@ -366,7 +364,7 @@ export default function ForTherapistsPage() {
                       fontFamily: "system-ui, sans-serif",
                     }}
                   >
-                    {b.body}
+                    {benefit.body}
                   </p>
                 </div>
               ))}
@@ -374,7 +372,7 @@ export default function ForTherapistsPage() {
           </div>
         </section>
 
-        {/* ── How It Works ── */}
+        {/* How It Works */}
         <section
           style={{
             background: "#0B1F3A",
@@ -413,13 +411,13 @@ export default function ForTherapistsPage() {
                 gap: 0,
               }}
             >
-              {steps.map((s, i) => (
+              {steps.map((step, index) => (
                 <div
-                  key={s.n}
+                  key={step.n}
                   style={{
                     padding: "36px 28px",
                     borderLeft:
-                      i > 0 ? "1px solid rgba(252,251,248,0.1)" : "none",
+                      index > 0 ? "1px solid rgba(252,251,248,0.1)" : "none",
                   }}
                 >
                   <div
@@ -432,7 +430,7 @@ export default function ForTherapistsPage() {
                       lineHeight: 1,
                     }}
                   >
-                    {s.n}
+                    {step.n}
                   </div>
                   <h3
                     style={{
@@ -441,7 +439,7 @@ export default function ForTherapistsPage() {
                       marginBottom: 12,
                     }}
                   >
-                    {s.title}
+                    {step.title}
                   </h3>
                   <p
                     style={{
@@ -451,7 +449,7 @@ export default function ForTherapistsPage() {
                       fontFamily: "system-ui, sans-serif",
                     }}
                   >
-                    {s.body}
+                    {step.body}
                   </p>
                 </div>
               ))}
@@ -459,7 +457,7 @@ export default function ForTherapistsPage() {
           </div>
         </section>
 
-        {/* ── Testimonials ── */}
+        {/* Testimonials */}
         <section style={{ padding: "100px 24px" }}>
           <div style={{ maxWidth: 1100, margin: "0 auto" }}>
             <p
@@ -490,9 +488,9 @@ export default function ForTherapistsPage() {
                 gap: 2,
               }}
             >
-              {testimonials.map((t) => (
+              {testimonials.map((testimonial) => (
                 <blockquote
-                  key={t.name}
+                  key={testimonial.name}
                   style={{
                     background: "#fff",
                     padding: "40px 36px",
@@ -510,7 +508,7 @@ export default function ForTherapistsPage() {
                       fontFamily: "system-ui, sans-serif",
                     }}
                   >
-                    &ldquo;{t.quote}&rdquo;
+                    &ldquo;{testimonial.quote}&rdquo;
                   </p>
                   <footer>
                     <div
@@ -521,7 +519,7 @@ export default function ForTherapistsPage() {
                         fontFamily: "system-ui, sans-serif",
                       }}
                     >
-                      {t.name}
+                      {testimonial.name}
                     </div>
                     <div
                       style={{
@@ -531,7 +529,7 @@ export default function ForTherapistsPage() {
                         marginTop: 2,
                       }}
                     >
-                      {t.location} · {t.years}
+                      {testimonial.location} | {testimonial.years}
                     </div>
                   </footer>
                 </blockquote>
@@ -540,7 +538,7 @@ export default function ForTherapistsPage() {
           </div>
         </section>
 
-        {/* ── Requirements ── */}
+        {/* Requirements */}
         <section
           style={{
             background: "#FCFBF8",
@@ -573,15 +571,15 @@ export default function ForTherapistsPage() {
               }}
             >
               {[
-                "Valid state massage therapy license",
+                "Accurate service profile details",
                 "License in good standing",
                 "Commitment to LGBTQ+-inclusive practice",
                 "Accurate, truthful profile information",
                 "Professional profile photo",
                 "Legally operating independent practice",
-              ].map((req) => (
+              ].map((requirement) => (
                 <div
-                  key={req}
+                  key={requirement}
                   style={{
                     display: "flex",
                     gap: 12,
@@ -591,7 +589,7 @@ export default function ForTherapistsPage() {
                   }}
                 >
                   <span style={{ color: "#FF8A1F", marginTop: 2, flexShrink: 0 }}>
-                    ✓
+                    +
                   </span>
                   <span
                     style={{
@@ -601,7 +599,7 @@ export default function ForTherapistsPage() {
                       lineHeight: 1.5,
                     }}
                   >
-                    {req}
+                    {requirement}
                   </span>
                 </div>
               ))}
@@ -609,7 +607,7 @@ export default function ForTherapistsPage() {
           </div>
         </section>
 
-        {/* ── CTA ── */}
+        {/* CTA */}
         <section
           style={{
             background: "#FF8A1F",
@@ -640,9 +638,16 @@ export default function ForTherapistsPage() {
           >
             Free listing. No commitment. Live within 48 hours.
           </p>
-          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: 12,
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
             <Link
-              href="/therapists/register"
+              href="/register"
               style={{
                 display: "inline-block",
                 padding: "16px 44px",

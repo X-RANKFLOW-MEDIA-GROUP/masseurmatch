@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { cache } from "react";
 import { notFound } from "next/navigation";
 import { CityDirectoryPage } from "@/app/_components/city-directory-page";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
@@ -29,18 +28,17 @@ export function generateStaticParams(): Params[] {
   });
 }
 
-const fetchKeywordTherapists = cache(
-  (cityName: string, segmentSlug: string, keywordSlug: string) =>
-    getPublicTherapists({
-      city: cityName,
-      page: 1,
-      pageSize: 9,
-      ...resolveDirectoryFilters(
-        getSegmentSearchFilters(segmentSlug),
-        getKeywordSearchFilters(keywordSlug),
-      ),
-    }),
-);
+async function fetchKeywordTherapists(cityName: string, segmentSlug: string, keywordSlug: string) {
+  return getPublicTherapists({
+    city: cityName,
+    page: 1,
+    pageSize: 9,
+    ...resolveDirectoryFilters(
+      getSegmentSearchFilters(segmentSlug),
+      getKeywordSearchFilters(keywordSlug),
+    ),
+  });
+}
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const resolvedParams = await params;

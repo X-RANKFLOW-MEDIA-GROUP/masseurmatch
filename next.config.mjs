@@ -61,16 +61,32 @@ const LEGACY_REDIRECTS = [
   // Legacy SPA routes → App Router
   { source: "/Auth",    destination: "/auth",    permanent: true },
   { source: "/Privacy", destination: "/privacy", permanent: true },
+  // Legacy alias for the therapists directory
+  { source: "/massage-therapists", destination: "/therapists", permanent: true },
 ];
+
+const isDev = process.env.NODE_ENV !== "production";
+
+const CONTENT_SECURITY_POLICY = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "frame-ancestors 'self'",
+  "object-src 'none'",
+  "form-action 'self'",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data: https:",
+  "style-src 'self' 'unsafe-inline' https:",
+  `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}https://js.stripe.com https://vercel.live`,
+  "connect-src 'self' https://*.supabase.co https://api.stripe.com https://vercel.live https://*.vercel.app https://*.vercel.sh",
+  "frame-src 'self' http://localhost:* https://*.vusercontent.net https://*.lite.vusercontent.net https://generated.vusercontent.net https://*.vercel.run https://*.vercel.app https://*.vercel.sh https://vercel.live https://vercel.com https://vercel.fides-cdn.ethyca.com https://js.stripe.com https://hooks.stripe.com https://*.accounts.dev https://*.clerk.accounts.dev https://ops.askchapter.org https://*.supabase.co",
+  "worker-src 'self' blob:",
+  "upgrade-insecure-requests" // Adicionado para forçar HTTPS em todas as requisições em produção
+].join("; ");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typedRoutes: false,
   allowedDevOrigins: ["100.69.207.7", "localhost", "127.0.0.1", "::1", "*.replit.dev", "*.janeway.replit.dev"],
-  experimental: {
-    webpackBuildWorker: true,
-    webpackMemoryOptimizations: true,
-  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
@@ -101,8 +117,12 @@ const nextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: "frame-src 'self' http://localhost:* https://*.vusercontent.net/ https://*.lite.vusercontent.net/ https://generated.vusercontent.net/ https://*.vercel.run/ https://*.vercel.app/ https://*.vercel.sh/ https://vercel.live/ https://vercel.com https://vercel.fides-cdn.ethyca.com/ https://js.stripe.com/ https://*.accounts.dev https://*.clerk.accounts.dev https://ops.askchapter.org https://*.supabase.co/; connect-src 'self' https://*.supabase.co;",
+            value: CONTENT_SECURITY_POLICY,
           },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self)" },
         ],
       },
     ];

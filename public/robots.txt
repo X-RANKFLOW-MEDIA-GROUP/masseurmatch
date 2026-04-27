@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /auth/
+Disallow: /pro/dashboard/
+
+# Allow specific pages
+Allow: /explore/
+Allow: /therapists/
+
+# Crawl delay to be respectful
+Crawl-delay: 1
+
+# Sitemap
+Sitemap: https://masseurmatch.com/sitemap.xml

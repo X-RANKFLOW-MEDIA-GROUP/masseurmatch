@@ -99,24 +99,49 @@ export function PremiumProfileAbout({ profile, reviews = [] }: Props) {
               <div>
                 <div className="text-xs font-semibold text-white/90">LMT Certified</div>
                 <div className="text-[11px] text-[var(--text-muted)]">Licensed Massage Therapist</div>
-                <div className="text-[11px] text-[var(--text-muted)]">Active since {2025 - yearsExp}</div>
+                <div className="text-[11px] text-[var(--text-muted)]">Active since {new Date().getFullYear() - yearsExp}</div>
               </div>
             </div>
           </div>
 
-          {/* Training */}
+          {/* Training / Education */}
           <div className="pp-sidebar-card">
-            <h4>Training</h4>
-            <div className="flex gap-3 items-start">
-              <div className="w-9 h-9 rounded-lg bg-[rgba(30,75,143,0.3)] flex items-center justify-center flex-shrink-0">
-                <GraduationCap className="w-4 h-4 text-[#7ab3ff]" />
+            <h4>Training & Education</h4>
+            {profile.training && profile.training.length > 0 ? (
+              profile.training.map((t, i) => (
+                <div key={i} className="flex gap-3 items-start mb-3 last:mb-0">
+                  <div className="w-9 h-9 rounded-lg bg-[rgba(30,75,143,0.3)] flex items-center justify-center flex-shrink-0">
+                    <Award className="w-4 h-4 text-[#7ab3ff]" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold text-white/90">{t.label}</div>
+                    {t.detail && <div className="text-[11px] text-[var(--text-muted)]">{t.detail}</div>}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="flex gap-3 items-start">
+                <div className="w-9 h-9 rounded-lg bg-[rgba(30,75,143,0.3)] flex items-center justify-center flex-shrink-0">
+                  <GraduationCap className="w-4 h-4 text-[#7ab3ff]" />
+                </div>
+                <div>
+                  <div className="text-xs font-semibold text-white/90">Professional Training</div>
+                  <div className="text-[11px] text-[var(--text-muted)]">{city} area</div>
+                  <div className="text-[11px] text-[var(--text-muted)]">500+ clinical hours</div>
+                </div>
               </div>
-              <div>
-                <div className="text-xs font-semibold text-white/90">Professional Training</div>
-                <div className="text-[11px] text-[var(--text-muted)]">{city} area</div>
-                <div className="text-[11px] text-[var(--text-muted)]">500+ clinical hours</div>
+            )}
+            {profile.education && (
+              <div className="flex gap-3 items-start mt-3">
+                <div className="w-9 h-9 rounded-lg bg-[rgba(30,75,143,0.3)] flex items-center justify-center flex-shrink-0">
+                  <GraduationCap className="w-4 h-4 text-[#7ab3ff]" />
+                </div>
+                <div>
+                  <div className="text-xs font-semibold text-white/90">Higher Education</div>
+                  <div className="text-[11px] text-[var(--text-muted)]">{profile.education}</div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

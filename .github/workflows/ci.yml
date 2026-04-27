@@ -38,6 +38,24 @@ env:
   SITEMAP_SUPABASE_KEY: ${{ secrets.SITEMAP_SUPABASE_KEY }}
 
 jobs:
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install gitleaks (OSS)
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/main/install.sh | sh -s -- -b /usr/local/bin v8.24.2
+      - name: Scan for secrets (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          fail: true
+          redact: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   typecheck:
     name: Typecheck
     runs-on: ubuntu-latest
@@ -84,3 +102,32 @@ jobs:
             ${{ runner.os }}-nextjs-
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: [build]
+    env:
+      PLAYWRIGHT_BASE_URL: ${{ vars.PLAYWRIGHT_BASE_URL }}
+    # Only runs when a base URL is configured (production or preview deployment).
+    # Set PLAYWRIGHT_BASE_URL as a GitHub Actions repo variable (Settings → Variables).
+    # A base URL is not sensitive — use vars, not secrets.
+    if: ${{ vars.PLAYWRIGHT_BASE_URL != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - name: Run E2E tests
+        run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

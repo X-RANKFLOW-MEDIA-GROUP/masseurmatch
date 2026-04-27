@@ -120,19 +120,18 @@ export default function KnottyGlassChat({
   };
 
   return (
-    <div className="relative flex h-[450px] w-full flex-col overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.06] shadow-[0_32px_100px_rgba(2,6,23,0.55)] backdrop-blur-3xl">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.18),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(15,23,42,0.7),transparent_48%)]" />
-      <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+    <div className="relative flex h-[450px] w-full flex-col overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-[0_32px_100px_rgba(2,6,23,0.15)]">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.08),transparent_34%)]" />
 
-      <div className="relative z-10 flex items-center gap-3 border-b border-white/10 bg-gradient-to-r from-white/10 via-white/[0.03] to-transparent px-6 py-4">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-sky-300/20 bg-sky-400/15 text-sky-100 shadow-[0_0_24px_rgba(56,189,248,0.18)]">
+      <div className="relative z-10 flex items-center gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white px-6 py-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-sky-200 bg-sky-100 text-sky-600 shadow-sm">
           <Sparkles className="h-5 w-5" />
         </div>
         <div>
-          <h3 className="font-display text-base font-medium tracking-tight text-white">
+          <h3 className="font-display text-base font-semibold tracking-tight text-slate-900">
             Knotty AI
           </h3>
-          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-emerald-300/90">
+          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-emerald-600">
             Online / Gemini Powered
           </p>
         </div>
@@ -140,7 +139,7 @@ export default function KnottyGlassChat({
 
       <div
         ref={bodyRef}
-        className="relative z-10 flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-6"
+        className="relative z-10 flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-6 bg-white"
       >
         {messages.map((message) => (
           <motion.div
@@ -155,8 +154,8 @@ export default function KnottyGlassChat({
             <div
               className={`max-w-[85%] rounded-2xl px-4 py-3 font-sans text-sm leading-relaxed ${
                 message.role === "user"
-                  ? "rounded-tr-none border border-sky-300/10 bg-sky-500/85 text-white shadow-[0_10px_30px_rgba(14,165,233,0.22)]"
-                  : "rounded-tl-none border border-white/10 bg-white/[0.08] text-slate-100"
+                  ? "rounded-tr-none border border-sky-200 bg-sky-500 text-white shadow-md"
+                  : "rounded-tl-none border border-slate-200 bg-slate-100 text-slate-900"
               }`}
             >
               {message.text}
@@ -171,11 +170,11 @@ export default function KnottyGlassChat({
             transition={{ duration: 0.25 }}
             className="flex justify-start"
           >
-            <div className="flex items-center gap-1 rounded-2xl rounded-tl-none border border-white/10 bg-white/[0.06] px-4 py-3">
+            <div className="flex items-center gap-1 rounded-2xl rounded-tl-none border border-slate-200 bg-slate-100 px-4 py-3">
               {[0, 1, 2].map((index) => (
                 <motion.span
                   key={index}
-                  className="h-1.5 w-1.5 rounded-full bg-slate-300/80"
+                  className="h-1.5 w-1.5 rounded-full bg-slate-400"
                   animate={{ opacity: [0.35, 1, 0.35], y: [0, -2, 0] }}
                   transition={{
                     duration: 0.9,
@@ -190,14 +189,14 @@ export default function KnottyGlassChat({
         )}
       </div>
 
-      <div className="relative z-10 border-t border-white/10 bg-black/25 p-4">
+      <div className="relative z-10 border-t border-slate-100 bg-white p-4">
         <form onSubmit={handleSend} className="relative flex items-center">
           <input
             type="text"
             value={inputValue}
             onChange={(event) => setInputValue(event.target.value)}
             placeholder="Type your reply..."
-            className="w-full rounded-xl border border-white/10 bg-white/[0.05] py-3 pl-4 pr-12 font-sans text-sm text-white placeholder:text-slate-500 focus:border-sky-400/50 focus:outline-none transition-colors"
+            className="w-full rounded-xl border border-slate-300 bg-white py-3 pl-4 pr-12 font-sans text-sm text-slate-900 placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-200 transition-all"
           />
           <button
             type="submit"

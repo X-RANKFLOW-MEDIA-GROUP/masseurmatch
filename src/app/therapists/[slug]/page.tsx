@@ -25,46 +25,81 @@ const DEMO_PROFILES: Record<string, any> = {
     id: 'bruno-demo-001',
     slug: 'bruno-dallas-tx',
     display_name: 'Bruno',
-    full_name: 'Bruno Martinez',
+    full_name: 'Bruno Santos',
     city: 'Dallas',
     state: 'Texas',
     neighborhood_name: 'Oak Lawn',
     primary_area: 'Uptown Dallas',
-    bio: 'Professional licensed massage therapist with 8 years of experience specializing in deep tissue and therapeutic massage. I create a welcoming, judgment-free environment for all clients. My approach combines traditional Swedish techniques with targeted deep tissue work to address your specific needs, whether that\'s stress relief, muscle recovery, or chronic pain management.',
-    avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop&crop=face',
-    photo_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop&crop=face',
+    bio: 'With 14 years of professional experience, I bring a unique blend of Brazilian therapeutic bodywork and diverse massage modalities to every session. My practice is rooted in both Brazilian and American massage traditions, offering techniques ranging from traditional AMMA Therapy and Zero Balancing to Deep Tissue, Shiatsu, Hot Stone, and Lymphatic Drainage. Based in Oak Lawn, I operate from a private studio with full amenities — shower, private restroom, and hot towels included. My practice is proudly LGBTQ+ owned and operated. Whether you prefer an in-studio session or a mobile outcall to your home or hotel throughout Dallas, I customize every session to your specific needs. Member of the National Association of Massage Therapists.',
+    avatar_url: '/photos/bruno/photo-4.jpg',
+    photo_url: '/photos/bruno/photo-4.jpg',
+    gallery_photos: [
+      '/photos/bruno/photo-4.jpg',
+      '/photos/bruno/photo-3.jpg',
+      '/photos/bruno/photo-1.jpg',
+      '/photos/bruno/photo-2.jpg',
+    ],
     modality: 'Licensed Massage Therapist',
-    specialties: ['Deep Tissue', 'Swedish', 'Sports Massage', 'Therapeutic'],
-    languages: ['English', 'Spanish'],
+    specialties: ['AMMA Therapy', 'Deep Tissue', 'Hot Stone', 'Lymphatic Drainage', 'Myofascial Release', 'Shiatsu', 'Swedish', 'Zero Balancing'],
+    languages_spoken: ['English', 'Portuguese'],
     contact_email: 'bruno@masseurmatch.com',
-    phone: '214-555-0123',
-    website: 'https://masseurmatch.com',
-    incall_price: 120,
-    outcall_price: 150,
-    years_experience: 8,
+    phone: '(762) 334-5300',
+    incall_price: 175,
+    outcall_price: 175,
+    pricing_sessions: [
+      { name: 'Standard Session', duration: 60, incall: 175, outcall: 175 },
+      { name: 'Extended Session', duration: 90, incall: 250, outcall: 250 },
+    ],
+    years_experience: 14,
     lgbtq_affirming: true,
-    gay_friendly: true,
-    inclusive: true,
+    accepts_all_genders: true,
     available_now: true,
     is_verified_identity: true,
     is_verified_profile: true,
+    review_count: 12,
     _tier: 'pro',
+    areas_served: ['Highland Park', 'University Park', 'Downtown Dallas', 'Turtle Creek', 'Oak Lawn', 'Uptown'],
+    education: 'Degree in Accounting and Business, UFRJ (2000–2003)',
+    training: [
+      { label: 'National Association of Massage Therapists', detail: 'Professional Member' }
+    ],
+    promotions: [
+      { title: 'Monday Special', description: '10% off any session on Mondays' },
+      { title: 'Weekly Offer', description: '$10 off any session – week of April 5' },
+      { title: 'Loyalty & Service Discounts', description: 'Special discounts for military, law enforcement, and repeat clients' },
+    ],
+    add_ons: [
+      { name: 'Cupping Therapy', price: 25 },
+      { name: 'Fitness Training', price: 50 },
+    ],
     travel_schedule: [
-      { city: 'Austin', start_date: '2026-04-01', end_date: '2026-04-04' },
-      { city: 'Houston', start_date: '2026-04-15', end_date: '2026-04-18' },
+      { city: 'Pensacola', state: 'FL', start_date: '2026-04-01', end_date: '2026-04-01' },
+      { city: 'Tallahassee', state: 'FL', start_date: '2026-04-02', end_date: '2026-04-02' },
     ],
     custom_faq: [
       {
-        question: 'What should I expect during my first session?',
-        answer: 'During your first visit, we will discuss your goals, any areas of concern, and your preferred pressure level. The session is tailored entirely to your needs.'
+        question: 'What massage techniques do you offer?',
+        answer: 'I offer AMMA Therapy, Deep Tissue, Hot Stone, Lymphatic Drainage, Myofascial Release, Shiatsu, Swedish, and Zero Balancing. I also offer cupping therapy and fitness training as add-ons.'
+      },
+      {
+        question: 'What are your rates?',
+        answer: '60-minute sessions start at $175 and 90-minute sessions are $250. I offer a 10% Monday discount and periodic promotional deals. Special pricing available for military, law enforcement, and repeat clients.'
       },
       {
         question: 'Do you offer outcall services?',
-        answer: 'Yes, I offer mobile massage services throughout the Dallas area including Oak Lawn, Uptown, Downtown, and surrounding neighborhoods.'
+        answer: 'Yes! I offer mobile massage to homes and hotels throughout Dallas, including Highland Park, University Park, Downtown Dallas, Turtle Creek, Oak Lawn, and Uptown.'
       },
       {
-        question: 'What is your cancellation policy?',
-        answer: 'I require 24 hours notice for cancellations. Late cancellations may be subject to a fee.'
+        question: 'What are your hours?',
+        answer: 'I am available daily from midnight to 11pm. Contact me via text or call to schedule your session.'
+      },
+      {
+        question: 'What payment methods do you accept?',
+        answer: 'I accept Apple Pay, Cash, Mastercard, Venmo, Visa, and Zelle.'
+      },
+      {
+        question: 'Is your practice LGBTQ+ friendly?',
+        answer: 'Absolutely. My practice is proudly LGBTQ+ owned and operated. I welcome all clients and create a safe, inclusive, and judgment-free environment.'
       }
     ]
   }

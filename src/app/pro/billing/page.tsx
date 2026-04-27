@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowRight, ExternalLink, Loader2, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowRight, CheckCircle2, ExternalLink, Loader2, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
 
 import { PageSection, Surface } from "@/app/_components/primitives";
 import { ProviderGrowthMarketplace } from "@/app/_components/provider-growth-marketplace";
@@ -287,7 +287,10 @@ export default function ProBillingPage() {
 
                   <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
                     {plan.features.map((feature) => (
-                      <li key={feature}>{feature}</li>
+                      <li key={feature} className="flex items-start gap-2">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                        <span>{feature}</span>
+                      </li>
                     ))}
                   </ul>
 

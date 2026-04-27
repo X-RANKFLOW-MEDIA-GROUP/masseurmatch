@@ -15,9 +15,15 @@ export function PremiumProfileGallery({ profile, photos }: Props) {
   const name = getPublicProfileName(profile);
   const city = profile.city || "the area";
 
+  const demoPhotos: string[] = Array.isArray((profile as any).gallery_photos)
+    ? (profile as any).gallery_photos
+    : [];
+
   const images = photos.length > 0
     ? photos.slice(0, limit).map((p) => p.storage_path)
-    : [profile.avatar_url].filter(Boolean) as string[];
+    : demoPhotos.length > 0
+      ? demoPhotos.slice(0, limit)
+      : [profile.avatar_url].filter(Boolean) as string[];
 
   if (images.length === 0) {
     // Show placeholder with gradient

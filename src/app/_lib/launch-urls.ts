@@ -14,6 +14,7 @@ export const FIRST_30_URLS_IN_ORDER = [
   "/dallas/areas/oak-lawn",
   "/dallas/areas/turtle-creek",
   "/dallas/areas/uptown",
+  "/dallas/areas/deep-ellum",
   "/dallas/areas/medical-district",
   "/dallas/areas/love-field",
   "/dallas/areas/dfw-airport",
@@ -39,6 +40,8 @@ export const FIRST_30_URLS_IN_ORDER = [
   "/houston/wellness/swedish",
   "/houston/wellness/thai",
   "/houston/areas/montrose",
+  "/houston/areas/the-heights",
+  "/houston/areas/midtown",
   "/houston/areas/downtown-houston",
   "/austin",
   "/austin/verified-profiles",
@@ -47,6 +50,7 @@ export const FIRST_30_URLS_IN_ORDER = [
   "/austin/wellness/outcall",
   "/austin/wellness/incall",
   "/austin/areas/south-congress",
+  "/austin/areas/east-austin",
   "/miami",
   "/miami/verified-profiles",
   "/miami/wellness",
@@ -89,6 +93,7 @@ export const FIRST_30_URLS_IN_ORDER = [
   "/philadelphia/gay-massage",
   "/minneapolis/gay-massage",
   "/washington-dc/gay-massage",
+  "/san-antonio/areas/king-william",
 ] as const;
 
 const FIRST_30_SET: ReadonlySet<string> = new Set(FIRST_30_URLS_IN_ORDER);

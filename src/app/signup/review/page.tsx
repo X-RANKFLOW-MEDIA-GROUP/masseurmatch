@@ -34,6 +34,14 @@ export default function SignupReviewPage() {
     setLoading(true);
 
     try {
+      if (!state.termsAccepted) {
+        throw new Error("You must accept the Terms of Service before submitting.");
+      }
+
+      if (!state.complianceAcknowledged) {
+        throw new Error("You must acknowledge the Therapist Agreement and platform policies.");
+      }
+
       // Submit the profile for moderation
       const res = await fetch("/api/signup/submit", {
         method: "POST",
@@ -41,6 +49,10 @@ export default function SignupReviewPage() {
         body: JSON.stringify({
           planTier: state.selectedPlanTier,
           profile: {
+            fullName: state.fullName,
+            displayName: state.displayName || state.fullName,
+            email: state.email,
+            phone: state.phone,
             tagline: p.tagline,
             bio: p.bio,
             yearsExperience: p.yearsExperience,
@@ -62,7 +74,6 @@ export default function SignupReviewPage() {
             emailVerified: state.emailVerified,
             phoneVerified: state.phoneVerified,
             identityVerificationStatus: state.identityVerificationStatus,
-            stripeIdentitySessionId: state.stripeIdentitySessionId,
           },
           termsAccepted: state.termsAccepted,
           complianceAcknowledged: state.complianceAcknowledged,
@@ -228,7 +239,7 @@ export default function SignupReviewPage() {
             </li>
             <li className="flex items-center gap-2">
               <CheckCircle2
-                className={`h-4 w-4 ${p.mediaCompliance ? "text-green-500" : "text-muted-foreground"}`}
+                className={`h-4 w-4 ${state.complianceAcknowledged ? "text-green-500" : "text-muted-foreground"}`}
               />
               Content compliance acknowledged
             </li>
@@ -267,11 +278,28 @@ export default function SignupReviewPage() {
       </Card>
 
       {/* CTAs */}
+      {(!state.emailVerified || state.identityVerificationStatus !== "verified") && (
+        <p className="rounded-lg bg-amber-50 px-4 py-2.5 text-sm text-amber-700 border border-amber-200">
+          Complete email and identity verification on the{" "}
+          <Link href="/signup/verify" className="underline font-medium">Verify step</Link>{" "}
+          before submitting.
+        </p>
+      )}
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
         <Button asChild variant="outline">
           <Link href="/signup/profile">Back to Edit Profile</Link>
         </Button>
-        <Button size="lg" onClick={handleSubmit} disabled={loading}>
+        <Button
+          size="lg"
+          onClick={handleSubmit}
+          disabled={
+            loading ||
+            !state.emailVerified ||
+            state.identityVerificationStatus !== "verified" ||
+            !state.termsAccepted ||
+            !state.complianceAcknowledged
+          }
+        >
           {loading ? "Submitting…" : "Submit for Review"}
         </Button>
       </div>

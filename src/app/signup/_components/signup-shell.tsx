@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { SignupProvider } from "../_lib/signup-context";
 import { cn } from "@/lib/utils";
+import { AuroraBackgroundLight } from "@/components/ui/aurora-background";
 
 const STEPS = [
   { path: "/signup", label: "Start" },
@@ -36,7 +37,7 @@ function ProgressStepper() {
                   "mx-auto flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors",
                   isComplete && "border-green-500 bg-green-500 text-white",
                   isCurrent && "border-brand-secondary bg-brand-secondary/10 text-brand-secondary",
-                  !isComplete && !isCurrent && "border-border bg-white text-muted-foreground",
+                  !isComplete && !isCurrent && "border-border bg-card text-muted-foreground",
                 )}
               >
                 {isComplete ? "✓" : idx + 1}
@@ -60,10 +61,10 @@ function ProgressStepper() {
 export function SignupShell({ children }: { children: React.ReactNode }) {
   return (
     <SignupProvider>
-      <div className="min-h-[calc(100vh-74px)]">
+      <AuroraBackgroundLight className="min-h-[calc(100vh-74px)]">
         <ProgressStepper />
         <div className="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">{children}</div>
-      </div>
+      </AuroraBackgroundLight>
     </SignupProvider>
   );
 }
