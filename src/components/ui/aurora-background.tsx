@@ -176,3 +176,51 @@ export function AuroraBackgroundLight({
     </div>
   );
 }
+
+export function AuroraBackgroundLight({
+  children,
+  className,
+}: AuroraBackgroundProps) {
+  return (
+    <div
+      className={cn(
+        "relative flex flex-col min-h-screen w-full overflow-hidden bg-white",
+        className
+      )}
+    >
+      {/* Base gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white via-slate-50 to-white" />
+
+      {/* Animated blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div
+          className="absolute -top-1/4 -left-1/4 w-[60%] h-[60%] rounded-full blur-3xl animate-aurora-1"
+          style={{
+            background: "radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 70%)",
+          }}
+        />
+        <div
+          className="absolute -top-1/4 -right-1/4 w-[50%] h-[50%] rounded-full blur-3xl animate-aurora-2"
+          style={{
+            background: "radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, transparent 70%)",
+          }}
+        />
+        <div
+          className="absolute -bottom-1/4 -left-1/4 w-[55%] h-[55%] rounded-full blur-3xl animate-aurora-3"
+          style={{
+            background: "radial-gradient(circle, rgba(59, 130, 246, 0.06) 0%, transparent 70%)",
+          }}
+        />
+        <div
+          className="absolute -bottom-1/4 -right-1/4 w-[45%] h-[45%] rounded-full blur-3xl animate-aurora-4"
+          style={{
+            background: "radial-gradient(circle, rgba(34, 197, 94, 0.06) 0%, transparent 70%)",
+          }}
+        />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 flex-1">{children}</div>
+    </div>
+  );
+}
