@@ -17,6 +17,8 @@ import { PremiumProfileLocation } from "./PremiumProfileLocation";
 import { KnottyProfileTracker } from "./KnottyProfileTracker";
 import { ProfileAreasServed } from "./ProfileAreasServed";
 import { PremiumProfileContact } from "./PremiumProfileContact";
+import { ReviewsDisplay } from "@/components/reviews/ReviewsDisplaySection";
+import { SocialProofBadges } from "@/components/social/SocialProofBadges";
 import "./premium-profile.css";
 
 interface Props {
@@ -31,6 +33,9 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
   
   const city = profile.city || "United States";
   const neighborhood = profile.neighborhood_name || profile.primary_area;
+  const avgRating = reviews.length > 0
+    ? reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length
+    : 0;
 
   return (
     <div className="premium-profile min-h-screen">
@@ -63,6 +68,39 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
           </div>
           <PremiumProfileGallery profile={profile} photos={photos} />
         </section>
+
+        {/* Social Proof Badges */}
+        <section className="pp-section pp-fade-in">
+          <SocialProofBadges
+            isTopRated={avgRating >= 4.7}
+            isMostReviewed={reviews.length >= 20}
+            isRising={Boolean(profile.available_now)}
+            reviewCount={reviews.length}
+            averageRating={avgRating}
+            viewCount={profile.profile_views ?? 0}
+          />
+        </section>
+
+        {/* Reviews */}
+        {reviews.length > 0 && (
+          <section className="pp-section pp-fade-in" id="reviews">
+            <div className="pp-section-header">
+              <h2 className="pp-section-title">Client Reviews</h2>
+              <span className="text-sm text-slate-500">{reviews.length} verified reviews</span>
+            </div>
+            <ReviewsDisplay
+              reviews={reviews.map(r => ({
+                id: r.id,
+                author_name: r.reviewer_name ?? "Verified Client",
+                rating: r.rating ?? 5,
+                body: r.review_text,
+                created_at: r.review_date ?? new Date().toISOString()
+              }))}
+              averageRating={avgRating}
+              totalReviews={reviews.length}
+            />
+          </section>
+        )}
 
         {/* About */}
         <PremiumProfileAbout profile={profile} reviews={reviews} />
