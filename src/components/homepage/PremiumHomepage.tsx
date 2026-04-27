@@ -143,8 +143,9 @@ export function PremiumHomepage({ featuredTherapists, totalTherapists, cityCount
                 <Link key={therapist.id} href={`/therapists/${therapist.slug || therapist.id}`}>
                   <div className="group cursor-pointer">
                     <div className="mb-4 rounded-lg overflow-hidden h-64 bg-gradient-to-br from-purple-400 to-pink-400 relative">
-                      {therapist.photo_url ? (
-                        <img src={therapist.photo_url} alt={therapist.display_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      {therapist.avatar_url ? (
+                        <img src={therapist.avatar_url ?? undefined} alt={therapist.display_name || "Therapist"} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        <img src={therapist.avatar_url} alt={therapist.display_name || "Therapist"} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <Users className="w-16 h-16 text-white opacity-50" />
@@ -159,15 +160,12 @@ export function PremiumHomepage({ featuredTherapists, totalTherapists, cityCount
                     <h3 className="font-semibold text-lg group-hover:text-purple-600 transition-colors">{therapist.display_name || "Therapist"}</h3>
                     <div className="flex items-center gap-2 mt-2 text-sm text-slate-600">
                       <MapPin className="w-4 h-4" />
-                      {therapist.city}, {therapist.state}
+                      {therapist.city || "Location available on profile"}
                     </div>
-                    {therapist.average_rating && (
-                      <div className="flex items-center gap-1 mt-2">
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        <span className="font-medium">{therapist.average_rating.toFixed(1)}</span>
-                        <span className="text-slate-500">({therapist.review_count || 0})</span>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-1 mt-2">
+                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                      <span className="text-slate-500">{therapist.review_count || 0} review{(therapist.review_count || 0) === 1 ? "" : "s"}</span>
+                    </div>
                   </div>
                 </Link>
               ))}
