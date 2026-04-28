@@ -10,6 +10,7 @@ import {
 } from "@/app/_lib/public-profile";
 import { useKnottyProfileAttribution } from "./useKnottyProfileAttribution";
 import { ReportTraffickingButton } from "./ReportTraffickingButton";
+import { ProfileActionButtons } from "./ProfileActionButtons";
 
 interface Props {
   profile: PublicTherapist;
@@ -137,6 +138,12 @@ export function PremiumProfileHero({ profile, cityPath, reviews = [] }: Props) {
               Call
             </a>
           )}
+        </div>
+        <div className="mt-3">
+          <ProfileActionButtons
+            therapistId={profile.id}
+            therapistName={name}
+          />
         </div>
         <div className="mt-3">
           <ReportTraffickingButton therapistId={profile.id} therapistName={name} compact />
