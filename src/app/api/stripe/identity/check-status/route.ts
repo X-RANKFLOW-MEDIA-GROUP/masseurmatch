@@ -30,10 +30,10 @@ function getStripe(request: NextRequest) {
 }
 
 function mapVerificationStatus(status: Stripe.Identity.VerificationSession.Status) {
-  if (status === "verified") return "verified";
-  if (status === "processing") return "processing";
+  if (status === "verified") return "approved";
+  if (status === "processing") return "reviewing";
   if (status === "canceled") return "expired";
-  return "failed";
+  return "rejected";
 }
 
 export async function GET(request: NextRequest) {
@@ -57,10 +57,13 @@ export async function GET(request: NextRequest) {
         .maybeSingle();
 
       if (mockError) {
-        return NextResponse.json({ error: mockError.message }, { status: 500 });
+        const isSchemaCacheColumnError = /schema cache|column .* does not exist/i.test(mockError.message);
+        if (!isSchemaCacheColumnError) {
+          return NextResponse.json({ error: mockError.message }, { status: 500 });
+        }
       }
 
-      const userId = mockRow?.user_id ?? null;
+      const userId = mockRow?.user_id ?? requester.userId;
       if (!userId) {
         return NextResponse.json({ error: "Verification session not found." }, { status: 404 });
       }
@@ -69,7 +72,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "Forbidden." }, { status: 403 });
       }
 
-      const mockStatus = mockRow?.status === "verified" ? "verified" : "processing";
+      const mockStatus = mockRow?.status === "approved" ? "verified" : "processing";
 
       if (mockStatus === "verified") {
         await adminClient
@@ -97,10 +100,19 @@ export async function GET(request: NextRequest) {
     }
     const dbStatus = mapVerificationStatus(stripeSession.status);
 
-    await adminClient
+    const { error: verificationUpdateError } = await adminClient
       .from("identity_verifications")
       .update({ status: dbStatus })
       .eq("stripe_session_id", sessionId);
+
+    if (verificationUpdateError) {
+      const isSchemaCacheColumnError = /schema cache|column .* does not exist/i.test(
+        verificationUpdateError.message,
+      );
+      if (!isSchemaCacheColumnError) {
+        throw new Error(verificationUpdateError.message);
+      }
+    }
 
     if (stripeSession.status === "verified") {
       await adminClient
