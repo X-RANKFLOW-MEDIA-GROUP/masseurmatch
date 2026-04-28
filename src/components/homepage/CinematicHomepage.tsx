@@ -9,7 +9,7 @@ import {
   ChevronRight, Sparkles, CheckCircle, Users, Award, 
   Clock, Heart, ArrowRight, Globe
 } from "lucide-react";
-import type { Profile } from "@/lib/supabase/directory";
+import type { PublicTherapist as Profile } from "@/app/_lib/directory";
 
 interface CinematicHomepageProps {
   featuredTherapists: Profile[];
@@ -328,7 +328,7 @@ function TherapistCard({ therapist, index, isInView }: { therapist: Profile; ind
     free: { bg: "bg-[#64748B]", border: "border-[#64748B]/10", text: "text-white" },
   };
 
-  const tier = (therapist.subscription_tier || "free").toLowerCase();
+  const tier = (therapist._tier || "free").toLowerCase();
   const tierStyle = tierColors[tier] || tierColors.free;
 
   return (
@@ -345,7 +345,7 @@ function TherapistCard({ therapist, index, isInView }: { therapist: Profile; ind
           {/* Image */}
           <div className="relative aspect-[4/5] overflow-hidden">
             <Image
-              src={therapist.avatar_url || therapist.photo_url || "/images/placeholder-therapist.jpg"}
+              src={therapist.avatar_url || "/images/placeholder-therapist.jpg"}
               alt={therapist.display_name || "Therapist"}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-700"
