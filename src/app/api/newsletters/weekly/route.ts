@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
       const result = await resend.emails.send({
         from: FROM_EMAIL,
         to: subscriber.email,
-        subject: "🗓️ Sua newsletter semanal – Available Now & Visiting Soon",
+        subject: "🗓️ Your weekly newsletter – Available Now & Visiting Soon",
         html,
       });
 

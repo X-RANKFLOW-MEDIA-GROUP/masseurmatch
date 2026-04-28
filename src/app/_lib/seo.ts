@@ -487,6 +487,7 @@ export const buildHealthAndBeautyBusinessJsonLd = ({
           "@type": "Service",
           name: specialty,
         },
+        ...(incallPrice ? { price: incallPrice.toString(), priceCurrency: "USD" } : {}),
       },
     }),
     ...(averageRating !== null
