@@ -31,7 +31,6 @@ interface Props {
 export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props) {
   useFadeInOnScroll();
   
-  const FALLBACK_REVIEW_DATE = "1970-01-01T00:00:00.000Z";
   const city = profile.city || "United States";
   const neighborhood = profile.neighborhood_name || profile.primary_area;
   const avgRating = reviews.length > 0
