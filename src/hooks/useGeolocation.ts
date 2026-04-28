@@ -17,6 +17,8 @@ type GeolocationStatus = "idle" | "checking" | "ready" | "unsupported" | "denied
 type IpCityResponse = {
   city?: string | null;
   stateCode?: string | null;
+  region_code?: string | null;
+  region?: string | null;
 };
 
 type UseGeolocationOptions = {
@@ -27,6 +29,7 @@ type UseGeolocationOptions = {
 };
 
 const DEFAULT_STORAGE_KEY = "mm:geolocation-city";
+const PROMPT_SESSION_KEY = "mm:geolocation:auto-prompted";
 
 function normalize(value: string | null | undefined) {
   return (value || "")
@@ -95,6 +98,23 @@ function persistCity(storageKey: string, city: CityData | null) {
   }
 }
 
+function shouldAutoPromptLocation() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  try {
+    if (window.sessionStorage.getItem(PROMPT_SESSION_KEY) === "1") {
+      return false;
+    }
+
+    window.sessionStorage.setItem(PROMPT_SESSION_KEY, "1");
+    return true;
+  } catch {
+    return true;
+  }
+}
+
 export function useGeolocation(options: UseGeolocationOptions = {}) {
   const {
     autoLocate = true,
@@ -125,7 +145,10 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
   const resolveCityFromIpFallback = useCallback(async () => {
     try {
       const response = await requestJson<IpCityResponse>("https://ipapi.co/json/", { cache: "no-store" });
-      const matchedCity = matchCity(response.city ?? null, response.stateCode ?? null);
+      const matchedCity = matchCity(
+        response.city ?? null,
+        response.stateCode ?? response.region_code ?? response.region ?? null,
+      );
 
       if (matchedCity) {
         setCity(matchedCity);
@@ -141,10 +164,6 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
   const requestLocation = useCallback(async (userInitiated = true) => {
     if (typeof window === "undefined") {
       return null;
-    }
-
-    if (city) {
-      return city;
     }
 
     if (!navigator.geolocation) {
@@ -210,7 +229,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
           resolveCityFromIpFallback().then(resolve);
         },
         {
-          enableHighAccuracy: false,
+          enableHighAccuracy: true,
           timeout,
           maximumAge,
         },
@@ -218,7 +237,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
     });
 
     return requestRef.current;
-  }, [city, maximumAge, resolveCityFromIpFallback, setCity, timeout]);
+  }, [maximumAge, resolveCityFromIpFallback, setCity, timeout]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -240,7 +259,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
       return;
     }
 
-    if (!autoLocate || storedCity) {
+    if (!autoLocate) {
       setLoading(false);
       if (!storedCity) {
         setStatus("idle");
@@ -253,9 +272,14 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
     const maybeLocate = async () => {
       try {
         if (!navigator.permissions?.query) {
+          if (shouldAutoPromptLocation()) {
+            await requestLocation(false);
+            return;
+          }
+
           if (!cancelled) {
             setLoading(false);
-            setStatus("idle");
+            setStatus(storedCity ? "ready" : "idle");
           }
           return;
         }
@@ -273,6 +297,17 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
           return;
         }
 
+        if (permission.state === "prompt") {
+          if (shouldAutoPromptLocation()) {
+            await requestLocation(false);
+            return;
+          }
+
+          setStatus(storedCity ? "ready" : "idle");
+          setLoading(false);
+          return;
+        }
+
         if (permission.state === "denied") {
           setDenied(true);
           setStatus("denied");
@@ -282,11 +317,16 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
           return;
         }
 
-        setStatus("idle");
+        setStatus(storedCity ? "ready" : "idle");
         setLoading(false);
       } catch {
         if (!cancelled) {
-          setStatus("idle");
+          if (shouldAutoPromptLocation()) {
+            await requestLocation(false);
+            return;
+          }
+
+          setStatus(storedCity ? "ready" : "idle");
           setLoading(false);
         }
       }
@@ -297,7 +337,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
     return () => {
       cancelled = true;
     };
-  }, [autoLocate, maximumAge, requestLocation, resolveCityFromIpFallback, storageKey, timeout]);
+  }, [autoLocate, requestLocation, resolveCityFromIpFallback, storageKey]);
 
   return {
     city,
