@@ -70,7 +70,7 @@ export default function ContactPageClient() {
           </p>
           <div className="mt-8 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.06] px-5 py-3 text-sm text-slate-200 backdrop-blur-xl">
             <span className="knotty-active-dot h-2.5 w-2.5 rounded-full" aria-hidden="true" />
-            Premium support, typically within 24 hours.
+            Premium support, typically within 24 hours. Phone: 978-MASSEUR
           </div>
         </div>
       </section>
@@ -135,7 +135,7 @@ export default function ContactPageClient() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/how-it-works"
+              href="/knotty"
               className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.06] px-5 py-3 text-sm font-medium text-white transition hover:border-sky-300/35 hover:bg-white/[0.12]"
             >
               <Mail className="h-4 w-4" />
