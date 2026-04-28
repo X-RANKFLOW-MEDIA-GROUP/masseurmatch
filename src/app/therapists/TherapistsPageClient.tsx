@@ -13,6 +13,7 @@ type TherapistsPageClientProps = {
   filters: {
     city: string;
     modality: string;
+    tier: string;
   };
 };
 
@@ -27,11 +28,13 @@ export default function TherapistsPageClient({
   const router = useRouter();
   const [city, setCity] = useState(filters.city);
   const [modality, setModality] = useState(filters.modality);
+  const [tier, setTier] = useState(filters.tier);
 
   useEffect(() => {
     setCity(filters.city);
     setModality(filters.modality);
-  }, [filters.city, filters.modality]);
+    setTier(filters.tier);
+  }, [filters.city, filters.modality, filters.tier]);
 
   const setParam = (key: string, value: string) => {
     const next = new URLSearchParams();
@@ -100,6 +103,7 @@ export default function TherapistsPageClient({
           onClick={() => {
             setCity("");
             setModality("");
+            setTier("");
             router.push(pathname || "/therapists");
           }}
         >
