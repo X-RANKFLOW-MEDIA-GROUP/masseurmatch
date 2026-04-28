@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
+import { PhoneInput } from "@/components/ui/phone-input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { useSignup } from "../_lib/signup-context";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -39,23 +41,6 @@ export default function SignupAccountPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  function getPasswordStrength(pw: string): { label: string; color: string; percent: number } {
-    if (pw.length === 0) return { label: "", color: "bg-gray-200", percent: 0 };
-    let score = 0;
-    if (pw.length >= 8) score++;
-    if (pw.length >= 12) score++;
-    if (/[A-Z]/.test(pw)) score++;
-    if (/[0-9]/.test(pw)) score++;
-    if (/[^A-Za-z0-9]/.test(pw)) score++;
-    if (score <= 1) return { label: "Weak", color: "bg-red-500", percent: 20 };
-    if (score <= 2) return { label: "Fair", color: "bg-orange-500", percent: 40 };
-    if (score <= 3) return { label: "Good", color: "bg-yellow-500", percent: 60 };
-    if (score <= 4) return { label: "Strong", color: "bg-green-500", percent: 80 };
-    return { label: "Very Strong", color: "bg-green-600", percent: 100 };
-  }
-
-  const pwStrength = getPasswordStrength(form.password);
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -66,6 +51,10 @@ export default function SignupAccountPage() {
     }
     if (!form.email.trim()) {
       setError("Email is required.");
+      return;
+    }
+    if (!form.phone.trim() || form.phone.length < 10) {
+      setError("A valid phone number is required.");
       return;
     }
     if (form.password.length < 8) {
@@ -104,7 +93,8 @@ export default function SignupAccountPage() {
       setTermsAccepted(termsChecked);
       setComplianceAcknowledged(complianceChecked);
 
-      router.push("/signup/verify");
+      // Redirect new users to plan selection
+      router.push("/signup/plan");
     } catch {
       setError("An unexpected error occurred. Please try again.");
     } finally {
@@ -161,45 +151,33 @@ export default function SignupAccountPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
+              <Label htmlFor="phone">Phone Number *</Label>
+              <PhoneInput
                 id="phone"
-                type="tel"
                 value={form.phone}
-                onChange={(e) => updateField("phone", e.target.value)}
-                placeholder="+1 (555) 000-0000"
+                onChange={(value) => updateField("phone", value)}
+                placeholder="(555) 000-0000"
               />
+              <p className="text-xs text-muted-foreground">Required for verification. Select your country to auto-fill the code.</p>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="password">Password *</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 value={form.password}
                 onChange={(e) => updateField("password", e.target.value)}
                 placeholder="At least 8 characters"
                 required
                 minLength={8}
+                showStrength
               />
-              {form.password && (
-                <div className="space-y-1">
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
-                    <div
-                      className={`h-full rounded-full transition-all ${pwStrength.color}`}
-                      style={{ width: `${pwStrength.percent}%` }}
-                    />
-                  </div>
-                  <p className="text-xs text-muted-foreground">{pwStrength.label}</p>
-                </div>
-              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password *</Label>
-              <Input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
                 value={form.confirmPassword}
                 onChange={(e) => updateField("confirmPassword", e.target.value)}
                 placeholder="Re-enter your password"

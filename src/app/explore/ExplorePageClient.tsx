@@ -28,6 +28,7 @@ import {
   Sparkles,
   Star,
   X,
+  Grid2x2,
 } from "lucide-react";
 import type { CityData } from "@/data/cities";
 import {
@@ -50,6 +51,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
 import { handleProfileCardTilt, resetProfileCardTilt } from "@/app/_components/profile-card-tilt";
+import { CompactTherapistCard } from "@/components/explore/CompactTherapistCard";
 
 type ExplorePageClientProps = {
   cities: CityData[];
@@ -92,6 +94,7 @@ const SORT_OPTIONS = [
 
 const VIEW_OPTIONS = [
   { value: "grid", label: "Grid", icon: Layers3 },
+  { value: "cards", label: "Cards", icon: Grid2x2 },
   { value: "map", label: "Map", icon: MapPinned },
   { value: "swipe", label: "Swipe", icon: Sparkles },
 ] as const;
@@ -922,6 +925,7 @@ export default function ExplorePageClient({
   const [selectedProviderId, setSelectedProviderId] = useState<string | null>(initialBaseItems[0]?.id || null);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [swipeState, setSwipeState] = useState<SwipeState>({ liked: [], skipped: [], saved: [] });
+  const [compareSelection, setCompareSelection] = useState<ExploreProvider[]>([]);
   const [geoOrigin, setGeoOrigin] = useState<ExplorePoint | null>(null);
   const [invalidProviderCount, setInvalidProviderCount] = useState(initialInvalidProviderCount);
   const [serverLoading, setServerLoading] = useState(false);
@@ -932,7 +936,7 @@ export default function ExplorePageClient({
   const baseFetchKeyRef = useRef(`${initialFilters.city}|${initialFilters.zip}|${initialFilters.radius}`);
   const restoreHandledRef = useRef(false);
   const deferredLocationInput = useDeferredValue(locationInput);
-  const { city: geoCity, requestLocation } = useGeolocation({
+  const { city: geoCity, requestLocation, denied: geoDenied } = useGeolocation({
     autoLocate: true,
     storageKey: "mm:explore:location-city",
   });
@@ -1103,6 +1107,20 @@ export default function ExplorePageClient({
 
     applyFilters({ ...filters, city: nextCity, zip: nextZip });
   }, [applyFilters, deferredLocationInput, filters]);
+
+  useEffect(() => {
+    if (hasExplicitLocation || typeof window === "undefined") {
+      return;
+    }
+
+    const firstVisitKey = "mm:explore:first-location-attempt";
+    if (window.localStorage.getItem(firstVisitKey)) {
+      return;
+    }
+
+    window.localStorage.setItem(firstVisitKey, "1");
+    void requestLocation(false);
+  }, [hasExplicitLocation, requestLocation]);
 
   useEffect(() => {
     if (!geoCity || hasExplicitLocation || !usingDetectedLocation) {
@@ -1335,6 +1353,25 @@ export default function ExplorePageClient({
     [],
   );
 
+  const handleToggleCompare = useCallback((provider: ExploreProvider) => {
+    setCompareSelection((current) => {
+      const exists = current.some((item) => item.id === provider.id);
+      if (exists) {
+        return current.filter((item) => item.id !== provider.id);
+      }
+
+      if (current.length >= 3) {
+        return [...current.slice(1), provider];
+      }
+
+      return [...current, provider];
+    });
+  }, []);
+
+  const compareHref = compareSelection.length >= 2
+    ? `/compare?ids=${compareSelection.map((provider) => provider.id).join(",")}`
+    : "#";
+
   const handleSidebarReset = useCallback(() => {
     const reset = { ...initialFilters, city: filters.city, zip: filters.zip, radius: filters.radius };
     setDraftFilters(reset);
@@ -1532,6 +1569,21 @@ export default function ExplorePageClient({
                     {invalidProviderCount} incomplete {invalidProviderCount === 1 ? "profile" : "profiles"} hidden until neighborhood, experience, and starting price are complete.
                   </p>
                 ) : null}
+                {geoDenied ? (
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-600">
+                      Location permission denied — showing an approximate city fallback.
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full"
+                      onClick={() => void requestLocation(true)}
+                    >
+                      Retry location
+                    </Button>
+                  </div>
+                ) : null}
               </div>
 
               <div className="flex items-center gap-3">
@@ -1593,6 +1645,32 @@ export default function ExplorePageClient({
               </>
             ) : null}
 
+            {providers.length > 0 && filters.view === "cards" ? (
+              <>
+                <div className="mt-6 grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                  {visibleProviders.map((provider) => (
+                    <CompactTherapistCard
+                      key={provider.id}
+                      provider={provider}
+                      selectedForCompare={compareSelection.some((item) => item.id === provider.id)}
+                      onToggleCompare={() => handleToggleCompare(provider)}
+                      onOpen={handleProfileOpen}
+                    />
+                  ))}
+
+                  {(serverLoading || isPending) ? (
+                    Array.from({ length: 6 }).map((_, index) => (
+                      <div
+                        key={`skeleton-${index}`}
+                        className="aspect-[3/4] rounded-xl border border-slate-200 bg-slate-100 animate-pulse"
+                      />
+                    ))
+                  ) : null}
+                </div>
+                <div ref={listSentinelRef} className="h-12" />
+              </>
+            ) : null}
+
             {providers.length > 0 && filters.view === "map" ? (
               <div className="mt-6">
                 <div className="fixed inset-x-0 bottom-0 top-[75px] z-40 bg-[rgb(var(--color-bg-body-rgb)/0.92)] px-4 pb-4 pt-4 md:static md:inset-auto md:h-[720px] md:bg-transparent md:p-0">
@@ -1634,6 +1712,27 @@ export default function ExplorePageClient({
         </section>
       </div>
 
+      {compareSelection.length > 0 ? (
+        <div className="fixed bottom-4 left-1/2 z-50 w-[min(720px,calc(100%-2rem))] -translate-x-1/2 rounded-2xl border border-border-subtle bg-white/95 p-3 shadow-2xl backdrop-blur">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm font-medium text-text-secondary">
+              Compare queue: {compareSelection.map((provider) => provider.name).join(" • ")}
+            </p>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setCompareSelection([])}>Clear</Button>
+              <Button size="sm" asChild disabled={compareSelection.length < 2}>
+                <Link
+                  href={compareHref}
+                  onClick={compareSelection.length < 2 ? (e) => e.preventDefault() : undefined}
+                >
+                  Compare {compareSelection.length} profiles
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
         <SheetContent
           side="bottom"
@@ -1650,13 +1749,16 @@ export default function ExplorePageClient({
             </div>
 
             <div className="relative flex-1 overflow-hidden px-5 py-5">
-              <SidebarFilters
-                draft={draftFilters}
-                onDraftChange={setDraftFilters}
-                onReset={handleSidebarReset}
-                onApply={handleSidebarApply}
-                compact
-              />
+              <div className="space-y-6">
+                {/* Standard Sidebar Filters */}
+                <SidebarFilters
+                  draft={draftFilters}
+                  onDraftChange={setDraftFilters}
+                  onReset={handleSidebarReset}
+                  onApply={handleSidebarApply}
+                  compact
+                />
+              </div>
             </div>
           </div>
         </SheetContent>

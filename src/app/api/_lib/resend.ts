@@ -17,7 +17,11 @@ export async function sendWelcomeEmail(email: string, name: string, token: strin
     from: 'MasseurMatch Concierge <concierge@masseurmatch.com>',
     to: email,
     subject: 'Welcome to MasseurMatch PRO',
-    react: WelcomeEmail({ therapistName: name, verifyLink: `https://masseurmatch.com/verify?token=${token}` }),
+    react: WelcomeEmail({
+      name,
+      isTherapist: true,
+      onboardingLink: `https://masseurmatch.com/verify?token=${token}`,
+    }),
   });
 }
 

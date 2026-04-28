@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Container, Head, Hr, Html, Img, Link, Preview, Row, Section, Text } from '@react-email/components';
+import { Body, Button, Container, Head, Hr, Html, Preview, Section, Text } from '@react-email/components';
 
 interface InquiryReceivedEmailProps {
   clientName: string;
@@ -104,10 +104,10 @@ const detailsBox = {
   margin: '24px 0',
 };
 
-const labelText = {
+const labelText: React.CSSProperties = {
   fontSize: '12px',
   fontWeight: '600',
-  textTransform: 'uppercase',
+  textTransform: 'uppercase' as const,
   color: '#6b7280',
   marginTop: '12px',
 };

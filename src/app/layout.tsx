@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import { AppMotionShell } from "@/app/_components/app-motion-shell";
 import { JsonLd } from "@/app/_components/json-ld";
 import { SiteFooter } from "@/app/_components/site-footer";
@@ -9,6 +10,8 @@ import { AppProviders } from "@/app/providers";
 import { SITE_URL } from "@/lib/site";
 import "leaflet/dist/leaflet.css";
 import "@/index.css";
+import "@/styles/mobile-responsive.css";
+import "@/styles/homepage-mobile-hotfix.css";
 
 const rootMetadata = createPageMetadata({
   title: "The safest and most trusted premium male massage directory",
@@ -31,7 +34,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      style={
+        {
+          "--font-sora": "Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
+          "--font-inter": "Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
+          "--font-space-grotesk": "Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
+        } as CSSProperties
+      }
+    >
       <body className="theme-masseurmatch min-h-screen overflow-x-hidden font-sans text-foreground antialiased">
         <AppProviders>
           <JsonLd data={buildOrganizationJsonLd()} />

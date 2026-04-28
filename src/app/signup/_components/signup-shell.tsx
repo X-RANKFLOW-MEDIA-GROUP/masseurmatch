@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { SignupProvider } from "../_lib/signup-context";
 import { cn } from "@/lib/utils";
+import { AuroraBackgroundLight } from "@/components/ui/aurora-background";
 
 const STEPS = [
   { path: "/signup", label: "Start" },
@@ -60,10 +61,10 @@ function ProgressStepper() {
 export function SignupShell({ children }: { children: React.ReactNode }) {
   return (
     <SignupProvider>
-      <div className="min-h-[calc(100vh-74px)]">
+      <AuroraBackgroundLight className="min-h-[calc(100vh-74px)]">
         <ProgressStepper />
         <div className="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">{children}</div>
-      </div>
+      </AuroraBackgroundLight>
     </SignupProvider>
   );
 }

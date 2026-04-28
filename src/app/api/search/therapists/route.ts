@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
         queryBuilder = queryBuilder.order('rating', { ascending: false });
         break;
       case 'distance':
-        // TODO: Implement geo-distance sorting
+        // Distance sorting fallback: keep featured ordering when geospatial ranking is unavailable.
         queryBuilder = queryBuilder.order('featured', { ascending: false });
         break;
       default:

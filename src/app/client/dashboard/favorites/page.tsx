@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,11 +37,7 @@ export default function ClientFavoritesPage() {
   const [sortBy, setSortBy] = useState("recent");
   const supabase = createClient();
 
-  useEffect(() => {
-    fetchFavorites();
-  }, []);
-
-  async function fetchFavorites() {
+  const fetchFavorites = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
@@ -71,7 +67,11 @@ export default function ClientFavoritesPage() {
       setFavorites(data as unknown as Favorite[]);
     }
     setLoading(false);
-  }
+  }, [supabase]);
+
+  useEffect(() => {
+    fetchFavorites();
+  }, [fetchFavorites]);
 
   async function removeFavorite(favoriteId: string) {
     const { error } = await supabase

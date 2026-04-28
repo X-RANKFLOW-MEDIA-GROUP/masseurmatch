@@ -11,7 +11,12 @@ import { GUIDES } from "@/app/guides/data";
 import { absoluteUrl, getSeoBlogPosts, getSeoCities, getSeoTherapists, FEATURED_PROFILE_SLUGS } from "@/app/_lib/seo-data";
 import { uniqueStrings } from "@/app/_lib/utils";
 import { competitorSlugs } from "@/lib/competitors";
-import { getCities } from "@/app/_lib/directory";
+import { getCities, getCityInventoryMap, getPublicTherapists } from "@/app/_lib/directory";
+import {
+  getKeywordSearchFilters,
+  getSegmentSearchFilters,
+  resolveDirectoryFilters,
+} from "@/app/_lib/directory-taxonomy";
 import { buildCanonicalPath } from "@/app/_lib/route-normalization";
 
 type StaticSitemapRoute = {
@@ -126,6 +131,60 @@ function isRoutableCityPath(path: string): boolean {
   return citySlug ? ROUTABLE_CITY_SLUGS.has(citySlug) : false;
 }
 
+function cityNameBySlug(slug: string): string | null {
+  const city = getCities().find((entry) => entry.slug === slug);
+  return city?.name ?? null;
+}
+
+async function pathHasInventory(path: string): Promise<boolean> {
+  const parts = path.split("/").filter(Boolean);
+  const [citySlug, segmentSlug, keywordOrAreaSlug] = parts;
+
+  if (!citySlug) {
+    return false;
+  }
+
+  const cityName = cityNameBySlug(citySlug);
+  if (!cityName) {
+    return false;
+  }
+
+  if (parts.length === 1) {
+    const { total } = await getPublicTherapists({ city: cityName, page: 1, pageSize: 1 });
+    return total > 0;
+  }
+
+  if (parts.length === 2 && segmentSlug) {
+    const { total } = await getPublicTherapists({
+      city: cityName,
+      page: 1,
+      pageSize: 1,
+      ...getSegmentSearchFilters(segmentSlug),
+    });
+    return total > 0;
+  }
+
+  if (parts.length === 3 && segmentSlug === "areas") {
+    const { total } = await getPublicTherapists({ city: cityName, page: 1, pageSize: 1 });
+    return total > 0;
+  }
+
+  if (parts.length === 3 && segmentSlug && keywordOrAreaSlug) {
+    const { total } = await getPublicTherapists({
+      city: cityName,
+      page: 1,
+      pageSize: 1,
+      ...resolveDirectoryFilters(
+        getSegmentSearchFilters(segmentSlug),
+        getKeywordSearchFilters(keywordOrAreaSlug),
+      ),
+    });
+    return total > 0;
+  }
+
+  return false;
+}
+
 export function buildRobotsRules(): MetadataRoute.Robots["rules"] {
   const searchEngineDisallow = uniqueStrings([...PRIVATE_ROBOTS_PATHS, ...FILTER_ROBOTS_PATHS]);
   return [
@@ -161,10 +220,15 @@ export function buildCoreSitemapEntries(now = new Date()): MetadataRoute.Sitemap
 
 export async function buildCitiesSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
   const dbCities = await getSeoCities();
+  const inventoryMap = await getCityInventoryMap();
 
   if (dbCities.length > 0) {
     return dbCities
       .filter((city) => ROUTABLE_CITY_SLUGS.has(city.slug))
+      .filter((city) => {
+        const cityName = cityNameBySlug(city.slug);
+        return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) > 0 : false;
+      })
       .map((city) => ({
         url: toSitemapUrl(`/${city.slug}`),
         lastModified: city.updated_at ? new Date(city.updated_at) : now,
@@ -175,6 +239,11 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Metad
 
   return getLaunchCityPaths()
     .filter((path) => isRoutableCityPath(path))
+    .filter((path) => {
+      const slug = path.split("/").filter(Boolean)[0];
+      const cityName = slug ? cityNameBySlug(slug) : null;
+      return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) > 0 : false;
+    })
     .map((path) => buildSitemapEntry(path, now, "weekly", path === "/dallas" ? 0.8 : 0.7));
 }
 
@@ -184,15 +253,25 @@ export async function buildServicesSitemapEntries(now = new Date()): Promise<Met
   const orderedServicePaths = FIRST_30_URLS_IN_ORDER.filter(
     (path) => (launchSegmentPaths.has(path) || launchKeywordPaths.has(path)) && isRoutableCityPath(path) && isLaunchUrl(path),
   );
-  return orderedServicePaths.map((path) =>
-    buildSitemapEntry(path, now, "weekly", path.startsWith("/dallas") ? 0.72 : 0.66),
+
+  const inventoryChecks = await Promise.all(
+    orderedServicePaths.map(async (path) => ({ path, hasInventory: await pathHasInventory(path) })),
   );
+
+  return inventoryChecks
+    .filter((entry) => entry.hasInventory)
+    .map((entry) => buildSitemapEntry(entry.path, now, "weekly", entry.path.startsWith("/dallas") ? 0.72 : 0.66));
 }
 
-export function buildNeighborhoodsSitemapEntries(now = new Date()): MetadataRoute.Sitemap {
-  return getLaunchAreaPaths()
-    .filter((path) => isRoutableCityPath(path) && isLaunchUrl(path))
-    .map((path) => buildSitemapEntry(path, now, "weekly", 0.6));
+export async function buildNeighborhoodsSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
+  const candidatePaths = getLaunchAreaPaths().filter((path) => isRoutableCityPath(path) && isLaunchUrl(path));
+  const inventoryChecks = await Promise.all(
+    candidatePaths.map(async (path) => ({ path, hasInventory: await pathHasInventory(path) })),
+  );
+
+  return inventoryChecks
+    .filter((entry) => entry.hasInventory)
+    .map((entry) => buildSitemapEntry(entry.path, now, "weekly", 0.6));
 }
 
 export async function buildProfilesSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
@@ -200,6 +279,7 @@ export async function buildProfilesSitemapEntries(now = new Date()): Promise<Met
   const featuredSet = new Set(FEATURED_PROFILE_SLUGS);
   return therapistData
     .filter((therapist) => therapist.slug)
+    .filter((therapist) => therapist.slug.length >= 3)
     .map((therapist) => ({
       url: toSitemapUrl(`/therapists/${therapist.slug}`),
       lastModified: therapist.updated_at ? new Date(therapist.updated_at) : now,
@@ -240,7 +320,7 @@ export async function buildSitemapEntries(now = new Date()): Promise<MetadataRou
     buildServicesSitemapEntries(now),
     buildProfilesSitemapEntries(now),
   ]);
-  const neighborhoods = buildNeighborhoodsSitemapEntries(now);
+  const neighborhoods = await buildNeighborhoodsSitemapEntries(now);
   const guides = buildGuidesSitemapEntries(now);
   return [...core, ...cities, ...services, ...neighborhoods, ...profiles, ...guides];
 }

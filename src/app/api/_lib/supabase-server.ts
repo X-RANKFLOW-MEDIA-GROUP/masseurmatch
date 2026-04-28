@@ -230,8 +230,7 @@ export async function ensureUserProfileAndRole(
       user_id: user.id,
       full_name: fullName,
       display_name: fullName,
-      status: "pending_approval",
-      is_active: false,
+      status: "pending",
     });
 
     if (profileError) {

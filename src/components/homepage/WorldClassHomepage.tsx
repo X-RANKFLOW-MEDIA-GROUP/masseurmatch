@@ -589,7 +589,7 @@ export function WorldClassHomepage({
             </h1>
 
             <p className="wc-hero-p">
-              The premier LGBTQ+-inclusive directory with verified credentials, 
+              The premier LGBTQ+-inclusive directory with verified profile quality, 
               transparent pricing, and neighborhood-level coverage across major cities.
             </p>
 
@@ -1012,7 +1012,7 @@ export function WorldClassHomepage({
               {
                 n: "02",
                 title: "Review credentials",
-                body: "Read verified reviews, licenses, certifications, and full profiles. Know exactly who you'll be working with.",
+                body: "Read verified reviews, detailed profiles, and session details. Know exactly who you'll be working with.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                     <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />

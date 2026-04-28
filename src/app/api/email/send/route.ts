@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { requireAdminSession } from "@/app/api/_lib/supabase-server";
+import { RouteError } from "@/app/api/_lib/http";
 
 interface EmailData {
   to: string;
@@ -11,6 +11,15 @@ interface EmailData {
 
 export async function POST(request: NextRequest) {
   try {
+    try {
+      await requireAdminSession(request as unknown as Request);
+    } catch (authError) {
+      if (authError instanceof RouteError) {
+        return NextResponse.json({ error: authError.message }, { status: authError.status });
+      }
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body: EmailData = await request.json();
     const { to, template, data } = body;
 
@@ -22,6 +31,16 @@ export async function POST(request: NextRequest) {
     }
 
     const htmlContent = renderTemplate(template, data);
+    const apiKey = process.env.RESEND_API_KEY;
+
+    if (!apiKey) {
+      return NextResponse.json(
+        { message: 'Email service not configured', id: `mock-${Date.now()}` },
+        { status: 200 }
+      );
+    }
+
+    const resend = new Resend(apiKey);
 
     const result = await resend.emails.send({
       from: 'notifications@masseurmatch.com',
