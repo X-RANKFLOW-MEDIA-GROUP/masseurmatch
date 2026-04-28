@@ -125,7 +125,7 @@ function ProfileStatusBanner({ status }: { status: string }) {
 }
 
 export default function DashboardHome() {
-  const { user } = useAuth();
+  const { user, subscription } = useAuth();
   const [activeStatus, setActiveStatus] = useState<AvailabilityStatus>("available");
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
@@ -304,6 +304,8 @@ export default function DashboardHome() {
                 { href: "/pro/listing", label: "Edit Profile", desc: "Update bio, photos, and services" },
                 { href: "/pro/photos", label: "Manage Photos", desc: "Upload and reorder gallery photos" },
                 { href: "/pro/inquiries", label: "Inquiries", desc: "View messages from clients" },
+                { href: "/pro/tickets", label: "Support Tickets", desc: "Open and track support requests" },
+                { href: "/pro/travel-system", label: "Travel HTML", desc: "Paid tiers can embed travel tools" },
                 { href: "/pro/subscription", label: "Subscription", desc: "View or upgrade your plan" },
               ].map((link) => (
                 <Link
@@ -316,6 +318,36 @@ export default function DashboardHome() {
                 </Link>
               ))}
             </div>
+          </div>
+
+          <div className="border border-slate-200/60 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="font-sans font-semibold text-slate-900">Ads Activation (Compact)</h3>
+              <span className="text-xs text-slate-500">Pay instantly in Stripe</span>
+            </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {[
+                { name: "Explore Boost", slug: "explore-boost", price: "$12" },
+                { name: "City Spotlight", slug: "city-spotlight", price: "$29" },
+                { name: "Geo Ads Campaign", slug: "geo-ads-campaign", price: "$15+" },
+                { name: "Masseur of the Day", slug: "masseur-of-the-day", price: "$29/day" },
+              ].map((ad) => (
+                <Link
+                  key={ad.slug}
+                  href={`/pro/billing?addon=${encodeURIComponent(ad.slug)}`}
+                  className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm transition hover:border-slate-300 hover:bg-slate-50"
+                >
+                  <span className="font-medium text-slate-700">{ad.name}</span>
+                  <span className="font-mono text-xs text-slate-500">{ad.price}</span>
+                </Link>
+              ))}
+            </div>
+            <p className="mt-3 text-xs text-slate-500">
+              No activation email is needed. Checkout opens directly and activates via Stripe.
+            </p>
+            {subscription.plan_key === "free" && (
+              <p className="mt-2 text-xs text-amber-700">Tip: upgrade to unlock higher ad inventory and visibility.</p>
+            )}
           </div>
 
           {profileStatus === "pending_approval" && (
