@@ -15,9 +15,9 @@ import MasseurProfile from "@/app/_components/MasseurProfileClient";
 export const revalidate = 1800;
 
 const homeMetadata = createPageMetadata({
-  title: "Gay massage therapists & male massage near me — verified LGBTQ+ directory",
+  title: "MasseurMatch | Find Independent Massage Therapists Near You",
   description:
-    "Find verified gay massage therapists and male massage near you. LGBTQ+-affirming directory covering Dallas, Miami, Chicago, Houston, Austin and 100+ US cities. Compare outcall, incall, deep tissue, Swedish, and direct-contact profiles.",
+    "Find independent massage therapists by city, style, availability, and contact preference. Browse profiles and contact providers directly.",
   path: "/",
   keywords: [
     "gay massage near me",
