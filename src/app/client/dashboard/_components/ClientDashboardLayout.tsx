@@ -10,9 +10,9 @@ export function ClientDashboardLayout({ children }: { children: React.ReactNode 
 
   const navItems = [
     { href: '/client/dashboard', label: 'Dashboard', icon: Search },
-    { href: '/client/inquiries', label: 'Inquiries', icon: Bell },
-    { href: '/client/favorites', label: 'Favorites', icon: Heart },
-    { href: '/client/settings', label: 'Settings', icon: Settings },
+    { href: '/client/dashboard/inquiries', label: 'Inquiries', icon: Bell },
+    { href: '/client/dashboard/favorites', label: 'Favorites', icon: Heart },
+    { href: '/client/dashboard/settings', label: 'Settings', icon: Settings },
   ];
 
   return (
