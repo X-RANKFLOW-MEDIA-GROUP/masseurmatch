@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
+import { env, hasStripe } from "@/lib/env";
 
 type SubscriptionTier = "free" | "standard" | "pro" | "elite";
 
@@ -76,8 +77,11 @@ function resolveTier(obj: StripeEventObject, subscriptionStatus?: string): Subsc
 }
 
 function getStripeClient() {
-  const key = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_MCP_KEY || "";
-  return new Stripe(key, { apiVersion: "2025-08-27.basil" });
+  if (!hasStripe || !env.stripeSecretKey) {
+    return null;
+  }
+
+  return new Stripe(env.stripeSecretKey, { apiVersion: "2025-08-27.basil" });
 }
 
 async function updateTier(userId: string, tier: SubscriptionTier) {
@@ -102,7 +106,7 @@ async function updateTier(userId: string, tier: SubscriptionTier) {
 
 export async function GET() {
   return NextResponse.json({
-    configured: Boolean((process.env.STRIPE_SECRET_KEY || process.env.STRIPE_MCP_KEY) && process.env.STRIPE_WEBHOOK_SECRET),
+    configured: Boolean(hasStripe && env.stripeWebhookSecret),
     endpoint: "/api/webhooks/stripe",
   });
 }
@@ -121,7 +125,7 @@ export async function POST(request: Request) {
   if (isLocalDev) {
     event = JSON.parse(rawBody) as StripeEvent;
   } else {
-    if (!webhookSecret) {
+    if (!webhookSecret || !stripe) {
       return NextResponse.json({ error: "Webhook secret not configured." }, { status: 400 });
     }
     try {
