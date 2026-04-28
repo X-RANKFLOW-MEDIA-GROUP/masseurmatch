@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { requireAdminSession } from "@/app/api/_lib/supabase-server";
+import { RouteError } from "@/app/api/_lib/http";
 
 interface EmailData {
   to: string;
@@ -9,6 +11,15 @@ interface EmailData {
 
 export async function POST(request: NextRequest) {
   try {
+    try {
+      await requireAdminSession(request as unknown as Request);
+    } catch (authError) {
+      if (authError instanceof RouteError) {
+        return NextResponse.json({ error: authError.message }, { status: authError.status });
+      }
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body: EmailData = await request.json();
     const { to, template, data } = body;
 

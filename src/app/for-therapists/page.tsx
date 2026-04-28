@@ -55,7 +55,7 @@ const benefits = [
   {
     icon: "04",
     title: "Verified badge builds trust",
-    body: "Our verification process signals to clients that you are licensed and committed to professional standards before they even read your bio.",
+    body: "Our verification process signals to clients that you are committed to professional standards before they even read your bio.",
   },
   {
     icon: "05",
@@ -77,8 +77,8 @@ const steps = [
   },
   {
     n: "02",
-    title: "Submit your license",
-    body: "Our team verifies your state massage therapy license within 1-2 business days.",
+    title: "Submit your profile details",
+    body: "Our team reviews profile quality and safety details within 1-2 business days.",
   },
   {
     n: "03",
@@ -571,7 +571,7 @@ export default function ForTherapistsPage() {
               }}
             >
               {[
-                "Valid state massage therapy license",
+                "Accurate service profile details",
                 "License in good standing",
                 "Commitment to LGBTQ+-inclusive practice",
                 "Accurate, truthful profile information",

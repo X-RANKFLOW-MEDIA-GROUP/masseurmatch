@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AppButton, AppInput, Surface } from "@/app/_components/primitives";
+import { PasswordInput } from "@/components/ui/password-input";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -133,7 +134,7 @@ function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
     setLoading(false);
     toast({ title: isLogin ? "Welcome back" : "Account created" });
     // Use window.location for a full page navigation to ensure cookies are read properly
-    const destination = isLogin ? redirectTo : "/pro/onboard";
+    const destination = isLogin ? redirectTo : "/signup/plan";
     window.location.href = destination;
   };
 
@@ -189,7 +190,7 @@ function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
   const sendOtp = async () => {
     if (!email.trim()) return;
     setLoading(true);
-    const destination = isLogin ? redirectTo : "/pro/onboard";
+    const destination = isLogin ? redirectTo : "/signup/plan";
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
       options: {
@@ -226,7 +227,7 @@ function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
     setLoading(false);
     toast({ title: isLogin ? "Welcome back" : "Account created" });
     // Use window.location for a full page navigation to ensure cookies are read properly
-    const destination = isLogin ? redirectTo : "/pro/onboard";
+    const destination = isLogin ? redirectTo : "/signup/plan";
     window.location.href = destination;
   };
 
@@ -349,7 +350,8 @@ export function AuthForms({
     });
 
     // Use window.location for a full page navigation to ensure cookies are read properly
-    const destination = isLogin ? redirectTo : "/pro/onboard";
+    // New users go to plan selection, existing users go to their redirect or dashboard
+    const destination = isLogin ? redirectTo : "/signup/plan";
     window.location.href = destination;
   };
 
@@ -415,14 +417,16 @@ export function AuthForms({
               autoComplete="email"
               required
             />
-            <AppInput
-              type="password"
+            
+            {/* Kept PasswordInput from 'main' branch */}
+            <PasswordInput
               aria-label="Password"
               placeholder={isLogin ? "Password" : "At least 8 characters"}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoComplete={isLogin ? "current-password" : "new-password"}
               minLength={8}
+              showStrength={!isLogin}
               required
             />
 

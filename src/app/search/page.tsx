@@ -43,7 +43,7 @@ const SEARCH_FAQS = [
   {
     question: "What does the verified badge mean?",
     answer:
-      "Verified therapists have completed one or more identity checks. This signals a higher level of trust — not a licensing guarantee.",
+      "Verified therapists have completed one or more identity and profile checks. This signals a higher level of trust within the directory.",
   },
   {
     question: "Can I filter by specialty or session type?",

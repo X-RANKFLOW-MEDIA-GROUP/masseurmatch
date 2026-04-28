@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Bell, Key, LogOut, Save, Shield, User } from "lucide-react";
 import Link from "next/link";
 
@@ -117,6 +118,11 @@ export default function ProSettingsPage() {
     toast({ title: "Preferences saved", description: "Notification settings updated." });
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    window.location.href = "/";
+  };
+
   return (
     <div className="mx-auto max-w-3xl space-y-8 p-6 pb-32 md:p-10">
       <header>
@@ -161,9 +167,8 @@ export default function ProSettingsPage() {
             <label htmlFor="current-pw" className="text-xs font-medium uppercase tracking-wider text-slate-500">
               Palavra-passe Atual
             </label>
-            <Input
+            <PasswordInput
               id="current-pw"
-              type="password"
               value={pwForm.current}
               onChange={(e) => setPwForm((f) => ({ ...f, current: e.target.value }))}
               required
@@ -174,9 +179,8 @@ export default function ProSettingsPage() {
             <label htmlFor="new-pw" className="text-xs font-medium uppercase tracking-wider text-slate-500">
               Nova Palavra-passe
             </label>
-            <Input
+            <PasswordInput
               id="new-pw"
-              type="password"
               value={pwForm.next}
               onChange={(e) => setPwForm((f) => ({ ...f, next: e.target.value }))}
               required
@@ -188,9 +192,8 @@ export default function ProSettingsPage() {
             <label htmlFor="confirm-pw" className="text-xs font-medium uppercase tracking-wider text-slate-500">
               Confirmar Nova Palavra-passe
             </label>
-            <Input
+            <PasswordInput
               id="confirm-pw"
-              type="password"
               value={pwForm.confirm}
               onChange={(e) => setPwForm((f) => ({ ...f, confirm: e.target.value }))}
               required
@@ -299,7 +302,7 @@ export default function ProSettingsPage() {
           </p>
           <Button
             variant="destructive"
-            onClick={() => signOut()}
+            onClick={() => handleSignOut()}
             className="gap-2"
           >
             <LogOut className="h-4 w-4" />
