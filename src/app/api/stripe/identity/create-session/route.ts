@@ -128,7 +128,17 @@ export async function POST(request: NextRequest) {
       });
 
       if (insertError) {
-        throw new Error(insertError.message);
+        const isLegacySchemaConstraintError =
+          /not-null|null value|violates check constraint|column .* does not exist/i.test(insertError.message);
+
+        if (!isLegacySchemaConstraintError) {
+          throw new Error(insertError.message);
+        }
+
+        console.warn("identity_verifications insert skipped due to schema mismatch", {
+          message: insertError.message,
+          code: insertError.code,
+        });
       }
     }
 
