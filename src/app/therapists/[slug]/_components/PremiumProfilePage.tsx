@@ -77,7 +77,10 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
             isMostReviewed={reviews.length >= 20}
             isRising={Boolean(profile.available_now)}
             reviewCount={reviews.length}
-            averageRating={avgRating}
+            averageRating={reviews.length > 0 ? (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length) : 0}
+            isTopRated={reviews.length > 0 && (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length) >= 4.5}
+            isMostReviewed={reviews.length >= 10}
+            isRising={false}
             viewCount={profile.profile_views ?? 0}
           />
         </section>
@@ -92,8 +95,8 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
             <ReviewsDisplay
               reviews={reviews.map(r => ({
                 id: r.id,
-                author_name: r.reviewer_name ?? "Verified Client",
-                rating: r.rating ?? 5,
+                author_name: r.reviewer_name ?? "Anonymous",
+                rating: r.rating ?? 0,
                 body: r.review_text,
                 created_at: r.review_date ?? new Date().toISOString()
               }))}

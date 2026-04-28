@@ -118,6 +118,11 @@ export default function ProSettingsPage() {
     toast({ title: "Preferences saved", description: "Notification settings updated." });
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    window.location.href = "/";
+  };
+
   return (
     <div className="mx-auto max-w-3xl space-y-8 p-6 pb-32 md:p-10">
       <header>
@@ -297,7 +302,7 @@ export default function ProSettingsPage() {
           </p>
           <Button
             variant="destructive"
-            onClick={() => signOut()}
+            onClick={() => handleSignOut()}
             className="gap-2"
           >
             <LogOut className="h-4 w-4" />
