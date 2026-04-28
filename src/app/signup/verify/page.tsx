@@ -50,6 +50,7 @@ export default function SignupVerifyPage() {
   const [phoneSent, setPhoneSent] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
   const [phoneLoading, setPhoneLoading] = useState(false);
+  const [phoneBypassAvailable, setPhoneBypassAvailable] = useState(false);
   const [idLoading, setIdLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -77,16 +78,11 @@ export default function SignupVerifyPage() {
       phone: state.phone || user.phone?.trim() || "",
     });
 
-    if (user.email_confirmed_at) {
-      markEmailVerified();
-    }
-
     if (user.phone_confirmed_at) {
       markPhoneVerified();
     }
   }, [
     authLoading,
-    markEmailVerified,
     markPhoneVerified,
     router,
     setAccountInfo,
@@ -149,12 +145,14 @@ export default function SignupVerifyPage() {
     setError(null);
 
     try {
-      const { error: resendError } = await supabase.auth.resend({
-        type: "signup",
+      const { error: otpError } = await supabase.auth.signInWithOtp({
         email: state.email,
+        options: {
+          shouldCreateUser: false,
+        },
       });
 
-      if (resendError) throw resendError;
+      if (otpError) throw otpError;
       setEmailSent(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to send email verification code.");
@@ -209,7 +207,13 @@ export default function SignupVerifyPage() {
       if (otpError) throw otpError;
       setPhoneSent(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send SMS verification code.");
+      const message = err instanceof Error ? err.message : "Failed to send SMS verification code.";
+      if (/twilio|sms provider|phone provider|not configured/i.test(message)) {
+        setPhoneBypassAvailable(true);
+        setError("SMS provider unavailable (Twilio/Supabase). You can continue temporarily without SMS verification.");
+      } else {
+        setError(message);
+      }
     } finally {
       setPhoneLoading(false);
     }
@@ -368,7 +372,7 @@ export default function SignupVerifyPage() {
               {!emailSent ? (
                 <Button onClick={sendEmailCode} disabled={emailLoading} variant="outline">
                   {emailLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  Send Verification Code
+                  Send Email Code
                 </Button>
               ) : (
                 <div className="space-y-3">
@@ -449,6 +453,16 @@ export default function SignupVerifyPage() {
                     {phoneLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                     Send SMS Code
                   </Button>
+                  {phoneBypassAvailable && (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={markPhoneVerified}
+                      disabled={phoneLoading}
+                    >
+                      Continue without SMS (temporary)
+                    </Button>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-3">
