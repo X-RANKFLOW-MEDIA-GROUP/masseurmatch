@@ -8,6 +8,8 @@ interface CinematicHomepageProps {
   featuredTherapists: Profile[];
   totalTherapists: number;
   cityCount: number;
+  priorityCityLinks: Array<{ href: string; anchor: string }>;
+  topCityBannerItems: Array<{ href: string; label: string }>;
 }
 
 const featureCards = [
@@ -104,6 +106,53 @@ function HeroSection({ totalTherapists, cityCount }: { totalTherapists: number; 
               <div className="font-sans text-3xl font-bold text-[#FF8A1F]">{stat.value}</div>
               <div className="mt-2 font-sans text-[11px] uppercase tracking-[0.12em] text-white/55">{stat.label}</div>
             </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TopCitySideBanner({ cities }: { cities: Array<{ href: string; label: string }> }) {
+  if (cities.length === 0) return null;
+
+  const loopedCities = [...cities, ...cities];
+
+  return (
+    <section className="border-y border-[#0B1F3A]/10 bg-[#F5EFE3] px-4 py-5 text-[#0B1F3A]">
+      <div className="mx-auto grid max-w-6xl gap-4 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-center">
+        <p className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-[#A56B21]">Top 20 Cities</p>
+        <div className="relative h-16 overflow-hidden rounded-2xl border border-[#0B1F3A]/10 bg-white">
+          <div className="animate-[city-side-scroll_28s_linear_infinite]">
+            {loopedCities.map((city, index) => (
+              <Link
+                key={`${city.href}-${index}`}
+                href={city.href}
+                className="block border-b border-[#0B1F3A]/8 px-4 py-2 font-sans text-sm font-medium transition hover:bg-[#FCFBF8]"
+              >
+                {city.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PriorityCityLinks({ links }: { links: Array<{ href: string; anchor: string }> }) {
+  if (links.length === 0) return null;
+
+  return (
+    <section className="bg-[#FCFBF8] px-6 py-12 text-[#0B1F3A]">
+      <div className="mx-auto max-w-6xl rounded-3xl border border-[#0B1F3A]/10 bg-white p-6 sm:p-8">
+        <p className="font-sans text-[11px] uppercase tracking-[0.2em] text-[#A56B21]">Fast index internal links</p>
+        <h2 className="mt-3 font-serif text-3xl leading-tight tracking-[-0.02em]">Explore our priority city pages</h2>
+        <div className="mt-6 flex flex-wrap gap-2">
+          {links.map((link) => (
+            <Link key={link.href} href={link.href} className="rounded-full border border-[#0B1F3A]/20 px-4 py-2 font-sans text-xs font-semibold uppercase tracking-[0.08em] transition hover:bg-[#0B1F3A] hover:text-[#FCFBF8]">
+              {link.anchor}
+            </Link>
           ))}
         </div>
       </div>
@@ -243,14 +292,32 @@ function TherapistCTASection() {
   );
 }
 
-export function CinematicHomepage({ featuredTherapists, totalTherapists, cityCount }: CinematicHomepageProps) {
+export function CinematicHomepage({
+  featuredTherapists,
+  totalTherapists,
+  cityCount,
+  priorityCityLinks,
+  topCityBannerItems,
+}: CinematicHomepageProps) {
   return (
     <main className="overflow-x-hidden bg-[#FCFBF8]">
       <HeroSection totalTherapists={totalTherapists} cityCount={cityCount} />
+      <TopCitySideBanner cities={topCityBannerItems} />
+      <PriorityCityLinks links={priorityCityLinks} />
       <FeaturedTherapists therapists={featuredTherapists} />
       <BenefitsSection />
       <HowItWorksSection />
       <TherapistCTASection />
+      <style jsx global>{`
+        @keyframes city-side-scroll {
+          from {
+            transform: translateY(0);
+          }
+          to {
+            transform: translateY(-50%);
+          }
+        }
+      `}</style>
     </main>
   );
 }
