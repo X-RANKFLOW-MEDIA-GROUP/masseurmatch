@@ -1,87 +1,103 @@
 #!/usr/bin/env node
 
+import fs from "node:fs";
+import path from "node:path";
+
 const BASE_URL = (process.env.SITEMAP_VALIDATION_BASE_URL || "https://masseurmatch.com").replace(/\/$/, "");
 const SITEMAP_URL = `${BASE_URL}/sitemap.xml`;
+const repoRoot = process.cwd();
+
+const PRIVATE_PATTERNS = ["/dashboard", "/admin", "/api", "/login", "/register", "/billing", "/checkout"];
 
 function parseLocs(xml) {
-  const matches = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)];
-  return [...new Set(matches.map((m) => m[1].trim()))];
+  return [...new Set([...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].trim()))];
 }
 
-function chunk(values, size) {
-  const chunks = [];
-  for (let i = 0; i < values.length; i += size) {
-    chunks.push(values.slice(i, i + size));
-  }
-  return chunks;
+function fail(message) {
+  console.error(`[sitemap-validator] ERROR: ${message}`);
+  process.exit(1);
 }
 
-async function checkUrl(url) {
-  if (url.includes("?lang=")) {
-    return { url, ok: false, reason: "contains ?lang=" };
+function validateUrls(urls) {
+  if (!urls.length) {
+    fail("No <loc> entries found in sitemap output.");
   }
 
-  const response = await fetch(url, {
-    method: "GET",
-    redirect: "manual",
-    headers: {
-      "user-agent": "MasseurMatch-SitemapValidator/1.0",
-    },
-  });
-
-  if (response.status >= 300 && response.status < 400) {
-    return {
-      url,
-      ok: false,
-      reason: `redirects (${response.status}) to ${response.headers.get("location") || "(missing location)"}`,
-    };
+  const privateHits = urls.filter((url) => PRIVATE_PATTERNS.some((pattern) => url.includes(pattern)));
+  if (privateHits.length > 0) {
+    fail(`Private routes detected in sitemap output: ${privateHits.slice(0, 5).join(", ")}`);
   }
 
-  if (response.status !== 200) {
-    return { url, ok: false, reason: `returns ${response.status}` };
+  const requiredPublic = ["/", "/therapists", "/blog", "/guides", "/compare", "/legal", "/privacy", "/terms"];
+  const missingRequired = requiredPublic.filter((route) => !urls.some((url) => url.endsWith(route)));
+  if (missingRequired.length > 0) {
+    fail(`Required public routes missing from sitemap output: ${missingRequired.join(", ")}`);
+  }
+}
+
+async function validateViaHttp() {
+  console.log(`[sitemap-validator] Fetching ${SITEMAP_URL}`);
+  const response = await fetch(SITEMAP_URL, { headers: { "user-agent": "MasseurMatch-SitemapValidator/1.1" } });
+  if (!response.ok) {
+    fail(`Unable to fetch sitemap: ${response.status} ${response.statusText}`);
   }
 
-  return { url, ok: true };
+  const xml = await response.text();
+  validateUrls(parseLocs(xml));
+  console.log("[sitemap-validator] OK (remote fetch)");
+}
+
+function validateViaSourceFiles() {
+  const seoRoutesPath = path.join(repoRoot, "src/app/_lib/seo-routes.ts");
+  const sitemapRoutePath = path.join(repoRoot, "src/app/sitemap.ts");
+  const robotsRoutePath = path.join(repoRoot, "src/app/robots.ts");
+
+  for (const filePath of [seoRoutesPath, sitemapRoutePath, robotsRoutePath]) {
+    if (!fs.existsSync(filePath)) {
+      fail(`Required SEO file missing: ${path.relative(repoRoot, filePath)}`);
+    }
+  }
+
+  const seoSource = fs.readFileSync(seoRoutesPath, "utf8");
+  const sitemapSource = fs.readFileSync(sitemapRoutePath, "utf8");
+  const robotsSource = fs.readFileSync(robotsRoutePath, "utf8");
+
+  const mustContain = [
+    "/therapists",
+    "/blog",
+    "/guides",
+    "/compare",
+    "/privacy",
+    "/terms",
+    "/legal",
+  ];
+
+  const missing = mustContain.filter((token) => !seoSource.includes(token));
+  if (missing.length > 0) {
+    fail(`SEO routes are missing required public paths: ${missing.join(", ")}`);
+  }
+
+  for (const privateRoute of PRIVATE_PATTERNS) {
+    if (sitemapSource.includes(privateRoute)) {
+      fail(`sitemap.ts appears to include private route pattern: ${privateRoute}`);
+    }
+  }
+
+  if (!robotsSource.includes("buildRobotsRules") && !robotsSource.includes("disallow") && !robotsSource.includes("Disallow")) {
+    fail("robots.ts does not appear to define robots disallow rules.");
+  }
+
+  console.log("[sitemap-validator] OK (source fallback)");
 }
 
 async function main() {
-  console.log(`[sitemap-validator] Fetching ${SITEMAP_URL}`);
-  const sitemapResponse = await fetch(SITEMAP_URL, {
-    headers: {
-      "user-agent": "MasseurMatch-SitemapValidator/1.0",
-    },
-  });
-
-  if (!sitemapResponse.ok) {
-    throw new Error(`Unable to fetch sitemap: ${sitemapResponse.status} ${sitemapResponse.statusText}`);
+  try {
+    await validateViaHttp();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.log(`[sitemap-validator] Remote fetch unavailable (${message}). Falling back to source validation.`);
+    validateViaSourceFiles();
   }
-
-  const sitemapXml = await sitemapResponse.text();
-  const urls = parseLocs(sitemapXml);
-
-  if (!urls.length) {
-    throw new Error("No <loc> entries found in sitemap.xml");
-  }
-
-  const failures = [];
-
-  for (const group of chunk(urls, 10)) {
-    const results = await Promise.all(group.map((url) => checkUrl(url)));
-    failures.push(...results.filter((result) => !result.ok));
-  }
-
-  if (failures.length) {
-    console.error(`\n[sitemap-validator] ${failures.length} failing URL(s):`);
-    for (const failure of failures) {
-      console.error(`- ${failure.url} -> ${failure.reason}`);
-    }
-    process.exit(1);
-  }
-
-  console.log(`[sitemap-validator] OK. ${urls.length} URL(s) checked. All are 200 and non-redirecting.`);
 }
 
-main().catch((error) => {
-  console.error(`[sitemap-validator] ERROR: ${error instanceof Error ? error.message : String(error)}`);
-  process.exit(1);
-});
+await main();

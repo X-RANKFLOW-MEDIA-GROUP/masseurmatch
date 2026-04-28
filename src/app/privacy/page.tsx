@@ -26,7 +26,7 @@ const sections = [
   {
     id: "information-we-collect",
     title: "1. Information We Collect",
-    content: `We collect information you provide directly when creating an account, listing a practice, or contacting us. This includes your name, email address, and (for therapists) your professional license information and service details.
+    content: `We collect information you provide directly when creating an account, listing a practice, or contacting us. This includes your name, email address, and (for therapists) your service and profile details.
 
 We also collect limited technical data automatically, including your IP address, browser type, and pages visited on our site. This data is used solely to maintain and improve the platform.
 
@@ -38,7 +38,7 @@ We do not collect health information, sensitive personal data, or any informatio
     content: `We use your information to:
 
 - Operate and maintain the MasseurMatch directory
-- Verify therapist credentials with state licensing boards
+- Review profile quality and completeness
 - Send transactional communications (account confirmations, support responses)
 - Improve platform functionality and user experience
 - Detect and prevent fraud, abuse, or policy violations
@@ -52,7 +52,7 @@ We do not use your information for advertising profiling or behavioral targeting
 
 We share limited data only with:
 
-- State licensing boards (therapist license numbers only, for verification purposes)
+- Safety/compliance partners when required by law
 - Payment processors (Stripe) for handling subscription payments - we never store payment card data
 - Hosting and infrastructure providers (Vercel, Supabase) who process data solely on our behalf under strict data processing agreements
 - Law enforcement when required by valid legal process

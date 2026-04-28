@@ -5,9 +5,12 @@ import { NextResponse } from "next/server";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { readdirSync } from "fs";
+import { requireAdminSession } from "@/app/api/_lib/supabase-server";
 
 export async function POST(request: NextRequest) {
   try {
+    await requireAdminSession(request as unknown as Request);
+
     const cookieStore = await cookies();
     
     // Create Supabase client with service role key (admin)

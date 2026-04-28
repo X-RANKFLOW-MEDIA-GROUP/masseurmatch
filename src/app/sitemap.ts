@@ -19,6 +19,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     buildNeighborhoodsSitemapEntries(now),
     buildProfilesSitemapEntries(now),
     buildBlogPostsSitemapEntries(now),
+    buildNeighborhoodsSitemapEntries(now),
+    buildGuidesSitemapEntries(now),
   ]);
   const core = buildCoreSitemapEntries(now);
   const guides = buildGuidesSitemapEntries(now);

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ResetPasswordPageClient() {
@@ -110,8 +110,7 @@ export default function ResetPasswordPageClient() {
         </p>
 
         <form onSubmit={handleSubmit} className="mt-5 space-y-3">
-          <Input
-            type="password"
+          <PasswordInput
             placeholder="New password (min 8 characters)"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -119,8 +118,7 @@ export default function ResetPasswordPageClient() {
             required
             minLength={8}
           />
-          <Input
-            type="password"
+          <PasswordInput
             placeholder="Confirm new password"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}

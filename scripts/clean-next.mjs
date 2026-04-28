@@ -27,6 +27,15 @@ const looksLikeNextServerCommand = (value) => {
 	);
 };
 
+const isLikelyApiTestNextProcess = (value) => {
+	const command = normalizeCommand(value);
+	return (
+		command.includes("next dev -p 3311") ||
+		command.includes("next dev --port 3311") ||
+		command.includes("api_test_port=3311")
+	);
+};
+
 const getWindowsProcessCommands = () => {
 	const output = execFileSync(
 		"powershell.exe",
@@ -96,17 +105,19 @@ const ensureChunkDirectories = () => {
 if (process.env[OVERRIDE_ENV] !== "1") {
 	const serverProcesses = findRunningNextServerProcesses();
 
-	if (serverProcesses.length > 0) {
-		console.error(
-			[
-				"Refusing to delete .next because a Next dev/start server appears to be running.",
-				`Stop \`npm run dev\` or \`npm run start\` first, or rerun with ${OVERRIDE_ENV}=1 if you intend to force a clean.`,
-				`Detected process: ${serverProcesses[0].command}`,
-			].join("\n"),
-		);
+		const blockingProcesses = serverProcesses.filter((item) => !isLikelyApiTestNextProcess(item.command));
 
-		process.exit(1);
-	}
+		if (blockingProcesses.length > 0) {
+			console.error(
+				[
+					"Refusing to delete .next because a Next dev/start server appears to be running.",
+					`Stop \`npm run dev\` or \`npm run start\` first, or rerun with ${OVERRIDE_ENV}=1 if you intend to force a clean.`,
+					`Detected process: ${blockingProcesses[0].command}`,
+				].join("\n"),
+			);
+
+			process.exit(1);
+		}
 }
 
 rmSync(nextDir, { recursive: true, force: true });

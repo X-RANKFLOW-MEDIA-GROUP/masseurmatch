@@ -41,7 +41,7 @@ Important: MasseurMatch is not an employer, staffing agency, or service provider
     title: "3. Eligibility",
     content: `You must be at least 18 years old to use MasseurMatch. By using the Platform, you represent that you meet this requirement.
 
-Therapists must hold a valid state massage therapy license for each state in which they practice and maintain that license in good standing at all times their profile is active.`,
+Therapists must follow all applicable local regulations for their services and keep profile information accurate while their listing is active.`,
   },
   {
     id: "therapist-listings",
@@ -49,13 +49,13 @@ Therapists must hold a valid state massage therapy license for each state in whi
     content: `Therapists listing on MasseurMatch agree to:
 
 • Provide accurate, truthful information in their profiles
-• Maintain a valid, active state massage therapy license
-• Offer only legal, licensed massage therapy services
+• Maintain accurate and current profile details
+• Offer only legal wellness services within applicable law
 • Adhere to MasseurMatch's LGBTQ+-Inclusive Practice Standards
-• Promptly notify us of any changes to their license status
+• Promptly notify us of major profile or service changes
 • Not misrepresent their qualifications, rates, or availability
 
-We reserve the right to remove any listing at any time for any reason, including but not limited to license inactivity, policy violations, or substantiated client complaints.`,
+We reserve the right to remove any listing at any time for any reason, including but not limited to policy violations or substantiated client complaints.`,
   },
   {
     id: "client-conduct",
@@ -64,7 +64,7 @@ We reserve the right to remove any listing at any time for any reason, including
 
 • Use the Platform only for the purpose of finding legitimate massage therapy services
 • Treat all therapists with respect and professionalism
-• Not solicit or request any services that are illegal or outside the scope of licensed massage therapy
+• Not solicit or request any services that are illegal or unsafe
 • Not submit false, misleading, or malicious reviews
 • Report any concerns or inappropriate behavior to MasseurMatch support
 
@@ -89,7 +89,7 @@ Violations may result in immediate and permanent account termination and, where 
     title: "7. Disclaimer of Warranties",
     content: `The Platform is provided "as is" and "as available" without warranties of any kind, express or implied. We do not guarantee:
 
-• The accuracy of therapist profiles, credentials, or reviews
+• The accuracy of therapist profiles, profile claims, or reviews
 • The availability of any particular therapist
 • The quality of services provided by listed therapists
 • Uninterrupted or error-free access to the Platform
@@ -146,7 +146,7 @@ export default function TermsPage() {
           style={{
             background: "#0B1F3A",
             color: "#FCFBF8",
-            padding: "80px 24px 72px",
+            padding: "clamp(56px, 8vw, 80px) 20px clamp(48px, 7vw, 72px)",
           }}
         >
           <div style={{ maxWidth: 820, margin: "0 auto" }}>
@@ -174,16 +174,16 @@ export default function TermsPage() {
             </h1>
             <p
               style={{
-                fontSize: 14,
+                fontSize: "clamp(12px, 2.5vw, 14px)",
                 opacity: 0.5,
                 fontFamily: "system-ui, sans-serif",
               }}
             >
-              Last Updated: March 1, 2025 — Effective immediately
+              Last Updated: April 27, 2026 — Effective immediately
             </p>
             <p
               style={{
-                fontSize: 16,
+                fontSize: "clamp(14px, 2.8vw, 16px)",
                 opacity: 0.65,
                 marginTop: 16,
                 fontFamily: "system-ui, sans-serif",
@@ -203,17 +203,17 @@ export default function TermsPage() {
           style={{
             maxWidth: 820,
             margin: "0 auto",
-            padding: "72px 24px 100px",
+            padding: "clamp(32px, 6vw, 48px) 16px clamp(56px, 8vw, 84px)",
             display: "grid",
-            gridTemplateColumns: "200px 1fr",
-            gap: 64,
+            gridTemplateColumns: "minmax(0, 1fr)",
+            gap: 28,
             alignItems: "start",
           }}
         >
           {/* Sidebar nav */}
           <nav
             aria-label="Terms sections"
-            style={{ position: "sticky", top: 100 }}
+            className="md:sticky md:top-24"
           >
             <p
               style={{
@@ -233,7 +233,7 @@ export default function TermsPage() {
                 href={`#${s.id}`}
                 style={{
                   display: "block",
-                  fontSize: 12,
+                  fontSize: 13,
                   fontFamily: "system-ui, sans-serif",
                   color: "#6B7280",
                   textDecoration: "none",
@@ -252,7 +252,7 @@ export default function TermsPage() {
               style={{
                 background: "#1E4B8F",
                 color: "#FCFBF8",
-                padding: "20px 24px",
+                padding: "18px 18px",
                 marginBottom: 48,
                 fontSize: 14,
                 fontFamily: "system-ui, sans-serif",
@@ -273,7 +273,7 @@ export default function TermsPage() {
               >
                 <h2
                   style={{
-                    fontSize: 19,
+                    fontSize: "clamp(18px, 3.2vw, 19px)",
                     fontWeight: 400,
                     marginBottom: 16,
                     paddingBottom: 12,
@@ -284,7 +284,7 @@ export default function TermsPage() {
                 </h2>
                 <div
                   style={{
-                    fontSize: 15,
+                    fontSize: "clamp(14px, 2.9vw, 15px)",
                     lineHeight: 1.85,
                     color: "#374151",
                     fontFamily: "system-ui, sans-serif",

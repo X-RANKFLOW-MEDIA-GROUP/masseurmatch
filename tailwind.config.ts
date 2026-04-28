@@ -103,11 +103,11 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
-        serif: ["var(--font-playfair)", "Georgia", "serif"],
-        heading: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
-        display: ["var(--font-playfair)", "Georgia", "serif"],
-        mono: ["var(--font-dm-mono)", "monospace"],
+        sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
+        heading: ["var(--font-sora)", "Sora", "system-ui", "sans-serif"],
+        display: ["var(--font-sora)", "Sora", "system-ui", "sans-serif"],
+        stat: ["var(--font-space-grotesk)", "Space Grotesk", "system-ui", "sans-serif"],
+        mono: ["var(--font-space-grotesk)", "Space Grotesk", "monospace"],
       },
       borderRadius: {
         xl: "1.25rem",
