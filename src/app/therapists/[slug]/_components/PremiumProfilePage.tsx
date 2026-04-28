@@ -190,34 +190,6 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
 
         {/* Final CTA */}
         <PremiumProfileCTA profile={profile} />
-
-        {/* Reviews */}
-        {reviews.length > 0 && (
-          <section className="pp-section pp-fade-in" id="reviews">
-            <div className="pp-section-header">
-              <h2 className="pp-section-title">Reviews</h2>
-            </div>
-            <div className="space-y-4">
-              {reviews.map((review) => (
-                <article
-                  key={review.id}
-                  className="rounded-lg border border-[var(--glass-border)] bg-[var(--cream-dim)] p-5"
-                >
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="text-[var(--orange)]">
-                      {"★".repeat(review.rating || 5)}
-                      {"☆".repeat(5 - (review.rating || 5))}
-                    </div>
-                    {review.reviewer_name && (
-                      <span className="text-xs text-[var(--text-muted)]">by {review.reviewer_name}</span>
-                    )}
-                  </div>
-                  <p className="text-sm leading-relaxed text-[var(--cream-soft)]">{review.review_text}</p>
-                </article>
-              ))}
-            </div>
-          </section>
-        )}
       </div>
 
       {/* AI Chat Widget */}
