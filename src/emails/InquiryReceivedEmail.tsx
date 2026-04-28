@@ -107,7 +107,7 @@ const detailsBox = {
 const labelText: React.CSSProperties = {
   fontSize: '12px',
   fontWeight: '600',
-  textTransform: 'uppercase',
+  textTransform: 'uppercase' as const,
   color: '#6b7280',
   marginTop: '12px',
 };
