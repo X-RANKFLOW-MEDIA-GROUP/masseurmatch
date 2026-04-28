@@ -37,20 +37,20 @@ const statusMessages: Record<AvailabilityStatus, string> = {
 
 const colorMap: Record<string, { active: string; idle: string }> = {
   emerald: {
-    active: "bg-emerald-500/10 border-emerald-500/50 text-emerald-400",
-    idle: "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10",
+    active: "border-emerald-500/40 bg-emerald-500/10 text-emerald-700",
+    idle: "border-border bg-background text-muted-foreground hover:bg-secondary",
   },
   indigo: {
-    active: "bg-indigo-500/10 border-indigo-500/50 text-indigo-400",
-    idle: "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10",
+    active: "border-indigo-500/40 bg-indigo-500/10 text-indigo-700",
+    idle: "border-border bg-background text-muted-foreground hover:bg-secondary",
   },
   amber: {
-    active: "bg-amber-500/10 border-amber-500/50 text-amber-400",
-    idle: "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10",
+    active: "border-amber-500/40 bg-amber-500/10 text-amber-700",
+    idle: "border-border bg-background text-muted-foreground hover:bg-secondary",
   },
   rose: {
-    active: "bg-rose-500/10 border-rose-500/50 text-rose-400",
-    idle: "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10",
+    active: "border-rose-500/40 bg-rose-500/10 text-rose-700",
+    idle: "border-border bg-background text-muted-foreground hover:bg-secondary",
   },
 };
 
@@ -149,26 +149,26 @@ export default function DashboardHome() {
   const profileStatus = profile?.status ?? "draft";
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 p-6 md:p-10">
+    <div className="mx-auto max-w-7xl space-y-6 p-4 md:space-y-8 md:p-6 lg:p-8">
       <header className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
-          <h1 className="font-display text-3xl font-semibold tracking-tight text-slate-900">
+          <h1 className="font-display text-3xl font-semibold tracking-tight text-foreground">
             Dashboard
           </h1>
-          <p className="mt-1 font-sans text-sm text-slate-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             Track your profile performance and manage availability.
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-3">
           <Link
             href="/pro/listing"
-            className="border border-slate-200 bg-white px-4 py-2 font-mono text-xs uppercase tracking-wider text-slate-600 shadow-sm transition-colors hover:bg-slate-50"
+            className="rounded-lg border border-border bg-white px-4 py-2 text-center font-mono text-[11px] uppercase tracking-wider text-muted-foreground shadow-sm transition-colors hover:bg-secondary"
           >
             Edit Profile
           </Link>
           <Link
             href="/pro/settings"
-            className="border border-slate-200 bg-white px-4 py-2 font-mono text-xs uppercase tracking-wider text-slate-600 shadow-sm transition-colors hover:bg-slate-50"
+            className="rounded-lg border border-border bg-white px-4 py-2 text-center font-mono text-[11px] uppercase tracking-wider text-muted-foreground shadow-sm transition-colors hover:bg-secondary"
           >
             <Settings className="inline h-3.5 w-3.5" />
           </Link>
@@ -183,19 +183,19 @@ export default function DashboardHome() {
             variants={fadeUp}
             initial="hidden"
             animate="show"
-            className="relative overflow-hidden border border-slate-200/60 bg-white p-6 shadow-sm"
+            className="relative overflow-hidden rounded-2xl border border-border bg-white p-5 shadow-sm md:p-6"
           >
             <div className="flex items-center gap-4">
               <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-tr from-emerald-400 to-emerald-600">
                 <UserCircle className="relative h-10 w-10 text-white" />
               </div>
               <div>
-                <h2 className="font-display text-xl font-medium text-slate-900">
+                <h2 className="font-display text-xl font-medium text-foreground">
                   {displayName}
                 </h2>
                 <div className="mt-0.5 flex items-center gap-1">
                   <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                     Pro Member
                   </span>
                 </div>
@@ -204,26 +204,26 @@ export default function DashboardHome() {
 
             <div className="mt-6">
               <div className="mb-2 flex justify-between text-xs">
-                <span className="font-mono uppercase tracking-wider text-slate-500">
+                <span className="font-mono uppercase tracking-wider text-muted-foreground">
                   Profile Completion
                 </span>
-                <span className="font-mono font-semibold text-slate-900">
+                <span className="font-mono font-semibold text-foreground">
                   {profileLoading ? "…" : `${completion}%`}
                 </span>
               </div>
-              <div className="h-1.5 w-full overflow-hidden bg-slate-100">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
                 {!profileLoading && (
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${completion}%` }}
                     transition={{ duration: 0.8, delay: 0.3 }}
-                    className="h-full bg-slate-900"
+                    className="h-full bg-primary"
                   />
                 )}
               </div>
               {!profileLoading && completion < 100 && (
-                <p className="mt-2 text-[11px] text-slate-500">
-                  <Link href="/pro/listing" className="text-indigo-600 underline">
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  <Link href="/pro/listing" className="text-primary underline">
                     Complete your profile
                   </Link>{" "}
                   to appear in more searches.
@@ -237,9 +237,9 @@ export default function DashboardHome() {
             initial="hidden"
             animate="show"
             transition={{ delay: 0.1 }}
-            className="border border-slate-800 bg-slate-950 p-6 text-white shadow-xl"
+            className="rounded-2xl border border-border bg-white p-5 shadow-sm md:p-6"
           >
-            <h3 className="mb-4 font-mono text-xs uppercase tracking-widest text-slate-400">
+            <h3 className="mb-4 font-mono text-xs uppercase tracking-widest text-muted-foreground">
               Availability
             </h3>
 
@@ -263,9 +263,9 @@ export default function DashboardHome() {
               })}
             </div>
 
-            <div className="mt-4 border border-white/10 bg-white/5 p-3 font-sans text-xs leading-relaxed text-slate-300">
-              {statusMessages[activeStatus]}
-            </div>
+              <div className="mt-4 rounded-xl border border-border bg-secondary/50 p-3 text-xs leading-relaxed text-muted-foreground">
+                {statusMessages[activeStatus]}
+              </div>
           </motion.div>
         </div>
 
@@ -281,25 +281,25 @@ export default function DashboardHome() {
                 variants={fadeUp}
                 initial="hidden"
                 animate="show"
-                className="flex flex-col gap-2 border border-slate-200/60 bg-white p-4 shadow-sm"
+                className="flex flex-col gap-2 rounded-xl border border-border bg-white p-4 shadow-sm"
               >
-                <item.icon className="h-4 w-4 text-slate-400" />
+                <item.icon className="h-4 w-4 text-muted-foreground" />
                 <div>
-                  <div className="font-display text-lg font-medium text-slate-400">—</div>
-                  <div className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                  <div className="font-display text-lg font-medium text-muted-foreground">—</div>
+                  <div className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                     {item.label}
                   </div>
-                  <div className="mt-1 text-[10px] text-slate-400 italic">{item.note}</div>
+                  <div className="mt-1 text-[10px] italic text-muted-foreground">{item.note}</div>
                 </div>
               </motion.div>
             ))}
           </div>
 
-          <div className="border border-slate-200/60 bg-white shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-100 p-5">
-              <h3 className="font-sans font-semibold text-slate-900">Quick Links</h3>
+          <div className="rounded-2xl border border-border bg-white shadow-sm">
+            <div className="flex items-center justify-between border-b border-border/50 p-5">
+              <h3 className="font-sans font-semibold text-foreground">Quick Links</h3>
             </div>
-            <div className="grid grid-cols-1 gap-0 divide-y divide-slate-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+            <div className="grid grid-cols-1 gap-0 divide-y divide-border/50 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
               {[
                 { href: "/pro/listing", label: "Edit Profile", desc: "Update bio, photos, and services" },
                 { href: "/pro/photos", label: "Manage Photos", desc: "Upload and reorder gallery photos" },
@@ -311,19 +311,19 @@ export default function DashboardHome() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="flex flex-col gap-0.5 p-5 transition hover:bg-slate-50"
+                  className="flex flex-col gap-0.5 p-5 transition hover:bg-secondary/60"
                 >
-                  <span className="font-sans text-sm font-semibold text-slate-800">{link.label}</span>
-                  <span className="font-sans text-xs text-slate-500">{link.desc}</span>
+                  <span className="font-sans text-sm font-semibold text-foreground">{link.label}</span>
+                  <span className="font-sans text-xs text-muted-foreground">{link.desc}</span>
                 </Link>
               ))}
             </div>
           </div>
 
-          <div className="border border-slate-200/60 bg-white p-5 shadow-sm">
+          <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-sans font-semibold text-slate-900">Ads Activation (Compact)</h3>
-              <span className="text-xs text-slate-500">Pay instantly in Stripe</span>
+              <h3 className="font-sans font-semibold text-foreground">Ads Activation (Compact)</h3>
+              <span className="text-xs text-muted-foreground">Pay instantly in Stripe</span>
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {[
@@ -335,14 +335,14 @@ export default function DashboardHome() {
                 <Link
                   key={ad.slug}
                   href={`/pro/billing?addon=${encodeURIComponent(ad.slug)}`}
-                  className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm transition hover:border-slate-300 hover:bg-slate-50"
+                  className="flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm transition hover:border-primary/30 hover:bg-secondary/60"
                 >
-                  <span className="font-medium text-slate-700">{ad.name}</span>
-                  <span className="font-mono text-xs text-slate-500">{ad.price}</span>
+                  <span className="font-medium text-foreground">{ad.name}</span>
+                  <span className="font-mono text-xs text-muted-foreground">{ad.price}</span>
                 </Link>
               ))}
             </div>
-            <p className="mt-3 text-xs text-slate-500">
+            <p className="mt-3 text-xs text-muted-foreground">
               No activation email is needed. Checkout opens directly and activates via Stripe.
             </p>
             {subscription.plan_key === "free" && (
@@ -351,8 +351,8 @@ export default function DashboardHome() {
           </div>
 
           {profileStatus === "pending_approval" && (
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
-              <p className="font-semibold text-slate-800 mb-1">What happens next?</p>
+            <div className="rounded-lg border border-border bg-secondary/40 p-5 text-sm text-muted-foreground">
+              <p className="mb-1 font-semibold text-foreground">What happens next?</p>
               <ol className="list-decimal list-inside space-y-1 text-xs">
                 <li>Our team reviews your profile and photos — usually within 1–2 business days.</li>
                 <li>You'll receive an email once approved.</li>
