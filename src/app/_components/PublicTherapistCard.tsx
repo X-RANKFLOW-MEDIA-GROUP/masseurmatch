@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, CheckCircle2, MapPin, Star } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, MapPin } from "lucide-react";
 import { useMemo } from "react";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import {
@@ -140,14 +140,14 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
         {/* Badges */}
         <div className="absolute left-2 right-2 top-2 flex items-start justify-between gap-1">
           {isVerified && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200/70 bg-emerald-50/90 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-700 backdrop-blur-sm">
-              <CheckCircle2 className="h-2.5 w-2.5" />
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/90 text-white px-2 py-0.5 text-[10px] font-semibold backdrop-blur-sm">
+              <CheckCircle2 className="h-3 w-3" />
               Verified
             </span>
           )}
           {therapist.review_count ? (
-            <span className="ml-auto inline-flex items-center gap-0.5 rounded-full border border-amber-200/80 bg-amber-50/90 px-1.5 py-0.5 text-[9px] font-semibold text-amber-700">
-              <Star className="h-2.5 w-2.5 fill-current" /> {therapist.review_count}
+            <span className="inline-flex items-center gap-0.5 rounded-full bg-yellow-500/90 text-white px-2 py-0.5 text-[10px] font-semibold ml-auto">
+              ★ {therapist.review_count}
             </span>
           ) : null}
         </div>

@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AppMotionShell } from "@/app/_components/app-motion-shell";
 import { JsonLd } from "@/app/_components/json-ld";
 import { SiteFooter } from "@/app/_components/site-footer";
 import SiteHeader from "@/app/_components/site-header";
+import { CookieConsent } from "@/app/_components/CookieConsent";
 import { SITE_DESCRIPTION, SITE_NAME, createPageMetadata } from "@/app/_lib/metadata";
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/app/_lib/structured-data";
 import { AppProviders } from "@/app/providers";
@@ -53,9 +52,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SiteHeader />
           <AppMotionShell>{children}</AppMotionShell>
           <SiteFooter />
+          <CookieConsent />
         </AppProviders>
-        <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );

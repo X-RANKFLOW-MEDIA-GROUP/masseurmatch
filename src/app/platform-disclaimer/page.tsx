@@ -29,8 +29,8 @@ const disclaimers: DisclaimerCard[] = [
   },
   {
     icon: BadgeInfo,
-    title: "Identity verification scope",
-    body: "If a profile is marked verified, that means identity-only verification via Stripe Identity. Professional licenses, credentials, and insurance are not verified by default and must be confirmed directly.",
+    title: "No license verification",
+    body: "Credentials, certifications, and licenses shown on profiles are self-declared unless explicitly stated otherwise. Clients should confirm qualifications directly before booking.",
   },
   {
     icon: FileText,
