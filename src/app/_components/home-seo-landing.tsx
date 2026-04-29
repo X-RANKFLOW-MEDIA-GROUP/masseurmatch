@@ -402,11 +402,6 @@ export function HomeSeoLanding({
                   )}
 
                   <div className="absolute left-4 top-4 flex flex-wrap gap-2">
-                    {therapist._tier ? (
-                      <span className="rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-primary">
-                        {therapist._tier}
-                      </span>
-                    ) : null}
                     {(therapist.is_verified_identity || therapist.is_verified_profile) ? (
                       <span className="rounded-full bg-[rgba(15,118,110,0.88)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white">
                         Verified

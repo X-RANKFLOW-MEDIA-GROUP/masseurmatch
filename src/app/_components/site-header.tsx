@@ -261,7 +261,7 @@ export default function SiteHeader() {
         {/* Right CTAs — desktop + mobile hamburger */}
         <div className="flex items-center gap-3">
           <Link
-            href={user ? "/client/dashboard" : "/login"}
+            href={user ? "/pro/dashboard" : "/login"}
             className={`hidden md:flex px-4 py-2 text-sm font-medium transition-colors ${
               isDarkHero ? 'text-white/80 hover:text-white' : 'text-[#4A4F5C] hover:text-[#0B1F3A]'
             }`}
