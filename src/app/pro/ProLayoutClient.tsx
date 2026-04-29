@@ -13,7 +13,9 @@ import {
   Loader2,
   Mail,
   Menu,
+  Plane,
   Settings,
+  Ticket,
   UserCircle,
   X,
 } from "lucide-react";
@@ -24,6 +26,8 @@ const navItems = [
   { name: "My Profile", href: "/pro/listing", icon: UserCircle },
   { name: "Photos", href: "/pro/photos", icon: ImageIcon },
   { name: "Inquiries", href: "/pro/inquiries", icon: Mail },
+  { name: "Tickets", href: "/pro/tickets", icon: Ticket },
+  { name: "Travel HTML", href: "/pro/travel-system", icon: Plane },
   { name: "Analytics", href: "/pro/analytics", icon: BarChart },
   { name: "Subscription", href: "/pro/subscription", icon: CreditCard },
   { name: "Settings", href: "/pro/settings", icon: Settings },
@@ -63,16 +67,18 @@ export default function ProLayoutClient({
 
   const sidebarContent = (
     <>
-      <div className="p-6">
-        <Link href="/" className="font-display text-2xl font-bold tracking-tighter text-white">
-          Masseur<span className="text-slate-500">Match</span>{" "}
-          <span className="ml-1 align-top font-mono text-[10px] uppercase tracking-widest text-indigo-400">
-            PRO
+      <div className="p-4">
+        <Link href="/pro/dashboard" className="flex items-center gap-2">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-accent text-sidebar-accent-foreground">
+            <BookUser className="h-4 w-4" />
+          </div>
+          <span className="text-base font-semibold text-sidebar-foreground">
+            Pro Dashboard
           </span>
         </Link>
       </div>
 
-      <nav className="flex-1 space-y-2 px-4 py-6">
+      <nav className="flex-1 space-y-1 px-3 py-5">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
 
@@ -81,15 +87,15 @@ export default function ProLayoutClient({
               {isActive ? (
                 <motion.div
                   layoutId="activeNav"
-                  className="absolute inset-0 rounded-lg border border-slate-800 bg-slate-900"
+                  className="absolute inset-0 rounded-lg border border-primary/20 bg-primary/10"
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 />
               ) : null}
               <span
-                className={`relative flex items-center gap-3 rounded-lg px-4 py-3 font-sans text-sm transition-colors ${
+                className={`relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
                   isActive
-                    ? "font-medium text-white"
-                    : "text-slate-400 hover:bg-slate-900/50 hover:text-slate-200"
+                    ? "font-medium text-foreground"
+                    : "text-muted-foreground hover:bg-secondary/80 hover:text-foreground"
                 }`}
               >
                 <item.icon className="h-4 w-4" />
@@ -100,10 +106,10 @@ export default function ProLayoutClient({
         })}
       </nav>
 
-      <div className="m-4 rounded-xl border border-indigo-500/20 bg-gradient-to-b from-indigo-900/20 to-transparent p-4">
-        <p className="font-sans text-xs text-slate-400">
+      <div className="m-3 rounded-xl border border-border bg-sidebar-accent/30 p-4">
+        <p className="text-xs text-muted-foreground">
           Need help?{" "}
-          <a href="mailto:support@masseurmatch.com" className="text-indigo-300 underline">
+          <a href="mailto:support@masseurmatch.com" className="text-primary underline">
             Contact support
           </a>
         </p>
@@ -112,22 +118,20 @@ export default function ProLayoutClient({
   );
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
-      <aside className="z-20 hidden w-64 flex-col border-r border-slate-900 bg-slate-950 text-slate-300 shadow-2xl md:flex">
+    <div className="flex min-h-screen overflow-hidden bg-[hsl(220,33%,97%)]">
+      <aside className="z-20 hidden w-64 flex-col border-r border-border bg-sidebar text-sidebar-foreground md:flex">
         {sidebarContent}
       </aside>
 
-      <div className="fixed inset-x-0 top-0 z-30 flex items-center justify-between border-b border-slate-900 bg-slate-950 px-4 py-3 md:hidden">
-        <Link href="/" className="font-display text-xl font-bold tracking-tighter text-white">
-          Masseur<span className="text-slate-500">Match</span>{" "}
-          <span className="ml-1 align-top font-mono text-[9px] uppercase tracking-widest text-indigo-400">
-            PRO
-          </span>
+      <div className="fixed inset-x-0 top-0 z-30 flex items-center justify-between border-b border-border bg-white/90 px-4 py-3 backdrop-blur-xl md:hidden">
+        <Link href="/pro/dashboard" className="flex items-center gap-2 text-sm font-semibold text-foreground">
+          <BookUser className="h-4 w-4 text-primary" />
+          Pro Dashboard
         </Link>
         <button
           onClick={() => setMobileOpen((prev) => !prev)}
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          className="rounded-md p-1.5 text-slate-300 transition-colors hover:bg-slate-800"
+          className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-secondary"
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -151,7 +155,7 @@ export default function ProLayoutClient({
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", stiffness: 300, damping: 35 }}
-              className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-slate-950 text-slate-300 shadow-2xl md:hidden"
+              className="fixed inset-y-0 left-0 z-50 flex w-[86vw] max-w-xs flex-col border-r border-border bg-sidebar text-sidebar-foreground shadow-2xl md:hidden"
             >
               {sidebarContent}
             </motion.aside>
@@ -159,7 +163,7 @@ export default function ProLayoutClient({
         ) : null}
       </AnimatePresence>
 
-      <main className="flex-1 overflow-y-auto bg-slate-50 pt-14 md:pt-0">{children}</main>
+      <main className="flex-1 overflow-y-auto pt-14 md:pt-0">{children}</main>
     </div>
   );
 }

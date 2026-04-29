@@ -10,7 +10,7 @@ import type { Database } from "@/integrations/supabase/types";
 type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 
 const PROFILE_SELECT =
-  "id, user_id, slug, display_name, full_name, bio, city, state, phone, specialties, incall_price, outcall_price, height_inches, weight_lb, body_type, status, is_active, updated_at";
+  "id, user_id, slug, display_name, full_name, headline, bio, city, state, neighborhood, location_description, phone, booking_link, whatsapp_number, telegram_handle, specialties, languages, massage_techniques, incall_price, outcall_price, offers_incall, offers_outcall, outcall_radius, travel_note, travel_cities, seo_title, seo_description, seo_keywords, height_inches, weight_lb, body_type, status, is_active, updated_at";
 
 const AVAILABLE_NOW_SELECT = "id, _tier, available_now, available_now_expires";
 

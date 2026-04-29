@@ -8,6 +8,10 @@ import {
   requireSession,
 } from "@/app/api/_lib/supabase-server";
 
+const DEFAULT_STRIPE_IDENTITY_FLOW_ID = "vf_1TRCvwLUTr1XrJOD6xxCrjjN";
+const DEFAULT_STRIPE_IDENTITY_VERIFY_URL =
+  "https://verify.stripe.com/v/14AdRadtH3cfajZaZWfUQ02";
+
 function shouldUseMockStripe(request: NextRequest) {
   if (request.headers.get("x-playwright-ci") === "1") {
     return true;
@@ -17,7 +21,6 @@ function shouldUseMockStripe(request: NextRequest) {
 }
 
 function getStripe(request: NextRequest) {
-  // Check multiple possible env var names for Stripe secret key
   const key = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_MCP_KEY;
   if (!key) {
     if (!shouldUseMockStripe(request)) {
@@ -28,6 +31,14 @@ function getStripe(request: NextRequest) {
   }
 
   return new Stripe(key, { apiVersion: "2025-08-27.basil" });
+}
+
+function getStripeIdentityFlowId() {
+  return process.env.STRIPE_IDENTITY_FLOW_ID || DEFAULT_STRIPE_IDENTITY_FLOW_ID;
+}
+
+function getStripeIdentityVerifyUrl() {
+  return process.env.STRIPE_IDENTITY_VERIFY_URL || DEFAULT_STRIPE_IDENTITY_VERIFY_URL;
 }
 
 function createMockVerificationSession(userId: string, email: string) {
@@ -46,6 +57,8 @@ export async function POST(request: NextRequest) {
     const requesterRole = await getUserRole(session.userId);
     const adminClient = createSupabaseAdminClient();
     const body = await request.json().catch(() => ({} as Record<string, unknown>));
+    const identityFlowId = getStripeIdentityFlowId();
+    const identityVerifyUrl = getStripeIdentityVerifyUrl();
 
     let targetUserId = session.userId;
     let targetEmail = session.email || "";
@@ -86,6 +99,7 @@ export async function POST(request: NextRequest) {
             userId: targetUserId,
             email: targetEmail,
             requestedBy: session.userId,
+            identityFlowId,
           },
           options: {
             document: {
@@ -150,7 +164,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       sessionId: verificationSession.id,
       clientSecret: verificationSession.client_secret,
-      url: verificationSession.url,
+      url: verificationSession.url || identityVerifyUrl,
+      identityFlowId,
     });
   } catch (error) {
     const message =

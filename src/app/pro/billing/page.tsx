@@ -33,8 +33,10 @@ export default function ProBillingPage() {
   const [portalLoading, setPortalLoading] = useState(false);
   const autoHandledCheckout = useRef(false);
   const autoHandledPortal = useRef(false);
+  const autoHandledAddon = useRef(false);
   const handleCheckoutRef = useRef<((tier: Tier) => Promise<void>) | null>(null);
   const handleManageBillingRef = useRef<(() => Promise<void>) | null>(null);
+  const handleAddonCheckoutRef = useRef<((addonSlug: string) => Promise<void>) | null>(null);
 
   const currentTier = normalizePlanKey(subscription.plan_key) || (subscription.subscribed ? "standard" : "free");
   const currentPlan = SIGNUP_PLANS.find((plan) => plan.tier === currentTier) || SIGNUP_PLANS[0];
@@ -109,6 +111,28 @@ export default function ProBillingPage() {
   };
   handleManageBillingRef.current = handleManageBilling;
 
+  const handleAddonCheckout = async (addonSlug: string) => {
+    try {
+      const response = await fetch("/api/stripe/addon-checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ addonSlug }),
+      });
+      const payload = (await response.json()) as { ok?: boolean; url?: string; error?: string };
+      if (!response.ok || !payload?.url) {
+        throw new Error(payload?.error || "Could not start add-on checkout.");
+      }
+      window.open(payload.url, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      toast({
+        title: "Add-on checkout failed",
+        description: error instanceof Error ? error.message : "Unknown error.",
+        variant: "destructive",
+      });
+    }
+  };
+  handleAddonCheckoutRef.current = handleAddonCheckout;
+
   useEffect(() => {
     if (!searchParams) return;
 
@@ -129,6 +153,14 @@ export default function ProBillingPage() {
       void handleManageBillingRef.current?.();
     }
 
+    if (!autoHandledAddon.current && user) {
+      const addonSlug = searchParams.get("addon");
+      if (addonSlug) {
+        autoHandledAddon.current = true;
+        void handleAddonCheckoutRef.current?.(addonSlug);
+      }
+    }
+
     if (searchParams.get("success") === "true") {
       toast({
         title: "Checkout complete",
@@ -143,6 +175,20 @@ export default function ProBillingPage() {
         title: "Checkout canceled",
         description: "No changes were made to your billing.",
         variant: "destructive",
+      });
+    }
+
+    if (searchParams.get("addon_success") === "true") {
+      toast({
+        title: "Add-on activated",
+        description: "Stripe checkout completed and your add-on is now being processed.",
+      });
+    }
+
+    if (searchParams.get("addon_canceled") === "true") {
+      toast({
+        title: "Add-on checkout canceled",
+        description: "No add-on charges were made.",
       });
     }
   }, [searchParams, user, refreshSubscription, router, toast]);

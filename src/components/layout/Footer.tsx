@@ -34,6 +34,7 @@ export const Footer = () => {
         { to: "/terms", label: t("footer.termsOfService") },
         { to: "/privacy", label: t("footer.privacyPolicy") },
         { to: "/safety", label: t("footer.safetyGuidelines") },
+        { to: "/safety/anti-trafficking", label: "Anti-Trafficking" },
         { to: "/billing-policy", label: "Billing & Refunds" },
         { to: "/acceptable-use", label: "Acceptable Use" },
         { to: "/cookies", label: "Cookies" },

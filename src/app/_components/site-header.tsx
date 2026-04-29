@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   ChevronDown,
   Menu,
@@ -32,6 +33,8 @@ const exploreItems = [
 const navLinks = [
   { href: "/therapists", label: "Therapists" },
   { href: "/how-it-works", label: "How it Works" },
+  { href: "/knotty", label: "Knotty" },
+  { href: "/pricing", label: "Pricing" },
   { href: "/for-therapists", label: "For Therapists" },
   { href: "/trust", label: "Trust" },
 ];
@@ -106,6 +109,9 @@ function MobileNav() {
     { href: "/blog", label: "Blog" },
     { href: "/for-therapists", label: "For Therapists" },
     { href: "/how-it-works", label: "How it Works" },
+    { href: "/knotty", label: "Knotty" },
+    { href: "/pricing", label: "Pricing" },
+    { href: "/terms", label: "Terms" },
     { href: "/trust", label: "Trust & Safety" },
     { href: "/faq", label: "FAQ" },
     { href: "/contact", label: "Contact" },
@@ -196,6 +202,7 @@ function MobileNav() {
 export default function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const { user } = useAuth();
   const isHomepage = pathname === "/";
 
   useEffect(() => {
@@ -254,18 +261,18 @@ export default function SiteHeader() {
         {/* Right CTAs — desktop + mobile hamburger */}
         <div className="flex items-center gap-3">
           <Link
-            href="/login"
+            href={user ? "/client/dashboard" : "/login"}
             className={`hidden md:flex px-4 py-2 text-sm font-medium transition-colors ${
               isDarkHero ? 'text-white/80 hover:text-white' : 'text-[#4A4F5C] hover:text-[#0B1F3A]'
             }`}
           >
-            Log in
+            {user ? "Dashboard" : "Log in"}
           </Link>
           <Link
-            href="/signup"
+            href={user ? "/auth/logout" : "/signup"}
             className="hidden sm:flex h-10 px-6 items-center justify-center rounded-full text-sm font-semibold transition-all duration-300 bg-gradient-to-r from-[#FF8A1F] to-[#FF9E45] text-white hover:shadow-lg hover:shadow-[#FF8A1F]/30 hover:scale-[1.02]"
           >
-            Get Started
+            {user ? "Logout" : "Get Started"}
             <ArrowUpRight className="ml-2 w-4 h-4" />
           </Link>
           <MobileNav />
