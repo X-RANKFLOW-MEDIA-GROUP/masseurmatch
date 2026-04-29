@@ -432,7 +432,7 @@ function normalizeProvider(profile: PublicTherapist, origin: ExplorePoint): Expl
       profile.bio ||
       "Profile details are still being completed. Open the listing for direct contact and more session details.",
     phone: profile.phone,
-    modality: profile.modality,
+    modality: profile.modality ?? null,
     tier: profile._tier || "free",
     trustSignals,
     missingFields,

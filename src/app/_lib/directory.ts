@@ -14,39 +14,11 @@ export interface ProfilePromotion {
   description: string;
 }
 
-export interface ProfilePhoto {
-  id: string;
-  storage_path: string;
-  is_primary?: boolean | null;
-}
-
 export interface PricingSessionItem {
-  name?: string | null;
-  duration?: number | null;
+  name: string;
+  duration: number;
   incall?: number | null;
   outcall?: number | null;
-  price?: number | null;
-}
-
-export interface ProfileTrainingEntry {
-  title?: string | null;
-  school?: string | null;
-  year?: number | string | null;
-  description?: string | null;
-}
-
-export interface ProfileTravelEntry {
-  city?: string | null;
-  state?: string | null;
-  start_date?: string | null;
-  end_date?: string | null;
-  notes?: string | null;
-}
-
-export interface ProfileAddOn {
-  name?: string | null;
-  price?: number | null;
-  description?: string | null;
 }
 
 export interface PublicTherapist {
@@ -91,8 +63,16 @@ export interface PublicTherapist {
   start_year?: number | null;
   avatar_url?: string | null;
   review_count?: number | null;
-  _tier?: TherapistTier | string | null;
+  profile_views?: number | null;
+  _tier?: string | null;
+  status?: string | null;
   pricing_sessions?: PricingSessionItem[] | null;
+  business_hours?: unknown;
+  custom_faq?: unknown;
+  latitude?: number | null;
+  longitude?: number | null;
+  zip_code?: string | null;
+  special_offer_text?: string | null;
   neighborhood_name?: string | null;
   primary_area?: string | null;
   is_verified_identity?: boolean | null;
