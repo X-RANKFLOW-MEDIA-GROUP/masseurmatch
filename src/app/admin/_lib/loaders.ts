@@ -87,16 +87,16 @@ export async function loadImportedReviews(): Promise<AdminLoadResult<AdminImport
         throw new Error(profilesError.message);
       }
 
-        const profileRows = (profiles || []) as Array<{
-          id: string;
-          user_id: string;
-          display_name: string | null;
-          full_name: string | null;
-          city: string | null;
-          status: string;
-        }>;
+      const profileRows = (profiles || []) as Array<{
+        id: string;
+        user_id: string;
+        display_name: string | null;
+        full_name: string | null;
+        city: string | null;
+        status: string;
+      }>;
 
-        for (const profile of profileRows) {
+      for (const profile of profileRows) {
         profileMap.set(profile.id, profile);
       }
     }
