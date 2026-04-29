@@ -1,6 +1,18 @@
 import type { PublicTherapist, TherapistTier } from "@/app/_lib/directory";
 
-type FallbackTherapist = PublicTherapist & {
+type FallbackTherapist = Partial<PublicTherapist> & {
+  id: string;
+  slug: string;
+  city: string;
+  display_name: string;
+  full_name: string;
+  bio: string;
+  specialties: string[];
+  modality: string;
+  incall_price: number | null;
+  outcall_price: number | null;
+  available_now: boolean;
+  available_now_expires: string | null;
   latitude: number;
   longitude: number;
   zip_code: string | null;

@@ -26,6 +26,13 @@ export interface ProfilePromotion {
   description: string;
 }
 
+export interface PricingSessionItem {
+  name: string;
+  duration: number;
+  incall?: number | null;
+  outcall?: number | null;
+}
+
 export interface PublicTherapist {
   id: string;
   slug: string | null;
@@ -66,9 +73,16 @@ export interface PublicTherapist {
   start_year?: number | null;
   avatar_url?: string | null;
   review_count?: number | null;
+  profile_views?: number | null;
   _tier?: string | null;
-  profile_photo?: string | null;
-  pricing_sessions?: any[] | null;
+  status?: string | null;
+  pricing_sessions?: PricingSessionItem[] | null;
+  business_hours?: unknown;
+  custom_faq?: unknown;
+  latitude?: number | null;
+  longitude?: number | null;
+  zip_code?: string | null;
+  special_offer_text?: string | null;
   neighborhood_name?: string | null;
   primary_area?: string | null;
   is_verified_identity?: boolean;
