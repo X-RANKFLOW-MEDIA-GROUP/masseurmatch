@@ -3,40 +3,32 @@ import { notFound } from "next/navigation";
 import { CityDirectoryPage } from "@/app/_components/city-directory-page";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
 import {
-  getKeywordSearchFilters,
+  formatSlugLabel,
   getKeywordBySlug,
   getSegmentSearchFilters,
-  resolveDirectoryFilters,
   getSegmentBySlug,
 } from "@/app/_lib/directory-taxonomy";
-import { getLaunchKeywordPaths, isLaunchUrl } from "@/app/_lib/launch-urls";
+import { getLaunchKeywordPaths, getLaunchSegmentPaths, isLaunchUrl } from "@/app/_lib/launch-urls";
 import { createPageMetadata } from "@/app/_lib/metadata";
 import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd } from "@/app/_lib/structured-data";
 
-type Params = { city: string; segment: string; keyword: string };
+type Params = { city: string; segment: string };
 
 export const revalidate = 60;
 
-export function generateStaticParams(): Params[] {
-  return getLaunchKeywordPaths().map((path) => {
-    const [city, segment, keyword] = path.split("/").filter(Boolean);
-    return {
-      city: city || "",
-      segment: segment || "",
-      keyword: keyword || "",
-    };
-  });
-}
-
-async function fetchKeywordTherapists(cityName: string, segmentSlug: string, keywordSlug: string) {
+async function fetchSegmentTherapists(cityName: string, segmentSlug: string) {
   return getPublicTherapists({
     city: cityName,
     page: 1,
     pageSize: 9,
-    ...resolveDirectoryFilters(
-      getSegmentSearchFilters(segmentSlug),
-      getKeywordSearchFilters(keywordSlug),
-    ),
+    ...getSegmentSearchFilters(segmentSlug),
+  });
+}
+
+export function generateStaticParams(): Params[] {
+  return getLaunchSegmentPaths().map((path) => {
+    const [city, segment] = path.split("/").filter(Boolean);
+    return { city: city || "", segment: segment || "" };
   });
 }
 
@@ -44,93 +36,135 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const resolvedParams = await params;
   const city = getCities().find((entry) => entry.slug === resolvedParams.city);
   const segment = getSegmentBySlug(resolvedParams.segment);
-  const keyword = getKeywordBySlug(resolvedParams.keyword);
-  const routePath = `/${resolvedParams.city}/${resolvedParams.segment}/${resolvedParams.keyword}`;
+  const routePath = `/${resolvedParams.city}/${resolvedParams.segment}`;
 
-  if (!city || !segment || !keyword || !isLaunchUrl(routePath)) {
+  if (!city || !segment || !isLaunchUrl(routePath)) {
     return createPageMetadata({
-      title: "Specialty page",
-      description: "Keyword directory page.",
+      title: "Directory",
+      description: "City segment directory page.",
       path: routePath,
       noIndex: true,
     });
   }
 
-  const { total } = await fetchKeywordTherapists(city.name, segment.slug, keyword.slug);
+  const { total } = await fetchSegmentTherapists(city.name, segment.slug);
+
+  const isGayMassageSegment = segment.slug === "gay-massage" || segment.slug === "lgbtq-friendly";
+  const cityLabel = `${city.name}, ${city.stateCode}`;
+  const title = isGayMassageSegment
+    ? `Gay Massage Therapists in ${cityLabel} | Verified LGBTQ+-Affirming`
+    : `${city.name} ${segment.label}`;
+  const description = isGayMassageSegment
+    ? `Find verified, LGBTQ+-affirming male massage therapists in ${cityLabel}. Browse gay-friendly profiles with identity verification, affirming practice standards, and direct booking on MasseurMatch.`
+    : `${segment.intro} Compare trusted local listings, direct contact options, and stronger city-intent pages in ${city.name}.`;
+  const keywords = isGayMassageSegment
+    ? [
+        `gay massage ${city.name}`,
+        `gay massage therapist ${city.name}`,
+        `LGBTQ massage ${city.name}`,
+        `gay-friendly massage near me`,
+        `male massage therapist ${city.name}`,
+        `queer massage ${city.name}`,
+        `${city.name} gay bodywork`,
+        `LGBTQ affirming massage ${city.stateCode}`,
+      ]
+    : [city.name, segment.label, `${city.name} verified massage`, `${city.name} ${segment.shortLabel}`];
 
   return createPageMetadata({
-    title: `${keyword.label} in ${city.name}`,
-    description: `${keyword.intro} Compare trusted local therapist listings through the ${segment.shortLabel.toLowerCase()} path in ${city.name}.`,
-    path: `/${city.slug}/${segment.slug}/${keyword.slug}`,
-    keywords: [city.name, keyword.label, segment.label, `${city.name} verified ${keyword.shortLabel}`],
+    title,
+    description,
+    path: `/${city.slug}/${segment.slug}`,
+    keywords,
     noIndex: total === 0,
   });
 }
 
-export default async function CityKeywordPage({ params }: { params: Promise<Params> }) {
+export default async function CitySegmentPage({ params }: { params: Promise<Params> }) {
   const resolvedParams = await params;
   const city = getCities().find((entry) => entry.slug === resolvedParams.city);
   const segment = getSegmentBySlug(resolvedParams.segment);
-  const keyword = getKeywordBySlug(resolvedParams.keyword);
-  const routePath = `/${resolvedParams.city}/${resolvedParams.segment}/${resolvedParams.keyword}`;
+  const routePath = `/${resolvedParams.city}/${resolvedParams.segment}`;
 
-  if (!city || !segment || !keyword || !isLaunchUrl(routePath)) {
+  if (!city || !segment || !isLaunchUrl(routePath)) {
     notFound();
   }
 
-  const therapists = await fetchKeywordTherapists(city.name, segment.slug, keyword.slug);
+  const therapists = await fetchSegmentTherapists(city.name, segment.slug);
   const canonicalCityPath = `/${city.slug}`;
-  const keywordFaqs = [
+  const launchServiceLinks = getLaunchKeywordPaths()
+    .filter((path) => path.startsWith(`${canonicalCityPath}/${segment.slug}/`))
+    .map((path) => {
+      const [, , keywordSlug] = path.split("/").filter(Boolean);
+      const keyword = getKeywordBySlug(keywordSlug || "");
+
+      return {
+        href: path,
+        label: keyword?.shortLabel || formatSlugLabel(keywordSlug || "service"),
+      };
+    });
+  const segmentFaqs = [
     {
-      question: `How do I choose ${keyword.shortLabel.toLowerCase()} in ${city.name}?`,
-      answer: `Compare specialties, profile bios, verification signals, and session format first, then contact providers directly to confirm fit and availability.`,
+      question: `What does ${segment.shortLabel} mean on MasseurMatch?`,
+      answer: `This page groups listings around ${segment.shortLabel.toLowerCase()} intent in ${city.name}, making local discovery safer, cleaner, and faster.`,
     },
     {
-      question: `Can I find nearby ${keyword.shortLabel.toLowerCase()} options fast?`,
-      answer: `Yes. This page is optimized for local discovery and links to profiles built for immediate call or message actions on mobile.`,
+      question: `How do I contact providers from this ${city.name} page?`,
+      answer: `Open any profile and use the direct call or message actions. MasseurMatch stays discovery-first and does not process bookings on-site.`,
     },
     {
-      question: `Is this page only for booking ${keyword.shortLabel.toLowerCase()}?`,
-      answer: `No. MasseurMatch is a discovery engine. This page helps visitors find a more relevant shortlist, but scheduling still happens directly between visitor and provider.`,
+      question: `Why does this page exist separately from the main ${city.name} page?`,
+      answer: `Segment pages give Google and visitors a stronger city-plus-intent destination, which helps MasseurMatch compete for long-tail local searches.`,
     },
   ];
 
   return (
     <CityDirectoryPage
-      eyebrow="Specialty massage page"
-      title={`${keyword.label} in ${city.name}`}
-      intro={`${keyword.intro} This specialty page also inherits the ${segment.shortLabel.toLowerCase()} path so search engines and users have stronger context around the page intent.`}
+      eyebrow="City segment page"
+      title={`${city.name} ${segment.label}`}
+      intro={`${segment.intro} This landing page gives search engines a meaningful city-plus-category destination and gives visitors a clean route into therapist profiles.`}
       breadcrumbJsonLd={buildBreadcrumbJsonLd([
         { name: "Home", path: "/" },
         { name: city.name, path: canonicalCityPath },
         { name: segment.shortLabel, path: `${canonicalCityPath}/${segment.slug}` },
-        { name: keyword.shortLabel, path: `${canonicalCityPath}/${segment.slug}/${keyword.slug}` },
       ])}
       collectionJsonLd={buildCollectionPageJsonLd({
-        name: `${keyword.label} in ${city.name}`,
-        description: `${keyword.intro} Compare local therapist listings in ${city.name}.`,
-        path: `${canonicalCityPath}/${segment.slug}/${keyword.slug}`,
+        name: `${city.name} ${segment.label}`,
+        description: `${segment.intro} Browse local listings and internal specialty links in ${city.name}.`,
+        path: `${canonicalCityPath}/${segment.slug}`,
       })}
       itemListJsonLd={buildItemListJsonLd({
-        name: `${city.name} ${keyword.shortLabel} listings`,
-        path: `${canonicalCityPath}/${segment.slug}/${keyword.slug}`,
+        name: `${city.name} ${segment.shortLabel} listings`,
+        path: `${canonicalCityPath}/${segment.slug}`,
         items: therapists.items.map((item) => ({
           name: item.display_name || item.full_name || "Therapist",
           path: `/therapists/${item.slug || item.id}`,
         })),
       })}
       leadLinks={[
-        { href: `${canonicalCityPath}/${segment.slug}`, label: `Back to ${segment.shortLabel}` },
         { href: canonicalCityPath, label: `Back to ${city.name}` },
+        { href: `/search?city=${city.slug}&verified=1`, label: `Verified in ${city.name}` },
         { href: "/safety", label: "Safety guidance" },
       ]}
+      linkSections={
+        launchServiceLinks.length
+          ? [
+              {
+                title: `Service pages inside ${segment.shortLabel}`,
+                layout: "chips" as const,
+                description:
+                  "Use these city-plus-service routes to narrow the directory by both intent and modality without losing the trust context.",
+                items: launchServiceLinks,
+              },
+            ]
+          : []
+      }
       therapists={therapists.items}
-      listingTitle={`Listings for ${keyword.shortLabel}`}
-      listingDescription={`Compare public therapist cards that match ${keyword.shortLabel.toLowerCase()} in ${city.name}, with trust signals and direct-contact clarity kept visible.`}
-      emptyTitle={`No public listings matched ${keyword.shortLabel} yet.`}
-      emptyDescription="Try the broader city segment page or the main city page to view nearby or related therapist profiles."
-      faqTitle={`Common Questions About ${keyword.shortLabel} in ${city.name}`}
-      faqItems={keywordFaqs}
+      listingTitle="Listings on this page"
+      listingDescription={`These listings reflect the ${segment.shortLabel.toLowerCase()} focus in ${city.name} and are structured to feel more premium, more trustworthy, and easier to scan on mobile.`}
+      emptyTitle="No listings matched this segment yet."
+      emptyDescription="Use the service links above or return to the city page for broader trusted-directory coverage."
+      faqTitle={`Common Questions About ${segment.shortLabel} Massage in ${city.name}`}
+      faqItems={segmentFaqs}
     />
   );
 }
