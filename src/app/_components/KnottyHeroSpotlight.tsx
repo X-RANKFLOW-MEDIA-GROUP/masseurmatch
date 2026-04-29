@@ -155,8 +155,8 @@ function buildShowcaseTherapists(therapists: PublicTherapist[]) {
       tierLabel: getTierLabel(therapist._tier),
       detailLabel,
       profilePath: `/therapists/${therapist.slug || therapist.id}`,
-      avatarUrl: therapist.avatar_url,
-      reviewCount: therapist.review_count,
+      avatarUrl: therapist.avatar_url || null,
+      reviewCount: therapist.review_count || null,
       showAvailable: therapist._tier === "standard" || therapist._tier === "pro" || therapist._tier === "elite",
       byline: therapist.display_name ? "by Featured Host" : "by MasseurMatch",
     };

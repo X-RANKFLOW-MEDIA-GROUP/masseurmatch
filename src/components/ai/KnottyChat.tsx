@@ -20,7 +20,7 @@ function TypingDots() {
       {[0, 1, 2].map((index) => (
         <span
           key={index}
-          className="h-2 w-2 animate-pulse rounded-full bg-sky-500/80"
+          className="h-2 w-2 animate-pulse rounded-full bg-white/70"
           style={{ animationDelay: `${index * 120}ms` }}
         />
       ))}
@@ -42,37 +42,37 @@ function RecommendationCard({
       className={cn(
         "rounded-[20px] border px-4 py-4 backdrop-blur-2xl",
         featured
-          ? "border-sky-200 bg-white text-slate-800 shadow-[0_16px_34px_rgba(14,116,144,0.16)]"
-          : "border-sky-100 bg-sky-50/70 text-slate-700",
+          ? "border-white/18 bg-white/14 text-white shadow-[0_22px_48px_rgba(0,0,0,0.18)]"
+          : "border-white/12 bg-white/[0.08] text-white/88",
       )}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-700/80">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55">
             {featured ? "Top Match" : `Alternative ${recommendation.position}`}
           </p>
           <h3 className="mt-1 text-lg font-semibold">{recommendation.name}</h3>
-          <p className="mt-1 text-sm text-slate-600">
+          <p className="mt-1 text-sm text-white/72">
             {recommendation.neighborhood || recommendation.city || "Local area"} · {recommendation.specialty}
           </p>
         </div>
         {recommendation.verified ? (
-          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-700">
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/18 bg-white/12 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]">
             <ShieldCheck className="h-3.5 w-3.5" />
             Verified
           </span>
         ) : null}
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-600">
+      <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/72">
         {recommendation.availableNow ? (
-          <span className="rounded-full border border-sky-200 bg-sky-50 px-3 py-1">
+          <span className="rounded-full border border-white/14 bg-white/10 px-3 py-1">
             <Clock3 className="mr-1 inline h-3.5 w-3.5" />
             Available now
           </span>
         ) : null}
         {typeof recommendation.distanceMiles === "number" ? (
-          <span className="rounded-full border border-sky-200 bg-sky-50 px-3 py-1">
+          <span className="rounded-full border border-white/14 bg-white/10 px-3 py-1">
             <MapPinned className="mr-1 inline h-3.5 w-3.5" />
             {recommendation.distanceMiles < 10
               ? `${recommendation.distanceMiles.toFixed(1)} mi`
@@ -80,13 +80,13 @@ function RecommendationCard({
           </span>
         ) : null}
         {typeof recommendation.priceFrom === "number" ? (
-          <span className="rounded-full border border-sky-200 bg-sky-50 px-3 py-1">
+          <span className="rounded-full border border-white/14 bg-white/10 px-3 py-1">
             From ${recommendation.priceFrom}
           </span>
         ) : null}
       </div>
 
-      <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-700">
+      <ul className="mt-3 space-y-2 text-sm leading-6 text-white/78">
         {recommendation.why.map((reason) => (
           <li key={`${recommendation.therapistId}-${reason}`}>• {reason}</li>
         ))}
@@ -99,8 +99,8 @@ function RecommendationCard({
           className={cn(
             "inline-flex min-h-11 items-center justify-center rounded-full px-4 text-sm font-semibold uppercase tracking-[0.12em] transition",
             featured
-              ? "bg-sky-600 text-white hover:bg-sky-700"
-              : "border border-sky-200 bg-white text-slate-700 hover:bg-sky-50",
+              ? "bg-white text-slate-900 hover:bg-white/90"
+              : "border border-white/18 bg-white/10 text-white hover:bg-white/16",
           )}
         >
           View profile
@@ -136,7 +136,7 @@ function ChatBubble({
 
   return (
     <div className="flex justify-start">
-      <div className="w-full max-w-[88%] space-y-3 rounded-[24px] rounded-bl-sm border border-sky-100 bg-white/95 px-4 py-4 text-sm leading-relaxed text-slate-800 shadow-[0_12px_28px_rgba(14,116,144,0.15)] backdrop-blur-2xl">
+      <div className="w-full max-w-[88%] space-y-3 rounded-[24px] rounded-bl-sm border border-white/12 bg-white/[0.08] px-4 py-4 text-sm leading-relaxed text-white/92 shadow-[0_18px_40px_rgba(0,0,0,0.12)] backdrop-blur-2xl">
         <p>{message.content}</p>
 
         {recommendations.length > 0 ? (
@@ -182,7 +182,7 @@ export const KnottyChat = ({
       key={action.key}
       type="button"
       onClick={() => void sendMessage({ quickAction: action.key })}
-      className="rounded-full border border-sky-200 bg-white/85 px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-sky-700 transition hover:border-sky-300 hover:bg-sky-50 hover:text-sky-800"
+      className="rounded-full border border-[#2f6098] bg-[#0f315b]/72 px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#bfdcff] transition hover:border-[#4f85c2] hover:bg-[#174273] hover:text-[#e4f2ff]"
     >
       {action.label}
     </button>
@@ -191,34 +191,31 @@ export const KnottyChat = ({
   const panel = (
     <div
       className={cn(
-        "relative flex flex-col overflow-hidden rounded-[28px] border border-[#bfdbfe] bg-[linear-gradient(180deg,#f8fcff_0%,#edf6ff_45%,#e1efff_100%)] text-slate-900 shadow-[0_28px_80px_rgba(22,78,153,0.22)] backdrop-blur-3xl",
+        "relative flex flex-col overflow-hidden rounded-[28px] border border-[#1b4678] bg-[linear-gradient(180deg,#0b2447_0%,#091b37_52%,#07162f_100%)] shadow-[0_32px_96px_rgba(1,10,28,0.62)] backdrop-blur-3xl",
         isEmbedded
           ? "h-[620px] w-full"
           : "w-[396px] max-w-[calc(100vw-2rem)] h-[min(620px,calc(100svh-5rem))]",
         className,
       )}
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.26),transparent_38%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.18),transparent_60%)]" />
-      <div className="pointer-events-none absolute inset-x-10 top-0 h-32 rounded-full bg-[radial-gradient(circle,rgba(14,165,233,0.22),transparent_70%)] blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(58,126,207,0.26),transparent_38%),radial-gradient(circle_at_bottom_left,rgba(18,52,94,0.5),transparent_56%)]" />
+      <div className="pointer-events-none absolute inset-x-10 top-0 h-32 rounded-full bg-[radial-gradient(circle,rgba(98,166,238,0.22),transparent_70%)] blur-3xl" />
 
-      <div className="relative flex items-center justify-between border-b border-[#bfdbfe] bg-white/70 px-5 py-4">
+      <div className="relative flex items-center justify-between border-b border-[#204e83] bg-[#0d2a4f]/72 px-5 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-sky-300 bg-sky-100 text-sky-700">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#2a5b95] bg-[#12335d] text-[#8ec2f6]">
             <Sparkles className="h-4 w-4" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-slate-900">Knotty</p>
-            <p className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-sky-700">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_0_5px_rgba(16,185,129,0.2)] animate-pulse" />
-              Live concierge
-            </p>
+            <p className="text-sm font-semibold text-[#a9d4ff]">Knotty</p>
+            <p className="text-[11px] uppercase tracking-[0.24em] text-[#6f9dcb]">AI concierge closer</p>
           </div>
         </div>
         {!isEmbedded ? (
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-sky-200 bg-white text-sky-700 transition hover:bg-sky-50 hover:text-sky-800"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-[#2a5a93] bg-[#12355f] text-[#94bde7] transition hover:bg-[#174273] hover:text-[#d3e8ff]"
             aria-label="Close Knotty chat"
           >
             <X className="h-4 w-4" />
@@ -226,7 +223,7 @@ export const KnottyChat = ({
         ) : null}
       </div>
 
-      <div className="relative border-b border-[#bfdbfe] px-4 py-3">
+      <div className="relative border-b border-[#204e83] px-4 py-3">
         <div className="flex flex-wrap gap-2">
           {quickActionButtons}
           {(promptExamples || []).slice(0, 0).map(() => null)}
@@ -244,7 +241,7 @@ export const KnottyChat = ({
 
         {isTyping ? (
           <div className="flex justify-start">
-            <div className="rounded-[20px] rounded-bl-sm border border-sky-100 bg-white/90 px-4 py-3 text-sm text-slate-700 backdrop-blur-2xl">
+            <div className="rounded-[20px] rounded-bl-sm border border-white/12 bg-white/[0.08] px-4 py-3 text-sm text-white/82 backdrop-blur-2xl">
               <TypingDots />
             </div>
           </div>
@@ -258,20 +255,20 @@ export const KnottyChat = ({
           event.preventDefault();
           void sendMessage({ content: input });
         }}
-        className="relative border-t border-[#bfdbfe] px-4 py-4"
+        className="relative border-t border-[#204e83] px-4 py-4"
       >
-        <div className="flex items-center gap-2 rounded-[22px] border border-sky-200 bg-white/90 px-3 py-2.5 backdrop-blur-2xl">
+        <div className="flex items-center gap-2 rounded-[22px] border border-[#28568b] bg-[#0c2a4f]/75 px-3 py-2.5 backdrop-blur-2xl">
           <input
             type="text"
             value={input}
             onChange={(event) => setInput(event.target.value)}
-            placeholder="Pergunte e eu busco no diretório em tempo real..."
-            className="flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
+            placeholder="Tell Knotty what matters most..."
+            className="flex-1 bg-transparent text-sm text-[#d7e8fa] outline-none placeholder:text-[#b8d4f0]"
           />
           <button
             type="submit"
             disabled={!input.trim() || isTyping}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-sky-300 bg-sky-600 text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-35"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#3f6ea6] bg-[#194679] text-[#e6f3ff] transition hover:bg-[#245890] disabled:cursor-not-allowed disabled:opacity-35"
             aria-label="Send message"
           >
             <Send className="h-4 w-4" />
@@ -300,12 +297,12 @@ export const KnottyChat = ({
               setIsOpen(true);
               trackOpen();
             }}
-            className="group relative h-16 w-16 rounded-full border border-sky-300 bg-[linear-gradient(180deg,#e0f2fe,#7dd3fc)] shadow-[0_18px_42px_rgba(14,116,144,0.35)]"
+            className="group relative h-16 w-16 rounded-full border border-white/18 bg-[linear-gradient(180deg,rgba(9,18,34,0.96),rgba(18,44,73,0.96))] shadow-[0_20px_48px_rgba(0,0,0,0.3)]"
             aria-label="Open Knotty chat"
           >
-            <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_58%)]" />
-            <div className="absolute -inset-2 rounded-full bg-[radial-gradient(circle,rgba(56,189,248,0.35),transparent_65%)] opacity-75 blur-2xl transition group-hover:opacity-100" />
-            <div className="relative flex h-full w-full items-center justify-center text-sky-800">
+            <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.18),transparent_58%)]" />
+            <div className="absolute -inset-2 rounded-full bg-[radial-gradient(circle,rgba(122,198,255,0.22),transparent_65%)] opacity-75 blur-2xl transition group-hover:opacity-100" />
+            <div className="relative flex h-full w-full items-center justify-center text-white">
               <Sparkles className="h-6 w-6" />
             </div>
           </motion.button>
