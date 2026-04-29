@@ -9,14 +9,28 @@ import type { Database } from "@/integrations/supabase/types";
 
 type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 
-const PROFILE_SELECT =
-  "id, user_id, slug, display_name, full_name, headline, bio, city, state, neighborhood, location_description, phone, booking_link, whatsapp_number, telegram_handle, specialties, languages, massage_techniques, incall_price, outcall_price, offers_incall, offers_outcall, outcall_radius, travel_note, travel_cities, seo_title, seo_description, seo_keywords, height_inches, weight_lb, body_type, status, is_active, updated_at";
+// Full list of fields aligned with the new schema and directory requirements
+const PROFILE_SELECT = `
+  id, user_id, slug, display_name, full_name, headline, bio, city, state, neighborhood, 
+  phone, whatsapp_number, email_address, website,
+  service_categories, massage_techniques, specialties,
+  incall_price, outcall_price, starting_price,
+  height_inches, weight_lb, body_type,
+  offers_incall, offers_outcall, outcall_radius,
+  years_experience, languages,
+  profile_status, visibility_status, verification_status,
+  subscription_tier, is_featured, is_suspended, is_banned,
+  stripe_customer_id, stripe_subscription_id, current_period_end,
+  photo_limit, visibility_level, featured_until,
+  promotions, seo_title, seo_description, seo_keywords,
+  updated_at, created_at
+`;
 
-const AVAILABLE_NOW_SELECT = "id, _tier, available_now, available_now_expires";
+const AVAILABLE_NOW_SELECT = "id, subscription_tier, available_now, available_now_expires";
 
 export type AvailableNowProfile = {
   id: string;
-  _tier: string | null;
+  subscription_tier: string | null;
   available_now: boolean | null;
   available_now_expires: string | null;
 };
@@ -81,6 +95,21 @@ export async function updateProfileByUserId(userId: string, updates: ProfileUpda
     })
     .eq("user_id", userId)
     .select(PROFILE_SELECT)
+    .maybeSingle();
+
+  if (error) {
+    throw new RouteError(500, error.message);
+  }
+
+  return data;
+}
+
+export async function getSiteSettings() {
+  const adminClient = createSupabaseAdminClient();
+  const { data, error } = await adminClient
+    .from("site_settings")
+    .select("*")
+    .eq("id", "singleton")
     .maybeSingle();
 
   if (error) {

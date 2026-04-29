@@ -47,7 +47,7 @@ const faqs = [
       },
       {
         q: "What types of massage are available?",
-        a: "Therapists on MasseurMatch offer a wide range of modalities including Swedish, deep tissue, sports massage, trigger point therapy, lymphatic drainage, Thai massage, and more. Use the modality filter on the search page to find the right specialty.",
+        a: "Therapists on MasseurMatch offer a wide range of modalities including Swedish, deep tissue, sports massage, trigger point therapy, prenatal massage, lymphatic drainage, Thai massage, and more. Use the modality filter on the search page to find the right specialty.",
       },
       {
         q: "How do I leave a review for my therapist?",
