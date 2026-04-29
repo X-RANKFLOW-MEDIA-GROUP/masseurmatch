@@ -15,9 +15,9 @@ import MasseurProfile from "@/app/_components/MasseurProfileClient";
 export const revalidate = 1800;
 
 const homeMetadata = createPageMetadata({
-  title: "MasseurMatch | Find Independent Massage Therapists Near You",
+  title: "Gay massage therapists & male massage near me — verified LGBTQ+ directory",
   description:
-    "Find independent massage therapists by city, style, availability, and contact preference. Browse profiles and contact providers directly.",
+    "Find verified gay massage therapists and male massage near you. LGBTQ+-affirming directory covering Dallas, Miami, Chicago, Houston, Austin and 100+ US cities. Compare outcall, incall, deep tissue, Swedish, and direct-contact profiles.",
   path: "/",
   keywords: [
     "gay massage near me",
@@ -47,29 +47,6 @@ export const metadata: Metadata = {
     },
   },
 };
-
-const HOMEPAGE_CITY_DISCOVERY = [
-  { slug: "new-york", blurb: "Massage therapists near you" },
-  { slug: "los-angeles", blurb: "Trusted local massage profiles" },
-  { slug: "chicago", blurb: "Direct contact massage listings" },
-  { slug: "miami", blurb: "Massage therapists available locally" },
-  { slug: "dallas", blurb: "Professional massage profiles" },
-  { slug: "houston", blurb: "Browse massage therapists" },
-  { slug: "austin", blurb: "Find local massage providers" },
-  { slug: "atlanta", blurb: "Trusted massage listings" },
-  { slug: "san-francisco", blurb: "Massage therapists nearby" },
-  { slug: "seattle", blurb: "Browse local massage profiles" },
-  { slug: "boston", blurb: "Professional massage listings" },
-  { slug: "washington-dc", blurb: "Find massage therapists" },
-  { slug: "denver", blurb: "Local massage profiles" },
-  { slug: "phoenix", blurb: "Trusted massage providers" },
-  { slug: "las-vegas", blurb: "Browse massage therapists" },
-  { slug: "orlando", blurb: "Local massage listings" },
-  { slug: "san-diego", blurb: "Massage providers nearby" },
-  { slug: "philadelphia", blurb: "Professional massage profiles" },
-  { slug: "portland", blurb: "Trusted massage listings" },
-  { slug: "nashville", blurb: "Browse massage therapists" },
-] as const;
 
 export default async function HomePage() {
   const cities = getCities();
@@ -149,17 +126,6 @@ export default async function HomePage() {
     })
     .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
 
-  const cityDiscoveryItems = HOMEPAGE_CITY_DISCOVERY.map((entry) => {
-    const city = cities.find((cityItem) => cityItem.slug === entry.slug);
-
-    return {
-      href: city ? `/${city.slug}` : "/cities",
-      city: city?.name || entry.slug.replace(/-/g, " "),
-      state: city?.stateCode || "US",
-      blurb: entry.blurb,
-    };
-  });
-
   const homeFaqs = [
     {
       question: "How do I find verified male massage therapists near me?",
@@ -219,7 +185,6 @@ export default async function HomePage() {
         featuredTherapists={featuredTherapists}
         totalTherapists={therapistsResult.total}
         cityCount={launchCities.length}
-        cityDiscoveryItems={cityDiscoveryItems}
       />
     </>
   );

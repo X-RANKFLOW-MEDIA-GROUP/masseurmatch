@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Sparkles, X, Send, Radio } from "lucide-react";
+import { Sparkles, X, Send, ChevronRight } from "lucide-react";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import { getPublicProfileName } from "@/app/_lib/public-profile";
 
@@ -35,7 +35,6 @@ export function ProfileAIChat({ profile }: Props) {
     `Does ${name} offer outcall?`,
     `What specialties does ${name} have?`,
     `Is ${name} LGBTQ+ affirming?`,
-    `Can you find similar masseurs on the website?`,
   ];
 
   // Generate AI response based on profile data
@@ -78,10 +77,6 @@ export function ProfileAIChat({ profile }: Props) {
     
     if (q.includes("book") || q.includes("schedule") || q.includes("appointment") || q.includes("reserve")) {
       return `To contact ${name}, you can:\n\n1. Send a text message using the "Contact" button\n2. Call directly using the phone button\n3. Message on WhatsApp\n\nReach out to discuss availability and services directly with ${name}.`;
-    }
-
-    if (q.includes("find") || q.includes("search") || q.includes("similar") || q.includes("website")) {
-      return `Yes — I can help you search masseurs inside Masseurfinder. Start with /search?city=${encodeURIComponent(city)} and filter by specialties, verified profiles, and availability. If you tell me your budget and preferred technique, I can suggest what filters to apply.`;
     }
     
     if (q.includes("experience") || q.includes("how long") || q.includes("years")) {
@@ -161,39 +156,38 @@ export function ProfileAIChat({ profile }: Props) {
 
       {/* Chat Panel */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 flex h-[520px] w-[380px] flex-col overflow-hidden rounded-[24px] border border-sky-200 bg-[linear-gradient(180deg,#f8fcff_0%,#eef6ff_55%,#e0f0ff_100%)] shadow-[0_24px_68px_rgba(14,116,144,0.24)] backdrop-blur-xl">
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col w-[380px] h-[520px] rounded-[24px] border border-white/10 bg-[#0B1F3A]/95 backdrop-blur-xl shadow-2xl overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-sky-100 bg-white/75 px-5 py-4">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-gradient-to-r from-[#FF8A1F]/10 to-transparent">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-cyan-300">
-                <Sparkles className="h-5 w-5 text-sky-900" />
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#FF8A1F] to-[#ff6b00] flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-[#0B1F3A]" />
               </div>
               <div>
-                <p className="text-sm font-bold text-slate-900">Knotty • {name}</p>
-                <p className="flex items-center gap-1.5 text-xs text-sky-700">
-                  <Radio className="h-3.5 w-3.5" />
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <p className="text-sm font-bold text-white">Knotty AI</p>
+                <p className="text-xs text-white/50 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#2ECC8A] animate-pulse" />
                   Ask about {name}
                 </p>
               </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-sky-100"
+              className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10 transition"
             >
-              <X className="h-4 w-4 text-sky-700" />
+              <X className="w-4 h-4 text-white/60" />
             </button>
           </div>
 
           {/* Messages */}
-          <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-5 py-4">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
             {messages.map((msg) => (
               <div
                 key={msg.id}
                 className={`max-w-[85%] rounded-[18px] px-4 py-3 text-sm leading-relaxed whitespace-pre-line ${
                   msg.role === "ai"
-                    ? "mr-auto border border-sky-100 bg-white/95 text-slate-800"
-                    : "ml-auto bg-gradient-to-r from-sky-500 to-cyan-400 text-white"
+                    ? "mr-auto bg-white/8 text-white/90 border border-white/5"
+                    : "ml-auto bg-gradient-to-r from-[#FF8A1F] to-[#ff6b00] text-white"
                 }`}
               >
                 {msg.text}
@@ -201,11 +195,11 @@ export function ProfileAIChat({ profile }: Props) {
             ))}
             
             {isTyping && (
-              <div className="mr-auto max-w-[85%] rounded-[18px] border border-sky-100 bg-white/95 px-4 py-3">
+              <div className="mr-auto max-w-[85%] rounded-[18px] bg-white/8 border border-white/5 px-4 py-3">
                 <div className="flex gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-sky-400 animate-bounce" style={{ animationDelay: "0ms" }} />
-                  <span className="h-2 w-2 rounded-full bg-sky-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <span className="h-2 w-2 rounded-full bg-sky-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+                  <span className="w-2 h-2 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <span className="w-2 h-2 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: "150ms" }} />
+                  <span className="w-2 h-2 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: "300ms" }} />
                 </div>
               </div>
             )}
@@ -214,13 +208,13 @@ export function ProfileAIChat({ profile }: Props) {
           {/* Quick Questions */}
           {messages.length <= 1 && (
             <div className="px-5 pb-3 space-y-2">
-              <p className="text-[10px] uppercase tracking-wider text-sky-700/70">Quick questions</p>
+              <p className="text-[10px] text-white/40 uppercase tracking-wider">Quick questions</p>
               <div className="flex flex-wrap gap-2">
                 {QUICK_QUESTIONS.map((q) => (
                   <button
                     key={q}
                     onClick={() => handleQuickQuestion(q)}
-                    className="rounded-full border border-sky-200 bg-white px-3 py-1.5 text-xs text-sky-700 transition hover:bg-sky-50 hover:text-sky-900"
+                    className="text-xs px-3 py-1.5 rounded-full border border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white transition"
                   >
                     {q}
                   </button>
@@ -230,7 +224,7 @@ export function ProfileAIChat({ profile }: Props) {
           )}
 
           {/* Input */}
-          <div className="border-t border-sky-100 bg-white/70 px-4 py-4">
+          <div className="px-4 py-4 border-t border-white/10 bg-white/[0.02]">
             <div className="flex items-center gap-3">
               <input
                 type="text"
@@ -238,14 +232,14 @@ export function ProfileAIChat({ profile }: Props) {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
                 placeholder={`Ask about ${name}...`}
-                className="flex-1 rounded-full border border-sky-200 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none"
+                className="flex-1 bg-white/8 border border-white/10 rounded-full px-4 py-2.5 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#FF8A1F]/50"
               />
               <button
                 onClick={handleSend}
                 disabled={!input.trim()}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-600 transition hover:bg-sky-700 disabled:opacity-40"
+                className="w-10 h-10 rounded-full bg-[#FF8A1F] flex items-center justify-center disabled:opacity-40 transition hover:bg-[#ff9d3f]"
               >
-                <Send className="h-4 w-4 text-white" />
+                <Send className="w-4 h-4 text-[#0B1F3A]" />
               </button>
             </div>
           </div>

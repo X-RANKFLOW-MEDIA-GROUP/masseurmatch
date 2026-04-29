@@ -6,8 +6,8 @@ import type {
   AuthRegisterInput,
   ContactFormInput,
   ForgotPasswordInput,
+  ProProfileInput,
 } from "@/app/_lib/validation";
-import type { MassageTherapistProfileInput } from "@/app/_lib/validation.massagist";
 
 export type AuthMutationResponse = {
   ok: boolean;
@@ -42,29 +42,13 @@ export type ProProfileMutationResponse = {
     slug: string | null;
     display_name: string | null;
     full_name: string;
-    headline: string | null;
     bio: string | null;
     city: string | null;
     state: string | null;
-    neighborhood: string | null;
-    location_description: string | null;
     phone: string | null;
-    booking_link: string | null;
-    whatsapp_number: string | null;
-    telegram_handle: string | null;
     specialties: string[] | null;
-    languages: string[] | null;
-    massage_techniques: string[] | null;
     incall_price: number | null;
     outcall_price: number | null;
-    offers_incall: boolean | null;
-    offers_outcall: boolean | null;
-    outcall_radius: number | null;
-    travel_note: string | null;
-    travel_cities: string[] | null;
-    seo_title: string | null;
-    seo_description: string | null;
-    seo_keywords: string[] | null;
     height_inches: number | null;
     weight_lb: number | null;
     body_type: string | null;
@@ -95,6 +79,6 @@ export function sendContactMessage(input: ContactFormInput) {
   return postJson<ContactMutationResponse>("/api/contact", input);
 }
 
-export function updateProfileMutation(input: MassageTherapistProfileInput) {
+export function updateProfileMutation(input: ProProfileInput) {
   return postJson<ProProfileMutationResponse>("/api/pro/profile", input);
 }

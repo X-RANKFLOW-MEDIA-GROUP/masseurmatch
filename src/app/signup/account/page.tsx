@@ -93,8 +93,7 @@ export default function SignupAccountPage() {
       setTermsAccepted(termsChecked);
       setComplianceAcknowledged(complianceChecked);
 
-      // Redirect new users to plan selection
-      router.push("/signup/plan");
+      router.push("/signup/verify");
     } catch {
       setError("An unexpected error occurred. Please try again.");
     } finally {

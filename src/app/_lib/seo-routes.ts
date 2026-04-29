@@ -11,7 +11,6 @@ import { GUIDES } from "@/app/guides/data";
 import { absoluteUrl, getSeoBlogPosts, getSeoCities, getSeoTherapists, FEATURED_PROFILE_SLUGS } from "@/app/_lib/seo-data";
 import { uniqueStrings } from "@/app/_lib/utils";
 import { competitorSlugs } from "@/lib/competitors";
-import { getSitemapCompetitorRoutes } from "@/lib/seo/competitorComparisonRoutes";
 import { getCities, getCityInventoryMap, getPublicTherapists } from "@/app/_lib/directory";
 import {
   getKeywordSearchFilters,
@@ -41,9 +40,6 @@ export const PRIVATE_ROBOTS_PATHS = uniqueStrings([
   "/dashboard/",
   "/*?*token=",
   "/*?*redirect=",
-  "/massage-directories/drafts",
-  "/massage-directories/internal",
-  "/massage-directories/data",
 ]);
 
 export const FILTER_ROBOTS_PATHS = [
@@ -103,7 +99,6 @@ const CORE_STATIC_ROUTES: StaticSitemapRoute[] = [
   { path: "/cookie-policy",       changeFrequency: "monthly", priority: 0.4 },
   { path: "/therapist-agreement", changeFrequency: "monthly", priority: 0.4 },
   { path: "/compare",            changeFrequency: "monthly", priority: 0.7 },
-  { path: "/massage-directories", changeFrequency: "monthly", priority: 0.7 },
   ...competitorSlugs.map((slug) => ({
     path: `/compare/${slug}`,
     changeFrequency: "monthly" as const,
@@ -223,12 +218,6 @@ export function buildCoreSitemapEntries(now = new Date()): MetadataRoute.Sitemap
   return CORE_STATIC_ROUTES.map((route) => buildSitemapEntry(route.path, now, route.changeFrequency, route.priority));
 }
 
-export function buildCompetitorSitemapEntries(now = new Date()): MetadataRoute.Sitemap {
-  return getSitemapCompetitorRoutes().map((route) =>
-    buildSitemapEntry(`/massage-directories/${route.slug}`, now, route.changeFrequency, route.priority),
-  );
-}
-
 export async function buildCitiesSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
   const dbCities = await getSeoCities();
   const inventoryMap = await getCityInventoryMap();
@@ -333,8 +322,7 @@ export async function buildSitemapEntries(now = new Date()): Promise<MetadataRou
   ]);
   const neighborhoods = await buildNeighborhoodsSitemapEntries(now);
   const guides = buildGuidesSitemapEntries(now);
-  const competitors = buildCompetitorSitemapEntries(now);
-  return [...core, ...cities, ...services, ...neighborhoods, ...profiles, ...guides, ...competitors];
+  return [...core, ...cities, ...services, ...neighborhoods, ...profiles, ...guides];
 }
 
 export function buildLaunchOrderList(): string[] {
