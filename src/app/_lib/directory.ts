@@ -4,18 +4,6 @@ import { matchBodyTypeKeyword } from "@/lib/physical-profile";
 
 export type TherapistTier = "free" | "standard" | "pro" | "elite";
 
-const PUBLIC_PROFILE_SELECT = `
-  id, slug, display_name, full_name, headline, bio, city, state, neighborhood,
-  phone, whatsapp_number, email_address, website,
-  service_categories, massage_techniques, specialties,
-  incall_price, outcall_price, starting_price,
-  height_inches, weight_lb, body_type,
-  years_experience, languages,
-  subscription_tier, verification_status, is_featured,
-  promotions, updated_at, profile_status, visibility_status,
-  is_suspended, is_banned, available_now, available_now_expires
-`;
-
 export interface ProfileFaqItem {
   question: string;
   answer: string;
@@ -26,10 +14,46 @@ export interface ProfilePromotion {
   description: string;
 }
 
+export interface ProfilePhoto {
+  id: string;
+  storage_path: string;
+  is_primary?: boolean | null;
+}
+
+export interface PricingSessionItem {
+  name?: string | null;
+  duration?: number | null;
+  incall?: number | null;
+  outcall?: number | null;
+  price?: number | null;
+}
+
+export interface ProfileTrainingEntry {
+  title?: string | null;
+  school?: string | null;
+  year?: number | string | null;
+  description?: string | null;
+}
+
+export interface ProfileTravelEntry {
+  city?: string | null;
+  state?: string | null;
+  start_date?: string | null;
+  end_date?: string | null;
+  notes?: string | null;
+}
+
+export interface ProfileAddOn {
+  name?: string | null;
+  price?: number | null;
+  description?: string | null;
+}
+
 export interface PublicTherapist {
   id: string;
   slug: string | null;
   city: string | null;
+  state?: string | null;
   display_name: string | null;
   full_name: string | null;
   headline: string | null;
@@ -44,6 +68,7 @@ export interface PublicTherapist {
   subscription_tier: TherapistTier | null;
   profile_status: string | null;
   visibility_status: string | null;
+  status?: string | null;
   incall_price: number | null;
   outcall_price: number | null;
   starting_price: number | null;
@@ -57,25 +82,48 @@ export interface PublicTherapist {
   weight_lb?: number | null;
   body_type?: string | null;
   languages?: string[] | null;
-  profile_photo?: string;
-  gallery_photos?: string[];
+  profile_photo?: string | null;
+  gallery_photos?: string[] | null;
   is_featured: boolean;
   updated_at: string;
-  // Legacy compatibility fields
+
   modality?: string | null;
   start_year?: number | null;
   avatar_url?: string | null;
   review_count?: number | null;
-  _tier?: string | null;
-  profile_photo?: string | null;
-  pricing_sessions?: any[] | null;
+  _tier?: TherapistTier | string | null;
+  pricing_sessions?: PricingSessionItem[] | null;
   neighborhood_name?: string | null;
   primary_area?: string | null;
-  is_verified_identity?: boolean;
-  is_verified_profile?: boolean;
-  is_verified_photos?: boolean;
-  lgbtq_affirming?: boolean;
+  is_verified_identity?: boolean | null;
+  is_verified_profile?: boolean | null;
+  is_verified_photos?: boolean | null;
+  lgbtq_affirming?: boolean | null;
+  training?: ProfileTrainingEntry[] | string[] | null;
+  education?: ProfileTrainingEntry[] | string[] | null;
+  business_hours?: unknown;
+  custom_faq?: ProfileFaqItem[] | unknown;
+  areas_served?: string[] | null;
+  outcall_radius_miles?: number | null;
+  profile_views?: number | null;
+  contact_clicks?: number | null;
+  travel_schedule?: ProfileTravelEntry[] | unknown;
+  add_ons?: ProfileAddOn[] | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
+
+const PUBLIC_PROFILE_SELECT = `
+  id, slug, display_name, full_name, headline, bio, city, state, neighborhood,
+  phone, whatsapp_number, email_address, website,
+  service_categories, massage_techniques, specialties,
+  incall_price, outcall_price, starting_price,
+  height_inches, weight_lb, body_type,
+  years_experience, languages,
+  subscription_tier, verification_status, is_featured,
+  promotions, updated_at, profile_status, visibility_status,
+  is_suspended, is_banned, available_now, available_now_expires
+`;
 
 export interface ImportedReview {
   id: string;
@@ -105,6 +153,7 @@ export const getPublicTherapists = async (filters?: {
   session?: "home-visit" | "incall";
   verified?: boolean;
   availableToday?: boolean;
+  lgbtqAffirming?: boolean;
   tier?: TherapistTier;
   page?: number;
   pageSize?: number;
@@ -188,7 +237,6 @@ export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTher
 
   if (error || !profile) return null;
 
-  // Fetch photos
   const { data: photos } = await supabase
     .from("therapist_photos")
     .select("public_url, photo_type")
@@ -207,7 +255,7 @@ export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTher
 };
 
 export const getImportedReviews = async (profileId: string, limit = 5) => {
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from("imported_reviews")
     .select("id, review_text, rating, reviewer_name, review_date")
     .eq("profile_id", profileId)
@@ -217,7 +265,7 @@ export const getImportedReviews = async (profileId: string, limit = 5) => {
   return (data || []) as ImportedReview[];
 };
 
-export const getProfilePhotos = async (profileId: string, limit = 6) => {
+export const getProfilePhotos = async (profileId: string, limit = 6): Promise<ProfilePhoto[]> => {
   const { data, error } = await supabase
     .from("therapist_photos")
     .select("id, public_url, storage_path, photo_type")
@@ -236,7 +284,7 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
 };
 
 export async function getCityInventoryCount(cityName: string): Promise<number> {
-  const { count, error } = await supabase
+  const { count } = await supabase
     .from("profiles")
     .select("id", { count: "exact", head: true })
     .eq("visibility_status", "public")
