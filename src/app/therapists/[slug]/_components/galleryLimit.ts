@@ -1,7 +1,5 @@
-import type { TherapistTier } from "@/app/_lib/directory";
+const PUBLIC_PROFILE_GALLERY_LIMIT = 12;
 
-export function galleryLimit(tier: TherapistTier | null): number {
-  if (tier === "elite") return 12;
-  if (tier === "pro") return 9;
-  return 5;
+export function galleryLimit(): number {
+  return PUBLIC_PROFILE_GALLERY_LIMIT;
 }

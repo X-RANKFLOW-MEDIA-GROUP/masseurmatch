@@ -62,7 +62,6 @@ type ProfileJsonLdInput = {
   city?: string | null;
   specialties?: string[] | null;
   image?: string | null;
-  tier?: string | null;
   incallPrice?: number | null;
   outcallPrice?: number | null;
   reviews?: ProfileReview[];
@@ -320,7 +319,6 @@ export const buildProfilePageJsonLd = ({
   city,
   specialties,
   image,
-  tier,
   incallPrice,
   outcallPrice,
   reviews = [],
@@ -357,7 +355,7 @@ export const buildProfilePageJsonLd = ({
               priceCurrency: "USD",
               price: incallPrice || outcallPrice || undefined,
               availability: "https://schema.org/InStock",
-              category: tier || "directory listing",
+              category: "massage therapy directory listing",
             }
           : undefined,
       aggregateRating:

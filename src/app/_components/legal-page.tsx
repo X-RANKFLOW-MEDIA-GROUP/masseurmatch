@@ -6,6 +6,11 @@ const LEGAL_LINKS = [
   { href: "/privacy", label: "Privacy" },
   { href: "/therapist-agreement", label: "Therapist Agreement" },
   { href: "/cookie-policy", label: "Cookies" },
+  { href: "/billing-policy", label: "Billing" },
+  { href: "/acceptable-use", label: "Acceptable Use" },
+  { href: "/photo-policy", label: "Photo Policy" },
+  { href: "/dmca", label: "DMCA" },
+  { href: "/governing-law", label: "Governing Law" },
 ];
 
 type LegalPageProps = {
