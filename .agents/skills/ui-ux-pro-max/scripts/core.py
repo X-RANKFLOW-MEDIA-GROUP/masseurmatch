@@ -142,6 +142,9 @@ class BM25:
         """Score all documents against query"""
         query_tokens = self.tokenize(query)
         scores = []
+        
+        # Prevent division by zero
+        safe_avgdl = max(self.avgdl, 0.1)
 
         for idx, doc in enumerate(self.corpus):
             score = 0
@@ -155,7 +158,7 @@ class BM25:
                     tf = term_freqs[token]
                     idf = self.idf[token]
                     numerator = tf * (self.k1 + 1)
-                    denominator = tf + self.k1 * (1 - self.b + self.b * doc_len / self.avgdl)
+                    denominator = tf + self.k1 * (1 - self.b + self.b * doc_len / safe_avgdl)
                     score += idf * numerator / denominator
 
             scores.append((idx, score))
