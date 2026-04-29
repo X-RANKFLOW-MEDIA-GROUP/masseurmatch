@@ -18,8 +18,20 @@ interface AuditEntry {
   created_at: string;
 }
 
+interface SupportTicket {
+  id: string;
+  user_id: string;
+  subject: string;
+  message: string;
+  status: "open" | "in_progress" | "resolved" | "closed";
+  priority: "low" | "normal" | "high" | "urgent";
+  admin_note: string | null;
+  created_at: string;
+}
+
 export default function AdminSupportPage() {
   const [logs, setLogs] = useState<AuditEntry[]>([]);
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,6 +43,9 @@ export default function AdminSupportPage() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       setLogs(json.logs ?? []);
+      const ticketsRes = await fetch("/api/admin/tickets");
+      const ticketsJson = await ticketsRes.json();
+      setTickets(ticketsJson.tickets ?? []);
     } catch (err: any) {
       setError(err.message ?? "Failed to load support data.");
     } finally {
@@ -72,7 +87,7 @@ export default function AdminSupportPage() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Support"
-        description={`${uniqueSupport.length} support-related actions · ${suspensions.length} suspensions · ${photoActions.length} photo actions`}
+        description={`${uniqueSupport.length} support-related actions · ${tickets.length} tickets · ${photoActions.length} photo actions`}
         actions={
           <Button variant="outline" size="sm" onClick={fetchLogs}>
             <RefreshCw className="mr-1.5 h-3.5 w-3.5" /> Refresh
@@ -86,6 +101,7 @@ export default function AdminSupportPage() {
           <TabsTrigger value="suspensions">Suspensions ({suspensions.length})</TabsTrigger>
           <TabsTrigger value="profiles">Profile Edits ({profileEdits.length})</TabsTrigger>
           <TabsTrigger value="photos">Photo Actions ({photoActions.length})</TabsTrigger>
+          <TabsTrigger value="tickets">Tickets ({tickets.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all">
@@ -99,6 +115,28 @@ export default function AdminSupportPage() {
         </TabsContent>
         <TabsContent value="photos">
           <SupportTable entries={photoActions} />
+        </TabsContent>
+        <TabsContent value="tickets">
+          <Card className="border-border bg-white shadow-sm">
+            <CardHeader>
+              <CardTitle className="font-display text-base">Support Tickets</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {tickets.map((ticket) => (
+                  <div key={ticket.id} className="rounded-xl border border-border p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="font-medium">{ticket.subject}</p>
+                      <Badge variant="secondary">{ticket.status}</Badge>
+                    </div>
+                    <p className="mt-2 text-sm text-muted-foreground">{ticket.message}</p>
+                    <p className="mt-2 text-xs text-muted-foreground">Priority: {ticket.priority}</p>
+                  </div>
+                ))}
+                {tickets.length === 0 ? <p className="text-sm text-muted-foreground">No tickets found.</p> : null}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

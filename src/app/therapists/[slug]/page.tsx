@@ -160,13 +160,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     .filter((p): p is number => typeof p === "number" && p > 0)
     .sort((a, b) => a - b)[0];
 
-  const titleParts = [
-    name,
-    [verified ? "Verified" : null, topTechnique, "Therapist"].filter(Boolean).join(" "),
-    [neighborhood, city].filter(Boolean).join(", "),
-  ]
-    .filter(Boolean)
-    .join(" | ");
+  const titleParts = `${name} | Massage Therapist in ${city} | MasseurMatch`;
 
   const descParts = [
     `${name} is a${yearsExp ? ` ${yearsExp}+ year` : ""} professional massage therapist`,
@@ -174,7 +168,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     `specializing in ${topTechnique}.`,
     priceFrom ? `Sessions from $${priceFrom}.` : null,
     verified ? "Identity verified." : null,
-    "View rates, availability & book directly.",
+    "View rates, availability, and contact options directly.",
   ].filter(Boolean);
 
   const description = profile.bio

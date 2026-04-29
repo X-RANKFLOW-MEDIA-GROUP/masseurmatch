@@ -23,6 +23,7 @@ import {
 } from "@/app/_lib/public-profile";
 import { buildPhysicalProfileSummary } from "@/lib/physical-profile";
 import { useKnottyProfileAttribution } from "./useKnottyProfileAttribution";
+import { ReportTraffickingButton } from "./ReportTraffickingButton";
 
 function statusConfig(profile: PublicTherapist) {
   if (profile.available_now) {
@@ -106,7 +107,7 @@ export function ProfileHero({ profile, cityPath }: Props) {
             {isVerifiedDirectoryProfile(profile) ? (
               <span className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/8 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/84 backdrop-blur">
                 <BadgeCheck className="h-4 w-4" />
-                Verified listing
+                Identity-Verified via Stripe — license & insurance not verified
               </span>
             ) : null}
           </div>
@@ -191,6 +192,9 @@ export function ProfileHero({ profile, cityPath }: Props) {
             >
               Contact options
             </a>
+          </div>
+          <div className="max-w-md">
+            <ReportTraffickingButton therapistId={profile.id} therapistName={name} />
           </div>
         </div>
 

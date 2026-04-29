@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AppButton, AppInput, Surface } from "@/app/_components/primitives";
@@ -9,9 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-type AuthMethod = "email" | "phone" | "email-otp";
-
-/* ─────────── Social OAuth ─────────── */
+type AuthMethod = "email" | "email-otp";
 
 function SocialButtons({ label }: { label: string }) {
   const [loading, setLoading] = useState<string | null>(null);
@@ -58,8 +56,6 @@ function SocialButtons({ label }: { label: string }) {
   );
 }
 
-/* ─────────── Divider ─────────── */
-
 function OrDivider() {
   return (
     <div className="relative my-5">
@@ -69,12 +65,9 @@ function OrDivider() {
   );
 }
 
-/* ─────────── Method Tabs ─────────── */
-
 function MethodTabs({ method, onChange }: { method: AuthMethod; onChange: (m: AuthMethod) => void }) {
   const tabs: { key: AuthMethod; label: string }[] = [
     { key: "email", label: "Email & Password" },
-    { key: "phone", label: "Phone OTP" },
     { key: "email-otp", label: "Email OTP" },
   ];
   return (
@@ -93,93 +86,6 @@ function MethodTabs({ method, onChange }: { method: AuthMethod; onChange: (m: Au
   );
 }
 
-/* ─────────── Phone OTP Form ─────────── */
-
-function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: string }) {
-  const { toast } = useToast();
-  const [phone, setPhone] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const sendOtp = async () => {
-    if (!phone.trim()) return;
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({ phone: phone.trim() });
-    setLoading(false);
-    if (error) {
-      toast({ title: "Could not send OTP", description: error.message, variant: "destructive" });
-      return;
-    }
-    setOtpSent(true);
-    toast({ title: "OTP sent", description: "Check your phone for a text message." });
-  };
-
-  const verifyOtp = async () => {
-    setLoading(true);
-    const { data, error } = await supabase.auth.verifyOtp({ phone: phone.trim(), token: otp, type: "sms" });
-    if (error) {
-      setLoading(false);
-      toast({ title: "Verification failed", description: error.message, variant: "destructive" });
-      return;
-    }
-    // Sync the mm_session cookie so middleware recognises the user
-    if (data.session?.access_token) {
-      await fetch("/api/auth/sync-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ access_token: data.session.access_token }),
-      });
-    }
-    setLoading(false);
-    toast({ title: isLogin ? "Welcome back" : "Account created" });
-    // Use window.location for a full page navigation to ensure cookies are read properly
-    const destination = isLogin ? redirectTo : "/signup/plan";
-    window.location.href = destination;
-  };
-
-  return (
-    <div className="space-y-3">
-      <AppInput
-        type="tel"
-        aria-label="Phone number"
-        placeholder="+1 (555) 123-4567"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        disabled={otpSent}
-        required
-      />
-      {otpSent ? (
-        <>
-          <AppInput
-            type="text"
-            aria-label="One-time password code"
-            placeholder="Enter 6-digit code"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            maxLength={6}
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            required
-          />
-          <AppButton className="w-full" disabled={loading || otp.length < 6} onClick={verifyOtp}>
-            {loading ? "Verifying…" : "Verify & Continue"}
-          </AppButton>
-          <button type="button" onClick={() => { setOtpSent(false); setOtp(""); }} className="text-xs text-muted-foreground hover:underline">
-            Change phone number
-          </button>
-        </>
-      ) : (
-        <AppButton className="w-full" disabled={loading || !phone.trim()} onClick={sendOtp}>
-          {loading ? "Sending…" : "Send OTP via SMS"}
-        </AppButton>
-      )}
-    </div>
-  );
-}
-
-/* ─────────── Email OTP Form ─────────── */
-
 function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: string }) {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
@@ -194,18 +100,16 @@ function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
       options: {
-        // Ensure clicking the magic link in the email redirects to the correct
-        // destination rather than the bare site URL (which would land on the homepage).
         emailRedirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(destination)}`,
       },
     });
     setLoading(false);
     if (error) {
-      toast({ title: "Could not send OTP", description: error.message, variant: "destructive" });
+      toast({ title: "Could not send email OTP", description: error.message, variant: "destructive" });
       return;
     }
     setOtpSent(true);
-    toast({ title: "OTP sent", description: "Check your email inbox." });
+    toast({ title: "Email OTP sent", description: "Check your email inbox." });
   };
 
   const verifyOtp = async () => {
@@ -216,7 +120,6 @@ function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
       toast({ title: "Verification failed", description: error.message, variant: "destructive" });
       return;
     }
-    // Sync the mm_session cookie so middleware recognises the user
     if (data.session?.access_token) {
       await fetch("/api/auth/sync-session", {
         method: "POST",
@@ -226,7 +129,6 @@ function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
     }
     setLoading(false);
     toast({ title: isLogin ? "Welcome back" : "Account created" });
-    // Use window.location for a full page navigation to ensure cookies are read properly
     const destination = isLogin ? redirectTo : "/signup/plan";
     window.location.href = destination;
   };
@@ -271,8 +173,6 @@ function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: s
   );
 }
 
-/* ─────────── Main AuthForms ─────────── */
-
 export function AuthForms({
   mode,
   redirectTo = "/pro/dashboard",
@@ -292,7 +192,6 @@ export function AuthForms({
 
   const isLogin = mode === "login";
 
-  // Remember user email
   useEffect(() => {
     if (isLogin) {
       const saved = localStorage.getItem("mm_saved_email");
@@ -306,7 +205,6 @@ export function AuthForms({
     event.preventDefault();
     setLoading(true);
 
-    // Remember me logic
     if (isLogin) {
       localStorage.setItem("mm_remember_me", String(rememberMe));
       if (rememberMe) {
@@ -317,10 +215,33 @@ export function AuthForms({
       }
     }
 
-    const result = isLogin
-      ? await signIn(email.trim(), password)
-      : await signUp(email.trim(), password, fullName.trim());
+    if (isLogin) {
+      const result = await signIn(email.trim(), password);
+      setLoading(false);
 
+      if (result.error) {
+        const errorMsg = result.error.message || "";
+        toast({
+          title: "Login failed",
+          description: errorMsg,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({ title: "Welcome back" });
+      const destination = (!redirectTo || redirectTo === "/client/dashboard" || redirectTo === "/pro/dashboard")
+        ? result.role === "admin"
+          ? "/admin"
+          : redirectTo === "/client/dashboard"
+            ? "/client/dashboard"
+            : "/pro/dashboard"
+        : redirectTo;
+      window.location.href = destination;
+      return;
+    }
+
+    const result = await signUp(email.trim(), password, fullName.trim());
     setLoading(false);
 
     if (result.error) {
@@ -331,7 +252,7 @@ export function AuthForms({
         ((typeof (result.error as any)?.code === "string" && (result.error as any).code) === "USER_EXISTS");
 
       toast({
-        title: isLogin ? "Login failed" : "Could not register",
+        title: "Could not register",
         description: isUserExists
           ? "An account with this email already exists. Please sign in instead."
           : errorMsg,
@@ -344,20 +265,12 @@ export function AuthForms({
       return;
     }
 
-    toast({
-      title: isLogin ? "Welcome back" : "Account created",
-      description: isLogin ? undefined : "You can continue into onboarding now.",
-    });
-
-    // Use window.location for a full page navigation to ensure cookies are read properly
-    // New users go to plan selection, existing users go to their redirect or dashboard
-    const destination = isLogin ? redirectTo : "/signup/plan";
-    window.location.href = destination;
+    toast({ title: "Account created", description: "You can continue into onboarding now." });
+    window.location.href = "/signup/plan";
   };
 
   return (
     <Surface className="mx-auto max-w-lg">
-      {/* Mode toggle */}
       <div className="inline-flex rounded-full border border-border bg-secondary/60 p-1 text-sm font-semibold">
         <Link
           href="/login"
@@ -380,20 +293,16 @@ export function AuthForms({
           : "Create your therapist account and get started with onboarding."}
       </p>
 
-      {/* Social login/signup */}
       <div className="mt-5">
         <SocialButtons label={isLogin ? "Sign in" : "Sign up"} />
       </div>
 
       <OrDivider />
 
-      {/* Method tabs */}
       <MethodTabs method={method} onChange={setMethod} />
 
       <div className="mt-4">
-        {method === "phone" ? (
-          <PhoneOtpForm isLogin={isLogin} redirectTo={redirectTo} />
-        ) : method === "email-otp" ? (
+        {method === "email-otp" ? (
           <EmailOtpForm isLogin={isLogin} redirectTo={redirectTo} />
         ) : (
           <form onSubmit={onSubmit} className="space-y-3">
@@ -417,8 +326,6 @@ export function AuthForms({
               autoComplete="email"
               required
             />
-            
-            {/* Kept PasswordInput from 'main' branch */}
             <PasswordInput
               aria-label="Password"
               placeholder={isLogin ? "Password" : "At least 8 characters"}
