@@ -112,3 +112,5 @@ export const massageTherapistProfileSchema = z
     weightLb: data.weightLb ?? null,
     bodyType: data.bodyType ?? null,
   }));
+
+export type MassageTherapistProfileInput = z.input<typeof massageTherapistProfileSchema>;

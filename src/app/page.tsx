@@ -48,35 +48,27 @@ export const metadata: Metadata = {
   },
 };
 
-const PRIORITY_INDEX_CITY_LINKS = [
-  { slug: "dallas", anchor: "male massage em Dallas com perfis verificados" },
-  { slug: "houston", anchor: "massagistas em Houston com contato direto" },
-  { slug: "austin", anchor: "descubra terapeutas premium em Austin" },
-  { slug: "miami", anchor: "encontre male massage em Miami hoje" },
-  { slug: "chicago", anchor: "guia confiável de massage em Chicago" },
-] as const;
-
-const TOP_20_CITY_SLUGS = [
-  "new-york",
-  "los-angeles",
-  "chicago",
-  "houston",
-  "phoenix",
-  "philadelphia",
-  "san-antonio",
-  "san-diego",
-  "dallas",
-  "austin",
-  "san-jose",
-  "fort-worth",
-  "jacksonville",
-  "columbus",
-  "charlotte",
-  "indianapolis",
-  "seattle",
-  "denver",
-  "washington-dc",
-  "miami",
+const HOMEPAGE_CITY_DISCOVERY = [
+  { slug: "new-york", blurb: "Massage therapists near you" },
+  { slug: "los-angeles", blurb: "Trusted local massage profiles" },
+  { slug: "chicago", blurb: "Direct contact massage listings" },
+  { slug: "miami", blurb: "Massage therapists available locally" },
+  { slug: "dallas", blurb: "Professional massage profiles" },
+  { slug: "houston", blurb: "Browse massage therapists" },
+  { slug: "austin", blurb: "Find local massage providers" },
+  { slug: "atlanta", blurb: "Trusted massage listings" },
+  { slug: "san-francisco", blurb: "Massage therapists nearby" },
+  { slug: "seattle", blurb: "Browse local massage profiles" },
+  { slug: "boston", blurb: "Professional massage listings" },
+  { slug: "washington-dc", blurb: "Find massage therapists" },
+  { slug: "denver", blurb: "Local massage profiles" },
+  { slug: "phoenix", blurb: "Trusted massage providers" },
+  { slug: "las-vegas", blurb: "Browse massage therapists" },
+  { slug: "orlando", blurb: "Local massage listings" },
+  { slug: "san-diego", blurb: "Massage providers nearby" },
+  { slug: "philadelphia", blurb: "Professional massage profiles" },
+  { slug: "portland", blurb: "Trusted massage listings" },
+  { slug: "nashville", blurb: "Browse massage therapists" },
 ] as const;
 
 export default async function HomePage() {
@@ -157,22 +149,14 @@ export default async function HomePage() {
     })
     .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
 
-  const priorityCityLinks = PRIORITY_INDEX_CITY_LINKS.map((entry) => {
+  const cityDiscoveryItems = HOMEPAGE_CITY_DISCOVERY.map((entry) => {
     const city = cities.find((cityItem) => cityItem.slug === entry.slug);
 
     return {
       href: city ? `/${city.slug}` : "/cities",
-      anchor: entry.anchor,
-    };
-  });
-
-  const topCityBannerItems = TOP_20_CITY_SLUGS.map((slug) => {
-    const city = cities.find((entry) => entry.slug === slug);
-    const label = city ? `${city.name}, ${city.stateCode}` : slug.replace(/-/g, " ");
-
-    return {
-      href: city ? `/${city.slug}` : "/cities",
-      label,
+      city: city?.name || entry.slug.replace(/-/g, " "),
+      state: city?.stateCode || "US",
+      blurb: entry.blurb,
     };
   });
 
@@ -235,8 +219,7 @@ export default async function HomePage() {
         featuredTherapists={featuredTherapists}
         totalTherapists={therapistsResult.total}
         cityCount={launchCities.length}
-        priorityCityLinks={priorityCityLinks}
-        topCityBannerItems={topCityBannerItems}
+        cityDiscoveryItems={cityDiscoveryItems}
       />
     </>
   );

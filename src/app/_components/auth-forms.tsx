@@ -215,10 +215,33 @@ export function AuthForms({
       }
     }
 
-    const result = isLogin
-      ? await signIn(email.trim(), password)
-      : await signUp(email.trim(), password, fullName.trim());
+    if (isLogin) {
+      const result = await signIn(email.trim(), password);
+      setLoading(false);
 
+      if (result.error) {
+        const errorMsg = result.error.message || "";
+        toast({
+          title: "Login failed",
+          description: errorMsg,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({ title: "Welcome back" });
+      const destination = (!redirectTo || redirectTo === "/client/dashboard" || redirectTo === "/pro/dashboard")
+        ? result.role === "admin"
+          ? "/admin"
+          : redirectTo === "/client/dashboard"
+            ? "/client/dashboard"
+            : "/pro/dashboard"
+        : redirectTo;
+      window.location.href = destination;
+      return;
+    }
+
+    const result = await signUp(email.trim(), password, fullName.trim());
     setLoading(false);
 
     if (result.error) {
@@ -229,7 +252,7 @@ export function AuthForms({
         ((typeof (result.error as any)?.code === "string" && (result.error as any).code) === "USER_EXISTS");
 
       toast({
-        title: isLogin ? "Login failed" : "Could not register",
+        title: "Could not register",
         description: isUserExists
           ? "An account with this email already exists. Please sign in instead."
           : errorMsg,
@@ -242,13 +265,8 @@ export function AuthForms({
       return;
     }
 
-    toast({
-      title: isLogin ? "Welcome back" : "Account created",
-      description: isLogin ? undefined : "You can continue into onboarding now.",
-    });
-
-    const destination = isLogin ? redirectTo : "/signup/plan";
-    window.location.href = destination;
+    toast({ title: "Account created", description: "You can continue into onboarding now." });
+    window.location.href = "/signup/plan";
   };
 
   return (
