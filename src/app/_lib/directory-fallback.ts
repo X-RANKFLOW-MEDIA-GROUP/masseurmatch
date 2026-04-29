@@ -1,6 +1,33 @@
 import type { PublicTherapist, TherapistTier } from "@/app/_lib/directory";
 
-type FallbackTherapist = PublicTherapist & {
+type FallbackTherapist = Partial<PublicTherapist> & {
+  id: string;
+  slug: string;
+  city: string;
+  display_name: string;
+  full_name: string;
+  bio: string;
+  phone: string | null;
+  specialties: string[];
+  _tier: TherapistTier;
+  modality: string;
+  status?: string | null;
+  profile_views?: number | null;
+  review_count: number | null;
+  incall_price: number | null;
+  outcall_price: number | null;
+  business_hours?: unknown;
+  custom_faq?: unknown;
+  pricing_sessions?: PublicTherapist["pricing_sessions"];
+  available_now: boolean;
+  available_now_expires: string | null;
+  is_verified_identity?: boolean;
+  is_verified_profile?: boolean;
+  is_verified_photos?: boolean;
+  neighborhood_name?: string | null;
+  primary_area?: string | null;
+  years_experience: number | null;
+  start_year?: number | null;
   latitude: number;
   longitude: number;
   zip_code: string | null;

@@ -24,21 +24,6 @@ const DFW_SUBURB_SLUGS = new Set([
   "addison", "carrollton", "arlington", "grand-prairie",
 ]);
 
-const PRIORITY_INDEX_CITY_SLUGS = ["dallas", "houston", "austin", "miami", "chicago"] as const;
-
-const PRIORITY_CITY_META_DESCRIPTIONS: Record<string, string> = {
-  dallas:
-    "Dallas male massage directory with verified profiles, direct contact links, and neighborhood filters for Oak Lawn, Uptown, Downtown, and nearby areas. Compare session styles and reach out in minutes.",
-  houston:
-    "Explore trusted male massage in Houston with fast city, service, and area pages. Find verified therapists, check incall or outcall options, and contact directly with confidence.",
-  austin:
-    "Austin city guide for verified male massage therapists. Browse deep tissue, Swedish, and mobile session routes, compare trusted profiles, and message providers directly.",
-  miami:
-    "Find premium male massage therapists in Miami across Brickell, Miami Beach, and central neighborhoods. Compare verified profiles and direct-contact options for faster booking decisions.",
-  chicago:
-    "Chicago male massage directory built for real local intent. Discover trusted therapists by neighborhood and service type, then contact directly with clear incall or outcall expectations.",
-};
-
 export function generateStaticParams(): Params[] {
   return getCities().map((city) => ({ city: city.slug }));
 }
@@ -63,8 +48,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     ? `${inventoryCount}+ Verified Male Massage Therapists in ${cityLabel}`
     : `Verified Male Massage Therapists in ${cityLabel}`;
 
-  const description = PRIORITY_CITY_META_DESCRIPTIONS[city.slug]
-    ?? `Find trusted, verified male massage therapists in ${cityLabel}. LGBTQ+-friendly directory with identity-verified professionals, real reviews, and direct booking. Compare rates, specialties & availability.`;
+  const description = `Find trusted, verified male massage therapists in ${cityLabel}. LGBTQ+-friendly directory with identity-verified professionals, real reviews, and direct booking. Compare rates, specialties & availability.`;
 
   return createPageMetadata({
     title,
@@ -130,15 +114,6 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
     });
 
   const therapists = await getPublicTherapists({ city: city.name, page: 1, pageSize: 9 });
-  const crossCityLinks = PRIORITY_INDEX_CITY_SLUGS
-    .filter((slug) => slug !== city.slug)
-    .map((slug) => getCities().find((entry) => entry.slug === slug))
-    .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
-    .map((entry) => ({
-      href: `/${entry.slug}`,
-      label: `${entry.name} city page`,
-      description: `See verified male massage routes in ${entry.name}, including neighborhood and service filters.`,
-    }));
 
   const cityIntro = DFW_SUBURB_SLUGS.has(city.slug)
     ? buildSuburbIntro(buildAreaCopyInput({ area: city.name, city: "DFW", therapists: therapists.items }))
@@ -183,13 +158,7 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
       question: `Does MasseurMatch handle booking in ${city.name}?`,
       answer: `No. MasseurMatch is a trusted discovery directory. You contact therapists directly by phone, WhatsApp, or SMS to confirm fit, timing, and availability.`,
     },
-    {
-      question: `How does this page help indexation for ${city.name}?`,
-      answer: `This city page now includes expanded editorial copy, stronger internal links, and cross-links to other major city hubs. Those signals help search engines understand freshness, local relevance, and site architecture more quickly.`,
-    },
   ];
-
-  const cityFreshnessParagraph = `If you are researching male massage in ${city.name}, this page was expanded with fresh editorial content to improve both usability and crawl clarity. Instead of thin city copy, you now get richer context about how to compare providers, what service routes represent, and why internal navigation between city, service, and area pages matters. Search engines typically prioritize pages that continue to evolve, so this update focuses on meaningful changes: clearer language, stronger internal linking structure, and better intent matching for users who arrive from mobile search. As you explore profiles, start with verification and specialties, then review session format, neighborhood fit, and direct-contact preferences. If timing matters, check availability indicators and shortlist two or three providers before sending a message. This tighter journey reduces bounce, increases relevance signals, and helps this ${city.name} page perform as a dependable local discovery hub over time.`;
 
   return (
     <>
@@ -274,15 +243,6 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
               },
             ],
           },
-          ...(crossCityLinks.length
-            ? [{
-                title: "Explore other priority city hubs",
-                layout: "grid" as const,
-                description:
-                  "Strong cross-city links reinforce topical authority and help visitors compare options across major markets.",
-                items: crossCityLinks,
-              }]
-            : []),
         ]}
         therapists={therapists.items}
         listingTitle={`Trusted listings in ${city.name}`}
@@ -292,13 +252,6 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
         faqTitle={`Common Questions About Male Massage in ${city.name}`}
         faqItems={cityFaqs}
       />
-
-      <section className="page-shell pb-6">
-        <div className="rounded-3xl border border-border bg-background p-6">
-          <h2 className="text-2xl font-semibold text-foreground">Updated local guide for {city.name}</h2>
-          <p className="mt-3 text-sm leading-7 text-muted-foreground">{cityFreshnessParagraph}</p>
-        </div>
-      </section>
 
       {comparisonProfiles.length > 1 ? (
         <section className="page-shell pb-14">

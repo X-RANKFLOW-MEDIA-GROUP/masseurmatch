@@ -66,7 +66,7 @@ export async function GET(request: Request) {
     const { count: completedVerifications } = await adminClient
       .from("identity_verifications")
       .select("id", { count: "exact", head: true })
-      .eq("status", "approved");
+      .eq("status", "verified");
 
     return json({
       ok: true,

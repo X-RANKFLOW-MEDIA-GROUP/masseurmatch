@@ -11,7 +11,8 @@ export type DirectoryObjectiveId =
   | "all"
   | "deep-recovery"
   | "sports-clinical"
-  | "stress-relief";
+  | "stress-relief"
+  | "pre-natal";
 
 type DirectoryObjective = {
   id: DirectoryObjectiveId;
@@ -53,6 +54,12 @@ export const DIRECTORY_OBJECTIVES: DirectoryObjective[] = [
     label: "Stress Relief",
     searchValue: "relaxation",
     aliases: ["relaxation", "stress", "swedish", "lymphatic"],
+  },
+  {
+    id: "pre-natal",
+    label: "Pre-Natal",
+    searchValue: "prenatal",
+    aliases: ["prenatal", "pre natal", "pre-natal", "maternal"],
   },
 ];
 

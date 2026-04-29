@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import {
-  BadgeCheck,
-  CalendarClock,
-  CircleAlert,
-  FileSearch,
-  LockKeyhole,
-  ShieldCheck,
-  UserRoundCheck,
-} from "lucide-react";
+import { ShieldCheck, Bot, Lock, CheckCircle2, UserCheck, EyeOff, ShieldAlert } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Trust & Safety | MasseurMatch",
+  title: "Trust & Safety | How MasseurMatch Protects You",
   description:
-    "Public, auditable trust definitions for Identity Checked, Profile Reviewed, and Photo Checked badges, including audit cadence and oversight.",
+    "Learn how MasseurMatch verifies therapists, protects your privacy, and ensures a safe environment with AI-driven moderation and identity verification.",
+  openGraph: {
+    title: "Trust & Safety | MasseurMatch",
+    description:
+      "AI-driven moderation, identity verification, and encrypted communications - uncompromising commitment to your safety.",
+    url: "https://masseurmatch.com/trust",
+    siteName: "MasseurMatch",
+    type: "website",
+  },
   alternates: { canonical: "https://masseurmatch.com/trust" },
 };
 
@@ -23,129 +23,137 @@ const jsonLd = {
   name: "Trust & Safety - MasseurMatch",
   url: "https://masseurmatch.com/trust",
   description:
-    "Public trust framework with independent verification definitions, legal disclaimers, and security posture statements.",
+    "MasseurMatch's commitment to AI-driven moderation, identity verification, data privacy, and secure communications.",
+  publisher: {
+    "@type": "Organization",
+    name: "MasseurMatch",
+    url: "https://masseurmatch.com",
+  },
 };
 
-const trustBadges = [
-  {
-    icon: UserRoundCheck,
-    name: "Identity Checked",
-    definition:
-      "Provider completed a government-ID verification workflow. This badge confirms identity matching at the time of review.",
-    cadence: "Re-validated every 12 months or after legal-name/profile-ownership changes.",
-    auditor: "Primary check by Stripe Identity workflow + internal compliance verification.",
-    note: "Identity checks do not confirm professional license, certifications, or legal authorization to practice in every jurisdiction.",
-  },
-  {
-    icon: BadgeCheck,
-    name: "Profile Reviewed",
-    definition:
-      "Listing text, categories, and contact metadata were reviewed against content standards and prohibited-content policy.",
-    cadence: "Automated checks continuously + manual spot checks at least every 30 days.",
-    auditor: "MasseurMatch trust team with moderation tooling and policy checklist.",
-    note: "Review means policy conformance at review time, not endorsement or guarantee of service quality.",
-  },
-  {
-    icon: FileSearch,
-    name: "Photo Checked",
-    definition:
-      "Photos passed moderation checks for policy compliance (professional framing, prohibited-content controls, and quality rules).",
-    cadence: "Every upload is scanned pre-publication; high-risk profiles receive manual re-check within 7 days.",
-    auditor: "Automated moderation model + human escalation queue for borderline or flagged cases.",
-    note: "Photo checks do not verify real-time appearance, current condition, or identity continuity outside submitted assets.",
-  },
-];
+function RuleRow({ text }: { text: string }) {
+  return (
+    <div className="flex items-start gap-4 border border-slate-200 bg-white p-4 shadow-sm">
+      <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
+      <span className="font-sans text-sm leading-relaxed text-slate-700">{text}</span>
+    </div>
+  );
+}
 
 export default function TrustPage() {
   return (
     <>
-      <Script id="trust-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <Script
+        id="trust-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
-      <main className="page-shell py-12 md:py-16">
-        <section className="rounded-3xl border border-border bg-slate-950 px-6 py-10 text-white md:px-10 md:py-14">
-          <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">Trust Framework</h1>
-          <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-200 md:text-base">
-            Public definitions below are designed to be auditable, specific, and legally precise. Badge language reflects
-            what is checked — and what is not checked.
+      <div className="min-h-screen bg-slate-50 pb-32 pt-24">
+        <section className="container mx-auto mb-20 max-w-4xl px-4 text-center md:px-6">
+          <ShieldCheck className="mx-auto mb-6 h-12 w-12 text-emerald-500" />
+          <h1 className="font-display mb-6 text-4xl font-medium tracking-tight text-slate-900 md:text-6xl">
+            Trust First. <br />
+            <span className="text-slate-400">Uncompromising commitment.</span>
+          </h1>
+          <p className="mx-auto max-w-2xl font-sans text-lg leading-relaxed text-slate-600">
+            Your safety is the foundation of MasseurMatch. We built an AI-driven and rigorously
+            verified technological infrastructure to guarantee peace of mind with every booking.
           </p>
         </section>
 
-        <section className="mt-8 grid gap-5">
-          {trustBadges.map((badge) => {
-            const Icon = badge.icon;
-
-            return (
-              <article key={badge.name} className="rounded-2xl border border-border bg-background p-6">
-                <h2 className="flex items-center gap-2 text-2xl font-semibold text-foreground">
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-800">
-                    <Icon className="h-4 w-4" />
-                  </span>
-                  {badge.name}
-                </h2>
-                <p className="mt-4 text-sm leading-7 text-muted-foreground">{badge.definition}</p>
-                <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  <div className="rounded-xl border border-border bg-muted/20 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Audit Cadence</p>
-                    <p className="mt-2 text-sm text-foreground">{badge.cadence}</p>
-                  </div>
-                  <div className="rounded-xl border border-border bg-muted/20 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Who Audits</p>
-                    <p className="mt-2 text-sm text-foreground">{badge.auditor}</p>
-                  </div>
-                </div>
-                <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-6 text-amber-900">{badge.note}</p>
-              </article>
-            );
-          })}
+        <section className="container mx-auto mb-16 max-w-3xl px-4 md:px-6">
+          <div className="flex items-start gap-4 rounded-2xl border border-orange-200 bg-orange-50 p-6 shadow-sm md:p-8">
+            <ShieldAlert className="mt-1 h-10 w-10 flex-shrink-0 text-orange-500" />
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Important Platform Disclaimer</h3>
+              <p className="text-gray-700 font-medium">
+                <strong>MasseurMatch verifies therapists&apos; identities but not their professional licenses.</strong> Users are solely responsible for verifying the credentials, legality, and safety of any professional they choose to contact or book outside of this platform.
+              </p>
+            </div>
+          </div>
         </section>
 
-        <section className="mt-8 grid gap-4 md:grid-cols-2">
-          <article className="rounded-2xl border border-border bg-background p-6">
-            <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-              <LockKeyhole className="h-5 w-5" /> Security posture
-            </h2>
-            <p className="mt-3 text-sm leading-7 text-muted-foreground">
-              MasseurMatch uses TLS in transit, scoped access controls, and moderation/abuse monitoring. We do not state
-              SOC 2 certification unless and until formally completed.
-            </p>
-            <p className="mt-3 text-sm leading-7 text-muted-foreground">
-              Current statement: <strong>independent security assessment in progress.</strong>
-            </p>
-          </article>
+        <section className="container mx-auto max-w-5xl px-4 md:px-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="group relative overflow-hidden bg-slate-950 p-8 text-white md:p-10">
+              <div className="absolute right-0 top-0 h-32 w-32 bg-indigo-500/10 blur-[50px] transition-colors group-hover:bg-indigo-500/20" />
+              <Bot className="mb-6 h-8 w-8 text-indigo-400" />
+              <h3 className="font-display mb-3 text-2xl font-medium">AI Singleton Moderation</h3>
+              <p className="mb-6 font-sans text-sm leading-relaxed text-slate-400">
+                Our proprietary Artificial Intelligence system reads and verifies every word and
+                photo submitted to the platform in real-time. We automatically identify and block
+                fake profiles or inappropriate language before they ever go live.
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                </span>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-emerald-400">
+                  AI Engine Online
+                </span>
+              </div>
+            </div>
 
-          <article className="rounded-2xl border border-border bg-background p-6">
-            <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-              <CircleAlert className="h-5 w-5" /> Legal disclaimer
-            </h2>
-            <p className="mt-3 text-sm leading-7 text-muted-foreground">
-              MasseurMatch is a discovery directory. Users are responsible for due diligence before any session, including
-              legal compliance, credentials, boundaries, and pricing confirmation.
-            </p>
-            <p className="mt-3 text-sm leading-7 text-muted-foreground">
-              Badge status is a trust signal, not a guarantee, warranty, or medical/legal endorsement.
-            </p>
-          </article>
+            <div className="border border-slate-200 bg-white p-8 shadow-sm md:p-10">
+              <UserCheck className="mb-6 h-8 w-8 text-slate-900" />
+              <h3 className="font-display mb-3 text-2xl font-medium text-slate-900">
+                Identity Verification
+              </h3>
+              <p className="mb-6 font-sans text-sm leading-relaxed text-slate-600">
+                Powered by Stripe Identity, we require therapists to provide valid
+                government-issued documents. Look for the blue &ldquo;Verified&rdquo; badge for
+                professionals who have passed our strictest audit.
+                <br />
+                <span className="mt-2 block font-semibold text-orange-700">
+                  Note: Identity verification confirms a person&apos;s legal identity, <u>not</u>{" "}
+                  their professional licensure.
+                </span>
+              </p>
+              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5">
+                <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-600">
+                  Verified Therapists
+                </span>
+              </div>
+            </div>
+
+            <div className="border border-slate-200 bg-white p-8 shadow-sm md:p-10">
+              <EyeOff className="mb-6 h-8 w-8 text-slate-900" />
+              <h3 className="font-display mb-3 text-2xl font-medium text-slate-900">Data Privacy</h3>
+              <p className="font-sans text-sm leading-relaxed text-slate-600">
+                We do not sell your data. Your searches, message history, and location data are
+                end-to-end encrypted. We only share what is strictly necessary to connect you with
+                your chosen therapist.
+              </p>
+            </div>
+
+            <div className="border border-slate-200 bg-white p-8 shadow-sm md:p-10">
+              <Lock className="mb-6 h-8 w-8 text-slate-900" />
+              <h3 className="font-display mb-3 text-2xl font-medium text-slate-900">Secure Contact</h3>
+              <p className="font-sans text-sm leading-relaxed text-slate-600">
+                Our floating contact bar allows for quick initial communication (SMS/Call) without
+                forcing you to fill out long forms, keeping you in total control of who has your
+                phone number.
+              </p>
+            </div>
+          </div>
         </section>
 
-        <section className="mt-8 rounded-2xl border border-border bg-background p-6">
-          <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <CalendarClock className="h-5 w-5" /> Audit transparency cadence
+        <section className="container mx-auto mt-24 max-w-3xl px-4 md:px-6">
+          <h2 className="font-display mb-8 text-center text-2xl font-medium text-slate-900 md:text-3xl">
+            Our Unbreakable Rules
           </h2>
-          <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-            <li>• Monthly: moderation quality report and policy exception review.</li>
-            <li>• Quarterly: sampled badge accuracy review by internal compliance owners.</li>
-            <li>• Annual: independent security review summary and trust-page update.</li>
-          </ul>
-          <p className="mt-4 text-xs text-muted-foreground">Last policy refresh: April 28, 2026.</p>
-        </section>
 
-        <section className="mt-8 rounded-2xl border border-border bg-background p-6">
-          <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <ShieldCheck className="h-5 w-5" /> Contact support
-          </h2>
-          <p className="mt-3 text-sm text-muted-foreground">Need a trust clarification? Call support at 978-MASSEUR or use the contact page.</p>
+          <div className="space-y-4">
+            <RuleRow text="Zero tolerance for solicitations of illegal or sexual services." />
+            <RuleRow text="Profile photos must be strictly professional and free of watermarks." />
+            <RuleRow text="Verbal aggression, discrimination, or harassment in chat results in an instant ban." />
+            <RuleRow text="All reviews must come from real clients to combat fake reputations." />
+          </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }

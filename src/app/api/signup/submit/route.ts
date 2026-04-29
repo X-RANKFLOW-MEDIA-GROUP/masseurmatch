@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getRequestSession } from "@/app/api/_lib/session";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import { sendEmail } from "@/app/api/_lib/email";
+import React from "react";
 
 export async function POST(request: NextRequest) {
   try {
@@ -66,6 +68,17 @@ export async function POST(request: NextRequest) {
       console.error("[signup/submit] profile update failed:", updateError.message);
       return NextResponse.json({ error: "Failed to save profile." }, { status: 500 });
     }
+
+    // Notify Admin of new signup
+    await sendEmail({
+      to: process.env.ADMIN_EMAIL || "admin@masseurmatch.com",
+      subject: "New Provider Signup Pending Review",
+      react: React.createElement("div", {}, [
+        React.createElement("h1", {}, "New Signup"),
+        React.createElement("p", {}, `A new provider (${profile.full_name || session.userId}) has submitted their profile for review.`),
+        React.createElement("a", { href: "https://masseurmatch.com/admin/therapists" }, "Review in Admin Dashboard")
+      ])
+    });
 
     return NextResponse.json({ success: true });
   } catch {

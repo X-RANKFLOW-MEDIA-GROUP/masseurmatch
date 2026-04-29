@@ -14,54 +14,30 @@ type ProfileResponse = {
 
 type FormState = {
   displayName: string;
-  headline: string;
   bio: string;
   city: string;
   state: string;
-  neighborhood: string;
-  locationDescription: string;
   phone: string;
-  bookingLink: string;
-  whatsappNumber: string;
-  telegramHandle: string;
   specialties: string;
-  languages: string;
-  massageTechniques: string;
   incallPrice: string;
   outcallPrice: string;
-  outcallRadius: string;
   heightInches: string;
   weightLb: string;
   bodyType: string;
-  seoTitle: string;
-  seoDescription: string;
-  seoKeywords: string;
 };
 
 const EMPTY_FORM: FormState = {
   displayName: "",
-  headline: "",
   bio: "",
   city: "",
   state: "",
-  neighborhood: "",
-  locationDescription: "",
   phone: "",
-  bookingLink: "",
-  whatsappNumber: "",
-  telegramHandle: "",
   specialties: "",
-  languages: "",
-  massageTechniques: "",
   incallPrice: "",
   outcallPrice: "",
-  outcallRadius: "",
   heightInches: "",
   weightLb: "",
   bodyType: "",
-  seoTitle: "",
-  seoDescription: "",
-  seoKeywords: "",
 };
 
 function mapProfileToForm(profile: ProfileResponse["profile"]): FormState {
@@ -71,28 +47,16 @@ function mapProfileToForm(profile: ProfileResponse["profile"]): FormState {
 
   return {
     displayName: profile.display_name || profile.full_name || "",
-    headline: profile.headline || "",
     bio: profile.bio || "",
     city: profile.city || "",
     state: profile.state || "",
-    neighborhood: profile.neighborhood || "",
-    locationDescription: profile.location_description || "",
     phone: profile.phone || "",
-    bookingLink: profile.booking_link || "",
-    whatsappNumber: profile.whatsapp_number || "",
-    telegramHandle: profile.telegram_handle || "",
     specialties: (profile.specialties || []).join(", "),
-    languages: (profile.languages || []).join(", "),
-    massageTechniques: (profile.massage_techniques || []).join(", "),
     incallPrice: profile.incall_price ? String(profile.incall_price) : "",
     outcallPrice: profile.outcall_price ? String(profile.outcall_price) : "",
-    outcallRadius: typeof profile.outcall_radius === "number" ? String(profile.outcall_radius) : "",
     heightInches: typeof profile.height_inches === "number" ? String(profile.height_inches) : "",
     weightLb: typeof profile.weight_lb === "number" ? String(profile.weight_lb) : "",
     bodyType: normalizeBodyTypeValue(profile.body_type) || "",
-    seoTitle: profile.seo_title || "",
-    seoDescription: profile.seo_description || "",
-    seoKeywords: (profile.seo_keywords || []).join(", "),
   };
 }
 
@@ -163,31 +127,19 @@ export default function ProProfilePageClient() {
     try {
       const response = await updateProfileMutation({
         displayName: form.displayName,
-        headline: form.headline || null,
         bio: form.bio,
         city: form.city,
         state: form.state || null,
-        neighborhood: form.neighborhood || null,
-        location_description: form.locationDescription || null,
         phone: form.phone || null,
-        booking_link: form.bookingLink || null,
-        whatsapp_number: form.whatsappNumber || null,
-        telegram_handle: form.telegramHandle || null,
         specialties: form.specialties
           .split(",")
           .map((value) => value.trim())
           .filter(Boolean),
-        languages: form.languages.split(",").map((value) => value.trim()).filter(Boolean),
-        massage_techniques: form.massageTechniques.split(",").map((value) => value.trim()).filter(Boolean),
         incallPrice: parsePrice(form.incallPrice),
         outcallPrice: parsePrice(form.outcallPrice),
-        outcall_radius: parseWholeNumber(form.outcallRadius),
         heightInches: parseWholeNumber(form.heightInches),
         weightLb: parseWholeNumber(form.weightLb),
         bodyType: normalizeBodyTypeValue(form.bodyType),
-        seo_title: form.seoTitle || null,
-        seo_description: form.seoDescription || null,
-        seo_keywords: form.seoKeywords.split(",").map((value) => value.trim()).filter(Boolean),
       });
 
       setForm(mapProfileToForm(response.profile));
@@ -226,11 +178,6 @@ export default function ProProfilePageClient() {
                 required
               />
               <AppInput
-                placeholder="Headline"
-                value={form.headline}
-                onChange={(event) => setForm((current) => ({ ...current, headline: event.target.value }))}
-              />
-              <AppInput
                 placeholder="City"
                 value={form.city}
                 onChange={(event) => setForm((current) => ({ ...current, city: event.target.value }))}
@@ -247,41 +194,9 @@ export default function ProProfilePageClient() {
                 onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))}
               />
               <AppInput
-                placeholder="Neighborhood"
-                value={form.neighborhood}
-                onChange={(event) => setForm((current) => ({ ...current, neighborhood: event.target.value }))}
-              />
-              <AppInput
-                placeholder="Booking link"
-                value={form.bookingLink}
-                onChange={(event) => setForm((current) => ({ ...current, bookingLink: event.target.value }))}
-              />
-              <AppInput
-                placeholder="WhatsApp number"
-                value={form.whatsappNumber}
-                onChange={(event) => setForm((current) => ({ ...current, whatsappNumber: event.target.value }))}
-              />
-              <AppInput
-                placeholder="Telegram handle"
-                value={form.telegramHandle}
-                onChange={(event) => setForm((current) => ({ ...current, telegramHandle: event.target.value }))}
-              />
-              <AppInput
                 placeholder="Specialties (comma separated)"
                 value={form.specialties}
                 onChange={(event) => setForm((current) => ({ ...current, specialties: event.target.value }))}
-                className="md:col-span-2"
-              />
-              <AppInput
-                placeholder="Languages (comma separated)"
-                value={form.languages}
-                onChange={(event) => setForm((current) => ({ ...current, languages: event.target.value }))}
-                className="md:col-span-2"
-              />
-              <AppInput
-                placeholder="Massage techniques (comma separated)"
-                value={form.massageTechniques}
-                onChange={(event) => setForm((current) => ({ ...current, massageTechniques: event.target.value }))}
                 className="md:col-span-2"
               />
               <AppInput
@@ -326,32 +241,7 @@ export default function ProProfilePageClient() {
                   </option>
                 ))}
               </select>
-              <AppInput
-                type="number"
-                min="0"
-                placeholder="Outcall radius (miles)"
-                value={form.outcallRadius}
-                onChange={(event) => setForm((current) => ({ ...current, outcallRadius: event.target.value }))}
-              />
-              <AppInput
-                placeholder="SEO title"
-                value={form.seoTitle}
-                onChange={(event) => setForm((current) => ({ ...current, seoTitle: event.target.value }))}
-                className="md:col-span-2"
-              />
-              <AppInput
-                placeholder="SEO keywords (comma separated)"
-                value={form.seoKeywords}
-                onChange={(event) => setForm((current) => ({ ...current, seoKeywords: event.target.value }))}
-                className="md:col-span-2"
-              />
             </div>
-
-            <AppTextarea
-              placeholder="Location description"
-              value={form.locationDescription}
-              onChange={(event) => setForm((current) => ({ ...current, locationDescription: event.target.value }))}
-            />
 
             <AppTextarea
               placeholder="Bio"
@@ -359,11 +249,6 @@ export default function ProProfilePageClient() {
               onChange={(event) => setForm((current) => ({ ...current, bio: event.target.value }))}
               className="min-h-48"
               required
-            />
-            <AppTextarea
-              placeholder="SEO description"
-              value={form.seoDescription}
-              onChange={(event) => setForm((current) => ({ ...current, seoDescription: event.target.value }))}
             />
 
             <div className="flex flex-wrap gap-3">
