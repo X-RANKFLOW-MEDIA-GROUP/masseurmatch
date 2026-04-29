@@ -74,6 +74,7 @@ export interface PublicTherapist {
   is_verified_identity?: boolean;
   is_verified_profile?: boolean;
   is_verified_photos?: boolean;
+  lgbtq_affirming?: boolean;
 }
 
 export interface ImportedReview {
