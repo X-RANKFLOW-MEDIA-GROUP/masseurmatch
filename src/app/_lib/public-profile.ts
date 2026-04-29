@@ -4,63 +4,49 @@ export function getPublicProfileName(profile: Pick<PublicTherapist, "display_nam
   return profile.display_name || profile.full_name || "Therapist";
 }
 
-export function isVerifiedDirectoryProfile(profile: Pick<PublicTherapist, "_tier" | "is_verified_identity" | "is_verified_profile">) {
+export function isVerifiedDirectoryProfile(profile: Pick<PublicTherapist, "subscription_tier" | "verification_status">) {
   return (
-    profile._tier === "standard" ||
-    profile._tier === "pro" ||
-    profile._tier === "elite" ||
-    Boolean(profile.is_verified_identity) ||
-    Boolean(profile.is_verified_profile)
+    profile.subscription_tier === "standard" ||
+    profile.subscription_tier === "pro" ||
+    profile.subscription_tier === "elite" ||
+    profile.verification_status === "verified"
   );
 }
 
-export function getDirectoryTierLabel(profile: Pick<PublicTherapist, "_tier">) {
-  if (profile._tier === "pro" || profile._tier === "elite") {
+export function getDirectoryTierLabel(profile: Pick<PublicTherapist, "subscription_tier">) {
+  const tier = profile.subscription_tier;
+  if (tier === "pro" || tier === "elite") {
     return "Premium";
   }
-
-  if (profile._tier === "standard") {
+  if (tier === "standard") {
     return "Verified";
   }
-
   return "Directory";
 }
 
 export function normalizePhoneNumber(phone: string | null) {
-  if (!phone) {
-    return "";
-  }
-
+  if (!phone) return "";
   return phone.replace(/[^\d+]/g, "");
 }
 
-export function getPublicContactLinks(phone: string | null) {
+export function getPublicContactLinks(phone: string | null, whatsapp_number?: string | null) {
   const normalizedPhone = normalizePhoneNumber(phone);
-
-  if (!normalizedPhone) {
-    return {
-      callHref: null,
-      whatsappHref: null,
-      smsHref: null,
-    };
-  }
+  const normalizedWhatsapp = normalizePhoneNumber(whatsapp_number || phone);
 
   return {
-    callHref: `tel:${normalizedPhone}`,
-    whatsappHref: `https://wa.me/${normalizedPhone.replace(/[^\d]/g, "")}`,
-    smsHref: `sms:${normalizedPhone.replace(/[^\d+]/g, "")}`,
+    callHref: normalizedPhone ? `tel:${normalizedPhone}` : null,
+    whatsappHref: normalizedWhatsapp ? `https://wa.me/${normalizedWhatsapp.replace(/[^\d]/g, "")}` : null,
+    smsHref: normalizedPhone ? `sms:${normalizedPhone.replace(/[^\d+]/g, "")}` : null,
   };
 }
 
 export function getPublicTrustHighlights(profile: PublicTherapist) {
   const highlights = [
     profile.available_now ? "Available now" : null,
-    profile.is_verified_identity ? "Identity reviewed" : null,
-    profile.is_verified_profile ? "Profile reviewed" : null,
-    profile.is_verified_photos ? "Photos reviewed" : null,
-    profile.review_count ? `${profile.review_count} public reviews` : null,
-    profile.incall_price || profile.outcall_price ? "Rates visible before contact" : null,
-    profile.avatar_url ? "Profile image published" : null,
+    profile.verification_status === "verified" ? "Identity reviewed" : null,
+    profile.profile_status === "approved" ? "Profile reviewed" : null,
+    profile.subscription_tier === "pro" || profile.subscription_tier === "elite" ? "Premium Member" : null,
+    profile.starting_price ? "Rates visible before contact" : null,
   ].filter((value): value is string => Boolean(value));
 
   if (highlights.length > 0) {

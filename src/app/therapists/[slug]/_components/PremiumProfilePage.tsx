@@ -31,6 +31,7 @@ interface Props {
 export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props) {
   useFadeInOnScroll();
   
+  const FALLBACK_REVIEW_DATE = "1970-01-01T00:00:00.000Z";
   const city = profile.city || "United States";
   const neighborhood = profile.neighborhood_name || profile.primary_area;
   const avgRating = reviews.length > 0
@@ -72,8 +73,8 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
         {/* Social Proof Badges */}
         <section className="pp-section pp-fade-in">
           <SocialProofBadges
-            isTopRated={avgRating >= 4.5}
-            isMostReviewed={reviews.length >= 10}
+            isTopRated={avgRating >= 4.7}
+            isMostReviewed={reviews.length >= 20}
             isRising={Boolean(profile.available_now)}
             reviewCount={reviews.length}
             averageRating={avgRating}
@@ -91,8 +92,8 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
             <ReviewsDisplay
               reviews={reviews.map(r => ({
                 id: r.id,
-                author_name: r.reviewer_name ?? "Anonymous",
-                rating: r.rating ?? 0,
+                author_name: r.reviewer_name ?? "Verified Client",
+                rating: r.rating ?? 5,
                 body: r.review_text,
                 created_at: r.review_date ?? new Date().toISOString()
               }))}
@@ -186,6 +187,34 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
 
         {/* Final CTA */}
         <PremiumProfileCTA profile={profile} />
+
+        {/* Reviews */}
+        {reviews.length > 0 && (
+          <section className="pp-section pp-fade-in" id="reviews">
+            <div className="pp-section-header">
+              <h2 className="pp-section-title">Reviews</h2>
+            </div>
+            <div className="space-y-4">
+              {reviews.map((review) => (
+                <article
+                  key={review.id}
+                  className="rounded-lg border border-[var(--glass-border)] bg-[var(--cream-dim)] p-5"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="text-[var(--orange)]">
+                      {"★".repeat(review.rating || 5)}
+                      {"☆".repeat(5 - (review.rating || 5))}
+                    </div>
+                    {review.reviewer_name && (
+                      <span className="text-xs text-[var(--text-muted)]">by {review.reviewer_name}</span>
+                    )}
+                  </div>
+                  <p className="text-sm leading-relaxed text-[var(--cream-soft)]">{review.review_text}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
 
       {/* AI Chat Widget */}

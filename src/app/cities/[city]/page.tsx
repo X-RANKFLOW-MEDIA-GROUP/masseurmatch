@@ -30,11 +30,6 @@ function cityDisplayName(canonicalCity: string): string {
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-function pickVariant(city: string, items: string[]) {
-  const seed = city.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return items[seed % items.length];
-}
-
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const resolved = await params;
   const citySlug = resolveCitySlug(resolved.city);
@@ -89,16 +84,6 @@ export default async function CanonicalCityPage({ params }: { params: Promise<Pa
   const canonicalCity = getCanonicalCitySlug(city.slug);
   const canonicalCityPath = `/cities/${canonicalCity}`;
   const cityName = city.name;
-  const cityHeadline = pickVariant(cityName, [
-    `${cityName} Gay Massage and Male Massage Therapists`,
-    `Find Verified Male Massage in ${cityName}`,
-    `${cityName} City Guide for Male Massage Sessions`,
-  ]);
-  const cityIntro = pickVariant(cityName, [
-    `${cityName} directory page built for high-intent local discovery. Compare service routes, session styles, and trusted profiles before direct provider contact.`,
-    `This ${cityName} route blends neighborhood intent, profile trust context, and session format filters so users can move from search to contact with less friction.`,
-    `Use this ${cityName} hub to navigate services, neighborhoods, and verified profile details while keeping direct contact decisions in your control.`,
-  ]);
   const therapists = await getPublicTherapists({ city: cityName, page: 1, pageSize: 10 });
 
   const categories = getCityCanonicalCategorySlugs(canonicalCity);
@@ -166,9 +151,11 @@ export default async function CanonicalCityPage({ params }: { params: Promise<Pa
         <div className="space-y-8">
           <header className="rounded-3xl border border-border bg-background p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">City Beachhead</p>
-            <h1 className="mt-2 text-3xl font-semibold text-foreground">{cityHeadline}</h1>
+            <h1 className="mt-2 text-3xl font-semibold text-foreground">{cityName} Gay Massage and Male Massage Therapists</h1>
             <p className="mt-3 max-w-4xl text-sm leading-7 text-muted-foreground">
-              {cityIntro}
+              Dallas-first city template for high-intent discovery. This page consolidates services, session formats, neighborhood routes,
+              and profile listings so users can move from broad search to direct contact with less friction. It is designed to compete
+              directly with city and micro-area structures already ranking in DFW.
             </p>
           </header>
 
@@ -212,7 +199,7 @@ export default async function CanonicalCityPage({ params }: { params: Promise<Pa
           </section>
 
           <section className="rounded-3xl border border-border bg-background p-6">
-            <h2 className="text-2xl font-semibold text-foreground">{cityName} Profiles</h2>
+            <h2 className="text-2xl font-semibold text-foreground">Dallas Profiles</h2>
             {therapists.items.length > 0 ? (
               <div className="mt-4 grid gap-3 md:grid-cols-2">
                 {therapists.items.slice(0, 10).map((therapist, index) => (

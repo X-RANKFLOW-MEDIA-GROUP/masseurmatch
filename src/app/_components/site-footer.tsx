@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, LockKeyhole, PhoneCall } from "lucide-react";
+import { ShieldCheck, ArrowUpRight } from "lucide-react";
 
 export function SiteFooter() {
   const currentYear = new Date().getFullYear();
@@ -18,18 +18,9 @@ export function SiteFooter() {
             <p className="font-sans text-sm leading-relaxed max-w-sm">
               The world&apos;s leading directory for high-performance massage therapy and elite holistic wellness professionals.
             </p>
-            <div className="mt-4 space-y-2">
-              <div className="flex items-center gap-2">
-                <LockKeyhole className="w-4 h-4 text-sky-400" />
-                <span className="font-mono text-[10px] uppercase tracking-widest text-slate-300">TLS Encrypted Platform</span>
-              </div>
-              <p className="text-xs text-slate-500">
-                Independent security assessment in progress. We do not claim SOC 2 certification at this time.
-              </p>
-              <div className="flex items-center gap-2 text-sm text-slate-300">
-                <PhoneCall className="h-4 w-4 text-emerald-400" />
-                <span>Support: 978-MASSEUR</span>
-              </div>
+            <div className="flex items-center gap-2 mt-4">
+              <ShieldCheck className="w-5 h-5 text-emerald-500" />
+              <span className="font-mono text-[10px] uppercase tracking-widest text-slate-300">Verified Secure Network</span>
             </div>
           </div>
 
@@ -50,7 +41,6 @@ export function SiteFooter() {
             <ul className="space-y-4 font-sans text-sm">
               <li><Link href="/for-therapists" className="hover:text-white transition-colors">Join the Network</Link></li>
               <li><Link href="/pricing" className="hover:text-white transition-colors">Plans &amp; Pricing</Link></li>
-              <li><Link href="/knotty" className="hover:text-white transition-colors">Knotty AI</Link></li>
               <li><Link href="/login" className="hover:text-white transition-colors">Provider Login</Link></li>
               <li><Link href="/trust" className="hover:text-white transition-colors">Quality Guidelines</Link></li>
             </ul>

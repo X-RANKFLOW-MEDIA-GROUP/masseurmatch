@@ -1,29 +1,14 @@
 import type { MetadataRoute } from "next";
-import { siteUrl } from "@/lib/seo/site";
+import { appUrl } from "@/app/_lib/metadata";
+import { buildRobotsRules } from "@/app/_lib/seo-routes";
+import { siteUrl } from "@/lib/site";
+
+export const revalidate = 3600;
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [
-      {
-        userAgent: "*",
-        allow: ["/", "/search", "/near-me", "/massage", "/therapists", "/blog"],
-        disallow: [
-          "/admin/",
-          "/dashboard/",
-          "/client/",
-          "/login",
-          "/register",
-          "/billing",
-          "/api/",
-          "/verification",
-          "/checkout",
-          "/account",
-          "/auth/callback",
-          "/signup/",
-        ],
-      },
-    ],
-    sitemap: `${siteUrl("/")}/sitemap.xml`,
-    host: siteUrl("/"),
+    rules: buildRobotsRules(),
+    sitemap: [siteUrl("/sitemap.xml")],
+    host: appUrl,
   };
 }
