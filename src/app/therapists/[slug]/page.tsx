@@ -157,6 +157,7 @@ export default async function TherapistPage({ params }: { params: Promise<Params
           city: profile.city,
           stateCode: matchedCity?.stateCode,
           specialty: profile.specialties?.[0] || profile.modality || "Massage",
+          specialties: profile.specialties,
           image: profile.avatar_url,
           phone: profile.phone,
           incallPrice: profile.incall_price,
