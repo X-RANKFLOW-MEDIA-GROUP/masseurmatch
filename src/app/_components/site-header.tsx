@@ -22,6 +22,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
+const SIGNED_IN_DASHBOARD_PATH = "/pro/dashboard";
+
 /* ── nav data ─────────────────────────────────────────── */
 
 const exploreItems = [
@@ -39,8 +41,6 @@ const navLinks = [
   { href: "/trust", label: "Trust" },
 ];
 
-/* ── Explore dropdown (desktop) ───────────────────────── */
-
 function ExploreDropdown({ isDarkHero = false }: { isDarkHero?: boolean }) {
   const [open, setOpen] = useState(false);
 
@@ -56,9 +56,9 @@ function ExploreDropdown({ isDarkHero = false }: { isDarkHero?: boolean }) {
         aria-expanded={open}
         aria-haspopup="menu"
         className={`flex items-center gap-1 font-sans text-sm font-medium transition-colors ${
-          isDarkHero 
-            ? 'text-white/80 hover:text-white' 
-            : 'text-[#4A4F5C] hover:text-[#0B1F3A]'
+          isDarkHero
+            ? "text-white/80 hover:text-white"
+            : "text-[#4A4F5C] hover:text-[#0B1F3A]"
         }`}
       >
         Explore
@@ -96,11 +96,10 @@ function ExploreDropdown({ isDarkHero = false }: { isDarkHero?: boolean }) {
   );
 }
 
-/* ── Mobile nav (Sheet) ───────────────────────────────── */
-
 function MobileNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const { user } = useAuth();
 
   const allLinks = [
     { href: "/explore", label: "Explore" },
@@ -115,7 +114,7 @@ function MobileNav() {
     { href: "/trust", label: "Trust & Safety" },
     { href: "/faq", label: "FAQ" },
     { href: "/contact", label: "Contact" },
-    { href: "/login", label: "Login / Sign up" },
+    { href: user ? SIGNED_IN_DASHBOARD_PATH : "/login", label: user ? "Dashboard" : "Login / Sign up" },
   ];
 
   return (
@@ -130,13 +129,9 @@ function MobileNav() {
         </button>
       </SheetTrigger>
 
-      <SheetContent
-        side="right"
-        className="w-[280px] bg-background border-border p-0"
-      >
+      <SheetContent side="right" className="w-[280px] bg-background border-border p-0">
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
-        {/* header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <Link
             href="/"
@@ -154,7 +149,6 @@ function MobileNav() {
           </button>
         </div>
 
-        {/* links */}
         <nav className="flex flex-col px-3 py-4 gap-0.5">
           {allLinks.map(({ href, label }) => {
             const active = pathname === href;
@@ -175,29 +169,26 @@ function MobileNav() {
           })}
         </nav>
 
-        {/* auth CTAs */}
         <div className="mt-auto px-5 pb-6 pt-4 border-t border-border space-y-2">
           <Link
-            href="/login"
+            href={user ? SIGNED_IN_DASHBOARD_PATH : "/login"}
             onClick={() => setOpen(false)}
             className="block w-full text-center rounded-lg border border-border py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
           >
-            Log In
+            {user ? "Dashboard" : "Log In"}
           </Link>
           <Link
-            href="/signup"
+            href={user ? "/auth/logout" : "/signup"}
             onClick={() => setOpen(false)}
             className="block w-full text-center rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
           >
-            Sign Up
+            {user ? "Log Out" : "Sign Up"}
           </Link>
         </div>
       </SheetContent>
     </Sheet>
   );
 }
-
-/* ── Main Header ──────────────────────────────────────── */
 
 export default function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -207,11 +198,10 @@ export default function SiteHeader() {
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Determine if we're on a dark hero page (homepage)
   const isDarkHero = isHomepage && !isScrolled;
 
   return (
@@ -220,27 +210,24 @@ export default function SiteHeader() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled 
-          ? 'bg-white/95 backdrop-blur-xl border-b border-[#E2E6F0] shadow-sm' 
+        isScrolled
+          ? "bg-white/95 backdrop-blur-xl border-b border-[#E2E6F0] shadow-sm"
           : isDarkHero
-            ? 'bg-transparent'
-            : 'bg-white/50 backdrop-blur-sm'
+            ? "bg-transparent"
+            : "bg-white/50 backdrop-blur-sm"
       }`}
     >
       <div className="w-full max-w-[1400px] mx-auto flex items-center justify-between px-6 lg:px-10 py-4">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="group flex items-center gap-2"
-        >
-          <span className={`font-heading text-[24px] font-bold tracking-tight transition-colors ${
-            isDarkHero ? 'text-white' : 'text-[#0B1F3A]'
-          }`}>
-            Masseur<span className={isDarkHero ? 'text-[#FF8A1F]' : 'text-[#1E4B8F]'}>Match</span>
+        <Link href="/" className="group flex items-center gap-2">
+          <span
+            className={`font-heading text-[24px] font-bold tracking-tight transition-colors ${
+              isDarkHero ? "text-white" : "text-[#0B1F3A]"
+            }`}
+          >
+            Masseur<span className={isDarkHero ? "text-[#FF8A1F]" : "text-[#1E4B8F]"}>Match</span>
           </span>
         </Link>
 
-        {/* Center Navigation — desktop */}
         <nav className="hidden lg:flex items-center gap-1">
           <ExploreDropdown isDarkHero={isDarkHero} />
           {navLinks.map(({ href, label }) => (
@@ -248,9 +235,9 @@ export default function SiteHeader() {
               key={href}
               href={href}
               className={`px-4 py-2 text-sm font-medium transition-colors rounded-lg ${
-                isDarkHero 
-                  ? 'text-white/80 hover:text-white hover:bg-white/10' 
-                  : 'text-[#4A4F5C] hover:text-[#0B1F3A] hover:bg-[#F4F6F9]'
+                isDarkHero
+                  ? "text-white/80 hover:text-white hover:bg-white/10"
+                  : "text-[#4A4F5C] hover:text-[#0B1F3A] hover:bg-[#F4F6F9]"
               }`}
             >
               {label}
@@ -258,12 +245,11 @@ export default function SiteHeader() {
           ))}
         </nav>
 
-        {/* Right CTAs — desktop + mobile hamburger */}
         <div className="flex items-center gap-3">
           <Link
-            href={user ? "/client/dashboard" : "/login"}
+            href={user ? SIGNED_IN_DASHBOARD_PATH : "/login"}
             className={`hidden md:flex px-4 py-2 text-sm font-medium transition-colors ${
-              isDarkHero ? 'text-white/80 hover:text-white' : 'text-[#4A4F5C] hover:text-[#0B1F3A]'
+              isDarkHero ? "text-white/80 hover:text-white" : "text-[#4A4F5C] hover:text-[#0B1F3A]"
             }`}
           >
             {user ? "Dashboard" : "Log in"}
