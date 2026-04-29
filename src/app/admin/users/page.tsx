@@ -9,7 +9,7 @@ export default async function AdminUsersPage() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Users"
-        description="Create new auth users with full profiles, then manage provider/admin roles."
+        description="Review provider accounts and move them between provider and admin roles."
       />
 
       {error ? (

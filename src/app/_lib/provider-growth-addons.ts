@@ -22,11 +22,6 @@ export interface GrowthAddon {
   cadence?: "one-time" | "recurring" | "usage" | "included";
 }
 
-export interface AddonCheckoutSpec {
-  unitAmountCents: number;
-  recurringInterval: "month" | null;
-}
-
 export interface GrowthAddonCategory {
   id: GrowthAddonCategoryId;
   eyebrow: string;
@@ -464,20 +459,6 @@ export function buildAddonSupportHref(label: string, source: string) {
   ].join("\n");
 
   return `mailto:billing@masseurmatch.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-}
-
-export function parseAddonPriceForCheckout(addon: GrowthAddon): AddonCheckoutSpec | null {
-  const amountMatch = addon.priceLabel.match(/\$([0-9]+)(?:\.[0-9]{2})?/);
-  if (!amountMatch) return null;
-
-  const amount = Number(amountMatch[1]);
-  if (!Number.isFinite(amount) || amount <= 0) return null;
-
-  const recurringInterval = addon.cadence === "recurring" ? "month" : null;
-  return {
-    unitAmountCents: Math.round(amount * 100),
-    recurringInterval,
-  };
 }
 
 export function isAddonIncludedInPlan(addon: GrowthAddon, currentPlan: GrowthAddonPlanTier) {

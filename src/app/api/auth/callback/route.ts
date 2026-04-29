@@ -29,7 +29,7 @@ function getServiceRoleKey() {
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const requestedNext = searchParams.get("next");
+  const next = searchParams.get("next") || "/pro/dashboard";
 
   if (!code) {
     return NextResponse.redirect(new URL("/login?error=no_code", origin));
@@ -100,7 +100,6 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const next = requestedNext || (role === "admin" ? "/admin" : "/pro/dashboard");
   const response = NextResponse.redirect(new URL(next, origin));
   response.headers.append(
     "Set-Cookie",

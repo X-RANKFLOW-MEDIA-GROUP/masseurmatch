@@ -6,6 +6,7 @@ import {
   PROVIDER_GROWTH_ADDON_CATEGORIES,
   PROVIDER_GROWTH_BUNDLES,
   PROVIDER_GROWTH_HERO_ADDONS,
+  buildAddonSupportHref,
   isAddonIncludedInPlan,
   type GrowthAddon,
   type GrowthAddonCategoryId,
@@ -84,8 +85,8 @@ function getAddonAction(
 
   if (source === "billing") {
     return {
-      href: `/pro/billing?addon=${encodeURIComponent(addon.slug)}`,
-      label: "Activate in Stripe",
+      href: buildAddonSupportHref(addon.name, "provider billing"),
+      label: "Request activation",
     };
   }
 
@@ -167,10 +168,17 @@ function AddonCard({
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
         <p className="max-w-xl text-sm text-muted-foreground">{addon.bestResults}</p>
         <Button asChild variant={isIncluded ? "outline" : "hero"}>
-          <Link href={action.href}>
-            {action.label}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          {action.href.startsWith("mailto:") ? (
+            <a href={action.href}>
+              {action.label}
+              <ArrowRight className="h-4 w-4" />
+            </a>
+          ) : (
+            <Link href={action.href}>
+              {action.label}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          )}
         </Button>
       </div>
     </div>

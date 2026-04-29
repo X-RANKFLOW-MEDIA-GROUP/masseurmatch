@@ -31,6 +31,7 @@ const SERVICE_CATEGORIES = [
   "Reflexology",
   "Aromatherapy",
   "Shiatsu",
+  "Prenatal",
   "Lymphatic Drainage",
   "Myofascial Release",
   "Trigger Point",
