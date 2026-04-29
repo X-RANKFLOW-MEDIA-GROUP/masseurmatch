@@ -21,7 +21,7 @@ export async function GET(request: Request) {
   try {
     const session = requireRequestSession(request);
     const profile = await getAvailableNowProfile(session.userId);
-    const planKey = normalizePlanKey(profile?._tier);
+    const planKey = normalizePlanKey(profile?.subscription_tier);
 
     return json({
       ok: true,

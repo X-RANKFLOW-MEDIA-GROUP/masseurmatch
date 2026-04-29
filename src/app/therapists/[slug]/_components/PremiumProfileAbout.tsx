@@ -16,6 +16,9 @@ export function PremiumProfileAbout({ profile, reviews = [] }: Props) {
   const neighborhood = profile.neighborhood_name || profile.primary_area || "";
   const yearsExp = profile.years_experience || (profile.start_year ? new Date().getFullYear() - profile.start_year : 5);
   const specialties = profile.specialties || [];
+  const educationText = Array.isArray(profile.education)
+    ? profile.education.map((item) => (typeof item === "string" ? item : item.label || item.institution || "")).filter(Boolean).join(", ")
+    : profile.education;
   const ratedReviews = reviews.filter((r) => typeof r.rating === "number");
   const avgRating = ratedReviews.length > 0 
     ? (ratedReviews.reduce((sum, r) => sum + (r.rating as number), 0) / ratedReviews.length).toFixed(1)
@@ -138,7 +141,7 @@ export function PremiumProfileAbout({ profile, reviews = [] }: Props) {
                 </div>
                 <div>
                   <div className="text-xs font-semibold text-white/90">Higher Education</div>
-                  <div className="text-[11px] text-[var(--text-muted)]">{profile.education}</div>
+                  <div className="text-[11px] text-[var(--text-muted)]">{educationText}</div>
                 </div>
               </div>
             )}

@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     const profile = await getAvailableNowProfile(session.userId);
     if (!profile) throw new RouteError(404, "Profile not found.");
 
-    const tier = toTier(profile._tier);
+    const tier = toTier(profile.subscription_tier);
 
     if (!body.activate) {
       await setAvailableNow(session.userId, { available_now: false, available_now_expires: null });

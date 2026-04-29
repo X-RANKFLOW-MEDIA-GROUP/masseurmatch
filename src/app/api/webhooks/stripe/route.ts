@@ -74,7 +74,7 @@ function resolveTier(obj: StripeEventObject, subscriptionStatus?: string): Subsc
 
 function getStripeClient() {
   if (!hasStripe || !env.stripeSecretKey) return null;
-  return new Stripe(env.stripeSecretKey, { apiVersion: "2023-10-16" });
+  return new Stripe(env.stripeSecretKey, { apiVersion: "2025-08-27.basil" });
 }
 
 async function updateProfileBilling(userId: string, updates: any) {

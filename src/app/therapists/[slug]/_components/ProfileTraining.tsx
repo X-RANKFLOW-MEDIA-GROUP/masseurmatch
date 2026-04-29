@@ -15,7 +15,9 @@ interface Props {
 export function ProfileTraining({ profile }: Props) {
   const entries = normalizeTraining(profile.training);
   const yearsExp = profile.years_experience ?? (profile.start_year ? new Date().getFullYear() - profile.start_year : null);
-  const education = profile.education;
+  const education = Array.isArray(profile.education)
+    ? profile.education.map((item) => (typeof item === "string" ? item : item.label || item.institution || "")).filter(Boolean).join(", ")
+    : profile.education;
 
   if (entries.length === 0 && !yearsExp && !education) return null;
 

@@ -128,7 +128,7 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
         </section>
 
         {/* Travel */}
-        {profile.travel_schedule && profile.travel_schedule.length > 0 && (
+        {Array.isArray(profile.travel_schedule) && profile.travel_schedule.length > 0 && (
           <section className="pp-section pp-fade-in" id="travel">
             <div className="pp-section-header">
               <h2 className="pp-section-title">Travel Schedule</h2>

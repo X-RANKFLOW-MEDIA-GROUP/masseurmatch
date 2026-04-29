@@ -68,7 +68,7 @@ export function ProfileHero({ profile, cityPath }: Props) {
   const { trackContact } = useKnottyProfileAttribution({
     therapistId: profile.id,
     city: profile.city,
-    neighborhood,
+    neighborhood: neighborhood ?? null,
   });
   const city = profile.city || "United States";
   const topTechnique = profile.specialties?.[0] || profile.modality || "Massage therapy";
