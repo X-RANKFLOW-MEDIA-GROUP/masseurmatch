@@ -2,6 +2,8 @@ import { US_CITIES } from "@/data/cities";
 import { supabase } from "@/integrations/supabase/client";
 import { matchBodyTypeKeyword } from "@/lib/physical-profile";
 
+/** * TYPES & INTERFACES 
+ */
 export type TherapistTier = "free" | "standard" | "pro" | "elite";
 
 export interface ProfileFaqItem {
@@ -19,6 +21,29 @@ export interface PricingSessionItem {
   duration: number;
   incall?: number | null;
   outcall?: number | null;
+}
+
+export interface ProfileTrainingEntry {
+  institution: string;
+  year: number;
+  description?: string;
+}
+
+export interface ProfileTravelEntry {
+  city: string;
+  start_date: string;
+  end_date: string;
+}
+
+export interface ProfileAddOn {
+  name: string;
+  price: number;
+}
+
+export interface ProfilePhoto {
+  id: string;
+  storage_path: string;
+  is_primary: boolean;
 }
 
 export interface PublicTherapist {
@@ -40,7 +65,6 @@ export interface PublicTherapist {
   subscription_tier: TherapistTier | null;
   profile_status: string | null;
   visibility_status: string | null;
-  status?: string | null;
   incall_price: number | null;
   outcall_price: number | null;
   starting_price: number | null;
@@ -58,41 +82,26 @@ export interface PublicTherapist {
   gallery_photos?: string[] | null;
   is_featured: boolean;
   updated_at: string;
-
-  modality?: string | null;
-  start_year?: number | null;
   avatar_url?: string | null;
   review_count?: number | null;
   profile_views?: number | null;
-  _tier?: string | null;
-  status?: string | null;
   pricing_sessions?: PricingSessionItem[] | null;
   business_hours?: unknown;
-  custom_faq?: unknown;
+  custom_faq?: ProfileFaqItem[] | null;
   latitude?: number | null;
   longitude?: number | null;
   zip_code?: string | null;
-  special_offer_text?: string | null;
-  neighborhood_name?: string | null;
-  primary_area?: string | null;
   is_verified_identity?: boolean | null;
-  is_verified_profile?: boolean | null;
-  is_verified_photos?: boolean | null;
-  lgbtq_affirming?: boolean | null;
-  training?: ProfileTrainingEntry[] | string[] | null;
-  education?: ProfileTrainingEntry[] | string[] | null;
-  business_hours?: unknown;
-  custom_faq?: ProfileFaqItem[] | unknown;
+  training?: ProfileTrainingEntry[] | null;
   areas_served?: string[] | null;
   outcall_radius_miles?: number | null;
-  profile_views?: number | null;
-  contact_clicks?: number | null;
-  travel_schedule?: ProfileTravelEntry[] | unknown;
+  travel_schedule?: ProfileTravelEntry[] | null;
   add_ons?: ProfileAddOn[] | null;
-  latitude?: number | null;
-  longitude?: number | null;
 }
 
+/**
+ * CONSTANTS & HELPERS
+ */
 const PUBLIC_PROFILE_SELECT = `
   id, slug, display_name, full_name, headline, bio, city, state, neighborhood,
   phone, whatsapp_number, email_address, website,
@@ -113,14 +122,15 @@ export interface ImportedReview {
   review_date: string | null;
 }
 
+/**
+ * FUNCTIONS
+ */
 export const getCities = () => US_CITIES;
 
 const buildPublicTherapistsQuery = () =>
   supabase
     .from("profiles")
-    .select(PUBLIC_PROFILE_SELECT, {
-      count: "exact",
-    })
+    .select(PUBLIC_PROFILE_SELECT, { count: "exact" })
     .eq("visibility_status", "public")
     .eq("profile_status", "approved")
     .eq("is_suspended", false)
@@ -133,7 +143,6 @@ export const getPublicTherapists = async (filters?: {
   session?: "home-visit" | "incall";
   verified?: boolean;
   availableToday?: boolean;
-  lgbtqAffirming?: boolean;
   tier?: TherapistTier;
   page?: number;
   pageSize?: number;
@@ -186,6 +195,7 @@ export const getPublicTherapists = async (filters?: {
 
   const nowMs = Date.now();
   const TIER_RANK: Record<string, number> = { elite: 4, pro: 3, standard: 2, free: 1 };
+  
   const isActivelyAvailable = (p: any): boolean =>
     p.available_now === true &&
     (p.available_now_expires == null || new Date(p.available_now_expires).getTime() > nowMs);
@@ -195,10 +205,12 @@ export const getPublicTherapists = async (filters?: {
         const aTier = TIER_RANK[a.subscription_tier ?? "free"] ?? 0;
         const bTier = TIER_RANK[b.subscription_tier ?? "free"] ?? 0;
         if (bTier !== aTier) return bTier - aTier;
+        
         const aAvail = isActivelyAvailable(a) ? 1 : 0;
         const bAvail = isActivelyAvailable(b) ? 1 : 0;
         if (bAvail !== aAvail) return bAvail - aAvail;
-        return (a.is_featured ? 1 : 0) - (b.is_featured ? 1 : 0);
+        
+        return (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0);
       })
     : [];
 
@@ -285,9 +297,9 @@ export async function getCityInventoryMap(): Promise<Map<string, number>> {
 
   if (error) return map;
 
-  for (const row of data ?? []) {
+  data.forEach((row) => {
     const key = (row.city as string).toLowerCase().trim();
     map.set(key, (map.get(key) ?? 0) + 1);
-  }
+  });
   return map;
 }
