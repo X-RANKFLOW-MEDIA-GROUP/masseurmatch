@@ -26,7 +26,6 @@ const SERVICE_OPTIONS = [
   "Swedish",
   "Sports",
   "Trigger Point",
-  "Prenatal",
   "Reflexology",
   "Hot Stone",
 ];
@@ -148,7 +147,7 @@ function getApiErrorMessage(error: unknown, fallback: string) {
 
 function formatReason(reason?: string | null) {
   if (!reason) {
-    return "A IA identificou linguagem fora do padrao de qualidade do marketplace.";
+    return "AI detected language outside marketplace quality standards.";
   }
 
   return reason.split("_").join(" ");
@@ -217,8 +216,8 @@ export default function MyListingPage() {
       } catch (error) {
         if (!cancelled) {
           toast({
-            title: "Nao foi possivel carregar seu perfil",
-            description: getApiErrorMessage(error, "Tente novamente em alguns instantes."),
+            title: "Could not load your profile",
+            description: getApiErrorMessage(error, "Please try again in a few moments."),
             variant: "destructive",
           });
         }
@@ -262,8 +261,8 @@ export default function MyListingPage() {
   const handleSaveAndScan = async () => {
     if (!profileId) {
       toast({
-        title: "Perfil indisponivel",
-        description: "Recarregue a pagina antes de salvar suas alteracoes.",
+        title: "Profile unavailable",
+        description: "Reload the page before saving your changes.",
         variant: "destructive",
       });
       return;
@@ -271,8 +270,8 @@ export default function MyListingPage() {
 
     if (!agreedToTerms) {
       toast({
-        title: "Confirme as regras do perfil",
-        description: "Marque a caixa de concordancia antes de publicar alteracoes.",
+        title: "Confirm listing rules",
+        description: "Check the agreement box before publishing changes.",
         variant: "destructive",
       });
       return;
@@ -297,7 +296,7 @@ export default function MyListingPage() {
         },
         {
           fieldName: "specialties",
-          label: "servicos",
+          label: "services",
           text: form.specialties.join(", "),
         },
       ];
@@ -347,8 +346,8 @@ export default function MyListingPage() {
           setFlagReason(reason);
           setSaveState("flagged");
           toast({
-            title: "Conteudo retido para revisao humana",
-            description: "Sua versao atual continua como esta. A equipe podera revisar o texto sinalizado.",
+            title: "Content held for human review",
+            description: "Your current public version remains unchanged. The team can review flagged text.",
             variant: "destructive",
           });
           return;
@@ -380,11 +379,11 @@ export default function MyListingPage() {
       setSaveState("success");
       toast({
         title: moderationUnavailable
-          ? "Alteracoes salvas para revisao"
-          : "Sightengine liberou seu texto",
+          ? "Changes saved for review"
+          : "Sightengine approved your text",
         description: moderationUnavailable
-          ? "A verificacao automatica nao respondeu, entao enviamos tudo para revisao manual."
-          : "Seu texto passou na triagem automatica e foi enviado para a fila de revisao.",
+          ? "Automated moderation was unavailable, so we sent everything to manual review."
+          : "Your text passed automated checks and was sent to the review queue.",
       });
 
       window.setTimeout(() => {
@@ -393,8 +392,8 @@ export default function MyListingPage() {
     } catch (error) {
       setSaveState("idle");
       toast({
-        title: "Nao foi possivel salvar agora",
-        description: getApiErrorMessage(error, "Revise os campos e tente novamente."),
+        title: "Could not save right now",
+        description: getApiErrorMessage(error, "Review your fields and try again."),
         variant: "destructive",
       });
     }
@@ -416,12 +415,12 @@ export default function MyListingPage() {
         </div>
         <div className="space-y-2">
           <h2 className="font-display text-lg font-medium text-slate-900">
-            Guardiao de qualidade por IA ativo
+            AI quality guardian is active
           </h2>
           <p className="font-sans text-sm leading-relaxed text-slate-600">
-            Todo texto do seu perfil passa pelo Sightengine antes de seguir para revisao.
-            A triagem bloqueia linguagem sexual explicita, promessas enganosas, contato direto e
-            termos fora do padrao premium da plataforma.
+            All profile copy goes through Sightengine before moderation review.
+            Screening blocks explicit language, misleading claims, direct off-platform contact, and
+            terms outside the platform quality standard.
           </p>
         </div>
       </div>
@@ -430,10 +429,10 @@ export default function MyListingPage() {
         <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4">
           <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
           <div>
-            <h3 className="font-sans text-sm font-semibold text-amber-900">Perfil em revisao</h3>
+            <h3 className="font-sans text-sm font-semibold text-amber-900">Profile under review</h3>
             <p className="mt-1 font-sans text-sm leading-relaxed text-amber-800">
-              Seu listing ja esta em fila de revisao humana. Novas alteracoes seguem o mesmo fluxo
-              ate a aprovacao final do time.
+              Your listing is already in the human review queue. New changes follow the same flow
+              until final approval by the team.
             </p>
           </div>
         </div>
@@ -442,9 +441,9 @@ export default function MyListingPage() {
       <div className="sticky top-4 z-30 flex flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:flex-row lg:items-center lg:justify-between">
         <div className="space-y-3">
           <div>
-            <h1 className="font-display text-2xl font-medium text-slate-900">Editar meu perfil</h1>
+            <h1 className="font-display text-2xl font-medium text-slate-900">Edit my listing</h1>
             <p className="mt-1 font-sans text-sm text-slate-500">
-              Ajuste seu texto, confirme as regras e deixe a IA validar antes do envio.
+              Update your content, confirm the rules, and let AI validate before submission.
             </p>
           </div>
 
@@ -456,7 +455,7 @@ export default function MyListingPage() {
               className="mt-1 h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
             />
             <span className="leading-relaxed">
-              Li e concordo com as regras de qualidade do perfil e aceito a verificacao automatica.
+              I agree with listing quality standards and automated verification checks.
               Consulte o{" "}
               <Link href="/legal" className="font-semibold text-slate-900 underline underline-offset-4">
                 Legal Center
@@ -483,7 +482,7 @@ export default function MyListingPage() {
           {saveState === "idle" && (
             <>
               <Save className="h-4 w-4" />
-              Publicar alteracoes
+              Publish changes
             </>
           )}
 
@@ -523,11 +522,11 @@ export default function MyListingPage() {
           <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" />
           <div>
             <h3 className="font-sans text-sm font-semibold text-rose-900">
-              Texto retido pelo filtro de seguranca
+              Text blocked by safety filter
             </h3>
             <p className="mt-1 font-sans text-sm leading-relaxed text-rose-800">
-              {flagReason} A versao publica do seu perfil nao foi alterada. Registramos a tentativa
-              para revisao humana do time.
+              {flagReason} Your public listing was not changed. We logged this attempt
+              for human moderation review.
             </p>
           </div>
         </motion.div>
@@ -554,12 +553,12 @@ export default function MyListingPage() {
             {isAiLoading ? (
               <>
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                Melhorando texto
+                Improving text
               </>
             ) : (
               <>
                 <Sparkles className="h-3.5 w-3.5" />
-                Usar IA para lapidar
+                Refine with AI
               </>
             )}
           </button>
@@ -569,13 +568,13 @@ export default function MyListingPage() {
           value={form.bio}
           onChange={(event) => setForm((current) => ({ ...current, bio: event.target.value }))}
           className="min-h-40 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 p-4 font-sans leading-relaxed text-slate-700 outline-none transition-colors focus:border-slate-400"
-          placeholder="Conte sua experiencia, seu estilo de atendimento e o que o cliente pode esperar da sessao."
+          placeholder="Describe your experience, your session style, and what clients should expect."
         />
 
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-2">
             <label className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Nome de exibicao
+              Display name
             </label>
             <input
               type="text"
@@ -584,13 +583,13 @@ export default function MyListingPage() {
                 setForm((current) => ({ ...current, displayName: event.target.value }))
               }
               className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 font-sans text-sm text-slate-900 outline-none transition-colors focus:border-slate-400"
-              placeholder="Como voce quer aparecer no marketplace"
+              placeholder="How you want to appear in the marketplace"
             />
           </div>
 
           <div className="space-y-2">
             <label className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Telefone
+              Phone
             </label>
             <input
               type="tel"
@@ -603,7 +602,7 @@ export default function MyListingPage() {
 
           <div className="space-y-2">
             <label className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Cidade
+              City
             </label>
             <div className="relative">
               <MapPin className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
@@ -619,7 +618,7 @@ export default function MyListingPage() {
 
           <div className="space-y-2">
             <label className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Estado
+              State
             </label>
             <input
               type="text"
@@ -632,7 +631,7 @@ export default function MyListingPage() {
 
           <div className="space-y-2">
             <label className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Preco incall
+              In-call price
             </label>
             <input
               type="number"
@@ -648,7 +647,7 @@ export default function MyListingPage() {
 
           <div className="space-y-2">
             <label className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Preco outcall
+              Out-call price
             </label>
             <input
               type="number"
@@ -664,7 +663,7 @@ export default function MyListingPage() {
 
           <div className="space-y-2">
             <label className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Altura (in)
+              Height (in)
             </label>
             <input
               type="number"
@@ -681,7 +680,7 @@ export default function MyListingPage() {
 
           <div className="space-y-2">
             <label className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Peso (lb)
+              Weight (lb)
             </label>
             <input
               type="number"
@@ -698,7 +697,7 @@ export default function MyListingPage() {
 
           <div className="space-y-2">
             <label className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Tipo de corpo
+              Body type
             </label>
             <select
               value={form.bodyType}
@@ -707,7 +706,7 @@ export default function MyListingPage() {
               }
               className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 font-sans text-sm text-slate-900 outline-none transition-colors focus:border-slate-400"
             >
-              <option value="">Selecione</option>
+              <option value="">Select</option>
               {BODY_TYPE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -720,9 +719,9 @@ export default function MyListingPage() {
 
       <section className="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div>
-          <h2 className="font-display text-xl font-medium text-slate-900">Especialidades</h2>
+          <h2 className="font-display text-xl font-medium text-slate-900">Specialties</h2>
           <p className="mt-1 font-sans text-sm text-slate-500">
-            Escolha os servicos que melhor representam seu atendimento.
+            Select the services that best represent your practice.
           </p>
         </div>
 

@@ -8,6 +8,7 @@ interface CinematicHomepageProps {
   featuredTherapists: Profile[];
   totalTherapists: number;
   cityCount: number;
+  cityDiscoveryItems: Array<{ href: string; city: string; state: string; blurb: string }>;
 }
 
 const featureCards = [
@@ -105,6 +106,40 @@ function HeroSection({ totalTherapists, cityCount }: { totalTherapists: number; 
               <div className="mt-2 font-sans text-[11px] uppercase tracking-[0.12em] text-white/55">{stat.label}</div>
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CityDiscoveryMarquee({ items }: { items: Array<{ href: string; city: string; state: string; blurb: string }> }) {
+  if (items.length === 0) return null;
+
+  const loopedItems = [...items, ...items];
+
+  return (
+    <section className="bg-[#F5EFE3] px-4 py-14 text-[#0B1F3A] sm:px-6">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-8 text-center">
+          <h2 className="font-serif text-[clamp(30px,4vw,46px)] leading-tight tracking-[-0.02em]">Explore Massage Therapists by City</h2>
+          <p className="mx-auto mt-3 max-w-2xl font-sans text-sm leading-6 text-[#0B1F3A]/70 sm:text-base">
+            Browse trusted massage therapist profiles in major cities and connect directly.
+          </p>
+        </div>
+
+        <div className="city-marquee-wrap relative overflow-hidden rounded-3xl border border-[#0B1F3A]/10 bg-white/70 p-3 shadow-[0_14px_45px_rgba(11,31,58,0.08)] backdrop-blur-sm sm:p-4">
+          <div className="city-marquee-track flex w-max gap-3 sm:gap-4">
+            {loopedItems.map((item, index) => (
+              <Link
+                key={`${item.href}-${index}`}
+                href={item.href}
+                className="city-marquee-card group min-w-[220px] rounded-2xl border border-white/70 bg-white/85 px-5 py-4 text-left shadow-[0_8px_30px_rgba(11,31,58,0.08)] transition duration-300 hover:-translate-y-0.5 hover:border-[#1E4B8F]/20 hover:shadow-[0_14px_35px_rgba(11,31,58,0.14)] sm:min-w-[250px]"
+              >
+                <p className="font-serif text-xl leading-tight text-[#0B1F3A]">{item.city}, {item.state}</p>
+                <p className="mt-2 font-sans text-sm leading-5 text-[#0B1F3A]/65">{item.blurb}</p>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -243,10 +278,16 @@ function TherapistCTASection() {
   );
 }
 
-export function CinematicHomepage({ featuredTherapists, totalTherapists, cityCount }: CinematicHomepageProps) {
+export function CinematicHomepage({
+  featuredTherapists,
+  totalTherapists,
+  cityCount,
+  cityDiscoveryItems,
+}: CinematicHomepageProps) {
   return (
     <main className="overflow-x-hidden bg-[#FCFBF8]">
       <HeroSection totalTherapists={totalTherapists} cityCount={cityCount} />
+      <CityDiscoveryMarquee items={cityDiscoveryItems} />
       <FeaturedTherapists therapists={featuredTherapists} />
       <BenefitsSection />
       <HowItWorksSection />
