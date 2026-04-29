@@ -9,7 +9,6 @@ import { containsLangParam, removeLangSearchParam } from "@/app/_lib/route-norma
 const SESSION_COOKIE_NAME = "mm_session";
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
-let sessionHmacKeyPromise: Promise<CryptoKey> | null = null;
 
 type MiddlewareSession = {
   userId: string;
@@ -56,16 +55,13 @@ function constantTimeEqual(a: string, b: string): boolean {
 }
 
 async function signPayload(payload: string): Promise<string> {
-  if (!sessionHmacKeyPromise) {
-    sessionHmacKeyPromise = crypto.subtle.importKey(
-      "raw",
-      encoder.encode(getSessionSecret()),
-      { name: "HMAC", hash: "SHA-256" },
-      false,
-      ["sign"],
-    );
-  }
-  const key = await sessionHmacKeyPromise;
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(getSessionSecret()),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
   const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(payload));
   return toBase64Url(new Uint8Array(signature));
 }
@@ -155,6 +151,7 @@ function exploreCityToSlug(rawCity: string): string {
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname, searchParams } = request.nextUrl;
+  const session = await readSessionCookie(request);
 
   // ── 1. Removed routes → 301 redirects ───────────────────────────────────
   if (pathname === "/wireframes" || pathname.startsWith("/wireframes/")) {
@@ -296,7 +293,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // Unauthenticated → /login (with redirect param)
   // Authenticated but wrong role → / (home, no redirect param)
   if (pathname === "/pro" || pathname.startsWith("/pro/")) {
-    const session = await readSessionCookie(request);
     if (!session) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
@@ -308,7 +304,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   }
 
   if (pathname === "/admin" || pathname.startsWith("/admin/")) {
-    const session = await readSessionCookie(request);
     if (!session) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);

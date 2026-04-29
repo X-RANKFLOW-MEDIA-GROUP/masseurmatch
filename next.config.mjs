@@ -10,9 +10,6 @@ import path from "node:path";
  * If you require strict HTTP 301, apply a header rewrite at the CDN/edge layer.
  */
 const LEGACY_REDIRECTS = [
-  { source: "/Massage/:path*", destination: "/massage/:path*", permanent: true },
-  { source: "/THERAPISTS/:path*", destination: "/therapists/:path*", permanent: true },
-  { source: "/blog/:slug/", destination: "/blog/:slug", permanent: true },
   // /city/* → /{city}
   { source: "/city/dallas",          destination: "/dallas",          permanent: true },
   { source: "/city/plano",           destination: "/plano",           permanent: true },
@@ -89,7 +86,6 @@ const CONTENT_SECURITY_POLICY = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typedRoutes: false,
-  trailingSlash: false,
   allowedDevOrigins: ["100.69.207.7", "localhost", "127.0.0.1", "::1", "*.replit.dev", "*.janeway.replit.dev"],
   images: {
     remotePatterns: [

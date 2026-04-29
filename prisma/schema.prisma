@@ -82,39 +82,3 @@ model MassageTherapistProfile {
     city_demand_score    Float      @default(0)
     photos_score         Float      @default(0)
 }
-
-// Alert Me When Available – watches a therapist's availability on behalf of a client.
-// Supabase table: therapist_alerts
-model TherapistAlert {
-  id            String   @id @default(uuid())
-  client_id     String   // references auth.users.id
-  therapist_id  String   // references profiles.id
-  email         String?  // override email for this alert (falls back to user's email)
-  phone         String?  // E.164 phone for SMS alerts
-  active        Boolean  @default(true)
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-}
-
-// Save as Favorite – persists a client's saved therapists.
-// Supabase table: favorites
-model Favorite {
-  id            String   @id @default(uuid())
-  user_id       String   // references auth.users.id
-  therapist_id  String   // references profiles.id
-  created_at    DateTime @default(now())
-}
-
-// Profile Report – general moderation report (not human trafficking — that has its own table).
-// Supabase table: profile_reports
-model ProfileReport {
-  id             String   @id @default(uuid())
-  therapist_id   String   // references profiles.id
-  reporter_email String
-  reason         String   // fake_profile | inappropriate_content | misleading_information | spam | other
-  details        String?
-  status         String   @default("pending") // pending | reviewed | resolved | dismissed
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
-}
-

@@ -37,7 +37,7 @@ const INITIAL_ASSISTANT_MESSAGE: ConversationMessage = {
   id: "knotty-intro",
   role: "assistant",
   content:
-    "I use Masseurfinder data from this website to answer common questions and find the best masseur matches for you. Tell me what matters most.",
+    "Tell me what matters most right now and I’ll narrow this down into a clear match with the next best backups.",
 };
 
 export function useKnotty() {

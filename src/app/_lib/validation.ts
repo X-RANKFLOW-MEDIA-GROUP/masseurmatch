@@ -113,28 +113,16 @@ export const knottyEventSchema = z.object({
 
 export const proProfileSchema = z.object({
   displayName: z.string().min(2).max(80),
-  headline: z.string().max(4000).nullable().optional(),
-  bio: z.string().min(10).max(4000),
+  bio: z.string().min(20).max(4000),
   city: z.string().min(2).max(120),
   state: z.string().min(2).max(120).nullable().optional(),
-  neighborhood: z.string().max(4000).nullable().optional(),
-  location_description: z.string().max(4000).nullable().optional(),
   phone: z.string().min(7).max(30).nullable().optional(),
-  booking_link: z.string().max(4000).nullable().optional(),
-  whatsapp_number: z.string().max(4000).nullable().optional(),
-  telegram_handle: z.string().max(4000).nullable().optional(),
-  specialties: z.array(z.string().min(2).max(120)).max(30).default([]),
-  languages: z.array(z.string().min(1).max(120)).max(30).default([]),
-  massage_techniques: z.array(z.string().min(1).max(120)).max(40).default([]),
+  specialties: z.array(z.string().min(2).max(60)).max(12).default([]),
   incallPrice: z.number().int().min(0).nullable().optional(),
   outcallPrice: z.number().int().min(0).nullable().optional(),
-  outcall_radius: z.number().int().min(0).nullable().optional(),
   heightInches: z.number().int().min(48).max(96).nullable().optional(),
   weightLb: z.number().int().min(80).max(450).nullable().optional(),
   bodyType: z.enum(BODY_TYPES).nullable().optional(),
-  seo_title: z.string().max(4000).nullable().optional(),
-  seo_description: z.string().max(4000).nullable().optional(),
-  seo_keywords: z.array(z.string().min(1).max(120)).max(40).default([]),
 });
 
 export type AuthLoginInput = z.infer<typeof authLoginSchema>;

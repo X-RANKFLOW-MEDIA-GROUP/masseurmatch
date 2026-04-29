@@ -1,215 +1,119 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, TrendingUp, Users, MessageSquare, Star, Heart } from 'lucide-react';
-import { toast } from 'sonner';
+import { useEffect, useState } from "react";
+import { 
+  BarChart3, 
+  TrendingUp, 
+  Users, 
+  MapPin, 
+  DollarSign,
+  Loader2
+} from "lucide-react";
+import { DashboardSkeleton } from "@/app/_components/DashboardSkeleton";
 
-interface AnalyticsData {
-  metrics: {
-    totalInquiries: number;
-    totalReviews: number;
-    avgRating: string;
-    totalTherapists: number;
-    totalClients: number;
-    totalFavorites: number;
-  };
-  inquiriesByStatus: {
-    pending: number;
-    responded: number;
-    archived: number;
-  };
-  chartData: Array<{ date: string; inquiries: number }>;
-  timeRange: number;
-}
-
-export default function AnalyticsDashboard() {
-  const [data, setData] = useState<AnalyticsData | null>(null);
+export default function AdminAnalyticsPage() {
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState(7);
-
-  const fetchAnalytics = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/analytics?timeRange=${timeRange}`);
-      if (!response.ok) throw new Error('Failed to fetch analytics');
-      const analyticsData = await response.json();
-      setData(analyticsData);
-    } catch (error) {
-      toast.error('Failed to load analytics');
-    } finally {
-      setLoading(false);
-    }
-  }, [timeRange]);
 
   useEffect(() => {
-    fetchAnalytics();
-  }, [fetchAnalytics]);
+    fetch("/api/admin/analytics")
+      .then(res => res.json())
+      .then(json => {
+        if (json.ok) setData(json);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
-      </div>
-    );
-  }
+  if (loading) return <div className="p-8"><DashboardSkeleton /></div>;
+  if (!data) return <div className="p-8">Failed to load analytics.</div>;
 
-  if (!data) {
-    return (
-      <div className="min-h-screen bg-slate-50 p-8">
-        <div className="max-w-7xl mx-auto">
-          <p className="text-slate-600">Failed to load analytics data</p>
-        </div>
-      </div>
-    );
-  }
-
-  const metrics = [
-    {
-      title: 'Total Inquiries',
-      value: data.metrics.totalInquiries,
-      icon: MessageSquare,
-      color: 'bg-blue-100 text-blue-600',
-    },
-    {
-      title: 'Total Reviews',
-      value: data.metrics.totalReviews,
-      icon: Star,
-      color: 'bg-yellow-100 text-yellow-600',
-    },
-    {
-      title: 'Average Rating',
-      value: `${data.metrics.avgRating}★`,
-      icon: TrendingUp,
-      color: 'bg-emerald-100 text-emerald-600',
-    },
-    {
-      title: 'Therapists',
-      value: data.metrics.totalTherapists,
-      icon: Users,
-      color: 'bg-purple-100 text-purple-600',
-    },
-    {
-      title: 'Clients',
-      value: data.metrics.totalClients,
-      icon: Users,
-      color: 'bg-orange-100 text-orange-600',
-    },
-    {
-      title: 'Favorites',
-      value: data.metrics.totalFavorites,
-      icon: Heart,
-      color: 'bg-pink-100 text-pink-600',
-    },
-  ];
+  const { stats, revenueByTier, topCities, signupsByDay } = data;
 
   return (
-    <div className="min-h-screen bg-slate-50 p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">Analytics Dashboard</h1>
-            <p className="text-slate-600 mt-2">Platform metrics and performance overview</p>
+    <div className="space-y-8 p-8">
+      <div>
+        <h1 className="font-display text-3xl font-bold text-slate-900">Analytics Overview</h1>
+        <p className="text-slate-500">Real-time performance metrics for MasseurMatch.</p>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="rounded-xl bg-indigo-50 p-3 text-indigo-600">
+              <Users className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-500">Total Therapists</p>
+              <p className="text-2xl font-bold text-slate-900">{stats.totalTherapists}</p>
+            </div>
           </div>
-          <div className="flex gap-2">
-            {[7, 30, 90].map(days => (
-              <Button
-                key={days}
-                variant={timeRange === days ? 'default' : 'outline'}
-                onClick={() => setTimeRange(days)}
-              >
-                {days}d
-              </Button>
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="rounded-xl bg-amber-50 p-3 text-amber-600">
+              <TrendingUp className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-500">Pending Reviews</p>
+              <p className="text-2xl font-bold text-slate-900">{stats.pendingReviews}</p>
+            </div>
+          </div>
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="rounded-xl bg-emerald-50 p-3 text-emerald-600">
+              <DollarSign className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-500">Verified Identity</p>
+              <p className="text-2xl font-bold text-slate-900">{stats.verifiedIdentity}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        {/* Top Cities */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="font-display text-lg font-bold text-slate-900">Top Cities</h2>
+            <MapPin className="h-5 w-5 text-slate-400" />
+          </div>
+          <div className="space-y-4">
+            {topCities.map((city: any) => (
+              <div key={city.name} className="flex items-center justify-between">
+                <span className="text-sm text-slate-600">{city.name}</span>
+                <div className="flex items-center gap-3">
+                  <div className="h-2 w-32 rounded-full bg-slate-100 overflow-hidden">
+                    <div 
+                      className="h-full bg-indigo-500" 
+                      style={{ width: `${stats.totalTherapists > 0 ? (city.count / stats.totalTherapists) * 100 : 0}%` }}
+                    />
+                  </div>
+                  <span className="text-sm font-bold text-slate-900">{city.count}</span>
+                </div>
+              </div>
             ))}
           </div>
         </div>
 
-        {/* Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {metrics.map((metric, idx) => {
-            const Icon = metric.icon;
-            return (
-              <Card key={idx}>
-                <CardContent className="pt-6">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-600">{metric.title}</p>
-                      <p className="text-2xl font-bold text-slate-900 mt-2">{metric.value}</p>
-                    </div>
-                    <div className={`p-3 rounded-lg ${metric.color}`}>
-                      <Icon className="w-6 h-6" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+        {/* Revenue by Tier */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="font-display text-lg font-bold text-slate-900">Subscription Tiers</h2>
+            <BarChart3 className="h-5 w-5 text-slate-400" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            {Object.entries(revenueByTier).map(([tier, count]: any) => (
+              <div key={tier} className="rounded-xl bg-slate-50 p-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{tier}</p>
+                <p className="mt-1 text-xl font-bold text-slate-900">{count}</p>
+              </div>
+            ))}
+          </div>
         </div>
-
-        {/* Inquiry Status Breakdown */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Inquiry Status Breakdown</CardTitle>
-            <CardDescription>Distribution of inquiries by status</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 gap-4">
-              {Object.entries(data.inquiriesByStatus).map(([status, count]) => (
-                <div key={status} className="text-center">
-                  <p className="text-3xl font-bold text-slate-900">{count}</p>
-                  <p className="text-sm text-slate-600 mt-1 capitalize">{status}</p>
-                  <Badge className="mt-2" variant={status === 'pending' ? 'secondary' : 'default'}>
-                    {((count / data.metrics.totalInquiries) * 100).toFixed(0)}%
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Chart Data */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Inquiries Over Time</CardTitle>
-            <CardDescription>Daily inquiry volume for the last {timeRange} days</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {data.chartData.length === 0 ? (
-                <p className="text-center text-slate-500">No data available</p>
-              ) : (
-                <div className="space-y-2">
-                  {data.chartData.map((point, idx) => (
-                    <div key={idx} className="flex items-center gap-4">
-                      <span className="text-xs font-medium text-slate-600 w-20">{point.date}</span>
-                      <div className="flex-1 h-8 bg-slate-100 rounded relative overflow-hidden">
-                        <div
-                          className="h-full bg-blue-500 transition-all"
-                          style={{
-                            width: `${
-                              (point.inquiries /
-                                Math.max(
-                                  ...data.chartData.map(d => d.inquiries),
-                                  1
-                                )) *
-                              100
-                            }%`,
-                          }}
-                        />
-                      </div>
-                      <span className="text-sm font-semibold text-slate-900 w-12 text-right">
-                        {point.inquiries}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

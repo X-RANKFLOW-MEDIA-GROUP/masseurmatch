@@ -7,23 +7,22 @@ import {
   buildProfilesSitemapEntries,
   buildGuidesSitemapEntries,
   buildBlogPostsSitemapEntries,
-  buildCompetitorSitemapEntries,
 } from "@/app/_lib/seo-routes";
 
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const [cities, services, neighborhoods, profiles, blogPosts, guides] = await Promise.all([
+  const [cities, services, profiles, blogPosts, neighborhoods, guides] = await Promise.all([
     buildCitiesSitemapEntries(now),
     buildServicesSitemapEntries(now),
     buildNeighborhoodsSitemapEntries(now),
     buildProfilesSitemapEntries(now),
     buildBlogPostsSitemapEntries(now),
+    buildNeighborhoodsSitemapEntries(now),
     buildGuidesSitemapEntries(now),
   ]);
   const core = buildCoreSitemapEntries(now);
-  const competitors = buildCompetitorSitemapEntries(now);
 
-  return [...core, ...cities, ...services, ...neighborhoods, ...profiles, ...guides, ...blogPosts, ...competitors];
+  return [...core, ...cities, ...services, ...neighborhoods, ...profiles, ...guides, ...blogPosts];
 }
