@@ -168,18 +168,18 @@ export default function AdminUsersManager({
 
   return (
     <div className="space-y-4">
-      <article className="rounded-lg border border-border p-4">
+      <article className="rounded-xl border border-border bg-background p-4 md:p-5">
         <h2 className="font-semibold">Create user + full profile</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Create an auth user and prefill complete profile details in one action.
         </p>
 
         <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <input placeholder="Full name *" className="rounded-md border px-3 py-2 text-sm" value={createForm.fullName} onChange={(event) => setCreateForm((current) => ({ ...current, fullName: event.target.value }))} />
-          <input placeholder="Display name" className="rounded-md border px-3 py-2 text-sm" value={createForm.displayName} onChange={(event) => setCreateForm((current) => ({ ...current, displayName: event.target.value }))} />
-          <input placeholder="Email *" type="email" className="rounded-md border px-3 py-2 text-sm" value={createForm.email} onChange={(event) => setCreateForm((current) => ({ ...current, email: event.target.value }))} />
-          <input placeholder="Temporary password *" type="password" className="rounded-md border px-3 py-2 text-sm" value={createForm.password} onChange={(event) => setCreateForm((current) => ({ ...current, password: event.target.value }))} />
-          <input placeholder="Phone" className="rounded-md border px-3 py-2 text-sm" value={createForm.phone} onChange={(event) => setCreateForm((current) => ({ ...current, phone: event.target.value }))} />
+          <input placeholder="Full name *" className="rounded-md border border-input bg-background px-3 py-2 text-sm" value={createForm.fullName} onChange={(event) => setCreateForm((current) => ({ ...current, fullName: event.target.value }))} />
+          <input placeholder="Display name" className="rounded-md border border-input bg-background px-3 py-2 text-sm" value={createForm.displayName} onChange={(event) => setCreateForm((current) => ({ ...current, displayName: event.target.value }))} />
+          <input placeholder="Email *" type="email" className="rounded-md border border-input bg-background px-3 py-2 text-sm" value={createForm.email} onChange={(event) => setCreateForm((current) => ({ ...current, email: event.target.value }))} />
+          <input placeholder="Temporary password *" type="password" className="rounded-md border border-input bg-background px-3 py-2 text-sm" value={createForm.password} onChange={(event) => setCreateForm((current) => ({ ...current, password: event.target.value }))} />
+          <input placeholder="Phone" className="rounded-md border border-input bg-background px-3 py-2 text-sm" value={createForm.phone} onChange={(event) => setCreateForm((current) => ({ ...current, phone: event.target.value }))} />
           <input placeholder="City" className="rounded-md border px-3 py-2 text-sm" value={createForm.city} onChange={(event) => setCreateForm((current) => ({ ...current, city: event.target.value }))} />
           <input placeholder="State" className="rounded-md border px-3 py-2 text-sm" value={createForm.state} onChange={(event) => setCreateForm((current) => ({ ...current, state: event.target.value }))} />
           <input placeholder="Neighborhood" className="rounded-md border px-3 py-2 text-sm" value={createForm.neighborhood} onChange={(event) => setCreateForm((current) => ({ ...current, neighborhood: event.target.value }))} />
@@ -238,10 +238,10 @@ export default function AdminUsersManager({
                 {user.email || "No email"} · {user.city || "No city"} · {user.status}
               </p>
               <h2 className="mt-1 font-semibold">{user.fullName}</h2>
-              <p className="mt-2 text-sm text-muted-foreground">User ID: {user.userId}</p>
+              <p className="mt-2 break-all text-sm text-muted-foreground">User ID: {user.userId}</p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex w-full items-center gap-2 sm:w-auto sm:gap-3">
               <select
                 value={drafts[user.userId] || "provider"}
                 onChange={(event) =>
@@ -250,12 +250,12 @@ export default function AdminUsersManager({
                     [user.userId]: event.target.value as "admin" | "provider",
                   }))
                 }
-                className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="flex h-10 min-w-0 flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm sm:flex-none"
               >
                 <option value="provider">Provider</option>
                 <option value="admin">Admin</option>
               </select>
-              <Button type="button" variant="outline" size="sm" disabled={busyId === user.userId} onClick={() => void handleSave(user.userId)}>
+              <Button type="button" variant="outline" size="sm" className="shrink-0" disabled={busyId === user.userId} onClick={() => void handleSave(user.userId)}>
                 {busyId === user.userId ? "Saving..." : "Save role"}
               </Button>
             </div>

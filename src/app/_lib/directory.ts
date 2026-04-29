@@ -1,5 +1,5 @@
 import { US_CITIES } from "@/data/cities";
-import { supabase } from "@/integrations/supabase/client";
+import { hasSupabaseClientEnv, supabase } from "@/integrations/supabase/client";
 import {
   getFallbackPublicTherapistBySlug,
   getFallbackPublicTherapists,
@@ -115,6 +115,8 @@ export interface ImportedReview {
 
 export const getCities = () => US_CITIES;
 
+const canUseSupabase = () => hasSupabaseClientEnv;
+
 const buildPublicTherapistsQuery = () =>
   supabase
     .from("profiles")
@@ -138,6 +140,20 @@ export const getPublicTherapists = async (filters?: {
   pageSize?: number;
 }) => {
   const page = Math.max(1, filters?.page ?? 1);
+
+  if (!canUseSupabase()) {
+    return getFallbackPublicTherapists({
+      city: filters?.city,
+      modality: filters?.modality,
+      keyword: filters?.keyword,
+      session: filters?.session,
+      verified: filters?.verified,
+      availableToday: filters?.availableToday,
+      tier: filters?.tier,
+      page,
+      pageSize: Math.max(1, Math.min(500, filters?.pageSize ?? 12)),
+    });
+  }
   const pageSize = Math.max(1, Math.min(500, filters?.pageSize ?? 12));
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
@@ -284,6 +300,9 @@ export const getPublicTherapists = async (filters?: {
 };
 
 export const getPublicTherapistBySlug = async (slug: string) => {
+  if (!canUseSupabase()) {
+    return getFallbackPublicTherapistBySlug(slug);
+  }
   const slugQuery = buildPublicTherapistsQuery()
     .eq("slug", slug)
     .limit(1)
@@ -312,6 +331,9 @@ export const getPublicTherapistBySlug = async (slug: string) => {
 };
 
 export const getImportedReviews = async (profileId: string, limit = 5) => {
+  if (!canUseSupabase()) {
+    return [] as ImportedReview[];
+  }
   const { data, error } = await supabase
     .from("imported_reviews")
     .select("id, review_text, rating, reviewer_name, review_date")
@@ -327,6 +349,9 @@ export const getImportedReviews = async (profileId: string, limit = 5) => {
 };
 
 export const getProfilePhotos = async (profileId: string, limit = 6) => {
+  if (!canUseSupabase()) {
+    return [] as ProfilePhoto[];
+  }
   const { data, error } = await supabase
     .from("profile_photos")
     .select("id, storage_path, is_primary")
@@ -345,6 +370,9 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
 
 /** Returns the number of active public profiles in a given city. */
 export async function getCityInventoryCount(cityName: string): Promise<number> {
+  if (!canUseSupabase()) {
+    return getFallbackPublicTherapists({ city: cityName, pageSize: 500 }).total;
+  }
   const fallbackCount = getFallbackPublicTherapists({ city: cityName, pageSize: 500 }).total;
   const { count, error } = await supabase
     .from("profiles")
@@ -365,6 +393,14 @@ export async function getCityInventoryCount(cityName: string): Promise<number> {
  * Used by sitemap builders to filter empty cities.
  */
 export async function getCityInventoryMap(): Promise<Map<string, number>> {
+  if (!canUseSupabase()) {
+    const fallbackMap = new Map<string, number>();
+    for (const city of getCities()) {
+      const fallbackCount = getFallbackPublicTherapists({ city: city.name, pageSize: 500 }).total;
+      if (fallbackCount > 0) fallbackMap.set(city.name.toLowerCase().trim(), fallbackCount);
+    }
+    return fallbackMap;
+  }
   const map = new Map<string, number>();
 
   for (const city of getCities()) {
