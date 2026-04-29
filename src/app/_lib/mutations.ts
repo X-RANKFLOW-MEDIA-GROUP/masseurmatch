@@ -6,8 +6,8 @@ import type {
   AuthRegisterInput,
   ContactFormInput,
   ForgotPasswordInput,
-  ProProfileInput,
 } from "@/app/_lib/validation";
+import type { MassageTherapistProfileInput } from "@/app/_lib/validation.massagist";
 
 export type AuthMutationResponse = {
   ok: boolean;
@@ -95,6 +95,6 @@ export function sendContactMessage(input: ContactFormInput) {
   return postJson<ContactMutationResponse>("/api/contact", input);
 }
 
-export function updateProfileMutation(input: ProProfileInput) {
+export function updateProfileMutation(input: MassageTherapistProfileInput) {
   return postJson<ProProfileMutationResponse>("/api/pro/profile", input);
 }

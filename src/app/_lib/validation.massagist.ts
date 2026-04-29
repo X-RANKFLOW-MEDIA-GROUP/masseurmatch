@@ -7,10 +7,10 @@ const stringArray = z.array(z.string().trim().max(120)).optional().default([]);
 
 export const massageTherapistProfileSchema = z.object({
   full_name: optionalString,
-  display_name: z.string().trim().min(2).max(80),
+  display_name: z.string().trim().min(2).max(80).optional(),
   headline: optionalString,
   bio_short: optionalString,
-  bio_full: z.string().trim().min(10).max(4000),
+  bio_full: z.string().trim().min(10).max(4000).optional(),
   experience_start: optionalString,
   languages: stringArray,
   city: z.string().trim().min(2).max(120),
@@ -91,3 +91,6 @@ export const massageTherapistProfileSchema = z.object({
   weightLb: data.weightLb ?? null,
   bodyType: data.bodyType ?? null,
 }));
+
+
+export type MassageTherapistProfileInput = z.input<typeof massageTherapistProfileSchema>;
