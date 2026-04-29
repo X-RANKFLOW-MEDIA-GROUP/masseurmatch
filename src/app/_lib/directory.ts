@@ -65,6 +65,7 @@ export interface PublicTherapist {
   subscription_tier: TherapistTier | null;
   profile_status: string | null;
   visibility_status: string | null;
+  status?: string | null;
   incall_price: number | null;
   outcall_price: number | null;
   starting_price: number | null;
@@ -82,20 +83,31 @@ export interface PublicTherapist {
   gallery_photos?: string[] | null;
   is_featured: boolean;
   updated_at: string;
+  modality?: string | null;
+  start_year?: number | null;
   avatar_url?: string | null;
   review_count?: number | null;
   profile_views?: number | null;
+  _tier?: string | null;
   pricing_sessions?: PricingSessionItem[] | null;
   business_hours?: unknown;
-  custom_faq?: ProfileFaqItem[] | null;
+  custom_faq?: ProfileFaqItem[] | unknown;
   latitude?: number | null;
   longitude?: number | null;
   zip_code?: string | null;
+  special_offer_text?: string | null;
+  neighborhood_name?: string | null;
+  primary_area?: string | null;
   is_verified_identity?: boolean | null;
-  training?: ProfileTrainingEntry[] | null;
+  is_verified_profile?: boolean | null;
+  is_verified_photos?: boolean | null;
+  lgbtq_affirming?: boolean | null;
+  training?: ProfileTrainingEntry[] | string[] | null;
+  education?: ProfileTrainingEntry[] | string[] | null;
   areas_served?: string[] | null;
   outcall_radius_miles?: number | null;
-  travel_schedule?: ProfileTravelEntry[] | null;
+  contact_clicks?: number | null;
+  travel_schedule?: ProfileTravelEntry[] | unknown;
   add_ons?: ProfileAddOn[] | null;
 }
 
@@ -130,7 +142,9 @@ export const getCities = () => US_CITIES;
 const buildPublicTherapistsQuery = () =>
   supabase
     .from("profiles")
-    .select(PUBLIC_PROFILE_SELECT, { count: "exact" })
+    .select(PUBLIC_PROFILE_SELECT, {
+      count: "exact",
+    })
     .eq("visibility_status", "public")
     .eq("profile_status", "approved")
     .eq("is_suspended", false)
@@ -143,6 +157,7 @@ export const getPublicTherapists = async (filters?: {
   session?: "home-visit" | "incall";
   verified?: boolean;
   availableToday?: boolean;
+  lgbtqAffirming?: boolean;
   tier?: TherapistTier;
   page?: number;
   pageSize?: number;
@@ -185,6 +200,18 @@ export const getPublicTherapists = async (filters?: {
     query = query.eq("available_now", true).or(`available_now_expires.is.null,available_now_expires.gt.${nowIso}`);
   }
 
+  // Restored: Logic to handle lgbtqAffirming filter
+  if (filters?.lgbtqAffirming) {
+    query = query.eq("lgbtq_affirming", true);
+  }
+
+  // Restored: Logic to handle session filter 
+  if (filters?.session === "home-visit") {
+    query = query.not("outcall_price", "is", null);
+  } else if (filters?.session === "incall") {
+    query = query.not("incall_price", "is", null);
+  }
+
   if (filters?.tier) {
     query = query.eq("subscription_tier", filters.tier);
   }
@@ -195,7 +222,6 @@ export const getPublicTherapists = async (filters?: {
 
   const nowMs = Date.now();
   const TIER_RANK: Record<string, number> = { elite: 4, pro: 3, standard: 2, free: 1 };
-  
   const isActivelyAvailable = (p: any): boolean =>
     p.available_now === true &&
     (p.available_now_expires == null || new Date(p.available_now_expires).getTime() > nowMs);
