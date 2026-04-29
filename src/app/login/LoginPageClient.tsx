@@ -3,6 +3,7 @@
 import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthForms } from "@/app/_components/auth-forms";
+import { getSafeAuthRedirect } from "@/app/_lib/auth-redirect";
 import { useAuth } from "@/contexts/AuthContext";
 
 function LoginPageContent() {
@@ -10,7 +11,7 @@ function LoginPageContent() {
   const { user, loading } = useAuth();
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams?.toString() ?? "");
-  const redirectTo = params.get("redirect") || "/client/dashboard";
+  const redirectTo = getSafeAuthRedirect(params.get("redirect"), "/pro/dashboard");
 
   useEffect(() => {
     if (loading || !user) {
