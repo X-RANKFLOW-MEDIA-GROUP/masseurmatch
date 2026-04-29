@@ -3,7 +3,6 @@
 import Image from "next/image";
 import type { PublicTherapist, ProfilePhoto } from "@/app/_lib/directory";
 import { getPublicProfileName } from "@/app/_lib/public-profile";
-import { galleryLimit } from "./galleryLimit";
 
 interface Props {
   profile: PublicTherapist;
@@ -11,7 +10,6 @@ interface Props {
 }
 
 export function PremiumProfileGallery({ profile, photos }: Props) {
-  const limit = galleryLimit(profile._tier);
   const name = getPublicProfileName(profile);
   const city = profile.city || "the area";
 
@@ -20,9 +18,9 @@ export function PremiumProfileGallery({ profile, photos }: Props) {
     : [];
 
   const images = photos.length > 0
-    ? photos.slice(0, limit).map((p) => p.storage_path)
+    ? photos.slice(0, 24).map((p) => p.storage_path)
     : demoPhotos.length > 0
-      ? demoPhotos.slice(0, limit)
+      ? demoPhotos.slice(0, 24)
       : [profile.avatar_url].filter(Boolean) as string[];
 
   if (images.length === 0) {
@@ -63,19 +61,6 @@ export function PremiumProfileGallery({ profile, photos }: Props) {
           {i === 0 && <span className="pp-gallery-tag">New</span>}
         </div>
       ))}
-      
-      {/* Show tier note */}
-      {profile._tier && (
-        <div className="col-span-full mt-2 rounded-lg border border-[var(--glass-border)] bg-[var(--cream-dim)] px-4 py-3 flex items-center justify-between text-xs text-[var(--text-dim)]">
-          <span>
-            {name} is on the{" "}
-            <strong style={{ color: "var(--orange)" }}>
-              {profile._tier.toUpperCase()} Plan
-            </strong>{" "}
-            · {limit} photos available
-          </span>
-        </div>
-      )}
     </div>
   );
 }
