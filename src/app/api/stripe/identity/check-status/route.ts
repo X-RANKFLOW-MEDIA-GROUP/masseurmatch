@@ -12,7 +12,7 @@ function getStripe() {
   if (!key) {
     throw new Error("STRIPE_SECRET_KEY is not configured. Please ensure the Stripe connector is enabled.");
   }
-  return new Stripe(key, { apiVersion: "2023-10-16" });
+  return new Stripe(key, { apiVersion: "2025-08-27.basil" });
 }
 
 function mapVerificationStatus(status: Stripe.Identity.VerificationSession.Status) {
@@ -49,11 +49,16 @@ export async function GET(request: NextRequest) {
     
     const dbStatus = mapVerificationStatus(stripeSession.status);
 
+    const lastErrorMessage =
+      stripeSession.last_error && "reason" in stripeSession.last_error
+        ? String(stripeSession.last_error.reason)
+        : null;
+
     await adminClient
       .from("identity_verifications")
       .update({ 
         status: dbStatus,
-        last_error: stripeSession.last_error?.message || null
+        last_error: lastErrorMessage
       })
       .eq("stripe_session_id", sessionId);
 

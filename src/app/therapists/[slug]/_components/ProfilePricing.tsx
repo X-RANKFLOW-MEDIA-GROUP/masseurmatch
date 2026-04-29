@@ -22,7 +22,7 @@ export function ProfilePricing({ profile }: Props) {
   const hasOutcall = sessions.some((s) => s.outcall) || !!profile.outcall_price;
 
   // Função para checar se valor está acima de +33.33% do valor base
-  function isOverLimit(base: number | undefined, value: number | undefined) {
+  function isOverLimit(base: number | null | undefined, value: number | null | undefined) {
     if (!base || !value) return false;
     return value > base * 1.3333;
   }
