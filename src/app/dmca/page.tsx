@@ -1,46 +1,32 @@
 import type { Metadata } from "next";
-
 import { LegalPage } from "@/app/_components/legal-page";
 import { createPageMetadata } from "@/app/_lib/metadata";
 
 export const metadata: Metadata = createPageMetadata({
   title: "DMCA & Intellectual Property Policy",
-  description:
-    "MasseurMatch's DMCA process, designated agent contact, counter-notification procedure, repeat infringer policy, and trademark rules.",
+  description: "MasseurMatch DMCA process, designated agent, counter-notification procedure, and repeat infringer policy.",
   path: "/dmca",
-  keywords: [
-    "DMCA",
-    "copyright",
-    "intellectual property",
-    "takedown",
-    "counter-notification",
-    "repeat infringer",
-  ],
 });
 
 export default function DmcaPage() {
   return (
-    <LegalPage title="DMCA & Intellectual Property Policy" path="/dmca">
+    <LegalPage title="DMCA & Intellectual Property Policy" path="/dmca" lastUpdated="March 10, 2026">
       <h2>1. Our Commitment</h2>
       <p>
         XRankFlow Media Group LLC respects intellectual property rights and complies with the Digital Millennium
-        Copyright Act (17 U.S.C. Sec. 512) (&ldquo;DMCA&rdquo;). We respond promptly to valid takedown notices
-        and maintain a repeat infringer policy.
+        Copyright Act (17 U.S.C. Sec. 512) (&ldquo;DMCA&rdquo;). We respond promptly to valid takedown notices and
+        maintain a repeat infringer policy.
       </p>
 
       <h2>2. Designated DMCA Agent</h2>
       <p>DMCA takedown notices must be sent to our registered agent:</p>
       <ul>
-        <li>
-          <strong>Name:</strong> DMCA Agent, MasseurMatch / XRankFlow Media Group LLC
-        </li>
+        <li><strong>Name:</strong> DMCA Agent, MasseurMatch / XRankFlow Media Group LLC</li>
         <li>
           <strong>Email:</strong>{" "}
           <a href="mailto:dmca@masseurmatch.com">dmca@masseurmatch.com</a>
         </li>
-        <li>
-          <strong>Mailing Address:</strong> Dover, DE, United States
-        </li>
+        <li><strong>Mailing Address:</strong> Dover, DE, United States</li>
       </ul>
       <p>
         Note: Inquiries other than DMCA notices should be directed to{" "}
@@ -119,17 +105,16 @@ export default function DmcaPage() {
       <p>
         The MasseurMatch name, logo, and all related marks are trademarks or service marks of XRankFlow Media
         Group LLC. Unauthorized use is prohibited. Trademark infringement claims should be submitted to{" "}
-        <a href="mailto:legal@masseurmatch.com">legal@masseurmatch.com</a> with the same level of specificity
-        as DMCA notices.
+        <a href="mailto:legal@masseurmatch.com">legal@masseurmatch.com</a> with the same level of specificity as
+        DMCA notices.
       </p>
 
       <h2>8. Intellectual Property in Therapist Profiles</h2>
       <p>
         Each therapist retains ownership of their original profile content but grants MasseurMatch the license
-        described in the{" "}
-        <a href="/therapist-agreement">Therapist Subscription Agreement</a>. Therapists must not include content
-        that infringes any third-party copyright, trademark, or right of publicity. MasseurMatch will remove
-        infringing content upon valid notice and may terminate the account of repeat infringers.
+        described in the Therapist Subscription Agreement. Therapists must not include content that infringes
+        any third-party copyright, trademark, or right of publicity. MasseurMatch will remove infringing content
+        upon valid notice and may terminate the account of repeat infringers.
       </p>
     </LegalPage>
   );

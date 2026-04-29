@@ -1,29 +1,18 @@
 import type { Metadata } from "next";
-
 import { LegalPage } from "@/app/_components/legal-page";
 import { createPageMetadata } from "@/app/_lib/metadata";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Marketing Consent Language",
-  description:
-    "Standardized email and SMS consent language used by MasseurMatch for CAN-SPAM, TCPA, and FCC compliance.",
+  description: "Standardized consent language for MasseurMatch email and SMS marketing programs under CAN-SPAM and TCPA.",
   path: "/marketing-consent",
-  keywords: [
-    "marketing consent",
-    "CAN-SPAM",
-    "TCPA",
-    "SMS consent",
-    "email marketing",
-    "FCC",
-    "opt-in",
-  ],
 });
 
 export default function MarketingConsentPage() {
   return (
-    <LegalPage title="Marketing Consent Language" path="/marketing-consent">
+    <LegalPage title="Marketing Consent Language" path="/marketing-consent" lastUpdated="March 10, 2026">
       <p>
-        This page provides the standardized consent language required for MasseurMatch&apos;s email and SMS
+        This section provides the standardized consent language required for MasseurMatch&apos;s email and SMS
         marketing programs, in compliance with CAN-SPAM (email), TCPA (SMS/calls), and FCC regulations.
       </p>
 
@@ -41,13 +30,15 @@ export default function MarketingConsentPage() {
       </p>
 
       <h2>2. Email Opt-In — Consent Language for Signup Forms</h2>
-      <p>Used at email signup or account registration:</p>
-      <blockquote>
-        &ldquo;By checking this box, I agree to receive promotional emails from MasseurMatch, including news,
-        special offers, and platform updates. I understand I may unsubscribe at any time by clicking the
-        Unsubscribe link in any email. Consent to marketing is not required to create a listing or use the
-        Platform.&rdquo;
-      </blockquote>
+      <p>Use at email signup or account registration:</p>
+      <p>
+        <em>
+          &ldquo;By checking this box, I agree to receive promotional emails from MasseurMatch, including news,
+          special offers, and platform updates. I understand I may unsubscribe at any time by clicking the
+          Unsubscribe link in any email. Consent to marketing is not required to create a listing or use the
+          Platform.&rdquo;
+        </em>
+      </p>
 
       <h2>3. SMS / Text Marketing — TCPA Compliance</h2>
       <p>
@@ -59,16 +50,15 @@ export default function MarketingConsentPage() {
         If MasseurMatch elects to send SMS marketing, the following prior express written consent standard
         applies:
       </p>
+      <p><strong>SMS Consent Language — use at point of SMS opt-in:</strong></p>
       <p>
-        <strong>SMS Consent Language</strong> — used at point of SMS opt-in:
+        <em>
+          &ldquo;By providing your mobile number and checking this box, you agree to receive recurring automated
+          marketing text messages from MasseurMatch at the number provided. Consent is not a condition of
+          purchase. Message and data rates may apply. Message frequency may vary. Reply STOP to cancel. Reply
+          HELP for help. View our Privacy Policy at [URL].&rdquo;
+        </em>
       </p>
-      <blockquote>
-        &ldquo;By providing your mobile number and checking this box, you agree to receive recurring automated
-        marketing text messages from MasseurMatch at the number provided. Consent is not a condition of
-        purchase. Message and data rates may apply. Message frequency may vary. Reply STOP to cancel. Reply HELP
-        for help. View our{" "}
-        <a href="/privacy">Privacy Policy</a>.&rdquo;
-      </blockquote>
 
       <h2>4. FCC One-to-One Consent Rule (Effective January 27, 2025)</h2>
       <p>

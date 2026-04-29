@@ -1,26 +1,16 @@
 import type { Metadata } from "next";
-
 import { LegalPage } from "@/app/_components/legal-page";
 import { createPageMetadata } from "@/app/_lib/metadata";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Photo & Profile Policy",
-  description:
-    "Rules governing photos, images, and profile text submitted by therapists to MasseurMatch, including copyright, consent, and moderation.",
+  description: "Rules governing photographs, images, videos, and profile text submitted by therapists to MasseurMatch.",
   path: "/photo-policy",
-  keywords: [
-    "photo policy",
-    "profile policy",
-    "image guidelines",
-    "copyright",
-    "consent",
-    "therapist listing",
-  ],
 });
 
 export default function PhotoPolicyPage() {
   return (
-    <LegalPage title="Photo & Profile Policy" path="/photo-policy">
+    <LegalPage title="Photo & Profile Policy" path="/photo-policy" lastUpdated="March 10, 2026">
       <h2>1. Purpose</h2>
       <p>
         This policy governs all photographs, images, videos, and profile text submitted by therapists to
@@ -80,8 +70,7 @@ export default function PhotoPolicyPage() {
         <li>Therapeutic outcome guarantees of any kind</li>
         <li>
           Coded, euphemistic, or indirect references to sexual services (examples: &ldquo;full service,&rdquo;
-          &ldquo;happy ending,&rdquo; &ldquo;FBSM,&rdquo; &ldquo;incall/outcall with extras,&rdquo;
-          &ldquo;GFE,&rdquo; or similar)
+          &ldquo;happy ending,&rdquo; &ldquo;FBSM,&rdquo; &ldquo;incall/outcall with extras,&rdquo; &ldquo;GFE,&rdquo; or similar)
         </li>
         <li>False credential claims (license numbers you do not hold, certifications you have not earned)</li>
         <li>Impersonation of another therapist or professional</li>
@@ -90,9 +79,9 @@ export default function PhotoPolicyPage() {
       <h2>4. Copyright &amp; Ownership</h2>
       <p>
         By submitting any photo or content, you represent and warrant that you own the content or have the legal
-        right to use it and to grant MasseurMatch the license described in the{" "}
-        <a href="/therapist-agreement">Therapist Subscription Agreement</a>. If any submitted content infringes
-        a third party&apos;s copyright, you are solely responsible for resulting claims.
+        right to use it and to grant MasseurMatch the license described in the Therapist Subscription Agreement.
+        If any submitted content infringes a third party&apos;s copyright, you are solely responsible for resulting
+        claims.
       </p>
 
       <h2>5. Consent for Identifiable Persons</h2>

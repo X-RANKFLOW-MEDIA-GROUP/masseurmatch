@@ -8,6 +8,18 @@ const SUPABASE_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
 const browserStorage = typeof window === "undefined" ? undefined : window.localStorage;
 const isBrowser = typeof window !== "undefined";
 
+const supabaseWarningGlobalKey = "__MASSEURMATCH_SUPABASE_ENV_WARNED__" as const;
+
+function warnMissingSupabaseEnvOnce() {
+  if (process.env.NODE_ENV === "test") return;
+  const globalState = globalThis as typeof globalThis & Record<string, boolean | undefined>;
+  if (globalState[supabaseWarningGlobalKey]) return;
+  globalState[supabaseWarningGlobalKey] = true;
+  console.warn(
+    "[supabase] Public env missing; running in fallback mode (NEXT_PUBLIC_SUPABASE_URL/NEXT_PUBLIC_SUPABASE_ANON_KEY).",
+  );
+}
+
 export const hasSupabaseClientEnv =
   SUPABASE_URL.length > 0 && SUPABASE_PUBLISHABLE_KEY.length > 0;
 
@@ -25,9 +37,7 @@ const missingEnvClient = new Proxy(
 ) as SupabaseClient<any>;
 
 if (!hasSupabaseClientEnv) {
-  console.error(
-    "❌ Supabase env not configured correctly. Check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.",
-  );
+  warnMissingSupabaseEnvOnce();
 }
 
 export const supabase: SupabaseClient<any> = hasSupabaseClientEnv

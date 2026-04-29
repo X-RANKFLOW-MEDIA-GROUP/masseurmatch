@@ -62,7 +62,6 @@ type ProfileJsonLdInput = {
   city?: string | null;
   specialties?: string[] | null;
   image?: string | null;
-  tier?: string | null;
   incallPrice?: number | null;
   outcallPrice?: number | null;
   reviews?: ProfileReview[];
@@ -83,11 +82,15 @@ type HealthAndBeautyBusinessJsonLdInput = {
   city?: string | null;
   stateCode?: string | null;
   specialty: string;
+  specialties?: string[] | null;
   image?: string | null;
   phone?: string | null;
   incallPrice?: number | null;
   outcallPrice?: number | null;
   reviews?: ProfileReview[];
+  businessHours?: Record<string, unknown> | null;
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 type LocalBusinessJsonLdInput = {
@@ -316,7 +319,6 @@ export const buildProfilePageJsonLd = ({
   city,
   specialties,
   image,
-  tier,
   incallPrice,
   outcallPrice,
   reviews = [],
@@ -353,7 +355,7 @@ export const buildProfilePageJsonLd = ({
               priceCurrency: "USD",
               price: incallPrice || outcallPrice || undefined,
               availability: "https://schema.org/InStock",
-              category: tier || "directory listing",
+              category: "massage therapy directory listing",
             }
           : undefined,
       aggregateRating:
@@ -394,11 +396,15 @@ export const buildHealthAndBeautyBusinessJsonLd = ({
   city,
   stateCode,
   specialty,
+  specialties,
   image,
   phone,
   incallPrice,
   outcallPrice,
   reviews = [],
+  businessHours,
+  latitude,
+  longitude,
 }: HealthAndBeautyBusinessJsonLdInput) => {
   const profileUrl = siteUrl(`/therapists/${slug}`);
   const ratedReviews = reviews.filter((r) => typeof r.rating === "number");
@@ -409,6 +415,46 @@ export const buildHealthAndBeautyBusinessJsonLd = ({
 
   const priceRange =
     (incallPrice ?? 0) >= 200 || (outcallPrice ?? 0) >= 200 ? "$$$" : (incallPrice ?? 0) >= 100 ? "$$" : "$";
+
+  // Build openingHoursSpecification from businessHours when available
+  const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const openingHoursSpecification: Record<string, unknown>[] = [];
+  if (businessHours && typeof businessHours === "object") {
+    for (const day of DAYS) {
+      const key = day.toLowerCase();
+      const entry = (businessHours as Record<string, { open?: string; close?: string; closed?: boolean } | null>)[key];
+      if (entry && !entry.closed && entry.open && entry.close) {
+        openingHoursSpecification.push({
+          "@type": "OpeningHoursSpecification",
+          dayOfWeek: `https://schema.org/${day}`,
+          opens: entry.open,
+          closes: entry.close,
+        });
+      }
+    }
+  }
+
+  // Build per-modality service offers
+  const allModalities = Array.from(
+    new Set([specialty, ...(specialties ?? [])].filter(Boolean)),
+  );
+  const hasOfferCatalog =
+    allModalities.length > 0
+      ? {
+          "@type": "OfferCatalog",
+          name: "Massage Services",
+          itemListElement: allModalities.map((modality) => ({
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: modality,
+            },
+            ...(incallPrice
+              ? { price: incallPrice.toString(), priceCurrency: "USD" }
+              : {}),
+          })),
+        }
+      : undefined;
 
   return {
     "@context": "https://schema.org",
@@ -428,6 +474,20 @@ export const buildHealthAndBeautyBusinessJsonLd = ({
           addressCountry: "US",
         }
       : undefined,
+    ...(latitude != null && longitude != null
+      ? { geo: { "@type": "GeoCoordinates", latitude, longitude } }
+      : {}),
+    ...(openingHoursSpecification.length > 0 ? { openingHoursSpecification } : {}),
+    ...(hasOfferCatalog ? { hasOfferCatalog } : {
+      makesOffer: {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: specialty,
+        },
+        ...(incallPrice ? { price: incallPrice.toString(), priceCurrency: "USD" } : {}),
+      },
+    }),
     ...(averageRating !== null
       ? {
           aggregateRating: {
@@ -438,13 +498,6 @@ export const buildHealthAndBeautyBusinessJsonLd = ({
           },
         }
       : {}),
-    makesOffer: {
-      "@type": "Offer",
-      itemOffered: {
-        "@type": "Service",
-        name: specialty,
-      },
-    },
   };
 };
 

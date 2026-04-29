@@ -8,31 +8,31 @@ import { MODALITIES } from "@/lib/seo/modalities";
 import { schema } from "@/lib/seo/schema";
 import { SEO_STATES, STATE_SLUG_SET } from "@/lib/seo/states";
 
-export async function generateMetadata({ params }: { params: Promise<{ location: string }> }) {
-  const { location } = await params;
-  if (STATE_SLUG_SET.has(location)) {
-    const state = SEO_STATES.find((item) => item.slug === location);
+export async function generateMetadata({ params }: { params: Promise<{ city: string }> }) {
+  const { city: citySlug } = await params;
+  if (STATE_SLUG_SET.has(citySlug)) {
+    const state = SEO_STATES.find((item) => item.slug === citySlug);
     return buildMetadata({
       title: `Massage Therapists in ${state?.name || "this state"} | MasseurMatch`,
       description: `Find independent massage therapists in ${state?.name || "this state"}. Browse city pages and contact providers directly.`,
-      path: `/massage/${location}`,
+      path: `/massage/${citySlug}`,
     });
   }
-  const city = CITY_BY_SLUG.get(location);
-  if (!city) return buildMetadata({ title: "Massage city page", description: "City massage listings.", path: `/massage/${location}`, noIndex: true });
+  const city = CITY_BY_SLUG.get(citySlug);
+  if (!city) return buildMetadata({ title: "Massage city page", description: "City massage listings.", path: `/massage/${citySlug}`, noIndex: true });
   const formula = METADATA_FORMULAS.city(city.name);
-  return buildMetadata({ title: formula.title, description: formula.description, path: `/massage/${location}` });
+  return buildMetadata({ title: formula.title, description: formula.description, path: `/massage/${citySlug}` });
 }
 
-export default async function LocationPage({ params }: { params: Promise<{ location: string }> }) {
-  const { location } = await params;
-  if (STATE_SLUG_SET.has(location)) {
-    const state = SEO_STATES.find((item) => item.slug === location);
-    const stateCities = Array.from(CITY_BY_SLUG.values()).filter((city) => city.stateSlug === location);
+export default async function LocationPage({ params }: { params: Promise<{ city: string }> }) {
+  const { city: citySlug } = await params;
+  if (STATE_SLUG_SET.has(citySlug)) {
+    const state = SEO_STATES.find((item) => item.slug === citySlug);
+    const stateCities = Array.from(CITY_BY_SLUG.values()).filter((city) => city.stateSlug === citySlug);
     return <main className="container mx-auto px-4 py-10"><h1 className="text-3xl font-bold">Massage Therapists in {state?.name}</h1><ul className="mt-6 grid gap-2">{stateCities.map((city) => <li key={city.slug}><Link className="text-primary hover:underline" href={`/massage/${city.slug}`}>{city.name} massage therapists</Link></li>)}</ul></main>;
   }
 
-  const city = CITY_BY_SLUG.get(location);
+  const city = CITY_BY_SLUG.get(citySlug);
   if (!city) notFound();
   const faq = [
     { question: `How do I contact massage therapists in ${city.name}?`, answer: "Use phone, SMS, WhatsApp, email, or website links shown on each profile." },

@@ -1,26 +1,16 @@
 import type { Metadata } from "next";
-
 import { LegalPage } from "@/app/_components/legal-page";
 import { createPageMetadata } from "@/app/_lib/metadata";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Governing Law & Dispute Resolution",
-  description:
-    "Delaware law governs all MasseurMatch legal documents. Disputes are resolved through informal negotiation first, then binding individual arbitration.",
+  description: "Delaware governing law, informal resolution, binding arbitration, and class action waiver for MasseurMatch.",
   path: "/governing-law",
-  keywords: [
-    "governing law",
-    "dispute resolution",
-    "arbitration",
-    "Delaware",
-    "class action waiver",
-    "jury trial waiver",
-  ],
 });
 
 export default function GoverningLawPage() {
   return (
-    <LegalPage title="Governing Law & Dispute Resolution" path="/governing-law">
+    <LegalPage title="Governing Law & Dispute Resolution" path="/governing-law" lastUpdated="March 10, 2026">
       <h2>1. Governing Law</h2>
       <p>
         These Terms of Use and all other legal documents in this package are governed by and construed in
@@ -83,9 +73,9 @@ export default function GoverningLawPage() {
 
       <h2>8. Entire Agreement</h2>
       <p>
-        This legal package, comprising all legal documents published on MasseurMatch, constitutes the entire
-        agreement between you and MasseurMatch regarding the Platform and supersedes all prior or
-        contemporaneous understandings, whether written or oral.
+        This legal package, comprising all sections listed on the cover page, constitutes the entire agreement
+        between you and MasseurMatch regarding the Platform and supersedes all prior or contemporaneous
+        understandings, whether written or oral.
       </p>
 
       <h2>9. Waiver</h2>

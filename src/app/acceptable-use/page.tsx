@@ -1,26 +1,16 @@
 import type { Metadata } from "next";
-
 import { LegalPage } from "@/app/_components/legal-page";
 import { createPageMetadata } from "@/app/_lib/metadata";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Acceptable Use & Content Standards",
-  description:
-    "Rules governing content and conduct on MasseurMatch: what is permitted, what is prohibited, and how enforcement works.",
+  description: "Rules governing all content submitted to and use of the MasseurMatch Platform.",
   path: "/acceptable-use",
-  keywords: [
-    "acceptable use",
-    "content standards",
-    "prohibited content",
-    "platform rules",
-    "FTC",
-    "reviews",
-  ],
 });
 
 export default function AcceptableUsePage() {
   return (
-    <LegalPage title="Acceptable Use & Content Standards" path="/acceptable-use">
+    <LegalPage title="Acceptable Use & Content Standards" path="/acceptable-use" lastUpdated="March 10, 2026">
       <h2>1. Purpose</h2>
       <p>
         This Acceptable Use &amp; Content Standards Policy governs all content submitted to, and all use of, the
@@ -54,8 +44,8 @@ export default function AcceptableUsePage() {
       <ul>
         <li>False or unverifiable professional credentials, license numbers, or certifications</li>
         <li>
-          Medical claims, diagnosis language, or disease treatment claims (e.g., &ldquo;cures back
-          pain,&rdquo; &ldquo;treats fibromyalgia&rdquo;)
+          Medical claims, diagnosis language, or disease treatment claims (e.g., &ldquo;cures back pain,&rdquo;
+          &ldquo;treats fibromyalgia&rdquo;)
         </li>
         <li>Outcome guarantees of any therapeutic or medical nature</li>
         <li>Before/after imagery or testimonials used deceptively</li>
@@ -82,10 +72,9 @@ export default function AcceptableUsePage() {
       <p>
         Per FTC guidelines, all objective claims in advertising — including therapist profile descriptions —
         must be truthful, non-deceptive, and substantiated. Do not use language that states or implies you can
-        diagnose, treat, cure, or prevent any medical condition. Claims like &ldquo;I treat chronic pain&rdquo;
-        or &ldquo;heals sports injuries&rdquo; enter regulated health claim territory. Use factual, qualified
-        language: &ldquo;relaxation massage,&rdquo; &ldquo;Swedish technique,&rdquo; &ldquo;sports
-        massage,&rdquo; etc.
+        diagnose, treat, cure, or prevent any medical condition. Claims like &ldquo;I treat chronic pain&rdquo; or
+        &ldquo;heals sports injuries&rdquo; enter regulated health claim territory. Use factual, qualified language:
+        &ldquo;relaxation massage,&rdquo; &ldquo;Swedish technique,&rdquo; &ldquo;sports massage,&rdquo; etc.
       </p>
 
       <h2>5. Reviews &amp; Testimonials</h2>

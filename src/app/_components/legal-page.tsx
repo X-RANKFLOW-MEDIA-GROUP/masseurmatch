@@ -5,12 +5,10 @@ const LEGAL_LINKS = [
   { href: "/terms", label: "Terms" },
   { href: "/privacy", label: "Privacy" },
   { href: "/cookie-policy", label: "Cookies" },
-  { href: "/therapist-agreement", label: "Therapist Agreement" },
-  { href: "/billing", label: "Billing" },
-  { href: "/dmca", label: "DMCA" },
+  { href: "/billing-policy", label: "Billing" },
   { href: "/acceptable-use", label: "Acceptable Use" },
   { href: "/photo-policy", label: "Photo Policy" },
-  { href: "/accessibility", label: "Accessibility" },
+  { href: "/dmca", label: "DMCA" },
   { href: "/governing-law", label: "Governing Law" },
 ];
 
