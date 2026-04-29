@@ -15,9 +15,9 @@ import MasseurProfile from "@/app/_components/MasseurProfileClient";
 export const revalidate = 1800;
 
 const homeMetadata = createPageMetadata({
-  title: "MasseurMatch | Find Independent Massage Therapists Near You",
+  title: "Gay massage therapists & male massage near me — verified LGBTQ+ directory",
   description:
-    "Find independent massage therapists by city, style, availability, and contact preference. Browse profiles and contact providers directly.",
+    "Find verified gay massage therapists and male massage near you. LGBTQ+-affirming directory covering Dallas, Miami, Chicago, Houston, Austin and 100+ US cities. Compare outcall, incall, deep tissue, Swedish, and direct-contact profiles.",
   path: "/",
   keywords: [
     "gay massage near me",
@@ -47,37 +47,6 @@ export const metadata: Metadata = {
     },
   },
 };
-
-const PRIORITY_INDEX_CITY_LINKS = [
-  { slug: "dallas", anchor: "male massage em Dallas com perfis verificados" },
-  { slug: "houston", anchor: "massagistas em Houston com contato direto" },
-  { slug: "austin", anchor: "descubra terapeutas premium em Austin" },
-  { slug: "miami", anchor: "encontre male massage em Miami hoje" },
-  { slug: "chicago", anchor: "guia confiável de massage em Chicago" },
-] as const;
-
-const TOP_20_CITY_SLUGS = [
-  "new-york",
-  "los-angeles",
-  "chicago",
-  "houston",
-  "phoenix",
-  "philadelphia",
-  "san-antonio",
-  "san-diego",
-  "dallas",
-  "austin",
-  "san-jose",
-  "fort-worth",
-  "jacksonville",
-  "columbus",
-  "charlotte",
-  "indianapolis",
-  "seattle",
-  "denver",
-  "washington-dc",
-  "miami",
-] as const;
 
 export default async function HomePage() {
   const cities = getCities();
@@ -157,25 +126,6 @@ export default async function HomePage() {
     })
     .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
 
-  const priorityCityLinks = PRIORITY_INDEX_CITY_LINKS.map((entry) => {
-    const city = cities.find((cityItem) => cityItem.slug === entry.slug);
-
-    return {
-      href: city ? `/${city.slug}` : "/cities",
-      anchor: entry.anchor,
-    };
-  });
-
-  const topCityBannerItems = TOP_20_CITY_SLUGS.map((slug) => {
-    const city = cities.find((entry) => entry.slug === slug);
-    const label = city ? `${city.name}, ${city.stateCode}` : slug.replace(/-/g, " ");
-
-    return {
-      href: city ? `/${city.slug}` : "/cities",
-      label,
-    };
-  });
-
   const homeFaqs = [
     {
       question: "How do I find verified male massage therapists near me?",
@@ -235,8 +185,6 @@ export default async function HomePage() {
         featuredTherapists={featuredTherapists}
         totalTherapists={therapistsResult.total}
         cityCount={launchCities.length}
-        priorityCityLinks={priorityCityLinks}
-        topCityBannerItems={topCityBannerItems}
       />
     </>
   );
