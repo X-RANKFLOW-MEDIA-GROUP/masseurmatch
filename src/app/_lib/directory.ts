@@ -24,15 +24,18 @@ export interface PricingSessionItem {
 }
 
 export interface ProfileTrainingEntry {
-  institution: string;
-  year: number;
+  institution?: string;
+  year?: number;
   description?: string;
+  label?: string;
+  detail?: string;
 }
 
 export interface ProfileTravelEntry {
   city: string;
   start_date: string;
   end_date: string;
+  state?: string;
 }
 
 export interface ProfileAddOn {

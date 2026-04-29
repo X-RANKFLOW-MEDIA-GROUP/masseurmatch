@@ -15,7 +15,7 @@ export function PremiumProfileCTA({ profile }: Props) {
   const { trackContact } = useKnottyProfileAttribution({
     therapistId: profile.id,
     city: profile.city,
-    neighborhood: profile.neighborhood_name || profile.primary_area,
+    neighborhood: profile.neighborhood_name || profile.primary_area || null,
   });
 
   return (
