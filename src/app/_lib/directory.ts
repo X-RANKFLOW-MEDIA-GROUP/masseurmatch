@@ -2,6 +2,8 @@ import { US_CITIES } from "@/data/cities";
 import { supabase } from "@/integrations/supabase/client";
 import { matchBodyTypeKeyword } from "@/lib/physical-profile";
 
+/** * TYPES & INTERFACES 
+ */
 export type TherapistTier = "free" | "standard" | "pro" | "elite";
 
 export interface ProfileFaqItem {
@@ -19,6 +21,29 @@ export interface PricingSessionItem {
   duration: number;
   incall?: number | null;
   outcall?: number | null;
+}
+
+export interface ProfileTrainingEntry {
+  institution: string;
+  year: number;
+  description?: string;
+}
+
+export interface ProfileTravelEntry {
+  city: string;
+  start_date: string;
+  end_date: string;
+}
+
+export interface ProfileAddOn {
+  name: string;
+  price: number;
+}
+
+export interface ProfilePhoto {
+  id: string;
+  storage_path: string;
+  is_primary: boolean;
 }
 
 export interface PublicTherapist {
@@ -58,17 +83,15 @@ export interface PublicTherapist {
   gallery_photos?: string[] | null;
   is_featured: boolean;
   updated_at: string;
-
   modality?: string | null;
   start_year?: number | null;
   avatar_url?: string | null;
   review_count?: number | null;
   profile_views?: number | null;
   _tier?: string | null;
-  status?: string | null;
   pricing_sessions?: PricingSessionItem[] | null;
   business_hours?: unknown;
-  custom_faq?: unknown;
+  custom_faq?: ProfileFaqItem[] | unknown;
   latitude?: number | null;
   longitude?: number | null;
   zip_code?: string | null;
@@ -81,18 +104,16 @@ export interface PublicTherapist {
   lgbtq_affirming?: boolean | null;
   training?: ProfileTrainingEntry[] | string[] | null;
   education?: ProfileTrainingEntry[] | string[] | null;
-  business_hours?: unknown;
-  custom_faq?: ProfileFaqItem[] | unknown;
   areas_served?: string[] | null;
   outcall_radius_miles?: number | null;
-  profile_views?: number | null;
   contact_clicks?: number | null;
   travel_schedule?: ProfileTravelEntry[] | unknown;
   add_ons?: ProfileAddOn[] | null;
-  latitude?: number | null;
-  longitude?: number | null;
 }
 
+/**
+ * CONSTANTS & HELPERS
+ */
 const PUBLIC_PROFILE_SELECT = `
   id, slug, display_name, full_name, headline, bio, city, state, neighborhood,
   phone, whatsapp_number, email_address, website,
@@ -113,6 +134,9 @@ export interface ImportedReview {
   review_date: string | null;
 }
 
+/**
+ * FUNCTIONS
+ */
 export const getCities = () => US_CITIES;
 
 const buildPublicTherapistsQuery = () =>
@@ -176,6 +200,18 @@ export const getPublicTherapists = async (filters?: {
     query = query.eq("available_now", true).or(`available_now_expires.is.null,available_now_expires.gt.${nowIso}`);
   }
 
+  // Restored: Logic to handle lgbtqAffirming filter
+  if (filters?.lgbtqAffirming) {
+    query = query.eq("lgbtq_affirming", true);
+  }
+
+  // Restored: Logic to handle session filter 
+  if (filters?.session === "home-visit") {
+    query = query.not("outcall_price", "is", null);
+  } else if (filters?.session === "incall") {
+    query = query.not("incall_price", "is", null);
+  }
+
   if (filters?.tier) {
     query = query.eq("subscription_tier", filters.tier);
   }
@@ -195,10 +231,12 @@ export const getPublicTherapists = async (filters?: {
         const aTier = TIER_RANK[a.subscription_tier ?? "free"] ?? 0;
         const bTier = TIER_RANK[b.subscription_tier ?? "free"] ?? 0;
         if (bTier !== aTier) return bTier - aTier;
+        
         const aAvail = isActivelyAvailable(a) ? 1 : 0;
         const bAvail = isActivelyAvailable(b) ? 1 : 0;
         if (bAvail !== aAvail) return bAvail - aAvail;
-        return (a.is_featured ? 1 : 0) - (b.is_featured ? 1 : 0);
+        
+        return (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0);
       })
     : [];
 
@@ -285,9 +323,9 @@ export async function getCityInventoryMap(): Promise<Map<string, number>> {
 
   if (error) return map;
 
-  for (const row of data ?? []) {
+  data.forEach((row) => {
     const key = (row.city as string).toLowerCase().trim();
     map.set(key, (map.get(key) ?? 0) + 1);
-  }
+  });
   return map;
 }

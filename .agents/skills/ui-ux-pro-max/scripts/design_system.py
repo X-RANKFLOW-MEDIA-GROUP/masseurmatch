@@ -110,7 +110,7 @@ class DesignSystemGenerator:
 
         return {
             "pattern": rule.get("Recommended_Pattern", ""),
-            "style_priority": [s.strip() for s in rule.get("Style_Priority", "").split("+")],
+            "style_priority": [s.strip() for s in rule.get("Style_Priority", "").split("+") if s.strip()],
             "color_mood": rule.get("Color_Mood", ""),
             "typography_mood": rule.get("Typography_Mood", ""),
             "key_effects": rule.get("Key_Effects", ""),
@@ -158,7 +158,7 @@ class DesignSystemGenerator:
 
     def _extract_results(self, search_result: dict) -> list:
         """Extract results list from search result dict."""
-        return search_result.get("results", [])
+        return search_result.get("results", []) if isinstance(search_result, dict) else []
 
     def generate(self, query: str, project_name: str = None) -> dict:
         """Generate complete design system recommendation."""

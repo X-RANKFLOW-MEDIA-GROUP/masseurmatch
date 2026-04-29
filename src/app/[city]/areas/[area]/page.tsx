@@ -54,6 +54,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   const areaLabel = formatAreaLabel(resolved.area);
   const { total } = await getPublicTherapists({ city: city.name, keyword: areaLabel, page: 1, pageSize: 2 });
+  
   // noindex if fewer than 2 profiles — prevents thin-content indexation
   const noIndex = total === 0;
 
@@ -94,10 +95,19 @@ export default async function CityAreaPage({ params }: { params: Promise<Params>
   // Nearby-area quick links derived from the static map
   const nearbyAreaSlugs = AREA_NEARBY_MAP[resolved.area] ?? [];
   const nearbyLinks = nearbyAreaSlugs
-    .map((label) => ({
-      href: `/${city.slug}/areas/${label.toLowerCase().replace(/ /g, "-")}`,
-      label,
-    }))
+    .map((label) => {
+      // Robust slugification to handle punctuation and multiple spaces safely
+      const safeSlug = label
+        .toLowerCase()
+        .replace(/[\s_]+/g, "-")       // Replace spaces and underscores with hyphens
+        .replace(/[^\w-]+/g, "")       // Remove all non-word characters (like apostrophes or commas)
+        .replace(/^-+|-+$/g, "");      // Trim trailing or leading hyphens
+
+      return {
+        href: `/${city.slug}/areas/${safeSlug}`,
+        label,
+      };
+    })
     .filter((link) => isLaunchUrl(link.href));
 
   // Sibling service-type links
@@ -111,6 +121,7 @@ export default async function CityAreaPage({ params }: { params: Promise<Params>
     { href: `/${city.slug}/wellness/mobile-massage`, label: "Mobile" },
     { href: `/${city.slug}/wellness/hotel-massage`, label: "Hotel sessions" },
   ].filter((link) => isLaunchUrl(link.href));
+  
   const guideHref = AREA_GUIDE_MAP[resolved.area];
 
   return (
