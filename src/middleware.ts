@@ -186,15 +186,14 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.redirect(destination, 301);
   }
 
-  // ── 2. /pt-br/  →  301 /pt-br ────────────────────────────────────────────
+  // ── 3. /pt-br/  →  301 /pt-br ────────────────────────────────────────────
   // Consolidates trailing-slash duplicate that GSC crawled as a separate URL.
   if (pathname === "/pt-br/") {
     const destination = new URL("/pt-br", request.url);
     return NextResponse.redirect(destination, 301);
   }
 
-
-  // ── 4. /explore/*  →  noindex, follow header ─────────────────────────────
+  // ── 4. /explore/* →  noindex, follow header ─────────────────────────────
   // Browse/directory pages are navigation aids, not SEO targets.
   // follow keeps link equity flowing to the /massage/ landing pages.
   if (pathname === "/explore" || pathname.startsWith("/explore/")) {
