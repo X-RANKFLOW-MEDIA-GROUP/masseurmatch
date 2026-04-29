@@ -11,11 +11,9 @@ import {
   Phone,
   Ruler,
   ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import {
-  getDirectoryTierLabel,
   getPublicContactLinks,
   getPublicProfileName,
   getPublicTrustHighlights,
@@ -23,7 +21,6 @@ import {
 } from "@/app/_lib/public-profile";
 import { buildPhysicalProfileSummary } from "@/lib/physical-profile";
 import { useKnottyProfileAttribution } from "./useKnottyProfileAttribution";
-import { ReportTraffickingButton } from "./ReportTraffickingButton";
 
 function statusConfig(profile: PublicTherapist) {
   if (profile.available_now) {
@@ -79,7 +76,6 @@ export function ProfileHero({ profile, cityPath }: Props) {
     profile.years_experience ?? (profile.start_year ? new Date().getFullYear() - profile.start_year : null);
   const startingAt = profile.incall_price ?? profile.outcall_price;
   const trustHighlights = getPublicTrustHighlights(profile).slice(0, 4);
-  const tierLabel = getDirectoryTierLabel(profile);
   const physicalProfile = buildPhysicalProfileSummary({
     heightInches: profile.height_inches,
     weightLb: profile.weight_lb,
@@ -100,14 +96,10 @@ export function ProfileHero({ profile, cityPath }: Props) {
               <ArrowUpRight className="h-4 w-4" />
               Explore {city}
             </Link>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/8 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/84 backdrop-blur">
-              <Sparkles className="h-4 w-4" />
-              {tierLabel} profile
-            </span>
             {isVerifiedDirectoryProfile(profile) ? (
               <span className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/8 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/84 backdrop-blur">
                 <BadgeCheck className="h-4 w-4" />
-                Identity-Verified via Stripe — license & insurance not verified
+                Verified listing
               </span>
             ) : null}
           </div>
@@ -193,9 +185,6 @@ export function ProfileHero({ profile, cityPath }: Props) {
               Contact options
             </a>
           </div>
-          <div className="max-w-md">
-            <ReportTraffickingButton therapistId={profile.id} therapistName={name} />
-          </div>
         </div>
 
         {/* ── Right: profile photo (clean, no overlapping badges) ── */}
@@ -250,10 +239,10 @@ export function ProfileHero({ profile, cityPath }: Props) {
             <ShieldCheck className="h-5 w-5 text-brand-soft" />
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/50">
-                {yearsExp ? "Experience" : "Profile tier"}
+                Experience
               </p>
               <p className="text-sm font-semibold text-white">
-                {yearsExp ? `${yearsExp}+ years` : `${tierLabel} listing`}
+                {yearsExp ? `${yearsExp}+ years` : "Professional provider"}
               </p>
             </div>
           </div>

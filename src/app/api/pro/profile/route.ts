@@ -31,32 +31,43 @@ export async function POST(request: Request) {
     }
 
     const body = await parseJsonBody(request, massageTherapistProfileSchema);
+    
+    // Map Zod schema fields to DB columns
     const nextProfile = await updateProfileByUserId(session.userId, {
       display_name: sanitizeText(body.display_name),
+      full_name: sanitizeText(body.full_name),
       headline: sanitizeOptionalText(body.headline),
       bio: sanitizeText(body.bio_full),
       city: sanitizeText(body.city),
       state: sanitizeOptionalText(body.state),
       neighborhood: sanitizeOptionalText(body.neighborhood),
-      location_description: sanitizeOptionalText(body.location_description),
       phone: sanitizeOptionalText(body.phone_number),
-      booking_link: sanitizeOptionalText(body.booking_link),
       whatsapp_number: sanitizeOptionalText(body.whatsapp_number),
-      telegram_handle: sanitizeOptionalText(body.telegram_handle),
+      email_address: sanitizeOptionalText(body.email_address),
+      website: sanitizeOptionalText(body.booking_link),
       specialties: sanitizeStringArray(body.specialties),
-      languages: sanitizeStringArray(body.languages),
       massage_techniques: sanitizeStringArray(body.massage_techniques),
-      incall_price: body.incallPrice ?? null,
-      outcall_price: body.outcallPrice ?? null,
-      outcall_radius: body.outcall_radius ?? null,
+      service_categories: sanitizeStringArray(body.massage_techniques), // Syncing for now
+      height_inches: body.heightInches || null,
+      weight_lb: body.weightLb || null,
+      body_type: sanitizeOptionalText(body.bodyType),
+      years_experience: body.years_experience || 0,
+      languages: sanitizeStringArray(body.languages),
+      offers_incall: body.offers_incall ?? true,
+      offers_outcall: body.offers_outcall ?? true,
+      outcall_radius: body.outcall_radius || null,
+      starting_price: body.starting_rate || null,
+      incall_price: body.starting_rate || null, // Legacy sync
+      outcall_price: body.starting_rate || null, // Legacy sync
       seo_title: sanitizeOptionalText(body.seo_title),
       seo_description: sanitizeOptionalText(body.seo_description),
-      seo_keywords: sanitizeStringArray(body.seo_keywords),
-      body_type: sanitizeOptionalText(body.bodyType),
-      height_inches: body.heightInches ?? null,
-      weight_lb: body.weightLb ?? null,
-      status: profile.status === "active" ? "pending_approval" : profile.status,
-      is_active: profile.status === "active" ? false : profile.is_active,
+      seo_keywords: sanitizeStringArray(body.seo_keywords || []),
+      slug: sanitizeText(body.slug),
+      // Promotions are handled as JSONB in the profile for now
+      promotions: body.gallery_photos ? profile.promotions : profile.promotions, // Placeholder for actual promo logic
+      
+      // Status logic
+      profile_status: profile.profile_status === "approved" ? "under_review" : profile.profile_status,
       updated_at: new Date().toISOString(),
     });
 

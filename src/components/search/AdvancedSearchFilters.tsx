@@ -30,6 +30,7 @@ const SPECIALTIES = [
   "Sports Massage",
   "Thai Massage",
   "Hot Stone",
+  "Prenatal",
   "Lymphatic Drainage",
   "Trigger Point",
   "Myofascial Release",

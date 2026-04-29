@@ -4,8 +4,20 @@ import { env, hasStripe } from "@/lib/env";
 
 type SubscriptionTier = "free" | "standard" | "pro" | "elite";
 
-// Price ID → tier mapping (set STRIPE_PRICE_<TIER> env vars, or fall back to metadata)
-// This is the authoritative resolution path for subscription plan changes.
+const PHOTO_LIMITS: Record<SubscriptionTier, number> = {
+  free: 2,
+  standard: 6,
+  pro: 12,
+  elite: 20,
+};
+
+const VISIBILITY_LEVELS: Record<SubscriptionTier, number> = {
+  free: 1,
+  standard: 2,
+  pro: 3,
+  elite: 4,
+};
+
 function priceIdToTier(priceId: string | undefined): SubscriptionTier | null {
   if (!priceId) return null;
   const standardPrice = process.env.STRIPE_PRICE_STANDARD;
@@ -18,6 +30,7 @@ function priceIdToTier(priceId: string | undefined): SubscriptionTier | null {
 }
 
 type StripeEventObject = {
+  id?: string;
   metadata?: {
     userId?: string;
     user_id?: string;
@@ -31,6 +44,7 @@ type StripeEventObject = {
     data?: Array<{ price?: { id?: string } }>;
   };
   plan?: { id?: string };
+  current_period_end?: number;
 };
 
 type StripeEvent = {
@@ -42,53 +56,29 @@ type StripeEvent = {
 
 const VALID_TIERS = new Set<SubscriptionTier>(["free", "standard", "pro", "elite"]);
 
-/**
- * Resolve the subscription tier from:
- * 1. Checkout session / subscription metadata (explicit intent, e.g. free plan via masseurmatch_plan key)
- * 2. Subscription item price IDs (authoritative for portal plan swaps with no metadata)
- * 3. Fallback: if status is active/trialing without a recognized plan → "standard"
- *
- * Returns "free" whenever the subscription is not active/trialing.
- * Metadata is checked FIRST because the free plan uses the standard price ID as its
- * Stripe vehicle — checking price ID first would incorrectly resolve it to "standard".
- */
 function resolveTier(obj: StripeEventObject, subscriptionStatus?: string): SubscriptionTier {
   const isActive = !subscriptionStatus || subscriptionStatus === "active" || subscriptionStatus === "trialing";
-
   if (!isActive) return "free";
 
-  // Priority 1: explicit metadata plan (checked FIRST to handle free-trial case where
-  // the free plan uses the standard price ID as the Stripe vehicle but sets
-  // masseurmatch_plan: 'free' in metadata — price-ID mapping would incorrectly
-  // resolve it to 'standard' if checked first).
   const planKey = obj?.metadata?.masseurmatch_plan ?? obj?.metadata?.plan_key;
   if (planKey && VALID_TIERS.has(planKey as SubscriptionTier)) {
     return planKey as SubscriptionTier;
   }
 
-  // Priority 2: subscription item price ID (authoritative for portal plan swaps where
-  // no metadata plan key is set — e.g., the customer upgraded via billing portal).
   const firstItemPriceId = obj?.items?.data?.[0]?.price?.id ?? obj?.plan?.id;
   const tierFromPrice = priceIdToTier(firstItemPriceId);
   if (tierFromPrice) return tierFromPrice;
 
-  // Priority 3: active subscription with unknown plan key → standard (minimum paid tier)
   return "standard";
 }
 
 function getStripeClient() {
-  if (!hasStripe || !env.stripeSecretKey) {
-    return null;
-  }
-
-  return new Stripe(env.stripeSecretKey, { apiVersion: "2025-08-27.basil" });
+  if (!hasStripe || !env.stripeSecretKey) return null;
+  return new Stripe(env.stripeSecretKey, { apiVersion: "2023-10-16" });
 }
 
-async function updateTier(userId: string, tier: SubscriptionTier) {
-  const url =
-    process.env.SUPABASE_URL ||
-    process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    process.env.VITE_SUPABASE_URL;
+async function updateProfileBilling(userId: string, updates: any) {
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !serviceKey) return;
 
@@ -100,7 +90,10 @@ async function updateTier(userId: string, tier: SubscriptionTier) {
       Authorization: `Bearer ${serviceKey}`,
       Prefer: "return=minimal",
     },
-    body: JSON.stringify({ _tier: tier }),
+    body: JSON.stringify({
+      ...updates,
+      updated_at: new Date().toISOString(),
+    }),
   });
 }
 
@@ -117,8 +110,6 @@ export async function POST(request: Request) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? "";
   const rawBody = await request.text();
 
-  // Fail closed: always require a valid signature except in explicit local dev mode.
-  // When STRIPE_WEBHOOK_SECRET is not set in production this returns 400 immediately.
   const isLocalDev = process.env.NODE_ENV !== "production" && !webhookSecret;
 
   let event: StripeEvent;
@@ -129,7 +120,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Webhook secret not configured." }, { status: 400 });
     }
     try {
-      event = stripe.webhooks.constructEvent(rawBody, stripeSignature, webhookSecret) as StripeEvent;
+      event = stripe.webhooks.constructEvent(rawBody, stripeSignature, webhookSecret) as any;
     } catch {
       return NextResponse.json({ error: "Invalid webhook signature." }, { status: 400 });
     }
@@ -142,15 +133,34 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, skipped: "no_user_id" });
   }
 
-  if (event.type === "checkout.session.completed") {
-    const tier = resolveTier(obj, "active");
-    await updateTier(userId, tier);
-  } else if (event.type === "customer.subscription.updated") {
-    const status = obj?.status;
+  if (event.type === "checkout.session.completed" || event.type === "customer.subscription.updated") {
+    const status = obj?.status || "active";
     const tier = resolveTier(obj, status);
-    await updateTier(userId, tier);
+    const subscriptionId = (obj as any).subscription || (obj as any).id;
+    
+    const updates: any = {
+      subscription_tier: tier,
+      _tier: tier, // Legacy sync
+      photo_limit: PHOTO_LIMITS[tier],
+      visibility_level: VISIBILITY_LEVELS[tier],
+      stripe_customer_id: obj.customer,
+      stripe_subscription_id: subscriptionId,
+    };
+
+    if (obj.current_period_end) {
+      updates.current_period_end = new Date(obj.current_period_end * 1000).toISOString();
+    }
+
+    await updateProfileBilling(userId, updates);
   } else if (event.type === "customer.subscription.deleted") {
-    await updateTier(userId, "free");
+    await updateProfileBilling(userId, {
+      subscription_tier: "free",
+      _tier: "free",
+      photo_limit: 2,
+      visibility_level: 1,
+      stripe_subscription_id: null,
+      current_period_end: null,
+    });
   }
 
   return NextResponse.json({ ok: true });

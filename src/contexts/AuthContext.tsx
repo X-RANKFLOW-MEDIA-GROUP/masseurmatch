@@ -41,6 +41,7 @@ const defaultSubscription: SubscriptionState = {
   loading: true,
   config_error: null,
 };
+const CLIENT_SESSION_SYNC_TIMEOUT_MS = 8000;
 
 type SubscriptionResponse = {
   ok: boolean;
@@ -201,10 +202,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const result = await registerMutation({ email, password, fullName });
 
       // Registration API already sets the server session cookie.
-      // Try to establish the browser Supabase session in the background.
-      void establishClientSession(email, password, result.session).catch((sessionError) => {
-        console.warn("Client session sync failed after signup.", sessionError);
-      });
+      // Try to establish the browser Supabase session, but do not block signup flow on it.
+      await Promise.race([
+        establishClientSession(email, password, result.session),
+        wait(8000),
+      ]).catch(() => null);
 
       return { error: null };
     } catch (error) {
@@ -219,9 +221,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Login API already sets the server session cookie.
       // Mirror the Supabase browser session so client auth state hydrates immediately,
       // but don't block login when this sync fails (server cookie is already valid).
-      void establishClientSession(email, password, result.session).catch((sessionError) => {
+      const sessionSyncPromise = establishClientSession(email, password, result.session).catch((sessionError) => {
         console.warn("Client session sync failed after login.", sessionError);
       });
+      await Promise.race([
+        sessionSyncPromise,
+        wait(CLIENT_SESSION_SYNC_TIMEOUT_MS),
+      ]);
 
       return { error: null };
     } catch (error) {

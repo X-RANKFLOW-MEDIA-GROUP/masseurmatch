@@ -13,9 +13,7 @@ import {
   Loader2,
   Mail,
   Menu,
-  Plane,
   Settings,
-  Ticket,
   UserCircle,
   X,
 } from "lucide-react";
@@ -26,8 +24,6 @@ const navItems = [
   { name: "My Profile", href: "/pro/listing", icon: UserCircle },
   { name: "Photos", href: "/pro/photos", icon: ImageIcon },
   { name: "Inquiries", href: "/pro/inquiries", icon: Mail },
-  { name: "Tickets", href: "/pro/tickets", icon: Ticket },
-  { name: "Travel HTML", href: "/pro/travel-system", icon: Plane },
   { name: "Analytics", href: "/pro/analytics", icon: BarChart },
   { name: "Subscription", href: "/pro/subscription", icon: CreditCard },
   { name: "Settings", href: "/pro/settings", icon: Settings },

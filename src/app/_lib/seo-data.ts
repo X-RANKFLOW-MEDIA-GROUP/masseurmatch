@@ -164,8 +164,10 @@ export async function getSeoTherapists(): Promise<SeoTherapist[]> {
     "slug, updated_at",
     (query) =>
       query
-        .or("is_active.eq.true,is_active.is.null")
-        .in("status", ["active", "approved"])
+        .eq("visibility_status", "public")
+        .eq("profile_status", "approved")
+        .eq("is_suspended", false)
+        .eq("is_banned", false)
         .not("slug", "is", null)
         .order("slug"),
   );
