@@ -25,7 +25,7 @@ interface AuthContextType {
   subscription: SubscriptionState;
   refreshSubscription: () => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null; role: "admin" | "provider" | "client" | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -223,9 +223,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.warn("Client session sync failed after login.", sessionError);
       });
 
-      return { error: null };
+      return { error: null, role: result.role };
     } catch (error) {
-      return { error: error as Error };
+      return { error: error as Error, role: null };
     }
   };
 

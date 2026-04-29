@@ -8,8 +8,7 @@ interface CinematicHomepageProps {
   featuredTherapists: Profile[];
   totalTherapists: number;
   cityCount: number;
-  priorityCityLinks: Array<{ href: string; anchor: string }>;
-  topCityBannerItems: Array<{ href: string; label: string }>;
+  cityDiscoveryItems: Array<{ href: string; city: string; state: string; blurb: string }>;
 }
 
 const featureCards = [
@@ -113,47 +112,34 @@ function HeroSection({ totalTherapists, cityCount }: { totalTherapists: number; 
   );
 }
 
-function TopCitySideBanner({ cities }: { cities: Array<{ href: string; label: string }> }) {
-  if (cities.length === 0) return null;
+function CityDiscoveryMarquee({ items }: { items: Array<{ href: string; city: string; state: string; blurb: string }> }) {
+  if (items.length === 0) return null;
 
-  const loopedCities = [...cities, ...cities];
+  const loopedItems = [...items, ...items];
 
   return (
-    <section className="border-y border-[#0B1F3A]/10 bg-[#F5EFE3] px-4 py-5 text-[#0B1F3A]">
-      <div className="mx-auto grid max-w-6xl gap-4 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-center">
-        <p className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-[#A56B21]">Top 20 Cities</p>
-        <div className="relative h-16 overflow-hidden rounded-2xl border border-[#0B1F3A]/10 bg-white">
-          <div className="animate-[city-side-scroll_28s_linear_infinite]">
-            {loopedCities.map((city, index) => (
+    <section className="bg-[#F5EFE3] px-4 py-14 text-[#0B1F3A] sm:px-6">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-8 text-center">
+          <h2 className="font-serif text-[clamp(30px,4vw,46px)] leading-tight tracking-[-0.02em]">Explore Massage Therapists by City</h2>
+          <p className="mx-auto mt-3 max-w-2xl font-sans text-sm leading-6 text-[#0B1F3A]/70 sm:text-base">
+            Browse trusted massage therapist profiles in major cities and connect directly.
+          </p>
+        </div>
+
+        <div className="city-marquee-wrap relative overflow-hidden rounded-3xl border border-[#0B1F3A]/10 bg-white/70 p-3 shadow-[0_14px_45px_rgba(11,31,58,0.08)] backdrop-blur-sm sm:p-4">
+          <div className="city-marquee-track flex w-max gap-3 sm:gap-4">
+            {loopedItems.map((item, index) => (
               <Link
-                key={`${city.href}-${index}`}
-                href={city.href}
-                className="block border-b border-[#0B1F3A]/8 px-4 py-2 font-sans text-sm font-medium transition hover:bg-[#FCFBF8]"
+                key={`${item.href}-${index}`}
+                href={item.href}
+                className="city-marquee-card group min-w-[220px] rounded-2xl border border-white/70 bg-white/85 px-5 py-4 text-left shadow-[0_8px_30px_rgba(11,31,58,0.08)] transition duration-300 hover:-translate-y-0.5 hover:border-[#1E4B8F]/20 hover:shadow-[0_14px_35px_rgba(11,31,58,0.14)] sm:min-w-[250px]"
               >
-                {city.label}
+                <p className="font-serif text-xl leading-tight text-[#0B1F3A]">{item.city}, {item.state}</p>
+                <p className="mt-2 font-sans text-sm leading-5 text-[#0B1F3A]/65">{item.blurb}</p>
               </Link>
             ))}
           </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function PriorityCityLinks({ links }: { links: Array<{ href: string; anchor: string }> }) {
-  if (links.length === 0) return null;
-
-  return (
-    <section className="bg-[#FCFBF8] px-6 py-12 text-[#0B1F3A]">
-      <div className="mx-auto max-w-6xl rounded-3xl border border-[#0B1F3A]/10 bg-white p-6 sm:p-8">
-        <p className="font-sans text-[11px] uppercase tracking-[0.2em] text-[#A56B21]">Fast index internal links</p>
-        <h2 className="mt-3 font-serif text-3xl leading-tight tracking-[-0.02em]">Explore our priority city pages</h2>
-        <div className="mt-6 flex flex-wrap gap-2">
-          {links.map((link) => (
-            <Link key={link.href} href={link.href} className="rounded-full border border-[#0B1F3A]/20 px-4 py-2 font-sans text-xs font-semibold uppercase tracking-[0.08em] transition hover:bg-[#0B1F3A] hover:text-[#FCFBF8]">
-              {link.anchor}
-            </Link>
-          ))}
         </div>
       </div>
     </section>
@@ -296,28 +282,16 @@ export function CinematicHomepage({
   featuredTherapists,
   totalTherapists,
   cityCount,
-  priorityCityLinks,
-  topCityBannerItems,
+  cityDiscoveryItems,
 }: CinematicHomepageProps) {
   return (
     <main className="overflow-x-hidden bg-[#FCFBF8]">
       <HeroSection totalTherapists={totalTherapists} cityCount={cityCount} />
-      <TopCitySideBanner cities={topCityBannerItems} />
-      <PriorityCityLinks links={priorityCityLinks} />
+      <CityDiscoveryMarquee items={cityDiscoveryItems} />
       <FeaturedTherapists therapists={featuredTherapists} />
       <BenefitsSection />
       <HowItWorksSection />
       <TherapistCTASection />
-      <style jsx global>{`
-        @keyframes city-side-scroll {
-          from {
-            transform: translateY(0);
-          }
-          to {
-            transform: translateY(-50%);
-          }
-        }
-      `}</style>
     </main>
   );
 }

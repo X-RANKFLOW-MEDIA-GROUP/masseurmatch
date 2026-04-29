@@ -78,6 +78,10 @@ export default function SignupVerifyPage() {
       phone: state.phone || user.phone?.trim() || "",
     });
 
+    if (user.email_confirmed_at) {
+      markEmailVerified();
+    }
+
     if (user.phone_confirmed_at) {
       markPhoneVerified();
     }
