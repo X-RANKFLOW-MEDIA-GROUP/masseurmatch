@@ -64,7 +64,7 @@ export function ProfileHero({ profile, cityPath }: Props) {
   const name = getPublicProfileName(profile);
   const status = statusConfig(profile);
   const { callHref, smsHref } = getPublicContactLinks(profile.phone);
-  const neighborhood = profile.neighborhood_name || profile.primary_area;
+  const neighborhood = profile.neighborhood_name || profile.primary_area || null;
   const { trackContact } = useKnottyProfileAttribution({
     therapistId: profile.id,
     city: profile.city,

@@ -54,7 +54,7 @@ export default async function HomePage() {
 
   const featuredTherapists = therapists
     .filter(
-      (therapist) =>
+      (therapist: any) =>
         therapist._tier === "elite" ||
         therapist._tier === "pro" ||
         Boolean(therapist.is_verified_identity || therapist.is_verified_profile),
@@ -64,7 +64,7 @@ export default async function HomePage() {
   const cityCounts = new Map<string, number>();
   const cityHighlights = new Map<string, Set<string>>();
 
-  therapists.forEach((therapist) => {
+  therapists.forEach((therapist: any) => {
     const cityKey = therapist.city?.toLowerCase().trim();
 
     if (!cityKey) {
@@ -74,7 +74,7 @@ export default async function HomePage() {
     cityCounts.set(cityKey, (cityCounts.get(cityKey) || 0) + 1);
 
     const highlights = cityHighlights.get(cityKey) || new Set<string>();
-    (therapist.specialties || []).slice(0, 3).forEach((specialty) => highlights.add(specialty));
+    (therapist.specialties || []).slice(0, 3).forEach((specialty: string) => highlights.add(specialty));
 
     if (therapist.available_now) {
       highlights.add("Available now");

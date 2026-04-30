@@ -46,7 +46,7 @@ export async function GET(request: Request) {
     });
   }
 
-  const items = result.items
+  const items = result
     .filter((provider) => !exclude.has(provider.id))
     .slice(0, limit);
 
@@ -54,10 +54,9 @@ export async function GET(request: Request) {
     ok: true,
     items: items.map(serializeExploreProvider),
     total: items.length,
-    filters: result.filters,
+    filters,
     meta: {
       cache_hit: cacheHit,
-      invalid_provider_count: result.invalidProviderCount,
     },
   }, {
     headers: {

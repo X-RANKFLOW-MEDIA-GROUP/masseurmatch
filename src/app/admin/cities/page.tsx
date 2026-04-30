@@ -9,7 +9,7 @@ export default async function AdminCitiesPage() {
     getPublicTherapists({ page: 1, pageSize: 50 }),
   ]);
 
-  const therapistCounts = therapists.items.reduce<Record<string, number>>((accumulator, therapist) => {
+  const therapistCounts = (therapists.items as any[]).reduce<Record<string, number>>((accumulator, therapist) => {
     const key = therapist.city?.toLowerCase();
     if (!key) {
       return accumulator;

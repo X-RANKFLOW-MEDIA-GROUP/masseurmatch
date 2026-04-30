@@ -149,8 +149,8 @@ export default async function TherapistPage({ params }: { params: Promise<Params
           outcallPrice: profile.outcall_price,
           reviews: reviews.map((review) => ({
             rating: review.rating,
-            reviewText: review.review_text,
-            reviewerName: review.reviewer_name,
+            reviewText: review.content || review.review_text || "",
+            reviewerName: review.author_name || review.reviewer_name || "Verified Client",
           })),
         })}
       />
@@ -170,8 +170,8 @@ export default async function TherapistPage({ params }: { params: Promise<Params
           outcallPrice: profile.outcall_price,
           reviews: reviews.map((review) => ({
             rating: review.rating,
-            reviewText: review.review_text,
-            reviewerName: review.reviewer_name,
+            reviewText: review.content || review.review_text || "",
+            reviewerName: review.author_name || review.reviewer_name || "Verified Client",
           })),
         })}
       />

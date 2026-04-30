@@ -9,8 +9,8 @@ export default async function AdminKeywordsPage() {
     getPublicTherapists({ page: 1, pageSize: 50 }),
   ]);
 
-  const keywordCounts = therapists.items.reduce<Record<string, number>>((accumulator, therapist) => {
-    for (const specialty of therapist.specialties || []) {
+  const keywordCounts = (therapists.items as any[]).reduce<Record<string, number>>((accumulator, therapist) => {
+    for (const specialty of (therapist.specialties || [])) {
       const key = specialty.toLowerCase();
       accumulator[key] = (accumulator[key] || 0) + 1;
     }

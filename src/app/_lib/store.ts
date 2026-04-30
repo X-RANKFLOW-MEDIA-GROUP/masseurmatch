@@ -26,11 +26,12 @@ const PROFILE_SELECT = `
   updated_at, created_at
 `;
 
-const AVAILABLE_NOW_SELECT = "id, subscription_tier, available_now, available_now_expires";
+const AVAILABLE_NOW_SELECT = "id, subscription_tier, _tier, available_now, available_now_expires";
 
 export type AvailableNowProfile = {
   id: string;
   subscription_tier: string | null;
+  _tier: string | null;
   available_now: boolean | null;
   available_now_expires: string | null;
 };

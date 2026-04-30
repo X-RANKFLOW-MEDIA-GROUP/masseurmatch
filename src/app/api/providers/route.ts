@@ -55,16 +55,14 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     ok: true,
-    items: result.items.slice(from, to).map(serializeExploreProvider),
-    total: result.total,
+    items: result.slice(from, to).map(serializeExploreProvider),
+    total: result.length,
     page,
     pageSize,
-    hasMore: to < result.total,
-    filters: result.filters,
+    hasMore: to < result.length,
+    filters,
     meta: {
       cache_hit: cacheHit,
-      invalid_provider_count: result.invalidProviderCount,
-      origin: result.origin,
     },
   }, {
     headers: {

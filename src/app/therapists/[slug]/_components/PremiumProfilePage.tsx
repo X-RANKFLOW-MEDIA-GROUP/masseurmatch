@@ -92,10 +92,10 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
             <ReviewsDisplay
               reviews={reviews.map(r => ({
                 id: r.id,
-                author_name: r.reviewer_name ?? "Verified Client",
+                author_name: r.author_name || r.reviewer_name || "Verified Client",
                 rating: r.rating ?? 5,
-                body: r.review_text,
-                created_at: r.review_date ?? new Date().toISOString()
+                body: r.content || r.review_text || "",
+                created_at: r.created_at || r.review_date || new Date().toISOString()
               }))}
               averageRating={avgRating}
               totalReviews={reviews.length}
@@ -205,11 +205,11 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
                       {"★".repeat(review.rating || 5)}
                       {"☆".repeat(5 - (review.rating || 5))}
                     </div>
-                    {review.reviewer_name && (
-                      <span className="text-xs text-[var(--text-muted)]">by {review.reviewer_name}</span>
+                    {(review.author_name || review.reviewer_name) && (
+                      <span className="text-xs text-[var(--text-muted)]">by {review.author_name || review.reviewer_name}</span>
                     )}
                   </div>
-                  <p className="text-sm leading-relaxed text-[var(--cream-soft)]">{review.review_text}</p>
+                  <p className="text-sm leading-relaxed text-[var(--cream-soft)]">{review.content || review.review_text}</p>
                 </article>
               ))}
             </div>
