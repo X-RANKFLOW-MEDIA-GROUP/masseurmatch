@@ -109,7 +109,7 @@ export function CityDirectoryPage({
                 {
                   icon: LockKeyhole,
                   title: "Direct connection",
-                  body: "Profiles are built for immediate call or message without booking-platform detours.",
+                  body: "Profiles are built for immediate call or message without platform detours.",
                 },
               ].map((item) => {
                 const Icon = item.icon;

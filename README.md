@@ -15,7 +15,7 @@ MasseurMatch is a directory platform for independent massage therapists. Visitor
 
 ```bash
 corepack enable
-corepack prepare pnpm@9.15.4 --activate
+corepack prepare pnpm@10.32.1 --activate
 pnpm install
 pnpm dev
 ```

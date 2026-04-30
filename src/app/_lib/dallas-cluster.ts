@@ -194,7 +194,7 @@ const DALLAS_CATEGORY_COPY: Record<string, Omit<CanonicalCategory, "slug">> = {
     title: "Gay Massage near DFW Airport, TX | Verified Male Therapists | MasseurMatch",
     h1: "Gay Massage near DFW Airport",
     intro:
-      "DFW Airport is treated as a high-intent micro-market where travel timing and response speed matter. This page highlights providers relevant to airport-adjacent demand with clear outcall and direct-contact signals. It supports the Dallas beachhead by connecting travelers and nearby users to trusted profile listings and session pages. Instead of forcing broad-city navigation, users can stay in an airport-focused funnel and move quickly to outreach. Use this route for hotel and transit-related intent where location precision and booking readiness are both critical.",
+      "DFW Airport is treated as a high-intent micro-market where travel timing and response speed matter. This page highlights providers relevant to airport-adjacent demand with clear outcall and direct-contact signals. It supports the Dallas beachhead by connecting travelers and nearby users to trusted profile listings and session pages. Instead of forcing broad-city navigation, users can stay in an airport-focused funnel and move quickly to outreach. Use this route for hotel and transit-related intent where location precision and direct-contact readiness are both critical.",
   },
   "love-field": {
     label: "Love Field",

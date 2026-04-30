@@ -24,7 +24,7 @@ const SERVICE_DESCRIPTIONS: Record<string, string> = {
   sports: "Pre or post-activity work to improve performance and reduce injury risk.",
   relaxing: "Gentle full-body session focused on stress relief and calm.",
   therapeutic: "Blended modalities tailored to your specific physical concerns.",
-  couples: "Side-by-side session for two. Incall only with advance booking.",
+  couples: "Side-by-side session for two. Incall only with advance notice.",
   "hot stone": "Heated volcanic stones for deep relaxation and muscle tension release.",
   aromatherapy: "Essential oils combined with massage for enhanced relaxation.",
   thai: "Traditional stretching and pressure point work without oils.",

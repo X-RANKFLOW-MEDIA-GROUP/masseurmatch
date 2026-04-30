@@ -84,6 +84,7 @@ Verify:
 8. Auth signup creates a pending therapist profile.
 9. Missing optional columns do not break signup.
 10. Public pages fall back safely if Supabase is unavailable.
+11. Database settings for cron-triggered Edge Functions are configured: `app.settings.supabase_url`, `app.settings.supabase_anon_key`, and `app.settings.service_role_key`.
 
 ## 4. Stripe checklist
 
