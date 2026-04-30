@@ -1,18 +1,26 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Bell, Heart, Search, Settings, LogOut } from 'lucide-react';
 
 export function ClientDashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/login');
+    router.refresh();
+  };
 
   const navItems = [
     { href: '/client/dashboard', label: 'Dashboard', icon: Search },
-    { href: '/client/inquiries', label: 'Inquiries', icon: Bell },
-    { href: '/client/favorites', label: 'Favorites', icon: Heart },
-    { href: '/client/settings', label: 'Settings', icon: Settings },
+    { href: '/client/dashboard/inquiries', label: 'Inquiries', icon: Bell },
+    { href: '/client/dashboard/favorites', label: 'Favorites', icon: Heart },
+    { href: '/client/dashboard/settings', label: 'Settings', icon: Settings },
   ];
 
   return (
@@ -25,14 +33,13 @@ export function ClientDashboardLayout({ children }: { children: React.ReactNode 
               My Dashboard
             </h1>
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               className="text-slate-600 hover:text-slate-900"
-              asChild
+              onClick={handleLogout}
             >
-              <Link href="/auth/logout">
-                <LogOut className="h-4 w-4" />
-              </Link>
+              <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
