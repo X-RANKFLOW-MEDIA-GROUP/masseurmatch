@@ -8,7 +8,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { User, Bell, Shield, Trash2, Loader2, Check } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { User, Bell, Shield, Trash2, Loader2, Check, KeyRound } from "lucide-react";
 import { ClientDashboardLayout } from "../_components/ClientDashboardLayout";
 import { toast } from "sonner";
 
@@ -22,15 +33,36 @@ export default function ClientSettingsPage() {
     email_promotions: false,
     email_newsletter: true,
   });
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
     async function fetchUser() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUser({
-          email: user.email ?? "",
-          full_name: user.user_metadata?.full_name ?? "",
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) { setLoading(false); return; }
+
+      setUser({
+        email: authUser.email ?? "",
+        full_name: authUser.user_metadata?.full_name ?? "",
+      });
+
+      const { data: prefs } = await supabase
+        .from("user_notification_preferences")
+        .select("email_enabled, marketing_enabled")
+        .eq("user_id", authUser.id)
+        .maybeSingle();
+
+      if (prefs) {
+        setPreferences({
+          email_inquiry_updates: prefs.email_enabled ?? true,
+          email_new_messages: prefs.email_enabled ?? true,
+          email_promotions: prefs.marketing_enabled ?? false,
+          email_newsletter: prefs.marketing_enabled ?? false,
         });
       }
       setLoading(false);
@@ -41,7 +73,7 @@ export default function ClientSettingsPage() {
   async function handleSaveProfile(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    
+
     const { error } = await supabase.auth.updateUser({
       data: { full_name: user?.full_name },
     });
@@ -56,10 +88,63 @@ export default function ClientSettingsPage() {
 
   async function handleSaveNotifications() {
     setSaving(true);
-    // In production, save to database
-    await new Promise((r) => setTimeout(r, 500));
-    toast.success("Notification preferences saved");
+
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (!authUser) { setSaving(false); return; }
+
+    const { error } = await supabase
+      .from("user_notification_preferences")
+      .upsert({
+        user_id: authUser.id,
+        email_enabled: preferences.email_inquiry_updates || preferences.email_new_messages,
+        marketing_enabled: preferences.email_promotions || preferences.email_newsletter,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "user_id" });
+
+    if (error) {
+      toast.error("Failed to save preferences");
+    } else {
+      toast.success("Notification preferences saved");
+    }
     setSaving(false);
+  }
+
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    if (newPassword.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+    setPasswordSaving(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Password updated successfully");
+      setNewPassword("");
+      setConfirmPassword("");
+      setShowPasswordForm(false);
+    }
+    setPasswordSaving(false);
+  }
+
+  async function handleDeleteAccount() {
+    if (deleteConfirmText !== "DELETE") return;
+    setDeleting(true);
+
+    const res = await fetch("/api/auth/delete-account", { method: "DELETE" });
+    if (res.ok) {
+      toast.success("Account deleted");
+      await supabase.auth.signOut();
+      window.location.href = "/";
+    } else {
+      toast.error("Failed to delete account. Please contact support.");
+      setDeleting(false);
+    }
   }
 
   if (loading) {
@@ -191,6 +276,7 @@ export default function ClientSettingsPage() {
               />
             </div>
             <Button onClick={handleSaveNotifications} disabled={saving} className="mt-4">
+              {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Save Preferences
             </Button>
           </CardContent>
@@ -211,16 +297,43 @@ export default function ClientSettingsPage() {
                 <p className="font-medium text-slate-900">Change Password</p>
                 <p className="text-sm text-slate-500">Update your account password</p>
               </div>
-              <Button variant="outline">Change Password</Button>
+              <Button variant="outline" onClick={() => setShowPasswordForm((v) => !v)}>
+                <KeyRound className="mr-2 h-4 w-4" />
+                {showPasswordForm ? "Cancel" : "Change Password"}
+              </Button>
             </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-slate-900">Two-Factor Authentication</p>
-                <p className="text-sm text-slate-500">Add an extra layer of security</p>
-              </div>
-              <Button variant="outline">Enable 2FA</Button>
-            </div>
+
+            {showPasswordForm && (
+              <form onSubmit={handleChangePassword} className="space-y-3 rounded-lg border border-slate-200 p-4">
+                <div className="space-y-2">
+                  <Label htmlFor="new-password">New Password</Label>
+                  <Input
+                    id="new-password"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="At least 8 characters"
+                    required
+                    minLength={8}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password">Confirm Password</Label>
+                  <Input
+                    id="confirm-password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Repeat new password"
+                    required
+                  />
+                </div>
+                <Button type="submit" disabled={passwordSaving}>
+                  {passwordSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  Update Password
+                </Button>
+              </form>
+            )}
           </CardContent>
         </Card>
 
@@ -239,7 +352,38 @@ export default function ClientSettingsPage() {
                 <p className="font-medium text-slate-900">Delete Account</p>
                 <p className="text-sm text-slate-500">Permanently delete your account and all data</p>
               </div>
-              <Button variant="destructive">Delete Account</Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive">Delete Account</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete your account and all associated data. This action cannot be undone.
+                      <br /><br />
+                      Type <strong>DELETE</strong> below to confirm.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <Input
+                    value={deleteConfirmText}
+                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    placeholder="Type DELETE to confirm"
+                    className="mt-2"
+                  />
+                  <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => setDeleteConfirmText("")}>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDeleteAccount}
+                      disabled={deleteConfirmText !== "DELETE" || deleting}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      {deleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      Delete Account
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </CardContent>
         </Card>
