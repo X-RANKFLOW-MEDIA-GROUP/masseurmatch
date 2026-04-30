@@ -20,7 +20,11 @@ export type AuthMutationResponse = {
     access_token: string;
     refresh_token: string;
   } | null;
+  requiresEmailConfirmation?: boolean;
+  message?: string;
 };
+
+export type ResendConfirmationResponse = { ok: boolean; message: string };
 
 export type ForgotPasswordMutationResponse = {
   ok: boolean;
@@ -69,6 +73,10 @@ export function logoutMutation() {
   return requestJson<{ ok: true }>("/api/auth/logout", {
     method: "POST",
   });
+}
+
+export function resendConfirmationMutation(email: string) {
+  return postJson<ResendConfirmationResponse>("/api/auth/resend-confirmation", { email });
 }
 
 export function forgotPasswordMutation(input: ForgotPasswordInput) {

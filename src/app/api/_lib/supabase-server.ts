@@ -154,6 +154,10 @@ export async function verifyPassword(email: string, password: string) {
   });
 
   if (error || !data.user) {
+    const authError = error?.message?.toLowerCase() ?? "";
+    if (authError.includes("email not confirmed")) {
+      throw new RouteError(401, "Check your email to confirm your account before continuing.", "EMAIL_NOT_CONFIRMED");
+    }
     throw new RouteError(401, "Invalid email or password.");
   }
 
@@ -281,29 +285,29 @@ export async function createTherapistUser(input: {
   fullName: string;
   email: string;
   password: string;
+  emailRedirectTo: string;
 }) {
-  const adminClient = createSupabaseAdminClient();
+  const publicClient = createSupabasePublicClient();
 
-  const { data, error } = await adminClient.auth.admin.createUser({
+  const { data, error } = await publicClient.auth.signUp({
     email: input.email,
     password: input.password,
-    email_confirm: true,
-    user_metadata: {
-      full_name: input.fullName,
+    options: {
+      emailRedirectTo: input.emailRedirectTo,
+      data: {
+        full_name: input.fullName,
+        role: "provider",
+      },
     },
   });
 
   if (error || !data.user) {
-    throw new RouteError(400, error?.message ?? "Could not create user.");
+    throw new RouteError(400, "Could not create account.");
   }
-
-  const { role } = await ensureUserProfileAndRole(data.user, {
-    defaultRole: "provider",
-    fallbackName: input.fullName,
-  });
 
   return {
     user: data.user,
-    role,
+    role: null,
+    session: data.session ?? null,
   };
 }
