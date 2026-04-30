@@ -104,7 +104,9 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
   const name = getPublicProfileName(therapist);
   const profilePath = `/therapists/${therapist.slug || therapist.id}`;
   const isVerified = isVerifiedDirectoryProfile(therapist);
-  const neighborhood = therapist.neighborhood_name ?? therapist.primary_area ?? null;
+  
+  // Adicionado o fallback triplo (neighborhood_name -> neighborhood -> primary_area)
+  const neighborhood = therapist.neighborhood_name ?? therapist.neighborhood ?? therapist.primary_area ?? null;
   const startingPrice = getStartingPrice(therapist);
   const startingValue = formatCurrency(startingPrice);
   const locationLabel = neighborhood || therapist.city || "Local area";
@@ -114,8 +116,9 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
   const profileImage = useMemo(
     () =>
       therapist.avatar_url ||
+      therapist.profile_photo ||
       "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=900&h=700&fit=crop",
-    [therapist.avatar_url],
+    [therapist.avatar_url, therapist.profile_photo],
   );
 
   const imageAlt = `${name} - ${therapist.city || "US"} Massage Therapist`;
