@@ -20,10 +20,9 @@ type Inquiry = {
   created_at: string;
   therapist?: {
     id: string;
-    full_name: string;
-    profile_image_url: string;
-    city: string;
-    state_code: string;
+    display_name: string;
+    photo_url: string;
+    state: string;
   };
 };
 
@@ -47,12 +46,11 @@ export default function ClientInquiriesPage() {
           message,
           status,
           created_at,
-          therapist:therapist_profiles!therapist_id (
+          therapist:therapists!therapist_id (
             id,
-            full_name,
-            profile_image_url,
-            city,
-            state_code
+            display_name,
+            photo_url,
+            state
           )
         `)
         .eq("client_email", user.email)
@@ -68,7 +66,7 @@ export default function ClientInquiriesPage() {
   }, [supabase]);
 
   const filteredInquiries = inquiries.filter((inquiry) => {
-    const matchesSearch = inquiry.therapist?.full_name
+    const matchesSearch = inquiry.therapist?.display_name
       ?.toLowerCase()
       .includes(searchQuery.toLowerCase()) ?? false;
     const matchesTab = activeTab === "all" || inquiry.status === activeTab;
@@ -145,10 +143,10 @@ export default function ClientInquiriesPage() {
                 <Card key={inquiry.id} className="transition-shadow hover:shadow-md">
                   <CardContent className="flex items-start gap-4 p-4">
                     <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full bg-slate-100">
-                      {inquiry.therapist?.profile_image_url ? (
+                      {inquiry.therapist?.photo_url ? (
                         <img
-                          src={inquiry.therapist.profile_image_url}
-                          alt={inquiry.therapist.full_name}
+                          src={inquiry.therapist.photo_url}
+                          alt={inquiry.therapist.display_name}
                           className="h-full w-full object-cover"
                         />
                       ) : (
@@ -162,10 +160,10 @@ export default function ClientInquiriesPage() {
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <h3 className="font-medium text-slate-900">
-                            {inquiry.therapist?.full_name ?? "Unknown Therapist"}
+                            {inquiry.therapist?.display_name ?? "Unknown Therapist"}
                           </h3>
                           <p className="text-sm text-slate-500">
-                            {inquiry.therapist?.city}, {inquiry.therapist?.state_code}
+                            {inquiry.therapist?.state}
                           </p>
                         </div>
                         <Badge className={config.color}>

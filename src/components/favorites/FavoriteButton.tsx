@@ -30,8 +30,8 @@ export function FavoriteButton({ therapistId, variant = "icon", className }: Fav
       const { data } = await supabase
         .from("client_favorites")
         .select("id")
-        .eq("client_id", user.id)
-        .eq("therapist_id", therapistId)
+        .eq("client_user_id", user.id)
+        .eq("therapist_profile_id", therapistId)
         .maybeSingle();
 
       setIsFavorite(!!data);
@@ -54,8 +54,8 @@ export function FavoriteButton({ therapistId, variant = "icon", className }: Fav
       const { error } = await supabase
         .from("client_favorites")
         .delete()
-        .eq("client_id", user.id)
-        .eq("therapist_id", therapistId);
+        .eq("client_user_id", user.id)
+        .eq("therapist_profile_id", therapistId);
 
       if (error) {
         toast.error("Failed to remove from favorites");
@@ -67,8 +67,8 @@ export function FavoriteButton({ therapistId, variant = "icon", className }: Fav
       const { error } = await supabase
         .from("client_favorites")
         .insert({
-          client_id: user.id,
-          therapist_id: therapistId,
+          client_user_id: user.id,
+          therapist_profile_id: therapistId,
         });
 
       if (error) {
