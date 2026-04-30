@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     ? `Gay Massage Therapists in ${cityLabel} | Verified LGBTQ+-Affirming`
     : `${city.name} ${segment.label}`;
   const description = isGayMassageSegment
-    ? `Find verified, LGBTQ+-affirming male massage therapists in ${cityLabel}. Browse gay-friendly profiles with identity verification, affirming practice standards, and direct booking on MasseurMatch.`
+    ? `Find verified, LGBTQ+-affirming male massage therapists in ${cityLabel}. Browse gay-friendly profiles with identity verification, affirming practice standards, and direct contact on MasseurMatch.`
     : `${segment.intro} Compare trusted local listings, direct contact options, and stronger city-intent pages in ${city.name}.`;
   const keywords = isGayMassageSegment
     ? [
