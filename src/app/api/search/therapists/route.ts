@@ -21,64 +21,69 @@ export async function GET(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
 
+    // Atualizado para os nomes de colunas do novo Schema
     let queryBuilder = supabase
       .from('profiles')
       .select('*', { count: 'exact' })
-      .eq('account_type', 'therapist')
-      .eq('is_published', true);
+      .eq('visibility_status', 'public')
+      .eq('profile_status', 'approved')
+      .eq('is_suspended', false)
+      .eq('is_banned', false);
 
-    // Text search
+    // Text search atualizado para display_name e full_name
     if (query) {
       queryBuilder = queryBuilder.or(
-        `first_name.ilike.%${query}%,last_name.ilike.%${query}%,bio.ilike.%${query}%,specialty.ilike.%${query}%`
+        `display_name.ilike.%${query}%,full_name.ilike.%${query}%,bio.ilike.%${query}%,headline.ilike.%${query}%`
       );
     }
 
-    // Price range filter
+    // Price range filter atualizado para starting_price
     if (minPrice) {
-      queryBuilder = queryBuilder.gte('price_from', parseInt(minPrice));
+      queryBuilder = queryBuilder.gte('starting_price', parseInt(minPrice));
     }
     if (maxPrice) {
-      queryBuilder = queryBuilder.lte('price_from', parseInt(maxPrice));
+      queryBuilder = queryBuilder.lte('starting_price', parseInt(maxPrice));
     }
 
-    // Specialties filter
+    // Specialties filter atualizado para buscar dentro do array (contains)
     if (specialties.length > 0) {
-      queryBuilder = queryBuilder.in('specialty', specialties);
+      queryBuilder = queryBuilder.contains('specialties', specialties);
     }
 
-    // Verification filter
+    // Verification filter atualizado para verification_status e subscription_tier
     if (verified === 'true') {
-      queryBuilder = queryBuilder.or('verified_status.eq.verified,verified_status.eq.elite');
+      queryBuilder = queryBuilder.or('verification_status.eq.verified,subscription_tier.eq.elite,subscription_tier.eq.pro');
     }
 
     // Availability filter
     if (available === 'true') {
-      queryBuilder = queryBuilder.eq('available_now', true);
+      const nowIso = new Date().toISOString();
+      queryBuilder = queryBuilder.eq('available_now', true).or(`available_now_expires.is.null,available_now_expires.gt.${nowIso}`);
     }
 
-    // Service mode filters
+    // Service mode filters (Atualizado para buscar por preços não nulos, igual no public-profiles.ts)
     if (incall === 'true') {
-      queryBuilder = queryBuilder.eq('incall', true);
+      queryBuilder = queryBuilder.not('incall_price', 'is', null);
     }
     if (outcall === 'true') {
-      queryBuilder = queryBuilder.eq('outcall', true);
+      queryBuilder = queryBuilder.not('outcall_price', 'is', null);
     }
 
     // Sorting
     switch (sortBy) {
       case 'price':
-        queryBuilder = queryBuilder.order('price_from', { ascending: true });
+        queryBuilder = queryBuilder.order('starting_price', { ascending: true });
         break;
       case 'rating':
-        queryBuilder = queryBuilder.order('rating', { ascending: false });
+        // Se rating não existe diretamente em profiles, ordena por tier/reviews
+        queryBuilder = queryBuilder.order('review_count', { ascending: false });
         break;
       case 'distance':
-        // Distance sorting fallback: keep featured ordering when geospatial ranking is unavailable.
-        queryBuilder = queryBuilder.order('featured', { ascending: false });
+        // Fallback igual o original, usa is_featured
+        queryBuilder = queryBuilder.order('is_featured', { ascending: false });
         break;
       default:
-        queryBuilder = queryBuilder.order('featured', { ascending: false });
+        queryBuilder = queryBuilder.order('is_featured', { ascending: false });
     }
 
     // Pagination
