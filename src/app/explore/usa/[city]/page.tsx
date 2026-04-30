@@ -64,7 +64,7 @@ export default async function ExploreCityPage({ params }: { params: Promise<Para
   };
   const baseFilters = getBaseExploreFilters(filters);
   const baseResult = await loadExploreProviders(baseFilters);
-  const initialItems = applyExploreFilters(baseResult, filters);
+  const initialItems = applyExploreFilters(baseResult.items, filters, baseResult.origin);
 
   return (
     <>
@@ -80,9 +80,9 @@ export default async function ExploreCityPage({ params }: { params: Promise<Para
       <ExplorePageClient
         cities={getCities()}
         hasExplicitLocation
-        initialBaseItems={baseResult}
+        initialBaseItems={baseResult.items}
         initialFilters={filters}
-        initialInvalidProviderCount={0}
+        initialInvalidProviderCount={baseResult.invalidProviderCount}
         initialTotal={initialItems.length}
       />
     </>
