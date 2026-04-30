@@ -46,7 +46,7 @@ export async function GET(request: Request) {
     });
   }
 
-  const items = result
+  const items = result.items
     .filter((provider) => !exclude.has(provider.id))
     .slice(0, limit);
 
@@ -54,7 +54,7 @@ export async function GET(request: Request) {
     ok: true,
     items: items.map(serializeExploreProvider),
     total: items.length,
-    filters,
+    filters: result.filters,
     meta: {
       cache_hit: cacheHit,
     },

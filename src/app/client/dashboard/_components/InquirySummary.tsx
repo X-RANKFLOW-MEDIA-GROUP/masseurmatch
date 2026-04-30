@@ -13,7 +13,7 @@ type Inquiry = Pick<
   'id' | 'therapist_name' | 'therapist_id' | 'status' | 'message' | 'created_at' | 'responded_at'
 >;
 
-export function InquirySummary({ userId }: { userId: string }) {
+export function InquirySummary({ userEmail }: { userEmail: string }) {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
@@ -23,7 +23,7 @@ export function InquirySummary({ userId }: { userId: string }) {
       const { data, error } = await supabase
         .from('contact_inquiries')
         .select('id, therapist_name, therapist_id, status, message, created_at, responded_at')
-        .eq('client_id', userId)
+        .eq('client_email', userEmail)
         .order('created_at', { ascending: false })
         .limit(5);
 
@@ -34,7 +34,7 @@ export function InquirySummary({ userId }: { userId: string }) {
     }
 
     loadInquiries();
-  }, [userId, supabase]);
+  }, [userEmail, supabase]);
 
   const stats = {
     total: inquiries.length,
@@ -120,7 +120,7 @@ export function InquirySummary({ userId }: { userId: string }) {
         </div>
 
         <Button variant="outline" asChild className="w-full">
-          <Link href="/client/inquiries">
+          <Link href="/client/dashboard/inquiries">
             View All Inquiries <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>

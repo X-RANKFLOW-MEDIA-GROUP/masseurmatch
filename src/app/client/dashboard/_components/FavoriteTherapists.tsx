@@ -43,7 +43,7 @@ export function FavoriteTherapists({ userId }: { userId: string }) {
           )
         `
         )
-        .eq('user_id', userId);
+        .eq('client_id', userId);
 
       if (!error && data) {
         const therapists = data
