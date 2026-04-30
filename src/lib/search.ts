@@ -27,7 +27,7 @@ export type TherapistSearchRow = {
   massage_techniques: string[] | null;
   languages: string[] | null;
   rates: Record<string, unknown> | null;
-  profile_verified: boolean | null;
+  is_verified_identity: boolean | null;
   rating_average: number | null;
   latitude: number | null;
   longitude: number | null;
@@ -96,7 +96,7 @@ export function applyInMemoryFilters(items: TherapistSearchRow[], filters: Thera
         if (!hasLanguage) return false;
       }
 
-      if (filters.verifiedOnly && !item.profile_verified) {
+      if (filters.verifiedOnly && !item.is_verified_identity) {
         return false;
       }
 
@@ -131,7 +131,7 @@ export async function fetchTherapistSearchResults(
   let query = client
     .from("profiles")
     .select(
-      "id,slug,display_name,city,state,bio,massage_techniques,languages,rates,profile_verified,rating_average,latitude,longitude",
+      "id,slug,display_name,city,state,bio,massage_techniques,languages,rates,is_verified_identity,rating_average,latitude,longitude",
     )
     .eq("status", "active")
     .limit((filters.limit ?? 25) * 4);

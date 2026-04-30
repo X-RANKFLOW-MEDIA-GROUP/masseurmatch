@@ -6,16 +6,12 @@ import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Mail, CheckCircle2, Clock3, AlertCircle, ArrowRight } from 'lucide-react';
+import type { Tables } from '@/integrations/supabase/types';
 
-type Inquiry = {
-  id: string;
-  therapist_name: string;
-  therapist_id: string;
-  status: 'new' | 'viewed' | 'responded' | 'archived';
-  message: string;
-  created_at: string;
-  responded_at?: string;
-};
+type Inquiry = Pick<
+  Tables<'contact_inquiries'>,
+  'id' | 'therapist_name' | 'therapist_id' | 'status' | 'message' | 'created_at' | 'responded_at'
+>;
 
 export function InquirySummary({ userId }: { userId: string }) {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
@@ -26,7 +22,7 @@ export function InquirySummary({ userId }: { userId: string }) {
     async function loadInquiries() {
       const { data, error } = await supabase
         .from('contact_inquiries')
-        .select('*')
+        .select('id, therapist_name, therapist_id, status, message, created_at, responded_at')
         .eq('client_id', userId)
         .order('created_at', { ascending: false })
         .limit(5);

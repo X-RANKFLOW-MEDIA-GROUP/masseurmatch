@@ -6,13 +6,9 @@ import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Search, Trash2, Clock } from 'lucide-react';
+import type { Tables } from '@/integrations/supabase/types';
 
-type SearchRecord = {
-  id: string;
-  query: string;
-  results_count: number;
-  created_at: string;
-};
+type SearchRecord = Pick<Tables<'search_history'>, 'id' | 'query' | 'results_count' | 'created_at'>;
 
 export function SearchHistory({ userId }: { userId: string }) {
   const [searches, setSearches] = useState<SearchRecord[]>([]);
@@ -23,7 +19,7 @@ export function SearchHistory({ userId }: { userId: string }) {
     async function loadSearchHistory() {
       const { data, error } = await supabase
         .from('search_history')
-        .select('*')
+        .select('id, query, results_count, created_at')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(10);

@@ -36,6 +36,7 @@ export interface ProfileTravelEntry {
   start_date: string;
   end_date: string;
   state?: string;
+  detail?: string;
 }
 
 export interface ProfileAddOn {
@@ -126,7 +127,10 @@ const PUBLIC_PROFILE_SELECT = `
   years_experience, languages,
   subscription_tier, verification_status, is_featured,
   promotions, updated_at, profile_status, visibility_status,
-  is_suspended, is_banned, available_now, available_now_expires
+  is_suspended, is_banned, available_now, available_now_expires,
+  is_verified_identity, is_verified_profile, is_verified_photos,
+  lgbtq_affirming, training, education, areas_served, outcall_radius_miles,
+  contact_clicks, travel_schedule, add_ons
 `;
 
 export interface ImportedReview {
