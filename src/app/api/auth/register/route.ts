@@ -1,41 +1,35 @@
-import { errorResponse, json, parseJsonBody, withSetCookie } from "@/app/api/_lib/http";
+import { errorResponse, json, parseJsonBody } from "@/app/api/_lib/http";
 import { RouteError } from "@/app/api/_lib/http";
-import { setSessionCookie } from "@/app/api/_lib/session";
 import { authRegisterSchema } from "@/app/_lib/validation";
 import {
   createTherapistUser,
-  verifyPasswordWithRetry,
 } from "@/app/api/_lib/supabase-server";
 
 export async function POST(request: Request) {
   try {
     const body = await parseJsonBody(request, authRegisterSchema);
-    const result = await createTherapistUser(body);
-    const signInResult = await verifyPasswordWithRetry(body.email, body.password, 5);
+    const { origin } = new URL(request.url);
+    const result = await createTherapistUser({
+      ...body,
+      emailRedirectTo: `${origin}/api/auth/callback?next=/pro/onboard`,
+    });
 
-    const response = json({
+    return json({
       ok: true,
       user: {
         id: result.user.id,
         email: result.user.email,
       },
-      role: result.role,
-      session: signInResult.session
+      role: null,
+      session: result.session
         ? {
-            access_token: signInResult.session.access_token,
-            refresh_token: signInResult.session.refresh_token,
-          }
+          access_token: result.session.access_token,
+          refresh_token: result.session.refresh_token,
+        }
         : null,
+      requiresEmailConfirmation: true,
+      message: "Check your email to confirm your account before continuing.",
     });
-
-    return withSetCookie(
-      response,
-      setSessionCookie({
-        userId: result.user.id,
-        email: result.user.email || body.email,
-        role: result.role,
-      }),
-    );
   } catch (error) {
     if (error instanceof RouteError && error.status === 400) {
       const msg = error.message.toLowerCase();

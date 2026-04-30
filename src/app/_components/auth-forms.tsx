@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { AppButton, AppInput, Surface } from "@/app/_components/primitives";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useAuth } from "@/contexts/AuthContext";
+import { resendConfirmationMutation } from "@/app/_lib/mutations";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -289,6 +290,7 @@ export function AuthForms({
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [method, setMethod] = useState<AuthMethod>("email");
+  const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
 
   const sanitizedRedirectTo =
     typeof redirectTo === "string" && redirectTo.startsWith("/") && !redirectTo.startsWith("//")
@@ -353,6 +355,18 @@ export function AuthForms({
       return;
     }
 
+    if (!isLogin) {
+      const signUpResult = result as Awaited<ReturnType<typeof signUp>>;
+      if (signUpResult.requiresEmailConfirmation) {
+      setNeedsEmailConfirmation(true);
+      toast({
+        title: "Confirm your email",
+        description: signUpResult.message ?? "Check your email to confirm your account before continuing.",
+      });
+      return;
+      }
+    }
+
     toast({
       title: isLogin ? "Welcome back" : "Account created",
       description: isLogin ? undefined : "You can continue into onboarding now.",
@@ -362,6 +376,28 @@ export function AuthForms({
     const destination = isLogin ? sanitizedRedirectTo : "/pro/onboard";
     window.location.href = destination;
   };
+
+  const resendConfirmation = async () => {
+    try {
+      await resendConfirmationMutation(email.trim());
+      toast({ title: "Email sent", description: "We sent another confirmation email." });
+    } catch {
+      toast({ title: "Could not resend", description: "Please try again in a moment.", variant: "destructive" });
+    }
+  };
+
+  if (!isLogin && needsEmailConfirmation) {
+    return (
+      <Surface className="mx-auto max-w-lg space-y-4">
+        <h1 className="font-display text-3xl font-semibold tracking-tight">Confirm your email</h1>
+        <p className="text-base leading-6 text-muted-foreground">
+          Check your email to confirm your account before continuing.
+        </p>
+        <p className="text-sm text-muted-foreground">We sent a confirmation link to <strong>{email}</strong>.</p>
+        <AppButton className="w-full" onClick={resendConfirmation}>Resend confirmation email</AppButton>
+      </Surface>
+    );
+  }
 
   return (
     <Surface className="mx-auto max-w-lg">
