@@ -7,7 +7,17 @@ import { postJson } from "@/app/_lib/client-api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import type { AdminTherapist } from "@/app/admin/_lib/loaders";
+
+type AdminTherapistListItem = {
+  id: string;
+  display_name: string | null;
+  full_name: string | null;
+  city: string | null;
+  status: string | null;
+  is_verified_identity: boolean | null;
+  tier: string | null;
+  featured: { is_active: boolean | null } | null;
+};
 
 type TherapistAction =
   | "approve"
@@ -33,7 +43,7 @@ const DEFAULT_ACTION: ActionDraft = {
   displayOrder: "",
 };
 
-function buildDrafts(therapists: AdminTherapist[]) {
+function buildDrafts(therapists: AdminTherapistListItem[]) {
   return therapists.reduce<Record<string, ActionDraft>>((accumulator, therapist) => {
     accumulator[therapist.id] = {
       ...DEFAULT_ACTION,
@@ -46,7 +56,7 @@ function buildDrafts(therapists: AdminTherapist[]) {
 export default function AdminTherapistsManager({
   initialTherapists,
 }: {
-  initialTherapists: AdminTherapist[];
+  initialTherapists: AdminTherapistListItem[];
 }) {
   const router = useRouter();
   const { toast } = useToast();
