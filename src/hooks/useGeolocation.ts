@@ -17,6 +17,8 @@ type GeolocationStatus = "idle" | "checking" | "ready" | "unsupported" | "denied
 type IpCityResponse = {
   city?: string | null;
   stateCode?: string | null;
+  region_code?: string | null;
+  region?: string | null;
 };
 
 type UseGeolocationOptions = {
@@ -125,7 +127,8 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
   const resolveCityFromIpFallback = useCallback(async () => {
     try {
       const response = await requestJson<IpCityResponse>("https://ipapi.co/json/", { cache: "no-store" });
-      const matchedCity = matchCity(response.city ?? null, response.stateCode ?? null);
+      const stateCode = response.stateCode ?? response.region_code ?? null;
+      const matchedCity = matchCity(response.city ?? null, stateCode);
 
       if (matchedCity) {
         setCity(matchedCity);
