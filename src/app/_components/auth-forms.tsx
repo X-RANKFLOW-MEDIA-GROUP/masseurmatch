@@ -290,6 +290,15 @@ export function AuthForms({
   const [rememberMe, setRememberMe] = useState(true);
   const [method, setMethod] = useState<AuthMethod>("email");
 
+  const sanitizedRedirectTo =
+    typeof redirectTo === "string" && redirectTo.startsWith("/") && !redirectTo.startsWith("//")
+      ? redirectTo
+      : "/pro/dashboard";
+
+  const loginHref = `/login?redirect=${encodeURIComponent(sanitizedRedirectTo)}`;
+  const registerHref = `/register?redirect=${encodeURIComponent(sanitizedRedirectTo)}`;
+  const forgotPasswordHref = `/forgot-password?redirect=${encodeURIComponent(sanitizedRedirectTo)}`;
+
   const isLogin = mode === "login";
 
   // Remember user email
@@ -350,7 +359,7 @@ export function AuthForms({
     });
 
     // Use window.location for a full page navigation to ensure cookies are read properly
-    const destination = isLogin ? redirectTo : "/pro/onboard";
+    const destination = isLogin ? sanitizedRedirectTo : "/pro/onboard";
     window.location.href = destination;
   };
 
@@ -359,13 +368,13 @@ export function AuthForms({
       {/* Mode toggle */}
       <div className="inline-flex rounded-full border border-border bg-secondary/60 p-1 text-sm font-semibold">
         <Link
-          href="/login"
+          href={loginHref}
           className={`rounded-full px-4 py-2 transition ${isLogin ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
         >
           Sign in
         </Link>
         <Link
-          href="/register"
+          href={registerHref}
           className={`rounded-full px-4 py-2 transition ${!isLogin ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
         >
           Sign up
@@ -391,9 +400,9 @@ export function AuthForms({
 
       <div className="mt-4">
         {method === "phone" ? (
-          <PhoneOtpForm isLogin={isLogin} redirectTo={redirectTo} />
+          <PhoneOtpForm isLogin={isLogin} redirectTo={sanitizedRedirectTo} />
         ) : method === "email-otp" ? (
-          <EmailOtpForm isLogin={isLogin} redirectTo={redirectTo} />
+          <EmailOtpForm isLogin={isLogin} redirectTo={sanitizedRedirectTo} />
         ) : (
           <form onSubmit={onSubmit} className="space-y-3">
             {!isLogin ? (
@@ -438,7 +447,7 @@ export function AuthForms({
                   />
                   Remember me
                 </label>
-                <Link href="/forgot-password" className="text-sm font-semibold text-primary hover:underline">
+                <Link href={forgotPasswordHref} className="text-sm font-semibold text-primary hover:underline">
                   Forgot password?
                 </Link>
               </div>
@@ -457,12 +466,12 @@ export function AuthForms({
         {isLogin ? (
           <>
             Don&apos;t have an account?{" "}
-            <Link href="/register" className="font-semibold text-primary hover:underline">Sign up</Link>
+            <Link href={registerHref} className="font-semibold text-primary hover:underline">Sign up</Link>
           </>
         ) : (
           <>
             Already have an account?{" "}
-            <Link href="/login" className="font-semibold text-primary hover:underline">Sign in</Link>
+            <Link href={loginHref} className="font-semibold text-primary hover:underline">Sign in</Link>
           </>
         )}
       </div>
