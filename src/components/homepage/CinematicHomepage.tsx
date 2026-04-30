@@ -38,7 +38,7 @@ function HeroSection({ totalTherapists, cityCount }: { totalTherapists: number; 
     <section 
       ref={heroRef}
       className="relative min-h-[100vh] overflow-hidden"
-      style={{ background: "linear-gradient(135deg, #060B12 0%, #0B1F3A 45%, #16386A 100%)" }}
+      style={{ background: "linear-gradient(135deg, #0B1F3A 0%, #13315C 52%, #1A4A86 100%)" }}
     >
       {/* Animated grid pattern */}
       <div 
@@ -95,7 +95,7 @@ function HeroSection({ totalTherapists, cityCount }: { totalTherapists: number; 
             }}
           >
             <span className="w-2 h-2 rounded-full bg-[#FF8A1F] animate-pulse" />
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FCFBF8]/80">
               The Premium Massage Directory
             </span>
           </motion.div>
@@ -105,7 +105,7 @@ function HeroSection({ totalTherapists, cityCount }: { totalTherapists: number; 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.8 }}
-            className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.05] tracking-[-0.03em] mb-6"
+            className="font-['Georgia','Times_New_Roman',serif] text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-[#FCFBF8] leading-[1.05] tracking-[-0.02em] mb-6"
           >
             Find Independent{" "}
             <span className="bg-gradient-to-r from-[#FF8A1F] to-[#FFB347] bg-clip-text text-transparent">
@@ -119,7 +119,7 @@ function HeroSection({ totalTherapists, cityCount }: { totalTherapists: number; 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.8 }}
-            className="text-lg sm:text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed"
+            className="text-lg sm:text-xl text-[#FCFBF8]/70 max-w-2xl mx-auto mb-10 leading-relaxed"
           >
             Compare profiles, specialties, trust signals and direct contact options 
             in one premium directory. No booking fees. Contact therapists directly.
@@ -174,7 +174,7 @@ function HeroSection({ totalTherapists, cityCount }: { totalTherapists: number; 
                 {/* Search button */}
                 <Link
                   href={`/explore${selectedCity ? `?city=${selectedCity}` : ""}${searchQuery ? `&q=${searchQuery}` : ""}`}
-                  className="h-14 px-8 rounded-xl bg-gradient-to-r from-[#FF8A1F] to-[#FF9E45] text-white font-semibold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-[#FF8A1F]/30 transition-all duration-300 hover:scale-[1.02]"
+                  className="h-14 px-8 rounded-xl bg-gradient-to-r from-[#FF8A1F] to-[#FF9E45] text-[#0B1F3A] font-semibold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-[#FF8A1F]/30 transition-all duration-300 hover:scale-[1.02]"
                 >
                   <span>Search</span>
                   <ArrowRight className="w-4 h-4" />
