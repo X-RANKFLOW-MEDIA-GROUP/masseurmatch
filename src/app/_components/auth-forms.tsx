@@ -10,7 +10,7 @@ import { resendConfirmationMutation } from "@/app/_lib/mutations";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-type AuthMethod = "email" | "phone" | "email-otp";
+type AuthMethod = "email" | "email-otp";
 
 /* ─────────── Social OAuth ─────────── */
 
@@ -75,7 +75,6 @@ function OrDivider() {
 function MethodTabs({ method, onChange }: { method: AuthMethod; onChange: (m: AuthMethod) => void }) {
   const tabs: { key: AuthMethod; label: string }[] = [
     { key: "email", label: "Email & Password" },
-    { key: "phone", label: "Phone OTP" },
     { key: "email-otp", label: "Email OTP" },
   ];
   return (
@@ -90,91 +89,6 @@ function MethodTabs({ method, onChange }: { method: AuthMethod; onChange: (m: Au
           {t.label}
         </button>
       ))}
-    </div>
-  );
-}
-
-/* ─────────── Phone OTP Form ─────────── */
-
-function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: string }) {
-  const { toast } = useToast();
-  const [phone, setPhone] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const sendOtp = async () => {
-    if (!phone.trim()) return;
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({ phone: phone.trim() });
-    setLoading(false);
-    if (error) {
-      toast({ title: "Could not send OTP", description: error.message, variant: "destructive" });
-      return;
-    }
-    setOtpSent(true);
-    toast({ title: "OTP sent", description: "Check your phone for a text message." });
-  };
-
-  const verifyOtp = async () => {
-    setLoading(true);
-    const { data, error } = await supabase.auth.verifyOtp({ phone: phone.trim(), token: otp, type: "sms" });
-    if (error) {
-      setLoading(false);
-      toast({ title: "Verification failed", description: error.message, variant: "destructive" });
-      return;
-    }
-    // Sync the mm_session cookie so middleware recognises the user
-    if (data.session?.access_token) {
-      await fetch("/api/auth/sync-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ access_token: data.session.access_token }),
-      });
-    }
-    setLoading(false);
-    toast({ title: isLogin ? "Welcome back" : "Account created" });
-    // Use window.location for a full page navigation to ensure cookies are read properly
-    const destination = isLogin ? redirectTo : "/pro/onboard";
-    window.location.href = destination;
-  };
-
-  return (
-    <div className="space-y-3">
-      <AppInput
-        type="tel"
-        aria-label="Phone number"
-        placeholder="+1 (555) 123-4567"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        disabled={otpSent}
-        required
-      />
-      {otpSent ? (
-        <>
-          <AppInput
-            type="text"
-            aria-label="One-time password code"
-            placeholder="Enter 6-digit code"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            maxLength={6}
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            required
-          />
-          <AppButton className="w-full" disabled={loading || otp.length < 6} onClick={verifyOtp}>
-            {loading ? "Verifying…" : "Verify & Continue"}
-          </AppButton>
-          <button type="button" onClick={() => { setOtpSent(false); setOtp(""); }} className="text-xs text-muted-foreground hover:underline">
-            Change phone number
-          </button>
-        </>
-      ) : (
-        <AppButton className="w-full" disabled={loading || !phone.trim()} onClick={sendOtp}>
-          {loading ? "Sending…" : "Send OTP via SMS"}
-        </AppButton>
-      )}
     </div>
   );
 }
@@ -435,9 +349,7 @@ export function AuthForms({
       <MethodTabs method={method} onChange={setMethod} />
 
       <div className="mt-4">
-        {method === "phone" ? (
-          <PhoneOtpForm isLogin={isLogin} redirectTo={sanitizedRedirectTo} />
-        ) : method === "email-otp" ? (
+        {method === "email-otp" ? (
           <EmailOtpForm isLogin={isLogin} redirectTo={sanitizedRedirectTo} />
         ) : (
           <form onSubmit={onSubmit} className="space-y-3">

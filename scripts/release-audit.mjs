@@ -68,7 +68,7 @@ function checkEnvExample() {
   const envFile = envCandidates.find((file) => exists(file));
   assert(envFile, "Missing .env.example (or .env.local.example)");
   const source = fs.readFileSync(path.join(root, envFile), "utf8");
-  const requiredKeys = ["NEXT_PUBLIC_APP_URL", "NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_ANON_KEY"];
+  const requiredKeys = ["NEXT_PUBLIC_APP_URL","SUPABASE_URL","NEXT_PUBLIC_SUPABASE_URL","SUPABASE_ANON_KEY","NEXT_PUBLIC_SUPABASE_ANON_KEY","SUPABASE_SERVICE_ROLE_KEY","MM_SESSION_SECRET","STRIPE_SECRET_KEY","STRIPE_WEBHOOK_SECRET","STRIPE_PRICE_STANDARD","STRIPE_PRICE_PRO","STRIPE_PRICE_ELITE"];
   for (const key of requiredKeys) {
     assert(source.includes(key), `Env example missing key: ${key}`);
   }
