@@ -56,11 +56,11 @@ export async function GET(request: Request) {
   return NextResponse.json({
     ok: true,
     items: result.items.slice(from, to).map(serializeExploreProvider),
-    total: result.total,
+    total: result.items.length,
     page,
     pageSize,
-    hasMore: to < result.total,
-    filters,
+    hasMore: to < result.items.length,
+    filters: result.filters,
     meta: {
       cache_hit: cacheHit,
     },

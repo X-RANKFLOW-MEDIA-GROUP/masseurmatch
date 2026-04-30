@@ -25,7 +25,7 @@ export default async function ClientDashboard() {
     <ClientDashboardLayout>
       <div className="grid gap-8 md:grid-cols-3">
         <div className="md:col-span-2 space-y-8">
-          <InquirySummary userId={user.id} />
+          <InquirySummary userEmail={user.email ?? ""} />
           <FavoriteTherapists userId={user.id} />
         </div>
         <div>

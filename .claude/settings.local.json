@@ -9,7 +9,9 @@
       "Bash(gh auth:*)",
       "mcp__claude_ai_Supabase__list_projects",
       "mcp__claude_ai_Supabase__execute_sql",
-      "mcp__claude_ai_Supabase__apply_migration"
+      "mcp__claude_ai_Supabase__apply_migration",
+      "mcp__62546f64-76f6-4716-9428-8891166a51a0__execute_sql",
+      "mcp__62546f64-76f6-4716-9428-8891166a51a0__list_projects"
     ]
   }
 }

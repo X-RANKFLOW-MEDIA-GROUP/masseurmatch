@@ -54,7 +54,7 @@ export async function GET(request: Request) {
     ok: true,
     items: items.map(serializeExploreProvider),
     total: items.length,
-    filters,
+    filters: result.filters,
     meta: {
       cache_hit: cacheHit,
     },

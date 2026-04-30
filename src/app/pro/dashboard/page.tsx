@@ -63,6 +63,7 @@ type ProfileData = {
   id: string;
   status: string;
   is_active: boolean | null;
+  available_now: boolean | null;
   display_name: string | null;
   full_name: string;
   bio: string | null;
@@ -127,6 +128,7 @@ function ProfileStatusBanner({ status }: { status: string }) {
 export default function DashboardHome() {
   const { user } = useAuth();
   const [activeStatus, setActiveStatus] = useState<AvailabilityStatus>("available");
+  const [statusSaving, setStatusSaving] = useState(false);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
 
@@ -140,10 +142,32 @@ export default function DashboardHome() {
 
   useEffect(() => {
     requestJson<{ ok: boolean; profile: ProfileData | null }>("/api/pro/profile")
-      .then((data) => setProfile(data.profile))
+      .then((data) => {
+        setProfile(data.profile);
+        if (data.profile?.available_now) {
+          setActiveStatus("available");
+        } else if (data.profile?.is_active === false) {
+          setActiveStatus("hidden");
+        }
+      })
       .catch(() => null)
       .finally(() => setProfileLoading(false));
   }, []);
+
+  async function handleStatusChange(status: AvailabilityStatus) {
+    setActiveStatus(status);
+    setStatusSaving(true);
+    try {
+      await requestJson("/api/pro/availability", {
+        method: "POST",
+        body: JSON.stringify({ status }),
+      });
+    } catch {
+      // status updated optimistically; API failure is non-fatal
+    } finally {
+      setStatusSaving(false);
+    }
+  }
 
   const completion = computeCompletion(profile);
   const profileStatus = profile?.status ?? "draft";
@@ -251,8 +275,9 @@ export default function DashboardHome() {
                 return (
                   <button
                     key={option.key}
-                    onClick={() => setActiveStatus(option.key)}
-                    className={`flex flex-col items-center justify-center gap-2 border p-4 transition-all duration-300 ${
+                    onClick={() => handleStatusChange(option.key)}
+                    disabled={statusSaving}
+                    className={`flex flex-col items-center justify-center gap-2 border p-4 transition-all duration-300 disabled:opacity-60 ${
                       isActive ? colors.active : colors.idle
                     }`}
                   >
