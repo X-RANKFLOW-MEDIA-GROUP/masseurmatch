@@ -267,10 +267,12 @@ export default function PhotoManagerPage() {
           throw new Error(insertError?.message || "Nao foi possivel registrar a foto.");
         }
 
+        const insertedPhoto = photoRecord as { id: string };
+
         const { error: queueInsertError } = await supabase.from("moderation_queue").insert({
           profile_id: profile.id,
           user_id: profile.user_id,
-          target_id: photoRecord.id,
+          target_id: insertedPhoto.id,
           item_type: "photo",
           source: "pro_photos",
           field_name: null,
@@ -279,7 +281,7 @@ export default function PhotoManagerPage() {
           moderation_provider: "sightengine",
           moderation_reason: "queued_for_ai_review",
           snapshot: {
-            photoId: photoRecord.id,
+            photoId: insertedPhoto.id,
             imageUrl,
             isPrimary: photos.length === 0 && index === 0,
             sortOrder: nextPosition,
@@ -297,7 +299,7 @@ export default function PhotoManagerPage() {
           "moderate-photo",
           {
             body: {
-              photo_id: photoRecord.id,
+              photo_id: insertedPhoto.id,
               image_url: imageUrl,
             },
           },
@@ -311,7 +313,7 @@ export default function PhotoManagerPage() {
               moderation_status: "pending",
               moderation_reason: "manual_review_required",
             })
-            .eq("id", photoRecord.id);
+            .eq("id", insertedPhoto.id);
         } else if (moderationData?.approved === false) {
           flaggedCount += 1;
         } else {

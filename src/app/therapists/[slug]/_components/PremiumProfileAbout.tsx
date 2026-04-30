@@ -19,6 +19,9 @@ export function PremiumProfileAbout({ profile, reviews = [] }: Props) {
   const educationText = Array.isArray(profile.education)
     ? profile.education.map((item) => (typeof item === "string" ? item : item.label || item.institution || "")).filter(Boolean).join(", ")
     : profile.education;
+  const trainingEntries = Array.isArray(profile.training)
+    ? profile.training.filter((item): item is Exclude<(typeof profile.training)[number], string> => typeof item === "object" && item !== null)
+    : [];
   const ratedReviews = reviews.filter((r) => typeof r.rating === "number");
   const avgRating = ratedReviews.length > 0 
     ? (ratedReviews.reduce((sum, r) => sum + (r.rating as number), 0) / ratedReviews.length).toFixed(1)
@@ -110,8 +113,8 @@ export function PremiumProfileAbout({ profile, reviews = [] }: Props) {
           {/* Training / Education */}
           <div className="pp-sidebar-card">
             <h4>Training & Education</h4>
-            {profile.training && profile.training.length > 0 ? (
-              profile.training.map((t, i) => (
+            {trainingEntries?.length > 0 ? (
+              trainingEntries.map((t, i) => (
                 <div key={i} className="flex gap-3 items-start mb-3 last:mb-0">
                   <div className="w-9 h-9 rounded-lg bg-[rgba(30,75,143,0.3)] flex items-center justify-center flex-shrink-0">
                     <Award className="w-4 h-4 text-[#7ab3ff]" />
