@@ -65,8 +65,13 @@ export async function GET(request: NextRequest) {
     if (stripeSession.status === "verified") {
       await adminClient
         .from("profiles")
-        .update({ is_verified_identity: true })
-        .eq("user_id", userId);
+        .update({
+          is_verified_identity: true,
+          verification_status: "verified",
+          status: "approved",
+        })
+        .eq("user_id", userId)
+        .in("status", ["pending", "pending_approval"]);
     }
 
     return NextResponse.json({
