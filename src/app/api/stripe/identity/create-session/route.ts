@@ -53,8 +53,11 @@ export async function POST(request: NextRequest) {
     }
 
     const stripe = getStripe();
+    const origin = request.nextUrl.origin;
+    const returnUrl = `${origin}/signup/verify?identity_return=1`;
     const verificationSession = await stripe.identity.verificationSessions.create({
       type: "document",
+      return_url: returnUrl,
       metadata: {
         userId: targetUserId,
         email: targetEmail,
