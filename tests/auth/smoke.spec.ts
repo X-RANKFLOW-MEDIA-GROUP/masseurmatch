@@ -50,6 +50,16 @@ test.describe("Auth pages smoke", () => {
     ).toBeVisible();
   });
 
+  test("auth pages do not expose legacy email OTP UI", async ({ page }) => {
+    for (const route of ["/login", "/register"]) {
+      await page.goto(route);
+
+      await expect(page.getByText(/send otp|one-time password|verify & continue/i)).toHaveCount(0);
+      await expect(page.locator('input[autocomplete="one-time-code"]')).toHaveCount(0);
+      await expect(page.locator('button', { hasText: /otp/i })).toHaveCount(0);
+    }
+  });
+
   test("/login shows forgot password link", async ({ page }) => {
     await page.goto("/login");
 
@@ -72,11 +82,9 @@ test.describe("Auth pages smoke", () => {
     await expect(signInLink).toHaveAttribute("href", "/login");
   });
 
-  // --- NOVOS TESTES DE REGRESSÃO: RESET E PRO ONBOARDING ---
-
   test("/forgot-password renders reset form", async ({ page }) => {
     await page.goto("/forgot-password");
-    
+
     await expect(page).not.toHaveURL(/\/(404|500)/);
 
     // Email field
@@ -92,16 +100,16 @@ test.describe("Auth pages smoke", () => {
 
   test("/pro/join renders marketing/join page for signed out users", async ({ page }) => {
     await page.goto("/pro/join");
-    
+
     await expect(page).not.toHaveURL(/\/(404|500)/);
-    // Garante que a tag main renderizou corretamente sem quebrar
-    await expect(page.locator('main')).toBeVisible();
+    // Ensures the main tag rendered correctly without breaking.
+    await expect(page.locator("main")).toBeVisible();
   });
 
   test("/pro/dashboard redirects unauthenticated users to login", async ({ page }) => {
     await page.goto("/pro/dashboard");
-    
-    // Verifica o client auth gate (deve redirecionar para o login passando a rota de origem no query param)
+
+    // Verifies the client auth gate redirects to login with the source route in the query string.
     await expect(page).toHaveURL(/.*\/login\?redirect=.*pro.*dashboard/i);
   });
 });
