@@ -47,7 +47,8 @@ type TherapistProfile = {
 export default function ApprovalDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const profileId = params.id as string;
+  const rawProfileId = params?.id;
+  const profileId = Array.isArray(rawProfileId) ? rawProfileId[0] : rawProfileId ?? "";
 
   const [profile, setProfile] = useState<TherapistProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -55,6 +56,11 @@ export default function ApprovalDetailPage() {
   const [adminNotes, setAdminNotes] = useState("");
 
   useEffect(() => {
+    if (!profileId) {
+      setLoading(false);
+      return;
+    }
+
     requestJson<{ ok: boolean; profile: TherapistProfile }>(`/api/admin/approvals/${profileId}`)
       .then((data) => {
         setProfile(data.profile);
@@ -67,6 +73,8 @@ export default function ApprovalDetailPage() {
   }, [profileId]);
 
   async function handleApprove() {
+    if (!profileId) return;
+
     setActioning(true);
     try {
       await requestJson(`/api/admin/approvals/${profileId}`, {
@@ -82,6 +90,8 @@ export default function ApprovalDetailPage() {
   }
 
   async function handleReject() {
+    if (!profileId) return;
+
     setActioning(true);
     try {
       await requestJson(`/api/admin/approvals/${profileId}`, {
@@ -97,6 +107,8 @@ export default function ApprovalDetailPage() {
   }
 
   async function handleRequestChanges() {
+    if (!profileId) return;
+
     setActioning(true);
     try {
       await requestJson(`/api/admin/approvals/${profileId}`, {
