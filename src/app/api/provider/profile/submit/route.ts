@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       .update({
         profile_status: "pending_approval",
         visibility_status: "hidden",
-        pending_approval_at: now,
+        submitted_at: now,
         updated_at: now,
       })
       .eq("user_id", session.userId);
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
         profile_id: profile.id,
         user_id: session.userId,
         status: "pending_approval",
-        pending_approval_at: now,
+        submitted_at: now,
         updated_at: now,
       },
       { onConflict: "profile_id" }
