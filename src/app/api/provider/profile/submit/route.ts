@@ -30,9 +30,9 @@ export async function POST(request: Request) {
     const { error: updateError } = await adminClient
       .from("profiles")
       .update({
-        profile_status: "submitted",
+        profile_status: "pending_approval",
         visibility_status: "hidden",
-        submitted_at: now,
+        pending_approval_at: now,
         updated_at: now,
       })
       .eq("user_id", session.userId);
@@ -44,8 +44,8 @@ export async function POST(request: Request) {
       {
         profile_id: profile.id,
         user_id: session.userId,
-        status: "submitted",
-        submitted_at: now,
+        status: "pending_approval",
+        pending_approval_at: now,
         updated_at: now,
       },
       { onConflict: "profile_id" }

@@ -10,7 +10,7 @@ import { resendConfirmationMutation } from "@/app/_lib/mutations";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-type AuthMethod = "email" | "email-otp";
+type AuthMethod = "email";
 
 /* ─────────── Social OAuth ─────────── */
 
@@ -75,8 +75,7 @@ function OrDivider() {
 function MethodTabs({ method, onChange }: { method: AuthMethod; onChange: (m: AuthMethod) => void }) {
   const tabs: { key: AuthMethod; label: string }[] = [
     { key: "email", label: "Email & Password" },
-    { key: "email-otp", label: "Email OTP" },
-  ];
+      ];
   return (
     <div className="flex gap-1 rounded-lg border border-border bg-secondary/40 p-1 text-xs font-medium">
       {tabs.map((t) => (
@@ -345,14 +344,8 @@ export function AuthForms({
 
       <OrDivider />
 
-      {/* Method tabs */}
-      <MethodTabs method={method} onChange={setMethod} />
-
       <div className="mt-4">
-        {method === "email-otp" ? (
-          <EmailOtpForm isLogin={isLogin} redirectTo={sanitizedRedirectTo} />
-        ) : (
-          <form onSubmit={onSubmit} className="space-y-3">
+        <form onSubmit={onSubmit} className="space-y-3">
             {!isLogin ? (
               <AppInput
                 aria-label="Full name"
@@ -407,7 +400,6 @@ export function AuthForms({
                 : (isLogin ? "Sign in" : "Create account")}
             </AppButton>
           </form>
-        )}
       </div>
 
       <div className="mt-5 text-center text-sm text-muted-foreground">

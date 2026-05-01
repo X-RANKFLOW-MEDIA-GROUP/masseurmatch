@@ -75,7 +75,7 @@ export default function SignupResubmitPage() {
         throw new Error(body.error ?? "Resubmission failed.");
       }
 
-      setSubmissionStatus("submitted");
+      setSubmissionStatus("pending_approval");
       router.push("/signup/pending");
     } catch (err: any) {
       setError(err.message);

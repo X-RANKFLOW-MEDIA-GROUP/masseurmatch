@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 const STATUS_ITEMS = [
   { icon: CheckCircle2, label: "Account created", done: true },
   { icon: ShieldCheck, label: "Identity verified", done: true },
-  { icon: Send, label: "Profile submitted", done: true },
+  { icon: Send, label: "Profile pending_approval", done: true },
   { icon: Clock, label: "Review in progress", done: false },
 ];
 
