@@ -1,4 +1,4 @@
-import { MapPin, MapIcon, Car } from "lucide-react";
+import { MapPin, Car } from "lucide-react";
 import type { PublicTherapist } from "@/app/_lib/directory";
 
 interface Props {
