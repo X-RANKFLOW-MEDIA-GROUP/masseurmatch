@@ -35,7 +35,7 @@ const disclaimers: DisclaimerCard[] = [
   {
     icon: FileText,
     title: "Provider-owned listings",
-    body: "Profile content, including bios, pricing, photos, and service descriptions, is submitted by providers. MasseurMatch does not guarantee that listing content is accurate, professional, or lawful.",
+    body: "Profile content, including bios, pricing, photos, and service descriptions, is pending_approval by providers. MasseurMatch does not guarantee that listing content is accurate, professional, or lawful.",
   },
   {
     icon: Stethoscope,
