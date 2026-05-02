@@ -11,10 +11,10 @@ export async function GET(
     {
       cookies: {
         getAll() {
-          return request.cookies.getSetCookie().map((cookie) => {
-            const [name, ...rest] = cookie.split("=");
-            return { name, value: rest.join("=") };
-          });
+          return request.cookies.getAll().map(({ name, value }) => ({
+            name,
+            value,
+          }));
         },
         setAll() {},
       },
@@ -101,10 +101,10 @@ export async function POST(
     {
       cookies: {
         getAll() {
-          return request.cookies.getSetCookie().map((cookie) => {
-            const [name, ...rest] = cookie.split("=");
-            return { name, value: rest.join("=") };
-          });
+          return request.cookies.getAll().map(({ name, value }) => ({
+            name,
+            value,
+          }));
         },
         setAll() {},
       },

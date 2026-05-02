@@ -8,10 +8,10 @@ export async function GET(request: NextRequest) {
     {
       cookies: {
         getAll() {
-          return request.cookies.getSetCookie().map((cookie) => {
-            const [name, ...rest] = cookie.split("=");
-            return { name, value: rest.join("=") };
-          });
+          return request.cookies.getAll().map(({ name, value }) => ({
+            name,
+            value,
+          }));
         },
         setAll() {},
       },
