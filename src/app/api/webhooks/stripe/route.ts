@@ -18,6 +18,11 @@ const VISIBILITY_LEVELS: Record<SubscriptionTier, number> = {
   elite: 4,
 };
 
+const WEBHOOK_RATE_LIMIT = { windowMs: 60_000, max: 120 };
+const webhookHits = new Map<string, { count: number; resetAt: number }>();
+const processedEvents = new Map<string, number>();
+const EVENT_TTL_MS = 24 * 60 * 60 * 1000;
+
 function priceIdToTier(priceId: string | undefined): SubscriptionTier | null {
   if (!priceId) return null;
   const standardPrice = process.env.STRIPE_PRICE_STANDARD;
@@ -48,6 +53,7 @@ type StripeEventObject = {
 };
 
 type StripeEvent = {
+  id?: string;
   type: string;
   data: {
     object: StripeEventObject;
@@ -74,27 +80,71 @@ function resolveTier(obj: StripeEventObject, subscriptionStatus?: string): Subsc
 
 function getStripeClient() {
   if (!hasStripe || !env.stripeSecretKey) return null;
-  return new Stripe(env.stripeSecretKey, { apiVersion: "2025-08-27.basil" });
+  return new Stripe(env.stripeSecretKey, { apiVersion: "2024-11-20.acacia" });
 }
 
-async function updateProfileBilling(userId: string, updates: any) {
+function getClientIp(request: Request): string {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const existing = webhookHits.get(ip);
+  if (!existing || now >= existing.resetAt) {
+    webhookHits.set(ip, { count: 1, resetAt: now + WEBHOOK_RATE_LIMIT.windowMs });
+    return false;
+  }
+
+  if (existing.count >= WEBHOOK_RATE_LIMIT.max) return true;
+  existing.count += 1;
+  return false;
+}
+
+function cleanupProcessedEvents() {
+  const now = Date.now();
+  for (const [id, timestamp] of processedEvents.entries()) {
+    if (now - timestamp > EVENT_TTL_MS) {
+      processedEvents.delete(id);
+    }
+  }
+}
+
+async function updateProfileBilling(userId: string, updates: Record<string, unknown>) {
   const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !serviceKey) return;
+  if (!url || !serviceKey) {
+    return { ok: false, status: 500, error: "Supabase env vars missing" } as const;
+  }
 
-  await fetch(`${url}/rest/v1/profiles?user_id=eq.${userId}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      apikey: serviceKey,
-      Authorization: `Bearer ${serviceKey}`,
-      Prefer: "return=minimal",
-    },
-    body: JSON.stringify({
-      ...updates,
-      updated_at: new Date().toISOString(),
-    }),
-  });
+  try {
+    const response = await fetch(`${url}/rest/v1/profiles?user_id=eq.${userId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify({
+        ...updates,
+        updated_at: new Date().toISOString(),
+      }),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      return { ok: false, status: response.status, error: text || "Supabase update failed" } as const;
+    }
+
+    return { ok: true } as const;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return { ok: false, status: 500, error: message } as const;
+  }
 }
 
 export async function GET() {
@@ -105,6 +155,10 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (isRateLimited(getClientIp(request))) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const stripe = getStripeClient();
   const stripeSignature = request.headers.get("stripe-signature") ?? "";
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? "";
@@ -120,10 +174,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Webhook secret not configured." }, { status: 400 });
     }
     try {
-      event = stripe.webhooks.constructEvent(rawBody, stripeSignature, webhookSecret) as any;
+      event = stripe.webhooks.constructEvent(rawBody, stripeSignature, webhookSecret) as StripeEvent;
     } catch {
       return NextResponse.json({ error: "Invalid webhook signature." }, { status: 400 });
     }
+  }
+
+  cleanupProcessedEvents();
+  if (event.id && processedEvents.has(event.id)) {
+    return NextResponse.json({ ok: true, skipped: "duplicate_event" });
   }
 
   const obj = event.data?.object;
@@ -133,14 +192,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, skipped: "no_user_id" });
   }
 
+  let updateResult: { ok: boolean; status?: number; error?: string } = { ok: true };
+
   if (event.type === "checkout.session.completed" || event.type === "customer.subscription.updated") {
     const status = obj?.status || "active";
     const tier = resolveTier(obj, status);
-    const subscriptionId = (obj as any).subscription || (obj as any).id;
-    
-    const updates: any = {
+    const subscriptionId = obj.subscription || obj.id;
+
+    const updates: Record<string, unknown> = {
       subscription_tier: tier,
-      _tier: tier, // Legacy sync
+      _tier: tier,
       photo_limit: PHOTO_LIMITS[tier],
       visibility_level: VISIBILITY_LEVELS[tier],
       stripe_customer_id: obj.customer,
@@ -151,9 +212,9 @@ export async function POST(request: Request) {
       updates.current_period_end = new Date(obj.current_period_end * 1000).toISOString();
     }
 
-    await updateProfileBilling(userId, updates);
+    updateResult = await updateProfileBilling(userId, updates);
   } else if (event.type === "customer.subscription.deleted") {
-    await updateProfileBilling(userId, {
+    updateResult = await updateProfileBilling(userId, {
       subscription_tier: "free",
       _tier: "free",
       photo_limit: 2,
@@ -161,6 +222,17 @@ export async function POST(request: Request) {
       stripe_subscription_id: null,
       current_period_end: null,
     });
+  }
+
+  if (!updateResult.ok) {
+    return NextResponse.json(
+      { error: "Failed to persist Stripe webhook update", details: updateResult.error },
+      { status: updateResult.status ?? 500 },
+    );
+  }
+
+  if (event.id) {
+    processedEvents.set(event.id, Date.now());
   }
 
   return NextResponse.json({ ok: true });

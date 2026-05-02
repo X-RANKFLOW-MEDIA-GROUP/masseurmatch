@@ -22,8 +22,10 @@ export type SubmissionStatus =
   | "draft"
   | "submitted"
   | "under_review"
+  | "pending_approval"
   | "approved"
   | "rejected";
+
 
 export type BillingStatus =
   | "not_started"
