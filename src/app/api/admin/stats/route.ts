@@ -8,10 +8,7 @@ export async function GET(request: NextRequest) {
     {
       cookies: {
         getAll() {
-          return request.cookies.getAll().map(({ name, value }) => ({
-            name,
-            value,
-          }));
+          return request.cookies.getAll().map(({ name, value }) => ({ name, value }));
         },
         setAll() {},
       },
