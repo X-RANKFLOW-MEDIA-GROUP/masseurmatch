@@ -47,7 +47,8 @@ type TherapistProfile = {
 export default function ApprovalDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const profileId = params.id as string;
+  const rawProfileId = params?.id;
+  const profileId = Array.isArray(rawProfileId) ? rawProfileId[0] : rawProfileId ?? "";
 
   const [profile, setProfile] = useState<TherapistProfile | null>(null);
   const [loading, setLoading] = useState(true);

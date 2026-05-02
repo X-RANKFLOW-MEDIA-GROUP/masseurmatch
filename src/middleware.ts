@@ -13,7 +13,7 @@ const decoder = new TextDecoder();
 type MiddlewareSession = {
   userId: string;
   email: string;
-  role: "admin" | "provider" | "client" | null;
+  role: "admin" | "provider" | "therapist" | "client" | null;
   expiresAt: string;
 };
 
@@ -297,7 +297,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
-    if (session.role !== "provider") {
+    if (session.role !== "provider" && session.role !== "therapist") {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
