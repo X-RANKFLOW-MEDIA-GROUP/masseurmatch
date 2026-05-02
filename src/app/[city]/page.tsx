@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     ? `${inventoryCount}+ Verified Male Massage Therapists in ${cityLabel}`
     : `Verified Male Massage Therapists in ${cityLabel}`;
 
-  const description = `Find trusted, verified male massage therapists in ${cityLabel}. LGBTQ+-friendly directory with identity-verified professionals, real reviews, and direct booking. Compare rates, specialties & availability.`;
+  const description = `Find trusted, verified male massage therapists in ${cityLabel}. LGBTQ+-friendly directory with identity-verified professionals, real reviews, and direct contact. Compare rates, specialties & availability.`;
 
   return createPageMetadata({
     title,

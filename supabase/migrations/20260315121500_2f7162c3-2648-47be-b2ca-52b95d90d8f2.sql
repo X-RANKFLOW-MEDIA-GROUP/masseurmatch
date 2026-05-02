@@ -19,12 +19,8 @@ BEGIN
   _url := current_setting('app.settings.supabase_url', true);
   _anon_key := current_setting('app.settings.supabase_anon_key', true);
 
-  IF _url IS NULL OR _url = '' THEN
-    _url := 'https://cnycelkfbtzfnphbeurd.supabase.co';
-  END IF;
-
-  IF _anon_key IS NULL OR _anon_key = '' THEN
-    _anon_key := 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNueWNlbGtmYnR6Zm5waGJldXJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNzE1OTEsImV4cCI6MjA4Njk0NzU5MX0.NTLP8YbvjNhZGIrJPFrijsb1UZr5qjlcCkSl-UhSfCU';
+  IF _url IS NULL OR _url = '' OR _anon_key IS NULL OR _anon_key = '' THEN
+    RAISE EXCEPTION 'Set app.settings.supabase_url and app.settings.supabase_anon_key before scheduling lifecycle edge function jobs.';
   END IF;
 
   PERFORM net.http_post(

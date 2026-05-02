@@ -36,8 +36,8 @@ function defaultFaq(profile: PublicTherapist): ProfileFaqItem[] {
         : "Pricing depends on duration and service type. Contact me for current rates.",
     },
     {
-      question: "Are same-day appointments available?",
-      answer: "Yes, availability depends on schedule and current bookings.",
+      question: "Is same-day availability offered?",
+      answer: "Yes, availability depends on the provider's schedule and direct confirmation.",
     },
     {
       question: "What areas do you serve?",
@@ -48,7 +48,7 @@ function defaultFaq(profile: PublicTherapist): ProfileFaqItem[] {
     {
       question: "Do you travel to other cities?",
       answer: Array.isArray(profile.travel_schedule) && profile.travel_schedule.length > 0
-        ? "Yes, I regularly travel and accept bookings in listed travel locations."
+        ? "Yes, I regularly travel and accept direct inquiries in listed travel locations."
         : "Contact me to discuss travel availability.",
     },
     {

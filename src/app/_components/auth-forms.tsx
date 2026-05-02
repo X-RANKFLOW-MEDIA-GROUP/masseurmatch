@@ -14,7 +14,7 @@ type AuthMethod = "email";
 
 /* ─────────── Social OAuth ─────────── */
 
-function SocialButtons({ label }: { label: string }) {
+function SocialButtons({ label, redirectTo = "/pro/dashboard" }: { label: string; redirectTo?: string }) {
   const [loading, setLoading] = useState<string | null>(null);
 
   const handleOAuth = async (provider: "google" | "apple") => {
@@ -22,7 +22,7 @@ function SocialButtons({ label }: { label: string }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/api/auth/callback`,
+        redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(redirectTo)}`,
       },
     });
     if (error) setLoading(null);
@@ -339,7 +339,7 @@ export function AuthForms({
 
       {/* Social login/signup */}
       <div className="mt-5">
-        <SocialButtons label={isLogin ? "Sign in" : "Sign up"} />
+        <SocialButtons label={isLogin ? "Sign in" : "Sign up"} redirectTo={isLogin ? sanitizedRedirectTo : "/pro/onboard"} />
       </div>
 
       <OrDivider />

@@ -26,10 +26,18 @@ function getServiceRoleKey() {
   return process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 }
 
+function sanitizeRedirect(next: string | null): string {
+  const fallback = "/pro/dashboard";
+  if (!next) return fallback;
+  // Must start with "/" and not "//" (protocol-relative URL attack)
+  if (!next.startsWith("/") || next.startsWith("//")) return fallback;
+  return next;
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") || "/pro/dashboard";
+  const next = sanitizeRedirect(searchParams.get("next"));
 
   if (!code) {
     return NextResponse.redirect(new URL("/login?error=no_code", origin));

@@ -43,7 +43,7 @@ Garantir que o produto esteja pronto para produção com qualidade técnica, UX,
 - `pnpm typecheck`: passou após correções de imports quebrados.
 - `pnpm build`: passou (Next.js 15.5.12; 616 páginas geradas).
 - `npx playwright test tests/api/profiles-listing.spec.ts tests/redirects.spec.ts` (baseURL `http://127.0.0.1:5000`): 35/35 testes passando.
-- `node scripts/_test-login.mjs`: login admin e therapist validados com status 200.
+- `pnpm test`: API smoke test validates the auth, contact, OG, admin, pro and logout routes.
 
 ### Achados priorizados
 
