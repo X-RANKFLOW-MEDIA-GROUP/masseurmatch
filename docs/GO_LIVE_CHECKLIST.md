@@ -9,12 +9,14 @@ Run these commands from the repository root:
 ```bash
 corepack enable
 corepack prepare pnpm@10.32.1 --activate
-pnpm install
+pnpm install --frozen-lockfile
 pnpm lint
 pnpm typecheck
 pnpm test
 pnpm validate:sitemap
+pnpm validate:db-contract
 pnpm release:audit
+pnpm release:check
 pnpm build
 ```
 
@@ -213,3 +215,9 @@ Go live only when:
 6. Stripe webhook is configured.
 7. Supabase production env is configured.
 8. Legal pages are live.
+
+
+## 12. Launch constraints
+
+- Phone OTP is disabled for public launch until provider OTP configuration is finalized.
+- Apply `supabase/PRODUCTION_SCHEMA_LOCK.sql` before deployment and block release if `pnpm validate:db-contract` fails.
