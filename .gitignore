@@ -49,3 +49,6 @@ tmp/
 
 # Generated Supabase manual migration bundle
 supabase/manual/apply_all_migrations.sql
+
+# Local security tooling binaries
+bin/

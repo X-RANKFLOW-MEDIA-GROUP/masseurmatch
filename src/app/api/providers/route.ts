@@ -60,7 +60,7 @@ export async function GET(request: Request) {
     page,
     pageSize,
     hasMore: to < result.items.length,
-    filters,
+    filters: result.filters,
     meta: {
       cache_hit: cacheHit,
     },

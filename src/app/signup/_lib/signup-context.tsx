@@ -11,10 +11,6 @@ import {
 import type { SignupPlanTier } from "./plans";
 import { useAuth } from "@/contexts/AuthContext";
 
-/* ------------------------------------------------------------------ */
-/*  Types                                                              */
-/* ------------------------------------------------------------------ */
-
 export type IdentityVerificationStatus =
   | "not_started"
   | "processing"
@@ -26,8 +22,10 @@ export type SubmissionStatus =
   | "draft"
   | "submitted"
   | "under_review"
+  | "pending_approval"
   | "approved"
   | "rejected";
+
 
 export type BillingStatus =
   | "not_started"
@@ -45,13 +43,20 @@ export interface SignupProfile {
   certifications: string;
   city: string;
   state: string;
+  zipCode: string;
   neighborhood: string;
+  locationDescription: string;
+  serviceAreaCities: string[];
+  landmarks: string[];
   visitingCities: string[];
   locationType: "incall" | "outcall" | "both" | "";
   serviceCategories: string[];
   sessionLengths: string[];
   startingPrice: string;
   addOns: string;
+  heightInches: string;
+  weightLb: string;
+  bodyType: string;
   availableNow: boolean;
   profilePhoto: File | null;
   galleryPhotos: File[];
@@ -59,35 +64,22 @@ export interface SignupProfile {
 }
 
 export interface SignupState {
-  /* Plan */
   selectedPlanTier: SignupPlanTier | null;
-
-  /* Account */
   accountCreated: boolean;
   fullName: string;
   displayName: string;
   email: string;
   phone: string;
-
-  /* Verification */
   emailVerified: boolean;
   phoneVerified: boolean;
   identityVerificationStatus: IdentityVerificationStatus;
   stripeIdentitySessionId: string | null;
-
-  /* Profile */
   profile: SignupProfile;
   profileCompleted: boolean;
-
-  /* Submission */
   submissionStatus: SubmissionStatus;
   moderationNotes: string[];
-
-  /* Billing */
   billingStatus: BillingStatus;
   stripeCustomerId: string | null;
-
-  /* Terms */
   termsAccepted: boolean;
   complianceAcknowledged: boolean;
 }
@@ -101,13 +93,20 @@ const emptyProfile: SignupProfile = {
   certifications: "",
   city: "",
   state: "",
+  zipCode: "",
   neighborhood: "",
+  locationDescription: "",
+  serviceAreaCities: [],
+  landmarks: [],
   visitingCities: [],
   locationType: "",
   serviceCategories: [],
   sessionLengths: [],
   startingPrice: "",
   addOns: "",
+  heightInches: "",
+  weightLb: "",
+  bodyType: "",
   availableNow: false,
   profilePhoto: null,
   galleryPhotos: [],
@@ -149,10 +148,6 @@ function createPersistedStateSnapshot(state: SignupState): SignupState {
   };
 }
 
-/* ------------------------------------------------------------------ */
-/*  Context                                                            */
-/* ------------------------------------------------------------------ */
-
 interface SignupContextType {
   state: SignupState;
   setPlan: (tier: SignupPlanTier) => void;
@@ -190,9 +185,7 @@ export function SignupProvider({ children }: { children: ReactNode }) {
     const persisted = window.sessionStorage.getItem(SIGNUP_STATE_STORAGE_KEY);
     const bootstrap = window.sessionStorage.getItem(SIGNUP_BOOTSTRAP_STORAGE_KEY);
 
-    if (!persisted && !bootstrap) {
-      return;
-    }
+    if (!persisted && !bootstrap) return;
 
     try {
       const nextState = persisted ? (JSON.parse(persisted) as Partial<SignupState>) : {};
@@ -202,6 +195,11 @@ export function SignupProvider({ children }: { children: ReactNode }) {
         ...current,
         ...nextState,
         ...bootstrapState,
+        profile: {
+          ...current.profile,
+          ...(nextState.profile || {}),
+          ...(bootstrapState.profile || {}),
+        },
       }));
     } catch {
       // Ignore malformed persisted state from older builds.
@@ -212,11 +210,7 @@ export function SignupProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-
-    window.sessionStorage.setItem(
-      SIGNUP_STATE_STORAGE_KEY,
-      JSON.stringify(createPersistedStateSnapshot(state)),
-    );
+    window.sessionStorage.setItem(SIGNUP_STATE_STORAGE_KEY, JSON.stringify(createPersistedStateSnapshot(state)));
   }, [state]);
 
   useEffect(() => {
@@ -258,90 +252,27 @@ export function SignupProvider({ children }: { children: ReactNode }) {
     });
   }, [user]);
 
-  const setPlan = useCallback(
-    (tier: SignupPlanTier) => setState((s) => ({ ...s, selectedPlanTier: tier })),
-    [],
-  );
-
-  const setAccountInfo = useCallback(
-    (info: { fullName: string; displayName: string; email: string; phone: string }) =>
-      setState((s) => ({ ...s, ...info })),
-    [],
-  );
-
-  const markAccountCreated = useCallback(
-    () => setState((s) => ({ ...s, accountCreated: true })),
-    [],
-  );
-
-  const markEmailVerified = useCallback(
-    () => setState((s) => ({ ...s, emailVerified: true })),
-    [],
-  );
-
-  const markPhoneVerified = useCallback(
-    () => setState((s) => ({ ...s, phoneVerified: true })),
-    [],
-  );
-
-  const setIdentityStatus = useCallback(
-    (status: IdentityVerificationStatus) =>
-      setState((s) => ({ ...s, identityVerificationStatus: status })),
-    [],
-  );
-
-  const setStripeIdentitySessionId = useCallback(
-    (id: string) => setState((s) => ({ ...s, stripeIdentitySessionId: id })),
-    [],
-  );
-
-  const updateProfile = useCallback(
-    (updates: Partial<SignupProfile>) =>
-      setState((s) => ({ ...s, profile: { ...s.profile, ...updates } })),
-    [],
-  );
-
-  const markProfileCompleted = useCallback(
-    () => setState((s) => ({ ...s, profileCompleted: true })),
-    [],
-  );
-
-  const setTermsAccepted = useCallback(
-    (v: boolean) => setState((s) => ({ ...s, termsAccepted: v })),
-    [],
-  );
-
-  const setComplianceAcknowledged = useCallback(
-    (v: boolean) => setState((s) => ({ ...s, complianceAcknowledged: v })),
-    [],
-  );
-
-  const setSubmissionStatus = useCallback(
-    (status: SubmissionStatus) => setState((s) => ({ ...s, submissionStatus: status })),
-    [],
-  );
-
-  const setModerationNotes = useCallback(
-    (notes: string[]) => setState((s) => ({ ...s, moderationNotes: notes })),
-    [],
-  );
-
-  const setBillingStatus = useCallback(
-    (status: BillingStatus) => setState((s) => ({ ...s, billingStatus: status })),
-    [],
-  );
-
-  const setStripeCustomerId = useCallback(
-    (id: string) => setState((s) => ({ ...s, stripeCustomerId: id })),
-    [],
-  );
+  const setPlan = useCallback((tier: SignupPlanTier) => setState((s) => ({ ...s, selectedPlanTier: tier })), []);
+  const setAccountInfo = useCallback((info: { fullName: string; displayName: string; email: string; phone: string }) => setState((s) => ({ ...s, ...info })), []);
+  const markAccountCreated = useCallback(() => setState((s) => ({ ...s, accountCreated: true })), []);
+  const markEmailVerified = useCallback(() => setState((s) => ({ ...s, emailVerified: true })), []);
+  const markPhoneVerified = useCallback(() => setState((s) => ({ ...s, phoneVerified: true })), []);
+  const setIdentityStatus = useCallback((status: IdentityVerificationStatus) => setState((s) => ({ ...s, identityVerificationStatus: status })), []);
+  const setStripeIdentitySessionId = useCallback((id: string) => setState((s) => ({ ...s, stripeIdentitySessionId: id })), []);
+  const updateProfile = useCallback((updates: Partial<SignupProfile>) => setState((s) => ({ ...s, profile: { ...s.profile, ...updates } })), []);
+  const markProfileCompleted = useCallback(() => setState((s) => ({ ...s, profileCompleted: true })), []);
+  const setTermsAccepted = useCallback((v: boolean) => setState((s) => ({ ...s, termsAccepted: v })), []);
+  const setComplianceAcknowledged = useCallback((v: boolean) => setState((s) => ({ ...s, complianceAcknowledged: v })), []);
+  const setSubmissionStatus = useCallback((status: SubmissionStatus) => setState((s) => ({ ...s, submissionStatus: status })), []);
+  const setModerationNotes = useCallback((notes: string[]) => setState((s) => ({ ...s, moderationNotes: notes })), []);
+  const setBillingStatus = useCallback((status: BillingStatus) => setState((s) => ({ ...s, billingStatus: status })), []);
+  const setStripeCustomerId = useCallback((id: string) => setState((s) => ({ ...s, stripeCustomerId: id })), []);
 
   const reset = useCallback(() => {
     if (typeof window !== "undefined") {
       window.sessionStorage.removeItem(SIGNUP_BOOTSTRAP_STORAGE_KEY);
       window.sessionStorage.removeItem(SIGNUP_STATE_STORAGE_KEY);
     }
-
     setState(initialState);
   }, []);
 

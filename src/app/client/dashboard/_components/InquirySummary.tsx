@@ -6,14 +6,17 @@ import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Mail, CheckCircle2, Clock3, AlertCircle, ArrowRight } from 'lucide-react';
-import type { Tables } from '@/integrations/supabase/types';
 
-type Inquiry = Pick<
-  Tables<'contact_inquiries'>,
-  'id' | 'therapist_name' | 'therapist_id' | 'status' | 'message' | 'created_at' | 'responded_at'
->;
+type Inquiry = {
+  id: string;
+  therapist_id: string;
+  status: string;
+  message: string;
+  created_at: string;
+  therapist: { display_name: string } | null;
+};
 
-export function InquirySummary({ userId }: { userId: string }) {
+export function InquirySummary({ userEmail }: { userEmail: string }) {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
@@ -22,19 +25,19 @@ export function InquirySummary({ userId }: { userId: string }) {
     async function loadInquiries() {
       const { data, error } = await supabase
         .from('contact_inquiries')
-        .select('id, therapist_name, therapist_id, status, message, created_at, responded_at')
-        .eq('client_id', userId)
+        .select('id, therapist_id, status, message, created_at, therapist:therapists!therapist_id(display_name)')
+        .eq('client_email', userEmail)
         .order('created_at', { ascending: false })
         .limit(5);
 
       if (!error && data) {
-        setInquiries(data);
+        setInquiries(data as unknown as Inquiry[]);
       }
       setLoading(false);
     }
 
     loadInquiries();
-  }, [userId, supabase]);
+  }, [userEmail, supabase]);
 
   const stats = {
     total: inquiries.length,
@@ -83,7 +86,7 @@ export function InquirySummary({ userId }: { userId: string }) {
                 >
                   <div className="flex-1">
                     <div className="font-medium text-slate-900">
-                      {inquiry.therapist_name}
+                      {inquiry.therapist?.display_name ?? "Unknown Therapist"}
                     </div>
                     <div className="line-clamp-1 text-sm text-slate-600">
                       {inquiry.message}
@@ -120,7 +123,7 @@ export function InquirySummary({ userId }: { userId: string }) {
         </div>
 
         <Button variant="outline" asChild className="w-full">
-          <Link href="/client/inquiries">
+          <Link href="/client/dashboard/inquiries">
             View All Inquiries <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>

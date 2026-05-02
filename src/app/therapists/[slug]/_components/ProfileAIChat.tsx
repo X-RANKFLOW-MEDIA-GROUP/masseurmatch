@@ -63,7 +63,7 @@ export function ProfileAIChat({ profile }: Props) {
     
     if (q.includes("incall") || q.includes("your place") || q.includes("location") || q.includes("studio")) {
       if (profile.incall_price) {
-        return `${name} offers incall sessions at their private studio in ${neighborhood || city}. Sessions start at $${profile.incall_price}. The exact address is shared after booking confirmation.`;
+        return `${name} offers incall sessions at their private studio in ${neighborhood || city}. Sessions start at $${profile.incall_price}. The exact address is shared after you contact the provider directly.`;
       }
       return `Contact ${name} directly for information about their incall location and availability.`;
     }

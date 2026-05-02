@@ -85,7 +85,7 @@ export default function SignupReviewPage() {
         throw new Error(body.error ?? "Submission failed. Please try again.");
       }
 
-      setSubmissionStatus("submitted");
+      setSubmissionStatus("pending_approval");
       router.push("/signup/pending");
     } catch (err: any) {
       setError(err.message);

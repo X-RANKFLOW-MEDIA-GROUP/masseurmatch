@@ -72,9 +72,9 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
       <ExplorePageClient
         cities={getCities()}
         hasExplicitLocation={hasExplicitLocation}
-        initialBaseItems={baseResult}
+        initialBaseItems={baseResult.items}
         initialFilters={filters}
-        initialInvalidProviderCount={0}
+        initialInvalidProviderCount={baseResult.invalidProviderCount}
         initialTotal={initialItems.length}
       />
     </>

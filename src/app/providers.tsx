@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import React, { useState } from "react";
 
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -14,8 +14,29 @@ const ChatWidget = dynamic(
   () => import("@/app/_components/chat-widget").then((module) => module.ChatWidget),
   {
     ssr: false,
+    loading: () => null,
   },
 );
+
+class ChatWidgetBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  override componentDidCatch(error: Error) {
+    console.error("Chat widget render failed", error);
+  }
+
+  override render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
@@ -28,7 +49,9 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
             {children}
             <Toaster />
             <Sonner />
-            <ChatWidget />
+            <ChatWidgetBoundary>
+              <ChatWidget />
+            </ChatWidgetBoundary>
           </TooltipProvider>
         </AuthProvider>
       </I18nProvider>

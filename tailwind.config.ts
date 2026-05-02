@@ -6,11 +6,9 @@ const withOpacity = (variableName: string) => `rgb(var(${variableName}) / <alpha
 
 const config: Config = {
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/_components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/mm/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {

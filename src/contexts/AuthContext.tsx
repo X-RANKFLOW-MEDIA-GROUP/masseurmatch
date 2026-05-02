@@ -24,7 +24,7 @@ interface AuthContextType {
   loading: boolean;
   subscription: SubscriptionState;
   refreshSubscription: () => Promise<void>;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null; requiresEmailConfirmation?: boolean; message?: string }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
@@ -200,15 +200,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
       const result = await registerMutation({ email, password, fullName });
-
-      // Registration API already sets the server session cookie.
-      // Try to establish the browser Supabase session, but do not block signup flow on it.
-      await Promise.race([
-        establishClientSession(email, password, result.session),
-        wait(8000),
-      ]).catch(() => null);
-
-      return { error: null };
+      return {
+        error: null,
+        requiresEmailConfirmation: result.requiresEmailConfirmation,
+        message: result.message,
+      };
     } catch (error) {
       return { error: error as Error };
     }

@@ -256,8 +256,14 @@ export const getPublicTherapists = async (filters?: {
 };
 
 export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTherapist | null> => {
+  const sanitizedSlug = slug.trim();
+
+  if (!sanitizedSlug) {
+    return null;
+  }
+
   const { data: profile, error } = await buildPublicTherapistsQuery()
-    .eq("slug", slug)
+    .or(`slug.eq.${sanitizedSlug},id.eq.${sanitizedSlug}`)
     .maybeSingle();
 
   if (error || !profile) return null;

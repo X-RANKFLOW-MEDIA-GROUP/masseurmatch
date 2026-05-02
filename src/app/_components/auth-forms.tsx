@@ -1,19 +1,18 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AppButton, AppInput, Surface } from "@/app/_components/primitives";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useAuth } from "@/contexts/AuthContext";
+import { resendConfirmationMutation } from "@/app/_lib/mutations";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-type AuthMethod = "email" | "phone" | "email-otp";
-
 /* ─────────── Social OAuth ─────────── */
 
-function SocialButtons({ label }: { label: string }) {
+function SocialButtons({ label, redirectTo = "/pro/dashboard" }: { label: string; redirectTo?: string }) {
   const [loading, setLoading] = useState<string | null>(null);
 
   const handleOAuth = async (provider: "google" | "apple") => {
@@ -21,7 +20,7 @@ function SocialButtons({ label }: { label: string }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/api/auth/callback`,
+        redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(redirectTo)}`,
       },
     });
     if (error) setLoading(null);
@@ -69,208 +68,6 @@ function OrDivider() {
   );
 }
 
-/* ─────────── Method Tabs ─────────── */
-
-function MethodTabs({ method, onChange }: { method: AuthMethod; onChange: (m: AuthMethod) => void }) {
-  const tabs: { key: AuthMethod; label: string }[] = [
-    { key: "email", label: "Email & Password" },
-    { key: "phone", label: "Phone OTP" },
-    { key: "email-otp", label: "Email OTP" },
-  ];
-  return (
-    <div className="flex gap-1 rounded-lg border border-border bg-secondary/40 p-1 text-xs font-medium">
-      {tabs.map((t) => (
-        <button
-          key={t.key}
-          type="button"
-          onClick={() => onChange(t.key)}
-          className={`flex-1 rounded-md px-2 py-1.5 transition ${method === t.key ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
-        >
-          {t.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-/* ─────────── Phone OTP Form ─────────── */
-
-function PhoneOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: string }) {
-  const { toast } = useToast();
-  const [phone, setPhone] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const sendOtp = async () => {
-    if (!phone.trim()) return;
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({ phone: phone.trim() });
-    setLoading(false);
-    if (error) {
-      toast({ title: "Could not send OTP", description: error.message, variant: "destructive" });
-      return;
-    }
-    setOtpSent(true);
-    toast({ title: "OTP sent", description: "Check your phone for a text message." });
-  };
-
-  const verifyOtp = async () => {
-    setLoading(true);
-    const { data, error } = await supabase.auth.verifyOtp({ phone: phone.trim(), token: otp, type: "sms" });
-    if (error) {
-      setLoading(false);
-      toast({ title: "Verification failed", description: error.message, variant: "destructive" });
-      return;
-    }
-    // Sync the mm_session cookie so middleware recognises the user
-    if (data.session?.access_token) {
-      await fetch("/api/auth/sync-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ access_token: data.session.access_token }),
-      });
-    }
-    setLoading(false);
-    toast({ title: isLogin ? "Welcome back" : "Account created" });
-    // Use window.location for a full page navigation to ensure cookies are read properly
-    const destination = isLogin ? redirectTo : "/pro/onboard";
-    window.location.href = destination;
-  };
-
-  return (
-    <div className="space-y-3">
-      <AppInput
-        type="tel"
-        aria-label="Phone number"
-        placeholder="+1 (555) 123-4567"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        disabled={otpSent}
-        required
-      />
-      {otpSent ? (
-        <>
-          <AppInput
-            type="text"
-            aria-label="One-time password code"
-            placeholder="Enter 6-digit code"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            maxLength={6}
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            required
-          />
-          <AppButton className="w-full" disabled={loading || otp.length < 6} onClick={verifyOtp}>
-            {loading ? "Verifying…" : "Verify & Continue"}
-          </AppButton>
-          <button type="button" onClick={() => { setOtpSent(false); setOtp(""); }} className="text-xs text-muted-foreground hover:underline">
-            Change phone number
-          </button>
-        </>
-      ) : (
-        <AppButton className="w-full" disabled={loading || !phone.trim()} onClick={sendOtp}>
-          {loading ? "Sending…" : "Send OTP via SMS"}
-        </AppButton>
-      )}
-    </div>
-  );
-}
-
-/* ─────────── Email OTP Form ─────────── */
-
-function EmailOtpForm({ isLogin, redirectTo }: { isLogin: boolean; redirectTo: string }) {
-  const { toast } = useToast();
-  const [email, setEmail] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const sendOtp = async () => {
-    if (!email.trim()) return;
-    setLoading(true);
-    const destination = isLogin ? redirectTo : "/pro/onboard";
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
-      options: {
-        // Ensure clicking the magic link in the email redirects to the correct
-        // destination rather than the bare site URL (which would land on the homepage).
-        emailRedirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(destination)}`,
-      },
-    });
-    setLoading(false);
-    if (error) {
-      toast({ title: "Could not send OTP", description: error.message, variant: "destructive" });
-      return;
-    }
-    setOtpSent(true);
-    toast({ title: "OTP sent", description: "Check your email inbox." });
-  };
-
-  const verifyOtp = async () => {
-    setLoading(true);
-    const { data, error } = await supabase.auth.verifyOtp({ email: email.trim(), token: otp, type: "email" });
-    if (error) {
-      setLoading(false);
-      toast({ title: "Verification failed", description: error.message, variant: "destructive" });
-      return;
-    }
-    // Sync the mm_session cookie so middleware recognises the user
-    if (data.session?.access_token) {
-      await fetch("/api/auth/sync-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ access_token: data.session.access_token }),
-      });
-    }
-    setLoading(false);
-    toast({ title: isLogin ? "Welcome back" : "Account created" });
-    // Use window.location for a full page navigation to ensure cookies are read properly
-    const destination = isLogin ? redirectTo : "/pro/onboard";
-    window.location.href = destination;
-  };
-
-  return (
-    <div className="space-y-3">
-      <AppInput
-        type="email"
-        aria-label="Email address"
-        placeholder="your@email.com"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        disabled={otpSent}
-        required
-      />
-      {otpSent ? (
-        <>
-          <AppInput
-            type="text"
-            aria-label="One-time password code"
-            placeholder="Enter 6-digit code"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            maxLength={6}
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            required
-          />
-          <AppButton className="w-full" disabled={loading || otp.length < 6} onClick={verifyOtp}>
-            {loading ? "Verifying…" : "Verify & Continue"}
-          </AppButton>
-          <button type="button" onClick={() => { setOtpSent(false); setOtp(""); }} className="text-xs text-muted-foreground hover:underline">
-            Change email
-          </button>
-        </>
-      ) : (
-        <AppButton className="w-full" disabled={loading || !email.trim()} onClick={sendOtp}>
-          {loading ? "Sending…" : "Send OTP via Email"}
-        </AppButton>
-      )}
-    </div>
-  );
-}
-
 /* ─────────── Main AuthForms ─────────── */
 
 export function AuthForms({
@@ -288,7 +85,16 @@ export function AuthForms({
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
-  const [method, setMethod] = useState<AuthMethod>("email");
+  const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
+
+  const sanitizedRedirectTo =
+    typeof redirectTo === "string" && redirectTo.startsWith("/") && !redirectTo.startsWith("//")
+      ? redirectTo
+      : "/pro/dashboard";
+
+  const loginHref = `/login?redirect=${encodeURIComponent(sanitizedRedirectTo)}`;
+  const registerHref = `/register?redirect=${encodeURIComponent(sanitizedRedirectTo)}`;
+  const forgotPasswordHref = `/forgot-password?redirect=${encodeURIComponent(sanitizedRedirectTo)}`;
 
   const isLogin = mode === "login";
 
@@ -344,28 +150,62 @@ export function AuthForms({
       return;
     }
 
+    if (!isLogin) {
+      const signUpResult = result as Awaited<ReturnType<typeof signUp>>;
+      if (signUpResult.requiresEmailConfirmation) {
+        setNeedsEmailConfirmation(true);
+        toast({
+          title: "Confirm your email",
+          description: signUpResult.message ?? "Check your email to confirm your account before continuing.",
+        });
+        return;
+      }
+    }
+
     toast({
       title: isLogin ? "Welcome back" : "Account created",
       description: isLogin ? undefined : "You can continue into onboarding now.",
     });
 
     // Use window.location for a full page navigation to ensure cookies are read properly
-    const destination = isLogin ? redirectTo : "/pro/onboard";
+    const destination = isLogin ? sanitizedRedirectTo : "/pro/onboard";
     window.location.href = destination;
   };
+
+  const resendConfirmation = async () => {
+    try {
+      await resendConfirmationMutation(email.trim());
+      toast({ title: "Email sent", description: "We sent another confirmation email." });
+    } catch {
+      toast({ title: "Could not resend", description: "Please try again in a moment.", variant: "destructive" });
+    }
+  };
+
+  if (!isLogin && needsEmailConfirmation) {
+    return (
+      <Surface className="mx-auto max-w-lg space-y-4">
+        <h1 className="font-display text-3xl font-semibold tracking-tight">Confirm your email</h1>
+        <p className="text-base leading-6 text-muted-foreground">
+          Check your email to confirm your account before continuing.
+        </p>
+        <p className="text-sm text-muted-foreground">We sent a confirmation link to <strong>{email}</strong>.</p>
+        <AppButton className="w-full" onClick={resendConfirmation}>Resend confirmation email</AppButton>
+      </Surface>
+    );
+  }
 
   return (
     <Surface className="mx-auto max-w-lg">
       {/* Mode toggle */}
       <div className="inline-flex rounded-full border border-border bg-secondary/60 p-1 text-sm font-semibold">
         <Link
-          href="/login"
+          href={loginHref}
           className={`rounded-full px-4 py-2 transition ${isLogin ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
         >
           Sign in
         </Link>
         <Link
-          href="/register"
+          href={registerHref}
           className={`rounded-full px-4 py-2 transition ${!isLogin ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
         >
           Sign up
@@ -381,88 +221,79 @@ export function AuthForms({
 
       {/* Social login/signup */}
       <div className="mt-5">
-        <SocialButtons label={isLogin ? "Sign in" : "Sign up"} />
+        <SocialButtons label={isLogin ? "Sign in" : "Sign up"} redirectTo={isLogin ? sanitizedRedirectTo : "/pro/onboard"} />
       </div>
 
       <OrDivider />
 
-      {/* Method tabs */}
-      <MethodTabs method={method} onChange={setMethod} />
-
       <div className="mt-4">
-        {method === "phone" ? (
-          <PhoneOtpForm isLogin={isLogin} redirectTo={redirectTo} />
-        ) : method === "email-otp" ? (
-          <EmailOtpForm isLogin={isLogin} redirectTo={redirectTo} />
-        ) : (
-          <form onSubmit={onSubmit} className="space-y-3">
-            {!isLogin ? (
-              <AppInput
-                aria-label="Full name"
-                placeholder="Full name"
-                value={fullName}
-                onChange={(event) => setFullName(event.target.value)}
-                minLength={2}
-                maxLength={120}
-                required
-              />
-            ) : null}
+        <form onSubmit={onSubmit} className="space-y-3">
+          {!isLogin ? (
             <AppInput
-              type="email"
-              aria-label="Email address"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              autoComplete="email"
+              aria-label="Full name"
+              placeholder="Full name"
+              value={fullName}
+              onChange={(event) => setFullName(event.target.value)}
+              minLength={2}
+              maxLength={120}
               required
             />
-            <PasswordInput
-              aria-label="Password"
-              placeholder={isLogin ? "Password" : "At least 8 characters"}
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              autoComplete={isLogin ? "current-password" : "new-password"}
-              minLength={8}
-              showStrength={!isLogin}
-              required
-            />
+          ) : null}
+          <AppInput
+            type="email"
+            aria-label="Email address"
+            placeholder="your@email.com"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            autoComplete="email"
+            required
+          />
+          <PasswordInput
+            aria-label="Password"
+            placeholder={isLogin ? "Password" : "At least 8 characters"}
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            autoComplete={isLogin ? "current-password" : "new-password"}
+            minLength={8}
+            showStrength={!isLogin}
+            required
+          />
 
-            {isLogin ? (
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
-                  />
-                  Remember me
-                </label>
-                <Link href="/forgot-password" className="text-sm font-semibold text-primary hover:underline">
-                  Forgot password?
-                </Link>
-              </div>
-            ) : null}
+          {isLogin ? (
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                />
+                Remember me
+              </label>
+              <Link href={forgotPasswordHref} className="text-sm font-semibold text-primary hover:underline">
+                Forgot password?
+              </Link>
+            </div>
+          ) : null}
 
-            <AppButton className="w-full" disabled={loading} type="submit">
-              {loading
-                ? (isLogin ? "Signing in..." : "Creating account...")
-                : (isLogin ? "Sign in" : "Create account")}
-            </AppButton>
-          </form>
-        )}
+          <AppButton className="w-full" disabled={loading} type="submit">
+            {loading
+              ? (isLogin ? "Signing in..." : "Creating account...")
+              : (isLogin ? "Sign in" : "Create account")}
+          </AppButton>
+        </form>
       </div>
 
       <div className="mt-5 text-center text-sm text-muted-foreground">
         {isLogin ? (
           <>
             Don&apos;t have an account?{" "}
-            <Link href="/register" className="font-semibold text-primary hover:underline">Sign up</Link>
+            <Link href={registerHref} className="font-semibold text-primary hover:underline">Sign up</Link>
           </>
         ) : (
           <>
             Already have an account?{" "}
-            <Link href="/login" className="font-semibold text-primary hover:underline">Sign in</Link>
+            <Link href={loginHref} className="font-semibold text-primary hover:underline">Sign in</Link>
           </>
         )}
       </div>

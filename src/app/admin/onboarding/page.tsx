@@ -1,7 +1,5 @@
 import Link from "next/link";
 
-import { DebugProfilesButton } from "./DebugProfilesButton";
-
 export default function OnboardingPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
@@ -26,7 +24,6 @@ export default function OnboardingPage() {
             Abrir perfil Pro
           </Link>
         </div>
-        <DebugProfilesButton />
       </div>
     </div>
   );

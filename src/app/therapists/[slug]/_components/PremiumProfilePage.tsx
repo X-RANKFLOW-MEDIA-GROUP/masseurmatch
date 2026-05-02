@@ -13,7 +13,6 @@ import { PremiumProfileGallery } from "./PremiumProfileGallery";
 import { PremiumProfileAvailability } from "./PremiumProfileAvailability";
 import { PremiumProfileFaq } from "./PremiumProfileFaq";
 import { ProfileTravel } from "./ProfileTravel";
-import { PremiumProfileLocation } from "./PremiumProfileLocation";
 import { KnottyProfileTracker } from "./KnottyProfileTracker";
 import { ProfileAreasServed } from "./ProfileAreasServed";
 import { PremiumProfileContact } from "./PremiumProfileContact";
@@ -30,8 +29,7 @@ interface Props {
 
 export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props) {
   useFadeInOnScroll();
-  
-  const FALLBACK_REVIEW_DATE = "1970-01-01T00:00:00.000Z";
+
   const city = profile.city || "United States";
   const neighborhood = profile.neighborhood_name || profile.primary_area;
   const avgRating = reviews.length > 0
@@ -92,10 +90,10 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
             <ReviewsDisplay
               reviews={reviews.map(r => ({
                 id: r.id,
-                author_name: r.author_name || r.reviewer_name || "Verified Client",
+                author_name: r.reviewer_name || "Verified Client",
                 rating: r.rating ?? 5,
-                body: r.content || r.review_text || "",
-                created_at: r.created_at || r.review_date || new Date().toISOString()
+                body: r.review_text || "",
+                created_at: r.review_date || new Date().toISOString()
               }))}
               averageRating={avgRating}
               totalReviews={reviews.length}
@@ -159,27 +157,27 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
             <h2 className="pp-section-title">Browse More in {city}</h2>
           </div>
           <div className="pp-internal-links">
-            <Link href={`/search?city=${encodeURIComponent(city)}&q=gay+massage`} className="pp-int-link">
+            <Link href={`/search?city=${encodeURIComponent(city)}&keyword=gay+massage`} className="pp-int-link">
               Gay Massage {city}
             </Link>
             <Link href={`/search?city=${encodeURIComponent(city)}`} className="pp-int-link">
               All {city} Therapists
             </Link>
             {neighborhood && (
-              <Link href={`/search?city=${encodeURIComponent(city)}&q=${encodeURIComponent(neighborhood)}`} className="pp-int-link">
+              <Link href={`/search?city=${encodeURIComponent(city)}&keyword=${encodeURIComponent(neighborhood)}`} className="pp-int-link">
                 {neighborhood} Massage
               </Link>
             )}
-            <Link href={`/search?city=${encodeURIComponent(city)}&q=outcall`} className="pp-int-link">
+            <Link href={`/search?city=${encodeURIComponent(city)}&keyword=outcall`} className="pp-int-link">
               Outcall {city}
             </Link>
-            <Link href={`/search?city=${encodeURIComponent(city)}&q=deep+tissue`} className="pp-int-link">
+            <Link href={`/search?city=${encodeURIComponent(city)}&keyword=deep+tissue`} className="pp-int-link">
               Deep Tissue {city}
             </Link>
-            <Link href={`/search?city=${encodeURIComponent(city)}&q=swedish`} className="pp-int-link">
+            <Link href={`/search?city=${encodeURIComponent(city)}&keyword=swedish`} className="pp-int-link">
               Swedish Massage {city}
             </Link>
-            <Link href={`/search?city=${encodeURIComponent(city)}&q=lgbtq`} className="pp-int-link">
+            <Link href={`/search?city=${encodeURIComponent(city)}&keyword=lgbtq`} className="pp-int-link">
               LGBTQ+ Massage {city}
             </Link>
           </div>
@@ -205,11 +203,11 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
                       {"★".repeat(review.rating || 5)}
                       {"☆".repeat(5 - (review.rating || 5))}
                     </div>
-                    {(review.author_name || review.reviewer_name) && (
-                      <span className="text-xs text-[var(--text-muted)]">by {review.author_name || review.reviewer_name}</span>
+                    {review.reviewer_name && (
+                      <span className="text-xs text-[var(--text-muted)]">by {review.reviewer_name}</span>
                     )}
                   </div>
-                  <p className="text-sm leading-relaxed text-[var(--cream-soft)]">{review.content || review.review_text}</p>
+                  <p className="text-sm leading-relaxed text-[var(--cream-soft)]">{review.review_text}</p>
                 </article>
               ))}
             </div>
