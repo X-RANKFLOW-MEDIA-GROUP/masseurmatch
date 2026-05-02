@@ -148,7 +148,7 @@ function getApiErrorMessage(error: unknown, fallback: string) {
 
 function formatReason(reason?: string | null) {
   if (!reason) {
-    return "A IA identificou linguagem fora do padrao de qualidade do marketplace.";
+    return "AI flagged language outside profile quality guidelines.";
   }
 
   return reason.split("_").join(" ");
@@ -217,8 +217,8 @@ export default function MyListingPage() {
       } catch (error) {
         if (!cancelled) {
           toast({
-            title: "Nao foi possivel carregar seu perfil",
-            description: getApiErrorMessage(error, "Tente novamente em alguns instantes."),
+            title: "Could not load your profile",
+            description: getApiErrorMessage(error, "Try again in a moment."),
             variant: "destructive",
           });
         }
@@ -262,8 +262,8 @@ export default function MyListingPage() {
   const handleSaveAndScan = async () => {
     if (!profileId) {
       toast({
-        title: "Perfil indisponivel",
-        description: "Recarregue a pagina antes de salvar suas alteracoes.",
+        title: "Profile unavailable",
+        description: "Reload the page before saving changes.",
         variant: "destructive",
       });
       return;
@@ -271,8 +271,8 @@ export default function MyListingPage() {
 
     if (!agreedToTerms) {
       toast({
-        title: "Confirme as regras do perfil",
-        description: "Marque a caixa de concordancia antes de publicar alteracoes.",
+        title: "Confirm profile rules",
+        description: "Check the agreement box before submitting changes.",
         variant: "destructive",
       });
       return;
@@ -287,7 +287,7 @@ export default function MyListingPage() {
       const moderationChecks = [
         {
           fieldName: "display_name",
-          label: "nome de exibicao",
+          label: "display name",
           text: form.displayName,
         },
         {
@@ -297,7 +297,7 @@ export default function MyListingPage() {
         },
         {
           fieldName: "specialties",
-          label: "servicos",
+          label: "services",
           text: form.specialties.join(", "),
         },
       ];
@@ -347,8 +347,8 @@ export default function MyListingPage() {
           setFlagReason(reason);
           setSaveState("flagged");
           toast({
-            title: "Conteudo retido para revisao humana",
-            description: "Sua versao atual continua como esta. A equipe podera revisar o texto sinalizado.",
+            title: "Content held for manual review",
+            description: "Your current public version remains unchanged. The team may review flagged text.",
             variant: "destructive",
           });
           return;
@@ -380,11 +380,11 @@ export default function MyListingPage() {
       setSaveState("success");
       toast({
         title: moderationUnavailable
-          ? "Alteracoes salvas para revisao"
-          : "Sightengine liberou seu texto",
+          ? "Changes saved for review"
+          : "Automated screening passed",
         description: moderationUnavailable
-          ? "A verificacao automatica nao respondeu, entao enviamos tudo para revisao manual."
-          : "Seu texto passou na triagem automatica e foi enviado para a fila de revisao.",
+          ? "Automated screening was unavailable, so we sent everything for manual review."
+          : "Your text passed automated screening and was sent to the review queue.",
       });
 
       window.setTimeout(() => {
@@ -393,8 +393,8 @@ export default function MyListingPage() {
     } catch (error) {
       setSaveState("idle");
       toast({
-        title: "Nao foi possivel salvar agora",
-        description: getApiErrorMessage(error, "Revise os campos e tente novamente."),
+        title: "Could not save right now",
+        description: getApiErrorMessage(error, "Review the fields and try again."),
         variant: "destructive",
       });
     }
@@ -416,10 +416,10 @@ export default function MyListingPage() {
         </div>
         <div className="space-y-2">
           <h2 className="font-display text-lg font-medium text-slate-900">
-            Guardiao de qualidade por IA ativo
+            AI quality guard is active
           </h2>
           <p className="font-sans text-sm leading-relaxed text-slate-600">
-            Todo texto do seu perfil passa pelo Sightengine antes de seguir para revisao.
+            All profile text is screened before review.
             A triagem bloqueia linguagem sexual explicita, promessas enganosas, contato direto e
             termos fora do padrao premium da plataforma.
           </p>
@@ -430,10 +430,9 @@ export default function MyListingPage() {
         <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4">
           <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
           <div>
-            <h3 className="font-sans text-sm font-semibold text-amber-900">Perfil em revisao</h3>
+            <h3 className="font-sans text-sm font-semibold text-amber-900">Profile under review</h3>
             <p className="mt-1 font-sans text-sm leading-relaxed text-amber-800">
-              Seu listing ja esta em fila de revisao humana. Novas alteracoes seguem o mesmo fluxo
-              ate a aprovacao final do time.
+              Your listing is already in the human review queue. New updates follow the same process until final approval.
             </p>
           </div>
         </div>
@@ -442,9 +441,9 @@ export default function MyListingPage() {
       <div className="sticky top-4 z-30 flex flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:flex-row lg:items-center lg:justify-between">
         <div className="space-y-3">
           <div>
-            <h1 className="font-display text-2xl font-medium text-slate-900">Editar meu perfil</h1>
+            <h1 className="font-display text-2xl font-medium text-slate-900">Edit my profile</h1>
             <p className="mt-1 font-sans text-sm text-slate-500">
-              Ajuste seu texto, confirme as regras e deixe a IA validar antes do envio.
+              Refine your copy, confirm the rules, and let AI validate before submission.
             </p>
           </div>
 
@@ -456,12 +455,11 @@ export default function MyListingPage() {
               className="mt-1 h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
             />
             <span className="leading-relaxed">
-              Li e concordo com as regras de qualidade do perfil e aceito a verificacao automatica.
-              Consulte o{" "}
+              I have read and agree to profile quality rules and automated screening. See the{" "}
               <Link href="/legal" className="font-semibold text-slate-900 underline underline-offset-4">
                 Legal Center
               </Link>{" "}
-              para ver as politicas completas.
+              for full policies.
             </span>
           </label>
         </div>
@@ -483,7 +481,7 @@ export default function MyListingPage() {
           {saveState === "idle" && (
             <>
               <Save className="h-4 w-4" />
-              Publicar alteracoes
+              Submit changes
             </>
           )}
 
@@ -494,21 +492,21 @@ export default function MyListingPage() {
                 transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }}
                 className="h-0.5 w-5 rounded-full bg-sky-300 shadow-[0_0_10px_rgba(125,211,252,0.85)]"
               />
-              Sightengine verificando {scanLabel}
+              Sightengine reviewing {scanLabel}
             </>
           )}
 
           {saveState === "success" && (
             <>
               <CheckCircle2 className="h-4 w-4" />
-              Liberado e enviado
+              Passed and submitted
             </>
           )}
 
           {saveState === "flagged" && (
             <>
               <ShieldAlert className="h-4 w-4" />
-              Retido para analise
+              Held for review
             </>
           )}
         </button>
@@ -523,11 +521,10 @@ export default function MyListingPage() {
           <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" />
           <div>
             <h3 className="font-sans text-sm font-semibold text-rose-900">
-              Texto retido pelo filtro de seguranca
+              Text held by safety filter
             </h3>
             <p className="mt-1 font-sans text-sm leading-relaxed text-rose-800">
-              {flagReason} A versao publica do seu perfil nao foi alterada. Registramos a tentativa
-              para revisao humana do time.
+              {flagReason} Your public profile was not changed. We recorded this attempt for manual team review.
             </p>
           </div>
         </motion.div>
@@ -537,11 +534,11 @@ export default function MyListingPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="flex items-center gap-2 font-display text-xl font-medium text-slate-900">
-              Sobre mim
+              About me
               <FileText className="h-4 w-4 text-slate-400" />
             </h2>
             <p className="mt-1 font-sans text-sm text-slate-500">
-              Escreva com clareza, tom profissional e foco em experiencia real.
+              Write clearly with a professional tone and focus on real experience.
             </p>
           </div>
 
@@ -554,12 +551,12 @@ export default function MyListingPage() {
             {isAiLoading ? (
               <>
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                Melhorando texto
+                Improving copy
               </>
             ) : (
               <>
                 <Sparkles className="h-3.5 w-3.5" />
-                Usar IA para lapidar
+                Use AI polish
               </>
             )}
           </button>
@@ -569,13 +566,13 @@ export default function MyListingPage() {
           value={form.bio}
           onChange={(event) => setForm((current) => ({ ...current, bio: event.target.value }))}
           className="min-h-40 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 p-4 font-sans leading-relaxed text-slate-700 outline-none transition-colors focus:border-slate-400"
-          placeholder="Conte sua experiencia, seu estilo de atendimento e o que o cliente pode esperar da sessao."
+          placeholder="Share your experience, service style, and what clients can expect from a session."
         />
 
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-2">
             <label className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Nome de exibicao
+              Display name
             </label>
             <input
               type="text"
