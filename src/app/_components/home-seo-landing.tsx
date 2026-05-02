@@ -195,7 +195,7 @@ export function HomeSeoLanding({
                     "Verified signals and visible session types are surfaced early.",
                     "City pages, service pages, guides, and comparison pages reinforce internal linking.",
                     "Users can move from broad discovery to high-intent local pages in one hop.",
-                    "Direct contact remains clear without forcing a booking workflow.",
+                    "Direct contact remains clear without forcing an on-platform scheduling workflow.",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3">
                       <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-soft" />

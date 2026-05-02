@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import styles from './MasseurProfile.module.css';
 
-// TODO: Move these to a config or context if needed
+// Legacy standalone profile demo values.
 const PHONE = '+17623345300';
 const PHONE_DISPLAY = '(762) 334-5300';
 const STUDIO_LOCATION = 'Oak Lawn & Uptown Dallas, TX 75219';
@@ -91,7 +91,7 @@ function MasseurProfile() {
           <li><a href="#">Find Therapists</a></li>
           <li><a href="#">Cities</a></li>
           <li><a href="#">For Therapists</a></li>
-          <li><a href="#" className="nav-cta">Book Now</a></li>
+          <li><a href="#" className="nav-cta">Contact Directly</a></li>
         </ul>
       </nav>
 
@@ -140,7 +140,7 @@ function MasseurProfile() {
               <div className="qs"><div className="qs-val">10<span>mi</span></div><div className="qs-label">Mobile radius</div></div>
             </div>
             <div className="hero-ctas anim-4">
-              <a href={`sms:${PHONE}`} className="btn-primary">💬 Text to Book</a>
+              <a href={`sms:${PHONE}`} className="btn-primary">💬 Text Bruno</a>
               <a href={`tel:${PHONE}`} className="btn-secondary">📞 {PHONE_DISPLAY}</a>
             </div>
           </div>
@@ -259,8 +259,8 @@ function MasseurProfile() {
           {/* Booking card */}
           <div className="book-card anim-2">
             <div className="book-header">
-              <h3>Book a Session</h3>
-              <p>Text or call to schedule</p>
+              <h3>Contact Bruno</h3>
+              <p>Text or call directly</p>
             </div>
             <div className="book-body">
               <div className="avail-row">
@@ -279,7 +279,7 @@ function MasseurProfile() {
                 <span className="avail-label">Starting at</span>
                 <span className="avail-val" style={{ color: 'var(--orange)', fontSize: 18, fontFamily: 'Cormorant Garamond,serif', fontWeight: 600 }}>$160 / 60 min</span>
               </div>
-              <a href={`sms:${PHONE}`} className="book-cta">💬 Text to Book Now</a>
+              <a href={`sms:${PHONE}`} className="book-cta">💬 Text Bruno Directly</a>
               <a href={`tel:${PHONE}`} className="book-tel">{PHONE_DISPLAY} — tap to call</a>
             </div>
           </div>

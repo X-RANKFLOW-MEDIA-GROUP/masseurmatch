@@ -31,7 +31,7 @@ type AvailabilityStatus = (typeof statusOptions)[number]["key"];
 const statusMessages: Record<AvailabilityStatus, string> = {
   available: "Your profile is visible at the top of local search results with the 'Available Now' badge.",
   mobile: "In-call / out-call mode is active. Edit your service radius on your profile.",
-  traveling: "Set your destination city and travel dates to attract advance bookings.",
+  traveling: "Set your destination city and travel dates to attract advance inquiries.",
   hidden: "Invisible mode — your profile has been temporarily removed from search results.",
 };
 

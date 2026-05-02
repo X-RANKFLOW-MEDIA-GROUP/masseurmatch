@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   Loader2,
   Mail,
-  Phone,
   ShieldCheck,
 } from "lucide-react";
 
@@ -16,7 +15,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PhoneInput } from "@/components/ui/phone-input";
 import { useSignup } from "../_lib/signup-context";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,18 +36,13 @@ export default function SignupVerifyPage() {
     state,
     setAccountInfo,
     markEmailVerified,
-    markPhoneVerified,
     setIdentityStatus,
     setStripeIdentitySessionId,
   } = useSignup();
 
   const [emailOtp, setEmailOtp] = useState("");
-  const [phoneOtp, setPhoneOtp] = useState("");
-  const [phoneInputValue, setPhoneInputValue] = useState("");
   const [emailSent, setEmailSent] = useState(false);
-  const [phoneSent, setPhoneSent] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
-  const [phoneLoading, setPhoneLoading] = useState(false);
   const [idLoading, setIdLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -80,14 +73,9 @@ export default function SignupVerifyPage() {
     if (user.email_confirmed_at) {
       markEmailVerified();
     }
-
-    if (user.phone_confirmed_at) {
-      markPhoneVerified();
-    }
   }, [
     authLoading,
     markEmailVerified,
-    markPhoneVerified,
     router,
     setAccountInfo,
     state.displayName,
@@ -185,58 +173,6 @@ export default function SignupVerifyPage() {
     }
   }
 
-  function handleSetPhone() {
-    if (!phoneInputValue.trim() || phoneInputValue.length < 10) return;
-    setAccountInfo({
-      fullName: state.fullName,
-      displayName: state.displayName,
-      email: state.email,
-      phone: phoneInputValue,
-    });
-  }
-
-  async function sendPhoneCode() {
-    if (!state.phone) return;
-
-    setPhoneLoading(true);
-    setError(null);
-
-    try {
-      const { error: otpError } = await supabase.auth.signInWithOtp({
-        phone: state.phone,
-      });
-
-      if (otpError) throw otpError;
-      setPhoneSent(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send SMS verification code.");
-    } finally {
-      setPhoneLoading(false);
-    }
-  }
-
-  async function verifyPhoneCode() {
-    setPhoneLoading(true);
-    setError(null);
-
-    try {
-      const { data, error: verifyError } = await supabase.auth.verifyOtp({
-        phone: state.phone,
-        token: phoneOtp,
-        type: "sms",
-      });
-
-      if (verifyError) throw verifyError;
-
-      await syncServerSession(data.session?.access_token);
-      markPhoneVerified();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid phone verification code.");
-    } finally {
-      setPhoneLoading(false);
-    }
-  }
-
   const startIdentityVerification = useCallback(async () => {
     setIdLoading(true);
     setError(null);
@@ -268,7 +204,7 @@ export default function SignupVerifyPage() {
     }
   }, [setIdentityStatus, setStripeIdentitySessionId]);
 
-  const canContinue = state.emailVerified && state.phoneVerified && state.identityVerificationStatus === "verified";
+  const canContinue = state.emailVerified && state.identityVerificationStatus === "verified";
 
   function handleContinue() {
     if (!canContinue) return;
@@ -404,86 +340,6 @@ export default function SignupVerifyPage() {
       <Card>
         <CardContent className="space-y-4 p-6">
           <div className="flex items-center gap-2">
-            <Phone className="h-5 w-5 text-brand-secondary" />
-            <h2 className="font-display text-lg font-semibold">Phone Verification</h2>
-            <Badge variant="secondary" className="ml-auto gap-1 border-amber-200 bg-amber-50 text-amber-700">
-              Required
-            </Badge>
-            {state.phoneVerified && (
-              <Badge
-                variant="secondary"
-                className="gap-1 border-green-200 bg-green-50 text-green-700"
-              >
-                <CheckCircle2 className="h-3 w-3" /> Verified
-              </Badge>
-            )}
-          </div>
-
-          {!state.phoneVerified && (
-            <>
-              {!state.phone ? (
-                <div className="space-y-3">
-                  <Label htmlFor="phoneInput">Enter your phone number</Label>
-                  <PhoneInput
-                    id="phoneInput"
-                    value={phoneInputValue}
-                    onChange={setPhoneInputValue}
-                    placeholder="(555) 123-4567"
-                  />
-                  <Button 
-                    onClick={handleSetPhone} 
-                    disabled={phoneLoading || !phoneInputValue.trim() || phoneInputValue.length < 10}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    Continue with this number
-                  </Button>
-                  <p className="text-xs text-muted-foreground">
-                    Select your country code from the dropdown
-                  </p>
-                </div>
-              ) : !phoneSent ? (
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">Phone: {state.phone}</p>
-                  <Button onClick={sendPhoneCode} disabled={phoneLoading} variant="outline">
-                    {phoneLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    Send SMS Code
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <Label htmlFor="phoneOtp">Enter the code sent to {state.phone}</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="phoneOtp"
-                      value={phoneOtp}
-                      onChange={(event) => setPhoneOtp(event.target.value)}
-                      placeholder="000000"
-                      maxLength={6}
-                    />
-                    <Button onClick={verifyPhoneCode} disabled={phoneLoading || phoneOtp.length < 4}>
-                      {phoneLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                      Verify
-                    </Button>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={sendPhoneCode}
-                    className="text-xs text-brand-secondary underline"
-                    disabled={phoneLoading}
-                  >
-                    Resend code
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="space-y-4 p-6">
-          <div className="flex items-center gap-2">
             <ShieldCheck className="h-5 w-5 text-brand-secondary" />
             <h2 className="font-display text-lg font-semibold">Secure ID Check</h2>
           </div>
@@ -505,7 +361,7 @@ export default function SignupVerifyPage() {
 
       {!canContinue && (
         <p className="text-center text-xs text-muted-foreground">
-          Complete email, phone, and identity verification above to continue.
+          Complete email and identity verification above to continue.
         </p>
       )}
     </div>
