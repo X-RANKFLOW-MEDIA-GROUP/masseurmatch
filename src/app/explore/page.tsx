@@ -56,7 +56,7 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
   const filters = parseExploreSearchParams(params);
   const baseFilters = getBaseExploreFilters(filters);
   const baseResult = await loadExploreProviders(baseFilters);
-  const initialItems = applyExploreFilters(baseResult, filters);
+  const initialItems = applyExploreFilters(baseResult.items, filters);
   const hasExplicitLocation = Boolean(getFirstParam(params.city) || getFirstParam(params.zip));
 
   return (

@@ -55,11 +55,11 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     ok: true,
-    items: result.slice(from, to).map(serializeExploreProvider),
-    total: result.length,
+    items: result.items.slice(from, to).map(serializeExploreProvider),
+    total: result.items.length,
     page,
     pageSize,
-    hasMore: to < result.length,
+    hasMore: to < result.items.length,
     filters,
     meta: {
       cache_hit: cacheHit,

@@ -46,7 +46,7 @@ export async function GET(request: Request) {
     });
   }
 
-  const items = result
+  const items = result.items
     .filter((provider) => !exclude.has(provider.id))
     .slice(0, limit);
 
