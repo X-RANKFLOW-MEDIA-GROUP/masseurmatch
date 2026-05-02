@@ -1,93 +1,280 @@
-import fs from 'node:fs';
+#!/usr/bin/env node
 
-const schemaPath = 'supabase/PRODUCTION_SCHEMA_LOCK.sql';
+import fs from "node:fs";
+import path from "node:path";
 
-if (!fs.existsSync(schemaPath)) {
-  console.error(`Missing schema lock file: ${schemaPath}`);
+const ROOT = process.cwd();
+const SCHEMA_PATH = path.join(ROOT, "supabase/PRODUCTION_SCHEMA_LOCK.sql");
+const SCAN_DIRS = ["src", "scripts", "supabase"];
+
+const REQUIRED_TABLES = [
+  "users",
+  "user_roles",
+  "profiles",
+  "profile_reviews",
+  "admin_actions",
+  "profile_photos",
+  "therapist_photos",
+  "identity_verifications",
+  "audit_log",
+  "lifecycle_email_queue",
+  "contact_inquiries",
+  "newsletter_subscribers",
+  "site_settings",
+];
+
+const REQUIRED_PROFILE_COLUMNS = [
+  "id",
+  "user_id",
+  "slug",
+  "email",
+  "full_name",
+  "display_name",
+  "headline",
+  "bio",
+  "photo_url",
+  "avatar_url",
+  "city",
+  "state",
+  "country",
+  "neighborhood",
+  "phone",
+  "phone_number",
+  "whatsapp_number",
+  "email_address",
+  "website",
+  "service_categories",
+  "modalities",
+  "languages",
+  "incall",
+  "outcall",
+  "offers_incall",
+  "offers_outcall",
+  "starting_price",
+  "price_min",
+  "price_max",
+  "incall_price",
+  "outcall_price",
+  "outcall_radius",
+  "available_now",
+  "verification_status",
+  "profile_status",
+  "visibility_status",
+  "status",
+  "is_active",
+  "is_featured",
+  "is_suspended",
+  "is_banned",
+  "subscription_tier",
+  "subscription_status",
+  "stripe_customer_id",
+  "stripe_subscription_id",
+  "stripe_verification_session_id",
+  "current_period_end",
+  "_tier",
+  "photo_limit",
+  "visibility_level",
+  "featured_until",
+  "seo_title",
+  "seo_description",
+  "seo_keywords",
+  "profile_completeness",
+  "profile_views",
+  "contact_clicks",
+  "submitted_at",
+  "approved_at",
+  "approved_by",
+  "moderation_notes",
+  "created_at",
+  "updated_at",
+  "last_active_at",
+];
+
+const ALLOWED_PROFILE_STATUS = [
+  "draft",
+  "pending",
+  "pending_approval",
+  "under_review",
+  "approved",
+  "suspended",
+  "rejected",
+  "changes_requested",
+];
+
+const ALLOWED_SUBSCRIPTION_TIERS = ["free", "standard", "pro", "elite", "featured"];
+const IGNORED_TABLES = new Set(["auth.users", "storage.buckets", "storage.objects"]);
+const IDENTIFIER = "[a-zA-Z_][a-zA-Z0-9_]*";
+
+function walkFiles(dir) {
+  const absolute = path.join(ROOT, dir);
+  if (!fs.existsSync(absolute)) return [];
+  const results = [];
+  const stack = [absolute];
+  while (stack.length) {
+    const current = stack.pop();
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      const full = path.join(current, entry.name);
+      if (entry.isDirectory()) {
+        if (["node_modules", ".next", ".git", "dist", "build"].includes(entry.name)) continue;
+        stack.push(full);
+      } else if (entry.isFile() && /\.(ts|tsx|js|jsx|mjs|cjs|sql)$/.test(entry.name)) {
+        results.push(full);
+      }
+    }
+  }
+  return results;
+}
+
+function normalizeSql(sql) {
+  return sql.replace(/--.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "").toLowerCase();
+}
+
+function addColumn(contract, table, column) {
+  const cleanTable = table.replace(/^public\./, "").toLowerCase();
+  const cleanColumn = column.toLowerCase();
+  if (!contract.has(cleanTable)) contract.set(cleanTable, new Set());
+  contract.get(cleanTable).add(cleanColumn);
+}
+
+function parseSchemaContract(sql) {
+  const contract = new Map();
+  const normalized = normalizeSql(sql);
+  const createTableRegex = new RegExp(`create\\s+table\\s+if\\s+not\\s+exists\\s+(?:public\\.)?(${IDENTIFIER})\\s*\\(([\\s\\S]*?)\\);`, "gi");
+  let tableMatch;
+  while ((tableMatch = createTableRegex.exec(normalized))) {
+    const [, table, body] = tableMatch;
+    if (!contract.has(table)) contract.set(table, new Set());
+    for (const rawLine of body.split("\n")) {
+      const line = rawLine.trim().replace(/,$/, "");
+      if (!line || /^(constraint|primary|foreign|unique|check|exclude)\b/.test(line)) continue;
+      const column = line.match(new RegExp(`^(${IDENTIFIER})\\b`, "i"))?.[1];
+      if (column) addColumn(contract, table, column);
+    }
+  }
+
+  const alterRegex = new RegExp(`alter\\s+table\\s+(?:public\\.)?(${IDENTIFIER})[\\s\\S]*?;`, "gi");
+  let alterMatch;
+  while ((alterMatch = alterRegex.exec(normalized))) {
+    const table = alterMatch[1];
+    const statement = alterMatch[0];
+    const columnRegex = new RegExp(`add\\s+column\\s+if\\s+not\\s+exists\\s+(${IDENTIFIER})\\b`, "gi");
+    let columnMatch;
+    while ((columnMatch = columnRegex.exec(statement))) addColumn(contract, table, columnMatch[1]);
+  }
+  return contract;
+}
+
+function extractSelectColumns(selectBody) {
+  return selectBody
+    .split(",")
+    .map((part) => part.trim().replace(/!inner|!left|!right/g, ""))
+    .map((part) => part.split(":").pop()?.trim() || "")
+    .map((part) => part.match(new RegExp(`^(${IDENTIFIER})\\b`, "i"))?.[1])
+    .filter(Boolean);
+}
+
+function extractObjectKeys(objectBody) {
+  const keys = new Set();
+  const keyRegex = /(?:^|[,\s])([_a-zA-Z][_a-zA-Z0-9]*)\s*:/g;
+  let match;
+  while ((match = keyRegex.exec(objectBody))) keys.add(match[1]);
+  return [...keys];
+}
+
+function scanReferences() {
+  const references = new Map();
+  const addRef = (table, column, file) => {
+    if (!table || IGNORED_TABLES.has(table)) return;
+    const cleanTable = table.replace(/^public\./, "").toLowerCase();
+    if (!references.has(cleanTable)) references.set(cleanTable, new Map());
+    if (!column) return;
+    const cleanColumn = column.toLowerCase();
+    if (!references.get(cleanTable).has(cleanColumn)) references.get(cleanTable).set(cleanColumn, new Set());
+    references.get(cleanTable).get(cleanColumn).add(path.relative(ROOT, file));
+  };
+
+  for (const file of SCAN_DIRS.flatMap(walkFiles)) {
+    const source = fs.readFileSync(file, "utf8");
+    let match;
+    const fromRegex = /\.from\(["'`]([a-zA-Z_][a-zA-Z0-9_\.]*?)["'`]\)/g;
+    while ((match = fromRegex.exec(source))) addRef(match[1], null, file);
+
+    const sqlTableRegex = /(?:from|into|update|join)\s+(?:public\.)?([a-zA-Z_][a-zA-Z0-9_]*)/gi;
+    while ((match = sqlTableRegex.exec(source))) addRef(match[1], null, file);
+
+    const chainRegex = /\.from\(["'`]([a-zA-Z_][a-zA-Z0-9_\.]*?)["'`]\)([\s\S]{0,2500}?)(?=\.from\(|;|\n\s*return|\n\s*const|\n\s*let|\n\s*await|$)/g;
+    let chainMatch;
+    while ((chainMatch = chainRegex.exec(source))) {
+      const table = chainMatch[1];
+      const chain = chainMatch[2];
+      const colRegex = /\.(?:eq|neq|gt|gte|lt|lte|order)\(["'`]([a-zA-Z_][a-zA-Z0-9_]*)["'`]/g;
+      let colMatch;
+      while ((colMatch = colRegex.exec(chain))) addRef(table, colMatch[1], file);
+
+      const selectRegex = /\.select\(\s*["'`]([\s\S]*?)["'`]\s*\)/g;
+      let selectMatch;
+      while ((selectMatch = selectRegex.exec(chain))) {
+        for (const column of extractSelectColumns(selectMatch[1])) addRef(table, column, file);
+      }
+
+      const objectRegex = /\.(?:insert|update|upsert)\(\s*({[\s\S]*?})\s*(?:,|\))/g;
+      let objectMatch;
+      while ((objectMatch = objectRegex.exec(chain))) {
+        for (const column of extractObjectKeys(objectMatch[1])) addRef(table, column, file);
+      }
+    }
+  }
+  return references;
+}
+
+function schemaContainsAllowedValues(sql, constraintName, values) {
+  const normalized = normalizeSql(sql);
+  const index = normalized.indexOf(constraintName.toLowerCase());
+  if (index === -1) return { ok: false, missing: values };
+  const segment = normalized.slice(index, index + 700);
+  const missing = values.filter((value) => !segment.includes(`'${value}'`));
+  return { ok: missing.length === 0, missing };
+}
+
+if (!fs.existsSync(SCHEMA_PATH)) {
+  console.error(`Missing schema lock file: ${path.relative(ROOT, SCHEMA_PATH)}`);
   process.exit(1);
 }
 
-const schema = fs.readFileSync(schemaPath, 'utf8').replace(/\s+/g, ' ').toLowerCase();
+const sql = fs.readFileSync(SCHEMA_PATH, "utf8");
+const contract = parseSchemaContract(sql);
+const scanned = scanReferences();
+const errors = [];
 
-const requiredTokens = [
-  'create extension if not exists pgcrypto',
-  'create extension if not exists citext',
-  'create or replace function public.set_updated_at()',
-  'create or replace function public.is_admin()',
-  'create table if not exists public.user_roles',
-  'create table if not exists public.users',
-  'create table if not exists public.profiles',
-  'create table if not exists public.profile_photos',
-  'create table if not exists public.therapist_photos',
-  'create table if not exists public.profile_reviews',
-  'create table if not exists public.identity_verifications',
-  'create table if not exists public.text_verifications',
-  'create table if not exists public.admin_actions',
-  'create table if not exists public.audit_log',
-  'create table if not exists public.lifecycle_email_queue',
-  'create table if not exists public.contact_inquiries',
-  'create table if not exists public.newsletter_subscribers',
-  'create table if not exists public.site_settings',
-  'add column if not exists profile_status',
-  'add column if not exists visibility_status',
-  'add column if not exists subscription_tier',
-  'add column if not exists stripe_customer_id',
-  'add column if not exists stripe_subscription_id',
-  'add column if not exists stripe_verification_session_id',
-  'add column if not exists submitted_at',
-  'add column if not exists approved_at',
-  'add column if not exists rejected_at',
-  'add column if not exists reviewed_at',
-  'add column if not exists admin_notes',
-  'add constraint profiles_status_check',
-  'add constraint profiles_profile_status_check',
-  'add constraint profiles_subscription_tier_check',
-  'add constraint profiles_visibility_status_check',
-  'add constraint profiles_verification_status_check',
-  'add constraint identity_verifications_status_check',
-  'alter table public.users enable row level security',
-  'alter table public.user_roles enable row level security',
-  'alter table public.profiles enable row level security',
-  'alter table public.profile_reviews enable row level security',
-  'alter table public.therapist_photos enable row level security',
-  'create index if not exists idx_profiles_user_id',
-  'create index if not exists idx_profiles_profile_status',
-  'create index if not exists idx_profiles_status',
-  'create index if not exists idx_profiles_visibility_status',
-  'create index if not exists idx_profiles_subscription_tier',
-  'create index if not exists idx_profile_reviews_profile',
-  'create index if not exists idx_profile_reviews_user',
-  'create index if not exists idx_therapist_photos_user',
-  'create index if not exists idx_therapist_photos_profile',
-  'create trigger on_auth_user_created',
-  'create trigger set_profiles_updated_at',
-  "insert into storage.buckets(id,name,public) values ('profile-photos','profile-photos',true)",
-  "insert into storage.buckets(id,name,public) values ('identity-documents','identity-documents',false)",
-];
-
-const forbiddenTokens = [
-  'pending_approval_at',
-];
-
-const missing = requiredTokens.filter((token) => !schema.includes(token));
-const forbidden = forbiddenTokens.filter((token) => schema.includes(token));
-
-if (schema.length < 10000) {
-  missing.push('schema lock is unexpectedly small; expected full production contract');
+for (const table of REQUIRED_TABLES) {
+  if (!contract.has(table)) errors.push(`Missing required production table: ${table}`);
+}
+for (const column of REQUIRED_PROFILE_COLUMNS) {
+  if (!contract.get("profiles")?.has(column)) errors.push(`profiles.${column} is missing from schema lock`);
 }
 
-if (missing.length > 0 || forbidden.length > 0) {
-  if (missing.length > 0) {
-    console.error('DB contract validation failed. Missing required contract entries:');
-    for (const item of missing) console.error(`- ${item}`);
-  }
+const profileStatus = schemaContainsAllowedValues(sql, "profiles_profile_status_check", ALLOWED_PROFILE_STATUS);
+if (!profileStatus.ok) errors.push(`profiles_profile_status_check missing values: ${profileStatus.missing.join(", ")}`);
+if (/profiles_profile_status_check[\s\S]{0,700}'submitted'/i.test(sql)) errors.push("profiles_profile_status_check must not allow submitted; use pending_approval instead");
 
-  if (forbidden.length > 0) {
-    console.error('DB contract validation failed. Forbidden entries detected:');
-    for (const item of forbidden) console.error(`- ${item}`);
-  }
+const tierStatus = schemaContainsAllowedValues(sql, "profiles_subscription_tier_check", ALLOWED_SUBSCRIPTION_TIERS);
+if (!tierStatus.ok) errors.push(`profiles_subscription_tier_check missing values: ${tierStatus.missing.join(", ")}`);
 
+for (const [table, columns] of scanned) {
+  if (IGNORED_TABLES.has(table)) continue;
+  if (!contract.has(table)) {
+    errors.push(`Referenced table missing from schema lock: ${table}`);
+    continue;
+  }
+  for (const [column, files] of columns) {
+    if (!contract.get(table)?.has(column)) errors.push(`Referenced column missing from schema lock: ${table}.${column} (${[...files].slice(0, 3).join(", ")})`);
+  }
+}
+
+if (errors.length) {
+  console.error("DB contract validation failed:");
+  for (const error of errors) console.error(`- ${error}`);
   process.exit(1);
 }
 
-console.log('DB contract OK');
+console.log("DB contract OK");
