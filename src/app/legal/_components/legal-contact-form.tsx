@@ -180,7 +180,7 @@ export function LegalContactForm() {
 
       <div className="flex flex-col gap-3 border-t border-border-subtle pt-4 text-sm leading-7 text-text-secondary sm:flex-row sm:items-center sm:justify-between">
         <p className="max-w-2xl">
-          Information submitted here is used to respond to your legal or compliance inquiry and to keep a record of
+          Information pending_approval here is used to respond to your legal or compliance inquiry and to keep a record of
           the communication.
         </p>
         <AppButton

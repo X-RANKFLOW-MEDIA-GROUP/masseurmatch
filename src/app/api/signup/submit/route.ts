@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       subject: "New Provider Signup Pending Review",
       react: React.createElement("div", {}, [
         React.createElement("h1", {}, "New Signup"),
-        React.createElement("p", {}, `A new provider (${profile.full_name || session.userId}) has submitted their profile for review.`),
+        React.createElement("p", {}, `A new provider (${profile.full_name || session.userId}) has pending_approval their profile for review.`),
         React.createElement("a", { href: "https://masseurmatch.com/admin/therapists" }, "Review in Admin Dashboard")
       ])
     });

@@ -129,7 +129,8 @@ export default function ApprovalStatusPage() {
     },
   };
 
-  const config = statusConfig[profile.status];
+  const currentProfile = profile;
+  const config = statusConfig[currentProfile.status];
   const StatusIcon = config.icon;
 
   function getSubmissionDate(): string {
@@ -196,16 +197,16 @@ export default function ApprovalStatusPage() {
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Progress</span>
-            <span className="font-semibold text-foreground">{profile.completion_percentage}%</span>
+            <span className="font-semibold text-foreground">{currentProfile.completion_percentage}%</span>
           </div>
           <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
             <div
               className="h-full bg-slate-900 transition-all"
-              style={{ width: `${profile.completion_percentage}%` }}
+              style={{ width: `${currentProfile.completion_percentage}%` }}
             />
           </div>
         </div>
-        {profile.completion_percentage < 100 && (
+        {currentProfile.completion_percentage < 100 && (
           <Link
             href="/pro/listing"
             className="text-sm text-primary hover:underline inline-flex items-center gap-1"
@@ -222,7 +223,7 @@ export default function ApprovalStatusPage() {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm text-foreground">Identity Verification</span>
-            {profile.is_verified_identity ? (
+            {currentProfile.is_verified_identity ? (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-xs font-medium text-emerald-700">
                 <CheckCircle2 className="h-3 w-3" />
                 Verified
@@ -256,7 +257,7 @@ export default function ApprovalStatusPage() {
           <div className="flex gap-4">
             <div className="flex flex-col items-center">
               <div className={`h-3 w-3 rounded-full ${
-                profile.status !== "draft" && profile.status !== "pending_approval"
+                currentProfile.status !== "draft" && currentProfile.status !== "pending_approval"
                   ? "bg-slate-900"
                   : "bg-slate-300"
               }`} />
@@ -264,12 +265,12 @@ export default function ApprovalStatusPage() {
             <div>
               <p className="text-sm font-medium text-foreground">Under Review</p>
               <p className="text-xs text-muted-foreground mt-1">
-                {profile.status === "pending_approval" ? "In progress" : "Completed"}
+                {currentProfile.status === "pending_approval" ? "In progress" : "Completed"}
               </p>
             </div>
           </div>
 
-          {profile.reviewed_at && (
+          {currentProfile.reviewed_at && (
             <div className="flex gap-4">
               <div className="flex flex-col items-center">
                 <div className="h-3 w-3 rounded-full bg-slate-900" />
@@ -286,13 +287,13 @@ export default function ApprovalStatusPage() {
       </div>
 
       {/* Admin Notes */}
-      {profile.admin_notes && (
+      {currentProfile.admin_notes && (
         <div className="border border-amber-200 bg-amber-50 rounded-lg p-6 space-y-3">
           <div className="flex items-start gap-2">
             <MessageSquare className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
             <div>
               <h3 className="font-semibold text-amber-900">Admin Feedback</h3>
-              <p className="mt-2 text-sm text-amber-700">{profile.admin_notes}</p>
+              <p className="mt-2 text-sm text-amber-700">{currentProfile.admin_notes}</p>
             </div>
           </div>
         </div>
