@@ -262,7 +262,7 @@ export default function MyListingPage() {
   const handleSaveAndScan = async () => {
     if (!profileId) {
       toast({
-        title: "Perfil indisponivel",
+        title: "Profile unavailable",
         description: "Reload the page before saving changes.",
         variant: "destructive",
       });
@@ -287,7 +287,7 @@ export default function MyListingPage() {
       const moderationChecks = [
         {
           fieldName: "display_name",
-          label: "nome de exibicao",
+          label: "display name",
           text: form.displayName,
         },
         {
@@ -297,7 +297,7 @@ export default function MyListingPage() {
         },
         {
           fieldName: "specialties",
-          label: "servicos",
+          label: "services",
           text: form.specialties.join(", "),
         },
       ];
@@ -556,7 +556,7 @@ export default function MyListingPage() {
             ) : (
               <>
                 <Sparkles className="h-3.5 w-3.5" />
-                Usar IA para lapidar
+                Use AI polish
               </>
             )}
           </button>
@@ -566,13 +566,13 @@ export default function MyListingPage() {
           value={form.bio}
           onChange={(event) => setForm((current) => ({ ...current, bio: event.target.value }))}
           className="min-h-40 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 p-4 font-sans leading-relaxed text-slate-700 outline-none transition-colors focus:border-slate-400"
-          placeholder="Conte sua experiencia, seu estilo de atendimento e o que o cliente pode esperar da sessao."
+          placeholder="Share your experience, service style, and what clients can expect from a session."
         />
 
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-2">
             <label className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Nome de exibicao
+              Display name
             </label>
             <input
               type="text"
