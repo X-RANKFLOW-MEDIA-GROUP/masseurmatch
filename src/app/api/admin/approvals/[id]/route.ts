@@ -11,10 +11,8 @@ export async function GET(
     {
       cookies: {
         getAll() {
-          return request.cookies.getSetCookie().map((cookie) => {
-            const [name, ...rest] = cookie.split("=");
-            return { name, value: rest.join("=") };
-          });
+          // Next.js RequestCookies already returns the correct [{ name, value }] format
+          return request.cookies.getAll();
         },
         setAll() {},
       },
@@ -101,10 +99,8 @@ export async function POST(
     {
       cookies: {
         getAll() {
-          return request.cookies.getSetCookie().map((cookie) => {
-            const [name, ...rest] = cookie.split("=");
-            return { name, value: rest.join("=") };
-          });
+          // Next.js RequestCookies already returns the correct [{ name, value }] format
+          return request.cookies.getAll();
         },
         setAll() {},
       },
@@ -152,3 +148,4 @@ export async function POST(
     );
   }
 }
+
