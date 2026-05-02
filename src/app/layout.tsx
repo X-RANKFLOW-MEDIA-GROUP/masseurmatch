@@ -9,7 +9,6 @@ import { SITE_DESCRIPTION, SITE_NAME, createPageMetadata } from "@/app/_lib/meta
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/app/_lib/structured-data";
 import { AppProviders } from "@/app/providers";
 import { SITE_URL } from "@/lib/site";
-import "leaflet/dist/leaflet.css";
 import "@/index.css";
 import "@/styles/mobile-responsive.css";
 import "@/styles/homepage-mobile-hotfix.css";
@@ -31,6 +30,9 @@ export const metadata: Metadata = {
     apple: "/favicon.ico",
   },
   ...rootMetadata,
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -39,9 +41,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       style={
         {
-          "--font-sora": "Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
+          "--font-sora": "Sora, Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
           "--font-inter": "Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
-          "--font-space-grotesk": "Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
+          "--font-space-grotesk": "Space Grotesk, Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
         } as CSSProperties
       }
     >
