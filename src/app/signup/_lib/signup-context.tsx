@@ -22,9 +22,9 @@ export type SubmissionStatus =
   | "draft"
   | "submitted"
   | "under_review"
+  | "pending_approval"
   | "approved"
   | "rejected";
-"pending_approval";
 
 
 export type BillingStatus =
