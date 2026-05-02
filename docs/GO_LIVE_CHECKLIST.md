@@ -113,6 +113,7 @@ Verify manually:
 6. Reset password renders.
 7. Public pages do not require login.
 8. Visitors never need an account to browse or contact therapists.
+9. Auth UI exposes email/password and OAuth only. It must not render email OTP tabs, OTP entry fields or Send OTP actions for launch.
 
 ## 6. Public route smoke test
 
@@ -219,5 +220,5 @@ Go live only when:
 
 ## 12. Launch constraints
 
-- Phone OTP is disabled for public launch until provider OTP configuration is finalized.
+- Phone OTP and email OTP UI are disabled for public launch. The launch auth surface is email/password plus configured OAuth only.
 - Apply `supabase/PRODUCTION_SCHEMA_LOCK.sql` before deployment and block release if `pnpm validate:db-contract` fails.
