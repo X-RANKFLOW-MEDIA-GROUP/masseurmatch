@@ -23,7 +23,7 @@ export function ReviewForm({ therapistId, therapistName, onSuccess }: ReviewForm
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [pending_approval, setSubmitted] = useState(false);
   const supabase = createClient();
 
   async function handleSubmit(e: React.FormEvent) {
@@ -68,8 +68,8 @@ export function ReviewForm({ therapistId, therapistName, onSuccess }: ReviewForm
       setSubmitted(true);
       toast.success(
         data.isVerified
-          ? "Review submitted with verified badge!"
-          : "Review submitted successfully!"
+          ? "Review pending_approval with verified badge!"
+          : "Review pending_approval successfully!"
       );
       onSuccess?.();
     } catch (error) {
@@ -79,7 +79,7 @@ export function ReviewForm({ therapistId, therapistName, onSuccess }: ReviewForm
     setLoading(false);
   }
 
-  if (submitted) {
+  if (pending_approval) {
     return (
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-8">
