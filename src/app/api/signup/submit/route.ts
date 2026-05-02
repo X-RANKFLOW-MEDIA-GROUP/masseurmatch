@@ -47,6 +47,24 @@ export async function POST(request: NextRequest) {
 
     const adminClient = createSupabaseAdminClient();
 
+    const { data: identityVerification, error: identityVerificationError } = await adminClient
+      .from("identity_verifications")
+      .select("id, status")
+      .eq("user_id", session.userId)
+      .eq("status", "verified")
+      .maybeSingle();
+
+    if (identityVerificationError) {
+      return NextResponse.json({ error: "Could not verify identity status." }, { status: 500 });
+    }
+
+    if (!identityVerification) {
+      return NextResponse.json(
+        { error: "Identity verification must be completed." },
+        { status: 400 },
+      );
+    }
+
     const { error: updateError } = await adminClient
       .from("profiles")
       .update({

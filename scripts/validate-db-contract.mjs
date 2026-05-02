@@ -5,7 +5,7 @@ import path from "node:path";
 
 const ROOT = process.cwd();
 const SCHEMA_PATH = path.join(ROOT, "supabase/PRODUCTION_SCHEMA_LOCK.sql");
-const SCAN_DIRS = ["src", "scripts", "supabase"];
+const SCAN_DIRS = ["src", "scripts", "tests", "supabase"];
 
 const REQUIRED_TABLES = [
   "users",
@@ -165,9 +165,26 @@ function parseSchemaContract(sql) {
 }
 
 function extractSelectColumns(selectBody) {
-  return selectBody
-    .split(",")
+  const parts = [];
+  let depth = 0;
+  let current = "";
+
+  for (const char of selectBody) {
+    if (char === "(") depth += 1;
+    if (char === ")") depth = Math.max(0, depth - 1);
+    if (char === "," && depth === 0) {
+      parts.push(current);
+      current = "";
+      continue;
+    }
+    current += char;
+  }
+
+  if (current.trim()) parts.push(current);
+
+  return parts
     .map((part) => part.trim().replace(/!inner|!left|!right/g, ""))
+    .filter((part) => part && part !== "*" && !part.includes("("))
     .map((part) => part.split(":").pop()?.trim() || "")
     .map((part) => part.match(new RegExp(`^(${IDENTIFIER})\\b`, "i"))?.[1])
     .filter(Boolean);
@@ -175,9 +192,42 @@ function extractSelectColumns(selectBody) {
 
 function extractObjectKeys(objectBody) {
   const keys = new Set();
-  const keyRegex = /(?:^|[,\s])([_a-zA-Z][_a-zA-Z0-9]*)\s*:/g;
-  let match;
-  while ((match = keyRegex.exec(objectBody))) keys.add(match[1]);
+  const ignoredKeys = new Set(["true", "false", "null", "undefined"]);
+  let depth = 0;
+  let quote = null;
+
+  for (let index = 0; index < objectBody.length; index += 1) {
+    const char = objectBody[index];
+    const previous = objectBody[index - 1];
+
+    if (quote) {
+      if (char === quote && previous !== "\\") quote = null;
+      continue;
+    }
+
+    if (char === "\"" || char === "'" || char === "`") {
+      quote = char;
+      continue;
+    }
+
+    if (char === "{" || char === "[") {
+      depth += 1;
+      continue;
+    }
+
+    if (char === "}" || char === "]") {
+      depth = Math.max(0, depth - 1);
+      continue;
+    }
+
+    if (char !== ":" || depth !== 1) continue;
+
+    const before = objectBody.slice(0, index);
+    const match = before.match(new RegExp(`(${IDENTIFIER})\\s*$`));
+    const key = match?.[1];
+    if (key && !ignoredKeys.has(key) && key === key.toLowerCase()) keys.add(key);
+  }
+
   return [...keys];
 }
 

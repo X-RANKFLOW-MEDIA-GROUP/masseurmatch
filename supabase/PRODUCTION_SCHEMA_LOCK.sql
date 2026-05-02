@@ -69,6 +69,7 @@ alter table public.profiles
   add column if not exists website text,
   add column if not exists booking_link text,
   add column if not exists specialties text[] default '{}',
+  add column if not exists specialty text,
   add column if not exists modalities text[] default '{}',
   add column if not exists modality text,
   add column if not exists massage_techniques text[] default '{}',
@@ -147,6 +148,18 @@ alter table public.profiles
   add column if not exists terms_accepted_at timestamptz,
   add column if not exists add_ons jsonb,
   add column if not exists pricing_sessions jsonb,
+  add column if not exists rates jsonb,
+  add column if not exists rating_average numeric(3,2),
+  add column if not exists latitude numeric(10,7),
+  add column if not exists longitude numeric(10,7),
+  add column if not exists presentation_video_url text,
+  add column if not exists social_media jsonb,
+  add column if not exists subscription_plan text,
+  add column if not exists subscription_current_period_start timestamptz,
+  add column if not exists subscription_current_period_end timestamptz,
+  add column if not exists subscription_cancel_at_period_end boolean default false,
+  add column if not exists completion_percentage integer default 0,
+  add column if not exists role text,
   add column if not exists submitted_at timestamptz,
   add column if not exists approved_at timestamptz,
   add column if not exists approved_by uuid references auth.users(id) on delete set null,
@@ -161,7 +174,7 @@ alter table public.profiles
 alter table public.profiles drop constraint if exists profiles_status_check;
 alter table public.profiles add constraint profiles_status_check check (status in ('draft','pending','pending_approval','submitted','under_review','approved','suspended','rejected','changes_requested'));
 alter table public.profiles drop constraint if exists profiles_profile_status_check;
-alter table public.profiles add constraint profiles_profile_status_check check (profile_status in ('draft','pending','pending_approval','submitted','under_review','approved','suspended','rejected','changes_requested'));
+alter table public.profiles add constraint profiles_profile_status_check check (profile_status in ('draft','pending','pending_approval','under_review','approved','suspended','rejected','changes_requested'));
 alter table public.profiles drop constraint if exists profiles_subscription_tier_check;
 alter table public.profiles add constraint profiles_subscription_tier_check check (subscription_tier in ('free','standard','pro','elite','featured'));
 alter table public.profiles drop constraint if exists profiles_visibility_status_check;
@@ -175,7 +188,10 @@ create table if not exists public.profile_photos (
   user_id uuid references auth.users(id) on delete cascade,
   storage_path text,
   url text,
+  is_primary boolean default false,
+  sort_order integer default 0,
   moderation_status text default 'pending',
+  moderation_reason text,
   created_at timestamptz default timezone('utc', now()),
   updated_at timestamptz default timezone('utc', now())
 );
@@ -232,6 +248,7 @@ create table if not exists public.text_verifications (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   phone text not null,
+  verification_code text,
   status text not null default 'not_started' check (status in ('not_started','pending','verified','failed','expired')),
   provider text,
   attempt_count integer not null default 0,
@@ -255,10 +272,15 @@ create table if not exists public.admin_actions (
 
 create table if not exists public.audit_log (
   id uuid primary key default gen_random_uuid(),
+  admin_user_id uuid references auth.users(id) on delete set null,
   admin_id uuid references auth.users(id) on delete set null,
+  action text,
   action_type text not null,
+  target_type text,
+  target_id uuid,
   target_user_id uuid,
   target_profile_id uuid,
+  details jsonb,
   reason text,
   metadata jsonb,
   created_at timestamptz default timezone('utc', now())
@@ -267,12 +289,23 @@ create table if not exists public.audit_log (
 create table if not exists public.lifecycle_email_queue (
   id uuid primary key default gen_random_uuid(),
   user_id uuid,
+  provider_id uuid,
   recipient_email text,
+  recipient_name text,
+  segment text,
+  campaign_key text,
+  flow_key text,
+  template_key text,
+  send_category text,
+  suppression_reason text,
   subject text,
   status text default 'pending',
   body_html text,
   body_text text,
   scheduled_for timestamptz,
+  sent_at timestamptz,
+  error_message text,
+  retry_count integer not null default 0,
   idempotency_key text unique,
   created_at timestamptz default timezone('utc', now())
 );
@@ -280,6 +313,9 @@ create table if not exists public.lifecycle_email_queue (
 create table if not exists public.contact_inquiries (
   id uuid primary key default gen_random_uuid(),
   profile_id uuid references public.profiles(id) on delete cascade,
+  therapist_id uuid,
+  client_email text,
+  message text,
   status text default 'new',
   created_at timestamptz default timezone('utc', now())
 );
@@ -287,6 +323,338 @@ create table if not exists public.contact_inquiries (
 create table if not exists public.newsletter_subscribers (
   id uuid primary key default gen_random_uuid(),
   email citext unique not null,
+  name text,
+  city text,
+  is_active boolean not null default true,
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.therapists (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid,
+  slug text unique,
+  display_name text,
+  contact_email text,
+  city text,
+  state text,
+  created_at timestamptz default timezone('utc', now()),
+  updated_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.cities (
+  id uuid primary key default gen_random_uuid(),
+  name text,
+  slug text unique,
+  state text,
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.keywords (
+  id uuid primary key default gen_random_uuid(),
+  keyword text,
+  slug text unique,
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid,
+  profile_id uuid,
+  stripe_customer_id text,
+  stripe_subscription_id text,
+  status text,
+  tier text,
+  current_period_end timestamptz,
+  created_at timestamptz default timezone('utc', now()),
+  updated_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.blog_posts (
+  id uuid primary key default gen_random_uuid(),
+  slug text unique,
+  title text,
+  excerpt text,
+  body text,
+  tags text[] default '{}',
+  published_at timestamptz,
+  seo_description text,
+  created_at timestamptz default timezone('utc', now()),
+  updated_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.reviews (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid,
+  therapist_id uuid,
+  client_id uuid,
+  client_email text,
+  reviewer_name text,
+  title text,
+  content text,
+  review_text text,
+  rating integer,
+  review_date date,
+  status text default 'pending',
+  is_public boolean default false,
+  is_verified boolean default false,
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.client_favorites (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid,
+  client_user_id uuid,
+  profile_id uuid,
+  therapist_id uuid,
+  therapist_profile_id uuid,
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.search_history (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid,
+  query text,
+  filters jsonb,
+  results_count integer,
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.contact_preferences (
+  id uuid primary key default gen_random_uuid(),
+  therapist_id uuid,
+  allow_phone boolean default true,
+  allow_email boolean default true,
+  allow_whatsapp boolean default true,
+  auto_reply_message text,
+  created_at timestamptz default timezone('utc', now()),
+  updated_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.user_notification_preferences (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid unique,
+  email_enabled boolean default true,
+  sms_enabled boolean default false,
+  push_enabled boolean default false,
+  marketing_enabled boolean default false,
+  phone_e164 text,
+  timezone text,
+  quiet_hours_start time,
+  quiet_hours_end time,
+  created_at timestamptz default timezone('utc', now()),
+  updated_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.notifications (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid,
+  title text,
+  message text,
+  body text,
+  type text,
+  is_read boolean default false,
+  data jsonb,
+  metadata jsonb,
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.notification_deliveries (
+  id uuid primary key default gen_random_uuid(),
+  notification_id uuid,
+  user_id uuid,
+  channel text,
+  provider text,
+  destination text,
+  status text,
+  payload jsonb,
+  provider_message_id text,
+  error_message text,
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.push_subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid,
+  endpoint text unique,
+  p256dh text,
+  auth text,
+  keys jsonb,
+  user_agent text,
+  is_active boolean default true,
+  created_at timestamptz default timezone('utc', now()),
+  updated_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.therapist_learning_scores (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid,
+  therapist_id uuid,
+  city text,
+  intent text,
+  score numeric,
+  weighted_score numeric,
+  impressions integer default 0,
+  profile_clicks integer default 0,
+  contact_clicks integer default 0,
+  ctr numeric,
+  contact_rate numeric,
+  created_at timestamptz default timezone('utc', now()),
+  updated_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.ranking_events (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid,
+  event_type text,
+  event_name text,
+  weight numeric,
+  metadata jsonb,
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.imported_profile_data (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid,
+  source_url text,
+  payload jsonb,
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.imported_reviews (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid,
+  source_url text,
+  reviewer_name text,
+  review_text text,
+  rating integer,
+  review_date date,
+  source_platform text,
+  imported_at timestamptz,
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.moderation_queue (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid,
+  profile_id uuid,
+  photo_id uuid,
+  target_id uuid,
+  item_type text,
+  queue_type text,
+  source text,
+  field_name text,
+  priority integer default 0,
+  moderation_provider text,
+  moderation_reason text,
+  admin_reason text,
+  snapshot jsonb,
+  status text default 'pending',
+  payload jsonb,
+  resolved_by uuid,
+  resolved_at timestamptz,
+  created_at timestamptz default timezone('utc', now()),
+  updated_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.therapist_profiles (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid,
+  profile_id uuid,
+  created_at timestamptz default timezone('utc', now()),
+  updated_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.user_suspensions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid,
+  admin_id uuid,
+  type text,
+  reason text,
+  reason_detail text,
+  duration_days integer,
+  ends_at timestamptz,
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.featured_masters (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid,
+  city text,
+  display_order integer default 0,
+  is_active boolean default true,
+  featured_by uuid,
+  starts_at timestamptz,
+  ends_at timestamptz,
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.complaints (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid,
+  reporter_id uuid,
+  reported_profile_id uuid,
+  reporter_email text,
+  category text,
+  message text,
+  description text,
+  status text default 'new',
+  admin_notes text,
+  resolved_at timestamptz,
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.photo_moderations (
+  id uuid primary key default gen_random_uuid(),
+  photo_id uuid,
+  therapist_id uuid,
+  type text,
+  url text,
+  status text,
+  reason text,
+  admin_notes text,
+  flagged_at timestamptz,
+  reviewed_at timestamptz,
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.profile_documents (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid,
+  type text,
+  document_type text,
+  storage_path text,
+  url text,
+  status text default 'pending',
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.provider_travel (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid,
+  destination_city text,
+  start_date date,
+  end_date date,
+  is_active boolean default true,
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.lifecycle_email_log (
+  id uuid primary key default gen_random_uuid(),
+  queue_id uuid,
+  user_id uuid,
+  provider_id uuid,
+  provider text,
+  recipient_email text,
+  segment text,
+  campaign_key text,
+  flow_key text,
+  template_key text,
+  send_category text,
+  suppression_reason text,
+  subject text,
+  status text,
+  metadata jsonb,
+  error_message text,
   created_at timestamptz default timezone('utc', now())
 );
 

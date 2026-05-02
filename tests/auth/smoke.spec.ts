@@ -69,17 +69,18 @@ test.describe("Auth pages smoke", () => {
   test("/login links to /register", async ({ page }) => {
     await page.goto("/login");
 
-    const signUpLink = page.locator('a[href="/register"]').filter({ hasText: /sign up/i }).first();
+    const signUpLink = page.locator('a[href^="/register"]').filter({ hasText: /sign up/i }).first();
     await expect(signUpLink).toBeVisible();
-    await expect(signUpLink).toHaveAttribute("href", "/register");
+    await expect(signUpLink).toHaveAttribute("href", /\/register/);
   });
 
   test("/register links to /login", async ({ page }) => {
     await page.goto("/register");
 
-    const signInLink = page.locator('a[href="/login"]').filter({ hasText: /sign in/i }).first();
-    await expect(signInLink).toBeVisible();
-    await expect(signInLink).toHaveAttribute("href", "/login");
+    await expect(page).toHaveURL(/\/signup\/account/);
+    const loginLink = page.locator('a[href="/login"]').filter({ hasText: /log in/i }).first();
+    await expect(loginLink).toBeVisible();
+    await expect(loginLink).toHaveAttribute("href", "/login");
   });
 
   test("/forgot-password renders reset form", async ({ page }) => {

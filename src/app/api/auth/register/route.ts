@@ -1,8 +1,10 @@
-import { errorResponse, json, parseJsonBody } from "@/app/api/_lib/http";
+import { errorResponse, json, parseJsonBody, withSetCookie } from "@/app/api/_lib/http";
+import { setSessionCookie } from "@/app/api/_lib/session";
 import { RouteError } from "@/app/api/_lib/http";
 import { authRegisterSchema } from "@/app/_lib/validation";
 import {
   createTherapistUser,
+  ensureUserProfileAndRole,
 } from "@/app/api/_lib/supabase-server";
 
 export async function POST(request: Request) {
@@ -13,23 +15,42 @@ export async function POST(request: Request) {
       ...body,
       emailRedirectTo: `${origin}/api/auth/callback?next=/pro/onboard`,
     });
+    const { role } = await ensureUserProfileAndRole(result.user, {
+      defaultRole: "provider",
+      fallbackName: body.fullName,
+    });
 
-    return json({
+    const response = json({
       ok: true,
       user: {
         id: result.user.id,
         email: result.user.email,
       },
-      role: null,
+      role,
       session: result.session
         ? {
           access_token: result.session.access_token,
           refresh_token: result.session.refresh_token,
         }
         : null,
-      requiresEmailConfirmation: true,
-      message: "Check your email to confirm your account before continuing.",
+      requiresEmailConfirmation: !result.session,
+      message: result.session
+        ? "Account created. You can continue onboarding now."
+        : "Check your email to confirm your account before continuing.",
     });
+
+    if (!result.session) {
+      return response;
+    }
+
+    return withSetCookie(
+      response,
+      setSessionCookie({
+        userId: result.user.id,
+        email: result.user.email ?? body.email,
+        role,
+      }),
+    );
   } catch (error) {
     if (error instanceof RouteError && error.status === 400) {
       const msg = error.message.toLowerCase();

@@ -289,7 +289,7 @@ export async function createTherapistUser(input: {
 }) {
   const publicClient = createSupabasePublicClient();
 
-  const { data, error } = await publicClient.auth.signUp({
+  const signUpPayload = {
     email: input.email,
     password: input.password,
     options: {
@@ -299,15 +299,58 @@ export async function createTherapistUser(input: {
         role: "provider",
       },
     },
+  };
+
+  const { data, error } = await publicClient.auth.signUp(signUpPayload);
+
+  if (!error && data.user) {
+    return {
+      user: data.user,
+      role: null,
+      session: data.session ?? null,
+    };
+  }
+
+  const canFallbackToAdminCreate =
+    error?.message?.toLowerCase().includes("sending confirmation email") ||
+    error?.message?.toLowerCase().includes("email");
+
+  if (!canFallbackToAdminCreate) {
+    throw new RouteError(400, error?.message || "Could not create account.");
+  }
+
+  const adminClient = createSupabaseAdminClient();
+  const { data: created, error: createError } = await adminClient.auth.admin.createUser({
+    email: input.email,
+    password: input.password,
+    email_confirm: true,
+    user_metadata: {
+      full_name: input.fullName,
+      role: "provider",
+    },
   });
 
-  if (error || !data.user) {
-    throw new RouteError(400, "Could not create account.");
+  if (createError || !created.user) {
+    throw new RouteError(400, createError?.message || "Could not create account.");
+  }
+
+  await ensureUserProfileAndRole(created.user, {
+    defaultRole: "provider",
+    fallbackName: input.fullName,
+  });
+
+  const { data: sessionData, error: signInError } = await publicClient.auth.signInWithPassword({
+    email: input.email,
+    password: input.password,
+  });
+
+  if (signInError || !sessionData.session) {
+    throw new RouteError(400, signInError?.message || "Could not create account session.");
   }
 
   return {
-    user: data.user,
+    user: created.user,
     role: null,
-    session: data.session ?? null,
+    session: sessionData.session,
   };
 }

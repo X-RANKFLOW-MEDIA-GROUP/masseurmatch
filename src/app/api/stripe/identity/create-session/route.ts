@@ -108,6 +108,18 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to create identity verification session.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    const isStripeConfigurationError =
+      message.toLowerCase().includes("api key") ||
+      message.toLowerCase().includes("stripe_secret_key") ||
+      message.toLowerCase().includes("not configured");
+
+    return NextResponse.json(
+      {
+        error: isStripeConfigurationError
+          ? "Stripe Identity is not configured with a valid API key."
+          : message,
+      },
+      { status: isStripeConfigurationError ? 503 : 500 },
+    );
   }
 }

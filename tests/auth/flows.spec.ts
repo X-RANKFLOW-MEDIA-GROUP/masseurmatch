@@ -108,14 +108,14 @@ test.describe.serial("Auth launch flow", () => {
 
     await page.getByLabel(/full name/i).fill(fullName);
     await page.getByLabel(/email address/i).fill(email);
-    await page.getByLabel(/^password$/i).fill(password);
-        await page.getByRole("checkbox", { name: /terms of service/i }).check();
-        await page.getByRole("checkbox", { name: /therapist agreement/i }).check();
-        await page.getByRole("checkbox", { name: /i agree to the/i }).check();
-        await page.getByRole("checkbox", { name: /i acknowledge the/i }).check();
-    await page.getByRole("button", { name: /create account/i }).click();
+    await page.getByLabel(/phone number/i).fill("5551112222");
+    await page.getByLabel(/^password/i).fill(password);
+    await page.getByLabel(/confirm password/i).fill(password);
+    await page.getByRole("checkbox", { name: /i agree to the terms of service/i }).check();
+    await page.getByRole("checkbox", { name: /i acknowledge the therapist agreement/i }).check();
+    await page.getByRole("button", { name: /continue to verification/i }).click();
 
-    await expect(page).toHaveURL(/\/signup\/plan$/, { timeout: 30_000 });
+    await expect(page).toHaveURL(/\/signup\/verify$/, { timeout: 30_000 });
 
     await expect
       .poll(async () => {
@@ -142,7 +142,7 @@ test.describe.serial("Auth launch flow", () => {
       expect.objectContaining({
         user_id: createdUserId,
         full_name: fullName,
-        status: "pending_approval",
+        status: "draft",
         is_active: false,
       }),
     );
@@ -190,6 +190,7 @@ test.describe.serial("Auth launch flow", () => {
             serviceCategories: ["Deep Tissue"],
             sessionLengths: ["60 min"],
             startingPrice: "180",
+            yearsExperience: "5",
           },
           verification: {
             emailVerified: true,
@@ -235,6 +236,12 @@ test.describe.serial("Auth launch flow", () => {
         body: await response.json().catch(() => ({})),
       };
     });
+
+    test.skip(
+      createSessionResult.status === 503 &&
+        String(createSessionResult.body.error || "").includes("Stripe Identity is not configured"),
+      "Stripe Identity E2E requires a valid STRIPE_SECRET_KEY.",
+    );
 
     expect(createSessionResult.status).toBe(200);
     expect(createSessionResult.body.sessionId).toBeTruthy();
