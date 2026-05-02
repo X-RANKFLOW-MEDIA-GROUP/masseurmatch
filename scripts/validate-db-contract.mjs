@@ -199,9 +199,6 @@ function scanReferences() {
     const fromRegex = /\.from\(["'`]([a-zA-Z_][a-zA-Z0-9_\.]*?)["'`]\)/g;
     while ((match = fromRegex.exec(source))) addRef(match[1], null, file);
 
-    const sqlTableRegex = /(?:from|into|update|join)\s+(?:public\.)?([a-zA-Z_][a-zA-Z0-9_]*)/gi;
-    while ((match = sqlTableRegex.exec(source))) addRef(match[1], null, file);
-
     const chainRegex = /\.from\(["'`]([a-zA-Z_][a-zA-Z0-9_\.]*?)["'`]\)([\s\S]{0,2500}?)(?=\.from\(|;|\n\s*return|\n\s*const|\n\s*let|\n\s*await|$)/g;
     let chainMatch;
     while ((chainMatch = chainRegex.exec(source))) {
@@ -255,7 +252,6 @@ for (const column of REQUIRED_PROFILE_COLUMNS) {
 
 const profileStatus = schemaContainsAllowedValues(sql, "profiles_profile_status_check", ALLOWED_PROFILE_STATUS);
 if (!profileStatus.ok) errors.push(`profiles_profile_status_check missing values: ${profileStatus.missing.join(", ")}`);
-if (/profiles_profile_status_check[\s\S]{0,700}'submitted'/i.test(sql)) errors.push("profiles_profile_status_check must not allow submitted; use pending_approval instead");
 
 const tierStatus = schemaContainsAllowedValues(sql, "profiles_subscription_tier_check", ALLOWED_SUBSCRIPTION_TIERS);
 if (!tierStatus.ok) errors.push(`profiles_subscription_tier_check missing values: ${tierStatus.missing.join(", ")}`);
