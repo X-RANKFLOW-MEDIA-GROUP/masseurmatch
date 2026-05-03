@@ -80,7 +80,7 @@ function resolveTier(obj: StripeEventObject, subscriptionStatus?: string): Subsc
 
 function getStripeClient() {
   if (!hasStripe || !env.stripeSecretKey) return null;
-  return new Stripe(env.stripeSecretKey, { apiVersion: "2025-08-27.basil" });
+  return new Stripe(env.stripeSecretKey, { apiVersion: "2024-11-20.acacia" });
 }
 
 function getClientIp(request: Request): string {
@@ -155,85 +155,97 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (isRateLimited(getClientIp(request))) {
-    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
-  }
-
-  const stripe = getStripeClient();
-  const stripeSignature = request.headers.get("stripe-signature") ?? "";
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? "";
-  const rawBody = await request.text();
-
-  const isLocalDev = process.env.NODE_ENV !== "production" && !webhookSecret;
-
-  let event: StripeEvent;
-  if (isLocalDev) {
-    event = JSON.parse(rawBody) as StripeEvent;
-  } else {
-    if (!webhookSecret || !stripe) {
-      return NextResponse.json({ error: "Webhook secret not configured." }, { status: 400 });
-    }
-    try {
-      event = stripe.webhooks.constructEvent(rawBody, stripeSignature, webhookSecret) as StripeEvent;
-    } catch {
-      return NextResponse.json({ error: "Invalid webhook signature." }, { status: 400 });
-    }
-  }
-
-  cleanupProcessedEvents();
-  if (event.id && processedEvents.has(event.id)) {
-    return NextResponse.json({ ok: true, skipped: "duplicate_event" });
-  }
-
-  const obj = event.data?.object;
-  const userId = obj?.metadata?.user_id ?? obj?.metadata?.userId;
-
-  if (!userId) {
-    return NextResponse.json({ ok: true, skipped: "no_user_id" });
-  }
-
-  let updateResult: { ok: boolean; status?: number; error?: string } = { ok: true };
-
-  if (event.type === "checkout.session.completed" || event.type === "customer.subscription.updated") {
-    const status = obj?.status || "active";
-    const tier = resolveTier(obj, status);
-    const subscriptionId = obj.subscription || obj.id;
-
-    const updates: Record<string, unknown> = {
-      subscription_tier: tier,
-      _tier: tier,
-      photo_limit: PHOTO_LIMITS[tier],
-      visibility_level: VISIBILITY_LEVELS[tier],
-      stripe_customer_id: obj.customer,
-      stripe_subscription_id: subscriptionId,
-    };
-
-    if (obj.current_period_end) {
-      updates.current_period_end = new Date(obj.current_period_end * 1000).toISOString();
+  try {
+    if (isRateLimited(getClientIp(request))) {
+      console.warn("[stripe-webhook] rate-limited request");
+      return NextResponse.json({ ok: true, skipped: "rate_limited" });
     }
 
-    updateResult = await updateProfileBilling(userId, updates);
-  } else if (event.type === "customer.subscription.deleted") {
-    updateResult = await updateProfileBilling(userId, {
-      subscription_tier: "free",
-      _tier: "free",
-      photo_limit: 2,
-      visibility_level: 1,
-      stripe_subscription_id: null,
-      current_period_end: null,
+    const stripe = getStripeClient();
+    const stripeSignature = request.headers.get("stripe-signature") ?? "";
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? "";
+    const rawBody = await request.text();
+
+    const isLocalDev = process.env.NODE_ENV !== "production" && !webhookSecret;
+
+    let event: StripeEvent;
+    if (isLocalDev) {
+      event = JSON.parse(rawBody) as StripeEvent;
+    } else {
+      if (!webhookSecret || !stripe) {
+        console.error("[stripe-webhook] secret or stripe client not configured");
+        return NextResponse.json({ ok: true, skipped: "not_configured" });
+      }
+      try {
+        event = stripe.webhooks.constructEvent(rawBody, stripeSignature, webhookSecret) as StripeEvent;
+      } catch {
+        console.warn("[stripe-webhook] invalid webhook signature");
+        return NextResponse.json({ ok: true, skipped: "invalid_signature" });
+      }
+    }
+
+    cleanupProcessedEvents();
+    if (event.id && processedEvents.has(event.id)) {
+      return NextResponse.json({ ok: true, skipped: "duplicate_event" });
+    }
+
+    const obj = event.data?.object;
+    const userId = obj?.metadata?.user_id ?? obj?.metadata?.userId;
+
+    if (!userId) {
+      console.info(`[stripe-webhook] skipped event ${event.id ?? "unknown"}: no user_id metadata`);
+      return NextResponse.json({ ok: true, skipped: "no_user_id" });
+    }
+
+    let updateResult: { ok: boolean; status?: number; error?: string } = { ok: true };
+
+    if (event.type === "checkout.session.completed" || event.type === "customer.subscription.updated") {
+      const status = obj?.status || "active";
+      const tier = resolveTier(obj, status);
+      const subscriptionId = obj.subscription || obj.id;
+
+      const updates: Record<string, unknown> = {
+        subscription_tier: tier,
+        _tier: tier,
+        photo_limit: PHOTO_LIMITS[tier],
+        visibility_level: VISIBILITY_LEVELS[tier],
+        stripe_customer_id: obj.customer,
+        stripe_subscription_id: subscriptionId,
+      };
+
+      if (obj.current_period_end) {
+        updates.current_period_end = new Date(obj.current_period_end * 1000).toISOString();
+      }
+
+      updateResult = await updateProfileBilling(userId, updates);
+    } else if (event.type === "customer.subscription.deleted") {
+      updateResult = await updateProfileBilling(userId, {
+        subscription_tier: "free",
+        _tier: "free",
+        photo_limit: 2,
+        visibility_level: 1,
+        stripe_subscription_id: null,
+        current_period_end: null,
+      });
+    }
+
+    if (!updateResult.ok) {
+      console.error(`[stripe-webhook] failed persisting event ${event.id ?? "unknown"}`, {
+        status: updateResult.status,
+        error: updateResult.error,
+      });
+      return NextResponse.json({ ok: true, skipped: "persist_failed" });
+    }
+
+    if (event.id) {
+      processedEvents.set(event.id, Date.now());
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("[stripe-webhook] unhandled error", {
+      message: error instanceof Error ? error.message : "unknown",
     });
+    return NextResponse.json({ ok: true, skipped: "internal_error" });
   }
-
-  if (!updateResult.ok) {
-    return NextResponse.json(
-      { error: "Failed to persist Stripe webhook update", details: updateResult.error },
-      { status: updateResult.status ?? 500 },
-    );
-  }
-
-  if (event.id) {
-    processedEvents.set(event.id, Date.now());
-  }
-
-  return NextResponse.json({ ok: true });
 }
