@@ -51,6 +51,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/login?error=config", origin));
   }
 
+  if (process.env.NODE_ENV === "production" && !serviceKey) {
+    return NextResponse.redirect(new URL("/login?error=server_session_config", origin));
+  }
+
   const supabase = createClient(supabaseUrl, anonKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
@@ -106,6 +110,10 @@ export async function GET(request: NextRequest) {
         // Best-effort only. Email queue issues should not block auth.
       }
     }
+  }
+
+  if (!role) {
+    return NextResponse.redirect(new URL("/login?error=missing_role", origin));
   }
 
   const response = NextResponse.redirect(new URL(next, origin));
