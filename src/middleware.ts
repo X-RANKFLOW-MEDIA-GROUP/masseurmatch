@@ -25,10 +25,10 @@ function getSessionSecret(): string {
     process.env.JWT_SECRET ??
     process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (secret) return secret;
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('MM_SESSION_SECRET is required in production.');
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("MM_SESSION_SECRET is required in production.");
   }
-  return 'dev-only-masseurmatch-session-secret';
+  return "dev-only-masseurmatch-session-secret";
 }
 
 function toBase64Url(bytes: Uint8Array): string {
@@ -86,34 +86,6 @@ async function readSessionCookie(request: NextRequest): Promise<MiddlewareSessio
   }
 }
 
-
-const PUBLIC_RATE_LIMIT = { windowMs: 60_000, max: 240 };
-const publicHits = new Map<string, { count: number; resetAt: number }>();
-
-function getRequestIp(request: NextRequest): string {
-  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? request.headers.get("x-real-ip") ?? "unknown";
-}
-
-function isPublicRateLimited(request: NextRequest): boolean {
-  if (request.method !== "GET") return false;
-  const pathname = request.nextUrl.pathname;
-  if (pathname.startsWith("/_next") || pathname.startsWith("/api")) return false;
-
-  const ip = getRequestIp(request);
-  const now = Date.now();
-  const current = publicHits.get(ip);
-  if (!current || now >= current.resetAt) {
-    publicHits.set(ip, { count: 1, resetAt: now + PUBLIC_RATE_LIMIT.windowMs });
-    return false;
-  }
-
-  if (current.count >= PUBLIC_RATE_LIMIT.max) {
-    return true;
-  }
-
-  current.count += 1;
-  return false;
-}
 // Maps ?city= display values to /explore/usa/{slug} paths.
 // Keys are lowercase — always .toLowerCase().trim() before lookup.
 const EXPLORE_CITY_SLUG_MAP: Record<string, string> = {
@@ -181,10 +153,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname, searchParams } = request.nextUrl;
   const session = await readSessionCookie(request);
 
-  if (isPublicRateLimited(request)) {
-    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
-  }
-
   // ── 1. Removed routes → 301 redirects ───────────────────────────────────
   if (pathname === "/wireframes" || pathname.startsWith("/wireframes/")) {
     return NextResponse.redirect(new URL("/", request.url), 301);
@@ -225,9 +193,9 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.redirect(destination, 301);
   }
 
-  // ── 4. /explore/* →  noindex, follow header ─────────────────────────────
-  // Browse/directory pages are navigation aids, not SEO targets.
-  // follow keeps link equity flowing to the /massage/ landing pages.
+  // ── 4. /explore base and browse variants → noindex, follow header ────────
+  // Keep broad browse/search UX out of the index without touching canonical
+  // city and programmatic SEO landing pages such as /miami or /key-west.
   if (pathname === "/explore" || pathname.startsWith("/explore/")) {
     const response = NextResponse.next();
     response.headers.set("X-Robots-Tag", "noindex, follow");
