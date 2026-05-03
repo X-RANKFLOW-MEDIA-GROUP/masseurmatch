@@ -80,7 +80,7 @@ function resolveTier(obj: StripeEventObject, subscriptionStatus?: string): Subsc
 
 function getStripeClient() {
   if (!hasStripe || !env.stripeSecretKey) return null;
-  return new Stripe(env.stripeSecretKey, { apiVersion: "2024-11-20.acacia" });
+  return new Stripe(env.stripeSecretKey, { apiVersion: "2025-08-27.basil" });
 }
 
 function getClientIp(request: Request): string {
@@ -158,7 +158,7 @@ export async function POST(request: Request) {
   try {
     if (isRateLimited(getClientIp(request))) {
       console.warn("[stripe-webhook] rate-limited request");
-      return NextResponse.json({ ok: true, skipped: "rate_limited" });
+      return NextResponse.json({ error: "Too many webhook requests" }, { status: 429 });
     }
 
     const stripe = getStripeClient();
@@ -174,13 +174,13 @@ export async function POST(request: Request) {
     } else {
       if (!webhookSecret || !stripe) {
         console.error("[stripe-webhook] secret or stripe client not configured");
-        return NextResponse.json({ ok: true, skipped: "not_configured" });
+        return NextResponse.json({ error: "Stripe webhook is not configured" }, { status: 500 });
       }
       try {
         event = stripe.webhooks.constructEvent(rawBody, stripeSignature, webhookSecret) as StripeEvent;
       } catch {
         console.warn("[stripe-webhook] invalid webhook signature");
-        return NextResponse.json({ ok: true, skipped: "invalid_signature" });
+        return NextResponse.json({ error: "Invalid webhook signature" }, { status: 400 });
       }
     }
 
@@ -234,7 +234,10 @@ export async function POST(request: Request) {
         status: updateResult.status,
         error: updateResult.error,
       });
-      return NextResponse.json({ ok: true, skipped: "persist_failed" });
+      return NextResponse.json(
+        { error: "Failed to persist Stripe webhook update" },
+        { status: updateResult.status ?? 500 },
+      );
     }
 
     if (event.id) {
@@ -246,6 +249,6 @@ export async function POST(request: Request) {
     console.error("[stripe-webhook] unhandled error", {
       message: error instanceof Error ? error.message : "unknown",
     });
-    return NextResponse.json({ ok: true, skipped: "internal_error" });
+    return NextResponse.json({ error: "Stripe webhook internal error" }, { status: 500 });
   }
 }
