@@ -94,11 +94,16 @@ export function getErrorMessage(error: unknown): string {
 
 export function errorResponse(error: unknown): Response {
   if (error instanceof ZodError) {
+    // SECURITY: Only expose field-level validation errors, not internal schema details
+    const flattened = error.flatten();
     return json(
       {
         ok: false,
         error: "Validation failed.",
-        issues: error.flatten(),
+        issues: {
+          fieldErrors: flattened.fieldErrors,
+          formErrors: flattened.formErrors.length > 0 ? ["Invalid input"] : [],
+        },
       },
       { status: 422 },
     );
@@ -115,10 +120,12 @@ export function errorResponse(error: unknown): Response {
     );
   }
 
+  // SECURITY FIX: Log full error server-side but return generic message to client
+  console.error("[http] Unhandled error:", error instanceof Error ? error.message : "unknown");
   return json(
     {
       ok: false,
-      error: getErrorMessage(error),
+      error: "An unexpected error occurred. Please try again.",
     },
     { status: 500 },
   );
