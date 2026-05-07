@@ -80,7 +80,7 @@ function resolveTier(obj: StripeEventObject, subscriptionStatus?: string): Subsc
 
 function getStripeClient() {
   if (!hasStripe || !env.stripeSecretKey) return null;
-  return new Stripe(env.stripeSecretKey, { apiVersion: "2024-11-20.acacia" });
+  return new Stripe(env.stripeSecretKey, { apiVersion: "2025-02-24.acacia" });
 }
 
 function getClientIp(request: Request): string {

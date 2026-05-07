@@ -12,7 +12,7 @@ function getStripe() {
   if (!key) {
     throw new Error("STRIPE_SECRET_KEY is not configured. Please ensure the Stripe connector is enabled.");
   }
-  return new Stripe(key, { apiVersion: "2025-08-27.basil" });
+  return new Stripe(key, { apiVersion: "2025-02-24.acacia" });
 }
 
 function mapVerificationStatus(status: Stripe.Identity.VerificationSession.Status) {
