@@ -24,6 +24,7 @@ type AdminTherapist = {
   display_name: string | null;
   full_name: string;
   city: string | null;
+  slug?: string | null;
   profile_status: string;
   subscription_tier: string | null;
   verification_status: string | null;
