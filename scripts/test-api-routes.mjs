@@ -87,6 +87,10 @@ function ensure(condition, message) {
   }
 }
 
+function locationIncludes(response, expected) {
+  return response.headers.get("location")?.includes(expected) === true;
+}
+
 async function stopServer(child) {
   if (child.killed) {
     return;
@@ -116,6 +120,8 @@ const server = spawn(serverCommand, serverArgs, {
     ...process.env,
     NEXT_TELEMETRY_DISABLED: "1",
     RESEND_API_KEY: "",
+    STRIPE_SECRET_KEY: "sk_test_masseurmatch_smoke_test",
+    STRIPE_WEBHOOK_SECRET: "whsec_masseurmatch_smoke_test",
   },
   stdio: ["ignore", "pipe", "pipe"],
 });
@@ -127,6 +133,43 @@ const checks = [];
 
 try {
   await waitForServer();
+
+  {
+    const { response } = await request("/api/auth/callback", { method: "GET" });
+    assert.equal(response.status, 307);
+    ensure(locationIncludes(response, "/login?error=no_code"), "OAuth callback should reject missing code.");
+    checks.push("oauth-callback-missing-code");
+  }
+
+  {
+    const { response } = await request("/pro/dashboard", { method: "GET" });
+    assert.equal(response.status, 307);
+    ensure(locationIncludes(response, "/login"), "Pro dashboard should redirect unauthenticated users to login.");
+    ensure(locationIncludes(response, "redirect=%2Fpro%2Fdashboard"), "Pro dashboard redirect should preserve destination.");
+    checks.push("pro-dashboard-unauthorized-redirect");
+  }
+
+  {
+    const { response } = await request("/admin", { method: "GET" });
+    assert.equal(response.status, 307);
+    ensure(locationIncludes(response, "/login"), "Admin should redirect unauthenticated users to login.");
+    ensure(locationIncludes(response, "redirect=%2Fadmin"), "Admin redirect should preserve destination.");
+    checks.push("admin-unauthorized-redirect");
+  }
+
+  {
+    const { response, json } = await request("/api/webhooks/stripe", {
+      method: "POST",
+      headers: {
+        "stripe-signature": "invalid-signature",
+      },
+      body: JSON.stringify({ id: "evt_invalid_signature_test", type: "checkout.session.completed", data: { object: {} } }),
+    });
+
+    assert.equal(response.status, 400);
+    ensure(json?.error === "Invalid webhook signature", "Stripe webhook should reject invalid signatures.");
+    checks.push("stripe-webhook-invalid-signature");
+  }
 
   {
     const { response, json } = await request("/api/auth/forgot-password", {
