@@ -41,9 +41,9 @@
 - Verification status (identity, phone)
 - Admin notes textarea (add/edit feedback)
 - Action buttons:
-  - **Approve Profile** (green) - Goes live immediately
-  - **Request Changes** (yellow) - Therapist sees feedback, can resubmit
-  - **Reject Profile** (red) - Therapist must resubmit entire profile
+ - **Approve Profile** (green) - Goes live immediately
+ - **Request Changes** (yellow) - Therapist sees feedback, can resubmit
+ - **Reject Profile** (red) - Therapist must resubmit entire profile
 - Timeline showing submission/review dates
 
 **Workflow Tips**:
@@ -136,9 +136,9 @@
 ### Task: Request Profile Improvements
 1. Go to `/admin/approvals` and click profile
 2. In "Admin Notes" add specific feedback:
-   - "Please add bio describing your experience"
-   - "Rates should be in $50-150 range"
-   - "Add at least 3 professional photos"
+ - "Please add bio describing your experience"
+ - "Rates should be in $50-150 range"
+ - "Add at least 3 professional photos"
 3. Click "Request Changes" button
 4. Therapist sees red banner with your feedback
 5. Therapist can update profile and resubmit
@@ -147,9 +147,9 @@
 ### Task: Reject a Profile (Policy Violation)
 1. Go to `/admin/approvals` and click profile
 2. In "Admin Notes" explain the reason:
-   - "Photos contain inappropriate content"
-   - "Profile violates our terms of service"
-   - "Unverified identity cannot continue"
+ - "Photos contain inappropriate content"
+ - "Profile violates our terms of service"
+ - "Unverified identity cannot continue"
 3. Click "Reject Profile" button
 4. Therapist gets rejection email with your feedback
 5. Therapist must create new profile to reapply
@@ -161,20 +161,20 @@
 4. Click link to view therapist's profile
 5. Check: photos, reviews, verification status
 6. Decide:
-   - **Dismiss** - No violation found, close ticket
-   - **Resolve & Suspend** - Multiple violations, remove profile
-   - **Resolve & Warn** - First-time, send warning email
+ - **Dismiss** - No violation found, close ticket
+ - **Resolve & Suspend** - Multiple violations, remove profile
+ - **Resolve & Warn** - First-time, send warning email
 
 ### Task: View Platform Health
 1. Go to `/admin/analytics`
 2. Check key metrics:
-   - Are approvals keeping up? (days < 2 is good)
-   - Are complaints trending up? (investigate if so)
-   - Which cities have most therapists?
+ - Are approvals keeping up? (days < 2 is good)
+ - Are complaints trending up? (investigate if so)
+ - Which cities have most therapists?
 3. If metrics look bad:
-   - Longer approval times? Need more reviewers
-   - More complaints? Might need stricter screening
-   - Uneven city distribution? Consider marketing in gaps
+ - Longer approval times? Need more reviewers
+ - More complaints? Might need stricter screening
+ - Uneven city distribution? Consider marketing in gaps
 
 ---
 

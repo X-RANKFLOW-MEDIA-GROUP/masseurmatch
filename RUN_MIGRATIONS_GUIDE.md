@@ -35,10 +35,10 @@ Se preferir fazer manualmente:
 2. Selecione seu projeto
 3. Clique em **SQL Editor**
 4. Para cada arquivo em `supabase/migrations/*.sql`:
-   - Abra o arquivo no seu editor
-   - Copie TODO o conteúdo SQL
-   - Cole no Supabase SQL Editor
-   - Clique em **RUN**
+ - Abra o arquivo no seu editor
+ - Copie TODO o conteúdo SQL
+ - Cole no Supabase SQL Editor
+ - Clique em **RUN**
 
 ---
 
@@ -80,10 +80,10 @@ node scripts/run-migrations.js
 📍 API URL: http://localhost:3000/api/admin/run-migrations
 
 📊 Migration Results:
-   ✓ Executed: 21
-   ⏭️  Skipped: 0
-   ❌ Errors: 0
-   📈 Total: 21
+ ✓ Executed: 21
+ ⏭️ Skipped: 0
+ ❌ Errors: 0
+ 📈 Total: 21
 
 🎉 All migrations completed successfully!
 ✨ Your Supabase database is now ready!
@@ -97,7 +97,7 @@ Depois de executar, vá ao Supabase Dashboard e verifique em **Database → Tabl
 
 Você deve ver as seguintes tabelas criadas:
 - ✓ profiles
-- ✓ profiles_photos  
+- ✓ profiles_photos 
 - ✓ client_favorites
 - ✓ search_history
 - ✓ reviews

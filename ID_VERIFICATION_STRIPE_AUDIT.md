@@ -47,11 +47,11 @@ MasseurMatch possui uma implementação **robusta e completa** de ID Verificatio
 **Mapeamento de Status**:
 ```
 Stripe Status → BD Status
-verified      → verified
-processing    → processing
+verified → verified
+processing → processing
 requires_input→ requires_input
-canceled      → expired
-other         → failed
+canceled → expired
+other → failed
 ```
 
 **Fluxo**:
@@ -66,28 +66,28 @@ other         → failed
 
 #### Tabela: `identity_verifications`
 ```sql
-id                      | UUID (PK)
-user_id                 | UUID (FK - auth.users)
-profile_id              | UUID (FK - profiles)
-legal_name_hash         | TEXT (SHA-256, nunca plaintext)
-document_type           | TEXT (drivers_license|passport|state_id|military_id)
-document_country        | TEXT (default: US)
-document_expiry         | DATE
-document_storage_path   | TEXT (caminho no bucket privado)
-selfie_storage_path     | TEXT (selfie para liveness check)
-status                  | TEXT (pending|reviewing|approved|rejected|expired)
-rejection_reason        | TEXT
-reviewer_id             | UUID (admin que revisou)
-reviewed_at             | TIMESTAMPTZ
-show_verified_badge     | BOOLEAN (default: true)
-show_first_name         | BOOLEAN (default: false)
-show_verification_date  | BOOLEAN (default: true)
-show_document_type      | BOOLEAN (default: false)
-verification_method     | TEXT (manual|automated|partner_api)
-verified_at             | TIMESTAMPTZ
-expires_at              | TIMESTAMPTZ (2 anos)
-created_at              | TIMESTAMPTZ
-updated_at              | TIMESTAMPTZ
+id | UUID (PK)
+user_id | UUID (FK - auth.users)
+profile_id | UUID (FK - profiles)
+legal_name_hash | TEXT (SHA-256, nunca plaintext)
+document_type | TEXT (drivers_license|passport|state_id|military_id)
+document_country | TEXT (default: US)
+document_expiry | DATE
+document_storage_path | TEXT (caminho no bucket privado)
+selfie_storage_path | TEXT (selfie para liveness check)
+status | TEXT (pending|reviewing|approved|rejected|expired)
+rejection_reason | TEXT
+reviewer_id | UUID (admin que revisou)
+reviewed_at | TIMESTAMPTZ
+show_verified_badge | BOOLEAN (default: true)
+show_first_name | BOOLEAN (default: false)
+show_verification_date | BOOLEAN (default: true)
+show_document_type | BOOLEAN (default: false)
+verification_method | TEXT (manual|automated|partner_api)
+verified_at | TIMESTAMPTZ
+expires_at | TIMESTAMPTZ (2 anos)
+created_at | TIMESTAMPTZ
+updated_at | TIMESTAMPTZ
 ```
 
 #### Política RLS
@@ -194,10 +194,10 @@ Backend: Recupera status do Stripe
 - Documento armazenado em bucket privado
 - Terapeuta controla o que é mostrado publicamente
 - Opções de privacidade:
-  - `show_verified_badge` (padrão: true)
-  - `show_first_name` (padrão: false)
-  - `show_verification_date` (padrão: true)
-  - `show_document_type` (padrão: false)
+ - `show_verified_badge` (padrão: true)
+ - `show_first_name` (padrão: false)
+ - `show_verification_date` (padrão: true)
+ - `show_document_type` (padrão: false)
 
 ### 3.2 Proteção de Dados
 - RLS: Usuários veem apenas seus dados
@@ -220,44 +220,44 @@ Backend: Recupera status do Stripe
 
 ```
 ┌─────────────────────────────────────────┐
-│  PENDING (Criado, aguardando usuário)   │
+│ PENDING (Criado, aguardando usuário) │
 └───────────────┬─────────────────────────┘
-                │
-        ┌───────▼───────┐
-        │  REVIEWING    │  (Admin revendo)
-        │  (opcional)   │
-        └───────┬───────┘
-                │
-    ┌───────────┼───────────┐
-    │           │           │
-┌───▼───┐   ┌──▼──┐    ┌──▼───┐
-│APPROVED│   │REJECTED  │EXPIRED│
-└────────┘   └──────┘    └──────┘
+ │
+ ┌───────▼───────┐
+ │ REVIEWING │ (Admin revendo)
+ │ (opcional) │
+ └───────┬───────┘
+ │
+ ┌───────────┼───────────┐
+ │ │ │
+┌───▼───┐ ┌──▼──┐ ┌──▼───┐
+│APPROVED│ │REJECTED │EXPIRED│
+└────────┘ └──────┘ └──────┘
 
 ✓ APPROVED:
-  - Verif icação bem-sucedida
-  - Badge mostrada no perfil
-  - Válido por 2 anos
+ - Verif icação bem-sucedida
+ - Badge mostrada no perfil
+ - Válido por 2 anos
 
 ✗ REJECTED:
-  - Documento não corresponde
-  - Selfie não passou
-  - Pode tentar novamente
+ - Documento não corresponde
+ - Selfie não passou
+ - Pode tentar novamente
 
 ⏱ EXPIRED:
-  - 2 anos passaram
-  - Precisa renovar
+ - 2 anos passaram
+ - Precisa renovar
 ```
 
 ### 4.2 Transições:
 ```
-pending    → reviewing (admin inicia)
-pending    → approved  (Stripe aprova)
-pending    → rejected  (Stripe rejeita)
-reviewing  → approved
-reviewing  → rejected
-approved   → expired   (após 2 anos)
-rejected   → pending   (novo envio)
+pending → reviewing (admin inicia)
+pending → approved (Stripe aprova)
+pending → rejected (Stripe rejeita)
+reviewing → approved
+reviewing → rejected
+approved → expired (após 2 anos)
+rejected → pending (novo envio)
 ```
 
 ---
@@ -296,12 +296,12 @@ rejected   → pending   (novo envio)
 
 **Necessárias**:
 ```bash
-STRIPE_SECRET_KEY              # Stripe API secret
-STRIPE_PUBLISHABLE_KEY         # Stripe public key
-NEXT_PUBLIC_STRIPE_KEY         # Cliente-side
-SUPABASE_URL                   # Supabase project URL
-SUPABASE_ANON_KEY              # Supabase anon key
-SUPABASE_SERVICE_ROLE_KEY      # Supabase service role
+STRIPE_SECRET_KEY # Stripe API secret
+STRIPE_PUBLISHABLE_KEY # Stripe public key
+NEXT_PUBLIC_STRIPE_KEY # Cliente-side
+SUPABASE_URL # Supabase project URL
+SUPABASE_ANON_KEY # Supabase anon key
+SUPABASE_SERVICE_ROLE_KEY # Supabase service role
 ```
 
 **Opcionais (Mock)**:

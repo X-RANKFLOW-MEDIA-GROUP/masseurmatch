@@ -7,10 +7,10 @@ This document summarizes the complete implementation of the MasseurMatch admin d
 
 ### Changes Made
 - **Removed Twilio OTP from signup verification** (`/signup/verify/page.tsx`)
-  - Phone verification is no longer required for signup
-  - Email verification via Supabase remains the only required verification
-  - Phone number is now collected as an optional therapist profile field during onboarding
-  - Marked Twilio environment variables as `[OPTIONAL]` in `.env.example`
+ - Phone verification is no longer required for signup
+ - Email verification via Supabase remains the only required verification
+ - Phone number is now collected as an optional therapist profile field during onboarding
+ - Marked Twilio environment variables as `[OPTIONAL]` in `.env.example`
 
 ### Impact
 - Faster onboarding flow for therapists
@@ -24,12 +24,12 @@ This document summarizes the complete implementation of the MasseurMatch admin d
 ### Migration File Created
 - **File**: `supabase/migrations/20250501000000_admin_moderation_system.sql`
 - **Columns Added to `profiles` Table**:
-  - `status` (draft → pending_approval → approved/rejected/changes_requested/suspended)
-  - `submitted_at` (when therapist submits profile for approval)
-  - `reviewed_at` (when admin reviews)
-  - `reviewed_by` (admin user ID)
-  - `admin_notes` (feedback from admin)
-  - `completion_percentage` (profile completion score)
+ - `status` (draft → pending_approval → approved/rejected/changes_requested/suspended)
+ - `submitted_at` (when therapist submits profile for approval)
+ - `reviewed_at` (when admin reviews)
+ - `reviewed_by` (admin user ID)
+ - `admin_notes` (feedback from admin)
+ - `completion_percentage` (profile completion score)
 
 ### New Tables Created
 - `complaints` - Track client complaints and reports
@@ -48,24 +48,24 @@ This document summarizes the complete implementation of the MasseurMatch admin d
 
 ### Admin Dashboard (`/admin`)
 - **Main Overview**: `/admin/page.tsx`
-  - Quick stats on total therapists, approvals, rejections, complaints
-  - Weekly approval metrics and avg approval time
-  - Quick links to all admin sections
+ - Quick stats on total therapists, approvals, rejections, complaints
+ - Weekly approval metrics and avg approval time
+ - Quick links to all admin sections
 
 ### Therapist Approvals (`/admin/approvals`)
 - **List Page**: `/admin/approvals/page.tsx`
-  - Filter by: pending, approved, rejected, changes_requested, all
-  - Shows therapist name, email, city, ID verification status, completion %
-  - Time waiting indicator
-  - Quick link to detail page
+ - Filter by: pending, approved, rejected, changes_requested, all
+ - Shows therapist name, email, city, ID verification status, completion %
+ - Time waiting indicator
+ - Quick link to detail page
 
 - **Detail Page**: `/admin/approvals/[id]/page.tsx`
-  - Full therapist profile information
-  - Photo gallery with moderation status
-  - Identity verification details
-  - Approve/Reject/Request Changes buttons
-  - Admin notes textarea
-  - Decision audit trail
+ - Full therapist profile information
+ - Photo gallery with moderation status
+ - Identity verification details
+ - Approve/Reject/Request Changes buttons
+ - Admin notes textarea
+ - Decision audit trail
 
 ### Photo & Document Moderation (`/admin/moderation`)
 - Already existed with comprehensive flagged content queue
@@ -74,11 +74,11 @@ This document summarizes the complete implementation of the MasseurMatch admin d
 
 ### Client Complaints (`/admin/complaints`)
 - **List Page**: `/admin/complaints/page.tsx`
-  - Filter by: pending, resolved, dismissed, all
-  - Shows reported therapist name, complaint category, description
-  - Status badges (pending/resolved/dismissed)
-  - Days ago indicator
-  - Link to detail page
+ - Filter by: pending, resolved, dismissed, all
+ - Shows reported therapist name, complaint category, description
+ - Status badges (pending/resolved/dismissed)
+ - Days ago indicator
+ - Link to detail page
 
 ### Platform Analytics (`/admin/analytics`)
 - Real-time metrics dashboard
@@ -124,10 +124,10 @@ This document summarizes the complete implementation of the MasseurMatch admin d
 THERAPIST JOURNEY:
 1. draft → (completes profile) → 
 2. pending_approval → (admin reviews) →
-   - approved (goes live) ✓
-   - rejected (must resubmit) 🔄
-   - changes_requested (fix specific items) 🔄
-   - suspended (policy violation) ⛔
+ - approved (goes live) ✓
+ - rejected (must resubmit) 🔄
+ - changes_requested (fix specific items) 🔄
+ - suspended (policy violation) ⛔
 
 ADMIN WORKFLOW:
 - View pending approvals sorted by wait time
@@ -142,34 +142,34 @@ ADMIN WORKFLOW:
 ## Key Features
 
 ### Admin Powers
-✅ Approve/reject therapist profiles  
-✅ Request specific changes from therapists  
-✅ Review photos and documents  
-✅ Flag and moderate inappropriate content  
-✅ Track and resolve client complaints  
-✅ Suspend profiles for policy violations  
-✅ View detailed analytics on platform health  
-✅ Leave admin notes visible to therapists  
-✅ Track approval history and audit trails  
+✅ Approve/reject therapist profiles 
+✅ Request specific changes from therapists 
+✅ Review photos and documents 
+✅ Flag and moderate inappropriate content 
+✅ Track and resolve client complaints 
+✅ Suspend profiles for policy violations 
+✅ View detailed analytics on platform health 
+✅ Leave admin notes visible to therapists 
+✅ Track approval history and audit trails 
 
 ### Therapist Features
-✅ See approval status in real-time  
-✅ View admin feedback and requested changes  
-✅ Resubmit profile with updates  
-✅ View profile completion percentage  
-✅ Check identity verification status  
-✅ Manage subscription plan  
-✅ Access billing portal  
-✅ Contact support if issues arise  
+✅ See approval status in real-time 
+✅ View admin feedback and requested changes 
+✅ Resubmit profile with updates 
+✅ View profile completion percentage 
+✅ Check identity verification status 
+✅ Manage subscription plan 
+✅ Access billing portal 
+✅ Contact support if issues arise 
 
 ### Platform Protections
-✅ Identity verification via Stripe  
-✅ Email verification required  
-✅ Photo moderation via AI + manual review  
-✅ Complaint tracking and investigation  
-✅ Role-based access control (middleware)  
-✅ Session-based authentication  
-✅ RLS policies on database level  
+✅ Identity verification via Stripe 
+✅ Email verification required 
+✅ Photo moderation via AI + manual review 
+✅ Complaint tracking and investigation 
+✅ Role-based access control (middleware) 
+✅ Session-based authentication 
+✅ RLS policies on database level 
 
 ---
 
@@ -242,44 +242,44 @@ ADMIN WORKFLOW:
 ```
 /vercel/share/v0-project/
 ├── supabase/
-│   └── migrations/
-│       └── 20250501000000_admin_moderation_system.sql
+│ └── migrations/
+│ └── 20250501000000_admin_moderation_system.sql
 │
 ├── src/app/admin/
-│   ├── page.tsx (dashboard overview)
-│   ├── approvals/
-│   │   ├── page.tsx (list)
-│   │   └── [id]/page.tsx (detail + actions)
-│   ├── complaints/
-│   │   └── page.tsx (list)
-│   ├── moderation/
-│   │   └── page.tsx (already existed)
-│   ├── analytics/
-│   │   └── page.tsx (already existed)
-│   └── _components/
-│       └── AdminPageHeader.tsx
+│ ├── page.tsx (dashboard overview)
+│ ├── approvals/
+│ │ ├── page.tsx (list)
+│ │ └── [id]/page.tsx (detail + actions)
+│ ├── complaints/
+│ │ └── page.tsx (list)
+│ ├── moderation/
+│ │ └── page.tsx (already existed)
+│ ├── analytics/
+│ │ └── page.tsx (already existed)
+│ └── _components/
+│ └── AdminPageHeader.tsx
 │
 ├── src/app/pro/
-│   ├── approval-status/
-│   │   └── page.tsx (therapist sees status)
-│   ├── subscription/
-│   │   └── page.tsx (already existed)
-│   └── dashboard/
-│       └── page.tsx (already existed)
+│ ├── approval-status/
+│ │ └── page.tsx (therapist sees status)
+│ ├── subscription/
+│ │ └── page.tsx (already existed)
+│ └── dashboard/
+│ └── page.tsx (already existed)
 │
 ├── src/app/api/
-│   ├── admin/
-│   │   ├── stats/route.ts
-│   │   ├── approvals/route.ts
-│   │   ├── approvals/[id]/route.ts
-│   │   ├── complaints/route.ts
-│   │   └── moderation/route.ts
-│   └── pro/
-│       ├── profile/status/route.ts
-│       └── subscription/status/route.ts
+│ ├── admin/
+│ │ ├── stats/route.ts
+│ │ ├── approvals/route.ts
+│ │ ├── approvals/[id]/route.ts
+│ │ ├── complaints/route.ts
+│ │ └── moderation/route.ts
+│ └── pro/
+│ ├── profile/status/route.ts
+│ └── subscription/status/route.ts
 │
 └── src/app/signup/
-    └── verify/page.tsx (Twilio removed)
+ └── verify/page.tsx (Twilio removed)
 ```
 
 ---
@@ -287,28 +287,28 @@ ADMIN WORKFLOW:
 ## Next Steps / Future Enhancements
 
 1. **Email Notifications**
-   - Send approval email when profile goes live
-   - Send rejection email with admin feedback
-   - Send changes_requested email with specific items
+ - Send approval email when profile goes live
+ - Send rejection email with admin feedback
+ - Send changes_requested email with specific items
 
 2. **Therapist Resubmission Flow**
-   - Create `/signup/resubmit` for rejected profiles
-   - Track resubmission count and history
+ - Create `/signup/resubmit` for rejected profiles
+ - Track resubmission count and history
 
 3. **Advanced Analytics**
-   - Therapist-level performance metrics
-   - City-level coverage analysis
-   - Conversion funnel tracking
+ - Therapist-level performance metrics
+ - City-level coverage analysis
+ - Conversion funnel tracking
 
 4. **Automation**
-   - Auto-approve profiles that meet quality threshold
-   - Auto-suspend on multiple complaints
-   - Scheduled reports for admins
+ - Auto-approve profiles that meet quality threshold
+ - Auto-suspend on multiple complaints
+ - Scheduled reports for admins
 
 5. **Mobile App**
-   - Native admin approval interface
-   - Push notifications for pending reviews
-   - Offline-capable moderation queue
+ - Native admin approval interface
+ - Push notifications for pending reviews
+ - Offline-capable moderation queue
 
 ---
 

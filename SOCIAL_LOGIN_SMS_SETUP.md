@@ -9,27 +9,27 @@
 3. Enable Google+ API
 4. Create OAuth 2.0 credentials (Web application)
 5. Add authorized redirect URIs:
-   - `https://yourapp.com/api/auth/callback/google`
-   - `https://staging.yourapp.com/api/auth/callback/google`
+ - `https://yourapp.com/api/auth/callback/google`
+ - `https://staging.yourapp.com/api/auth/callback/google`
 6. Copy Client ID and Secret
 7. Add to environment variables:
-   ```env
-   GOOGLE_CLIENT_ID=your-client-id
-   GOOGLE_CLIENT_SECRET=your-client-secret
-   ```
+ ```env
+ GOOGLE_CLIENT_ID=your-client-id
+ GOOGLE_CLIENT_SECRET=your-client-secret
+ ```
 
 ### GitHub OAuth Setup
 
 1. Go to https://github.com/settings/developers
 2. Create new OAuth App
 3. Set Authorization callback URL to:
-   - `https://yourapp.com/api/auth/callback/github`
+ - `https://yourapp.com/api/auth/callback/github`
 4. Copy Client ID and Secret
 5. Add to environment variables:
-   ```env
-   GITHUB_CLIENT_ID=your-client-id
-   GITHUB_CLIENT_SECRET=your-client-secret
-   ```
+ ```env
+ GITHUB_CLIENT_ID=your-client-id
+ GITHUB_CLIENT_SECRET=your-client-secret
+ ```
 
 ## SMS Integration with Twilio
 
@@ -40,11 +40,11 @@
 3. Get a Twilio phone number
 4. Copy Account SID and Auth Token
 5. Add to environment variables:
-   ```env
-   TWILIO_ACCOUNT_SID=your-account-sid
-   TWILIO_AUTH_TOKEN=your-auth-token
-   TWILIO_PHONE_NUMBER=+1234567890
-   ```
+ ```env
+ TWILIO_ACCOUNT_SID=your-account-sid
+ TWILIO_AUTH_TOKEN=your-auth-token
+ TWILIO_PHONE_NUMBER=+1234567890
+ ```
 
 ### SMS Message Types
 
@@ -60,8 +60,8 @@ Implemented SMS notifications for:
 ```typescript
 // Send SMS notification
 await sendSMSNotification(
-  phoneNumber: '+1234567890',
-  message: 'Your appointment is confirmed for tomorrow at 2 PM'
+ phoneNumber: '+1234567890',
+ message: 'Your appointment is confirmed for tomorrow at 2 PM'
 );
 ```
 

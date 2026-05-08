@@ -12,21 +12,21 @@
 ## What was executed
 
 1. `npx playwright test tests/auth/smoke.spec.ts tests/auth/flows.spec.ts`
-   - Result: Could not execute browser tests because Playwright Chromium is not installed in the environment.
-   - `tests/auth/flows.spec.ts` was also skipped by design when Supabase service-role credentials are not present.
+ - Result: Could not execute browser tests because Playwright Chromium is not installed in the environment.
+ - `tests/auth/flows.spec.ts` was also skipped by design when Supabase service-role credentials are not present.
 
 2. `npx playwright install --with-deps chromium`
-   - Result: failed due to apt/network proxy restrictions (`403 Forbidden`).
+ - Result: failed due to apt/network proxy restrictions (`403 Forbidden`).
 
 3. `npx playwright install chromium`
-   - Result: failed due to CDN/network proxy restrictions (`403 Forbidden`).
+ - Result: failed due to CDN/network proxy restrictions (`403 Forbidden`).
 
 4. `npm run test:api`
-   - Result: passed.
-   - Covered endpoints include: forgot-password, contact, og, admin-blog-unauthorized, pro-profile-unauthorized, login-validation, register-validation, logout.
+ - Result: passed.
+ - Covered endpoints include: forgot-password, contact, og, admin-blog-unauthorized, pro-profile-unauthorized, login-validation, register-validation, logout.
 
 5. `npm run check-all`
-   - Result: lint warnings only, but typecheck fails on unrelated compile-time issues currently present in the repository.
+ - Result: lint warnings only, but typecheck fails on unrelated compile-time issues currently present in the repository.
 
 ## Current verification status for requested flow
 
@@ -41,10 +41,10 @@
 ## Notes from existing E2E coverage in repo
 
 - `tests/auth/flows.spec.ts` already includes checks that:
-  - Registration should provision user/profile/role,
-  - Login should succeed,
-  - Fake verification claims are rejected by `/api/signup/submit`,
-  - Identity verification session can be created through `/api/stripe/identity/create-session`.
+ - Registration should provision user/profile/role,
+ - Login should succeed,
+ - Fake verification claims are rejected by `/api/signup/submit`,
+ - Identity verification session can be created through `/api/stripe/identity/create-session`.
 - This suite is conditionally skipped without Supabase service-role credentials.
 
 ## Recommended next step to fully complete your requested run

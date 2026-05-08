@@ -22,8 +22,8 @@ source venv/bin/activate
 3. Clique em **Settings** (engrenagem)
 4. Clique em **API**
 5. Copie:
-   - Project URL (em "Project API keys")
-   - Service Role Key (em "Project API keys")
+ - Project URL (em "Project API keys")
+ - Service Role Key (em "Project API keys")
 
 ## PASSO 3: Executar Migrações
 
@@ -38,12 +38,12 @@ python3 scripts/run_migrations.py
 
 ## O que o script faz:
 
-✅ Lê todos os arquivos .sql em ordem  
-✅ Conecta ao Supabase  
-✅ Executa cada migração automaticamente  
-✅ Trata erros comuns (like "already exists")  
-✅ Mostra progresso em tempo real  
-✅ Mostra resumo final  
+✅ Lê todos os arquivos .sql em ordem 
+✅ Conecta ao Supabase 
+✅ Executa cada migração automaticamente 
+✅ Trata erros comuns (like "already exists") 
+✅ Mostra progresso em tempo real 
+✅ Mostra resumo final 
 
 ## Esperado ao terminar:
 
@@ -61,9 +61,9 @@ python3 scripts/run_migrations.py
 ============================================================
 
 📊 Migration Summary:
-   ✅ Executed: 21
-   ⏭️  Skipped:  0
-   ❌ Errors:   0
+ ✅ Executed: 21
+ ⏭️ Skipped: 0
+ ❌ Errors: 0
 
 ✨ All migrations completed successfully!
 ```

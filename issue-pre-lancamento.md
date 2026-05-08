@@ -50,9 +50,9 @@ Garantir que o produto esteja pronto para produção com qualidade técnica, UX,
 #### P0 (bloqueadores de lançamento)
 1. **Build e typecheck quebravam por imports inexistentes (corrigido)**
 	- Arquivos afetados:
-	  - `src/app/admin/onboarding/page.tsx`
-	  - `src/app/admin/onboarding/DebugProfilesButton.tsx`
-	  - `src/app/therapists/kevin-os/page.tsx`
+	 - `src/app/admin/onboarding/page.tsx`
+	 - `src/app/admin/onboarding/DebugProfilesButton.tsx`
+	 - `src/app/therapists/kevin-os/page.tsx`
 	- Problema: referências para módulos legados em `src/mm/**` que não existem mais.
 	- Ação aplicada: substituição por fluxo válido atual (`/pro/onboard`, `/pro/profile`) e redirecionamento do perfil legado `kevin-os` para `/therapists`.
 

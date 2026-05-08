@@ -1,0 +1,491 @@
+{
+  "total": 35,
+  "clean": 12,
+  "critical": 3,
+  "needs_fix": 20,
+  "files": [
+    {
+      "file": "ADMIN_GUIDE.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\ADMIN_GUIDE.md",
+      "priority": "P1",
+      "status": "NEEDS_FIX",
+      "total_issues": 1,
+      "issues": [
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 18,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "AUTH_FLOW_VERIFICATION.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\AUTH_FLOW_VERIFICATION.md",
+      "priority": "P2",
+      "status": "NEEDS_FIX",
+      "total_issues": 1,
+      "issues": [
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 78,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "CONTACT_SYSTEM_SETUP.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\CONTACT_SYSTEM_SETUP.md",
+      "priority": "P2",
+      "status": "NEEDS_FIX",
+      "total_issues": 1,
+      "issues": [
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 31,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "DEPLOYMENT_CHECKLIST.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\DEPLOYMENT_CHECKLIST.md",
+      "priority": "P1",
+      "status": "NEEDS_FIX",
+      "total_issues": 1,
+      "issues": [
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 24,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "DEPLOYMENT_READINESS_REPORT.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\DEPLOYMENT_READINESS_REPORT.md",
+      "priority": "P1",
+      "status": "NEEDS_FIX",
+      "total_issues": 1,
+      "issues": [
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 18,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "ID_VERIFICATION_STRIPE_AUDIT.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\ID_VERIFICATION_STRIPE_AUDIT.md",
+      "priority": "P1",
+      "status": "NEEDS_FIX",
+      "total_issues": 1,
+      "issues": [
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 78,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "IMPLEMENTATION_SUMMARY.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\IMPLEMENTATION_SUMMARY.md",
+      "priority": "P2",
+      "status": "NEEDS_FIX",
+      "total_issues": 1,
+      "issues": [
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 112,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "MIGRATIONS_PYTHON_GUIDE.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\MIGRATIONS_PYTHON_GUIDE.md",
+      "priority": "P2",
+      "status": "NEEDS_FIX",
+      "total_issues": 1,
+      "issues": [
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 14,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "MISSING_FEATURES_ANALYSIS.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\MISSING_FEATURES_ANALYSIS.md",
+      "priority": "P1",
+      "status": "NEEDS_FIX",
+      "total_issues": 1,
+      "issues": [
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 175,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "README.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\README.md",
+      "priority": "P2",
+      "status": "CLEAN",
+      "total_issues": 0,
+      "issues": []
+    },
+    {
+      "file": "RUN_MIGRATIONS_GUIDE.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\RUN_MIGRATIONS_GUIDE.md",
+      "priority": "P2",
+      "status": "NEEDS_FIX",
+      "total_issues": 1,
+      "issues": [
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 10,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "SOCIAL_LOGIN_SMS_SETUP.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\SOCIAL_LOGIN_SMS_SETUP.md",
+      "priority": "P2",
+      "status": "NEEDS_FIX",
+      "total_issues": 1,
+      "issues": [
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 18,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "STAGING_ENVIRONMENT_SETUP.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\STAGING_ENVIRONMENT_SETUP.md",
+      "priority": "P2",
+      "status": "CLEAN",
+      "total_issues": 0,
+      "issues": []
+    },
+    {
+      "file": "WCAG_2_1_COMPLIANCE_CHECKLIST.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\WCAG_2_1_COMPLIANCE_CHECKLIST.md",
+      "priority": "P0",
+      "status": "CLEAN",
+      "total_issues": 0,
+      "issues": []
+    },
+    {
+      "file": "AUTH_FLOW_TEST_REPORT_2026-04-25.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\docs\\AUTH_FLOW_TEST_REPORT_2026-04-25.md",
+      "priority": "P2",
+      "status": "NEEDS_FIX",
+      "total_issues": 1,
+      "issues": [
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 11,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "GO_LIVE_CHECKLIST.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\docs\\GO_LIVE_CHECKLIST.md",
+      "priority": "P0",
+      "status": "CLEAN",
+      "total_issues": 0,
+      "issues": []
+    },
+    {
+      "file": "GO_LIVE_FULL_REPO_AUDIT.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\docs\\GO_LIVE_FULL_REPO_AUDIT.md",
+      "priority": "P0",
+      "status": "CLEAN",
+      "total_issues": 0,
+      "issues": []
+    },
+    {
+      "file": "RELEASE_REPORT.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\docs\\RELEASE_REPORT.md",
+      "priority": "P2",
+      "status": "CLEAN",
+      "total_issues": 0,
+      "issues": []
+    },
+    {
+      "file": "deploy-checklist.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\docs\\deploy-checklist.md",
+      "priority": "P2",
+      "status": "CLEAN",
+      "total_issues": 0,
+      "issues": []
+    },
+    {
+      "file": "deployment-log-analysis-2026-04-10.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\docs\\deployment-log-analysis-2026-04-10.md",
+      "priority": "P2",
+      "status": "CLEAN",
+      "total_issues": 0,
+      "issues": []
+    },
+    {
+      "file": "masseurmatch-wireframe-handoff.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\docs\\masseurmatch-wireframe-handoff.md",
+      "priority": "P2",
+      "status": "NEEDS_FIX",
+      "total_issues": 1,
+      "issues": [
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 35,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "mobile-ui-overflow-fix.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\docs\\mobile-ui-overflow-fix.md",
+      "priority": "P2",
+      "status": "CRITICAL",
+      "total_issues": 2,
+      "issues": [
+        {
+          "type": "PLACEHOLDER",
+          "count": 2,
+          "severity": "P0"
+        },
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 70,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "next-manual-qa-checklist.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\docs\\next-manual-qa-checklist.md",
+      "priority": "P2",
+      "status": "NEEDS_FIX",
+      "total_issues": 1,
+      "issues": [
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 27,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "provider-otp-twilio-fallback.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\docs\\provider-otp-twilio-fallback.md",
+      "priority": "P2",
+      "status": "NEEDS_FIX",
+      "total_issues": 1,
+      "issues": [
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 3,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "search-interest-index.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\docs\\search-interest-index.md",
+      "priority": "P2",
+      "status": "CLEAN",
+      "total_issues": 0,
+      "issues": []
+    },
+    {
+      "file": "seo-operational-plan.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\docs\\seo-operational-plan.md",
+      "priority": "P2",
+      "status": "CLEAN",
+      "total_issues": 0,
+      "issues": []
+    },
+    {
+      "file": "issue-pre-lancamento.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\issue-pre-lancamento.md",
+      "priority": "P2",
+      "status": "NEEDS_FIX",
+      "total_issues": 1,
+      "issues": [
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 3,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "README.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\prisma\\README.md",
+      "priority": "P2",
+      "status": "CLEAN",
+      "total_issues": 0,
+      "issues": []
+    },
+    {
+      "file": "README.md",
+      "path": "C:\\Users\\admin\\masseurmatch\\supabase\\manual\\README.md",
+      "priority": "P2",
+      "status": "CLEAN",
+      "total_issues": 0,
+      "issues": []
+    },
+    {
+      "file": "index.html",
+      "path": "C:\\Users\\admin\\masseurmatch\\dist\\index.html",
+      "priority": "P2",
+      "status": "NEEDS_FIX",
+      "total_issues": 3,
+      "issues": [
+        {
+          "type": "BROKEN_LINK",
+          "count": 26,
+          "severity": "P2"
+        },
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 133,
+          "severity": "P2"
+        },
+        {
+          "type": "EMPTY_TAGS",
+          "count": 4,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "lifecycle-email-esp-mobile-compact.html",
+      "path": "C:\\Users\\admin\\masseurmatch\\docs\\lifecycle-email-esp-mobile-compact.html",
+      "priority": "P2",
+      "status": "CRITICAL",
+      "total_issues": 3,
+      "issues": [
+        {
+          "type": "PLACEHOLDER",
+          "count": 12,
+          "severity": "P0"
+        },
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 171,
+          "severity": "P2"
+        },
+        {
+          "type": "EMPTY_TAGS",
+          "count": 33,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "lifecycle-email-esp-ready.html",
+      "path": "C:\\Users\\admin\\masseurmatch\\docs\\lifecycle-email-esp-ready.html",
+      "priority": "P2",
+      "status": "CRITICAL",
+      "total_issues": 3,
+      "issues": [
+        {
+          "type": "PLACEHOLDER",
+          "count": 10,
+          "severity": "P0"
+        },
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 103,
+          "severity": "P2"
+        },
+        {
+          "type": "EMPTY_TAGS",
+          "count": 23,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "lifecycle-email-visualizacao.html",
+      "path": "C:\\Users\\admin\\masseurmatch\\docs\\lifecycle-email-visualizacao.html",
+      "priority": "P2",
+      "status": "NEEDS_FIX",
+      "total_issues": 3,
+      "issues": [
+        {
+          "type": "BROKEN_LINK",
+          "count": 4,
+          "severity": "P2"
+        },
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 325,
+          "severity": "P2"
+        },
+        {
+          "type": "EMPTY_TAGS",
+          "count": 47,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "masseurmatch-complete-legal-package.html",
+      "path": "C:\\Users\\admin\\masseurmatch\\docs\\masseurmatch-complete-legal-package.html",
+      "priority": "P0",
+      "status": "NEEDS_FIX",
+      "total_issues": 3,
+      "issues": [
+        {
+          "type": "BROKEN_LINK",
+          "count": 53,
+          "severity": "P2"
+        },
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 476,
+          "severity": "P2"
+        },
+        {
+          "type": "EMPTY_TAGS",
+          "count": 75,
+          "severity": "P2"
+        }
+      ]
+    },
+    {
+      "file": "masseurmatch-legal-polished.html",
+      "path": "C:\\Users\\admin\\masseurmatch\\docs\\masseurmatch-legal-polished.html",
+      "priority": "P0",
+      "status": "NEEDS_FIX",
+      "total_issues": 3,
+      "issues": [
+        {
+          "type": "BROKEN_LINK",
+          "count": 53,
+          "severity": "P2"
+        },
+        {
+          "type": "DOUBLE_SPACE",
+          "count": 476,
+          "severity": "P2"
+        },
+        {
+          "type": "EMPTY_TAGS",
+          "count": 75,
+          "severity": "P2"
+        }
+      ]
+    }
+  ]
+}

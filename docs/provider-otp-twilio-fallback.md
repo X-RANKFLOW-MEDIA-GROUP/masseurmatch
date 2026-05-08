@@ -31,9 +31,9 @@ Required behavior:
 
 ```json
 {
-  "success": true,
-  "smsSent": false,
-  "message": "Verification code created. SMS delivery is temporarily unavailable."
+ "success": true,
+ "smsSent": false,
+ "message": "Verification code created. SMS delivery is temporarily unavailable."
 }
 ```
 

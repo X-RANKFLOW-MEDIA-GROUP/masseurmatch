@@ -9,29 +9,29 @@ The contact system requires two new tables in Supabase. Execute this SQL in your
 ```sql
 -- Create contact_inquiries table
 CREATE TABLE IF NOT EXISTS public.contact_inquiries (
-  id BIGSERIAL PRIMARY KEY,
-  therapist_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  client_name VARCHAR(255) NOT NULL,
-  client_email VARCHAR(255) NOT NULL,
-  client_phone VARCHAR(20),
-  message TEXT NOT NULL,
-  contact_method VARCHAR(50) NOT NULL CHECK (contact_method IN ('email', 'phone', 'whatsapp', 'contact-form')),
-  status VARCHAR(50) NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'viewed', 'responded', 'archived')),
-  therapist_notes TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+ id BIGSERIAL PRIMARY KEY,
+ therapist_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+ client_name VARCHAR(255) NOT NULL,
+ client_email VARCHAR(255) NOT NULL,
+ client_phone VARCHAR(20),
+ message TEXT NOT NULL,
+ contact_method VARCHAR(50) NOT NULL CHECK (contact_method IN ('email', 'phone', 'whatsapp', 'contact-form')),
+ status VARCHAR(50) NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'viewed', 'responded', 'archived')),
+ therapist_notes TEXT,
+ created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+ updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create contact_preferences table
 CREATE TABLE IF NOT EXISTS public.contact_preferences (
-  id BIGSERIAL PRIMARY KEY,
-  therapist_id UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
-  allow_email BOOLEAN DEFAULT true,
-  allow_phone BOOLEAN DEFAULT true,
-  allow_whatsapp BOOLEAN DEFAULT true,
-  auto_reply_message TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+ id BIGSERIAL PRIMARY KEY,
+ therapist_id UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
+ allow_email BOOLEAN DEFAULT true,
+ allow_phone BOOLEAN DEFAULT true,
+ allow_whatsapp BOOLEAN DEFAULT true,
+ auto_reply_message TEXT,
+ created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+ updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Enable RLS on contact_inquiries
@@ -39,36 +39,36 @@ ALTER TABLE public.contact_inquiries ENABLE ROW LEVEL SECURITY;
 
 -- Allow therapists to see their own inquiries
 CREATE POLICY "therapists_can_view_own_inquiries" ON public.contact_inquiries
-  FOR SELECT
-  USING (auth.uid() = therapist_id);
+ FOR SELECT
+ USING (auth.uid() = therapist_id);
 
 -- Allow therapists to update their own inquiries
 CREATE POLICY "therapists_can_update_own_inquiries" ON public.contact_inquiries
-  FOR UPDATE
-  USING (auth.uid() = therapist_id);
+ FOR UPDATE
+ USING (auth.uid() = therapist_id);
 
 -- Allow anyone to create inquiries
 CREATE POLICY "anyone_can_create_inquiries" ON public.contact_inquiries
-  FOR INSERT
-  WITH CHECK (true);
+ FOR INSERT
+ WITH CHECK (true);
 
 -- Enable RLS on contact_preferences
 ALTER TABLE public.contact_preferences ENABLE ROW LEVEL SECURITY;
 
 -- Allow therapists to view their own preferences
 CREATE POLICY "therapists_can_view_own_preferences" ON public.contact_preferences
-  FOR SELECT
-  USING (auth.uid() = therapist_id);
+ FOR SELECT
+ USING (auth.uid() = therapist_id);
 
 -- Allow therapists to update their own preferences
 CREATE POLICY "therapists_can_update_own_preferences" ON public.contact_preferences
-  FOR UPDATE
-  USING (auth.uid() = therapist_id);
+ FOR UPDATE
+ USING (auth.uid() = therapist_id);
 
 -- Allow therapists to insert their own preferences
 CREATE POLICY "therapists_can_insert_preferences" ON public.contact_preferences
-  FOR INSERT
-  WITH CHECK (auth.uid() = therapist_id);
+ FOR INSERT
+ WITH CHECK (auth.uid() = therapist_id);
 
 -- Create indexes for performance
 CREATE INDEX idx_contact_inquiries_therapist_id ON public.contact_inquiries(therapist_id);

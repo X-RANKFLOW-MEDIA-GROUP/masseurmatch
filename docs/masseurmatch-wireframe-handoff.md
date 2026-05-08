@@ -3,11 +3,11 @@
 ## Deliverables
 
 - `/wireframes`
-  - Complete wireframe hub for homepage, explore, profile, join, dashboard, admin, legal, and chatbot.
+ - Complete wireframe hub for homepage, explore, profile, join, dashboard, admin, legal, and chatbot.
 - `/wireframes/prototype`
-  - Clickable test flow for `home -> explore -> profile -> join -> dashboard`.
+ - Clickable test flow for `home -> explore -> profile -> join -> dashboard`.
 - `/exports/masseurmatch-wireframes-accessibility.css`
-  - Exported accessibility stylesheet with reusable tokens and component classes.
+ - Exported accessibility stylesheet with reusable tokens and component classes.
 
 ## Figma page structure
 
@@ -59,33 +59,33 @@ Use this pattern for consistency:
 - Tablet frames: 834px width, 8-column grid, 32px margins, 24px gutters.
 - Mobile frames: 390px width, 4-column grid, 20px margins, 16px gutters.
 - Section padding:
-  - Desktop: 24px internal card padding
-  - Tablet: 20px internal card padding
-  - Mobile: 16px internal card padding
+ - Desktop: 24px internal card padding
+ - Tablet: 20px internal card padding
+ - Mobile: 16px internal card padding
 - Vertical rhythm:
-  - Desktop: 56px to 80px between major sections
-  - Tablet: 40px to 56px
-  - Mobile: 24px to 32px
+ - Desktop: 56px to 80px between major sections
+ - Tablet: 40px to 56px
+ - Mobile: 24px to 32px
 
 ## Prototype interactions
 
 Connect the prototype frames in this order:
 
 1. `PROTO / Home`
-   - Primary CTA -> `PROTO / Explore`
-   - Spotlight card -> `PROTO / Profile`
-   - Knotty prompt `How does the provider side work?` -> `PROTO / Join`
+ - Primary CTA -> `PROTO / Explore`
+ - Spotlight card -> `PROTO / Profile`
+ - Knotty prompt `How does the provider side work?` -> `PROTO / Join`
 2. `PROTO / Explore`
-   - First result card -> `PROTO / Profile`
-   - Knotty prompt `Take me to the best matching profile` -> `PROTO / Profile`
+ - First result card -> `PROTO / Profile`
+ - Knotty prompt `Take me to the best matching profile` -> `PROTO / Profile`
 3. `PROTO / Profile`
-   - Provider CTA -> `PROTO / Join`
-   - Secondary CTA -> `PROTO / Explore`
+ - Provider CTA -> `PROTO / Join`
+ - Secondary CTA -> `PROTO / Explore`
 4. `PROTO / Join`
-   - Submit CTA -> `PROTO / Dashboard`
-   - Secondary CTA -> `PROTO / Profile`
+ - Submit CTA -> `PROTO / Dashboard`
+ - Secondary CTA -> `PROTO / Profile`
 5. `PROTO / Dashboard`
-   - Restart test flow -> `PROTO / Home`
+ - Restart test flow -> `PROTO / Home`
 
 Motion notes:
 
@@ -98,16 +98,16 @@ Motion notes:
 - Add a visible skip-link frame and annotate it as keyboard-only until focus.
 - Mark focus rings as 4px with 4px offset using `#0F62FE`.
 - Preserve semantic landmarks in annotation notes:
-  - `header`
-  - `nav`
-  - `main`
-  - `section`
-  - `aside`
-  - `footer`
+ - `header`
+ - `nav`
+ - `main`
+ - `section`
+ - `aside`
+ - `footer`
 - Add annotations for:
-  - `aria-current="step"` on the prototype stepper
-  - `aria-pressed` on viewport and auth-state toggles
-  - `aria-live="polite"` on Knotty transcript updates
+ - `aria-current="step"` on the prototype stepper
+ - `aria-pressed` on viewport and auth-state toggles
+ - `aria-live="polite"` on Knotty transcript updates
 - Keep body copy at 16px minimum and maintain 44px minimum touch targets.
 
 ## Core contrast pairs
@@ -122,17 +122,17 @@ Motion notes:
 ## Component mapping
 
 - Buttons
-  - Primary, secondary, ghost
-  - Document hover, active, and disabled variants
+ - Primary, secondary, ghost
+ - Document hover, active, and disabled variants
 - Pills
-  - Available Now, Visiting Soon, New Profile
-  - Include icon plus text, not color alone
+ - Available Now, Visiting Soon, New Profile
+ - Include icon plus text, not color alone
 - 3D profile card
-  - Badge row, service chips, trust block, CTA row
+ - Badge row, service chips, trust block, CTA row
 - Forms
-  - Input, select, modal, helper text, error state
+ - Input, select, modal, helper text, error state
 - Knotty AI
-  - Header, prompt chips, transcript, composer, connected actions
+ - Header, prompt chips, transcript, composer, connected actions
 
 ## Export stylesheet usage
 

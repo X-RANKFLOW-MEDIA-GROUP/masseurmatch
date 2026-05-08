@@ -68,10 +68,10 @@ MasseurMatch is production-ready with all critical systems in place. Recent home
 - **Image Optimization**: Remote patterns allow Unsplash and Supabase CDN
 - **Redirects**: 40+ legacy redirects configured for SEO (permanent 308 redirects)
 - **Security Headers**: 
-  - X-Frame-Options: SAMEORIGIN
-  - X-Content-Type-Options: nosniff
-  - Referrer-Policy: strict-origin-when-cross-origin
-  - Permissions-Policy: geolocation restricted to same-origin
+ - X-Frame-Options: SAMEORIGIN
+ - X-Content-Type-Options: nosniff
+ - Referrer-Policy: strict-origin-when-cross-origin
+ - Permissions-Policy: geolocation restricted to same-origin
 
 ---
 
@@ -87,16 +87,16 @@ MasseurMatch is production-ready with all critical systems in place. Recent home
 - **Status**: Implemented
 - **Route**: `/explore` (primary), `/therapists` (legacy redirect)
 - **Files Updated**: 
-  - Header navigation links
-  - Homepage links
-  - SEO landing page
+ - Header navigation links
+ - Homepage links
+ - SEO landing page
 
 ### 3. Horizontal Scroll Sections ✅
 - **Status**: Implemented
 - **Sections**:
-  - "Modalities for every body" - scrollable specialty cards
-  - "Top 15 Cities" - new section with major cities
-  - "By Neighborhood" - existing, maintained compatibility
+ - "Modalities for every body" - scrollable specialty cards
+ - "Top 15 Cities" - new section with major cities
+ - "By Neighborhood" - existing, maintained compatibility
 - **Implementation**: Unified drag-scroll handler for all horizontal containers
 
 ### 4. Therapist Card Image Centering ✅
@@ -296,18 +296,18 @@ MasseurMatch is production-ready with all critical systems in place. Recent home
 
 ```bash
 # Local Development
-npm run dev                    # Start dev server
-npm run typecheck             # Type validation
-npm run lint                  # ESLint check
+npm run dev # Start dev server
+npm run typecheck # Type validation
+npm run lint # ESLint check
 
 # Pre-Deployment
-npm run build                 # Build for production
-npm run test:api              # Test API routes
-npm run test:redirects        # Test redirects (Playwright)
+npm run build # Build for production
+npm run test:api # Test API routes
+npm run test:redirects # Test redirects (Playwright)
 
 # Production
-npm start                     # Start server
-npm run seed:supabase         # Seed database (if needed)
+npm start # Start server
+npm run seed:supabase # Seed database (if needed)
 ```
 
 ---

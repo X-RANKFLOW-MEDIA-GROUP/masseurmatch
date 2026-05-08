@@ -10,9 +10,9 @@ This document verifies that the login and signup flows are working correctly aft
 ### Entry Point: `/login`
 - **Component**: `LoginPageClient.tsx`
 - **Features**: 
-  - Checks if user is authenticated via `useAuth()` hook
-  - Auto-redirects authenticated users to `/pro/dashboard` (or custom redirect)
-  - Displays login form via `<AuthForms mode="login" />`
+ - Checks if user is authenticated via `useAuth()` hook
+ - Auto-redirects authenticated users to `/pro/dashboard` (or custom redirect)
+ - Displays login form via `<AuthForms mode="login" />`
 
 ### Auth Method
 - **Email + Password**: Via Supabase Auth
@@ -22,10 +22,10 @@ This document verifies that the login and signup flows are working correctly aft
 ### Redirect Logic
 ```
 Login Form Submit
-  → API: POST /api/auth/signin (via AuthForms component)
-  → Supabase verifies credentials
-  → Sets session cookie via middleware
-  → Redirects to `/pro/dashboard` or custom `?redirect=` param
+ → API: POST /api/auth/signin (via AuthForms component)
+ → Supabase verifies credentials
+ → Sets session cookie via middleware
+ → Redirects to `/pro/dashboard` or custom `?redirect=` param
 ```
 
 **Status**: Working as expected
@@ -44,10 +44,10 @@ Login Form Submit
 #### Step 1: Create Account (`/signup/account`)
 ```
 Email + Password Form
-  → API: POST /api/auth/register (via Supabase)
-  → Creates auth user in Supabase
-  → Sets `SignupContext.accountCreated = true`
-  → Redirects to `/signup/verify`
+ → API: POST /api/auth/register (via Supabase)
+ → Creates auth user in Supabase
+ → Sets `SignupContext.accountCreated = true`
+ → Redirects to `/signup/verify`
 ```
 **Status**: Working
 
@@ -56,36 +56,36 @@ Email + Password Form
 
 ```
 Email Verification Section:
-  → Click "Send Verification Code"
-  → API: supabase.auth.resend() - sends OTP to email
-  → User enters 6-digit code
-  → API: supabase.auth.verifyOtp(email, token, type: 'email')
-  → Sets `state.emailVerified = true`
-  ✓ STATUS: WORKING - This replaces phone verification
+ → Click "Send Verification Code"
+ → API: supabase.auth.resend() - sends OTP to email
+ → User enters 6-digit code
+ → API: supabase.auth.verifyOtp(email, token, type: 'email')
+ → Sets `state.emailVerified = true`
+ ✓ STATUS: WORKING - This replaces phone verification
 
 Stripe Identity Verification Section:
-  → Click "Start ID Verification"
-  → API: POST /api/stripe/identity/create-session
-  → Redirects to Stripe verification URL
-  → User completes identity verification
-  → Returns with sessionId
-  → API: GET /api/stripe/identity/check-status (polls)
-  → Sets `state.identityVerificationStatus = 'verified'`
-  ✓ STATUS: WORKING
+ → Click "Start ID Verification"
+ → API: POST /api/stripe/identity/create-session
+ → Redirects to Stripe verification URL
+ → User completes identity verification
+ → Returns with sessionId
+ → API: GET /api/stripe/identity/check-status (polls)
+ → Sets `state.identityVerificationStatus = 'verified'`
+ ✓ STATUS: WORKING
 
 Requirement: Both emailVerified AND identityVerificationStatus === 'verified'
-  → Only then "Continue to Profile" button is enabled
+ → Only then "Continue to Profile" button is enabled
 ```
 **Status**: Modified and working (phone verification completely removed)
 
 #### Step 3: Build Profile (`/signup/profile`)
 ```
 Multi-step form collecting:
-  - Professional info: Bio, experience, certifications
-  - Location: City, service areas, incall/outcall
-  - Services: Massage types, durations, pricing
-  - Media: Profile photo + gallery photos
-  - Compliance: Media consent, terms acceptance
+ - Professional info: Bio, experience, certifications
+ - Location: City, service areas, incall/outcall
+ - Services: Massage types, durations, pricing
+ - Media: Profile photo + gallery photos
+ - Compliance: Media consent, terms acceptance
 
 Form validation includes media compliance check
 Sets `state.profileCompleted = true` when finished
@@ -96,32 +96,32 @@ Redirects to `/signup/review`
 #### Step 4: Review & Payment (`/signup/review`)
 ```
 Display Summary of:
-  ✓ Account info (email, name)
-  ✓ Email verification status (verified)
-  ✗ Phone verification status (no longer checked)
-  ✓ Identity verification status (verified)
-  ✓ Profile details (with warnings if incomplete)
-  ✓ Payment method selection
+ ✓ Account info (email, name)
+ ✓ Email verification status (verified)
+ ✗ Phone verification status (no longer checked)
+ ✓ Identity verification status (verified)
+ ✓ Profile details (with warnings if incomplete)
+ ✓ Payment method selection
 
 Proceed to Payment:
-  → Click "Submit Profile"
-  → API: POST /api/signup (sends complete profile + payment token)
-  → Backend creates therapist profile
-  → Sets approval_status = 'pending_approval'
-  → Creates Stripe customer
-  → Sets billing status = 'active'
-  → Redirects to `/signup/complete`
+ → Click "Submit Profile"
+ → API: POST /api/signup (sends complete profile + payment token)
+ → Backend creates therapist profile
+ → Sets approval_status = 'pending_approval'
+ → Creates Stripe customer
+ → Sets billing status = 'active'
+ → Redirects to `/signup/complete`
 ```
 **Status**: Working (phone removed from this check)
 
 #### Step 5: Success (`/signup/complete`)
 ```
 Displays:
-  - Success message
-  - Profile submitted for admin review
-  - Next steps
-  - Link to therapist dashboard
-  - Link to check approval status: `/pro/approval-status`
+ - Success message
+ - Profile submitted for admin review
+ - Next steps
+ - Link to therapist dashboard
+ - Link to check approval status: `/pro/approval-status`
 ```
 **Status**: Working with new approval status page
 
@@ -141,52 +141,52 @@ After account creation, welcome email is sent via `lifecycle_email_queue`:
 ```
 Protected route - requires role === 'provider'
 Shows:
-  - Profile completion status
-  - Approval status (PENDING - can see in `/pro/approval-status`)
-  - Next steps: Complete billing, await admin review
-  - Link to payment settings
-  - Link to check approval status
+ - Profile completion status
+ - Approval status (PENDING - can see in `/pro/approval-status`)
+ - Next steps: Complete billing, await admin review
+ - Link to payment settings
+ - Link to check approval status
 ```
 **Status**: Working with new approval status page
 
 ### Approval Status Dashboard (`/pro/approval-status`)
 ```
 Shows current profile status:
-  - draft: Profile not yet submitted
-  - pending_approval: Awaiting admin review
-  - approved: Profile approved, live on platform
-  - rejected: Changes required (displays admin feedback)
-  - changes_requested: Admin feedback provided
-  
+ - draft: Profile not yet submitted
+ - pending_approval: Awaiting admin review
+ - approved: Profile approved, live on platform
+ - rejected: Changes required (displays admin feedback)
+ - changes_requested: Admin feedback provided
+ 
 Shows:
-  - Admin notes if status is rejected/changes_requested
-  - Profile completion percentage
-  - Identity verification status
-  - Timeline of submission
+ - Admin notes if status is rejected/changes_requested
+ - Profile completion percentage
+ - Identity verification status
+ - Timeline of submission
 ```
 **Status**: NEW - Created in this implementation
 
 ### Admin Approval Workflow (`/admin/approvals`)
 ```
 Admin sees list of pending profiles:
-  - Filter by status: pending, approved, rejected, changes_requested
-  - Sort by submission date
-  - Click profile to review detailed info
+ - Filter by status: pending, approved, rejected, changes_requested
+ - Sort by submission date
+ - Click profile to review detailed info
 
 Admin Review Page (`/admin/approvals/[id]`):
-  - View all therapist details
-  - View profile photos and documents
-  - View identity verification status
-  - Actions:
-    a) APPROVE - Sets status to 'approved', therapist goes live
-    b) REJECT - Sets status to 'rejected', requires admin notes
-    c) REQUEST CHANGES - Sets status to 'changes_requested', therapist can resubmit
-    d) SUSPEND - Sets status to 'suspended' for violations
+ - View all therapist details
+ - View profile photos and documents
+ - View identity verification status
+ - Actions:
+ a) APPROVE - Sets status to 'approved', therapist goes live
+ b) REJECT - Sets status to 'rejected', requires admin notes
+ c) REQUEST CHANGES - Sets status to 'changes_requested', therapist can resubmit
+ d) SUSPEND - Sets status to 'suspended' for violations
 
 Records admin decision with:
-  - admin_notes: Feedback or reason
-  - reviewed_at: Timestamp
-  - reviewed_by: Admin user ID
+ - admin_notes: Feedback or reason
+ - reviewed_at: Timestamp
+ - reviewed_by: Admin user ID
 ```
 **Status**: NEW - Created in this implementation
 
