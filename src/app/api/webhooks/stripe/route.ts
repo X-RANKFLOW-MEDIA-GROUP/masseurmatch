@@ -234,7 +234,8 @@ export async function POST(request: Request) {
         status: updateResult.status,
         error: updateResult.error,
       });
-      return NextResponse.json({ ok: true, skipped: "persist_failed" });
+      // SECURITY FIX: Return 500 to trigger Stripe retry - prevents lost payment events
+      return NextResponse.json({ ok: false, error: "persist_failed" }, { status: 500 });
     }
 
     if (event.id) {
@@ -246,6 +247,7 @@ export async function POST(request: Request) {
     console.error("[stripe-webhook] unhandled error", {
       message: error instanceof Error ? error.message : "unknown",
     });
-    return NextResponse.json({ ok: true, skipped: "internal_error" });
+    // SECURITY FIX: Return 500 to trigger Stripe retry on unexpected errors
+    return NextResponse.json({ ok: false, error: "internal_error" }, { status: 500 });
   }
 }
