@@ -13,7 +13,7 @@ function getStripe() {
   if (!key) {
     throw new Error("STRIPE_SECRET_KEY is not configured. Please ensure the Stripe connector is enabled.");
   }
-  return new Stripe(key, { apiVersion: "2024-11-20.acacia" });
+  return new Stripe(key, { apiVersion: "2023-10-16" });
 }
 
 export async function POST(request: NextRequest) {
@@ -53,11 +53,8 @@ export async function POST(request: NextRequest) {
     }
 
     const stripe = getStripe();
-    const origin = request.nextUrl.origin;
-    const returnUrl = `${origin}/signup/verify?identity_return=1`;
     const verificationSession = await stripe.identity.verificationSessions.create({
       type: "document",
-      return_url: returnUrl,
       metadata: {
         userId: targetUserId,
         email: targetEmail,
@@ -108,18 +105,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to create identity verification session.";
-    const isStripeConfigurationError =
-      message.toLowerCase().includes("api key") ||
-      message.toLowerCase().includes("stripe_secret_key") ||
-      message.toLowerCase().includes("not configured");
-
-    return NextResponse.json(
-      {
-        error: isStripeConfigurationError
-          ? "Stripe Identity is not configured with a valid API key."
-          : message,
-      },
-      { status: isStripeConfigurationError ? 503 : 500 },
-    );
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

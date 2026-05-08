@@ -8,17 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
-type AdminTherapistListItem = {
-  id: string;
-  display_name: string | null;
-  full_name: string | null;
-  city: string | null;
-  status: string | null;
-  is_verified_identity: boolean | null;
-  tier: string | null;
-  featured: { is_active: boolean | null } | null;
-};
-
 type TherapistAction =
   | "approve"
   | "reject"
@@ -28,6 +17,20 @@ type TherapistAction =
   | "verify_identity"
   | "feature"
   | "unfeature";
+
+type AdminTherapist = {
+  id: string;
+  user_id: string;
+  display_name: string | null;
+  full_name: string;
+  city: string | null;
+  profile_status: string;
+  subscription_tier: string | null;
+  verification_status: string | null;
+  is_featured: boolean;
+  is_suspended: boolean;
+  is_banned: boolean;
+};
 
 type ActionDraft = {
   action: TherapistAction;
@@ -43,11 +46,11 @@ const DEFAULT_ACTION: ActionDraft = {
   displayOrder: "",
 };
 
-function buildDrafts(therapists: AdminTherapistListItem[]) {
+function buildDrafts(therapists: AdminTherapist[]) {
   return therapists.reduce<Record<string, ActionDraft>>((accumulator, therapist) => {
     accumulator[therapist.id] = {
       ...DEFAULT_ACTION,
-      action: therapist.featured?.is_active ? "unfeature" : "approve",
+      action: therapist.is_featured ? "unfeature" : "approve",
     };
     return accumulator;
   }, {});
@@ -56,7 +59,7 @@ function buildDrafts(therapists: AdminTherapistListItem[]) {
 export default function AdminTherapistsManager({
   initialTherapists,
 }: {
-  initialTherapists: AdminTherapistListItem[];
+  initialTherapists: AdminTherapist[];
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -147,26 +150,26 @@ export default function AdminTherapistsManager({
                   <div className="flex items-center gap-2">
                     <h2 className="font-display text-lg font-semibold text-slate-900">{name}</h2>
                     <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                      therapist.tier === 'elite' ? 'bg-amber-100 text-amber-700' :
-                      therapist.tier === 'pro' ? 'bg-indigo-100 text-indigo-700' :
+                      therapist.subscription_tier === 'elite' ? 'bg-amber-100 text-amber-700' :
+                      therapist.subscription_tier === 'pro' ? 'bg-indigo-100 text-indigo-700' :
                       'bg-slate-100 text-slate-600'
                     }`}>
-                      {therapist.tier || 'free'}
+                      {therapist.subscription_tier || 'free'}
                     </span>
                   </div>
                   <p className="mt-1 text-xs text-slate-500">
                     {therapist.city || "No city"} · ID: {therapist.id.slice(0, 8)}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-3 text-xs">
-                    <span className={`flex items-center gap-1 ${therapist.status === 'approved' ? 'text-emerald-600' : 'text-amber-600'}`}>
-                      {therapist.status === 'approved' ? <CheckCircle2 className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
-                      Profile: {therapist.status?.replace('_', ' ')}
+                    <span className={`flex items-center gap-1 ${therapist.profile_status === 'approved' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                      {therapist.profile_status === 'approved' ? <CheckCircle2 className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
+                      Profile: {therapist.profile_status?.replace('_', ' ')}
                     </span>
-                    <span className={`flex items-center gap-1 ${therapist.is_verified_identity ? 'text-emerald-600' : 'text-slate-400'}`}>
+                    <span className={`flex items-center gap-1 ${therapist.verification_status === 'verified' ? 'text-emerald-600' : 'text-slate-400'}`}>
                       <ShieldCheck className="h-3 w-3" />
-                      Identity: {therapist.is_verified_identity ? 'verified' : 'unverified'}
+                      Identity: {therapist.verification_status || 'unverified'}
                     </span>
-                    {Boolean(therapist.featured?.is_active) && (
+                    {therapist.is_featured && (
                       <span className="flex items-center gap-1 text-amber-600">
                         <Star className="h-3 w-3 fill-current" /> Featured
                       </span>
@@ -178,7 +181,7 @@ export default function AdminTherapistsManager({
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    onClick={() => window.open(`/therapists/${therapist.id}`, '_blank')}
+                    onClick={() => window.open(`/therapists/${therapist.slug || therapist.id}`, '_blank')}
                   >
                     <Eye className="mr-2 h-4 w-4" /> View
                   </Button>

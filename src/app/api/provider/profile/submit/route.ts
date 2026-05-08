@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     const { error: updateError } = await adminClient
       .from("profiles")
       .update({
-        profile_status: "pending_approval",
+        profile_status: "submitted",
         visibility_status: "hidden",
         submitted_at: now,
         updated_at: now,
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       {
         profile_id: profile.id,
         user_id: session.userId,
-        status: "pending_approval",
+        status: "submitted",
         submitted_at: now,
         updated_at: now,
       },

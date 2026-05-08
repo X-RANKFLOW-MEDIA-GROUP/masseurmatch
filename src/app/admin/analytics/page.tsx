@@ -7,30 +7,19 @@ import {
   Users, 
   MapPin, 
   DollarSign,
+  Loader2
 } from "lucide-react";
 import { DashboardSkeleton } from "@/app/_components/DashboardSkeleton";
 
-// Cleaned up the types to remove 'any'
-interface AnalyticsData {
-  stats: {
-    totalTherapists: number;
-    pendingReviews: number;
-    verifiedIdentity: number;
-  };
-  topCities: Array<{ name: string; count: number }>;
-  revenueByTier: Record<string, number>;
-  signupsByDay?: Array<{ date: string; count: number }>;
-}
-
 export default function AdminAnalyticsPage() {
-  const [data, setData] = useState<AnalyticsData | null>(null);
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/admin/analytics")
       .then(res => res.json())
       .then(json => {
-        if (json.ok && json.stats) setData(json);
+        if (json.ok) setData(json);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -39,7 +28,7 @@ export default function AdminAnalyticsPage() {
   if (loading) return <div className="p-8"><DashboardSkeleton /></div>;
   if (!data) return <div className="p-8">Failed to load analytics.</div>;
 
-  const { stats, revenueByTier, topCities } = data;
+  const { stats, revenueByTier, topCities, signupsByDay } = data;
 
   return (
     <div className="space-y-8 p-8">
@@ -93,7 +82,7 @@ export default function AdminAnalyticsPage() {
             <MapPin className="h-5 w-5 text-slate-400" />
           </div>
           <div className="space-y-4">
-            {topCities.map((city) => (
+            {topCities.map((city: any) => (
               <div key={city.name} className="flex items-center justify-between">
                 <span className="text-sm text-slate-600">{city.name}</span>
                 <div className="flex items-center gap-3">
@@ -117,7 +106,7 @@ export default function AdminAnalyticsPage() {
             <BarChart3 className="h-5 w-5 text-slate-400" />
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {Object.entries(revenueByTier).map(([tier, count]) => (
+            {Object.entries(revenueByTier).map(([tier, count]: any) => (
               <div key={tier} className="rounded-xl bg-slate-50 p-4">
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{tier}</p>
                 <p className="mt-1 text-xl font-bold text-slate-900">{count}</p>

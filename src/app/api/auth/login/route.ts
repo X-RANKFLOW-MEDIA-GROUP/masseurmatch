@@ -1,7 +1,6 @@
 import { errorResponse, json, parseJsonBody, withSetCookie } from "@/app/api/_lib/http";
 import { setSessionCookie } from "@/app/api/_lib/session";
 import { authLoginSchema } from "@/app/_lib/validation";
-import { assertRateLimitAsync } from "@/app/_lib/security";
 import {
   ensureUserProfileAndRole,
   verifyPasswordWithRetry,
@@ -9,9 +8,6 @@ import {
 
 export async function POST(request: Request) {
   try {
-    // SECURITY: Rate limit login attempts - 5 per minute per IP
-    await assertRateLimitAsync(request, "auth:login", { limit: 5, windowMs: 60_000 });
-    
     const body = await parseJsonBody(request, authLoginSchema);
     const { user, session } = await verifyPasswordWithRetry(body.email, body.password, 5);
     const { role } = await ensureUserProfileAndRole(user, {

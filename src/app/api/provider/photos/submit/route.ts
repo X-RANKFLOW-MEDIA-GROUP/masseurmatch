@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
     if (updateError) throw new RouteError(500, updateError.message);
 
-    return json({ ok: true, pending_approval: ownIds.length });
+    return json({ ok: true, submitted: ownIds.length });
   } catch (error) {
     return errorResponse(error);
   }

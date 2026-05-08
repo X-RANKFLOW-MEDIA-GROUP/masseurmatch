@@ -12,7 +12,7 @@ function getStripe() {
   if (!key) {
     throw new Error("STRIPE_SECRET_KEY is not configured. Please ensure the Stripe connector is enabled.");
   }
-  return new Stripe(key, { apiVersion: "2024-11-20.acacia" });
+  return new Stripe(key, { apiVersion: "2023-10-16" });
 }
 
 function mapVerificationStatus(status: Stripe.Identity.VerificationSession.Status) {
@@ -49,29 +49,19 @@ export async function GET(request: NextRequest) {
     
     const dbStatus = mapVerificationStatus(stripeSession.status);
 
-    const lastErrorMessage =
-      stripeSession.last_error && "reason" in stripeSession.last_error
-        ? String(stripeSession.last_error.reason)
-        : null;
-
     await adminClient
       .from("identity_verifications")
       .update({ 
         status: dbStatus,
-        last_error: lastErrorMessage
+        last_error: stripeSession.last_error?.message || null
       })
       .eq("stripe_session_id", sessionId);
 
     if (stripeSession.status === "verified") {
       await adminClient
         .from("profiles")
-        .update({
-          is_verified_identity: true,
-          verification_status: "verified",
-          status: "approved",
-        })
-        .eq("user_id", userId)
-        .in("status", ["pending", "pending_approval"]);
+        .update({ is_verified_identity: true })
+        .eq("user_id", userId);
     }
 
     return NextResponse.json({
