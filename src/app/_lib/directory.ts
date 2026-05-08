@@ -14,7 +14,8 @@ const PUBLIC_PROFILE_SELECT = `
   subscription_tier, verification_status, is_featured,
   promotions, updated_at, profile_status, visibility_status,
   is_suspended, is_banned, available_now, available_now_expires,
-  lgbtq_affirming
+  lgbtq_affirming, business_hours, custom_faq, pricing_sessions, areas_served,
+  outcall_radius_miles, travel_schedule, add_ons, training, education, contact_clicks
 `;
 
 export interface ProfileFaqItem {
@@ -28,9 +29,42 @@ export interface ProfilePromotion {
 }
 
 export interface PricingSessionItem {
+  name?: string | null;
+  duration?: number | null;
   incall?: number | null;
   outcall?: number | null;
 }
+
+export interface ProfilePhoto {
+  id: string;
+  storage_path: string;
+  is_primary: boolean;
+}
+
+export interface ProfileAddOn {
+  name: string;
+  price?: number | null;
+}
+
+export interface ProfileTrainingEntry {
+  label: string;
+  detail?: string | null;
+  institution?: string | null;
+}
+
+export interface ProfileTravelEntry {
+  city: string;
+  state?: string | null;
+  start_date: string;
+  end_date: string;
+}
+
+export type ProfileEducationEntry = string | {
+  label?: string | null;
+  institution?: string | null;
+};
+
+export type BusinessHours = Record<string, unknown> | null;
 
 export interface PublicTherapist {
   id: string;
@@ -50,6 +84,7 @@ export interface PublicTherapist {
   subscription_tier: TherapistTier | null;
   profile_status: string | null;
   visibility_status: string | null;
+  status?: string | null;
   incall_price: number | null;
   outcall_price: number | null;
   starting_price: number | null;
@@ -78,12 +113,21 @@ export interface PublicTherapist {
   avatar_url?: string | null;
   review_count?: number | null;
   _tier?: string | null;
-  pricing_sessions?: any[] | null;
   neighborhood_name?: string | null;
   primary_area?: string | null;
   is_verified_identity?: boolean;
   is_verified_profile?: boolean;
   is_verified_photos?: boolean;
+  business_hours?: BusinessHours;
+  custom_faq?: ProfileFaqItem[] | null;
+  pricing_sessions?: PricingSessionItem[] | null;
+  areas_served?: string[] | null;
+  outcall_radius_miles?: number | null;
+  travel_schedule?: ProfileTravelEntry[] | null;
+  add_ons?: ProfileAddOn[] | null;
+  training?: Array<ProfileTrainingEntry | string> | null;
+  education?: ProfileEducationEntry[] | string | null;
+  contact_clicks?: number | null;
 }
 
 export interface ImportedReview {
@@ -115,6 +159,7 @@ export const getPublicTherapists = async (filters?: {
   verified?: boolean;
   availableToday?: boolean;
   tier?: TherapistTier;
+  lgbtqAffirming?: boolean;
   page?: number;
   pageSize?: number;
 }) => {
@@ -158,6 +203,10 @@ export const getPublicTherapists = async (filters?: {
 
   if (filters?.tier) {
     query = query.eq("subscription_tier", filters.tier);
+  }
+
+  if (filters?.lgbtqAffirming) {
+    query = query.eq("lgbtq_affirming", true);
   }
 
   const { data: rawData, error, count } = await query;

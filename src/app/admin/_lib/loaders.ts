@@ -2,7 +2,6 @@ import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import type { Tables } from "@/integrations/supabase/types";
 
 type ProfileRow = Tables<"profiles">;
-type FeaturedRow = Tables<"featured_masters">;
 type ImportedReviewRow = Tables<"imported_reviews">;
 type UserRoleRow = {
   user_id: string;
@@ -27,18 +26,15 @@ export type AdminImportedReview = Pick<
 
 export type AdminTherapist = Pick<
   ProfileRow,
-  | "id"
-  | "user_id"
-  | "display_name"
-  | "full_name"
-  | "city"
-  | "status"
-  | "is_active"
-  | "is_verified_profile"
-  | "is_verified_identity"
+  "id" | "user_id" | "display_name" | "full_name" | "city"
 > & {
-  tier: string | null;
-  featured: Pick<FeaturedRow, "display_order" | "is_active"> | null;
+  slug: string | null;
+  profile_status: string;
+  subscription_tier: string | null;
+  verification_status: string | null;
+  is_featured: boolean;
+  is_suspended: boolean;
+  is_banned: boolean;
 };
 
 export type AdminUser = {
@@ -121,7 +117,7 @@ export async function loadTherapists(): Promise<AdminLoadResult<AdminTherapist>>
     const adminClient = createSupabaseAdminClient();
     const { data, error } = await adminClient
       .from("profiles")
-      .select("id, user_id, display_name, full_name, city, status, is_active, is_verified_profile, is_verified_identity, _tier, updated_at")
+      .select("id, user_id, display_name, full_name, city, slug, profile_status, subscription_tier, verification_status, is_featured, is_suspended, is_banned, updated_at")
       .order("updated_at", { ascending: false })
       .limit(50);
 
@@ -129,56 +125,10 @@ export async function loadTherapists(): Promise<AdminLoadResult<AdminTherapist>>
       throw new Error(error.message);
     }
 
-    const profileRows = (data || []) as Array<
-      Pick<
-        ProfileRow,
-        | "id"
-        | "user_id"
-        | "display_name"
-        | "full_name"
-        | "city"
-        | "status"
-        | "is_active"
-        | "is_verified_profile"
-        | "is_verified_identity"
-      > & { _tier: string | null }
-    >;
-
-    const profileIds = profileRows.map((profile) => profile.id);
-    const featuredMap = new Map<string, AdminTherapist["featured"]>();
-
-    if (profileIds.length > 0) {
-      const { data: featured, error: featuredError } = await adminClient
-        .from("featured_masters")
-        .select("profile_id, display_order, is_active")
-        .in("profile_id", profileIds);
-
-      if (featuredError) {
-        throw new Error(featuredError.message);
-      }
-
-      for (const record of featured || []) {
-        featuredMap.set(record.profile_id, {
-          display_order: record.display_order,
-          is_active: record.is_active,
-        });
-      }
-    }
+    const profileRows = (data || []) as AdminTherapist[];
 
     return {
-      items: profileRows.map((profile) => ({
-        id: profile.id,
-        user_id: profile.user_id,
-        display_name: profile.display_name,
-        full_name: profile.full_name,
-        city: profile.city,
-        status: profile.status,
-        is_active: profile.is_active,
-        is_verified_profile: profile.is_verified_profile,
-        is_verified_identity: profile.is_verified_identity,
-        tier: profile._tier,
-        featured: featuredMap.get(profile.id) || null,
-      })),
+      items: profileRows,
       error: null,
     };
   } catch (error) {

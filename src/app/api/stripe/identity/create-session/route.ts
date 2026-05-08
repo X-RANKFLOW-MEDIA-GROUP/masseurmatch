@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { STRIPE_API_VERSION } from "@/app/api/_lib/stripe-config";
 
 import {
   createSupabaseAdminClient,
@@ -13,7 +14,7 @@ function getStripe() {
   if (!key) {
     throw new Error("STRIPE_SECRET_KEY is not configured. Please ensure the Stripe connector is enabled.");
   }
-  return new Stripe(key, { apiVersion: "2023-10-16" });
+  return new Stripe(key, { apiVersion: STRIPE_API_VERSION });
 }
 
 export async function POST(request: NextRequest) {

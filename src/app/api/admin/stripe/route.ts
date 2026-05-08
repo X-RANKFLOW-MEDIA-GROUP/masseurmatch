@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { STRIPE_API_VERSION } from "@/app/api/_lib/stripe-config";
 import { requireAdminSession } from "@/app/api/_lib/supabase-server";
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) return null;
-  return new Stripe(key, { apiVersion: "2025-08-27.basil" });
+  return new Stripe(key, { apiVersion: STRIPE_API_VERSION });
 }
 
 export async function GET(request: NextRequest) {
