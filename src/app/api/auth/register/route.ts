@@ -2,6 +2,7 @@ import { errorResponse, json, parseJsonBody, withSetCookie } from "@/app/api/_li
 import { setSessionCookie } from "@/app/api/_lib/session";
 import { RouteError } from "@/app/api/_lib/http";
 import { authRegisterSchema } from "@/app/_lib/validation";
+import { assertRateLimitAsync } from "@/app/_lib/security";
 import {
   createTherapistUser,
   ensureUserProfileAndRole,
@@ -9,6 +10,9 @@ import {
 
 export async function POST(request: Request) {
   try {
+    // SECURITY: Rate limit registration - 3 per hour per IP to prevent bot spam
+    await assertRateLimitAsync(request, "auth:register", { limit: 3, windowMs: 3600_000 });
+    
     const body = await parseJsonBody(request, authRegisterSchema);
     const { origin } = new URL(request.url);
     const result = await createTherapistUser({

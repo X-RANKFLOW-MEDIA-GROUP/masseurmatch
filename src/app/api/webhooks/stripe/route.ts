@@ -314,11 +314,8 @@ export async function POST(request: Request) {
         status: updateResult.status,
         error: updateResult.error,
       });
-      await updateWebhookEventRecord(event.id, "failed", updateResult.error ?? "Failed to persist Stripe webhook update");
-      return NextResponse.json(
-        { error: "Failed to persist Stripe webhook update" },
-        { status: updateResult.status ?? 500 },
-      );
+      // SECURITY FIX: Return 500 to trigger Stripe retry - prevents lost payment events
+      return NextResponse.json({ ok: false, error: "persist_failed" }, { status: 500 });
     }
 
     await updateWebhookEventRecord(event.id, "processed");
@@ -327,6 +324,7 @@ export async function POST(request: Request) {
     console.error("[stripe-webhook] unhandled error", {
       message: error instanceof Error ? error.message : "unknown",
     });
-    return NextResponse.json({ error: "Stripe webhook internal error" }, { status: 500 });
+    // SECURITY FIX: Return 500 to trigger Stripe retry on unexpected errors
+    return NextResponse.json({ ok: false, error: "internal_error" }, { status: 500 });
   }
 }

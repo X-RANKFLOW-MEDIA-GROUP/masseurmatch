@@ -4,7 +4,7 @@ import {
 } from "@supabase/supabase-js";
 
 import { envAny } from "@/app/api/_lib/env";
-import { RouteError } from "@/app/api/_lib/http";
+import { RouteError, withTimeout } from "@/app/api/_lib/http";
 import { getRequestSession, type RequestSession } from "@/app/api/_lib/session";
 import type { Database, Json } from "@/integrations/supabase/types";
 
@@ -57,13 +57,17 @@ export function createSupabaseAdminClient() {
 
 export async function getUserRole(userId: string): Promise<AppRole | null> {
   const adminClient = createSupabaseAdminClient();
-  const { data, error } = await adminClient
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const { data, error } = await withTimeout(
+    adminClient
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    5000,
+    "getUserRole"
+  );
 
   if (error) {
     throw new RouteError(500, error.message);

@@ -18,12 +18,10 @@ type MiddlewareSession = {
 };
 
 function getSessionSecret(): string {
+  // SECURITY: Never use SUPABASE_SERVICE_ROLE_KEY as session secret - it has elevated privileges
   const secret =
     process.env.MM_SESSION_SECRET ??
-    process.env.SESSION_SECRET ??
-    process.env.MM_JWT_SECRET ??
-    process.env.JWT_SECRET ??
-    process.env.SUPABASE_SERVICE_ROLE_KEY;
+    process.env.SESSION_SECRET;
   if (secret) return secret;
   if (process.env.NODE_ENV === "production") {
     throw new Error("MM_SESSION_SECRET is required in production.");
