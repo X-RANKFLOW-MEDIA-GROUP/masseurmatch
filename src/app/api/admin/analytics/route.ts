@@ -1,4 +1,4 @@
-import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
+import { errorResponse, json } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, requireAdminSession } from "@/app/api/_lib/supabase-server";
 
 export async function GET(request: Request) {
@@ -6,63 +6,47 @@ export async function GET(request: Request) {
     await requireAdminSession(request);
     const adminClient = createSupabaseAdminClient();
 
-    // 1. Total Stats
     const { count: totalTherapists } = await adminClient
-      .from("profiles")
-      .select("*", { count: "exact", head: true });
+      .from("therapist_profiles")
+      .select("id", { count: "exact", head: true });
 
     const { count: pendingReviews } = await adminClient
-      .from("profiles")
-      .select("*", { count: "exact", head: true })
-      .eq("profile_status", "pending_review");
+      .from("therapist_profiles")
+      .select("id", { count: "exact", head: true })
+      .eq("moderation_status", "pending");
 
     const { count: verifiedIdentity } = await adminClient
-      .from("profiles")
-      .select("*", { count: "exact", head: true })
+      .from("therapist_profiles")
+      .select("id", { count: "exact", head: true })
       .eq("verification_status", "verified");
 
-    // 2. Revenue by Tier (Approximate based on active subscriptions)
-    const { data: tierData } = await adminClient
-      .from("profiles")
-      .select("subscription_tier");
-
-    const revenueByTier = (tierData || []).reduce((acc: any, curr) => {
-      const tier = curr.subscription_tier || 'free';
-      acc[tier] = (acc[tier] || 0) + 1;
-      return acc;
-    }, {});
-
-    // 3. Top Cities
-    const { data: cityData } = await adminClient
-      .from("profiles")
+    const { data: cityRows } = await adminClient
+      .from("therapist_profiles")
       .select("city")
       .not("city", "is", null);
 
-    const topCities = (cityData || []).reduce((acc: any, curr) => {
-      const city = curr.city;
-      acc[city] = (acc[city] || 0) + 1;
-      return acc;
-    }, {});
+    const cityCounts: Record<string, number> = {};
+    for (const row of cityRows || []) {
+      const city = String(row.city || "Unknown");
+      cityCounts[city] = (cityCounts[city] || 0) + 1;
+    }
 
-    const sortedCities = Object.entries(topCities)
-      .sort(([, a]: any, [, b]: any) => b - a)
-      .slice(0, 5)
+    const topCities = Object.entries(cityCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 10)
       .map(([name, count]) => ({ name, count }));
 
-    // 4. Recent Signups (Last 30 days)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
-    const { data: recentSignups } = await adminClient
-      .from("profiles")
-      .select("created_at")
-      .gte("created_at", thirtyDaysAgo.toISOString());
+    const { data: subscriptionRows } = await adminClient
+      .from("therapist_subscriptions")
+      .select("subscription_plans(code)")
+      .in("status", ["trialing", "active"]);
 
-    const signupsByDay = (recentSignups || []).reduce((acc: any, curr) => {
-      const date = new Date(curr.created_at).toISOString().split('T')[0];
-      acc[date] = (acc[date] || 0) + 1;
-      return acc;
-    }, {});
+    const revenueByTier: Record<string, number> = {};
+    for (const row of subscriptionRows || []) {
+      const plan = Array.isArray(row.subscription_plans) ? row.subscription_plans[0] : row.subscription_plans;
+      const tier = plan?.code || "free";
+      revenueByTier[tier] = (revenueByTier[tier] || 0) + 1;
+    }
 
     return json({
       ok: true,
@@ -72,8 +56,8 @@ export async function GET(request: Request) {
         verifiedIdentity: verifiedIdentity || 0,
       },
       revenueByTier,
-      topCities: sortedCities,
-      signupsByDay: Object.entries(signupsByDay).map(([date, count]) => ({ date, count })),
+      topCities,
+      signupsByDay: [],
     });
   } catch (error) {
     return errorResponse(error);
