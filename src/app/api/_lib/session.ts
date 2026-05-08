@@ -18,12 +18,10 @@ const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
 const VALID_ROLES = new Set<AppRole>(["admin", "provider", "therapist", "client"]);
 
 function sessionSecret(): string {
+  // SECURITY: Never use SUPABASE_SERVICE_ROLE_KEY as session secret - it has elevated privileges
   const secret = envOptional([
     "MM_SESSION_SECRET",
     "SESSION_SECRET",
-    "MM_JWT_SECRET",
-    "JWT_SECRET",
-    "SUPABASE_SERVICE_ROLE_KEY",
   ]);
   if (secret) return secret;
   if (process.env.NODE_ENV === "production") {
