@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { JsonLd } from "@/app/_components/json-ld";
 import { PremiumSeoHomepage } from "@/components/homepage/PremiumSeoHomepage";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
@@ -46,6 +47,38 @@ export const metadata: Metadata = {
     },
   },
 };
+
+function HomepageTopBar() {
+  return (
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-[var(--navy)]/95 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-8 lg:px-12">
+        <Link href="/" className="text-sm font-semibold tracking-[0.18em] text-white uppercase">
+          MasseurMatch
+        </Link>
+        <nav className="flex items-center gap-2 sm:gap-3">
+          <Link
+            href="/explore"
+            className="hidden rounded-full px-4 py-2 text-sm font-medium text-white/75 transition hover:bg-white/10 hover:text-white sm:inline-flex"
+          >
+            Browse
+          </Link>
+          <Link
+            href="/for-therapists"
+            className="hidden rounded-full px-4 py-2 text-sm font-medium text-white/75 transition hover:bg-white/10 hover:text-white sm:inline-flex"
+          >
+            List Profile
+          </Link>
+          <Link
+            href="/login?redirect=/pro/dashboard"
+            className="rounded-full border border-white/15 bg-white px-4 py-2 text-sm font-semibold text-[var(--navy)] shadow-sm transition hover:bg-[var(--orange)] hover:text-white"
+          >
+            Provider Login
+          </Link>
+        </nav>
+      </div>
+    </header>
+  );
+}
 
 export default async function HomePage() {
   const cities = getCities();
@@ -180,6 +213,7 @@ export default async function HomePage() {
       />
       <JsonLd data={buildFaqJsonLd(homeFaqs)} />
 
+      <HomepageTopBar />
       <PremiumSeoHomepage
         featuredTherapists={featuredTherapists}
         totalTherapists={therapistsResult.total}
