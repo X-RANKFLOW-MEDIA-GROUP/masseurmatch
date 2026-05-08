@@ -4,15 +4,18 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { envAny, envOptional } from "@/app/api/_lib/env";
 import { parseCookieHeader } from "@/app/api/_lib/http";
 
+export type AppRole = "admin" | "provider" | "therapist" | "client";
+
 export interface RequestSession {
   userId: string;
   email: string;
-  role: "admin" | "provider" | "client" | null;
+  role: AppRole;
   expiresAt: string;
 }
 
 const COOKIE_NAME = "mm_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
+const VALID_ROLES = new Set<AppRole>(["admin", "provider", "therapist", "client"]);
 
 function sessionSecret(): string {
   // SECURITY: Never use SUPABASE_SERVICE_ROLE_KEY as session secret - it has elevated privileges
@@ -91,7 +94,7 @@ function parseSessionValue(value: string): RequestSession | null {
 
   try {
     const parsed = JSON.parse(decodeBase64Url(payload)) as RequestSession;
-    if (!parsed?.userId || !parsed?.email || !parsed?.expiresAt) {
+    if (!parsed?.userId || !parsed?.email || !parsed?.expiresAt || !VALID_ROLES.has(parsed.role)) {
       return null;
     }
 
@@ -106,6 +109,10 @@ function parseSessionValue(value: string): RequestSession | null {
 }
 
 export function setSessionCookie(session: Omit<RequestSession, "expiresAt"> & { expiresAt?: string }): string {
+  if (!VALID_ROLES.has(session.role)) {
+    throw new Error("Cannot create MasseurMatch app session without a valid role.");
+  }
+
   const expiresAt =
     session.expiresAt ?? new Date(Date.now() + SESSION_TTL_SECONDS * 1000).toISOString();
 

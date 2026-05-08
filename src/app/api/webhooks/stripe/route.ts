@@ -158,7 +158,7 @@ export async function POST(request: Request) {
   try {
     if (isRateLimited(getClientIp(request))) {
       console.warn("[stripe-webhook] rate-limited request");
-      return NextResponse.json({ ok: true, skipped: "rate_limited" });
+      return NextResponse.json({ error: "Too many webhook requests" }, { status: 429 });
     }
 
     const stripe = getStripeClient();
@@ -174,13 +174,13 @@ export async function POST(request: Request) {
     } else {
       if (!webhookSecret || !stripe) {
         console.error("[stripe-webhook] secret or stripe client not configured");
-        return NextResponse.json({ ok: true, skipped: "not_configured" });
+        return NextResponse.json({ error: "Stripe webhook is not configured" }, { status: 500 });
       }
       try {
         event = stripe.webhooks.constructEvent(rawBody, stripeSignature, webhookSecret) as StripeEvent;
       } catch {
         console.warn("[stripe-webhook] invalid webhook signature");
-        return NextResponse.json({ ok: true, skipped: "invalid_signature" });
+        return NextResponse.json({ error: "Invalid webhook signature" }, { status: 400 });
       }
     }
 
