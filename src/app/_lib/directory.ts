@@ -2,51 +2,17 @@ import { US_CITIES } from "@/data/cities";
 import { supabase } from "@/integrations/supabase/client";
 import { matchBodyTypeKeyword } from "@/lib/physical-profile";
 
+const db = supabase as any;
+
 export type TherapistTier = "free" | "standard" | "pro" | "elite";
 
-export interface ProfileFaqItem {
-  question: string;
-  answer: string;
-}
-
-export interface ProfilePromotion {
-  title: string;
-  description: string;
-}
-
-export interface PricingSessionItem {
-  name: string;
-  duration: number;
-  incall?: number | null;
-  outcall?: number | null;
-}
-
-export interface ProfileTrainingEntry {
-  institution?: string;
-  year?: number;
-  description?: string;
-  label?: string;
-  detail?: string;
-}
-
-export interface ProfileTravelEntry {
-  city: string;
-  start_date: string;
-  end_date: string;
-  state?: string;
-  detail?: string;
-}
-
-export interface ProfileAddOn {
-  name: string;
-  price: number;
-}
-
-export interface ProfilePhoto {
-  id: string;
-  storage_path: string;
-  is_primary: boolean;
-}
+export interface ProfileFaqItem { question: string; answer: string; }
+export interface ProfilePromotion { title: string; description: string; }
+export interface PricingSessionItem { name: string; duration: number; incall?: number | null; outcall?: number | null; }
+export interface ProfileTrainingEntry { institution?: string; year?: number; description?: string; label?: string; detail?: string; }
+export interface ProfileTravelEntry { city: string; start_date: string; end_date: string; state?: string; detail?: string; }
+export interface ProfileAddOn { name: string; price: number; }
+export interface ProfilePhoto { id: string; storage_path: string; is_primary: boolean; }
 
 export interface PublicTherapist {
   id: string;
@@ -113,13 +79,7 @@ export interface PublicTherapist {
   add_ons?: ProfileAddOn[] | null;
 }
 
-export interface ImportedReview {
-  id: string;
-  review_text: string;
-  rating: number | null;
-  reviewer_name: string | null;
-  review_date: string | null;
-}
+export interface ImportedReview { id: string; review_text: string; rating: number | null; reviewer_name: string | null; review_date: string | null; }
 
 const TIER_RANK: Record<string, number> = { elite: 4, pro: 3, standard: 2, free: 1 };
 
@@ -134,8 +94,7 @@ const moneyFromCents = (value?: number | null) => (typeof value === "number" ? M
 
 async function getApprovedPhotos(profileIds: string[]) {
   if (profileIds.length === 0) return new Map<string, { profile?: string; gallery: string[] }>();
-
-  const { data } = await supabase
+  const { data } = await db
     .from("therapist_photos")
     .select("id, therapist_profile_id, public_url, storage_path, is_primary, sort_order")
     .in("therapist_profile_id", profileIds)
@@ -156,8 +115,7 @@ async function getApprovedPhotos(profileIds: string[]) {
 
 async function getVisibleServices(profileIds: string[]) {
   if (profileIds.length === 0) return new Map<string, string[]>();
-
-  const { data } = await supabase
+  const { data } = await db
     .from("therapist_services")
     .select("therapist_profile_id, service_name, category, sort_order")
     .in("therapist_profile_id", profileIds)
@@ -176,8 +134,7 @@ async function getVisibleServices(profileIds: string[]) {
 
 async function getVisiblePricing(profileIds: string[]) {
   if (profileIds.length === 0) return new Map<string, PricingSessionItem[]>();
-
-  const { data } = await supabase
+  const { data } = await db
     .from("therapist_pricing")
     .select("therapist_profile_id, session_type, duration_minutes, price_cents")
     .in("therapist_profile_id", profileIds)
@@ -208,8 +165,7 @@ async function getVisiblePricing(profileIds: string[]) {
 
 async function getActiveTiers(profileIds: string[]) {
   if (profileIds.length === 0) return new Map<string, TherapistTier>();
-
-  const { data } = await supabase
+  const { data } = await db
     .from("therapist_subscriptions")
     .select("therapist_profile_id, subscription_plans(code)")
     .in("therapist_profile_id", profileIds)
@@ -219,7 +175,7 @@ async function getActiveTiers(profileIds: string[]) {
   for (const row of data || []) {
     const code = Array.isArray(row.subscription_plans)
       ? row.subscription_plans[0]?.code
-      : (row.subscription_plans as { code?: string } | null)?.code;
+      : row.subscription_plans?.code;
     map.set(String(row.therapist_profile_id), normalizeTier(code));
   }
   return map;
@@ -292,7 +248,7 @@ async function hydrateTherapists(rows: any[]): Promise<PublicTherapist[]> {
 }
 
 const buildTherapistBaseQuery = () =>
-  supabase
+  db
     .from("therapist_profiles")
     .select("id, slug, display_name, headline, bio, city, state, country, neighborhood, latitude, longitude, service_radius_miles, offers_incall, offers_outcall, phone, contact_email, website_url, is_published, moderation_status, verification_status, canonical_city_slug, updated_at", { count: "exact" })
     .eq("is_published", true)
@@ -357,16 +313,14 @@ export const getPublicTherapists = async (filters?: {
 export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTherapist | null> => {
   const sanitizedSlug = slug.trim();
   if (!sanitizedSlug) return null;
-
   const { data, error } = await buildTherapistBaseQuery().or(`slug.eq.${sanitizedSlug},id.eq.${sanitizedSlug}`).maybeSingle();
   if (error || !data) return null;
-
   const [profile] = await hydrateTherapists([data]);
   return profile || null;
 };
 
 export const getImportedReviews = async (profileId: string, limit = 5) => {
-  const { data } = await supabase
+  const { data } = await db
     .from("imported_reviews")
     .select("id, review_text, rating, reviewer_name, review_date")
     .eq("profile_id", profileId)
@@ -377,7 +331,7 @@ export const getImportedReviews = async (profileId: string, limit = 5) => {
 };
 
 export const getProfilePhotos = async (profileId: string, limit = 6): Promise<ProfilePhoto[]> => {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("therapist_photos")
     .select("id, public_url, storage_path, is_primary, sort_order")
     .eq("therapist_profile_id", profileId)
@@ -387,7 +341,7 @@ export const getProfilePhotos = async (profileId: string, limit = 6): Promise<Pr
 
   if (error) return [];
 
-  return (data || []).map((photo) => ({
+  return (data || []).map((photo: any) => ({
     id: photo.id,
     storage_path: photo.public_url || photo.storage_path,
     is_primary: Boolean(photo.is_primary),
@@ -396,7 +350,7 @@ export const getProfilePhotos = async (profileId: string, limit = 6): Promise<Pr
 
 export async function getCityInventoryCount(cityName: string): Promise<number> {
   const slug = cityName.toLowerCase().trim().replace(/\s+/g, "-");
-  const { count } = await supabase
+  const { count } = await db
     .from("therapist_profiles")
     .select("id", { count: "exact", head: true })
     .eq("is_published", true)
@@ -408,7 +362,7 @@ export async function getCityInventoryCount(cityName: string): Promise<number> {
 
 export async function getCityInventoryMap(): Promise<Map<string, number>> {
   const map = new Map<string, number>();
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("therapist_profiles")
     .select("city")
     .eq("is_published", true)
@@ -417,7 +371,7 @@ export async function getCityInventoryMap(): Promise<Map<string, number>> {
 
   if (error) return map;
 
-  data.forEach((row) => {
+  data.forEach((row: any) => {
     const key = (row.city as string).toLowerCase().trim();
     map.set(key, (map.get(key) ?? 0) + 1);
   });
