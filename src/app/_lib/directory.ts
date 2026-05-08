@@ -13,7 +13,8 @@ const PUBLIC_PROFILE_SELECT = `
   years_experience, languages,
   subscription_tier, verification_status, is_featured,
   promotions, updated_at, profile_status, visibility_status,
-  is_suspended, is_banned, available_now, available_now_expires
+  is_suspended, is_banned, available_now, available_now_expires,
+  lgbtq_affirming
 `;
 
 export interface ProfileFaqItem {
@@ -24,6 +25,11 @@ export interface ProfileFaqItem {
 export interface ProfilePromotion {
   title: string;
   description: string;
+}
+
+export interface PricingSessionItem {
+  incall?: number | null;
+  outcall?: number | null;
 }
 
 export interface PublicTherapist {
@@ -59,6 +65,11 @@ export interface PublicTherapist {
   languages?: string[] | null;
   profile_photo?: string;
   gallery_photos?: string[];
+  lgbtq_affirming?: boolean | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  special_offer_text?: string | null;
+  profile_views?: number | null;
   is_featured: boolean;
   updated_at: string;
   // Legacy compatibility fields
@@ -67,7 +78,6 @@ export interface PublicTherapist {
   avatar_url?: string | null;
   review_count?: number | null;
   _tier?: string | null;
-  profile_photo?: string | null;
   pricing_sessions?: any[] | null;
   neighborhood_name?: string | null;
   primary_area?: string | null;

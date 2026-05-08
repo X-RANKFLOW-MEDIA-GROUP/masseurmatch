@@ -1,22 +1,9 @@
 import type { PublicTherapist } from "@/app/_lib/directory";
 
-type FallbackTherapist = Partial<PublicTherapist> & {
+type FallbackTherapist = Omit<PublicTherapist, 'id' | 'slug'> & {
   id: string;
   slug: string;
-  city: string;
-  display_name: string;
-  full_name: string;
-  bio: string;
-  specialties: string[];
-  modality: string;
-  incall_price: number | null;
-  outcall_price: number | null;
-  available_now: boolean;
-  available_now_expires: string | null;
-  latitude: number;
-  longitude: number;
-  zip_code: string | null;
-  special_offer_text: string | null;
+  [key: string]: any;
 };
 
 const FUTURE_DATE = "2026-12-31T23:59:59.000Z";
