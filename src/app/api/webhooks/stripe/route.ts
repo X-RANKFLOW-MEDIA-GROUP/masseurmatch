@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { STRIPE_API_VERSION } from "@/app/api/_lib/stripe-config";
 import { NextResponse } from "next/server";
 import { env, hasStripe } from "@/lib/env";
 
@@ -74,7 +75,7 @@ function resolveTier(obj: StripeEventObject, subscriptionStatus?: string): Subsc
 
 function getStripeClient() {
   if (!hasStripe || !env.stripeSecretKey) return null;
-  return new Stripe(env.stripeSecretKey, { apiVersion: "2023-10-16" });
+  return new Stripe(env.stripeSecretKey, { apiVersion: STRIPE_API_VERSION });
 }
 
 async function updateProfileBilling(userId: string, updates: any) {

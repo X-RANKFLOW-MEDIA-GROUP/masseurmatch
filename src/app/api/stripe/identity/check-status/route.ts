@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { STRIPE_API_VERSION } from "@/app/api/_lib/stripe-config";
 
 import {
   createSupabaseAdminClient,
@@ -12,7 +13,7 @@ function getStripe() {
   if (!key) {
     throw new Error("STRIPE_SECRET_KEY is not configured. Please ensure the Stripe connector is enabled.");
   }
-  return new Stripe(key, { apiVersion: "2023-10-16" });
+  return new Stripe(key, { apiVersion: STRIPE_API_VERSION });
 }
 
 function mapVerificationStatus(status: Stripe.Identity.VerificationSession.Status) {
@@ -53,7 +54,7 @@ export async function GET(request: NextRequest) {
       .from("identity_verifications")
       .update({ 
         status: dbStatus,
-        last_error: stripeSession.last_error?.message || null
+        last_error: stripeSession.last_error?.reason || null
       })
       .eq("stripe_session_id", sessionId);
 
