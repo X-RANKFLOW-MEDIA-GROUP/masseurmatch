@@ -231,10 +231,17 @@ export async function ensureUserProfileAndRole(
   let profileCreated = false;
   if (!existingProfile) {
     const { error: profileError } = await adminClient.from("profiles").insert({
+      id: user.id,
       user_id: user.id,
+      email: user.email ?? null,
+      email_address: user.email ?? null,
       full_name: fullName,
       display_name: fullName,
       status: "pending",
+      profile_status: "draft",
+      visibility_status: "private",
+      subscription_tier: "free",
+      _tier: "free",
     });
 
     if (profileError) {

@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     const { count: pendingReviews } = await adminClient
       .from("profiles")
       .select("*", { count: "exact", head: true })
-      .eq("profile_status", "pending_review");
+      .in("profile_status", ["pending_approval", "submitted", "under_review"]);
 
     const { count: verifiedIdentity } = await adminClient
       .from("profiles")

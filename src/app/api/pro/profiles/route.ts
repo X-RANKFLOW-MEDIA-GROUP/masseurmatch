@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     const adminClient = createSupabaseAdminClient();
     let query = adminClient.from("profiles").select("*", { head: false });
     if (city) query = query.eq("city", city);
-    if (tier) query = query.eq("tier", tier);
+    if (tier) query = query.eq("subscription_tier", tier);
     if (available) query = query.eq("available_now", available === "true");
     // Adicione outros filtros conforme necessário
     const { data, error } = await query.limit(200);
