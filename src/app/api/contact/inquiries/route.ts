@@ -26,14 +26,64 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if therapist exists
-    const { data: therapist, error: therapistError } = await supabase
-      .from('therapists')
-      .select('id, display_name, contact_email, user_id')
-      .eq('id', therapistId)
-      .single();
+    // Resolve either the legacy therapists/profile id or the newer therapist_profiles id.
+    let therapist: {
+      id: string;
+      profileId: string | null;
+      display_name: string | null;
+      contact_email: string | null;
+      user_id: string | null;
+    } | null = null;
 
-    if (therapistError || !therapist) {
+    const { data: profileMatch, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, user_id, display_name, full_name, email_address, email')
+      .eq('id', therapistId)
+      .maybeSingle();
+
+    if (profileError) {
+      return NextResponse.json(
+        { message: profileError.message },
+        { status: 500 }
+      );
+    }
+
+    if (profileMatch) {
+      therapist = {
+        id: profileMatch.id,
+        profileId: profileMatch.id,
+        display_name: profileMatch.display_name || profileMatch.full_name,
+        contact_email: profileMatch.email_address || profileMatch.email,
+        user_id: profileMatch.user_id,
+      };
+    }
+
+    if (!therapist) {
+      const { data: therapistProfile, error: therapistProfileError } = await supabase
+        .from('therapist_profiles')
+        .select('id, profile_id, user_id, display_name, contact_email')
+        .eq('id', therapistId)
+        .maybeSingle();
+
+      if (therapistProfileError) {
+        return NextResponse.json(
+          { message: therapistProfileError.message },
+          { status: 500 }
+        );
+      }
+
+      if (therapistProfile) {
+        therapist = {
+          id: therapistProfile.id,
+          profileId: therapistProfile.profile_id,
+          display_name: therapistProfile.display_name,
+          contact_email: therapistProfile.contact_email,
+          user_id: therapistProfile.user_id,
+        };
+      }
+    }
+
+    if (!therapist) {
       return NextResponse.json(
         { message: 'Therapist not found' },
         { status: 404 }
@@ -41,11 +91,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Check contact preferences
-    const { data: prefs } = await supabase
+    let prefsQuery = supabase
       .from('contact_preferences')
       .select('allow_phone, allow_email, allow_whatsapp, auto_reply_message')
-      .eq('therapist_id', therapistId)
-      .single();
+      .eq('therapist_id', therapist.id);
+    if (therapist.profileId) {
+      prefsQuery = prefsQuery.or(`profile_id.eq.${therapist.profileId},therapist_id.eq.${therapist.id}`);
+    }
+    const { data: prefs } = await prefsQuery.maybeSingle();
 
     // Validate preferred contact method is allowed
     if (prefs) {
@@ -75,6 +128,7 @@ export async function POST(request: NextRequest) {
       .insert([
         {
           therapist_id: therapistId,
+          profile_id: therapist.profileId,
           client_name: clientName,
           client_email: clientEmail,
           client_phone: clientPhone || null,
@@ -96,7 +150,7 @@ export async function POST(request: NextRequest) {
 
     // Send notification email to therapist
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/email/send`, {
+      if (therapist.contact_email) await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/email/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
