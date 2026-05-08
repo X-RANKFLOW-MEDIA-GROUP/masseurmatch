@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
+import { assertCsrfSafe, errorResponse, json, parseJsonBody, RouteError, withTimeout } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, requireSession } from "@/app/api/_lib/supabase-server";
 
 const patchSchema = z.object({
@@ -14,9 +14,9 @@ const patchSchema = z.object({
   website: z.string().url().max(200).optional().or(z.literal("")),
   specialties: z.array(z.string()).optional(),
   sessionLengths: z.array(z.number().int().positive()).optional(),
-  startingPrice: z.number().int().min(0).optional().nullable(),
-  incallPrice: z.number().int().min(0).optional().nullable(),
-  outcallPrice: z.number().int().min(0).optional().nullable(),
+  startingPrice: z.number().int().min(0).max(99999).optional().nullable(),
+  incallPrice: z.number().int().min(0).max(99999).optional().nullable(),
+  outcallPrice: z.number().int().min(0).max(99999).optional().nullable(),
   locationType: z.enum(["incall", "outcall", "both"]).optional(),
   yearsExperience: z.number().int().min(0).max(60).optional().nullable(),
   languages: z.array(z.string()).optional(),
@@ -31,11 +31,15 @@ export async function GET(request: Request) {
     const session = await requireSession(request);
     const adminClient = createSupabaseAdminClient();
 
-    const { data: profile, error } = await adminClient
-      .from("profiles")
-      .select("*")
-      .eq("user_id", session.userId)
-      .maybeSingle();
+    const { data: profile, error } = await withTimeout(
+      adminClient
+        .from("profiles")
+        .select("*")
+        .eq("user_id", session.userId)
+        .maybeSingle(),
+      5000,
+      "getProfile"
+    );
 
     if (error) throw new RouteError(500, error.message);
     if (!profile) throw new RouteError(404, "Profile not found.");
@@ -48,6 +52,9 @@ export async function GET(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
+    // SECURITY: Validate CSRF for state-changing requests
+    assertCsrfSafe(request);
+    
     const session = await requireSession(request);
     const body = await parseJsonBody(request, patchSchema);
     const adminClient = createSupabaseAdminClient();
@@ -76,12 +83,16 @@ export async function PATCH(request: Request) {
     if (body.languages !== undefined) updatePayload.languages_spoken = body.languages;
     updatePayload.updated_at = new Date().toISOString();
 
-    const { data: updated, error } = await adminClient
-      .from("profiles")
-      .update(updatePayload)
-      .eq("user_id", session.userId)
-      .select("*")
-      .single();
+    const { data: updated, error } = await withTimeout(
+      adminClient
+        .from("profiles")
+        .update(updatePayload)
+        .eq("user_id", session.userId)
+        .select("*")
+        .single(),
+      5000,
+      "updateProfile"
+    );
 
     if (error) throw new RouteError(500, error.message);
 

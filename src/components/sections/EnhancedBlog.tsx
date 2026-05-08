@@ -1,7 +1,8 @@
-﻿"use client";
+"use client";
 
 import { motion } from "framer-motion";
 import { Calendar, User, Clock, BookmarkPlus } from "lucide-react";
+import DOMPurify from "dompurify";
 import { fadeInUp, staggerContainer } from "@/components/animations/MicroInteractions";
 
 export interface BlogPost {
@@ -235,7 +236,7 @@ export function BlogPostDetail({ post }: { post: BlogPost }) {
         {post.content && (
           <div
             className="text-foreground leading-relaxed space-y-4"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content, { ALLOWED_TAGS: ['p', 'br', 'b', 'i', 'strong', 'em', 'ul', 'ol', 'li', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'code', 'pre'], ALLOWED_ATTR: ['href', 'target', 'rel'] }) }}
           />
         )}
       </motion.div>
