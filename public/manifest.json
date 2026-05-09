@@ -3,7 +3,7 @@
   "name": "MasseurMatch - City-First Massage Directory",
   "short_name": "MasseurMatch",
   "description": "Find massage therapists by city, specialty, and profile quality through a city-first public directory.",
-  "start_url": "/",
+  "start_url": "/?v=20260508",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -13,7 +13,7 @@
   "categories": ["health", "lifestyle", "business"],
   "icons": [
     {
-      "src": "/favicon.ico",
+      "src": "/favicon.ico?v=20260508",
       "sizes": "64x64 32x32 16x16",
       "type": "image/x-icon"
     }
