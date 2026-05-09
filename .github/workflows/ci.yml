@@ -65,12 +65,7 @@ jobs:
         run: |
           curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/main/install.sh | sh -s -- -b /usr/local/bin v8.24.2
       - name: Scan for secrets (gitleaks)
-        uses: gitleaks/gitleaks-action@v2.3.9
-        with:
-          fail: true
-          redact: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gitleaks detect --source . --verbose --redact
 
   typecheck:
     name: Typecheck
