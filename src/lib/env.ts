@@ -26,7 +26,8 @@ export const env = {
   verificationApiKey: value("VERIFICATION_API_KEY"),
 };
 
-export const hasSupabase = Boolean(env.supabaseUrl && (env.supabaseAnonKey || env.supabaseServiceRoleKey));
+export const hasSupabase = Boolean(env.supabaseUrl && env.supabaseAnonKey);
+export const hasSupabaseAdmin = Boolean(env.supabaseUrl && env.supabaseServiceRoleKey);
 export const hasStripe = has("STRIPE_SECRET_KEY", "STRIPE_MCP_KEY");
 export const hasResend = has("RESEND_API_KEY");
 export const hasTwilio = has("TWILIO_ACCOUNT_SID") && has("TWILIO_AUTH_TOKEN") && has("TWILIO_PHONE_NUMBER");
