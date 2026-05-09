@@ -19,15 +19,17 @@ const rootMetadata = createPageMetadata({
   path: "/",
 });
 
+const faviconVersion = "20260508";
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   applicationName: SITE_NAME,
-  manifest: "/manifest.json",
+  manifest: `/manifest.json?v=${faviconVersion}`,
   category: "wellness",
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
+    icon: `/favicon.ico?v=${faviconVersion}`,
+    shortcut: `/favicon.ico?v=${faviconVersion}`,
+    apple: `/favicon.ico?v=${faviconVersion}`,
   },
   ...rootMetadata,
   alternates: {
@@ -52,7 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <JsonLd data={buildOrganizationJsonLd()} />
           <JsonLd data={buildWebsiteJsonLd()} />
           {/* Força visibilidade/z-index do header */}
-          <div style={{ position: 'relative', zIndex: 9999 }}>
+          <div style={{ position: "relative", zIndex: 9999 }}>
             <SiteHeader />
           </div>
           <AppMotionShell>{children}</AppMotionShell>
