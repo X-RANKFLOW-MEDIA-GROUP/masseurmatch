@@ -19,7 +19,7 @@ const rootMetadata = createPageMetadata({
   path: "/",
 });
 
-const faviconVersion = "20260508";
+const faviconVersion = "20260508b";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -27,9 +27,12 @@ export const metadata: Metadata = {
   manifest: `/manifest.json?v=${faviconVersion}`,
   category: "wellness",
   icons: {
-    icon: `/favicon.ico?v=${faviconVersion}`,
-    shortcut: `/favicon.ico?v=${faviconVersion}`,
-    apple: `/favicon.ico?v=${faviconVersion}`,
+    icon: [
+      { url: `/favicon.svg?v=${faviconVersion}`, type: "image/svg+xml" },
+      { url: `/favicon.ico?v=${faviconVersion}`, type: "image/x-icon" },
+    ],
+    shortcut: `/favicon.svg?v=${faviconVersion}`,
+    apple: `/favicon.svg?v=${faviconVersion}`,
   },
   ...rootMetadata,
   alternates: {
