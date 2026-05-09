@@ -1,5 +1,5 @@
 import js from "@eslint/js";
-import nextPlugin from "@next/eslint-plugin-next";
+import nextPlugin from "@next/eslint-plugin-next/dist/index.js";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
