@@ -2,7 +2,6 @@ import type { NextRequest } from "next/server";
 import { Redis } from "@upstash/redis";
 
 const memoryBuckets = new Map<string, { count: number; resetAt: number }>();
-
 let redisClient: Redis | null | undefined;
 
 function getRedis() {
@@ -45,7 +44,16 @@ function memoryRateLimit(key: string, windowMs: number, max: number): boolean {
   return false;
 }
 
-export async function isRateLimited(
+export function isRateLimited(
+  request: NextRequest,
+  options: { keyPrefix: string; windowMs: number; max: number; userId?: string | null },
+): boolean {
+  const actor = options.userId || requestIp(request);
+  const key = `rl:${options.keyPrefix}:${actor}`;
+  return memoryRateLimit(key, options.windowMs, options.max);
+}
+
+export async function isRateLimitedDistributed(
   request: NextRequest,
   options: { keyPrefix: string; windowMs: number; max: number; userId?: string | null },
 ): Promise<boolean> {
