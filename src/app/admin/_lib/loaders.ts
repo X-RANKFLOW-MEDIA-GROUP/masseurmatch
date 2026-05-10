@@ -144,24 +144,30 @@ async function listAllAuthUsers() {
   const users: Array<{ id: string; email: string | null }> = [];
   let page = 1;
 
-  while (page > 0) {
-    const { data, error } = await adminClient.auth.admin.listUsers({
-      page,
-      perPage: 20,
-    });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    for (const user of data.users) {
-      users.push({
-        id: user.id,
-        email: user.email || null,
+  try {
+    while (page > 0) {
+      const { data, error } = await adminClient.auth.admin.listUsers({
+        page,
+        perPage: 20,
       });
-    }
 
-    page = data.nextPage || 0;
+      if (error) {
+        console.error("Supabase Auth users could not be loaded.", error.message);
+        return users;
+      }
+
+      for (const user of data.users ?? []) {
+        users.push({
+          id: user.id,
+          email: user.email || null,
+        });
+      }
+
+      page = data.nextPage || 0;
+    }
+  } catch (error) {
+    console.error("Supabase Auth users fallback triggered.", error);
+    return users;
   }
 
   return users;
@@ -170,7 +176,7 @@ async function listAllAuthUsers() {
 export async function loadUsers(): Promise<AdminLoadResult<AdminUser>> {
   try {
     const adminClient = createSupabaseAdminClient();
-    const [{ data: profiles, error: profilesError }, { data: roles, error: rolesError }, authUsers] =
+    const [{ data: profiles, error: profilesError }, { data: roles, error: rolesError }] =
       await Promise.all([
         adminClient
           .from("profiles")
@@ -178,7 +184,6 @@ export async function loadUsers(): Promise<AdminLoadResult<AdminUser>> {
           .order("updated_at", { ascending: false })
           .limit(50),
         adminClient.from("user_roles").select("user_id, role, created_at").order("created_at", { ascending: false }),
-        listAllAuthUsers(),
       ]);
 
     if (profilesError) {
@@ -189,6 +194,7 @@ export async function loadUsers(): Promise<AdminLoadResult<AdminUser>> {
       throw new Error(rolesError.message);
     }
 
+    const authUsers = await listAllAuthUsers();
     const roleRows = (roles || []) as UserRoleRow[];
     const roleMap = new Map<string, UserRoleRow["role"]>();
     for (const role of roleRows) {

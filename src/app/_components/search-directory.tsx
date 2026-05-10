@@ -27,6 +27,12 @@ const normalizeText = (value: string | null | undefined) =>
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 
+type SearchItem = PublicTherapist & {
+  available_now?: boolean | null;
+  years_experience?: number | null;
+  lgbtq_affirming?: boolean | null;
+};
+
 const getYearsExperience = (therapist: PublicTherapist) => {
   if (typeof therapist.years_experience === "number" && therapist.years_experience > 0) {
     return therapist.years_experience;
@@ -128,6 +134,7 @@ export function SearchDirectory({
     const objectiveSearchValue = normalizeText(getDirectoryObjectiveSearchValue(goal, modality));
 
     return items.filter((item) => {
+      const row = item as SearchItem;
       const searchable = [
         item.display_name,
         item.full_name,
@@ -170,9 +177,9 @@ export function SearchDirectory({
             Boolean(item.is_verified_profile)
           : true;
       const matchesTier = tier ? item._tier === tier : true;
-      const matchesAvailable = availableToday ? Boolean(item.available_now) : true;
-      const matchesMaster = masterOnly ? Boolean(yearsExperience && yearsExperience >= 10) : true;
-      const matchesLgbtq = lgbtqAffirming ? Boolean(item.lgbtq_affirming) : true;
+      const matchesAvailable = availableToday ? !!row.available_now : true;
+      const matchesMaster = masterOnly ? (row.years_experience ?? yearsExperience ?? 0) >= 10 : true;
+      const matchesLgbtq = lgbtqAffirming ? !!row.lgbtq_affirming : true;
 
       return (
         matchesCity &&
