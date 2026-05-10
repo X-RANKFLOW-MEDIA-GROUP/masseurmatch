@@ -16,9 +16,9 @@ import { TherapistComparison, type ComparisonTherapistProfile } from "@/componen
 
 type Params = { city: string };
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-// DFW suburb slugs — these cities are served by Dallas therapists and get suburb-specific copy
 const DFW_SUBURB_SLUGS = new Set([
   "plano", "irving", "richardson", "fort-worth", "frisco",
   "addison", "carrollton", "arlington", "grand-prairie",
@@ -145,6 +145,7 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
       profile: true,
     },
   }));
+
   const cityFaqs = [
     {
       question: `How do I find a trusted male massage therapist in ${city.name}?`,
