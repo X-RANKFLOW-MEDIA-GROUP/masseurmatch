@@ -45,7 +45,6 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
           neighborhood={neighborhood || null}
         />
 
-        {/* Breadcrumb */}
         <nav className="pp-breadcrumb" aria-label="Breadcrumb">
           <Link href={cityPath}>{city}</Link>
           <span>{">"}</span>
@@ -54,10 +53,8 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
           <span className="text-[var(--cream)]">{profile.display_name || profile.full_name}</span>
         </nav>
 
-        {/* Hero */}
         <PremiumProfileHero profile={profile} cityPath={cityPath} reviews={reviews} />
 
-        {/* Gallery */}
         <section className="pp-section pp-fade-in" id="gallery">
           <div className="pp-section-header">
             <h2 className="pp-section-title">Gallery</h2>
@@ -68,7 +65,6 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
           <PremiumProfileGallery profile={profile} photos={photos} />
         </section>
 
-        {/* Social Proof Badges */}
         <section className="pp-section pp-fade-in">
           <SocialProofBadges
             isTopRated={avgRating >= 4.7}
@@ -80,7 +76,6 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
           />
         </section>
 
-        {/* Reviews */}
         {reviews.length > 0 && (
           <section className="pp-section pp-fade-in" id="reviews">
             <div className="pp-section-header">
@@ -88,12 +83,12 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
               <span className="text-sm text-slate-500">{reviews.length} verified reviews</span>
             </div>
             <ReviewsDisplay
-              reviews={reviews.map(r => ({
-                id: r.id,
-                author_name: r.reviewer_name || "Verified Client",
-                rating: r.rating ?? 5,
-                body: r.review_text || "",
-                created_at: r.review_date || new Date().toISOString()
+              reviews={reviews.map((review) => ({
+                id: review.id,
+                author_name: review.reviewer_name || "Verified Client",
+                rating: review.rating ?? 5,
+                body: review.review_text || "",
+                created_at: review.review_date || new Date().toISOString(),
               }))}
               averageRating={avgRating}
               totalReviews={reviews.length}
@@ -101,19 +96,11 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
           </section>
         )}
 
-        {/* About */}
         <PremiumProfileAbout profile={profile} reviews={reviews} />
-
-        {/* Services */}
         <PremiumProfileServices profile={profile} />
-
-        {/* Pricing */}
         <PremiumProfilePricing profile={profile} />
-
-        {/* Contact */}
         <PremiumProfileContact profile={profile} />
 
-        {/* Availability */}
         <section className="pp-section pp-fade-in" id="availability">
           <div className="pp-section-header">
             <h2 className="pp-section-title">Availability</h2>
@@ -125,7 +112,6 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
           <PremiumProfileAvailability profile={profile} />
         </section>
 
-        {/* Travel */}
         {Array.isArray(profile.travel_schedule) && profile.travel_schedule.length > 0 && (
           <section className="pp-section pp-fade-in" id="travel">
             <div className="pp-section-header">
@@ -135,7 +121,6 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
           </section>
         )}
 
-        {/* Areas Served */}
         <section className="pp-section pp-fade-in" id="location">
           <div className="pp-section-header">
             <h2 className="pp-section-title">Location</h2>
@@ -143,7 +128,6 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
           <ProfileAreasServed profile={profile} />
         </section>
 
-        {/* FAQ - always show, will use defaults if no custom FAQ */}
         <section className="pp-section pp-fade-in" id="faq">
           <div className="pp-section-header">
             <h2 className="pp-section-title">Frequently Asked Questions</h2>
@@ -151,7 +135,6 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
           <PremiumProfileFaq profile={profile} />
         </section>
 
-        {/* Browse More Links */}
         <section className="pp-section pp-fade-in" id="browse-more">
           <div className="pp-section-header">
             <h2 className="pp-section-title">Browse More in {city}</h2>
@@ -183,39 +166,9 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
           </div>
         </section>
 
-        {/* Final CTA */}
         <PremiumProfileCTA profile={profile} />
-
-        {/* Reviews */}
-        {reviews.length > 0 && (
-          <section className="pp-section pp-fade-in" id="reviews">
-            <div className="pp-section-header">
-              <h2 className="pp-section-title">Reviews</h2>
-            </div>
-            <div className="space-y-4">
-              {reviews.map((review) => (
-                <article
-                  key={review.id}
-                  className="rounded-lg border border-[var(--glass-border)] bg-[var(--cream-dim)] p-5"
-                >
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="text-[var(--orange)]">
-                      {"★".repeat(review.rating || 5)}
-                      {"☆".repeat(5 - (review.rating || 5))}
-                    </div>
-                    {review.reviewer_name && (
-                      <span className="text-xs text-[var(--text-muted)]">by {review.reviewer_name}</span>
-                    )}
-                  </div>
-                  <p className="text-sm leading-relaxed text-[var(--cream-soft)]">{review.review_text}</p>
-                </article>
-              ))}
-            </div>
-          </section>
-        )}
       </div>
 
-      {/* AI Chat Widget */}
       <ProfileAIChat profile={profile} />
     </div>
   );
