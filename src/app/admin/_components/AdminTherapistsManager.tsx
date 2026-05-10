@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, XCircle, AlertTriangle, ShieldCheck, Star, Eye, Search, Filter, Clock } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Star, Eye, Search, Clock } from "lucide-react";
 import { postJson } from "@/app/_lib/client-api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,6 +57,18 @@ function buildDrafts(therapists: AdminTherapist[]) {
   }, {});
 }
 
+function buildAdminActionEndpoint(therapist: AdminTherapist, action: TherapistAction) {
+  if (action === "suspend" || action === "ban") {
+    return `/api/admin/user/${therapist.user_id}/${action}`;
+  }
+
+  if (action === "feature" || action === "unfeature") {
+    return `/api/admin/profile/${therapist.id}/feature`;
+  }
+
+  return `/api/admin/profile/${therapist.id}/${action}`;
+}
+
 export default function AdminTherapistsManager({
   initialTherapists,
 }: {
@@ -82,18 +94,12 @@ export default function AdminTherapistsManager({
     }));
   };
 
-  const handleApply = async (therapistId: string) => {
-    const draft = drafts[therapistId];
-    setBusyId(therapistId);
+  const handleApply = async (therapist: AdminTherapist) => {
+    const draft = drafts[therapist.id];
+    setBusyId(therapist.id);
 
     try {
-      // Use the specific admin API routes created earlier
-      let endpoint = `/api/admin/profile/${therapistId}/${draft.action}`;
-      if (draft.action === "feature" || draft.action === "unfeature") {
-        endpoint = `/api/admin/profile/${therapistId}/feature`; // Assuming a feature endpoint
-      } else if (draft.action === "suspend" || draft.action === "ban") {
-        endpoint = `/api/admin/user/${therapistId}/${draft.action}`;
-      }
+      const endpoint = buildAdminActionEndpoint(therapist, draft.action);
 
       await postJson(endpoint, {
         reason: draft.reason || undefined,
@@ -102,7 +108,7 @@ export default function AdminTherapistsManager({
 
       toast({
         title: "Therapist updated",
-        description: `Applied ${draft.action} to ${therapistId}.`,
+        description: `Applied ${draft.action} to ${therapist.display_name || therapist.full_name || therapist.id}.`,
       });
       router.refresh();
     } catch (error) {
@@ -116,9 +122,9 @@ export default function AdminTherapistsManager({
     }
   };
 
-  const filteredTherapists = initialTherapists.filter(t => 
-    (t.display_name || t.full_name || "").toLowerCase().includes(search.toLowerCase()) ||
-    (t.city || "").toLowerCase().includes(search.toLowerCase())
+  const filteredTherapists = initialTherapists.filter((therapist) =>
+    (therapist.display_name || therapist.full_name || "").toLowerCase().includes(search.toLowerCase()) ||
+    (therapist.city || "").toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
@@ -151,24 +157,24 @@ export default function AdminTherapistsManager({
                   <div className="flex items-center gap-2">
                     <h2 className="font-display text-lg font-semibold text-slate-900">{name}</h2>
                     <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                      therapist.subscription_tier === 'elite' ? 'bg-amber-100 text-amber-700' :
-                      therapist.subscription_tier === 'pro' ? 'bg-indigo-100 text-indigo-700' :
-                      'bg-slate-100 text-slate-600'
+                      therapist.subscription_tier === "elite" ? "bg-amber-100 text-amber-700" :
+                      therapist.subscription_tier === "pro" ? "bg-indigo-100 text-indigo-700" :
+                      "bg-slate-100 text-slate-600"
                     }`}>
-                      {therapist.subscription_tier || 'free'}
+                      {therapist.subscription_tier || "free"}
                     </span>
                   </div>
                   <p className="mt-1 text-xs text-slate-500">
                     {therapist.city || "No city"} · ID: {therapist.id.slice(0, 8)}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-3 text-xs">
-                    <span className={`flex items-center gap-1 ${therapist.profile_status === 'approved' ? 'text-emerald-600' : 'text-amber-600'}`}>
-                      {therapist.profile_status === 'approved' ? <CheckCircle2 className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
-                      Profile: {therapist.profile_status?.replace('_', ' ')}
+                    <span className={`flex items-center gap-1 ${therapist.profile_status === "approved" ? "text-emerald-600" : "text-amber-600"}`}>
+                      {therapist.profile_status === "approved" ? <CheckCircle2 className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
+                      Profile: {therapist.profile_status?.replace("_", " ")}
                     </span>
-                    <span className={`flex items-center gap-1 ${therapist.verification_status === 'verified' ? 'text-emerald-600' : 'text-slate-400'}`}>
+                    <span className={`flex items-center gap-1 ${therapist.verification_status === "verified" ? "text-emerald-600" : "text-slate-400"}`}>
                       <ShieldCheck className="h-3 w-3" />
-                      Identity: {therapist.verification_status || 'unverified'}
+                      Identity: {therapist.verification_status || "unverified"}
                     </span>
                     {therapist.is_featured && (
                       <span className="flex items-center gap-1 text-amber-600">
@@ -182,7 +188,7 @@ export default function AdminTherapistsManager({
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    onClick={() => window.open(`/therapists/${therapist.slug || therapist.id}`, '_blank')}
+                    onClick={() => window.open(`/therapists/${therapist.slug || therapist.id}`, "_blank")}
                   >
                     <Eye className="mr-2 h-4 w-4" /> View
                   </Button>
@@ -222,7 +228,7 @@ export default function AdminTherapistsManager({
                   type="button" 
                   className="bg-slate-900 text-white hover:bg-slate-800"
                   disabled={busyId === therapist.id} 
-                  onClick={() => void handleApply(therapist.id)}
+                  onClick={() => void handleApply(therapist)}
                 >
                   {busyId === therapist.id ? "Applying..." : "Apply Action"}
                 </Button>
