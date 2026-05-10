@@ -30,10 +30,7 @@ export function normalizePhoneNumber(phone: string | null) {
 }
 
 export function getMaskedPhoneLabel(phone: string | null) {
-  const digits = normalizePhoneNumber(phone).replace(/[^\d]/g, "");
-  if (!digits) return "Contact provider";
-  const last4 = digits.slice(-4);
-  return last4 ? `Contact ending in ${last4}` : "Contact provider";
+  return normalizePhoneNumber(phone) ? "Contact provider" : "Contact unavailable";
 }
 
 export function getPublicContactLinks(
