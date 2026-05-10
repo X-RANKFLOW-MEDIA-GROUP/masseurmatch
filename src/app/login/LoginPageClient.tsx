@@ -5,12 +5,30 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AuthForms } from "@/app/_components/auth-forms";
 import { useAuth } from "@/contexts/AuthContext";
 
+function sanitizeRedirectTo(value: string | null) {
+  const fallback = "/pro/dashboard";
+
+  if (!value) {
+    return fallback;
+  }
+
+  if (!value.startsWith("/") || value.startsWith("//")) {
+    return fallback;
+  }
+
+  if (value.includes("admin.masseurmatch.com")) {
+    return fallback;
+  }
+
+  return value;
+}
+
 function LoginPageContent() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams?.toString() ?? "");
-  const redirectTo = params.get("redirect") || "/pro/dashboard";
+  const redirectTo = sanitizeRedirectTo(params.get("redirect"));
 
   useEffect(() => {
     if (loading || !user) {
