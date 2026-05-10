@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/app/_components/json-ld";
-import { CinematicHomepage } from "@/components/homepage/CinematicHomepage";
+import { EditorialHomepage } from "@/components/homepage/EditorialHomepage";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
 import { getLaunchAreaPaths, getLaunchCityPaths, getLaunchKeywordPaths, getLaunchSegmentPaths } from "@/app/_lib/launch-urls";
 import {
@@ -14,24 +14,23 @@ import { siteUrl } from "@/lib/site";
 export const revalidate = 1800;
 
 const homeMetadata = createPageMetadata({
-  title: "Gay massage therapists & male massage near me — verified LGBTQ+ directory",
+  title: "Verified massage therapists across the United States — LGBTQ+ directory",
   description:
-    "Find verified gay massage therapists and male massage near you. LGBTQ+-affirming directory covering Dallas, Miami, Chicago, Houston, Austin and 100+ US cities. Compare outcall, incall, deep tissue, Swedish, and direct-contact profiles.",
+    "Find verified LGBTQ+-affirming massage therapists across the United States. Browse by city, state, specialty, incall, outcall, deep tissue, Swedish, and direct-contact profiles.",
   path: "/",
   keywords: [
-    "gay massage near me",
+    "massage therapists near me",
+    "verified massage therapist directory",
+    "LGBTQ massage therapist directory",
     "gay massage therapist",
-    "male massage near me",
     "male massage therapist",
-    "lgbt massage",
-    "lgbtq massage directory",
-    "verified male massage directory",
-    "dallas male massage",
-    "outcall male massage",
-    "deep tissue male massage",
-    "swedish massage men",
-    "trusted premium massage directory",
-    "male massage by city",
+    "massage therapists by city",
+    "massage therapists by state",
+    "outcall massage",
+    "incall massage",
+    "deep tissue massage",
+    "swedish massage",
+    "trusted massage directory",
     "gay affirming massage",
   ],
 });
@@ -127,19 +126,19 @@ export default async function HomePage() {
 
   const homeFaqs = [
     {
-      question: "How do I find verified male massage therapists near me?",
+      question: "How do I find verified massage therapists near me?",
       answer:
-        "Start with a city page, then compare specialties, incall or outcall options, visible pricing, reviews, and profile quality before contacting a therapist directly.",
+        "Start with the national directory, choose a city or state, then compare specialties, incall or outcall options, visible pricing, reviews, and profile quality before contacting a therapist directly.",
     },
     {
-      question: "Which cities have live MasseurMatch landing pages?",
+      question: "Does MasseurMatch cover the whole United States?",
       answer:
-        "Current launch pages include Dallas, Plano, Irving, Highland Park, Houston, Austin, Miami, and Chicago, with local service and neighborhood clusters expanding alongside therapist coverage.",
+        "MasseurMatch is built as a national U.S. directory. City, state, service, and neighborhood pages are expanded as public therapist inventory and useful local content become available.",
     },
     {
       question: "Can I compare deep tissue, Swedish, hotel, and outcall options?",
       answer:
-        "Yes. The directory includes city-plus-service routes for deep tissue, Swedish, sports recovery, hotel massage, mobile massage, incall, and outcall discovery.",
+        "Yes. The directory supports city-plus-service discovery for deep tissue, Swedish, sports recovery, hotel massage, mobile massage, incall, and outcall options where enough local inventory exists.",
     },
     {
       question: "Does MasseurMatch handle booking or payments?",
@@ -152,9 +151,9 @@ export default async function HomePage() {
     <>
       <JsonLd
         data={buildCollectionPageJsonLd({
-          name: "MasseurMatch Premium Massage Directory",
+          name: "MasseurMatch National Massage Directory",
           description:
-            "Discover verified male massage therapists nearby with real availability, transparent pricing, and direct contact.",
+            "Discover verified LGBTQ+-affirming massage therapists across the United States with real availability, transparent profile details, and direct contact.",
           path: "/",
         })}
       />
@@ -163,7 +162,7 @@ export default async function HomePage() {
           name: "Top MasseurMatch city pages",
           path: "/",
           items: launchCities.map((city) => ({
-            name: `Verified male massage therapists in ${city.city.name}`,
+            name: `Verified massage therapists in ${city.city.name}, ${city.city.stateCode}`,
             path: city.href,
           })),
         })}
@@ -180,7 +179,7 @@ export default async function HomePage() {
       />
       <JsonLd data={buildFaqJsonLd(homeFaqs)} />
 
-      <CinematicHomepage
+      <EditorialHomepage
         featuredTherapists={featuredTherapists}
         totalTherapists={therapistsResult.total}
         cityCount={launchCities.length}

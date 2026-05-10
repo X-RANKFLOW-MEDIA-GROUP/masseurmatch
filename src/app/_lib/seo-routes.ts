@@ -35,9 +35,11 @@ export const PRIVATE_ROBOTS_PATHS = uniqueStrings([
   "/pro/",
   "/login",
   "/register",
+  "/signup",
   "/forgot-password",
   "/dashboard",
   "/dashboard/",
+  "/portal",
   "/*?*token=",
   "/*?*redirect=",
 ]);
@@ -45,6 +47,7 @@ export const PRIVATE_ROBOTS_PATHS = uniqueStrings([
 export const FILTER_ROBOTS_PATHS = [
   "/search?*",
   "/*?sort=*",
+  "/*?filter=*",
   "/*?verified=*",
   "/*?availability=*",
   "/*?radius=*",
@@ -79,6 +82,8 @@ export const AI_CRAWLER_BOTS = [
 const CORE_STATIC_ROUTES: StaticSitemapRoute[] = [
   { path: "/", changeFrequency: "daily", priority: 1.0 },
   { path: "/therapists", changeFrequency: "daily", priority: 0.9 },
+  { path: "/cities", changeFrequency: "weekly", priority: 0.82 },
+  { path: "/explore", changeFrequency: "weekly", priority: 0.72 },
   { path: "/blog", changeFrequency: "weekly", priority: 0.8 },
   { path: "/guides", changeFrequency: "weekly", priority: 0.76 },
   { path: "/pricing", changeFrequency: "monthly", priority: 0.7 },
@@ -214,10 +219,10 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Metad
         return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) > 0 : false;
       })
       .map((city) => ({
-        url: toSitemapUrl(`/${city.slug}`),
+        url: toSitemapUrl(`/cities/${city.slug}`),
         lastModified: city.updated_at ? new Date(city.updated_at) : now,
         changeFrequency: "weekly" as const,
-        priority: city.slug === "dallas" ? 0.8 : 0.7,
+        priority: 0.7,
       }));
   }
 
@@ -228,7 +233,7 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Metad
       const cityName = slug ? cityNameBySlug(slug) : null;
       return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) > 0 : false;
     })
-    .map((path) => buildSitemapEntry(path, now, "weekly", path === "/dallas" ? 0.8 : 0.7));
+    .map((path) => buildSitemapEntry(`/cities${path}`, now, "weekly", 0.7));
 }
 
 export async function buildServicesSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
@@ -240,7 +245,7 @@ export async function buildServicesSitemapEntries(now = new Date()): Promise<Met
   const inventoryChecks = await Promise.all(orderedServicePaths.map(async (path) => ({ path, hasInventory: await pathHasInventory(path) })));
   return inventoryChecks
     .filter((entry) => entry.hasInventory)
-    .map((entry) => buildSitemapEntry(entry.path, now, "weekly", entry.path.startsWith("/dallas") ? 0.72 : 0.66));
+    .map((entry) => buildSitemapEntry(entry.path, now, "weekly", 0.66));
 }
 
 export async function buildNeighborhoodsSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
