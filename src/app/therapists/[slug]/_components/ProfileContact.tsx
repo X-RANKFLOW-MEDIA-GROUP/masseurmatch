@@ -10,7 +10,7 @@ interface Props {
 }
 
 export function ProfileContact({ profile }: Props) {
-  const { callHref, whatsappHref, smsHref } = getPublicContactLinks(profile.phone);
+  const { callHref, whatsappHref, smsHref } = getPublicContactLinks(profile.phone, profile.whatsapp_number, profile.id);
   const neighborhood = profile.neighborhood_name || profile.primary_area || null;
   const { trackContact } = useKnottyProfileAttribution({
     therapistId: profile.id,
@@ -36,7 +36,7 @@ export function ProfileContact({ profile }: Props) {
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             Contact line
           </p>
-          <p className="mt-1 text-base font-semibold text-foreground">{profile.phone}</p>
+          <p className="mt-1 text-base font-semibold text-foreground">Protected contact enabled</p>
         </div>
       ) : null}
 
