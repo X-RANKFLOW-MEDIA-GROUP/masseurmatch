@@ -62,10 +62,15 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install gitleaks (OSS)
+        env:
+          GITLEAKS_VERSION: 8.24.2
         run: |
-          curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/main/install.sh | sh -s -- -b /usr/local/bin v8.24.2
+          tmpdir="$(mktemp -d)"
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz -C "$tmpdir" gitleaks
+          install -m 0755 "$tmpdir/gitleaks" /usr/local/bin/gitleaks
+          gitleaks version
       - name: Scan for secrets (gitleaks)
-        run: gitleaks detect --source . --verbose --redact
+        run: gitleaks detect --source . --redact --verbose --exit-code 1
 
   typecheck:
     name: Typecheck
