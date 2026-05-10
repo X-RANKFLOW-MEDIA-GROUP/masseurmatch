@@ -30,7 +30,10 @@ export function normalizePhoneNumber(phone: string | null) {
 }
 
 export function getMaskedPhoneLabel(phone: string | null) {
-  return normalizePhoneNumber(phone) ? "Contact provider" : "Contact unavailable";
+  const digits = normalizePhoneNumber(phone).replace(/[^\d]/g, "");
+  if (!digits) return "Contact provider";
+  const last4 = digits.slice(-4);
+  return last4 ? `Contact ending in ${last4}` : "Contact provider";
 }
 
 export function getPublicContactLinks(
@@ -38,14 +41,14 @@ export function getPublicContactLinks(
   whatsapp_number?: string | null,
   profileId?: string | null,
 ) {
-  const hasPhone = Boolean(normalizePhoneNumber(phone));
-  const hasWhatsapp = Boolean(normalizePhoneNumber(whatsapp_number || phone));
-  const id = profileId ? encodeURIComponent(profileId) : "";
+  const normalizedPhone = normalizePhoneNumber(phone);
+  const normalizedWhatsapp = normalizePhoneNumber(whatsapp_number || phone);
+  const encodedId = profileId ? encodeURIComponent(profileId) : "";
 
   return {
-    callHref: hasPhone && id ? `/api/public/contact/${id}?method=call` : null,
-    whatsappHref: hasWhatsapp && id ? `/api/public/contact/${id}?method=whatsapp` : null,
-    smsHref: hasPhone && id ? `/api/public/contact/${id}?method=sms` : null,
+    callHref: normalizedPhone && encodedId ? `/api/public/contact/${encodedId}?method=call` : null,
+    whatsappHref: normalizedWhatsapp && encodedId ? `/api/public/contact/${encodedId}?method=whatsapp` : null,
+    smsHref: normalizedPhone && encodedId ? `/api/public/contact/${encodedId}?method=sms` : null,
     phoneLabel: getMaskedPhoneLabel(phone),
   };
 }
