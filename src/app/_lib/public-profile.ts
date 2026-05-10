@@ -29,14 +29,24 @@ export function normalizePhoneNumber(phone: string | null) {
   return phone.replace(/[^\d+]/g, "");
 }
 
-export function getPublicContactLinks(phone: string | null, whatsapp_number?: string | null) {
-  const normalizedPhone = normalizePhoneNumber(phone);
-  const normalizedWhatsapp = normalizePhoneNumber(whatsapp_number || phone);
+export function getMaskedPhoneLabel(phone: string | null) {
+  return normalizePhoneNumber(phone) ? "Contact provider" : "Contact unavailable";
+}
+
+export function getPublicContactLinks(
+  phone: string | null,
+  whatsapp_number?: string | null,
+  profileId?: string | null,
+) {
+  const hasPhone = Boolean(normalizePhoneNumber(phone));
+  const hasWhatsapp = Boolean(normalizePhoneNumber(whatsapp_number || phone));
+  const id = profileId ? encodeURIComponent(profileId) : "";
 
   return {
-    callHref: normalizedPhone ? `tel:${normalizedPhone}` : null,
-    whatsappHref: normalizedWhatsapp ? `https://wa.me/${normalizedWhatsapp.replace(/[^\d]/g, "")}` : null,
-    smsHref: normalizedPhone ? `sms:${normalizedPhone.replace(/[^\d+]/g, "")}` : null,
+    callHref: hasPhone && id ? `/api/public/contact/${id}?method=call` : null,
+    whatsappHref: hasWhatsapp && id ? `/api/public/contact/${id}?method=whatsapp` : null,
+    smsHref: hasPhone && id ? `/api/public/contact/${id}?method=sms` : null,
+    phoneLabel: getMaskedPhoneLabel(phone),
   };
 }
 
