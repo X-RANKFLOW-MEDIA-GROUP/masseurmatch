@@ -239,7 +239,7 @@ export async function ensureUserProfileAndRole(
       display_name: fullName,
       status: "pending",
       profile_status: "draft",
-      visibility_status: "private",
+      visibility_status: "hidden",
       subscription_tier: "free",
       _tier: "free",
     });
