@@ -1,6 +1,7 @@
 import { US_CITIES } from "@/data/cities";
 import { supabase } from "@/integrations/supabase/client";
 import { matchBodyTypeKeyword } from "@/lib/physical-profile";
+import { FALLBACK_PUBLIC_THERAPISTS } from "@/app/_lib/directory-fallback";
 
 export type TherapistTier = "free" | "standard" | "pro" | "elite";
 
@@ -70,6 +71,7 @@ export interface PublicTherapist {
   id: string;
   slug: string | null;
   city: string | null;
+  state?: string | null;
   display_name: string | null;
   full_name: string | null;
   headline: string | null;
@@ -107,7 +109,6 @@ export interface PublicTherapist {
   profile_views?: number | null;
   is_featured: boolean;
   updated_at: string;
-  // Legacy compatibility fields
   modality?: string | null;
   start_year?: number | null;
   avatar_url?: string | null;
@@ -143,13 +144,57 @@ export const getCities = () => US_CITIES;
 const buildPublicTherapistsQuery = () =>
   supabase
     .from("profiles")
-    .select(PUBLIC_PROFILE_SELECT, {
-      count: "exact",
-    })
+    .select(PUBLIC_PROFILE_SELECT, { count: "exact" })
     .eq("visibility_status", "public")
     .eq("profile_status", "approved")
     .eq("is_suspended", false)
     .eq("is_banned", false);
+
+function isActivelyAvailable(profile: PublicTherapist) {
+  return profile.available_now === true &&
+    (profile.available_now_expires == null || new Date(profile.available_now_expires).getTime() > Date.now());
+}
+
+function sortPublicTherapists(items: PublicTherapist[]) {
+  const tierRank: Record<string, number> = { elite: 4, pro: 3, standard: 2, free: 1 };
+  return [...items].sort((a, b) => {
+    const aTier = tierRank[a.subscription_tier ?? "free"] ?? 0;
+    const bTier = tierRank[b.subscription_tier ?? "free"] ?? 0;
+    if (bTier !== aTier) return bTier - aTier;
+    const aAvail = isActivelyAvailable(a) ? 1 : 0;
+    const bAvail = isActivelyAvailable(b) ? 1 : 0;
+    if (bAvail !== aAvail) return bAvail - aAvail;
+    return (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0);
+  });
+}
+
+function applyFallbackFilters(items: PublicTherapist[], filters?: Parameters<typeof getPublicTherapists>[0]) {
+  return items.filter((profile) => {
+    if (filters?.city && profile.city?.toLowerCase() !== filters.city.toLowerCase()) return false;
+    if (filters?.verified && profile.verification_status !== "verified") return false;
+    if (filters?.availableToday && !isActivelyAvailable(profile)) return false;
+    if (filters?.tier && profile.subscription_tier !== filters.tier) return false;
+    if (filters?.lgbtqAffirming && profile.lgbtq_affirming !== true) return false;
+    if (filters?.keyword) {
+      const keyword = filters.keyword.toLowerCase();
+      const searchable = [
+        profile.bio,
+        profile.display_name,
+        profile.full_name,
+        profile.headline,
+        profile.neighborhood,
+        profile.neighborhood_name,
+        ...(profile.specialties ?? []),
+        ...(profile.massage_techniques ?? []),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      if (!searchable.includes(keyword)) return false;
+    }
+    return true;
+  });
+}
 
 export const getPublicTherapists = async (filters?: {
   city?: string;
@@ -170,14 +215,8 @@ export const getPublicTherapists = async (filters?: {
 
   let query = buildPublicTherapistsQuery().range(from, to);
 
-  if (filters?.city) {
-    query = query.ilike("city", filters.city);
-  }
-
-  if (filters?.modality) {
-    query = query.or(`modality.ilike.%${filters.modality}%,specialties.cs.{${filters.modality}},massage_techniques.cs.{${filters.modality}}`);
-  }
-
+  if (filters?.city) query = query.ilike("city", filters.city);
+  if (filters?.modality) query = query.or(`modality.ilike.%${filters.modality}%,specialties.cs.{${filters.modality}},massage_techniques.cs.{${filters.modality}}`);
   if (filters?.keyword) {
     const keyword = `%${filters.keyword}%`;
     const bodyTypeKeyword = matchBodyTypeKeyword(filters.keyword);
@@ -191,81 +230,59 @@ export const getPublicTherapists = async (filters?: {
     ];
     query = query.or(conditions.join(","));
   }
-
-  if (filters?.verified) {
-    query = query.eq("verification_status", "verified");
-  }
-
+  if (filters?.verified) query = query.eq("verification_status", "verified");
   if (filters?.availableToday) {
     const nowIso = new Date().toISOString();
     query = query.eq("available_now", true).or(`available_now_expires.is.null,available_now_expires.gt.${nowIso}`);
   }
-
-  if (filters?.tier) {
-    query = query.eq("subscription_tier", filters.tier);
-  }
-
-  if (filters?.lgbtqAffirming) {
-    query = query.eq("lgbtq_affirming", true);
-  }
+  if (filters?.tier) query = query.eq("subscription_tier", filters.tier);
+  if (filters?.lgbtqAffirming) query = query.eq("lgbtq_affirming", true);
 
   const { data: rawData, error, count } = await query;
-  
-  if (error) return { items: [], total: 0, page, pageSize };
+  const data = rawData ? sortPublicTherapists(rawData as PublicTherapist[]) : [];
 
-  const nowMs = Date.now();
-  const TIER_RANK: Record<string, number> = { elite: 4, pro: 3, standard: 2, free: 1 };
-  const isActivelyAvailable = (p: any): boolean =>
-    p.available_now === true &&
-    (p.available_now_expires == null || new Date(p.available_now_expires).getTime() > nowMs);
+  if (!error && data.length > 0) {
+    return { items: data, total: count || data.length, page, pageSize };
+  }
 
-  const data = rawData
-    ? [...rawData].sort((a, b) => {
-        const aTier = TIER_RANK[a.subscription_tier ?? "free"] ?? 0;
-        const bTier = TIER_RANK[b.subscription_tier ?? "free"] ?? 0;
-        if (bTier !== aTier) return bTier - aTier;
-        const aAvail = isActivelyAvailable(a) ? 1 : 0;
-        const bAvail = isActivelyAvailable(b) ? 1 : 0;
-        if (bAvail !== aAvail) return bAvail - aAvail;
-        return (a.is_featured ? 1 : 0) - (b.is_featured ? 1 : 0);
-      })
-    : [];
-
+  const fallbackItems = sortPublicTherapists(
+    applyFallbackFilters(FALLBACK_PUBLIC_THERAPISTS as PublicTherapist[], filters),
+  );
   return {
-    items: data as PublicTherapist[],
-    total: count || 0,
+    items: fallbackItems.slice(from, to + 1),
+    total: fallbackItems.length,
     page,
     pageSize,
   };
 };
 
 export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTherapist | null> => {
+  const sanitizedSlug = slug.trim();
   const { data: profile, error } = await buildPublicTherapistsQuery()
-    .eq("slug", slug)
+    .or(`slug.eq.${sanitizedSlug},id.eq.${sanitizedSlug}`)
     .maybeSingle();
 
-  if (error || !profile) return null;
+  if (!error && profile) {
+    const { data: photos } = await supabase
+      .from("therapist_photos")
+      .select("public_url, photo_type")
+      .eq("profile_id", profile.id)
+      .eq("status", "approved")
+      .order("sort_order", { ascending: true });
 
-  // Fetch photos
-  const { data: photos } = await supabase
-    .from("therapist_photos")
-    .select("public_url, photo_type")
-    .eq("profile_id", profile.id)
-    .eq("status", "approved")
-    .order("sort_order", { ascending: true });
+    const profile_photo = photos?.find((p) => p.photo_type === "profile")?.public_url;
+    const gallery_photos = photos?.filter((p) => p.photo_type === "gallery").map((p) => p.public_url);
 
-  const profile_photo = photos?.find(p => p.photo_type === "profile")?.public_url;
-  const gallery_photos = photos?.filter(p => p.photo_type === "gallery").map(p => p.public_url);
+    return { ...profile, profile_photo, gallery_photos } as PublicTherapist;
+  }
 
-  return {
-    ...profile,
-    profile_photo,
-    gallery_photos,
-  } as PublicTherapist;
+  return (FALLBACK_PUBLIC_THERAPISTS as PublicTherapist[]).find(
+    (profile) => profile.slug === sanitizedSlug || profile.id === sanitizedSlug,
+  ) ?? null;
 };
 
 export const getImportedReviews = async (profileId: string, limit = 5) => {
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from("imported_reviews")
     .select("id, review_text, rating, reviewer_name, review_date")
     .eq("profile_id", profileId)
@@ -276,6 +293,7 @@ export const getImportedReviews = async (profileId: string, limit = 5) => {
 };
 
 export const getProfilePhotos = async (profileId: string, limit = 6) => {
+  const fallback = (FALLBACK_PUBLIC_THERAPISTS as PublicTherapist[]).find((profile) => profile.id === profileId);
   const { data, error } = await supabase
     .from("therapist_photos")
     .select("id, public_url, storage_path, photo_type")
@@ -284,12 +302,15 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
     .order("photo_type", { ascending: true })
     .limit(limit);
 
-  if (error) return [];
+  if (error || !data?.length) {
+    if (!fallback?.avatar_url) return [];
+    return [{ id: `${fallback.id}-avatar`, storage_path: fallback.avatar_url, is_primary: true }];
+  }
 
-  return (data || []).map(p => ({
+  return data.map((p) => ({
     id: p.id,
     storage_path: p.public_url || p.storage_path,
-    is_primary: p.photo_type === 'profile'
+    is_primary: p.photo_type === "profile",
   }));
 };
 
@@ -301,7 +322,11 @@ export async function getCityInventoryCount(cityName: string): Promise<number> {
     .eq("profile_status", "approved")
     .ilike("city", cityName);
 
-  return count || 0;
+  if (!error && count && count > 0) return count;
+
+  return (FALLBACK_PUBLIC_THERAPISTS as PublicTherapist[]).filter(
+    (profile) => profile.city?.toLowerCase() === cityName.toLowerCase(),
+  ).length;
 }
 
 export async function getCityInventoryMap(): Promise<Map<string, number>> {
@@ -313,11 +338,18 @@ export async function getCityInventoryMap(): Promise<Map<string, number>> {
     .eq("profile_status", "approved")
     .not("city", "is", null);
 
-  if (error) return map;
-
-  for (const row of data ?? []) {
-    const key = (row.city as string).toLowerCase().trim();
-    map.set(key, (map.get(key) ?? 0) + 1);
+  if (!error) {
+    for (const row of data ?? []) {
+      const key = (row.city as string).toLowerCase().trim();
+      map.set(key, (map.get(key) ?? 0) + 1);
+    }
   }
+
+  for (const profile of FALLBACK_PUBLIC_THERAPISTS as PublicTherapist[]) {
+    const key = profile.city?.toLowerCase().trim();
+    if (key && !map.has(key)) map.set(key, 0);
+    if (key) map.set(key, (map.get(key) ?? 0) + 1);
+  }
+
   return map;
 }
