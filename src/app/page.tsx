@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/app/_components/json-ld";
-import { CinematicHomepage } from "@/components/homepage/CinematicHomepage";
+import { EditorialHomepage } from "@/components/homepage/EditorialHomepage";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
 import { getLaunchAreaPaths, getLaunchCityPaths, getLaunchKeywordPaths, getLaunchSegmentPaths } from "@/app/_lib/launch-urls";
 import {
@@ -179,7 +179,7 @@ export default async function HomePage() {
       />
       <JsonLd data={buildFaqJsonLd(homeFaqs)} />
 
-      <CinematicHomepage
+      <EditorialHomepage
         featuredTherapists={featuredTherapists}
         totalTherapists={therapistsResult.total}
         cityCount={launchCities.length}
