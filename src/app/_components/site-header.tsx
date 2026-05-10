@@ -13,7 +13,7 @@ import {
   Users,
   Navigation,
   ArrowUpRight,
-  LayoutDashboard,
+  LogIn,
 } from "lucide-react";
 import {
   Sheet,
@@ -39,26 +39,18 @@ function ExploreDropdown({ isDarkHero = false }: { isDarkHero?: boolean }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div
-      className="relative"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-    >
+    <div className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="menu"
         className={`flex items-center gap-1 font-sans text-sm font-medium transition-colors ${
-          isDarkHero
-            ? "text-white/80 hover:text-white"
-            : "text-[#4A4F5C] hover:text-[#0B1F3A]"
+          isDarkHero ? "text-white/80 hover:text-white" : "text-[#4A4F5C] hover:text-[#0B1F3A]"
         }`}
       >
         Explore
-        <ChevronDown
-          className={`w-3 h-3 opacity-50 transition-transform ${open ? "rotate-180" : ""}`}
-        />
+        <ChevronDown className={`w-3 h-3 opacity-50 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
 
       <AnimatePresence>
@@ -125,11 +117,7 @@ function MobileNav({ dashboardPath, authenticated }: { dashboardPath: string; au
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <Link
-            href="/"
-            onClick={() => setOpen(false)}
-            className="font-display text-lg font-bold tracking-tighter text-foreground"
-          >
+          <Link href="/" onClick={() => setOpen(false)} className="font-display text-lg font-bold tracking-tighter text-foreground">
             Masseur<span className="text-[#FF8A1F]">Match</span>
           </Link>
           <button
@@ -150,9 +138,7 @@ function MobileNav({ dashboardPath, authenticated }: { dashboardPath: string; au
                 href={href}
                 onClick={() => setOpen(false)}
                 className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  active
-                    ? "bg-muted text-foreground"
-                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                  active ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                 }`}
               >
                 {label}
@@ -185,7 +171,7 @@ function MobileNav({ dashboardPath, authenticated }: { dashboardPath: string; au
 export default function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
-  const [dashboardPath, setDashboardPath] = useState("/pro/dashboard");
+  const [dashboardPath, setDashboardPath] = useState("/login");
   const pathname = usePathname();
   const isHomepage = pathname === "/";
 
@@ -196,17 +182,23 @@ export default function SiteHeader() {
   }, []);
 
   useEffect(() => {
-    fetch("/api/auth/me", { credentials: "include" })
+    let mounted = true;
+    fetch("/api/auth/me", { credentials: "include", cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
-        setAuthenticated(Boolean(data?.authenticated));
-        if (data?.dashboardPath) {
-          setDashboardPath(data.dashboardPath);
-        }
+        if (!mounted) return;
+        const isAuthenticated = Boolean(data?.authenticated);
+        setAuthenticated(isAuthenticated);
+        setDashboardPath(isAuthenticated && data?.dashboardPath ? data.dashboardPath : "/login");
       })
       .catch(() => {
+        if (!mounted) return;
         setAuthenticated(false);
+        setDashboardPath("/login");
       });
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const isDarkHero = isHomepage && !isScrolled;
@@ -217,20 +209,12 @@ export default function SiteHeader() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled
-          ? "bg-[#FCFBF8]/95 backdrop-blur-xl border-b border-[#E2E6F0] shadow-sm"
-          : isDarkHero
-            ? "bg-transparent"
-            : "bg-[#FCFBF8]/90 backdrop-blur-sm"
+        isScrolled ? "bg-[#FCFBF8]/95 backdrop-blur-xl border-b border-[#E2E6F0] shadow-sm" : isDarkHero ? "bg-transparent" : "bg-[#FCFBF8]/90 backdrop-blur-sm"
       }`}
     >
       <div className="w-full max-w-[1400px] mx-auto flex items-center justify-between px-6 lg:px-10 py-4">
         <Link href="/" className="group flex items-center gap-2">
-          <span
-            className={`font-['Georgia','Times_New_Roman',serif] text-[24px] font-bold tracking-tight transition-colors ${
-              isDarkHero ? "text-white" : "text-[#0B1F3A]"
-            }`}
-          >
+          <span className={`font-['Georgia','Times_New_Roman',serif] text-[24px] font-bold tracking-tight transition-colors ${isDarkHero ? "text-white" : "text-[#0B1F3A]"}`}>
             Masseur<span className="text-[#FF8A1F]">Match</span>
           </span>
         </Link>
@@ -241,11 +225,7 @@ export default function SiteHeader() {
             <Link
               key={href}
               href={href}
-              className={`px-4 py-2 text-sm font-medium transition-colors rounded-lg ${
-                isDarkHero
-                  ? "text-white/80 hover:text-white hover:bg-white/10"
-                  : "text-[#4A4F5C] hover:text-[#0B1F3A] hover:bg-[#F4F6F9]"
-              }`}
+              className={`px-4 py-2 text-sm font-medium transition-colors rounded-lg ${isDarkHero ? "text-white/80 hover:text-white hover:bg-white/10" : "text-[#4A4F5C] hover:text-[#0B1F3A] hover:bg-[#F4F6F9]"}`}
             >
               {label}
             </Link>
@@ -255,11 +235,9 @@ export default function SiteHeader() {
         <div className="flex items-center gap-3">
           <Link
             href={authenticated ? dashboardPath : "/login"}
-            className={`hidden md:flex px-4 py-2 text-sm font-medium transition-colors items-center gap-2 ${
-              isDarkHero ? "text-white/80 hover:text-white" : "text-[#4A4F5C] hover:text-[#0B1F3A]"
-            }`}
+            className={`hidden md:flex px-4 py-2 text-sm font-medium transition-colors items-center gap-2 ${isDarkHero ? "text-white/80 hover:text-white" : "text-[#4A4F5C] hover:text-[#0B1F3A]"}`}
           >
-            {authenticated ? <LayoutDashboard className="w-4 h-4" /> : null}
+            {authenticated ? null : <LogIn className="w-4 h-4" />}
             {authenticated ? "Dashboard" : "Log in"}
           </Link>
           <Link
