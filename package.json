@@ -26,7 +26,7 @@
     "validate:sitemap": "node scripts/validate-sitemap.mjs",
     "supabase:migrations:bundle": "node scripts/build-manual-migration-bundle.mjs",
     "validate:db-contract": "node scripts/validate-db-contract.mjs",
-    "install:gitleaks": "curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/master/install.sh | sh -s -- -b ./bin",
+    "install:gitleaks": "curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/main/install.sh | sh -s -- -b ./bin",
     "scan:secrets": "./bin/gitleaks detect --source . --verbose"
   },
   "dependencies": {
