@@ -2,6 +2,9 @@ import AdminUsersManager from "@/app/admin/_components/AdminUsersManager";
 import { loadUsers } from "@/app/admin/_lib/loaders";
 import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AdminUsersPage() {
   const { items, error } = await loadUsers();
 
