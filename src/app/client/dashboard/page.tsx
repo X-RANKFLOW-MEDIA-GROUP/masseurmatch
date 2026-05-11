@@ -8,24 +8,28 @@ import { SearchHistory } from './_components/SearchHistory';
 export const metadata = {
   title: 'Dashboard',
   description: 'View your inquiries, favorite therapists, and search history',
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default async function ClientDashboard() {
   const supabase = await createClient();
-  
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/auth');
+    redirect('/login?redirect=%2Fclient%2Fdashboard');
   }
 
   return (
     <ClientDashboardLayout>
       <div className="grid gap-8 md:grid-cols-3">
         <div className="md:col-span-2 space-y-8">
-          <InquirySummary userEmail={user.email ?? ""} />
+          <InquirySummary userEmail={user.email ?? ''} />
           <FavoriteTherapists userId={user.id} />
         </div>
         <div>
