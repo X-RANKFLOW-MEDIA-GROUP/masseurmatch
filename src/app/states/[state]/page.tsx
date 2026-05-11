@@ -20,11 +20,12 @@ function getStateDirectory(stateSlug: string) {
     .filter((city) => toSlug(city.stateName) === stateSlug)
     .sort((left, right) => left.name.localeCompare(right.name));
 
-  if (cities.length === 0) return null;
+  const firstCity = cities[0];
+  if (!firstCity) return null;
 
   return {
-    stateName: cities[0].stateName,
-    stateCode: cities[0].stateCode,
+    stateName: firstCity.stateName,
+    stateCode: firstCity.stateCode,
     cities,
   };
 }

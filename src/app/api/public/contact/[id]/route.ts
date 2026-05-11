@@ -34,7 +34,7 @@ export async function GET(
 
   const { data: profile, error } = await adminClient
     .from("profiles")
-    .select("id,phone,whatsapp_number,profile_status,visibility_status,is_suspended,is_banned")
+    .select("id,phone,whatsapp_number,profile_status,visibility_status,is_suspended,is_banned,contact_clicks")
     .eq("id", id)
     .maybeSingle();
 
@@ -59,7 +59,11 @@ export async function GET(
     return NextResponse.json({ error: "Contact is unavailable." }, { status: 404 });
   }
 
-  await adminClient.rpc("increment_profile_contact_clicks", { profile_id: profile.id }).catch(() => null);
+  await adminClient
+    .from("profiles")
+    .update({ contact_clicks: (profile.contact_clicks || 0) + 1 })
+    .eq("id", profile.id)
+    .then(() => null);
 
   return NextResponse.redirect(redirectUrl, { status: 302 });
 }
