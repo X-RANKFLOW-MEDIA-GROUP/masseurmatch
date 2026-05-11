@@ -44,7 +44,29 @@ export interface Database {
       [key: string]: GenericTable;
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      exec_sql: {
+        Args: { sql: string };
+        Returns: Json;
+      };
+      get_nearby_therapists: {
+        Args: {
+          p_lat: number;
+          p_lng: number;
+          p_radius_miles?: number;
+          p_limit?: number;
+        };
+        Returns: GenericRow[];
+      };
+      get_ranking_event_counts: {
+        Args: Record<PropertyKey, never>;
+        Returns: Record<string, number>;
+      };
+      increment_profile_contact_clicks: {
+        Args: { p_profile_id: string };
+        Returns: undefined;
+      };
+    };
     Enums: {
       app_role: "admin" | "provider" | "client";
       [key: string]: "admin" | "provider" | "client";
