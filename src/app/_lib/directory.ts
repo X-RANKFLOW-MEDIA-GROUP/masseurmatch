@@ -10,13 +10,15 @@ const PUBLIC_PROFILE_SELECT = `
   phone, whatsapp_number, email_address, website,
   service_categories, massage_techniques, specialties,
   incall_price, outcall_price, starting_price,
+  offers_incall, offers_outcall, outcall_radius,
   height_inches, weight_lb, body_type,
   years_experience, languages,
   subscription_tier, verification_status, is_featured,
   promotions, updated_at, profile_status, visibility_status,
   is_suspended, is_banned, available_now, available_now_expires,
   lgbtq_affirming, business_hours, custom_faq, pricing_sessions, areas_served,
-  outcall_radius_miles, travel_schedule, add_ons, training, education, contact_clicks
+  outcall_radius_miles, travel_schedule, add_ons, training, education, contact_clicks,
+  seo_title, seo_description, seo_keywords, created_at
 `;
 
 export interface ProfileFaqItem {
@@ -90,6 +92,9 @@ export interface PublicTherapist {
   incall_price: number | null;
   outcall_price: number | null;
   starting_price: number | null;
+  offers_incall?: boolean | null;
+  offers_outcall?: boolean | null;
+  outcall_radius?: number | null;
   available_now: boolean | null;
   available_now_expires: string | null;
   verification_status: string | null;
@@ -129,6 +134,10 @@ export interface PublicTherapist {
   training?: Array<ProfileTrainingEntry | string> | null;
   education?: ProfileEducationEntry[] | string | null;
   contact_clicks?: number | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  seo_keywords?: string[] | string | null;
+  created_at?: string | null;
 }
 
 export interface ImportedReview {
