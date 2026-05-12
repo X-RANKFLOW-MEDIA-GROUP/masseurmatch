@@ -14,9 +14,9 @@ import { siteUrl } from "@/lib/site";
 export const revalidate = 1800;
 
 const homeMetadata = createPageMetadata({
-  title: "Verified massage therapists across the United States — LGBTQ+ directory",
+  title: "Verified massage therapists across the United States | LGBTQ+ affirming directory",
   description:
-    "Find verified LGBTQ+-affirming massage therapists across the United States. Browse by city, state, specialty, incall, outcall, deep tissue, Swedish, and direct-contact profiles.",
+    "Explore verified LGBTQ+ affirming massage therapists across the United States with protected direct contact, transparent profile details, city based discovery, incall and outcall filters, and zero booking fees.",
   path: "/",
   keywords: [
     "massage therapists near me",
@@ -32,6 +32,9 @@ const homeMetadata = createPageMetadata({
     "swedish massage",
     "trusted massage directory",
     "gay affirming massage",
+    "massage directory usa",
+    "verified male massage therapist",
+    "professional massage directory",
   ],
 });
 
@@ -138,7 +141,7 @@ export default async function HomePage() {
     {
       question: "Can I compare deep tissue, Swedish, hotel, and outcall options?",
       answer:
-        "Yes. The directory supports city-plus-service discovery for deep tissue, Swedish, sports recovery, hotel massage, mobile massage, incall, and outcall options where enough local inventory exists.",
+        "Yes. The directory supports city plus service discovery for deep tissue, Swedish, sports recovery, hotel massage, mobile massage, incall, and outcall options where enough local inventory exists.",
     },
     {
       question: "Does MasseurMatch handle booking or payments?",
@@ -153,7 +156,7 @@ export default async function HomePage() {
         data={buildCollectionPageJsonLd({
           name: "MasseurMatch National Massage Directory",
           description:
-            "Discover verified LGBTQ+-affirming massage therapists across the United States with real availability, transparent profile details, and direct contact.",
+            "Discover verified LGBTQ+ affirming massage therapists across the United States with transparent profiles, direct contact, protected privacy, and no booking fees.",
           path: "/",
         })}
       />
