@@ -18,7 +18,6 @@ export async function POST(request: NextRequest) {
       preferredContact,
     } = body;
 
-    // Validate input
     if (!therapistId || !clientName || !clientEmail || !message) {
       return NextResponse.json(
         { message: 'Missing required fields' },
@@ -26,13 +25,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Resolve either the legacy therapists/profile id or the newer therapist_profiles id.
     let therapist: {
       id: string;
       profileId: string | null;
-      display_name: string | null;
-      contact_email: string | null;
-      user_id: string | null;
+      displayName: string | null;
+      contactEmail: string | null;
+      userId: string | null;
     } | null = null;
 
     const { data: profileMatch, error: profileError } = await supabase
@@ -52,16 +50,16 @@ export async function POST(request: NextRequest) {
       therapist = {
         id: profileMatch.id,
         profileId: profileMatch.id,
-        display_name: profileMatch.display_name || profileMatch.full_name,
-        contact_email: profileMatch.email_address || profileMatch.email,
-        user_id: profileMatch.user_id,
+        displayName: profileMatch.display_name || profileMatch.full_name,
+        contactEmail: profileMatch.email_address || profileMatch.email,
+        userId: profileMatch.user_id,
       };
     }
 
     if (!therapist) {
       const { data: therapistProfile, error: therapistProfileError } = await supabase
         .from('therapist_profiles')
-        .select('id, profile_id, user_id, display_name, contact_email')
+        .select('id, profile_id, user_id')
         .eq('id', therapistId)
         .maybeSingle();
 
@@ -72,14 +70,29 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      if (therapistProfile) {
-        therapist = {
-          id: therapistProfile.id,
-          profileId: therapistProfile.profile_id,
-          display_name: therapistProfile.display_name,
-          contact_email: therapistProfile.contact_email,
-          user_id: therapistProfile.user_id,
-        };
+      if (therapistProfile?.profile_id) {
+        const { data: linkedProfile, error: linkedProfileError } = await supabase
+          .from('profiles')
+          .select('id, user_id, display_name, full_name, email_address, email')
+          .eq('id', therapistProfile.profile_id)
+          .maybeSingle();
+
+        if (linkedProfileError) {
+          return NextResponse.json(
+            { message: linkedProfileError.message },
+            { status: 500 }
+          );
+        }
+
+        if (linkedProfile) {
+          therapist = {
+            id: therapistProfile.id,
+            profileId: linkedProfile.id,
+            displayName: linkedProfile.display_name || linkedProfile.full_name,
+            contactEmail: linkedProfile.email_address || linkedProfile.email,
+            userId: therapistProfile.user_id || linkedProfile.user_id,
+          };
+        }
       }
     }
 
@@ -90,7 +103,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check contact preferences
     let prefsQuery = supabase
       .from('contact_preferences')
       .select('allow_phone, allow_email, allow_whatsapp, auto_reply_message')
@@ -100,7 +112,6 @@ export async function POST(request: NextRequest) {
     }
     const { data: prefs } = await prefsQuery.maybeSingle();
 
-    // Validate preferred contact method is allowed
     if (prefs) {
       if (preferredContact === 'phone' && !prefs.allow_phone) {
         return NextResponse.json(
@@ -122,7 +133,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Insert inquiry
     const { data: inquiry, error: insertError } = await supabase
       .from('contact_inquiries')
       .insert([
@@ -148,16 +158,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send notification email to therapist
     try {
-      if (therapist.contact_email) await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/email/send`, {
+      if (therapist.contactEmail) await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/email/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          to: therapist.contact_email,
+          to: therapist.contactEmail,
           template: 'new-inquiry',
           data: {
-            therapistName: therapist.display_name,
+            therapistName: therapist.displayName,
             clientName,
             clientEmail,
             clientPhone: clientPhone || 'Not provided',
@@ -169,7 +178,6 @@ export async function POST(request: NextRequest) {
       });
     } catch (emailError) {
       console.error('Email notification failed:', emailError);
-      // Don't fail the request if email fails
     }
 
     return NextResponse.json(
