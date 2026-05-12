@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.hostname = "www.masseurmatch.com";
     url.pathname = url.pathname === "/" ? "/admin" : url.pathname;
-    return NextResponse.redirect(url, 308);
+    return NextResponse.redirect(url, { status: 308 });
   }
 
   return NextResponse.next();
