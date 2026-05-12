@@ -7,6 +7,10 @@ import { createPageMetadata } from "@/app/_lib/seo";
 import { requireAdminSession } from "@/app/api/_lib/supabase-server";
 import AdminLayoutShell from "@/app/admin/_components/AdminLayoutShell";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
+
 export const metadata: Metadata = createPageMetadata({
   title: "Admin dashboard",
   description: "Private admin dashboard.",
@@ -17,6 +21,10 @@ export const metadata: Metadata = createPageMetadata({
 async function ensureAdminAccess() {
   const cookieStore = await cookies();
   const cookieHeader = cookieStore.toString();
+
+  if (!cookieHeader.includes("mm_session=")) {
+    redirect("/login?redirect=%2Fadmin");
+  }
 
   try {
     await requireAdminSession(
