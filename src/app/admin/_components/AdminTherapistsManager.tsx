@@ -133,6 +133,7 @@ export default function AdminTherapistsManager({
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
+            aria-label="Search therapists by name or city"
             placeholder="Search by name or city..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -197,6 +198,8 @@ export default function AdminTherapistsManager({
 
               <div className="mt-6 grid gap-3 md:grid-cols-4">
                 <select
+                  aria-label={`Admin action for ${name}`}
+                  title={`Admin action for ${name}`}
                   value={draft.action}
                   onChange={(event) =>
                     updateDraft(therapist.id, { action: event.target.value as TherapistAction })
@@ -212,11 +215,13 @@ export default function AdminTherapistsManager({
                   <option value="unfeature">Unfeature Profile</option>
                 </select>
                 <Input
+                  aria-label={`Reason for admin action on ${name}`}
                   placeholder="Reason (optional)"
                   value={draft.reason}
                   onChange={(event) => updateDraft(therapist.id, { reason: event.target.value })}
                 />
                 <Input
+                  aria-label={`Suspension duration in days for ${name}`}
                   type="number"
                   min="1"
                   placeholder="Suspend days"
