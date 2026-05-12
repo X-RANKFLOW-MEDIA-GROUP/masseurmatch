@@ -8,7 +8,7 @@ import { RouteError } from "@/app/api/_lib/http";
 import { getRequestSession, type RequestSession } from "@/app/api/_lib/session";
 import type { Database, Json } from "@/integrations/supabase/types";
 
-type AppRole = "admin" | "provider";
+type AppRole = "admin" | "therapist";
 
 function getSupabaseUrl() {
   return envAny(["SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL", "VITE_SUPABASE_URL"]);
@@ -215,7 +215,7 @@ export async function ensureUserProfileAndRole(
   } = {},
 ) {
   const adminClient = createSupabaseAdminClient();
-  const defaultRole = options.defaultRole ?? "provider";
+  const defaultRole = options.defaultRole ?? "therapist";
   const fullName = deriveUserDisplayName(user, options.fallbackName);
 
   const { data: existingProfile, error: existingProfileError } = await adminClient
@@ -303,7 +303,7 @@ export async function createTherapistUser(input: {
       emailRedirectTo: input.emailRedirectTo,
       data: {
         full_name: input.fullName,
-        role: "provider",
+        role: "therapist",
       },
     },
   };
@@ -333,7 +333,7 @@ export async function createTherapistUser(input: {
     email_confirm: true,
     user_metadata: {
       full_name: input.fullName,
-      role: "provider",
+      role: "therapist",
     },
   });
 
@@ -342,7 +342,7 @@ export async function createTherapistUser(input: {
   }
 
   await ensureUserProfileAndRole(created.user, {
-    defaultRole: "provider",
+    defaultRole: "therapist",
     fallbackName: input.fullName,
   });
 
