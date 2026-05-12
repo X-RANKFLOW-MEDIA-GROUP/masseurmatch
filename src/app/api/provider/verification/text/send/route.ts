@@ -11,6 +11,7 @@ const sendSchema = z.object({
 const TWILIO_SID = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_AUTH = process.env.TWILIO_AUTH_TOKEN;
 const TWILIO_PHONE = process.env.TWILIO_PHONE_NUMBER;
+const CODE_TTL_MINUTES = 10;
 
 export async function POST(request: Request) {
   try {
@@ -29,6 +30,7 @@ export async function POST(request: Request) {
 
     const client = twilio(TWILIO_SID, TWILIO_AUTH);
     const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + CODE_TTL_MINUTES * 60 * 1000).toISOString();
 
     await client.messages.create({
       body: `Your MasseurMatch verification code is: ${code}`,
@@ -37,13 +39,28 @@ export async function POST(request: Request) {
     });
 
     const supabase = createSupabaseAdminClient();
+
     await supabase
       .from("profiles")
-      .update({ 
-        verification_code: code,
-        phone_number: phone 
-      })
+      .update({ phone_number: phone })
       .eq("user_id", session.userId);
+
+    const { error: verificationError } = await supabase
+      .from("text_verifications")
+      .insert({
+        user_id: session.userId,
+        phone,
+        verification_code: code,
+        status: "pending",
+        provider: "twilio",
+        attempt_count: 1,
+        sent_at: new Date().toISOString(),
+        expires_at: expiresAt,
+      });
+
+    if (verificationError) {
+      return NextResponse.json({ error: verificationError.message }, { status: 500 });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
