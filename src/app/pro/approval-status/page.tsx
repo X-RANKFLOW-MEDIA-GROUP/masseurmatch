@@ -134,7 +134,7 @@ export default function ApprovalStatusPage() {
   const StatusIcon = config.icon;
 
   function getSubmissionDate(): string {
-    const submittedAt = profile?.submitted_at;
+    const submittedAt = currentProfile.submitted_at;
     if (!submittedAt) return "—";
     const date = new Date(submittedAt);
     return date.toLocaleDateString("en-US", {
@@ -145,7 +145,7 @@ export default function ApprovalStatusPage() {
   }
 
   function getReviewDate(): string {
-    const reviewedAt = profile?.reviewed_at;
+    const reviewedAt = currentProfile.reviewed_at;
     if (!reviewedAt) return "Pending";
     const date = new Date(reviewedAt);
     return date.toLocaleDateString("en-US", {

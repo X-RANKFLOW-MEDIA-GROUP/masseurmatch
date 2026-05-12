@@ -12,6 +12,9 @@ import {
 import { getCities } from "@/app/_lib/directory";
 import ExplorePageClient from "./ExplorePageClient";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 type ExplorePageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };

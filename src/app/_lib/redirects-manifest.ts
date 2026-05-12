@@ -1,82 +1,65 @@
 /**
- * Central redirect manifest — single source of truth for all legacy URL redirects.
- *
- * Rules:
- * - Every entry here mirrors the corresponding rule in next.config.mjs → redirects().
- * - CI: Playwright reads this file and asserts every redirect returns 301 or 308 with the
- *   correct Location header. If a destination changes here, the CI test catches the drift.
- *
- * permanent: true → Next.js issues HTTP 308 (permanent redirect).
- *   Google treats both 301 and 308 as permanent. If your CDN/host needs strict 301, add a
- *   header rewrite at the edge layer (Vercel rewrites or Cloudflare Workers).
+ * Central redirect manifest. Mirrors next.config.mjs redirects().
+ * permanent: true means Next.js serves HTTP 308, treated as permanent by search engines.
  */
 
 export type LegacyRedirect = {
-  /** Path the user (or bot) will hit. */
   source: string;
-  /** Path they should land on. */
   destination: string;
-  /** permanent: true → 308 via Next.js. */
   permanent: boolean;
 };
 
 export const legacyRedirects: LegacyRedirect[] = [
-  // ── /city/* → /{city} (singular legacy prefix) ──────────────────────────────
-  { source: "/city/dallas",        destination: "/dallas",        permanent: true },
-  { source: "/city/plano",         destination: "/plano",         permanent: true },
-  { source: "/city/irving",        destination: "/irving",        permanent: true },
-  { source: "/city/highland-park", destination: "/highland-park", permanent: true },
-  { source: "/city/fort-worth",    destination: "/fort-worth",    permanent: true },
-  { source: "/city/houston",       destination: "/houston",       permanent: true },
-  { source: "/city/austin",        destination: "/austin",        permanent: true },
-  { source: "/city/los-angeles",   destination: "/los-angeles",   permanent: true },
-  { source: "/city/miami",         destination: "/miami",         permanent: true },
-  { source: "/city/new-york",      destination: "/new-york",      permanent: true },
-  { source: "/city/chicago",       destination: "/chicago",       permanent: true },
-  { source: "/city/san-diego",     destination: "/san-diego",     permanent: true },
-  { source: "/city/fort-lauderdale", destination: "/fort-lauderdale", permanent: true },
-  { source: "/city/wilton-manors", destination: "/wilton-manors", permanent: true },
-  { source: "/city/west-hollywood", destination: "/west-hollywood", permanent: true },
-  { source: "/city/atlanta",       destination: "/atlanta",       permanent: true },
-  { source: "/city/seattle",       destination: "/seattle",       permanent: true },
-  { source: "/city/denver",        destination: "/denver",        permanent: true },
-  { source: "/city/phoenix",       destination: "/phoenix",       permanent: true },
-
-  // ── /cities/{city-state} → /{city} (canonical-to-legacy consolidation) ──────
-  { source: "/cities/dallas-tx",        destination: "/dallas",        permanent: true },
-  { source: "/cities/plano-tx",         destination: "/plano",         permanent: true },
-  { source: "/cities/irving-tx",        destination: "/irving",        permanent: true },
-  { source: "/cities/highland-park-tx", destination: "/highland-park", permanent: true },
-  { source: "/cities/fort-worth-tx",    destination: "/fort-worth",    permanent: true },
-  { source: "/cities/houston-tx",       destination: "/houston",       permanent: true },
-  { source: "/cities/austin-tx",        destination: "/austin",        permanent: true },
-  { source: "/cities/los-angeles-ca",   destination: "/los-angeles",   permanent: true },
-  { source: "/cities/miami-fl",         destination: "/miami",         permanent: true },
-  { source: "/cities/new-york-ny",      destination: "/new-york",      permanent: true },
-  { source: "/cities/chicago-il",       destination: "/chicago",       permanent: true },
-  { source: "/cities/san-diego-ca",     destination: "/san-diego",     permanent: true },
-  { source: "/cities/fort-lauderdale-fl", destination: "/fort-lauderdale", permanent: true },
-  { source: "/cities/atlanta-ga",       destination: "/atlanta",       permanent: true },
-  { source: "/cities/seattle-wa",       destination: "/seattle",       permanent: true },
-  { source: "/cities/denver-co",        destination: "/denver",        permanent: true },
-  { source: "/cities/phoenix-az",       destination: "/phoenix",       permanent: true },
-
-  // ── Service-page legacy slugs under /cities/dallas-tx/* ──────────────────────
-  { source: "/cities/dallas-tx/gay-massage",        destination: "/dallas/lgbtq-friendly",        permanent: true },
-  { source: "/cities/dallas-tx/male-massage",       destination: "/dallas/male-therapists",       permanent: true },
-  { source: "/cities/dallas-tx/deep-tissue",        destination: "/dallas/wellness/deep-tissue",  permanent: true },
-  { source: "/cities/dallas-tx/outcall",            destination: "/dallas/wellness/outcall",      permanent: true },
-  { source: "/cities/dallas-tx/incall",             destination: "/dallas/wellness/incall",       permanent: true },
-  { source: "/cities/dallas-tx/swedish",            destination: "/dallas/wellness/swedish",      permanent: true },
-  { source: "/cities/dallas-tx/sports-massage",     destination: "/dallas/wellness/sports-recovery", permanent: true },
-  { source: "/cities/dallas-tx/mobile",             destination: "/dallas/wellness/mobile-massage", permanent: true },
-  { source: "/cities/dallas-tx/hotel",              destination: "/dallas/wellness/hotel-massage", permanent: true },
-
-  // ── Global legacy aliases ────────────────────────────────────────────────────
+  { source: "/city/dallas", destination: "/cities/dallas-tx", permanent: true },
+  { source: "/city/plano", destination: "/cities/plano-tx", permanent: true },
+  { source: "/city/irving", destination: "/cities/irving-tx", permanent: true },
+  { source: "/city/highland-park", destination: "/cities/highland-park-tx", permanent: true },
+  { source: "/city/fort-worth", destination: "/cities/fort-worth-tx", permanent: true },
+  { source: "/city/houston", destination: "/cities/houston-tx", permanent: true },
+  { source: "/city/austin", destination: "/cities/austin-tx", permanent: true },
+  { source: "/city/los-angeles", destination: "/cities/los-angeles-ca", permanent: true },
+  { source: "/city/miami", destination: "/cities/miami-fl", permanent: true },
+  { source: "/city/new-york", destination: "/cities/new-york-ny", permanent: true },
+  { source: "/city/chicago", destination: "/cities/chicago-il", permanent: true },
+  { source: "/city/san-diego", destination: "/cities/san-diego-ca", permanent: true },
+  { source: "/city/fort-lauderdale", destination: "/cities/fort-lauderdale-fl", permanent: true },
+  { source: "/city/wilton-manors", destination: "/cities/wilton-manors-fl", permanent: true },
+  { source: "/city/west-hollywood", destination: "/cities/west-hollywood-ca", permanent: true },
+  { source: "/city/atlanta", destination: "/cities/atlanta-ga", permanent: true },
+  { source: "/city/seattle", destination: "/cities/seattle-wa", permanent: true },
+  { source: "/city/denver", destination: "/cities/denver-co", permanent: true },
+  { source: "/city/phoenix", destination: "/cities/phoenix-az", permanent: true },
+  { source: "/dallas", destination: "/cities/dallas-tx", permanent: true },
+  { source: "/plano", destination: "/cities/plano-tx", permanent: true },
+  { source: "/irving", destination: "/cities/irving-tx", permanent: true },
+  { source: "/highland-park", destination: "/cities/highland-park-tx", permanent: true },
+  { source: "/fort-worth", destination: "/cities/fort-worth-tx", permanent: true },
+  { source: "/houston", destination: "/cities/houston-tx", permanent: true },
+  { source: "/austin", destination: "/cities/austin-tx", permanent: true },
+  { source: "/los-angeles", destination: "/cities/los-angeles-ca", permanent: true },
+  { source: "/miami", destination: "/cities/miami-fl", permanent: true },
+  { source: "/new-york", destination: "/cities/new-york-ny", permanent: true },
+  { source: "/chicago", destination: "/cities/chicago-il", permanent: true },
+  { source: "/san-diego", destination: "/cities/san-diego-ca", permanent: true },
+  { source: "/fort-lauderdale", destination: "/cities/fort-lauderdale-fl", permanent: true },
+  { source: "/wilton-manors", destination: "/cities/wilton-manors-fl", permanent: true },
+  { source: "/west-hollywood", destination: "/cities/west-hollywood-ca", permanent: true },
+  { source: "/atlanta", destination: "/cities/atlanta-ga", permanent: true },
+  { source: "/seattle", destination: "/cities/seattle-wa", permanent: true },
+  { source: "/denver", destination: "/cities/denver-co", permanent: true },
+  { source: "/phoenix", destination: "/cities/phoenix-az", permanent: true },
+  { source: "/dallas/lgbtq-friendly", destination: "/cities/dallas-tx/gay-massage", permanent: true },
+  { source: "/dallas/male-therapists", destination: "/cities/dallas-tx/male-massage", permanent: true },
+  { source: "/dallas/wellness/deep-tissue", destination: "/cities/dallas-tx/deep-tissue", permanent: true },
+  { source: "/dallas/wellness/outcall", destination: "/cities/dallas-tx/outcall", permanent: true },
+  { source: "/dallas/wellness/incall", destination: "/cities/dallas-tx/incall", permanent: true },
+  { source: "/dallas/wellness/swedish", destination: "/cities/dallas-tx/swedish", permanent: true },
+  { source: "/dallas/wellness/sports-recovery", destination: "/cities/dallas-tx/sports-massage", permanent: true },
+  { source: "/dallas/wellness/mobile-massage", destination: "/cities/dallas-tx/mobile", permanent: true },
+  { source: "/dallas/wellness/hotel-massage", destination: "/cities/dallas-tx/hotel", permanent: true },
   { source: "/massage-therapists", destination: "/therapists", permanent: true },
 ];
 
-/** Convenience lookup: source path → destination. */
 export const REDIRECTS_BY_SOURCE: ReadonlyMap<string, string> = new Map(
   legacyRedirects.map(({ source, destination }) => [source, destination]),
 );

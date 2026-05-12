@@ -34,12 +34,20 @@ export async function generateMetadata({ searchParams }: TherapistsPageProps): P
   const hasFilters = Boolean(city || modality || tier || page > 1);
 
   return createPageMetadata({
-    title: city ? `${city} therapist listings` : "Therapist directory",
+    title: city ? `Massage therapists in ${city}` : "Verified massage therapists across the United States",
     description: city
-      ? `Browse public therapist listings in ${city} and compare specialties, tiers, and profile details.`
-      : "Browse the public therapist directory with crawlable listing pages, profile pages, and search-ready filters.",
+      ? `Browse verified massage therapists in ${city}. Compare specialties, incall, outcall, trust signals, profile tiers, and direct contact details.`
+      : "Browse verified LGBTQ+-affirming massage therapists across the United States by state, city, specialty, incall, outcall, trust signals, and direct contact options.",
     path: "/therapists",
-    keywords: ["therapist directory", city, modality, tier],
+    keywords: [
+      "national massage therapist directory",
+      "massage therapists across the United States",
+      "massage therapists by city",
+      "massage therapists by state",
+      city,
+      modality,
+      tier,
+    ],
     noIndex: hasFilters,
   });
 }
@@ -70,15 +78,15 @@ export default async function TherapistsPage({ searchParams }: TherapistsPagePro
       />
       <JsonLd
         data={buildCollectionPageJsonLd({
-          name: "Therapist directory",
+          name: "Verified massage therapists across the United States",
           description:
-            "Browse public massage therapist listings, move into profile pages, and compare specialties across the MasseurMatch directory.",
+            "Browse public massage therapist listings across the United States, move into state and city discovery paths, and compare specialties, trust signals, incall, outcall, and direct contact options.",
           path: "/therapists",
         })}
       />
       <JsonLd
         data={buildItemListJsonLd({
-          name: "Therapist directory listings",
+          name: "Nationwide therapist directory listings",
           path: "/therapists",
           items: results.items.map((item) => ({
             name: item.display_name || item.full_name || "Therapist",
@@ -89,23 +97,23 @@ export default async function TherapistsPage({ searchParams }: TherapistsPagePro
 
       <div className="container mx-auto px-4 py-10">
         <div className="max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">Directory listings</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">National directory</p>
           <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground">
-            Crawlable therapist listings with direct paths into city and specialty pages.
+            Browse verified massage therapists across the United States.
           </h1>
           <p className="mt-4 text-base leading-7 text-muted-foreground">
-            This directory page acts as a public index for therapist profiles. It supports search depth, internal
-            linking, and paginated discovery while keeping the most important content server-rendered.
+            Search MasseurMatch by state, city, specialty, incall, outcall, availability, profile tier, and trust signals.
+            Each public profile links into local discovery paths while filtered views stay out of the index to avoid thin duplicate pages.
           </p>
           <div className="mt-5 flex flex-wrap gap-3 text-sm font-semibold">
+            <Link href="/cities" className="text-primary hover:underline">
+              Browse cities
+            </Link>
             <Link href="/search" className="text-primary hover:underline">
-              Search by city
+              Search by city or specialty
             </Link>
-            <Link href="/blog" className="text-primary hover:underline">
-              Read the blog
-            </Link>
-            <Link href="/contact" className="text-primary hover:underline">
-              Contact support
+            <Link href="/for-therapists" className="text-primary hover:underline">
+              List your profile
             </Link>
           </div>
         </div>

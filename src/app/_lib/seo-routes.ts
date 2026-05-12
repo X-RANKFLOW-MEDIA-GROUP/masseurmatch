@@ -35,9 +35,11 @@ export const PRIVATE_ROBOTS_PATHS = uniqueStrings([
   "/pro/",
   "/login",
   "/register",
+  "/signup",
   "/forgot-password",
   "/dashboard",
   "/dashboard/",
+  "/portal",
   "/*?*token=",
   "/*?*redirect=",
 ]);
@@ -45,6 +47,7 @@ export const PRIVATE_ROBOTS_PATHS = uniqueStrings([
 export const FILTER_ROBOTS_PATHS = [
   "/search?*",
   "/*?sort=*",
+  "/*?filter=*",
   "/*?verified=*",
   "/*?availability=*",
   "/*?radius=*",
@@ -77,28 +80,30 @@ export const AI_CRAWLER_BOTS = [
 ];
 
 const CORE_STATIC_ROUTES: StaticSitemapRoute[] = [
-  { path: "/",                    changeFrequency: "daily",   priority: 1.0 },
-  { path: "/therapists",          changeFrequency: "daily",   priority: 0.9 },
-  { path: "/blog",                changeFrequency: "weekly",  priority: 0.8 },
-  { path: "/guides",              changeFrequency: "weekly",  priority: 0.76 },
-  { path: "/pricing",             changeFrequency: "monthly", priority: 0.7 },
-  { path: "/how-it-works",        changeFrequency: "monthly", priority: 0.7 },
-  { path: "/about",               changeFrequency: "monthly", priority: 0.7 },
-  { path: "/advertise",           changeFrequency: "monthly", priority: 0.7 },
-  { path: "/for-therapists",      changeFrequency: "weekly",  priority: 0.7 },
-  { path: "/safety",              changeFrequency: "monthly", priority: 0.7 },
-  { path: "/trust",               changeFrequency: "monthly", priority: 0.7 },
-  { path: "/contact",             changeFrequency: "monthly", priority: 0.6 },
-  { path: "/faq",                 changeFrequency: "monthly", priority: 0.6 },
-  { path: "/legal",               changeFrequency: "monthly", priority: 0.5 },
-  { path: "/privacy",             changeFrequency: "monthly", priority: 0.5 },
-  { path: "/terms",               changeFrequency: "monthly", priority: 0.5 },
-  { path: "/accessibility",       changeFrequency: "monthly", priority: 0.4 },
+  { path: "/", changeFrequency: "daily", priority: 1.0 },
+  { path: "/therapists", changeFrequency: "daily", priority: 0.9 },
+  { path: "/cities", changeFrequency: "weekly", priority: 0.82 },
+  { path: "/explore", changeFrequency: "weekly", priority: 0.72 },
+  { path: "/blog", changeFrequency: "weekly", priority: 0.8 },
+  { path: "/guides", changeFrequency: "weekly", priority: 0.76 },
+  { path: "/pricing", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/how-it-works", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/about", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/advertise", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/for-therapists", changeFrequency: "weekly", priority: 0.7 },
+  { path: "/safety", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/trust", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/contact", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/faq", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/legal", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/privacy", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/terms", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/accessibility", changeFrequency: "monthly", priority: 0.4 },
   { path: "/community-guidelines", changeFrequency: "monthly", priority: 0.4 },
-  { path: "/platform-disclaimer",  changeFrequency: "monthly", priority: 0.4 },
-  { path: "/cookie-policy",       changeFrequency: "monthly", priority: 0.4 },
+  { path: "/platform-disclaimer", changeFrequency: "monthly", priority: 0.4 },
+  { path: "/cookie-policy", changeFrequency: "monthly", priority: 0.4 },
   { path: "/therapist-agreement", changeFrequency: "monthly", priority: 0.4 },
-  { path: "/compare",            changeFrequency: "monthly", priority: 0.7 },
+  { path: "/compare", changeFrequency: "monthly", priority: 0.7 },
   ...competitorSlugs.map((slug) => ({
     path: `/compare/${slug}`,
     changeFrequency: "monthly" as const,
@@ -107,6 +112,24 @@ const CORE_STATIC_ROUTES: StaticSitemapRoute[] = [
 ];
 
 const ROUTABLE_CITY_SLUGS = new Set(getCities().map((city) => city.slug));
+const PRIVATE_PROFILE_SLUG_PATTERNS = [
+  /admin/i,
+  /dev/i,
+  /test/i,
+  /staging/i,
+  /masseurmatch-com/i,
+  /support/i,
+  /billing/i,
+  /legal/i,
+];
+
+function isPublicProfileSlug(slug: string | null | undefined): slug is string {
+  if (!slug || slug.length < 3) return false;
+  if (slug.includes("@")) return false;
+  if (slug.startsWith("admin-") || slug.startsWith("test-") || slug.startsWith("dev-")) return false;
+  if (PRIVATE_PROFILE_SLUG_PATTERNS.some((pattern) => pattern.test(slug))) return false;
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
+}
 
 function toSitemapUrl(path: string): string {
   return absoluteUrl(buildCanonicalPath(path));
@@ -118,12 +141,7 @@ function buildSitemapEntry(
   changeFrequency: NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>,
   priority: number,
 ): MetadataRoute.Sitemap[number] {
-  return {
-    url: toSitemapUrl(path),
-    lastModified: now,
-    changeFrequency,
-    priority,
-  };
+  return { url: toSitemapUrl(path), lastModified: now, changeFrequency, priority };
 }
 
 function isRoutableCityPath(path: string): boolean {
@@ -139,15 +157,9 @@ function cityNameBySlug(slug: string): string | null {
 async function pathHasInventory(path: string): Promise<boolean> {
   const parts = path.split("/").filter(Boolean);
   const [citySlug, segmentSlug, keywordOrAreaSlug] = parts;
-
-  if (!citySlug) {
-    return false;
-  }
-
+  if (!citySlug) return false;
   const cityName = cityNameBySlug(citySlug);
-  if (!cityName) {
-    return false;
-  }
+  if (!cityName) return false;
 
   if (parts.length === 1) {
     const { total } = await getPublicTherapists({ city: cityName, page: 1, pageSize: 1 });
@@ -155,12 +167,7 @@ async function pathHasInventory(path: string): Promise<boolean> {
   }
 
   if (parts.length === 2 && segmentSlug) {
-    const { total } = await getPublicTherapists({
-      city: cityName,
-      page: 1,
-      pageSize: 1,
-      ...getSegmentSearchFilters(segmentSlug),
-    });
+    const { total } = await getPublicTherapists({ city: cityName, page: 1, pageSize: 1, ...getSegmentSearchFilters(segmentSlug) });
     return total > 0;
   }
 
@@ -174,10 +181,7 @@ async function pathHasInventory(path: string): Promise<boolean> {
       city: cityName,
       page: 1,
       pageSize: 1,
-      ...resolveDirectoryFilters(
-        getSegmentSearchFilters(segmentSlug),
-        getKeywordSearchFilters(keywordOrAreaSlug),
-      ),
+      ...resolveDirectoryFilters(getSegmentSearchFilters(segmentSlug), getKeywordSearchFilters(keywordOrAreaSlug)),
     });
     return total > 0;
   }
@@ -188,25 +192,10 @@ async function pathHasInventory(path: string): Promise<boolean> {
 export function buildRobotsRules(): MetadataRoute.Robots["rules"] {
   const searchEngineDisallow = uniqueStrings([...PRIVATE_ROBOTS_PATHS, ...FILTER_ROBOTS_PATHS]);
   return [
-    {
-      userAgent: SEARCH_ENGINE_BOTS,
-      allow: "/",
-      disallow: searchEngineDisallow,
-    },
-    {
-      userAgent: SOCIAL_PREVIEW_BOTS,
-      allow: "/",
-    },
-    {
-      userAgent: AI_CRAWLER_BOTS,
-      allow: "/",
-      disallow: PRIVATE_ROBOTS_PATHS,
-    },
-    {
-      userAgent: "*",
-      allow: "/",
-      disallow: searchEngineDisallow,
-    },
+    { userAgent: SEARCH_ENGINE_BOTS, allow: "/", disallow: searchEngineDisallow },
+    { userAgent: SOCIAL_PREVIEW_BOTS, allow: "/" },
+    { userAgent: AI_CRAWLER_BOTS, allow: "/", disallow: PRIVATE_ROBOTS_PATHS },
+    { userAgent: "*", allow: "/", disallow: searchEngineDisallow },
   ];
 }
 
@@ -230,10 +219,10 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Metad
         return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) > 0 : false;
       })
       .map((city) => ({
-        url: toSitemapUrl(`/${city.slug}`),
+        url: toSitemapUrl(`/cities/${city.slug}`),
         lastModified: city.updated_at ? new Date(city.updated_at) : now,
         changeFrequency: "weekly" as const,
-        priority: city.slug === "dallas" ? 0.8 : 0.7,
+        priority: 0.7,
       }));
   }
 
@@ -244,7 +233,7 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Metad
       const cityName = slug ? cityNameBySlug(slug) : null;
       return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) > 0 : false;
     })
-    .map((path) => buildSitemapEntry(path, now, "weekly", path === "/dallas" ? 0.8 : 0.7));
+    .map((path) => buildSitemapEntry(`/cities${path}`, now, "weekly", 0.7));
 }
 
 export async function buildServicesSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
@@ -253,38 +242,28 @@ export async function buildServicesSitemapEntries(now = new Date()): Promise<Met
   const orderedServicePaths = FIRST_30_URLS_IN_ORDER.filter(
     (path) => (launchSegmentPaths.has(path) || launchKeywordPaths.has(path)) && isRoutableCityPath(path) && isLaunchUrl(path),
   );
-
-  const inventoryChecks = await Promise.all(
-    orderedServicePaths.map(async (path) => ({ path, hasInventory: await pathHasInventory(path) })),
-  );
-
+  const inventoryChecks = await Promise.all(orderedServicePaths.map(async (path) => ({ path, hasInventory: await pathHasInventory(path) })));
   return inventoryChecks
     .filter((entry) => entry.hasInventory)
-    .map((entry) => buildSitemapEntry(entry.path, now, "weekly", entry.path.startsWith("/dallas") ? 0.72 : 0.66));
+    .map((entry) => buildSitemapEntry(entry.path, now, "weekly", 0.66));
 }
 
 export async function buildNeighborhoodsSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
   const candidatePaths = getLaunchAreaPaths().filter((path) => isRoutableCityPath(path) && isLaunchUrl(path));
-  const inventoryChecks = await Promise.all(
-    candidatePaths.map(async (path) => ({ path, hasInventory: await pathHasInventory(path) })),
-  );
-
-  return inventoryChecks
-    .filter((entry) => entry.hasInventory)
-    .map((entry) => buildSitemapEntry(entry.path, now, "weekly", 0.6));
+  const inventoryChecks = await Promise.all(candidatePaths.map(async (path) => ({ path, hasInventory: await pathHasInventory(path) })));
+  return inventoryChecks.filter((entry) => entry.hasInventory).map((entry) => buildSitemapEntry(entry.path, now, "weekly", 0.6));
 }
 
 export async function buildProfilesSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
   const therapistData = await getSeoTherapists();
-  const featuredSet = new Set(FEATURED_PROFILE_SLUGS);
+  const featuredSet = new Set(FEATURED_PROFILE_SLUGS.filter(isPublicProfileSlug));
   return therapistData
-    .filter((therapist) => therapist.slug)
-    .filter((therapist) => therapist.slug.length >= 3)
+    .filter((therapist) => isPublicProfileSlug(therapist.slug))
     .map((therapist) => ({
       url: toSitemapUrl(`/therapists/${therapist.slug}`),
       lastModified: therapist.updated_at ? new Date(therapist.updated_at) : now,
       changeFrequency: "weekly" as const,
-      priority: featuredSet.has(therapist.slug!) ? 0.9 : 0.7,
+      priority: featuredSet.has(therapist.slug) ? 0.9 : 0.7,
     }));
 }
 

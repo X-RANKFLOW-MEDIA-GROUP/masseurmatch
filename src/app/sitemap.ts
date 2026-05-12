@@ -8,14 +8,12 @@ import {
   buildGuidesSitemapEntries,
   buildBlogPostsSitemapEntries,
 } from "@/app/_lib/seo-routes";
+import { siteUrl } from "@/lib/site";
 
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  
-  // FIXED: Aligned the array destructuring correctly with the Promise.all array 
-  // to prevent variable mismatches and removed the duplicate neighborhood call.
   const [cities, services, profiles, blogPosts, neighborhoods, guides] = await Promise.all([
     buildCitiesSitemapEntries(now),
     buildServicesSitemapEntries(now),
@@ -24,8 +22,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     buildNeighborhoodsSitemapEntries(now),
     buildGuidesSitemapEntries(now),
   ]);
-  
-  const core = buildCoreSitemapEntries(now);
 
-  return [...core, ...cities, ...services, ...neighborhoods, ...profiles, ...guides, ...blogPosts];
+  const core = buildCoreSitemapEntries(now);
+  const statesHub = [{ url: siteUrl("/states"), lastModified: now, changeFrequency: "weekly" as const, priority: 0.84 }];
+
+  return [...core, ...statesHub, ...cities, ...services, ...neighborhoods, ...profiles, ...guides, ...blogPosts];
 }

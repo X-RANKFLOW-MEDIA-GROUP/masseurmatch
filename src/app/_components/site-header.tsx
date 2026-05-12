@@ -13,6 +13,7 @@ import {
   Users,
   Navigation,
   ArrowUpRight,
+  LogIn,
 } from "lucide-react";
 import {
   Sheet,
@@ -20,8 +21,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-
-/* ── nav data ─────────────────────────────────────────── */
 
 const exploreItems = [
   { href: "/explore", label: "Explore", icon: Navigation },
@@ -36,32 +35,22 @@ const navLinks = [
   { href: "/trust", label: "Trust" },
 ];
 
-/* ── Explore dropdown (desktop) ───────────────────────── */
-
 function ExploreDropdown({ isDarkHero = false }: { isDarkHero?: boolean }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div
-      className="relative"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-    >
+    <div className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="menu"
         className={`flex items-center gap-1 font-sans text-sm font-medium transition-colors ${
-          isDarkHero 
-            ? 'text-white/80 hover:text-white' 
-            : 'text-[#4A4F5C] hover:text-[#0B1F3A]'
+          isDarkHero ? "text-white/80 hover:text-white" : "text-[#4A4F5C] hover:text-[#0B1F3A]"
         }`}
       >
         Explore
-        <ChevronDown
-          className={`w-3 h-3 opacity-50 transition-transform ${open ? "rotate-180" : ""}`}
-        />
+        <ChevronDown className={`w-3 h-3 opacity-50 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
 
       <AnimatePresence>
@@ -93,9 +82,7 @@ function ExploreDropdown({ isDarkHero = false }: { isDarkHero?: boolean }) {
   );
 }
 
-/* ── Mobile nav (Sheet) ───────────────────────────────── */
-
-function MobileNav() {
+function MobileNav({ dashboardPath, authenticated }: { dashboardPath: string; authenticated: boolean }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -109,7 +96,9 @@ function MobileNav() {
     { href: "/trust", label: "Trust & Safety" },
     { href: "/faq", label: "FAQ" },
     { href: "/contact", label: "Contact" },
-    { href: "/login", label: "Login / Sign up" },
+    authenticated
+      ? { href: dashboardPath, label: "Dashboard" }
+      : { href: "/login", label: "Login / Sign up" },
   ];
 
   return (
@@ -124,20 +113,12 @@ function MobileNav() {
         </button>
       </SheetTrigger>
 
-      <SheetContent
-        side="right"
-        className="w-[280px] bg-background border-border p-0"
-      >
+      <SheetContent side="right" className="w-[280px] bg-background border-border p-0">
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
-        {/* header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <Link
-            href="/"
-            onClick={() => setOpen(false)}
-            className="font-display text-lg font-bold tracking-tighter text-foreground"
-          >
-            Masseur<span className="text-muted-foreground">Match</span>
+          <Link href="/" onClick={() => setOpen(false)} className="font-display text-lg font-bold tracking-tighter text-foreground">
+            Masseur<span className="text-[#FF8A1F]">Match</span>
           </Link>
           <button
             type="button"
@@ -148,7 +129,6 @@ function MobileNav() {
           </button>
         </div>
 
-        {/* links */}
         <nav className="flex flex-col px-3 py-4 gap-0.5">
           {allLinks.map(({ href, label }) => {
             const active = pathname === href;
@@ -158,9 +138,7 @@ function MobileNav() {
                 href={href}
                 onClick={() => setOpen(false)}
                 className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  active
-                    ? "bg-muted text-foreground"
-                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                  active ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                 }`}
               >
                 {label}
@@ -169,21 +147,20 @@ function MobileNav() {
           })}
         </nav>
 
-        {/* auth CTAs */}
         <div className="mt-auto px-5 pb-6 pt-4 border-t border-border space-y-2">
           <Link
-            href="/login"
+            href={authenticated ? dashboardPath : "/login"}
             onClick={() => setOpen(false)}
             className="block w-full text-center rounded-lg border border-border py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
           >
-            Log In
+            {authenticated ? "Dashboard" : "Log In"}
           </Link>
           <Link
-            href="/signup"
+            href={authenticated ? dashboardPath : "/signup"}
             onClick={() => setOpen(false)}
-            className="block w-full text-center rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+            className="block w-full text-center rounded-lg bg-[#FF8A1F] py-2.5 text-sm font-semibold text-[#0B1F3A] hover:bg-[#ff9d3f] transition-colors"
           >
-            Sign Up
+            {authenticated ? "Open Dashboard" : "Get Started"}
           </Link>
         </div>
       </SheetContent>
@@ -191,20 +168,39 @@ function MobileNav() {
   );
 }
 
-/* ── Main Header ──────────────────────────────────────── */
-
 export default function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [dashboardPath, setDashboardPath] = useState("/login");
   const pathname = usePathname();
   const isHomepage = pathname === "/";
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Determine if we're on a dark hero page (homepage)
+  useEffect(() => {
+    let mounted = true;
+    fetch("/api/auth/me", { credentials: "include", cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!mounted) return;
+        const isAuthenticated = Boolean(data?.authenticated);
+        setAuthenticated(isAuthenticated);
+        setDashboardPath(isAuthenticated && data?.dashboardPath ? data.dashboardPath : "/login");
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setAuthenticated(false);
+        setDashboardPath("/login");
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   const isDarkHero = isHomepage && !isScrolled;
 
   return (
@@ -213,62 +209,45 @@ export default function SiteHeader() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled 
-          ? 'bg-white/95 backdrop-blur-xl border-b border-[#E2E6F0] shadow-sm' 
-          : isDarkHero
-            ? 'bg-transparent'
-            : 'bg-white/50 backdrop-blur-sm'
+        isScrolled ? "bg-[#FCFBF8]/95 backdrop-blur-xl border-b border-[#E2E6F0] shadow-sm" : isDarkHero ? "bg-transparent" : "bg-[#FCFBF8]/90 backdrop-blur-sm"
       }`}
     >
       <div className="w-full max-w-[1400px] mx-auto flex items-center justify-between px-6 lg:px-10 py-4">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="group flex items-center gap-2"
-        >
-          <span className={`font-heading text-[24px] font-bold tracking-tight transition-colors ${
-            isDarkHero ? 'text-white' : 'text-[#0B1F3A]'
-          }`}>
-            Masseur<span className={isDarkHero ? 'text-[#FF8A1F]' : 'text-[#1E4B8F]'}>Match</span>
+        <Link href="/" className="group flex items-center gap-2">
+          <span className={`font-['Georgia','Times_New_Roman',serif] text-[24px] font-bold tracking-tight transition-colors ${isDarkHero ? "text-white" : "text-[#0B1F3A]"}`}>
+            Masseur<span className="text-[#FF8A1F]">Match</span>
           </span>
         </Link>
 
-        {/* Center Navigation — desktop */}
         <nav className="hidden lg:flex items-center gap-1">
           <ExploreDropdown isDarkHero={isDarkHero} />
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
-              className={`px-4 py-2 text-sm font-medium transition-colors rounded-lg ${
-                isDarkHero 
-                  ? 'text-white/80 hover:text-white hover:bg-white/10' 
-                  : 'text-[#4A4F5C] hover:text-[#0B1F3A] hover:bg-[#F4F6F9]'
-              }`}
+              className={`px-4 py-2 text-sm font-medium transition-colors rounded-lg ${isDarkHero ? "text-white/80 hover:text-white hover:bg-white/10" : "text-[#4A4F5C] hover:text-[#0B1F3A] hover:bg-[#F4F6F9]"}`}
             >
               {label}
             </Link>
           ))}
         </nav>
 
-        {/* Right CTAs — desktop + mobile hamburger */}
         <div className="flex items-center gap-3">
           <Link
-            href="/login"
-            className={`hidden md:flex px-4 py-2 text-sm font-medium transition-colors ${
-              isDarkHero ? 'text-white/80 hover:text-white' : 'text-[#4A4F5C] hover:text-[#0B1F3A]'
-            }`}
+            href={authenticated ? dashboardPath : "/login"}
+            className={`hidden md:flex px-4 py-2 text-sm font-medium transition-colors items-center gap-2 ${isDarkHero ? "text-white/80 hover:text-white" : "text-[#4A4F5C] hover:text-[#0B1F3A]"}`}
           >
-            Log in
+            {authenticated ? null : <LogIn className="w-4 h-4" />}
+            {authenticated ? "Dashboard" : "Log in"}
           </Link>
           <Link
-            href="/signup"
-            className="hidden sm:flex h-10 px-6 items-center justify-center rounded-full text-sm font-semibold transition-all duration-300 bg-gradient-to-r from-[#FF8A1F] to-[#FF9E45] text-white hover:shadow-lg hover:shadow-[#FF8A1F]/30 hover:scale-[1.02]"
+            href={authenticated ? dashboardPath : "/signup"}
+            className="hidden sm:flex h-10 px-6 items-center justify-center rounded-full text-sm font-semibold transition-all duration-300 bg-[#FF8A1F] text-[#0B1F3A] hover:bg-[#ff9d3f] hover:shadow-lg hover:shadow-[#FF8A1F]/30 hover:scale-[1.02]"
           >
-            Get Started
+            {authenticated ? "Open Dashboard" : "Get Started"}
             <ArrowUpRight className="ml-2 w-4 h-4" />
           </Link>
-          <MobileNav />
+          <MobileNav dashboardPath={dashboardPath} authenticated={authenticated} />
         </div>
       </div>
     </motion.header>

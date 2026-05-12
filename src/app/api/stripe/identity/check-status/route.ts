@@ -24,6 +24,10 @@ function mapVerificationStatus(status: Stripe.Identity.VerificationSession.Statu
   return "failed";
 }
 
+function isSchemaDriftError(message = "") {
+  return /schema cache|column .* does not exist|stripe_session_id/i.test(message);
+}
+
 export async function GET(request: NextRequest) {
   const sessionId = request.nextUrl.searchParams.get("sessionId");
 
@@ -38,41 +42,53 @@ export async function GET(request: NextRequest) {
     const adminClient = createSupabaseAdminClient();
 
     const stripeSession = await stripe.identity.verificationSessions.retrieve(sessionId);
-    const userId = stripeSession.metadata?.userId ?? null;
-
-    if (!userId) {
-      return NextResponse.json({ error: "Verification session is missing user metadata." }, { status: 500 });
-    }
+    const userId = stripeSession.metadata?.userId ?? requester.userId;
 
     if (requesterRole !== "admin" && requester.userId !== userId) {
       return NextResponse.json({ error: "Forbidden." }, { status: 403 });
     }
-    
+
     const dbStatus = mapVerificationStatus(stripeSession.status);
 
-    await adminClient
+    const { error: verificationUpdateError } = await adminClient
       .from("identity_verifications")
-      .update({ 
+      .update({
         status: dbStatus,
-        last_error: stripeSession.last_error?.reason || null
+        last_error: stripeSession.last_error?.reason || null,
       })
       .eq("stripe_session_id", sessionId);
 
+    if (verificationUpdateError && !isSchemaDriftError(verificationUpdateError.message)) {
+      return NextResponse.json({ error: verificationUpdateError.message }, { status: 500 });
+    }
+
     if (stripeSession.status === "verified") {
-      await adminClient
+      const { error: profileUpdateError } = await adminClient
         .from("profiles")
-        .update({ is_verified_identity: true })
-        .eq("user_id", userId);
+        .update({
+          is_verified_identity: true,
+          verification_status: "verified",
+          status: "approved",
+          profile_status: "approved",
+          visibility_status: "public",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", userId)
+        .in("status", ["pending", "pending_approval", "under_review", "submitted"]);
+
+      if (profileUpdateError && !isSchemaDriftError(profileUpdateError.message)) {
+        return NextResponse.json({ error: profileUpdateError.message }, { status: 500 });
+      }
     }
 
     return NextResponse.json({
       status: stripeSession.status,
+      dbStatus,
       lastError: stripeSession.last_error,
       userId,
     });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Failed to check verification status.";
+    const message = error instanceof Error ? error.message : "Failed to check verification status.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

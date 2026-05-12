@@ -26,14 +26,18 @@ export function generateStaticParams(): Params[] {
   });
 }
 
+function categoryLabel(slug: string): string {
+  return slug.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const resolved = await params;
   const citySlug = resolveCitySlug(resolved.city);
 
   if (!citySlug) {
     return createPageMetadata({
-      title: "Category",
-      description: "City category page.",
+      title: "City category",
+      description: "City category page for MasseurMatch.",
       path: `/cities/${resolved.city}/${resolved.category}`,
       noIndex: true,
     });
@@ -42,8 +46,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const city = getCities().find((entry) => entry.slug === citySlug);
   if (!city) {
     return createPageMetadata({
-      title: "Category",
-      description: "City category page.",
+      title: "City category",
+      description: "City category page for MasseurMatch.",
       path: `/cities/${resolved.city}/${resolved.category}`,
       noIndex: true,
     });
@@ -53,18 +57,21 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const category = getCanonicalCategoryForCity(canonicalCity, resolved.category);
   if (!category) {
     return createPageMetadata({
-      title: "Category",
-      description: "City category page.",
+      title: "City category",
+      description: "City category page for MasseurMatch.",
       path: `/cities/${canonicalCity}/${resolved.category}`,
       noIndex: true,
     });
   }
 
+  const therapists = await getPublicTherapists({ city: city.name, page: 1, pageSize: 1 });
+
   return createPageMetadata({
-    title: category.title,
-    description: category.intro,
+    title: `${category.label} in ${city.name}, ${city.stateCode}`,
+    description: `Browse ${category.label.toLowerCase()} options in ${city.name}, ${city.stateName}. Compare therapist profiles, availability, incall, outcall, trust signals, and direct contact options.`,
     path: `/cities/${canonicalCity}/${category.slug}`,
-    keywords: [category.primaryKeyword, `male massage ${city.name.toLowerCase()}`],
+    keywords: [category.primaryKeyword, `massage therapists ${city.name.toLowerCase()}`, `${city.stateName.toLowerCase()} massage directory`],
+    noIndex: therapists.total === 0,
   });
 }
 
@@ -115,29 +122,29 @@ export default async function CanonicalCityCategoryPage({ params }: { params: Pr
     .slice(0, 10)
     .map((slug) => ({
       href: `${cityPath}/${slug}`,
-      label: slug.replace(/-/g, " "),
+      label: categoryLabel(slug),
     }));
 
   const faq = [
     {
       question: `How should I use the ${category.label.toLowerCase()} page in ${city.name}?`,
       answer:
-        "Use this page as a high-intent filter, then compare profile trust signals, session format, and starting rates before direct outreach.",
+        "Use this page as a focused local filter, then compare profile trust signals, session format, pricing, availability, and specialties before direct outreach.",
     },
     {
       question: "Are profile listings verified?",
       answer:
-        "Verification status is shown where available, alongside profile completeness and clear contact expectations.",
+        "Verification status is shown where available, alongside profile completeness, service details, and clear direct contact expectations.",
     },
     {
-      question: `Does this ${city.name} page support mobile and hotel intent?`,
+      question: `Does this ${city.name} page support mobile, incall, outcall, and hotel intent?`,
       answer:
-        "Yes. Session-specific pages for outcall, mobile, and hotel are linked directly from this route.",
+        "Yes. Session-specific pages for incall, outcall, mobile, and hotel massage are linked from city routes where enough local inventory exists.",
     },
     {
       question: "What if I want a nearby neighborhood instead?",
       answer:
-        "Use neighborhood links to switch from broad city intent to micro-area pages like Oak Lawn, Uptown, or airport corridors.",
+        "Use neighborhood links to move from broad city intent to a more specific local discovery page.",
     },
   ];
 
@@ -146,14 +153,15 @@ export default async function CanonicalCityCategoryPage({ params }: { params: Pr
       <JsonLd
         data={buildBreadcrumbJsonLd([
           { name: "Home", path: "/" },
+          { name: "Cities", path: "/cities" },
           { name: city.name, path: cityPath },
           { name: category.label, path: currentPath },
         ])}
       />
       <JsonLd
         data={buildCollectionPageJsonLd({
-          name: `${category.label} in ${city.name}`,
-          description: category.intro,
+          name: `${category.label} in ${city.name}, ${city.stateCode}`,
+          description: `Local discovery route for ${category.label.toLowerCase()} in ${city.name}, ${city.stateName}.`,
           path: currentPath,
         })}
       />
@@ -172,15 +180,18 @@ export default async function CanonicalCityCategoryPage({ params }: { params: Pr
       <section className="page-shell py-10">
         <div className="space-y-8">
           <header className="rounded-3xl border border-border bg-background p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{category.kind} Template</p>
-            <h1 className="mt-2 text-3xl font-semibold text-foreground">{category.h1}</h1>
-            <p className="mt-3 max-w-4xl text-sm leading-7 text-muted-foreground">{category.intro}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{category.kind} route</p>
+            <h1 className="mt-2 text-3xl font-semibold text-foreground">{category.label} in {city.name}, {city.stateCode}</h1>
+            <p className="mt-3 max-w-4xl text-sm leading-7 text-muted-foreground">
+              Browse {category.label.toLowerCase()} options in {city.name}. This page is part of MasseurMatch’s national city, state,
+              specialty, incall, and outcall SEO structure for the United States.
+            </p>
           </header>
 
           <section className="rounded-3xl border border-border bg-background p-6">
             <h2 className="text-2xl font-semibold text-foreground">Listings in this route</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Cards prioritize modality, neighborhood context, session format, pricing entry point, and verification cues.
+              Cards prioritize modality, local context, session format, pricing entry point, availability, and verification cues.
             </p>
             {therapists.items.length > 0 ? (
               <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -195,21 +206,21 @@ export default async function CanonicalCityCategoryPage({ params }: { params: Pr
                     <p className="mt-2 text-xs text-muted-foreground">
                       {therapist.incall_price ? `Incall from $${therapist.incall_price}` : "Incall not listed"} • {therapist.outcall_price ? `Outcall from $${therapist.outcall_price}` : "Outcall not listed"}
                     </p>
-                    <p className="mt-2 text-xs text-muted-foreground">Verified: {therapist._tier && therapist._tier !== "free" ? "Yes" : "Directory"} • Experience: 4+ years</p>
+                    <p className="mt-2 text-xs text-muted-foreground">Verification: {therapist._tier && therapist._tier !== "free" ? "Enhanced profile" : "Directory profile"}</p>
                   </article>
                 ))}
               </div>
             ) : (
-              <p className="mt-4 text-sm text-muted-foreground">No profiles matched this route yet. Keep this page live for regional intent consolidation while inventory grows.</p>
+              <p className="mt-4 text-sm text-muted-foreground">No profiles matched this route yet. This page should stay followable and only become indexable when inventory exists.</p>
             )}
           </section>
 
           <section className="rounded-3xl border border-border bg-background p-6">
-            <h2 className="text-2xl font-semibold text-foreground">Popular Neighborhoods</h2>
+            <h2 className="text-2xl font-semibold text-foreground">Neighborhood Discovery</h2>
             <div className="mt-3 flex flex-wrap gap-2">
               {DALLAS_NEIGHBORHOOD_SLUGS.map((slug) => (
                 <Link key={slug} href={`${cityPath}/${slug}`} className="rounded-full border border-border px-3 py-2 text-xs font-semibold text-foreground">
-                  {slug.replace(/-/g, " ")}
+                  {categoryLabel(slug)}
                 </Link>
               ))}
             </div>
@@ -218,7 +229,7 @@ export default async function CanonicalCityCategoryPage({ params }: { params: Pr
             <div className="mt-3 flex flex-wrap gap-2">
               {DALLAS_SERVICE_SLUGS.map((slug) => (
                 <Link key={slug} href={`${cityPath}/${slug}`} className="rounded-full border border-border px-3 py-2 text-xs font-semibold text-foreground">
-                  {slug.replace(/-/g, " ")}
+                  {categoryLabel(slug)}
                 </Link>
               ))}
             </div>
@@ -227,7 +238,7 @@ export default async function CanonicalCityCategoryPage({ params }: { params: Pr
             <div className="mt-3 flex flex-wrap gap-2">
               {DALLAS_SESSION_SLUGS.map((slug) => (
                 <Link key={slug} href={`${cityPath}/${slug}`} className="rounded-full border border-border px-3 py-2 text-xs font-semibold text-foreground">
-                  {slug.replace(/-/g, " ")}
+                  {categoryLabel(slug)}
                 </Link>
               ))}
             </div>
@@ -237,18 +248,18 @@ export default async function CanonicalCityCategoryPage({ params }: { params: Pr
             <h2 className="text-2xl font-semibold text-foreground">How Direct Contact Works</h2>
             <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm leading-7 text-muted-foreground">
               <li>Open a relevant profile from this route.</li>
-              <li>Review modalities, session format, and starting rate.</li>
-              <li>Use direct contact channel to confirm logistics and fit.</li>
-              <li>Use neighborhood or service sibling links when intent changes.</li>
+              <li>Review modalities, session format, starting rate, trust indicators, and availability.</li>
+              <li>Use the listed direct contact channel to confirm logistics and fit.</li>
+              <li>Use related city, service, or neighborhood links when intent changes.</li>
             </ol>
           </section>
 
           <section className="rounded-3xl border border-border bg-background p-6">
             <h2 className="text-2xl font-semibold text-foreground">Guides Supporting This Route</h2>
             <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
-              <Link href="/guides/deep-tissue-vs-swedish-massage-for-men" className="rounded-full border border-border px-3 py-2 text-foreground">Deep Tissue vs Swedish</Link>
-              <Link href="/guides/incall-vs-outcall-dallas" className="rounded-full border border-border px-3 py-2 text-foreground">Incall vs Outcall</Link>
-              <Link href="/guides/oak-lawn-male-massage-guide" className="rounded-full border border-border px-3 py-2 text-foreground">Oak Lawn Guide</Link>
+              <Link href="/guides" className="rounded-full border border-border px-3 py-2 text-foreground">Massage Guides</Link>
+              <Link href="/therapists" className="rounded-full border border-border px-3 py-2 text-foreground">Therapist Directory</Link>
+              <Link href="/for-therapists" className="rounded-full border border-border px-3 py-2 text-foreground">List Your Profile</Link>
             </div>
           </section>
 
