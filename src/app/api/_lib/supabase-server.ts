@@ -8,7 +8,7 @@ import { RouteError } from "@/app/api/_lib/http";
 import { getRequestSession, type RequestSession } from "@/app/api/_lib/session";
 import type { Database, Json } from "@/integrations/supabase/types";
 
-type AppRole = "admin" | "therapist";
+export type AppRole = "admin" | "provider" | "client";
 
 function getSupabaseUrl() {
   return envAny(["SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL", "VITE_SUPABASE_URL"]);
@@ -69,8 +69,13 @@ export async function getUserRole(userId: string): Promise<AppRole | null> {
     throw new RouteError(500, error.message);
   }
 
-  const roleRow = data as { role: AppRole } | null;
-  return roleRow?.role ?? null;
+  const role = typeof data?.role === "string" ? data.role : null;
+
+  if (role === "admin" || role === "provider" || role === "client") {
+    return role;
+  }
+
+  return null;
 }
 
 export async function requireSession(request: Request): Promise<RequestSession> {
@@ -215,7 +220,7 @@ export async function ensureUserProfileAndRole(
   } = {},
 ) {
   const adminClient = createSupabaseAdminClient();
-  const defaultRole = options.defaultRole ?? "therapist";
+  const defaultRole = options.defaultRole ?? "provider";
   const fullName = deriveUserDisplayName(user, options.fallbackName);
 
   const { data: existingProfile, error: existingProfileError } = await adminClient
@@ -272,7 +277,7 @@ export async function ensureUserProfileAndRole(
           id: user.id,
           email: user.email,
           full_name: fullName,
-          role: role === "admin" ? "admin" : "therapist",
+          role,
         },
         { onConflict: "id" },
       );
@@ -303,7 +308,7 @@ export async function createTherapistUser(input: {
       emailRedirectTo: input.emailRedirectTo,
       data: {
         full_name: input.fullName,
-        role: "therapist",
+        role: "provider",
       },
     },
   };
@@ -333,7 +338,7 @@ export async function createTherapistUser(input: {
     email_confirm: true,
     user_metadata: {
       full_name: input.fullName,
-      role: "therapist",
+      role: "provider",
     },
   });
 
@@ -342,7 +347,7 @@ export async function createTherapistUser(input: {
   }
 
   await ensureUserProfileAndRole(created.user, {
-    defaultRole: "therapist",
+    defaultRole: "provider",
     fallbackName: input.fullName,
   });
 
