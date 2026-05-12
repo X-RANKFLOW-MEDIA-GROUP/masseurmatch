@@ -20,18 +20,21 @@ export interface Database {
       user_roles: {
         Row: {
           user_id: string;
-          role: "admin" | "provider" | "client";
+          role: string;
           created_at?: string | null;
+          updated_at?: string | null;
         };
         Insert: {
           user_id: string;
-          role: "admin" | "provider" | "client";
+          role?: string;
           created_at?: string | null;
+          updated_at?: string | null;
         };
         Update: Partial<{
           user_id: string;
-          role: "admin" | "provider" | "client";
+          role: string;
           created_at?: string | null;
+          updated_at?: string | null;
         }>;
         Relationships: [];
       };
@@ -68,8 +71,8 @@ export interface Database {
       };
     };
     Enums: {
-      app_role: "admin" | "provider" | "client";
-      [key: string]: "admin" | "provider" | "client";
+      app_role: string;
+      [key: string]: string;
     };
     CompositeTypes: Record<string, never>;
   };
