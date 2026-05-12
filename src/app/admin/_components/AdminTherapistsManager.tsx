@@ -197,6 +197,8 @@ export default function AdminTherapistsManager({
 
               <div className="mt-6 grid gap-3 md:grid-cols-4">
                 <select
+                  aria-label={`Admin action for ${name}`}
+                  title={`Admin action for ${name}`}
                   value={draft.action}
                   onChange={(event) =>
                     updateDraft(therapist.id, { action: event.target.value as TherapistAction })
