@@ -59,9 +59,13 @@ export async function GET(
     return NextResponse.json({ error: "Contact is unavailable." }, { status: 404 });
   }
 
-  await adminClient.rpc("increment_profile_contact_clicks", {
-    p_profile_id: profile.id,
-  });
+  try {
+    await adminClient.rpc("increment_profile_contact_clicks", {
+      p_profile_id: profile.id,
+    });
+  } catch {
+    // Contact redirects should remain available even if analytics tracking fails.
+  }
 
   return NextResponse.redirect(redirectUrl, { status: 302 });
 }
