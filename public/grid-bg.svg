@@ -1,15 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" fill="none">
-  <rect width="240" height="240" fill="transparent" />
-  <g stroke="rgba(252,251,248,0.2)" stroke-width="1">
-    <path d="M0 40H240" />
-    <path d="M0 80H240" />
-    <path d="M0 120H240" />
-    <path d="M0 160H240" />
-    <path d="M0 200H240" />
-    <path d="M40 0V240" />
-    <path d="M80 0V240" />
-    <path d="M120 0V240" />
-    <path d="M160 0V240" />
-    <path d="M200 0V240" />
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400" fill="none">
+  <defs>
+    <pattern id="grid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <!-- Grid lines -->
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(252,251,248,0.12)" stroke-width="0.75"/>
+      <!-- Dot at each intersection -->
+      <circle cx="0" cy="0" r="1.2" fill="rgba(252,251,248,0.18)"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="400" fill="url(#grid)"/>
 </svg>
