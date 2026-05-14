@@ -16,15 +16,8 @@ import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildFaqJsonLd, build
 
 type Params = { city: string; category: string };
 
-export const revalidate = 60;
-
-export function generateStaticParams(): Params[] {
-  return getCities().flatMap((city) => {
-    const canonical = getCanonicalCitySlug(city.slug);
-    const categories = getCityCanonicalCategorySlugs(canonical);
-    return categories.map((category) => ({ city: canonical, category }));
-  });
-}
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 function categoryLabel(slug: string): string {
   return slug.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
