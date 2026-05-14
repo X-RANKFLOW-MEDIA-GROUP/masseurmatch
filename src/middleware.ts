@@ -17,8 +17,10 @@ type MiddlewareSession = {
   expiresAt: string;
 };
 
-function permanentRedirect(path: string): NextResponse {
-  return NextResponse.redirect(path, 301);
+// FIXED: must use absolute URL (new URL) — relative strings cause Next.js Edge
+// to emit a 307 instead of the requested 301.
+function permanentRedirect(path: string, request: NextRequest): NextResponse {
+  return NextResponse.redirect(new URL(path, request.url), 301);
 }
 
 function getSessionSecret(): string {
@@ -90,7 +92,6 @@ async function readSessionCookie(request: NextRequest): Promise<MiddlewareSessio
   }
 }
 
-
 const PUBLIC_RATE_LIMIT = { windowMs: 60_000, max: 240 };
 const publicHits = new Map<string, { count: number; resetAt: number }>();
 
@@ -118,8 +119,7 @@ function isPublicRateLimited(request: NextRequest): boolean {
   current.count += 1;
   return false;
 }
-// Maps ?city= display values to /explore/usa/{slug} paths.
-// Keys are lowercase — always .toLowerCase().trim() before lookup.
+
 const EXPLORE_CITY_SLUG_MAP: Record<string, string> = {
   "dallas": "dallas",
   "miami": "miami",
@@ -191,45 +191,41 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   // ── 1. Removed routes → 301 redirects ───────────────────────────────────
   if (pathname === "/wireframes" || pathname.startsWith("/wireframes/")) {
-    return permanentRedirect("/");
+    return permanentRedirect("/", request);
   }
 
   if (pathname === "/chat" || pathname.startsWith("/chat/")) {
-    return permanentRedirect("/explore");
+    return permanentRedirect("/explore", request);
   }
 
   if (pathname === "/pro/travel" || pathname.startsWith("/pro/travel/")) {
-    return permanentRedirect("/pro/dashboard");
+    return permanentRedirect("/pro/dashboard", request);
   }
 
   if (pathname === "/Auth") {
-    return permanentRedirect("/auth");
+    return permanentRedirect("/auth", request);
   }
 
   if (pathname === "/Privacy") {
-    return permanentRedirect("/privacy");
+    return permanentRedirect("/privacy", request);
   }
 
   if (pathname === "/admin/reviews" || pathname.startsWith("/admin/reviews/")) {
-    return permanentRedirect("/admin/moderation");
+    return permanentRedirect("/admin/moderation", request);
   }
 
   // ── 2. /explore?city=X  →  301 /explore/usa/{slug} ───────────────────────
-  // Cleans up parameterized browse URLs that Google indexed.
   if (pathname === "/explore" && searchParams.has("city")) {
     const slug = exploreCityToSlug(searchParams.get("city")!);
-    return permanentRedirect(`/explore/usa/${slug}`);
+    return permanentRedirect(`/explore/usa/${slug}`, request);
   }
 
   // ── 3. /pt-br/  →  301 /pt-br ────────────────────────────────────────────
-  // Consolidates trailing-slash duplicate that GSC crawled as a separate URL.
   if (pathname === "/pt-br/") {
-    return permanentRedirect("/pt-br");
+    return permanentRedirect("/pt-br", request);
   }
 
   // ── 4. /explore/* →  noindex, follow header ─────────────────────────────
-  // Browse/directory pages are navigation aids, not SEO targets.
-  // follow keeps link equity flowing to the /massage/ landing pages.
   if (pathname === "/explore" || pathname.startsWith("/explore/")) {
     const response = NextResponse.next();
     response.headers.set("X-Robots-Tag", "noindex, follow");
@@ -258,12 +254,12 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     if (citySlug) {
       const legacyParts = parts.slice(2);
       if (legacyParts[0] === "massage-therapists") {
-        return permanentRedirect(`/${citySlug}`);
+        return permanentRedirect(`/${citySlug}`, request);
       }
       const destinationPath = legacyParts.length
         ? `/${citySlug}/${legacyParts.join("/")}`
         : `/${citySlug}`;
-      return permanentRedirect(destinationPath);
+      return permanentRedirect(destinationPath, request);
     }
   }
 
@@ -277,23 +273,23 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       const incomingCategory = parts[2];
 
       if (!incomingCategory) {
-        return permanentRedirect(`/${citySlug}`);
+        return permanentRedirect(`/${citySlug}`, request);
       }
 
       if (incomingCategory === "massage-therapists") {
-        return permanentRedirect(`/${citySlug}`);
+        return permanentRedirect(`/${citySlug}`, request);
       }
 
       if (canonicalNeighborhoods.has(incomingCategory)) {
-        return permanentRedirect(`/${citySlug}/areas/${incomingCategory}`);
+        return permanentRedirect(`/${citySlug}/areas/${incomingCategory}`, request);
       }
 
       const mappedLegacy = canonicalCategoryToLegacyParts(incomingCategory);
       if (mappedLegacy) {
-        return permanentRedirect(`/${citySlug}/${mappedLegacy.join("/")}`);
+        return permanentRedirect(`/${citySlug}/${mappedLegacy.join("/")}`, request);
       }
 
-      return permanentRedirect(`/${citySlug}/${incomingCategory}`);
+      return permanentRedirect(`/${citySlug}/${incomingCategory}`, request);
     }
   }
 
@@ -302,7 +298,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   if (topLevelParts.length === 2 && topLevelParts[1] === "massage-therapists") {
     const citySlug = resolveCitySlug(topLevelParts[0] || "");
     if (citySlug) {
-      return permanentRedirect(`/${citySlug}`);
+      return permanentRedirect(`/${citySlug}`, request);
     }
   }
 
@@ -310,12 +306,10 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   if (containsLangParam(searchParams)) {
     const cleaned = removeLangSearchParam(searchParams);
     const search = cleaned.toString();
-    return permanentRedirect(search ? `${pathname}?${search}` : pathname);
+    return permanentRedirect(search ? `${pathname}?${search}` : pathname, request);
   }
 
   // ── 9. Auth guards ────────────────────────────────────────────────────────
-  // Unauthenticated → /login (with redirect param)
-  // Authenticated but wrong role → / (home, no redirect param)
   if (pathname === "/pro" || pathname.startsWith("/pro/")) {
     if (!session) {
       const loginUrl = new URL("/login", request.url);

@@ -1,20 +1,144 @@
+@import "tailwindcss";
 
+/* ─────────────────────────────────────────────
+   MasseurMatch Design System
+   Tokens extracted from /how-it-works
+   ──────────────────────────────────────────── */
 :root {
-  --navy:   #0B1F3A;
-  --navy2:  #122846;
-  --navy3:  #1a3560;
-  --orange: #FF8A1F;
-  --orange2:#e67a10;
-  --blue:   #1E4B8F;
-  --cream:  #FCFBF8;
-  --cream2: #F0EEE8;
-  --muted:  rgba(252,251,248,0.5);
-  --line:   rgba(252,251,248,0.08);
+  /* Colors */
+  --mm-bg:          #FCFBF8;   /* page background */
+  --mm-dark:        #0B1F3A;   /* primary dark / headings */
+  --mm-accent:      #FF8A1F;   /* orange accent */
+  --mm-blue:        #1E4B8F;   /* mid blue */
+  --mm-muted:       #6B7280;   /* body muted text */
+  --mm-border:      rgba(11,31,58,0.08);
+  --mm-white:       #FFFFFF;
+
+  /* Typography */
+  --mm-font-heading: 'Georgia', 'Times New Roman', serif;
+  --mm-font-body:    system-ui, -apple-system, sans-serif;
+
+  /* Label style */
+  --mm-label-size:    11px;
+  --mm-label-spacing: 0.22em;
 }
 
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior: smooth; }
-:root {
-  --navy: #0B1F3A;
-  --navy2: #122846;
+/* ── Base ── */
+html {
+  background: var(--mm-bg);
+  color: var(--mm-dark);
+}
+
+body {
+  background: var(--mm-bg);
+  color: var(--mm-dark);
+  font-family: var(--mm-font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Headings use serif like how-it-works ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--mm-font-heading);
+  font-weight: 400;
+  color: var(--mm-dark);
+}
+
+/* ── Eyebrow / section label utility ── */
+.mm-label {
+  font-family: var(--mm-font-body);
+  font-size: var(--mm-label-size);
+  letter-spacing: var(--mm-label-spacing);
+  text-transform: uppercase;
+  color: var(--mm-accent);
+}
+
+/* ── CTA buttons ── */
+.mm-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 36px;
+  font-family: var(--mm-font-body);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: var(--mm-accent);
+  color: var(--mm-dark);
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.mm-btn-primary:hover {
+  background: #ff9d3f;
+}
+
+.mm-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 28px;
+  font-family: var(--mm-font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--mm-dark);
+  text-decoration: none;
+  border: 1px solid rgba(11,31,58,0.2);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.mm-btn-outline:hover {
+  border-color: var(--mm-dark);
+}
+
+/* On dark backgrounds */
+.mm-btn-outline-light {
+  color: #FCFBF8;
+  border-color: rgba(252,251,248,0.2);
+}
+.mm-btn-outline-light:hover {
+  border-color: rgba(252,251,248,0.6);
+}
+
+/* ── Section dividers ── */
+.mm-divider {
+  border: none;
+  border-top: 1px solid var(--mm-border);
+}
+
+/* ── Muted body text ── */
+.mm-body {
+  font-family: var(--mm-font-body);
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--mm-muted);
+}
+
+/* ── Tailwind custom utilities ── */
+@layer utilities {
+  .font-display {
+    font-family: var(--mm-font-heading);
+  }
+  .text-accent {
+    color: var(--mm-accent);
+  }
+  .text-mm-dark {
+    color: var(--mm-dark);
+  }
+  .text-mm-muted {
+    color: var(--mm-muted);
+  }
+  .bg-mm {
+    background-color: var(--mm-bg);
+  }
+  .bg-mm-dark {
+    background-color: var(--mm-dark);
+  }
+  .bg-mm-accent {
+    background-color: var(--mm-accent);
+  }
 }
