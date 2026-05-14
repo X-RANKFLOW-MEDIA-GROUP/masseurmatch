@@ -9,24 +9,14 @@ import {
   resolveDirectoryFilters,
   getSegmentBySlug,
 } from "@/app/_lib/directory-taxonomy";
-import { getLaunchKeywordPaths, isLaunchUrl } from "@/app/_lib/launch-urls";
+import { isLaunchUrl } from "@/app/_lib/launch-urls";
 import { createPageMetadata } from "@/app/_lib/metadata";
 import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd } from "@/app/_lib/structured-data";
 
 type Params = { city: string; segment: string; keyword: string };
 
-export const revalidate = 60;
-
-export function generateStaticParams(): Params[] {
-  return getLaunchKeywordPaths().map((path) => {
-    const [city, segment, keyword] = path.split("/").filter(Boolean);
-    return {
-      city: city || "",
-      segment: segment || "",
-      keyword: keyword || "",
-    };
-  });
-}
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 async function fetchKeywordTherapists(cityName: string, segmentSlug: string, keywordSlug: string) {
   return getPublicTherapists({
