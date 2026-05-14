@@ -14,7 +14,7 @@ const PUBLIC_PROFILE_SELECT = `
   height_inches, weight_lb, body_type,
   years_experience, languages,
   subscription_tier, verification_status, is_featured,
-  promotions, updated_at, profile_status, visibility_status,
+  promotions, updated_at, status, profile_status, visibility_status,
   is_suspended, is_banned, available_now, available_now_expires,
   lgbtq_affirming, business_hours, custom_faq, pricing_sessions, areas_served,
   outcall_radius_miles, travel_schedule, add_ons, training, education, contact_clicks,
@@ -86,9 +86,9 @@ export interface PublicTherapist {
   massage_techniques: string[] | null;
   specialties: string[] | null;
   subscription_tier: TherapistTier | null;
+  status?: string | null;
   profile_status: string | null;
   visibility_status: string | null;
-  status?: string | null;
   incall_price: number | null;
   outcall_price: number | null;
   starting_price: number | null;
