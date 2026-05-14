@@ -9,7 +9,7 @@ import {
   resolveDirectoryFilters,
   getSegmentBySlug,
 } from "@/app/_lib/directory-taxonomy";
-import { getLaunchKeywordPaths, isLaunchUrl } from "@/app/_lib/launch-urls";
+import { isLaunchUrl } from "@/app/_lib/launch-urls";
 import { createPageMetadata } from "@/app/_lib/metadata";
 import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd } from "@/app/_lib/structured-data";
 

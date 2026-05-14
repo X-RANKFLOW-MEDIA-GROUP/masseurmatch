@@ -4,6 +4,9 @@ import { createClient } from "@supabase/supabase-js";
 import { setSessionCookie } from "@/app/api/_lib/session";
 import { ensureUserProfileAndRole } from "@/app/api/_lib/supabase-server";
 
+type SessionRole = "admin" | "provider" | "client" | null;
+const DEFAULT_PROVIDER_ROLE = "provider" as never;
+
 function getSupabaseUrl() {
   return (
     process.env.SUPABASE_URL ||
@@ -62,7 +65,7 @@ export async function GET(request: NextRequest) {
   }
 
   const user = data.session.user;
-  let role: "admin" | "provider" | "client" | null = null;
+  let role: SessionRole = null;
   let profileCreated = false;
   let fullName =
     typeof user.user_metadata?.full_name === "string"
@@ -77,10 +80,10 @@ export async function GET(request: NextRequest) {
     });
 
     const ensured = await ensureUserProfileAndRole(user, {
-      defaultRole: "provider",
+      defaultRole: DEFAULT_PROVIDER_ROLE,
     });
 
-    role = ensured.role;
+    role = ensured.role as SessionRole;
     profileCreated = ensured.profileCreated;
     fullName = ensured.fullName;
 

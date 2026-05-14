@@ -6,7 +6,6 @@ import {
   type BlogPost,
   type BlogSection,
   getBlogPost,
-  getBlogSlugs,
   getRelatedPosts,
 } from "@/app/_lib/blog-data";
 

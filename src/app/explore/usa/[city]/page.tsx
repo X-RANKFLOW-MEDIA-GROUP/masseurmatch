@@ -14,7 +14,8 @@ import ExplorePageClient from "../../ExplorePageClient";
 
 type Params = { city: string };
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 function getExploreCity(slug: string) {
   return getCities().find((city) => city.slug === slug);
