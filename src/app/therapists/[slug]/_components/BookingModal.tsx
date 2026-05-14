@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import type { PublicTherapist } from "@/app/_lib/directory";
@@ -91,7 +92,6 @@ export default function BookingModal({
     const startTime = new Date(`${date}T${time}:00`);
     const endTime = new Date(startTime.getTime() + service.duration * 60000);
 
-    // 1. Create appointment
     const apptRes = await fetch("/api/appointments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -115,7 +115,6 @@ export default function BookingModal({
     const apptData = await apptRes.json();
     setAppointmentId(apptData.appointment.id);
 
-    // 2. Create payment intent
     const piRes = await fetch("/api/stripe/payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -144,7 +143,6 @@ export default function BookingModal({
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-        {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <div>
             <h2 className="font-bold text-gray-900 text-lg">Book with {therapist.display_name || therapist.full_name}</h2>
@@ -154,7 +152,6 @@ export default function BookingModal({
         </div>
 
         <div className="p-5">
-          {/* Step: Success */}
           {step === "success" && (
             <div className="text-center py-8">
               <div className="text-5xl mb-4">🎉</div>
@@ -162,16 +159,15 @@ export default function BookingModal({
               <p className="text-gray-500 text-sm mb-6">
                 Your {service.label} session has been booked. You&apos;ll receive a confirmation shortly.
               </p>
-              <a
+              <Link
                 href="/client/bookings"
                 className="inline-block bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-700 font-medium"
               >
                 View My Bookings
-              </a>
+              </Link>
             </div>
           )}
 
-          {/* Step: Select service */}
           {step === "select" && (
             <div className="space-y-4">
               <h3 className="font-semibold text-gray-800">Choose a Service</h3>
@@ -203,7 +199,6 @@ export default function BookingModal({
             </div>
           )}
 
-          {/* Step: Date & Time */}
           {step === "datetime" && (
             <div className="space-y-4">
               <button onClick={() => setStep("select")} className="text-sm text-gray-500 hover:text-gray-700">← Back</button>
@@ -245,7 +240,6 @@ export default function BookingModal({
                 />
               </div>
 
-              {/* Summary */}
               <div className="bg-gray-50 rounded-xl p-3 text-sm">
                 <div className="flex justify-between text-gray-600"><span>{service.label}</span><span>{service.duration} min</span></div>
                 <div className="flex justify-between font-bold text-gray-900 mt-1"><span>Total</span><span>${(service.price_cents / 100).toFixed(2)}</span></div>
@@ -263,7 +257,6 @@ export default function BookingModal({
             </div>
           )}
 
-          {/* Step: Payment */}
           {step === "payment" && clientSecret && (
             <div className="space-y-4">
               <button onClick={() => setStep("datetime")} className="text-sm text-gray-500 hover:text-gray-700">← Back</button>

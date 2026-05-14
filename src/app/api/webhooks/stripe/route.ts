@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-01-27.acacia' })
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-08-27.basil' })
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
@@ -25,7 +25,6 @@ export async function POST(request: NextRequest) {
         .update({ status: 'succeeded', updated_at: new Date().toISOString() })
         .eq('stripe_payment_intent_id', pi.id)
 
-      // Confirm the appointment
       if (pi.metadata.appointment_id) {
         await supabase
           .from('appointments')
