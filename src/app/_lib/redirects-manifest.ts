@@ -1,6 +1,9 @@
 /**
  * Central redirect manifest. Mirrors next.config.mjs redirects().
  * permanent: true means Next.js serves HTTP 308, treated as permanent by search engines.
+ *
+ * Canonical SEO direction:
+ * legacy /city/* and /cities/* URLs redirect to the current top-level city routes.
  */
 
 export type LegacyRedirect = {
@@ -10,6 +13,7 @@ export type LegacyRedirect = {
 };
 
 export const legacyRedirects: LegacyRedirect[] = [
+  // Legacy /city/{slug} aliases.
   { source: "/city/dallas", destination: "/dallas", permanent: true },
   { source: "/city/plano", destination: "/plano", permanent: true },
   { source: "/city/irving", destination: "/irving", permanent: true },
@@ -29,36 +33,46 @@ export const legacyRedirects: LegacyRedirect[] = [
   { source: "/city/seattle", destination: "/seattle", permanent: true },
   { source: "/city/denver", destination: "/denver", permanent: true },
   { source: "/city/phoenix", destination: "/phoenix", permanent: true },
-  { source: "/dallas", destination: "/cities/dallas-tx", permanent: true },
-  { source: "/plano", destination: "/cities/plano-tx", permanent: true },
-  { source: "/irving", destination: "/cities/irving-tx", permanent: true },
-  { source: "/highland-park", destination: "/cities/highland-park-tx", permanent: true },
-  { source: "/fort-worth", destination: "/cities/fort-worth-tx", permanent: true },
-  { source: "/houston", destination: "/cities/houston-tx", permanent: true },
-  { source: "/austin", destination: "/cities/austin-tx", permanent: true },
-  { source: "/los-angeles", destination: "/cities/los-angeles-ca", permanent: true },
-  { source: "/miami", destination: "/cities/miami-fl", permanent: true },
-  { source: "/new-york", destination: "/cities/new-york-ny", permanent: true },
-  { source: "/chicago", destination: "/cities/chicago-il", permanent: true },
-  { source: "/san-diego", destination: "/cities/san-diego-ca", permanent: true },
-  { source: "/fort-lauderdale", destination: "/cities/fort-lauderdale-fl", permanent: true },
-  { source: "/wilton-manors", destination: "/cities/wilton-manors-fl", permanent: true },
-  { source: "/west-hollywood", destination: "/cities/west-hollywood-ca", permanent: true },
-  { source: "/atlanta", destination: "/cities/atlanta-ga", permanent: true },
-  { source: "/seattle", destination: "/cities/seattle-wa", permanent: true },
-  { source: "/denver", destination: "/cities/denver-co", permanent: true },
-  { source: "/phoenix", destination: "/cities/phoenix-az", permanent: true },
-  { source: "/dallas/lgbtq-friendly", destination: "/cities/dallas-tx/gay-massage", permanent: true },
-  { source: "/dallas/male-therapists", destination: "/cities/dallas-tx/male-massage", permanent: true },
-  { source: "/dallas/wellness/deep-tissue", destination: "/cities/dallas-tx/deep-tissue", permanent: true },
-  { source: "/dallas/wellness/outcall", destination: "/cities/dallas-tx/outcall", permanent: true },
-  { source: "/dallas/wellness/incall", destination: "/cities/dallas-tx/incall", permanent: true },
-  { source: "/dallas/wellness/swedish", destination: "/cities/dallas-tx/swedish", permanent: true },
-  { source: "/dallas/wellness/sports-recovery", destination: "/cities/dallas-tx/sports-massage", permanent: true },
-  { source: "/dallas/wellness/mobile-massage", destination: "/cities/dallas-tx/mobile", permanent: true },
-  { source: "/dallas/wellness/hotel-massage", destination: "/cities/dallas-tx/hotel", permanent: true },
+
+  // Legacy /cities/{city-state} aliases.
+  { source: "/cities/dallas-tx", destination: "/dallas", permanent: true },
+  { source: "/cities/plano-tx", destination: "/plano", permanent: true },
+  { source: "/cities/irving-tx", destination: "/irving", permanent: true },
+  { source: "/cities/highland-park-tx", destination: "/highland-park", permanent: true },
+  { source: "/cities/fort-worth-tx", destination: "/fort-worth", permanent: true },
+  { source: "/cities/houston-tx", destination: "/houston", permanent: true },
+  { source: "/cities/austin-tx", destination: "/austin", permanent: true },
+  { source: "/cities/los-angeles-ca", destination: "/los-angeles", permanent: true },
+  { source: "/cities/miami-fl", destination: "/miami", permanent: true },
+  { source: "/cities/new-york-ny", destination: "/new-york", permanent: true },
+  { source: "/cities/chicago-il", destination: "/chicago", permanent: true },
+  { source: "/cities/san-diego-ca", destination: "/san-diego", permanent: true },
+  { source: "/cities/fort-lauderdale-fl", destination: "/fort-lauderdale", permanent: true },
+  { source: "/cities/wilton-manors-fl", destination: "/wilton-manors", permanent: true },
+  { source: "/cities/west-hollywood-ca", destination: "/west-hollywood", permanent: true },
+  { source: "/cities/atlanta-ga", destination: "/atlanta", permanent: true },
+  { source: "/cities/seattle-wa", destination: "/seattle", permanent: true },
+  { source: "/cities/denver-co", destination: "/denver", permanent: true },
+  { source: "/cities/phoenix-az", destination: "/phoenix", permanent: true },
+
+  // Dallas service aliases under /cities/dallas-tx/*.
+  { source: "/cities/dallas-tx/gay-massage", destination: "/dallas/lgbtq-friendly", permanent: true },
+  { source: "/cities/dallas-tx/male-massage", destination: "/dallas/male-therapists", permanent: true },
+  { source: "/cities/dallas-tx/deep-tissue", destination: "/dallas/wellness/deep-tissue", permanent: true },
+  { source: "/cities/dallas-tx/outcall", destination: "/dallas/wellness/outcall", permanent: true },
+  { source: "/cities/dallas-tx/incall", destination: "/dallas/wellness/incall", permanent: true },
+  { source: "/cities/dallas-tx/swedish", destination: "/dallas/wellness/swedish", permanent: true },
+  { source: "/cities/dallas-tx/sports-massage", destination: "/dallas/wellness/sports-recovery", permanent: true },
+  { source: "/cities/dallas-tx/mobile", destination: "/dallas/wellness/mobile-massage", permanent: true },
+  { source: "/cities/dallas-tx/hotel", destination: "/dallas/wellness/hotel-massage", permanent: true },
+
+  // Current legacy aliases.
   { source: "/massage-therapists", destination: "/therapists", permanent: true },
+  { source: "/washington-dc/massage-therapists", destination: "/washington-dc", permanent: true },
+  { source: "/city/:path*", destination: "/:path*", permanent: true },
 ];
+
+export const REDIRECTS = legacyRedirects;
 
 export const REDIRECTS_BY_SOURCE: ReadonlyMap<string, string> = new Map(
   legacyRedirects.map(({ source, destination }) => [source, destination]),
