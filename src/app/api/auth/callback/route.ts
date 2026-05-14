@@ -2,10 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 import { setSessionCookie } from "@/app/api/_lib/session";
-import { ensureUserProfileAndRole } from "@/app/api/_lib/supabase-server";
+import { ensureUserProfileAndRole, type AppRole } from "@/app/api/_lib/supabase-server";
 
-type SessionRole = "admin" | "provider" | "client" | null;
-const DEFAULT_PROVIDER_ROLE = "provider" as never;
+type SessionRole = AppRole | null;
 
 function getSupabaseUrl() {
   return (
@@ -80,7 +79,7 @@ export async function GET(request: NextRequest) {
     });
 
     const ensured = await ensureUserProfileAndRole(user, {
-      defaultRole: DEFAULT_PROVIDER_ROLE,
+      defaultRole: "provider",
     });
 
     role = ensured.role as SessionRole;
