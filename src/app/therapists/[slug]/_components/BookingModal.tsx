@@ -137,6 +137,9 @@ export default function BookingModal({
     setLoading(false);
   };
 
+  // suppress unused var warning — appointmentId used for future receipt display
+  void appointmentId;
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
@@ -202,7 +205,7 @@ export default function BookingModal({
           {step === "datetime" && (
             <div className="space-y-4">
               <button onClick={() => setStep("select")} className="text-sm text-gray-500 hover:text-gray-700">← Back</button>
-              <h3 className="font-semibold text-gray-800">Pick Date & Time</h3>
+              <h3 className="font-semibold text-gray-800">Pick Date &amp; Time</h3>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
