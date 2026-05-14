@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   ChevronDown,
   Menu,
@@ -14,6 +14,7 @@ import {
   Navigation,
   ArrowUpRight,
   LogIn,
+  LogOut,
 } from "lucide-react";
 import {
   Sheet,
@@ -82,7 +83,7 @@ function ExploreDropdown({ isDarkHero = false }: { isDarkHero?: boolean }) {
   );
 }
 
-function MobileNav({ dashboardPath, authenticated }: { dashboardPath: string; authenticated: boolean }) {
+function MobileNav({ dashboardPath, authenticated, onLogout }: { dashboardPath: string; authenticated: boolean; onLogout: () => void }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -155,13 +156,23 @@ function MobileNav({ dashboardPath, authenticated }: { dashboardPath: string; au
           >
             {authenticated ? "Dashboard" : "Log In"}
           </Link>
-          <Link
-            href={authenticated ? dashboardPath : "/signup"}
-            onClick={() => setOpen(false)}
-            className="block w-full text-center rounded-lg bg-[#FF8A1F] py-2.5 text-sm font-semibold text-[#0B1F3A] hover:bg-[#ff9d3f] transition-colors"
-          >
-            {authenticated ? "Open Dashboard" : "Get Started"}
-          </Link>
+          {authenticated ? (
+            <button
+              type="button"
+              onClick={() => { setOpen(false); onLogout(); }}
+              className="block w-full text-center rounded-lg bg-[#FF8A1F] py-2.5 text-sm font-semibold text-[#0B1F3A] hover:bg-[#ff9d3f] transition-colors"
+            >
+              Log Out
+            </button>
+          ) : (
+            <Link
+              href="/signup"
+              onClick={() => setOpen(false)}
+              className="block w-full text-center rounded-lg bg-[#FF8A1F] py-2.5 text-sm font-semibold text-[#0B1F3A] hover:bg-[#ff9d3f] transition-colors"
+            >
+              Get Started
+            </Link>
+          )}
         </div>
       </SheetContent>
     </Sheet>
@@ -173,6 +184,7 @@ export default function SiteHeader() {
   const [authenticated, setAuthenticated] = useState(false);
   const [dashboardPath, setDashboardPath] = useState("/login");
   const pathname = usePathname();
+  const router = useRouter();
   const isHomepage = pathname === "/";
 
   useEffect(() => {
@@ -200,6 +212,21 @@ export default function SiteHeader() {
       mounted = false;
     };
   }, []);
+
+  async function handleLogout() {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch {
+      // ignore
+    }
+    setAuthenticated(false);
+    setDashboardPath("/login");
+    router.push("/");
+    router.refresh();
+  }
 
   const isDarkHero = isHomepage && !isScrolled;
 
@@ -233,21 +260,42 @@ export default function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link
-            href={authenticated ? dashboardPath : "/login"}
-            className={`hidden md:flex px-4 py-2 text-sm font-medium transition-colors items-center gap-2 ${isDarkHero ? "text-white/80 hover:text-white" : "text-[#4A4F5C] hover:text-[#0B1F3A]"}`}
-          >
-            {authenticated ? null : <LogIn className="w-4 h-4" />}
-            {authenticated ? "Dashboard" : "Log in"}
-          </Link>
-          <Link
-            href={authenticated ? dashboardPath : "/signup"}
-            className="hidden sm:flex h-10 px-6 items-center justify-center rounded-full text-sm font-semibold transition-all duration-300 bg-[#FF8A1F] text-[#0B1F3A] hover:bg-[#ff9d3f] hover:shadow-lg hover:shadow-[#FF8A1F]/30 hover:scale-[1.02]"
-          >
-            {authenticated ? "Open Dashboard" : "Get Started"}
-            <ArrowUpRight className="ml-2 w-4 h-4" />
-          </Link>
-          <MobileNav dashboardPath={dashboardPath} authenticated={authenticated} />
+          {authenticated ? (
+            <>
+              <Link
+                href={dashboardPath}
+                className={`hidden md:flex px-4 py-2 text-sm font-medium transition-colors items-center gap-2 ${isDarkHero ? "text-white/80 hover:text-white" : "text-[#4A4F5C] hover:text-[#0B1F3A]"}`}
+              >
+                Dashboard
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className={`hidden md:flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors rounded-lg ${isDarkHero ? "text-white/70 hover:text-white hover:bg-white/10" : "text-[#4A4F5C] hover:text-[#0B1F3A] hover:bg-[#F4F6F9]"}`}
+              >
+                <LogOut className="w-4 h-4" />
+                Log out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className={`hidden md:flex px-4 py-2 text-sm font-medium transition-colors items-center gap-2 ${isDarkHero ? "text-white/80 hover:text-white" : "text-[#4A4F5C] hover:text-[#0B1F3A]"}`}
+              >
+                <LogIn className="w-4 h-4" />
+                Log in
+              </Link>
+              <Link
+                href="/signup"
+                className="hidden sm:flex h-10 px-6 items-center justify-center rounded-full text-sm font-semibold transition-all duration-300 bg-[#FF8A1F] text-[#0B1F3A] hover:bg-[#ff9d3f] hover:shadow-lg hover:shadow-[#FF8A1F]/30 hover:scale-[1.02]"
+              >
+                Get Started
+                <ArrowUpRight className="ml-2 w-4 h-4" />
+              </Link>
+            </>
+          )}
+          <MobileNav dashboardPath={dashboardPath} authenticated={authenticated} onLogout={handleLogout} />
         </div>
       </div>
     </motion.header>

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { clearSessionCookie, getRequestSession } from "@/app/api/_lib/session";
+import { getUserRole } from "@/app/api/_lib/supabase-server";
 
 function dashboardPathForRole(role: string | null | undefined) {
   if (role === "admin") return "/admin";
@@ -26,13 +27,22 @@ export async function GET(request: Request) {
     return response;
   }
 
+  // Always re-validate role from DB — cookie role can be stale after manual role changes
+  let role = session.role;
+  try {
+    const freshRole = await getUserRole(session.userId);
+    if (freshRole) role = freshRole;
+  } catch {
+    // Fall back to cookie role if DB lookup fails
+  }
+
   return noStoreJson({
     authenticated: true,
     user: {
       id: session.userId,
       email: session.email,
-      role: session.role,
+      role,
     },
-    dashboardPath: dashboardPathForRole(session.role),
+    dashboardPath: dashboardPathForRole(role),
   });
 }
