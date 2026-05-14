@@ -11,8 +11,8 @@ import {
 } from "@/app/_lib/blog-data";
 
 export async function generateStaticParams() {
-  const slugs = await getBlogSlugs();
-  return slugs.map((slug) => ({ slug }));
+  // Blog posts are rendered on demand to prevent a single heavy article from blocking deploy builds.
+  return [];
 }
 
 export const revalidate = 3600;

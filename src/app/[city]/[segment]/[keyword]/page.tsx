@@ -18,14 +18,8 @@ type Params = { city: string; segment: string; keyword: string };
 export const revalidate = 60;
 
 export function generateStaticParams(): Params[] {
-  return getLaunchKeywordPaths().map((path) => {
-    const [city, segment, keyword] = path.split("/").filter(Boolean);
-    return {
-      city: city || "",
-      segment: segment || "",
-      keyword: keyword || "",
-    };
-  });
+  // Generate long-tail local SEO routes on demand so production builds stay fast and reliable.
+  return [];
 }
 
 async function fetchKeywordTherapists(cityName: string, segmentSlug: string, keywordSlug: string) {

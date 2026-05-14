@@ -26,10 +26,8 @@ const AREA_GUIDE_MAP: Record<string, string> = {
 };
 
 export function generateStaticParams(): Params[] {
-  return getLaunchAreaPaths().map((path) => {
-    const [city, , area] = path.split("/").filter(Boolean);
-    return { city: city || "", area: area || "" };
-  });
+  // Generate long-tail local SEO routes on demand so production builds stay fast and reliable.
+  return [];
 }
 
 function formatAreaLabel(areaSlug: string) {

@@ -21,12 +21,8 @@ type Params = { slug: string };
 export const revalidate = 60;
 
 export async function generateStaticParams() {
-  try {
-    const res = await getPublicTherapists({ page: 1, pageSize: 200 });
-    return res.items.map((item) => ({ slug: item.slug || item.id }));
-  } catch {
-    return [];
-  }
+  // Public profiles are generated on demand to avoid build-time database dependency.
+  return [];
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {

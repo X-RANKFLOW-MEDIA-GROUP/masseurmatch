@@ -31,7 +31,8 @@ function getStateDirectory(stateSlug: string) {
 }
 
 export function generateStaticParams(): Params[] {
-  return Array.from(new Set(getCities().map((city) => toSlug(city.stateName)))).map((state) => ({ state }));
+  // Generate long-tail local SEO routes on demand so production builds stay fast and reliable.
+  return [];
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {

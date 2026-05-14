@@ -19,11 +19,8 @@ type Params = { city: string; category: string };
 export const revalidate = 60;
 
 export function generateStaticParams(): Params[] {
-  return getCities().flatMap((city) => {
-    const canonical = getCanonicalCitySlug(city.slug);
-    const categories = getCityCanonicalCategorySlugs(canonical);
-    return categories.map((category) => ({ city: canonical, category }));
-  });
+  // Generate long-tail local SEO routes on demand so production builds stay fast and reliable.
+  return [];
 }
 
 function categoryLabel(slug: string): string {
