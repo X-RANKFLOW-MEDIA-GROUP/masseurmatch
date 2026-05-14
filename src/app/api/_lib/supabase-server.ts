@@ -8,7 +8,7 @@ import { RouteError } from "@/app/api/_lib/http";
 import { getRequestSession, type RequestSession } from "@/app/api/_lib/session";
 import type { Database, Json } from "@/integrations/supabase/types";
 
-type AppRole = "admin" | "provider";
+export type AppRole = "admin" | "provider" | "client";
 
 function getSupabaseUrl() {
   return envAny(["SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL", "VITE_SUPABASE_URL"]);
@@ -69,8 +69,13 @@ export async function getUserRole(userId: string): Promise<AppRole | null> {
     throw new RouteError(500, error.message);
   }
 
-  const roleRow = data as { role: AppRole } | null;
-  return roleRow?.role ?? null;
+  const role = typeof data?.role === "string" ? data.role : null;
+
+  if (role === "admin" || role === "provider" || role === "client") {
+    return role;
+  }
+
+  return null;
 }
 
 export async function requireSession(request: Request): Promise<RequestSession> {
@@ -272,7 +277,7 @@ export async function ensureUserProfileAndRole(
           id: user.id,
           email: user.email,
           full_name: fullName,
-          role: role === "admin" ? "admin" : "therapist",
+          role,
         },
         { onConflict: "id" },
       );
