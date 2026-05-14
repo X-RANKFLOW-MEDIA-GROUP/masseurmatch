@@ -9,22 +9,13 @@ import { getRequestSession, type RequestSession } from "@/app/api/_lib/session";
 import type { Database, Json } from "@/integrations/supabase/types";
 
 export type AppRole = "admin" | "provider" | "client";
-type LegacyAuthRole = "admin" | "therapist";
 
 function normalizeAppRole(role: unknown): AppRole | null {
   if (role === "admin" || role === "provider" || role === "client") {
     return role;
   }
 
-  if (role === "therapist") {
-    return "provider";
-  }
-
   return null;
-}
-
-function toLegacyAuthRole(role: AppRole): LegacyAuthRole {
-  return role === "admin" ? "admin" : "therapist";
 }
 
 function getSupabaseUrl() {
@@ -253,6 +244,7 @@ export async function ensureUserProfileAndRole(
       email_address: user.email ?? null,
       full_name: fullName,
       display_name: fullName,
+      role: defaultRole,
       status: "pending",
       profile_status: "draft",
       visibility_status: "hidden",
@@ -288,7 +280,7 @@ export async function ensureUserProfileAndRole(
           id: user.id,
           email: user.email,
           full_name: fullName,
-          role: toLegacyAuthRole(role),
+          role,
         },
         { onConflict: "id" },
       );
@@ -311,7 +303,6 @@ export async function createTherapistUser(input: {
   emailRedirectTo: string;
 }) {
   const publicClient = createSupabasePublicClient();
-  const legacyRole: LegacyAuthRole = "therapist";
 
   const signUpPayload: Parameters<typeof publicClient.auth.signUp>[0] = {
     email: input.email,
@@ -320,7 +311,7 @@ export async function createTherapistUser(input: {
       emailRedirectTo: input.emailRedirectTo,
       data: {
         full_name: input.fullName,
-        role: legacyRole,
+        role: "provider",
       },
     },
   };
@@ -350,7 +341,7 @@ export async function createTherapistUser(input: {
     email_confirm: true,
     user_metadata: {
       full_name: input.fullName,
-      role: legacyRole,
+      role: "provider",
     },
   });
 
