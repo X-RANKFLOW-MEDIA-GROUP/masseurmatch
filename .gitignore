@@ -1,54 +1,64 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
 # Dependencies
-node_modules
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+/playwright-report
+/test-results
 
 # Next.js
-.next
-out
+/.next/
+/out/
 
-# Environment
-.env
-.env.*
-!.env.example
+# Production
+/build
 
-# Local runtime data
-.runtime
+# Misc
+.DS_Store
+*.pem
 
-# Logs
-*.log
-*.tsbuildinfo
+# Debug
 npm-debug.log*
-pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-test-results/
 
-dist
-dist-ssr
-*.local
-.lovable/
+# Local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Editors
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# Vercel
 .vercel
-.env*.local
 
-# Pasted/uploaded user assets
-attached_assets/
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
 
-# Local temporary debug artifacts
-.tmp-dev.*
-tmp/
+# CI/build artifacts — never commit these
+*.lint-report.json
+lint-report.json
+audit_report.json
+audit_report*.json
+repo_structure.txt
 
-# Generated Supabase manual migration bundle
-supabase/manual/apply_all_migrations.sql
+# Binary/media files in root — always use /public or CDN
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.avif
 
-# Local security tooling binaries
-bin/
+# Temp scripts
+fix_all.py
+audit.py
+
+# Planning docs (use GitHub Issues or /docs instead)
+issue-*.md
+*-pages.txt
