@@ -78,8 +78,9 @@ export async function GET(request: NextRequest) {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
+    const defaultRole: AppRole = "provider";
     const ensured = await ensureUserProfileAndRole(user, {
-      defaultRole: "provider",
+      defaultRole,
     });
 
     role = ensured.role as SessionRole;
