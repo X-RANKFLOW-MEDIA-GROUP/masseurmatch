@@ -18,16 +18,8 @@ import { buildProfileViewModel } from "@/components/profile/profile-utils";
 
 type Params = { slug: string };
 
-export const revalidate = 60;
-
-export async function generateStaticParams() {
-  try {
-    const res = await getPublicTherapists({ page: 1, pageSize: 200 });
-    return res.items.map((item) => ({ slug: item.slug || item.id }));
-  } catch {
-    return [];
-  }
-}
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const resolvedParams = await params;

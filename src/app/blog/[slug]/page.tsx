@@ -6,16 +6,11 @@ import {
   type BlogPost,
   type BlogSection,
   getBlogPost,
-  getBlogSlugs,
   getRelatedPosts,
 } from "@/app/_lib/blog-data";
 
-export async function generateStaticParams() {
-  const slugs = await getBlogSlugs();
-  return slugs.map((slug) => ({ slug }));
-}
-
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function generateMetadata({
   params,
