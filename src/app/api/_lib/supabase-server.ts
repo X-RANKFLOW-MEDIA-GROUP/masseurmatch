@@ -15,10 +15,6 @@ function normalizeAppRole(role: unknown): AppRole | null {
     return role;
   }
 
-  if (role === "therapist") {
-    return "provider";
-  }
-
   return null;
 }
 

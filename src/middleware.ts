@@ -13,9 +13,13 @@ const decoder = new TextDecoder();
 type MiddlewareSession = {
   userId: string;
   email: string;
-  role: "admin" | "provider" | "therapist" | "client" | null;
+  role: "admin" | "provider" | "client" | null;
   expiresAt: string;
 };
+
+function permanentRedirect(path: string): NextResponse {
+  return NextResponse.redirect(path, 301);
+}
 
 function getSessionSecret(): string {
   const secret =
@@ -187,42 +191,40 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   // ── 1. Removed routes → 301 redirects ───────────────────────────────────
   if (pathname === "/wireframes" || pathname.startsWith("/wireframes/")) {
-    return NextResponse.redirect(new URL("/", request.url), 301);
+    return permanentRedirect("/");
   }
 
   if (pathname === "/chat" || pathname.startsWith("/chat/")) {
-    return NextResponse.redirect(new URL("/explore", request.url), 301);
+    return permanentRedirect("/explore");
   }
 
   if (pathname === "/pro/travel" || pathname.startsWith("/pro/travel/")) {
-    return NextResponse.redirect(new URL("/pro/dashboard", request.url), 301);
+    return permanentRedirect("/pro/dashboard");
   }
 
   if (pathname === "/Auth") {
-    return NextResponse.redirect(new URL("/auth", request.url), 301);
+    return permanentRedirect("/auth");
   }
 
   if (pathname === "/Privacy") {
-    return NextResponse.redirect(new URL("/privacy", request.url), 301);
+    return permanentRedirect("/privacy");
   }
 
   if (pathname === "/admin/reviews" || pathname.startsWith("/admin/reviews/")) {
-    return NextResponse.redirect(new URL("/admin/moderation", request.url), 301);
+    return permanentRedirect("/admin/moderation");
   }
 
   // ── 2. /explore?city=X  →  301 /explore/usa/{slug} ───────────────────────
   // Cleans up parameterized browse URLs that Google indexed.
   if (pathname === "/explore" && searchParams.has("city")) {
     const slug = exploreCityToSlug(searchParams.get("city")!);
-    const destination = new URL(`/explore/usa/${slug}`, request.url);
-    return NextResponse.redirect(destination, 301);
+    return permanentRedirect(`/explore/usa/${slug}`);
   }
 
   // ── 3. /pt-br/  →  301 /pt-br ────────────────────────────────────────────
   // Consolidates trailing-slash duplicate that GSC crawled as a separate URL.
   if (pathname === "/pt-br/") {
-    const destination = new URL("/pt-br", request.url);
-    return NextResponse.redirect(destination, 301);
+    return permanentRedirect("/pt-br");
   }
 
   // ── 4. /explore/* →  noindex, follow header ─────────────────────────────
@@ -256,14 +258,12 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     if (citySlug) {
       const legacyParts = parts.slice(2);
       if (legacyParts[0] === "massage-therapists") {
-        const destination = new URL(`/${citySlug}`, request.url);
-        return NextResponse.redirect(destination, 301);
+        return permanentRedirect(`/${citySlug}`);
       }
       const destinationPath = legacyParts.length
         ? `/${citySlug}/${legacyParts.join("/")}`
         : `/${citySlug}`;
-      const destination = new URL(destinationPath, request.url);
-      return NextResponse.redirect(destination, 301);
+      return permanentRedirect(destinationPath);
     }
   }
 
@@ -277,28 +277,23 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       const incomingCategory = parts[2];
 
       if (!incomingCategory) {
-        const destination = new URL(`/${citySlug}`, request.url);
-        return NextResponse.redirect(destination, 301);
+        return permanentRedirect(`/${citySlug}`);
       }
 
       if (incomingCategory === "massage-therapists") {
-        const destination = new URL(`/${citySlug}`, request.url);
-        return NextResponse.redirect(destination, 301);
+        return permanentRedirect(`/${citySlug}`);
       }
 
       if (canonicalNeighborhoods.has(incomingCategory)) {
-        const destination = new URL(`/${citySlug}/areas/${incomingCategory}`, request.url);
-        return NextResponse.redirect(destination, 301);
+        return permanentRedirect(`/${citySlug}/areas/${incomingCategory}`);
       }
 
       const mappedLegacy = canonicalCategoryToLegacyParts(incomingCategory);
       if (mappedLegacy) {
-        const destination = new URL(`/${citySlug}/${mappedLegacy.join("/")}`, request.url);
-        return NextResponse.redirect(destination, 301);
+        return permanentRedirect(`/${citySlug}/${mappedLegacy.join("/")}`);
       }
 
-      const destination = new URL(`/${citySlug}/${incomingCategory}`, request.url);
-      return NextResponse.redirect(destination, 301);
+      return permanentRedirect(`/${citySlug}/${incomingCategory}`);
     }
   }
 
@@ -307,17 +302,15 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   if (topLevelParts.length === 2 && topLevelParts[1] === "massage-therapists") {
     const citySlug = resolveCitySlug(topLevelParts[0] || "");
     if (citySlug) {
-      const destination = new URL(`/${citySlug}`, request.url);
-      return NextResponse.redirect(destination, 301);
+      return permanentRedirect(`/${citySlug}`);
     }
   }
 
   // ── 8. Strip crawlable language query variants (?lang=*) ──────────────────
   if (containsLangParam(searchParams)) {
-    const destination = new URL(pathname, request.url);
     const cleaned = removeLangSearchParam(searchParams);
-    destination.search = cleaned.toString();
-    return NextResponse.redirect(destination, 301);
+    const search = cleaned.toString();
+    return permanentRedirect(search ? `${pathname}?${search}` : pathname);
   }
 
   // ── 9. Auth guards ────────────────────────────────────────────────────────
@@ -329,7 +322,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
-    if (session.role !== "provider" && session.role !== "therapist") {
+    if (session.role !== "provider") {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }

@@ -10,7 +10,7 @@ const repoRoot = process.cwd();
 const PRIVATE_PATTERNS = ["/dashboard", "/admin", "/api", "/login", "/register", "/billing", "/checkout"];
 
 function parseLocs(xml) {
-  return [...new Set([...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].trim()))];
+  return [...new Set([...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1].trim()))];
 }
 
 function fail(message) {
@@ -37,9 +37,10 @@ function validateUrls(urls) {
 
 async function validateViaHttp() {
   console.log(`[sitemap-validator] Fetching ${SITEMAP_URL}`);
-  const response = await fetch(SITEMAP_URL, { headers: { "user-agent": "MasseurMatch-SitemapValidator/1.1" } });
+  const response = await fetch(SITEMAP_URL, { headers: { "user-agent": "MasseurMatch-SitemapValidator/1.2" } });
+
   if (!response.ok) {
-    fail(`Unable to fetch sitemap: ${response.status} ${response.statusText}`);
+    throw new Error(`Unable to fetch sitemap: ${response.status} ${response.statusText}`);
   }
 
   const xml = await response.text();
@@ -83,6 +84,10 @@ function validateViaSourceFiles() {
     }
   }
 
+  if (!sitemapSource.includes("MetadataRoute.Sitemap")) {
+    fail("sitemap.ts does not appear to export a Next.js sitemap route.");
+  }
+
   if (!robotsSource.includes("buildRobotsRules") && !robotsSource.includes("disallow") && !robotsSource.includes("Disallow")) {
     fail("robots.ts does not appear to define robots disallow rules.");
   }
@@ -95,7 +100,7 @@ async function main() {
     await validateViaHttp();
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.log(`[sitemap-validator] Remote fetch unavailable (${message}). Falling back to source validation.`);
+    console.log(`[sitemap-validator] Remote sitemap unavailable (${message}). Falling back to source validation.`);
     validateViaSourceFiles();
   }
 }
