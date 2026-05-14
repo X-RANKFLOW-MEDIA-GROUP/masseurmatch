@@ -15,8 +15,12 @@ import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd }
 
 type Params = { city: string; segment: string; keyword: string };
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
+
+export function generateStaticParams(): Params[] {
+  // Generate long-tail local SEO routes on demand so production builds stay fast and reliable.
+  return [];
+}
 
 async function fetchKeywordTherapists(cityName: string, segmentSlug: string, keywordSlug: string) {
   return getPublicTherapists({

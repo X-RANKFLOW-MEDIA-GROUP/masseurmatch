@@ -12,6 +12,9 @@ import "@/index.css";
 import "@/styles/mobile-responsive.css";
 import "@/styles/homepage-mobile-hotfix.css";
 
+// Font stacks are defined in CSS variables to keep production builds deterministic
+// even in CI environments without access to Google Fonts.
+
 const rootMetadata = createPageMetadata({
   title: "The safest and most trusted premium male massage directory",
   description: SITE_DESCRIPTION,

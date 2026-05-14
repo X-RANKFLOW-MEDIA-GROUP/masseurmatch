@@ -25,7 +25,8 @@ const DFW_SUBURB_SLUGS = new Set([
 ]);
 
 export function generateStaticParams(): Params[] {
-  return getCities().map((city) => ({ city: city.slug }));
+  // Generate long-tail local SEO routes on demand so production builds stay fast and reliable.
+  return [];
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {

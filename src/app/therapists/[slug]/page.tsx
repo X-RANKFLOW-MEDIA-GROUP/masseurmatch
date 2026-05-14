@@ -18,8 +18,12 @@ import { buildProfileViewModel } from "@/components/profile/profile-utils";
 
 type Params = { slug: string };
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  // Public profiles are generated on demand to avoid build-time database dependency.
+  return [];
+}
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const resolvedParams = await params;

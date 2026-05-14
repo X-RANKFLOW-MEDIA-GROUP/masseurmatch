@@ -12,11 +12,6 @@ import { absoluteUrl, getSeoBlogPosts, getSeoCities, getSeoTherapists, FEATURED_
 import { uniqueStrings } from "@/app/_lib/utils";
 import { competitorSlugs } from "@/lib/competitors";
 import { getCities, getCityInventoryMap, getPublicTherapists } from "@/app/_lib/directory";
-import {
-  getKeywordSearchFilters,
-  getSegmentSearchFilters,
-  resolveDirectoryFilters,
-} from "@/app/_lib/directory-taxonomy";
 import { buildCanonicalPath } from "@/app/_lib/route-normalization";
 
 type StaticSitemapRoute = {
@@ -154,39 +149,18 @@ function cityNameBySlug(slug: string): string | null {
   return city?.name ?? null;
 }
 
-async function pathHasInventory(path: string): Promise<boolean> {
-  const parts = path.split("/").filter(Boolean);
-  const [citySlug, segmentSlug, keywordOrAreaSlug] = parts;
+async function pathHasInventory(path: string, inventoryMap?: Map<string, number>): Promise<boolean> {
+  const [citySlug] = path.split("/").filter(Boolean);
   if (!citySlug) return false;
   const cityName = cityNameBySlug(citySlug);
   if (!cityName) return false;
 
-  if (parts.length === 1) {
-    const { total } = await getPublicTherapists({ city: cityName, page: 1, pageSize: 1 });
-    return total > 0;
+  if (inventoryMap) {
+    return (inventoryMap.get(cityName.toLowerCase()) ?? 0) > 0;
   }
 
-  if (parts.length === 2 && segmentSlug) {
-    const { total } = await getPublicTherapists({ city: cityName, page: 1, pageSize: 1, ...getSegmentSearchFilters(segmentSlug) });
-    return total > 0;
-  }
-
-  if (parts.length === 3 && segmentSlug === "areas") {
-    const { total } = await getPublicTherapists({ city: cityName, page: 1, pageSize: 1 });
-    return total > 0;
-  }
-
-  if (parts.length === 3 && segmentSlug && keywordOrAreaSlug) {
-    const { total } = await getPublicTherapists({
-      city: cityName,
-      page: 1,
-      pageSize: 1,
-      ...resolveDirectoryFilters(getSegmentSearchFilters(segmentSlug), getKeywordSearchFilters(keywordOrAreaSlug)),
-    });
-    return total > 0;
-  }
-
-  return false;
+  const { total } = await getPublicTherapists({ city: cityName, page: 1, pageSize: 1 });
+  return total > 0;
 }
 
 export function buildRobotsRules(): MetadataRoute.Robots["rules"] {
@@ -242,7 +216,10 @@ export async function buildServicesSitemapEntries(now = new Date()): Promise<Met
   const orderedServicePaths = FIRST_30_URLS_IN_ORDER.filter(
     (path) => (launchSegmentPaths.has(path) || launchKeywordPaths.has(path)) && isRoutableCityPath(path) && isLaunchUrl(path),
   );
-  const inventoryChecks = await Promise.all(orderedServicePaths.map(async (path) => ({ path, hasInventory: await pathHasInventory(path) })));
+  const inventoryMap = await getCityInventoryMap();
+  const inventoryChecks = await Promise.all(
+    orderedServicePaths.map(async (path) => ({ path, hasInventory: await pathHasInventory(path, inventoryMap) })),
+  );
   return inventoryChecks
     .filter((entry) => entry.hasInventory)
     .map((entry) => buildSitemapEntry(entry.path, now, "weekly", 0.66));
@@ -250,7 +227,10 @@ export async function buildServicesSitemapEntries(now = new Date()): Promise<Met
 
 export async function buildNeighborhoodsSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
   const candidatePaths = getLaunchAreaPaths().filter((path) => isRoutableCityPath(path) && isLaunchUrl(path));
-  const inventoryChecks = await Promise.all(candidatePaths.map(async (path) => ({ path, hasInventory: await pathHasInventory(path) })));
+  const inventoryMap = await getCityInventoryMap();
+  const inventoryChecks = await Promise.all(
+    candidatePaths.map(async (path) => ({ path, hasInventory: await pathHasInventory(path, inventoryMap) })),
+  );
   return inventoryChecks.filter((entry) => entry.hasInventory).map((entry) => buildSitemapEntry(entry.path, now, "weekly", 0.6));
 }
 

@@ -16,8 +16,12 @@ import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildFaqJsonLd, build
 
 type Params = { city: string; category: string };
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
+
+export function generateStaticParams(): Params[] {
+  // Generate long-tail local SEO routes on demand so production builds stay fast and reliable.
+  return [];
+}
 
 function categoryLabel(slug: string): string {
   return slug.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());

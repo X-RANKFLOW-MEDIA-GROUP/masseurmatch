@@ -26,10 +26,8 @@ async function fetchSegmentTherapists(cityName: string, segmentSlug: string) {
 }
 
 export function generateStaticParams(): Params[] {
-  return getLaunchSegmentPaths().map((path) => {
-    const [city, segment] = path.split("/").filter(Boolean);
-    return { city: city || "", segment: segment || "" };
-  });
+  // Generate long-tail local SEO routes on demand so production builds stay fast and reliable.
+  return [];
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {

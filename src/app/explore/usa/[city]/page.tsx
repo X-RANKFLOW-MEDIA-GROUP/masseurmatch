@@ -21,6 +21,11 @@ function getExploreCity(slug: string) {
   return getCities().find((city) => city.slug === slug);
 }
 
+export function generateStaticParams(): Params[] {
+  // These noindex discovery pages are generated on demand to keep go-live builds fast and reliable.
+  return [];
+}
+
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const resolvedParams = await params;
   const city = getExploreCity(resolvedParams.city);

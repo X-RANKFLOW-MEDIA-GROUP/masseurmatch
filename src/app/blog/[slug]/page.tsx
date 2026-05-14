@@ -9,8 +9,12 @@ import {
   getRelatedPosts,
 } from "@/app/_lib/blog-data";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export async function generateStaticParams() {
+  // Blog posts are rendered on demand to prevent a single heavy article from blocking deploy builds.
+  return [];
+}
+
+export const revalidate = 3600;
 
 export async function generateMetadata({
   params,

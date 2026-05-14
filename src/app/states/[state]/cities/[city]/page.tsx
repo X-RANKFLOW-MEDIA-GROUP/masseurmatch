@@ -20,7 +20,8 @@ function getCityForParams(stateSlug: string, citySlug: string) {
 }
 
 export function generateStaticParams(): Params[] {
-  return getCities().map((city) => ({ state: toSlug(city.stateName), city: city.slug }));
+  // Generate long-tail local SEO routes on demand so production builds stay fast and reliable.
+  return [];
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
