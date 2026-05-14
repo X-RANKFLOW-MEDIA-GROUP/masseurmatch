@@ -32,9 +32,13 @@ export const PRIVATE_ROBOTS_PATHS = uniqueStrings([
   "/register",
   "/signup",
   "/forgot-password",
+  "/reset-password",
   "/dashboard",
   "/dashboard/",
+  "/client",
+  "/client/",
   "/portal",
+  "/auth",
   "/*?*token=",
   "/*?*redirect=",
 ]);
@@ -79,6 +83,7 @@ const CORE_STATIC_ROUTES: StaticSitemapRoute[] = [
   { path: "/therapists", changeFrequency: "daily", priority: 0.9 },
   { path: "/cities", changeFrequency: "weekly", priority: 0.82 },
   { path: "/explore", changeFrequency: "weekly", priority: 0.72 },
+  { path: "/near-me", changeFrequency: "weekly", priority: 0.85 },
   { path: "/blog", changeFrequency: "weekly", priority: 0.8 },
   { path: "/guides", changeFrequency: "weekly", priority: 0.76 },
   { path: "/pricing", changeFrequency: "monthly", priority: 0.7 },
@@ -86,15 +91,15 @@ const CORE_STATIC_ROUTES: StaticSitemapRoute[] = [
   { path: "/about", changeFrequency: "monthly", priority: 0.7 },
   { path: "/advertise", changeFrequency: "monthly", priority: 0.7 },
   { path: "/for-therapists", changeFrequency: "weekly", priority: 0.7 },
-  { path: "/safety", changeFrequency: "monthly", priority: 0.7 },
-  { path: "/trust", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/safety", changeFrequency: "monthly", priority: 0.65 },
+  { path: "/trust", changeFrequency: "monthly", priority: 0.65 },
   { path: "/contact", changeFrequency: "monthly", priority: 0.6 },
   { path: "/faq", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/community-guidelines", changeFrequency: "monthly", priority: 0.5 },
   { path: "/legal", changeFrequency: "monthly", priority: 0.5 },
   { path: "/privacy", changeFrequency: "monthly", priority: 0.5 },
   { path: "/terms", changeFrequency: "monthly", priority: 0.5 },
   { path: "/accessibility", changeFrequency: "monthly", priority: 0.4 },
-  { path: "/community-guidelines", changeFrequency: "monthly", priority: 0.4 },
   { path: "/platform-disclaimer", changeFrequency: "monthly", priority: 0.4 },
   { path: "/cookie-policy", changeFrequency: "monthly", priority: 0.4 },
   { path: "/therapist-agreement", changeFrequency: "monthly", priority: 0.4 },
@@ -271,7 +276,7 @@ export function buildStaticSitemapEntries(now = new Date()): MetadataRoute.Sitem
   return buildCoreSitemapEntries(now);
 }
 
-/** @deprecated Used by scripts; prefer the segmented sitemap.ts. */
+/** @deprecated Use segmented sitemap.ts instead of this combined function. */
 export async function buildSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
   const [core, cities, services, profiles] = await Promise.all([
     buildCoreSitemapEntries(now),

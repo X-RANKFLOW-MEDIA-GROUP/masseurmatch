@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-08-27.basil' })
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY
+  if (!key) throw new Error('STRIPE_SECRET_KEY is not configured')
+  return new Stripe(key, { apiVersion: '2025-08-27.basil' })
+}
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -27,6 +31,8 @@ export async function POST(request: NextRequest) {
   if (apptError || !appointment) {
     return NextResponse.json({ error: 'Appointment not found' }, { status: 404 })
   }
+
+  const stripe = getStripe()
 
   // Get or create Stripe customer
   const { data: profile } = await supabase
