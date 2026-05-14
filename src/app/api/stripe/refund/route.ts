@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-08-27.basil' })
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY
+  if (!key) throw new Error('STRIPE_SECRET_KEY is not configured')
+  return new Stripe(key, { apiVersion: '2025-08-27.basil' })
+}
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -20,6 +24,8 @@ export async function POST(request: NextRequest) {
 
   if (txError || !tx) return NextResponse.json({ error: 'Transaction not found' }, { status: 404 })
   if (tx.status !== 'succeeded') return NextResponse.json({ error: 'Only completed payments can be refunded' }, { status: 400 })
+
+  const stripe = getStripe()
 
   const refund = await stripe.refunds.create({
     payment_intent: tx.stripe_payment_intent_id,
