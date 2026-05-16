@@ -51,7 +51,7 @@ export function createSupabasePublicClient() {
   assertConfig(url, "SUPABASE_URL");
   assertConfig(anonKey, "SUPABASE_ANON_KEY");
 
-  return createClient<any>(url, anonKey, baseOptions());
+  return createClient<Database>(url, anonKey, baseOptions());
 }
 
 export function createSupabaseAdminClient() {
@@ -60,7 +60,7 @@ export function createSupabaseAdminClient() {
   assertConfig(url, "SUPABASE_URL");
   assertConfig(serviceRoleKey, "SUPABASE_SERVICE_ROLE_KEY");
 
-  return createClient<any>(url, serviceRoleKey, baseOptions());
+  return createClient<Database>(url, serviceRoleKey, baseOptions());
 }
 
 export async function getUserRole(userId: string): Promise<AppRole | null> {

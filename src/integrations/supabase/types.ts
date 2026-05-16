@@ -6,6 +6,19 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
+type ProjectTable<
+  Row extends Record<string, unknown>,
+  Insert extends Record<string, unknown> = Partial<Row>,
+  Update extends Record<string, unknown> = Partial<Row>,
+> = {
+  Row: Row
+  Insert: Insert
+  Update: Update
+  Relationships: []
+}
+
+type FlexibleProjectTable = ProjectTable<Record<string, Json | undefined>>
+
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
@@ -14,37 +27,54 @@ export type Database = {
   }
   public: {
     Tables: {
-      [key: string]: any
       admin_actions: {
         Row: {
           action: string
+          action_type: string | null
+          admin_id: string | null
           actor_profile_id: string | null
           after_data: Json | null
           before_data: Json | null
           created_at: string
           id: string
           target_id: string | null
+          target_profile_id: string | null
           target_table: string
+          target_user_id: string | null
+          reason: string | null
+          metadata: Json | null
         }
         Insert: {
-          action: string
+          action?: string
+          action_type?: string | null
+          admin_id?: string | null
           actor_profile_id?: string | null
           after_data?: Json | null
           before_data?: Json | null
           created_at?: string
           id?: string
           target_id?: string | null
-          target_table: string
+          target_profile_id?: string | null
+          target_table?: string
+          target_user_id?: string | null
+          reason?: string | null
+          metadata?: Json | null
         }
         Update: {
           action?: string
+          action_type?: string | null
+          admin_id?: string | null
           actor_profile_id?: string | null
           after_data?: Json | null
           before_data?: Json | null
           created_at?: string
           id?: string
           target_id?: string | null
+          target_profile_id?: string | null
           target_table?: string
+          target_user_id?: string | null
+          reason?: string | null
+          metadata?: Json | null
         }
         Relationships: [
           {
@@ -138,7 +168,7 @@ export type Database = {
           target_type: string | null
         }
         Insert: {
-          action: string
+          action?: string
           admin_user_id?: string | null
           created_at?: string
           details?: Json | null
@@ -742,20 +772,22 @@ export type Database = {
           admin_reason: string | null
           ai_response: Json | null
           content_id: string | null
-          content_type: string
+          content_type: string | null
           created_at: string
           field_name: string | null
           id: string
           item_type: string | null
           moderation_provider: string | null
+          moderation_notes: string | null
+          content_hash: string | null
+          resolved_at: string | null
           moderation_reason: string | null
           notes: string | null
           payload: Json | null
           photo_id: string | null
-          priority: number | null
+          priority: string | number | null
           profile_id: string | null
           queue_type: string | null
-          resolved_at: string | null
           resolved_by: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -771,20 +803,22 @@ export type Database = {
           admin_reason?: string | null
           ai_response?: Json | null
           content_id?: string | null
-          content_type: string
+          content_type?: string | null
           created_at?: string
           field_name?: string | null
           id?: string
           item_type?: string | null
           moderation_provider?: string | null
+          moderation_notes?: string | null
+          content_hash?: string | null
+          resolved_at?: string | null
           moderation_reason?: string | null
           notes?: string | null
           payload?: Json | null
           photo_id?: string | null
-          priority?: number | null
+          priority?: string | number | null
           profile_id?: string | null
           queue_type?: string | null
-          resolved_at?: string | null
           resolved_by?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -800,20 +834,22 @@ export type Database = {
           admin_reason?: string | null
           ai_response?: Json | null
           content_id?: string | null
-          content_type?: string
+          content_type?: string | null
           created_at?: string
           field_name?: string | null
           id?: string
           item_type?: string | null
           moderation_provider?: string | null
+          moderation_notes?: string | null
+          content_hash?: string | null
+          resolved_at?: string | null
           moderation_reason?: string | null
           notes?: string | null
           payload?: Json | null
           photo_id?: string | null
-          priority?: number | null
+          priority?: string | number | null
           profile_id?: string | null
           queue_type?: string | null
-          resolved_at?: string | null
           resolved_by?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -863,6 +899,86 @@ export type Database = {
           },
         ]
       }
+      appointments: FlexibleProjectTable
+      client_favorites: ProjectTable<{
+        id: string
+        user_id: string | null
+        client_user_id: string | null
+        profile_id: string | null
+        therapist_id: string | null
+        therapist_profile_id: string | null
+        created_at: string | null
+      }>
+      complaints: FlexibleProjectTable
+      conversations: FlexibleProjectTable
+      favorites: FlexibleProjectTable
+      featured_masters: ProjectTable<{
+        id: string
+        profile_id: string
+        featured_by: string | null
+        city: string | null
+        is_active: boolean
+        display_order: number | null
+        created_at: string | null
+        updated_at: string | null
+      }>
+      imported_profile_data: ProjectTable<{
+        id: string
+        profile_id: string | null
+        source_url: string | null
+        payload: Json | null
+        created_at: string | null
+      }>
+      messages: FlexibleProjectTable
+      notification_deliveries: FlexibleProjectTable
+      payment_transactions: FlexibleProjectTable
+      photo_moderations: FlexibleProjectTable
+      profile_documents: FlexibleProjectTable
+      push_subscriptions: FlexibleProjectTable
+      ranking_events: ProjectTable<{
+        id: string
+        profile_id: string | null
+        event_type: string | null
+        event_name: string
+        weight: number | null
+        metadata: Json | null
+        created_at: string | null
+      }>
+      segments: FlexibleProjectTable
+      site_settings: FlexibleProjectTable
+      subscriptions: FlexibleProjectTable
+      therapist_availability: FlexibleProjectTable
+      therapist_learning_scores: ProjectTable<{
+        id: string
+        profile_id: string | null
+        therapist_id: string | null
+        city: string | null
+        intent: string | null
+        score: number | null
+        weighted_score: number | null
+        impressions: number | null
+        profile_clicks: number | null
+        contact_clicks: number | null
+        ctr: number | null
+        contact_rate: number | null
+        created_at: string | null
+        updated_at: string | null
+      }>
+      user_notification_preferences: ProjectTable<{
+        id: string
+        user_id: string | null
+        email_enabled: boolean | null
+        sms_enabled: boolean | null
+        push_enabled: boolean | null
+        marketing_enabled: boolean | null
+        phone_e164: string | null
+        timezone: string | null
+        quiet_hours_start: string | null
+        quiet_hours_end: string | null
+        created_at: string | null
+        updated_at: string | null
+      }>
+      user_suspensions: FlexibleProjectTable
       notifications: {
         Row: {
           body: string | null
@@ -909,6 +1025,7 @@ export type Database = {
           is_primary: boolean | null
           moderation_reason: string | null
           moderation_status: string | null
+          status: string | null
           profile_id: string | null
           sort_order: number | null
           storage_path: string | null
@@ -922,6 +1039,7 @@ export type Database = {
           is_primary?: boolean | null
           moderation_reason?: string | null
           moderation_status?: string | null
+          status?: string | null
           profile_id?: string | null
           sort_order?: number | null
           storage_path?: string | null
@@ -935,6 +1053,7 @@ export type Database = {
           is_primary?: boolean | null
           moderation_reason?: string | null
           moderation_status?: string | null
+          status?: string | null
           profile_id?: string | null
           sort_order?: number | null
           storage_path?: string | null
@@ -967,6 +1086,7 @@ export type Database = {
           profile_id: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          moderation_notes: string | null
           status: string
           submitted_at: string | null
           updated_at: string
@@ -979,6 +1099,7 @@ export type Database = {
           profile_id?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          moderation_notes?: string | null
           status?: string
           submitted_at?: string | null
           updated_at?: string
@@ -991,6 +1112,7 @@ export type Database = {
           profile_id?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          moderation_notes?: string | null
           status?: string
           submitted_at?: string | null
           updated_at?: string
@@ -1070,7 +1192,7 @@ export type Database = {
           is_editable?: boolean
           is_visible?: boolean
           section_key: string
-          therapist_profile_id: string
+          therapist_profile_id?: string
           updated_at?: string
         }
         Update: {
@@ -1164,6 +1286,7 @@ export type Database = {
           map_enabled: boolean | null
           massage_setup: string[] | null
           massage_techniques: string[] | null
+          modality: string | null
           mobile_extras: string[] | null
           moderation_notes: string | null
           neighborhood: string | null
@@ -1175,11 +1298,18 @@ export type Database = {
           outcall_radius_miles: number | null
           payment_methods: string[] | null
           phone: string | null
+          phone_number: string | null
+          whatsapp: string | null
+          session_lengths: number[] | null
           photo_limit: number | null
           pricing_sessions: Json | null
           products_sold: string[] | null
           products_used: string[] | null
           profile_status: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          location_type: string | null
+          sms_enabled: boolean | null
           promotions: Json | null
           regular_discounts: Json | null
           rejection_reason: string | null
@@ -1274,6 +1404,7 @@ export type Database = {
           map_enabled?: boolean | null
           massage_setup?: string[] | null
           massage_techniques?: string[] | null
+          modality?: string | null
           mobile_extras?: string[] | null
           moderation_notes?: string | null
           neighborhood?: string | null
@@ -1285,11 +1416,18 @@ export type Database = {
           outcall_radius_miles?: number | null
           payment_methods?: string[] | null
           phone?: string | null
+          phone_number?: string | null
+          whatsapp?: string | null
+          session_lengths?: number[] | null
           photo_limit?: number | null
           pricing_sessions?: Json | null
           products_sold?: string[] | null
           products_used?: string[] | null
           profile_status?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          location_type?: string | null
+          sms_enabled?: boolean | null
           promotions?: Json | null
           regular_discounts?: Json | null
           rejection_reason?: string | null
@@ -1384,6 +1522,7 @@ export type Database = {
           map_enabled?: boolean | null
           massage_setup?: string[] | null
           massage_techniques?: string[] | null
+          modality?: string | null
           mobile_extras?: string[] | null
           moderation_notes?: string | null
           neighborhood?: string | null
@@ -1395,11 +1534,18 @@ export type Database = {
           outcall_radius_miles?: number | null
           payment_methods?: string[] | null
           phone?: string | null
+          phone_number?: string | null
+          whatsapp?: string | null
+          session_lengths?: number[] | null
           photo_limit?: number | null
           pricing_sessions?: Json | null
           products_sold?: string[] | null
           products_used?: string[] | null
           profile_status?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          location_type?: string | null
+          sms_enabled?: boolean | null
           promotions?: Json | null
           regular_discounts?: Json | null
           rejection_reason?: string | null
@@ -1475,12 +1621,19 @@ export type Database = {
           outcall_price: number | null
           payment_methods: string[] | null
           phone: string | null
+          phone_number: string | null
+          whatsapp: string | null
+          session_lengths: number[] | null
           pricing_sessions: Json | null
           primary_area: string | null
           products_sold: string[] | null
           products_used: string[] | null
           profile_photo: string | null
           profile_status: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          location_type: string | null
+          sms_enabled: boolean | null
           promotions: Json | null
           review_count: number | null
           service_categories: string[] | null
@@ -1533,12 +1686,19 @@ export type Database = {
           outcall_price?: number | null
           payment_methods?: string[] | null
           phone?: string | null
+          phone_number?: string | null
+          whatsapp?: string | null
+          session_lengths?: number[] | null
           pricing_sessions?: Json | null
           primary_area?: string | null
           products_sold?: string[] | null
           products_used?: string[] | null
           profile_photo?: string | null
           profile_status?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          location_type?: string | null
+          sms_enabled?: boolean | null
           promotions?: Json | null
           review_count?: number | null
           service_categories?: string[] | null
@@ -1591,12 +1751,19 @@ export type Database = {
           outcall_price?: number | null
           payment_methods?: string[] | null
           phone?: string | null
+          phone_number?: string | null
+          whatsapp?: string | null
+          session_lengths?: number[] | null
           pricing_sessions?: Json | null
           primary_area?: string | null
           products_sold?: string[] | null
           products_used?: string[] | null
           profile_photo?: string | null
           profile_status?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          location_type?: string | null
+          sms_enabled?: boolean | null
           promotions?: Json | null
           review_count?: number | null
           service_categories?: string[] | null
@@ -1842,12 +2009,20 @@ export type Database = {
       text_verifications: {
         Row: {
           code: string | null
+          verification_code: string | null
+          phone: string | null
+          provider: string | null
+          attempt_count: number
+          sent_at: string | null
+          verified_at: string | null
+          expires_at: string | null
           created_at: string
           id: string
           profile_id: string | null
           rejection_reason: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          moderation_notes: string | null
           status: string
           submitted_text: string | null
           updated_at: string
@@ -1855,12 +2030,20 @@ export type Database = {
         }
         Insert: {
           code?: string | null
+          verification_code?: string | null
+          phone?: string | null
+          provider?: string | null
+          attempt_count?: number
+          sent_at?: string | null
+          verified_at?: string | null
+          expires_at?: string | null
           created_at?: string
           id?: string
           profile_id?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          moderation_notes?: string | null
           status?: string
           submitted_text?: string | null
           updated_at?: string
@@ -1868,12 +2051,20 @@ export type Database = {
         }
         Update: {
           code?: string | null
+          verification_code?: string | null
+          phone?: string | null
+          provider?: string | null
+          attempt_count?: number
+          sent_at?: string | null
+          verified_at?: string | null
+          expires_at?: string | null
           created_at?: string
           id?: string
           profile_id?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          moderation_notes?: string | null
           status?: string
           submitted_text?: string | null
           updated_at?: string
@@ -1924,7 +2115,7 @@ export type Database = {
           longitude?: number | null
           neighborhood?: string | null
           state?: string | null
-          therapist_profile_id: string
+          therapist_profile_id?: string
           updated_at?: string
         }
         Update: {
@@ -1979,6 +2170,8 @@ export type Database = {
           profile_id: string | null
           public_url: string | null
           rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           sort_order: number
           status: string | null
           storage_path: string
@@ -1998,10 +2191,12 @@ export type Database = {
           profile_id?: string | null
           public_url?: string | null
           rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           sort_order?: number
           status?: string | null
           storage_path: string
-          therapist_profile_id: string
+          therapist_profile_id?: string
           updated_at?: string
           user_id?: string | null
         }
@@ -2017,6 +2212,8 @@ export type Database = {
           profile_id?: string | null
           public_url?: string | null
           rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           sort_order?: number
           status?: string | null
           storage_path?: string
@@ -2070,7 +2267,7 @@ export type Database = {
           is_visible?: boolean
           price_cents: number
           session_type: string
-          therapist_profile_id: string
+          therapist_profile_id?: string
           updated_at?: string
         }
         Update: {
@@ -2133,6 +2330,9 @@ export type Database = {
           offers_outcall: boolean
           outcall_details: string | null
           phone: string | null
+          phone_number: string | null
+          whatsapp: string | null
+          session_lengths: number[] | null
           profile_completion_score: number
           profile_id: string
           seo_description: string | null
@@ -2168,6 +2368,9 @@ export type Database = {
           offers_outcall?: boolean
           outcall_details?: string | null
           phone?: string | null
+          phone_number?: string | null
+          whatsapp?: string | null
+          session_lengths?: number[] | null
           profile_completion_score?: number
           profile_id: string
           seo_description?: string | null
@@ -2203,6 +2406,9 @@ export type Database = {
           offers_outcall?: boolean
           outcall_details?: string | null
           phone?: string | null
+          phone_number?: string | null
+          whatsapp?: string | null
+          session_lengths?: number[] | null
           profile_completion_score?: number
           profile_id?: string
           seo_description?: string | null
@@ -2252,7 +2458,7 @@ export type Database = {
           is_visible?: boolean
           service_name: string
           sort_order?: number
-          therapist_profile_id: string
+          therapist_profile_id?: string
           updated_at?: string
         }
         Update: {
@@ -2314,7 +2520,7 @@ export type Database = {
           provider?: string | null
           provider_subscription_id?: string | null
           status?: string
-          therapist_profile_id: string
+          therapist_profile_id?: string
           updated_at?: string
         }
         Update: {
@@ -2449,7 +2655,7 @@ export type Database = {
           reason?: string | null
           score?: number
           status?: string
-          therapist_profile_id: string
+          therapist_profile_id?: string
           updated_at?: string
         }
         Update: {
@@ -2557,7 +2763,7 @@ export type Database = {
           priority_rank?: number
           starts_at?: string
           status?: string
-          therapist_profile_id: string
+          therapist_profile_id?: string
           updated_at?: string
         }
         Update: {
@@ -2598,7 +2804,6 @@ export type Database = {
       }
     }
     Views: {
-      [key: string]: any
       public_therapist_profiles: {
         Row: {
           availability_note: string | null
@@ -2617,6 +2822,10 @@ export type Database = {
           offers_outcall: boolean | null
           profile_completion_score: number | null
           profile_status: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          location_type: string | null
+          sms_enabled: boolean | null
           seo_description: string | null
           seo_title: string | null
           service_radius_miles: number | null
@@ -2643,6 +2852,10 @@ export type Database = {
           offers_outcall?: boolean | null
           profile_completion_score?: number | null
           profile_status?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          location_type?: string | null
+          sms_enabled?: boolean | null
           seo_description?: string | null
           seo_title?: string | null
           service_radius_miles?: number | null
@@ -2669,6 +2882,10 @@ export type Database = {
           offers_outcall?: boolean | null
           profile_completion_score?: number | null
           profile_status?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          location_type?: string | null
+          sms_enabled?: boolean | null
           seo_description?: string | null
           seo_title?: string | null
           service_radius_miles?: number | null
@@ -2698,6 +2915,10 @@ export type Database = {
           offers_outcall: boolean | null
           profile_completion_score: number | null
           profile_status: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          location_type: string | null
+          sms_enabled: boolean | null
           seo_description: string | null
           seo_title: string | null
           service_radius_miles: number | null
@@ -2724,6 +2945,10 @@ export type Database = {
           offers_outcall?: boolean | null
           profile_completion_score?: number | null
           profile_status?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          location_type?: string | null
+          sms_enabled?: boolean | null
           seo_description?: string | null
           seo_title?: string | null
           service_radius_miles?: number | null
@@ -2750,6 +2975,10 @@ export type Database = {
           offers_outcall?: boolean | null
           profile_completion_score?: number | null
           profile_status?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          location_type?: string | null
+          sms_enabled?: boolean | null
           seo_description?: string | null
           seo_title?: string | null
           service_radius_miles?: number | null
@@ -2803,10 +3032,17 @@ export type Database = {
           outcall_price: number | null
           outcall_radius_miles: number | null
           phone: string | null
+          phone_number: string | null
+          whatsapp: string | null
+          session_lengths: number[] | null
           pricing_sessions: Json | null
           primary_area: string | null
           profile_photo: string | null
           profile_status: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          location_type: string | null
+          sms_enabled: boolean | null
           promotions: Json | null
           review_count: number | null
           service_categories: string[] | null
@@ -2865,10 +3101,13 @@ export type Database = {
       }
     }
     Functions: {
-      [key: string]: any
       ensure_therapist_profile_for_profile: {
         Args: { p_profile_id: string }
         Returns: string
+      }
+      get_ranking_event_counts: {
+        Args: Record<PropertyKey, never>
+        Returns: Record<string, number>
       }
       increment_profile_contact_clicks: {
         Args: { p_profile_id: string }

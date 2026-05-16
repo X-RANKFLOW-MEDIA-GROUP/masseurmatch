@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, requireSession } from "@/app/api/_lib/supabase-server";
+import type { TablesUpdate } from "@/integrations/supabase/types";
 
 const patchSchema = z.object({
   displayName: z.string().min(1).max(80).optional(),
@@ -52,7 +53,7 @@ export async function PATCH(request: Request) {
     const body = await parseJsonBody(request, patchSchema);
     const adminClient = createSupabaseAdminClient();
 
-    const updatePayload: Record<string, unknown> = {};
+    const updatePayload: TablesUpdate<"profiles"> = {};
     if (body.displayName !== undefined) updatePayload.display_name = body.displayName;
     if (body.bio !== undefined) updatePayload.bio = body.bio || null;
     if (body.tagline !== undefined) updatePayload.headline = body.tagline || null;

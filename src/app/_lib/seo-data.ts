@@ -2,6 +2,7 @@ import { createSupabasePublicClient } from "@/app/api/_lib/supabase-server";
 import { getCities } from "@/app/_lib/directory";
 import { DIRECTORY_SEGMENTS, SPECIALTY_KEYWORDS } from "@/app/_lib/directory-taxonomy";
 import { siteUrl } from "@/lib/site";
+import type { Database } from "@/integrations/supabase/types";
 
 export type SeoCity = {
   slug: string;
@@ -24,13 +25,14 @@ export type SeoTherapist = {
 };
 
 const PAGE_SIZE = 1000;
+type SeoTableName = keyof Database["public"]["Tables"];
 
 export function absoluteUrl(path: string) {
   return siteUrl(path);
 }
 
 export async function fetchAllRows<T>(
-  table: string,
+  table: SeoTableName,
   columns: string,
   queryBuilder?: (query: any) => any,
 ): Promise<T[]> {
@@ -68,7 +70,7 @@ export async function fetchAllRows<T>(
 }
 
 async function tryFetchAllRows<T>(
-  table: string,
+  table: SeoTableName,
   columns: string,
   queryBuilder?: (query: any) => any,
 ): Promise<T[] | null> {

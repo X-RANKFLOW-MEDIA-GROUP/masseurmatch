@@ -279,8 +279,10 @@ export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTher
       .eq("status", "approved")
       .order("sort_order", { ascending: true });
 
-    const profile_photo = photos?.find((p) => p.photo_type === "profile")?.public_url;
-    const gallery_photos = photos?.filter((p) => p.photo_type === "gallery").map((p) => p.public_url);
+    const profile_photo = photos?.find((p) => p.photo_type === "profile")?.public_url ?? undefined;
+    const gallery_photos = photos
+      ?.filter((p) => p.photo_type === "gallery" && p.public_url)
+      .map((p) => p.public_url as string);
 
     const therapist = profile as unknown as PublicTherapist;
 

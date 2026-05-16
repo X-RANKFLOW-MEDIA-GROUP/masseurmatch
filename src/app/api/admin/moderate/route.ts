@@ -188,6 +188,10 @@ export async function POST(request: Request) {
     if (body.type === "text" && body.action === "approve") {
       const snapshot = moderationSnapshotSchema.parse(queueItem.snapshot ?? {});
 
+      if (!queueItem.profile_id) {
+        throw new RouteError(400, "Moderation item is missing profile_id.");
+      }
+
       const { data: profile, error: profileError } = await adminClient
         .from("profiles")
         .update({
@@ -218,6 +222,9 @@ export async function POST(request: Request) {
     if (body.type === "photo") {
       if (!queueItem.target_id) {
         throw new RouteError(400, "Photo moderation item is missing target_id.");
+      }
+      if (!queueItem.profile_id) {
+        throw new RouteError(400, "Photo moderation item is missing profile_id.");
       }
 
       const { data: photo, error: photoError } = await adminClient
