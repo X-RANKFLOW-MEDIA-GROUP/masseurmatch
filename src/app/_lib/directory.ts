@@ -248,7 +248,7 @@ export const getPublicTherapists = async (filters?: {
   if (filters?.lgbtqAffirming) query = query.eq("lgbtq_affirming", true);
 
   const { data: rawData, error, count } = await query;
-  const data = rawData ? sortPublicTherapists(rawData as PublicTherapist[]) : [];
+  const data = rawData ? sortPublicTherapists(rawData as unknown as PublicTherapist[]) : [];
 
   if (!error && data.length > 0) {
     return { items: data, total: count || data.length, page, pageSize };
@@ -282,7 +282,9 @@ export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTher
     const profile_photo = photos?.find((p) => p.photo_type === "profile")?.public_url;
     const gallery_photos = photos?.filter((p) => p.photo_type === "gallery").map((p) => p.public_url);
 
-    return { ...profile, profile_photo, gallery_photos } as PublicTherapist;
+    const therapist = profile as unknown as PublicTherapist;
+
+    return { ...therapist, profile_photo, gallery_photos };
   }
 
   return (FALLBACK_PUBLIC_THERAPISTS as PublicTherapist[]).find(
@@ -298,7 +300,7 @@ export const getImportedReviews = async (profileId: string, limit = 5) => {
     .order("review_date", { ascending: false, nullsFirst: false })
     .limit(limit);
 
-  return (data || []) as ImportedReview[];
+  return (data || []) as unknown as ImportedReview[];
 };
 
 export const getProfilePhotos = async (profileId: string, limit = 6) => {
