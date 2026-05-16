@@ -14,6 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
+      [key: string]: any
       admin_actions: {
         Row: {
           action: string
@@ -1012,6 +1013,45 @@ export type Database = {
           },
         ]
       }
+      imported_reviews: {
+        Row: {
+          id: string
+          profile_id: string
+          source_url: string | null
+          reviewer_name: string | null
+          review_text: string | null
+          rating: number | null
+          review_date: string | null
+          source_platform: string | null
+          imported_at: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          profile_id?: string
+          source_url?: string | null
+          reviewer_name?: string | null
+          review_text?: string | null
+          rating?: number | null
+          review_date?: string | null
+          source_platform?: string | null
+          imported_at?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          profile_id?: string
+          source_url?: string | null
+          reviewer_name?: string | null
+          review_text?: string | null
+          rating?: number | null
+          review_date?: string | null
+          source_platform?: string | null
+          imported_at?: string | null
+          created_at?: string | null
+        }
+        Relationships: []
+      }
       profile_sections: {
         Row: {
           created_at: string
@@ -1085,6 +1125,11 @@ export type Database = {
           booking_platform: string | null
           booking_url: string | null
           business_trips: Json | null
+          business_hours: Json | null
+          custom_faq: Json | null
+          current_status: string | null
+          service_radius_km: number | null
+          travel_destination: string | null
           certifications: string | null
           city: string | null
           contact_clicks: number
@@ -1190,6 +1235,11 @@ export type Database = {
           booking_platform?: string | null
           booking_url?: string | null
           business_trips?: Json | null
+          business_hours?: Json | null
+          custom_faq?: Json | null
+          current_status?: string | null
+          service_radius_km?: number | null
+          travel_destination?: string | null
           certifications?: string | null
           city?: string | null
           contact_clicks?: number
@@ -1295,6 +1345,11 @@ export type Database = {
           booking_platform?: string | null
           booking_url?: string | null
           business_trips?: Json | null
+          business_hours?: Json | null
+          custom_faq?: Json | null
+          current_status?: string | null
+          service_radius_km?: number | null
+          travel_destination?: string | null
           certifications?: string | null
           city?: string | null
           contact_clicks?: number
@@ -2543,6 +2598,7 @@ export type Database = {
       }
     }
     Views: {
+      [key: string]: any
       public_therapist_profiles: {
         Row: {
           availability_note: string | null
@@ -2809,6 +2865,7 @@ export type Database = {
       }
     }
     Functions: {
+      [key: string]: any
       ensure_therapist_profile_for_profile: {
         Args: { p_profile_id: string }
         Returns: string

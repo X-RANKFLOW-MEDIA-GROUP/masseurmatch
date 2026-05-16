@@ -39,7 +39,7 @@ export async function GET(request: Request) {
         }
       }
     } else {
-      eventBreakdown = eventCounts;
+      eventBreakdown = eventCounts as Record<string, number>;
     }
 
     // Fetch total profiles count

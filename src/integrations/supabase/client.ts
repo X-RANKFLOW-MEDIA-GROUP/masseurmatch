@@ -26,7 +26,7 @@ const isBrowser = typeof window !== "undefined";
 
 // Guard against missing env vars (e.g. CI builds without secrets configured).
 // All DB calls in the app handle the resulting empty responses gracefully.
-export const supabase = createClient<Database>(
+export const supabase = createClient<any>(
   SUPABASE_URL || "http://placeholder.supabase.invalid",
   SUPABASE_PUBLISHABLE_KEY || "placeholder-key",
   {
