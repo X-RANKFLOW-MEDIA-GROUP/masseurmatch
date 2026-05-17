@@ -1,6 +1,6 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
-export async function createClient() {
+export function createClient() {
   const supabaseUrl =
     process.env.NEXT_PUBLIC_SUPABASE_URL ||
     process.env.SUPABASE_URL ||
@@ -14,3 +14,5 @@ export async function createClient() {
 
   return createSupabaseClient(supabaseUrl, supabaseKey);
 }
+
+export const createServerClient = createClient;

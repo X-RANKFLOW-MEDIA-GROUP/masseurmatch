@@ -1,4 +1,5 @@
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import type { TablesUpdate } from "@/integrations/supabase/types";
 
 export interface SubmittedProfile {
   displayName?: string;
@@ -108,7 +109,7 @@ export async function persistSubmittedProfile(
   const startingPrice = toNumber(profile.startingPrice);
   const yearsExperience = toNumber(profile.yearsExperience);
 
-  const profileUpdate: Record<string, unknown> = {
+  const profileUpdate: TablesUpdate<"profiles"> = {
     status: "pending_approval",
     is_active: false,
     updated_at: new Date().toISOString(),

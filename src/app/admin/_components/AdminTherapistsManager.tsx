@@ -22,7 +22,7 @@ type AdminTherapist = {
   id: string;
   user_id: string;
   display_name: string | null;
-  full_name: string;
+  full_name: string | null;
   city: string | null;
   slug?: string | null;
   profile_status: string;

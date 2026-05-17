@@ -63,14 +63,14 @@ export function SearchHistory({ userId }: { userId: string }) {
                 className="flex items-center justify-between rounded-lg border border-slate-200 p-2 hover:bg-slate-50"
               >
                 <Link
-                  href={`/explore?q=${encodeURIComponent(search.query)}`}
+                  href={`/explore?q=${encodeURIComponent(search.query ?? "")}`}
                   className="flex-1 flex items-center gap-2 text-sm text-slate-700 hover:text-sky-600"
                 >
                   <Search className="h-4 w-4 text-slate-400" />
                   <span className="truncate">{search.query}</span>
-                  {search.results_count > 0 && (
+                  {(search.results_count ?? 0) > 0 && (
                     <span className="text-xs text-slate-500">
-                      ({search.results_count})
+                      ({search.results_count ?? 0})
                     </span>
                   )}
                 </Link>

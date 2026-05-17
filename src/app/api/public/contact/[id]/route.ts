@@ -53,6 +53,11 @@ export async function GET(
   }
 
   const phone = method === "whatsapp" ? profile.whatsapp_number || profile.phone : profile.phone;
+
+  if (!phone) {
+    return NextResponse.json({ error: "Contact is unavailable." }, { status: 404 });
+  }
+
   const redirectUrl = buildContactUrl(method, phone);
 
   if (!redirectUrl) {
