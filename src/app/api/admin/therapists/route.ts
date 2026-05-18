@@ -183,9 +183,9 @@ async function applyTherapistAdminAction(
           .update({
             is_active: true,
             city: profile.city || null,
-            display_order: input.displayOrder ?? (existing.data as FeaturedRow).display_order ?? 0,
+            display_order: input.displayOrder ?? (existing.data as unknown as FeaturedRow).display_order ?? 0,
           })
-          .eq("id", (existing.data as FeaturedRow).id)
+          .eq("id", (existing.data as unknown as FeaturedRow).id)
           .select("*")
           .single();
 

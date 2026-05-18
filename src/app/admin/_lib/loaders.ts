@@ -26,8 +26,9 @@ export type AdminImportedReview = Pick<
 
 export type AdminTherapist = Pick<
   ProfileRow,
-  "id" | "user_id" | "display_name" | "full_name" | "city"
+  "id" | "display_name" | "full_name" | "city"
 > & {
+  user_id: string;
   slug: string | null;
   profile_status: string;
   subscription_tier: string | null;
@@ -125,7 +126,10 @@ export async function loadTherapists(): Promise<AdminLoadResult<AdminTherapist>>
       throw new Error(error.message);
     }
 
-    const profileRows = (data || []) as AdminTherapist[];
+    const profileRows = ((data || []) as Array<AdminTherapist & { user_id: string | null }>).map((profile) => ({
+      ...profile,
+      user_id: profile.user_id ?? "",
+    }));
 
     return {
       items: profileRows,
