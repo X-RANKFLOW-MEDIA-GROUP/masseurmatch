@@ -214,6 +214,15 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return permanentRedirect("/admin/moderation", request);
   }
 
+
+  if (pathname === "/register") {
+    return permanentRedirect("/signup/account", request);
+  }
+
+  if (pathname === "/pro/onboard") {
+    return permanentRedirect("/signup/plan", request);
+  }
+
   // ── 2. /explore?city=X  →  301 /explore/usa/{slug} ───────────────────────
   if (pathname === "/explore" && searchParams.has("city")) {
     const slug = exploreCityToSlug(searchParams.get("city")!);
