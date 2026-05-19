@@ -1,6 +1,5 @@
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
 
 export const alt = "MasseurMatch – LGBTQ+-Inclusive Massage Therapist Directory";
 export const size = { width: 1200, height: 630 };
