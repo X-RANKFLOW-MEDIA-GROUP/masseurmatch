@@ -35,31 +35,37 @@ export default function ClientInquiriesPage() {
 
   useEffect(() => {
     async function fetchInquiries() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.email) return;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user?.email) {
+          setInquiries([]);
+          return;
+        }
 
-      const { data, error } = await supabase
-        .from("contact_inquiries")
-        .select(`
-          id,
-          therapist_id,
-          message,
-          status,
-          created_at,
-          therapist:therapists!therapist_id (
+        const { data, error } = await supabase
+          .from("contact_inquiries")
+          .select(`
             id,
-            display_name,
-            photo_url,
-            state
-          )
-        `)
-        .eq("client_email", user.email)
-        .order("created_at", { ascending: false });
+            therapist_id,
+            message,
+            status,
+            created_at,
+            therapist:therapists!therapist_id (
+              id,
+              display_name,
+              photo_url,
+              state
+            )
+          `)
+          .eq("client_email", user.email)
+          .order("created_at", { ascending: false });
 
-      if (!error && data) {
-        setInquiries(data as unknown as Inquiry[]);
+        if (!error && data) {
+          setInquiries(data as unknown as Inquiry[]);
+        }
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
 
     fetchInquiries();
