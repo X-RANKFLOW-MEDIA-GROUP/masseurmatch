@@ -15,6 +15,17 @@ type FAQItem = {
   answer: string;
 };
 
+function isFAQItem(item: unknown): item is FAQItem {
+  return (
+    typeof item === "object" &&
+    item !== null &&
+    "question" in item &&
+    "answer" in item &&
+    typeof (item as FAQItem).question === "string" &&
+    typeof (item as FAQItem).answer === "string"
+  );
+}
+
 const PREMADE_QUESTIONS = [
   "What types of massage do you specialize in?",
   "What should I expect during my first session?",
@@ -48,7 +59,7 @@ export function DashboardFAQ() {
 
     setFaqs(
       PREMADE_QUESTIONS.map((question) => {
-        const match = savedFaqs.find((item) => item?.question === question);
+        const match = savedFaqs.find((item): item is FAQItem => isFAQItem(item) && item.question === question);
         return {
           question,
           answer: typeof match?.answer === "string" ? match.answer : "",

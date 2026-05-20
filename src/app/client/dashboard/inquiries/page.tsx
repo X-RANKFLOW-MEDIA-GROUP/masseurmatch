@@ -36,7 +36,7 @@ export default function ClientInquiriesPage() {
   useEffect(() => {
     async function fetchInquiries() {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user?.email) return;
 
       const { data, error } = await supabase
         .from("contact_inquiries")

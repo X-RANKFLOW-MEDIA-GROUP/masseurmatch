@@ -12,6 +12,7 @@ import { createSupabaseAdminClient, recordAuditLog } from "@/app/api/_lib/supaba
 import { getProfileByUserId } from "@/app/_lib/store";
 import { proProfileSchema } from "@/app/_lib/validation";
 import { normalizeBodyTypeValue } from "@/lib/physical-profile";
+import type { Json, TablesInsert } from "@/integrations/supabase/types";
 
 const flaggedProfileSchema = proProfileSchema.extend({
   moderationReason: z.string().min(3).max(600),
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
       bodyType: normalizeBodyTypeValue(body.bodyType),
     };
 
-    const queuePayload = {
+    const queuePayload: TablesInsert<"moderation_queue"> = {
       profile_id: profile.id,
       user_id: session.userId,
       target_id: null,
@@ -58,8 +59,8 @@ export async function POST(request: Request) {
       priority: "normal",
       moderation_provider: sanitizeOptionalText(body.moderationProvider) || "sightengine",
       moderation_reason: sanitizeText(body.moderationReason),
-      snapshot,
-      ai_response: body.aiResponse ?? null,
+      snapshot: snapshot as Json,
+      ai_response: (body.aiResponse ?? null) as Json,
       admin_reason: null,
       resolved_by: null,
       resolved_at: null,

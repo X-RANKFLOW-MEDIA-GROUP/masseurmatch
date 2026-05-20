@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     }
 
     // Check expiry
-    if (new Date(verification.expires_at) < new Date()) {
+    if (!verification.expires_at || new Date(verification.expires_at) < new Date()) {
       await adminClient
         .from("text_verifications")
         .update({ status: "expired", updated_at: new Date().toISOString() })
