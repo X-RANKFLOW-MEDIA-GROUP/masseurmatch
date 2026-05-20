@@ -756,3 +756,89 @@ insert into storage.buckets(id,name,public) values ('identity-documents','identi
 -- insert into public.user_roles(user_id, role)
 -- select id, 'admin' from auth.users where email = 'replace-with-admin@domain.com'
 -- on conflict do nothing;
+
+-- Supplemental app-domain tables referenced by API/routes.
+create table if not exists public.public_therapists (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete set null,
+  slug text,
+  full_name text,
+  bio text,
+  city text,
+  state text,
+  photo_url text,
+  services text[],
+  rates jsonb,
+  updated_at timestamptz not null default timezone('utc', now()),
+  created_at timestamptz not null default timezone('utc', now())
+);
+
+create table if not exists public.favorites (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  therapist_id uuid not null,
+  created_at timestamptz not null default timezone('utc', now())
+);
+
+create table if not exists public.appointments (
+  id uuid primary key default gen_random_uuid(),
+  client_id uuid not null references auth.users(id) on delete cascade,
+  therapist_id uuid not null references auth.users(id) on delete cascade,
+  status text not null default 'pending',
+  service_type text,
+  location_type text,
+  notes text,
+  start_time timestamptz not null,
+  end_time timestamptz not null,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
+create table if not exists public.payment_transactions (
+  id uuid primary key default gen_random_uuid(),
+  appointment_id uuid references public.appointments(id) on delete set null,
+  stripe_payment_intent_id text unique,
+  amount integer,
+  currency text,
+  status text not null default 'pending',
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
+create table if not exists public.notifications (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  type text,
+  title text,
+  message text,
+  read_at timestamptz,
+  created_at timestamptz not null default timezone('utc', now())
+);
+
+create table if not exists public.conversations (
+  id uuid primary key default gen_random_uuid(),
+  participant_a_id uuid not null references auth.users(id) on delete cascade,
+  participant_b_id uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
+create table if not exists public.messages (
+  id uuid primary key default gen_random_uuid(),
+  conversation_id uuid not null references public.conversations(id) on delete cascade,
+  sender_id uuid not null references auth.users(id) on delete cascade,
+  content text not null,
+  read_at timestamptz,
+  created_at timestamptz not null default timezone('utc', now())
+);
+
+create table if not exists public.therapist_availability (
+  id uuid primary key default gen_random_uuid(),
+  therapist_id uuid not null references auth.users(id) on delete cascade,
+  day_of_week integer not null,
+  start_time text not null,
+  end_time text not null,
+  created_at timestamptz not null default timezone('utc', now())
+);
+alter table public.payment_transactions add column if not exists user_id uuid references auth.users(id) on delete set null;
+alter table public.payment_transactions add column if not exists stripe_refund_id text;

@@ -265,7 +265,7 @@ export function AuthForms({
                 <input
                   type="checkbox"
                   checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
+                  onChange={(event) => setRememberMe(event.target.checked)}
                   className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
                 />
                 Remember me
