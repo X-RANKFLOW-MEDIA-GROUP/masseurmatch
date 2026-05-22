@@ -24,6 +24,8 @@ export default async function Image() {
         {/* Logo wordmark */}
         <div
           style={{
+            display: "flex",
+            alignItems: "baseline",
             fontSize: 52,
             fontWeight: 400,
             color: "#FCFBF8",
@@ -31,7 +33,7 @@ export default async function Image() {
             marginBottom: 24,
           }}
         >
-          Masseur<span style={{ color: "#FF8A1F" }}>Match</span>
+          <span>Masseur</span><span style={{ color: "#FF8A1F" }}>Match</span>
         </div>
 
         {/* Tagline */}

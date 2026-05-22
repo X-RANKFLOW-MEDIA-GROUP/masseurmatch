@@ -125,50 +125,50 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
 
   return (
     <article
-      className="group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-md hover:border-slate-300"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#0B1F3A]/10 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_36px_rgba(11,31,58,0.12)] hover:border-[#0B1F3A]/20"
     >
-      {/* Compact Photo */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-slate-100">
+      {/* Photo */}
+      <div className="relative aspect-[3/4] overflow-hidden bg-[#0B1F3A]/8">
         <Image
           src={profileImage}
           alt={imageAlt}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           style={{ objectPosition: FACE_FOCUS_OBJECT_POSITION }}
           priority={false}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-        
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0B1F3A]/80 via-[#0B1F3A]/15 to-transparent" />
+
         {/* Badges */}
-        <div className="absolute left-2 right-2 top-2 flex items-start justify-between gap-1">
+        <div className="absolute left-2.5 right-2.5 top-2.5 flex items-start justify-between gap-1">
           {isVerified && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/90 text-white px-2 py-0.5 text-[10px] font-semibold backdrop-blur-sm">
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/90 text-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] backdrop-blur-sm">
               <CheckCircle2 className="h-3 w-3" />
               Verified
             </span>
           )}
           {therapist.review_count ? (
-            <span className="inline-flex items-center gap-0.5 rounded-full bg-yellow-500/90 text-white px-2 py-0.5 text-[10px] font-semibold ml-auto">
+            <span className="inline-flex items-center gap-0.5 rounded-full bg-[#FF8A1F]/90 text-[#0B1F3A] px-2.5 py-1 text-[10px] font-bold ml-auto backdrop-blur-sm">
               ★ {therapist.review_count}
             </span>
           ) : null}
         </div>
 
-        {/* Name overlay at bottom */}
-        <div className="absolute bottom-2 left-2 right-2">
-          <h3 className="text-sm font-semibold text-white line-clamp-1 drop-shadow-sm">
+        {/* Name overlay */}
+        <div className="absolute bottom-3 left-3 right-3">
+          <h3 className="font-['Georgia','Times_New_Roman',serif] text-base font-semibold text-white line-clamp-1">
             {name}
           </h3>
-          <p className="text-[11px] text-white/80 line-clamp-1">{specialtyLabel}</p>
+          <p className="mt-0.5 text-[11px] text-white/65 line-clamp-1">{specialtyLabel}</p>
         </div>
       </div>
 
-      {/* Compact Content */}
-      <div className="flex flex-1 flex-col gap-2 p-3">
+      {/* Content */}
+      <div className="flex flex-1 flex-col gap-2 p-3.5">
         {/* Location */}
-        <div className="flex items-center gap-1.5 text-xs text-slate-500">
-          <MapPin className="h-3 w-3 text-slate-400 flex-shrink-0" />
+        <div className="flex items-center gap-1.5 text-xs text-[#0B1F3A]/50">
+          <MapPin className="h-3 w-3 text-[#FF8A1F] flex-shrink-0" />
           <span className="line-clamp-1">{locationLabel}</span>
         </div>
 
@@ -176,7 +176,7 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
         {serviceModes.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {serviceModes.map((mode) => (
-              <span key={mode} className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+              <span key={mode} className="text-[10px] font-semibold uppercase tracking-[0.1em] px-2 py-0.5 rounded-full bg-[#0B1F3A]/6 text-[#0B1F3A]/70">
                 {mode}
               </span>
             ))}
@@ -186,15 +186,15 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
         <div className="flex-1" />
 
         {/* Price and CTA */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+        <div className="flex items-center justify-between pt-2.5 border-t border-[#0B1F3A]/8">
           <div>
-            <p className="text-[10px] text-slate-400">From</p>
-            <p className="text-sm font-bold text-slate-900">{startingValue || "Contact"}</p>
+            <p className="text-[10px] uppercase tracking-[0.12em] text-[#0B1F3A]/40">From</p>
+            <p className="text-sm font-bold text-[#0B1F3A]">{startingValue || "Contact"}</p>
           </div>
           <Link
             href={profilePath}
             onClick={beginRouteTransition}
-            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 transition-colors"
+            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#0B1F3A] text-white text-xs font-semibold hover:bg-[#FF8A1F] hover:text-[#0B1F3A] transition-all duration-200"
           >
             View <ArrowUpRight className="h-3 w-3" />
           </Link>
