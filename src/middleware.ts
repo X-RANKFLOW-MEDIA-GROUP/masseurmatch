@@ -17,10 +17,8 @@ type MiddlewareSession = {
   expiresAt: string;
 };
 
-// FIXED: must use absolute URL (new URL) — relative strings cause Next.js Edge
-// to emit a 307 instead of the requested 301.
 function permanentRedirect(path: string, request: NextRequest): NextResponse {
-  return NextResponse.redirect(new URL(path, request.url), 301);
+  return NextResponse.redirect(new URL(path, request.url), { status: 301 });
 }
 
 function getSessionSecret(): string {
