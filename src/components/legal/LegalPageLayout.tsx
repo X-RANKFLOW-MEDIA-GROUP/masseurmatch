@@ -29,7 +29,7 @@ export default function LegalPageLayout({ title, lastUpdated = "March 10, 2026",
   return (
     <div className="min-h-screen bg-gray-50 pt-32 pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-8">
-        {/* Sidebar de Navegação */}
+        {/* Navigation Sidebar */}
         <aside className="md:w-72 flex-shrink-0">
           <div className="sticky top-28 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
             {/* Busca Interna */}
@@ -61,7 +61,7 @@ export default function LegalPageLayout({ title, lastUpdated = "March 10, 2026",
           </div>
         </aside>
 
-        {/* Conteúdo Legal */}
+        {/* Legal Content */}
         <main className="flex-1 bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-gray-100">
           <h1 className="text-3xl font-extrabold text-gray-900 mb-2">{title}</h1>
           <p className="text-sm text-gray-500 mb-8 border-b pb-4">Last Updated: {lastUpdated}</p>

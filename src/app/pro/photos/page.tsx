@@ -68,7 +68,7 @@ export default function PhotoManagerPage() {
   const [agreedToPhotoRules, setAgreedToPhotoRules] = useState(false);
   const [uploadState, setUploadState] = useState<UploadState>("idle");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [scanLabel, setScanLabel] = useState("arquivo");
+  const [scanLabel, setScanLabel] = useState("file");
 
   const fetchPhotos = async () => {
     if (!profile?.id) {
@@ -175,7 +175,7 @@ export default function PhotoManagerPage() {
     const payload = (await response.json()) as { secure_url?: string };
 
     if (!payload.secure_url) {
-      throw new Error("A imagem foi enviada, mas nao recebemos a URL final.");
+      throw new Error("The image was uploaded but we did not receive the final URL.");
     }
 
     return payload.secure_url;
@@ -205,7 +205,7 @@ export default function PhotoManagerPage() {
     if (acceptedFiles.length < files.length) {
       toast({
         title: "Plan photo limit applied",
-        description: `So ${acceptedFiles.length} arquivo(s) foram selecionados agora.`,
+        description: `Only ${acceptedFiles.length} file(s) were selected now.`,
       });
     }
 
@@ -224,8 +224,8 @@ export default function PhotoManagerPage() {
 
     if (!agreedToPhotoRules) {
       toast({
-        title: "Confirme as regras de imagem",
-        description: "Marque a declaracao antes de enviar suas fotos.",
+        title: "Confirm photo rules",
+        description: "Check the declaration box before uploading your photos.",
         variant: "destructive",
       });
       return;
@@ -336,15 +336,15 @@ export default function PhotoManagerPage() {
       setUploadState("uploaded");
       toast({
         title: moderationUnavailable
-          ? "Parte do lote foi para revisao manual"
+          ? "Part of the batch went to manual review"
           : flaggedCount > 0
-            ? "Sightengine sinalizou algumas fotos para curadoria"
-            : "Sightengine aprovou suas fotos",
+            ? "Sightengine flagged some photos for curation"
+            : "Sightengine approved your photos",
         description: moderationUnavailable
-          ? "Pelo menos um arquivo ficou pendente para curadoria humana."
+          ? "At least one file is pending human curation."
           : flaggedCount > 0
-            ? `${approvedCount} aprovada(s) e ${flaggedCount} enviada(s) para revisao manual.`
-            : `${approvedCount} foto(s) aprovada(s) e pronta(s) para a galeria.`,
+            ? `${approvedCount} approved and ${flaggedCount} sent for manual review.`
+            : `${approvedCount} photo(s) approved and ready for the gallery.`,
       });
 
       if (moderationUnavailable || flaggedCount > 0) {
@@ -426,7 +426,7 @@ export default function PhotoManagerPage() {
     await fetchPhotos();
     toast({
       title: "Primary photo updated",
-      description: "Sua galeria ja mostra a nova ordem.",
+      description: "Your gallery now shows the new order.",
     });
   };
 
@@ -445,11 +445,11 @@ export default function PhotoManagerPage() {
           <Bot className="h-5 w-5 text-slate-700" />
         </div>
         <div className="space-y-2">
-          <h1 className="font-display text-2xl font-medium text-slate-900">Gerenciador de fotos</h1>
+          <h1 className="font-display text-2xl font-medium text-slate-900">Photo Manager</h1>
           <p className="font-sans text-sm leading-relaxed text-slate-600">
-            O Sightengine revisa cada imagem antes da publicacao. Arquivos com nudez,
-            marcas d agua, dados de contato, logos ou sinais de baixa confianca podem ser
-            reprovados automaticamente ou seguir para revisao manual.
+            Sightengine reviews each image before publication. Files with nudity,
+            watermarks, contact information, logos, or low-confidence signals may be
+            rejected automatically or sent for manual review.
           </p>
         </div>
       </div>
@@ -473,10 +473,10 @@ export default function PhotoManagerPage() {
               </div>
               <div>
                 <p className="font-sans text-sm font-semibold text-slate-900">
-                  Clique para escolher imagens
+                  Click to choose images
                 </p>
                 <p className="mt-1 font-sans text-xs text-slate-500">
-                  JPG, PNG ou WEBP. Evite filtros pesados e fotos com texto.
+                  JPG, PNG or WEBP. Avoid heavy filters and photos with text.
                 </p>
               </div>
             </button>
@@ -585,13 +585,13 @@ export default function PhotoManagerPage() {
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 px-1 pb-4">
             <div>
-              <h2 className="font-display text-xl font-medium text-slate-900">Fila de curadoria</h2>
+              <h2 className="font-display text-xl font-medium text-slate-900">Curation queue</h2>
               <p className="mt-1 font-sans text-sm text-slate-500">
-                Acompanhamento em tempo real da sua galeria.
+                Real-time tracking of your gallery.
               </p>
             </div>
             <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 font-sans text-xs text-slate-600">
-              {photos.length} publicadas ou em revisao de um total de {maxPhotos}
+              {photos.length} published or under review out of {maxPhotos}
             </div>
           </div>
 
@@ -600,7 +600,7 @@ export default function PhotoManagerPage() {
               active={activeTab === "approved"}
               onClick={() => setActiveTab("approved")}
               icon={CheckCircle2}
-              label="Aprovadas"
+              label="Approved"
               count={approvedPhotos.length}
               color="emerald"
             />
@@ -616,7 +616,7 @@ export default function PhotoManagerPage() {
               active={activeTab === "rejected"}
               onClick={() => setActiveTab("rejected")}
               icon={XCircle}
-              label="Reprovadas"
+              label="Rejected"
               count={rejectedPhotos.length}
               color="rose"
             />
@@ -626,8 +626,8 @@ export default function PhotoManagerPage() {
             {activeTab === "pending" && (
               <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
                 <p className="font-sans text-sm leading-relaxed text-amber-900">
-                  Fotos pendentes aguardam revisao humana. Se a IA nao conseguir concluir a leitura,
-                  o arquivo continua retido ate a curadoria do time.
+                  Pending photos are awaiting human review. If AI cannot complete the scan,
+                  the file remains held until the team curates it.
                 </p>
               </div>
             )}
@@ -654,7 +654,7 @@ export default function PhotoManagerPage() {
                       {getPhotoUrl(photo) ? (
                         <img
                           src={getPhotoUrl(photo)}
-                          alt="Foto do perfil"
+                          alt="Profile photo"
                           className="h-full w-full object-cover"
                         />
                       ) : (
