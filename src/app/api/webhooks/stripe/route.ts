@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { createClient } from '@/lib/supabase/server'
+import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY
@@ -16,11 +16,11 @@ export async function POST(request: NextRequest) {
   let event: Stripe.Event
   try {
     event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!)
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Webhook signature verification failed' }, { status: 400 })
   }
 
-  const supabase = await createClient()
+  const supabase = createSupabaseAdminClient()
 
   switch (event.type) {
     case 'payment_intent.succeeded': {

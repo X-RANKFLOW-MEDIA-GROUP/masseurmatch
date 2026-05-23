@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getRequestSession } from '@/app/api/_lib/session'
+import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
 
 export async function GET(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = getRequestSession(request)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const supabase = createSupabaseAdminClient()
   const { searchParams } = new URL(request.url)
   const status = searchParams.get('status')
   const role = searchParams.get('role') ?? 'client'
@@ -20,9 +21,9 @@ export async function GET(request: NextRequest) {
     .order('start_time', { ascending: true })
 
   if (role === 'therapist') {
-    query = query.eq('therapist_id', user.id)
+    query = query.eq('therapist_id', session.userId)
   } else {
-    query = query.eq('client_id', user.id)
+    query = query.eq('client_id', session.userId)
   }
 
   if (status) query = query.eq('status', status)
@@ -33,10 +34,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = getRequestSession(request)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const supabase = createSupabaseAdminClient()
   const body = await request.json()
   const { therapist_id, start_time, end_time, service_type, notes, location_type } = body
 
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
   const { data, error } = await supabase
     .from('appointments')
     .insert({
-      client_id: user.id,
+      client_id: session.userId,
       therapist_id,
       start_time,
       end_time,

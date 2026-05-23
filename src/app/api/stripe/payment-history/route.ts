@@ -1,11 +1,12 @@
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { getRequestSession } from '@/app/api/_lib/session'
+import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
 
-export async function GET() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function GET(request: NextRequest) {
+  const session = getRequestSession(request)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const supabase = createSupabaseAdminClient()
   const { data, error } = await supabase
     .from('payment_transactions')
     .select(`
@@ -15,7 +16,7 @@ export async function GET() {
         therapist:therapist_id(full_name, avatar_url)
       )
     `)
-    .eq('user_id', user.id)
+    .eq('user_id', session.userId)
     .order('created_at', { ascending: false })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

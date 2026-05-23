@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getRequestSession } from '@/app/api/_lib/session'
+import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
 
 export async function GET(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = getRequestSession(request)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const supabase = createSupabaseAdminClient()
   const { searchParams } = new URL(request.url)
   const conversationId = searchParams.get('conversation_id')
 
   if (!conversationId) {
-    // Return conversations list
     const { data, error } = await supabase
       .from('conversations')
       .select(`
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
         participant_b:participant_b_id(id, full_name, avatar_url),
         last_message:messages(content, created_at, sender_id)
       `)
-      .or(`participant_a_id.eq.${user.id},participant_b_id.eq.${user.id}`)
+      .or(`participant_a_id.eq.${session.userId},participant_b_id.eq.${session.userId}`)
       .order('updated_at', { ascending: false })
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -35,12 +35,11 @@ export async function GET(request: NextRequest) {
     .eq('conversation_id', conversationId)
     .order('created_at', { ascending: true })
 
-  // Mark messages as read
   await supabase
     .from('messages')
     .update({ read_at: new Date().toISOString() })
     .eq('conversation_id', conversationId)
-    .neq('sender_id', user.id)
+    .neq('sender_id', session.userId)
     .is('read_at', null)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -48,10 +47,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = getRequestSession(request)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const supabase = createSupabaseAdminClient()
   const body = await request.json()
   const { recipient_id, content, conversation_id } = body
 
@@ -62,12 +61,11 @@ export async function POST(request: NextRequest) {
   if (!convId) {
     if (!recipient_id) return NextResponse.json({ error: 'recipient_id or conversation_id required' }, { status: 400 })
 
-    // Find or create conversation
     const { data: existing } = await supabase
       .from('conversations')
       .select('id')
       .or(
-        `and(participant_a_id.eq.${user.id},participant_b_id.eq.${recipient_id}),and(participant_a_id.eq.${recipient_id},participant_b_id.eq.${user.id})`
+        `and(participant_a_id.eq.${session.userId},participant_b_id.eq.${recipient_id}),and(participant_a_id.eq.${recipient_id},participant_b_id.eq.${session.userId})`
       )
       .maybeSingle()
 
@@ -76,7 +74,7 @@ export async function POST(request: NextRequest) {
     } else {
       const { data: newConv, error: convError } = await supabase
         .from('conversations')
-        .insert({ participant_a_id: user.id, participant_b_id: recipient_id })
+        .insert({ participant_a_id: session.userId, participant_b_id: recipient_id })
         .select()
         .single()
       if (convError) return NextResponse.json({ error: convError.message }, { status: 500 })
@@ -86,11 +84,10 @@ export async function POST(request: NextRequest) {
 
   const { data, error } = await supabase
     .from('messages')
-    .insert({ conversation_id: convId, sender_id: user.id, content: content.trim() })
+    .insert({ conversation_id: convId, sender_id: session.userId, content: content.trim() })
     .select()
     .single()
 
-  // Update conversation updated_at
   await supabase.from('conversations').update({ updated_at: new Date().toISOString() }).eq('id', convId)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

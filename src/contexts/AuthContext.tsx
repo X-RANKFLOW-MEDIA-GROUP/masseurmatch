@@ -200,7 +200,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
       const result = await registerMutation({ email, password, fullName });
-      await establishClientSession(email, password, result.session);
+      if (!result.requiresEmailConfirmation) {
+        await establishClientSession(email, password, result.session);
+      }
       return {
         error: null,
         requiresEmailConfirmation: result.requiresEmailConfirmation,
