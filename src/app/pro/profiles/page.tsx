@@ -107,7 +107,7 @@ function ProfileForm({
       {/* Top bar */}
       <div className="flex items-center justify-between">
         <h2 className="font-display text-xl font-medium text-slate-900">
-          {form.id ? "Editar Perfil" : "Novo Perfil"}
+          {form.id ? "Edit Profile" : "New Profile"}
         </h2>
         <div className="flex items-center gap-3">
           {/* Active toggle */}
@@ -117,7 +117,7 @@ function ProfileForm({
             className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
               form.active ? "bg-emerald-500" : "bg-slate-300"
             }`}
-            aria-label="Ativo"
+            aria-label="Active"
           >
             <span
               className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
@@ -126,22 +126,22 @@ function ProfileForm({
             />
           </button>
           <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">
-            {form.active ? "Ativo" : "Inativo"}
+            {form.active ? "Active" : "Inactive"}
           </span>
 
           {form.verified && (
             <span className="flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-indigo-600">
               <ShieldCheck className="h-3 w-3" />
-              Verificado
+              Verified
             </span>
           )}
         </div>
       </div>
 
-      {/* Nome do Perfil + Modo */}
+      {/* Profile Name + Mode */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label className={labelCls}>Nome do Perfil *</label>
+          <label className={labelCls}>Profile Name *</label>
           <input
             className={inputCls}
             placeholder="Ex: Dallas — Semana"
@@ -150,7 +150,7 @@ function ProfileForm({
           />
         </div>
         <div>
-          <label className={labelCls}>Modo de Operação</label>
+          <label className={labelCls}>Operation Mode</label>
           <select className={inputCls} value={form.mode} onChange={field("mode")}>
             {MODE_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -161,14 +161,14 @@ function ProfileForm({
         </div>
       </div>
 
-      {/* Localização */}
+      {/* Location */}
       <section className="space-y-4">
         <h3 className="font-mono text-[10px] uppercase tracking-widest text-slate-400">
-          Localização
+          Location
         </h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label className={labelCls}>Cidade *</label>
+            <label className={labelCls}>City *</label>
             <input
               className={inputCls}
               placeholder="Ex: Dallas"
@@ -177,7 +177,7 @@ function ProfileForm({
             />
           </div>
           <div>
-            <label className={labelCls}>Bairro *</label>
+            <label className={labelCls}>Neighborhood *</label>
             <input
               className={inputCls}
               placeholder="Ex: Uptown"
@@ -187,7 +187,7 @@ function ProfileForm({
           </div>
         </div>
         <div>
-          <label className={labelCls}>Endereço Completo *</label>
+          <label className={labelCls}>Full Address *</label>
           <input
             className={inputCls}
             placeholder="Ex: 123 Main St, Suite 4"
@@ -197,14 +197,14 @@ function ProfileForm({
         </div>
       </section>
 
-      {/* Datas & Horários */}
+      {/* Dates & Hours */}
       <section className="space-y-4">
         <h3 className="font-mono text-[10px] uppercase tracking-widest text-slate-400">
-          Datas &amp; Horários
+          Dates &amp; Hours
         </h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
-            <label className={labelCls}>Período (texto) *</label>
+            <label className={labelCls}>Period (text) *</label>
             <input
               className={inputCls}
               placeholder="Ex: 10h–22h"
@@ -213,7 +213,7 @@ function ProfileForm({
             />
           </div>
           <div>
-            <label className={labelCls}>Data/Hora de Chegada *</label>
+            <label className={labelCls}>Arrival Date/Time *</label>
             <input
               type="datetime-local"
               className={inputCls}
@@ -233,9 +233,9 @@ function ProfileForm({
         </div>
       </section>
 
-      {/* Preços */}
+      {/* Pricing */}
       <section className="space-y-4">
-        <h3 className="font-mono text-[10px] uppercase tracking-widest text-slate-400">Preços</h3>
+        <h3 className="font-mono text-[10px] uppercase tracking-widest text-slate-400">Pricing</h3>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {/* Individual */}
@@ -274,7 +274,7 @@ function ProfileForm({
           {/* Casais */}
           <div className="space-y-3 border border-slate-100 p-4">
             <p className="font-mono text-[10px] uppercase tracking-widest text-slate-500">
-              Casais (Total)
+              Couples (Total)
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -308,10 +308,10 @@ function ProfileForm({
         {/* Parking + AA */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label className={labelCls}>Estacionamento</label>
+            <label className={labelCls}>Parking</label>
             <input
               className={inputCls}
-              placeholder="Ex: Gratuito na rua"
+              placeholder="e.g. Free street parking"
               value={form.parking}
               onChange={field("parking")}
             />
@@ -320,7 +320,7 @@ function ProfileForm({
             <label className={labelCls}>AA</label>
             <input
               className={inputCls}
-              placeholder="Ex: Disponível"
+              placeholder="e.g. Available"
               value={form.aa}
               onChange={field("aa")}
             />
@@ -333,9 +333,9 @@ function ProfileForm({
         <div className="flex items-center gap-3">
           <Bot className="h-5 w-5 text-indigo-500" />
           <div>
-            <p className="font-sans text-sm font-medium text-slate-800">Respostas com IA</p>
+            <p className="font-sans text-sm font-medium text-slate-800">AI Responses</p>
             <p className="font-sans text-xs text-slate-500">
-              A IA gera respostas personalizadas automaticamente
+              AI generates personalized responses automatically
             </p>
           </div>
         </div>
@@ -345,7 +345,7 @@ function ProfileForm({
           className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
             form.aiResponses ? "bg-indigo-500" : "bg-slate-300"
           }`}
-          aria-label="Respostas com IA"
+          aria-label="AI Responses"
         >
           <span
             className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
@@ -363,7 +363,7 @@ function ProfileForm({
           className="flex items-center gap-2 border border-slate-200 px-5 py-2 font-sans text-sm text-slate-600 transition-colors hover:bg-slate-50"
         >
           <X className="h-4 w-4" />
-          Cancelar
+          Cancel
         </button>
         <button
           type="button"
@@ -371,7 +371,7 @@ function ProfileForm({
           className="flex items-center gap-2 bg-slate-950 px-6 py-2 font-sans text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800 active:scale-95"
         >
           <Save className="h-4 w-4" />
-          Guardar Perfil
+          Save Profile
         </button>
       </div>
     </motion.div>
@@ -413,12 +413,12 @@ function ProfileCard({
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <p className="font-display text-base font-medium text-slate-900 truncate">
-              {profile.name || <span className="italic text-slate-400">Sem nome</span>}
+              {profile.name || <span className="italic text-slate-400">No name</span>}
             </p>
             {profile.verified && (
               <span className="flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-indigo-600">
                 <ShieldCheck className="h-3 w-3" />
-                Verificado
+                Verified
               </span>
             )}
             {profile.aiResponses && (
@@ -429,7 +429,7 @@ function ProfileCard({
             )}
           </div>
           <p className="mt-0.5 font-sans text-xs text-slate-400 truncate">
-            {[profile.city, profile.neighborhood].filter(Boolean).join(" · ") || "Sem localização"}
+            {[profile.city, profile.neighborhood].filter(Boolean).join(" · ") || "No location"}
             {profile.period ? ` · ${profile.period}` : ""}
           </p>
         </div>
@@ -439,7 +439,7 @@ function ProfileCard({
             type="button"
             onClick={() => setExpanded((v) => !v)}
             className="p-1.5 text-slate-400 hover:text-slate-700 transition-colors"
-            aria-label={expanded ? "Recolher" : "Expandir"}
+            aria-label={expanded ? "Collapse" : "Expand"}
           >
             {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
@@ -447,7 +447,7 @@ function ProfileCard({
             type="button"
             onClick={onEdit}
             className="p-1.5 text-slate-400 hover:text-slate-700 transition-colors"
-            aria-label="Editar"
+            aria-label="Edit"
           >
             <Pencil className="h-4 w-4" />
           </button>
@@ -455,7 +455,7 @@ function ProfileCard({
             type="button"
             onClick={onDelete}
             className="p-1.5 text-slate-400 hover:text-red-500 transition-colors"
-            aria-label="Eliminar"
+            aria-label="Delete"
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -465,7 +465,7 @@ function ProfileCard({
             className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
               profile.active ? "bg-emerald-500" : "bg-slate-300"
             }`}
-            aria-label="Alternar ativo"
+            aria-label="Toggle active"
           >
             <span
               className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
@@ -488,15 +488,15 @@ function ProfileCard({
           >
             <div className="grid grid-cols-2 gap-x-6 gap-y-3 p-5 sm:grid-cols-3 md:grid-cols-4">
               {[
-                { label: "Modo", value: MODE_OPTIONS.find((m) => m.value === profile.mode)?.label },
-                { label: "Endereço", value: profile.address },
-                { label: "Chegada", value: profile.arrivalDate ? new Date(profile.arrivalDate).toLocaleString("pt-BR") : "" },
+                { label: "Mode", value: MODE_OPTIONS.find((m) => m.value === profile.mode)?.label },
+                { label: "Address", value: profile.address },
+                { label: "Arrival", value: profile.arrivalDate ? new Date(profile.arrivalDate).toLocaleString("en-US") : "" },
                 { label: "ETA", value: profile.eta },
                 { label: "60min Individual", value: profile.price60Individual ? `$${profile.price60Individual}` : "" },
                 { label: "90min Individual", value: profile.price90Individual ? `$${profile.price90Individual}` : "" },
-                { label: "60min Casal", value: profile.price60Couple ? `$${profile.price60Couple}` : "" },
-                { label: "90min Casal", value: profile.price90Couple ? `$${profile.price90Couple}` : "" },
-                { label: "Estacionamento", value: profile.parking },
+                { label: "60min Couple", value: profile.price60Couple ? `$${profile.price60Couple}` : "" },
+                { label: "90min Couple", value: profile.price90Couple ? `$${profile.price90Couple}` : "" },
+                { label: "Parking", value: profile.parking },
                 { label: "AA", value: profile.aa },
               ]
                 .filter((r) => r.value)
@@ -516,7 +516,7 @@ function ProfileCard({
   );
 }
 
-export default function GerenciarPerfisPage() {
+export default function ManageProfilesPage() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [editing, setEditing] = useState<(Omit<Profile, "id"> & { id?: string }) | null>(null);
   const [saved, setSaved] = useState(false);
@@ -560,15 +560,15 @@ export default function GerenciarPerfisPage() {
       {/* Sticky header */}
       <div className="sticky top-4 z-30 flex flex-col justify-between gap-4 border border-slate-200/60 bg-white p-5 shadow-sm sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-display text-2xl font-medium text-slate-900">Gerenciar Perfis</h1>
+          <h1 className="font-display text-2xl font-medium text-slate-900">Manage Profiles</h1>
           <p className="font-sans text-sm text-slate-500">
-            Configure seus perfis de auto-resposta
+            Configure your auto-response profiles
           </p>
         </div>
         <div className="flex items-center gap-4">
           {profiles.length > 0 && (
             <span className="font-mono text-xs text-slate-400">
-              {activeCount} ativo{activeCount !== 1 ? "s" : ""} · {profiles.length} total
+              {activeCount} active · {profiles.length} total
             </span>
           )}
           <AnimatePresence>
@@ -580,7 +580,7 @@ export default function GerenciarPerfisPage() {
                 className="flex items-center gap-1.5 font-mono text-xs text-emerald-600"
               >
                 <CheckCircle2 className="h-3.5 w-3.5" />
-                Guardado
+                Saved
               </motion.span>
             )}
           </AnimatePresence>
@@ -591,7 +591,7 @@ export default function GerenciarPerfisPage() {
             className="flex items-center gap-2 bg-slate-950 px-5 py-2.5 font-sans text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800 disabled:opacity-40 active:scale-95"
           >
             <Plus className="h-4 w-4" />
-            Novo Perfil
+            New Profile
           </button>
         </div>
       </div>
@@ -619,9 +619,9 @@ export default function GerenciarPerfisPage() {
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
             <Bot className="h-6 w-6 text-slate-400" />
           </div>
-          <p className="font-display text-lg font-medium text-slate-700">Nenhum perfil criado</p>
+          <p className="font-display text-lg font-medium text-slate-700">No profiles created</p>
           <p className="mt-1 font-sans text-sm text-slate-400">
-            Crie o seu primeiro perfil de auto-resposta.
+            Create your first auto-response profile.
           </p>
           <button
             type="button"
@@ -629,7 +629,7 @@ export default function GerenciarPerfisPage() {
             className="mt-6 flex items-center gap-2 bg-slate-950 px-5 py-2.5 font-sans text-sm font-semibold text-white hover:bg-slate-800"
           >
             <Plus className="h-4 w-4" />
-            Criar Perfil
+            Create Profile
           </button>
         </motion.div>
       ) : (

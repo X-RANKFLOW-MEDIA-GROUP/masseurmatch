@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     if (city) query = query.eq("city", city);
     if (tier) query = query.eq("subscription_tier", tier);
     if (available) query = query.eq("available_now", available === "true");
-    // Adicione outros filtros conforme necessário
+    // Add additional filters as needed
     const { data, error } = await query.limit(200);
     if (error) throw error;
 

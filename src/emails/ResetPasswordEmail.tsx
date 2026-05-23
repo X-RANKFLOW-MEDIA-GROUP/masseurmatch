@@ -9,26 +9,26 @@ interface ResetPasswordEmailProps {
 
 export default function ResetPasswordEmail({ resetUrl = "https://masseurmatch.com/reset" }: ResetPasswordEmailProps) {
   return (
-    <BaseLayout previewText="Instruções para redefinir a tua password">
+    <BaseLayout previewText="Instructions to reset your password">
       <Text className="text-slate-900 text-xl font-medium mb-4">
-        Redefinir Password
+        Reset Password
       </Text>
-      
+
       <Text className="text-slate-600 text-sm leading-relaxed mb-6">
-        Recebemos um pedido para alterar a password da tua conta. Para criares uma nova password, clica no botão abaixo.
+        We received a request to change the password for your account. To create a new password, click the button below.
       </Text>
 
       <Section className="text-center mt-6 mb-6">
-        <Button 
-          href={resetUrl} 
+        <Button
+          href={resetUrl}
           className="bg-slate-950 text-white px-8 py-4 rounded-md text-sm font-semibold tracking-wide"
         >
-          Criar Nova Password
+          Create New Password
         </Button>
       </Section>
 
       <Text className="text-slate-500 text-xs mt-6">
-        Se não fizeste este pedido, a tua conta está segura e nenhuma alteração foi feita.
+        If you did not make this request, your account is safe and no changes have been made.
       </Text>
     </BaseLayout>
   );

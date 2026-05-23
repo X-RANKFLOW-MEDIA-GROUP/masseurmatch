@@ -111,7 +111,7 @@ export default function ProSettingsPage() {
     setNotifLoading(false);
 
     if (!res.ok) {
-      toast({ title: "Erro", description: "Não foi possível guardar preferências." });
+      toast({ title: "Error", description: "Could not save preferences." });
       return;
     }
 
@@ -122,10 +122,10 @@ export default function ProSettingsPage() {
     <div className="mx-auto max-w-3xl space-y-8 p-6 pb-32 md:p-10">
       <header>
         <h1 className="font-display text-3xl font-semibold tracking-tight text-slate-900">
-          Configurações
+          Settings
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          Gerencie sua conta, segurança e preferências de notificação.
+          Manage your account, security, and notification preferences.
         </p>
       </header>
 
@@ -133,18 +133,18 @@ export default function ProSettingsPage() {
       <section className="overflow-hidden border border-slate-200/60 bg-white shadow-sm">
         <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-4">
           <User className="h-4 w-4 text-slate-500" />
-          <h2 className="font-sans text-sm font-semibold text-slate-900">Conta</h2>
+          <h2 className="font-sans text-sm font-semibold text-slate-900">Account</h2>
         </div>
         <div className="space-y-4 p-6">
           <div>
             <p className="mb-1 text-xs font-medium uppercase tracking-wider text-slate-500">
-              E-mail
+              Email
             </p>
             <p className="font-sans text-sm text-slate-900">{user?.email ?? "—"}</p>
           </div>
           <div>
             <p className="mb-1 text-xs font-medium uppercase tracking-wider text-slate-500">
-              ID da conta
+              Account ID
             </p>
             <p className="font-mono text-xs text-slate-400">{user?.id ?? "—"}</p>
           </div>
@@ -155,12 +155,12 @@ export default function ProSettingsPage() {
       <section className="overflow-hidden border border-slate-200/60 bg-white shadow-sm">
         <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-4">
           <Key className="h-4 w-4 text-slate-500" />
-          <h2 className="font-sans text-sm font-semibold text-slate-900">Alterar Palavra-passe</h2>
+          <h2 className="font-sans text-sm font-semibold text-slate-900">Change Password</h2>
         </div>
         <form onSubmit={handlePasswordChange} className="space-y-4 p-6">
           <div className="grid gap-2">
             <label htmlFor="current-pw" className="text-xs font-medium uppercase tracking-wider text-slate-500">
-              Palavra-passe Atual
+              Current Password
             </label>
             <PasswordInput
               id="current-pw"
@@ -172,7 +172,7 @@ export default function ProSettingsPage() {
           </div>
           <div className="grid gap-2">
             <label htmlFor="new-pw" className="text-xs font-medium uppercase tracking-wider text-slate-500">
-              Nova Palavra-passe
+              New Password
             </label>
             <PasswordInput
               id="new-pw"
@@ -185,7 +185,7 @@ export default function ProSettingsPage() {
           </div>
           <div className="grid gap-2">
             <label htmlFor="confirm-pw" className="text-xs font-medium uppercase tracking-wider text-slate-500">
-              Confirmar Nova Palavra-passe
+              Confirm New Password
             </label>
             <PasswordInput
               id="confirm-pw"
@@ -202,7 +202,7 @@ export default function ProSettingsPage() {
             className="gap-2"
           >
             <Save className="h-4 w-4" />
-            {pwLoading ? "A guardar…" : "Guardar Palavra-passe"}
+            {pwLoading ? "Saving…" : "Save Password"}
           </Button>
         </form>
       </section>
@@ -211,14 +211,14 @@ export default function ProSettingsPage() {
       <section className="overflow-hidden border border-slate-200/60 bg-white shadow-sm">
         <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-4">
           <Shield className="h-4 w-4 text-slate-500" />
-          <h2 className="font-sans text-sm font-semibold text-slate-900">Segurança</h2>
+          <h2 className="font-sans text-sm font-semibold text-slate-900">Security</h2>
         </div>
         <div className="p-6">
           <p className="mb-4 text-sm text-slate-500">
-            Caso tenha esquecido a sua palavra-passe, pode redefiní-la via e-mail.
+            If you forgot your password, you can reset it via email.
           </p>
           <Button variant="outline" asChild>
-            <Link href="/forgot-password">Redefinir via e-mail</Link>
+            <Link href="/forgot-password">Reset via Email</Link>
           </Button>
         </div>
       </section>
@@ -227,13 +227,13 @@ export default function ProSettingsPage() {
       <section className="overflow-hidden border border-slate-200/60 bg-white shadow-sm">
         <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-4">
           <Bell className="h-4 w-4 text-slate-500" />
-          <h2 className="font-sans text-sm font-semibold text-slate-900">Notificações</h2>
+          <h2 className="font-sans text-sm font-semibold text-slate-900">Notifications</h2>
         </div>
         <div className="space-y-4 p-6">
           <label className="flex cursor-pointer items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-900">Notificações por e-mail</p>
-              <p className="text-xs text-slate-500">Novos contatos, mensagens e atualizações de ranking</p>
+              <p className="text-sm font-medium text-slate-900">Email Notifications</p>
+              <p className="text-xs text-slate-500">New contacts, messages, and ranking updates</p>
             </div>
             <input
               type="checkbox"
@@ -244,8 +244,8 @@ export default function ProSettingsPage() {
           </label>
           <label className="flex cursor-pointer items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-900">Notificações por SMS</p>
-              <p className="text-xs text-slate-500">Alertas urgentes de novos pedidos de contacto</p>
+              <p className="text-sm font-medium text-slate-900">SMS Notifications</p>
+              <p className="text-xs text-slate-500">Urgent alerts for new contact requests</p>
             </div>
             <input
               type="checkbox"
@@ -256,8 +256,8 @@ export default function ProSettingsPage() {
           </label>
           <label className="flex cursor-pointer items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-900">Notificações Push</p>
-              <p className="text-xs text-slate-500">Alertas no navegador para atualizações em tempo real</p>
+              <p className="text-sm font-medium text-slate-900">Push Notifications</p>
+              <p className="text-xs text-slate-500">Browser alerts for real-time updates</p>
             </div>
             <input
               type="checkbox"
@@ -268,7 +268,7 @@ export default function ProSettingsPage() {
           </label>
           <div className="grid gap-2">
             <label htmlFor="sms-phone" className="text-xs font-medium uppercase tracking-wider text-slate-500">
-              Telefone SMS (E.164)
+              SMS Phone (E.164)
             </label>
             <Input
               id="sms-phone"
@@ -280,7 +280,7 @@ export default function ProSettingsPage() {
           </div>
           <Button onClick={handleSaveNotifications} className="gap-2">
             <Save className="h-4 w-4" />
-            {notifLoading ? "A guardar..." : "Guardar Preferências"}
+            {notifLoading ? "Saving..." : "Save Preferences"}
           </Button>
         </div>
       </section>
@@ -289,11 +289,11 @@ export default function ProSettingsPage() {
       <section className="overflow-hidden border border-rose-200 bg-rose-50 shadow-sm">
         <div className="flex items-center gap-3 border-b border-rose-100 px-6 py-4">
           <LogOut className="h-4 w-4 text-rose-500" />
-          <h2 className="font-sans text-sm font-semibold text-rose-900">Sessão</h2>
+          <h2 className="font-sans text-sm font-semibold text-rose-900">Session</h2>
         </div>
         <div className="p-6">
           <p className="mb-4 text-sm text-rose-700">
-            Terminar sessão em todos os dispositivos.
+            Sign out from all devices.
           </p>
           <Button
             variant="destructive"
@@ -301,7 +301,7 @@ export default function ProSettingsPage() {
             className="gap-2"
           >
             <LogOut className="h-4 w-4" />
-            Terminar Sessão
+            Sign Out
           </Button>
         </div>
       </section>

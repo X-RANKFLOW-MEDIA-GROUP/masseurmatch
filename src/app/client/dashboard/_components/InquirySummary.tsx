@@ -9,11 +9,11 @@ import { Mail, CheckCircle2, Clock3, AlertCircle, ArrowRight } from 'lucide-reac
 
 type Inquiry = {
   id: string;
-  therapist_id: string;
-  status: string;
-  message: string;
+  profile_id: string | null;
+  status: string | null;
+  message: string | null;
   created_at: string;
-  therapist: { display_name: string } | null;
+  therapist: { display_name: string | null } | null;
 };
 
 export function InquirySummary({ userEmail }: { userEmail: string }) {
@@ -25,7 +25,7 @@ export function InquirySummary({ userEmail }: { userEmail: string }) {
     async function loadInquiries() {
       const { data, error } = await supabase
         .from('contact_inquiries')
-        .select('id, therapist_id, status, message, created_at, therapist:therapists!therapist_id(display_name)')
+        .select('id, profile_id, status, message, created_at, therapist:profiles!profile_id(display_name)')
         .eq('client_email', userEmail)
         .order('created_at', { ascending: false })
         .limit(5);

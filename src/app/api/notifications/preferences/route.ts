@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "http://placeholder.supabase.invalid",
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || "placeholder-key",
-);
+import { requireSession, createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 
 type PreferencePayload = {
-  userId: string;
   emailEnabled?: boolean;
   smsEnabled?: boolean;
   pushEnabled?: boolean;
@@ -36,25 +30,26 @@ const isMissingPreferencesTable = (message = "") =>
   message.includes("schema cache");
 
 export async function GET(request: NextRequest) {
-  const userId = new URL(request.url).searchParams.get("userId");
-
-  if (!userId) {
-    return NextResponse.json({ error: "userId is required" }, { status: 400 });
+  let session;
+  try {
+    session = await requireSession(request as unknown as Request);
+  } catch {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
   }
 
-  const fallback = defaultPreferences(userId);
+  const supabase = createSupabaseAdminClient();
+  const fallback = defaultPreferences(session.userId);
 
   const { data, error } = await supabase
     .from("user_notification_preferences")
     .select("*")
-    .eq("user_id", userId)
+    .eq("user_id", session.userId)
     .maybeSingle();
 
   if (error) {
     if (isMissingPreferencesTable(error.message)) {
       return NextResponse.json({ preferences: fallback, migrationPending: true });
     }
-
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
@@ -62,15 +57,19 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  let session;
+  try {
+    session = await requireSession(request as unknown as Request);
+  } catch {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+
   try {
     const body: PreferencePayload = await request.json();
+    const supabase = createSupabaseAdminClient();
 
-    if (!body.userId) {
-      return NextResponse.json({ error: "userId is required" }, { status: 400 });
-    }
-
-    const fallback = {
-      ...defaultPreferences(body.userId),
+    const upsertData = {
+      ...defaultPreferences(session.userId),
       email_enabled: body.emailEnabled ?? true,
       sms_enabled: body.smsEnabled ?? false,
       push_enabled: body.pushEnabled ?? false,
@@ -83,15 +82,14 @@ export async function PUT(request: NextRequest) {
 
     const { data, error } = await supabase
       .from("user_notification_preferences")
-      .upsert(fallback, { onConflict: "user_id" })
+      .upsert(upsertData, { onConflict: "user_id" })
       .select("*")
       .single();
 
     if (error) {
       if (isMissingPreferencesTable(error.message)) {
-        return NextResponse.json({ preferences: fallback, migrationPending: true });
+        return NextResponse.json({ preferences: upsertData, migrationPending: true });
       }
-
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 

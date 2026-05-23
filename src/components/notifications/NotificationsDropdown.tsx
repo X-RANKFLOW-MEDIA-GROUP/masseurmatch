@@ -52,7 +52,7 @@ export function NotificationsDropdown() {
       const res = await fetch(`/api/notifications?userId=${user.id}&limit=20`);
       const data = await res.json();
       setNotifications(data.notifications ?? []);
-      setUnreadCount(data.unreadCount ?? 0);
+      setUnreadCount(data.unread_count ?? 0);
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
     }
@@ -88,10 +88,7 @@ export function NotificationsDropdown() {
     await fetch("/api/notifications", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        notificationIds: [notificationId],
-        userId: user.id,
-      }),
+      body: JSON.stringify({ notification_ids: [notificationId] }),
     });
 
     setNotifications((prev) =>
@@ -107,10 +104,7 @@ export function NotificationsDropdown() {
     await fetch("/api/notifications", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        markAllRead: true,
-        userId: user.id,
-      }),
+      body: JSON.stringify({ mark_all: true }),
     });
 
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));

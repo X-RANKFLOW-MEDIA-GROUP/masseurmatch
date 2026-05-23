@@ -1,19 +1,54 @@
+import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import { getRequestSession } from '@/app/api/_lib/session'
+import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
 
 export const metadata = { robots: 'noindex, nofollow' }
 
-export default async function ClientFavoritesPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login?redirect=/client/favorites')
+async function getSession() {
+  const cookieStore = await cookies()
+  return getRequestSession(
+    new Request('http://localhost/client/favorites', {
+      headers: { cookie: cookieStore.toString() },
+    })
+  )
+}
 
+type TherapistProfile = {
+  id: string
+  full_name: string | null
+  avatar_url: string | null
+  slug: string | null
+  city: string | null
+  state: string | null
+  average_rating: number
+  review_count: number
+}
+
+export default async function ClientFavoritesPage() {
+  const session = await getSession()
+  if (!session) redirect('/login?redirect=/client/favorites')
+
+  const supabase = createSupabaseAdminClient()
   const { data: favorites } = await supabase
     .from('favorites')
-    .select('*, therapist:therapist_id(id, full_name, avatar_url, slug, city, state, rating, review_count)')
-    .eq('user_id', user.id)
+    .select('id, therapist_id, created_at')
+    .eq('user_id', session.userId)
     .order('created_at', { ascending: false })
+
+  const therapistIds = [...new Set(
+    (favorites ?? []).map(f => f.therapist_id as string).filter(Boolean)
+  )]
+
+  const profilesById: Record<string, TherapistProfile> = {}
+  if (therapistIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, avatar_url, slug, city, state, average_rating, review_count')
+      .in('id', therapistIds)
+    profiles?.forEach(p => { profilesById[p.id] = p as TherapistProfile })
+  }
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -30,26 +65,37 @@ export default async function ClientFavoritesPage() {
           </div>
         ) : (
           <div className="grid gap-4">
-            {favorites.map((fav: any) => (
-              <div key={fav.id} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
-                {fav.therapist?.avatar_url && (
-                  <img src={fav.therapist.avatar_url} alt="" className="w-14 h-14 rounded-full object-cover" />
-                )}
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-800">{fav.therapist?.full_name}</p>
-                  <p className="text-sm text-gray-500">{fav.therapist?.city}, {fav.therapist?.state}</p>
-                  {fav.therapist?.rating && (
-                    <p className="text-sm text-yellow-600">⭐ {fav.therapist.rating.toFixed(1)} ({fav.therapist.review_count} reviews)</p>
+            {favorites.map(fav => {
+              const therapist = profilesById[fav.therapist_id as string] ?? null
+              return (
+                <div key={fav.id as string} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
+                  {therapist?.avatar_url && (
+                    <img src={therapist.avatar_url} alt="" className="w-14 h-14 rounded-full object-cover" />
+                  )}
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-800">{therapist?.full_name ?? 'Therapist'}</p>
+                    {(therapist?.city || therapist?.state) && (
+                      <p className="text-sm text-gray-500">
+                        {[therapist.city, therapist.state].filter(Boolean).join(', ')}
+                      </p>
+                    )}
+                    {therapist?.average_rating > 0 && (
+                      <p className="text-sm text-yellow-600">
+                        ⭐ {therapist.average_rating.toFixed(1)} ({therapist.review_count} reviews)
+                      </p>
+                    )}
+                  </div>
+                  {therapist?.slug && (
+                    <Link
+                      href={`/therapists/${therapist.slug}`}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
+                    >
+                      View Profile
+                    </Link>
                   )}
                 </div>
-                <Link
-                  href={`/therapists/${fav.therapist?.slug}`}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
-                >
-                  View Profile
-                </Link>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>

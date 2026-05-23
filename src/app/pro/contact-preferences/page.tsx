@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -9,17 +9,14 @@ import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface ContactPreferences {
   id: string;
-  therapist_id: string;
-  allow_phone: boolean;
-  allow_email: boolean;
-  allow_whatsapp: boolean;
+  therapist_id: string | null;
+  allow_phone: boolean | null;
+  allow_email: boolean | null;
+  allow_whatsapp: boolean | null;
   auto_reply_message: string | null;
 }
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || 'http://placeholder.supabase.invalid',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'placeholder-key'
-);
+const supabase = createClient();
 
 export default function ContactPreferencesPage() {
   const [preferences, setPreferences] = useState<ContactPreferences | null>(null);
@@ -49,9 +46,9 @@ export default function ContactPreferencesPage() {
         return;
       }
 
-      // Get therapist ID
+      // Get profile ID
       const { data: therapist } = await supabase
-        .from('therapists')
+        .from('profiles')
         .select('id')
         .eq('user_id', user.id)
         .single();
@@ -75,9 +72,9 @@ export default function ContactPreferencesPage() {
       if (prefs) {
         setPreferences(prefs);
         setFormData({
-          allow_phone: prefs.allow_phone,
-          allow_email: prefs.allow_email,
-          allow_whatsapp: prefs.allow_whatsapp,
+          allow_phone: prefs.allow_phone ?? true,
+          allow_email: prefs.allow_email ?? true,
+          allow_whatsapp: prefs.allow_whatsapp ?? false,
           auto_reply_message: prefs.auto_reply_message || '',
         });
       } else {
