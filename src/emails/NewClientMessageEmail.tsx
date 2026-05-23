@@ -9,34 +9,33 @@ interface NewClientMessageEmailProps {
   inboxUrl: string;
 }
 
-export default function NewClientMessageEmail({ 
-  therapistName = "Alex", 
+export default function NewClientMessageEmail({
+  therapistName = "Alex",
   clientCity = "Dallas",
-  inboxUrl = "https://masseurmatch.com/pro/messages" 
+  inboxUrl = "https://masseurmatch.com/pro/messages"
 }: NewClientMessageEmailProps) {
   return (
-    <BaseLayout previewText={`Novo pedido de massagem em ${clientCity}`}>
+    <BaseLayout previewText={`New massage request in ${clientCity}`}>
       <Text className="text-slate-900 text-xl font-medium mb-4">
-        Nova solicitação de cliente 🔔
-      </Text>
-      
-      <Text className="text-slate-600 text-sm leading-relaxed mb-6">
-        Olá {therapistName}, um cliente na área de <strong>{clientCity}</strong> acabou de enviar-te uma mensagem através do teu perfil no MasseurMatch.
+        New client request 🔔
       </Text>
 
-      {/* Caixa de destaque brutalista */}
+      <Text className="text-slate-600 text-sm leading-relaxed mb-6">
+        Hi {therapistName}, a client in the <strong>{clientCity}</strong> area just sent you a message through your MasseurMatch profile.
+      </Text>
+
       <Section className="bg-slate-50 border-l-4 border-indigo-500 p-4 mb-8">
         <Text className="text-slate-700 text-sm font-medium m-0">
-          Dica de Elite: Terapeutas que respondem nos primeiros 15 minutos têm 80% mais probabilidade de fechar a sessão.
+          Elite Tip: Therapists who respond within the first 15 minutes are 80% more likely to close the session.
         </Text>
       </Section>
 
       <Section className="text-center mb-6">
-        <Button 
-          href={inboxUrl} 
+        <Button
+          href={inboxUrl}
           className="bg-indigo-600 text-white px-8 py-4 rounded-md text-sm font-semibold tracking-wide"
         >
-          Ler e Responder Agora
+          Read and Reply Now
         </Button>
       </Section>
     </BaseLayout>

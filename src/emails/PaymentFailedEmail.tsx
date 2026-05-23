@@ -9,26 +9,26 @@ interface PaymentFailedEmailProps {
 
 export default function PaymentFailedEmail({ billingUrl = "https://masseurmatch.com/pro/billing" }: PaymentFailedEmailProps) {
   return (
-    <BaseLayout previewText="Ação Necessária: Atualiza o teu método de pagamento">
+    <BaseLayout previewText="Action Required: Update your payment method">
       <Text className="text-amber-600 text-xl font-medium mb-4">
-        Problema com o Pagamento
+        Payment Issue
       </Text>
-      
+
       <Text className="text-slate-600 text-sm leading-relaxed mb-6">
-        Não conseguimos processar a renovação da tua subscrição MasseurMatch Elite com o cartão que temos registado. Para não perderes acesso ao botão "Available Now" e ao teu posicionamento premium nas pesquisas, por favor atualiza os teus dados.
+        We were unable to process the renewal for your MasseurMatch Elite subscription with the card on file. To keep your &quot;Available Now&quot; button and premium search placement, please update your billing details.
       </Text>
 
       <Section className="text-center mt-6 mb-6">
-        <Button 
-          href={billingUrl} 
+        <Button
+          href={billingUrl}
           className="bg-amber-500 text-white px-8 py-4 rounded-md text-sm font-semibold tracking-wide"
         >
-          Atualizar Pagamento Seguro
+          Update Payment Securely
         </Button>
       </Section>
-      
+
       <Text className="text-slate-500 text-xs mt-6">
-        Tentaremos processar o pagamento novamente nas próximas 48 horas.
+        We will attempt to process the payment again within the next 48 hours.
       </Text>
     </BaseLayout>
   );
