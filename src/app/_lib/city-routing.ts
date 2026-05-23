@@ -65,13 +65,13 @@ export function canonicalCategoryToLegacyParts(category: string): string[] | nul
   const legacyPair = {
     "gay-massage": ["lgbtq-friendly"],
     "male-massage": ["male-therapists"],
-    "sports-massage": ["sports-recovery"],
+    "sports-massage": ["wellness", "sports-recovery"],
     "deep-tissue": ["wellness", "deep-tissue"],
     swedish: ["wellness", "swedish"],
     incall: ["wellness", "incall"],
     outcall: ["wellness", "outcall"],
-    mobile: ["wellness", "outcall"],
-    hotel: ["wellness", "outcall"],
+    mobile: ["wellness", "mobile-massage"],
+    hotel: ["wellness", "hotel-massage"],
   } as Record<string, string[]>;
 
   return legacyPair[category] || null;
