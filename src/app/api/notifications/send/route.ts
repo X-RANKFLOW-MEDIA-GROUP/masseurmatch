@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import type { Json } from "@/integrations/supabase/types";
 import { Resend } from "resend";
 import twilio from "twilio";
-
-const supabase = createClient(
-  process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "http://placeholder.supabase.invalid",
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || "placeholder-key",
-);
 
 const resendApiKey = process.env.RESEND_API_KEY;
 const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -32,6 +28,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "userId, type and title are required" }, { status: 400 });
     }
 
+    const supabase = createSupabaseAdminClient();
+
     const { data: prefs } = await supabase
       .from("user_notification_preferences")
       .select("email_enabled,sms_enabled,push_enabled,phone_e164")
@@ -52,7 +50,7 @@ export async function POST(request: NextRequest) {
           type: body.type,
           title: body.title,
           message: body.message ?? null,
-          data: body.data ?? {},
+          data: (body.data ?? {}) as Json,
         })
         .select("id")
         .single();
@@ -69,7 +67,7 @@ export async function POST(request: NextRequest) {
         channel: "in_app",
         provider: "supabase",
         status: "sent",
-        payload: body.data ?? {},
+        payload: (body.data ?? {}) as Json,
       });
     }
 
@@ -179,6 +177,7 @@ async function logDelivery(input: {
   errorMessage?: string;
   payload?: Record<string, unknown>;
 }) {
+  const supabase = createSupabaseAdminClient();
   await supabase.from("notification_deliveries").insert({
     notification_id: input.notificationId,
     user_id: input.userId,
@@ -188,6 +187,6 @@ async function logDelivery(input: {
     destination: input.destination ?? null,
     status: input.status,
     error_message: input.errorMessage ?? null,
-    payload: input.payload ?? {},
+    payload: (input.payload ?? {}) as Json,
   });
 }

@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
+import { useAuth } from '@/contexts/AuthContext'
 
 type Conversation = {
   id: string
@@ -18,11 +19,12 @@ type Message = {
 }
 
 export default function ClientMessagesPage() {
+  const { user } = useAuth()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [activeConvId, setActiveConvId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  const currentUserId = user?.id ?? null
   const [loading, setLoading] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -33,8 +35,6 @@ export default function ClientMessagesPage() {
         setConversations(d.conversations ?? [])
         setLoading(false)
       })
-    // Get current user id from session
-    fetch('/api/auth/session').then(r => r.json()).then(d => setCurrentUserId(d?.user?.id ?? null))
   }, [])
 
   useEffect(() => {

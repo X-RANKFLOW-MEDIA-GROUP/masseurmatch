@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { setSessionCookie } from "@/app/api/_lib/session";
 import { withSetCookie } from "@/app/api/_lib/http";
-import { envAny } from "@/app/api/_lib/env";
-import { ensureUserProfileAndRole } from "@/app/api/_lib/supabase-server";
+import { ensureUserProfileAndRole, createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { isRateLimited } from "@/app/api/_lib/rate-limit";
 
 function secureJson(body: unknown, status = 200) {
@@ -40,20 +38,7 @@ export async function POST(request: NextRequest) {
     return secureJson({ error: "Missing access_token" }, 400);
   }
 
-  const supabaseUrl = envAny(
-    ["SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL", "VITE_SUPABASE_URL"],
-    "",
-  );
-
-  const serviceKey = envAny(["SUPABASE_SERVICE_ROLE_KEY"], "");
-
-  if (!supabaseUrl || !serviceKey) {
-    return secureJson({ error: "Server misconfigured" }, 500);
-  }
-
-  const supabase = createClient(supabaseUrl, serviceKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
+  const supabase = createSupabaseAdminClient();
 
   const {
     data: { user },

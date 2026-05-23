@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getRequestSession } from '@/app/api/_lib/session'
+import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
 import Stripe from 'stripe'
 
 function getStripe() {
@@ -9,17 +10,17 @@ function getStripe() {
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = getRequestSession(request)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const supabase = createSupabaseAdminClient()
   const { transaction_id, reason } = await request.json()
 
   const { data: tx, error: txError } = await supabase
     .from('payment_transactions')
     .select('*')
     .eq('id', transaction_id)
-    .eq('user_id', user.id)
+    .eq('user_id', session.userId)
     .single()
 
   if (txError || !tx) return NextResponse.json({ error: 'Transaction not found' }, { status: 404 })
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
   const stripe = getStripe()
 
   const refund = await stripe.refunds.create({
-    payment_intent: tx.stripe_payment_intent_id,
+    payment_intent: tx.stripe_payment_intent_id as string,
     reason: reason ?? 'requested_by_customer',
   })
 

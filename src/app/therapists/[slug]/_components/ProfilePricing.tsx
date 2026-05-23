@@ -21,13 +21,13 @@ export function ProfilePricing({ profile }: Props) {
   const hasIncall = sessions.some((s) => s.incall) || !!profile.incall_price;
   const hasOutcall = sessions.some((s) => s.outcall) || !!profile.outcall_price;
 
-  // Função para checar se valor está acima de +33.33% do valor base
+  // Check if a value is more than +33.33% above the base price
   function isOverLimit(base: number | null | undefined, value: number | null | undefined) {
     if (!base || !value) return false;
     return value > base * 1.3333;
   }
 
-  // Encontrar o menor valor base para referência (60min in-call, se existir)
+  // Find the base reference price (60min in-call, if it exists)
   const baseIncall = sessions.find((s) => s.duration === 60 && s.incall) ? sessions.find((s) => s.duration === 60)?.incall : undefined;
   const baseOutcall = sessions.find((s) => s.duration === 60 && s.outcall) ? sessions.find((s) => s.duration === 60)?.outcall : undefined;
 

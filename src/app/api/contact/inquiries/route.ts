@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { Resend } from 'resend';
+import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || 'http://placeholder.supabase.invalid',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'placeholder-key'
-);
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,92 +30,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let therapist: {
-      id: string;
-      profileId: string | null;
-      displayName: string | null;
-      contactEmail: string | null;
-      userId: string | null;
-    } | null = null;
+    const supabase = createSupabaseAdminClient();
 
-    const { data: profileMatch, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('id, user_id, display_name, full_name, email_address, email')
       .eq('id', therapistId)
       .maybeSingle();
 
     if (profileError) {
-      return NextResponse.json(
-        { message: profileError.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ message: profileError.message }, { status: 500 });
     }
 
-    if (profileMatch) {
-      therapist = {
-        id: profileMatch.id,
-        profileId: profileMatch.id,
-        displayName: profileMatch.display_name || profileMatch.full_name,
-        contactEmail: profileMatch.email_address || profileMatch.email,
-        userId: profileMatch.user_id,
-      };
+    if (!profile) {
+      return NextResponse.json({ message: 'Therapist not found' }, { status: 404 });
     }
 
-    if (!therapist) {
-      const { data: therapistProfile, error: therapistProfileError } = await supabase
-        .from('therapist_profiles')
-        .select('id, profile_id, user_id')
-        .eq('id', therapistId)
-        .maybeSingle();
-
-      if (therapistProfileError) {
-        return NextResponse.json(
-          { message: therapistProfileError.message },
-          { status: 500 }
-        );
-      }
-
-      if (therapistProfile?.profile_id) {
-        const { data: linkedProfile, error: linkedProfileError } = await supabase
-          .from('profiles')
-          .select('id, user_id, display_name, full_name, email_address, email')
-          .eq('id', therapistProfile.profile_id)
-          .maybeSingle();
-
-        if (linkedProfileError) {
-          return NextResponse.json(
-            { message: linkedProfileError.message },
-            { status: 500 }
-          );
-        }
-
-        if (linkedProfile) {
-          therapist = {
-            id: therapistProfile.id,
-            profileId: linkedProfile.id,
-            displayName: linkedProfile.display_name || linkedProfile.full_name,
-            contactEmail: linkedProfile.email_address || linkedProfile.email,
-            userId: therapistProfile.user_id || linkedProfile.user_id,
-          };
-        }
-      }
-    }
-
-    if (!therapist) {
-      return NextResponse.json(
-        { message: 'Therapist not found' },
-        { status: 404 }
-      );
-    }
-
-    let prefsQuery = supabase
+    const { data: prefs } = await supabase
       .from('contact_preferences')
       .select('allow_phone, allow_email, allow_whatsapp, auto_reply_message')
-      .eq('therapist_id', therapist.id);
-    if (therapist.profileId) {
-      prefsQuery = prefsQuery.or(`profile_id.eq.${therapist.profileId},therapist_id.eq.${therapist.id}`);
-    }
-    const { data: prefs } = await prefsQuery.maybeSingle();
+      .eq('therapist_id', profile.id)
+      .maybeSingle();
 
     if (prefs) {
       if (preferredContact === 'phone' && !prefs.allow_phone) {
@@ -137,13 +77,12 @@ export async function POST(request: NextRequest) {
       .from('contact_inquiries')
       .insert([
         {
-          therapist_id: therapistId,
-          profile_id: therapist.profileId,
+          profile_id: profile.id,
           client_name: clientName,
           client_email: clientEmail,
           client_phone: clientPhone || null,
           message,
-          preferred_contact: preferredContact,
+          preferred_contact: preferredContact ?? 'email',
           status: 'new',
         },
       ])
@@ -158,33 +97,58 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    try {
-      if (therapist.contactEmail) await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/email/send`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          to: therapist.contactEmail,
-          template: 'new-inquiry',
-          data: {
-            therapistName: therapist.displayName,
-            clientName,
-            clientEmail,
-            clientPhone: clientPhone || 'Not provided',
-            message,
-            preferredContact,
-            inquiryLink: `${process.env.NEXT_PUBLIC_APP_URL}/pro/inquiries/${inquiry.id}`,
-          },
-        }),
-      });
-    } catch (emailError) {
-      console.error('Email notification failed:', emailError);
+    // Send email notification directly using Resend (avoid calling admin-gated email API)
+    const therapistEmail = profile.email_address || profile.email;
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (therapistEmail && resendApiKey) {
+      try {
+        const resend = new Resend(resendApiKey);
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://masseurmatch.com';
+        const therapistName = escapeHtml(profile.display_name || profile.full_name || 'Therapist');
+        const safeClientName = escapeHtml(clientName);
+        const safeClientEmail = escapeHtml(clientEmail);
+        const safeMessage = escapeHtml(message);
+        const safePhone = clientPhone ? escapeHtml(clientPhone) : null;
+        const inquiryLink = `${appUrl}/pro/inquiries`;
+
+        await resend.emails.send({
+          from: process.env.RESEND_FROM_EMAIL || 'MasseurMatch <notifications@masseurmatch.com>',
+          to: therapistEmail,
+          subject: `New inquiry from ${safeClientName}`,
+          html: `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+            body{font-family:sans-serif;color:#333}
+            .container{max-width:600px;margin:0 auto;padding:20px}
+            .header{background:linear-gradient(135deg,#FF8A1F 0%,#F97316 100%);color:white;padding:20px;border-radius:8px 8px 0 0}
+            .content{border:1px solid #ddd;border-radius:0 0 8px 8px;padding:20px}
+            .info-block{background:#f5f5f5;padding:15px;border-radius:6px;margin:15px 0}
+            .button{background:#FF8A1F;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;display:inline-block;margin-top:15px}
+            .footer{font-size:12px;color:#999;margin-top:20px;border-top:1px solid #ddd;padding-top:20px}
+          </style></head><body>
+          <div class="container">
+            <div class="header"><h1>New Client Inquiry</h1><p>You have a new message from ${safeClientName}</p></div>
+            <div class="content">
+              <p>Hi ${therapistName},</p>
+              <p>A new client has reached out to you on MasseurMatch:</p>
+              <div class="info-block">
+                <p><strong>From:</strong> ${safeClientName}</p>
+                <p><strong>Email:</strong> <a href="mailto:${safeClientEmail}">${safeClientEmail}</a></p>
+                ${safePhone ? `<p><strong>Phone:</strong> ${safePhone}</p>` : ''}
+                <p><strong>Preferred contact:</strong> ${escapeHtml(preferredContact || 'email')}</p>
+              </div>
+              <p><strong>Message:</strong></p>
+              <div class="info-block"><p>${safeMessage.replace(/\n/g, '<br>')}</p></div>
+              <a href="${inquiryLink}" class="button">View in Dashboard</a>
+              <div class="footer"><p>This is an automated notification. Do not reply to this email.</p></div>
+            </div>
+          </div></body></html>`,
+        });
+      } catch (emailError) {
+        console.error('Email notification failed:', emailError);
+      }
     }
 
     return NextResponse.json(
-      {
-        message: 'Inquiry sent successfully',
-        inquiryId: inquiry.id,
-      },
+      { message: 'Inquiry sent successfully', inquiryId: inquiry.id },
       { status: 201 }
     );
   } catch (error) {

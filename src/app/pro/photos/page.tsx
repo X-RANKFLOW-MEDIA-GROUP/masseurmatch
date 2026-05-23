@@ -45,7 +45,7 @@ function getUploadError(error: unknown) {
     return error.message;
   }
 
-  return "Nao foi possivel concluir o upload agora.";
+  return "Could not complete the upload right now.";
 }
 
 function getProfileDisplayName(profile: Tables<"profiles"> | null) {
@@ -68,7 +68,7 @@ export default function PhotoManagerPage() {
   const [agreedToPhotoRules, setAgreedToPhotoRules] = useState(false);
   const [uploadState, setUploadState] = useState<UploadState>("idle");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [scanLabel, setScanLabel] = useState("arquivo");
+  const [scanLabel, setScanLabel] = useState("file");
 
   const fetchPhotos = async () => {
     if (!profile?.id) {
@@ -86,7 +86,7 @@ export default function PhotoManagerPage() {
 
     if (error) {
       toast({
-        title: "Nao foi possivel carregar suas fotos",
+        title: "Could not load your photos",
         description: error.message,
         variant: "destructive",
       });
@@ -115,7 +115,7 @@ export default function PhotoManagerPage() {
 
       if (error) {
         toast({
-          title: "Nao foi possivel carregar suas fotos",
+          title: "Could not load your photos",
           description: error.message,
           variant: "destructive",
         });
@@ -146,7 +146,7 @@ export default function PhotoManagerPage() {
     const { data: signData, error: signError } = await supabase.functions.invoke("cloudinary-sign");
 
     if (signError || !signData) {
-      throw new Error(signError?.message || "Nao foi possivel preparar o upload.");
+      throw new Error(signError?.message || "Could not prepare the upload.");
     }
 
     const formData = new FormData();
@@ -169,13 +169,13 @@ export default function PhotoManagerPage() {
         | { error?: { message?: string } }
         | null;
 
-      throw new Error(payload?.error?.message || "Cloudinary recusou o upload.");
+      throw new Error(payload?.error?.message || "Upload service rejected the file.");
     }
 
     const payload = (await response.json()) as { secure_url?: string };
 
     if (!payload.secure_url) {
-      throw new Error("A imagem foi enviada, mas nao recebemos a URL final.");
+      throw new Error("The image was uploaded but we did not receive the final URL.");
     }
 
     return payload.secure_url;
@@ -193,7 +193,7 @@ export default function PhotoManagerPage() {
 
     if (remainingSlots <= 0) {
       toast({
-        title: "Limite de fotos atingido",
+        title: "Photo limit reached",
         description: `Seu plano ${planLabel} permite ate ${maxPhotos} fotos.`,
         variant: "destructive",
       });
@@ -204,8 +204,8 @@ export default function PhotoManagerPage() {
     const acceptedFiles = files.slice(0, remainingSlots);
     if (acceptedFiles.length < files.length) {
       toast({
-        title: "Aplicamos o limite do seu plano",
-        description: `So ${acceptedFiles.length} arquivo(s) foram selecionados agora.`,
+        title: "Plan photo limit applied",
+        description: `Only ${acceptedFiles.length} file(s) were selected now.`,
       });
     }
 
@@ -215,8 +215,8 @@ export default function PhotoManagerPage() {
   const handleUpload = async () => {
     if (!profile?.id) {
       toast({
-        title: "Perfil indisponivel",
-        description: "Recarregue a pagina antes de enviar imagens.",
+        title: "Profile unavailable",
+        description: "Reload the page before uploading images.",
         variant: "destructive",
       });
       return;
@@ -224,8 +224,8 @@ export default function PhotoManagerPage() {
 
     if (!agreedToPhotoRules) {
       toast({
-        title: "Confirme as regras de imagem",
-        description: "Marque a declaracao antes de enviar suas fotos.",
+        title: "Confirm photo rules",
+        description: "Check the declaration box before uploading your photos.",
         variant: "destructive",
       });
       return;
@@ -233,8 +233,8 @@ export default function PhotoManagerPage() {
 
     if (selectedFiles.length === 0) {
       toast({
-        title: "Selecione uma foto primeiro",
-        description: "Escolha ao menos um arquivo para entrar na fila de analise.",
+        title: "Select a photo first",
+        description: "Choose at least one file to add to the review queue.",
         variant: "destructive",
       });
       return;
@@ -264,7 +264,7 @@ export default function PhotoManagerPage() {
           .single();
 
         if (insertError || !photoRecord) {
-          throw new Error(insertError?.message || "Nao foi possivel registrar a foto.");
+          throw new Error(insertError?.message || "Could not register the photo.");
         }
 
         const insertedPhoto = photoRecord as { id: string };
@@ -336,15 +336,15 @@ export default function PhotoManagerPage() {
       setUploadState("uploaded");
       toast({
         title: moderationUnavailable
-          ? "Parte do lote foi para revisao manual"
+          ? "Part of the batch went to manual review"
           : flaggedCount > 0
-            ? "Sightengine sinalizou algumas fotos para curadoria"
-            : "Sightengine aprovou suas fotos",
+            ? "Sightengine flagged some photos for curation"
+            : "Sightengine approved your photos",
         description: moderationUnavailable
-          ? "Pelo menos um arquivo ficou pendente para curadoria humana."
+          ? "At least one file is pending human curation."
           : flaggedCount > 0
-            ? `${approvedCount} aprovada(s) e ${flaggedCount} enviada(s) para revisao manual.`
-            : `${approvedCount} foto(s) aprovada(s) e pronta(s) para a galeria.`,
+            ? `${approvedCount} approved and ${flaggedCount} sent for manual review.`
+            : `${approvedCount} photo(s) approved and ready for the gallery.`,
       });
 
       if (moderationUnavailable || flaggedCount > 0) {
@@ -359,7 +359,7 @@ export default function PhotoManagerPage() {
     } catch (error) {
       setUploadState("idle");
       toast({
-        title: "Nao foi possivel concluir o upload",
+        title: "Could not complete the upload",
         description: getUploadError(error),
         variant: "destructive",
       });
@@ -371,7 +371,7 @@ export default function PhotoManagerPage() {
 
     if (error) {
       toast({
-        title: "Nao foi possivel remover a foto",
+        title: "Could not remove photo",
         description: error.message,
         variant: "destructive",
       });
@@ -386,7 +386,7 @@ export default function PhotoManagerPage() {
     await fetchPhotos();
     toast({
       title: "Foto removida",
-      description: "A galeria foi atualizada.",
+      description: "Gallery updated.",
     });
   };
 
@@ -402,7 +402,7 @@ export default function PhotoManagerPage() {
 
     if (resetError) {
       toast({
-        title: "Nao foi possivel atualizar a foto principal",
+        title: "Could not update primary photo",
         description: resetError.message,
         variant: "destructive",
       });
@@ -416,7 +416,7 @@ export default function PhotoManagerPage() {
 
     if (primaryError) {
       toast({
-        title: "Nao foi possivel atualizar a foto principal",
+        title: "Could not update primary photo",
         description: primaryError.message,
         variant: "destructive",
       });
@@ -425,8 +425,8 @@ export default function PhotoManagerPage() {
 
     await fetchPhotos();
     toast({
-      title: "Foto principal atualizada",
-      description: "Sua galeria ja mostra a nova ordem.",
+      title: "Primary photo updated",
+      description: "Your gallery now shows the new order.",
     });
   };
 
@@ -445,11 +445,11 @@ export default function PhotoManagerPage() {
           <Bot className="h-5 w-5 text-slate-700" />
         </div>
         <div className="space-y-2">
-          <h1 className="font-display text-2xl font-medium text-slate-900">Gerenciador de fotos</h1>
+          <h1 className="font-display text-2xl font-medium text-slate-900">Photo Manager</h1>
           <p className="font-sans text-sm leading-relaxed text-slate-600">
-            O Sightengine revisa cada imagem antes da publicacao. Arquivos com nudez,
-            marcas d agua, dados de contato, logos ou sinais de baixa confianca podem ser
-            reprovados automaticamente ou seguir para revisao manual.
+            Sightengine reviews each image before publication. Files with nudity,
+            watermarks, contact information, logos, or low-confidence signals may be
+            rejected automatically or sent for manual review.
           </p>
         </div>
       </div>
@@ -473,10 +473,10 @@ export default function PhotoManagerPage() {
               </div>
               <div>
                 <p className="font-sans text-sm font-semibold text-slate-900">
-                  Clique para escolher imagens
+                  Click to choose images
                 </p>
                 <p className="mt-1 font-sans text-xs text-slate-500">
-                  JPG, PNG ou WEBP. Evite filtros pesados e fotos com texto.
+                  JPG, PNG or WEBP. Avoid heavy filters and photos with text.
                 </p>
               </div>
             </button>
@@ -511,7 +511,7 @@ export default function PhotoManagerPage() {
             {selectedFiles.length > 0 && (
               <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-4">
                 <p className="font-sans text-sm font-semibold text-slate-900">
-                  {selectedFiles.length} arquivo(s) pronto(s) para analise
+                  {selectedFiles.length} file(s) ready for review
                 </p>
                 <ul className="mt-3 space-y-2 font-sans text-sm text-slate-600">
                   {selectedFiles.map((file) => (
@@ -538,7 +538,7 @@ export default function PhotoManagerPage() {
               {uploadState === "idle" && (
                 <>
                   <UploadCloud className="h-4 w-4" />
-                  Enviar para analise
+                  Submit for Review
                 </>
               )}
 
@@ -585,13 +585,13 @@ export default function PhotoManagerPage() {
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 px-1 pb-4">
             <div>
-              <h2 className="font-display text-xl font-medium text-slate-900">Fila de curadoria</h2>
+              <h2 className="font-display text-xl font-medium text-slate-900">Curation queue</h2>
               <p className="mt-1 font-sans text-sm text-slate-500">
-                Acompanhamento em tempo real da sua galeria.
+                Real-time tracking of your gallery.
               </p>
             </div>
             <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 font-sans text-xs text-slate-600">
-              {photos.length} publicadas ou em revisao de um total de {maxPhotos}
+              {photos.length} published or under review out of {maxPhotos}
             </div>
           </div>
 
@@ -600,7 +600,7 @@ export default function PhotoManagerPage() {
               active={activeTab === "approved"}
               onClick={() => setActiveTab("approved")}
               icon={CheckCircle2}
-              label="Aprovadas"
+              label="Approved"
               count={approvedPhotos.length}
               color="emerald"
             />
@@ -608,7 +608,7 @@ export default function PhotoManagerPage() {
               active={activeTab === "pending"}
               onClick={() => setActiveTab("pending")}
               icon={Clock}
-              label="Em analise"
+              label="Under Review"
               count={pendingPhotos.length}
               color="amber"
             />
@@ -616,7 +616,7 @@ export default function PhotoManagerPage() {
               active={activeTab === "rejected"}
               onClick={() => setActiveTab("rejected")}
               icon={XCircle}
-              label="Reprovadas"
+              label="Rejected"
               count={rejectedPhotos.length}
               color="rose"
             />
@@ -626,8 +626,8 @@ export default function PhotoManagerPage() {
             {activeTab === "pending" && (
               <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
                 <p className="font-sans text-sm leading-relaxed text-amber-900">
-                  Fotos pendentes aguardam revisao humana. Se a IA nao conseguir concluir a leitura,
-                  o arquivo continua retido ate a curadoria do time.
+                  Pending photos are awaiting human review. If AI cannot complete the scan,
+                  the file remains held until the team curates it.
                 </p>
               </div>
             )}
@@ -654,7 +654,7 @@ export default function PhotoManagerPage() {
                       {getPhotoUrl(photo) ? (
                         <img
                           src={getPhotoUrl(photo)}
-                          alt="Foto do perfil"
+                          alt="Profile photo"
                           className="h-full w-full object-cover"
                         />
                       ) : (
@@ -691,7 +691,7 @@ export default function PhotoManagerPage() {
                     <div className="space-y-4 p-4">
                       <div>
                         <p className="font-sans text-sm font-semibold text-slate-900">
-                          {photo.is_primary ? "Foto principal" : "Foto da galeria"}
+                          {photo.is_primary ? "Primary photo" : "Gallery photo"}
                         </p>
                         <p className="mt-1 font-sans text-xs leading-relaxed text-slate-500">
                           {photo.moderation_reason

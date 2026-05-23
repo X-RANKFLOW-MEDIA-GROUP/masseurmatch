@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,20 +12,16 @@ import { formatDistanceToNow } from 'date-fns';
 
 interface ContactInquiry {
   id: string;
-  client_name: string;
-  client_email: string;
+  client_name: string | null;
+  client_email: string | null;
   client_phone: string | null;
-  message: string;
-  preferred_contact: 'email' | 'phone' | 'whatsapp';
-  status: 'new' | 'viewed' | 'responded' | 'archived';
-  notes: string | null;
+  message: string | null;
+  preferred_contact: string | null;
+  status: string | null;
   created_at: string;
 }
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || 'http://placeholder.supabase.invalid',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'placeholder-key'
-);
+const supabase = createClient();
 
 export default function InquiriesDashboard() {
   const [inquiries, setInquiries] = useState<ContactInquiry[]>([]);
@@ -61,9 +57,20 @@ export default function InquiriesDashboard() {
   async function loadInquiries() {
     try {
       setError('');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setError('Not authenticated'); setLoading(false); return; }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+      if (!profile) { setLoading(false); return; }
+
       const { data, error: err } = await supabase
         .from('contact_inquiries')
         .select('*')
+        .eq('profile_id', profile.id)
         .order('created_at', { ascending: false });
 
       if (err) throw err;
@@ -75,7 +82,7 @@ export default function InquiriesDashboard() {
     }
   }
 
-  async function updateStatus(id: string, status: ContactInquiry['status']) {
+  async function updateStatus(id: string, status: string) {
     try {
       const { error: err } = await supabase
         .from('contact_inquiries')
@@ -86,20 +93,6 @@ export default function InquiriesDashboard() {
       loadInquiries();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update status');
-    }
-  }
-
-  async function updateNotes(id: string, notes: string) {
-    try {
-      const { error: err } = await supabase
-        .from('contact_inquiries')
-        .update({ notes })
-        .eq('id', id);
-
-      if (err) throw err;
-      loadInquiries();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save notes');
     }
   }
 
@@ -115,22 +108,17 @@ export default function InquiriesDashboard() {
     return i.status === selectedTab;
   });
 
-  const getStatusBadge = (status: ContactInquiry['status']) => {
-    const variants: Record<ContactInquiry['status'], string> = {
+  const getStatusBadge = (status: string | null) => {
+    const variants: Record<string, string> = {
       new: 'bg-blue-100 text-blue-800',
       viewed: 'bg-purple-100 text-purple-800',
       responded: 'bg-emerald-100 text-emerald-800',
       archived: 'bg-gray-100 text-gray-800',
     };
-    const labels: Record<ContactInquiry['status'], string> = {
-      new: 'New',
-      viewed: 'Viewed',
-      responded: 'Responded',
-      archived: 'Archived',
-    };
+    const s = status ?? 'new';
     return (
-      <Badge className={variants[status]}>
-        {labels[status]}
+      <Badge className={variants[s] ?? 'bg-gray-100 text-gray-800'}>
+        {s.charAt(0).toUpperCase() + s.slice(1)}
       </Badge>
     );
   };
@@ -214,7 +202,7 @@ export default function InquiriesDashboard() {
                           {getStatusBadge(inquiry.status)}
                         </div>
                         <p className="text-sm text-muted-foreground flex items-center gap-1">
-                          {getContactIcon(inquiry.preferred_contact)}
+                          {getContactIcon(inquiry.preferred_contact ?? 'email')}
                           {inquiry.client_email}
                         </p>
                       </div>
@@ -250,19 +238,6 @@ export default function InquiriesDashboard() {
                         )}
                       </div>
 
-                      {/* Notes */}
-                      <div>
-                        <label htmlFor={`notes-${inquiry.id}`} className="text-sm font-medium">
-                          Internal Notes
-                        </label>
-                        <textarea
-                          id={`notes-${inquiry.id}`}
-                          defaultValue={inquiry.notes || ''}
-                          onBlur={(e) => updateNotes(inquiry.id, e.target.value)}
-                          className="mt-1 w-full min-h-24 p-2 border rounded text-sm"
-                          placeholder="Add notes for yourself..."
-                        />
-                      </div>
 
                       {/* Actions */}
                       <div className="flex gap-2 flex-wrap">
@@ -302,7 +277,7 @@ export default function InquiriesDashboard() {
 
                   <div className="px-6 py-3 border-t flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">
-                      {inquiry.message.substring(0, 100)}...
+                      {(inquiry.message ?? '').substring(0, 100)}...
                     </span>
                     <Button
                       size="sm"

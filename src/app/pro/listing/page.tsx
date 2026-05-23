@@ -254,7 +254,7 @@ export default function MyListingPage() {
     await delay(1200);
     setForm((current) => ({
       ...current,
-      bio: "Com foco em conforto, tecnica e discricao, ofereco sessoes personalizadas para relaxamento profundo e alivio de tensao muscular. Trabalho com atendimento profissional, ritmo acolhedor e comunicacao clara para que cada cliente se sinta seguro durante toda a experiencia.",
+      bio: "Focused on comfort, technique, and discretion, I offer personalized sessions for deep relaxation and muscle tension relief. I work with a professional approach, a welcoming pace, and clear communication so every client feels safe throughout the experience.",
     }));
     setIsAiLoading(false);
   };
@@ -419,9 +419,9 @@ export default function MyListingPage() {
             AI quality guard is active
           </h2>
           <p className="font-sans text-sm leading-relaxed text-slate-600">
-            All profile text is screened before review.
-            A triagem bloqueia linguagem sexual explicita, promessas enganosas, contato direto e
-            termos fora do padrao premium da plataforma.
+            All profile text is screened before review. Screening blocks explicit sexual language,
+            misleading promises, direct contact details, and terms outside the platform's premium
+            standards.
           </p>
         </div>
       </div>
@@ -581,13 +581,13 @@ export default function MyListingPage() {
                 setForm((current) => ({ ...current, displayName: event.target.value }))
               }
               className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 font-sans text-sm text-slate-900 outline-none transition-colors focus:border-slate-400"
-              placeholder="Como voce quer aparecer no marketplace"
+              placeholder="How you want to appear in the marketplace"
             />
           </div>
 
           <div className="space-y-2">
             <label className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Telefone
+              Phone
             </label>
             <input
               type="tel"
@@ -600,7 +600,7 @@ export default function MyListingPage() {
 
           <div className="space-y-2">
             <label className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Cidade
+              City
             </label>
             <div className="relative">
               <MapPin className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
@@ -616,7 +616,7 @@ export default function MyListingPage() {
 
           <div className="space-y-2">
             <label className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Estado
+              State
             </label>
             <input
               type="text"
@@ -629,7 +629,7 @@ export default function MyListingPage() {
 
           <div className="space-y-2">
             <label className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Preco incall
+              Incall Price
             </label>
             <input
               type="number"
@@ -645,7 +645,7 @@ export default function MyListingPage() {
 
           <div className="space-y-2">
             <label className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Preco outcall
+              Outcall Price
             </label>
             <input
               type="number"
@@ -695,7 +695,7 @@ export default function MyListingPage() {
 
           <div className="space-y-2">
             <label className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Tipo de corpo
+              Body Type
             </label>
             <select
               value={form.bodyType}
@@ -704,7 +704,7 @@ export default function MyListingPage() {
               }
               className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 font-sans text-sm text-slate-900 outline-none transition-colors focus:border-slate-400"
             >
-              <option value="">Selecione</option>
+              <option value="">Select</option>
               {BODY_TYPE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -717,9 +717,9 @@ export default function MyListingPage() {
 
       <section className="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div>
-          <h2 className="font-display text-xl font-medium text-slate-900">Especialidades</h2>
+          <h2 className="font-display text-xl font-medium text-slate-900">Specialties</h2>
           <p className="mt-1 font-sans text-sm text-slate-500">
-            Escolha os servicos que melhor representam seu atendimento.
+            Choose the services that best represent your practice.
           </p>
         </div>
 

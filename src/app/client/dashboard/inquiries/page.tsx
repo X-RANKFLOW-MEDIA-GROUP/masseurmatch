@@ -14,16 +14,16 @@ import { ClientDashboardLayout } from "../_components/ClientDashboardLayout";
 
 type Inquiry = {
   id: string;
-  therapist_id: string;
-  message: string;
-  status: "new" | "viewed" | "responded" | "archived";
+  profile_id: string | null;
+  message: string | null;
+  status: string | null;
   created_at: string;
   therapist?: {
     id: string;
-    display_name: string;
-    photo_url: string;
-    state: string;
-  };
+    display_name: string | null;
+    avatar_url: string | null;
+    state: string | null;
+  } | null;
 };
 
 export default function ClientInquiriesPage() {
@@ -46,14 +46,14 @@ export default function ClientInquiriesPage() {
           .from("contact_inquiries")
           .select(`
             id,
-            therapist_id,
+            profile_id,
             message,
             status,
             created_at,
-            therapist:therapists!therapist_id (
+            therapist:profiles!profile_id (
               id,
               display_name,
-              photo_url,
+              avatar_url,
               state
             )
           `)
@@ -142,17 +142,17 @@ export default function ClientInquiriesPage() {
         ) : (
           <div className="space-y-3">
             {filteredInquiries.map((inquiry) => {
-              const config = statusConfig[inquiry.status];
+              const config = statusConfig[(inquiry.status ?? 'new') as keyof typeof statusConfig] ?? statusConfig.new;
               const StatusIcon = config.icon;
 
               return (
                 <Card key={inquiry.id} className="transition-shadow hover:shadow-md">
                   <CardContent className="flex items-start gap-4 p-4">
                     <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full bg-slate-100">
-                      {inquiry.therapist?.photo_url ? (
+                      {inquiry.therapist?.avatar_url ? (
                         <img
-                          src={inquiry.therapist.photo_url}
-                          alt={inquiry.therapist.display_name}
+                          src={inquiry.therapist.avatar_url}
+                          alt={inquiry.therapist.display_name ?? undefined}
                           className="h-full w-full object-cover"
                         />
                       ) : (
@@ -187,7 +187,7 @@ export default function ClientInquiriesPage() {
                           {formatDistanceToNow(new Date(inquiry.created_at), { addSuffix: true })}
                         </span>
                         <Button variant="ghost" size="sm" asChild>
-                          <Link href={`/therapists/${inquiry.therapist_id}`}>
+                          <Link href={`/therapists/${inquiry.therapist?.id ?? inquiry.profile_id ?? ''}`}>
                             View Profile <ExternalLink className="ml-1 h-3 w-3" />
                           </Link>
                         </Button>

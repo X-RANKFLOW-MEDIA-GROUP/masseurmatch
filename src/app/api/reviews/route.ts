@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { requireSession, createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://placeholder.supabase.invalid',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'placeholder-key'
-);
-
-// GET reviews for a therapist
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const therapistId = searchParams.get("therapistId");
@@ -18,24 +12,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "therapistId is required" }, { status: 400 });
   }
 
+  const supabase = createSupabaseAdminClient();
+
   let query = supabase
     .from("reviews")
-    .select(`
-      id,
-      rating,
-      title,
-      content,
-      is_verified,
-      helpful_count,
-      created_at,
-      client:auth.users!client_id (
-        raw_user_meta_data
-      )
-    `, { count: "exact" })
+    .select("id, rating, title, content, is_verified, helpful_count, created_at", { count: "exact" })
     .eq("therapist_id", therapistId)
     .eq("is_public", true);
 
-  // Sorting
   switch (sortBy) {
     case "rating-high":
       query = query.order("rating", { ascending: false });
@@ -50,10 +34,8 @@ export async function GET(request: NextRequest) {
       query = query.order("created_at", { ascending: false });
   }
 
-  // Pagination
   const from = (page - 1) * limit;
-  const to = from + limit - 1;
-  query = query.range(from, to);
+  query = query.range(from, from + limit - 1);
 
   const { data, error, count } = await query;
 
@@ -61,7 +43,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Calculate rating distribution
   const { data: distribution } = await supabase
     .from("reviews")
     .select("rating")
@@ -82,57 +63,63 @@ export async function GET(request: NextRequest) {
   });
 }
 
-// POST create a new review
 export async function POST(request: NextRequest) {
+  let session;
+  try {
+    session = await requireSession(request as unknown as Request);
+  } catch {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
-    const { therapistId, rating, title, content, clientId } = body;
+    const { therapistId, rating, title, content } = body;
 
-    // Validation
-    if (!therapistId || !rating || !clientId) {
+    if (!therapistId || !rating) {
       return NextResponse.json(
-        { error: "therapistId, rating, and clientId are required" },
+        { error: "therapistId and rating are required" },
         { status: 400 }
       );
     }
 
     if (rating < 1 || rating > 5) {
-      return NextResponse.json(
-        { error: "Rating must be between 1 and 5" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Rating must be between 1 and 5" }, { status: 400 });
     }
 
-    // Check if user already reviewed this therapist
+    const supabase = createSupabaseAdminClient();
+
     const { data: existing } = await supabase
       .from("reviews")
       .select("id")
-      .eq("client_id", clientId)
+      .eq("client_id", session.userId)
       .eq("therapist_id", therapistId)
       .maybeSingle();
 
     if (existing) {
-      return NextResponse.json(
-        { error: "You have already reviewed this therapist" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "You have already reviewed this therapist" }, { status: 400 });
     }
 
-    // Check if user had a contact inquiry with this therapist (verified review)
-    const { data: inquiry } = await supabase
-      .from("contact_inquiries")
-      .select("id")
-      .eq("therapist_id", therapistId)
-      .eq("client_email", (await supabase.auth.admin.getUserById(clientId)).data.user?.email)
+    const { data: userProfile } = await supabase
+      .from("profiles")
+      .select("email")
+      .eq("user_id", session.userId)
       .maybeSingle();
+
+    const { data: inquiry } = userProfile?.email
+      ? await supabase
+          .from("contact_inquiries")
+          .select("id")
+          .eq("profile_id", therapistId)
+          .eq("client_email", userProfile.email)
+          .maybeSingle()
+      : { data: null };
 
     const isVerified = !!inquiry;
 
-    // Create review
     const { data, error } = await supabase
       .from("reviews")
       .insert({
-        client_id: clientId,
+        client_id: session.userId,
         therapist_id: therapistId,
         rating,
         title: title?.trim() || null,
@@ -146,16 +133,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Create notification for therapist
-    const { data: therapist } = await supabase
-      .from("therapist_profiles")
+    const { data: therapistProfile } = await supabase
+      .from("profiles")
       .select("user_id")
       .eq("id", therapistId)
-      .single();
+      .maybeSingle();
 
-    if (therapist) {
+    if (therapistProfile?.user_id) {
       await supabase.from("notifications").insert({
-        user_id: therapist.user_id,
+        user_id: therapistProfile.user_id,
         type: "new_review",
         title: "New Review Received",
         message: `You received a ${rating}-star review${title ? `: "${title}"` : ""}`,
@@ -165,27 +151,31 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ review: data, isVerified });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to create review" },
-      { status: 500 }
-    );
+    console.error("[api/reviews] POST error:", error);
+    return NextResponse.json({ error: "Failed to create review" }, { status: 500 });
   }
 }
 
-// PATCH update a review
 export async function PATCH(request: NextRequest) {
+  let session;
+  try {
+    session = await requireSession(request as unknown as Request);
+  } catch {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
-    const { reviewId, rating, title, content, clientId } = body;
+    const { reviewId, rating, title, content } = body;
 
-    if (!reviewId || !clientId) {
-      return NextResponse.json(
-        { error: "reviewId and clientId are required" },
-        { status: 400 }
-      );
+    if (!reviewId) {
+      return NextResponse.json({ error: "reviewId is required" }, { status: 400 });
     }
 
-    const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    const supabase = createSupabaseAdminClient();
+    const updates: { updated_at: string; rating?: number; title?: string | null; content?: string | null } = {
+      updated_at: new Date().toISOString(),
+    };
     if (rating) updates.rating = rating;
     if (title !== undefined) updates.title = title?.trim() || null;
     if (content !== undefined) updates.content = content?.trim() || null;
@@ -194,7 +184,7 @@ export async function PATCH(request: NextRequest) {
       .from("reviews")
       .update(updates)
       .eq("id", reviewId)
-      .eq("client_id", clientId)
+      .eq("client_id", session.userId)
       .select()
       .single();
 
@@ -204,31 +194,32 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ review: data });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to update review" },
-      { status: 500 }
-    );
+    console.error("[api/reviews] PATCH error:", error);
+    return NextResponse.json({ error: "Failed to update review" }, { status: 500 });
   }
 }
 
-// DELETE a review
 export async function DELETE(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const reviewId = searchParams.get("reviewId");
-  const clientId = searchParams.get("clientId");
-
-  if (!reviewId || !clientId) {
-    return NextResponse.json(
-      { error: "reviewId and clientId are required" },
-      { status: 400 }
-    );
+  let session;
+  try {
+    session = await requireSession(request as unknown as Request);
+  } catch {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
   }
 
+  const { searchParams } = new URL(request.url);
+  const reviewId = searchParams.get("reviewId");
+
+  if (!reviewId) {
+    return NextResponse.json({ error: "reviewId is required" }, { status: 400 });
+  }
+
+  const supabase = createSupabaseAdminClient();
   const { error } = await supabase
     .from("reviews")
     .delete()
     .eq("id", reviewId)
-    .eq("client_id", clientId);
+    .eq("client_id", session.userId);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

@@ -66,8 +66,13 @@ for (const [source, destination] of REDIRECT_CASES) {
     ).toContain(res.status());
 
     const location = res.headers()["location"];
+    // Middleware returns absolute URLs; next.config redirects return relative paths.
+    // Normalize to path-only so both forms pass the assertion.
+    const normalizedLocation = location?.startsWith("http")
+      ? new URL(location).pathname
+      : location;
     expect(
-      location,
+      normalizedLocation,
       `Expected Location: ${destination} but got ${location} for ${source}`,
     ).toBe(destination);
   });

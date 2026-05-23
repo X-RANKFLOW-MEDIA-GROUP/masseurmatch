@@ -1,19 +1,13 @@
 'use server'
 
-import { createServerClient } from '@/lib/supabase/server'
+import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
 import type { OnboardingFields } from '@/lib/profile.types'
 
-/**
- * Persists onboarding fields to `profiles` and syncs the 9 public-facing
- * fields to `public_therapists` in a single async flow.
- *
- * Throws on any Supabase error so the calling Server Action can handle it.
- */
 export async function saveOnboardingStep(
   profileId: string,
   data: OnboardingFields
 ): Promise<void> {
-  const supabase = createServerClient()
+  const supabase = createSupabaseAdminClient()
 
   const { error: profileError } = await supabase
     .from('profiles')
@@ -22,7 +16,6 @@ export async function saveOnboardingStep(
 
   if (profileError) throw profileError
 
-  // Sync the publicly-visible subset to public_therapists
   const publicFields = {
     zip_code:             data.zip_code,
     map_enabled:          data.map_enabled,

@@ -1,36 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "http://placeholder.supabase.invalid",
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || "placeholder-key",
-);
-
-type SubscriptionPayload = {
-  userId: string;
-  endpoint: string;
-  keys: {
-    p256dh: string;
-    auth: string;
-  };
-};
+import { requireSession, createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 
 export async function POST(request: NextRequest) {
+  let session;
   try {
-    const body = (await request.json()) as SubscriptionPayload;
+    session = await requireSession(request as unknown as Request);
+  } catch {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
 
-    if (!body.userId || !body.endpoint || !body.keys?.p256dh || !body.keys?.auth) {
+  try {
+    const body = await request.json();
+    const { endpoint, keys } = body as { endpoint?: string; keys?: { p256dh?: string; auth?: string } };
+
+    if (!endpoint || !keys?.p256dh || !keys?.auth) {
       return NextResponse.json({ error: "Invalid push subscription payload" }, { status: 400 });
     }
 
+    const supabase = createSupabaseAdminClient();
     const { data, error } = await supabase
       .from("push_subscriptions")
       .upsert(
         {
-          user_id: body.userId,
-          endpoint: body.endpoint,
-          p256dh: body.keys.p256dh,
-          auth: body.keys.auth,
+          user_id: session.userId,
+          endpoint,
+          p256dh: keys.p256dh,
+          auth: keys.auth,
           user_agent: request.headers.get("user-agent"),
           is_active: true,
         },

@@ -10,38 +10,38 @@ interface SubscriptionCancelledEmailProps {
   reactivateUrl: string;
 }
 
-export default function SubscriptionCancelledEmail({ 
-  therapistName = "Alex", 
-  planName = "Elite PRO", 
-  endDate = "15 de Novembro, 2026",
-  reactivateUrl = "https://masseurmatch.com/pro/billing" 
+export default function SubscriptionCancelledEmail({
+  therapistName = "Alex",
+  planName = "Elite PRO",
+  endDate = "November 15, 2026",
+  reactivateUrl = "https://masseurmatch.com/pro/billing"
 }: SubscriptionCancelledEmailProps) {
   return (
-    <BaseLayout previewText="A tua subscrição foi cancelada">
+    <BaseLayout previewText="Your subscription has been cancelled">
       <Text className="text-slate-900 text-xl font-medium mb-4">
-        Confirmação de Cancelamento
+        Cancellation Confirmation
       </Text>
-      
+
       <Text className="text-slate-600 text-sm leading-relaxed mb-6">
-        Olá {therapistName}, recebemos o teu pedido e a tua subscrição <strong>{planName}</strong> foi cancelada. Não faremos mais nenhuma cobrança no teu cartão.
+        Hi {therapistName}, we received your request and your <strong>{planName}</strong> subscription has been cancelled. No further charges will be made to your card.
       </Text>
 
       <Section className="bg-slate-50 border border-slate-200 p-4 mb-6 rounded-md">
         <Text className="text-slate-700 text-sm m-0 leading-relaxed">
-          Continuarás a ter acesso total a todas as tuas funcionalidades PRO até ao final do ciclo de faturação atual: <strong className="font-mono text-slate-900">{endDate}</strong>. Após esta data, o teu perfil será ajustado para o plano básico gratuito.
+          You will continue to have full access to all your PRO features until the end of your current billing cycle: <strong className="font-mono text-slate-900">{endDate}</strong>. After this date, your profile will revert to the basic free plan.
         </Text>
       </Section>
 
       <Text className="text-slate-600 text-sm leading-relaxed mb-6">
-        Foi um prazer ajudar-te a crescer. Se mudares de ideias ou a tua disponibilidade alterar, podes reativar a tua conta a qualquer momento com apenas um clique.
+        It has been a pleasure helping you grow. If you change your mind or your availability changes, you can reactivate your account at any time with just one click.
       </Text>
 
       <Section className="text-center mb-6">
-        <Button 
-          href={reactivateUrl} 
+        <Button
+          href={reactivateUrl}
           className="bg-indigo-50 text-indigo-700 border border-indigo-200 px-8 py-3 rounded-md text-sm font-semibold tracking-wide"
         >
-          Reativar a minha subscrição
+          Reactivate my subscription
         </Button>
       </Section>
     </BaseLayout>

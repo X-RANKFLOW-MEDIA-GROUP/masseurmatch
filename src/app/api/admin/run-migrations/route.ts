@@ -1,39 +1,15 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { readdirSync } from "fs";
-import { requireAdminSession } from "@/app/api/_lib/supabase-server";
+import { requireAdminSession, createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 
 export async function POST(request: NextRequest) {
   try {
     await requireAdminSession(request as unknown as Request);
 
-    const cookieStore = await cookies();
-    
-    // Create Supabase client with service role key (admin)
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              );
-            } catch {
-              // Ignore errors in set
-            }
-          },
-        },
-      }
-    );
+    const supabase = createSupabaseAdminClient();
 
     // Get all migration files from supabase/migrations
     const migrationsDir = join(process.cwd(), "supabase", "migrations");
@@ -61,7 +37,8 @@ export async function POST(request: NextRequest) {
         }
 
         // Execute the SQL
-        const { error } = await supabase.rpc("exec_sql", {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase as any).rpc("exec_sql", {
           sql: sqlContent,
         });
 

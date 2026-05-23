@@ -7,10 +7,10 @@ export default function TrustAndVerificationPage() {
     <div className="mx-auto max-w-4xl space-y-8 p-6 pb-32 md:p-10">
       <div className="mb-8">
         <h1 className="font-display text-3xl font-medium tracking-tight text-slate-900">
-          Confiança &amp; Verificação
+          Trust &amp; Verification
         </h1>
         <p className="mt-2 font-sans text-slate-500">
-          Perfis verificados recebem até 70% mais agendamentos de clientes premium.
+          Verified profiles receive up to 70% more bookings from premium clients.
         </p>
       </div>
 
@@ -22,16 +22,16 @@ export default function TrustAndVerificationPage() {
           </div>
           <div>
             <h3 className="font-sans font-semibold text-emerald-900">
-              A tua identidade está Verificada
+              Your identity is Verified
             </h3>
             <p className="font-sans text-sm text-emerald-700">
-              O teu selo azul está ativo no teu perfil público.
+              Your blue badge is active on your public profile.
             </p>
           </div>
         </div>
         <div className="hidden sm:block">
           <span className="rounded-full bg-emerald-600 px-3 py-1.5 font-mono text-xs uppercase tracking-widest text-white">
-            Ativo
+            Active
           </span>
         </div>
       </div>
@@ -43,10 +43,10 @@ export default function TrustAndVerificationPage() {
           <CheckCircle2 className="mt-2 h-8 w-8 text-emerald-500" />
           <div>
             <h4 className="font-display text-lg font-medium text-slate-900">
-              Verificação de Identidade (Stripe)
+              Identity Verification (Stripe)
             </h4>
             <p className="mt-1 font-sans text-sm text-slate-500">
-              Passaporte ou Carta de Condução validados com sucesso pela nossa IA de segurança.
+              Passport or Driver&apos;s License successfully validated by our security AI.
             </p>
           </div>
         </div>
@@ -57,14 +57,14 @@ export default function TrustAndVerificationPage() {
           <FileCheck className="mt-2 h-8 w-8 text-amber-500" />
           <div>
             <h4 className="font-display text-lg font-medium text-slate-900">
-              Licença Profissional
+              Professional License
             </h4>
             <p className="mt-1 font-sans text-sm text-slate-500">
-              Ficheiro em análise. Por favor aguarde 24-48 horas pela validação manual.
+              File under review. Please allow 24-48 hours for manual validation.
             </p>
           </div>
           <button className="mt-2 bg-slate-100 px-4 py-2 font-mono text-xs uppercase tracking-wider text-slate-900 transition-colors hover:bg-slate-200">
-            Ver Detalhes
+            View Details
           </button>
         </div>
       </div>
