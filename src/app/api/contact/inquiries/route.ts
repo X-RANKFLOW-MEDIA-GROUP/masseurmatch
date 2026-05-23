@@ -1,5 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Resend } from 'resend';
 import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server';
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -87,26 +97,50 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Send email notification directly using Resend (avoid calling admin-gated email API)
     const therapistEmail = profile.email_address || profile.email;
-    if (therapistEmail) {
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (therapistEmail && resendApiKey) {
       try {
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-        await fetch(`${appUrl}/api/email/send`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: therapistEmail,
-            template: 'new-inquiry',
-            data: {
-              therapistName: profile.display_name || profile.full_name,
-              clientName,
-              clientEmail,
-              clientPhone: clientPhone || 'Not provided',
-              message,
-              preferredContact,
-              inquiryLink: `${appUrl}/pro/inquiries/${inquiry.id}`,
-            },
-          }),
+        const resend = new Resend(resendApiKey);
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://masseurmatch.com';
+        const therapistName = escapeHtml(profile.display_name || profile.full_name || 'Therapist');
+        const safeClientName = escapeHtml(clientName);
+        const safeClientEmail = escapeHtml(clientEmail);
+        const safeMessage = escapeHtml(message);
+        const safePhone = clientPhone ? escapeHtml(clientPhone) : null;
+        const inquiryLink = `${appUrl}/pro/inquiries`;
+
+        await resend.emails.send({
+          from: process.env.RESEND_FROM_EMAIL || 'MasseurMatch <notifications@masseurmatch.com>',
+          to: therapistEmail,
+          subject: `New inquiry from ${safeClientName}`,
+          html: `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+            body{font-family:sans-serif;color:#333}
+            .container{max-width:600px;margin:0 auto;padding:20px}
+            .header{background:linear-gradient(135deg,#FF8A1F 0%,#F97316 100%);color:white;padding:20px;border-radius:8px 8px 0 0}
+            .content{border:1px solid #ddd;border-radius:0 0 8px 8px;padding:20px}
+            .info-block{background:#f5f5f5;padding:15px;border-radius:6px;margin:15px 0}
+            .button{background:#FF8A1F;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;display:inline-block;margin-top:15px}
+            .footer{font-size:12px;color:#999;margin-top:20px;border-top:1px solid #ddd;padding-top:20px}
+          </style></head><body>
+          <div class="container">
+            <div class="header"><h1>New Client Inquiry</h1><p>You have a new message from ${safeClientName}</p></div>
+            <div class="content">
+              <p>Hi ${therapistName},</p>
+              <p>A new client has reached out to you on MasseurMatch:</p>
+              <div class="info-block">
+                <p><strong>From:</strong> ${safeClientName}</p>
+                <p><strong>Email:</strong> <a href="mailto:${safeClientEmail}">${safeClientEmail}</a></p>
+                ${safePhone ? `<p><strong>Phone:</strong> ${safePhone}</p>` : ''}
+                <p><strong>Preferred contact:</strong> ${escapeHtml(preferredContact || 'email')}</p>
+              </div>
+              <p><strong>Message:</strong></p>
+              <div class="info-block"><p>${safeMessage.replace(/\n/g, '<br>')}</p></div>
+              <a href="${inquiryLink}" class="button">View in Dashboard</a>
+              <div class="footer"><p>This is an automated notification. Do not reply to this email.</p></div>
+            </div>
+          </div></body></html>`,
         });
       } catch (emailError) {
         console.error('Email notification failed:', emailError);
