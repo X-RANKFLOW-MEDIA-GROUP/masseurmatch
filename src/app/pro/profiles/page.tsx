@@ -320,7 +320,7 @@ function ProfileForm({
             <label className={labelCls}>AA</label>
             <input
               className={inputCls}
-              placeholder="Ex: Disponível"
+              placeholder="e.g. Available"
               value={form.aa}
               onChange={field("aa")}
             />

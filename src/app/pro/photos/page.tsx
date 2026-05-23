@@ -233,8 +233,8 @@ export default function PhotoManagerPage() {
 
     if (selectedFiles.length === 0) {
       toast({
-        title: "Selecione uma foto primeiro",
-        description: "Escolha ao menos um arquivo para entrar na fila de analise.",
+        title: "Select a photo first",
+        description: "Choose at least one file to add to the review queue.",
         variant: "destructive",
       });
       return;
@@ -511,7 +511,7 @@ export default function PhotoManagerPage() {
             {selectedFiles.length > 0 && (
               <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-4">
                 <p className="font-sans text-sm font-semibold text-slate-900">
-                  {selectedFiles.length} arquivo(s) pronto(s) para analise
+                  {selectedFiles.length} file(s) ready for review
                 </p>
                 <ul className="mt-3 space-y-2 font-sans text-sm text-slate-600">
                   {selectedFiles.map((file) => (
@@ -538,7 +538,7 @@ export default function PhotoManagerPage() {
               {uploadState === "idle" && (
                 <>
                   <UploadCloud className="h-4 w-4" />
-                  Enviar para analise
+                  Submit for Review
                 </>
               )}
 
@@ -608,7 +608,7 @@ export default function PhotoManagerPage() {
               active={activeTab === "pending"}
               onClick={() => setActiveTab("pending")}
               icon={Clock}
-              label="Em analise"
+              label="Under Review"
               count={pendingPhotos.length}
               color="amber"
             />

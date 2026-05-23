@@ -704,7 +704,7 @@ export default function MyListingPage() {
               }
               className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 font-sans text-sm text-slate-900 outline-none transition-colors focus:border-slate-400"
             >
-              <option value="">Selecione</option>
+              <option value="">Select</option>
               {BODY_TYPE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
