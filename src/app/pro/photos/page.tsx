@@ -45,7 +45,7 @@ function getUploadError(error: unknown) {
     return error.message;
   }
 
-  return "Nao foi possivel concluir o upload agora.";
+  return "Could not complete the upload right now.";
 }
 
 function getProfileDisplayName(profile: Tables<"profiles"> | null) {
@@ -86,7 +86,7 @@ export default function PhotoManagerPage() {
 
     if (error) {
       toast({
-        title: "Nao foi possivel carregar suas fotos",
+        title: "Could not load your photos",
         description: error.message,
         variant: "destructive",
       });
@@ -115,7 +115,7 @@ export default function PhotoManagerPage() {
 
       if (error) {
         toast({
-          title: "Nao foi possivel carregar suas fotos",
+          title: "Could not load your photos",
           description: error.message,
           variant: "destructive",
         });
@@ -146,7 +146,7 @@ export default function PhotoManagerPage() {
     const { data: signData, error: signError } = await supabase.functions.invoke("cloudinary-sign");
 
     if (signError || !signData) {
-      throw new Error(signError?.message || "Nao foi possivel preparar o upload.");
+      throw new Error(signError?.message || "Could not prepare the upload.");
     }
 
     const formData = new FormData();
@@ -169,7 +169,7 @@ export default function PhotoManagerPage() {
         | { error?: { message?: string } }
         | null;
 
-      throw new Error(payload?.error?.message || "Cloudinary recusou o upload.");
+      throw new Error(payload?.error?.message || "Upload service rejected the file.");
     }
 
     const payload = (await response.json()) as { secure_url?: string };
@@ -193,7 +193,7 @@ export default function PhotoManagerPage() {
 
     if (remainingSlots <= 0) {
       toast({
-        title: "Limite de fotos atingido",
+        title: "Photo limit reached",
         description: `Seu plano ${planLabel} permite ate ${maxPhotos} fotos.`,
         variant: "destructive",
       });
@@ -204,7 +204,7 @@ export default function PhotoManagerPage() {
     const acceptedFiles = files.slice(0, remainingSlots);
     if (acceptedFiles.length < files.length) {
       toast({
-        title: "Aplicamos o limite do seu plano",
+        title: "Plan photo limit applied",
         description: `So ${acceptedFiles.length} arquivo(s) foram selecionados agora.`,
       });
     }
@@ -215,8 +215,8 @@ export default function PhotoManagerPage() {
   const handleUpload = async () => {
     if (!profile?.id) {
       toast({
-        title: "Perfil indisponivel",
-        description: "Recarregue a pagina antes de enviar imagens.",
+        title: "Profile unavailable",
+        description: "Reload the page before uploading images.",
         variant: "destructive",
       });
       return;
@@ -264,7 +264,7 @@ export default function PhotoManagerPage() {
           .single();
 
         if (insertError || !photoRecord) {
-          throw new Error(insertError?.message || "Nao foi possivel registrar a foto.");
+          throw new Error(insertError?.message || "Could not register the photo.");
         }
 
         const insertedPhoto = photoRecord as { id: string };
@@ -359,7 +359,7 @@ export default function PhotoManagerPage() {
     } catch (error) {
       setUploadState("idle");
       toast({
-        title: "Nao foi possivel concluir o upload",
+        title: "Could not complete the upload",
         description: getUploadError(error),
         variant: "destructive",
       });
@@ -371,7 +371,7 @@ export default function PhotoManagerPage() {
 
     if (error) {
       toast({
-        title: "Nao foi possivel remover a foto",
+        title: "Could not remove photo",
         description: error.message,
         variant: "destructive",
       });
@@ -386,7 +386,7 @@ export default function PhotoManagerPage() {
     await fetchPhotos();
     toast({
       title: "Foto removida",
-      description: "A galeria foi atualizada.",
+      description: "Gallery updated.",
     });
   };
 
@@ -402,7 +402,7 @@ export default function PhotoManagerPage() {
 
     if (resetError) {
       toast({
-        title: "Nao foi possivel atualizar a foto principal",
+        title: "Could not update primary photo",
         description: resetError.message,
         variant: "destructive",
       });
@@ -416,7 +416,7 @@ export default function PhotoManagerPage() {
 
     if (primaryError) {
       toast({
-        title: "Nao foi possivel atualizar a foto principal",
+        title: "Could not update primary photo",
         description: primaryError.message,
         variant: "destructive",
       });
@@ -425,7 +425,7 @@ export default function PhotoManagerPage() {
 
     await fetchPhotos();
     toast({
-      title: "Foto principal atualizada",
+      title: "Primary photo updated",
       description: "Sua galeria ja mostra a nova ordem.",
     });
   };
@@ -691,7 +691,7 @@ export default function PhotoManagerPage() {
                     <div className="space-y-4 p-4">
                       <div>
                         <p className="font-sans text-sm font-semibold text-slate-900">
-                          {photo.is_primary ? "Foto principal" : "Foto da galeria"}
+                          {photo.is_primary ? "Primary photo" : "Gallery photo"}
                         </p>
                         <p className="mt-1 font-sans text-xs leading-relaxed text-slate-500">
                           {photo.moderation_reason
