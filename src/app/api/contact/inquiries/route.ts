@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || 'http://placeholder.supabase.invalid',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'placeholder-key'
-);
+import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,92 +20,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let therapist: {
-      id: string;
-      profileId: string | null;
-      displayName: string | null;
-      contactEmail: string | null;
-      userId: string | null;
-    } | null = null;
+    const supabase = createSupabaseAdminClient();
 
-    const { data: profileMatch, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('id, user_id, display_name, full_name, email_address, email')
       .eq('id', therapistId)
       .maybeSingle();
 
     if (profileError) {
-      return NextResponse.json(
-        { message: profileError.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ message: profileError.message }, { status: 500 });
     }
 
-    if (profileMatch) {
-      therapist = {
-        id: profileMatch.id,
-        profileId: profileMatch.id,
-        displayName: profileMatch.display_name || profileMatch.full_name,
-        contactEmail: profileMatch.email_address || profileMatch.email,
-        userId: profileMatch.user_id,
-      };
+    if (!profile) {
+      return NextResponse.json({ message: 'Therapist not found' }, { status: 404 });
     }
 
-    if (!therapist) {
-      const { data: therapistProfile, error: therapistProfileError } = await supabase
-        .from('therapist_profiles')
-        .select('id, profile_id, user_id')
-        .eq('id', therapistId)
-        .maybeSingle();
-
-      if (therapistProfileError) {
-        return NextResponse.json(
-          { message: therapistProfileError.message },
-          { status: 500 }
-        );
-      }
-
-      if (therapistProfile?.profile_id) {
-        const { data: linkedProfile, error: linkedProfileError } = await supabase
-          .from('profiles')
-          .select('id, user_id, display_name, full_name, email_address, email')
-          .eq('id', therapistProfile.profile_id)
-          .maybeSingle();
-
-        if (linkedProfileError) {
-          return NextResponse.json(
-            { message: linkedProfileError.message },
-            { status: 500 }
-          );
-        }
-
-        if (linkedProfile) {
-          therapist = {
-            id: therapistProfile.id,
-            profileId: linkedProfile.id,
-            displayName: linkedProfile.display_name || linkedProfile.full_name,
-            contactEmail: linkedProfile.email_address || linkedProfile.email,
-            userId: therapistProfile.user_id || linkedProfile.user_id,
-          };
-        }
-      }
-    }
-
-    if (!therapist) {
-      return NextResponse.json(
-        { message: 'Therapist not found' },
-        { status: 404 }
-      );
-    }
-
-    let prefsQuery = supabase
+    const { data: prefs } = await supabase
       .from('contact_preferences')
       .select('allow_phone, allow_email, allow_whatsapp, auto_reply_message')
-      .eq('therapist_id', therapist.id);
-    if (therapist.profileId) {
-      prefsQuery = prefsQuery.or(`profile_id.eq.${therapist.profileId},therapist_id.eq.${therapist.id}`);
-    }
-    const { data: prefs } = await prefsQuery.maybeSingle();
+      .eq('therapist_id', profile.id)
+      .maybeSingle();
 
     if (prefs) {
       if (preferredContact === 'phone' && !prefs.allow_phone) {
@@ -137,13 +67,12 @@ export async function POST(request: NextRequest) {
       .from('contact_inquiries')
       .insert([
         {
-          therapist_id: therapistId,
-          profile_id: therapist.profileId,
+          profile_id: profile.id,
           client_name: clientName,
           client_email: clientEmail,
           client_phone: clientPhone || null,
           message,
-          preferred_contact: preferredContact,
+          preferred_contact: preferredContact ?? 'email',
           status: 'new',
         },
       ])
@@ -158,33 +87,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    try {
-      if (therapist.contactEmail) await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/email/send`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          to: therapist.contactEmail,
-          template: 'new-inquiry',
-          data: {
-            therapistName: therapist.displayName,
-            clientName,
-            clientEmail,
-            clientPhone: clientPhone || 'Not provided',
-            message,
-            preferredContact,
-            inquiryLink: `${process.env.NEXT_PUBLIC_APP_URL}/pro/inquiries/${inquiry.id}`,
-          },
-        }),
-      });
-    } catch (emailError) {
-      console.error('Email notification failed:', emailError);
+    const therapistEmail = profile.email_address || profile.email;
+    if (therapistEmail) {
+      try {
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        await fetch(`${appUrl}/api/email/send`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: therapistEmail,
+            template: 'new-inquiry',
+            data: {
+              therapistName: profile.display_name || profile.full_name,
+              clientName,
+              clientEmail,
+              clientPhone: clientPhone || 'Not provided',
+              message,
+              preferredContact,
+              inquiryLink: `${appUrl}/pro/inquiries/${inquiry.id}`,
+            },
+          }),
+        });
+      } catch (emailError) {
+        console.error('Email notification failed:', emailError);
+      }
     }
 
     return NextResponse.json(
-      {
-        message: 'Inquiry sent successfully',
-        inquiryId: inquiry.id,
-      },
+      { message: 'Inquiry sent successfully', inquiryId: inquiry.id },
       { status: 201 }
     );
   } catch (error) {

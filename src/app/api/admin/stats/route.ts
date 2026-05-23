@@ -1,24 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { requireAdminSession, createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 
 export async function GET(request: NextRequest) {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll() {},
-      },
-    }
-  );
+  try {
+    await requireAdminSession(request as unknown as Request);
+  } catch {
+    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+  }
 
   try {
-    // Get overall stats
+    const supabase = createSupabaseAdminClient();
+
     const { data: profileStats } = await supabase
       .from("profiles")
       .select("status, created_at", { count: "exact" });
@@ -27,29 +19,24 @@ export async function GET(request: NextRequest) {
       .from("complaints")
       .select("status, created_at", { count: "exact" });
 
-    // Calculate metrics
     const total = profileStats?.length || 0;
     const approved = profileStats?.filter((p) => p.status === "approved").length || 0;
     const pending = profileStats?.filter((p) => p.status === "pending_approval").length || 0;
     const rejected = profileStats?.filter((p) => p.status === "rejected").length || 0;
 
     const pendingComplaints = complaintStats?.filter((c) => c.status === "pending").length || 0;
-    const resolvedComplaints = complaintStats?.filter((c) => c.status === "resolved").length || 0;
 
-    // Calculate avg approval time (simplified)
     const approvedProfiles = profileStats?.filter(
       (p) => p.status === "approved" && p.created_at
     ) || [];
     const avgApprovalHours =
       approvedProfiles.length > 0
-        ? Math.floor(approvedProfiles.length * 24 / 7) // Simplified average
+        ? Math.floor(approvedProfiles.length * 24 / 7)
         : 0;
 
-    const weeklySampleSize = 5; // Mock data - in production, calculate from date ranges
-    const weeklyApprovals =
-      approvedProfiles.filter(
-        (p) => new Date(p.created_at).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000
-      ).length || weeklySampleSize;
+    const weeklyApprovals = approvedProfiles.filter(
+      (p) => new Date(p.created_at).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000
+    ).length || 0;
 
     return NextResponse.json({
       ok: true,
@@ -59,7 +46,7 @@ export async function GET(request: NextRequest) {
         pending_approval: pending,
         rejected_profiles: rejected,
         pending_complaints: pendingComplaints,
-        flagged_photos: 0, // Would come from photos table
+        flagged_photos: 0,
         avg_approval_time_hours: avgApprovalHours,
         weekly_approvals: weeklyApprovals,
       },

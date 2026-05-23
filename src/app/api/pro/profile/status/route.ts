@@ -1,51 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { requireSession, createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 
 export async function GET(request: NextRequest) {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll() {},
-      },
-    }
-  );
+  let session;
+  try {
+    session = await requireSession(request as unknown as Request);
+  } catch {
+    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+  }
 
   try {
-    // Get the current user's profile
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json(
-        { ok: false, error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
+    const supabase = createSupabaseAdminClient();
 
     const { data: profile, error } = await supabase
       .from("profiles")
-      .select(
-        `
-        id,
-        display_name,
-        full_name,
-        status,
-        submitted_at,
-        reviewed_at,
-        admin_notes,
-        completion_percentage,
-        is_verified_identity
-      `
-      )
-      .eq("user_id", user.id)
+      .select("id, display_name, full_name, status, submitted_at, is_verified_identity, rejection_reason")
+      .eq("user_id", session.userId)
       .single();
 
     if (error || !profile) {
@@ -63,9 +33,7 @@ export async function GET(request: NextRequest) {
         full_name: profile.full_name,
         status: profile.status || "draft",
         submitted_at: profile.submitted_at,
-        reviewed_at: profile.reviewed_at,
-        admin_notes: profile.admin_notes,
-        completion_percentage: profile.completion_percentage || 0,
+        rejection_reason: profile.rejection_reason || null,
         is_verified_identity: profile.is_verified_identity || false,
       },
     });
