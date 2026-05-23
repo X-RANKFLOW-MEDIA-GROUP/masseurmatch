@@ -23,7 +23,7 @@ export default async function ClientDashboardPage() {
   const [{ data: upcomingAppts }, { data: pastAppts }, { data: transactions }] = await Promise.all([
     supabase
       .from('appointments')
-      .select('*, therapist:therapist_id(id, full_name, avatar_url, slug)')
+      .select('id, therapist_id, start_time, end_time, service_type, status')
       .eq('client_id', session.userId)
       .in('status', ['pending', 'confirmed'])
       .gte('start_time', new Date().toISOString())
@@ -31,18 +31,35 @@ export default async function ClientDashboardPage() {
       .limit(5),
     supabase
       .from('appointments')
-      .select('*, therapist:therapist_id(id, full_name, avatar_url, slug)')
+      .select('id, therapist_id, start_time, end_time, service_type, status')
       .eq('client_id', session.userId)
       .in('status', ['completed', 'cancelled'])
       .order('start_time', { ascending: false })
       .limit(10),
     supabase
       .from('payment_transactions')
-      .select('*')
+      .select('id, amount_cents, status, created_at')
       .eq('user_id', session.userId)
       .order('created_at', { ascending: false })
       .limit(5),
   ])
+
+  // Collect unique therapist IDs and fetch profiles in one query
+  const therapistIds = [...new Set([
+    ...(upcomingAppts ?? []).map(a => a.therapist_id as string),
+    ...(pastAppts ?? []).map(a => a.therapist_id as string),
+  ].filter(Boolean))]
+
+  const profilesById: Record<string, { id: string; full_name: string | null; avatar_url: string | null; slug: string | null }> = {}
+  if (therapistIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, avatar_url, slug')
+      .in('id', therapistIds)
+    profiles?.forEach(p => { profilesById[p.id] = p })
+  }
+
+  type Appt = { id: string; therapist_id: string; start_time: string; service_type: string; status: string }
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -78,27 +95,27 @@ export default async function ClientDashboardPage() {
             </div>
           ) : (
             <ul className="divide-y divide-gray-100">
-              {upcomingAppts.map((appt: Record<string, unknown>) => {
-                const therapist = appt.therapist as Record<string, unknown> | null
+              {(upcomingAppts as Appt[]).map(appt => {
+                const therapist = profilesById[appt.therapist_id] ?? null
                 return (
-                  <li key={appt.id as string} className="py-3 flex items-center gap-4">
-                    {Boolean(therapist?.avatar_url) && (
-                      <img src={String(therapist!.avatar_url)} alt="" className="w-10 h-10 rounded-full object-cover" />
+                  <li key={appt.id} className="py-3 flex items-center gap-4">
+                    {therapist?.avatar_url && (
+                      <img src={therapist.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
                     )}
                     <div className="flex-1">
-                      <p className="font-medium text-gray-800">{therapist?.full_name as string}</p>
+                      <p className="font-medium text-gray-800">{therapist?.full_name ?? 'Therapist'}</p>
                       <p className="text-sm text-gray-500">
-                        {new Date(appt.start_time as string).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                        {new Date(appt.start_time).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                         {' at '}
-                        {new Date(appt.start_time as string).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                        {new Date(appt.start_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
                       </p>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                       appt.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
                     }`}>
-                      {appt.status as string}
+                      {appt.status}
                     </span>
-                    <Link href={`/client/bookings/${appt.id as string}`} className="text-sm text-blue-600 hover:underline">View</Link>
+                    <Link href={`/client/bookings/${appt.id}`} className="text-sm text-blue-600 hover:underline">View</Link>
                   </li>
                 )
               })}
@@ -115,17 +132,17 @@ export default async function ClientDashboardPage() {
             <p className="text-gray-500 text-sm py-4">No payment history yet.</p>
           ) : (
             <ul className="divide-y divide-gray-100">
-              {transactions.map((tx: Record<string, unknown>) => (
-                <li key={tx.id as string} className="py-3 flex justify-between items-center">
+              {(transactions as { id: string; amount_cents: number; status: string; created_at: string }[]).map(tx => (
+                <li key={tx.id} className="py-3 flex justify-between items-center">
                   <div>
-                    <p className="font-medium text-gray-800">${((tx.amount_cents as number) / 100).toFixed(2)}</p>
-                    <p className="text-sm text-gray-500">{new Date(tx.created_at as string).toLocaleDateString()}</p>
+                    <p className="font-medium text-gray-800">${(tx.amount_cents / 100).toFixed(2)}</p>
+                    <p className="text-sm text-gray-500">{new Date(tx.created_at).toLocaleDateString()}</p>
                   </div>
                   <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                     tx.status === 'succeeded' ? 'bg-green-100 text-green-700' :
                     tx.status === 'refunded' ? 'bg-gray-100 text-gray-600' : 'bg-red-100 text-red-700'
                   }`}>
-                    {tx.status as string}
+                    {tx.status}
                   </span>
                 </li>
               ))}
@@ -142,20 +159,20 @@ export default async function ClientDashboardPage() {
             <p className="text-gray-500 text-sm py-4">No past sessions yet.</p>
           ) : (
             <ul className="divide-y divide-gray-100">
-              {pastAppts.map((appt: Record<string, unknown>) => {
-                const therapist = appt.therapist as Record<string, unknown> | null
+              {(pastAppts as Appt[]).map(appt => {
+                const therapist = profilesById[appt.therapist_id] ?? null
                 return (
-                  <li key={appt.id as string} className="py-3 flex items-center gap-4">
+                  <li key={appt.id} className="py-3 flex items-center gap-4">
                     <div className="flex-1">
-                      <p className="font-medium text-gray-800">{therapist?.full_name as string}</p>
+                      <p className="font-medium text-gray-800">{therapist?.full_name ?? 'Therapist'}</p>
                       <p className="text-sm text-gray-500">
-                        {new Date(appt.start_time as string).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        {' · '}{appt.service_type as string}
+                        {new Date(appt.start_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {' · '}{appt.service_type}
                       </p>
                     </div>
-                    {appt.status === 'completed' && (
+                    {appt.status === 'completed' && therapist?.slug && (
                       <Link
-                        href={`/therapists/${therapist?.slug as string}?review=1&appointment=${appt.id as string}`}
+                        href={`/therapists/${therapist.slug}?review=1&appointment=${appt.id}`}
                         className="text-sm text-yellow-600 hover:underline font-medium"
                       >
                         ⭐ Leave Review

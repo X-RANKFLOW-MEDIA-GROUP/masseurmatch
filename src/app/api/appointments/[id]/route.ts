@@ -8,19 +8,33 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const supabase = createSupabaseAdminClient()
-  const { data, error } = await supabase
+  const { data: appt, error } = await supabase
     .from('appointments')
-    .select(`
-      *,
-      therapist:therapist_id(id, full_name, avatar_url, slug, phone),
-      client:client_id(id, full_name, avatar_url, phone)
-    `)
+    .select('*')
     .eq('id', id)
     .or(`client_id.eq.${session.userId},therapist_id.eq.${session.userId}`)
     .single()
 
-  if (error) return NextResponse.json({ error: 'Appointment not found' }, { status: 404 })
-  return NextResponse.json({ appointment: data })
+  if (error || !appt) return NextResponse.json({ error: 'Appointment not found' }, { status: 404 })
+
+  // Fetch therapist and client profiles separately (FKs point to auth.users, profiles.id = auth user UUID)
+  const profileIds = [...new Set([appt.therapist_id as string, appt.client_id as string].filter(Boolean))]
+  const profilesById: Record<string, { id: string; full_name: string | null; avatar_url: string | null; slug: string | null; phone: string | null }> = {}
+  if (profileIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, avatar_url, slug, phone')
+      .in('id', profileIds)
+    profiles?.forEach(p => { profilesById[p.id] = p })
+  }
+
+  return NextResponse.json({
+    appointment: {
+      ...appt,
+      therapist: appt.therapist_id ? (profilesById[appt.therapist_id as string] ?? null) : null,
+      client: appt.client_id ? (profilesById[appt.client_id as string] ?? null) : null,
+    },
+  })
 }
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {

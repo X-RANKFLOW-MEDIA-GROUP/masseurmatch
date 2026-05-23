@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getRequestSession } from '@/app/api/_lib/session'
 import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
 
+type ProfileSnippet = { id: string; full_name: string | null; avatar_url: string | null }
+
 export async function GET(request: NextRequest) {
   const session = getRequestSession(request)
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -11,27 +13,39 @@ export async function GET(request: NextRequest) {
   const conversationId = searchParams.get('conversation_id')
 
   if (!conversationId) {
-    const { data, error } = await supabase
+    const { data: convs, error } = await supabase
       .from('conversations')
-      .select(`
-        *,
-        participant_a:participant_a_id(id, full_name, avatar_url),
-        participant_b:participant_b_id(id, full_name, avatar_url),
-        last_message:messages(content, created_at, sender_id)
-      `)
+      .select('id, participant_a_id, participant_b_id, updated_at')
       .or(`participant_a_id.eq.${session.userId},participant_b_id.eq.${session.userId}`)
       .order('updated_at', { ascending: false })
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-    return NextResponse.json({ conversations: data })
+
+    // Fetch profiles for all participants (FKs point to auth.users, profiles.id = auth user UUID)
+    const participantIds = [...new Set(
+      (convs ?? []).flatMap(c => [c.participant_a_id as string, c.participant_b_id as string]).filter(Boolean)
+    )]
+    const profilesById: Record<string, ProfileSnippet> = {}
+    if (participantIds.length > 0) {
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', participantIds)
+      profiles?.forEach(p => { profilesById[p.id] = p as ProfileSnippet })
+    }
+
+    const conversations = (convs ?? []).map(c => ({
+      ...c,
+      participant_a: c.participant_a_id ? (profilesById[c.participant_a_id as string] ?? null) : null,
+      participant_b: c.participant_b_id ? (profilesById[c.participant_b_id as string] ?? null) : null,
+    }))
+
+    return NextResponse.json({ conversations })
   }
 
-  const { data, error } = await supabase
+  const { data: msgs, error } = await supabase
     .from('messages')
-    .select(`
-      *,
-      sender:sender_id(id, full_name, avatar_url)
-    `)
+    .select('id, conversation_id, sender_id, content, created_at, read_at')
     .eq('conversation_id', conversationId)
     .order('created_at', { ascending: true })
 
@@ -43,7 +57,23 @@ export async function GET(request: NextRequest) {
     .is('read_at', null)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ messages: data })
+
+  const senderIds = [...new Set((msgs ?? []).map(m => m.sender_id as string).filter(Boolean))]
+  const profilesById: Record<string, ProfileSnippet> = {}
+  if (senderIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, avatar_url')
+      .in('id', senderIds)
+    profiles?.forEach(p => { profilesById[p.id] = p as ProfileSnippet })
+  }
+
+  const messages = (msgs ?? []).map(m => ({
+    ...m,
+    sender: m.sender_id ? (profilesById[m.sender_id as string] ?? null) : null,
+  }))
+
+  return NextResponse.json({ messages })
 }
 
 export async function POST(request: NextRequest) {

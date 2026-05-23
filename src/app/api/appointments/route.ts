@@ -13,11 +13,7 @@ export async function GET(request: NextRequest) {
 
   let query = supabase
     .from('appointments')
-    .select(`
-      *,
-      therapist:therapist_id(id, full_name, avatar_url, slug),
-      client:client_id(id, full_name, avatar_url)
-    `)
+    .select('id, therapist_id, client_id, start_time, end_time, service_type, status, notes, location_type, created_at')
     .order('start_time', { ascending: true })
 
   if (role === 'therapist') {
@@ -28,9 +24,30 @@ export async function GET(request: NextRequest) {
 
   if (status) query = query.eq('status', status)
 
-  const { data, error } = await query
+  const { data: appointments, error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ appointments: data })
+
+  // Fetch therapist and client profiles separately (therapist_id/client_id FK → auth.users, profiles.id = auth user UUID)
+  const therapistIds = [...new Set((appointments ?? []).map(a => a.therapist_id as string).filter(Boolean))]
+  const clientIds = [...new Set((appointments ?? []).map(a => a.client_id as string).filter(Boolean))]
+  const allProfileIds = [...new Set([...therapistIds, ...clientIds])]
+
+  const profilesById: Record<string, { id: string; full_name: string | null; avatar_url: string | null; slug: string | null }> = {}
+  if (allProfileIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, avatar_url, slug')
+      .in('id', allProfileIds)
+    profiles?.forEach(p => { profilesById[p.id] = p })
+  }
+
+  const enriched = (appointments ?? []).map(appt => ({
+    ...appt,
+    therapist: appt.therapist_id ? (profilesById[appt.therapist_id as string] ?? null) : null,
+    client: appt.client_id ? (profilesById[appt.client_id as string] ?? null) : null,
+  }))
+
+  return NextResponse.json({ appointments: enriched })
 }
 
 export async function POST(request: NextRequest) {
@@ -45,7 +62,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'therapist_id, start_time, end_time are required' }, { status: 400 })
   }
 
-  // Check for double-booking
   const { data: conflict } = await supabase
     .from('appointments')
     .select('id')
