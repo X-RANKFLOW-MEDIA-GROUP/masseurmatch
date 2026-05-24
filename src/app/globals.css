@@ -118,6 +118,55 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--mm-muted);
 }
 
+/* ── Keyword marquee ticker ── */
+@keyframes mm-marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.mm-marquee-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: mm-marquee 40s linear infinite;
+  will-change: transform;
+}
+
+/* ── City card (homepage grid) ── */
+.mm-city-card {
+  background: #ffffff;
+  border-bottom: 3px solid transparent;
+  transition: border-bottom-color 0.2s ease, background 0.2s ease;
+  display: block;
+  text-decoration: none;
+}
+.mm-city-card:hover {
+  border-bottom-color: #FF8A1F;
+  background: #FCFBF8;
+}
+
+/* ── Service style link ── */
+.mm-service-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 22px;
+  background: #FCFBF8;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-bottom-color 0.2s ease, background 0.2s ease;
+}
+.mm-service-link:hover {
+  border-bottom-color: #FF8A1F;
+  background: #ffffff;
+}
+.mm-service-link .mm-arrow {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.mm-service-link:hover .mm-arrow {
+  opacity: 1;
+}
+
 /* ── Tailwind custom utilities ── */
 @layer utilities {
   .font-display {

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, CheckCircle2, MapPin, Search, Shield, Sparkles, Star, Heart, TrendingUp } from "lucide-react";
+import { ArrowRight, CheckCircle2, MapPin, Sparkles, Star, Heart, TrendingUp } from "lucide-react";
 
 import type { PublicTherapist as Profile } from "@/app/_lib/directory";
 
@@ -10,9 +10,50 @@ interface EditorialHomepageProps {
   cityCount: number;
 }
 
-const popularCities = ["New York", "Los Angeles", "Miami", "Chicago", "San Francisco", "Houston", "Atlanta", "Las Vegas", "Seattle", "Washington DC"];
+const popularCities = [
+  { name: "New York",      state: "NY" },
+  { name: "Los Angeles",   state: "CA" },
+  { name: "Miami",         state: "FL" },
+  { name: "Chicago",       state: "IL" },
+  { name: "San Francisco", state: "CA" },
+  { name: "Houston",       state: "TX" },
+  { name: "Atlanta",       state: "GA" },
+  { name: "Las Vegas",     state: "NV" },
+  { name: "Seattle",       state: "WA" },
+  { name: "Washington DC", state: "DC" },
+];
 
-const massageStyles = ["Deep tissue massage", "Swedish massage", "Sports massage", "Relaxation massage", "Therapeutic massage", "Mobile massage", "Incall massage", "Outcall massage"];
+const marqueeKeywords = [
+  "Deep Tissue Massage",
+  "Swedish Massage",
+  "Sports Recovery",
+  "LGBTQ+ Affirming",
+  "Outcall Massage",
+  "Incall Massage",
+  "Mobile Massage",
+  "Hotel Massage",
+  "Verified Therapists",
+  "Direct Contact",
+  "Privacy First",
+  "Zero Platform Fees",
+  "New York",
+  "Los Angeles",
+  "Miami",
+  "Chicago",
+  "San Francisco",
+  "Atlanta",
+];
+
+const massageStyles = [
+  "Deep tissue massage",
+  "Swedish massage",
+  "Sports massage",
+  "Relaxation massage",
+  "Therapeutic massage",
+  "Mobile massage",
+  "Incall massage",
+  "Outcall massage",
+];
 
 const faqs = [
   ["What is MasseurMatch?", "MasseurMatch is a premium directory where independent massage therapists can publish profiles and clients can browse by city, service style, and profile details."],
@@ -21,145 +62,131 @@ const faqs = [
   ["Can therapists create a profile?", "Yes. Independent therapists can create a profile to improve visibility in city based directory pages and search results."],
 ];
 
-function profileName(profile: Profile) {
-  return profile.display_name || profile.full_name || "Massage Therapist";
-}
+const S = {
+  serif: "'Georgia', 'Times New Roman', serif" as const,
+  sans:  "system-ui, -apple-system, sans-serif" as const,
+  dark:  "#0B1F3A",
+  cream: "#FCFBF8",
+  orange:"#FF8A1F",
+  muted: "#6B7280",
+  white: "#ffffff",
+};
 
-function cityHref(city: string) {
-  return `/${city.toLowerCase().replace(/\s+/g, "-")}`;
+function profileName(p: Profile) {
+  return p.display_name || p.full_name || "Massage Therapist";
 }
-
-function styleHref(style: string) {
-  return `/massage-styles/${style.toLowerCase().replace(/\s+/g, "-")}`;
+function cityHref(name: string) {
+  return `/${name.toLowerCase().replace(/\s+/g, "-")}`;
+}
+function styleHref(s: string) {
+  return `/massage-styles/${s.toLowerCase().replace(/\s+/g, "-")}`;
 }
 
 export function EditorialHomepage({ featuredTherapists, totalTherapists, cityCount }: EditorialHomepageProps) {
   const visibleProfiles = featuredTherapists.slice(0, 6);
+  const marqueeItems = [...marqueeKeywords, ...marqueeKeywords];
 
   return (
-    <main className="min-h-screen bg-[#FCFBF8] text-[#0B1F3A]">
+    <main style={{ background: S.cream, color: S.dark }}>
 
-      {/* ── HERO ── dark navy, bold, masculine */}
-      <section className="relative overflow-hidden bg-[#0B1F3A] px-4 py-28 sm:px-6 lg:px-8 lg:py-36">
+      {/* ═══════════════════════════════════════════
+          HERO  — SEO-first fold, editorial premium
+          ═══════════════════════════════════════════ */}
+      <section
+        style={{
+          background: S.dark,
+          color: S.cream,
+          padding: "clamp(88px, 13vw, 140px) 20px clamp(80px, 11vw, 120px)",
+          textAlign: "center",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
         {/* Atmospheric glows */}
-        <div className="pointer-events-none absolute -right-48 -top-48 h-[640px] w-[640px] rounded-full bg-[#FF8A1F]/[0.07] blur-[120px]" />
-        <div className="pointer-events-none absolute -left-32 bottom-0 h-[480px] w-[480px] rounded-full bg-[#1E4B8F]/50 blur-[90px]" />
-        {/* Subtle diagonal grid */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.025]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
-          }}
-        />
+        <div style={{ position: "absolute", right: "-160px", top: "-160px", width: 640, height: 640, borderRadius: "50%", background: "rgba(255,138,31,0.07)", filter: "blur(110px)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", left: "-120px", bottom: 0,    width: 500, height: 500, borderRadius: "50%", background: "rgba(30,75,143,0.40)",  filter: "blur(90px)",  pointerEvents: "none" }} />
+        {/* Subtle grid overlay */}
+        <div style={{ position: "absolute", inset: 0, opacity: 0.025, backgroundImage: "linear-gradient(rgba(255,255,255,0.6) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.6) 1px,transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
 
-        <div className="relative mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-[1.1fr_0.9fr]">
-          {/* Left: copy */}
-          <div>
-            <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/[0.06] px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-white/60">
-              <span className="h-2 w-2 rounded-full bg-[#FF8A1F]" />
-              LGBTQ+ affirming directory
-            </div>
+        <div style={{ position: "relative", maxWidth: 860, margin: "0 auto" }}>
 
-            <h1 className="font-['Georgia','Times_New_Roman',serif] text-5xl font-semibold leading-[1.0] tracking-[-0.04em] text-white sm:text-6xl lg:text-[4.25rem]">
-              Find LGBTQ+&nbsp;affirming massage therapists near&nbsp;you.
-            </h1>
+          {/* Eyebrow */}
+          <p style={{ fontFamily: S.sans, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: S.orange, marginBottom: 28 }}>
+            LGBTQ+ affirming directory · United States
+          </p>
 
-            <p className="mt-7 max-w-xl text-lg leading-8 text-white/60 sm:text-xl">
-              Discover independent massage therapists by city, specialty, and direct contact. A privacy-first directory — not a booking platform.
-            </p>
+          {/* H1 – keyword-rich, editorial serif at weight 400 */}
+          <h1 style={{ fontFamily: S.serif, fontSize: "clamp(44px, 8vw, 82px)", fontWeight: 400, lineHeight: 1.05, letterSpacing: "-0.02em", margin: "0 auto 30px", color: S.cream }}>
+            Verified massage therapists{" "}
+            <br className="hidden sm:block" />
+            <em style={{ color: S.orange, fontStyle: "italic" }}>across the United States.</em>
+          </h1>
 
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/explore"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FF8A1F] px-7 py-4 text-sm font-bold text-[#0B1F3A] shadow-[0_8px_32px_rgba(255,138,31,0.38)] transition-all duration-300 hover:bg-[#ff9b42] hover:shadow-[0_14px_40px_rgba(255,138,31,0.50)] hover:scale-[1.02]"
-              >
-                Browse therapists
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/for-therapists"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 px-7 py-4 text-sm font-semibold text-white/80 transition-all duration-300 hover:bg-white/10 hover:text-white hover:border-white/30"
-              >
-                List your profile
-              </Link>
-            </div>
+          {/* Sub-headline */}
+          <p style={{ fontFamily: S.sans, fontSize: "clamp(15px, 2.4vw, 18px)", lineHeight: 1.8, maxWidth: 560, margin: "0 auto 56px", opacity: 0.60, fontWeight: 300 }}>
+            Discover independent LGBTQ+ affirming massage therapists by city,
+            specialty, and availability. Direct contact — no bookings, no platform fees.
+          </p>
 
-            <p className="mt-5 text-xs font-medium uppercase tracking-[0.18em] text-white/30">
-              No bookings · No payments · No platform fees
-            </p>
-
-            {/* Stats */}
-            <div className="mt-12 grid max-w-sm grid-cols-3 gap-3">
-              {[
-                [totalTherapists || 500, "Profiles"],
-                [cityCount || 50, "Cities"],
-                ["$0", "Booking fees"],
-              ].map(([value, label]) => (
-                <div
-                  key={String(label)}
-                  className="rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-sm"
-                >
-                  <p className="font-['Georgia','Times_New_Roman',serif] text-3xl font-semibold text-white">
-                    {value}+
-                  </p>
-                  <p className="mt-1 text-[10px] uppercase tracking-[0.18em] text-white/40">{String(label)}</p>
-                </div>
-              ))}
-            </div>
+          {/* CTAs — square, editorial buttons matching how-it-works */}
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 72 }}>
+            <Link
+              href="/explore"
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "16px 40px", fontFamily: S.sans, fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", background: S.orange, color: S.dark, textDecoration: "none" }}
+            >
+              Browse Therapists
+              <ArrowRight style={{ width: 14, height: 14 }} />
+            </Link>
+            <Link
+              href="/for-therapists"
+              style={{ display: "inline-flex", alignItems: "center", padding: "16px 32px", fontFamily: S.sans, fontSize: 12, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", background: "transparent", color: S.cream, textDecoration: "none", border: "1px solid rgba(252,251,248,0.22)" }}
+            >
+              List Your Profile
+            </Link>
           </div>
 
-          {/* Right: search card */}
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-4 shadow-[0_32px_80px_rgba(0,0,0,0.50)] backdrop-blur-sm">
-            <div className="rounded-[1.5rem] bg-[#FCFBF8] p-4">
-              <div className="rounded-2xl border border-[#0B1F3A]/10 bg-white p-5 shadow-sm">
-                <div className="flex items-center gap-3">
-                  <Search className="h-5 w-5 text-[#FF8A1F]" />
-                  <span className="text-sm font-semibold text-[#0B1F3A]">Search the directory</span>
-                </div>
-                <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
-                  <div className="rounded-xl border border-[#0B1F3A]/10 bg-[#FCFBF8] px-4 py-3 text-sm text-[#0B1F3A]/50">City</div>
-                  <div className="rounded-xl border border-[#0B1F3A]/10 bg-[#FCFBF8] px-4 py-3 text-sm text-[#0B1F3A]/50">Massage style</div>
-                  <div className="rounded-xl border border-[#0B1F3A]/10 bg-[#FCFBF8] px-4 py-3 text-sm text-[#0B1F3A]/50">Provider type</div>
-                  <Link
-                    href="/explore"
-                    className="rounded-xl bg-[#FF8A1F] px-4 py-3 text-center text-sm font-bold text-[#0B1F3A] transition hover:bg-[#ff9b42]"
-                  >
-                    Search
-                  </Link>
-                </div>
+          {/* Stats — magazine-column style */}
+          <div style={{ display: "flex", gap: 1, justifyContent: "center", flexWrap: "wrap", maxWidth: 540, margin: "0 auto" }}>
+            {([
+              [String(totalTherapists > 0 ? totalTherapists : 500) + "+", "Verified Profiles"],
+              [String(cityCount > 0 ? cityCount : 50) + "+", "Cities"],
+              ["$0", "Platform Fees"],
+            ] as [string, string][]).map(([value, label]) => (
+              <div key={label} style={{ flex: "1 1 160px", textAlign: "center", padding: "24px 12px", background: "rgba(255,255,255,0.04)", borderTop: "1px solid rgba(252,251,248,0.08)", borderBottom: "1px solid rgba(252,251,248,0.08)" }}>
+                <p style={{ fontFamily: S.serif, fontSize: "clamp(32px, 4.5vw, 50px)", fontWeight: 400, color: S.cream, lineHeight: 1 }}>{value}</p>
+                <p style={{ fontFamily: S.sans, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(252,251,248,0.38)", marginTop: 10 }}>{label}</p>
               </div>
-
-              <div className="mt-4 grid grid-cols-2 gap-2.5">
-                {popularCities.slice(0, 6).map((city) => (
-                  <Link
-                    key={city}
-                    href={cityHref(city)}
-                    className="rounded-xl border border-[#0B1F3A]/10 bg-white px-3 py-2.5 text-xs font-semibold text-[#0B1F3A] transition hover:border-[#FF8A1F]/60 hover:bg-[#FCFBF8]"
-                  >
-                    {city}
-                  </Link>
-                ))}
-              </div>
-
-              <div className="mt-4 rounded-2xl bg-[#0B1F3A] p-4 text-white">
-                <div className="flex items-center gap-2.5 text-sm font-semibold">
-                  <Shield className="h-4 w-4 text-[#FF8A1F]" />
-                  Privacy-first browsing
-                </div>
-                <p className="mt-2 text-xs leading-5 text-white/60">
-                  Browse profiles and contact therapists directly. No booking management, no payment control.
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
+
+          <p style={{ marginTop: 44, fontFamily: S.sans, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(252,251,248,0.22)" }}>
+            No bookings · No payments · No platform fees
+          </p>
         </div>
       </section>
 
-      {/* ── TRUST PILLARS ── */}
-      <section className="border-b border-[#0B1F3A]/8 bg-white px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-5">
+      {/* ═══════════════════════════════════════════
+          KEYWORD TICKER — scrolling right-to-left
+          ═══════════════════════════════════════════ */}
+      <div style={{ background: S.orange, overflow: "hidden", padding: "14px 0" }}>
+        <div className="mm-marquee-track">
+          {marqueeItems.map((kw, i) => (
+            <span
+              key={i}
+              style={{ fontFamily: S.sans, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: S.dark, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", padding: "0 22px", gap: 22 }}
+            >
+              {kw}
+              <span style={{ color: "rgba(11,31,58,0.28)", fontSize: 8, lineHeight: 1 }}>✦</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════
+          TRUST PILLARS
+          ═══════════════════════════════════════════ */}
+      <section style={{ background: S.white, borderBottom: "1px solid rgba(11,31,58,0.08)", padding: "clamp(32px, 5vw, 48px) 20px" }}>
+        <div className="mx-auto max-w-[1060px] grid gap-0.5 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
           {[
             "LGBTQ+ affirming",
             "Direct therapist contact",
@@ -167,142 +194,155 @@ export function EditorialHomepage({ featuredTherapists, totalTherapists, cityCou
             "Transparent profiles",
             "Privacy-first browsing",
           ].map((item) => (
-            <div key={item} className="rounded-2xl border border-[#0B1F3A]/8 bg-[#FCFBF8] p-5 text-sm font-semibold text-[#0B1F3A]">
-              <CheckCircle2 className="mb-3 h-5 w-5 text-[#FF8A1F]" />
-              {item}
+            <div key={item} style={{ background: S.cream, padding: "20px 18px" }}>
+              <CheckCircle2 style={{ width: 18, height: 18, color: S.orange, marginBottom: 12 }} />
+              <p style={{ fontFamily: S.sans, fontSize: 13, fontWeight: 600, color: S.dark, lineHeight: 1.4 }}>{item}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── CITIES ── */}
-      <section className="px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-12 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+      {/* ═══════════════════════════════════════════
+          CITIES — premium editorial grid
+          ═══════════════════════════════════════════ */}
+      <section style={{ padding: "clamp(64px, 10vw, 100px) 20px" }}>
+        <div style={{ maxWidth: 1060, margin: "0 auto" }}>
+
+          {/* Section header */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 52, gap: 20, flexWrap: "wrap" }}>
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#FF8A1F]">Explore by city</p>
-              <h2 className="mt-3 font-['Georgia','Times_New_Roman',serif] text-4xl font-semibold tracking-[-0.03em] text-[#0B1F3A] sm:text-5xl">
+              <p style={{ fontFamily: S.sans, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: S.orange, marginBottom: 16 }}>
+                Explore by city
+              </p>
+              <h2 style={{ fontFamily: S.serif, fontSize: "clamp(28px, 4.5vw, 44px)", fontWeight: 400, lineHeight: 1.12, color: S.dark }}>
                 Massage therapists by city.
               </h2>
-              <p className="mt-4 max-w-2xl leading-7 text-[#0B1F3A]/60">
-                Browse independent massage therapists in major U.S. cities by location, service style, and availability.
+              <p style={{ fontFamily: S.sans, fontSize: 14, lineHeight: 1.75, color: S.muted, marginTop: 14, maxWidth: 440 }}>
+                Browse independent therapists in major U.S. cities by location, specialty, and direct contact options.
               </p>
             </div>
-            <Link href="/explore" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0B1F3A] hover:text-[#FF8A1F] transition-colors">
-              Browse all cities <ArrowRight className="h-4 w-4" />
+            <Link
+              href="/explore"
+              style={{ fontFamily: S.sans, fontSize: 12, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: S.dark, textDecoration: "none", borderBottom: "1px solid " + S.dark, paddingBottom: 3, display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap", flexShrink: 0 }}
+            >
+              All Cities <ArrowRight style={{ width: 12, height: 12 }} />
             </Link>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+
+          {/* City cards — 2 col mobile → 3 tablet → 5 desktop */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5" style={{ gap: 2 }}>
             {popularCities.map((city) => (
-              <Link
-                key={city}
-                href={cityHref(city)}
-                className="group rounded-2xl border border-[#0B1F3A]/10 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#FF8A1F]/50 hover:shadow-[0_12px_40px_rgba(11,31,58,0.12)]"
-              >
-                <MapPin className="h-5 w-5 text-[#FF8A1F]" />
-                <h3 className="mt-4 font-['Georgia','Times_New_Roman',serif] text-2xl font-semibold text-[#0B1F3A]">{city}</h3>
-                <p className="mt-2 text-xs uppercase tracking-[0.14em] text-[#0B1F3A]/45">View therapists</p>
+              <Link key={city.name} href={cityHref(city.name)} className="mm-city-card" style={{ padding: "28px 22px" }}>
+                {/* State abbreviation label */}
+                <p style={{ fontFamily: S.sans, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: S.orange, marginBottom: 10 }}>
+                  {city.state}
+                </p>
+                {/* City name — editorial serif */}
+                <h3 style={{ fontFamily: S.serif, fontSize: "clamp(18px, 2.5vw, 22px)", fontWeight: 400, color: S.dark, lineHeight: 1.2, marginBottom: 16 }}>
+                  {city.name}
+                </h3>
+                {/* CTA hint */}
+                <p style={{ fontFamily: S.sans, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(11,31,58,0.38)", display: "flex", alignItems: "center", gap: 6 }}>
+                  View therapists
+                  <ArrowRight style={{ width: 10, height: 10 }} />
+                </p>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── dark navy */}
-      <section className="bg-[#0B1F3A] px-4 py-24 text-white sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#FF8A1F]">How MasseurMatch works</p>
-          <h2 className="mt-3 max-w-3xl font-['Georgia','Times_New_Roman',serif] text-4xl font-semibold tracking-[-0.03em] sm:text-5xl">
+      {/* ═══════════════════════════════════════════
+          HOW IT WORKS — dark navy
+          ═══════════════════════════════════════════ */}
+      <section style={{ background: S.dark, color: S.cream, padding: "clamp(64px, 10vw, 100px) 20px" }}>
+        <div style={{ maxWidth: 1060, margin: "0 auto" }}>
+          <p style={{ fontFamily: S.sans, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: S.orange, marginBottom: 20 }}>
+            How MasseurMatch works
+          </p>
+          <h2 style={{ fontFamily: S.serif, fontSize: "clamp(26px, 4vw, 40px)", fontWeight: 400, maxWidth: 540, lineHeight: 1.25, marginBottom: 56 }}>
             Simple discovery. Clear profiles. Direct contact.
           </h2>
-          <div className="mt-14 grid gap-6 lg:grid-cols-3">
-            {[
-              [Sparkles, "Search by city", "Find massage therapists by location, profile details, and service information."],
-              [Star, "Compare profiles", "Review photos, descriptions, specialties, incall or outcall options, and contact preferences."],
-              [Heart, "Contact directly", "Reach the therapist using their listed contact method — no middleman, no booking fees."],
-            ].map(([Icon, title, text]) => {
-              const Component = Icon as typeof Sparkles;
-              return (
-                <div
-                  key={String(title)}
-                  className="group rounded-2xl border border-white/10 bg-white/[0.04] p-8 transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.08] hover:border-white/20"
-                >
-                  <Component className="h-7 w-7 text-[#FF8A1F]" />
-                  <h3 className="mt-6 font-['Georgia','Times_New_Roman',serif] text-2xl font-semibold">{title as string}</h3>
-                  <p className="mt-4 text-sm leading-7 text-white/60">{text as string}</p>
-                </div>
-              );
-            })}
+          <div className="grid gap-[2px] sm:grid-cols-3">
+            {([
+              [Sparkles, "Search by city",    "Find massage therapists by location, profile details, and service information."],
+              [Star,     "Compare profiles",  "Review photos, descriptions, specialties, incall or outcall options, and contact preferences."],
+              [Heart,    "Contact directly",  "Reach the therapist using their listed contact method — no middleman, no booking fees."],
+            ] as [typeof Sparkles, string, string][]).map(([Icon, title, text]) => (
+              <div key={title} style={{ background: "rgba(255,255,255,0.04)", padding: "36px 32px", borderTop: "1px solid rgba(252,251,248,0.07)" }}>
+                <Icon style={{ width: 24, height: 24, color: S.orange }} />
+                <h3 style={{ fontFamily: S.serif, fontSize: 20, fontWeight: 400, color: S.cream, marginTop: 24, marginBottom: 14 }}>{title}</h3>
+                <p style={{ fontFamily: S.sans, fontSize: 14, lineHeight: 1.75, color: "rgba(252,251,248,0.60)" }}>{text}</p>
+              </div>
+            ))}
           </div>
-          <Link
-            href="/how-it-works"
-            className="mt-12 inline-flex items-center gap-2 rounded-full bg-[#FF8A1F] px-7 py-4 text-sm font-bold text-[#0B1F3A] transition-all duration-300 hover:bg-[#ff9b42] hover:shadow-[0_8px_28px_rgba(255,138,31,0.40)]"
-          >
-            See how it works <ArrowRight className="h-4 w-4" />
-          </Link>
+          <div style={{ marginTop: 36 }}>
+            <Link
+              href="/how-it-works"
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "15px 36px", fontFamily: S.sans, fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", background: S.orange, color: S.dark, textDecoration: "none" }}
+            >
+              See how it works <ArrowRight style={{ width: 14, height: 14 }} />
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* ── FEATURED PROFILES ── */}
+      {/* ═══════════════════════════════════════════
+          FEATURED PROFILES
+          ═══════════════════════════════════════════ */}
       {visibleProfiles.length > 0 && (
-        <section className="px-4 py-20 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl">
-            <div className="mb-12 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+        <section style={{ padding: "clamp(64px, 10vw, 100px) 20px" }}>
+          <div style={{ maxWidth: 1060, margin: "0 auto" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 48, gap: 20, flexWrap: "wrap" }}>
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#FF8A1F]">Featured profiles</p>
-                <h2 className="mt-3 font-['Georgia','Times_New_Roman',serif] text-4xl font-semibold tracking-[-0.03em] text-[#0B1F3A] sm:text-5xl">
+                <p style={{ fontFamily: S.sans, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: S.orange, marginBottom: 16 }}>Featured profiles</p>
+                <h2 style={{ fontFamily: S.serif, fontSize: "clamp(28px, 4.5vw, 42px)", fontWeight: 400, lineHeight: 1.15, color: S.dark }}>
                   Featured massage therapist profiles.
                 </h2>
-                <p className="mt-4 max-w-2xl leading-7 text-[#0B1F3A]/60">
+                <p style={{ fontFamily: S.sans, fontSize: 14, lineHeight: 1.75, color: S.muted, marginTop: 12, maxWidth: 480 }}>
                   Selected independent therapists with profile details, location, service style, and direct contact options.
                 </p>
               </div>
-              <Link href="/explore" className="inline-flex items-center gap-2 text-sm font-semibold text-[#0B1F3A] hover:text-[#FF8A1F] transition-colors">
-                View all profiles <ArrowRight className="h-4 w-4" />
+              <Link href="/explore" style={{ fontFamily: S.sans, fontSize: 12, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: S.dark, textDecoration: "none", borderBottom: "1px solid " + S.dark, paddingBottom: 3, display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap", flexShrink: 0 }}>
+                All Profiles <ArrowRight style={{ width: 12, height: 12 }} />
               </Link>
             </div>
-            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-[2px] md:grid-cols-2 lg:grid-cols-3">
               {visibleProfiles.map((therapist) => (
                 <Link
                   key={therapist.id}
                   href={`/therapists/${therapist.slug || therapist.id}`}
-                  className="group overflow-hidden rounded-2xl border border-[#0B1F3A]/10 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_48px_rgba(11,31,58,0.14)] hover:border-[#0B1F3A]/20"
+                  style={{ background: S.white, overflow: "hidden", textDecoration: "none", display: "block" }}
                 >
-                  <div className="relative h-64 bg-[#0B1F3A]/8">
+                  <div style={{ position: "relative", height: 260, background: "rgba(11,31,58,0.08)" }}>
                     <Image
                       src={therapist.avatar_url || therapist.profile_photo || "/images/placeholder-therapist.jpg"}
                       alt={profileName(therapist)}
                       fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      style={{ objectFit: "cover" }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B1F3A]/85 via-[#0B1F3A]/20 to-transparent" />
-                    <div className="absolute bottom-4 left-4 right-4 text-white">
-                      <p className="font-['Georgia','Times_New_Roman',serif] text-xl font-semibold">{profileName(therapist)}</p>
-                      <p className="mt-1 flex items-center gap-1.5 text-xs text-white/70">
-                        <MapPin className="h-3.5 w-3.5" />
+                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(11,31,58,0.85) 0%, rgba(11,31,58,0.20) 50%, transparent 100%)" }} />
+                    <div style={{ position: "absolute", bottom: 20, left: 20, right: 20, color: "#fff" }}>
+                      <p style={{ fontFamily: S.serif, fontSize: 20, fontWeight: 400 }}>{profileName(therapist)}</p>
+                      <p style={{ fontFamily: S.sans, fontSize: 12, color: "rgba(255,255,255,0.65)", marginTop: 4, display: "flex", alignItems: "center", gap: 6 }}>
+                        <MapPin style={{ width: 12, height: 12 }} />
                         {therapist.city || "United States"}
                       </p>
                     </div>
                   </div>
-                  <div className="p-5">
-                    <div className="mb-3 flex flex-wrap gap-1.5">
+                  <div style={{ padding: "20px 24px" }}>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
                       {therapist.verification_status === "verified" && (
-                        <span className="rounded-full bg-[#0B1F3A]/8 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#0B1F3A]">
-                          Verified
-                        </span>
+                        <span style={{ fontFamily: S.sans, fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", background: "rgba(11,31,58,0.07)", color: S.dark, padding: "4px 10px" }}>Verified</span>
                       )}
                       {therapist.lgbtq_affirming && (
-                        <span className="rounded-full bg-[#FF8A1F]/12 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9A4A00]">
-                          LGBTQ+ affirming
-                        </span>
+                        <span style={{ fontFamily: S.sans, fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", background: "rgba(255,138,31,0.1)", color: "#9A4A00", padding: "4px 10px" }}>LGBTQ+ affirming</span>
                       )}
                       {therapist.available_now && (
-                        <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-700">
-                          Available
-                        </span>
+                        <span style={{ fontFamily: S.sans, fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", background: "rgba(16,185,129,0.1)", color: "#065f46", padding: "4px 10px" }}>Available</span>
                       )}
                     </div>
-                    <p className="line-clamp-2 text-sm leading-6 text-[#0B1F3A]/60">
+                    <p style={{ fontFamily: S.sans, fontSize: 13, lineHeight: 1.7, color: S.muted, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
                       {therapist.headline || therapist.bio || "Review profile details, services, pricing, and contact options directly."}
                     </p>
                   </div>
@@ -313,28 +353,26 @@ export function EditorialHomepage({ featuredTherapists, totalTherapists, cityCou
         </section>
       )}
 
-      {/* ── SERVICE STYLES ── */}
-      <section className="border-t border-[#0B1F3A]/8 bg-white px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+      {/* ═══════════════════════════════════════════
+          SERVICE STYLES
+          ═══════════════════════════════════════════ */}
+      <section style={{ borderTop: "1px solid rgba(11,31,58,0.08)", background: S.white, padding: "clamp(64px, 10vw, 100px) 20px" }}>
+        <div style={{ maxWidth: 1060, margin: "0 auto" }}>
+          <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#FF8A1F]">Browse by service</p>
-              <h2 className="mt-3 font-['Georgia','Times_New_Roman',serif] text-4xl font-semibold tracking-[-0.03em] text-[#0B1F3A] sm:text-5xl">
+              <p style={{ fontFamily: S.sans, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: S.orange, marginBottom: 16 }}>Browse by service</p>
+              <h2 style={{ fontFamily: S.serif, fontSize: "clamp(28px, 4.5vw, 42px)", fontWeight: 400, lineHeight: 1.15, color: S.dark }}>
                 Discover by massage style.
               </h2>
-              <p className="mt-5 leading-7 text-[#0B1F3A]/60">
-                Service category pages help visitors discover profiles by actual search intent — deep tissue, Swedish, sports, mobile, and more.
+              <p style={{ fontFamily: S.sans, fontSize: 14, lineHeight: 1.75, color: S.muted, marginTop: 16, maxWidth: 340 }}>
+                Service category pages help visitors discover profiles by search intent — deep tissue, Swedish, sports, mobile, and more.
               </p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-[2px] sm:grid-cols-2">
               {massageStyles.map((style) => (
-                <Link
-                  key={style}
-                  href={styleHref(style)}
-                  className="group flex items-center justify-between rounded-xl border border-[#0B1F3A]/10 bg-[#FCFBF8] px-5 py-4 font-semibold text-[#0B1F3A] transition-all duration-200 hover:border-[#FF8A1F]/50 hover:bg-white hover:shadow-md"
-                >
-                  {style}
-                  <ArrowRight className="h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100 text-[#FF8A1F]" />
+                <Link key={style} href={styleHref(style)} className="mm-service-link">
+                  <span style={{ fontFamily: S.sans, fontSize: 14, fontWeight: 600, color: S.dark }}>{style}</span>
+                  <ArrowRight className="mm-arrow" style={{ width: 14, height: 14, color: S.orange }} />
                 </Link>
               ))}
             </div>
@@ -342,28 +380,32 @@ export function EditorialHomepage({ featuredTherapists, totalTherapists, cityCou
         </div>
       </section>
 
-      {/* ── SEO / EDITORIAL BLOCK ── */}
-      <section className="px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-8 rounded-[2rem] border border-[#0B1F3A]/10 bg-white p-8 shadow-sm lg:grid-cols-[1.1fr_0.9fr] lg:p-12">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#FF8A1F]">About MasseurMatch</p>
-            <h2 className="mt-3 font-['Georgia','Times_New_Roman',serif] text-4xl font-semibold tracking-[-0.03em] text-[#0B1F3A]">
+      {/* ═══════════════════════════════════════════
+          EDITORIAL / ABOUT BLOCK
+          ═══════════════════════════════════════════ */}
+      <section style={{ padding: "clamp(64px, 10vw, 100px) 20px" }}>
+        <div className="grid gap-[2px] lg:grid-cols-[1.1fr_0.9fr]" style={{ maxWidth: 1060, margin: "0 auto" }}>
+          <div style={{ background: S.white, padding: "clamp(36px, 5vw, 56px)" }}>
+            <p style={{ fontFamily: S.sans, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: S.orange, marginBottom: 16 }}>About MasseurMatch</p>
+            <h2 style={{ fontFamily: S.serif, fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 400, lineHeight: 1.25, color: S.dark, marginBottom: 24 }}>
               Find massage therapists in your city.
             </h2>
-            <p className="mt-6 leading-8 text-[#0B1F3A]/65">
+            <p style={{ fontFamily: S.sans, fontSize: 14, lineHeight: 1.85, color: S.muted, marginBottom: 16 }}>
               MasseurMatch helps clients discover independent massage therapists through city-based directory pages and detailed therapist profiles. Whether visitors are looking for deep tissue, Swedish, sports, mobile, incall, or outcall options, the directory makes it easier to compare profiles and contact therapists directly.
             </p>
-            <p className="mt-5 leading-8 text-[#0B1F3A]/65">
+            <p style={{ fontFamily: S.sans, fontSize: 14, lineHeight: 1.85, color: S.muted }}>
               Unlike booking platforms, MasseurMatch does not manage appointments, payments, calendars, or therapist schedules. Each profile provides information submitted by the provider, helping clients make informed direct contact outside the platform.
             </p>
           </div>
-          <div className="rounded-2xl bg-[#0B1F3A] p-8 text-white">
-            <TrendingUp className="h-8 w-8 text-[#FF8A1F]" />
-            <h3 className="mt-6 font-['Georgia','Times_New_Roman',serif] text-2xl font-semibold">Built for organic growth.</h3>
-            <ul className="mt-6 space-y-3 text-sm leading-7 text-white/65">
+          <div style={{ background: S.dark, padding: "clamp(36px, 5vw, 56px)", color: S.cream }}>
+            <TrendingUp style={{ width: 28, height: 28, color: S.orange }} />
+            <h3 style={{ fontFamily: S.serif, fontSize: 24, fontWeight: 400, color: S.cream, marginTop: 24, marginBottom: 24 }}>
+              Built for organic growth.
+            </h3>
+            <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: 14 }}>
               {["City-based internal links", "Service category clusters", "Featured profile pathways", "FAQ content for long-tail search", "Direct, indexable directory copy"].map((item) => (
-                <li key={item} className="flex items-center gap-2.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#FF8A1F] flex-shrink-0" />
+                <li key={item} style={{ display: "flex", alignItems: "flex-start", gap: 12, fontFamily: S.sans, fontSize: 13, lineHeight: 1.7, color: "rgba(252,251,248,0.65)" }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: S.orange, flexShrink: 0, marginTop: 5 }} />
                   {item}
                 </li>
               ))}
@@ -372,53 +414,49 @@ export function EditorialHomepage({ featuredTherapists, totalTherapists, cityCou
         </div>
       </section>
 
-      {/* ── FAQ ── */}
-      <section className="border-t border-[#0B1F3A]/8 bg-white px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl">
-          <p className="text-center text-xs font-bold uppercase tracking-[0.22em] text-[#FF8A1F]">FAQ</p>
-          <h2 className="mt-3 text-center font-['Georgia','Times_New_Roman',serif] text-4xl font-semibold tracking-[-0.03em] text-[#0B1F3A] sm:text-5xl">
+      {/* ═══════════════════════════════════════════
+          FAQ
+          ═══════════════════════════════════════════ */}
+      <section style={{ borderTop: "1px solid rgba(11,31,58,0.08)", background: S.white, padding: "clamp(64px, 10vw, 100px) 20px" }}>
+        <div style={{ maxWidth: 720, margin: "0 auto" }}>
+          <p style={{ fontFamily: S.sans, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: S.orange, marginBottom: 20, textAlign: "center" }}>FAQ</p>
+          <h2 style={{ fontFamily: S.serif, fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 400, textAlign: "center", marginBottom: 44, color: S.dark }}>
             Frequently asked questions.
           </h2>
-          <div className="mt-10 divide-y divide-[#0B1F3A]/8 rounded-2xl border border-[#0B1F3A]/10 bg-[#FCFBF8] overflow-hidden">
-            {faqs.map(([question, answer]) => (
-              <div key={question} className="p-6 sm:p-8">
-                <h3 className="font-semibold text-[#0B1F3A]">{question}</h3>
-                <p className="mt-3 leading-7 text-[#0B1F3A]/60">{answer}</p>
-              </div>
-            ))}
-          </div>
+          {faqs.map(([question, answer], i) => (
+            <div key={String(question)} style={{ padding: "28px 0", borderBottom: "1px solid rgba(11,31,58,0.08)", borderTop: i === 0 ? "1px solid rgba(11,31,58,0.08)" : "none" }}>
+              <h3 style={{ fontFamily: S.serif, fontSize: 17, fontWeight: 400, color: S.dark, marginBottom: 12 }}>{question}</h3>
+              <p style={{ fontFamily: S.sans, fontSize: 14, lineHeight: 1.75, color: S.muted }}>{answer}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* ── FINAL CTA ── */}
-      <section className="px-4 pb-24 pt-4 sm:px-6 lg:px-8">
-        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-[#0B1F3A] p-10 text-center text-white lg:p-16">
-          <div className="pointer-events-none absolute -right-32 -top-32 h-[400px] w-[400px] rounded-full bg-[#FF8A1F]/[0.08] blur-[80px]" />
-          <div className="pointer-events-none absolute -left-32 bottom-0 h-[300px] w-[300px] rounded-full bg-[#1E4B8F]/40 blur-[60px]" />
-          <div className="relative">
-            <h2 className="font-['Georgia','Times_New_Roman',serif] text-4xl font-semibold tracking-[-0.03em] sm:text-5xl">
+      {/* ═══════════════════════════════════════════
+          FINAL CTA
+          ═══════════════════════════════════════════ */}
+      <section style={{ padding: "clamp(64px, 10vw, 100px) 20px" }}>
+        <div style={{ maxWidth: 1060, margin: "0 auto", background: S.dark, padding: "clamp(56px, 8vw, 88px) clamp(28px, 5vw, 56px)", textAlign: "center", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", right: "-100px", top: "-100px", width: 380, height: 380, borderRadius: "50%", background: "rgba(255,138,31,0.08)", filter: "blur(60px)", pointerEvents: "none" }} />
+          <div style={{ position: "relative" }}>
+            <h2 style={{ fontFamily: S.serif, fontSize: "clamp(28px, 5vw, 50px)", fontWeight: 400, color: S.cream, marginBottom: 18, lineHeight: 1.15 }}>
               Start exploring independent massage therapists.
             </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/55">
+            <p style={{ fontFamily: S.sans, fontSize: 15, lineHeight: 1.7, color: "rgba(252,251,248,0.55)", maxWidth: 520, margin: "0 auto 48px" }}>
               Browse city pages, compare profiles, or create a therapist profile to grow visibility in a premium directory experience.
             </p>
-            <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link
-                href="/explore"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FF8A1F] px-7 py-4 text-sm font-bold text-[#0B1F3A] shadow-[0_8px_28px_rgba(255,138,31,0.40)] transition-all duration-300 hover:bg-[#ff9b42] hover:shadow-[0_14px_40px_rgba(255,138,31,0.55)]"
-              >
-                Browse therapists <ArrowRight className="h-4 w-4" />
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              <Link href="/explore" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "16px 40px", fontFamily: S.sans, fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", background: S.orange, color: S.dark, textDecoration: "none" }}>
+                Browse Therapists <ArrowRight style={{ width: 14, height: 14 }} />
               </Link>
-              <Link
-                href="/for-therapists"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 px-7 py-4 text-sm font-semibold text-white/80 transition-all duration-300 hover:bg-white/10 hover:text-white"
-              >
-                List your profile
+              <Link href="/for-therapists" style={{ display: "inline-flex", alignItems: "center", padding: "16px 32px", fontFamily: S.sans, fontSize: 12, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", background: "transparent", color: S.cream, textDecoration: "none", border: "1px solid rgba(252,251,248,0.22)" }}>
+                List Your Profile
               </Link>
             </div>
           </div>
         </div>
       </section>
+
     </main>
   );
 }
