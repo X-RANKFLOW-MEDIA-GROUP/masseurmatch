@@ -104,6 +104,8 @@ const ALLOWED_PROFILE_STATUS = [
 const ALLOWED_SUBSCRIPTION_TIERS = ["free", "standard", "pro", "elite", "featured"];
 const IGNORED_TABLES = new Set(["auth.users", "storage.buckets", "storage.objects"]);
 const IDENTIFIER = "[a-zA-Z_][a-zA-Z0-9_]*";
+const IDENT_TOKEN = `(?:"[^"]+"|${IDENTIFIER})`; // quoted or unquoted identifier
+const TABLE_REF = `(?:${IDENT_TOKEN}\\s*\\.\\s*)?${IDENT_TOKEN}`; // [schema.]table
 
 function walkFiles(dir) {
   const absolute = path.join(ROOT, dir);
@@ -129,6 +131,33 @@ function normalizeSql(sql) {
   return sql.replace(/--.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "").toLowerCase();
 }
 
+function unquoteIdentifier(identifier) {
+  if (!identifier) return "";
+  const value = identifier.trim();
+  if (value.startsWith('"') && value.endsWith('"')) return value.slice(1, -1).replace(/""/g, '"');
+  return value;
+}
+
+function extractTableName(tableRef) {
+  // Handles:
+  // - profiles
+  // - public.profiles
+  // - "profiles"
+  // - "public"."profiles"
+  // - public."profiles"
+  const parts = tableRef
+    .split(".")
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  const tablePart = parts[parts.length - 1] || tableRef;
+  return unquoteIdentifier(tablePart).toLowerCase();
+}
+
+function extractColumnName(columnToken) {
+  return unquoteIdentifier(columnToken).toLowerCase();
+}
+
 function addColumn(contract, table, column) {
   const cleanTable = table.replace(/^public\./, "").toLowerCase();
   const cleanColumn = column.toLowerCase();
@@ -139,28 +168,49 @@ function addColumn(contract, table, column) {
 function parseSchemaContract(sql) {
   const contract = new Map();
   const normalized = normalizeSql(sql);
-  const createTableRegex = new RegExp(`create\\s+table\\s+if\\s+not\\s+exists\\s+(?:public\\.)?(${IDENTIFIER})\\s*\\(([\\s\\S]*?)\\);`, "gi");
+
+  // CREATE TABLE [IF NOT EXISTS] [schema.]table (...)
+  const createTableRegex = new RegExp(
+    `create\\s+table\\s+(?:if\\s+not\\s+exists\\s+)?(${TABLE_REF})\\s*\\(([\\s\\S]*?)\\);`,
+    "gi"
+  );
+
   let tableMatch;
   while ((tableMatch = createTableRegex.exec(normalized))) {
-    const [, table, body] = tableMatch;
+    const table = extractTableName(tableMatch[1]);
+    const body = tableMatch[2];
+
     if (!contract.has(table)) contract.set(table, new Set());
+
     for (const rawLine of body.split("\n")) {
       const line = rawLine.trim().replace(/,$/, "");
       if (!line || /^(constraint|primary|foreign|unique|check|exclude)\b/.test(line)) continue;
-      const column = line.match(new RegExp(`^(${IDENTIFIER})\\b`, "i"))?.[1];
-      if (column) addColumn(contract, table, column);
+
+      // Column definition starts with either "quoted_ident" or unquoted_ident
+      const colMatch = line.match(new RegExp(`^("([^"]|"")*"|${IDENTIFIER})\\b`, "i"));
+      const rawColumn = colMatch?.[1];
+      if (rawColumn) addColumn(contract, table, extractColumnName(rawColumn));
     }
   }
 
-  const alterRegex = new RegExp(`alter\\s+table\\s+(?:public\\.)?(${IDENTIFIER})[\\s\\S]*?;`, "gi");
+  // ALTER TABLE [schema.]table ... ;
+  const alterRegex = new RegExp(`alter\\s+table\\s+(${TABLE_REF})[\\s\\S]*?;`, "gi");
   let alterMatch;
   while ((alterMatch = alterRegex.exec(normalized))) {
-    const table = alterMatch[1];
+    const table = extractTableName(alterMatch[1]);
     const statement = alterMatch[0];
-    const columnRegex = new RegExp(`add\\s+column\\s+if\\s+not\\s+exists\\s+(${IDENTIFIER})\\b`, "gi");
+
+    // ADD COLUMN [IF NOT EXISTS] column_name
+    const columnRegex = new RegExp(
+      `add\\s+column\\s+(?:if\\s+not\\s+exists\\s+)?("([^"]|"")*"|${IDENTIFIER})\\b`,
+      "gi"
+    );
     let columnMatch;
-    while ((columnMatch = columnRegex.exec(statement))) addColumn(contract, table, columnMatch[1]);
+    while ((columnMatch = columnRegex.exec(statement))) {
+      addColumn(contract, table, extractColumnName(columnMatch[1]));
+    }
   }
+
   return contract;
 }
 
