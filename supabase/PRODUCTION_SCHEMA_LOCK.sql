@@ -844,3 +844,44 @@ create table if not exists public.therapist_availability (
 alter table public.payment_transactions add column if not exists user_id uuid references auth.users(id) on delete set null;
 alter table public.payment_transactions add column if not exists stripe_refund_id text;
 alter table public.payment_transactions add column if not exists amount_cents integer;
+
+create table if not exists public.waitlist_rate_limits (
+  fingerprint text primary key,
+  window_start timestamptz not null default timezone('utc', now()),
+  request_count integer not null default 0,
+  blocked_until timestamptz,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
+create table if not exists public.waitlist_events (
+  id uuid primary key default gen_random_uuid(),
+  event_name text not null,
+  email citext,
+  source text,
+  page_path text,
+  referrer text,
+  user_agent text,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default timezone('utc', now())
+);
+
+create table if not exists public.waitlist_signups (
+  id uuid primary key default gen_random_uuid(),
+  email citext not null,
+  normalized_email citext generated always as (lower(email::text)::citext) stored,
+  role text not null default 'visitor' check (role in ('visitor','therapist','partner','press')),
+  source text,
+  campaign text,
+  page_path text,
+  referrer text,
+  user_agent text,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now()),
+  unique(normalized_email)
+);
+
+create index if not exists idx_waitlist_events_email_created_at on public.waitlist_events(email, created_at desc);
+create index if not exists idx_waitlist_events_event_name_created_at on public.waitlist_events(event_name, created_at desc);
+create index if not exists idx_waitlist_signups_created_at on public.waitlist_signups(created_at desc);
