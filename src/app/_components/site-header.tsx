@@ -228,6 +228,10 @@ export default function SiteHeader() {
     router.refresh();
   }
 
+  if (isHomepage) {
+    return null;
+  }
+
   const isDarkHero = false;
 
   return (
