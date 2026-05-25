@@ -1,40 +1,32 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/app/_components/json-ld";
-import { EditorialHomepage } from "@/components/homepage/EditorialHomepage";
-import { getCities, getPublicTherapists } from "@/app/_lib/directory";
-import { getLaunchAreaPaths, getLaunchCityPaths, getLaunchKeywordPaths, getLaunchSegmentPaths } from "@/app/_lib/launch-urls";
-import {
-  buildCollectionPageJsonLd,
-  buildFaqJsonLd,
-  buildItemListJsonLd,
-  createPageMetadata,
-} from "@/app/_lib/seo";
+import { createPageMetadata } from "@/app/_lib/seo";
 import { siteUrl } from "@/lib/site";
+import { MasseurMatchComingSoon } from "@/components/coming-soon/MasseurMatchComingSoon";
 
-export const revalidate = 1800;
+export const revalidate = 3600;
 
 const homeMetadata = createPageMetadata({
-  title: "Verified massage therapists across the United States | LGBTQ+ affirming directory",
+  title: "MasseurMatch Coming Soon | Find Independent Massage Therapists",
   description:
-    "Explore verified LGBTQ+ affirming massage therapists across the United States with protected direct contact, transparent profile details, city based discovery, incall and outcall filters, and zero booking fees.",
+    "MasseurMatch is launching soon. Join early access for a modern directory built to discover independent LGBTQ+ affirming massage therapists by city, service style, profile details, and direct contact preferences.",
   path: "/",
   keywords: [
+    "MasseurMatch",
+    "massage therapist directory",
+    "independent massage therapists",
+    "LGBTQ massage directory",
+    "LGBTQ affirming massage therapists",
+    "find massage therapist",
     "massage therapists near me",
-    "verified massage therapist directory",
-    "LGBTQ massage therapist directory",
-    "gay massage therapist",
-    "male massage therapist",
-    "massage therapists by city",
-    "massage therapists by state",
+    "local massage search",
     "outcall massage",
     "incall massage",
     "deep tissue massage",
     "swedish massage",
-    "trusted massage directory",
-    "gay affirming massage",
-    "massage directory usa",
-    "verified male massage therapist",
     "professional massage directory",
+    "therapist profile directory",
+    "massage directory USA",
   ],
 });
 
@@ -47,146 +39,51 @@ export const metadata: Metadata = {
       "pt-BR": siteUrl("/pt-br"),
     },
   },
+  openGraph: {
+    ...homeMetadata.openGraph,
+    title: "MasseurMatch is Coming Soon",
+    description:
+      "Join early access for a modern directory built to discover independent LGBTQ+ affirming massage therapists by city, service style, profile details, and direct contact preferences.",
+    url: siteUrl("/"),
+    siteName: "MasseurMatch",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "MasseurMatch is Coming Soon",
+    description:
+      "Join early access for a modern directory built to discover independent LGBTQ+ affirming massage therapists.",
+  },
 };
 
-export default async function HomePage() {
-  const cities = getCities();
-  const therapistsResult = await getPublicTherapists({ pageSize: 60 });
-  const therapists = therapistsResult.items;
-
-  const featuredTherapists = therapists
-    .filter(
-      (therapist: any) =>
-        therapist._tier === "elite" ||
-        therapist._tier === "pro" ||
-        Boolean(therapist.is_verified_identity || therapist.is_verified_profile),
-    )
-    .slice(0, 6);
-
-  const cityCounts = new Map<string, number>();
-  const cityHighlights = new Map<string, Set<string>>();
-
-  therapists.forEach((therapist: any) => {
-    const cityKey = therapist.city?.toLowerCase().trim();
-
-    if (!cityKey) {
-      return;
-    }
-
-    cityCounts.set(cityKey, (cityCounts.get(cityKey) || 0) + 1);
-
-    const highlights = cityHighlights.get(cityKey) || new Set<string>();
-    (therapist.specialties || []).slice(0, 3).forEach((specialty: string) => highlights.add(specialty));
-
-    if (therapist.available_now) {
-      highlights.add("Available now");
-    }
-
-    if (therapist.outcall_price) {
-      highlights.add("Outcall");
-    }
-
-    if (therapist.incall_price) {
-      highlights.add("Incall");
-    }
-
-    cityHighlights.set(cityKey, highlights);
-  });
-
-  const launchSegmentPaths = getLaunchSegmentPaths();
-  const launchKeywordPaths = getLaunchKeywordPaths();
-  const launchAreaPaths = getLaunchAreaPaths();
-
-  const launchCities = getLaunchCityPaths()
-    .map((path) => {
-      const citySlug = path.split("/").filter(Boolean)[0] || "";
-      const city = cities.find((entry) => entry.slug === citySlug);
-
-      if (!city) {
-        return null;
-      }
-
-      const cityKey = city.name.toLowerCase();
-      const highlightValues = Array.from(cityHighlights.get(cityKey) || []);
-      const routeCount = [
-        path,
-        ...launchSegmentPaths.filter((entry) => entry.startsWith(`${path}/`)),
-        ...launchKeywordPaths.filter((entry) => entry.startsWith(`${path}/`)),
-        ...launchAreaPaths.filter((entry) => entry.startsWith(`${path}/`)),
-      ].length;
-
-      return {
-        href: path,
-        city,
-        listingCount: cityCounts.get(cityKey) || 0,
-        routeCount,
-        highlights: (highlightValues.length > 0
-          ? highlightValues
-          : ["Verified", "City page", "Direct contact"]).slice(0, 3),
-      };
-    })
-    .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
-
-  const homeFaqs = [
-    {
-      question: "How do I find verified massage therapists near me?",
-      answer:
-        "Start with the national directory, choose a city or state, then compare specialties, incall or outcall options, visible pricing, reviews, and profile quality before contacting a therapist directly.",
-    },
-    {
-      question: "Does MasseurMatch cover the whole United States?",
-      answer:
-        "MasseurMatch is built as a national U.S. directory. City, state, service, and neighborhood pages are expanded as public therapist inventory and useful local content become available.",
-    },
-    {
-      question: "Can I compare deep tissue, Swedish, hotel, and outcall options?",
-      answer:
-        "Yes. The directory supports city plus service discovery for deep tissue, Swedish, sports recovery, hotel massage, mobile massage, incall, and outcall options where enough local inventory exists.",
-    },
-    {
-      question: "Does MasseurMatch handle booking or payments?",
-      answer:
-        "No. MasseurMatch is a discovery directory. Users review profiles and contact therapists directly to confirm rates, boundaries, timing, location, and availability.",
-    },
-  ];
-
+export default function HomePage() {
   return (
     <>
       <JsonLd
-        data={buildCollectionPageJsonLd({
-          name: "MasseurMatch National Massage Directory",
+        data={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "MasseurMatch",
+          url: siteUrl("/"),
           description:
-            "Discover verified LGBTQ+ affirming massage therapists across the United States with transparent profiles, direct contact, protected privacy, and no booking fees.",
-          path: "/",
-        })}
+            "MasseurMatch is a modern directory for discovering independent LGBTQ+ affirming massage therapists by city, service style, profile details, and direct contact preferences.",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: siteUrl("/explore?q={search_term_string}"),
+            "query-input": "required name=search_term_string",
+          },
+        }}
       />
       <JsonLd
-        data={buildItemListJsonLd({
-          name: "Top MasseurMatch city pages",
-          path: "/",
-          items: launchCities.map((city) => ({
-            name: `Verified massage therapists in ${city.city.name}, ${city.city.stateCode}`,
-            path: city.href,
-          })),
-        })}
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "MasseurMatch",
+          url: siteUrl("/"),
+          slogan: "Find the right massage therapist, beautifully.",
+        }}
       />
-      <JsonLd
-        data={buildItemListJsonLd({
-          name: "Featured MasseurMatch therapists",
-          path: "/",
-          items: featuredTherapists.map((therapist) => ({
-            name: therapist.display_name || therapist.full_name || "Therapist",
-            path: `/therapists/${therapist.slug || therapist.id}`,
-          })),
-        })}
-      />
-      <JsonLd data={buildFaqJsonLd(homeFaqs)} />
-
-      <EditorialHomepage
-        featuredTherapists={featuredTherapists}
-        totalTherapists={therapistsResult.total}
-        cityCount={launchCities.length}
-      />
+      <MasseurMatchComingSoon />
     </>
   );
 }
