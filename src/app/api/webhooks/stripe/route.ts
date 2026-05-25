@@ -56,6 +56,51 @@ export async function POST(request: NextRequest) {
         .eq('stripe_subscription_id', sub.id)
       break
     }
+
+    // ── Identity verification ────────────────────────────────────────────────
+    case 'identity.verification_session.verified': {
+      const vs = event.data.object as Stripe.Identity.VerificationSession
+      const userId = vs.metadata?.userId
+      if (!userId) break
+
+      const now = new Date().toISOString()
+
+      // Mark the verification row as verified
+      await supabase
+        .from('identity_verifications')
+        .update({ status: 'verified', updated_at: now })
+        .eq('stripe_session_id', vs.id)
+
+      // Auto-approve the profile when identity passes, but only if it is
+      // pending review — never demote an already-approved profile.
+      await supabase
+        .from('profiles')
+        .update({
+          is_verified_identity: true,
+          verification_status: 'verified',
+          status: 'approved',
+          approved_at: now,
+          updated_at: now,
+        })
+        .eq('user_id', userId)
+        .in('status', ['pending_approval', 'under_review', 'submitted', 'changes_requested'])
+
+      break
+    }
+
+    case 'identity.verification_session.requires_input': {
+      const vs = event.data.object as Stripe.Identity.VerificationSession
+      await supabase
+        .from('identity_verifications')
+        .update({
+          status: 'requires_input',
+          last_error: vs.last_error?.reason ?? null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('stripe_session_id', vs.id)
+      break
+    }
+
     default:
       break
   }

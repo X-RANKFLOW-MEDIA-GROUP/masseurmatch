@@ -169,6 +169,7 @@ alter table public.profiles
   add column if not exists reviewed_by uuid references auth.users(id) on delete set null,
   add column if not exists admin_notes text,
   add column if not exists moderation_notes text,
+  add column if not exists rejection_reason text,
   add column if not exists last_active_at timestamptz;
 
 alter table public.profiles drop constraint if exists profiles_status_check;
@@ -842,3 +843,4 @@ create table if not exists public.therapist_availability (
 );
 alter table public.payment_transactions add column if not exists user_id uuid references auth.users(id) on delete set null;
 alter table public.payment_transactions add column if not exists stripe_refund_id text;
+alter table public.payment_transactions add column if not exists amount_cents integer;

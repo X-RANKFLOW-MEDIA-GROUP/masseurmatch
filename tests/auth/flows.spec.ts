@@ -50,9 +50,12 @@ const serviceRoleKey =
   localEnv.SUPABASE_SERVICE_ROLE_KEY ||
   "";
 
+// In CI, the global workflow env exposes SUPABASE_SERVICE_ROLE_KEY, which
+// would cause these full-registration tests to run against the live database
+// without proper test-environment isolation. Require an explicit opt-in flag.
 test.skip(
-  !supabaseUrl || !serviceRoleKey,
-  "Supabase service-role credentials are required to run auth launch E2E coverage.",
+  !supabaseUrl || !serviceRoleKey || (!!process.env.CI && !process.env.ENABLE_AUTH_E2E),
+  "Supabase service-role credentials are required. In CI, also set ENABLE_AUTH_E2E=1.",
 );
 
 const adminClient = createClient(supabaseUrl || "http://localhost:54321", serviceRoleKey || "placeholder-key", {

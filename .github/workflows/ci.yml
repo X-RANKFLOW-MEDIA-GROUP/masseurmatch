@@ -132,6 +132,9 @@ jobs:
     needs: [build]
     env:
       PLAYWRIGHT_BASE_URL: ${{ vars.PLAYWRIGHT_BASE_URL }}
+      # Optional: set as a GitHub secret when PLAYWRIGHT_BASE_URL points to a
+      # Vercel preview that has Deployment Protection enabled.
+      VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
     # Only runs when a base URL is configured (production or preview deployment).
     # Set PLAYWRIGHT_BASE_URL as a GitHub Actions repo variable (Settings → Variables).
     # A base URL is not sensitive — use vars, not secrets.
