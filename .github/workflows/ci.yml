@@ -69,7 +69,7 @@ jobs:
           tmpdir="$(mktemp -d)"
           curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz -C "$tmpdir" gitleaks
           install -m 0755 "$tmpdir/gitleaks" /usr/local/bin/gitleaks
-          gitleaks version
+          
       - name: Scan for secrets (gitleaks)
         run: gitleaks detect --source . --redact --verbose --exit-code 1
 
