@@ -1652,8 +1652,6 @@ export default function ExplorePageClient({
                     <CompactTherapistCard
                       key={provider.id}
                       provider={provider}
-                      selectedForCompare={compareSelection.some((item) => item.id === provider.id)}
-                      onToggleCompare={() => handleToggleCompare(provider)}
                       onOpen={handleProfileOpen}
                     />
                   ))}
