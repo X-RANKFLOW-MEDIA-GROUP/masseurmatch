@@ -228,7 +228,7 @@ export default function SiteHeader() {
     router.refresh();
   }
 
-  const isDarkHero = isHomepage && !isScrolled;
+  const isDarkHero = false;
 
   return (
     <motion.header

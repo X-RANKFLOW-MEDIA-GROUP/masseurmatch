@@ -92,8 +92,30 @@ export function HomeSeoLanding({
   guides,
   cityCoverageLine,
 }: HomeSeoLandingProps) {
+  const keywordRibbon = [
+    "Deep Tissue Massage",
+    "Swedish Massage",
+    "Sports Recovery",
+    "Incall Session",
+    "Outcall Massage",
+    "Available Now",
+    "Verified Therapist",
+    "LGBTQ+ Friendly",
+  ];
+
   return (
     <div className="bg-[#f4f6fa] text-text-primary">
+      <section className="overflow-hidden border-b border-white/20 bg-[#06152a] py-2">
+        <div className="whitespace-nowrap [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+          <div className="inline-flex min-w-full animate-[marquee_24s_linear_infinite] gap-6 px-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#b6d7ff]">
+            {[...keywordRibbon, ...keywordRibbon].map((keyword, index) => (
+              <span key={`${keyword}-${index}`} className="rounded-full border border-[#2a588f] bg-[#0c2342] px-4 py-1.5">
+                {keyword}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
       <section className="relative isolate overflow-hidden border-b border-white/40 bg-[linear-gradient(160deg,#08162b_0%,#0b1f3a_40%,#153e79_100%)] text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,179,71,0.22),transparent_26%),radial-gradient(circle_at_85%_10%,rgba(255,255,255,0.12),transparent_24%),linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:auto,auto,72px_72px,72px_72px] opacity-90" />
         <div className="page-shell relative py-12 sm:py-16 lg:py-20">
