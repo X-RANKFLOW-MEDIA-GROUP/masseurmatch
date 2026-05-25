@@ -191,7 +191,7 @@ export const KnottyChat = ({
   const panel = (
     <div
       className={cn(
-        "relative flex flex-col overflow-hidden rounded-[28px] border border-[#1b4678] bg-[linear-gradient(180deg,#0b2447_0%,#091b37_52%,#07162f_100%)] shadow-[0_32px_96px_rgba(1,10,28,0.62)] backdrop-blur-3xl",
+        "relative flex flex-col overflow-hidden rounded-[28px] border border-[#27527f] bg-[linear-gradient(180deg,#133a63_0%,#102f54_52%,#0a223f_100%)] shadow-[0_32px_96px_rgba(1,10,28,0.48)] backdrop-blur-3xl",
         isEmbedded
           ? "h-[620px] w-full"
           : "w-[396px] max-w-[calc(100vw-2rem)] h-[min(620px,calc(100svh-5rem))]",
