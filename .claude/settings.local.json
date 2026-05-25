@@ -18,7 +18,8 @@
       "mcp__f96443c2-f18b-4594-8973-0a9afb2bd095__get_runtime_logs",
       "mcp__f96443c2-f18b-4594-8973-0a9afb2bd095__web_fetch_vercel_url",
       "mcp__f96443c2-f18b-4594-8973-0a9afb2bd095__get_project",
-      "mcp__f96443c2-f18b-4594-8973-0a9afb2bd095__get_access_to_vercel_url"
+      "mcp__f96443c2-f18b-4594-8973-0a9afb2bd095__get_access_to_vercel_url",
+      "mcp__f96443c2-f18b-4594-8973-0a9afb2bd095__get_deployment_build_logs"
     ]
   }
 }
