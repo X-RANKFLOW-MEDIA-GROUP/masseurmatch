@@ -1,8 +1,16 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ShieldCheck, ArrowUpRight } from "lucide-react";
 
 export function SiteFooter() {
   const currentYear = new Date().getFullYear();
+  const pathname = usePathname();
+
+  if (pathname === "/") {
+    return null;
+  }
 
   return (
     <footer className="bg-[#060E1A] text-slate-400 pt-20 pb-10 border-t border-white/[0.06]">
