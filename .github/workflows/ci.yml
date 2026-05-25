@@ -131,10 +131,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build]
     env:
-      # Do not set PLAYWRIGHT_BASE_URL in CI. Leaving it unset lets
-      # playwright.config.ts start the local Next.js dev server and validates
-      # the current checkout instead of the already-deployed production site.
+      PLAYWRIGHT_BASE_URL: ${{ vars.PLAYWRIGHT_BASE_URL }}
+      # Optional: set as a GitHub secret when PLAYWRIGHT_BASE_URL points to a
+      # Vercel preview that has Deployment Protection enabled.
       VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
+    # Only runs when a base URL is configured (production or preview deployment).
+    # Set PLAYWRIGHT_BASE_URL as a GitHub Actions repo variable (Settings → Variables).
+    # A base URL is not sensitive — use vars, not secrets.
+    if: ${{ vars.PLAYWRIGHT_BASE_URL != '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
