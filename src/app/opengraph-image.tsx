@@ -1,7 +1,10 @@
 import { ImageResponse } from "next/og";
 
 export const alt = "MasseurMatch – LGBTQ+-Inclusive Massage Therapist Directory";
-export const size = { width: 1200, height: 630 };
+export const size = {
+  width: 1200,
+  height: 630,
+};
 export const contentType = "image/png";
 
 export default async function Image() {
@@ -13,7 +16,6 @@ export default async function Image() {
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           padding: "64px",

@@ -32,14 +32,15 @@ export function ProfileAreasServed({ profile }: Props) {
     return null;
   }
 
-  const mapEmbedUrl = mapQuery 
-    ? `https://www.google.com/maps/embed/v1/place?q=${encodeURIComponent(mapQuery)}&key=AIzaSyB41DcZfigtf2v4c0D0iQLQoDjiMEsPJwg`
+  const mapEmbedKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY;
+  const mapEmbedUrl = mapQuery && mapEmbedKey
+    ? `https://www.google.com/maps/embed/v1/place?q=${encodeURIComponent(mapQuery)}&key=${mapEmbedKey}`
     : null;
 
   return (
     <div className="pp-location-section">
       {/* Map Card */}
-      {mapEmbedUrl && (
+      {mapEmbedUrl ? (
         <div className="pp-map-card pp-fade-in">
           <div className="pp-map-container">
             <iframe
@@ -59,7 +60,21 @@ export function ProfileAreasServed({ profile }: Props) {
             <span>Map shows approximate service area, not exact private address</span>
           </div>
         </div>
-      )}
+      ) : mapQuery ? (
+        <div className="pp-map-card pp-fade-in">
+          <div className="rounded-[var(--radius-sm)] border border-[var(--glass-border)] bg-[var(--cream-dim)] p-6 text-sm text-[var(--cream-soft)]">
+            Map preview unavailable right now. You can still open this area directly in Google Maps:
+            <a
+              className="ml-1 text-[var(--orange)] underline"
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {mapQuery}
+            </a>
+          </div>
+        </div>
+      ) : null}
 
       {/* Base Location */}
       <div className="pp-location-header">

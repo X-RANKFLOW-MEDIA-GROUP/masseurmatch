@@ -37,7 +37,6 @@ export async function POST(request: NextRequest) {
         }
 
         // Execute the SQL
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any).rpc("exec_sql", {
           sql: sqlContent,
         });

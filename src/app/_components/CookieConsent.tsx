@@ -2,16 +2,23 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function CookieConsent() {
   const [show, setShow] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
+    if (pathname === "/") {
+      setShow(false);
+      return;
+    }
+
     const consent = localStorage.getItem("mm_cookie_consent");
     if (!consent) {
       setShow(true);
     }
-  }, []);
+  }, [pathname]);
 
   const accept = () => {
     localStorage.setItem("mm_cookie_consent", "accepted");
