@@ -217,7 +217,8 @@ export default function SignupVerifyPage() {
     }
   }, [setIdentityStatus, setStripeIdentitySessionId]);
 
-  const canContinue = state.emailVerified && state.identityVerificationStatus === "verified";
+  const idVerified = state.identityVerificationStatus === "verified";
+  const canContinue = state.emailVerified;
 
   function handleContinue() {
     if (!canContinue) return;
@@ -352,29 +353,36 @@ export default function SignupVerifyPage() {
 
       <Card>
         <CardContent className="space-y-4 p-6">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-brand-secondary" />
-            <h2 className="font-display text-lg font-semibold">Secure ID Check</h2>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-brand-secondary" />
+              <h2 className="font-display text-lg font-semibold">Secure ID Check</h2>
+            </div>
+            <Badge variant="outline" className="text-xs text-muted-foreground">Optional now</Badge>
           </div>
           <p className="text-sm text-muted-foreground">
-            You will complete a secure identity verification powered by Stripe. This helps
-            confirm authenticity and supports a safer experience for clients and providers.
+            Verify your identity with a government-issued ID via Stripe. Verified profiles get a
+            trust badge and are approved faster. You can complete this later from your dashboard.
           </p>
           <p className="text-xs text-muted-foreground">
-            A government-issued ID is required. Verification is handled securely by Stripe
-            Identity. MasseurMatch does not store your ID documents.
+            Verification is handled securely by Stripe Identity. MasseurMatch does not store your ID documents.
           </p>
           {renderIdButton()}
         </CardContent>
       </Card>
 
       <Button size="lg" className="w-full" disabled={!canContinue} onClick={handleContinue}>
-        Continue to Profile
+        {idVerified ? "Continue to Profile" : "Continue to Profile →"}
       </Button>
 
-      {!canContinue && (
+      {!state.emailVerified && (
         <p className="text-center text-xs text-muted-foreground">
-          Complete email and identity verification above to continue.
+          Verify your email above to continue.
+        </p>
+      )}
+      {state.emailVerified && !idVerified && (
+        <p className="text-center text-xs text-muted-foreground">
+          ID verification is optional — you can complete it later from your dashboard.
         </p>
       )}
     </div>

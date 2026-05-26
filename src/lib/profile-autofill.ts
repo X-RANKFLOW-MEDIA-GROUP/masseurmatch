@@ -224,6 +224,39 @@ export function lookupZipArea(rawZip: string) {
   );
 }
 
+export type ZipLookupResult = {
+  city: string;
+  state: string;
+  stateAbbr: string;
+};
+
+/** Fetch city/state for any US ZIP from the free zippopotam.us API (no key needed). */
+export async function fetchZipByCode(zip: string): Promise<ZipLookupResult | null> {
+  const cleaned = zip.replace(/\D/g, "").slice(0, 5);
+  if (cleaned.length < 5) return null;
+
+  // Check local cache first
+  const cached = lookupZipArea(cleaned);
+  if (cached) {
+    return { city: cached.city, state: cached.primaryNeighborhood ? cached.city : cached.city, stateAbbr: cached.state };
+  }
+
+  try {
+    const res = await fetch(`https://api.zippopotam.us/us/${cleaned}`, { cache: "force-cache" });
+    if (!res.ok) return null;
+    const data = await res.json() as { places?: Array<{ "place name": string; "state abbreviation": string; state: string }> };
+    const place = data.places?.[0];
+    if (!place) return null;
+    return {
+      city: place["place name"],
+      state: place["state"],
+      stateAbbr: place["state abbreviation"],
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function formatHeightLabel(totalInches: number) {
   const feet = Math.floor(totalInches / 12);
   const inches = totalInches % 12;
