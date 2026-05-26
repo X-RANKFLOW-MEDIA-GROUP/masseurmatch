@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   AlertCircle,
   CheckCircle2,
@@ -31,6 +31,7 @@ async function syncServerSession(accessToken: string | undefined) {
 
 export default function SignupVerifyPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
   const {
     state,
@@ -45,6 +46,7 @@ export default function SignupVerifyPage() {
   const [emailLoading, setEmailLoading] = useState(false);
   const [idLoading, setIdLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const autoCheckedRef = useRef(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -126,6 +128,17 @@ export default function SignupVerifyPage() {
 
     void checkIdentityStatus();
   }, [checkIdentityStatus, state.identityVerificationStatus, state.stripeIdentitySessionId]);
+
+  // When Stripe redirects back with ?identity_return=1, auto-check status once
+  useEffect(() => {
+    if (autoCheckedRef.current) return;
+    if (!searchParams?.get("identity_return")) return;
+    if (!state.stripeIdentitySessionId) return;
+    if (state.identityVerificationStatus === "verified") return;
+
+    autoCheckedRef.current = true;
+    void checkIdentityStatus();
+  }, [checkIdentityStatus, searchParams, state.stripeIdentitySessionId, state.identityVerificationStatus]);
 
   async function sendEmailCode() {
     if (!state.email) {
