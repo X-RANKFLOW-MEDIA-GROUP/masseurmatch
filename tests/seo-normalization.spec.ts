@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type APIRequestContext } from "@playwright/test";
 
 /**
  * SEO normalization redirects — each case must be a single-hop 301/308.
@@ -7,6 +7,32 @@ import { expect, test } from "@playwright/test";
  * Canonical URL format: /{city-slug}  (e.g. /dallas)
  * Legacy formats redirect to canonical — never the other way around.
  */
+
+/**
+ * Follow Vercel's infrastructure-level domain redirect (apex → www, 307)
+ * transparently so the test sees the application-level redirect (301/308).
+ * The apex domain `masseurmatch.com` redirects to `www.masseurmatch.com`
+ * with a 307 before Next.js runs; we skip over that hop here.
+ */
+async function fetchCanonical(
+  request: APIRequestContext,
+  url: string,
+): Promise<Awaited<ReturnType<APIRequestContext["get"]>>> {
+  const res = await request.get(url, { maxRedirects: 0 });
+  if (res.status() === 307 || res.status() === 302) {
+    const loc = res.headers()["location"];
+    if (loc) {
+      const locUrl = new URL(loc);
+      const srcUrl = new URL(url);
+      // Same path, different host → domain-level redirect; follow it once.
+      if (locUrl.pathname === srcUrl.pathname && locUrl.hostname !== srcUrl.hostname) {
+        return request.get(locUrl.origin + locUrl.pathname, { maxRedirects: 0 });
+      }
+    }
+  }
+  return res;
+}
+
 const CASES: Array<{ source: string; destination: string }> = [
   // /city/:slug → /:slug (old single-level prefix removal)
   { source: "/city/atlanta", destination: "/atlanta" },
@@ -31,7 +57,7 @@ const CASES: Array<{ source: string; destination: string }> = [
 
 for (const { source, destination } of CASES) {
   test(`SEO normalization redirect ${source} -> ${destination}`, async ({ request, baseURL }) => {
-    const response = await request.get(`${baseURL}${source}`, { maxRedirects: 0 });
+    const response = await fetchCanonical(request, `${baseURL}${source}`);
 
     expect([301, 308], `Expected permanent redirect for ${source}`).toContain(response.status());
 
@@ -39,7 +65,7 @@ for (const { source, destination } of CASES) {
     // Normalize absolute URLs (middleware) to path-only for consistent assertions.
     const normalizedLocation = location?.startsWith("http")
       ? new URL(location).pathname
-      : location;
+      : location?.split("?")[0];
     expect(normalizedLocation).toBe(destination);
   });
 }

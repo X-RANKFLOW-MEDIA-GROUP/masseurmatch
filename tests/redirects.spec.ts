@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type APIRequestContext } from "@playwright/test";
 
 /**
  * CI gate: validates every entry in the redirects manifest.
@@ -10,6 +10,31 @@ import { test, expect } from "@playwright/test";
  */
 
 type RedirectCase = [source: string, destination: string];
+
+/**
+ * Follow Vercel's infrastructure-level domain redirect (apex → www, 307)
+ * transparently so the test sees the application-level redirect (301/308).
+ * The apex domain `masseurmatch.com` redirects to `www.masseurmatch.com`
+ * with a 307 before Next.js runs; we skip over that hop here.
+ */
+async function fetchCanonical(
+  request: APIRequestContext,
+  url: string,
+): Promise<Awaited<ReturnType<APIRequestContext["get"]>>> {
+  const res = await request.get(url, { maxRedirects: 0 });
+  if (res.status() === 307 || res.status() === 302) {
+    const loc = res.headers()["location"];
+    if (loc) {
+      const locUrl = new URL(loc);
+      const srcUrl = new URL(url);
+      // Same path, different host → domain-level redirect; follow it once.
+      if (locUrl.pathname === srcUrl.pathname && locUrl.hostname !== srcUrl.hostname) {
+        return request.get(locUrl.origin + locUrl.pathname, { maxRedirects: 0 });
+      }
+    }
+  }
+  return res;
+}
 
 // Mirror of src/app/_lib/redirects-manifest.ts — update both together.
 // The source of truth for intent is the TS file; these cases validate HTTP behaviour.
@@ -55,9 +80,7 @@ const REDIRECT_CASES: RedirectCase[] = [
 
 for (const [source, destination] of REDIRECT_CASES) {
   test(`redirect ${source} → ${destination}`, async ({ request, baseURL }) => {
-    const res = await request.get(`${baseURL}${source}`, {
-      maxRedirects: 0,
-    });
+    const res = await fetchCanonical(request, `${baseURL}${source}`);
 
     // Accept both 301 (edge/host-level) and 308 (Next.js permanent: true).
     expect(
@@ -70,7 +93,7 @@ for (const [source, destination] of REDIRECT_CASES) {
     // Normalize to path-only so both forms pass the assertion.
     const normalizedLocation = location?.startsWith("http")
       ? new URL(location).pathname
-      : location;
+      : location?.split("?")[0];
     expect(
       normalizedLocation,
       `Expected Location: ${destination} but got ${location} for ${source}`,
