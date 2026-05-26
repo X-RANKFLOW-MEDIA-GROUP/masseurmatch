@@ -1341,14 +1341,6 @@ export default function ExplorePageClient({
         action,
       });
 
-      void fetch("/api/swipe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          provider_id: provider.id,
-          action,
-        }),
-      }).catch(() => undefined);
     },
     [],
   );

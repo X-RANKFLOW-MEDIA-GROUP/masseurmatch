@@ -6,7 +6,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   BarChart,
-  BookUser,
   CreditCard,
   Image as ImageIcon,
   LayoutDashboard,

@@ -61,6 +61,9 @@ const LEGACY_REDIRECTS = [
   { source: "/Auth", destination: "/auth", permanent: true },
   { source: "/Privacy", destination: "/privacy", permanent: true },
   { source: "/massage-therapists", destination: "/therapists", permanent: true },
+  // Client-side booking pages removed — clients browse without accounts
+  { source: "/client", destination: "/search", permanent: false },
+  { source: "/client/:path*", destination: "/search", permanent: false },
 ];
 
 const isDev = process.env.NODE_ENV !== "production";

@@ -32,6 +32,7 @@ import {
   buildSeoDescription,
   createHeadlineOptions,
   createHeightOptions,
+  fetchZipByCode,
   getCompletionScore,
   lookupZipArea,
   poundsToKilogramsLabel,
@@ -77,25 +78,38 @@ export default function SignupProfilePage() {
 
   function applyZipLookup(zipValue: string) {
     const cleanedZip = zipValue.replace(/\D/g, "").slice(0, 5);
-    const match = lookupZipArea(cleanedZip);
-
     updateProfile({ zipCode: cleanedZip });
 
-    if (!match) {
-      setZipMessage(cleanedZip.length >= 3 ? "No exact match yet. Add city and neighborhood manually." : null);
+    if (cleanedZip.length < 5) {
+      setZipMessage(null);
       return;
     }
 
-    updateProfile({
-      zipCode: cleanedZip,
-      city: match.city,
-      state: match.state,
-      neighborhood: match.primaryNeighborhood,
-      serviceAreaCities: match.serviceAreaCities,
-      landmarks: match.landmarks,
-      locationDescription: `${match.primaryNeighborhood} area near ${match.landmarks.slice(0, 2).join(" and ")}`,
+    // Try local cache first (instant)
+    const cached = lookupZipArea(cleanedZip);
+    if (cached) {
+      updateProfile({
+        city: cached.city,
+        state: cached.state,
+        neighborhood: cached.primaryNeighborhood,
+        serviceAreaCities: cached.serviceAreaCities,
+        landmarks: cached.landmarks,
+        locationDescription: `${cached.primaryNeighborhood} area near ${cached.landmarks.slice(0, 2).join(" and ")}`,
+      });
+      setZipMessage(`Auto filled: ${cached.primaryNeighborhood}, ${cached.city}, ${cached.state}`);
+      return;
+    }
+
+    // Fall back to free API for any US ZIP
+    setZipMessage("Looking up ZIP code…");
+    fetchZipByCode(cleanedZip).then((result) => {
+      if (result) {
+        updateProfile({ city: result.city, state: result.stateAbbr });
+        setZipMessage(`Auto filled: ${result.city}, ${result.stateAbbr}`);
+      } else {
+        setZipMessage("ZIP not found — enter city and state manually.");
+      }
     });
-    setZipMessage(`Auto filled ${match.primaryNeighborhood}, ${match.city}, ${match.state}.`);
   }
 
   function applyBioSuggestion() {
@@ -115,7 +129,6 @@ export default function SignupProfilePage() {
     if (!p.tagline.trim()) { setError("Headline is required."); return; }
     if (!p.bio.trim()) { setError("Profile description is required."); return; }
     if (!p.zipCode.trim() && (!p.city.trim() || !p.state.trim())) { setError("Add a ZIP code or enter city and state manually."); return; }
-    if (!p.neighborhood.trim()) { setError("Neighborhood or primary area is required for local discovery."); return; }
     if (p.serviceCategories.length === 0) { setError("Select at least one massage service."); return; }
     if (p.sessionLengths.length === 0) { setError("Select at least one session length."); return; }
     if (!p.startingPrice.trim()) { setError("Starting price is required."); return; }
@@ -222,7 +235,7 @@ export default function SignupProfilePage() {
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2"><Label htmlFor="city">City *</Label><Input id="city" value={p.city} onChange={(e) => updateProfile({ city: e.target.value })} placeholder="New York" /></div>
-              <div className="space-y-2"><Label htmlFor="neighborhood">Neighborhood or Area *</Label><Input id="neighborhood" value={p.neighborhood} onChange={(e) => updateProfile({ neighborhood: e.target.value })} placeholder="Chelsea" /></div>
+              <div className="space-y-2"><Label htmlFor="neighborhood">Neighborhood or Area</Label><Input id="neighborhood" value={p.neighborhood} onChange={(e) => updateProfile({ neighborhood: e.target.value })} placeholder="Chelsea (optional)" /></div>
               <div className="space-y-2"><Label htmlFor="locationDescription">Location Note</Label><Input id="locationDescription" value={p.locationDescription} onChange={(e) => updateProfile({ locationDescription: e.target.value })} placeholder="Near major hotels or landmarks" /></div>
             </div>
             {(p.serviceAreaCities.length > 0 || p.landmarks.length > 0) && (
