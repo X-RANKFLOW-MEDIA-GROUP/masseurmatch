@@ -19,45 +19,50 @@ export default async function Image() {
           alignItems: "center",
           justifyContent: "center",
           padding: "64px",
-          color: "#FCFBF8",
           fontFamily: "Georgia, serif",
         }}
       >
-        <span
+        {/* Logo wordmark — display:flex required because it has two span children */}
+        <div
           style={{
             display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            textAlign: "center",
+            flexDirection: "row",
+            fontSize: 52,
+            fontWeight: 400,
+            letterSpacing: "-0.01em",
+            marginBottom: 24,
           }}
         >
-          <span
-            style={{
-              display: "flex",
-              fontSize: "54px",
-              fontWeight: 700,
-              letterSpacing: "-0.01em",
-              marginBottom: "28px",
-            }}
-          >
-            MasseurMatch
-          </span>
-          <span
-            style={{
-              display: "flex",
-              fontSize: "22px",
-              color: "rgba(252,251,248,0.6)",
-              fontFamily: "system-ui, sans-serif",
-              fontWeight: 300,
-              letterSpacing: "0.04em",
-            }}
-          >
-            LGBTQ+-Inclusive Massage Therapist Directory
-          </span>
-        </span>
+          <span style={{ color: "#FCFBF8" }}>Masseur</span>
+          <span style={{ color: "#FF8A1F" }}>Match</span>
+        </div>
+
+        {/* Tagline */}
+        <div
+          style={{
+            display: "flex",
+            fontSize: 22,
+            color: "rgba(252,251,248,0.6)",
+            fontFamily: "system-ui, sans-serif",
+            fontWeight: 300,
+            letterSpacing: "0.04em",
+          }}
+        >
+          LGBTQ+-Inclusive Massage Therapist Directory
+        </div>
+
+        {/* Accent line */}
+        <div
+          style={{
+            display: "flex",
+            width: 80,
+            height: 3,
+            background: "#FF8A1F",
+            marginTop: 36,
+          }}
+        />
       </div>
     ),
-    { ...size },
+    { ...size }
   );
 }
