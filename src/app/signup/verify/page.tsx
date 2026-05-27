@@ -29,7 +29,7 @@ async function syncServerSession(accessToken: string | undefined) {
   });
 }
 
-function SignupVerifyInner() {
+function SignupVerifyPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
@@ -392,7 +392,7 @@ function SignupVerifyInner() {
 export default function SignupVerifyPage() {
   return (
     <Suspense>
-      <SignupVerifyInner />
+      <SignupVerifyPageInner />
     </Suspense>
   );
 }
