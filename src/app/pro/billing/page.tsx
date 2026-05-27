@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, CheckCircle2, ExternalLink, Loader2, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
 
@@ -24,7 +24,7 @@ function toTier(value: string | null): Tier | null {
   return null;
 }
 
-export default function ProBillingPage() {
+function ProBillingPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, subscription, refreshSubscription } = useAuth();
@@ -314,5 +314,13 @@ export default function ProBillingPage() {
         <ProviderGrowthMarketplace source="billing" currentPlan={currentTier} />
       </div>
     </div>
+  );
+}
+
+export default function ProBillingPage() {
+  return (
+    <Suspense>
+      <ProBillingPageInner />
+    </Suspense>
   );
 }
