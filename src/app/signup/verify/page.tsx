@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   AlertCircle,
@@ -29,7 +29,7 @@ async function syncServerSession(accessToken: string | undefined) {
   });
 }
 
-export default function SignupVerifyPage() {
+function SignupVerifyPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
@@ -386,5 +386,13 @@ export default function SignupVerifyPage() {
         </p>
       )}
     </div>
+  );
+}
+
+export default function SignupVerifyPage() {
+  return (
+    <Suspense>
+      <SignupVerifyPageInner />
+    </Suspense>
   );
 }
