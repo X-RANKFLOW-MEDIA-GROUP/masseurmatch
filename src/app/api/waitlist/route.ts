@@ -122,9 +122,12 @@ export async function POST(request: Request) {
   if (eventInsert.error) return NextResponse.json({ ok: false, error: "Unable to track event." }, { status: 500 });
   if (!email) return NextResponse.json({ ok: true, tracked: true });
 
+  // normalized_email is the unique conflict target — strip dots/plus-tricks
+  const normalizedEmail = email.toLowerCase().replace(/\+[^@]*(?=@)/, "").replace(/\.(?=[^@]*@)/g, "");
+
   const signupInsert = await supabase
     .from("waitlist_signups")
-    .upsert({ email, role, source, campaign, page_path: pagePath, referrer, user_agent: userAgent, metadata }, { onConflict: "normalized_email" })
+    .upsert({ email, normalized_email: normalizedEmail, role, source, campaign, page_path: pagePath, referrer, user_agent: userAgent, metadata }, { onConflict: "normalized_email" })
     .select("id, email, created_at")
     .single();
 
