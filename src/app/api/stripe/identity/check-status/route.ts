@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
           updated_at: new Date().toISOString(),
         })
         .eq("user_id", userId)
-        .in("status", ["pending", "pending_approval", "under_review", "submitted"]);
+        .not("profile_status", "in", '("rejected","banned","suspended")');
 
       if (profileUpdateError && !isSchemaDriftError(profileUpdateError.message)) {
         return NextResponse.json({ error: profileUpdateError.message }, { status: 500 });
