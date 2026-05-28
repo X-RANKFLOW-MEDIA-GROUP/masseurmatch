@@ -152,25 +152,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-      if (session?.user) {
-        // Defer to avoid Supabase deadlock
-        setTimeout(() => refreshSubscription(), 0);
-      } else {
-        setSubscription({ ...defaultSubscription, loading: false });
-      }
-    });
+    let initialLoadDone = false;
 
     supabase.auth.getSession().then(({ data: { session } }) => {
+      initialLoadDone = true;
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
       if (session?.user) {
         refreshSubscription();
       } else {
+        setSubscription({ ...defaultSubscription, loading: false });
+      }
+    });
+
+    const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+      if (event === "SIGNED_IN" && initialLoadDone) {
+        // Only refresh on explicit sign-in events, not on initial session restore
+        setTimeout(() => refreshSubscription(), 0);
+      } else if (!session) {
         setSubscription({ ...defaultSubscription, loading: false });
       }
     });
@@ -189,13 +192,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, []);
-
-  // Auto-refresh subscription every 60s
-  useEffect(() => {
-    if (!user) return;
-    const interval = setInterval(refreshSubscription, 60_000);
-    return () => clearInterval(interval);
-  }, [user, refreshSubscription]);
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {

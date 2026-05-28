@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { STRIPE_API_VERSION } from "@/app/api/_lib/stripe-config";

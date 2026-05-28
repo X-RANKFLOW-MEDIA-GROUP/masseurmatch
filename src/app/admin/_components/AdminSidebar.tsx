@@ -22,20 +22,6 @@ import {
   ImageIcon,
   BarChart3,
 } from "lucide-react";
-import {
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarSeparator,
-  useSidebar,
-} from "@/components/ui/sidebar";
 
 const navSections = [
   {
@@ -78,7 +64,6 @@ const navSections = [
 
 export default function AdminSidebarNav() {
   const pathname = usePathname();
-  const { collapsed } = useSidebar();
 
   const isActive = (href: string, exact?: boolean) => {
     if (exact) return pathname === href;
@@ -86,66 +71,58 @@ export default function AdminSidebarNav() {
   };
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader className="p-4">
-        <Link href="/admin" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-accent text-sidebar-accent-foreground">
-            <ShieldCheck className="h-4 w-4" />
-          </div>
-          {!collapsed && (
-            <span className="text-lg font-bold text-sidebar-foreground">
-              Admin
-            </span>
-          )}
+    <nav className="flex flex-1 flex-col overflow-y-auto py-2">
+      {navSections.map((section) => (
+        <div key={section.title} className="mb-1">
+          <p className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+            {section.title}
+          </p>
+          <ul>
+            {section.items.map((item) => {
+              const active = isActive(item.href, item.exact);
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                      active
+                        ? "bg-slate-100 font-medium text-slate-900"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    }`}
+                  >
+                    <item.icon className="h-4 w-4 shrink-0" />
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+
+      <div className="mt-auto border-t border-slate-100 pt-2">
+        <Link
+          href="/"
+          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
+        >
+          <Home className="h-4 w-4 shrink-0" />
+          Back to Site
         </Link>
-      </SidebarHeader>
-      <SidebarSeparator />
-      <SidebarContent>
-        {navSections.map((section) => (
-          <SidebarGroup key={section.title}>
-            <SidebarGroupLabel>{section.title}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {section.items.map((item) => (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive(item.href, item.exact)}
-                      tooltip={item.label}
-                    >
-                      <Link href={item.href}>
-                        <item.icon className="h-4 w-4 shrink-0" />
-                        {!collapsed && <span>{item.label}</span>}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
-      </SidebarContent>
-      <SidebarSeparator />
-      <SidebarFooter className="p-2">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Back to site">
-              <Link href="/">
-                <Home className="h-4 w-4 shrink-0" />
-                {!collapsed && <span>Back to Site</span>}
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Logout">
-              <Link href="/login">
-                <LogOut className="h-4 w-4 shrink-0" />
-                {!collapsed && <span>Logout</span>}
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
+        <Link
+          href="/pro/dashboard"
+          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
+        >
+          <LayoutDashboard className="h-4 w-4 shrink-0" />
+          Pro Dashboard
+        </Link>
+        <Link
+          href="/login"
+          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
+        >
+          <LogOut className="h-4 w-4 shrink-0" />
+          Logout
+        </Link>
+      </div>
+    </nav>
   );
 }
