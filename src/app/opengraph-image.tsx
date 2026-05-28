@@ -16,28 +16,28 @@ export default async function Image() {
           width: "100%",
           height: "100%",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           padding: "64px",
           fontFamily: "Georgia, serif",
         }}
       >
-        {/* Logo wordmark — display:flex required because it has two span children */}
         <div
           style={{
             display: "flex",
             flexDirection: "row",
+            alignItems: "baseline",
             fontSize: 52,
             fontWeight: 400,
             letterSpacing: "-0.01em",
             marginBottom: 24,
           }}
         >
-          <span style={{ color: "#FCFBF8" }}>Masseur</span>
-          <span style={{ color: "#FF8A1F" }}>Match</span>
+          <span style={{ display: "flex", color: "#FCFBF8" }}>Masseur</span>
+          <span style={{ display: "flex", color: "#FF8A1F" }}>Match</span>
         </div>
 
-        {/* Tagline */}
         <div
           style={{
             display: "flex",
@@ -51,7 +51,6 @@ export default async function Image() {
           LGBTQ+-Inclusive Massage Therapist Directory
         </div>
 
-        {/* Accent line */}
         <div
           style={{
             display: "flex",
@@ -63,6 +62,6 @@ export default async function Image() {
         />
       </div>
     ),
-    { ...size }
+    { ...size },
   );
 }
