@@ -323,7 +323,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
-    if (session.role !== "provider") {
+    if (session.role !== "provider" && session.role !== "admin") {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
