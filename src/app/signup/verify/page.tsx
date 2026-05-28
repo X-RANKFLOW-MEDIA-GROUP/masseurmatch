@@ -222,7 +222,7 @@ function SignupVerifyPageInner() {
 
   function handleContinue() {
     if (!canContinue) return;
-    router.push("/signup/profile");
+    router.push(idVerified ? "/pro/listing" : "/signup/profile");
   }
 
   function renderIdButton() {
@@ -372,7 +372,7 @@ function SignupVerifyPageInner() {
       </Card>
 
       <Button size="lg" className="w-full" disabled={!canContinue} onClick={handleContinue}>
-        {idVerified ? "Continue to Profile" : "Continue to Profile →"}
+        {idVerified ? "Go to Profile Editor →" : "Continue to Profile →"}
       </Button>
 
       {!state.emailVerified && (

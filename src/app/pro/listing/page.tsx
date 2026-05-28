@@ -27,7 +27,7 @@ import { ApiError, postJson, requestJson } from "@/app/_lib/request";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { BODY_TYPE_OPTIONS, normalizeBodyTypeValue } from "@/lib/physical-profile";
-import { fetchZipByCode, lookupZipArea } from "@/lib/profile-autofill";
+import { lookupZipArea } from "@/lib/profile-autofill";
 
 const SERVICE_OPTIONS = [
   "Deep Tissue",
@@ -320,14 +320,17 @@ export default function MyListingPage() {
     }
 
     setZipStatus("Looking up…");
-    fetchZipByCode(cleaned).then((res) => {
-      if (res) {
-        setForm((f) => ({ ...f, city: res.city, state: res.stateAbbr }));
-        setZipStatus(`✓ ${res.city}, ${res.stateAbbr}`);
-      } else {
-        setZipStatus("Not found — enter manually");
-      }
-    });
+    fetch(`/api/zip-lookup?zip=${cleaned}`)
+      .then((r) => r.json())
+      .then((res: { city: string; state: string; stateAbbr: string } | null) => {
+        if (res?.city) {
+          setForm((f) => ({ ...f, city: res.city, state: res.stateAbbr }));
+          setZipStatus(`✓ ${res.city}, ${res.stateAbbr}`);
+        } else {
+          setZipStatus("Not found — enter manually");
+        }
+      })
+      .catch(() => setZipStatus("Not found — enter manually"));
   }
 
   const handleKnottyAIMagic = async () => {
