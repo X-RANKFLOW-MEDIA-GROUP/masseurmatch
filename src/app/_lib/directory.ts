@@ -320,11 +320,13 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
     return [{ id: `${fallback.id}-avatar`, storage_path: fallback.avatar_url, is_primary: true }];
   }
 
-  return data.map((p) => ({
-    id: p.id,
-    storage_path: p.storage_path,
-    is_primary: p.is_primary ?? false,
-  }));
+  return data
+    .filter((p): p is typeof p & { storage_path: string } => p.storage_path != null)
+    .map((p) => ({
+      id: p.id,
+      storage_path: p.storage_path,
+      is_primary: p.is_primary ?? false,
+    }));
 };
 
 export async function getCityInventoryCount(cityName: string): Promise<number> {
