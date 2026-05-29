@@ -73,7 +73,7 @@ function buildProfileBadges(therapist: PublicTherapist) {
   }
 
   if (therapist.is_verified_identity || therapist.is_verified_profile || therapist.is_verified_photos) {
-    badges.push("Verified signals");
+    badges.push("Trust signals");
   }
 
   if (therapist.outcall_price) {
@@ -103,7 +103,7 @@ export function HomeSeoLanding({
     "Incall Session",
     "Outcall Massage",
     "Available Now",
-    "Verified Therapist",
+    "Independent Therapist",
     "LGBTQ+ Friendly",
   ];
 
@@ -129,7 +129,7 @@ export function HomeSeoLanding({
                 Structured for trust, speed, and local discovery
               </span>
               <h1 className="mt-6 max-w-4xl text-4xl font-semibold tracking-[-0.05em] text-white sm:text-5xl lg:text-7xl">
-                Verified male massage therapists in Dallas, Miami, Chicago, Houston, and top US cities.
+                Independent male massage therapists in Dallas, Miami, Chicago, Houston, and top US cities.
               </h1>
               <p className="mt-6 max-w-3xl text-base leading-8 text-white/78 sm:text-lg">
                 Search premium profiles, compare deep tissue, Swedish, sports recovery, incall, and outcall options,
@@ -218,7 +218,7 @@ export function HomeSeoLanding({
                 <p className="text-sm font-semibold text-white">Why this homepage is easier to trust</p>
                 <ul className="mt-4 space-y-3 text-sm text-white/74">
                   {[
-                    "Verified signals and visible session types are surfaced early.",
+                    "Trust signals and visible session types are surfaced early.",
                     "City pages, service pages, guides, and comparison pages reinforce internal linking.",
                     "Users can move from broad discovery to high-intent local pages in one hop.",
                     "Direct contact remains clear without forcing an on-platform scheduling workflow.",
@@ -285,7 +285,7 @@ export function HomeSeoLanding({
               Start with the strongest local pages.
             </h2>
             <p className="mt-3 text-sm leading-7 text-text-secondary">
-              These city pages are built to rank for local massage discovery while still routing users deeper into verified profiles, service intent pages, trust guidance, and comparison content.
+              These city pages are built to rank for local massage discovery while still routing users deeper into active profiles, service intent pages, trust guidance, and comparison content.
             </p>
           </div>
 
@@ -430,7 +430,7 @@ export function HomeSeoLanding({
                   <div className="absolute left-4 top-4 flex flex-wrap gap-2">
                     {(therapist.is_verified_identity || therapist.is_verified_profile) ? (
                       <span className="rounded-full bg-[rgba(15,118,110,0.88)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white">
-                        Verified
+                        Active
                       </span>
                     ) : null}
                   </div>
@@ -599,7 +599,7 @@ export function HomeSeoLanding({
             <div className="space-y-4">
               {[
                 {
-                  question: "How do I find verified male massage therapists near me?",
+                  question: "How do I find independent male massage therapists near me?",
                   answer:
                     "Start with a city page, then compare specialties, incall or outcall options, visible pricing, reviews, and profile quality before contacting a therapist directly.",
                 },
@@ -651,7 +651,7 @@ export function HomeSeoLanding({
           </h2>
           <p className="mt-3 text-sm leading-7 text-text-secondary">
             MasseurMatch covers every major US market — the same cities served by MasseurFinder and RentMasseur,
-            plus growing coverage in hundreds more. Select your city to browse verified therapists, compare
+            plus growing coverage in hundreds more. Select your city to browse independent therapists, compare
             session types, and contact directly.
           </p>
         </div>

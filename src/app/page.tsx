@@ -22,9 +22,9 @@ export const revalidate = 3600;
 // ─── Metadata ───────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = createPageMetadata({
-  title: "Find Verified Male Massage Therapists Near You | MasseurMatch",
+  title: "Find Independent Male Massage Therapists Near You | MasseurMatch",
   description:
-    "MasseurMatch is the premium US directory for verified LGBTQ+-affirming male massage therapists. Search Dallas, Miami, NYC, LA, Chicago & 80+ cities. Compare deep tissue, Swedish, outcall & incall options. A modern alternative to MasseurFinder and RentMasseur.",
+    "MasseurMatch is the premium US directory for LGBTQ+-affirming independent male massage therapists. Search Dallas, Miami, NYC, LA, Chicago & 80+ cities. Compare deep tissue, Swedish, outcall & incall options. A modern alternative to MasseurFinder and RentMasseur.",
   path: "/",
   keywords: [
     // Brand
@@ -102,10 +102,10 @@ const HOME_FAQ = [
   {
     question: "What is MasseurMatch?",
     answer:
-      "MasseurMatch is a premium US discovery directory for verified LGBTQ+-affirming male massage therapists. Search by city, filter by specialty (deep tissue, Swedish, sports), choose incall or outcall, and contact therapists directly without any booking middleman.",
+      "MasseurMatch is a premium US discovery directory for LGBTQ+-affirming independent male massage therapists. Search by city, filter by specialty (deep tissue, Swedish, sports), choose incall or outcall, and contact therapists directly without any booking middleman.",
   },
   {
-    question: "How do I find verified male massage therapists near me?",
+    question: "How do I find male massage therapists near me?",
     answer:
       "Select your city on MasseurMatch, browse profiles with trust signals, compare specialties and session types (incall or outcall), check availability and pricing, then contact your therapist directly to confirm details.",
   },
@@ -122,7 +122,7 @@ const HOME_FAQ = [
   {
     question: "How does MasseurMatch compare to RentMasseur?",
     answer:
-      "MasseurMatch offers a cleaner professional experience than RentMasseur. The focus is on wellness-forward discovery: verified profiles, transparent pricing, and direct contact without the mixed-intent marketplace environment.",
+      "MasseurMatch offers a cleaner professional experience than RentMasseur. The focus is on wellness-forward discovery: active profiles, transparent pricing, and direct contact without the mixed-intent marketplace environment.",
   },
   {
     question: "Can I find outcall and incall massage options on MasseurMatch?",
@@ -145,9 +145,9 @@ const HOME_FAQ = [
 
 const HOME_STATS = [
   {
-    label: "Verified therapist profiles",
+    label: "Active therapist profiles",
     value: "500+",
-    helper: "Profiles reviewed for identity, quality, and trust signals across all active US markets.",
+    helper: "Profiles reviewed for quality and trust signals across all active US markets.",
   },
   {
     label: "Cities with live landing pages",
@@ -162,7 +162,7 @@ const HOME_STATS = [
   {
     label: "Average therapist rating",
     value: "4.8 ★",
-    helper: "Based on verified client reviews across active profile listings.",
+    helper: "Based on client reviews across active profile listings.",
   },
 ];
 
@@ -178,14 +178,14 @@ const PRIORITY_CITY_SLUGS = [
 ];
 
 const CITY_HIGHLIGHTS: Record<string, string[]> = {
-  dallas: ["Deep Tissue", "Outcall", "Hotel Massage", "Verified Profiles"],
-  miami: ["Outcall", "LGBTQ+ Friendly", "Beach Area", "Verified Profiles"],
-  "new-york": ["Manhattan", "Brooklyn", "Incall & Outcall", "Verified"],
-  "los-angeles": ["West Hollywood", "Santa Monica", "Outcall", "Verified"],
-  chicago: ["Deep Tissue", "Sports Recovery", "Incall", "Verified"],
-  houston: ["Outcall", "Deep Tissue", "Swedish", "Verified Profiles"],
-  atlanta: ["LGBTQ+ Friendly", "Outcall", "Deep Tissue", "Verified"],
-  "washington-dc": ["Incall & Outcall", "Deep Tissue", "Verified", "LGBTQ+"],
+  dallas: ["Deep Tissue", "Outcall", "Hotel Massage", "Active Profiles"],
+  miami: ["Outcall", "LGBTQ+ Friendly", "Beach Area", "Active Profiles"],
+  "new-york": ["Manhattan", "Brooklyn", "Incall & Outcall", "Active"],
+  "los-angeles": ["West Hollywood", "Santa Monica", "Outcall", "Active"],
+  chicago: ["Deep Tissue", "Sports Recovery", "Incall", "Active"],
+  houston: ["Outcall", "Deep Tissue", "Swedish", "Active Profiles"],
+  atlanta: ["LGBTQ+ Friendly", "Outcall", "Deep Tissue", "Active"],
+  "washington-dc": ["Incall & Outcall", "Deep Tissue", "Active", "LGBTQ+"],
 };
 
 const CITY_ROUTE_COUNTS: Record<string, number> = {
@@ -218,7 +218,7 @@ const HOME_INTENT_CARDS = [
     href: "/miami/wellness/outcall",
     title: "Outcall Massage in Miami",
     description:
-      "Discover verified outcall therapists in Miami Beach, South Beach, Brickell, and surrounding neighborhoods.",
+      "Discover independent outcall therapists in Miami Beach, South Beach, Brickell, and surrounding neighborhoods.",
     cityLabel: "Miami, FL",
   },
   {
@@ -274,7 +274,7 @@ export default async function HomePage() {
         city,
         listingCount: 0,
         routeCount: CITY_ROUTE_COUNTS[slug] ?? 12,
-        highlights: CITY_HIGHLIGHTS[slug] ?? ["Verified Profiles", "Incall & Outcall"],
+        highlights: CITY_HIGHLIGHTS[slug] ?? ["Active Profiles", "Incall & Outcall"],
       },
     ];
   });
@@ -314,7 +314,7 @@ export default async function HomePage() {
       {/* CollectionPage */}
       <JsonLd
         data={buildCollectionPageJsonLd({
-          name: "MasseurMatch — Verified Male Massage Therapist Directory",
+          name: "MasseurMatch — Independent Male Massage Therapist Directory",
           description: SITE_DESCRIPTION,
           path: "/",
         })}
@@ -357,7 +357,7 @@ export default async function HomePage() {
         data={{
           "@context": "https://schema.org",
           "@type": "WebPage",
-          name: "MasseurMatch — Verified Male Massage Therapist Directory",
+          name: "MasseurMatch — Independent Male Massage Therapist Directory",
           description: SITE_DESCRIPTION,
           url: siteUrl("/"),
           speakable: {

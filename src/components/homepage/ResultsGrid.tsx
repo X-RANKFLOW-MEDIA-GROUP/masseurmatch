@@ -37,7 +37,7 @@ function DynamicBadge({
     return (
       <div className="inline-flex items-center gap-1 rounded-full border border-blue-400/25 bg-blue-500/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-300 backdrop-blur-sm">
         <ShieldCheck className="h-3 w-3" />
-        Verified
+        Active
       </div>
     );
   }

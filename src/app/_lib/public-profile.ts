@@ -19,7 +19,7 @@ export function getDirectoryTierLabel(profile: Pick<PublicTherapist, "subscripti
     return "Premium";
   }
   if (tier === "standard") {
-    return "Verified";
+    return "Active";
   }
   return "Directory";
 }
