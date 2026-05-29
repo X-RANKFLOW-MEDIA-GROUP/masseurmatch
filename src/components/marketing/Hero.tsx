@@ -12,28 +12,18 @@ const avatarStack = [
   { id: 4, src: "/marketing/hero/avatar-4.jpg", alt: "Avatar 4" },
 ];
 
-const headlineLines = ["The", "Safest", "Massage", "Directory"];
+const headlineLines = ["The", "Safest", "Massage", "Directory."];
 
-// Animation config
-const customEase = [0.22, 1, 0.36, 1] as any;
+const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export function HeroMotionIsland() {
   const reducedMotion = useReducedMotion();
 
   return (
     <section className="bg-background text-foreground">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 lg:pt-32 lg:pb-24">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 lg:pt-32 lg:pb-24">
         {/* Avatar Stack + Label */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{
-            duration: reducedMotion ? 0 : 0.6,
-            ease: customEase,
-          }}
-          className="flex items-center gap-3 mb-12 lg:mb-16"
-        >
-          {/* Avatar Stack */}
+        <div className="flex items-center gap-3 mb-12 lg:mb-16">
           <div className="flex -space-x-3">
             {avatarStack.map((avatar, index) => (
               <motion.div
@@ -58,7 +48,6 @@ export function HeroMotionIsland() {
             ))}
           </div>
 
-          {/* Label */}
           <motion.span
             initial={{ opacity: 0, y: 80 }}
             animate={{ opacity: 1, y: 0 }}
@@ -71,12 +60,12 @@ export function HeroMotionIsland() {
           >
             500+ Verified Therapists nationwide
           </motion.span>
-        </motion.div>
+        </div>
 
-        {/* Headline */}
-        <div className="mb-8 lg:mb-10">
+        {/* Headline — single h1 with animated span blocks */}
+        <h1 className="font-display font-extrabold uppercase leading-[0.85] tracking-[-0.05em] text-[clamp(3.5rem,12vw,9.75rem)] mb-8 lg:mb-10">
           {headlineLines.map((line, i) => (
-            <motion.h1
+            <motion.span
               key={`${line}-${i}`}
               initial={{ opacity: 0, y: 80 }}
               animate={{ opacity: 1, y: 0 }}
@@ -85,19 +74,22 @@ export function HeroMotionIsland() {
                 ease: customEase,
                 delay: reducedMotion ? 0 : 0.2 + i * 0.12,
               }}
-              className="font-display font-800 uppercase leading-[0.85] tracking-[-0.05em] text-[clamp(3.5rem,12vw,9.75rem)] block"
+              className="block"
             >
               {line === "Massage" ? (
                 <>
                   {line}
-                  <span className="inline-flex align-middle ml-2 w-[0.9em] h-[0.9em] rounded-full bg-primary" />
+                  <span
+                    aria-hidden="true"
+                    className="inline-flex align-middle ml-2 w-[0.9em] h-[0.9em] rounded-full bg-primary"
+                  />
                 </>
               ) : (
                 line
               )}
-            </motion.h1>
+            </motion.span>
           ))}
-        </div>
+        </h1>
 
         {/* Subhead */}
         <motion.p
@@ -110,7 +102,9 @@ export function HeroMotionIsland() {
           }}
           className="max-w-xl text-lg lg:text-xl text-muted-foreground leading-relaxed mb-10 lg:mb-12"
         >
-          Verified male massage therapists across the US. Background-checked profiles, licensed professionals, real reviews. Find your therapist in Dallas, Houston, Miami, NYC, and 80+ cities.
+          Verified male massage therapists across the US. Background-checked
+          profiles, licensed professionals, real reviews. Find your therapist in
+          Dallas, Houston, Miami, NYC, and 80+ cities.
         </motion.p>
 
         {/* CTAs */}
@@ -138,7 +132,7 @@ export function HeroMotionIsland() {
           </Link>
         </motion.div>
 
-        {/* Full-bleed Image */}
+        {/* Full-bleed cover image — clip-path reveal from bottom */}
         <motion.div
           initial={{ clipPath: "inset(100% 0 0 0)" }}
           animate={{ clipPath: "inset(0% 0 0 0)" }}
@@ -147,11 +141,11 @@ export function HeroMotionIsland() {
             ease: customEase,
             delay: reducedMotion ? 0 : 1.0,
           }}
-          className="relative w-screen -mx-[calc(50vw-50%)] aspect-video lg:aspect-[21/9] overflow-hidden rounded-none lg:rounded-2xl"
+          className="relative w-screen -mx-[calc(50vw-50%)] aspect-video lg:aspect-[21/9] overflow-hidden"
         >
           <Image
             src="/marketing/hero/cover.jpg"
-            alt="Professional massage therapy"
+            alt="Professional massage therapy — editorial hero"
             fill
             priority
             fetchPriority="high"
@@ -164,10 +158,6 @@ export function HeroMotionIsland() {
   );
 }
 
-/**
- * Hero Server Component Shell
- * Renders the HeroMotionIsland as a client component
- */
 export function Hero() {
   return <HeroMotionIsland />;
 }
