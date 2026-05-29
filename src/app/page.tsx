@@ -3,7 +3,14 @@ import { JsonLd } from "@/app/_components/json-ld";
 import { Hero } from "@/components/marketing/Hero";
 import { ValuesMarquee } from "@/components/marketing/ValuesMarquee";
 import { StatsBand } from "@/components/marketing/StatsBand";
+import { CityCaseStudies } from "@/components/marketing/CityCaseStudies";
+import { FeaturedTherapistsEditorial } from "@/components/marketing/FeaturedTherapistsEditorial";
+import { WhyUsSplit } from "@/components/marketing/WhyUsSplit";
+import { PricingToggle } from "@/components/marketing/PricingToggle";
 import { HomeSeoLanding } from "@/app/_components/home-seo-landing";
+import { FaqAccordion } from "@/components/marketing/FaqAccordion";
+import { CityCoverageSection } from "@/components/marketing/CityCoverageSection";
+import { FinalCta } from "@/components/marketing/FinalCta";
 import {
   createPageMetadata,
   buildFaqJsonLd,
@@ -22,6 +29,7 @@ import {
   PRIORITY_CITY_SLUGS,
   CITY_HIGHLIGHTS,
   CITY_ROUTE_COUNTS,
+  LANDING_FAQ,
 } from "@/lib/marketing/home-data";
 
 export const revalidate = 3600;
@@ -148,56 +156,6 @@ const HOME_FAQ = [
   },
 ];
 
-// ─── Static homepage data ────────────────────────────────────────────────────
-
-const HOME_INTENT_CARDS = [
-  {
-    href: "/dallas/wellness/deep-tissue",
-    title: "Deep Tissue Massage in Dallas",
-    description:
-      "Find licensed therapists specializing in deep tissue work across Dallas neighborhoods including Oak Lawn, Uptown, and Medical District.",
-    cityLabel: "Dallas, TX",
-  },
-  {
-    href: "/dallas/wellness/outcall",
-    title: "Outcall Massage in Dallas",
-    description:
-      "Browse therapists offering mobile and hotel outcall sessions across Dallas and the DFW metro area.",
-    cityLabel: "Dallas, TX",
-  },
-  {
-    href: "/miami/wellness/outcall",
-    title: "Outcall Massage in Miami",
-    description:
-      "Discover verified outcall therapists in Miami Beach, South Beach, Brickell, and surrounding neighborhoods.",
-    cityLabel: "Miami, FL",
-  },
-  {
-    href: "/los-angeles/wellness/deep-tissue",
-    title: "Deep Tissue Massage in Los Angeles",
-    description:
-      "Compare deep tissue specialists across West Hollywood, Santa Monica, Silver Lake, and greater LA.",
-    cityLabel: "Los Angeles, CA",
-  },
-  {
-    href: "/chicago/wellness/incall",
-    title: "Incall Massage in Chicago",
-    description:
-      "Find incall massage sessions in Chicago's Near North Side, Boystown, River North, and South Loop.",
-    cityLabel: "Chicago, IL",
-  },
-  {
-    href: "/new-york/wellness/outcall",
-    title: "Outcall Massage in New York",
-    description:
-      "Browse mobile and hotel outcall therapists serving Manhattan, Brooklyn, and the NYC metro area.",
-    cityLabel: "New York, NY",
-  },
-];
-
-const CITY_COVERAGE_LINE =
-  "Covering 80+ US cities — Dallas, Miami, New York, Los Angeles, Chicago, Houston, Atlanta, Washington DC, San Francisco, Seattle, Denver, Boston, Phoenix, Las Vegas, and more.";
-
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
@@ -280,7 +238,7 @@ export default async function HomePage() {
         })}
       />
 
-      {/* Competitor comparison ItemList — helps Google understand alternatives context */}
+      {/* Competitor comparison ItemList */}
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -300,10 +258,10 @@ export default async function HomePage() {
         }}
       />
 
-      {/* FAQPage — includes competitor comparison questions for rich snippet eligibility */}
+      {/* FAQPage */}
       <JsonLd data={buildFaqJsonLd(HOME_FAQ)} />
 
-      {/* SpeakableSpecification — helps voice search */}
+      {/* SpeakableSpecification */}
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -329,21 +287,38 @@ export default async function HomePage() {
         }}
       />
 
-      {/* Editorial Hero Section */}
+      {/* 1. Editorial hero */}
       <Hero />
 
-      {/* Brand values ticker + animated stats band */}
+      {/* 2. Brand values ticker */}
       <ValuesMarquee />
+
+      {/* 3. Animated stats band */}
       <StatsBand />
 
-      <HomeSeoLanding
-        launchCities={launchCities}
-        intentCards={HOME_INTENT_CARDS}
-        featuredTherapists={featuredTherapists}
-        comparisonLinks={comparisonLinks}
-        guides={guides}
-        cityCoverageLine={CITY_COVERAGE_LINE}
-      />
+      {/* 4. Editorial city case studies */}
+      <CityCaseStudies launchCities={launchCities} />
+
+      {/* 5. Featured therapist profiles */}
+      <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
+
+      {/* 6. Why Us split with giant stats */}
+      <WhyUsSplit />
+
+      {/* 7. Pricing toggle */}
+      <PricingToggle />
+
+      {/* 8. Comparison hub + guides */}
+      <HomeSeoLanding comparisonLinks={comparisonLinks} guides={guides} />
+
+      {/* 9. FAQ accordion */}
+      <FaqAccordion items={LANDING_FAQ} />
+
+      {/* 10. City coverage grid */}
+      <CityCoverageSection />
+
+      {/* Final CTA */}
+      <FinalCta />
     </>
   );
 }
