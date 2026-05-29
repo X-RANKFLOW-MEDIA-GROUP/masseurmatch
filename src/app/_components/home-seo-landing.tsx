@@ -20,6 +20,7 @@ import type { GuideArticle } from "@/app/guides/data";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import type { CityData } from "@/data/cities";
 import type { Competitor } from "@/lib/competitors";
+import { US_CITIES } from "@/data/cities";
 
 type HomeStat = {
   label: string;
@@ -641,7 +642,7 @@ export function HomeSeoLanding({
         </div>
       </section>
 
-      {/* City coverage grid — SEO crawlable city link matrix */}
+      {/* City coverage grid — full MasseurFinder market parity, every US city */}
       <section className="page-shell py-10 sm:py-12">
         <div className="max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-action-secondary">City coverage</p>
@@ -649,61 +650,33 @@ export function HomeSeoLanding({
             Find a therapist in your city.
           </h2>
           <p className="mt-3 text-sm leading-7 text-text-secondary">
-            MasseurMatch has verified profiles, local landing pages, and service intent pages across 80+ US cities.
-            Select your city to browse available therapists, compare session types, and contact directly.
+            MasseurMatch covers every major US market — the same cities served by MasseurFinder and RentMasseur,
+            plus growing coverage in hundreds more. Select your city to browse verified therapists, compare
+            session types, and contact directly.
           </p>
         </div>
         <div className="mt-8 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-          {[
-            { name: "Dallas", slug: "dallas", state: "TX" },
-            { name: "Miami", slug: "miami", state: "FL" },
-            { name: "New York", slug: "new-york", state: "NY" },
-            { name: "Los Angeles", slug: "los-angeles", state: "CA" },
-            { name: "Chicago", slug: "chicago", state: "IL" },
-            { name: "Houston", slug: "houston", state: "TX" },
-            { name: "Atlanta", slug: "atlanta", state: "GA" },
-            { name: "Washington DC", slug: "washington-dc", state: "DC" },
-            { name: "San Francisco", slug: "san-francisco", state: "CA" },
-            { name: "Seattle", slug: "seattle", state: "WA" },
-            { name: "Denver", slug: "denver", state: "CO" },
-            { name: "Boston", slug: "boston", state: "MA" },
-            { name: "Phoenix", slug: "phoenix", state: "AZ" },
-            { name: "Las Vegas", slug: "las-vegas", state: "NV" },
-            { name: "Portland", slug: "portland", state: "OR" },
-            { name: "Nashville", slug: "nashville", state: "TN" },
-            { name: "Austin", slug: "austin", state: "TX" },
-            { name: "Philadelphia", slug: "philadelphia", state: "PA" },
-            { name: "San Diego", slug: "san-diego", state: "CA" },
-            { name: "Orlando", slug: "orlando", state: "FL" },
-            { name: "Tampa", slug: "tampa", state: "FL" },
-            { name: "Minneapolis", slug: "minneapolis", state: "MN" },
-            { name: "New Orleans", slug: "new-orleans", state: "LA" },
-            { name: "Scottsdale", slug: "scottsdale", state: "AZ" },
-            { name: "West Hollywood", slug: "west-hollywood", state: "CA" },
-            { name: "Fort Lauderdale", slug: "fort-lauderdale", state: "FL" },
-            { name: "Palm Springs", slug: "palm-springs", state: "CA" },
-            { name: "Wilton Manors", slug: "wilton-manors", state: "FL" },
-            { name: "Provincetown", slug: "provincetown", state: "MA" },
-            { name: "Key West", slug: "key-west", state: "FL" },
-          ].map((city) => (
-            <Link
-              key={city.slug}
-              href={`/${city.slug}`}
-              className="group rounded-[1rem] border border-border-subtle bg-white px-3 py-2.5 text-center shadow-[0_6px_16px_rgba(11,31,58,0.04)] transition hover:-translate-y-0.5 hover:border-brand-accent/40"
-            >
-              <p className="text-sm font-semibold text-brand-primary group-hover:text-brand-secondary">
-                {city.name}
-              </p>
-              <p className="mt-0.5 text-[11px] font-medium text-text-secondary">{city.state}</p>
-            </Link>
-          ))}
+          {[...US_CITIES]
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((city) => (
+              <Link
+                key={city.slug}
+                href={`/${city.slug}`}
+                className="group rounded-[1rem] border border-border-subtle bg-white px-3 py-2.5 text-center shadow-[0_6px_16px_rgba(11,31,58,0.04)] transition hover:-translate-y-0.5 hover:border-brand-accent/40"
+              >
+                <p className="text-sm font-semibold text-brand-primary group-hover:text-brand-secondary">
+                  {city.name}
+                </p>
+                <p className="mt-0.5 text-[11px] font-medium text-text-secondary">{city.stateCode}</p>
+              </Link>
+            ))}
         </div>
         <div className="mt-6 text-center">
           <Link
             href="/cities"
             className="inline-flex items-center gap-2 text-sm font-semibold text-action-secondary transition hover:gap-3"
           >
-            View all cities
+            View all cities &amp; service pages
             <ChevronRight className="h-4 w-4" />
           </Link>
         </div>
