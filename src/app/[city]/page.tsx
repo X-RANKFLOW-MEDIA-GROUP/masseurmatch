@@ -65,7 +65,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       `${city.name} sports massage`,
       `mobile massage ${city.name}`,
     ],
-    noIndex: inventoryCount === 0,
+    noIndex: inventoryCount < 3,
   });
 }
 

@@ -195,7 +195,7 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Metad
       .filter((city) => ROUTABLE_CITY_SLUGS.has(city.slug))
       .filter((city) => {
         const cityName = cityNameBySlug(city.slug);
-        return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) > 0 : false;
+        return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) >= 3 : false;
       })
       .map((city) => ({
         url: toSitemapUrl(`/cities/${city.slug}`),
@@ -210,7 +210,7 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Metad
     .filter((path) => {
       const slug = path.split("/").filter(Boolean)[0];
       const cityName = slug ? cityNameBySlug(slug) : null;
-      return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) > 0 : false;
+      return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) >= 3 : false;
     })
     .map((path) => buildSitemapEntry(`/cities${path}`, now, "weekly", 0.7));
 }
