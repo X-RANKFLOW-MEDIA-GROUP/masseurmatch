@@ -1,8 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  BadgeCheck,
   BookOpenText,
   ChevronRight,
   Clock3,
@@ -17,17 +15,11 @@ import {
 } from "lucide-react";
 import type { GuideArticle } from "@/app/guides/data";
 import type { PublicTherapist } from "@/app/_lib/directory";
-import type { CityData } from "@/data/cities";
 import type { Competitor } from "@/lib/competitors";
 import { US_CITIES } from "@/data/cities";
-
-type LaunchCityCard = {
-  href: string;
-  city: CityData;
-  listingCount: number;
-  routeCount: number;
-  highlights: string[];
-};
+import type { LaunchCityCard } from "@/lib/marketing/home-data";
+import { CityCaseStudies } from "@/components/marketing/CityCaseStudies";
+import { FeaturedTherapistsEditorial } from "@/components/marketing/FeaturedTherapistsEditorial";
 
 type IntentCard = {
   href: string;
@@ -45,39 +37,6 @@ type HomeSeoLandingProps = {
   cityCoverageLine: string;
 };
 
-function formatPrice(amount: number | null) {
-  if (!amount) {
-    return "Contact for pricing";
-  }
-
-  return `From $${amount}`;
-}
-
-function buildLocationLabel(therapist: PublicTherapist) {
-  return therapist.neighborhood_name || therapist.primary_area || therapist.city || "Featured market";
-}
-
-function buildProfileBadges(therapist: PublicTherapist) {
-  const badges: string[] = [];
-
-  if (therapist.available_now) {
-    badges.push("Available now");
-  }
-
-  if (therapist.is_verified_identity || therapist.is_verified_profile || therapist.is_verified_photos) {
-    badges.push("Verified signals");
-  }
-
-  if (therapist.outcall_price) {
-    badges.push("Outcall");
-  }
-
-  if (therapist.incall_price) {
-    badges.push("Incall");
-  }
-
-  return badges.slice(0, 3);
-}
 
 export function HomeSeoLanding({
   launchCities,
@@ -231,71 +190,7 @@ export function HomeSeoLanding({
         </div>
       </section>
 
-      <section className="page-shell py-10 sm:py-12">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-action-secondary">City cluster</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-brand-primary sm:text-4xl">
-              Start with the strongest local pages.
-            </h2>
-            <p className="mt-3 text-sm leading-7 text-text-secondary">
-              These city pages are built to rank for local massage discovery while still routing users deeper into verified profiles, service intent pages, trust guidance, and comparison content.
-            </p>
-          </div>
-
-          <Link
-            href="/explore"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-action-secondary transition hover:gap-3"
-          >
-            Explore all listings
-            <ChevronRight className="h-4 w-4" />
-          </Link>
-        </div>
-
-        <div className="mt-8 grid gap-4 lg:grid-cols-2">
-          {launchCities.map((entry) => (
-            <Link
-              key={entry.href}
-              href={entry.href}
-              className="group rounded-[1.9rem] border border-border-subtle bg-white p-6 shadow-[0_18px_42px_rgba(11,31,58,0.05)] transition hover:-translate-y-1 hover:border-brand-accent/40"
-            >
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="rounded-full bg-brand-primary/6 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-secondary">
-                  {entry.city.stateCode}
-                </span>
-                <span className="rounded-full bg-brand-soft/18 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-primary">
-                  {entry.routeCount} live routes
-                </span>
-              </div>
-
-              <div className="mt-5 flex items-end justify-between gap-4">
-                <div>
-                  <h3 className="text-2xl font-semibold tracking-[-0.04em] text-brand-primary">
-                    {entry.city.name}
-                  </h3>
-                  <p className="mt-2 text-sm text-text-secondary">
-                    {entry.listingCount > 0
-                      ? `${entry.listingCount} visible profiles in the current directory snapshot`
-                      : "Launch market with canonical local landing pages already live"}
-                  </p>
-                </div>
-                <ArrowRight className="h-5 w-5 shrink-0 text-action-secondary transition group-hover:translate-x-1" />
-              </div>
-
-              <div className="mt-5 flex flex-wrap gap-2">
-                {entry.highlights.map((highlight) => (
-                  <span
-                    key={highlight}
-                    className="rounded-full border border-border-subtle bg-[#f8fafc] px-3 py-1 text-xs font-medium text-text-secondary"
-                  >
-                    {highlight}
-                  </span>
-                ))}
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <CityCaseStudies launchCities={launchCities} />
 
       <section className="page-shell py-10 sm:py-12">
         <div className="max-w-3xl">
@@ -329,124 +224,7 @@ export function HomeSeoLanding({
         </div>
       </section>
 
-      <section className="page-shell py-10 sm:py-12">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-action-secondary">Featured profiles</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-brand-primary sm:text-4xl">
-              Trust-led profiles with clear session details.
-            </h2>
-            <p className="mt-3 text-sm leading-7 text-text-secondary">
-              Instead of forcing users through a marketplace wall, the directory keeps the most useful trust signals visible: location context, availability, session type, and straightforward price anchors.
-            </p>
-          </div>
-          <Link
-            href="/safety"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-action-secondary transition hover:gap-3"
-          >
-            Read safety guidance
-            <ChevronRight className="h-4 w-4" />
-          </Link>
-        </div>
-
-        <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {featuredTherapists.map((therapist, index) => {
-            const profileHref = `/therapists/${therapist.slug || therapist.id}`;
-            const badges = buildProfileBadges(therapist);
-            const specialties = (therapist.specialties || []).slice(0, 3);
-
-            return (
-              <Link
-                key={profileHref}
-                href={profileHref}
-                className="group overflow-hidden rounded-[1.9rem] border border-border-subtle bg-white shadow-[0_18px_42px_rgba(11,31,58,0.06)] transition hover:-translate-y-1 hover:border-brand-accent/40"
-              >
-                <div className="relative aspect-[4/3] overflow-hidden bg-[linear-gradient(160deg,#dce6f7_0%,#f6ede1_100%)]">
-                  {therapist.avatar_url ? (
-                    <Image
-                      src={therapist.avatar_url}
-                      alt={therapist.display_name || therapist.full_name || "Featured therapist"}
-                      fill
-                      className="object-cover transition duration-500 group-hover:scale-105"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-4xl font-semibold text-brand-primary/30">
-                      {(therapist.display_name || therapist.full_name || `T${index + 1}`)
-                        .split(" ")
-                        .slice(0, 2)
-                        .map((part) => part[0])
-                        .join("")
-                        .toUpperCase()}
-                    </div>
-                  )}
-
-                  <div className="absolute left-4 top-4 flex flex-wrap gap-2">
-                    {(therapist.is_verified_identity || therapist.is_verified_profile) ? (
-                      <span className="rounded-full bg-[rgba(15,118,110,0.88)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white">
-                        Verified
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-
-                <div className="p-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h3 className="text-xl font-semibold text-brand-primary">
-                        {therapist.display_name || therapist.full_name || "Featured therapist"}
-                      </h3>
-                      <p className="mt-2 text-sm text-text-secondary">
-                        {buildLocationLabel(therapist)}
-                      </p>
-                    </div>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-brand-primary/6 px-3 py-1 text-xs font-semibold text-brand-secondary">
-                      <BadgeCheck className="h-3.5 w-3.5" />
-                      {therapist.review_count || 0} reviews
-                    </span>
-                  </div>
-
-                  <p className="mt-4 line-clamp-3 text-sm leading-7 text-text-secondary">
-                    {therapist.bio || "Premium profile with direct contact and service details."}
-                  </p>
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {specialties.map((specialty) => (
-                      <span
-                        key={specialty}
-                        className="rounded-full border border-border-subtle bg-[#f8fafc] px-3 py-1 text-xs font-medium text-text-secondary"
-                      >
-                        {specialty}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {badges.map((badge) => (
-                      <span
-                        key={badge}
-                        className="rounded-full bg-brand-primary/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-secondary"
-                      >
-                        {badge}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="mt-5 flex items-center justify-between gap-3 border-t border-border-subtle pt-4">
-                    <p className="text-sm font-semibold text-brand-primary">
-                      {formatPrice(therapist.incall_price || therapist.outcall_price)}
-                    </p>
-                    <span className="inline-flex items-center gap-2 text-sm font-semibold text-action-secondary transition group-hover:gap-3">
-                      View profile
-                      <ChevronRight className="h-4 w-4" />
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
+      <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
 
       <section className="page-shell py-10 sm:py-12">
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">

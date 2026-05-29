@@ -18,7 +18,11 @@ import { siteUrl } from "@/lib/site";
 import { getPublicTherapists, getCities } from "@/app/_lib/directory";
 import { competitorsByTier } from "@/lib/competitors";
 import { GUIDES } from "@/app/guides/data";
-import type { CityData } from "@/data/cities";
+import {
+  PRIORITY_CITY_SLUGS,
+  CITY_HIGHLIGHTS,
+  CITY_ROUTE_COUNTS,
+} from "@/lib/marketing/home-data";
 
 export const revalidate = 3600;
 
@@ -145,39 +149,6 @@ const HOME_FAQ = [
 ];
 
 // ─── Static homepage data ────────────────────────────────────────────────────
-
-const PRIORITY_CITY_SLUGS = [
-  "dallas",
-  "miami",
-  "new-york",
-  "los-angeles",
-  "chicago",
-  "houston",
-  "atlanta",
-  "washington-dc",
-];
-
-const CITY_HIGHLIGHTS: Record<string, string[]> = {
-  dallas: ["Deep Tissue", "Outcall", "Hotel Massage", "Verified Profiles"],
-  miami: ["Outcall", "LGBTQ+ Friendly", "Beach Area", "Verified Profiles"],
-  "new-york": ["Manhattan", "Brooklyn", "Incall & Outcall", "Verified"],
-  "los-angeles": ["West Hollywood", "Santa Monica", "Outcall", "Verified"],
-  chicago: ["Deep Tissue", "Sports Recovery", "Incall", "Verified"],
-  houston: ["Outcall", "Deep Tissue", "Swedish", "Verified Profiles"],
-  atlanta: ["LGBTQ+ Friendly", "Outcall", "Deep Tissue", "Verified"],
-  "washington-dc": ["Incall & Outcall", "Deep Tissue", "Verified", "LGBTQ+"],
-};
-
-const CITY_ROUTE_COUNTS: Record<string, number> = {
-  dallas: 42,
-  miami: 28,
-  "new-york": 36,
-  "los-angeles": 32,
-  chicago: 24,
-  houston: 22,
-  atlanta: 18,
-  "washington-dc": 20,
-};
 
 const HOME_INTENT_CARDS = [
   {
