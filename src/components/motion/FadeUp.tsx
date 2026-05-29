@@ -7,17 +7,19 @@ type FadeUpProps = {
   children: React.ReactNode;
   delay?: number;
   y?: number;
+  className?: string;
 };
 
-export default function FadeUp({ children, delay = 0, y = 24 }: FadeUpProps) {
+export default function FadeUp({ children, delay = 0, y = 24, className }: FadeUpProps) {
   const reduce = useReducedMotion();
 
   if (reduce) {
-    return <div>{children}</div>;
+    return <div className={className}>{children}</div>;
   }
 
   return (
     <motion.div
+      className={className}
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
