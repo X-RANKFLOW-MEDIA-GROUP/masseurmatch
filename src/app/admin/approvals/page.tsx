@@ -52,9 +52,7 @@ export default function ApprovalsPage() {
       .then((data) => {
         setProfiles(data.profiles || []);
       })
-      .catch(() => {
-        console.error("[v0] Failed to load therapist profiles");
-      })
+      .catch(() => { /* UI shows empty list */ })
       .finally(() => setLoading(false));
   }, [filter]);
 
