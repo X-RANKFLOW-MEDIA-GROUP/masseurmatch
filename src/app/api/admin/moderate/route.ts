@@ -2,7 +2,6 @@ export const dynamic = "force-dynamic";
 import { z } from "zod";
 
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
-import { buildTherapistRevalidatePaths, triggerRevalidate } from "@/app/_lib/revalidate";
 import { assertRateLimit, sanitizeOptionalText, sanitizeStringArray, sanitizeText } from "@/app/_lib/security";
 import {
   createSupabaseAdminClient,
@@ -309,13 +308,12 @@ export async function POST(request: Request) {
     });
 
     if (updatedProfile) {
-      await triggerRevalidate(
-        await buildTherapistRevalidatePaths({
+      await import("@/app/_lib/revalidate").then(({ buildTherapistRevalidatePaths, triggerRevalidate }) =>
+        buildTherapistRevalidatePaths({
           id: updatedProfile.id,
           slug: updatedProfile.slug,
           city: updatedProfile.city,
-        }),
-        { request },
+        }).then((paths) => triggerRevalidate(paths, { request }))
       ).catch((error) => {
         console.error("[api/admin/moderate] Revalidation failed:", error);
       });

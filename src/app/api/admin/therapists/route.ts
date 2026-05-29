@@ -25,7 +25,6 @@ type FeaturedRow = {
 
 
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
-import { buildTherapistRevalidatePaths, triggerRevalidate } from "@/app/_lib/revalidate";
 import {
   createSupabaseAdminClient,
   recordAuditLog,
@@ -253,13 +252,12 @@ export async function POST(request: Request) {
     const body = await parseJsonBody(request, adminTherapistActionSchema);
     const result = await applyTherapistAdminAction(admin.userId, body);
 
-    await triggerRevalidate(
-      await buildTherapistRevalidatePaths({
+    await import("@/app/_lib/revalidate").then(({ buildTherapistRevalidatePaths, triggerRevalidate }) =>
+      buildTherapistRevalidatePaths({
         id: result.profile?.id,
         slug: result.profile?.slug,
         city: result.profile?.city,
-      }),
-      { request },
+      }).then((paths) => triggerRevalidate(paths, { request }))
     ).catch((error) => {
       console.error("[api/admin/therapists] Revalidation failed:", error);
     });

@@ -9,7 +9,6 @@ import {
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { requireAdminSession, recordAuditLog } from "@/app/api/_lib/supabase-server";
 import { slugify } from "@/app/api/_lib/text";
-import { buildKeywordRevalidatePaths, triggerRevalidate } from "@/app/_lib/revalidate";
 
 const keywordSchema = z.object({
   slug: z.string().min(1).optional(),
@@ -58,9 +57,11 @@ export async function POST(request: Request) {
       city: keyword.city,
     });
 
-    await triggerRevalidate(await buildKeywordRevalidatePaths(keyword.slug, keyword.city), {
-      request,
-    }).catch((error) => {
+    await import("@/app/_lib/revalidate").then(({ buildKeywordRevalidatePaths, triggerRevalidate }) =>
+      buildKeywordRevalidatePaths(keyword.slug, keyword.city).then((paths) =>
+        triggerRevalidate(paths, { request })
+      )
+    ).catch((error) => {
       console.error("[api/admin/keywords] Revalidation failed:", error);
     });
 

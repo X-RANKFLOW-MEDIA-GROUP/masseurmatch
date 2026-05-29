@@ -9,7 +9,6 @@ import {
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { requireAdminSession, recordAuditLog } from "@/app/api/_lib/supabase-server";
 import { slugify } from "@/app/api/_lib/text";
-import { buildCityRevalidatePaths, triggerRevalidate } from "@/app/_lib/revalidate";
 
 const citySchema = z.object({
   slug: z.string().min(1).optional(),
@@ -58,7 +57,9 @@ export async function POST(request: Request) {
       stateCode: city.stateCode,
     });
 
-    await triggerRevalidate(await buildCityRevalidatePaths(city.slug), { request }).catch((error) => {
+    await import("@/app/_lib/revalidate").then(({ buildCityRevalidatePaths, triggerRevalidate }) =>
+      buildCityRevalidatePaths(city.slug).then((paths) => triggerRevalidate(paths, { request }))
+    ).catch((error) => {
       console.error("[api/admin/cities] Revalidation failed:", error);
     });
 
