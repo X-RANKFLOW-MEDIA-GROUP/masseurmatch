@@ -1,8 +1,10 @@
 import { JsonLd } from "@/app/_components/JsonLd";
 import type { ProfileViewModel } from "./profile-utils";
 
+type Credential = { "@type": string; credentialCategory: string; name: string; description: string };
+
 function buildCredentials(profile: ProfileViewModel) {
-  const credentials = [];
+  const credentials: Credential[] = [];
   if (profile.licenseOptional) {
     credentials.push({
       "@type": "EducationalOccupationalCredential",
