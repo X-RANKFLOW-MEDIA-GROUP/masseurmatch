@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/app/_components/json-ld";
+import { Hero } from "@/components/marketing/Hero";
 import { HomeSeoLanding } from "@/app/_components/home-seo-landing";
 import {
   createPageMetadata,
@@ -377,6 +378,9 @@ export default async function HomePage() {
           },
         }}
       />
+
+      {/* Editorial Hero Section */}
+      <Hero />
 
       <HomeSeoLanding
         stats={HOME_STATS}
