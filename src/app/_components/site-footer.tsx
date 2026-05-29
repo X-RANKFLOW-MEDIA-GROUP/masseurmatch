@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ShieldCheck, ArrowUpRight } from "lucide-react";
+import { SiteFooterTalk } from "@/components/marketing/SiteFooterTalk";
 
 export function SiteFooter() {
   const currentYear = new Date().getFullYear();
   const pathname = usePathname();
 
   if (pathname === "/") {
-    return null;
+    return <SiteFooterTalk />;
   }
 
   return (
