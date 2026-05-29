@@ -12,11 +12,15 @@ import {
   Scale,
   ShieldCheck,
   Sparkles,
+  Star,
+  Users,
+  TrendingUp,
 } from "lucide-react";
 import type { GuideArticle } from "@/app/guides/data";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import type { CityData } from "@/data/cities";
 import type { Competitor } from "@/lib/competitors";
+import { US_CITIES } from "@/data/cities";
 
 type HomeStat = {
   label: string;
@@ -602,7 +606,7 @@ export function HomeSeoLanding({
                 {
                   question: "Which cities have live MasseurMatch landing pages?",
                   answer:
-                    "Current launch pages include Dallas, Plano, Irving, and Highland Park, with profile coverage already expanding into Austin, Houston, Miami, Chicago, and other major US markets.",
+                    "MasseurMatch covers 80+ US cities including Dallas, Miami, New York, Los Angeles, Chicago, Houston, Atlanta, Washington DC, San Francisco, Seattle, Denver, Phoenix, Las Vegas, Boston, New Orleans, and more.",
                 },
                 {
                   question: "Can I compare deep tissue, Swedish, hotel, and outcall options?",
@@ -614,6 +618,16 @@ export function HomeSeoLanding({
                   answer:
                     "No. MasseurMatch is a discovery directory. Users review profiles and contact therapists directly to confirm rates, boundaries, timing, location, and availability.",
                 },
+                {
+                  question: "Is MasseurMatch a better alternative to MasseurFinder or RentMasseur?",
+                  answer:
+                    "MasseurMatch is a modern alternative to legacy directories like MasseurFinder and RentMasseur. It offers cleaner profile presentation, stronger local SEO, city-first landing pages, and a professional wellness-forward brand without the mixed-intent marketplace feel.",
+                },
+                {
+                  question: "Is MasseurMatch LGBTQ+ affirming?",
+                  answer:
+                    "Yes. MasseurMatch is built as an inclusive LGBTQ+-affirming platform. Therapists signal their affirmation and clients can filter for it — creating a safer, more targeted discovery experience.",
+                },
               ].map((item) => (
                 <article
                   key={item.question}
@@ -623,6 +637,148 @@ export function HomeSeoLanding({
                   <p className="mt-3 text-sm leading-7 text-text-secondary">{item.answer}</p>
                 </article>
               ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* City coverage grid — full MasseurFinder market parity, every US city */}
+      <section className="page-shell py-10 sm:py-12">
+        <div className="max-w-3xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-action-secondary">City coverage</p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-brand-primary sm:text-4xl">
+            Find a therapist in your city.
+          </h2>
+          <p className="mt-3 text-sm leading-7 text-text-secondary">
+            MasseurMatch covers every major US market — the same cities served by MasseurFinder and RentMasseur,
+            plus growing coverage in hundreds more. Select your city to browse verified therapists, compare
+            session types, and contact directly.
+          </p>
+        </div>
+        <div className="mt-8 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+          {[...US_CITIES]
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((city) => (
+              <Link
+                key={city.slug}
+                href={`/${city.slug}`}
+                className="group rounded-[1rem] border border-border-subtle bg-white px-3 py-2.5 text-center shadow-[0_6px_16px_rgba(11,31,58,0.04)] transition hover:-translate-y-0.5 hover:border-brand-accent/40"
+              >
+                <p className="text-sm font-semibold text-brand-primary group-hover:text-brand-secondary">
+                  {city.name}
+                </p>
+                <p className="mt-0.5 text-[11px] font-medium text-text-secondary">{city.stateCode}</p>
+              </Link>
+            ))}
+        </div>
+        <div className="mt-6 text-center">
+          <Link
+            href="/cities"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-action-secondary transition hover:gap-3"
+          >
+            View all cities &amp; service pages
+            <ChevronRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </section>
+
+      {/* Why switch section — captures competitor comparison searches */}
+      <section className="page-shell py-10 sm:py-12">
+        <div className="rounded-[2rem] border border-border-subtle bg-[linear-gradient(160deg,#06152a_0%,#0b1f3a_100%)] p-8 text-white shadow-[0_18px_42px_rgba(11,31,58,0.12)]">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand-soft">
+                Looking for a MasseurFinder or RentMasseur alternative?
+              </p>
+              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-4xl">
+                Why therapists and clients choose MasseurMatch.
+              </h2>
+              <p className="mt-4 text-sm leading-7 text-white/75">
+                MasseurMatch is the modern alternative to legacy niche directories. Whether you currently use
+                MasseurFinder, RentMasseur, MassageFinder, FindAMasseur, or another platform, MasseurMatch offers
+                a cleaner experience built for today&rsquo;s search behavior.
+              </p>
+              <div className="mt-6">
+                <Link
+                  href="/compare"
+                  className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#ff8a1f,#ffb347)] px-6 py-3 text-sm font-semibold text-slate-950 shadow-[0_12px_32px_rgba(255,138,31,0.32)] transition hover:translate-y-[-1px]"
+                >
+                  Compare MasseurMatch vs alternatives
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+              {[
+                {
+                  icon: Star,
+                  title: "Premium profile quality",
+                  body: "Cleaner design, trust signals, and richer content than legacy directories like MasseurFinder.",
+                },
+                {
+                  icon: TrendingUp,
+                  title: "City-first local SEO",
+                  body: "Local landing pages built to rank for city and service intent — not just brand searches.",
+                },
+                {
+                  icon: ShieldCheck,
+                  title: "Wellness-forward brand",
+                  body: "A professional brand context that sets the right tone vs mixed-intent platforms like RentMasseur.",
+                },
+                {
+                  icon: Users,
+                  title: "LGBTQ+-affirming focus",
+                  body: "Built around inclusive and affirming discovery that broader directories often lack.",
+                },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div
+                    key={item.title}
+                    className="rounded-[1.5rem] border border-white/10 bg-white/[0.07] p-5"
+                  >
+                    <Icon className="h-5 w-5 text-brand-soft" />
+                    <p className="mt-3 text-sm font-semibold text-white">{item.title}</p>
+                    <p className="mt-2 text-xs leading-6 text-white/65">{item.body}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* For Therapists CTA */}
+      <section className="page-shell pb-14 pt-4 sm:pb-16">
+        <div className="rounded-[2rem] border border-border-subtle bg-white p-7 shadow-[0_18px_42px_rgba(11,31,58,0.05)]">
+          <div className="grid gap-6 md:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] md:items-center">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-action-secondary">For therapists</p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-brand-primary">
+                Get your profile in front of local search.
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-text-secondary">
+                MasseurMatch gives independent massage therapists a premium, city-optimized public profile backed by
+                a growing SEO ecosystem of city pages, service routes, and comparison content.
+                A better alternative to listing on MasseurFinder or RentMasseur alone.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 md:items-end">
+              <Link
+                href="/for-therapists"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-brand-primary px-7 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(11,31,58,0.2)] transition hover:bg-brand-secondary"
+              >
+                List your practice
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/pricing"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-border-strong px-7 py-3.5 text-sm font-semibold text-brand-primary transition hover:border-brand-accent/40"
+              >
+                View pricing
+                <ChevronRight className="h-4 w-4" />
+              </Link>
             </div>
           </div>
         </div>

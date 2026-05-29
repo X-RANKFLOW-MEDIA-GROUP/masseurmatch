@@ -103,11 +103,11 @@ const CORE_STATIC_ROUTES: StaticSitemapRoute[] = [
   { path: "/platform-disclaimer", changeFrequency: "monthly", priority: 0.4 },
   { path: "/cookie-policy", changeFrequency: "monthly", priority: 0.4 },
   { path: "/therapist-agreement", changeFrequency: "monthly", priority: 0.4 },
-  { path: "/compare", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/compare", changeFrequency: "weekly", priority: 0.82 },
   ...competitorSlugs.map((slug) => ({
     path: `/compare/${slug}`,
     changeFrequency: "monthly" as const,
-    priority: 0.7,
+    priority: 0.75,
   })),
 ];
 
