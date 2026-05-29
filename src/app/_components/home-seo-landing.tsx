@@ -4,7 +4,6 @@ import {
   ArrowRight,
   BadgeCheck,
   BookOpenText,
-  CheckCircle2,
   ChevronRight,
   Clock3,
   MapPinned,
@@ -22,12 +21,6 @@ import type { CityData } from "@/data/cities";
 import type { Competitor } from "@/lib/competitors";
 import { US_CITIES } from "@/data/cities";
 
-type HomeStat = {
-  label: string;
-  value: string;
-  helper: string;
-};
-
 type LaunchCityCard = {
   href: string;
   city: CityData;
@@ -44,7 +37,6 @@ type IntentCard = {
 };
 
 type HomeSeoLandingProps = {
-  stats: HomeStat[];
   launchCities: LaunchCityCard[];
   intentCards: IntentCard[];
   featuredTherapists: PublicTherapist[];
@@ -88,7 +80,6 @@ function buildProfileBadges(therapist: PublicTherapist) {
 }
 
 export function HomeSeoLanding({
-  stats,
   launchCities,
   intentCards,
   featuredTherapists,
@@ -123,8 +114,7 @@ export function HomeSeoLanding({
       <section className="relative isolate overflow-hidden border-b border-white/40 bg-[linear-gradient(160deg,#08162b_0%,#0b1f3a_40%,#153e79_100%)] text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,179,71,0.22),transparent_26%),radial-gradient(circle_at_85%_10%,rgba(255,255,255,0.12),transparent_24%),linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:auto,auto,72px_72px,72px_72px] opacity-90" />
         <div className="page-shell relative py-12 sm:py-16 lg:py-20">
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,430px)] lg:items-start">
-            <div>
+          <div>
               <span className="eyebrow-chip eyebrow-chip-inverse">
                 Structured for trust, speed, and local discovery
               </span>
@@ -196,42 +186,6 @@ export function HomeSeoLanding({
                 ))}
               </div>
             </div>
-
-            <aside className="rounded-[2rem] border border-white/12 bg-white/[0.08] p-6 shadow-[0_24px_64px_rgba(0,0,0,0.22)] backdrop-blur-2xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand-soft">
-                Directory signals
-              </p>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                {stats.map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="rounded-[1.4rem] border border-white/10 bg-white/[0.06] p-4"
-                  >
-                    <p className="text-3xl font-semibold tracking-[-0.05em] text-white">{stat.value}</p>
-                    <p className="mt-2 text-sm font-semibold text-white">{stat.label}</p>
-                    <p className="mt-1 text-xs leading-6 text-white/62">{stat.helper}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 rounded-[1.6rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] p-5">
-                <p className="text-sm font-semibold text-white">Why this homepage is easier to trust</p>
-                <ul className="mt-4 space-y-3 text-sm text-white/74">
-                  {[
-                    "Verified signals and visible session types are surfaced early.",
-                    "City pages, service pages, guides, and comparison pages reinforce internal linking.",
-                    "Users can move from broad discovery to high-intent local pages in one hop.",
-                    "Direct contact remains clear without forcing an on-platform scheduling workflow.",
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-soft" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </aside>
-          </div>
         </div>
       </section>
 

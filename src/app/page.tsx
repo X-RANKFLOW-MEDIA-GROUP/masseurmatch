@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/app/_components/json-ld";
 import { Hero } from "@/components/marketing/Hero";
+import { ValuesMarquee } from "@/components/marketing/ValuesMarquee";
+import { StatsBand } from "@/components/marketing/StatsBand";
 import { HomeSeoLanding } from "@/app/_components/home-seo-landing";
 import {
   createPageMetadata,
@@ -143,29 +145,6 @@ const HOME_FAQ = [
 ];
 
 // ─── Static homepage data ────────────────────────────────────────────────────
-
-const HOME_STATS = [
-  {
-    label: "Verified therapist profiles",
-    value: "500+",
-    helper: "Profiles reviewed for identity, quality, and trust signals across all active US markets.",
-  },
-  {
-    label: "Cities with live landing pages",
-    value: "80+",
-    helper: "City-specific discovery pages from Dallas and Miami to New York and Los Angeles.",
-  },
-  {
-    label: "Service routes indexed",
-    value: "1,200+",
-    helper: "Deep tissue, Swedish, outcall, incall, and hotel massage routes across major markets.",
-  },
-  {
-    label: "Average therapist rating",
-    value: "4.8 ★",
-    helper: "Based on verified client reviews across active profile listings.",
-  },
-];
 
 const PRIORITY_CITY_SLUGS = [
   "dallas",
@@ -382,8 +361,11 @@ export default async function HomePage() {
       {/* Editorial Hero Section */}
       <Hero />
 
+      {/* Brand values ticker + animated stats band */}
+      <ValuesMarquee />
+      <StatsBand />
+
       <HomeSeoLanding
-        stats={HOME_STATS}
         launchCities={launchCities}
         intentCards={HOME_INTENT_CARDS}
         featuredTherapists={featuredTherapists}
