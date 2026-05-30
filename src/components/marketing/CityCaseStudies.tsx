@@ -27,7 +27,16 @@ export function CityCaseStudies({ launchCities }: Props) {
                 className="group block rounded-3xl overflow-hidden bg-card border border-border transition-transform duration-300 hover:scale-[1.01]"
               >
                 {/* City image */}
-                <div className="relative aspect-[16/10] overflow-hidden">
+                <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-[#0f1f3d] via-[#1a2a4a] to-[#0a0f1e]">
+                  {/* Fallback: always-visible gradient overlay with city name */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 opacity-60">
+                    <span className="font-display text-5xl font-extrabold uppercase tracking-tight text-white/20 lg:text-6xl">
+                      {entry.city.name}
+                    </span>
+                    <span className="text-xs font-semibold uppercase tracking-[0.3em] text-white/15">
+                      {entry.city.stateCode}
+                    </span>
+                  </div>
                   <Image
                     src={`/marketing/cities/${entry.city.slug}.jpg`}
                     alt={`${entry.city.name}, ${entry.city.stateCode} massage therapists`}
