@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/app/_components/json-ld";
+import { HomeBackground } from "@/components/marketing/HomeBackground";
 import { Hero } from "@/components/marketing/Hero";
 import { ValuesMarquee } from "@/components/marketing/ValuesMarquee";
 import { StatsBand } from "@/components/marketing/StatsBand";
@@ -287,38 +288,42 @@ export default async function HomePage() {
         }}
       />
 
-      {/* 1. Editorial hero */}
-      <Hero />
+      <div className="home-dark relative min-h-screen overflow-x-hidden">
+        <HomeBackground />
 
-      {/* 2. Brand values ticker */}
-      <ValuesMarquee />
+        {/* 1. Editorial hero */}
+        <Hero />
 
-      {/* 3. Animated stats band */}
-      <StatsBand />
+        {/* 2. Brand values ticker */}
+        <ValuesMarquee />
 
-      {/* 4. Editorial city case studies */}
-      <CityCaseStudies launchCities={launchCities} />
+        {/* 3. Animated stats band */}
+        <StatsBand />
 
-      {/* 5. Featured therapist profiles */}
-      <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
+        {/* 4. Editorial city case studies */}
+        <CityCaseStudies launchCities={launchCities} />
 
-      {/* 6. Why Us split with giant stats */}
-      <WhyUsSplit />
+        {/* 5. Featured therapist profiles */}
+        <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
 
-      {/* 7. Pricing toggle */}
-      <PricingToggle />
+        {/* 6. Why Us split with giant stats */}
+        <WhyUsSplit />
 
-      {/* 8. Comparison hub + guides */}
-      <HomeSeoLanding comparisonLinks={comparisonLinks} guides={guides} />
+        {/* 7. Pricing toggle */}
+        <PricingToggle />
 
-      {/* 9. FAQ accordion */}
-      <FaqAccordion items={LANDING_FAQ} />
+        {/* 8. Comparison hub + guides */}
+        <HomeSeoLanding comparisonLinks={comparisonLinks} guides={guides} />
 
-      {/* 10. City coverage grid */}
-      <CityCoverageSection />
+        {/* 9. FAQ accordion */}
+        <FaqAccordion items={LANDING_FAQ} />
 
-      {/* Final CTA */}
-      <FinalCta />
+        {/* 10. City coverage grid */}
+        <CityCoverageSection />
+
+        {/* Final CTA */}
+        <FinalCta />
+      </div>
     </>
   );
 }
