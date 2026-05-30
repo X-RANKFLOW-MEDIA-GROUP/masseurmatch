@@ -27,15 +27,15 @@ export default async function Image() {
           style={{
             display: "flex",
             flexDirection: "row",
-            alignItems: "baseline",
+            alignItems: "flex-end",
             fontSize: 52,
             fontWeight: 400,
             letterSpacing: "-0.01em",
             marginBottom: 24,
           }}
         >
-          <span style={{ display: "flex", color: "#FCFBF8" }}>Masseur</span>
-          <span style={{ display: "flex", color: "#FF8A1F" }}>Match</span>
+          <span style={{ color: "#FCFBF8" }}>Masseur</span>
+          <span style={{ color: "#FF8A1F" }}>Match</span>
         </div>
 
         <div
@@ -48,7 +48,7 @@ export default async function Image() {
             letterSpacing: "0.04em",
           }}
         >
-          LGBTQ+-Inclusive Massage Therapist Directory
+          <span>LGBTQ+-Inclusive Massage Therapist Directory</span>
         </div>
 
         <div
