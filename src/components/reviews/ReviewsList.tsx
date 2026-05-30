@@ -168,7 +168,7 @@ export function ReviewsList({ therapistId, averageRating = 0, totalReviews = 0 }
                       {review.is_verified && (
                         <Badge variant="secondary" className="gap-1 text-xs">
                           <CheckCircle2 className="h-3 w-3" />
-                          Verified
+                          Confirmed
                         </Badge>
                       )}
                     </div>

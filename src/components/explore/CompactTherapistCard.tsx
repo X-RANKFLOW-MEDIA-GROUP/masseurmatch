@@ -64,7 +64,7 @@ export function CompactTherapistCard({
             <div className="absolute left-3 top-3">
               <span className="inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 backdrop-blur-sm">
                 <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                {isElite ? 'Elite' : 'Verified'}
+                {isElite ? 'Elite' : 'Active'}
               </span>
             </div>
           )}

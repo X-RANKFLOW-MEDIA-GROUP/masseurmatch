@@ -23,7 +23,7 @@ export function FinalCTA({ searchInputRef }: FinalCTAProps) {
           Ready to find your therapist?
         </h2>
         <p className="mx-auto mt-4 max-w-lg text-base text-white/70">
-          Search again to discover verified massage therapists near you with transparent pricing and direct contact.
+          Search again to discover independent massage therapists near you with transparent pricing and direct contact.
         </p>
         <Button
           variant="premium"

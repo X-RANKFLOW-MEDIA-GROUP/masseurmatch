@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BookOpenText, ChevronRight, Scale } from "lucide-react";
 import type { GuideArticle } from "@/app/guides/data";
 import type { Competitor } from "@/lib/competitors";
+import { US_CITIES } from "@/data/cities";
 
 type HomeSeoLandingProps = {
   comparisonLinks: Competitor[];

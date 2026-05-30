@@ -26,12 +26,7 @@ import { siteUrl } from "@/lib/site";
 import { getPublicTherapists, getCities } from "@/app/_lib/directory";
 import { competitorsByTier } from "@/lib/competitors";
 import { GUIDES } from "@/app/guides/data";
-import {
-  PRIORITY_CITY_SLUGS,
-  CITY_HIGHLIGHTS,
-  CITY_ROUTE_COUNTS,
-  LANDING_FAQ,
-} from "@/lib/marketing/home-data";
+import type { CityData } from "@/data/cities";
 
 export const revalidate = 3600;
 

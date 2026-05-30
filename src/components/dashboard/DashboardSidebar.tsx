@@ -97,9 +97,9 @@ export const DashboardSidebar = () => {
             </p>
             <div className="flex items-center gap-2 mt-1">
               {profile.is_verified_identity ? (
-                <Badge variant="outline" className="text-[10px] border-success/40 text-success">Verified</Badge>
+                <Badge variant="outline" className="text-[10px] border-success/40 text-success">Active</Badge>
               ) : (
-                <Badge variant="outline" className="text-[10px] border-warning/40 text-warning">Unverified</Badge>
+                <Badge variant="outline" className="text-[10px] border-warning/40 text-warning">Pending</Badge>
               )}
               {profile.is_active ? (
                 <Badge variant="outline" className="text-[10px] border-success/40 text-success">Active</Badge>

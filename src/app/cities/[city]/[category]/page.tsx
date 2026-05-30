@@ -129,9 +129,9 @@ export default async function CanonicalCityCategoryPage({ params }: { params: Pr
         "Use this page as a focused local filter, then compare profile trust signals, session format, pricing, availability, and specialties before direct outreach.",
     },
     {
-      question: "Are profile listings verified?",
+      question: "Are profile listings reviewed?",
       answer:
-        "Verification status is shown where available, alongside profile completeness, service details, and clear direct contact expectations.",
+        "Profile review status is shown where available, alongside profile completeness, service details, and clear direct contact expectations.",
     },
     {
       question: `Does this ${city.name} page support mobile, incall, outcall, and hotel intent?`,
