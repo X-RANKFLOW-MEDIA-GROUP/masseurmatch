@@ -166,7 +166,7 @@ export default function HeroClient() {
             ease: customEase,
             delay: reducedMotion ? 0 : TYPING_END + 0.25,
           }}
-          className="flex flex-wrap gap-4 mb-16 lg:mb-24"
+          className="flex flex-wrap gap-3 mb-12 lg:mb-16"
         >
           <Link
             href="/search"
@@ -190,7 +190,7 @@ export default function HeroClient() {
             ease: customEase,
             delay: reducedMotion ? 0 : 1.0,
           }}
-          className="relative w-screen -mx-[calc(50vw-50%)] aspect-video lg:aspect-[21/9] overflow-hidden"
+          className="relative w-screen -mx-[calc(50vw-50%)] aspect-[4/3] sm:aspect-video lg:aspect-[21/9] overflow-hidden"
         >
           <Image
             src="/marketing/hero/cover.jpg"
@@ -201,6 +201,7 @@ export default function HeroClient() {
             className="object-cover"
             sizes="100vw"
           />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/60" />
         </motion.div>
       </div>
     </section>

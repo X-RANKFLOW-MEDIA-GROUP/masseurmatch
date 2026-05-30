@@ -1,6 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import FadeUp from "@/components/motion/FadeUp";
+import { motion } from "framer-motion";
 import type { LaunchCityCard } from "@/lib/marketing/home-data";
 
 type Props = {
@@ -9,80 +11,71 @@ type Props = {
 
 export function CityCaseStudies({ launchCities }: Props) {
   return (
-    <section className="py-20 lg:py-32">
+    <section className="py-16 lg:py-24">
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
-        <div className="mb-12 lg:mb-16">
-          <p className="text-sm uppercase tracking-widest text-muted-foreground">City coverage</p>
-          <h2 className="mt-3 font-display text-[clamp(2.5rem,5vw,4.5rem)] font-extrabold leading-[0.95] tracking-tight">
-            Start with the strongest local pages.
-          </h2>
+        <div className="mb-8 flex items-end justify-between">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+              Top markets
+            </p>
+            <h2 className="mt-2 font-display text-[clamp(1.75rem,3.5vw,3rem)] font-extrabold leading-[0.95] tracking-tight">
+              Find your city.
+            </h2>
+          </div>
+          <Link
+            href="/cities"
+            className="hidden text-xs font-semibold uppercase tracking-widest text-primary transition hover:opacity-70 sm:block"
+          >
+            All cities →
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8">
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:gap-3">
           {launchCities.map((entry, i) => (
-            <FadeUp key={entry.href} delay={i * 0.08}>
+            <motion.div
+              key={entry.href}
+              initial={{ opacity: 0, scale: 0.96 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay: i * 0.05 }}
+            >
               <Link
                 href={entry.href}
-                className="group block rounded-3xl overflow-hidden bg-card border border-border transition-transform duration-300 hover:scale-[1.01]"
+                className="group relative block aspect-square overflow-hidden rounded-2xl bg-[#0a1628]"
               >
+                {/* Fallback ghost name */}
+                <span className="pointer-events-none absolute inset-0 flex items-center justify-center font-display text-4xl font-extrabold uppercase text-white/[0.06] select-none">
+                  {entry.city.name.split(" ")[0]}
+                </span>
+
                 {/* City image */}
-                <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-[#0f1f3d] via-[#1a2a4a] to-[#0a0f1e]">
-                  {/* Fallback: always-visible gradient overlay with city name */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 opacity-60">
-                    <span className="font-display text-5xl font-extrabold uppercase tracking-tight text-white/20 lg:text-6xl">
-                      {entry.city.name}
-                    </span>
-                    <span className="text-xs font-semibold uppercase tracking-[0.3em] text-white/15">
-                      {entry.city.stateCode}
-                    </span>
-                  </div>
-                  <Image
-                    src={`/marketing/cities/${entry.city.slug}.jpg`}
-                    alt={`${entry.city.name}, ${entry.city.stateCode} massage therapists`}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
-                </div>
+                <Image
+                  src={`/marketing/cities/${entry.city.slug}.jpg`}
+                  alt={`${entry.city.name} massage therapists`}
+                  fill
+                  className="object-cover object-center transition-transform duration-500 ease-out group-hover:scale-[1.06]"
+                  sizes="(max-width: 640px) 50vw, 25vw"
+                />
 
-                {/* Card body */}
-                <div className="p-6 lg:p-8">
-                  {/* Route count pill */}
-                  <span className="inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-                    {entry.routeCount} live routes
-                  </span>
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent transition-opacity duration-300 group-hover:from-black/85" />
 
-                  {/* City name + state */}
-                  <h3 className="mt-4 font-display text-3xl font-bold lg:text-4xl">
+                {/* Bottom label */}
+                <div className="absolute bottom-0 left-0 right-0 p-3.5">
+                  <p className="font-display text-base font-bold leading-none text-white lg:text-lg">
                     {entry.city.name}
-                    <span className="ml-2 text-lg font-normal text-muted-foreground">
-                      {entry.city.stateCode}
-                    </span>
-                  </h3>
-
-                  {/* Tag chips */}
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {entry.highlights.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border border-border px-3 py-1 text-xs"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Arrow link */}
-                  <p className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-primary">
-                    Open city page
-                    <span className="inline-block transition-transform duration-200 group-hover:translate-x-1">
-                      →
-                    </span>
+                  </p>
+                  <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-white/50">
+                    {entry.city.stateCode} · {entry.routeCount} routes
                   </p>
                 </div>
+
+                {/* Top-right arrow — appears on hover */}
+                <div className="absolute right-3 top-3 grid h-7 w-7 place-items-center rounded-full border border-white/20 bg-white/0 text-[11px] text-white/0 transition-all duration-300 group-hover:bg-white/15 group-hover:text-white">
+                  ↗
+                </div>
               </Link>
-            </FadeUp>
+            </motion.div>
           ))}
         </div>
       </div>

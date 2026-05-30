@@ -1,21 +1,21 @@
 import InfiniteMarquee from "@/components/motion/InfiniteMarquee";
 
 const VALUES = [
-  "VERIFIED THERAPISTS",
-  "BACKGROUND CHECKED",
-  "LICENSED PROFESSIONALS",
-  "LGBTQ+ AFFIRMING",
-  "REAL REVIEWS",
-  "SAFE & PRIVATE",
+  "Verified Therapists",
+  "Background Checked",
+  "Licensed Professionals",
+  "LGBTQ+ Affirming",
+  "Real Reviews",
+  "Safe & Private",
 ];
 
 export function ValuesMarquee() {
   return (
     <InfiniteMarquee
       items={VALUES}
-      separator="✦"
-      speed={40}
-      className="border-y border-border bg-muted/30 py-6 font-display text-2xl uppercase tracking-tight text-foreground lg:text-3xl"
+      separator="·"
+      speed={35}
+      className="border-y border-border/40 py-4 font-display text-sm uppercase tracking-[0.2em] text-muted-foreground"
     />
   );
 }

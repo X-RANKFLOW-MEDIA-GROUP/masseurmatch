@@ -1,100 +1,87 @@
 import Image from "next/image";
-import InfiniteMarquee from "@/components/motion/InfiniteMarquee";
 import FadeUp from "@/components/motion/FadeUp";
 
-const MARQUEE_VALUES = [
-  "Quality",
-  "Trust",
-  "Privacy",
-  "Verified",
-  "LGBTQ+ Affirming",
-  "Premium",
-  "Local-First",
+const TRUST_POINTS = [
+  "Multi-step identity & credential review",
+  "Photo quality check before publishing",
+  "No anonymous or unverified listings",
+  "Real client reviews, never incentivised",
 ];
 
 export function WhyUsSplit() {
   return (
-    <section className="py-20 lg:py-32">
-      <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
-        <FadeUp>
-          <div className="mb-12 lg:mb-16">
-            <p className="text-sm uppercase tracking-widest text-muted-foreground">
-              Why MasseurMatch
-            </p>
-            <h2 className="mt-3 font-display text-[clamp(2.5rem,5vw,4.5rem)] font-extrabold leading-[0.95] tracking-tight">
-              Built different from legacy directories.
-            </h2>
-          </div>
-        </FadeUp>
-      </div>
+    <section className="py-16 lg:py-24">
 
-      {/* Values marquee — full-width strip */}
-      <InfiniteMarquee
-        items={MARQUEE_VALUES}
-        separator="•"
-        speed={35}
-        className="border-y border-border bg-muted/30 py-5 font-display text-xl uppercase tracking-tight text-foreground lg:text-2xl"
-      />
+      <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8 pt-16 lg:pt-20">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16 items-center">
 
-      <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-        <div className="mt-12 grid grid-cols-1 gap-8 lg:mt-16 lg:grid-cols-12 lg:gap-12">
-          {/* Block 1: image + stat */}
-          <FadeUp delay={0.05} className="lg:col-span-7">
-            <div className="flex h-full flex-col">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-gradient-to-br from-[#0f1f3d] via-[#1a2a4a] to-[#0a0f1e]">
-                <Image
-                  src="/marketing/why-us/primary.jpg"
-                  alt="Verified massage therapy professional"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 58vw"
-                />
+          {/* Left — cinematic image with overlaid stat */}
+          <FadeUp delay={0.05}>
+            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-[#0a1628]">
+              <Image
+                src="/marketing/hero/cover.jpg"
+                alt="Verified massage therapy session"
+                fill
+                className="object-cover object-center"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+              {/* Dark gradient */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/30 to-transparent" />
+
+              {/* Overlaid stat */}
+              <div className="absolute bottom-8 left-8">
+                <p className="font-display text-[5.5rem] font-extrabold leading-none tracking-tight text-white lg:text-[7rem]">
+                  98<span className="text-primary">%</span>
+                </p>
+                <p className="mt-1 text-sm font-semibold uppercase tracking-widest text-white/70">
+                  Profiles verified before going live
+                </p>
               </div>
-              <div className="mt-8">
-                <p
-                  aria-label="98 percent"
-                  className="font-display text-[8rem] font-extrabold leading-none tracking-tight"
-                >
-                  98%
-                </p>
-                <p className="mt-2 text-lg font-semibold">
-                  Profiles verified before they go live
-                </p>
-                <p className="mt-3 max-w-lg text-base leading-relaxed text-muted-foreground">
-                  Every therapist on MasseurMatch passes a multi-step review covering
-                  identity, credentials, and photo quality before their profile is
-                  published. No anonymous listings, no unverified claims.
+
+              {/* Top badge */}
+              <div className="absolute right-5 top-5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 backdrop-blur-sm">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-white">
+                  MasseurMatch Standard
                 </p>
               </div>
             </div>
           </FadeUp>
 
-          {/* Block 2: stat + image */}
-          <FadeUp delay={0.12} className="lg:col-span-5">
-            <div className="flex h-full flex-col">
-              <div>
-                <p
-                  aria-label="4.9 star average rating"
-                  className="font-display text-[8rem] font-extrabold leading-none tracking-tight"
-                >
-                  4.9★
+          {/* Right — content */}
+          <FadeUp delay={0.12}>
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+                Why MasseurMatch
+              </p>
+              <h2 className="mt-3 font-display text-[clamp(2rem,4vw,3.25rem)] font-extrabold leading-[0.95] tracking-tight">
+                Built different from legacy directories.
+              </h2>
+              <p className="mt-5 text-base leading-relaxed text-muted-foreground max-w-md">
+                MasseurMatch focuses on safety, trust, and inclusivity. Every profile
+                passes a multi-step review before going live — no anonymous listings,
+                no unverified claims.
+              </p>
+
+              <ul className="mt-8 space-y-3">
+                {TRUST_POINTS.map((point) => (
+                  <li key={point} className="flex items-start gap-3">
+                    <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary/15 text-[10px] font-bold text-primary">
+                      ✓
+                    </span>
+                    <span className="text-sm leading-relaxed text-foreground/80">{point}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Rating stat */}
+              <div className="mt-10 inline-flex items-baseline gap-3 border-t border-border/40 pt-8">
+                <p className="font-display text-[4rem] font-extrabold leading-none tracking-tight">
+                  4.9<span className="text-primary">★</span>
                 </p>
-                <p className="mt-2 text-lg font-semibold">Average therapist rating</p>
-                <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-                  Real reviews from verified clients. No fake testimonials, no
-                  incentivised ratings — just honest feedback that helps you choose
-                  with confidence.
-                </p>
-              </div>
-              <div className="relative mt-8 aspect-[3/4] overflow-hidden rounded-3xl bg-gradient-to-br from-[#1a2a4a] via-[#0f1f3d] to-[#0a0f1e]">
-                <Image
-                  src="/marketing/why-us/secondary.jpg"
-                  alt="Happy client after professional massage"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 42vw"
-                />
+                <div>
+                  <p className="text-sm font-semibold">Average therapist rating</p>
+                  <p className="text-xs text-muted-foreground">Across all verified profiles</p>
+                </div>
               </div>
             </div>
           </FadeUp>
