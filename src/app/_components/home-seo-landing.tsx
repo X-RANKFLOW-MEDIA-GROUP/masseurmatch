@@ -65,7 +65,7 @@ export function HomeSeoLanding({ comparisonLinks, guides }: HomeSeoLandingProps)
               </h2>
             </div>
           </div>
-          <p className="mt-5 text-sm leading-7 text-muted-foreground">
+          <p className="mt-5 text-sm leading-7 text-text-secondary">
             Guides help capture earlier research queries while still routing visitors back into city pages,
             session-type pages, and trust content. That gives Google and Bing more topical context without
             turning the site into thin SEO filler.
