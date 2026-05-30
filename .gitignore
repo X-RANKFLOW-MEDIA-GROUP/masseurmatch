@@ -57,6 +57,13 @@ repo_structure.txt
 *.gif
 *.webp
 *.avif
+# Allow static marketing images in public/
+!public/marketing/**/*.jpg
+!public/marketing/**/*.jpeg
+!public/marketing/**/*.png
+!public/marketing/**/*.webp
+!public/images/**/*.jpg
+!public/images/**/*.png
 
 # Temp scripts
 fix_all.py
