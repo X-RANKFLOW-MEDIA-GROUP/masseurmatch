@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   return createPageMetadata({
     title: `Massage therapists in ${city.name}, ${city.stateCode}`,
     description:
-      `Browse verified massage therapists in ${city.name}, ${city.stateName}. Compare specialties, incall, outcall, trust signals, availability, and direct contact options.` ,
+      `Browse independent massage therapists in ${city.name}, ${city.stateName}. Compare specialties, incall, outcall, trust signals, availability, and direct contact options.`,
     path: `/cities/${canonicalCity}`,
     keywords: [
       `massage therapists ${city.name.toLowerCase()}`,
@@ -105,7 +105,7 @@ export default async function CanonicalCityPage({ params }: { params: Promise<Pa
     {
       question: `How do I find massage therapists in ${cityName}?`,
       answer:
-        "Start with verified profile signals, then compare specialty, session type, pricing, availability, and direct contact options before reaching out.",
+        "Start with trust signals on each profile, then compare specialty, session type, pricing, availability, and direct contact options before reaching out.",
     },
     {
       question: `Can I find incall, outcall, and hotel massage options in ${cityName}?`,

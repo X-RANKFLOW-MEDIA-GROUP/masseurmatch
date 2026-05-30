@@ -17,7 +17,7 @@ export function PremiumHomepage({ featuredTherapists, totalTherapists, cityCount
   const [selectedCity, setSelectedCity] = useState("Dallas");
 
   const stats = [
-    { label: "Verified Therapists", value: totalTherapists.toLocaleString() },
+    { label: "Active Therapists", value: totalTherapists.toLocaleString() },
     { label: "LGBTQ+ Affirming", value: "100%" },
     { label: "Cities Covered", value: cityCount },
     { label: "Avg Rating", value: "4.8★" },
@@ -26,8 +26,8 @@ export function PremiumHomepage({ featuredTherapists, totalTherapists, cityCount
   const trustFeatures = [
     {
       icon: Shield,
-      title: "Identity Verified",
-      description: "Every therapist goes through thorough background verification",
+      title: "Profile Reviewed",
+      description: "Every therapist profile is reviewed for completeness and quality",
     },
     {
       icon: Star,
@@ -42,7 +42,7 @@ export function PremiumHomepage({ featuredTherapists, totalTherapists, cityCount
     {
       icon: Zap,
       title: "Available Now",
-      description: "Real-time availability updates from verified therapists",
+      description: "Real-time availability updates from active therapists",
     },
   ];
 
@@ -57,7 +57,7 @@ export function PremiumHomepage({ featuredTherapists, totalTherapists, cityCount
             {/* Preheader Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-200">
               <CheckCircle className="w-4 h-4 text-emerald-600" />
-              <span className="text-sm font-medium text-emerald-900">LGBTQ+ Affirming • 100% Verified • No Booking Fees</span>
+              <span className="text-sm font-medium text-emerald-900">LGBTQ+ Affirming • Independent Therapists • No Booking Fees</span>
             </div>
 
             {/* Main Headline */}
@@ -70,7 +70,7 @@ export function PremiumHomepage({ featuredTherapists, totalTherapists, cityCount
                 </span>
               </h1>
               <p className="text-xl sm:text-2xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                Discover verified, LGBTQ+-affirming massage therapists in your area. Real profiles, transparent pricing, direct contact.
+                Discover LGBTQ+-affirming independent massage therapists in your area. Real profiles, transparent pricing, direct contact.
               </p>
             </div>
 
@@ -107,7 +107,7 @@ export function PremiumHomepage({ featuredTherapists, totalTherapists, cityCount
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-bold mb-4">Why Therapists Choose MasseurMatch</h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Trusted by both clients and verified massage therapists across the US
+              Trusted by both clients and independent massage therapists across the US
             </p>
           </div>
 
@@ -134,7 +134,7 @@ export function PremiumHomepage({ featuredTherapists, totalTherapists, cityCount
         <section className="py-20 bg-gradient-to-br from-slate-50 to-slate-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl sm:text-5xl font-bold mb-4">Featured Verified Therapists</h2>
+              <h2 className="text-4xl sm:text-5xl font-bold mb-4">Featured Therapists</h2>
               <p className="text-lg text-slate-600">Top-rated LGBTQ+-affirming massage professionals</p>
             </div>
 
@@ -152,7 +152,7 @@ export function PremiumHomepage({ featuredTherapists, totalTherapists, cityCount
                       )}
                       {therapist.is_verified_identity && (
                         <div className="absolute top-3 right-3 bg-emerald-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                          <CheckCircle className="w-3 h-3" /> Verified
+                          <CheckCircle className="w-3 h-3" /> Active
                         </div>
                       )}
                     </div>
@@ -185,7 +185,7 @@ export function PremiumHomepage({ featuredTherapists, totalTherapists, cityCount
       <section className="py-20 bg-gradient-to-r from-purple-600 to-pink-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">Ready to Find Your Perfect Match?</h2>
-          <p className="text-lg text-purple-100 mb-8">Join thousands of clients who have found verified, affirming massage therapists on MasseurMatch.</p>
+          <p className="text-lg text-purple-100 mb-8">Join thousands of clients who have found LGBTQ+-affirming independent massage therapists on MasseurMatch.</p>
           <Link href="/explore">
             <Button size="lg" className="bg-white text-purple-600 hover:bg-purple-50 shadow-xl hover:shadow-2xl transition-all">
               Start Exploring Now <ArrowRight className="ml-2 w-4 h-4" />

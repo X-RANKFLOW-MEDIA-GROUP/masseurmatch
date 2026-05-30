@@ -118,7 +118,7 @@ export function SearchFilters({ value, onChange }: SearchFiltersProps) {
           checked={value.verifiedOnly}
           onCheckedChange={(checked) => onChange({ ...value, verifiedOnly: checked === true })}
         />
-        <span>Verified therapists only</span>
+        <span>Active profiles only</span>
       </label>
     </section>
   );

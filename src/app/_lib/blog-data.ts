@@ -407,7 +407,7 @@ const FALLBACK_FULL_POSTS: Record<string, BlogPost> = {
         "Proximity to your home or office for recurring appointments",
         "Studio vs. independent home-based practice setup",
       ]},
-      { type: "paragraph", content: "MasseurMatch lets you filter Dallas therapists by neighborhood, modality, and availability. Reviews from verified clients help narrow the list further." },
+      { type: "paragraph", content: "MasseurMatch lets you filter Dallas therapists by neighborhood, modality, and availability. Client reviews help narrow the list further." },
     ],
   },
   "grow-massage-practice-online": {

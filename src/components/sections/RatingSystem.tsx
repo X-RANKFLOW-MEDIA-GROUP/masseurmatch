@@ -149,7 +149,7 @@ export function ReviewCard({ review }: { review: Review }) {
           <div>
             <div className="font-medium text-foreground">{review.author}</div>
             {review.verified && (
-              <div className="text-xs font-semibold text-brand-electric">Verified</div>
+              <div className="text-xs font-semibold text-brand-electric">Confirmed</div>
             )}
           </div>
         </div>

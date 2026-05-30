@@ -99,7 +99,7 @@ export function AdvancedSearchFilters({ filters, onChange, onClear }: AdvancedSe
         className="gap-1"
       >
         <Award className="h-3.5 w-3.5" />
-        Verified
+        Active
       </Button>
 
       <Button

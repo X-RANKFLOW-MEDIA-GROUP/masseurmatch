@@ -67,9 +67,7 @@ export default function ApprovalDetailPage() {
         setProfile(data.profile);
         setAdminNotes(data.profile.admin_notes || "");
       })
-      .catch(() => {
-        console.error("[v0] Failed to load profile");
-      })
+      .catch(() => { /* handled: UI shows "Profile Not Found" */ })
       .finally(() => setLoading(false));
   }, [profileId]);
 
@@ -83,8 +81,8 @@ export default function ApprovalDetailPage() {
         body: JSON.stringify({ action: "approve", notes: adminNotes }),
       });
       router.push("/admin/approvals?status=pending");
-    } catch (err) {
-      console.error("[v0] Approval failed", err);
+    } catch {
+      // no-op — actioning spinner reset in finally is enough
     } finally {
       setActioning(false);
     }
@@ -100,8 +98,8 @@ export default function ApprovalDetailPage() {
         body: JSON.stringify({ action: "reject", notes: adminNotes }),
       });
       router.push("/admin/approvals?status=rejected");
-    } catch (err) {
-      console.error("[v0] Rejection failed", err);
+    } catch {
+      // no-op
     } finally {
       setActioning(false);
     }
@@ -132,8 +130,8 @@ export default function ApprovalDetailPage() {
         body: JSON.stringify({ action: "changes_requested", notes: adminNotes }),
       });
       router.push("/admin/approvals?status=changes_requested");
-    } catch (err) {
-      console.error("[v0] Request changes failed", err);
+    } catch {
+      // no-op
     } finally {
       setActioning(false);
     }
