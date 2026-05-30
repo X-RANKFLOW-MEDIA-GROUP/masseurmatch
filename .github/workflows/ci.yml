@@ -221,6 +221,13 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: [build]
+    # Allow only one E2E run per ref at a time, but never cancel mid-run.
+    # The top-level concurrency group cancels fast jobs (lint/build) on new
+    # pushes; E2E is expensive enough that finishing the current run beats
+    # throwing it away and starting over.
+    concurrency:
+      group: e2e-${{ github.ref }}
+      cancel-in-progress: false
     env:
       PLAYWRIGHT_BASE_URL: ${{ vars.PLAYWRIGHT_BASE_URL }}
       # Optional: set as a GitHub secret when PLAYWRIGHT_BASE_URL points to a
