@@ -42,7 +42,7 @@ export function WhyUsSplit() {
           {/* Block 1: image + stat */}
           <FadeUp delay={0.05} className="lg:col-span-7">
             <div className="flex h-full flex-col">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-gradient-to-br from-[#0f1f3d] via-[#1a2a4a] to-[#0a0f1e]">
                 <Image
                   src="/marketing/why-us/primary.jpg"
                   alt="Verified massage therapy professional"
@@ -87,7 +87,7 @@ export function WhyUsSplit() {
                   with confidence.
                 </p>
               </div>
-              <div className="relative mt-8 aspect-[3/4] overflow-hidden rounded-3xl">
+              <div className="relative mt-8 aspect-[3/4] overflow-hidden rounded-3xl bg-gradient-to-br from-[#1a2a4a] via-[#0f1f3d] to-[#0a0f1e]">
                 <Image
                   src="/marketing/why-us/secondary.jpg"
                   alt="Happy client after professional massage"
