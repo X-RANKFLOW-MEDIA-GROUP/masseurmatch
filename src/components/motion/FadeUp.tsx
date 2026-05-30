@@ -7,6 +7,7 @@ type FadeUpProps = {
   children: React.ReactNode;
   delay?: number;
   y?: number;
+  /** Optional Tailwind / CSS classes forwarded to the wrapper element */
   className?: string;
 };
 
