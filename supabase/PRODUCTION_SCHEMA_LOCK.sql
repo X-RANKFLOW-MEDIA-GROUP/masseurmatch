@@ -844,3 +844,38 @@ create table if not exists public.therapist_availability (
 alter table public.payment_transactions add column if not exists user_id uuid references auth.users(id) on delete set null;
 alter table public.payment_transactions add column if not exists stripe_refund_id text;
 alter table public.payment_transactions add column if not exists amount_cents integer;
+
+create table if not exists public.waitlist_rate_limits (
+  id            uuid primary key default gen_random_uuid(),
+  fingerprint   text not null unique,
+  window_start  timestamptz not null default now(),
+  request_count integer not null default 1,
+  blocked_until timestamptz,
+  created_at    timestamptz not null default now()
+);
+
+create table if not exists public.waitlist_events (
+  id          uuid primary key default gen_random_uuid(),
+  event_name  text not null,
+  email       text,
+  source      text,
+  page_path   text,
+  referrer    text,
+  user_agent  text,
+  metadata    jsonb default '{}'::jsonb,
+  created_at  timestamptz not null default now()
+);
+
+create table if not exists public.waitlist_signups (
+  id               uuid primary key default gen_random_uuid(),
+  email            text not null,
+  normalized_email text not null unique,
+  role             text not null default 'visitor',
+  source           text,
+  campaign         text,
+  page_path        text,
+  referrer         text,
+  user_agent       text,
+  metadata         jsonb default '{}'::jsonb,
+  created_at       timestamptz not null default now()
+);

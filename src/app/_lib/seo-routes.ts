@@ -103,11 +103,11 @@ const CORE_STATIC_ROUTES: StaticSitemapRoute[] = [
   { path: "/platform-disclaimer", changeFrequency: "monthly", priority: 0.4 },
   { path: "/cookie-policy", changeFrequency: "monthly", priority: 0.4 },
   { path: "/therapist-agreement", changeFrequency: "monthly", priority: 0.4 },
-  { path: "/compare", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/compare", changeFrequency: "weekly", priority: 0.82 },
   ...competitorSlugs.map((slug) => ({
     path: `/compare/${slug}`,
     changeFrequency: "monthly" as const,
-    priority: 0.7,
+    priority: 0.75,
   })),
 ];
 
@@ -195,7 +195,7 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Metad
       .filter((city) => ROUTABLE_CITY_SLUGS.has(city.slug))
       .filter((city) => {
         const cityName = cityNameBySlug(city.slug);
-        return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) > 0 : false;
+        return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) >= 3 : false;
       })
       .map((city) => ({
         url: toSitemapUrl(`/cities/${city.slug}`),
@@ -210,7 +210,7 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Metad
     .filter((path) => {
       const slug = path.split("/").filter(Boolean)[0];
       const cityName = slug ? cityNameBySlug(slug) : null;
-      return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) > 0 : false;
+      return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) >= 3 : false;
     })
     .map((path) => buildSitemapEntry(`/cities${path}`, now, "weekly", 0.7));
 }
