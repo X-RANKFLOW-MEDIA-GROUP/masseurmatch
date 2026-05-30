@@ -14,7 +14,7 @@ export const DEFAULT_KEYWORDS = [
   "MasseurMatch",
   "massage therapist directory",
   "male massage therapist directory",
-  "independent massage therapists",
+  "verified massage therapists",
   "massage therapists near me",
   "male massage near me",
   // LGBTQ

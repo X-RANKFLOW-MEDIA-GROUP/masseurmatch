@@ -56,7 +56,10 @@ async function enforceRateLimit(supabase: ReturnType<typeof createClient>, finge
     .eq("fingerprint", fingerprint)
     .maybeSingle();
 
-  if (existing.error) return { allowed: false, status: 500, error: "Unable to validate request." };
+  if (existing.error) {
+    console.error("[waitlist] rate-limit check failed:", existing.error.message);
+    return { allowed: true }; // fail open — don't block signups on DB errors
+  }
   if (!existing.data) {
     await supabase.from("waitlist_rate_limits").insert({ fingerprint, window_start: now.toISOString(), request_count: 1 });
     return { allowed: true };

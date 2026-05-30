@@ -1,6 +1,17 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/app/_components/json-ld";
+import { HomeBackground } from "@/components/marketing/HomeBackground";
+import { Hero } from "@/components/marketing/Hero";
+import { ValuesMarquee } from "@/components/marketing/ValuesMarquee";
+import { StatsBand } from "@/components/marketing/StatsBand";
+import { CityCaseStudies } from "@/components/marketing/CityCaseStudies";
+import { FeaturedTherapistsEditorial } from "@/components/marketing/FeaturedTherapistsEditorial";
+import { WhyUsSplit } from "@/components/marketing/WhyUsSplit";
+import { PricingToggle } from "@/components/marketing/PricingToggle";
 import { HomeSeoLanding } from "@/app/_components/home-seo-landing";
+import { FaqAccordion } from "@/components/marketing/FaqAccordion";
+import { CityCoverageSection } from "@/components/marketing/CityCoverageSection";
+import { FinalCta } from "@/components/marketing/FinalCta";
 import {
   createPageMetadata,
   buildFaqJsonLd,
@@ -22,9 +33,9 @@ export const revalidate = 3600;
 // ─── Metadata ───────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = createPageMetadata({
-  title: "Find Independent Male Massage Therapists Near You | MasseurMatch",
+  title: "Find Verified Male Massage Therapists Near You | MasseurMatch",
   description:
-    "MasseurMatch is the premium US directory for LGBTQ+-affirming independent male massage therapists. Search Dallas, Miami, NYC, LA, Chicago & 80+ cities. Compare deep tissue, Swedish, outcall & incall options. A modern alternative to MasseurFinder and RentMasseur.",
+    "MasseurMatch is the premium US directory for verified LGBTQ+-affirming male massage therapists. Search Dallas, Miami, NYC, LA, Chicago & 80+ cities. Compare deep tissue, Swedish, outcall & incall options. A modern alternative to MasseurFinder and RentMasseur.",
   path: "/",
   keywords: [
     // Brand
@@ -102,10 +113,10 @@ const HOME_FAQ = [
   {
     question: "What is MasseurMatch?",
     answer:
-      "MasseurMatch is a premium US discovery directory for LGBTQ+-affirming independent male massage therapists. Search by city, filter by specialty (deep tissue, Swedish, sports), choose incall or outcall, and contact therapists directly without any booking middleman.",
+      "MasseurMatch is a premium US discovery directory for verified LGBTQ+-affirming male massage therapists. Search by city, filter by specialty (deep tissue, Swedish, sports), choose incall or outcall, and contact therapists directly without any booking middleman.",
   },
   {
-    question: "How do I find male massage therapists near me?",
+    question: "How do I find verified male massage therapists near me?",
     answer:
       "Select your city on MasseurMatch, browse profiles with trust signals, compare specialties and session types (incall or outcall), check availability and pricing, then contact your therapist directly to confirm details.",
   },
@@ -122,7 +133,7 @@ const HOME_FAQ = [
   {
     question: "How does MasseurMatch compare to RentMasseur?",
     answer:
-      "MasseurMatch offers a cleaner professional experience than RentMasseur. The focus is on wellness-forward discovery: active profiles, transparent pricing, and direct contact without the mixed-intent marketplace environment.",
+      "MasseurMatch offers a cleaner professional experience than RentMasseur. The focus is on wellness-forward discovery: verified profiles, transparent pricing, and direct contact without the mixed-intent marketplace environment.",
   },
   {
     question: "Can I find outcall and incall massage options on MasseurMatch?",
@@ -140,112 +151,6 @@ const HOME_FAQ = [
       "No. MasseurMatch is a discovery directory — not a booking platform. Clients review profiles and contact therapists directly to confirm session details, rates, availability, and boundaries outside the platform.",
   },
 ];
-
-// ─── Static homepage data ────────────────────────────────────────────────────
-
-const HOME_STATS = [
-  {
-    label: "Active therapist profiles",
-    value: "500+",
-    helper: "Profiles reviewed for quality and trust signals across all active US markets.",
-  },
-  {
-    label: "Cities with live landing pages",
-    value: "80+",
-    helper: "City-specific discovery pages from Dallas and Miami to New York and Los Angeles.",
-  },
-  {
-    label: "Service routes indexed",
-    value: "1,200+",
-    helper: "Deep tissue, Swedish, outcall, incall, and hotel massage routes across major markets.",
-  },
-  {
-    label: "Average therapist rating",
-    value: "4.8 ★",
-    helper: "Based on client reviews across active profile listings.",
-  },
-];
-
-const PRIORITY_CITY_SLUGS = [
-  "dallas",
-  "miami",
-  "new-york",
-  "los-angeles",
-  "chicago",
-  "houston",
-  "atlanta",
-  "washington-dc",
-];
-
-const CITY_HIGHLIGHTS: Record<string, string[]> = {
-  dallas: ["Deep Tissue", "Outcall", "Hotel Massage", "Active Profiles"],
-  miami: ["Outcall", "LGBTQ+ Friendly", "Beach Area", "Active Profiles"],
-  "new-york": ["Manhattan", "Brooklyn", "Incall & Outcall", "Active"],
-  "los-angeles": ["West Hollywood", "Santa Monica", "Outcall", "Active"],
-  chicago: ["Deep Tissue", "Sports Recovery", "Incall", "Active"],
-  houston: ["Outcall", "Deep Tissue", "Swedish", "Active Profiles"],
-  atlanta: ["LGBTQ+ Friendly", "Outcall", "Deep Tissue", "Active"],
-  "washington-dc": ["Incall & Outcall", "Deep Tissue", "Active", "LGBTQ+"],
-};
-
-const CITY_ROUTE_COUNTS: Record<string, number> = {
-  dallas: 42,
-  miami: 28,
-  "new-york": 36,
-  "los-angeles": 32,
-  chicago: 24,
-  houston: 22,
-  atlanta: 18,
-  "washington-dc": 20,
-};
-
-const HOME_INTENT_CARDS = [
-  {
-    href: "/dallas/wellness/deep-tissue",
-    title: "Deep Tissue Massage in Dallas",
-    description:
-      "Find licensed therapists specializing in deep tissue work across Dallas neighborhoods including Oak Lawn, Uptown, and Medical District.",
-    cityLabel: "Dallas, TX",
-  },
-  {
-    href: "/dallas/wellness/outcall",
-    title: "Outcall Massage in Dallas",
-    description:
-      "Browse therapists offering mobile and hotel outcall sessions across Dallas and the DFW metro area.",
-    cityLabel: "Dallas, TX",
-  },
-  {
-    href: "/miami/wellness/outcall",
-    title: "Outcall Massage in Miami",
-    description:
-      "Discover independent outcall therapists in Miami Beach, South Beach, Brickell, and surrounding neighborhoods.",
-    cityLabel: "Miami, FL",
-  },
-  {
-    href: "/los-angeles/wellness/deep-tissue",
-    title: "Deep Tissue Massage in Los Angeles",
-    description:
-      "Compare deep tissue specialists across West Hollywood, Santa Monica, Silver Lake, and greater LA.",
-    cityLabel: "Los Angeles, CA",
-  },
-  {
-    href: "/chicago/wellness/incall",
-    title: "Incall Massage in Chicago",
-    description:
-      "Find incall massage sessions in Chicago's Near North Side, Boystown, River North, and South Loop.",
-    cityLabel: "Chicago, IL",
-  },
-  {
-    href: "/new-york/wellness/outcall",
-    title: "Outcall Massage in New York",
-    description:
-      "Browse mobile and hotel outcall therapists serving Manhattan, Brooklyn, and the NYC metro area.",
-    cityLabel: "New York, NY",
-  },
-];
-
-const CITY_COVERAGE_LINE =
-  "Covering 80+ US cities — Dallas, Miami, New York, Los Angeles, Chicago, Houston, Atlanta, Washington DC, San Francisco, Seattle, Denver, Boston, Phoenix, Las Vegas, and more.";
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
@@ -274,7 +179,7 @@ export default async function HomePage() {
         city,
         listingCount: 0,
         routeCount: CITY_ROUTE_COUNTS[slug] ?? 12,
-        highlights: CITY_HIGHLIGHTS[slug] ?? ["Active Profiles", "Incall & Outcall"],
+        highlights: CITY_HIGHLIGHTS[slug] ?? ["Verified Profiles", "Incall & Outcall"],
       },
     ];
   });
@@ -314,7 +219,7 @@ export default async function HomePage() {
       {/* CollectionPage */}
       <JsonLd
         data={buildCollectionPageJsonLd({
-          name: "MasseurMatch — Independent Male Massage Therapist Directory",
+          name: "MasseurMatch — Verified Male Massage Therapist Directory",
           description: SITE_DESCRIPTION,
           path: "/",
         })}
@@ -329,7 +234,7 @@ export default async function HomePage() {
         })}
       />
 
-      {/* Competitor comparison ItemList — helps Google understand alternatives context */}
+      {/* Competitor comparison ItemList */}
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -349,15 +254,15 @@ export default async function HomePage() {
         }}
       />
 
-      {/* FAQPage — includes competitor comparison questions for rich snippet eligibility */}
+      {/* FAQPage */}
       <JsonLd data={buildFaqJsonLd(HOME_FAQ)} />
 
-      {/* SpeakableSpecification — helps voice search */}
+      {/* SpeakableSpecification */}
       <JsonLd
         data={{
           "@context": "https://schema.org",
           "@type": "WebPage",
-          name: "MasseurMatch — Independent Male Massage Therapist Directory",
+          name: "MasseurMatch — Verified Male Massage Therapist Directory",
           description: SITE_DESCRIPTION,
           url: siteUrl("/"),
           speakable: {
@@ -378,15 +283,42 @@ export default async function HomePage() {
         }}
       />
 
-      <HomeSeoLanding
-        stats={HOME_STATS}
-        launchCities={launchCities}
-        intentCards={HOME_INTENT_CARDS}
-        featuredTherapists={featuredTherapists}
-        comparisonLinks={comparisonLinks}
-        guides={guides}
-        cityCoverageLine={CITY_COVERAGE_LINE}
-      />
+      <div className="home-dark relative min-h-screen overflow-x-hidden">
+        <HomeBackground />
+
+        {/* 1. Editorial hero */}
+        <Hero />
+
+        {/* 2. Brand values ticker */}
+        <ValuesMarquee />
+
+        {/* 3. Animated stats band */}
+        <StatsBand />
+
+        {/* 4. Editorial city case studies */}
+        <CityCaseStudies launchCities={launchCities} />
+
+        {/* 5. Featured therapist profiles */}
+        <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
+
+        {/* 6. Why Us split with giant stats */}
+        <WhyUsSplit />
+
+        {/* 7. Pricing toggle */}
+        <PricingToggle />
+
+        {/* 8. Comparison hub + guides */}
+        <HomeSeoLanding comparisonLinks={comparisonLinks} guides={guides} />
+
+        {/* 9. FAQ accordion */}
+        <FaqAccordion items={LANDING_FAQ} />
+
+        {/* 10. City coverage grid */}
+        <CityCoverageSection />
+
+        {/* Final CTA */}
+        <FinalCta />
+      </div>
     </>
   );
 }

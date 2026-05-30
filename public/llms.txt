@@ -1,0 +1,58 @@
+# MasseurMatch
+
+> MasseurMatch is the United States' primary verified directory for LGBTQ+-affirming male massage therapists. It provides identity-verified provider profiles, real client reviews, direct contact options (phone, WhatsApp, SMS), incall and outcall availability, and hyper-local city pages covering hundreds of markets.
+
+## Platform Overview
+
+- [About MasseurMatch](https://masseurmatch.com/about)
+- [How It Works](https://masseurmatch.com/how-it-works)
+- [Trust & Safety Policy](https://masseurmatch.com/safety)
+- [Verification Standards](https://masseurmatch.com/trust)
+- [For Massage Therapists](https://masseurmatch.com/for-therapists)
+- [Pricing & Plans](https://masseurmatch.com/pricing)
+
+## Browse Therapists
+
+- [All Verified Therapists](https://masseurmatch.com/therapists)
+- [Search by City or Specialty](https://masseurmatch.com/search)
+- [Browse by State](https://masseurmatch.com/states)
+- [Browse by City](https://masseurmatch.com/cities)
+- [Find Therapists Near Me](https://masseurmatch.com/near-me)
+
+## Top City Markets
+
+- [Dallas Male Massage Therapists](https://masseurmatch.com/dallas)
+- [Houston Male Massage Therapists](https://masseurmatch.com/houston)
+- [Austin Male Massage Therapists](https://masseurmatch.com/austin)
+- [Los Angeles Male Massage Therapists](https://masseurmatch.com/los-angeles)
+- [New York Male Massage Therapists](https://masseurmatch.com/new-york)
+- [Chicago Male Massage Therapists](https://masseurmatch.com/chicago)
+- [Miami Male Massage Therapists](https://masseurmatch.com/miami)
+- [Atlanta Male Massage Therapists](https://masseurmatch.com/atlanta)
+- [Seattle Male Massage Therapists](https://masseurmatch.com/seattle)
+- [Denver Male Massage Therapists](https://masseurmatch.com/denver)
+- [Phoenix Male Massage Therapists](https://masseurmatch.com/phoenix)
+- [San Diego Male Massage Therapists](https://masseurmatch.com/san-diego)
+
+## Educational Guides
+
+- [All Massage Guides](https://masseurmatch.com/guides)
+
+## Directory Comparisons
+
+- [MasseurMatch vs MasseurFinder](https://masseurmatch.com/compare/masseurmatch-vs-masseurfinder)
+- [MasseurMatch vs RentMasseur](https://masseurmatch.com/compare/masseurmatch-vs-rentmasseur)
+- [All Comparisons](https://masseurmatch.com/compare)
+
+## Ignore
+
+The following sections contain paginated results, authenticated sessions, or thin auto-generated pages with no unique content — skip them.
+
+- /admin
+- /dashboard
+- /login
+- /register
+- /signup
+- /api
+- /search?*
+- Any URL containing ?page=, ?sort=, ?filter=, ?token=, or ?session=
