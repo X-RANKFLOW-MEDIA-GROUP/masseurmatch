@@ -173,6 +173,28 @@
     --warning-foreground: 0 0% 100%;
   }
 
+  .home-dark {
+    --background: 214 68% 14%;
+    --foreground: 30 11% 98%;
+    --card: 214 60% 11%;
+    --card-foreground: 30 11% 98%;
+    --popover: 214 60% 11%;
+    --popover-foreground: 30 11% 98%;
+    --primary: 26 100% 56%;
+    --primary-foreground: 214 68% 8%;
+    --secondary: 214 40% 22%;
+    --secondary-foreground: 30 11% 98%;
+    --muted: 214 40% 18%;
+    --muted-foreground: 214 15% 62%;
+    --accent: 26 100% 56%;
+    --accent-foreground: 214 68% 8%;
+    --border: 214 25% 22%;
+    --input: 214 25% 22%;
+    --ring: 26 100% 56%;
+    background-color: #0B1F3A;
+    color: #FCFBF8;
+  }
+
   /* Removed @apply border-border due to missing class in Tailwind config */
   * {
     /* Add any global border styles here if needed */

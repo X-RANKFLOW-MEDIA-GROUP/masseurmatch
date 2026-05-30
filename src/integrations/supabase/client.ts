@@ -34,6 +34,9 @@ export const supabase = createClient<Database>(
       storage: browserStorage,
       persistSession: isBrowser,
       autoRefreshToken: isBrowser,
+      // PKCE flow: exchanges a server-side code for tokens, preventing
+      // the access_token from appearing in the URL hash fragment.
+      flowType: "pkce",
     },
   }
 );

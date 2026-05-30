@@ -385,7 +385,7 @@ export default function PhotoManagerPage() {
     });
     await fetchPhotos();
     toast({
-      title: "Foto removida",
+      title: "Photo removed",
       description: "Gallery updated.",
     });
   };

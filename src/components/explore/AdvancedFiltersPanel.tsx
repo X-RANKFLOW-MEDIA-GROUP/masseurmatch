@@ -39,9 +39,9 @@ const TRAVEL_OPTIONS = [
 ];
 
 const VERIFICATION_OPTIONS = [
-  { id: 'verified', label: 'Verified' },
-  { id: 'pending', label: 'Pending Verification' },
-  { id: 'unverified', label: 'Unverified' },
+  { id: 'verified', label: 'Active' },
+  { id: 'pending', label: 'Pending Review' },
+  { id: 'unverified', label: 'Not Yet Reviewed' },
 ];
 
 const SERVICE_MODE_OPTIONS = [
@@ -62,7 +62,7 @@ const DEFAULT_LEGACY_FILTERS: FilterState = {
 
 const EXPLORE_FILTER_OPTIONS: Array<{ key: keyof Pick<ExploreFilters, 'available' | 'verified' | 'featured' | 'offers' | 'incall' | 'outcall'>; label: string }> = [
   { key: 'available', label: 'Available Now' },
-  { key: 'verified', label: 'Verified' },
+  { key: 'verified', label: 'Active' },
   { key: 'featured', label: 'Featured' },
   { key: 'offers', label: 'Offers' },
   { key: 'incall', label: 'In-Call' },
