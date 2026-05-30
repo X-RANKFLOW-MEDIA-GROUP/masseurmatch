@@ -75,3 +75,6 @@ audit.py
 # Planning docs (use GitHub Issues or /docs instead)
 issue-*.md
 *-pages.txt
+
+.vercel
+.vscode/
