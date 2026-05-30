@@ -48,15 +48,7 @@ export default function ProLayoutClient({
     }
   }, [loading, router, user]);
 
-  if (loading) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
-  if (!user) {
+  if (!loading && !user) {
     return null;
   }
 
@@ -158,7 +150,13 @@ export default function ProLayoutClient({
         ) : null}
       </AnimatePresence>
 
-      <main className="flex-1 overflow-y-auto bg-slate-50 pt-14 md:pt-0">{children}</main>
+      <main className="flex-1 overflow-y-auto bg-slate-50 pt-14 md:pt-0">
+        {loading ? (
+          <div className="flex min-h-[50vh] items-center justify-center">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          </div>
+        ) : children}
+      </main>
     </div>
   );
 }

@@ -10,22 +10,36 @@ export const DEFAULT_SOCIAL_HANDLE = "@masseurmatch";
 export const appUrl = SITE_URL;
 
 export const DEFAULT_KEYWORDS = [
-  "massage therapists",
+  // Core brand & directory
+  "MasseurMatch",
   "massage therapist directory",
-  "massage therapists near me",
+  "male massage therapist directory",
   "verified massage therapists",
+  "massage therapists near me",
+  "male massage near me",
+  // LGBTQ
   "LGBTQ massage directory",
   "LGBTQ affirming massage therapists",
   "gay massage directory",
+  "gay friendly massage therapist",
+  // Services
   "male massage therapist",
-  "massage by state",
-  "massage by city",
   "outcall massage",
   "incall massage",
   "sports massage",
   "deep tissue massage",
   "swedish massage",
+  "mobile massage therapist",
+  // Discovery
+  "massage by state",
+  "massage by city",
   "premium wellness directory",
+  // Competitor alternatives — people searching these are high-intent users
+  "MasseurFinder alternative",
+  "RentMasseur alternative",
+  "MassageFinder alternative",
+  "FindAMasseur alternative",
+  "niche massage directory",
 ];
 
 type PageMetadataInput = {

@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { z } from "zod";
 
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";

@@ -273,16 +273,16 @@ export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTher
 
   if (!error && profile) {
     const { data: photos } = await supabase
-      .from("therapist_photos")
-      .select("public_url, photo_type")
+      .from("profile_photos")
+      .select("storage_path, is_primary")
       .eq("profile_id", profile.id)
-      .eq("status", "approved")
+      .eq("moderation_status", "approved")
       .order("sort_order", { ascending: true });
 
-    const profile_photo = photos?.find((p) => p.photo_type === "profile")?.public_url ?? undefined;
+    const profile_photo = photos?.find((p) => p.is_primary)?.storage_path ?? undefined;
     const gallery_photos = photos
-      ?.filter((p) => p.photo_type === "gallery" && p.public_url)
-      .map((p) => p.public_url as string);
+      ?.filter((p) => !p.is_primary && p.storage_path)
+      .map((p) => p.storage_path as string);
 
     const therapist = profile as unknown as PublicTherapist;
 
@@ -308,11 +308,11 @@ export const getImportedReviews = async (profileId: string, limit = 5) => {
 export const getProfilePhotos = async (profileId: string, limit = 6) => {
   const fallback = (FALLBACK_PUBLIC_THERAPISTS as PublicTherapist[]).find((profile) => profile.id === profileId);
   const { data, error } = await supabase
-    .from("therapist_photos")
-    .select("id, public_url, storage_path, photo_type")
+    .from("profile_photos")
+    .select("id, storage_path, is_primary, sort_order")
     .eq("profile_id", profileId)
-    .eq("status", "approved")
-    .order("photo_type", { ascending: true })
+    .eq("moderation_status", "approved")
+    .order("sort_order", { ascending: true })
     .limit(limit);
 
   if (error || !data?.length) {
@@ -320,11 +320,13 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
     return [{ id: `${fallback.id}-avatar`, storage_path: fallback.avatar_url, is_primary: true }];
   }
 
-  return data.map((p) => ({
-    id: p.id,
-    storage_path: p.public_url || p.storage_path,
-    is_primary: p.photo_type === "profile",
-  }));
+  return data
+    .filter((p): p is typeof p & { storage_path: string } => p.storage_path != null)
+    .map((p) => ({
+      id: p.id,
+      storage_path: p.storage_path,
+      is_primary: p.is_primary ?? false,
+    }));
 };
 
 export async function getCityInventoryCount(cityName: string): Promise<number> {

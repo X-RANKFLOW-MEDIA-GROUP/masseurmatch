@@ -11,10 +11,9 @@ import type { Database, Json } from "@/integrations/supabase/types";
 export type AppRole = "admin" | "provider" | "client";
 
 function normalizeAppRole(role: unknown): AppRole | null {
-  if (role === "admin" || role === "provider" || role === "client") {
-    return role;
-  }
-
+  if (role === "admin") return "admin";
+  if (role === "provider" || role === "therapist" || role === "masseur") return "provider";
+  if (role === "client") return "client";
   return null;
 }
 

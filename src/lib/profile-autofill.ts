@@ -153,6 +153,15 @@ export const ZIP_AREA_LOOKUP: ZipAreaMatch[] = [
     serviceAreaCities: ["Orlando", "Winter Park", "Maitland", "Kissimmee", "Altamonte Springs"],
     landmarks: ["Lake Eola", "Thornton Park", "Creative Village"],
   },
+  {
+    zip: "75219",
+    city: "Dallas",
+    state: "TX",
+    primaryNeighborhood: "Oak Lawn",
+    neighborhoods: ["Oak Lawn", "Uptown", "Turtle Creek"],
+    serviceAreaCities: ["Dallas", "Highland Park", "University Park", "Irving", "Plano"],
+    landmarks: ["Oak Lawn", "Turtle Creek", "Katy Trail"],
+  },
 ];
 
 const ZIP_PREFIX_FALLBACKS: Record<string, ZipAreaMatch> = {
@@ -169,6 +178,7 @@ const ZIP_PREFIX_FALLBACKS: Record<string, ZipAreaMatch> = {
   "850": ZIP_AREA_LOOKUP[13],
   "200": ZIP_AREA_LOOKUP[14],
   "328": ZIP_AREA_LOOKUP[15],
+  "752": ZIP_AREA_LOOKUP[16],
 };
 
 export const PROFILE_RULES = [
@@ -238,7 +248,7 @@ export async function fetchZipByCode(zip: string): Promise<ZipLookupResult | nul
   // Check local cache first
   const cached = lookupZipArea(cleaned);
   if (cached) {
-    return { city: cached.city, state: cached.primaryNeighborhood ? cached.city : cached.city, stateAbbr: cached.state };
+    return { city: cached.city, state: cached.state, stateAbbr: cached.state };
   }
 
   try {
