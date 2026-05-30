@@ -4,9 +4,9 @@ import { motion } from "framer-motion";
 const TRUST_ITEMS = [
   {
     icon: ShieldCheck,
-    label: "Verified Profiles",
-    stat: "100%",
-    desc: "Identity verified",
+    label: "Active Profiles",
+    stat: "500+",
+    desc: "Profile reviewed",
     color: "text-blue-500",
     bg: "bg-blue-500/8",
     border: "border-blue-500/15",
@@ -36,7 +36,7 @@ const TRUST_ITEMS = [
     icon: UserCheck,
     label: "Trusted Reviews",
     stat: "4.9★",
-    desc: "From verified clients only",
+    desc: "From confirmed clients",
     color: "text-purple-500",
     bg: "bg-purple-500/8",
     border: "border-purple-500/15",
