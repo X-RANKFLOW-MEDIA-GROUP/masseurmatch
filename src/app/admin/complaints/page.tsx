@@ -52,9 +52,7 @@ export default function ComplaintsPage() {
       .then((data) => {
         setComplaints(data.complaints || []);
       })
-      .catch(() => {
-        console.error("[v0] Failed to load complaints");
-      })
+      .catch(() => { /* UI shows empty list */ })
       .finally(() => setLoading(false));
   }, [filter]);
 
