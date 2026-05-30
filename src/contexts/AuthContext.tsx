@@ -25,7 +25,7 @@ interface AuthContextType {
   subscription: SubscriptionState;
   refreshSubscription: () => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null; requiresEmailConfirmation?: boolean; message?: string }>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null; role?: "admin" | "provider" | "client" | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -224,7 +224,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         wait(CLIENT_SESSION_SYNC_TIMEOUT_MS),
       ]);
 
-      return { error: null };
+      return { error: null, role: result.role };
     } catch (error) {
       return { error: error as Error };
     }
