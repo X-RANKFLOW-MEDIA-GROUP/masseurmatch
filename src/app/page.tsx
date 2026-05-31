@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/app/_components/json-ld";
-import { HomeBackground } from "@/components/marketing/HomeBackground";
 import { Hero } from "@/components/marketing/Hero";
-import { ValuesMarquee } from "@/components/marketing/ValuesMarquee";
+import { CityMarquee } from "@/components/marketing/CityMarquee";
 import { StatsBand } from "@/components/marketing/StatsBand";
 import { CityCaseStudies } from "@/components/marketing/CityCaseStudies";
 import { FeaturedTherapistsEditorial } from "@/components/marketing/FeaturedTherapistsEditorial";
@@ -290,15 +289,17 @@ export default async function HomePage() {
         }}
       />
 
-      <div className="home-dark relative min-h-screen overflow-x-hidden">
-        <HomeBackground />
+      <div className="relative min-h-screen overflow-x-hidden bg-background">
+        {/* ── FIRST FOLD — dark navy ─────────────────────────────────── */}
+        <div className="home-dark relative">
+          {/* 1. Editorial hero */}
+          <Hero />
 
-        {/* 1. Editorial hero */}
-        <Hero />
+          {/* 2. Animated top-cities marquee */}
+          <CityMarquee />
+        </div>
 
-        {/* 2. Brand values ticker */}
-        <ValuesMarquee />
-
+        {/* ── LIGHT BODY ─────────────────────────────────────────────── */}
         {/* 3. Animated stats band */}
         <StatsBand />
 

@@ -31,7 +31,7 @@ export default function HeroClient() {
   const reducedMotion = useReducedMotion();
 
   return (
-    <section className="relative bg-background text-foreground">
+    <section className="relative overflow-hidden bg-background text-foreground">
       {!reducedMotion && (
         <style>{`
           @keyframes _blink{0%,100%{opacity:1}50%{opacity:0}}
@@ -43,7 +43,30 @@ export default function HeroClient() {
           ._dotcore{animation:_dotglow 2.4s ease-in-out infinite}
         `}</style>
       )}
-      <div className="mx-auto max-w-[1280px] px-4 pb-16 pt-24 sm:px-6 lg:px-8 lg:pb-20 lg:pt-28">
+
+      {/* ── Animated first-fold backdrop ─────────────────────────────── */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        {/* Faint grid, radially masked */}
+        <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,.7)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.7)_1px,transparent_1px)] [background-size:54px_54px] [mask-image:radial-gradient(ellipse_at_50%_35%,black,transparent_72%)]" />
+        {/* Orange aurora */}
+        <motion.div
+          className="absolute -right-[12%] -top-[18%] h-[60vw] max-h-[640px] w-[60vw] max-w-[640px] rounded-full blur-[90px]"
+          style={{ background: "radial-gradient(circle, rgba(255,138,31,0.42), transparent 65%)" }}
+          animate={reducedMotion ? undefined : { x: [0, 30, 0], y: [0, 24, 0], scale: [1, 1.08, 1] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        />
+        {/* Blue aurora */}
+        <motion.div
+          className="absolute -bottom-[22%] -left-[10%] h-[55vw] max-h-[580px] w-[55vw] max-w-[580px] rounded-full blur-[90px]"
+          style={{ background: "radial-gradient(circle, rgba(30,75,143,0.5), transparent 65%)" }}
+          animate={reducedMotion ? undefined : { x: [0, -26, 0], y: [0, -20, 0], scale: [1, 1.1, 1] }}
+          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+        />
+        {/* Soft top glow */}
+        <div className="absolute left-1/2 top-0 h-[40vh] w-[80vw] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,138,31,0.10),transparent_70%)] blur-2xl" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-[1280px] px-4 pb-16 pt-24 sm:px-6 lg:px-8 lg:pb-20 lg:pt-28">
         <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
           {/* ── Left: copy ─────────────────────────────────────────────── */}
           <div>
@@ -158,8 +181,8 @@ export default function HeroClient() {
               transition={{ duration: reducedMotion ? 0 : 0.7, ease: customEase, delay: reducedMotion ? 0 : TYPING_END + 0.1 }}
               className="speakable-intro mb-8 max-w-xl text-lg leading-relaxed text-muted-foreground lg:text-xl"
             >
-              Premium male massage therapists across the US. Screened profiles, licensed
-              professionals, real reviews — in Dallas, Houston, Miami, NYC, and 80+ cities.
+              Premium male massage therapists across the US — real profiles, real reviews,
+              and AI-powered search with Knotty. Dallas, Houston, Miami, NYC, and 80+ cities.
             </motion.p>
 
             <motion.div
@@ -207,7 +230,7 @@ export default function HeroClient() {
         whileInView={{ clipPath: "inset(0% 0 0 0)" }}
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: reducedMotion ? 0 : 1.0, ease: customEase }}
-        className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-video lg:aspect-[21/9]"
+        className="relative z-10 aspect-[4/3] w-full overflow-hidden sm:aspect-video lg:aspect-[21/9]"
       >
         <Image
           src="/marketing/hero/cover.jpg"
