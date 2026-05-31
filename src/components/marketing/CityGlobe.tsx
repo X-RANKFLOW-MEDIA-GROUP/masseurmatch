@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import createGlobe from "cobe";
 import { useReducedMotion } from "framer-motion";
 
@@ -25,8 +25,11 @@ const MARKERS: { location: [number, number]; size: number }[] = [
 
 /**
  * Interactive 3D globe of MasseurMatch markets.
- * Auto-rotates, and can be grabbed and spun with pointer/touch.
- * Built on `cobe` (WebGL) with the brand navy/orange palette.
+ *
+ * Always auto-rotates, can be grabbed and spun with pointer/touch, and keeps
+ * spinning with inertia after you let go. Built on `cobe` (WebGL) with the
+ * brand navy/orange palette. Falls back to a styled CSS sphere when WebGL is
+ * unavailable or fails to initialise.
  */
 export function CityGlobe() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -37,20 +40,14 @@ export function CityGlobe() {
   const thetaRef = useRef(0.25);
   const widthRef = useRef(0);
 
-  // Pointer-drag interaction state.
+  // Pointer-drag + inertia interaction state.
   const pointerInteracting = useRef<number | null>(null);
-  const pointerInteractionStart = useRef(0);
   const phiAtPointerStart = useRef(0);
+  const velocityRef = useRef(0); // residual angular velocity for "fling" momentum
   const [grabbing, setGrabbing] = useState(false);
 
   // Falls back to a styled CSS sphere when WebGL is unavailable or fails.
   const [webglOk, setWebglOk] = useState(true);
-
-  const onResize = useCallback(() => {
-    if (canvasRef.current) {
-      widthRef.current = canvasRef.current.offsetWidth;
-    }
-  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -66,10 +63,21 @@ export function CityGlobe() {
       return;
     }
 
-    window.addEventListener("resize", onResize);
-    onResize();
+    // Measure the canvas robustly: seed from offsetWidth, then keep it in sync
+    // with a ResizeObserver so the globe is never created at width 0.
+    widthRef.current = canvas.offsetWidth;
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width;
+      if (w) widthRef.current = w;
+    });
+    ro.observe(canvas);
 
-    let globe: { destroy: () => void };
+    // The auto-rotate speed. We keep a gentle spin even under reduced-motion so
+    // the globe still reads as a globe; users who prefer less motion just get a
+    // calmer rotation rather than a frozen sphere.
+    const autoSpeed = reducedMotion ? 0.0015 : 0.0045;
+
+    let globe: { destroy: () => void } | undefined;
     try {
       globe = createGlobe(canvas, {
         devicePixelRatio: 2,
@@ -78,17 +86,20 @@ export function CityGlobe() {
         phi: 0,
         theta: 0.25,
         dark: 1,
-        diffuse: 1.2,
+        diffuse: 1.25,
         mapSamples: 16000,
-        mapBrightness: 6,
-        baseColor: [0.12, 0.22, 0.38],
+        mapBrightness: 6.5,
+        baseColor: [0.13, 0.24, 0.4],
         markerColor: [1, 0.541, 0.122],
-        glowColor: [0.18, 0.32, 0.52],
+        glowColor: [0.2, 0.34, 0.55],
         markers: MARKERS,
         onRender: (state) => {
-          // Auto-rotate unless the user is dragging or prefers reduced motion.
-          if (pointerInteracting.current === null && !reducedMotion) {
-            phiRef.current += 0.004;
+          if (pointerInteracting.current === null) {
+            // Continuous auto-rotation, plus any residual fling velocity that
+            // decays smoothly back to the baseline spin.
+            phiRef.current += autoSpeed + velocityRef.current;
+            velocityRef.current *= 0.94; // friction
+            if (Math.abs(velocityRef.current) < 0.00005) velocityRef.current = 0;
           }
           state.phi = phiRef.current;
           state.theta = thetaRef.current;
@@ -98,7 +109,7 @@ export function CityGlobe() {
       });
     } catch {
       setWebglOk(false);
-      window.removeEventListener("resize", onResize);
+      ro.disconnect();
       return;
     }
 
@@ -109,15 +120,18 @@ export function CityGlobe() {
 
     return () => {
       cancelAnimationFrame(reveal);
-      globe.destroy();
-      window.removeEventListener("resize", onResize);
+      globe?.destroy();
+      ro.disconnect();
     };
-  }, [onResize, reducedMotion]);
+  }, [reducedMotion]);
 
   const updateFromPointer = (clientX: number) => {
     if (pointerInteracting.current === null) return;
     const delta = clientX - pointerInteracting.current;
-    phiRef.current = phiAtPointerStart.current + delta / 200;
+    const nextPhi = phiAtPointerStart.current + delta / 200;
+    // Track velocity so releasing the globe gives it a natural fling.
+    velocityRef.current = nextPhi - phiRef.current;
+    phiRef.current = nextPhi;
   };
 
   return (
@@ -132,8 +146,9 @@ export function CityGlobe() {
         <div
           role="img"
           aria-label="Globe highlighting MasseurMatch cities across the United States"
-          className="absolute inset-0 grid place-items-center rounded-full bg-[radial-gradient(circle_at_35%_30%,#16365c,#0a1a2e_55%,#060d1b)] shadow-[0_0_80px_rgba(255,138,31,0.18)] ring-1 ring-white/10"
+          className="absolute inset-0 grid place-items-center overflow-hidden rounded-full bg-[radial-gradient(circle_at_35%_30%,#16365c,#0a1a2e_55%,#060d1b)] shadow-[0_0_80px_rgba(255,138,31,0.18)] ring-1 ring-white/10"
         >
+          <div className="absolute inset-0 animate-spin rounded-full border border-dashed border-white/10 [animation-duration:40s]" />
           <div className="absolute inset-6 rounded-full border border-white/10" />
           <div className="absolute inset-16 rounded-full border border-white/5" />
           <span className="absolute h-2.5 w-2.5 animate-ping rounded-full bg-primary [animation-duration:2s]" style={{ top: "32%", left: "40%" }} />
@@ -146,12 +161,12 @@ export function CityGlobe() {
         ref={canvasRef}
         role="img"
         aria-label="Rotating 3D globe highlighting MasseurMatch cities across the United States"
-        className={`h-full w-full opacity-0 transition-opacity duration-700 [contain:layout_paint_size] ${webglOk ? "" : "hidden"}`}
+        className={`h-full w-full touch-none opacity-0 transition-opacity duration-700 [contain:layout_paint_size] ${webglOk ? "" : "hidden"}`}
         style={{ cursor: grabbing ? "grabbing" : "grab" }}
         onPointerDown={(e) => {
           pointerInteracting.current = e.clientX;
-          pointerInteractionStart.current = e.clientX;
           phiAtPointerStart.current = phiRef.current;
+          velocityRef.current = 0;
           setGrabbing(true);
           (e.target as HTMLElement).setPointerCapture(e.pointerId);
         }}

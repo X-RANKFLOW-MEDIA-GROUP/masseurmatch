@@ -6,6 +6,7 @@ import { ValuesMarquee } from "@/components/marketing/ValuesMarquee";
 import { StatsBand } from "@/components/marketing/StatsBand";
 import { CityCaseStudies } from "@/components/marketing/CityCaseStudies";
 import { FeaturedTherapistsEditorial } from "@/components/marketing/FeaturedTherapistsEditorial";
+import { MeetKnotty } from "@/components/marketing/MeetKnotty";
 import { WhyUsSplit } from "@/components/marketing/WhyUsSplit";
 import { PricingToggle } from "@/components/marketing/PricingToggle";
 import { HomeSeoLanding } from "@/app/_components/home-seo-landing";
@@ -306,6 +307,9 @@ export default async function HomePage() {
 
         {/* 5. Featured therapist profiles */}
         <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
+
+        {/* 5b. Meet Knotty — AI assistant */}
+        <MeetKnotty />
 
         {/* 6. Why Us split with giant stats */}
         <WhyUsSplit />

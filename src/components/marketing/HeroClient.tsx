@@ -33,7 +33,15 @@ export default function HeroClient() {
   return (
     <section className="relative bg-background text-foreground">
       {!reducedMotion && (
-        <style>{`@keyframes _blink{0%,100%{opacity:1}50%{opacity:0}}._cursor{animation:_blink 0.65s step-end infinite}`}</style>
+        <style>{`
+          @keyframes _blink{0%,100%{opacity:1}50%{opacity:0}}
+          ._cursor{animation:_blink 0.65s step-end infinite}
+          @keyframes _dotping{0%{transform:scale(1);opacity:.55}70%,100%{transform:scale(2.6);opacity:0}}
+          ._dotping{animation:_dotping 2.4s cubic-bezier(0,0,.2,1) infinite}
+          ._dotping2{animation:_dotping 2.4s cubic-bezier(0,0,.2,1) infinite 1.2s}
+          @keyframes _dotglow{0%,100%{box-shadow:0 0 14px 2px rgba(255,138,31,.35)}50%{box-shadow:0 0 24px 6px rgba(255,138,31,.6)}}
+          ._dotcore{animation:_dotglow 2.4s ease-in-out infinite}
+        `}</style>
       )}
       <div className="mx-auto max-w-[1280px] px-4 pb-16 pt-24 sm:px-6 lg:px-8 lg:pb-20 lg:pt-28">
         <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
@@ -112,11 +120,21 @@ export default function HeroClient() {
                           ? {}
                           : {
                               hidden: { opacity: 0, scale: 0 },
-                              visible: { opacity: 1, scale: 1, transition: { duration: 0.25, ease: customEase } },
+                              visible: { opacity: 1, scale: 1, transition: { duration: 0.35, ease: customEase } },
                             }
                       }
-                      className="ml-2 inline-flex h-[0.9em] w-[0.9em] rounded-full bg-primary align-middle"
-                    />
+                      className="relative ml-2 inline-flex h-[0.8em] w-[0.8em] align-middle"
+                    >
+                      {/* Expanding "live signal" rings */}
+                      {!reducedMotion && (
+                        <>
+                          <span className="_dotping absolute inset-0 rounded-full bg-primary/60" />
+                          <span className="_dotping2 absolute inset-0 rounded-full bg-primary/40" />
+                        </>
+                      )}
+                      {/* Core dot with a soft breathing glow */}
+                      <span className="_dotcore relative inline-block h-full w-full rounded-full bg-primary" />
+                    </motion.span>
                   )}
 
                   {i === headlineLines.length - 1 && !reducedMotion && (
