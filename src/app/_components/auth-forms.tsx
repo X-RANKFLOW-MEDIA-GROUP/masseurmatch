@@ -164,7 +164,7 @@ export function AuthForms({
     const destination = !isLogin
       ? "/pro/onboard"
       : role === "client"
-        ? "/"
+        ? "/dashboard"
         : sanitizedRedirectTo;
     window.location.href = destination;
   };
