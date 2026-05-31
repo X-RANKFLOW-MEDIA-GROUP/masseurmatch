@@ -1,7 +1,7 @@
 import InfiniteMarquee from "@/components/motion/InfiniteMarquee";
 
 const VALUES = [
-  "Verified Therapists",
+  "Trusted Therapists",
   "Background Checked",
   "Licensed Professionals",
   "LGBTQ+ Affirming",

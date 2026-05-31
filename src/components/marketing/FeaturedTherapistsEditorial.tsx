@@ -34,7 +34,7 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
               Featured profiles
             </p>
             <h2 className="mt-2 font-display text-[clamp(1.75rem,3.5vw,3rem)] font-extrabold leading-[0.95] tracking-tight">
-              Verified. Rated. Ready.
+              Trusted. Rated. Ready.
             </h2>
           </div>
           <Link
@@ -62,7 +62,7 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
               <FadeUp key={profileHref} delay={i * 0.07}>
                 <Link
                   href={profileHref}
-                  className="group block overflow-hidden rounded-2xl bg-card border border-border/60 transition-all duration-300 hover:border-border hover:shadow-lg"
+                  className="group block overflow-hidden rounded-2xl glass-card transition-all duration-300 hover:border-white/12 hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
                 >
                   {/* Portrait image */}
                   <div className="relative aspect-[3/4] overflow-hidden bg-muted">
@@ -80,9 +80,9 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
                       </div>
                     )}
                     {isVerified && (
-                      <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-background/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">
+                      <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full glass-dark px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">
                         <BadgeCheck className="h-3 w-3 text-primary" />
-                        Verified
+                        Pro
                       </div>
                     )}
                   </div>

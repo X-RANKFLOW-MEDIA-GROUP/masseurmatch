@@ -30,49 +30,43 @@ export function CityCaseStudies({ launchCities }: Props) {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:gap-4">
           {launchCities.map((entry, i) => (
             <motion.div
               key={entry.href}
-              initial={{ opacity: 0, scale: 0.96 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay: i * 0.05 }}
             >
-              <Link
-                href={entry.href}
-                className="group relative block aspect-square overflow-hidden rounded-2xl bg-[#0a1628]"
-              >
-                {/* Fallback ghost name */}
-                <span className="pointer-events-none absolute inset-0 flex items-center justify-center font-display text-4xl font-extrabold uppercase text-white/[0.06] select-none">
-                  {entry.city.name.split(" ")[0]}
-                </span>
-
-                {/* City image */}
-                <Image
-                  src={`/marketing/cities/${entry.city.slug}.jpg`}
-                  alt={`${entry.city.name} massage therapists`}
-                  fill
-                  className="object-cover object-center transition-transform duration-500 ease-out group-hover:scale-[1.06]"
-                  sizes="(max-width: 640px) 50vw, 25vw"
-                />
-
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent transition-opacity duration-300 group-hover:from-black/85" />
-
-                {/* Bottom label */}
-                <div className="absolute bottom-0 left-0 right-0 p-3.5">
-                  <p className="font-display text-base font-bold leading-none text-white lg:text-lg">
-                    {entry.city.name}
-                  </p>
-                  <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-white/50">
-                    {entry.city.stateCode} · {entry.routeCount} routes
-                  </p>
+              <Link href={entry.href} className="group block">
+                {/* Square image frame */}
+                <div className="relative aspect-square overflow-hidden rounded-2xl bg-[#060f1e] ring-1 ring-white/5 transition-all duration-300 group-hover:ring-primary/30 group-hover:shadow-[0_0_24px_rgba(255,138,31,0.12)]">
+                  <Image
+                    src={`/marketing/cities/${entry.city.slug}.svg`}
+                    alt={`${entry.city.name} massage therapists`}
+                    fill
+                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                    sizes="(max-width: 640px) 50vw, 25vw"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = `/marketing/cities/${entry.city.slug}.jpg`;
+                    }}
+                  />
+                  {/* Hover arrow */}
+                  <div className="absolute right-2.5 top-2.5 grid h-6 w-6 place-items-center rounded-full border border-white/0 bg-white/0 text-[10px] text-white/0 transition-all duration-300 group-hover:border-white/20 group-hover:bg-white/10 group-hover:text-white">
+                    ↗
+                  </div>
                 </div>
 
-                {/* Top-right arrow — appears on hover */}
-                <div className="absolute right-3 top-3 grid h-7 w-7 place-items-center rounded-full border border-white/20 bg-white/0 text-[11px] text-white/0 transition-all duration-300 group-hover:bg-white/15 group-hover:text-white">
-                  ↗
+                {/* City name below */}
+                <div className="mt-3 px-0.5">
+                  <p className="font-display text-base font-bold leading-none lg:text-lg">
+                    {entry.city.name}
+                  </p>
+                  <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                    {entry.city.stateCode} · {entry.routeCount} routes
+                  </p>
                 </div>
               </Link>
             </motion.div>

@@ -73,7 +73,7 @@ export default function HeroClient() {
             }}
             className="text-sm md:text-base text-muted-foreground font-medium whitespace-nowrap"
           >
-            500+ Verified Therapists nationwide
+            500+ Professional Therapists nationwide
           </motion.span>
         </div>
 
@@ -155,7 +155,7 @@ export default function HeroClient() {
           }}
           className="max-w-xl text-lg lg:text-xl text-muted-foreground leading-relaxed mb-10 lg:mb-12"
         >
-          Verified male massage therapists across the US. Background-checked profiles, licensed professionals, real reviews. Find your therapist in Dallas, Houston, Miami, NYC, and 80+ cities.
+          Premium male massage therapists across the US. Screened profiles, licensed professionals, real reviews. Find your therapist in Dallas, Houston, Miami, NYC, and 80+ cities.
         </motion.p>
 
         <motion.div

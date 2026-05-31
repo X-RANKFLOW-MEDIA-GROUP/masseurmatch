@@ -39,7 +39,7 @@ export function WhyUsSplit() {
               </div>
 
               {/* Top badge */}
-              <div className="absolute right-5 top-5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 backdrop-blur-sm">
+              <div className="absolute right-5 top-5 rounded-full glass-dark px-3 py-1.5">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-white">
                   MasseurMatch Standard
                 </p>

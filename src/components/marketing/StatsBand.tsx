@@ -4,7 +4,7 @@ import Counter from "@/components/motion/Counter";
 import FadeUp from "@/components/motion/FadeUp";
 
 const STATS = [
-  { value: 500, suffix: "+", label: "Verified profiles" },
+  { value: 500, suffix: "+", label: "Professional profiles" },
   { value: 80, suffix: "+", label: "US cities" },
   { value: 1200, suffix: "+", label: "Service routes" },
   { value: 4.9, suffix: "★", label: "Avg. rating" },
