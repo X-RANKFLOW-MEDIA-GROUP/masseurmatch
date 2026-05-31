@@ -45,9 +45,9 @@ export async function GET(request: NextRequest) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+    .select("role, display_name, headline")
+    .eq("user_id", user.id)
+    .maybeSingle();
 
   const role = (profile?.role as "admin" | "provider" | "client" | null) ?? null;
 
@@ -57,7 +57,16 @@ export async function GET(request: NextRequest) {
     role,
   });
 
-  const redirectResponse = NextResponse.redirect(`${origin}${safeNext}`);
+  // Redirect new OAuth users (no display name or headline set) to onboarding,
+  // unless they explicitly requested a different destination via the `next` param.
+  const isNewProfile = !profile?.display_name && !profile?.headline;
+  const requestedOnboard = safeNext === "/pro/onboard";
+  const destination =
+    isNewProfile && !requestedOnboard && safeNext === "/pro/dashboard"
+      ? "/pro/onboard"
+      : safeNext;
+
+  const redirectResponse = NextResponse.redirect(`${origin}${destination}`);
   redirectResponse.headers.append("Set-Cookie", sessionCookieHeader);
   return redirectResponse;
 }

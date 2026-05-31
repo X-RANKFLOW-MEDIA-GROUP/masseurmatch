@@ -173,7 +173,7 @@ alter table public.profiles
   add column if not exists last_active_at timestamptz;
 
 alter table public.profiles drop constraint if exists profiles_status_check;
-alter table public.profiles add constraint profiles_status_check check (status in ('draft','pending','pending_approval','submitted','under_review','approved','suspended','rejected','changes_requested'));
+alter table public.profiles add constraint profiles_status_check check (status in ('draft','pending','pending_approval','under_review','approved','suspended','rejected','changes_requested'));
 alter table public.profiles drop constraint if exists profiles_profile_status_check;
 alter table public.profiles add constraint profiles_profile_status_check check (profile_status in ('draft','pending','pending_approval','under_review','approved','suspended','rejected','changes_requested'));
 alter table public.profiles drop constraint if exists profiles_subscription_tier_check;
