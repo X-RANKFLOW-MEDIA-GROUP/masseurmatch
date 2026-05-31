@@ -8,6 +8,67 @@ function getStripe() {
   return new Stripe(key, { apiVersion: '2025-08-27.basil' })
 }
 
+// Map plan keys (from subscription metadata) to profile tier values.
+function planKeyToTier(planKey: string | undefined | null): string {
+  if (planKey === 'standard') return 'standard'
+  if (planKey === 'pro') return 'pro'
+  if (planKey === 'elite') return 'elite'
+  return 'free'
+}
+
+// Photo limits per subscription tier.
+const PHOTO_LIMITS: Record<string, number> = {
+  free: 2,
+  standard: 6,
+  pro: 12,
+  elite: 20,
+}
+
+// Visibility levels per subscription tier.
+const VISIBILITY_LEVELS: Record<string, number> = {
+  free: 1,
+  standard: 2,
+  pro: 3,
+  elite: 4,
+}
+
+// Build the profile update payload for a subscription sync.
+function buildTierUpdate(tier: string, sub: { id: string; customer?: string | Stripe.Customer | Stripe.DeletedCustomer | null }) {
+  const customerId =
+    typeof sub.customer === 'string' ? sub.customer : (sub.customer as Stripe.Customer | null)?.id ?? null
+
+  return {
+    subscription_tier: tier,
+    _tier: tier,
+    photo_limit: PHOTO_LIMITS[tier] ?? 2,
+    visibility_level: VISIBILITY_LEVELS[tier] ?? 1,
+    stripe_customer_id: customerId,
+    stripe_subscription_id: sub.id,
+    updated_at: new Date().toISOString(),
+  }
+}
+
+// Update the profiles row that belongs to a Stripe customer/subscription.
+// Resolves user_id from subscription metadata, falling back to stripe_customer_id lookup.
+async function syncSubscriptionToProfile(
+  supabase: ReturnType<typeof createSupabaseAdminClient>,
+  sub: Stripe.Subscription,
+  tier: string,
+) {
+  const userId = sub.metadata?.user_id
+  const update = buildTierUpdate(tier, sub)
+
+  if (userId) {
+    await supabase.from('profiles').update(update).eq('user_id', userId)
+    return
+  }
+
+  // Fall back to matching by stripe_customer_id.
+  if (update.stripe_customer_id) {
+    await supabase.from('profiles').update(update).eq('stripe_customer_id', update.stripe_customer_id)
+  }
+}
+
 export async function POST(request: NextRequest) {
   const stripe = getStripe()
   const body = await request.text()
@@ -23,6 +84,7 @@ export async function POST(request: NextRequest) {
   const supabase = createSupabaseAdminClient()
 
   switch (event.type) {
+    // ── Payment intent ───────────────────────────────────────────────────────
     case 'payment_intent.succeeded': {
       const pi = event.data.object as Stripe.PaymentIntent
       await supabase
@@ -38,6 +100,7 @@ export async function POST(request: NextRequest) {
       }
       break
     }
+
     case 'payment_intent.payment_failed': {
       const pi = event.data.object as Stripe.PaymentIntent
       await supabase
@@ -46,13 +109,69 @@ export async function POST(request: NextRequest) {
         .eq('stripe_payment_intent_id', pi.id)
       break
     }
-    case 'customer.subscription.updated':
-    case 'customer.subscription.deleted': {
+
+    // ── Checkout completed — sync tier on initial purchase ───────────────────
+    case 'checkout.session.completed': {
+      const session = event.data.object as Stripe.Checkout.Session
+      const subscriptionId =
+        typeof session.subscription === 'string' ? session.subscription : session.subscription?.id
+      const userId = session.metadata?.user_id
+      const planKey = session.metadata?.plan_key
+
+      if (!subscriptionId || !userId) break
+
+      const tier = planKeyToTier(planKey)
+      const customerId =
+        typeof session.customer === 'string' ? session.customer : (session.customer as Stripe.Customer | null)?.id ?? null
+
+      await supabase
+        .from('profiles')
+        .update({
+          subscription_tier: tier,
+          _tier: tier,
+          photo_limit: PHOTO_LIMITS[tier] ?? 2,
+          visibility_level: VISIBILITY_LEVELS[tier] ?? 1,
+          stripe_customer_id: customerId,
+          stripe_subscription_id: subscriptionId,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', userId)
+
+      break
+    }
+
+    // ── Subscription created — sync tier when a new subscription is created ──
+    case 'customer.subscription.created': {
       const sub = event.data.object as Stripe.Subscription
-      const status = event.type === 'customer.subscription.deleted' ? 'cancelled' : sub.status
+      const planKey = sub.metadata?.masseurmatch_plan
+      const tier = planKeyToTier(planKey)
+      await syncSubscriptionToProfile(supabase, sub, tier)
+      break
+    }
+
+    // ── Subscription updated — re-sync tier on plan changes ─────────────────
+    case 'customer.subscription.updated': {
+      const sub = event.data.object as Stripe.Subscription
+      const planKey = sub.metadata?.masseurmatch_plan
+      const tier = planKeyToTier(planKey)
+      await syncSubscriptionToProfile(supabase, sub, tier)
+
+      // Also update the legacy subscriptions table for backwards compatibility.
       await supabase
         .from('subscriptions')
-        .update({ status, updated_at: new Date().toISOString() })
+        .update({ status: sub.status, updated_at: new Date().toISOString() })
+        .eq('stripe_subscription_id', sub.id)
+      break
+    }
+
+    // ── Subscription deleted — downgrade to free ─────────────────────────────
+    case 'customer.subscription.deleted': {
+      const sub = event.data.object as Stripe.Subscription
+      await syncSubscriptionToProfile(supabase, sub, 'free')
+
+      await supabase
+        .from('subscriptions')
+        .update({ status: 'cancelled', updated_at: new Date().toISOString() })
         .eq('stripe_subscription_id', sub.id)
       break
     }
@@ -65,7 +184,7 @@ export async function POST(request: NextRequest) {
 
       const now = new Date().toISOString()
 
-      // Mark the verification row as verified
+      // Mark the verification row as verified.
       await supabase
         .from('identity_verifications')
         .update({ status: 'verified', updated_at: now })
@@ -83,7 +202,7 @@ export async function POST(request: NextRequest) {
           updated_at: now,
         })
         .eq('user_id', userId)
-        .in('status', ['pending_approval', 'under_review', 'submitted', 'changes_requested'])
+        .in('status', ['pending_approval', 'under_review', 'changes_requested'])
 
       break
     }
