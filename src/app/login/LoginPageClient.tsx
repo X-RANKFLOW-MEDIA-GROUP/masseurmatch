@@ -6,7 +6,7 @@ import { AuthForms } from "@/app/_components/auth-forms";
 import { useAuth } from "@/contexts/AuthContext";
 
 function sanitizeRedirectTo(value: string | null) {
-  const fallback = "/pro/dashboard";
+  const fallback = "/dashboard";
 
   if (!value) {
     return fallback;

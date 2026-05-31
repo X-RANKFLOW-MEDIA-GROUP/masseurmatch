@@ -10,7 +10,7 @@ import { resendConfirmationMutation } from "@/app/_lib/mutations";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-function SocialButtons({ label, redirectTo = "/pro/dashboard" }: { label: string; redirectTo?: string }) {
+function SocialButtons({ label, redirectTo = "/dashboard" }: { label: string; redirectTo?: string }) {
   const [loading, setLoading] = useState<string | null>(null);
 
   const handleOAuth = async (provider: "google" | "apple") => {
@@ -66,7 +66,7 @@ function OrDivider() {
 
 export function AuthForms({
   mode,
-  redirectTo = "/pro/dashboard",
+  redirectTo = "/dashboard",
 }: {
   mode: "login" | "register";
   redirectTo?: string;
@@ -84,7 +84,7 @@ export function AuthForms({
   const sanitizedRedirectTo =
     typeof redirectTo === "string" && redirectTo.startsWith("/") && !redirectTo.startsWith("//")
       ? redirectTo
-      : "/pro/dashboard";
+      : "/dashboard";
 
   const loginHref = `/login?redirect=${encodeURIComponent(sanitizedRedirectTo)}`;
   const registerHref = `/register?redirect=${encodeURIComponent(sanitizedRedirectTo)}`;
@@ -160,12 +160,7 @@ export function AuthForms({
     });
 
     // Use window.location for a full page navigation to ensure cookies are read properly
-    const role = (result as { role?: string | null }).role;
-    const destination = !isLogin
-      ? "/pro/onboard"
-      : role === "client"
-        ? "/dashboard"
-        : sanitizedRedirectTo;
+    const destination = isLogin ? sanitizedRedirectTo : "/pro/onboard";
     window.location.href = destination;
   };
 
