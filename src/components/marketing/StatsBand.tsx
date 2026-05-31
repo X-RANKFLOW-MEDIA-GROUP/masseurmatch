@@ -6,8 +6,8 @@ import FadeUp from "@/components/motion/FadeUp";
 const STATS = [
   { value: 500, suffix: "+", label: "Professional profiles" },
   { value: 80, suffix: "+", label: "US cities" },
-  { value: 1200, suffix: "+", label: "Service routes" },
-  { value: 4.9, suffix: "★", label: "Avg. rating" },
+  { value: 1200, suffix: "+", label: "Services listed" },
+  { value: 100, suffix: "%", label: "Licensed & screened" },
 ] as const;
 
 export function StatsBand() {
