@@ -194,7 +194,7 @@ export default function PhotoManagerPage() {
     if (remainingSlots <= 0) {
       toast({
         title: "Photo limit reached",
-        description: `Seu plano ${planLabel} permite ate ${maxPhotos} fotos.`,
+        description: `Your ${planLabel} plan allows up to ${maxPhotos} photos.`,
         variant: "destructive",
       });
       event.target.value = "";
@@ -457,10 +457,10 @@ export default function PhotoManagerPage() {
       <div className="grid gap-8 lg:grid-cols-[340px_minmax(0,1fr)]">
         <div className="space-y-6">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="font-display text-lg font-medium text-slate-900">Nova foto</h2>
+            <h2 className="font-display text-lg font-medium text-slate-900">New photo</h2>
             <p className="mt-2 font-sans text-sm text-slate-500">
-              Plano atual: <span className="font-semibold text-slate-900">{planLabel}</span>. Voce
-              pode manter ate <span className="font-semibold text-slate-900">{maxPhotos}</span> fotos.
+              Current plan: <span className="font-semibold text-slate-900">{planLabel}</span>. You
+              can keep up to <span className="font-semibold text-slate-900">{maxPhotos}</span> photos.
             </p>
 
             <button
@@ -498,8 +498,8 @@ export default function PhotoManagerPage() {
                   className="mt-1 h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
                 />
                 <span className="leading-relaxed">
-                  Confirmo que estas imagens nao contem nudez explicita, logos, dados de contato,
-                  marcas d agua ou elementos enganosos. Tambem concordo com as regras de imagem do{" "}
+                  I confirm these images contain no explicit nudity, logos, contact details,
+                  watermarks or misleading elements. I also agree to the image rules in the{" "}
                   <Link href="/legal" className="font-semibold text-slate-900 underline underline-offset-4">
                     Legal Center
                   </Link>
@@ -550,33 +550,33 @@ export default function PhotoManagerPage() {
                   >
                     <ShieldAlert className="h-4 w-4 text-sky-300" />
                   </motion.div>
-                  Sightengine lendo {scanLabel}
+                  Sightengine reading {scanLabel}
                 </>
               )}
 
               {uploadState === "uploaded" && (
                 <>
                   <Clock className="h-4 w-4" />
-                  Analise concluida
+                  Analysis complete
                 </>
               )}
             </button>
           </section>
 
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="font-display text-lg font-medium text-slate-900">Padrao visual</h2>
+            <h2 className="font-display text-lg font-medium text-slate-900">Visual standard</h2>
             <ul className="mt-4 space-y-4 font-sans text-sm text-slate-600">
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-                Use fotos nitidas, recentes e coerentes com seu atendimento real.
+                Use sharp, recent photos that match your real service.
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-                Inclua pelo menos uma foto de rosto e imagens do espaco de atendimento.
+                Include at least one face photo and images of the service space.
               </li>
               <li className="flex items-start gap-3">
                 <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" />
-                Evite qualquer overlay, QR code, telefone, logo ou marca d agua.
+                Avoid any overlay, QR code, phone number, logo or watermark.
               </li>
             </ul>
           </section>
@@ -640,7 +640,7 @@ export default function PhotoManagerPage() {
               <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-16 text-center">
                 <Camera className="mx-auto h-10 w-10 text-slate-300" />
                 <p className="mt-4 font-sans text-sm text-slate-500">
-                  Nenhuma foto nesta categoria ainda.
+                  No photos in this category yet.
                 </p>
               </div>
             ) : (
@@ -696,7 +696,7 @@ export default function PhotoManagerPage() {
                         <p className="mt-1 font-sans text-xs leading-relaxed text-slate-500">
                           {photo.moderation_reason
                             ? photo.moderation_reason.split("_").join(" ")
-                            : "Sem observacoes da moderacao ate o momento."}
+                            : "No moderation notes yet."}
                         </p>
                       </div>
 
