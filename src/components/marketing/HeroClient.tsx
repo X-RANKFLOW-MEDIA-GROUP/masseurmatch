@@ -5,10 +5,10 @@ import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 
 const avatarStack = [
-  { id: 1, src: "/marketing/hero/avatar-1.jpg", alt: "Avatar 1" },
-  { id: 2, src: "/marketing/hero/avatar-2.jpg", alt: "Avatar 2" },
-  { id: 3, src: "/marketing/hero/avatar-3.jpg", alt: "Avatar 3" },
-  { id: 4, src: "/marketing/hero/avatar-4.jpg", alt: "Avatar 4" },
+  { id: 1, src: "/marketing/hero/avatar-1.jpg", alt: "Verified therapist", initials: "JM", color: "from-orange-500 to-amber-600" },
+  { id: 2, src: "/marketing/hero/avatar-2.jpg", alt: "Verified therapist", initials: "RK", color: "from-blue-600 to-indigo-700" },
+  { id: 3, src: "/marketing/hero/avatar-3.jpg", alt: "Verified therapist", initials: "AL", color: "from-teal-500 to-cyan-600" },
+  { id: 4, src: "/marketing/hero/avatar-4.jpg", alt: "Verified therapist", initials: "DV", color: "from-violet-600 to-purple-700" },
 ];
 
 const headlineLines = ["The", "Safest", "Massage", "Directory."];
@@ -47,13 +47,16 @@ export default function HeroClient() {
                   ease: customEase,
                   delay: reducedMotion ? 0 : 0.1 + index * 0.08,
                 }}
-                className="relative w-12 h-12 rounded-full ring-2 ring-background overflow-hidden flex-shrink-0"
+                className={`relative w-12 h-12 rounded-full ring-2 ring-background overflow-hidden flex-shrink-0 bg-gradient-to-br ${avatar.color} flex items-center justify-center`}
               >
+                <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white/80 select-none z-0">
+                  {avatar.initials}
+                </span>
                 <Image
                   src={avatar.src}
                   alt={avatar.alt}
                   fill
-                  className="object-cover"
+                  className="object-cover z-10"
                   sizes="48px"
                 />
               </motion.div>
@@ -70,7 +73,7 @@ export default function HeroClient() {
             }}
             className="text-sm md:text-base text-muted-foreground font-medium whitespace-nowrap"
           >
-            500+ Verified Therapists nationwide
+            500+ Professional Therapists nationwide
           </motion.span>
         </div>
 
@@ -152,7 +155,7 @@ export default function HeroClient() {
           }}
           className="max-w-xl text-lg lg:text-xl text-muted-foreground leading-relaxed mb-10 lg:mb-12"
         >
-          Verified male massage therapists across the US. Background-checked profiles, licensed professionals, real reviews. Find your therapist in Dallas, Houston, Miami, NYC, and 80+ cities.
+          Premium male massage therapists across the US. Screened profiles, licensed professionals, real reviews. Find your therapist in Dallas, Houston, Miami, NYC, and 80+ cities.
         </motion.p>
 
         <motion.div
@@ -163,7 +166,7 @@ export default function HeroClient() {
             ease: customEase,
             delay: reducedMotion ? 0 : TYPING_END + 0.25,
           }}
-          className="flex flex-wrap gap-4 mb-16 lg:mb-24"
+          className="flex flex-wrap gap-3 mb-12 lg:mb-16"
         >
           <Link
             href="/search"
@@ -187,7 +190,7 @@ export default function HeroClient() {
             ease: customEase,
             delay: reducedMotion ? 0 : 1.0,
           }}
-          className="relative w-screen -mx-[calc(50vw-50%)] aspect-video lg:aspect-[21/9] overflow-hidden"
+          className="relative w-screen -mx-[calc(50vw-50%)] aspect-[4/3] sm:aspect-video lg:aspect-[21/9] overflow-hidden"
         >
           <Image
             src="/marketing/hero/cover.jpg"
@@ -198,6 +201,7 @@ export default function HeroClient() {
             className="object-cover"
             sizes="100vw"
           />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/60" />
         </motion.div>
       </div>
     </section>

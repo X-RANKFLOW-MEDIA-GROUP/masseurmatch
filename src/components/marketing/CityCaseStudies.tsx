@@ -1,6 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import FadeUp from "@/components/motion/FadeUp";
+import { motion } from "framer-motion";
 import type { LaunchCityCard } from "@/lib/marketing/home-data";
 
 type Props = {
@@ -9,71 +11,65 @@ type Props = {
 
 export function CityCaseStudies({ launchCities }: Props) {
   return (
-    <section className="py-20 lg:py-32">
+    <section className="py-16 lg:py-24">
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
-        <div className="mb-12 lg:mb-16">
-          <p className="text-sm uppercase tracking-widest text-muted-foreground">City coverage</p>
-          <h2 className="mt-3 font-display text-[clamp(2.5rem,5vw,4.5rem)] font-extrabold leading-[0.95] tracking-tight">
-            Start with the strongest local pages.
-          </h2>
+        <div className="mb-8 flex items-end justify-between">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+              Top markets
+            </p>
+            <h2 className="mt-2 font-display text-[clamp(1.75rem,3.5vw,3rem)] font-extrabold leading-[0.95] tracking-tight">
+              Find your city.
+            </h2>
+          </div>
+          <Link
+            href="/cities"
+            className="hidden text-xs font-semibold uppercase tracking-widest text-primary transition hover:opacity-70 sm:block"
+          >
+            All cities →
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:gap-4">
           {launchCities.map((entry, i) => (
-            <FadeUp key={entry.href} delay={i * 0.08}>
-              <Link
-                href={entry.href}
-                className="group block rounded-3xl overflow-hidden bg-card border border-border transition-transform duration-300 hover:scale-[1.01]"
-              >
-                {/* City image */}
-                <div className="relative aspect-[16/10] overflow-hidden">
+            <motion.div
+              key={entry.href}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay: i * 0.05 }}
+            >
+              <Link href={entry.href} className="group block">
+                {/* Square image frame */}
+                <div className="relative aspect-square overflow-hidden rounded-2xl bg-[#060f1e] ring-1 ring-white/5 transition-all duration-300 group-hover:ring-primary/30 group-hover:shadow-[0_0_24px_rgba(255,138,31,0.12)]">
                   <Image
-                    src={`/marketing/cities/${entry.city.slug}.jpg`}
-                    alt={`${entry.city.name}, ${entry.city.stateCode} massage therapists`}
+                    src={`/marketing/cities/${entry.city.slug}.svg`}
+                    alt={`${entry.city.name} massage therapists`}
                     fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                    sizes="(max-width: 640px) 50vw, 25vw"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = `/marketing/cities/${entry.city.slug}.jpg`;
+                    }}
                   />
+                  {/* Hover arrow */}
+                  <div className="absolute right-2.5 top-2.5 grid h-6 w-6 place-items-center rounded-full border border-white/0 bg-white/0 text-[10px] text-white/0 transition-all duration-300 group-hover:border-white/20 group-hover:bg-white/10 group-hover:text-white">
+                    ↗
+                  </div>
                 </div>
 
-                {/* Card body */}
-                <div className="p-6 lg:p-8">
-                  {/* Route count pill */}
-                  <span className="inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-                    {entry.routeCount} live routes
-                  </span>
-
-                  {/* City name + state */}
-                  <h3 className="mt-4 font-display text-3xl font-bold lg:text-4xl">
+                {/* City name below */}
+                <div className="mt-3 px-0.5">
+                  <p className="font-display text-base font-bold leading-none lg:text-lg">
                     {entry.city.name}
-                    <span className="ml-2 text-lg font-normal text-muted-foreground">
-                      {entry.city.stateCode}
-                    </span>
-                  </h3>
-
-                  {/* Tag chips */}
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {entry.highlights.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border border-border px-3 py-1 text-xs"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Arrow link */}
-                  <p className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-primary">
-                    Open city page
-                    <span className="inline-block transition-transform duration-200 group-hover:translate-x-1">
-                      →
-                    </span>
+                  </p>
+                  <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                    {entry.city.stateCode} · {entry.routeCount} routes
                   </p>
                 </div>
               </Link>
-            </FadeUp>
+            </motion.div>
           ))}
         </div>
       </div>

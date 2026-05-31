@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#07111f"/><stop offset="100%" stop-color="#0b1c30"/>
+    </linearGradient>
+    <filter id="gblur"><feGaussianBlur stdDeviation="22"/></filter>
+  </defs>
+  <rect width="800" height="800" fill="url(#bg)"/>
+  <circle cx="400" cy="260" r="240" fill="#FF8A1F" opacity="0.06" filter="url(#gblur)"/>
+  <g stroke="#fff" stroke-opacity="0.04" stroke-width="1">
+    <line x1="0" y1="200" x2="800" y2="200"/><line x1="0" y1="400" x2="800" y2="400"/>
+    <line x1="0" y1="600" x2="800" y2="600"/><line x1="200" y1="0" x2="200" y2="800"/>
+    <line x1="400" y1="0" x2="400" y2="800"/><line x1="600" y1="0" x2="600" y2="800"/>
+  </g>
+  <!-- Space shuttle silhouette (subtle) -->
+  <polygon points="398,220 402,220 410,340 390,340" fill="#FF8A1F" opacity="0.18"/>
+  <path d="M385 310 Q382 360 388 360 L400 360 L412 360 Q418 360 415 310 Z" fill="#FF8A1F" opacity="0.12"/>
+  <!-- Exhaust glow -->
+  <ellipse cx="400" cy="375" rx="15" ry="25" fill="#FF8A1F" opacity="0.15" filter="url(#gblur)"/>
+  <!-- Houston skyline -->
+  <g fill="#122236" opacity="0.7">
+    <rect x="80" y="460" width="55" height="140"/><rect x="145" y="430" width="60" height="170"/>
+    <rect x="215" y="400" width="70" height="200"/><rect x="295" y="380" width="80" height="220"/>
+    <rect x="385" y="420" width="30" height="180"/><rect x="425" y="390" width="75" height="210"/>
+    <rect x="510" y="420" width="65" height="180"/><rect x="585" y="440" width="55" height="160"/>
+    <rect x="650" y="455" width="60" height="145"/>
+  </g>
+  <!-- NASA/space ring accent -->
+  <circle cx="400" cy="280" r="80" fill="none" stroke="#FF8A1F" stroke-width="1" opacity="0.15" stroke-dasharray="8 6"/>
+  <line x1="0" y1="600" x2="800" y2="600" stroke="#FF8A1F" stroke-width="1" opacity="0.15"/>
+  <text x="400" y="688" font-family="Georgia,serif" font-size="64" font-weight="700" fill="#FCFBF8" text-anchor="middle" letter-spacing="-1">HOUSTON</text>
+  <text x="400" y="724" font-family="Georgia,serif" font-size="16" fill="#FF8A1F" text-anchor="middle" letter-spacing="6">TEXAS</text>
+  <rect x="345" y="742" width="110" height="2" fill="#FF8A1F" opacity="0.5" rx="1"/>
+</svg>

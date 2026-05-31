@@ -50,7 +50,9 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --no-tags --prune --depth=1 origin "${GITHUB_REF}"
+          FETCH_REF="${GITHUB_HEAD_REF:+refs/heads/${GITHUB_HEAD_REF}}"
+          FETCH_REF="${FETCH_REF:-${GITHUB_REF}}"
+          git fetch --no-tags --prune --depth=1 origin "${FETCH_REF}"
           git checkout --force FETCH_HEAD
       - name: Install Node.js 24 and pnpm
         env:
@@ -89,7 +91,9 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --prune origin "${GITHUB_REF}"
+          FETCH_REF="${GITHUB_HEAD_REF:+refs/heads/${GITHUB_HEAD_REF}}"
+          FETCH_REF="${FETCH_REF:-${GITHUB_REF}}"
+          git fetch --prune origin "${FETCH_REF}"
           git checkout --force FETCH_HEAD
       - name: Install gitleaks (OSS)
         env:
@@ -113,7 +117,9 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --no-tags --prune --depth=1 origin "${GITHUB_REF}"
+          FETCH_REF="${GITHUB_HEAD_REF:+refs/heads/${GITHUB_HEAD_REF}}"
+          FETCH_REF="${FETCH_REF:-${GITHUB_REF}}"
+          git fetch --no-tags --prune --depth=1 origin "${FETCH_REF}"
           git checkout --force FETCH_HEAD
       - name: Install Node.js 24 and pnpm
         env:
@@ -151,7 +157,9 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --no-tags --prune --depth=1 origin "${GITHUB_REF}"
+          FETCH_REF="${GITHUB_HEAD_REF:+refs/heads/${GITHUB_HEAD_REF}}"
+          FETCH_REF="${FETCH_REF:-${GITHUB_REF}}"
+          git fetch --no-tags --prune --depth=1 origin "${FETCH_REF}"
           git checkout --force FETCH_HEAD
       - name: Install Node.js 24 and pnpm
         env:
@@ -190,7 +198,9 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --no-tags --prune --depth=1 origin "${GITHUB_REF}"
+          FETCH_REF="${GITHUB_HEAD_REF:+refs/heads/${GITHUB_HEAD_REF}}"
+          FETCH_REF="${FETCH_REF:-${GITHUB_REF}}"
+          git fetch --no-tags --prune --depth=1 origin "${FETCH_REF}"
           git checkout --force FETCH_HEAD
       - name: Install Node.js 24 and pnpm
         env:
@@ -221,6 +231,13 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: [build]
+    # Allow only one E2E run per ref at a time, but never cancel mid-run.
+    # The top-level concurrency group cancels fast jobs (lint/build) on new
+    # pushes; E2E is expensive enough that finishing the current run beats
+    # throwing it away and starting over.
+    concurrency:
+      group: e2e-${{ github.ref }}
+      cancel-in-progress: false
     env:
       PLAYWRIGHT_BASE_URL: ${{ vars.PLAYWRIGHT_BASE_URL }}
       # Optional: set as a GitHub secret when PLAYWRIGHT_BASE_URL points to a
@@ -238,7 +255,9 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --no-tags --prune --depth=1 origin "${GITHUB_REF}"
+          FETCH_REF="${GITHUB_HEAD_REF:+refs/heads/${GITHUB_HEAD_REF}}"
+          FETCH_REF="${FETCH_REF:-${GITHUB_REF}}"
+          git fetch --no-tags --prune --depth=1 origin "${FETCH_REF}"
           git checkout --force FETCH_HEAD
       - name: Install Node.js 24 and pnpm
         env:

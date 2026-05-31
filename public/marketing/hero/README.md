@@ -1,24 +1,25 @@
 # Hero Section Images
 
-This directory contains placeholder references for hero section images.
+## cover.jpg
+- **Status**: Selected — source file at `public/marketing/cover.JPG`
+- **Place at**: `public/marketing/hero/cover.jpg`
+- **Target size**: 1920 × 860 px (21:9), JPEG or WebP, ≤ 200 KB
+- **Scene**: Male massage therapist in black t-shirt performing back/shoulder work on a male client lying face-down on a dark massage table
+- **Setting**: Upscale luxury suite — floor-to-ceiling windows with night city skyline, multiple warm candles on a low side table and a rear shelf, ambient bottle/vase decor, indoor plant
+- **Lighting**: Dark and cinematic; primary warmth from candlelight (amber/gold), secondary from city lights (cool blue) through glass — no harsh studio light
+- **Color palette**: Deep navy, near-black charcoal, warm amber/gold highlights, earthy skin tones — matches site dark theme
+- **Composition**: Wide cinematic landscape crop; therapist slightly right of center; city view fills the left third; strong depth of field
 
-## Required Images
+### Optimization checklist before deploying
+- [ ] Resize to 1920 × 860 px
+- [ ] Export as WebP (prefer) or JPEG quality 80
+- [ ] Confirm file is ≤ 200 KB
+- [ ] Verify white hero text is legible over the darker left/center region
 
-### cover.jpg
-- **Size**: 2400x1029px (or responsive, maintaining 21:9 aspect ratio on desktop)
-- **Description**: Editorial photo of professional massage therapy in action. Should convey trust, professionalism, and wellness.
-- **Usage**: Full-bleed hero image below the headline and CTAs
-- **Status**: ⚠️ Placeholder — replace with actual editorial photo
+---
 
-### avatar-1.jpg through avatar-4.jpg
-- **Size**: 192x192px (rendered at 48x48px with -space-x-3)
+## avatar-1.jpg through avatar-4.jpg
+- **Size**: 192 × 192 px (rendered at 48 px, 2× retina)
 - **Description**: Headshots of diverse verified male massage therapists
-- **Usage**: Avatar stack in hero top section
+- **Usage**: Avatar stack in hero social-proof strip
 - **Status**: ⚠️ Placeholder — replace with actual therapist profile photos
-
-## Instructions
-
-1. Replace `cover.jpg` with your editorial hero photography
-2. Replace `avatar-1.jpg` through `avatar-4.jpg` with real therapist headshots
-3. Ensure all images are optimized for web (consider WebP format)
-4. Verify aspect ratios match specifications above

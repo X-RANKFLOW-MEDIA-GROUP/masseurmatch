@@ -58,6 +58,16 @@ repo_structure.txt
 *.webp
 *.avif
 
+# Allow marketing assets in public/
+!public/marketing/**/*.jpg
+!public/marketing/**/*.jpeg
+!public/marketing/**/*.png
+!public/marketing/**/*.gif
+!public/marketing/**/*.webp
+!public/marketing/**/*.avif
+!public/marketing/**/*.JPG
+!public/marketing/**/*.JPEG
+
 # Temp scripts
 fix_all.py
 audit.py
@@ -65,3 +75,6 @@ audit.py
 # Planning docs (use GitHub Issues or /docs instead)
 issue-*.md
 *-pages.txt
+
+.vercel
+.vscode/
