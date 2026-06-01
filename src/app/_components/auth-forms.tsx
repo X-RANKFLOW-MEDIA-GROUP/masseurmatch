@@ -160,7 +160,12 @@ export function AuthForms({
     });
 
     // Use window.location for a full page navigation to ensure cookies are read properly
-    const destination = isLogin ? sanitizedRedirectTo : "/pro/onboard";
+    const role = (result as { role?: string | null }).role;
+    const destination = !isLogin
+      ? "/pro/onboard"
+      : role === "client"
+        ? "/dashboard"
+        : sanitizedRedirectTo;
     window.location.href = destination;
   };
 
