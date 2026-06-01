@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { RouteError } from "@/app/api/_lib/http";
 import { createPageMetadata } from "@/app/_lib/metadata";
-import { requireRequestSession } from "@/app/_lib/session";
+import { parseSessionCookieValue } from "@/app/_lib/session";
 import ProLayoutClient from "./ProLayoutClient";
 
 export const metadata: Metadata = createPageMetadata({
@@ -15,22 +14,11 @@ export const metadata: Metadata = createPageMetadata({
 
 async function ensureProAccess() {
   const cookieStore = await cookies();
-  const cookieHeader = cookieStore.toString();
+  const rawValue = cookieStore.get("mm_session")?.value;
+  const session = parseSessionCookieValue(rawValue);
 
-  try {
-    requireRequestSession(
-      new Request("http://localhost/pro", {
-        headers: {
-          cookie: cookieHeader,
-        },
-      }),
-    );
-  } catch (error) {
-    if (error instanceof RouteError && error.status === 401) {
-      redirect("/login?redirect=%2Fpro%2Fdashboard");
-    }
-
-    redirect("/");
+  if (!session) {
+    redirect("/login?redirect=%2Fpro%2Fdashboard");
   }
 }
 

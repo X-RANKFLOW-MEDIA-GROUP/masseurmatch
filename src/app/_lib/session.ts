@@ -2,11 +2,12 @@ import { RouteError } from "@/app/api/_lib/http";
 import {
   clearSessionCookie,
   getRequestSession,
+  parseSessionCookieValue,
   setSessionCookie,
   type RequestSession,
 } from "@/app/api/_lib/session";
 
-export { clearSessionCookie, getRequestSession, setSessionCookie, type RequestSession };
+export { clearSessionCookie, getRequestSession, parseSessionCookieValue, setSessionCookie, type RequestSession };
 
 export function requireRequestSession(request: Request): RequestSession {
   const session = getRequestSession(request);
