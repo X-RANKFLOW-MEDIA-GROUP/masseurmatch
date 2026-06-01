@@ -50,7 +50,7 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --no-tags --prune --depth=1 origin "${GITHUB_REF}"
+          git fetch --no-tags --prune --depth=1 origin "${GITHUB_SHA}"
           git checkout --force FETCH_HEAD
       - name: Install Node.js 24 and pnpm
         env:
@@ -89,7 +89,7 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --prune origin "${GITHUB_REF}"
+          git fetch --no-tags --prune --depth=1 origin "${GITHUB_SHA}"
           git checkout --force FETCH_HEAD
       - name: Install gitleaks (OSS)
         env:
@@ -113,7 +113,7 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --no-tags --prune --depth=1 origin "${GITHUB_REF}"
+          git fetch --no-tags --prune --depth=1 origin "${GITHUB_SHA}"
           git checkout --force FETCH_HEAD
       - name: Install Node.js 24 and pnpm
         env:
@@ -151,7 +151,7 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --no-tags --prune --depth=1 origin "${GITHUB_REF}"
+          git fetch --no-tags --prune --depth=1 origin "${GITHUB_SHA}"
           git checkout --force FETCH_HEAD
       - name: Install Node.js 24 and pnpm
         env:
@@ -190,7 +190,7 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --no-tags --prune --depth=1 origin "${GITHUB_REF}"
+          git fetch --no-tags --prune --depth=1 origin "${GITHUB_SHA}"
           git checkout --force FETCH_HEAD
       - name: Install Node.js 24 and pnpm
         env:
@@ -245,7 +245,7 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --no-tags --prune --depth=1 origin "${GITHUB_REF}"
+          git fetch --no-tags --prune --depth=1 origin "${GITHUB_SHA}"
           git checkout --force FETCH_HEAD
       - name: Install Node.js 24 and pnpm
         env:
