@@ -3,9 +3,9 @@ import { SITE_URL, siteUrl } from "@/lib/site";
 import { buildCanonicalPath } from "@/app/_lib/route-normalization";
 
 export const SITE_NAME = "MasseurMatch";
-export const SITE_TAGLINE = "A national directory for verified, LGBTQ+-affirming massage therapists";
+export const SITE_TAGLINE = "A national directory for LGBTQ+-affirming independent massage therapists";
 export const SITE_DESCRIPTION =
-  "Find verified LGBTQ+-affirming massage therapists across the United States by state, city, specialty, incall, outcall, trust signals, and direct contact options.";
+  "Find LGBTQ+-affirming independent massage therapists across the United States by state, city, specialty, incall, outcall, trust signals, and direct contact options.";
 export const DEFAULT_SOCIAL_HANDLE = "@masseurmatch";
 export const appUrl = SITE_URL;
 
@@ -477,7 +477,7 @@ export const buildLocalBusinessJsonLd = ({
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   name: `${SITE_NAME} — ${cityName}`,
-  description: `Browse ${therapistCount} verified massage therapists in ${cityName}, ${stateName}. Compare specialties, trust signals, availability, and direct contact options.`,
+  description: `Browse ${therapistCount} independent massage therapists in ${cityName}, ${stateName}. Compare specialties, trust signals, availability, and direct contact options.`,
   url: siteUrl(path),
   address: {
     "@type": "PostalAddress",

@@ -187,6 +187,20 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
+  // ── 0. Supabase auth callback guard ─────────────────────────────────────
+  // Supabase sometimes sends the ?code= param to the site root URL instead of
+  // /auth/callback (e.g. when the Redirect URL in the Supabase dashboard is set
+  // to https://www.masseurmatch.com instead of https://www.masseurmatch.com/auth/callback).
+  // Forward it to the real handler so the session exchange can complete.
+  if (pathname === "/" && searchParams.has("code")) {
+    const callbackUrl = new URL("/auth/callback", request.url);
+    // Preserve all query params (code, next, error, etc.)
+    searchParams.forEach((value, key) => {
+      callbackUrl.searchParams.set(key, value);
+    });
+    return NextResponse.redirect(callbackUrl, { status: 302 });
+  }
+
   // ── 1. Removed routes → 301 redirects ───────────────────────────────────
   if (pathname === "/wireframes" || pathname.startsWith("/wireframes/")) {
     return permanentRedirect("/", request);

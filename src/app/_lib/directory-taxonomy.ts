@@ -25,10 +25,10 @@ export type SpecialtyKeyword = {
 export const DIRECTORY_SEGMENTS: DirectorySegment[] = [
   {
     slug: "verified-profiles",
-    label: "Verified male massage therapists",
-    shortLabel: "Verified",
+    label: "Active male massage therapists",
+    shortLabel: "Active",
     intro:
-      "Browse verified profiles first so city discovery starts with clearer trust signals, cleaner listings, and direct contact options.",
+      "Browse active profiles first so city discovery starts with clearer trust signals, cleaner listings, and direct contact options.",
     search: {
       verified: true,
     },
@@ -59,7 +59,7 @@ export const DIRECTORY_SEGMENTS: DirectorySegment[] = [
     label: "Gay massage therapists",
     shortLabel: "Gay massage",
     intro:
-      "Find verified, LGBTQ+-affirming male massage therapists who create genuinely safe therapeutic experiences for gay and queer clients.",
+      "Find LGBTQ+-affirming independent male massage therapists who create genuinely safe therapeutic experiences for gay and queer clients.",
     search: {
       keyword: "gay",
       lgbtqAffirming: true,

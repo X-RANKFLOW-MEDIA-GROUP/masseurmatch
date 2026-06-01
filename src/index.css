@@ -11,7 +11,7 @@
   --muted:  rgba(252,251,248,0.5);
   --line:   rgba(252,251,248,0.08);
 }
-/* Glassmorphism light utility */
+/* Glassmorphism utilities */
 .glass-card-light {
   background: rgb(255 255 255 / 0.60);
   backdrop-filter: blur(16px);
@@ -19,6 +19,26 @@
   border: 1px solid rgb(255 255 255 / 0.40);
   box-shadow: 0 8px 32px 0 rgb(31 38 135 / 0.10);
   border-radius: 1.5rem;
+}
+.glass-dark {
+  background: rgb(11 31 58 / 0.55);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid rgb(255 255 255 / 0.08);
+  box-shadow: 0 8px 40px 0 rgb(0 0 0 / 0.35);
+}
+.glass-card {
+  background: rgb(11 31 58 / 0.45);
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  border: 1px solid rgb(255 255 255 / 0.07);
+  box-shadow: 0 4px 24px 0 rgb(0 0 0 / 0.25);
+}
+.glass-surface {
+  background: rgb(255 255 255 / 0.035);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgb(255 255 255 / 0.06);
 }
 
 /* Blob animation delay utilities */
@@ -171,6 +191,28 @@
     --success-foreground: 0 0% 100%;
     --warning: 24 95% 53%;
     --warning-foreground: 0 0% 100%;
+  }
+
+  .home-dark {
+    --background: 214 68% 14%;
+    --foreground: 30 11% 98%;
+    --card: 214 60% 11%;
+    --card-foreground: 30 11% 98%;
+    --popover: 214 60% 11%;
+    --popover-foreground: 30 11% 98%;
+    --primary: 26 100% 56%;
+    --primary-foreground: 214 68% 8%;
+    --secondary: 214 40% 22%;
+    --secondary-foreground: 30 11% 98%;
+    --muted: 214 40% 18%;
+    --muted-foreground: 214 15% 62%;
+    --accent: 26 100% 56%;
+    --accent-foreground: 214 68% 8%;
+    --border: 214 25% 22%;
+    --input: 214 25% 22%;
+    --ring: 26 100% 56%;
+    background-color: #0B1F3A;
+    color: #FCFBF8;
   }
 
   /* Removed @apply border-border due to missing class in Tailwind config */

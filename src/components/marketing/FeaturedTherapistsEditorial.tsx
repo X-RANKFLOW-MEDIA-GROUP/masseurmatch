@@ -23,31 +23,32 @@ function buildLocationLabel(therapist: PublicTherapist) {
 }
 
 export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
+  if (!featuredTherapists.length) return null;
+
   return (
-    <section className="py-20 lg:py-32">
+    <section className="py-16 lg:py-24">
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
-        <div className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between lg:mb-16">
+        <div className="mb-8 flex items-end justify-between">
           <div>
-            <p className="text-sm uppercase tracking-widest text-muted-foreground">
+            <p className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
               Featured profiles
             </p>
-            <h2 className="mt-3 font-display text-[clamp(2.5rem,5vw,4.5rem)] font-extrabold leading-[0.95] tracking-tight">
-              Trust-led profiles with clear session details.
+            <h2 className="mt-2 font-display text-[clamp(1.75rem,3.5vw,3rem)] font-extrabold leading-[0.95] tracking-tight">
+              Trusted. Rated. Ready.
             </h2>
           </div>
           <Link
-            href="/safety"
-            className="shrink-0 text-sm font-semibold text-primary transition hover:underline"
+            href="/search"
+            className="hidden text-xs font-semibold uppercase tracking-widest text-primary transition hover:opacity-70 sm:block"
           >
-            Read safety guidance →
+            Browse all →
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
           {featuredTherapists.map((therapist, i) => {
             const profileHref = `/therapists/${therapist.slug || therapist.id}`;
-            const specialties = (therapist.specialties || []).slice(0, 3);
+            const specialties = (therapist.specialties || []).slice(0, 2);
             const isVerified =
               therapist.is_verified_identity || therapist.is_verified_profile;
             const initials = (therapist.display_name || therapist.full_name || "?")
@@ -58,75 +59,59 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
               .toUpperCase();
 
             return (
-              <FadeUp key={profileHref} delay={i * 0.08}>
+              <FadeUp key={profileHref} delay={i * 0.07}>
                 <Link
                   href={profileHref}
-                  className="group block rounded-2xl overflow-hidden bg-card border border-border"
+                  className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-[0_2px_12px_rgba(11,31,58,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_20px_50px_-12px_rgba(11,31,58,0.18)]"
                 >
-                  {/* Image — aspect 4/5 editorial portrait ratio */}
-                  <div className="relative aspect-[4/5] overflow-hidden bg-muted">
+                  {/* Portrait image */}
+                  <div className="relative aspect-[3/4] overflow-hidden bg-muted">
                     {therapist.avatar_url ? (
                       <Image
                         src={therapist.avatar_url}
-                        alt={
-                          therapist.display_name ||
-                          therapist.full_name ||
-                          "Featured therapist"
-                        }
+                        alt={therapist.display_name || therapist.full_name || "Therapist"}
                         fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       />
                     ) : (
-                      <div className="flex h-full items-center justify-center text-5xl font-bold text-muted-foreground/20">
+                      <div className="flex h-full items-center justify-center font-display text-6xl font-extrabold text-muted-foreground/10">
                         {initials}
                       </div>
                     )}
-
-                    {/* Verified badge overlay */}
                     {isVerified && (
-                      <div className="absolute left-4 top-4 flex items-center gap-1 rounded-full bg-background/90 px-3 py-1 text-xs backdrop-blur-sm">
-                        <BadgeCheck className="h-3.5 w-3.5 text-primary" />
-                        Verified
+                      <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full glass-dark px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">
+                        <BadgeCheck className="h-3 w-3 text-primary" />
+                        Pro
                       </div>
                     )}
                   </div>
 
                   {/* Card body */}
-                  <div className="p-6">
-                    <h3 className="font-display text-2xl font-bold leading-tight">
-                      {therapist.display_name ||
-                        therapist.full_name ||
-                        "Featured therapist"}
+                  <div className="p-4">
+                    <h3 className="font-display text-lg font-bold leading-tight">
+                      {therapist.display_name || therapist.full_name || "Therapist"}
                     </h3>
-                    <p className="mt-1 text-sm text-muted-foreground">
+                    <p className="mt-0.5 text-xs text-muted-foreground">
                       {buildLocationLabel(therapist)}
                     </p>
-
-                    {/* Modality chips */}
                     {specialties.length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-2">
+                      <div className="mt-3 flex flex-wrap gap-1.5">
                         {specialties.map((s) => (
                           <span
                             key={s}
-                            className="rounded-full border border-border px-3 py-1 text-xs"
+                            className="rounded-full border border-border/60 px-2.5 py-0.5 text-[10px] font-medium"
                           >
                             {s}
                           </span>
                         ))}
                       </div>
                     )}
-
-                    {/* Price + view profile link */}
-                    <div className="mt-6 flex items-center justify-between">
-                      <p className="text-sm font-semibold">
-                        {formatPrice(
-                          therapist.incall_price || therapist.outcall_price
-                        )}
+                    <div className="mt-4 flex items-center justify-between border-t border-border/40 pt-3">
+                      <p className="text-xs font-semibold text-muted-foreground">
+                        {formatPrice(therapist.incall_price || therapist.outcall_price)}
                       </p>
-                      <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary transition-[gap] duration-200 group-hover:gap-2">
-                        View profile →
-                      </span>
+                      <span className="text-xs font-bold text-primary">View →</span>
                     </div>
                   </div>
                 </Link>

@@ -45,9 +45,7 @@ export default function ApprovalStatusPage() {
           setProfile(data.profile);
         }
       })
-      .catch(() => {
-        console.error("[v0] Failed to load profile status");
-      })
+      .catch(() => { /* UI shows loading state */ })
       .finally(() => setLoading(false));
   }, [authLoading, user, router]);
 

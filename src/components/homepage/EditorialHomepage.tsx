@@ -73,7 +73,7 @@ const popularCities = [
 const marqueeKeywords = [
   "Deep Tissue Massage", "Swedish Massage", "Sports Recovery",
   "LGBTQ+ Affirming", "Outcall Massage", "Incall Massage",
-  "Mobile Massage", "Hotel Massage", "Verified Therapists",
+  "Mobile Massage", "Hotel Massage", "Independent Therapists",
   "Direct Contact", "Privacy First", "Zero Platform Fees",
   "New York", "Los Angeles", "Miami", "Chicago", "San Francisco", "Atlanta",
 ];
@@ -448,7 +448,7 @@ function TherapistCard({ therapist }: { therapist: Profile }) {
                   borderRadius: 3,
                 }}
               >
-                Verified
+                Active
               </span>
             )}
             {therapist.lgbtq_affirming && (
@@ -726,7 +726,7 @@ export function EditorialHomepage({
                 color: C.cream,
               }}
             >
-              Verified massage therapists{" "}
+              Independent massage therapists{" "}
               <br className="hidden sm:block" />
               <em style={{ color: C.orange, fontStyle: "italic" }}>
                 across the United States.
@@ -779,7 +779,7 @@ export function EditorialHomepage({
             >
               {(
                 [
-                  [String(totalTherapists > 0 ? totalTherapists : 500) + "+", "Verified Profiles"],
+                  [String(totalTherapists > 0 ? totalTherapists : 500) + "+", "Active Profiles"],
                   [String(cityCount > 0 ? cityCount : 50) + "+", "Cities"],
                   ["$0", "Platform Fees"],
                 ] as [string, string][]
@@ -1571,7 +1571,7 @@ export function EditorialHomepage({
                   {[
                     "City-specific profile pages for local SEO",
                     "Direct client contact — no intermediary",
-                    "Verified profile badge for trust signals",
+                    "Member badge for trust signals",
                     "LGBTQ+ affirming directory inclusion",
                     "No booking fees or platform commissions",
                   ].map((item) => (

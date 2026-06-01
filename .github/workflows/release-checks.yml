@@ -25,7 +25,9 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --no-tags --prune --depth=1 origin "${GITHUB_SHA}"
+          FETCH_REF="${GITHUB_HEAD_REF:+refs/heads/${GITHUB_HEAD_REF}}"
+          FETCH_REF="${FETCH_REF:-${GITHUB_REF}}"
+          git fetch --no-tags --prune --depth=1 origin "${FETCH_REF}"
           git checkout --force FETCH_HEAD
       - name: Install Node.js 24 and pnpm
         env:

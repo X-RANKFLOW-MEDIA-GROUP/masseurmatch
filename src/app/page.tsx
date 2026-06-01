@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/app/_components/json-ld";
 import { Hero } from "@/components/marketing/Hero";
-import { ValuesMarquee } from "@/components/marketing/ValuesMarquee";
+import { CityMarquee } from "@/components/marketing/CityMarquee";
 import { StatsBand } from "@/components/marketing/StatsBand";
 import { CityCaseStudies } from "@/components/marketing/CityCaseStudies";
 import { FeaturedTherapistsEditorial } from "@/components/marketing/FeaturedTherapistsEditorial";
+import { MeetKnotty } from "@/components/marketing/MeetKnotty";
 import { WhyUsSplit } from "@/components/marketing/WhyUsSplit";
 import { PricingToggle } from "@/components/marketing/PricingToggle";
 import { HomeSeoLanding } from "@/app/_components/home-seo-landing";
@@ -27,10 +28,11 @@ import { competitorsByTier } from "@/lib/competitors";
 import { GUIDES } from "@/app/guides/data";
 import {
   PRIORITY_CITY_SLUGS,
-  CITY_HIGHLIGHTS,
   CITY_ROUTE_COUNTS,
+  CITY_HIGHLIGHTS,
   LANDING_FAQ,
 } from "@/lib/marketing/home-data";
+import type { CityData } from "@/data/cities";
 
 export const revalidate = 3600;
 
@@ -287,38 +289,47 @@ export default async function HomePage() {
         }}
       />
 
-      {/* 1. Editorial hero */}
-      <Hero />
+      <div className="relative min-h-screen overflow-x-hidden bg-background">
+        {/* ── FIRST FOLD — dark navy ─────────────────────────────────── */}
+        <div className="home-dark relative">
+          {/* 1. Editorial hero */}
+          <Hero />
 
-      {/* 2. Brand values ticker */}
-      <ValuesMarquee />
+          {/* 2. Animated top-cities marquee */}
+          <CityMarquee />
+        </div>
 
-      {/* 3. Animated stats band */}
-      <StatsBand />
+        {/* ── LIGHT BODY ─────────────────────────────────────────────── */}
+        {/* 3. Animated stats band */}
+        <StatsBand />
 
-      {/* 4. Editorial city case studies */}
-      <CityCaseStudies launchCities={launchCities} />
+        {/* 4. Editorial city case studies */}
+        <CityCaseStudies launchCities={launchCities} />
 
-      {/* 5. Featured therapist profiles */}
-      <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
+        {/* 5. Featured therapist profiles */}
+        <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
 
-      {/* 6. Why Us split with giant stats */}
-      <WhyUsSplit />
+        {/* 5b. Meet Knotty — AI assistant */}
+        <MeetKnotty />
 
-      {/* 7. Pricing toggle */}
-      <PricingToggle />
+        {/* 6. Why Us split with giant stats */}
+        <WhyUsSplit />
 
-      {/* 8. Comparison hub + guides */}
-      <HomeSeoLanding comparisonLinks={comparisonLinks} guides={guides} />
+        {/* 7. Pricing toggle */}
+        <PricingToggle />
 
-      {/* 9. FAQ accordion */}
-      <FaqAccordion items={LANDING_FAQ} />
+        {/* 8. Comparison hub + guides */}
+        <HomeSeoLanding comparisonLinks={comparisonLinks} guides={guides} />
 
-      {/* 10. City coverage grid */}
-      <CityCoverageSection />
+        {/* 9. FAQ accordion */}
+        <FaqAccordion items={LANDING_FAQ} />
 
-      {/* Final CTA */}
-      <FinalCta />
+        {/* 10. City coverage grid */}
+        <CityCoverageSection />
+
+        {/* Final CTA */}
+        <FinalCta />
+      </div>
     </>
   );
 }

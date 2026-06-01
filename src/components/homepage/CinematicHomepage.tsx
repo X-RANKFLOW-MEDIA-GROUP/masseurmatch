@@ -191,7 +191,7 @@ function HeroSection({ totalTherapists, cityCount }: { totalTherapists: number; 
             className="flex flex-wrap justify-center gap-8 mt-12"
           >
             {[
-              { value: totalTherapists > 0 ? `${totalTherapists}+` : "500+", label: "Verified Therapists" },
+              { value: totalTherapists > 0 ? `${totalTherapists}+` : "500+", label: "Active Therapists" },
               { value: "100%", label: "LGBTQ+ Affirming" },
               { value: `${cityCount}+`, label: "Cities" },
               { value: "4.9", label: "Avg Rating" },
@@ -283,7 +283,7 @@ function FeaturedTherapists({ therapists }: { therapists: Profile[] }) {
             Top-Rated Massage Therapists
           </h2>
           <p className="text-lg text-[#4A4F5C] max-w-2xl mx-auto">
-            Discover verified professionals with exceptional ratings and reviews
+            Discover trusted professionals with exceptional ratings and reviews
           </p>
         </motion.div>
 
@@ -392,7 +392,7 @@ function TherapistCard({ therapist, index, isInView }: { therapist: Profile; ind
               {therapist.is_verified_identity && (
                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-50 text-green-700 text-xs font-medium">
                   <Shield className="w-3 h-3" />
-                  ID Verified
+                  Profile Reviewed
                 </span>
               )}
               {therapist.lgbtq_affirming && (
@@ -451,18 +451,18 @@ function TrustSection() {
   const features = [
     {
       icon: Shield,
-      title: "Identity Verified",
-      description: "Every therapist goes through a secure identity verification process for your safety",
+      title: "Profile Reviewed",
+      description: "Every therapist profile is reviewed for quality and completeness before going live",
     },
     {
       icon: Star,
       title: "Authentic Reviews",
-      description: "Read real feedback from verified clients to make informed decisions",
+      description: "Read real feedback from clients to make informed decisions",
     },
     {
       icon: MapPin,
       title: "Real Locations",
-      description: "All service areas and locations are verified and regularly updated",
+      description: "All service areas and locations are reviewed and regularly updated",
     },
     {
       icon: Clock,
@@ -488,7 +488,7 @@ function TrustSection() {
             Your Safety is Our Priority
           </h2>
           <p className="text-lg text-[#4A4F5C] max-w-2xl mx-auto">
-            Every profile is reviewed and verified. We maintain the highest standards for your peace of mind.
+            Every profile is reviewed for quality. We maintain the highest standards for your peace of mind.
           </p>
         </motion.div>
 
@@ -527,7 +527,7 @@ function HowItWorksSection() {
     {
       number: "01",
       title: "Search & Discover",
-      description: "Browse verified therapists by location, specialty, and availability. Filter by your preferences.",
+      description: "Browse active therapists by location, specialty, and availability. Filter by your preferences.",
     },
     {
       number: "02", 

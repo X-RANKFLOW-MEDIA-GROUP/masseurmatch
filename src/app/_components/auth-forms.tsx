@@ -10,8 +10,6 @@ import { resendConfirmationMutation } from "@/app/_lib/mutations";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-/* ─────────── Social OAuth ─────────── */
-
 function SocialButtons({ label, redirectTo = "/pro/dashboard" }: { label: string; redirectTo?: string }) {
   const [loading, setLoading] = useState<string | null>(null);
 
@@ -20,7 +18,7 @@ function SocialButtons({ label, redirectTo = "/pro/dashboard" }: { label: string
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(redirectTo)}`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
       },
     });
     if (error) setLoading(null);
@@ -57,8 +55,6 @@ function SocialButtons({ label, redirectTo = "/pro/dashboard" }: { label: string
   );
 }
 
-/* ─────────── Divider ─────────── */
-
 function OrDivider() {
   return (
     <div className="relative my-5">
@@ -67,8 +63,6 @@ function OrDivider() {
     </div>
   );
 }
-
-/* ─────────── Main AuthForms ─────────── */
 
 export function AuthForms({
   mode,
@@ -98,7 +92,6 @@ export function AuthForms({
 
   const isLogin = mode === "login";
 
-  // Remember user email
   useEffect(() => {
     if (isLogin) {
       const saved = localStorage.getItem("mm_saved_email");
@@ -112,7 +105,6 @@ export function AuthForms({
     event.preventDefault();
     setLoading(true);
 
-    // Remember me logic
     if (isLogin) {
       localStorage.setItem("mm_remember_me", String(rememberMe));
       if (rememberMe) {
@@ -168,7 +160,12 @@ export function AuthForms({
     });
 
     // Use window.location for a full page navigation to ensure cookies are read properly
-    const destination = isLogin ? sanitizedRedirectTo : "/pro/onboard";
+    const role = (result as { role?: string | null }).role;
+    const destination = !isLogin
+      ? "/pro/onboard"
+      : role === "client"
+        ? "/dashboard"
+        : sanitizedRedirectTo;
     window.location.href = destination;
   };
 
@@ -196,7 +193,6 @@ export function AuthForms({
 
   return (
     <Surface className="mx-auto max-w-lg">
-      {/* Mode toggle */}
       <div className="inline-flex rounded-full border border-border bg-secondary/60 p-1 text-sm font-semibold">
         <Link
           href={loginHref}
@@ -219,7 +215,6 @@ export function AuthForms({
           : "Create your therapist account and get started with onboarding."}
       </p>
 
-      {/* Social login/signup */}
       <div className="mt-5">
         <SocialButtons label={isLogin ? "Sign in" : "Sign up"} redirectTo={isLogin ? sanitizedRedirectTo : "/pro/onboard"} />
       </div>

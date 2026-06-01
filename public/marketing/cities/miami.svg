@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a1e36"/><stop offset="100%" stop-color="#05111f"/>
+    </linearGradient>
+    <filter id="gblur"><feGaussianBlur stdDeviation="22"/></filter>
+  </defs>
+  <rect width="800" height="800" fill="url(#bg)"/>
+  <ellipse cx="400" cy="260" rx="260" ry="200" fill="#FF8A1F" opacity="0.07" filter="url(#gblur)"/>
+  <!-- Grid -->
+  <g stroke="#fff" stroke-opacity="0.04" stroke-width="1">
+    <line x1="0" y1="200" x2="800" y2="200"/><line x1="0" y1="400" x2="800" y2="400"/>
+    <line x1="0" y1="600" x2="800" y2="600"/><line x1="200" y1="0" x2="200" y2="800"/>
+    <line x1="400" y1="0" x2="400" y2="800"/><line x1="600" y1="0" x2="600" y2="800"/>
+  </g>
+  <!-- Ocean wave -->
+  <path d="M0 620 Q100 600 200 620 Q300 640 400 620 Q500 600 600 620 Q700 640 800 620 L800 800 L0 800 Z" fill="#0e2a52" opacity="0.6"/>
+  <!-- Art deco arch -->
+  <path d="M320 540 L320 340 Q320 240 400 240 Q480 240 480 340 L480 540" fill="none" stroke="#FF8A1F" stroke-width="3" opacity="0.45"/>
+  <rect x="310" y="530" width="180" height="20" fill="#FF8A1F" opacity="0.2" rx="2"/>
+  <!-- Palm silhouette -->
+  <rect x="175" y="420" width="10" height="180" fill="#1a3a6e" opacity="0.7" rx="3"/>
+  <ellipse cx="165" cy="415" rx="40" ry="18" fill="#1a3a6e" opacity="0.6" transform="rotate(-20,165,415)"/>
+  <ellipse cx="195" cy="410" rx="40" ry="16" fill="#1a3a6e" opacity="0.5" transform="rotate(15,195,410)"/>
+  <ellipse cx="175" cy="408" rx="38" ry="14" fill="#1a3a6e" opacity="0.55" transform="rotate(-5,175,408)"/>
+  <!-- Right palm -->
+  <rect x="615" y="440" width="10" height="160" fill="#1a3a6e" opacity="0.6" rx="3"/>
+  <ellipse cx="605" cy="435" rx="38" ry="16" fill="#1a3a6e" opacity="0.5" transform="rotate(-15,605,435)"/>
+  <ellipse cx="632" cy="430" rx="36" ry="15" fill="#1a3a6e" opacity="0.45" transform="rotate(20,632,430)"/>
+  <!-- Skyline -->
+  <g fill="#162d58" opacity="0.55">
+    <rect x="80" y="460" width="55" height="140"/><rect x="145" y="430" width="45" height="170"/>
+    <rect x="540" y="450" width="55" height="150"/><rect x="605" y="420" width="50" height="180"/>
+    <rect x="665" y="440" width="55" height="160"/>
+  </g>
+  <text x="400" y="690" font-family="Georgia,serif" font-size="68" font-weight="700" fill="#FCFBF8" text-anchor="middle" letter-spacing="-1">MIAMI</text>
+  <text x="400" y="726" font-family="Georgia,serif" font-size="16" fill="#FF8A1F" text-anchor="middle" letter-spacing="6">FLORIDA</text>
+  <rect x="350" y="742" width="100" height="2" fill="#FF8A1F" opacity="0.5" rx="1"/>
+</svg>

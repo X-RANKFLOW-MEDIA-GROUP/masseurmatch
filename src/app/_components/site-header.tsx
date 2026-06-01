@@ -228,11 +228,7 @@ export default function SiteHeader() {
     router.refresh();
   }
 
-  if (isHomepage) {
-    return null;
-  }
-
-  const isDarkHero = false;
+  const isDarkHero = isHomepage;
 
   return (
     <motion.header
@@ -240,7 +236,13 @@ export default function SiteHeader() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled ? "bg-[#FCFBF8]/95 backdrop-blur-xl border-b border-[#E2E6F0] shadow-sm" : isDarkHero ? "bg-transparent" : "bg-[#FCFBF8]/90 backdrop-blur-sm"
+        isDarkHero
+          ? isScrolled
+            ? "bg-[#0B1F3A]/80 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20"
+            : "bg-transparent"
+          : isScrolled
+          ? "bg-[#FCFBF8]/95 backdrop-blur-xl border-b border-[#E2E6F0] shadow-sm"
+          : "bg-[#FCFBF8]/90 backdrop-blur-sm"
       }`}
     >
       <div className="w-full max-w-[1400px] mx-auto flex items-center justify-between px-6 lg:px-10 py-4">

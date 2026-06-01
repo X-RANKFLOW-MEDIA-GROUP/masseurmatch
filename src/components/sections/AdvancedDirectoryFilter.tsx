@@ -25,7 +25,7 @@ const PANEL_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const TIER_LABELS: Record<TherapistTier, string> = {
   free: "Access",
-  standard: "Verified",
+  standard: "Active",
   pro: "Pro",
   elite: "Elite",
 };
@@ -194,7 +194,7 @@ export function AdvancedDirectoryFilter({
         ? "Studio"
         : "Any format";
   const tierLabel = filters.tier ? TIER_LABELS[filters.tier] : "All tiers";
-  const trustLabel = filters.verified ? "Verified only" : "Open index";
+  const trustLabel = filters.verified ? "Active only" : "Open index";
   const activeCount = [
     filters.keyword,
     filters.city,
@@ -375,7 +375,7 @@ export function AdvancedDirectoryFilter({
                       >
                         <option value="">All tiers</option>
                         <option value="free">Access</option>
-                        <option value="standard">Verified</option>
+                        <option value="standard">Active</option>
                         <option value="pro">Pro</option>
                         <option value="elite">Elite</option>
                       </select>
@@ -418,7 +418,7 @@ export function AdvancedDirectoryFilter({
                       />
                       <div className="h-px bg-slate-100" />
                       <FilterToggle
-                        label="Verified Profiles Only"
+                        label="Active Profiles Only"
                         checked={filters.verified}
                         onChange={(checked) => onChange({ verified: checked })}
                       />
