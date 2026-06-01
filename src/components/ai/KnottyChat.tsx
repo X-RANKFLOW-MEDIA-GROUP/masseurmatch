@@ -177,6 +177,22 @@ export const KnottyChat = ({
     }
   }, [isEmbedded, trackOpen]);
 
+  // Allow any part of the app to open the floating chat (optionally with a
+  // prefilled prompt) by dispatching a `knotty:open` window event.
+  useEffect(() => {
+    if (isEmbedded) return;
+    const handler = (event: Event) => {
+      setIsOpen(true);
+      trackOpen();
+      const prompt = (event as CustomEvent<{ prompt?: string }>).detail?.prompt;
+      if (prompt) {
+        void sendMessage({ content: prompt });
+      }
+    };
+    window.addEventListener("knotty:open", handler as EventListener);
+    return () => window.removeEventListener("knotty:open", handler as EventListener);
+  }, [isEmbedded, trackOpen, sendMessage]);
+
   const quickActionButtons = quickActions.map((action) => (
     <button
       key={action.key}

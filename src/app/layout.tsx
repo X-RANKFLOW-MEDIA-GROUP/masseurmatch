@@ -4,6 +4,7 @@ import { JsonLd } from "@/app/_components/json-ld";
 import { SiteFooter } from "@/app/_components/site-footer";
 import SiteHeader from "@/app/_components/site-header";
 import { CookieConsent } from "@/app/_components/CookieConsent";
+import { ChatWidget } from "@/app/_components/chat-widget";
 import { SITE_DESCRIPTION, SITE_NAME, createPageMetadata } from "@/app/_lib/metadata";
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/app/_lib/structured-data";
 import { AppProviders } from "@/app/providers";
@@ -59,6 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </AppMotionShell>
           <SiteFooter />
           <CookieConsent />
+          <ChatWidget />
         </AppProviders>
       </body>
     </html>
