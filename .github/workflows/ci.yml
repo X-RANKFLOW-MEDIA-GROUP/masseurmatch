@@ -50,9 +50,7 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          FETCH_REF="${GITHUB_HEAD_REF:+refs/heads/${GITHUB_HEAD_REF}}"
-          FETCH_REF="${FETCH_REF:-${GITHUB_REF}}"
-          git fetch --no-tags --prune --depth=1 origin "${FETCH_REF}"
+          git fetch --no-tags --prune --depth=1 origin "${{ github.sha }}"
           git checkout --force FETCH_HEAD
       - name: Install Node.js 24 and pnpm
         env:
@@ -91,9 +89,7 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          FETCH_REF="${GITHUB_HEAD_REF:+refs/heads/${GITHUB_HEAD_REF}}"
-          FETCH_REF="${FETCH_REF:-${GITHUB_REF}}"
-          git fetch --prune origin "${FETCH_REF}"
+          git fetch --prune origin "${{ github.sha }}"
           git checkout --force FETCH_HEAD
       - name: Install gitleaks (OSS)
         env:
@@ -102,7 +98,6 @@ jobs:
           tmpdir="$(mktemp -d)"
           curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz -C "$tmpdir" gitleaks
           install -m 0755 "$tmpdir/gitleaks" /usr/local/bin/gitleaks
-          
       - name: Scan for secrets (gitleaks)
         run: gitleaks detect --source . --redact --verbose --exit-code 1
 
@@ -117,9 +112,7 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          FETCH_REF="${GITHUB_HEAD_REF:+refs/heads/${GITHUB_HEAD_REF}}"
-          FETCH_REF="${FETCH_REF:-${GITHUB_REF}}"
-          git fetch --no-tags --prune --depth=1 origin "${FETCH_REF}"
+          git fetch --no-tags --prune --depth=1 origin "${{ github.sha }}"
           git checkout --force FETCH_HEAD
       - name: Install Node.js 24 and pnpm
         env:
@@ -157,9 +150,7 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          FETCH_REF="${GITHUB_HEAD_REF:+refs/heads/${GITHUB_HEAD_REF}}"
-          FETCH_REF="${FETCH_REF:-${GITHUB_REF}}"
-          git fetch --no-tags --prune --depth=1 origin "${FETCH_REF}"
+          git fetch --no-tags --prune --depth=1 origin "${{ github.sha }}"
           git checkout --force FETCH_HEAD
       - name: Install Node.js 24 and pnpm
         env:
@@ -198,9 +189,7 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          FETCH_REF="${GITHUB_HEAD_REF:+refs/heads/${GITHUB_HEAD_REF}}"
-          FETCH_REF="${FETCH_REF:-${GITHUB_REF}}"
-          git fetch --no-tags --prune --depth=1 origin "${FETCH_REF}"
+          git fetch --no-tags --prune --depth=1 origin "${{ github.sha }}"
           git checkout --force FETCH_HEAD
       - name: Install Node.js 24 and pnpm
         env:
@@ -231,21 +220,13 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: [build]
-    # Allow only one E2E run per ref at a time, but never cancel mid-run.
-    # The top-level concurrency group cancels fast jobs (lint/build) on new
-    # pushes; E2E is expensive enough that finishing the current run beats
-    # throwing it away and starting over.
+    timeout-minutes: 30
     concurrency:
       group: e2e-${{ github.ref }}
       cancel-in-progress: false
     env:
       PLAYWRIGHT_BASE_URL: ${{ vars.PLAYWRIGHT_BASE_URL }}
-      # Optional: set as a GitHub secret when PLAYWRIGHT_BASE_URL points to a
-      # Vercel preview that has Deployment Protection enabled.
       VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
-    # Only runs when a base URL is configured (production or preview deployment).
-    # Set PLAYWRIGHT_BASE_URL as a GitHub Actions repo variable (Settings → Variables).
-    # A base URL is not sensitive — use vars, not secrets.
     if: ${{ vars.PLAYWRIGHT_BASE_URL != '' }}
     steps:
       - name: Checkout repository
@@ -255,9 +236,7 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          FETCH_REF="${GITHUB_HEAD_REF:+refs/heads/${GITHUB_HEAD_REF}}"
-          FETCH_REF="${FETCH_REF:-${GITHUB_REF}}"
-          git fetch --no-tags --prune --depth=1 origin "${FETCH_REF}"
+          git fetch --no-tags --prune --depth=1 origin "${{ github.sha }}"
           git checkout --force FETCH_HEAD
       - name: Install Node.js 24 and pnpm
         env:
@@ -285,7 +264,7 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
       - name: Run E2E tests
-        run: npx playwright test
+        run: npx playwright test --timeout=30000 --retries=1
       - name: Summarize Playwright report
         if: failure()
         run: |

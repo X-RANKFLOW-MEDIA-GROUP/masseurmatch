@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ShieldCheck } from "lucide-react";
 import FadeUp from "@/components/motion/FadeUp";
 
 const TRUST_POINTS = [
@@ -28,13 +29,13 @@ export function WhyUsSplit() {
               {/* Dark gradient */}
               <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/30 to-transparent" />
 
-              {/* Overlaid stat */}
-              <div className="absolute bottom-8 left-8">
-                <p className="font-display text-[5.5rem] font-extrabold leading-none tracking-tight text-white lg:text-[7rem]">
-                  98<span className="text-primary">%</span>
+              {/* Overlaid statement */}
+              <div className="absolute bottom-8 left-8 right-8">
+                <p className="font-display text-[2.25rem] font-extrabold leading-[0.95] tracking-tight text-white lg:text-[3rem]">
+                  Reviewed<span className="text-primary">.</span> Before it goes live<span className="text-primary">.</span>
                 </p>
-                <p className="mt-1 text-sm font-semibold uppercase tracking-widest text-white/70">
-                  Profiles verified before going live
+                <p className="mt-2 text-sm font-semibold uppercase tracking-widest text-white/70">
+                  Every single profile
                 </p>
               </div>
 
@@ -73,14 +74,14 @@ export function WhyUsSplit() {
                 ))}
               </ul>
 
-              {/* Rating stat */}
-              <div className="mt-10 inline-flex items-baseline gap-3 border-t border-border/40 pt-8">
-                <p className="font-display text-[4rem] font-extrabold leading-none tracking-tight">
-                  4.9<span className="text-primary">★</span>
-                </p>
+              {/* Closing trust line */}
+              <div className="mt-10 flex items-center gap-3 border-t border-border/40 pt-8">
+                <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <ShieldCheck className="h-6 w-6" />
+                </span>
                 <div>
-                  <p className="text-sm font-semibold">Average therapist rating</p>
-                  <p className="text-xs text-muted-foreground">Across all verified profiles</p>
+                  <p className="text-sm font-semibold text-foreground">Real reviews, never incentivised</p>
+                  <p className="text-xs text-muted-foreground">Posted only by people who booked</p>
                 </div>
               </div>
             </div>

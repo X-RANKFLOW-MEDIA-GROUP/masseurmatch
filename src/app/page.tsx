@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/app/_components/json-ld";
-import { HomeBackground } from "@/components/marketing/HomeBackground";
 import { Hero } from "@/components/marketing/Hero";
-import { ValuesMarquee } from "@/components/marketing/ValuesMarquee";
+import { CityMarquee } from "@/components/marketing/CityMarquee";
 import { StatsBand } from "@/components/marketing/StatsBand";
 import { CityCaseStudies } from "@/components/marketing/CityCaseStudies";
 import { FeaturedTherapistsEditorial } from "@/components/marketing/FeaturedTherapistsEditorial";
+import { MeetKnotty } from "@/components/marketing/MeetKnotty";
 import { WhyUsSplit } from "@/components/marketing/WhyUsSplit";
 import { PricingToggle } from "@/components/marketing/PricingToggle";
 import { HomeSeoLanding } from "@/app/_components/home-seo-landing";
@@ -289,15 +289,17 @@ export default async function HomePage() {
         }}
       />
 
-      <div className="home-dark relative min-h-screen overflow-x-hidden">
-        <HomeBackground />
+      <div className="relative min-h-screen overflow-x-hidden bg-background">
+        {/* ── FIRST FOLD — dark navy ─────────────────────────────────── */}
+        <div className="home-dark relative">
+          {/* 1. Editorial hero */}
+          <Hero />
 
-        {/* 1. Editorial hero */}
-        <Hero />
+          {/* 2. Animated top-cities marquee */}
+          <CityMarquee />
+        </div>
 
-        {/* 2. Brand values ticker */}
-        <ValuesMarquee />
-
+        {/* ── LIGHT BODY ─────────────────────────────────────────────── */}
         {/* 3. Animated stats band */}
         <StatsBand />
 
@@ -306,6 +308,9 @@ export default async function HomePage() {
 
         {/* 5. Featured therapist profiles */}
         <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
+
+        {/* 5b. Meet Knotty — AI assistant */}
+        <MeetKnotty />
 
         {/* 6. Why Us split with giant stats */}
         <WhyUsSplit />
