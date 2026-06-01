@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Check, Star } from "lucide-react";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -48,7 +49,9 @@ export default function BrunoDallasTxPage() {
                 <br />
                 Photo
               </p>
-              <span className={styles["verified-badge"]}>✓ Verified</span>
+              <span className={styles["verified-badge"]}>
+                <Check className="inline h-3.5 w-3.5" strokeWidth={2.5} /> Verified
+              </span>
             </div>
             <span className={styles["photo-badge"]}>Available Now</span>
           </div>
@@ -74,7 +77,7 @@ export default function BrunoDallasTxPage() {
             <div className={styles.stars}>
               {[1, 2, 3, 4, 5].map((i) => (
                 <span key={i} className={styles.star}>
-                  ★
+                  <Star className="inline h-4 w-4 fill-current" />
                 </span>
               ))}
               <span className={styles["review-count"]}>(12 reviews)</span>

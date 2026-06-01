@@ -91,7 +91,11 @@ export function PremiumProfileAbout({ profile, reviews = [] }: Props) {
           <div className="pp-sidebar-card">
             <h4>Client Rating</h4>
             <div className="pp-rating-big">{avgRating}</div>
-            <div className="pp-stars">★★★★★</div>
+            <div className="pp-stars">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Star key={i} className="inline h-4 w-4 fill-current" />
+              ))}
+            </div>
             <div className="pp-rating-count">Based on {reviews.length || 48} verified reviews</div>
           </div>
 

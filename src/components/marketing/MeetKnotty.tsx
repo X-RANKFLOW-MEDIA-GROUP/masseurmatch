@@ -31,7 +31,7 @@ const SCRIPT: { role: "user" | "bot"; text: string }[] = [
   { role: "user", text: "Deep tissue in Miami this weekend, outcall under $150?" },
   {
     role: "bot",
-    text: "Found 7 therapists in Miami offering deep-tissue outcall this weekend under $150. Top match: Marcus R. — 4.9★, books Saturday evenings.",
+    text: "Found 7 therapists in Miami offering deep-tissue outcall this weekend under $150. Top match: Marcus R. — books Saturday evenings.",
   },
   { role: "user", text: "Who's available Sunday morning?" },
   { role: "bot", text: "3 of them have Sunday-morning slots. Want me to sort by distance from South Beach?" },

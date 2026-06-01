@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Star } from 'lucide-react';
 import type { ExploreProvider } from '@/app/_lib/explore';
 
 function formatCurrency(value: number | null) {
@@ -72,8 +72,9 @@ export function CompactTherapistCard({
           {/* Review count */}
           {provider.reviewCount > 0 && (
             <div className="absolute right-3 top-3">
-              <span className="inline-flex items-center gap-0.5 rounded-full bg-black/40 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur-sm">
-                ★ {provider.reviewCount}
+              <span className="inline-flex items-center gap-1 rounded-full bg-black/40 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur-sm">
+                <Star className="h-3 w-3 fill-primary text-primary" />
+                {provider.reviewCount}
               </span>
             </div>
           )}

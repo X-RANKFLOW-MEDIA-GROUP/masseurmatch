@@ -4,6 +4,7 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   AlertCircle,
+  ArrowRight,
   CheckCircle2,
   Loader2,
   Mail,
@@ -371,8 +372,9 @@ function SignupVerifyPageInner() {
         </CardContent>
       </Card>
 
-      <Button size="lg" className="w-full" disabled={!canContinue} onClick={handleContinue}>
-        {idVerified ? "Go to Profile Editor →" : "Continue to Profile →"}
+      <Button size="lg" className="w-full gap-2" disabled={!canContinue} onClick={handleContinue}>
+        {idVerified ? "Go to Profile Editor" : "Continue to Profile"}
+        <ArrowRight className="h-4 w-4" strokeWidth={2.25} />
       </Button>
 
       {!state.emailVerified && (
