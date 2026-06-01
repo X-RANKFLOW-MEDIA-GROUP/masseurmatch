@@ -152,3 +152,8 @@ export function getRequestSession(request: Request): RequestSession | null {
 
   return parseSessionValue(raw);
 }
+
+export function parseSessionCookieValue(rawValue: string | undefined): RequestSession | null {
+  if (!rawValue) return null;
+  return parseSessionValue(rawValue);
+}
