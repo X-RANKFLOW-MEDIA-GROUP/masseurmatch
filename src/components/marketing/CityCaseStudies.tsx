@@ -11,7 +11,6 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { ArrowRight, ArrowUpRight, Sparkles } from "lucide-react";
 import type { LaunchCityCard } from "@/lib/marketing/home-data";
 
 type Props = {
@@ -145,8 +144,8 @@ function CityPlatform({
           )}
 
           {featured && (
-            <div className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white ring-1 ring-white/20 backdrop-blur">
-              <Sparkles className="h-3 w-3 text-primary" strokeWidth={2.5} /> Most listings
+            <div className="absolute left-3 top-3 rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white ring-1 ring-white/20 backdrop-blur">
+              ✦ Most listings
             </div>
           )}
 
@@ -166,8 +165,8 @@ function CityPlatform({
           </div>
 
           {/* Hover arrow */}
-          <div className="absolute right-3 top-3 grid h-7 w-7 place-items-center rounded-full border border-white/0 bg-white/0 text-white/0 transition-all duration-300 group-hover:border-white/25 group-hover:bg-white/15 group-hover:text-white">
-            <ArrowUpRight className="h-4 w-4" strokeWidth={2.25} />
+          <div className="absolute right-3 top-3 grid h-7 w-7 place-items-center rounded-full border border-white/0 bg-white/0 text-xs text-white/0 transition-all duration-300 group-hover:border-white/25 group-hover:bg-white/15 group-hover:text-white">
+            ↗
           </div>
         </motion.div>
       </Link>
@@ -211,10 +210,9 @@ export function CityCaseStudies({ launchCities }: Props) {
           </div>
           <Link
             href="/cities"
-            className="hidden items-center gap-1.5 whitespace-nowrap text-xs font-semibold uppercase tracking-widest text-primary transition hover:opacity-70 sm:inline-flex"
+            className="hidden whitespace-nowrap text-xs font-semibold uppercase tracking-widest text-primary transition hover:opacity-70 sm:block"
           >
-            Explore all cities
-            <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.25} />
+            Explore all cities →
           </Link>
         </div>
 
@@ -234,10 +232,9 @@ export function CityCaseStudies({ launchCities }: Props) {
         <div className="mt-10 text-center sm:hidden">
           <Link
             href="/cities"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-primary transition hover:opacity-70"
+            className="text-xs font-semibold uppercase tracking-widest text-primary transition hover:opacity-70"
           >
-            Explore all cities
-            <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.25} />
+            Explore all cities →
           </Link>
         </div>
       </div>

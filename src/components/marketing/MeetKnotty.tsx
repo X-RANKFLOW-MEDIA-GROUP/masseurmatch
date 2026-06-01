@@ -1,8 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowUp, MessageCircle, Search, Sparkles } from "lucide-react";
+import { MessageCircle, Search, Sparkles } from "lucide-react";
 
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -31,29 +32,30 @@ const SCRIPT: { role: "user" | "bot"; text: string }[] = [
   { role: "user", text: "Deep tissue in Miami this weekend, outcall under $150?" },
   {
     role: "bot",
-    text: "Found 7 therapists in Miami offering deep-tissue outcall this weekend under $150. Top match: Marcus R. — books Saturday evenings.",
+    text: "Found 7 therapists in Miami offering deep-tissue outcall this weekend under $150. Top match: Marcus R. — 4.9★, books Saturday evenings.",
   },
   { role: "user", text: "Who's available Sunday morning?" },
   { role: "bot", text: "3 of them have Sunday-morning slots. Want me to sort by distance from South Beach?" },
 ];
 
-// Clickable suggestion chips — these launch the real Knotty assistant.
+// Clickable suggestion chips → canned answers (demo, no backend yet).
 const PROMPTS = ["Sports massage near me", "LGBTQ+ friendly in NYC", "Incall vs outcall?"];
-
-// Open the real (Gemini-backed) Knotty floating assistant, optionally with a
-// prefilled prompt. The floating widget lives in the root layout and listens
-// for this event.
-function openKnotty(prompt?: string) {
-  if (typeof window === "undefined") return;
-  window.dispatchEvent(
-    new CustomEvent("knotty:open", { detail: prompt ? { prompt } : {} }),
-  );
-}
+const ANSWERS: Record<string, string> = {
+  "Sports massage near me":
+    "I found 12 sports-massage specialists near you. The closest is 1.2 mi away with same-day availability.",
+  "LGBTQ+ friendly in NYC":
+    "Every NYC therapist here is LGBTQ+-affirming — 24 are open this week. Want me to filter by neighborhood?",
+  "Incall vs outcall?":
+    "Incall = you visit the therapist's studio. Outcall = they travel to your home or hotel. Many offer both.",
+};
+const FALLBACK =
+  "Great question — in the live app I'll search that instantly. Open Knotty search to try it for real ↗";
 
 /**
- * "Meet Knotty" — introduces the site's AI assistant. The card auto-types an
- * opening conversation as a teaser, and the prompts, input, and CTA all launch
- * the real Knotty assistant (which answers for real via /api/knotty).
+ * "Meet Knotty" — introduces the site's AI assistant with a live, interactive
+ * demo chat: it auto-types an opening conversation, then visitors can tap
+ * suggested prompts (or type) to get instant canned answers. The real
+ * AI backend is wired up separately.
  */
 export function MeetKnotty() {
   const reducedMotion = useReducedMotion();
@@ -115,11 +117,20 @@ export function MeetKnotty() {
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: reducedMotion ? "auto" : "smooth" });
   }, [msgs, typing, reducedMotion]);
 
-  const submit = (q: string) => {
+  const ask = (q: string) => {
     const text = q.trim();
-    if (!text) return;
+    if (!text || typing) return;
+    push("user", text);
     setInput("");
-    openKnotty(text);
+    if (reducedMotion) {
+      push("bot", ANSWERS[text] ?? FALLBACK);
+      return;
+    }
+    setTyping(true);
+    schedule(() => {
+      setTyping(false);
+      push("bot", ANSWERS[text] ?? FALLBACK);
+    }, 1100);
   };
 
   const reveal = (delay: number) =>
@@ -177,14 +188,13 @@ export function MeetKnotty() {
               ))}
             </ul>
 
-            <button
-              type="button"
-              onClick={() => openKnotty()}
+            <Link
+              href="/search"
               className="mt-9 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-primary px-7 font-semibold text-primary-foreground transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-primary/25"
             >
-              <Sparkles className="h-4 w-4" />
-              Chat with Knotty
-            </button>
+              <Search className="h-4 w-4" />
+              Try Knotty search
+            </Link>
           </motion.div>
 
           {/* ── Right: live interactive demo chat ──────────────────────── */}
@@ -249,8 +259,9 @@ export function MeetKnotty() {
                     <button
                       key={p}
                       type="button"
-                      onClick={() => openKnotty(p)}
-                      className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-primary hover:bg-primary/5 hover:text-primary"
+                      onClick={() => ask(p)}
+                      disabled={typing}
+                      className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-primary hover:bg-primary/5 hover:text-primary disabled:opacity-50"
                     >
                       {p}
                     </button>
@@ -261,7 +272,7 @@ export function MeetKnotty() {
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    submit(input);
+                    ask(input);
                   }}
                   className="flex items-center gap-2 bg-white px-4 py-3"
                 >
@@ -274,11 +285,11 @@ export function MeetKnotty() {
                   />
                   <button
                     type="submit"
-                    disabled={!input.trim()}
+                    disabled={!input.trim() || typing}
                     aria-label="Send"
                     className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition hover:scale-105 disabled:opacity-40"
                   >
-                    <ArrowUp className="h-4 w-4" strokeWidth={2.5} />
+                    ↑
                   </button>
                 </form>
               </div>

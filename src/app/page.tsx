@@ -290,8 +290,8 @@ export default async function HomePage() {
       />
 
       <div className="relative min-h-screen overflow-x-hidden bg-background">
-        {/* ── FIRST FOLD — deep navy, matches the footer ─────────────── */}
-        <div className="home-dark relative bg-[#060E1A]">
+        {/* ── FIRST FOLD — dark navy ─────────────────────────────────── */}
+        <div className="home-dark relative">
           {/* 1. Editorial hero */}
           <Hero />
 

@@ -7,11 +7,11 @@ import { setSessionCookie } from "@/app/api/_lib/session";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/pro/dashboard";
+  const next = searchParams.get("next") ?? "/dashboard";
   const safeNext =
     typeof next === "string" && next.startsWith("/") && !next.startsWith("//")
       ? next
-      : "/pro/dashboard";
+      : "/dashboard";
 
   if (!code) {
     return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
   const isNewProfile = !profile?.display_name && !profile?.headline;
   const requestedOnboard = safeNext === "/pro/onboard";
   const destination =
-    isNewProfile && !requestedOnboard && safeNext === "/pro/dashboard"
+    isNewProfile && !requestedOnboard && (safeNext === "/dashboard" || safeNext === "/pro/dashboard")
       ? "/pro/onboard"
       : safeNext;
 
