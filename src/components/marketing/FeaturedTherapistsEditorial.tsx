@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BadgeCheck } from "lucide-react";
+import { ArrowRight, BadgeCheck } from "lucide-react";
 import FadeUp from "@/components/motion/FadeUp";
 import type { PublicTherapist } from "@/app/_lib/directory";
 
@@ -39,9 +39,10 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
           </div>
           <Link
             href="/search"
-            className="hidden text-xs font-semibold uppercase tracking-widest text-primary transition hover:opacity-70 sm:block"
+            className="hidden items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-primary transition hover:opacity-70 sm:inline-flex"
           >
-            Browse all →
+            Browse all
+            <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.25} />
           </Link>
         </div>
 
@@ -111,7 +112,10 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
                       <p className="text-xs font-semibold text-muted-foreground">
                         {formatPrice(therapist.incall_price || therapist.outcall_price)}
                       </p>
-                      <span className="text-xs font-bold text-primary">View →</span>
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-primary">
+                        View
+                        <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" strokeWidth={2.5} />
+                      </span>
                     </div>
                   </div>
                 </Link>

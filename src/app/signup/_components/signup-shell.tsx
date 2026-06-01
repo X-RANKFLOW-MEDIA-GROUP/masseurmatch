@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { Check } from "lucide-react";
 import { SignupProvider } from "../_lib/signup-context";
 import { cn } from "@/lib/utils";
 import { AuroraBackgroundLight } from "@/components/ui/aurora-background";
@@ -40,7 +41,7 @@ function ProgressStepper() {
                   !isComplete && !isCurrent && "border-border bg-card text-muted-foreground",
                 )}
               >
-                {isComplete ? "✓" : idx + 1}
+                {isComplete ? <Check className="h-4 w-4" strokeWidth={3} /> : idx + 1}
               </div>
             </div>
             <span

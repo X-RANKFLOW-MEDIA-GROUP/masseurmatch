@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Star } from 'lucide-react';
 import type { ExploreFilters } from '@/app/_lib/explore';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -313,7 +314,14 @@ export function AdvancedFiltersPanel({
                   onClick={() => setFilters((prev) => ({ ...prev, rating }))}
                   className={filters.rating === rating ? 'bg-orange-600' : ''}
                 >
-                  {rating === null ? 'All' : `${rating}★`}
+                  {rating === null ? (
+                    'All'
+                  ) : (
+                    <span className="inline-flex items-center gap-1">
+                      {rating}
+                      <Star className="h-3.5 w-3.5 fill-current" />
+                    </span>
+                  )}
                 </Button>
               ))}
             </div>

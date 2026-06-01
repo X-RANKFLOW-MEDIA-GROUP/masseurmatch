@@ -17,6 +17,7 @@ export const env = {
   twilioAccountSid: value("TWILIO_ACCOUNT_SID"),
   twilioAuthToken: value("TWILIO_AUTH_TOKEN"),
   twilioPhoneNumber: value("TWILIO_PHONE_NUMBER"),
+  openaiApiKey: value("OPENAI_API_KEY"),
   geminiApiKey: value("GEMINI_API_KEY"),
   googleMapsApiKey: value("NEXT_PUBLIC_GOOGLE_MAPS_API_KEY") || value("GOOGLE_MAPS_API_KEY"),
   sightengineApiUser: value("SIGHTENGINE_API_USER"),
@@ -31,7 +32,10 @@ export const hasSupabaseAdmin = Boolean(env.supabaseUrl && env.supabaseServiceRo
 export const hasStripe = has("STRIPE_SECRET_KEY", "STRIPE_MCP_KEY");
 export const hasResend = has("RESEND_API_KEY");
 export const hasTwilio = has("TWILIO_ACCOUNT_SID") && has("TWILIO_AUTH_TOKEN") && has("TWILIO_PHONE_NUMBER");
+export const hasOpenai = has("OPENAI_API_KEY");
 export const hasGemini = has("GEMINI_API_KEY");
+/** Knotty composes replies with an LLM when either provider key is present. */
+export const hasKnottyLlm = has("OPENAI_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY");
 export const hasGoogleMaps = has("NEXT_PUBLIC_GOOGLE_MAPS_API_KEY", "GOOGLE_MAPS_API_KEY");
 export const hasVerificationProvider = has("VERIFICATION_API_KEY");
 export const hasSightengine = has("SIGHTENGINE_API_USER") && has("SIGHTENGINE_API_SECRET");

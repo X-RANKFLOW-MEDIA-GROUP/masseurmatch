@@ -561,7 +561,7 @@ export default function MyListingPage() {
                 </span>
               )}
             </div>
-            {zipStatus && <p className={`text-xs ${zipStatus.startsWith("✓") ? "text-emerald-600" : "text-slate-400"}`}>{zipStatus}</p>}
+            {zipStatus && <p className={`text-xs ${zipStatus.startsWith("✓") ? "text-emerald-600" : "text-slate-400"}`}>{zipStatus.replace(/^✓\s*/, "")}</p>}
           </Field>
           <div className="grid gap-4 sm:grid-cols-3">
             <Field>

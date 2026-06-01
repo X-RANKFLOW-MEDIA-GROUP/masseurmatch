@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
+import { ArrowRight, Check, X } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "How It Works | MasseurMatch Directory",
@@ -426,7 +427,7 @@ export default function HowItWorksPage() {
                       fontSize: 14,
                     }}
                   >
-                    <span style={{ color: "#FF8A1F" }}>✓</span>
+                    <Check className="inline h-4 w-4 shrink-0" style={{ color: "#FF8A1F" }} strokeWidth={2.5} />
                     {item}
                   </div>
                 ))}
@@ -474,7 +475,11 @@ export default function HowItWorksPage() {
                       opacity: 0.5,
                     }}
                   >
-                    <span>{i > 0 ? "✕" : "✓"}</span>
+                    {i > 0 ? (
+                      <X className="inline h-4 w-4 shrink-0" strokeWidth={2.5} />
+                    ) : (
+                      <Check className="inline h-4 w-4 shrink-0" strokeWidth={2.5} />
+                    )}
                     {item}
                   </div>
                 ))}
@@ -569,7 +574,7 @@ export default function HowItWorksPage() {
                   paddingBottom: 2,
                 }}
               >
-                Full Therapist Guide →
+                Full Therapist Guide <ArrowRight className="inline h-3.5 w-3.5" strokeWidth={2.25} />
               </Link>
             </div>
           </div>
@@ -632,7 +637,7 @@ export default function HowItWorksPage() {
             >
               More questions?{" "}
               <Link href="/faq" style={{ color: "#1E4B8F" }}>
-                Full FAQ →
+                Full FAQ <ArrowRight className="inline h-3.5 w-3.5" strokeWidth={2.25} />
               </Link>
             </p>
           </div>

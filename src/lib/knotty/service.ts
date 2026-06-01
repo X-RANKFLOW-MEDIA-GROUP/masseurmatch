@@ -1,8 +1,4 @@
-import {
-  GoogleGenerativeAI,
-  HarmBlockThreshold,
-  HarmCategory,
-} from "@google/generative-ai";
+import { completeText } from "@/lib/ai/llm";
 import { getPublicTherapists } from "@/app/_lib/directory";
 import { sanitizeText } from "@/app/_lib/security";
 import { getRequestSession } from "@/app/api/_lib/session";
@@ -22,8 +18,6 @@ import type {
   KnottyRequestPayload,
   KnottyResponsePayload,
 } from "@/lib/knotty/types";
-
-const GEMINI_MODEL = "gemini-1.5-flash";
 
 const PROFILE_SELECT = [
   "id",
@@ -319,88 +313,66 @@ function buildDeterministicReply(input: {
   return `${lead} ${input.primary.name} looks strongest${input.city ? ` in or near ${input.city}` : ""} because ${input.primary.why.join(", ").toLowerCase()}.${backupLine}`;
 }
 
-async function composeReply(input: {
+type ReplyInput = {
   question: string;
   intent: KnottyIntent;
   primary: KnottyResponsePayload["primary"];
   alternatives: KnottyResponsePayload["alternatives"];
   city: string | null;
-}) {
+};
+
+/** Build the shared system + user prompt from the ranked recommendations. */
+function buildKnottyPrompt(input: ReplyInput) {
+  const items = [input.primary, ...input.alternatives].filter(
+    (item): item is NonNullable<typeof item> => Boolean(item),
+  );
+  const candidateSummary = items
+    .map(
+      (item, index) =>
+        `${index === 0 ? "Primary" : `Alternative ${index}`}: ${item.name} | ${item.specialty} | ${item.why.join(", ")}`,
+    )
+    .join("\n");
+
+  const system = [
+    "You are Knotty, a discreet and welcoming AI concierge for a wellness directory.",
+    "Do not invent facts or change the recommendation order.",
+    "Use only the ranked options provided.",
+    "Keep the reply under 70 words.",
+    "Sound polished, direct, and reassuring.",
+  ].join(" ");
+
+  const user = [
+    `User request: ${input.question}`,
+    `Intent: ${input.intent}`,
+    `City context: ${input.city || "not specified"}`,
+    candidateSummary,
+    "Explain why the primary match stands out and optionally mention one backup.",
+  ].join("\n");
+
+  return { system, user };
+}
+
+async function composeReply(input: ReplyInput) {
   const fallback = buildDeterministicReply(input);
-  const apiKey = envAny(["GEMINI_API_KEY", "GOOGLE_API_KEY"], "");
-
-  if (!apiKey || !input.primary) {
-    return {
-      reply: fallback,
-      model: null,
-      fallbackUsed: true,
-    };
+  if (!input.primary) {
+    return { reply: fallback, model: null, fallbackUsed: true };
   }
 
-  try {
-    const client = new GoogleGenerativeAI(apiKey);
-    const model = client.getGenerativeModel(
-      {
-        model: GEMINI_MODEL,
-        safetySettings: [
-          {
-            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-            threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-          },
-        ],
-      },
-      {
-        timeout: 3500,
-      },
-    );
+  // OpenAI → Gemini → deterministic, handled by the shared LLM helper.
+  const { system, user } = buildKnottyPrompt(input);
+  const result = await completeText({
+    system,
+    user,
+    temperature: 0.5,
+    maxTokens: 160,
+    timeoutMs: 4000,
+  });
 
-    const candidateSummary = [input.primary, ...input.alternatives]
-      .map(
-        (item, index) =>
-          `${index === 0 ? "Primary" : `Alternative ${index}`}: ${item.name} | ${item.specialty} | ${item.why.join(", ")}`,
-      )
-      .join("\n");
-
-    const prompt = [
-      "You are Knotty, a discreet and welcoming AI concierge for a wellness directory.",
-      "Do not invent facts or change the recommendation order.",
-      "Use only the ranked options provided below.",
-      "Keep the reply under 70 words.",
-      "Sound polished, direct, and reassuring.",
-      `User request: ${input.question}`,
-      `Intent: ${input.intent}`,
-      `City context: ${input.city || "not specified"}`,
-      candidateSummary,
-      "Explain why the primary match stands out and optionally mention one backup.",
-    ].join("\n");
-
-    const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
-
-    if (!text) {
-      return {
-        reply: fallback,
-        model: GEMINI_MODEL,
-        fallbackUsed: true,
-      };
-    }
-
-    return {
-      reply: text,
-      model: GEMINI_MODEL,
-      fallbackUsed: false,
-    };
-  } catch {
-    return {
-      reply: fallback,
-      model: GEMINI_MODEL,
-      fallbackUsed: true,
-    };
+  if (result) {
+    return { reply: result.text, model: result.model, fallbackUsed: false };
   }
+
+  return { reply: fallback, model: null, fallbackUsed: true };
 }
 
 export async function handleKnottyRequest(

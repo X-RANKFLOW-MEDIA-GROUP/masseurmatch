@@ -1,12 +1,9 @@
-import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
 import { errorResponse, json, parseJsonBody } from "@/app/api/_lib/http";
-import { envAny } from "@/app/api/_lib/env";
 import { assertRateLimit } from "@/app/_lib/security";
 import { requireRequestSession } from "@/app/_lib/session";
 import { getProfileByUserId, recordAuditLog } from "@/app/_lib/store";
+import { completeText, hasAnyLlmKey } from "@/lib/ai/llm";
 import { z } from "zod";
-
-const GEMINI_MODEL = "gemini-1.5-flash";
 
 const moderateContentSchema = z.object({
   bio: z.string().min(1).max(5000),
@@ -30,9 +27,8 @@ export async function POST(request: Request) {
     }
 
     const body = await parseJsonBody(request, moderateContentSchema);
-    const apiKey = envAny(["GEMINI_API_KEY", "GOOGLE_API_KEY"], "");
 
-    if (!apiKey) {
+    if (!hasAnyLlmKey()) {
       await recordAuditLog(session.userId, "provider.content.flagged", "profile", profile.id, {
         reason: "AI moderation unavailable — queued for manual review",
       });
@@ -44,42 +40,43 @@ export async function POST(request: Request) {
       });
     }
 
-    const client = new GoogleGenerativeAI(apiKey);
-    const model = client.getGenerativeModel(
-      {
-        model: GEMINI_MODEL,
-        safetySettings: [
-          { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE },
-          { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-        ],
-      },
-      { timeout: 5000 },
-    );
-
-    const prompt = [
+    const system = [
       "You are a content moderator for MasseurMatch, a professional massage therapy directory.",
-      "Analyze the following therapist biography and check for:",
+      "Analyze the therapist biography and check for:",
       "1. Sexually explicit language or offers of sexual services.",
       "2. Offers of illegal services.",
       "3. Direct contact info (phone numbers, emails, social handles) meant to bypass the platform.",
-      "",
-      `Biography: "${body.bio}"`,
-      "",
       "Respond ONLY with a JSON object in this exact format:",
       '{"status": "SAFE" or "UNSAFE", "confidence": number_0_to_100, "reason": "brief justification if UNSAFE, empty string if SAFE"}',
     ].join("\n");
 
+    const result = await completeText({
+      system,
+      user: `Biography: "${body.bio}"`,
+      json: true,
+      temperature: 0,
+      maxTokens: 200,
+      timeoutMs: 5000,
+    });
+
     let aiDecision: AiDecision;
     try {
-      const result = await model.generateContent(prompt);
-      const text = result.response.text().trim();
-      aiDecision = JSON.parse(text) as AiDecision;
+      if (!result) throw new Error("No AI response");
+      const cleaned = result.text
+        .replace(/^```(?:json)?/i, "")
+        .replace(/```$/, "")
+        .trim();
+      aiDecision = JSON.parse(cleaned) as AiDecision;
 
       if (!["SAFE", "UNSAFE"].includes(aiDecision.status)) {
         throw new Error("Invalid AI response status");
       }
     } catch {
-      aiDecision = { status: "UNSAFE", confidence: 0, reason: "Automated analysis failed — queued for manual review." };
+      aiDecision = {
+        status: "UNSAFE",
+        confidence: 0,
+        reason: "Automated analysis failed — queued for manual review.",
+      };
     }
 
     await recordAuditLog(session.userId, "provider.content.moderated", "profile", profile.id, {

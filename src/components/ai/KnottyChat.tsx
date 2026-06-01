@@ -177,6 +177,22 @@ export const KnottyChat = ({
     }
   }, [isEmbedded, trackOpen]);
 
+  // Allow any part of the app to open the floating chat (optionally with a
+  // prefilled prompt) by dispatching a `knotty:open` window event.
+  useEffect(() => {
+    if (isEmbedded) return;
+    const handler = (event: Event) => {
+      setIsOpen(true);
+      trackOpen();
+      const prompt = (event as CustomEvent<{ prompt?: string }>).detail?.prompt;
+      if (prompt) {
+        void sendMessage({ content: prompt });
+      }
+    };
+    window.addEventListener("knotty:open", handler as EventListener);
+    return () => window.removeEventListener("knotty:open", handler as EventListener);
+  }, [isEmbedded, trackOpen, sendMessage]);
+
   const quickActionButtons = quickActions.map((action) => (
     <button
       key={action.key}
@@ -297,13 +313,13 @@ export const KnottyChat = ({
               setIsOpen(true);
               trackOpen();
             }}
-            className="group relative h-16 w-16 rounded-full border border-white/18 bg-[linear-gradient(180deg,rgba(9,18,34,0.96),rgba(18,44,73,0.96))] shadow-[0_20px_48px_rgba(0,0,0,0.3)]"
+            className="group relative h-16 w-16 rounded-full border border-white/20 bg-[linear-gradient(180deg,#FF8A1F,#e67a10)] shadow-[0_20px_48px_rgba(255,138,31,0.35)]"
             aria-label="Open Knotty chat"
           >
-            <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.18),transparent_58%)]" />
-            <div className="absolute -inset-2 rounded-full bg-[radial-gradient(circle,rgba(122,198,255,0.22),transparent_65%)] opacity-75 blur-2xl transition group-hover:opacity-100" />
+            <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.35),transparent_58%)]" />
+            <div className="absolute -inset-2 rounded-full bg-[radial-gradient(circle,rgba(255,138,31,0.5),transparent_65%)] opacity-75 blur-2xl transition group-hover:opacity-100" />
             <div className="relative flex h-full w-full items-center justify-center text-white">
-              <Sparkles className="h-6 w-6" />
+              <Sparkles className="h-6 w-6" strokeWidth={2.25} />
             </div>
           </motion.button>
         ) : (

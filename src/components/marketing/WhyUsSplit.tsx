@@ -66,8 +66,8 @@ export function WhyUsSplit() {
               <ul className="mt-8 space-y-3">
                 {TRUST_POINTS.map((point) => (
                   <li key={point} className="flex items-start gap-3">
-                    <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary/15 text-[10px] font-bold text-primary">
-                      ✓
+                    <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+                      <Check className="h-3 w-3" strokeWidth={3} />
                     </span>
                     <span className="text-sm leading-relaxed text-foreground/80">{point}</span>
                   </li>

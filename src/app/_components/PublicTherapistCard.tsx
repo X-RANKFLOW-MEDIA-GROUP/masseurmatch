@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Star } from "lucide-react";
 import { useMemo } from "react";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import {
@@ -97,8 +97,9 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
           {/* Review count — top right */}
           {therapist.review_count ? (
             <div className="absolute right-3 top-3">
-              <span className="inline-flex items-center gap-0.5 rounded-full bg-black/40 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur-sm">
-                ★ {therapist.review_count}
+              <span className="inline-flex items-center gap-1 rounded-full bg-black/40 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur-sm">
+                <Star className="h-3 w-3 fill-primary text-primary" />
+                {therapist.review_count}
               </span>
             </div>
           ) : null}
