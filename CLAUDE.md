@@ -46,9 +46,10 @@ The bar is **premium, hand-crafted, and trustworthy** — never cheap or
 ## Knotty (the AI assistant)
 
 The full stack already exists — do not rebuild it:
-- API: `src/app/api/knotty/route.ts` → `src/lib/knotty/service.ts`
-  (Gemini `gemini-1.5-flash` via `GEMINI_API_KEY`, with a deterministic
-  fallback; guardrails, FAQ, intent, ranking, learning, attribution).
+- API: `src/app/api/knotty/route.ts` → `src/lib/knotty/service.ts`.
+  LLM reply provider order: **OpenAI `gpt-4o-mini` (`OPENAI_API_KEY`)** →
+  Gemini `gemini-1.5-flash` (`GEMINI_API_KEY`) → deterministic fallback.
+  Plus guardrails, FAQ, intent, ranking, learning, attribution.
 - Client: `useKnotty` hook + `KnottyChat` (floating, mounted site-wide in
   `layout.tsx` via `ChatWidget`) + per-profile `ProfileAIChat`.
 - Open the floating chat from anywhere by dispatching
