@@ -1,8 +1,4 @@
-import {
-  GoogleGenerativeAI,
-  HarmBlockThreshold,
-  HarmCategory,
-} from "@google/generative-ai";
+import { completeText } from "@/lib/ai/llm";
 import { getPublicTherapists } from "@/app/_lib/directory";
 import { sanitizeText } from "@/app/_lib/security";
 import { getRequestSession } from "@/app/api/_lib/session";
@@ -22,9 +18,6 @@ import type {
   KnottyRequestPayload,
   KnottyResponsePayload,
 } from "@/lib/knotty/types";
-
-const GEMINI_MODEL = "gemini-1.5-flash";
-const OPENAI_MODEL = "gpt-4o-mini";
 
 const PROFILE_SELECT = [
   "id",
@@ -359,96 +352,27 @@ function buildKnottyPrompt(input: ReplyInput) {
   return { system, user };
 }
 
-/** Primary provider: OpenAI Chat Completions (dependency-free fetch). */
-async function composeWithOpenAI(apiKey: string, input: ReplyInput) {
-  const { system, user } = buildKnottyPrompt(input);
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 4000);
-  try {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: OPENAI_MODEL,
-        temperature: 0.5,
-        max_tokens: 160,
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: user },
-        ],
-      }),
-      signal: controller.signal,
-    });
-    if (!res.ok) return null;
-    const data = (await res.json()) as {
-      choices?: Array<{ message?: { content?: string } }>;
-    };
-    return data.choices?.[0]?.message?.content?.trim() || null;
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-/** Fallback provider: Google Gemini. */
-async function composeWithGemini(apiKey: string, input: ReplyInput) {
-  const { system, user } = buildKnottyPrompt(input);
-  const client = new GoogleGenerativeAI(apiKey);
-  const model = client.getGenerativeModel(
-    {
-      model: GEMINI_MODEL,
-      safetySettings: [
-        {
-          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-          threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-      ],
-    },
-    { timeout: 3500 },
-  );
-
-  const result = await model.generateContent(`${system}\n${user}`);
-  return result.response.text().trim() || null;
-}
-
 async function composeReply(input: ReplyInput) {
   const fallback = buildDeterministicReply(input);
   if (!input.primary) {
     return { reply: fallback, model: null, fallbackUsed: true };
   }
 
-  // Prefer OpenAI, fall back to Gemini, then the deterministic reply.
-  const openaiKey = envAny(["OPENAI_API_KEY"], "");
-  if (openaiKey) {
-    try {
-      const text = await composeWithOpenAI(openaiKey, input);
-      if (text) return { reply: text, model: OPENAI_MODEL, fallbackUsed: false };
-    } catch {
-      // fall through to the next provider
-    }
+  // OpenAI → Gemini → deterministic, handled by the shared LLM helper.
+  const { system, user } = buildKnottyPrompt(input);
+  const result = await completeText({
+    system,
+    user,
+    temperature: 0.5,
+    maxTokens: 160,
+    timeoutMs: 4000,
+  });
+
+  if (result) {
+    return { reply: result.text, model: result.model, fallbackUsed: false };
   }
 
-  const geminiKey = envAny(["GEMINI_API_KEY", "GOOGLE_API_KEY"], "");
-  if (geminiKey) {
-    try {
-      const text = await composeWithGemini(geminiKey, input);
-      if (text) return { reply: text, model: GEMINI_MODEL, fallbackUsed: false };
-    } catch {
-      // fall through to the deterministic reply
-    }
-  }
-
-  return {
-    reply: fallback,
-    model: openaiKey ? OPENAI_MODEL : geminiKey ? GEMINI_MODEL : null,
-    fallbackUsed: true,
-  };
+  return { reply: fallback, model: null, fallbackUsed: true };
 }
 
 export async function handleKnottyRequest(
