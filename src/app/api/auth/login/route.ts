@@ -1,5 +1,6 @@
 import { errorResponse, json, parseJsonBody, withSetCookie } from "@/app/api/_lib/http";
 import { setSessionCookie } from "@/app/api/_lib/session";
+import { assertRateLimit } from "@/app/_lib/security";
 import { authLoginSchema } from "@/app/_lib/validation";
 import {
   ensureUserProfileAndRole,
@@ -8,6 +9,8 @@ import {
 
 export async function POST(request: Request) {
   try {
+    // Throttle credential guessing on a per-IP basis.
+    assertRateLimit(request, "auth-login", { limit: 10, windowMs: 60_000 });
     const body = await parseJsonBody(request, authLoginSchema);
     const { user, session } = await verifyPasswordWithRetry(body.email, body.password, 5);
     const { role } = await ensureUserProfileAndRole(user, {

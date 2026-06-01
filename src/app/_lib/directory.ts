@@ -267,6 +267,14 @@ export const getPublicTherapists = async (filters?: {
 
 export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTherapist | null> => {
   const sanitizedSlug = slug.trim();
+
+  // Reject anything that is not a plain slug or UUID before interpolating into
+  // the PostgREST `.or()` filter, so characters like "," "." or ")" cannot
+  // break out of the intended expression and alter the matching logic.
+  if (!/^[a-z0-9-]+$/i.test(sanitizedSlug)) {
+    return null;
+  }
+
   const { data: profile, error } = await buildPublicTherapistsQuery()
     .or(`slug.eq.${sanitizedSlug},id.eq.${sanitizedSlug}`)
     .maybeSingle();

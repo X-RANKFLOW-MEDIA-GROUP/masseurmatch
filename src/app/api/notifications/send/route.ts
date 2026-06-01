@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import { createSupabaseAdminClient, getUserRole } from "@/app/api/_lib/supabase-server";
+import { getRequestSession } from "@/app/api/_lib/session";
 import type { Json } from "@/integrations/supabase/types";
 import { Resend } from "resend";
 import twilio from "twilio";
@@ -26,6 +27,29 @@ export async function POST(request: NextRequest) {
 
     if (!body.userId || !body.type || !body.title) {
       return NextResponse.json({ error: "userId, type and title are required" }, { status: 400 });
+    }
+
+    // This route uses the Supabase service-role client plus the Resend and
+    // Twilio senders, so it must never be reachable anonymously. Require an
+    // authenticated session and restrict non-admins to their own account to
+    // prevent notification spoofing, email bombing, and SMS toll fraud.
+    const session = getRequestSession(request);
+    if (!session) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
+    let isAdmin = session.role === "admin";
+    try {
+      isAdmin = (await getUserRole(session.userId)) === "admin";
+    } catch {
+      // Fall back to the signed cookie role if the authoritative lookup fails.
+    }
+
+    if (!isAdmin && body.userId !== session.userId) {
+      return NextResponse.json(
+        { error: "You can only send notifications to your own account." },
+        { status: 403 },
+      );
     }
 
     const supabase = createSupabaseAdminClient();

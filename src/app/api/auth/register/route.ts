@@ -1,6 +1,7 @@
 import { errorResponse, json, parseJsonBody, withSetCookie } from "@/app/api/_lib/http";
 import { setSessionCookie } from "@/app/api/_lib/session";
 import { RouteError } from "@/app/api/_lib/http";
+import { assertRateLimit } from "@/app/_lib/security";
 import { authRegisterSchema } from "@/app/_lib/validation";
 import {
   createTherapistUser,
@@ -9,6 +10,8 @@ import {
 
 export async function POST(request: Request) {
   try {
+    // Limit automated account creation per IP.
+    assertRateLimit(request, "auth-register", { limit: 5, windowMs: 60_000 });
     const body = await parseJsonBody(request, authRegisterSchema);
     const { origin } = new URL(request.url);
     const result = await createTherapistUser({
