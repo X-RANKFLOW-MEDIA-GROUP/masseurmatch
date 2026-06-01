@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { MessageCircle, Search, Sparkles } from "lucide-react";
+import { ArrowUp, MessageCircle, Search, Sparkles } from "lucide-react";
 
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -278,7 +278,7 @@ export function MeetKnotty() {
                     aria-label="Send"
                     className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition hover:scale-105 disabled:opacity-40"
                   >
-                    ↑
+                    <ArrowUp className="h-4 w-4" strokeWidth={2.5} />
                   </button>
                 </form>
               </div>

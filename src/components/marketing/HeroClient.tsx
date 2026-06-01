@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
+import { ArrowUpRight, Globe, Search } from "lucide-react";
 import { CityGlobe } from "@/components/marketing/CityGlobe";
 
 const avatarStack = [
@@ -31,7 +32,8 @@ export default function HeroClient() {
   const reducedMotion = useReducedMotion();
 
   return (
-    <section className="relative overflow-hidden bg-background text-foreground">
+    // Deep-navy first fold tuned to match the site footer (#060E1A).
+    <section className="relative overflow-hidden bg-[#060E1A] text-foreground">
       {!reducedMotion && (
         <style>{`
           @keyframes _blink{0%,100%{opacity:1}50%{opacity:0}}
@@ -44,67 +46,52 @@ export default function HeroClient() {
         `}</style>
       )}
 
-      {/* ── Animated first-fold backdrop ─────────────────────────────── */}
+      {/* ── Premium first-fold backdrop (footer-matched, restrained) ──── */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        {/* Faint grid, radially masked */}
-        <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,.7)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.7)_1px,transparent_1px)] [background-size:54px_54px] [mask-image:radial-gradient(ellipse_at_50%_35%,black,transparent_72%)]" />
-        {/* Orange aurora */}
+        {/* Fine dot grid, radially masked */}
+        <div className="absolute inset-0 [background-image:radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:26px_26px] [mask-image:radial-gradient(ellipse_at_55%_30%,black,transparent_70%)]" />
+        {/* Warm orange glow behind the globe — breathes slowly */}
         <motion.div
-          className="absolute -right-[12%] -top-[18%] h-[60vw] max-h-[640px] w-[60vw] max-w-[640px] rounded-full blur-[90px]"
-          style={{ background: "radial-gradient(circle, rgba(255,138,31,0.42), transparent 65%)" }}
-          animate={reducedMotion ? undefined : { x: [0, 30, 0], y: [0, 24, 0], scale: [1, 1.08, 1] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -right-[6%] top-[4%] h-[46vw] max-h-[560px] w-[46vw] max-w-[560px] rounded-full blur-[100px]"
+          style={{ background: "radial-gradient(circle, rgba(255,138,31,0.24), transparent 65%)" }}
+          animate={reducedMotion ? undefined : { opacity: [0.65, 1, 0.65], scale: [1, 1.06, 1] }}
+          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
         />
-        {/* Blue aurora */}
-        <motion.div
-          className="absolute -bottom-[22%] -left-[10%] h-[55vw] max-h-[580px] w-[55vw] max-w-[580px] rounded-full blur-[90px]"
-          style={{ background: "radial-gradient(circle, rgba(30,75,143,0.5), transparent 65%)" }}
-          animate={reducedMotion ? undefined : { x: [0, -26, 0], y: [0, -20, 0], scale: [1, 1.1, 1] }}
-          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-        />
-        {/* Soft top glow */}
-        <div className="absolute left-1/2 top-0 h-[40vh] w-[80vw] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,138,31,0.10),transparent_70%)] blur-2xl" />
+        {/* Cool depth glow, very subtle */}
+        <div className="absolute -bottom-[15%] -left-[8%] h-[40vw] max-h-[460px] w-[40vw] max-w-[460px] rounded-full bg-[radial-gradient(circle,rgba(30,75,143,0.18),transparent_65%)] blur-[100px]" />
+        {/* Top hairline + vignette */}
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_38%,transparent_55%,rgba(3,6,13,0.55)_100%)]" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-[1280px] px-4 pb-16 pt-24 sm:px-6 lg:px-8 lg:pb-20 lg:pt-28">
         <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
           {/* ── Left: copy ─────────────────────────────────────────────── */}
           <div>
-            <div className="mb-8 flex items-center gap-3 lg:mb-10">
-              <div className="flex -space-x-3">
-                {avatarStack.map((avatar, index) => (
-                  <motion.div
+            {/* Trust chip — glass + mono micro-label, mirrors the footer */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: reducedMotion ? 0 : 0.7, ease: customEase, delay: reducedMotion ? 0 : 0.1 }}
+              className="mb-8 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] py-1.5 pl-1.5 pr-4 backdrop-blur lg:mb-10"
+            >
+              <div className="flex -space-x-2.5">
+                {avatarStack.map((avatar) => (
+                  <div
                     key={avatar.id}
-                    initial={{ opacity: 0, y: 40 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: reducedMotion ? 0 : 0.7,
-                      ease: customEase,
-                      delay: reducedMotion ? 0 : 0.1 + index * 0.08,
-                    }}
-                    className={`relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-full bg-gradient-to-br ring-2 ring-background ${avatar.color} flex items-center justify-center`}
+                    className={`relative flex h-7 w-7 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br ring-2 ring-[#060E1A] ${avatar.color}`}
                   >
-                    <span className="absolute inset-0 z-0 flex select-none items-center justify-center text-[10px] font-bold text-white/80">
+                    <span className="absolute inset-0 z-0 flex select-none items-center justify-center text-[8px] font-bold text-white/80">
                       {avatar.initials}
                     </span>
-                    <Image src={avatar.src} alt={avatar.alt} fill className="z-10 object-cover" sizes="44px" />
-                  </motion.div>
+                    <Image src={avatar.src} alt={avatar.alt} fill className="z-10 object-cover" sizes="28px" />
+                  </div>
                 ))}
               </div>
-
-              <motion.span
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: reducedMotion ? 0 : 0.7,
-                  ease: customEase,
-                  delay: reducedMotion ? 0 : 0.1 + avatarStack.length * 0.08,
-                }}
-                className="text-sm font-medium text-muted-foreground md:text-base"
-              >
-                500+ professional therapists nationwide
-              </motion.span>
-            </div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-300">
+                500+ therapists nationwide
+              </span>
+            </motion.div>
 
             <h1 className="mb-6 font-display text-[clamp(3rem,8.5vw,6.5rem)] font-extrabold uppercase leading-[0.85] tracking-[-0.05em]">
               {headlineLines.map((line, i) => (
@@ -148,14 +135,12 @@ export default function HeroClient() {
                       }
                       className="relative ml-2 inline-flex h-[0.8em] w-[0.8em] align-middle"
                     >
-                      {/* Expanding "live signal" rings */}
                       {!reducedMotion && (
                         <>
                           <span className="_dotping absolute inset-0 rounded-full bg-primary/60" />
                           <span className="_dotping2 absolute inset-0 rounded-full bg-primary/40" />
                         </>
                       )}
-                      {/* Core dot with a soft breathing glow */}
                       <span className="_dotcore relative inline-block h-full w-full rounded-full bg-primary" />
                     </motion.span>
                   )}
@@ -179,7 +164,7 @@ export default function HeroClient() {
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: reducedMotion ? 0 : 0.7, ease: customEase, delay: reducedMotion ? 0 : TYPING_END + 0.1 }}
-              className="speakable-intro mb-8 max-w-xl text-lg leading-relaxed text-muted-foreground lg:text-xl"
+              className="speakable-intro mb-8 max-w-xl text-lg leading-relaxed text-slate-300 lg:text-xl"
             >
               Premium male massage therapists across the US — real profiles, real reviews,
               and AI-powered search with Knotty. Dallas, Houston, Miami, NYC, and 80+ cities.
@@ -193,15 +178,17 @@ export default function HeroClient() {
             >
               <Link
                 href="/search"
-                className="inline-flex h-14 items-center justify-center rounded-full bg-primary px-8 font-semibold text-primary-foreground transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-primary/25"
+                className="group inline-flex h-14 items-center justify-center gap-2 rounded-full bg-primary px-8 font-semibold text-primary-foreground transition-all duration-200 hover:scale-[1.03] hover:shadow-lg hover:shadow-primary/25"
               >
+                <Search className="h-5 w-5" strokeWidth={2.25} />
                 Find a therapist
               </Link>
               <Link
                 href="/for-therapists"
-                className="inline-flex h-14 items-center justify-center rounded-full border border-border bg-transparent px-8 font-semibold text-foreground transition-all duration-200 hover:border-foreground hover:bg-accent/50"
+                className="group inline-flex h-14 items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-8 font-semibold text-foreground backdrop-blur transition-all duration-200 hover:border-white/25 hover:bg-white/[0.08]"
               >
-                List your practice
+                Join the network
+                <ArrowUpRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" strokeWidth={2.25} />
               </Link>
             </motion.div>
           </div>
@@ -214,9 +201,9 @@ export default function HeroClient() {
             className="relative"
           >
             <CityGlobe />
-            <div className="pointer-events-none mt-2 flex items-center justify-center gap-2 text-center">
-              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-primary" />
-              <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            <div className="pointer-events-none mt-3 flex items-center justify-center gap-2 text-center">
+              <Globe className="h-3.5 w-3.5 text-primary" strokeWidth={2.25} />
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-slate-400">
                 Live coverage · 57+ cities · drag to explore
               </span>
             </div>
@@ -241,7 +228,7 @@ export default function HeroClient() {
           className="object-cover"
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#060E1A]" />
       </motion.div>
     </section>
   );
