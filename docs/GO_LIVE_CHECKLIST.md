@@ -2,6 +2,13 @@
 
 This checklist defines the minimum release gates required before sending MasseurMatch to production.
 
+> **Final closure pass (2026-06-03):** the full repository gate (section 1) was
+> re-run and passes end to end. The session signing secret is now
+> `MM_SESSION_SECRET` only — the `SUPABASE_SERVICE_ROLE_KEY` fallback has been
+> removed from both `src/app/api/_lib/session.ts` and `src/middleware.ts`, so
+> `MM_SESSION_SECRET` must be present in every deployed environment (it is
+> already set in production).
+
 ## 1. Repository gates
 
 Run these commands from the repository root:

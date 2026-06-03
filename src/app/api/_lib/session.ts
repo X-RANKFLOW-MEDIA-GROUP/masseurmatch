@@ -20,7 +20,6 @@ function sessionSecret(): string {
     "SESSION_SECRET",
     "MM_JWT_SECRET",
     "JWT_SECRET",
-    "SUPABASE_SERVICE_ROLE_KEY",
   ]);
   if (secret) return secret;
   // Only fall back to a constant for genuine local development/testing. Any
