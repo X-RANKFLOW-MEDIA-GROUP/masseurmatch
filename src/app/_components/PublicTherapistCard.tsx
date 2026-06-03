@@ -74,7 +74,7 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
         aria-label={`${name} – massage therapist${locationLabel ? ` in ${locationLabel}` : ""}${priceLabel ? `, from ${priceLabel}` : ""}`}
       >
         {/* Photo */}
-        <div className="relative aspect-[4/5] overflow-hidden bg-neutral-100">
+        <div className="relative aspect-square overflow-hidden bg-neutral-100">
           <Image
             src={profileImage}
             alt={`${name} – massage therapist in ${city || "your area"}`}
@@ -127,7 +127,7 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
         </div>
 
         {/* Info row */}
-        <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+        <div className="flex items-center justify-between gap-2 px-2.5 py-2">
           <div className="min-w-0">
             {locationLabel ? (
               <p className="flex items-center gap-1 truncate text-[11px] font-medium text-neutral-500">

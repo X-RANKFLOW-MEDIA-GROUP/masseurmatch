@@ -112,7 +112,7 @@ export default function TherapistsPageClient({
       </div>
 
       {items.length > 0 ? (
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mt-6 grid gap-3 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {items.map((item) => (
             <PublicTherapistCard key={item.id} therapist={item} />
           ))}

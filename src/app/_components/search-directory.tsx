@@ -274,7 +274,7 @@ export function SearchDirectory({
       />
 
       {visibleItems.length > 0 ? (
-        <div className="stagger-grid mt-6 grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="stagger-grid mt-6 grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {visibleItems.map((item) => (
             <PublicTherapistCard key={item.id} therapist={item} />
           ))}
