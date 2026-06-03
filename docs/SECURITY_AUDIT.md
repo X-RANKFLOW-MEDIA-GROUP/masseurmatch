@@ -67,18 +67,22 @@ These were left for a human to apply because they touch deployment
 configuration or coupled secret-resolution logic, where a blind change could
 cause a production outage.
 
-### A. HIGH — Session-secret resolution fallback
+### A. HIGH — Session-secret resolution fallback (partially fixed)
 `src/app/api/_lib/session.ts` and `src/middleware.ts` resolve the HMAC signing
 secret as `MM_SESSION_SECRET || … || SUPABASE_SERVICE_ROLE_KEY`, with a
-hardcoded `'dev-only-…'` constant outside production. Two concerns:
-1. Reusing the service-role key as a signing key couples two distinct secrets.
-2. Any non-`production` deployed environment using the constant fallback lets
-   an attacker forge a cookie with `role:"admin"`.
+hardcoded `'dev-only-…'` constant.
 
-Recommended: set a dedicated `MM_SESSION_SECRET` in **every** deployed
-environment and drop the service-role-key and constant fallbacks. Not changed
-automatically because production may currently rely on the service-role-key
-fallback, and the secret must match between `session.ts` and `middleware.ts`.
+Fixed: the constant fallback is now restricted to `NODE_ENV` of `development`
+or `test`. Any deployed environment (production, preview, staging) without a
+real secret now throws instead of silently signing with a forgeable constant.
+The resolution order is otherwise unchanged, so existing deployments keep the
+same secret (no forced logouts).
+
+Still recommended: set a dedicated `MM_SESSION_SECRET` in **every** deployed
+environment and drop the `SUPABASE_SERVICE_ROLE_KEY` fallback so the signing
+key is decoupled from the database key. Not done automatically because
+production may currently rely on that fallback (removing it without first
+setting `MM_SESSION_SECRET` would invalidate all live sessions).
 
 ### B. MEDIUM — Middleware authorizes on the cookie `role` claim
 `src/middleware.ts` gates `/pro`, `/client`, `/admin` on the cookie `role`.
