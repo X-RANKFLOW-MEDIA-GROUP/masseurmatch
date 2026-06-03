@@ -26,8 +26,7 @@ function getSessionSecret(): string {
     process.env.MM_SESSION_SECRET ??
     process.env.SESSION_SECRET ??
     process.env.MM_JWT_SECRET ??
-    process.env.JWT_SECRET ??
-    process.env.SUPABASE_SERVICE_ROLE_KEY;
+    process.env.JWT_SECRET;
   if (secret) return secret;
   // Only fall back to a constant for genuine local development/testing. Any
   // deployed environment (production, preview, staging) must provide a real

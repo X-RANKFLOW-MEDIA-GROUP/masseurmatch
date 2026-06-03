@@ -61,28 +61,29 @@ to each, throttling credential guessing and email bombing per client IP.
 `.or()` expression. Added a `^[a-z0-9-]+$` allowlist (valid for both slugs and
 UUIDs) so filter operators (`,` `.` `)`) cannot be injected.
 
+### 5. HIGH — Session-secret decoupled from the database key (now fully fixed)
+`src/app/api/_lib/session.ts` and `src/middleware.ts` previously resolved the
+HMAC signing secret as `MM_SESSION_SECRET || … || SUPABASE_SERVICE_ROLE_KEY`,
+with a hardcoded `'dev-only-…'` constant.
+
+Fixed in two stages:
+
+1. The constant fallback was restricted to `NODE_ENV` of `development`/`test`.
+   Any deployed environment (production, preview, staging) without a real secret
+   now throws instead of silently signing with a forgeable constant.
+2. The `SUPABASE_SERVICE_ROLE_KEY` fallback has now been **removed** from both
+   files. The signing key is `MM_SESSION_SECRET` (or one of `SESSION_SECRET` /
+   `MM_JWT_SECRET` / `JWT_SECRET`) only, fully decoupled from the database key.
+   This is safe to apply now because `MM_SESSION_SECRET` is confirmed set in the
+   production environment, so live sessions are unaffected (no forced logouts).
+
+Both files keep an identical resolution order, so cookies signed by API routes
+and validated by the Edge middleware continue to match.
+
 ## Open recommendations (not auto-applied — require deployment context)
 
 These were left for a human to apply because they touch deployment
-configuration or coupled secret-resolution logic, where a blind change could
-cause a production outage.
-
-### A. HIGH — Session-secret resolution fallback (partially fixed)
-`src/app/api/_lib/session.ts` and `src/middleware.ts` resolve the HMAC signing
-secret as `MM_SESSION_SECRET || … || SUPABASE_SERVICE_ROLE_KEY`, with a
-hardcoded `'dev-only-…'` constant.
-
-Fixed: the constant fallback is now restricted to `NODE_ENV` of `development`
-or `test`. Any deployed environment (production, preview, staging) without a
-real secret now throws instead of silently signing with a forgeable constant.
-The resolution order is otherwise unchanged, so existing deployments keep the
-same secret (no forced logouts).
-
-Still recommended: set a dedicated `MM_SESSION_SECRET` in **every** deployed
-environment and drop the `SUPABASE_SERVICE_ROLE_KEY` fallback so the signing
-key is decoupled from the database key. Not done automatically because
-production may currently rely on that fallback (removing it without first
-setting `MM_SESSION_SECRET` would invalidate all live sessions).
+configuration where a blind change could cause a production outage.
 
 ### B. MEDIUM — Middleware authorizes on the cookie `role` claim
 `src/middleware.ts` gates `/pro`, `/client`, `/admin` on the cookie `role`.

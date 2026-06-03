@@ -82,7 +82,7 @@ export default function TrustPage() {
               <h3 className="font-display mb-3 text-2xl font-medium">AI Singleton Moderation</h3>
               <p className="mb-6 font-sans text-sm leading-relaxed text-slate-400">
                 Our proprietary Artificial Intelligence system reads and verifies every word and
-                photo pending_approval to the platform in real-time. We automatically identify and block
+                photo submitted to the platform in real-time. We automatically identify and block
                 fake profiles or inappropriate language before they ever go live.
               </p>
               <div className="flex items-center gap-2">

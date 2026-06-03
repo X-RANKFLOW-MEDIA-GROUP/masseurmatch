@@ -68,7 +68,7 @@ const badgeMeanings = [
   {
     icon: UserCheck,
     title: "Identity reviewed",
-    description: "The provider pending_approval identity information for trust and safety review.",
+    description: "The provider submitted identity information for trust and safety review.",
   },
   {
     icon: Camera,
