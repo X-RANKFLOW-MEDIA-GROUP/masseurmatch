@@ -79,7 +79,7 @@ const CONTENT_SECURITY_POLICY = [
   "style-src 'self' 'unsafe-inline' https:",
   `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}https://js.stripe.com https://vercel.live`,
   "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://vercel.live https://*.vercel.app https://*.vercel.sh",
-  "frame-src 'self' http://localhost:* https://*.vusercontent.net https://*.lite.vusercontent.net https://generated.vusercontent.net https://*.vercel.net https://*.vercel.run https://*.vercel.app https://*.vercel.sh https://vercel.live https://vercel.com https://vercel.fides-cdn.ethyca.com https://js.stripe.com https://hooks.stripe.com https://*.accounts.dev https://*.clerk.accounts.dev https://ops.askchapter.org https://*.supabase.co",
+  "frame-src 'self' http://localhost:* https://*.vusercontent.net https://*.lite.vusercontent.net https://generated.vusercontent.net https://*.vercel.net https://*.vercel.run https://*.vercel.app https://*.vercel.sh https://vercel.live https://vercel.com https://vercel.fides-cdn.ethyca.com https://js.stripe.com https://hooks.stripe.com https://*.accounts.dev https://*.clerk.accounts.dev https://ops.askchapter.org https://*.supabase.co https://www.google.com https://maps.google.com",
   "worker-src 'self' blob:",
   "upgrade-insecure-requests"
 ].join("; ");

@@ -12,8 +12,12 @@ import { buildBreadcrumbJsonLd, buildFaqJsonLd, createPageMetadata } from "@/app
 import { InternalLinks } from "@/components/profile/InternalLinks";
 import { MobileContactCTA, StickyContactCard } from "@/components/profile/StickyContactCard";
 import { ProfileHero } from "@/components/profile/ProfileHero";
+import { ProfileKnotty } from "@/components/profile/ProfileKnotty";
+import { ProfileLocationMap } from "@/components/profile/ProfileLocationMap";
+import { ProfileQandA } from "@/components/profile/ProfileQandA";
 import { ProfileStructuredData } from "@/components/profile/ProfileStructuredData";
 import { SeoContentSections } from "@/components/profile/SeoContentSections";
+import { buildProfileFaq } from "@/components/profile/profile-faq";
 import { buildProfileViewModel } from "@/components/profile/profile-utils";
 
 type Params = { slug: string };
@@ -85,7 +89,30 @@ export default async function TherapistPage({ params }: { params: Promise<Params
   const profile = buildProfileViewModel(dbProfile, photos);
   const matchedCity = getCities().find((city) => city.name.toLowerCase() === profile.city.toLowerCase());
   const profilePath = `/therapists/${profile.slug}`;
-  const faqItems = Array.isArray(dbProfile.custom_faq) && dbProfile.custom_faq.length > 0 ? dbProfile.custom_faq : [];
+  const faqItems = buildProfileFaq(
+    profile,
+    Array.isArray(dbProfile.custom_faq) ? dbProfile.custom_faq : [],
+  );
+  const knottyFacts = {
+    name: profile.name,
+    firstName: profile.name.split(" ")[0] || profile.name,
+    city: profile.city,
+    neighborhood: profile.neighborhood,
+    services: profile.services,
+    specialties: profile.specialties,
+    startingPrice: profile.startingPrice,
+    incallPrice: profile.incallPrice,
+    outcallPrice: profile.outcallPrice,
+    incallAvailable: profile.incallAvailable,
+    outcallAvailable: profile.outcallAvailable,
+    travelRadius: /mile/i.test(profile.travelRadius) ? profile.travelRadius : "",
+    availabilityDays: profile.availabilityDays,
+    availabilityHours: profile.availabilityHours,
+    yearsExperience: profile.yearsExperience,
+    preferredContactMethod: profile.preferredContactMethod,
+    lgbtqAffirming: Boolean(dbProfile.lgbtq_affirming),
+    availableNow: Boolean(dbProfile.available_now),
+  };
 
   return (
     <main className="min-h-screen bg-[#071018] text-[#F8FAFC]" style={{ background: "radial-gradient(circle at top left, rgba(59,130,246,0.12), transparent 35%), radial-gradient(circle at bottom right, rgba(14,165,233,0.08), transparent 30%), #071018" }}>
@@ -99,7 +126,9 @@ export default async function TherapistPage({ params }: { params: Promise<Params
           <div className="hidden items-center gap-5 text-sm text-[#94A3B8] md:flex">
             <a href="#services" className="hover:text-white">Services</a>
             <a href="#pricing" className="hover:text-white">Pricing</a>
-            <a href="#gallery" className="hover:text-white">Gallery</a>
+            <a href="#location" className="hover:text-white">Location</a>
+            <a href="#faq" className="hover:text-white">Q&amp;A</a>
+            <a href="#ask-knotty" className="hover:text-white">Ask Knotty</a>
             <a href="#contact" className="hover:text-white">Contact</a>
           </div>
         </div>
@@ -109,6 +138,9 @@ export default async function TherapistPage({ params }: { params: Promise<Params
         <div className="space-y-8">
           <ProfileHero profile={profile} />
           <SeoContentSections profile={profile} />
+          <ProfileLocationMap profile={profile} />
+          <ProfileQandA items={faqItems} name={profile.name} />
+          <ProfileKnotty facts={knottyFacts} />
           <InternalLinks profile={profile} relatedProfiles={relatedResult.items} />
         </div>
         <StickyContactCard profile={profile} />
