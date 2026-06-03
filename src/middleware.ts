@@ -29,10 +29,13 @@ function getSessionSecret(): string {
     process.env.JWT_SECRET ??
     process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (secret) return secret;
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('MM_SESSION_SECRET is required in production.');
+  // Only fall back to a constant for genuine local development/testing. Any
+  // deployed environment (production, preview, staging) must provide a real
+  // secret so an attacker cannot forge a signed admin cookie.
+  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+    return 'dev-only-masseurmatch-session-secret';
   }
-  return 'dev-only-masseurmatch-session-secret';
+  throw new Error('MM_SESSION_SECRET is required outside local development.');
 }
 
 function toBase64Url(bytes: Uint8Array): string {
