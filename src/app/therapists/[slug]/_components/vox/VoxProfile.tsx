@@ -93,40 +93,8 @@ export function VoxProfile({
     { label: "Languages", value: String(profile.languages.length), suffix: profile.languages.length === 1 ? "lang" : "langs" },
   ];
 
-  const subnav = [
-    { href: "#about", label: "Overview" },
-    { href: "#services", label: "Services" },
-    { href: "#rates", label: "Rates" },
-    { href: "#availability", label: "Availability" },
-    { href: "#contact", label: "Contact" },
-  ];
-
   return (
     <main className="min-h-screen bg-[#FBF6F0] text-[#1a1a1a]">
-      {/* ── Local sticky subnav ─────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-30 border-b border-[#efe3d8] bg-[#FBF6F0]/85 backdrop-blur-xl" aria-label="Profile sections">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
-          <Link href="/" className="font-display text-lg font-extrabold tracking-tight text-[#060E1A]">
-            Masseur<span className="text-[#FF8A1F]">Match</span>
-          </Link>
-          <div className="hidden items-center gap-6 text-sm font-medium text-[#5a5147] md:flex">
-            {subnav.map((item) => (
-              <a key={item.href} href={item.href} className="transition-colors hover:text-[#060E1A]">
-                {item.label}
-              </a>
-            ))}
-          </div>
-          {phoneHref || whatsappHref ? (
-            <a
-              href={phoneHref || whatsappHref || "#contact"}
-              className="inline-flex h-10 items-center rounded-full bg-[#060E1A] px-5 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5"
-            >
-              Get in touch
-            </a>
-          ) : null}
-        </div>
-      </nav>
-
       <div className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:px-6 lg:pb-16">
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="mb-5 flex flex-wrap items-center gap-1.5 text-sm text-[#8a7d6f]">
