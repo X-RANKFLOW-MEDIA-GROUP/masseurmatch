@@ -54,19 +54,19 @@
 
 @layer base {
   :root {
-    --background: 220 33% 99%;
+    --background: 40 30% 98%;
     --foreground: 222 19% 11%;
     --card: 0 0% 100%;
     --card-foreground: 222 19% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 19% 11%;
-    --primary: 214 66% 14%;
+    --primary: 215 68% 12%;
     --primary-foreground: 0 0% 100%;
     --secondary: 220 25% 92%;
     --secondary-foreground: 222 19% 11%;
     --muted: 220 25% 92%;
     --muted-foreground: 225 10% 33%;
-    --accent: 26 100% 56%;
+    --accent: 27 96% 53%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 73% 52%;
     --destructive-foreground: 0 0% 100%;
@@ -74,8 +74,8 @@
     --input: 220 28% 88%;
     --ring: 214 50% 34%;
     --radius: 1rem;
-    --shadow-subtle: 0 18px 40px rgb(var(--color-brand-primary-rgb) / 0.08);
-    --shadow-card: 0 30px 72px rgb(var(--color-brand-primary-rgb) / 0.14);
+    --shadow-subtle: 0 1px 2px rgb(var(--color-brand-primary-rgb) / 0.04), 0 12px 32px rgb(var(--color-brand-primary-rgb) / 0.07);
+    --shadow-card: 0 2px 4px rgb(var(--color-brand-primary-rgb) / 0.05), 0 24px 60px rgb(var(--color-brand-primary-rgb) / 0.12);
     --sidebar-background: 214 66% 14%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 26 100% 56%;
@@ -158,27 +158,27 @@
   }
 
   .theme-masseurmatch {
-    --background: 220 33% 99%;
+    --background: 40 30% 98%;
     --foreground: 222 19% 11%;
     --card: 0 0% 100%;
     --card-foreground: 222 19% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 19% 11%;
-    --primary: 214 66% 14%;
+    --primary: 215 68% 12%;
     --primary-foreground: 0 0% 100%;
     --secondary: 220 25% 92%;
     --secondary-foreground: 222 19% 11%;
     --muted: 220 25% 92%;
     --muted-foreground: 225 10% 33%;
-    --accent: 26 100% 56%;
+    --accent: 27 96% 53%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 73% 52%;
     --destructive-foreground: 0 0% 100%;
     --border: 220 28% 88%;
     --input: 220 28% 88%;
     --ring: 214 50% 34%;
-    --shadow-subtle: 0 18px 40px rgb(var(--color-brand-primary-rgb) / 0.08);
-    --shadow-card: 0 30px 72px rgb(var(--color-brand-primary-rgb) / 0.14);
+    --shadow-subtle: 0 1px 2px rgb(var(--color-brand-primary-rgb) / 0.04), 0 12px 32px rgb(var(--color-brand-primary-rgb) / 0.07);
+    --shadow-card: 0 2px 4px rgb(var(--color-brand-primary-rgb) / 0.05), 0 24px 60px rgb(var(--color-brand-primary-rgb) / 0.12);
     --sidebar-background: 214 66% 14%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 26 100% 56%;
