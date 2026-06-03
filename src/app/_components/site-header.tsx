@@ -4,7 +4,9 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
+import { BRAND_ASSETS } from "@/lib/brand";
 import {
   ChevronDown,
   Menu,
@@ -118,8 +120,15 @@ function MobileNav({ dashboardPath, authenticated, onLogout }: { dashboardPath: 
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <Link href="/" onClick={() => setOpen(false)} className="font-display text-lg font-bold tracking-tighter text-foreground">
-            Masseur<span className="text-[#FF8A1F]">Match</span>
+          <Link href="/" onClick={() => setOpen(false)} className="flex items-center" aria-label="MasseurMatch home">
+            <Image
+              src={BRAND_ASSETS.logo}
+              alt="MasseurMatch"
+              width={150}
+              height={100}
+              priority
+              className="h-8 w-auto"
+            />
           </Link>
           <button
             type="button"
@@ -246,10 +255,15 @@ export default function SiteHeader() {
       }`}
     >
       <div className="w-full max-w-[1400px] mx-auto flex items-center justify-between px-6 lg:px-10 py-4">
-        <Link href="/" className="group flex items-center gap-2">
-          <span className={`font-['Georgia','Times_New_Roman',serif] text-[24px] font-bold tracking-tight transition-colors ${isDarkHero ? "text-white" : "text-[#0B1F3A]"}`}>
-            Masseur<span className="text-[#FF8A1F]">Match</span>
-          </span>
+        <Link href="/" className="group flex items-center" aria-label="MasseurMatch home">
+          <Image
+            src={BRAND_ASSETS.logo}
+            alt="MasseurMatch"
+            width={165}
+            height={110}
+            priority
+            className={`h-9 w-auto transition-all ${isDarkHero ? "drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]" : ""}`}
+          />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1">

@@ -5,6 +5,7 @@ import { SiteFooter } from "@/app/_components/site-footer";
 import SiteHeader from "@/app/_components/site-header";
 import { CookieConsent } from "@/app/_components/CookieConsent";
 import { ChatWidget } from "@/app/_components/chat-widget";
+import { IntroVideoSplash } from "@/app/_components/IntroVideoSplash";
 import { SITE_DESCRIPTION, SITE_NAME, createPageMetadata } from "@/app/_lib/metadata";
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/app/_lib/structured-data";
 import { AppProviders } from "@/app/providers";
@@ -24,7 +25,7 @@ const rootMetadata = createPageMetadata({
   path: "/",
 });
 
-const faviconVersion = "20260508b";
+const faviconVersion = "20260603mm";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -32,12 +33,9 @@ export const metadata: Metadata = {
   manifest: `/manifest.json?v=${faviconVersion}`,
   category: "wellness",
   icons: {
-    icon: [
-      { url: `/favicon.svg?v=${faviconVersion}`, type: "image/svg+xml" },
-      { url: `/favicon.ico?v=${faviconVersion}`, type: "image/x-icon" },
-    ],
-    shortcut: `/favicon.svg?v=${faviconVersion}`,
-    apple: `/favicon.svg?v=${faviconVersion}`,
+    icon: [{ url: `/favicon.ico?v=${faviconVersion}`, type: "image/x-icon" }],
+    shortcut: `/favicon.ico?v=${faviconVersion}`,
+    apple: `/favicon.ico?v=${faviconVersion}`,
   },
   ...rootMetadata,
   alternates: {
@@ -50,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${unbounded.variable}`}>
       <body className="theme-masseurmatch min-h-screen overflow-x-hidden font-sans text-foreground antialiased">
         <AppProviders>
+          <IntroVideoSplash />
           <JsonLd data={buildOrganizationJsonLd()} />
           <JsonLd data={buildWebsiteJsonLd()} />
           <div style={{ position: "relative", zIndex: 9999 }}>

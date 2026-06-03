@@ -58,8 +58,11 @@ const LEGACY_REDIRECTS = [
   { source: "/cities/dallas-tx/mobile", destination: "/dallas/wellness/mobile-massage", permanent: true },
   { source: "/cities/dallas-tx/hotel", destination: "/dallas/wellness/hotel-massage", permanent: true },
   // Global legacy aliases
-  { source: "/Auth", destination: "/auth", permanent: true },
-  { source: "/Privacy", destination: "/privacy", permanent: true },
+  // NOTE: Next.js redirect `source` matching is case-insensitive, so a redirect
+  // whose source differs from its destination only by letter case (e.g.
+  // "/Auth" -> "/auth") matches the lowercase destination too and creates an
+  // infinite 308 loop. Capitalized variants are handled safely by the
+  // case-sensitive (===) guards in src/middleware.ts instead.
   { source: "/massage-therapists", destination: "/therapists", permanent: true },
   // Client-side booking pages removed — clients browse without accounts
   { source: "/client", destination: "/search", permanent: false },
@@ -75,6 +78,7 @@ const CONTENT_SECURITY_POLICY = [
   "object-src 'none'",
   "form-action 'self'",
   "img-src 'self' data: blob: https:",
+  "media-src 'self' blob: https://a9brroevex4i0bnq.public.blob.vercel-storage.com",
   "font-src 'self' data: https:",
   "style-src 'self' 'unsafe-inline' https:",
   `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}https://js.stripe.com https://vercel.live`,

@@ -61,8 +61,10 @@ export const legacyRedirects: LegacyRedirect[] = [
   { source: "/cities/dallas-tx/mobile", destination: "/dallas/wellness/mobile-massage", permanent: true },
   { source: "/cities/dallas-tx/hotel", destination: "/dallas/wellness/hotel-massage", permanent: true },
   // Global legacy aliases
-  { source: "/Auth", destination: "/auth", permanent: true },
-  { source: "/Privacy", destination: "/privacy", permanent: true },
+  // NOTE: case-only redirects (e.g. "/Auth" -> "/auth") are intentionally NOT
+  // listed here. Next.js redirect source matching is case-insensitive, so they
+  // loop infinitely; capitalized variants are handled by case-sensitive guards
+  // in src/middleware.ts instead.
   { source: "/massage-therapists", destination: "/therapists", permanent: true },
 ];
 
