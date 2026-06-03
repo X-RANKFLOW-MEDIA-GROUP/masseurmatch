@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ShieldCheck } from "lucide-react";
+import { Check, ShieldCheck } from "lucide-react";
 import FadeUp from "@/components/motion/FadeUp";
 
 const TRUST_POINTS = [
