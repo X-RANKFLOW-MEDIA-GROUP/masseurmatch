@@ -32,8 +32,15 @@ const VISIBILITY_LEVELS: Record<string, number> = {
   elite: 4,
 }
 
+// Resolve the current billing period end. Under the Stripe "Basil" API version
+// this lives on the subscription items, not on the subscription itself.
+function getCurrentPeriodEnd(sub: Stripe.Subscription): string | null {
+  const periodEnd = sub.items?.data?.[0]?.current_period_end
+  return typeof periodEnd === 'number' ? new Date(periodEnd * 1000).toISOString() : null
+}
+
 // Build the profile update payload for a subscription sync.
-function buildTierUpdate(tier: string, sub: { id: string; customer?: string | Stripe.Customer | Stripe.DeletedCustomer | null }) {
+function buildTierUpdate(tier: string, sub: Stripe.Subscription) {
   const customerId =
     typeof sub.customer === 'string' ? sub.customer : (sub.customer as Stripe.Customer | null)?.id ?? null
 
@@ -44,6 +51,7 @@ function buildTierUpdate(tier: string, sub: { id: string; customer?: string | St
     visibility_level: VISIBILITY_LEVELS[tier] ?? 1,
     stripe_customer_id: customerId,
     stripe_subscription_id: sub.id,
+    current_period_end: getCurrentPeriodEnd(sub),
     updated_at: new Date().toISOString(),
   }
 }
@@ -121,21 +129,11 @@ export async function POST(request: NextRequest) {
       if (!subscriptionId || !userId) break
 
       const tier = planKeyToTier(planKey)
-      const customerId =
-        typeof session.customer === 'string' ? session.customer : (session.customer as Stripe.Customer | null)?.id ?? null
+      // Retrieve the subscription so we capture the billing period end alongside
+      // the tier on the initial purchase.
+      const sub = await stripe.subscriptions.retrieve(subscriptionId)
 
-      await supabase
-        .from('profiles')
-        .update({
-          subscription_tier: tier,
-          _tier: tier,
-          photo_limit: PHOTO_LIMITS[tier] ?? 2,
-          visibility_level: VISIBILITY_LEVELS[tier] ?? 1,
-          stripe_customer_id: customerId,
-          stripe_subscription_id: subscriptionId,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('user_id', userId)
+      await supabase.from('profiles').update(buildTierUpdate(tier, sub)).eq('user_id', userId)
 
       break
     }
