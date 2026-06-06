@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { CityGlobe } from "@/components/marketing/CityGlobe";
+import { Cta3DButton } from "@/components/marketing/Cta3DButton";
+import { HeroMediaBanner } from "@/components/marketing/HeroMediaBanner";
 
 const avatarStack = [
   { id: 1, src: "/marketing/hero/avatar-1.jpg", alt: "Verified therapist", initials: "JM", color: "from-orange-500 to-amber-600" },
@@ -189,20 +190,14 @@ export default function HeroClient() {
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: reducedMotion ? 0 : 0.7, ease: customEase, delay: reducedMotion ? 0 : TYPING_END + 0.2 }}
-              className="flex flex-wrap gap-3"
+              className="flex flex-wrap items-center gap-4"
             >
-              <Link
-                href="/search"
-                className="inline-flex h-14 items-center justify-center rounded-full bg-primary px-8 font-semibold text-primary-foreground transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-primary/25"
-              >
+              <Cta3DButton href="/search" variant="primary">
                 Find a therapist
-              </Link>
-              <Link
-                href="/for-therapists"
-                className="inline-flex h-14 items-center justify-center rounded-full border border-border bg-transparent px-8 font-semibold text-foreground transition-all duration-200 hover:border-foreground hover:bg-accent/50"
-              >
+              </Cta3DButton>
+              <Cta3DButton href="/for-therapists" variant="dark" withIcon={false}>
                 List your practice
-              </Link>
+              </Cta3DButton>
             </motion.div>
           </div>
 
@@ -224,24 +219,15 @@ export default function HeroClient() {
         </div>
       </div>
 
-      {/* ── Cinematic cover band (scroll reward) ─────────────────────── */}
+      {/* ── Cinematic cover band (video on desktop, still on mobile) ──── */}
       <motion.div
         initial={{ clipPath: "inset(100% 0 0 0)" }}
         whileInView={{ clipPath: "inset(0% 0 0 0)" }}
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: reducedMotion ? 0 : 1.0, ease: customEase }}
-        className="relative z-10 aspect-[4/3] w-full overflow-hidden sm:aspect-video lg:aspect-[21/9]"
+        className="relative z-10 w-full overflow-hidden"
       >
-        <Image
-          src="/marketing/hero/cover.jpg"
-          alt="Professional massage therapy — editorial hero"
-          fill
-          priority
-          fetchPriority="high"
-          className="object-cover"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/60" />
+        <HeroMediaBanner reducedMotion={!!reducedMotion} />
       </motion.div>
     </section>
   );
