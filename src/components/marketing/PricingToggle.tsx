@@ -1,69 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
-
-type Cycle = "monthly" | "yearly";
-
-const PLANS = [
-  {
-    id: "free",
-    name: "Free",
-    monthly: 0,
-    yearly: 0,
-    description: "Get started with a basic presence",
-    badge: null,
-    featured: false,
-    features: ["Basic profile listing", "1 city listing", "Contact form"],
-    cta: "Get started",
-    ctaHref: "/signup",
-    filled: false,
-  },
-  {
-    id: "verified",
-    name: "Verified",
-    monthly: 49,
-    yearly: 39,
-    description: "Grow your practice with verified trust signals",
-    badge: "Most Popular",
-    featured: true,
-    features: [
-      "Verified badge on profile",
-      "Multi-city listings",
-      "Priority search placement",
-      "Analytics dashboard",
-    ],
-    cta: "Start Verified",
-    ctaHref: "/pricing",
-    filled: true,
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    monthly: 99,
-    yearly: 79,
-    description: "Maximum visibility for established therapists",
-    badge: null,
-    featured: false,
-    features: [
-      "Everything in Verified",
-      "Featured homepage placement",
-      "Hotel & travel listings",
-      "Premium support",
-      "Custom profile URL",
-    ],
-    cta: "Go Pro",
-    ctaHref: "/pricing",
-    filled: false,
-  },
-] as const;
+import { PLANS } from "@/lib/pricing";
 
 const springConfig = { type: "spring", stiffness: 400, damping: 30 } as const;
 
 export function PricingToggle() {
-  const [cycle, setCycle] = useState<Cycle>("monthly");
+  // Display the three tiers most relevant for the homepage teaser: Free, Pro (most popular), Elite.
+  // The full plan comparison lives at /pricing.
+  const featured = PLANS.filter((p) => p.tier !== "standard");
 
   return (
     <section className="py-20 lg:py-32">
@@ -74,53 +21,28 @@ export function PricingToggle() {
           <h2 className="mt-3 font-display text-[clamp(2.5rem,5vw,4.5rem)] font-extrabold leading-[0.95] tracking-tight">
             Plans for therapists.
           </h2>
-        </div>
-
-        {/* Billing-cycle toggle */}
-        <div className="mb-12 flex justify-center">
-          <div className="inline-flex rounded-full bg-muted p-1">
-            {(["monthly", "yearly"] as const).map((c) => (
-              <button
-                key={c}
-                onClick={() => setCycle(c)}
-                className="relative rounded-full px-5 py-2 text-sm font-semibold"
-              >
-                {cycle === c && (
-                  <motion.span
-                    layoutId="pricing-toggle"
-                    className="absolute inset-0 rounded-full bg-primary"
-                    transition={springConfig}
-                  />
-                )}
-                <span
-                  className={`relative z-10 ${
-                    cycle === c ? "text-primary-foreground" : "text-foreground"
-                  }`}
-                >
-                  {c === "monthly" ? "Monthly" : "Yearly — Save 20%"}
-                </span>
-              </button>
-            ))}
-          </div>
+          <p className="mt-4 text-base text-muted-foreground">
+            14-day free trial on all paid tiers · Founder offer: 50% off your first 3 months
+          </p>
         </div>
 
         {/* Plan cards */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {PLANS.map((plan) => {
-            const price = cycle === "monthly" ? plan.monthly : plan.yearly;
+          {featured.map((plan) => {
+            const price = plan.price / 100;
             return (
               <div
-                key={plan.id}
+                key={plan.tier}
                 className={`relative rounded-3xl border p-8 ${
-                  plan.featured
+                  plan.popular
                     ? "scale-[1.02] border-primary ring-2 ring-primary"
                     : "border-border bg-card"
                 }`}
               >
-                {plan.badge && (
+                {plan.popular && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap">
                     <span className="rounded-full bg-primary px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary-foreground">
-                      {plan.badge}
+                      Most Popular
                     </span>
                   </div>
                 )}
@@ -136,9 +58,10 @@ export function PricingToggle() {
                     <span className="mb-1 text-base text-muted-foreground">/mo</span>
                   )}
                 </div>
-                {cycle === "yearly" && price > 0 && (
+
+                {plan.trialDays && (
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Billed annually &mdash; ${price * 12}/yr
+                    {plan.trialDays}-day free trial
                   </p>
                 )}
 
@@ -152,19 +75,26 @@ export function PricingToggle() {
                 </ul>
 
                 <Link
-                  href={plan.ctaHref}
+                  href={`/signup/plan?selected=${plan.tier}`}
                   className={`mt-8 flex h-12 w-full items-center justify-center rounded-full text-sm font-semibold transition-all ${
-                    plan.filled
+                    plan.popular
                       ? "bg-primary text-primary-foreground hover:opacity-90"
                       : "border border-border hover:bg-muted"
                   }`}
                 >
-                  {plan.cta}
+                  {price === 0 ? "Get started free" : `Start ${plan.name}`}
                 </Link>
               </div>
             );
           })}
         </div>
+
+        <p className="mt-8 text-center text-sm text-muted-foreground">
+          Need the full comparison?{" "}
+          <Link href="/pricing" className="font-semibold text-primary hover:underline">
+            See all plans
+          </Link>
+        </p>
       </div>
     </section>
   );

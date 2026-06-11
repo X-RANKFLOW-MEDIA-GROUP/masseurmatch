@@ -12,6 +12,7 @@ import { ProfileStructuredData } from "@/components/profile/ProfileStructuredDat
 import { buildProfileFaq } from "@/components/profile/profile-faq";
 import { buildProfileViewModel } from "@/components/profile/profile-utils";
 import { VoxProfile } from "@/app/therapists/[slug]/_components/vox/VoxProfile";
+import { DemoProfileBanner } from "@/app/_components/demo-profile-banner";
 
 type Params = { slug: string };
 
@@ -55,17 +56,19 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       description: profile.seoDescription,
       images: [profile.ogImage],
     },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        "max-image-preview": "large",
-        "max-snippet": -1,
-        "max-video-preview": -1,
-      },
-    },
+    robots: dbProfile.is_demo
+      ? { index: false, follow: false }
+      : {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+            "max-video-preview": -1,
+          },
+        },
   };
 }
 
@@ -107,6 +110,7 @@ export default async function TherapistPage({ params }: { params: Promise<Params
 
   return (
     <>
+      {dbProfile.is_demo && <DemoProfileBanner />}
       <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Therapists", path: "/therapists" }, ...(matchedCity ? [{ name: matchedCity.name, path: `/${matchedCity.slug}` }] : []), { name: profile.name, path: profilePath }])} />
       {faqItems.length > 0 ? <JsonLd data={buildFaqJsonLd(faqItems)} /> : null}
       <ProfileStructuredData profile={profile} />

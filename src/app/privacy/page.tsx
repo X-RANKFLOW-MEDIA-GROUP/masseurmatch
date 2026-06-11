@@ -4,8 +4,15 @@ import Script from "next/script";
 export const metadata: Metadata = {
   title: "Privacy Policy | MasseurMatch",
   description:
-    "MasseurMatch's privacy policy: how we collect, use, and protect your personal information. We never sell your data.",
+    "MasseurMatch's privacy policy: how we collect, use, and protect your personal information. We never sell your data. CCPA and GDPR rights included.",
   alternates: { canonical: "https://masseurmatch.com/privacy" },
+  openGraph: {
+    title: "Privacy Policy | MasseurMatch",
+    description: "How MasseurMatch collects, uses, and protects your data. We never sell your information.",
+    url: "https://masseurmatch.com/privacy",
+    siteName: "MasseurMatch",
+    type: "website",
+  },
   robots: { index: true, follow: true },
 };
 
@@ -64,11 +71,11 @@ Any third-party service provider we use is contractually prohibited from using y
     title: "4. Cookies & Tracking",
     content: `We use a minimal set of cookies necessary to operate the platform (authentication, session state). We do not use third-party advertising cookies or behavioral tracking technologies.
 
-You can disable cookies in your browser settings. Disabling cookies may affect your ability to log in and use account features.`,
+You can disable cookies in your browser settings. Disabling cookies may affect your ability to log in and use account features. See our Cookie Policy at /cookie-policy for a full breakdown.`,
   },
   {
     id: "your-rights",
-    title: "5. Your Rights",
+    title: "5. Your Privacy Rights",
     content: `Depending on your location, you may have rights including:
 
 - Access: Request a copy of the personal data we hold about you
@@ -80,35 +87,66 @@ You can disable cookies in your browser settings. Disabling cookies may affect y
 To exercise any of these rights, email privacy@masseurmatch.com. We respond to all requests within 30 days.`,
   },
   {
+    id: "ccpa",
+    title: "6. California Privacy Rights (CCPA)",
+    content: `If you are a California resident, the California Consumer Privacy Act (CCPA) provides you with specific rights:
+
+- Right to Know: You may request that we disclose the categories and specific pieces of personal information we have collected about you.
+- Right to Delete: You may request deletion of your personal information, subject to certain exceptions.
+- Right to Opt-Out of Sale: We do not sell your personal information. However, you may submit an opt-out request at any time to privacy@masseurmatch.com and we will confirm our non-sale status.
+- Right to Non-Discrimination: We will not discriminate against you for exercising any CCPA rights.
+
+Authorized agents may submit requests on your behalf by contacting us at privacy@masseurmatch.com. We may require verification of identity before fulfilling requests.`,
+  },
+  {
+    id: "gdpr",
+    title: "7. European Privacy Rights (GDPR)",
+    content: `If you are located in the European Economic Area (EEA), United Kingdom, or Switzerland, you have rights under the General Data Protection Regulation (GDPR) and equivalent laws:
+
+- Lawful Basis: We process your data under the following legal bases: (a) performance of a contract (operating your account and profile), (b) legitimate interests (platform security, fraud prevention, analytics), and (c) consent (where explicitly sought).
+- Right of Access (Article 15): Request a copy of your data.
+- Right to Rectification (Article 16): Request correction of inaccurate data.
+- Right to Erasure (Article 17): Request deletion of your data ("right to be forgotten").
+- Right to Restriction (Article 18): Request restriction of processing in certain circumstances.
+- Right to Data Portability (Article 20): Receive your data in a structured, machine-readable format.
+- Right to Object (Article 21): Object to processing based on legitimate interests.
+- Right to Lodge a Complaint: You have the right to lodge a complaint with your local supervisory authority.
+
+Data Controller: XRankFlow Media Group LLC, legal@masseurmatch.com.
+We do not transfer personal data outside the US except where necessary to operate the platform (e.g., Supabase, Vercel infrastructure), in which case we rely on standard contractual clauses or equivalent mechanisms.`,
+  },
+  {
     id: "data-security",
-    title: "6. Data Security",
+    title: "8. Data Security",
     content: `We implement industry-standard security measures including TLS encryption in transit, encrypted storage for sensitive data, and access controls that limit staff access to personal data on a need-to-know basis.
 
 No method of transmission over the internet is 100% secure. While we use commercially reasonable security measures, we cannot guarantee absolute security.`,
   },
   {
     id: "retention",
-    title: "7. Data Retention",
+    title: "9. Data Retention",
     content: `We retain account data for as long as your account is active. If you delete your account, we delete your personal data within 30 days, except where retention is required by law or for legitimate business purposes (e.g., fraud prevention records).`,
   },
   {
     id: "children",
-    title: "8. Children's Privacy",
+    title: "10. Children's Privacy",
     content: `MasseurMatch is not directed to children under 18. We do not knowingly collect personal information from anyone under 18. If you believe a minor has provided us with personal information, please contact us immediately at privacy@masseurmatch.com.`,
   },
   {
     id: "changes",
-    title: "9. Changes to This Policy",
+    title: "11. Changes to This Policy",
     content: `We may update this policy from time to time. We will notify registered users of material changes via email and update the "Last Updated" date below. Continued use of the platform after changes constitutes acceptance of the updated policy.`,
   },
   {
     id: "contact",
-    title: "10. Contact",
+    title: "12. Contact",
     content: `For privacy-related questions or to exercise your rights:
 
 Email: privacy@masseurmatch.com
-Operator: XRankFlow Media Group LLC
-Location: Dallas, Texas, USA`,
+Legal: legal@masseurmatch.com
+Support: support@masseurmatch.com
+Operator: XRankFlow Media Group LLC (Delaware)
+Mailing: 2810 N Church St PMB 74302, Wilmington, DE 19802`,
   },
 ];
 

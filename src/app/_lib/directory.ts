@@ -18,7 +18,7 @@ const PUBLIC_PROFILE_SELECT = `
   is_suspended, is_banned, available_now, available_now_expires,
   lgbtq_affirming, business_hours, custom_faq, pricing_sessions, areas_served,
   outcall_radius_miles, travel_schedule, add_ons, training, education, contact_clicks,
-  seo_title, seo_description, seo_keywords, created_at
+  seo_title, seo_description, seo_keywords, created_at, is_demo
 `;
 
 export interface ProfileFaqItem {
@@ -138,6 +138,7 @@ export interface PublicTherapist {
   seo_description?: string | null;
   seo_keywords?: string[] | string | null;
   created_at?: string | null;
+  is_demo?: boolean | null;
 }
 
 export interface ImportedReview {
@@ -150,14 +151,21 @@ export interface ImportedReview {
 
 export const getCities = () => US_CITIES;
 
-const buildPublicTherapistsQuery = () =>
-  supabase
+const showDemoProfiles = process.env.SHOW_DEMO_PROFILES === "true";
+
+const buildPublicTherapistsQuery = () => {
+  let q = supabase
     .from("profiles")
     .select(PUBLIC_PROFILE_SELECT, { count: "exact" })
     .eq("visibility_status", "public")
     .eq("profile_status", "approved")
     .eq("is_suspended", false)
     .eq("is_banned", false);
+  if (!showDemoProfiles) {
+    q = q.or("is_demo.is.null,is_demo.eq.false");
+  }
+  return q;
+};
 
 function isActivelyAvailable(profile: PublicTherapist) {
   return profile.available_now === true &&
@@ -338,12 +346,16 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
 };
 
 export async function getCityInventoryCount(cityName: string): Promise<number> {
-  const { count, error } = await supabase
+  let q = supabase
     .from("profiles")
     .select("id", { count: "exact", head: true })
     .eq("visibility_status", "public")
     .eq("profile_status", "approved")
     .ilike("city", cityName);
+  if (!showDemoProfiles) {
+    q = q.or("is_demo.is.null,is_demo.eq.false");
+  }
+  const { count, error } = await q;
 
   if (!error && count && count > 0) return count;
 

@@ -4,7 +4,10 @@ export function getPublicProfileName(profile: Pick<PublicTherapist, "display_nam
   return profile.display_name || profile.full_name || "Therapist";
 }
 
-export function isVerifiedDirectoryProfile(profile: Pick<PublicTherapist, "subscription_tier" | "verification_status">) {
+export function isVerifiedDirectoryProfile(
+  profile: Pick<PublicTherapist, "subscription_tier" | "verification_status" | "is_demo">,
+) {
+  if (profile.is_demo) return false;
   return (
     profile.subscription_tier === "standard" ||
     profile.subscription_tier === "pro" ||

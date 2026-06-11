@@ -58,7 +58,7 @@ export default function TrustPage() {
           </h1>
           <p className="mx-auto max-w-2xl font-sans text-lg leading-relaxed text-slate-600">
             Your safety is the foundation of MasseurMatch. We built an AI-driven and rigorously
-            verified technological infrastructure to guarantee peace of mind with every booking.
+            verified technological infrastructure for peace of mind with every connection.
           </p>
         </section>
 

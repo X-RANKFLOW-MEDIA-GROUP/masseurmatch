@@ -6,6 +6,13 @@ export const metadata: Metadata = {
   description:
     "MasseurMatch terms of service: rules for clients and therapists using the directory platform operated by XRankFlow Media Group LLC.",
   alternates: { canonical: "https://masseurmatch.com/terms" },
+  openGraph: {
+    title: "Terms of Service | MasseurMatch",
+    description: "Rules for clients and therapists using the MasseurMatch directory platform.",
+    url: "https://masseurmatch.com/terms",
+    siteName: "MasseurMatch",
+    type: "website",
+  },
   robots: { index: true, follow: true },
 };
 
