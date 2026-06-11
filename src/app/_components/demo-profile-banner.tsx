@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { FlaskConical } from "lucide-react";
 
 /**
@@ -15,9 +16,9 @@ export function DemoProfileBanner() {
       <FlaskConical className="h-4 w-4 shrink-0 text-amber-600" strokeWidth={2.25} />
       <span>
         <strong>Sample profile</strong> — this is a design showcase listing, not a verified therapist.{" "}
-        <a href="/search" className="underline underline-offset-2 hover:text-amber-900">
+        <Link href="/search" className="underline underline-offset-2 hover:text-amber-900">
           Browse real profiles
-        </a>
+        </Link>
         .
       </span>
     </div>

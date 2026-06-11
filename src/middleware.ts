@@ -316,6 +316,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
   }
 
+  const topLevelParts = pathname.split("/").filter(Boolean);
+
   // ── 7a. Legacy /{city}/therapist/{slug} → /therapists/{slug} ─────────────
   if (topLevelParts.length === 3 && topLevelParts[1] === "therapist") {
     const citySlug = resolveCitySlug(topLevelParts[0] || "");
@@ -325,7 +327,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   }
 
   // ── 7. Legacy /{city}/massage-therapists → /{city} ───────────────────────
-  const topLevelParts = pathname.split("/").filter(Boolean);
   if (topLevelParts.length === 2 && topLevelParts[1] === "massage-therapists") {
     const citySlug = resolveCitySlug(topLevelParts[0] || "");
     if (citySlug) {

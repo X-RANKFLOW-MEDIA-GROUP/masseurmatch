@@ -1272,6 +1272,7 @@ export type Database = {
           incall_price: number | null
           is_active: boolean | null
           is_banned: boolean | null
+          is_demo: boolean | null
           is_featured: boolean | null
           is_suspended: boolean | null
           is_verified_identity: boolean | null
@@ -1390,6 +1391,7 @@ export type Database = {
           incall_price?: number | null
           is_active?: boolean | null
           is_banned?: boolean | null
+          is_demo?: boolean | null
           is_featured?: boolean | null
           is_suspended?: boolean | null
           is_verified_identity?: boolean | null
@@ -1508,6 +1510,7 @@ export type Database = {
           incall_price?: number | null
           is_active?: boolean | null
           is_banned?: boolean | null
+          is_demo?: boolean | null
           is_featured?: boolean | null
           is_suspended?: boolean | null
           is_verified_identity?: boolean | null
