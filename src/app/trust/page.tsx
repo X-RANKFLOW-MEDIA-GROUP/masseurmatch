@@ -154,6 +154,14 @@ export default function TrustPage() {
             <RuleRow text="All reviews must come from real clients to combat fake reputations." />
           </div>
 
+          <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm leading-relaxed text-slate-600 font-sans">
+            <strong className="font-semibold text-slate-800">Verified reviews require proof of contact.</strong>{" "}
+            When a client clicks a contact button (call, SMS, or WhatsApp) on a profile, we record
+            that event. Only reviewers with a documented contact event receive a &ldquo;Verified
+            contact&rdquo; label on their review — making it easy to distinguish genuine first-hand
+            experiences from unverifiable submissions.
+          </div>
+
           <div className="mt-8 text-center">
             <Link
               href="/moderation-policy"
