@@ -195,6 +195,7 @@ export async function POST(request: NextRequest) {
         .update({
           is_verified_identity: true,
           verification_status: 'verified',
+          identity_verified_at: now,
           status: 'approved',
           approved_at: now,
           updated_at: now,

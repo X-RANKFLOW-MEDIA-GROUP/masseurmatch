@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { MapPin, MessageCircle, Phone, Star, Clock, Shield, Plane, Zap, UserCircle } from "lucide-react";
+import { MapPin, MessageCircle, Phone, Star, Clock, Plane, Zap, UserCircle } from "lucide-react";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import {
   getPublicContactLinks,
   getPublicProfileName,
 } from "@/app/_lib/public-profile";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { useKnottyProfileAttribution } from "./useKnottyProfileAttribution";
 
 interface Props {
@@ -70,9 +71,7 @@ export function PremiumProfileHero({ profile, cityPath, reviews = [] }: Props) {
             </span>
           )}
           {profile.verification_status === "verified" && (
-            <span className="pp-badge pp-badge-top">
-              <Shield className="w-3 h-3" /> Verified Pro
-            </span>
+            <VerifiedBadge size="sm" verifiedAt={profile.identity_verified_at} />
           )}
           {profile.subscription_tier === "elite" && (
             <span className="pp-badge pp-badge-traveling">
