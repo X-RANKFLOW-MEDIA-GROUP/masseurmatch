@@ -4,44 +4,51 @@
  * Never hardcode plan prices or feature lists elsewhere.
  */
 
-export type PlanTier = "free" | "standard" | "pro" | "elite";
+export type PlanId = "free" | "standard" | "pro" | "elite";
+/** @deprecated alias for PlanId */
+export type PlanTier = PlanId;
 
 export interface Plan {
-  tier: PlanTier;
+  id: PlanId;
   name: string;
-  /** Monthly price in USD cents */
+  /** Monthly price in whole USD (0 for Free) */
   price: number;
-  /** Formatted price string, e.g. "$39/mo" */
-  priceDisplay: string;
-  description: string;
-  features: string[];
-  /** Trial period in days (paid tiers) */
-  trialDays?: number;
-  /** Founder discount copy */
-  founderOffer?: string;
-  popular?: boolean;
+  trialDays: number;
+  features: readonly string[];
+  mostPopular?: boolean;
+  /** Market anchoring copy displayed near the price */
+  anchor?: string;
 }
+
+/** First 50 founding members lock in 50% off for their first 3 months. */
+export const FOUNDER_OFFER = { discountPct: 50, months: 3 } as const;
+
+/**
+ * When true, founding-member rates are grandfathered — the subscriber's
+ * price never increases while the subscription remains active.
+ * Do NOT touch live subscriptions when updating the Elite price.
+ */
+export const PRICE_LOCK = true;
 
 export const PLANS: Plan[] = [
   {
-    tier: "free",
+    id: "free",
     name: "Free",
     price: 0,
-    priceDisplay: "$0/mo",
-    description: "A basic listing for getting discovered without a monthly cost.",
+    trialDays: 0,
     features: [
       "1 photo",
+      "1 city listing",
+      "Direct contact buttons",
       "Bottom search placement",
       "1 travel schedule/month",
-      "No analytics",
     ],
   },
   {
-    tier: "standard",
+    id: "standard",
     name: "Standard",
-    price: 3900,
-    priceDisplay: "$39/mo",
-    description: "A stronger everyday plan with better placement and light analytics.",
+    price: 39,
+    trialDays: 14,
     features: [
       "6 photos",
       "Middle search placement",
@@ -50,15 +57,14 @@ export const PLANS: Plan[] = [
       "Views analytics",
       "Newsletter eligible",
     ],
-    trialDays: 14,
-    founderOffer: "50% off first 3 months",
+    anchor: "A fraction of what legacy directories charge for one city",
   },
   {
-    tier: "pro",
+    id: "pro",
     name: "Pro",
-    price: 7900,
-    priceDisplay: "$79/mo",
-    description: "Our most popular growth tier for therapists who want top exposure.",
+    price: 79,
+    trialDays: 14,
+    mostPopular: true,
     features: [
       "12 photos + video",
       "Top search placement",
@@ -67,34 +73,31 @@ export const PLANS: Plan[] = [
       "Views + clicks analytics",
       "Homepage rotation",
       "Weekly specials",
-      "Verified badge",
+      "Verified badge (Stripe Identity, with public verification date)",
     ],
-    trialDays: 14,
-    founderOffer: "50% off first 3 months",
-    popular: true,
   },
   {
-    tier: "elite",
+    id: "elite",
     name: "Elite",
-    price: 9900,
-    priceDisplay: "$99/mo",
-    description: "Everything in Pro plus a second active city for broader reach.",
-    features: [
-      "12 photos + video",
-      "Top search placement",
-      "Available Now (120 min)",
-      "Unlimited travel schedules",
-      "Views + clicks analytics",
-      "Homepage rotation",
-      "Weekly specials",
-      "Verified badge",
-      "2 active cities",
-    ],
+    price: 149,
     trialDays: 14,
-    founderOffer: "50% off first 3 months",
+    features: [
+      "Everything in Pro",
+      "3 active cities",
+      "Knotty AI answering on your profile 24/7",
+      "Demand Radar (city + neighborhood demand data)",
+      "Auto tour pages for travel schedules",
+      "Priority support",
+    ],
+    anchor: "Three cities + AI for less than half of one legacy city ad",
   },
 ];
 
+export function getPlanById(id: PlanId): Plan | undefined {
+  return PLANS.find((p) => p.id === id);
+}
+
+/** @deprecated Use getPlanById */
 export function getPlanByTier(tier: PlanTier): Plan | undefined {
-  return PLANS.find((p) => p.tier === tier);
+  return getPlanById(tier);
 }

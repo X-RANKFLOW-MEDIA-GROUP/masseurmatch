@@ -20,6 +20,8 @@ export interface GrowthAddon {
   scarcityNote?: string;
   includedIn?: string;
   cadence?: "one-time" | "recurring" | "usage" | "included";
+  /** When true, the add-on is not yet purchasable — join the waitlist instead. */
+  waitlist?: boolean;
 }
 
 export interface GrowthAddonCategory {
@@ -345,6 +347,21 @@ const premiumAddons: GrowthAddon[] = [
     bestResults: "Best results: Geo Ads Campaign + Masseur of the Day",
     scarcityNote: "Campaign inventory is capped by market to protect performance.",
     cadence: "usage",
+  },
+  {
+    slug: "ai-voice-receptionist",
+    categoryId: "premium",
+    name: "AI Voice Receptionist",
+    priceLabel: "Coming soon — join waitlist",
+    description:
+      "An AI phone receptionist that answers calls to your listing, captures client details, and sends you a summary — so you never miss an inquiry.",
+    impactPreview: "Impact preview: 24/7 first-response capability without a personal number or answering service.",
+    duration: "Monthly recurring",
+    placement: "Phone icon on your public profile",
+    bestResults: "Best results: AI Voice Receptionist + Elite plan for maximum coverage",
+    scarcityNote: "Early-access slots limited to first 100 members.",
+    cadence: "recurring",
+    waitlist: true,
   },
 ];
 
