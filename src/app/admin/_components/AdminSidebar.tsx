@@ -21,6 +21,8 @@ import {
   Home,
   ImageIcon,
   BarChart3,
+  CalendarCheck,
+  MessageSquare,
 } from "lucide-react";
 
 const navSections = [
@@ -32,6 +34,13 @@ const navSections = [
       { href: "/admin/therapists", label: "Therapists", icon: HeartHandshake },
       { href: "/admin/photos", label: "Photos", icon: ImageIcon },
       { href: "/admin/moderation", label: "Moderation", icon: ShieldAlert },
+    ],
+  },
+  {
+    title: "Messaging",
+    items: [
+      { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
+      { href: "/admin/sms", label: "SMS Auto-Reply", icon: MessageSquare },
     ],
   },
   {
