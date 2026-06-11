@@ -101,3 +101,6 @@ export function getPlanById(id: PlanId): Plan | undefined {
 export function getPlanByTier(tier: PlanTier): Plan | undefined {
   return getPlanById(tier);
 }
+
+/** Plans that unlock tour pages (Standard and above). Import this instead of duplicating the set. */
+export const TOUR_PAGE_TIERS = new Set<PlanId>(["standard", "pro", "elite"]);

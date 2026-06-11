@@ -7,7 +7,7 @@ import type { PublicTherapist } from "@/app/_lib/directory";
 import { getPublicProfileName } from "@/app/_lib/public-profile";
 
 /* ─── types ──────────────────────────────────────────────────────────────── */
-type Phase = "idle" | "analyzing" | "streaming" | "done";
+type Phase = "idle" | "analyzing" | "streaming";
 
 interface Message {
   id: string;
@@ -123,9 +123,9 @@ export function ProfileAIChat({ profile }: Props) {
         const delay = /[.!?]/.test(ch) ? 55 : /[,;:]/.test(ch) ? 30 : /[\n]/.test(ch) ? 80 : 18 + Math.random() * 10;
         streamRef.current = setTimeout(tick, delay);
       } else {
-        setPhase("done");
         setMessages(prev => [...prev, { id: Date.now().toString(), role: "ai", text: fullText }]);
         setStreamText("");
+        setPhase("idle");
       }
     };
     streamRef.current = setTimeout(tick, 18);
@@ -248,7 +248,12 @@ export function ProfileAIChat({ profile }: Props) {
                 </div>
               </div>
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  if (streamRef.current) clearTimeout(streamRef.current);
+                  setPhase("idle");
+                  setStreamText("");
+                  setIsOpen(false);
+                }}
                 className="flex h-8 w-8 items-center justify-center rounded-full transition"
                 style={{ background: "rgba(11,31,58,0.06)" }}
                 aria-label="Close chat"

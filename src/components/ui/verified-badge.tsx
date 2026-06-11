@@ -8,6 +8,8 @@ interface VerifiedBadgeProps {
   className?: string;
   /** ISO timestamp from identity_verified_at; shows "Stripe Identity · Mon YYYY" when provided */
   verifiedAt?: string | null;
+  /** Set to false when the badge is already inside a Link to avoid nested anchors (default: true for md, false for sm) */
+  asLink?: boolean;
 }
 
 function formatVerifiedMonth(iso: string): string {
@@ -18,8 +20,9 @@ function formatVerifiedMonth(iso: string): string {
   }
 }
 
-export const VerifiedBadge = ({ size = "md", className, verifiedAt }: VerifiedBadgeProps) => {
+export const VerifiedBadge = ({ size = "md", className, verifiedAt, asLink }: VerifiedBadgeProps) => {
   const isSmall = size === "sm";
+  const shouldLink = asLink ?? !isSmall;
   const dateLabel = verifiedAt ? formatVerifiedMonth(verifiedAt) : null;
 
   const inner = (
@@ -50,7 +53,7 @@ export const VerifiedBadge = ({ size = "md", className, verifiedAt }: VerifiedBa
     </motion.div>
   );
 
-  if (!isSmall) {
+  if (shouldLink) {
     return (
       <Link href="/verification" title="What does verified mean?" className="inline-flex">
         {inner}

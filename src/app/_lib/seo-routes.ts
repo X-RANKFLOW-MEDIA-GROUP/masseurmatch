@@ -12,6 +12,7 @@ import { absoluteUrl, getSeoBlogPosts, getSeoCities, getSeoTherapists, FEATURED_
 import { uniqueStrings } from "@/app/_lib/utils";
 import { competitorSlugs } from "@/lib/competitors";
 import { getCities, getCityInventoryMap, getPublicTherapists } from "@/app/_lib/directory";
+import { TOUR_PAGE_TIERS } from "@/lib/pricing";
 import { buildCanonicalPath } from "@/app/_lib/route-normalization";
 
 type StaticSitemapRoute = {
@@ -258,22 +259,25 @@ export async function buildTourPagesSitemapEntries(now = new Date()): Promise<Me
 
   let profiles;
   try {
-    const result = await getPublicTherapists({});
-    profiles = result.items ?? [];
+    // Fetch only tour-eligible tiers in parallel; pageSize:500 covers the full directory at launch scale
+    const [standard, pro, elite] = await Promise.all([
+      getPublicTherapists({ tier: "standard", pageSize: 500 }),
+      getPublicTherapists({ tier: "pro", pageSize: 500 }),
+      getPublicTherapists({ tier: "elite", pageSize: 500 }),
+    ]);
+    profiles = [...standard.items, ...pro.items, ...elite.items];
   } catch {
     return [];
   }
 
   const entries: MetadataRoute.Sitemap = [];
-  const tourTiers = new Set(["standard", "pro", "elite"]);
 
   for (const profile of profiles) {
-    if (!profile.slug || !tourTiers.has(profile.subscription_tier ?? "free")) continue;
+    if (!profile.slug || !TOUR_PAGE_TIERS.has(profile.subscription_tier as "standard" | "pro" | "elite")) continue;
     if (!Array.isArray(profile.travel_schedule)) continue;
 
-    const now_ = new Date();
     for (const visit of profile.travel_schedule as Array<{ city: string; start_date: string; end_date: string }>) {
-      if (new Date(visit.end_date) < now_) continue;
+      if (new Date(visit.end_date) < now) continue;
       const citySlug = visit.city.toLowerCase().replace(/\s+/g, "-");
       if (!citySlugSet.has(citySlug)) continue;
       entries.push({

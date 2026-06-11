@@ -6,11 +6,9 @@ import { getPublicTherapistBySlug, getCities } from "@/app/_lib/directory";
 import { resolveCitySlug } from "@/app/_lib/city-routing";
 import { getPublicProfileName } from "@/app/_lib/public-profile";
 import type { ProfileTravelEntry } from "@/app/_lib/directory";
+import { TOUR_PAGE_TIERS } from "@/lib/pricing";
 
 type Params = { city: string; "therapist-slug": string };
-
-// Plans that support tour pages (Standard ≥ 3/mo; Pro/Elite unlimited)
-const TOUR_PAGE_TIERS = new Set(["standard", "pro", "elite"]);
 
 function formatDateRange(start: string, end: string) {
   const opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };

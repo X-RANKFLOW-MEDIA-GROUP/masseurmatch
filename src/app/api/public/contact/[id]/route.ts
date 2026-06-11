@@ -78,7 +78,8 @@ export async function GET(
     request.headers.get("x-real-ip") ??
     null;
 
-  Promise.allSettled([
+  // Fire-and-forget; allSettled never rejects so no .catch() needed
+  void Promise.allSettled([
     adminClient.rpc("increment_profile_contact_clicks", { p_profile_id: profile.id }),
     adminClient.from("contact_events").insert({
       profile_id: profile.id,
@@ -86,9 +87,7 @@ export async function GET(
       method,
       ip_hash: hashIp(ipRaw),
     }),
-  ]).catch(() => {
-    // Never block the redirect on tracking failures.
-  });
+  ]);
 
   return NextResponse.redirect(redirectUrl, { status: 302 });
 }
