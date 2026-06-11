@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { CityGlobe } from "@/components/marketing/CityGlobe";
 import { Cta3DButton } from "@/components/marketing/Cta3DButton";
 import { HeroMediaBanner } from "@/components/marketing/HeroMediaBanner";
+import { LIVE_COVERAGE_CITIES, TOTAL_CITY_PAGES } from "@/lib/site-stats";
 
 const avatarStack = [
   { id: 1, src: "/marketing/hero/avatar-1.jpg", alt: "Verified therapist", initials: "JM", color: "from-orange-500 to-amber-600" },
@@ -107,7 +108,10 @@ export default function HeroClient() {
               </motion.span>
             </div>
 
-            <h1 className="mb-6 font-display text-[clamp(3rem,8.5vw,6.5rem)] font-extrabold uppercase leading-[0.85] tracking-[-0.05em]">
+            <h1
+              aria-label="The Safest Massage Directory."
+              className="mb-6 font-display text-[clamp(3rem,8.5vw,6.5rem)] font-extrabold uppercase leading-[0.85] tracking-[-0.05em]"
+            >
               {headlineLines.map((line, i) => (
                 <motion.span
                   key={`${line}-${i}`}
@@ -183,7 +187,7 @@ export default function HeroClient() {
               className="speakable-intro mb-8 max-w-xl text-lg leading-relaxed text-muted-foreground lg:text-xl"
             >
               Premium male massage therapists across the US — real profiles, real reviews,
-              and AI-powered search with Knotty. Dallas, Houston, Miami, NYC, and 80+ cities.
+              and AI-powered search with Knotty. Dallas, Houston, Miami, NYC, and {LIVE_COVERAGE_CITIES}+ cities.
             </motion.p>
 
             <motion.div
@@ -212,7 +216,7 @@ export default function HeroClient() {
             <div className="pointer-events-none mt-2 flex items-center justify-center gap-2 text-center">
               <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-primary" />
               <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                Live coverage · 57+ cities · drag to explore
+                Live coverage · {LIVE_COVERAGE_CITIES}+ cities · drag to explore
               </span>
             </div>
           </motion.div>

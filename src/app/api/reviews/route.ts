@@ -105,7 +105,20 @@ export async function POST(request: NextRequest) {
       .eq("user_id", session.userId)
       .maybeSingle();
 
-    const { data: inquiry } = userProfile?.email
+    // Check contact_events first (strongest proof of real contact)
+    const { data: contactEvent, error: contactEventError } = await supabase
+      .from("contact_events")
+      .select("id")
+      .eq("user_id", session.userId)
+      .eq("profile_id", therapistId)
+      .limit(1)
+      .maybeSingle();
+
+    // On DB error, fall through to the inquiry fallback rather than silently treating as "no contact"
+    const hasContactEvent = !contactEventError && !!contactEvent;
+
+    // Fallback: contact_inquiries (email-based inquiry form)
+    const { data: inquiry } = !hasContactEvent && userProfile?.email
       ? await supabase
           .from("contact_inquiries")
           .select("id")
@@ -114,7 +127,7 @@ export async function POST(request: NextRequest) {
           .maybeSingle()
       : { data: null };
 
-    const isVerified = !!inquiry;
+    const isVerified = hasContactEvent || !!inquiry;
 
     const { data, error } = await supabase
       .from("reviews")

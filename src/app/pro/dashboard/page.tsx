@@ -5,6 +5,8 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   AlertCircle,
+  ArrowRight,
+  Sparkles,
   Car,
   CheckCircle2,
   Clock,
@@ -17,6 +19,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { normalizePlanKey } from "@/hooks/usePlanLimits";
 import { requestJson } from "@/app/_lib/request";
 
 const statusOptions = [
@@ -126,7 +129,8 @@ function ProfileStatusBanner({ status }: { status: string }) {
 }
 
 export default function DashboardHome() {
-  const { user } = useAuth();
+  const { user, subscription } = useAuth();
+  const currentTier = normalizePlanKey(subscription?.plan_key) ?? (subscription?.subscribed ? "standard" : "free");
   const [activeStatus, setActiveStatus] = useState<AvailabilityStatus>("available");
   const [statusSaving, setStatusSaving] = useState(false);
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -342,6 +346,32 @@ export default function DashboardHome() {
               ))}
             </div>
           </div>
+
+          {/* Knotty AI teaser — only shown for non-Elite plans */}
+          {currentTier !== "elite" && (
+            <div className="rounded-xl border border-slate-800 bg-slate-950 p-5 text-white">
+              <div className="flex items-start gap-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-400/15">
+                  <Sparkles className="h-4 w-4 text-amber-400" strokeWidth={2.25} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold">Knotty AI — available on Elite</p>
+                  <p className="mt-1 text-xs leading-relaxed text-white/60">
+                    Elite profiles get a Knotty AI chat widget that answers client questions 24/7
+                    directly on your listing — rates, availability, specialties, and more —
+                    without you lifting a finger.
+                  </p>
+                  <Link
+                    href="/pro/billing?upgrade=elite"
+                    className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-amber-400 hover:text-amber-300"
+                  >
+                    Upgrade to Elite
+                    <ArrowRight className="h-3 w-3" strokeWidth={2.5} />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
 
           {profileStatus === "pending_approval" && (
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">

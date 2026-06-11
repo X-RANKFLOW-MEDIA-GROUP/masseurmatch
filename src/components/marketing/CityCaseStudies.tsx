@@ -19,16 +19,17 @@ type Props = {
 
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-// City slugs that ship with a real photo in /public/marketing/cities.
-const CITY_PHOTOS = new Set([
-  "atlanta",
-  "dallas",
-  "houston",
-  "los-angeles",
-  "miami",
-  "new-york",
-  "washington-dc",
-]);
+// City slugs that ship with a real photo in /public/marketing/cities (jpg preferred, svg fallback).
+const CITY_PHOTO_EXT: Record<string, "jpg" | "svg"> = {
+  atlanta: "jpg",
+  chicago: "svg",
+  dallas: "jpg",
+  houston: "jpg",
+  "los-angeles": "jpg",
+  miami: "jpg",
+  "new-york": "jpg",
+  "washington-dc": "jpg",
+};
 
 /**
  * A glass "city platform" that tilts in 3D toward the cursor, lifts a glare,
@@ -47,7 +48,8 @@ function CityPlatform({
 }) {
   const reducedMotion = useReducedMotion();
   const ref = useRef<HTMLAnchorElement>(null);
-  const hasPhoto = CITY_PHOTOS.has(entry.city.slug);
+  const photoExt = CITY_PHOTO_EXT[entry.city.slug];
+  const hasPhoto = Boolean(photoExt);
   const [imgError, setImgError] = useState(false);
 
   const px = useMotionValue(0.5);
@@ -105,14 +107,10 @@ function CityPlatform({
           }`}
         >
           {!hasPhoto || imgError ? (
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,138,31,0.35),transparent_55%),linear-gradient(150deg,#0d2038,#060d1b)]">
-              <span className="absolute bottom-3 left-3 font-display text-4xl font-extrabold text-white/10">
-                {entry.city.stateCode}
-              </span>
-            </div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,138,31,0.35),transparent_55%),linear-gradient(150deg,#0d2038,#060d1b)]" />
           ) : (
             <Image
-              src={`/marketing/cities/${entry.city.slug}.jpg`}
+              src={`/marketing/cities/${entry.city.slug}.${photoExt ?? "jpg"}`}
               alt={`${entry.city.name} massage therapists`}
               fill
               className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.07]"

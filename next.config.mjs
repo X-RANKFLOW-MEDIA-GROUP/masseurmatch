@@ -64,6 +64,10 @@ const LEGACY_REDIRECTS = [
   // infinite 308 loop. Capitalized variants are handled safely by the
   // case-sensitive (===) guards in src/middleware.ts instead.
   { source: "/massage-therapists", destination: "/therapists", permanent: true },
+  // Privacy policy alias — some external links use the longer form
+  { source: "/privacy-policy", destination: "/privacy", permanent: true },
+  // Legacy therapist profile URL — canonical is /therapists/:slug
+  { source: "/:city/therapist/:slug", destination: "/therapists/:slug", permanent: true },
   // Client-side booking pages removed — clients browse without accounts
   { source: "/client", destination: "/search", permanent: false },
   { source: "/client/:path*", destination: "/search", permanent: false },

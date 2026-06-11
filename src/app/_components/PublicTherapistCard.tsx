@@ -146,10 +146,18 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
           </div>
 
           <div className="shrink-0 text-right">
-            <p className="text-[9px] uppercase tracking-widest text-neutral-400">From</p>
-            <p className="text-sm font-semibold text-neutral-900" itemProp="priceRange">
-              {priceLabel ?? "Contact"}
-            </p>
+            {priceLabel ? (
+              <>
+                <p className="text-[9px] uppercase tracking-widest text-neutral-400">From</p>
+                <p className="text-sm font-semibold text-neutral-900" itemProp="priceRange">
+                  {priceLabel}
+                </p>
+              </>
+            ) : (
+              <p className="text-xs font-medium text-neutral-500" itemProp="priceRange">
+                Contact for rates
+              </p>
+            )}
           </div>
         </div>
       </Link>

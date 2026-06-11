@@ -50,7 +50,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     });
   }
 
-  const { total } = await fetchKeywordTherapists(city.name, segment.slug, keyword.slug);
+  let total = 0;
+  try {
+    ({ total } = await fetchKeywordTherapists(city.name, segment.slug, keyword.slug));
+  } catch {
+    // Supabase unavailable — fall through with zero total
+  }
 
   return createPageMetadata({
     title: `${keyword.label} in ${city.name}`,

@@ -607,6 +607,104 @@ export default function ForTherapistsPage() {
           </div>
         </section>
 
+        {/* Knotty AI — Elite differentiator */}
+        <section
+          style={{
+            background: "#060E1A",
+            padding: "80px 24px",
+            color: "#FCFBF8",
+          }}
+        >
+          <div style={{ maxWidth: 760, margin: "0 auto" }}>
+            <p
+              style={{
+                fontSize: 11,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                color: "#F59E0B",
+                marginBottom: 20,
+                fontFamily: "system-ui, sans-serif",
+              }}
+            >
+              Elite · AI Answering
+            </p>
+            <h2
+              style={{
+                fontSize: "clamp(26px, 4vw, 42px)",
+                fontWeight: 400,
+                lineHeight: 1.15,
+                marginBottom: 20,
+              }}
+            >
+              Knotty AI answers for you —
+              <br />
+              24 hours a day, 7 days a week.
+            </h2>
+            <p
+              style={{
+                fontSize: "clamp(14px, 2.5vw, 16px)",
+                opacity: 0.65,
+                fontFamily: "system-ui, sans-serif",
+                lineHeight: 1.7,
+                marginBottom: 36,
+                maxWidth: 540,
+              }}
+            >
+              Elite profiles get a Knotty AI chat widget embedded directly on their listing.
+              It answers client questions about rates, availability, specialties, and LGBTQ+
+              affirmation — without you needing to be online. First impressions happen at all
+              hours; Knotty makes sure yours is always ready.
+            </p>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                gap: 16,
+                marginBottom: 36,
+              }}
+            >
+              {[
+                { label: "Answers rate & availability questions", detail: "Without interrupting your schedule" },
+                { label: "Explains your services clearly", detail: "Using your own profile data" },
+                { label: "Available on every Elite listing", detail: "Not a third-party chatbot — fully integrated" },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    borderRadius: 12,
+                    padding: "16px 18px",
+                    fontFamily: "system-ui, sans-serif",
+                  }}
+                >
+                  <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{item.label}</p>
+                  <p style={{ fontSize: 12, opacity: 0.5, lineHeight: 1.5 }}>{item.detail}</p>
+                </div>
+              ))}
+            </div>
+            <a
+              href="/pricing"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                background: "#F59E0B",
+                color: "#0B1F3A",
+                borderRadius: 99,
+                padding: "12px 24px",
+                fontSize: 13,
+                fontWeight: 700,
+                fontFamily: "system-ui, sans-serif",
+                textDecoration: "none",
+                letterSpacing: "0.03em",
+              }}
+            >
+              See Elite pricing
+            </a>
+          </div>
+        </section>
+
         {/* CTA */}
         <section
           style={{

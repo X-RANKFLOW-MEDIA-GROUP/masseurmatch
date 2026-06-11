@@ -3,11 +3,12 @@
 import { Users, MapPin, Sparkles, BadgeDollarSign } from "lucide-react";
 import Counter from "@/components/motion/Counter";
 import FadeUp from "@/components/motion/FadeUp";
+import { TOTAL_PROFILES, LIVE_COVERAGE_CITIES, TOTAL_SERVICES } from "@/lib/site-stats";
 
 const STATS = [
-  { value: 500, suffix: "+", label: "Professional profiles", icon: Users },
-  { value: 80, suffix: "+", label: "US cities", icon: MapPin },
-  { value: 1200, suffix: "+", label: "Services listed", icon: Sparkles },
+  { value: TOTAL_PROFILES, suffix: "+", label: "Professional profiles", icon: Users },
+  { value: LIVE_COVERAGE_CITIES, suffix: "+", label: "US cities", icon: MapPin },
+  { value: TOTAL_SERVICES, suffix: "+", label: "Services listed", icon: Sparkles },
   { value: 100, suffix: "%", label: "Free to browse", icon: BadgeDollarSign },
 ] as const;
 

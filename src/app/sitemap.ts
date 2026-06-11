@@ -7,6 +7,7 @@ import {
   buildProfilesSitemapEntries,
   buildGuidesSitemapEntries,
   buildBlogPostsSitemapEntries,
+  buildTourPagesSitemapEntries,
 } from "@/app/_lib/seo-routes";
 import { siteUrl } from "@/lib/site";
 
@@ -15,13 +16,14 @@ export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const [cities, services, profiles, blogPosts, neighborhoods, guides] = await Promise.all([
+  const [cities, services, profiles, blogPosts, neighborhoods, guides, tourPages] = await Promise.all([
     buildCitiesSitemapEntries(now),
     buildServicesSitemapEntries(now),
     buildProfilesSitemapEntries(now),
     buildBlogPostsSitemapEntries(now),
     buildNeighborhoodsSitemapEntries(now),
     buildGuidesSitemapEntries(now),
+    buildTourPagesSitemapEntries(now),
   ]);
 
   const core = buildCoreSitemapEntries(now);
@@ -42,5 +44,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...profiles,
     ...guides,
     ...blogPosts,
+    ...tourPages,
   ];
 }

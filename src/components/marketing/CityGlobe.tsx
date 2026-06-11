@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import createGlobe from "cobe";
 import { useReducedMotion } from "framer-motion";
+import { LIVE_COVERAGE_CITIES } from "@/lib/site-stats";
 
 // Priority + supporting US markets. [latitude, longitude]
 const MARKERS: { location: [number, number]; size: number }[] = [
@@ -154,7 +155,7 @@ export function CityGlobe() {
           <span className="absolute h-2.5 w-2.5 animate-ping rounded-full bg-primary [animation-duration:2s]" style={{ top: "32%", left: "40%" }} />
           <span className="absolute h-2 w-2 rounded-full bg-primary" style={{ top: "55%", left: "60%" }} />
           <span className="absolute h-2 w-2 rounded-full bg-primary/70" style={{ top: "62%", left: "30%" }} />
-          <span className="font-display text-3xl font-extrabold text-white/80">57+ cities</span>
+          <span className="font-display text-3xl font-extrabold text-white/80">{LIVE_COVERAGE_CITIES}+ cities</span>
         </div>
       )}
       <canvas

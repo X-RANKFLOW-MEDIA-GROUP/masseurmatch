@@ -45,7 +45,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     });
   }
 
-  const { total } = await fetchSegmentTherapists(city.name, segment.slug);
+  let total = 0;
+  try {
+    ({ total } = await fetchSegmentTherapists(city.name, segment.slug));
+  } catch {
+    // Supabase unavailable — fall through with zero total
+  }
 
   const isGayMassageSegment = segment.slug === "gay-massage" || segment.slug === "lgbtq-friendly";
   const cityLabel = `${city.name}, ${city.stateCode}`;
