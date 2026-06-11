@@ -62,6 +62,7 @@ export function SiteFooter() {
               <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
               <li><Link href="/trust" className="hover:text-white transition-colors">Trust &amp; Safety</Link></li>
               <li><Link href="/verification" className="hover:text-white transition-colors">Identity Verification</Link></li>
+              <li><Link href="/moderation-policy" className="hover:text-white transition-colors">Moderation Policy</Link></li>
               <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
               <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
               <li><Link href="/contact" className="hover:text-white transition-colors">Contact Support</Link></li>

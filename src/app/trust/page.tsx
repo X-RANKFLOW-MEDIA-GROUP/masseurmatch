@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Script from "next/script";
-import { ShieldCheck, Bot, Lock, CheckCircle2, UserCheck, EyeOff, ShieldAlert } from "lucide-react";
+import { ArrowRight, ShieldCheck, Bot, Lock, CheckCircle2, UserCheck, EyeOff, ShieldAlert } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Trust & Safety | How MasseurMatch Protects You",
@@ -151,6 +152,16 @@ export default function TrustPage() {
             <RuleRow text="Profile photos must be strictly professional and free of watermarks." />
             <RuleRow text="Verbal aggression, discrimination, or harassment in chat results in an instant ban." />
             <RuleRow text="All reviews must come from real clients to combat fake reputations." />
+          </div>
+
+          <div className="mt-8 text-center">
+            <Link
+              href="/moderation-policy"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 underline-offset-2 hover:text-slate-900 hover:underline"
+            >
+              Read our full Moderation Policy
+              <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.25} />
+            </Link>
           </div>
         </section>
       </div>
