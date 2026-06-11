@@ -252,6 +252,48 @@ export async function buildProfilesSitemapEntries(now = new Date()): Promise<Met
     }));
 }
 
+export async function buildTourPagesSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
+  const cities = getCities();
+  const citySlugSet = new Set(cities.map((c) => c.slug));
+
+  let profiles;
+  try {
+    const result = await getPublicTherapists({});
+    profiles = result.items ?? [];
+  } catch {
+    return [];
+  }
+
+  const entries: MetadataRoute.Sitemap = [];
+  const tourTiers = new Set(["standard", "pro", "elite"]);
+
+  for (const profile of profiles) {
+    if (!profile.slug || !tourTiers.has(profile.subscription_tier ?? "free")) continue;
+    if (!Array.isArray(profile.travel_schedule)) continue;
+
+    const now_ = new Date();
+    for (const visit of profile.travel_schedule as Array<{ city: string; start_date: string; end_date: string }>) {
+      if (new Date(visit.end_date) < now_) continue;
+      const citySlug = visit.city.toLowerCase().replace(/\s+/g, "-");
+      if (!citySlugSet.has(citySlug)) continue;
+      entries.push({
+        url: toSitemapUrl(`/${citySlug}/visiting/${profile.slug}`),
+        lastModified: profile.updated_at ? new Date(profile.updated_at) : now,
+        changeFrequency: "weekly" as const,
+        priority: 0.65,
+      });
+    }
+  }
+
+  // Deduplicate — multiple travel windows for the same city/therapist combo
+  const seen = new Set<string>();
+  return entries.filter((e) => {
+    if (seen.has(e.url)) return false;
+    seen.add(e.url);
+    return true;
+  });
+}
+
 export function buildGuidesSitemapEntries(now = new Date()): MetadataRoute.Sitemap {
   return GUIDES.map((guide) => ({
     url: toSitemapUrl(`/guides/${guide.slug}`),
