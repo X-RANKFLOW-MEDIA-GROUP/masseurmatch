@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
+import { createSupabaseAdminClient, requireAdminSession } from '@/app/api/_lib/supabase-server'
 import { addDays, format, parseISO } from 'date-fns'
 import type { AvailableSlot } from '@/lib/booking/types'
 
-// GET /api/booking/slots?therapist_id=xxx&days=14
-// Returns available booking slots for the next N days based on therapist_availability
+// GET /api/booking/slots?therapist_id=xxx&days=14 (admin only)
 export async function GET(request: NextRequest) {
+  try { await requireAdminSession(request) } catch { return NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
   const { searchParams } = new URL(request.url)
   const therapistId = searchParams.get('therapist_id')
   const days = Math.min(parseInt(searchParams.get('days') ?? '14', 10), 60)
