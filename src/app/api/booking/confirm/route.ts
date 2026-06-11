@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate confirmation message from AI
-    const history = (inquiry.ai_conversation ?? []) as ConversationMessage[]
+    const history = (inquiry.ai_conversation ?? []) as unknown as ConversationMessage[]
     const confirmPrompt = `Client just selected their appointment slot: ${body.date} at ${body.time}.
     Confirm it warmly, let them know it's pending your guy's final confirmation, and give an ETA like "should hear back within the hour".`
 

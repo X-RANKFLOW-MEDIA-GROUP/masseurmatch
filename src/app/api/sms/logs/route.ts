@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
         })
       }
       const conv = convMap.get(key)!
-      conv.messages.push(log)
+      conv.messages.push(log as unknown as import('@/lib/sms/types').SmsLog)
       if (log.created_at > conv.last_message_at) {
         conv.last_message_at = log.created_at
       }

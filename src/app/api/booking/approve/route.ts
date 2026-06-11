@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
 
     const { data: updated, error } = await supabase
       .from('booking_inquiries')
-      .update(updatePayload)
+      .update(updatePayload as never)
       .eq('id', body.inquiry_id)
       .select()
       .single()

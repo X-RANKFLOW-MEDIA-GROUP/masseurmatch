@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 
   const bookedTimes = new Set(
     (booked ?? []).map(a => {
-      const d = new Date(a.start_time)
+      const d = new Date(a.start_time as string)
       return `${format(d, 'yyyy-MM-dd')}_${format(d, 'HH:mm')}`
     })
   )

@@ -124,7 +124,7 @@ export async function createInquiryAndRespond(input: NewInquiryInput): Promise<{
   if (!inquiry) throw new Error('Failed to save inquiry')
 
   // Try a quick intelligence check first (3s timeout)
-  let quickReport = null
+  let quickReport: Awaited<ReturnType<typeof runIntelligence>> | null = null
   if (inquiry.client_phone) {
     try {
       quickReport = await Promise.race([

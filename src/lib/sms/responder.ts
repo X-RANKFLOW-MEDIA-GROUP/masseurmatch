@@ -26,7 +26,7 @@ function buildSystemPrompt(profile: SmsProfile): string {
 
   // Pricing
   if (profile.pricing_60 || profile.pricing_90 || profile.pricing_couples) {
-    const parts = []
+    const parts: string[] = []
     if (profile.pricing_60) parts.push(`60min: ${profile.pricing_60}`)
     if (profile.pricing_90) parts.push(`90min: ${profile.pricing_90}`)
     if (profile.pricing_couples) parts.push(`couples: ${profile.pricing_couples}`)

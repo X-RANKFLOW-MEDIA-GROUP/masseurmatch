@@ -89,7 +89,7 @@ export async function upsertFollowUpAlert(
 }
 
 // Get the SMS profile for a given Twilio "To" number
-export async function getSmsProfileForNumber(twilioNumber: string) {
+export async function getSmsProfileForNumber(twilioNumber: string): Promise<import('./types').SmsProfile | null> {
   const supabase = createSupabaseAdminClient()
   const { data } = await supabase
     .from('sms_profiles')
@@ -97,7 +97,7 @@ export async function getSmsProfileForNumber(twilioNumber: string) {
     .eq('twilio_number', twilioNumber)
     .eq('ready_to_reply', true)
     .maybeSingle()
-  return data
+  return data as unknown as import('./types').SmsProfile | null
 }
 
 // Get recent conversation history for a phone pair
