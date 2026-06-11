@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
+import { createSupabaseAdminClient, requireAdminSession } from '@/app/api/_lib/supabase-server'
 import { getRequestSession } from '@/app/api/_lib/session'
 import { createInquiryAndRespond, continueConversation, runBackgroundIntelligence } from '@/lib/booking/ai-responder'
 import type { NewInquiryInput } from '@/lib/booking/types'
 
-// POST /api/booking/inquire — submit a new inquiry or reply to an existing one
+// POST /api/booking/inquire — submit a new inquiry or reply to an existing one (admin only)
 export async function POST(request: NextRequest) {
   try {
+    await requireAdminSession(request)
     const body = await request.json() as NewInquiryInput & {
       inquiry_id?: string
       client_message?: string

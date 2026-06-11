@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
+import { createSupabaseAdminClient, requireAdminSession } from '@/app/api/_lib/supabase-server'
 import { chatWithDeepSeek } from '@/lib/booking/deepseek'
 import type { ConversationMessage } from '@/lib/booking/types'
 
-// POST /api/booking/confirm — client selects a slot
+// POST /api/booking/confirm — admin confirms a slot for an inquiry (admin only)
 // Body: { inquiry_id, date, time }
 export async function POST(request: NextRequest) {
   try {
+    await requireAdminSession(request)
     const body = await request.json() as {
       inquiry_id: string
       date: string
