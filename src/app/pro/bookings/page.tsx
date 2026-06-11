@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import type { LucideIcon } from 'lucide-react'
 import {
   Calendar,
   Clock,
@@ -158,7 +159,7 @@ function StatCard({ label, value, color }: { label: string; value: number; color
   )
 }
 
-function SectionHeader({ icon: Icon, label, color }: { icon: React.ComponentType<{ className?: string; strokeWidth?: number }>; label: string; color: string }) {
+function SectionHeader({ icon: Icon, label, color }: { icon: LucideIcon; label: string; color: string }) {
   return (
     <div className="mb-3 flex items-center gap-2">
       <Icon className={`h-4 w-4 text-${color}-400`} strokeWidth={2.25} />

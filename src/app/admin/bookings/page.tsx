@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import type { LucideIcon } from 'lucide-react'
 import {
   Clock,
   CheckCircle2,
@@ -320,7 +321,7 @@ export default function AdminBookingsPage() {
   )
 }
 
-function Detail({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string; strokeWidth?: number }>; label: string; value?: string | null }) {
+function Detail({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value?: string | null }) {
   if (!value) return null
   return (
     <div className="flex items-start gap-2">
