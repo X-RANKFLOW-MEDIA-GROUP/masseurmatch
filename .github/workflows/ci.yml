@@ -262,7 +262,16 @@ jobs:
           pnpm --version
       - run: pnpm install --frozen-lockfile
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        timeout-minutes: 12
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          set -euo pipefail
+          # The apt phase of `--with-deps` occasionally stalls on the runner and,
+          # without a cap, consumed the entire job timeout. Give each attempt a
+          # hard 6-minute limit and retry once so a transient stall self-heals.
+          timeout 360 bash -c 'npx playwright install --with-deps chromium' \
+            || timeout 360 bash -c 'npx playwright install --with-deps chromium'
       - name: Run E2E tests
         run: npx playwright test --timeout=30000 --retries=1
       - name: Summarize Playwright report
