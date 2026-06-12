@@ -1334,7 +1334,6 @@ export type Database = {
           headline: string | null
           height_inches: number | null
           id: string
-          identity_verified_at: string | null
           incall_amenities: string[] | null
           incall_price: number | null
           is_active: boolean | null
@@ -1455,7 +1454,6 @@ export type Database = {
           headline?: string | null
           height_inches?: number | null
           id: string
-          identity_verified_at?: string | null
           incall_amenities?: string[] | null
           incall_price?: number | null
           is_active?: boolean | null
@@ -1576,7 +1574,6 @@ export type Database = {
           headline?: string | null
           height_inches?: number | null
           id?: string
-          identity_verified_at?: string | null
           incall_amenities?: string[] | null
           incall_price?: number | null
           is_active?: boolean | null
@@ -2958,72 +2955,6 @@ export type Database = {
           reviewed_at?: string | null
           created_at?: string
           updated_at?: string
-        }
-        Relationships: []
-      }
-      contact_events: {
-        Row: {
-          id: string
-          profile_id: string
-          user_id: string | null
-          method: string
-          ip_hash: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          profile_id: string
-          user_id?: string | null
-          method: string
-          ip_hash?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          profile_id?: string
-          user_id?: string | null
-          method?: string
-          ip_hash?: string | null
-          created_at?: string
-        }
-        Relationships: []
-      }
-      demand_scores: {
-        Row: {
-          id: string
-          city: string
-          state: string
-          neighborhood: string | null
-          score: number
-          trend: string
-          search_volume_index: number
-          competition_index: number
-          week_start: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          city: string
-          state: string
-          neighborhood?: string | null
-          score: number
-          trend?: string
-          search_volume_index?: number
-          competition_index?: number
-          week_start: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          city?: string
-          state?: string
-          neighborhood?: string | null
-          score?: number
-          trend?: string
-          search_volume_index?: number
-          competition_index?: number
-          week_start?: string
-          created_at?: string
         }
         Relationships: []
       }
