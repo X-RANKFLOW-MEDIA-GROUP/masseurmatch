@@ -879,3 +879,110 @@ create table if not exists public.waitlist_signups (
   metadata         jsonb default '{}'::jsonb,
   created_at       timestamptz not null default now()
 );
+
+-- ── Pre-launch audit features ────────────────────────────────────────────────
+-- Mirrors migrations 20260611000000 / 000001 / 200001 / 200002 / 200004.
+
+-- Public verified-badge timestamp (migration 20260611200002).
+alter table public.profiles add column if not exists identity_verified_at timestamptz;
+
+-- Visitor contact-event log; gates verified review eligibility (migration 20260611200004).
+create table if not exists public.contact_events (
+  id          uuid primary key default gen_random_uuid(),
+  profile_id  uuid not null references public.profiles(id) on delete cascade,
+  user_id     uuid references auth.users(id) on delete set null,
+  method      text not null,
+  ip_hash     text,
+  created_at  timestamptz not null default now()
+);
+
+-- Demand Radar scores, Elite-gated (migration 20260611200001).
+create table if not exists public.demand_scores (
+  id                  uuid primary key default gen_random_uuid(),
+  city                text not null,
+  state               text not null,
+  neighborhood        text,
+  score               integer not null,
+  trend               text not null default 'stable',
+  search_volume_index integer not null default 0,
+  competition_index   integer not null default 0,
+  week_start          date not null,
+  created_at          timestamptz not null default now()
+);
+
+-- Booking inquiry intake (migration 20260611000000).
+create table if not exists public.booking_inquiries (
+  id                  uuid primary key default gen_random_uuid(),
+  client_name         text,
+  client_phone        text,
+  client_email        text,
+  client_hotel        text,
+  service_type        text default 'massage',
+  preferred_date      date,
+  preferred_time      text,
+  duration_minutes    integer default 60,
+  message             text,
+  source              text default 'website',
+  therapist_id        uuid references public.profiles(id) on delete set null,
+  status              text not null default 'new',
+  intelligence_status text not null default 'pending',
+  intelligence_report jsonb default '{}',
+  ai_conversation     jsonb default '[]',
+  confirmed_date      date,
+  confirmed_time      text,
+  appointment_id      uuid,
+  sheets_row_id       text,
+  admin_notes         text,
+  reviewed_by         uuid references auth.users(id) on delete set null,
+  reviewed_at         timestamptz,
+  created_at          timestamptz default now(),
+  updated_at          timestamptz default now()
+);
+
+-- SMS auto-reply system (migration 20260611000001).
+create table if not exists public.sms_profiles (
+  id                  uuid primary key default gen_random_uuid(),
+  profile_id          uuid not null references public.profiles(id) on delete cascade,
+  ready_to_reply      boolean not null default false,
+  availability_mode   text not null default 'in_city',
+  arrival_date        date,
+  departure_date      date,
+  pricing_60          text,
+  pricing_90          text,
+  pricing_couples     text,
+  outcall_available   boolean not null default false,
+  couples_available   boolean not null default false,
+  outcall_area        text,
+  alert_phone         text,
+  custom_instructions text,
+  twilio_number       text,
+  created_at          timestamptz default now(),
+  updated_at          timestamptz default now()
+);
+
+create table if not exists public.sms_logs (
+  id                 uuid primary key default gen_random_uuid(),
+  profile_id         uuid references public.sms_profiles(id) on delete set null,
+  from_number        text not null,
+  to_number          text not null,
+  direction          text not null,
+  body               text not null,
+  twilio_sid         text,
+  intent             text,
+  status             text default 'received',
+  is_manual          boolean not null default false,
+  booking_inquiry_id uuid references public.booking_inquiries(id) on delete set null,
+  created_at         timestamptz default now()
+);
+
+create table if not exists public.sms_follow_up_alerts (
+  id               uuid primary key default gen_random_uuid(),
+  profile_id       uuid references public.sms_profiles(id) on delete cascade,
+  client_phone     text not null,
+  our_phone        text not null,
+  last_outbound_at timestamptz not null,
+  last_inbound_at  timestamptz,
+  resolved_at      timestamptz,
+  resolved_by      uuid references auth.users(id) on delete set null,
+  created_at       timestamptz default now()
+);
