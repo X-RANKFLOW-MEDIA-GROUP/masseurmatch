@@ -395,6 +395,33 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_events: {
+        Row: {
+          created_at: string
+          id: string
+          ip_hash: string | null
+          method: string
+          profile_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          method: string
+          profile_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          method?: string
+          profile_id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       contact_inquiries: {
         Row: {
           client_email: string | null
@@ -479,6 +506,45 @@ export type Database = {
           id?: string
           therapist_id?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      demand_scores: {
+        Row: {
+          city: string
+          competition_index: number
+          created_at: string
+          id: string
+          neighborhood: string | null
+          score: number
+          search_volume_index: number
+          state: string
+          trend: string
+          week_start: string
+        }
+        Insert: {
+          city: string
+          competition_index?: number
+          created_at?: string
+          id?: string
+          neighborhood?: string | null
+          score: number
+          search_volume_index?: number
+          state: string
+          trend?: string
+          week_start: string
+        }
+        Update: {
+          city?: string
+          competition_index?: number
+          created_at?: string
+          id?: string
+          neighborhood?: string | null
+          score?: number
+          search_volume_index?: number
+          state?: string
+          trend?: string
+          week_start?: string
         }
         Relationships: []
       }
@@ -1272,6 +1338,7 @@ export type Database = {
           incall_price: number | null
           is_active: boolean | null
           is_banned: boolean | null
+          identity_verified_at: string | null
           is_demo: boolean | null
           is_featured: boolean | null
           is_suspended: boolean | null
@@ -1391,6 +1458,7 @@ export type Database = {
           incall_price?: number | null
           is_active?: boolean | null
           is_banned?: boolean | null
+          identity_verified_at?: string | null
           is_demo?: boolean | null
           is_featured?: boolean | null
           is_suspended?: boolean | null
@@ -1510,6 +1578,7 @@ export type Database = {
           incall_price?: number | null
           is_active?: boolean | null
           is_banned?: boolean | null
+          identity_verified_at?: string | null
           is_demo?: boolean | null
           is_featured?: boolean | null
           is_suspended?: boolean | null
