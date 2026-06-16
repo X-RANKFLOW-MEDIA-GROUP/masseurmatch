@@ -8,9 +8,7 @@ import { PLANS, PRICE_LOCK } from "@/lib/pricing";
 const springConfig = { type: "spring", stiffness: 400, damping: 30 } as const;
 
 export function PricingToggle() {
-  // Display three tiers on the homepage teaser: Free, Pro (most popular), Elite.
-  // The full comparison lives at /pricing.
-  const featured = PLANS.filter((p) => p.id !== "standard");
+  const featured = PLANS;
 
   return (
     <section className="py-20 lg:py-32">
@@ -33,7 +31,7 @@ export function PricingToggle() {
         </div>
 
         {/* Plan cards */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {featured.map((plan) => (
             <motion.div
               key={plan.id}
