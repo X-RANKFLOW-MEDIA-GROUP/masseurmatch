@@ -41,7 +41,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = createPageMetadata({
   title: "Find Verified Male Massage Therapists Near You | MasseurMatch",
   description:
-    "MasseurMatch is the premium US directory for verified LGBTQ+-affirming male massage therapists. Search Dallas, Miami, NYC, LA, Chicago & 80+ cities across 278 city pages. Compare deep tissue, Swedish, outcall & incall options. A modern alternative to MasseurFinder and RentMasseur.",
+    "MasseurMatch is the premium US directory for verified LGBTQ+-affirming male massage therapists. Search Dallas, Miami, NYC, LA, Chicago & cities across the US. Compare deep tissue, Swedish, outcall & incall options. A modern alternative to MasseurFinder and RentMasseur.",
   path: "/",
   keywords: [
     // Brand

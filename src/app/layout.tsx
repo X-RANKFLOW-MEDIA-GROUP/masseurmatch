@@ -20,7 +20,7 @@ import SmoothScroll from "@/components/motion/SmoothScroll";
 // even in CI environments without access to Google Fonts.
 
 const rootMetadata = createPageMetadata({
-  title: "The safest and most trusted premium male massage directory",
+  title: "Premium verified male massage therapist directory",
   description: SITE_DESCRIPTION,
   path: "/",
 });

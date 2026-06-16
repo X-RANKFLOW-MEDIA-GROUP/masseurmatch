@@ -1,8 +1,10 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { Check } from "lucide-react";
 import { SignupProvider } from "../_lib/signup-context";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { AuroraBackgroundLight } from "@/components/ui/aurora-background";
 
@@ -60,6 +62,15 @@ function ProgressStepper() {
 }
 
 export function SignupShell({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace("/dashboard");
+    }
+  }, [loading, user, router]);
+
   return (
     <SignupProvider>
       <AuroraBackgroundLight className="min-h-[calc(100vh-74px)]">

@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { AppButton, AppInput, AppTextarea, PageSection, Surface } from "@/app/_components/primitives";
 import { updateProfileMutation, type ProProfileMutationResponse } from "@/app/_lib/mutations";
 import { requestJson } from "@/app/_lib/request";
 import { useToast } from "@/hooks/use-toast";
 import { BODY_TYPE_OPTIONS, normalizeBodyTypeValue } from "@/lib/physical-profile";
 import { US_CITIES } from "@/data/cities";
+import { Loader2, RefreshCw, AlertCircle } from "lucide-react";
 
 type ProfileResponse = {
   ok: boolean;
@@ -94,39 +95,42 @@ export default function ProProfilePageClient() {
   const { toast } = useToast();
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadSlow, setLoadSlow] = useState(false);
   const [saving, setSaving] = useState(false);
+  const slowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const loadProfile = useCallback(async () => {
+    setLoading(true);
+    setLoadError(null);
+    setLoadSlow(false);
+
+    slowTimerRef.current = setTimeout(() => setLoadSlow(true), 5000);
+
+    try {
+      const response = await requestJson<ProfileResponse>("/api/pro/profile");
+      setForm(mapProfileToForm(response.profile));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error.";
+      setLoadError(message);
+      toast({
+        title: "Could not load profile",
+        description: message,
+        variant: "destructive",
+      });
+    } finally {
+      if (slowTimerRef.current) clearTimeout(slowTimerRef.current);
+      setLoading(false);
+      setLoadSlow(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
-    let cancelled = false;
-
-    const loadProfile = async () => {
-      try {
-        const response = await requestJson<ProfileResponse>("/api/pro/profile");
-
-        if (!cancelled) {
-          setForm(mapProfileToForm(response.profile));
-        }
-      } catch (error) {
-        if (!cancelled) {
-          toast({
-            title: "Could not load profile",
-            description: error instanceof Error ? error.message : "Unknown error.",
-            variant: "destructive",
-          });
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
     void loadProfile();
-
     return () => {
-      cancelled = true;
+      if (slowTimerRef.current) clearTimeout(slowTimerRef.current);
     };
-  }, [toast]);
+  }, [loadProfile]);
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -175,7 +179,35 @@ export default function ProProfilePageClient() {
 
       <Surface className="mt-8">
         {loading ? (
-          <p className="text-sm text-muted-foreground">Loading profile...</p>
+          <div className="flex flex-col items-center justify-center gap-3 py-16">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" strokeWidth={2} />
+            <p className="text-sm text-muted-foreground">
+              {loadSlow ? "Taking longer than expected..." : "Loading profile..."}
+            </p>
+            {loadSlow && (
+              <button
+                type="button"
+                onClick={loadProfile}
+                className="mt-1 inline-flex items-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+              >
+                <RefreshCw className="h-3 w-3" strokeWidth={2.25} />
+                Retry
+              </button>
+            )}
+          </div>
+        ) : loadError ? (
+          <div className="flex flex-col items-center justify-center gap-3 py-16">
+            <AlertCircle className="h-6 w-6 text-destructive" strokeWidth={2} />
+            <p className="text-sm text-muted-foreground">Could not load profile: {loadError}</p>
+            <button
+              type="button"
+              onClick={loadProfile}
+              className="mt-1 inline-flex items-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+            >
+              <RefreshCw className="h-3 w-3" strokeWidth={2.25} />
+              Retry
+            </button>
+          </div>
         ) : (
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">

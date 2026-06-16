@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -17,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { BRAND_ASSETS } from "@/lib/brand";
 
 const navItems = [
   { name: "Dashboard", href: "/pro/dashboard", icon: LayoutDashboard },
@@ -55,9 +57,9 @@ export default function ProLayoutClient({
   const sidebarContent = (
     <>
       <div className="p-6">
-        <Link href="/" className="font-display text-2xl font-bold tracking-tighter text-white">
-          Masseur<span className="text-slate-500">Match</span>{" "}
-          <span className="ml-1 align-top font-mono text-[10px] uppercase tracking-widest text-indigo-400">
+        <Link href="/" className="inline-flex items-center gap-2">
+          <Image src={BRAND_ASSETS.logo} alt="MasseurMatch" width={160} height={32} className="h-8 w-auto" />
+          <span className="align-top font-mono text-[10px] uppercase tracking-widest text-indigo-400">
             PRO
           </span>
         </Link>
@@ -109,9 +111,9 @@ export default function ProLayoutClient({
       </aside>
 
       <div className="fixed inset-x-0 top-0 z-30 flex items-center justify-between border-b border-slate-900 bg-slate-950 px-4 py-3 md:hidden">
-        <Link href="/" className="font-display text-xl font-bold tracking-tighter text-white">
-          Masseur<span className="text-slate-500">Match</span>{" "}
-          <span className="ml-1 align-top font-mono text-[9px] uppercase tracking-widest text-indigo-400">
+        <Link href="/" className="inline-flex items-center gap-2">
+          <Image src={BRAND_ASSETS.logo} alt="MasseurMatch" width={128} height={28} className="h-7 w-auto" />
+          <span className="align-top font-mono text-[9px] uppercase tracking-widest text-indigo-400">
             PRO
           </span>
         </Link>

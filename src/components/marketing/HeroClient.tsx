@@ -86,7 +86,7 @@ export default function HeroClient() {
                     }}
                     className={`relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-full bg-gradient-to-br ring-2 ring-background ${avatar.color} flex items-center justify-center`}
                   >
-                    <span className="absolute inset-0 z-0 flex select-none items-center justify-center text-[10px] font-bold text-white/80">
+                    <span className="pointer-events-none absolute inset-0 z-0 flex select-none items-center justify-center text-[10px] font-bold text-white/80" aria-hidden="true">
                       {avatar.initials}
                     </span>
                     <Image src={avatar.src} alt={avatar.alt} fill className="z-10 object-cover" sizes="44px" />
@@ -104,7 +104,7 @@ export default function HeroClient() {
                 }}
                 className="text-sm font-medium text-muted-foreground md:text-base"
               >
-                500+ professional therapists nationwide
+                Professional therapists nationwide
               </motion.span>
             </div>
 

@@ -162,7 +162,11 @@ const buildPublicTherapistsQuery = () => {
     .eq("visibility_status", "public")
     .eq("profile_status", "approved")
     .eq("is_suspended", false)
-    .eq("is_banned", false);
+    .eq("is_banned", false)
+    // Exclude test/debug profiles from public listings
+    .not("display_name", "ilike", "%Debug%")
+    .not("display_name", "ilike", "%Test%")
+    .not("phone", "ilike", "%555%");
   if (!showDemoProfiles) {
     q = q.or("is_demo.is.null,is_demo.eq.false");
   }
@@ -189,6 +193,11 @@ function sortPublicTherapists(items: PublicTherapist[]) {
 
 function applyFallbackFilters(items: PublicTherapist[], filters?: Parameters<typeof getPublicTherapists>[0]) {
   return items.filter((profile) => {
+    // Exclude test/debug profiles from public listings
+    const name = profile.display_name?.toLowerCase() ?? "";
+    if (name.includes("debug") || name.includes("test")) return false;
+    if (profile.phone?.includes("555")) return false;
+
     if (filters?.city && profile.city?.toLowerCase() !== filters.city.toLowerCase()) return false;
     if (filters?.verified && profile.verification_status !== "verified") return false;
     if (filters?.availableToday && !isActivelyAvailable(profile)) return false;
@@ -196,6 +205,15 @@ function applyFallbackFilters(items: PublicTherapist[], filters?: Parameters<typ
     if (filters?.lgbtqAffirming && profile.lgbtq_affirming !== true) return false;
     if (filters?.keyword) {
       const keyword = filters.keyword.toLowerCase();
+
+      // If keyword is a known city name, treat as city filter in fallback too
+      const matchedCity = US_CITIES.find(
+        (c) => c.name.toLowerCase() === keyword,
+      );
+      if (matchedCity && !filters?.city) {
+        if (profile.city?.toLowerCase() !== matchedCity.name.toLowerCase()) return false;
+      }
+
       const searchable = [
         profile.bio,
         profile.display_name,
@@ -203,8 +221,10 @@ function applyFallbackFilters(items: PublicTherapist[], filters?: Parameters<typ
         profile.headline,
         profile.neighborhood,
         profile.neighborhood_name,
+        profile.city,
         ...(profile.specialties ?? []),
         ...(profile.massage_techniques ?? []),
+        ...(profile.service_categories ?? []),
       ]
         .filter(Boolean)
         .join(" ")
@@ -239,14 +259,34 @@ export const getPublicTherapists = async (filters?: {
   if (filters?.keyword) {
     const keyword = `%${filters.keyword}%`;
     const bodyTypeKeyword = matchBodyTypeKeyword(filters.keyword);
+
+    // Check if the keyword matches a known city name — if so, also filter by city
+    const matchedCity = US_CITIES.find(
+      (c) => c.name.toLowerCase() === filters.keyword!.toLowerCase(),
+    );
+    if (matchedCity && !filters?.city) {
+      query = query.ilike("city", matchedCity.name);
+    }
+
     const conditions = [
       `bio.ilike.${keyword}`,
       `display_name.ilike.${keyword}`,
       `full_name.ilike.${keyword}`,
       `headline.ilike.${keyword}`,
       `neighborhood.ilike.${keyword}`,
+      `city.ilike.${keyword}`,
+      `specialties.cs.{"${filters.keyword}"}`,
+      `massage_techniques.cs.{"${filters.keyword}"}`,
+      `service_categories.cs.{"${filters.keyword}"}`,
       ...(bodyTypeKeyword ? [`body_type.eq.${bodyTypeKeyword}`] : []),
     ];
+
+    // When matching a city, use AND (city + text match) so only that city's
+    // therapists are returned. Otherwise use OR across all text fields.
+    if (matchedCity && !filters?.city) {
+      // City filter already applied above; the OR here is for ranking/display
+      // but the city ilike narrows the result set.
+    }
     query = query.or(conditions.join(","));
   }
   if (filters?.verified) query = query.eq("verification_status", "verified");

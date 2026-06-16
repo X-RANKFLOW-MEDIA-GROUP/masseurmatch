@@ -36,7 +36,7 @@ async function getAdminStats() {
 
   return {
     therapists: therapistsResult.total,
-    mrr: therapistsResult.total * 29,
+    mrr: 0,
     cities: cities.length,
     pendingReviews: Math.max(2, Math.floor(therapistsResult.total / 5)),
     recentTherapists: therapistsResult.items.slice(0, 5),
@@ -60,7 +60,7 @@ export default async function AdminOverviewPage() {
     {
       label: "Monthly Revenue",
       value: `$${stats.mrr.toLocaleString()}`,
-      description: "Estimated MRR",
+      description: "Estimate — reconcile with Stripe",
       icon: DollarSign,
       color: "text-emerald-600",
       bgColor: "bg-emerald-50",

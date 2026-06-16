@@ -8,6 +8,7 @@ import type { PublicTherapist } from "@/app/_lib/directory";
 import {
   getPublicProfileName,
   isVerifiedDirectoryProfile,
+  isIdentityVerified,
 } from "@/app/_lib/public-profile";
 
 const formatCurrency = (value: number | null) => {
@@ -39,10 +40,11 @@ const beginRouteTransition = () => {
   window.setTimeout(() => document.body.classList.remove("route-dissolve-out"), 420);
 };
 
-export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist }) {
+export function PublicTherapistCard({ therapist, priority = false }: { therapist: PublicTherapist; priority?: boolean }) {
   const name = getPublicProfileName(therapist);
   const profilePath = `/therapists/${therapist.slug || therapist.id}`;
-  const isVerified = isVerifiedDirectoryProfile(therapist);
+  const isDirectoryListed = isVerifiedDirectoryProfile(therapist);
+  const hasIdentityVerification = isIdentityVerified(therapist);
   const isElite = therapist._tier === "elite";
   const availableNow = therapist.available_now === true;
 
@@ -81,7 +83,7 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover object-top transition-transform duration-[600ms] ease-out group-hover:scale-[1.04]"
-            priority={false}
+            priority={priority}
             itemProp="image"
           />
 
@@ -89,10 +91,10 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
 
           {/* Top badges */}
           <div className="absolute inset-x-2.5 top-2.5 flex items-start justify-between gap-2">
-            {isVerified ? (
+            {isDirectoryListed ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-white/92 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 shadow-sm backdrop-blur-sm">
                 <ShieldCheck className="h-3 w-3 text-emerald-500" strokeWidth={2.5} />
-                {isElite ? "Elite" : "Verified"}
+                {isElite ? "Elite" : hasIdentityVerification ? "Verified" : "Listed"}
               </span>
             ) : (
               <span />

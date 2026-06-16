@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "List Your Massage Practice on MasseurMatch",
     description:
-      "Join thousands of verified massage therapists on the leading LGBTQ+-inclusive directory.",
+      "Join verified massage therapists on the leading LGBTQ+-inclusive directory.",
     url: "https://masseurmatch.com/for-therapists",
     siteName: "MasseurMatch",
     type: "website",
@@ -270,8 +270,8 @@ export default function ForTherapistsPage() {
             }}
           >
             {[
-              { value: "2,400+", label: "Active Therapist Listings" },
-              { value: "104", label: "Cities" },
+              { value: "Growing", label: "Active Therapist Listings" },
+              { value: "80+", label: "US Cities Covered" },
               { value: "$0", label: "Booking Commission" },
               { value: "48h", label: "Average Verification Time" },
             ].map((stat) => (

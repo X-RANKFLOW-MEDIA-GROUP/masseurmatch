@@ -301,9 +301,9 @@ export default function DashboardHome() {
         <div className="space-y-6 lg:col-span-2">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             {[
-              { label: "Profile Views", icon: Eye, note: "Analytics coming soon" },
+              { label: "Profile Views", icon: Eye, note: "We start tracking views the day your listing goes live. Check back soon for your first insights." },
               { label: "Inquiries", icon: Zap, note: "Check Inquiries tab" },
-              { label: "Avg. Rating", icon: ShieldCheck, note: "Reviews coming soon" },
+              { label: "Avg. Rating", icon: ShieldCheck, note: "No reviews yet. Reviews will appear here as clients leave feedback." },
             ].map((item) => (
               <motion.div
                 key={item.label}
@@ -314,11 +314,11 @@ export default function DashboardHome() {
               >
                 <item.icon className="h-4 w-4 text-slate-400" />
                 <div>
-                  <div className="font-display text-lg font-medium text-slate-400">—</div>
+                  <div className="font-display text-lg font-medium text-slate-400">&mdash;</div>
                   <div className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-slate-500">
                     {item.label}
                   </div>
-                  <div className="mt-1 text-[10px] text-slate-400 italic">{item.note}</div>
+                  <div className="mt-1 text-[10px] text-slate-400">{item.note}</div>
                 </div>
               </motion.div>
             ))}

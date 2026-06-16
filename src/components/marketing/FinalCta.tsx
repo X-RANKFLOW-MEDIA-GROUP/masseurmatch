@@ -33,7 +33,7 @@ export function FinalCta() {
             Get listed today.
           </h2>
           <p className="mx-auto mt-5 max-w-md text-base text-white/60">
-            Join 500+ verified therapists growing their practice through MasseurMatch.
+            Join verified therapists growing their practice through MasseurMatch.
           </p>
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
