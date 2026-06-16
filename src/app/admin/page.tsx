@@ -7,7 +7,6 @@ import {
   Users,
   HeartHandshake,
   MapPin,
-  DollarSign,
   ShieldCheck,
   ShieldAlert,
   Newspaper,
@@ -23,9 +22,7 @@ async function getAdminStats() {
 
   return {
     therapists: therapists.total,
-    mrr: therapists.total * 29,
     cities: cities.length,
-    pendingReviews: Math.max(2, Math.floor(therapists.total / 5)),
     recentTherapists: therapists.items.slice(0, 5),
   };
 }
@@ -43,14 +40,6 @@ export default async function AdminOverviewPage() {
       bgColor: "bg-primary/10",
     },
     {
-      label: "Monthly Revenue",
-      value: `$${stats.mrr.toLocaleString()}`,
-      description: "Estimated MRR",
-      icon: DollarSign,
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50",
-    },
-    {
       label: "Cities Covered",
       value: String(stats.cities),
       description: "Active locations",
@@ -59,9 +48,17 @@ export default async function AdminOverviewPage() {
       bgColor: "bg-blue-50",
     },
     {
-      label: "Pending Reviews",
-      value: String(stats.pendingReviews),
-      description: "Awaiting moderation",
+      label: "Revenue",
+      value: "—",
+      description: "See Billing page",
+      icon: ShieldCheck,
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-50",
+    },
+    {
+      label: "Moderation",
+      value: "—",
+      description: "See Moderation page",
       icon: ShieldCheck,
       color: "text-amber-600",
       bgColor: "bg-amber-50",
