@@ -6,7 +6,7 @@ import {
 } from "@/app/_lib/directory";
 import { isVerifiedDirectoryProfile } from "@/app/_lib/public-profile";
 
-export const EXPLORE_DEFAULT_CITY = "Dallas";
+export const EXPLORE_DEFAULT_CITY = "";
 export const EXPLORE_DEFAULT_RADIUS = 25;
 export const EXPLORE_DEFAULT_PRICE_MAX = 300;
 export const EXPLORE_PAGE_SIZE = 24;
@@ -191,7 +191,7 @@ export function resolveExploreCity(inputCity: string, inputZip = "") {
 
   const raw = inputCity.trim();
   if (!raw) {
-    return EXPLORE_DEFAULT_CITY;
+    return "";
   }
 
   const matched = getCities().find((city) => {
@@ -202,10 +202,13 @@ export function resolveExploreCity(inputCity: string, inputZip = "") {
   return matched?.name || raw;
 }
 
+// Geographic center of the contiguous US — used when no city context is known
+const US_CENTER: ExplorePoint = { latitude: 39.8283, longitude: -98.5795 };
+
 export function getCityCoordinates(cityName: string) {
   const city = getCities().find((entry) => normalize(entry.name) === normalize(cityName));
   const slug = city?.slug || toSlug(cityName);
-  return CITY_COORDINATES[slug] || CITY_COORDINATES[toSlug(EXPLORE_DEFAULT_CITY)];
+  return CITY_COORDINATES[slug] || US_CENTER;
 }
 
 function getProfileCoordinates(profile: PublicTherapist) {
@@ -216,7 +219,7 @@ function getProfileCoordinates(profile: PublicTherapist) {
     return { latitude, longitude };
   }
 
-  return getCityCoordinates(profile.city || EXPLORE_DEFAULT_CITY);
+  return getCityCoordinates(profile.city || "");
 }
 
 function calculateDistanceMiles(from: ExplorePoint, to: ExplorePoint) {
@@ -405,7 +408,7 @@ function normalizeProvider(profile: PublicTherapist, origin: ExplorePoint): Expl
     id: profile.id,
     slug: profile.slug || profile.id,
     name: profile.display_name || profile.full_name || "Provider",
-    city: profile.city || EXPLORE_DEFAULT_CITY,
+    city: profile.city || "",
     neighborhood: deriveNeighborhood(profile),
     yearsExperience,
     specialty: deriveSpecialty(profile),

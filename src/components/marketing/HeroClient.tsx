@@ -187,7 +187,7 @@ export default function HeroClient() {
               className="speakable-intro mb-8 max-w-xl text-lg leading-relaxed text-muted-foreground lg:text-xl"
             >
               Premium male massage therapists across the US — real profiles, real reviews,
-              and AI-powered search with Knotty. Dallas, Houston, Miami, NYC, and {LIVE_COVERAGE_CITIES}+ cities.
+              and AI-powered search with Knotty. Available in {LIVE_COVERAGE_CITIES}+ cities nationwide.
             </motion.p>
 
             <motion.div
