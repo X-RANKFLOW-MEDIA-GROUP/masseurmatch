@@ -1,41 +1,84 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-
 import { cn } from "@/lib/utils";
 
+/**
+ * Button — MasseurMatch Design System v2
+ * ──────────────────────────────────────
+ * 5 variants × 4 sizes, all driven by CSS custom property tokens.
+ * Fully compatible with shadcn/ui (asChild via Slot).
+ *
+ * Variants:
+ *   primary   — amber/copper CTA (book, search, continue)
+ *   secondary — subtle fill, secondary actions
+ *   outline   — bordered, tertiary actions
+ *   ghost     — icon rows, sidebar items
+ *   danger    — destructive actions
+ *
+ * Sizes:
+ *   sm  — 32px, compact toolbars
+ *   md  — 40px (default), standard forms/cards
+ *   lg  — 48px, prominent inline CTAs
+ *   xl  — 56px, hero page entry (prefer ButtonLiquidMetal for hero)
+ *   icon — 40px square
+ */
+
 const buttonVariants = cva(
-  "motion-premium premium-shimmer inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  // Base — token-first, no arbitrary values
+  [
+    "inline-flex items-center justify-center gap-2",
+    "font-sans font-medium tracking-tight",
+    "select-none whitespace-nowrap",
+    "transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)]",
+    "focus-visible:outline-none",
+    "focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2",
+    "disabled:pointer-events-none disabled:opacity-50",
+    "[&_svg]:pointer-events-none [&_svg]:shrink-0",
+  ],
   {
     variants: {
       variant: {
-        default:
-          "bg-action-primary text-white shadow-[0_18px_38px_rgb(var(--color-action-primary-rgb)/0.26)] hover:bg-action-primary-hover hover:-translate-y-0.5",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border border-border bg-white/92 text-foreground shadow-[inset_0_1px_0_rgb(255_255_255/_0.9)] hover:border-action-secondary/20 hover:bg-bg-subtle",
-        secondary:
-          "bg-action-secondary text-white shadow-[0_18px_38px_rgb(var(--color-brand-secondary-rgb)/0.24)] hover:bg-action-secondary-hover hover:-translate-y-0.5",
-        ghost: "text-foreground hover:bg-secondary hover:text-primary",
-        link: "text-primary underline-offset-4 hover:text-brand-deep hover:underline",
-        hero:
-          "bg-action-primary text-white font-bold shadow-[0_22px_48px_rgb(var(--color-action-primary-rgb)/0.32)] hover:bg-action-primary-hover hover:scale-[1.02] transition-transform",
-        glass: "border border-white/16 bg-white/10 text-white hover:bg-white/18",
-        premium:
-          "bg-[linear-gradient(180deg,rgb(var(--color-brand-soft-accent-rgb)),rgb(var(--color-action-primary-rgb)))] text-brand-primary shadow-[0_22px_48px_rgb(var(--color-action-primary-rgb)/0.28)] hover:brightness-[1.03] hover:-translate-y-0.5",
+        primary: [
+          "bg-[var(--color-primary)] text-white",
+          "hover:bg-[var(--color-primary-hover)] hover:-translate-y-px hover:shadow-[var(--shadow-md)]",
+          "active:translate-y-0 active:shadow-none active:bg-[var(--color-primary-active)]",
+        ],
+        secondary: [
+          "bg-[var(--color-surface-offset)] text-[var(--color-text)]",
+          "border border-[var(--color-border)]",
+          "hover:bg-[var(--color-surface-dynamic)] hover:border-[var(--color-text-faint)]",
+          "active:bg-[var(--color-surface-dynamic)]",
+        ],
+        outline: [
+          "border border-[var(--color-border)] bg-transparent text-[var(--color-text)]",
+          "hover:border-[var(--color-text-muted)] hover:bg-[var(--color-surface-offset)]",
+          "active:bg-[var(--color-surface-dynamic)]",
+        ],
+        ghost: [
+          "bg-transparent text-[var(--color-text-muted)]",
+          "hover:bg-[var(--color-surface-offset)] hover:text-[var(--color-text)]",
+          "active:bg-[var(--color-surface-dynamic)]",
+        ],
+        danger: [
+          "bg-[var(--color-error)] text-white",
+          "hover:opacity-90 hover:-translate-y-px",
+          "active:translate-y-0 active:opacity-100",
+        ],
       },
       size: {
-        default: "h-11 px-6 py-2",
-        sm: "h-9 rounded-md px-4",
-        lg: "h-14 rounded-xl px-10 text-base",
-        icon: "h-10 w-10",
+        sm:   "h-8  px-3  text-xs  rounded-md",
+        md:   "h-10 px-5  text-sm  rounded-lg",
+        lg:   "h-12 px-8  text-base rounded-xl",
+        xl:   "h-14 px-10 text-base rounded-xl",
+        icon: "h-10 w-10  text-sm  rounded-lg",
       },
     },
     defaultVariants: {
-      variant: "default",
-      size: "default",
+      variant: "primary",
+      size: "md",
     },
-  },
+  }
 );
 
 export interface ButtonProps
@@ -47,8 +90,14 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
-    return <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />;
-  },
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    );
+  }
 );
 Button.displayName = "Button";
 
