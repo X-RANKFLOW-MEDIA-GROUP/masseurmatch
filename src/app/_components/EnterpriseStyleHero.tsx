@@ -17,7 +17,7 @@ export default function EnterpriseStyleHero() {
           // In a real app, you'd reverse-geocode these coords to a city name
           setUserLocation("Location Shared"); 
         },
-        (error) => console.log("User denied location")
+        () => { /* location denied or unavailable — silently skip */ }
       );
     }
   }, []);

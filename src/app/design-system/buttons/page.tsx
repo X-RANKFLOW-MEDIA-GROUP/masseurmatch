@@ -75,10 +75,10 @@ export default function ButtonShowcasePage() {
             Button Showcase
           </h1>
           <p className="mt-2 text-sm text-[var(--color-text-muted)] max-w-prose">
-            5 variantes × 4 tamanhos — prontos para aprovação do time.
-            Hover para ver os estados. CTA hero usa
+            5 variants × 4 sizes — ready for team approval.
+            Hover to see states. The hero CTA uses a separate{" "}
             <code className="mx-1 px-1.5 py-0.5 rounded bg-[var(--color-surface-offset)] text-xs">ButtonLiquidMetal</code>
-            separado.
+            component.
           </p>
         </div>
       </header>
@@ -87,50 +87,50 @@ export default function ButtonShowcasePage() {
         {/* ── 1. LIQUID METAL — Hero CTA ── */}
         <Section
           title="ButtonLiquidMetal — Hero CTA"
-          description="Efeito shimmer liquid-metal para o CTA principal do hero. Apenas CSS, sem JS. Respeita prefers-reduced-motion."
+          description="Liquid-metal shimmer effect for the primary hero CTA. Pure CSS, no JS. Respects prefers-reduced-motion."
         >
-          <Row label="Tamanhos disponíveis">
-            <ButtonLiquidMetal size="md">Book Now</ButtonLiquidMetal>
-            <ButtonLiquidMetal size="lg">Encontrar Massoterapeuta</ButtonLiquidMetal>
+          <Row label="Available sizes">
+            <ButtonLiquidMetal size="md">Find a Therapist</ButtonLiquidMetal>
+            <ButtonLiquidMetal size="lg">Search Nearby</ButtonLiquidMetal>
             <ButtonLiquidMetal size="xl">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
                 <circle cx="11" cy="11" r="8"/>
                 <path d="m21 21-4.35-4.35"/>
               </svg>
-              Buscar agora
+              Search Now
             </ButtonLiquidMetal>
           </Row>
-          <Row label="Estado desabilitado">
+          <Row label="Disabled state">
             <ButtonLiquidMetal size="lg" disabled>
-              Encontrar Massoterapeuta
+              Search Nearby
             </ButtonLiquidMetal>
           </Row>
           <Code>{`import { ButtonLiquidMetal } from "@/components/ui/button-liquid-metal"
 
 // Hero section
 <ButtonLiquidMetal size="lg">
-  Encontrar Massoterapeuta
+  Find a Therapist
 </ButtonLiquidMetal>
 
 // With icon
 <ButtonLiquidMetal size="xl">
   <SearchIcon />
-  Buscar agora
+  Search Now
 </ButtonLiquidMetal>`}</Code>
         </Section>
 
         {/* ── 2. PRIMARY ── */}
         <Section
-          title="Primary — Ação Principal"
-          description="Acento âmbar/cobre. Use para Book, Continuar, Confirmar. Máximo 1 primary por viewport."
+          title="Primary — Main Action"
+          description="Amber/copper accent. Use for primary CTAs: Search, Continue, Confirm. Max 1 primary per viewport."
         >
-          <Row label="Todos os tamanhos">
-            <Button variant="primary" size="sm">Reservar</Button>
-            <Button variant="primary" size="md">Reservar sessão</Button>
-            <Button variant="primary" size="lg">Reservar agora</Button>
-            <Button variant="primary" size="xl">Reservar agora</Button>
+          <Row label="All sizes">
+            <Button variant="primary" size="sm">Contact</Button>
+            <Button variant="primary" size="md">View Profile</Button>
+            <Button variant="primary" size="lg">Get Started</Button>
+            <Button variant="primary" size="xl">Get Started</Button>
           </Row>
-          <Row label="Com ícone">
+          <Row label="With icon">
             <Button variant="primary" size="md">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
@@ -138,9 +138,9 @@ export default function ButtonShowcasePage() {
                 <line x1="8" y1="2" x2="8" y2="6"/>
                 <line x1="3" y1="10" x2="21" y2="10"/>
               </svg>
-              Agendar sessão
+              Schedule a Session
             </Button>
-            <Button variant="primary" size="icon" aria-label="Agendar">
+            <Button variant="primary" size="icon" aria-label="Schedule">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
                 <line x1="16" y1="2" x2="16" y2="6"/>
@@ -149,55 +149,55 @@ export default function ButtonShowcasePage() {
               </svg>
             </Button>
           </Row>
-          <Row label="Estado desabilitado">
-            <Button variant="primary" disabled>Reservar sessão</Button>
+          <Row label="Disabled state">
+            <Button variant="primary" disabled>View Profile</Button>
           </Row>
-          <Code>{`<Button variant="primary" size="md">Reservar sessão</Button>
-<Button variant="primary" size="md" disabled>Reservar sessão</Button>`}</Code>
+          <Code>{`<Button variant="primary" size="md">View Profile</Button>
+<Button variant="primary" size="md" disabled>View Profile</Button>`}</Code>
         </Section>
 
         {/* ── 3. SECONDARY ── */}
         <Section
-          title="Secondary — Ação Secundária"
-          description="Fill sutil com borda. Use para Ver perfil, Compartilhar, Salvar."
+          title="Secondary — Secondary Action"
+          description="Subtle fill with border. Use for View profile, Share, Save."
         >
-          <Row label="Todos os tamanhos">
-            <Button variant="secondary" size="sm">Ver perfil</Button>
-            <Button variant="secondary" size="md">Ver perfil completo</Button>
-            <Button variant="secondary" size="lg">Ver todos os profissionais</Button>
+          <Row label="All sizes">
+            <Button variant="secondary" size="sm">View Profile</Button>
+            <Button variant="secondary" size="md">Full Profile</Button>
+            <Button variant="secondary" size="lg">Browse All Therapists</Button>
           </Row>
-          <Row label="Com ícone">
+          <Row label="With icon">
             <Button variant="secondary" size="md">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
               </svg>
-              Favoritar
+              Save
             </Button>
           </Row>
-          <Code>{`<Button variant="secondary" size="md">Ver perfil completo</Button>`}</Code>
+          <Code>{`<Button variant="secondary" size="md">Full Profile</Button>`}</Code>
         </Section>
 
         {/* ── 4. OUTLINE ── */}
         <Section
-          title="Outline — Ação Terciária"
-          description="Apenas borda. Use para Cancelar, Voltar, Filtrar."
+          title="Outline — Tertiary Action"
+          description="Border only. Use for Cancel, Back, Filter."
         >
-          <Row label="Todos os tamanhos">
-            <Button variant="outline" size="sm">Cancelar</Button>
-            <Button variant="outline" size="md">Ver mais filtros</Button>
-            <Button variant="outline" size="lg">Explorar categorias</Button>
+          <Row label="All sizes">
+            <Button variant="outline" size="sm">Cancel</Button>
+            <Button variant="outline" size="md">More Filters</Button>
+            <Button variant="outline" size="lg">Explore Categories</Button>
           </Row>
-          <Code>{`<Button variant="outline" size="md">Ver mais filtros</Button>`}</Code>
+          <Code>{`<Button variant="outline" size="md">More Filters</Button>`}</Code>
         </Section>
 
         {/* ── 5. GHOST ── */}
         <Section
-          title="Ghost — Ações Sutis"
-          description="Sem background. Use em rows de lista, sidebars, tooltips, ações inline."
+          title="Ghost — Subtle Actions"
+          description="No background. Use in list rows, sidebars, tooltips, inline actions."
         >
-          <Row label="Todos os tamanhos">
-            <Button variant="ghost" size="sm">Editar</Button>
-            <Button variant="ghost" size="md">Ver avaliações</Button>
+          <Row label="All sizes">
+            <Button variant="ghost" size="sm">Edit</Button>
+            <Button variant="ghost" size="md">View Reviews</Button>
             <Button variant="ghost" size="icon" aria-label="Menu">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
                 <line x1="3" y1="6" x2="21" y2="6"/>
@@ -206,33 +206,33 @@ export default function ButtonShowcasePage() {
               </svg>
             </Button>
           </Row>
-          <Code>{`<Button variant="ghost" size="md">Ver avaliações</Button>
+          <Code>{`<Button variant="ghost" size="md">View Reviews</Button>
 <Button variant="ghost" size="icon" aria-label="Menu"><MenuIcon /></Button>`}</Code>
         </Section>
 
         {/* ── 6. DANGER ── */}
         <Section
-          title="Danger — Ações Destrutivas"
-          description="Use apenas para cancelar reserva, excluir conta, remover dados."
+          title="Danger — Destructive Actions"
+          description="Use only for account deletion, removing data, or other irreversible actions."
         >
-          <Row label="Todos os tamanhos">
-            <Button variant="danger" size="sm">Excluir</Button>
-            <Button variant="danger" size="md">Cancelar reserva</Button>
-            <Button variant="danger" size="lg">Excluir conta permanentemente</Button>
+          <Row label="All sizes">
+            <Button variant="danger" size="sm">Remove</Button>
+            <Button variant="danger" size="md">Delete Photo</Button>
+            <Button variant="danger" size="lg">Delete Account Permanently</Button>
           </Row>
-          <Code>{`<Button variant="danger" size="md">Cancelar reserva</Button>`}</Code>
+          <Code>{`<Button variant="danger" size="md">Delete Photo</Button>`}</Code>
         </Section>
 
         {/* ── 7. THERAPIST CARD TILT ── */}
         <Section
           title="TherapistCardTilt — 3D Mouse Tracking"
-          description="Perspectiva CSS 3D + glare radial driven by mouse. Touch: sem tilt. prefers-reduced-motion: sem tilt."
+          description="CSS 3D perspective + radial glare driven by mouse position. Touch: no tilt. prefers-reduced-motion: no tilt."
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <TherapistCardTilt
-              name="Sofia Almeida"
-              specialty="Deep Tissue · Relaxamento"
-              location="São Paulo, SP"
+              name="James Carter"
+              specialty="Deep Tissue · Swedish"
+              location="Los Angeles, CA"
               rating={4.9}
               reviewCount={128}
               pricePerHour={180}
@@ -240,18 +240,18 @@ export default function ButtonShowcasePage() {
               available
             />
             <TherapistCardTilt
-              name="Lucas Ferreira"
+              name="Marcus Reid"
               specialty="Shiatsu · Trigger Point"
-              location="Rio de Janeiro, RJ"
+              location="New York, NY"
               rating={4.7}
               reviewCount={94}
               pricePerHour={160}
               verified
             />
             <TherapistCardTilt
-              name="Ana Carolina"
-              specialty="Pedras Quentes · Aromaterapia"
-              location="Belo Horizonte, MG"
+              name="Daniel Torres"
+              specialty="Hot Stone · Aromatherapy"
+              location="Miami, FL"
               rating={5.0}
               reviewCount={52}
               pricePerHour={220}
@@ -262,9 +262,9 @@ export default function ButtonShowcasePage() {
           <Code>{`import { TherapistCardTilt } from "@/components/ui/therapist-card-tilt"
 
 <TherapistCardTilt
-  name="Sofia Almeida"
-  specialty="Deep Tissue · Relaxamento"
-  location="São Paulo, SP"
+  name="James Carter"
+  specialty="Deep Tissue · Swedish"
+  location="Los Angeles, CA"
   rating={4.9}
   reviewCount={128}
   pricePerHour={180}
@@ -275,16 +275,16 @@ export default function ButtonShowcasePage() {
 
         {/* ── 8. HERO MOCKUP ── */}
         <Section
-          title="Hero Mockup — CTA em contexto real"
-          description="ButtonLiquidMetal como CTA primário com Secondary ao lado — padrão hero recomendado."
+          title="Hero Mockup — CTA in context"
+          description="ButtonLiquidMetal as primary CTA with Secondary alongside — recommended hero pattern."
         >
           <div className="rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] p-10 flex flex-col items-center text-center gap-6">
-            <span className="label-eyebrow">Bem-estar a domicílio</span>
+            <span className="label-eyebrow">Wellness at your door</span>
             <h2 className="font-display text-2xl text-[var(--color-text)] max-w-sm">
-              Encontre o massoterapeuta ideal para você
+              Find the right therapist for you
             </h2>
             <p className="text-sm text-[var(--color-text-muted)] max-w-xs">
-              Profissionais verificados, agendamento em minutos, atendimento onde você estiver.
+              Verified profiles, direct contact, available across the US.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <ButtonLiquidMetal size="lg">
@@ -292,18 +292,18 @@ export default function ButtonShowcasePage() {
                   <circle cx="11" cy="11" r="8"/>
                   <path d="m21 21-4.35-4.35"/>
                 </svg>
-                Buscar profissionais
+                Find a Therapist
               </ButtonLiquidMetal>
-              <Button variant="outline" size="lg">Como funciona</Button>
+              <Button variant="outline" size="lg">How it works</Button>
             </div>
-            <p className="text-xs text-[var(--color-text-faint)]">+3.200 profissionais verificados em todo o Brasil</p>
+            <p className="text-xs text-[var(--color-text-faint)]">Verified therapists in 80+ US cities</p>
           </div>
         </Section>
 
         {/* Footer */}
         <footer className="py-10 text-center">
           <p className="text-xs text-[var(--color-text-faint)]">
-            MasseurMatch Design System v2 · Para aprovação interna
+            MasseurMatch Design System v2 · Internal approval only
           </p>
         </footer>
       </div>
