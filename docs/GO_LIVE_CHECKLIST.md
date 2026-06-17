@@ -2,12 +2,22 @@
 
 This checklist defines the minimum release gates required before sending MasseurMatch to production.
 
-> **Final closure pass (2026-06-03):** the full repository gate (section 1) was
-> re-run and passes end to end. The session signing secret is now
-> `MM_SESSION_SECRET` only — the `SUPABASE_SERVICE_ROLE_KEY` fallback has been
-> removed from both `src/app/api/_lib/session.ts` and `src/middleware.ts`, so
-> `MM_SESSION_SECRET` must be present in every deployed environment (it is
-> already set in production).
+> **Final closure pass (2026-06-17):** full repository gate (section 1) passes end to end.
+>
+> Changes since last closure:
+> - `profile_status: "submitted"` replaced with `"pending_approval"` everywhere.
+>   `"submitted"` remains only in the `profile_reviews` review-workflow table constraint.
+> - OAuth callback now redirects new profiles to `/pro/onboard` (→ `/signup/plan`)
+>   instead of `/pro/dashboard`, so first-time Google users land in the onboarding flow.
+> - `release:audit` now fails if `STRIPE_SECRET_KEY` is set but any `STRIPE_PRICE_*`
+>   ID is missing or malformed, catching misconfigured production deployments early.
+> - Missing API routes added: `/api/geolocate-ip` (IP city lookup) and `/api/chat`
+>   (Knotty AI assistant via Gemini, with graceful fallback).
+> - Admin dashboard MRR stat removed (fake `therapists.total * 29` calculation).
+>   Real revenue is available from `/admin/billing` (Stripe API-backed).
+> - Session sign-out now redirects to `/` after clearing the session.
+> - `MM_SESSION_SECRET` is the only valid session secret — the `SUPABASE_SERVICE_ROLE_KEY`
+>   fallback has been removed. It must be present in every deployed environment.
 
 ## 1. Repository gates
 
