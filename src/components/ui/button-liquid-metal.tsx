@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  *
  * Usage:
  *   <ButtonLiquidMetal size="lg" asChild>
- *     <Link href="/search">Encontrar Massoterapeuta</Link>
+ *     <Link href="/search">Find a Therapist</Link>
  *   </ButtonLiquidMetal>
  */
 
