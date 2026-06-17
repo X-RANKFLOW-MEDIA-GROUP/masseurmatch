@@ -50,9 +50,8 @@ export function PremiumProfileAbout({ profile, reviews = [] }: Props) {
           ) : (
             <>
               <p>
-                My name is {name}, and I&apos;ve been practicing therapeutic massage in {city} for <strong>{yearsExp} years</strong>. 
-                What started as a personal interest in anatomy and wellness became a full-time calling. 
-                I hold an active <strong>Licensed Massage Therapist</strong> certification and continuously update my skills through professional development.
+                My name is {name}, and I&apos;ve been practicing therapeutic massage in {city} for <strong>{yearsExp} years</strong>.
+                What started as a personal interest in anatomy and wellness became a full-time calling, and I continuously deepen my training and techniques.
               </p>
               <p>
                 My practice is built around creating a space that is <strong>welcoming, discreet, and affirming</strong> — 
@@ -101,21 +100,6 @@ export function PremiumProfileAbout({ profile, reviews = [] }: Props) {
             </div>
           )}
 
-          {/* License */}
-          <div className="pp-sidebar-card">
-            <h4>License & Certification</h4>
-            <div className="flex gap-3 items-start">
-              <div className="w-9 h-9 rounded-lg bg-[rgba(30,75,143,0.3)] flex items-center justify-center flex-shrink-0">
-                <Award className="w-4 h-4 text-[#7ab3ff]" />
-              </div>
-              <div>
-                <div className="text-xs font-semibold text-white/90">LMT Certified</div>
-                <div className="text-[11px] text-[var(--text-muted)]">Licensed Massage Therapist</div>
-                <div className="text-[11px] text-[var(--text-muted)]">Active since {new Date().getFullYear() - yearsExp}</div>
-              </div>
-            </div>
-          </div>
-
           {/* Training / Education */}
           <div className="pp-sidebar-card">
             <h4>Training & Education</h4>
@@ -139,7 +123,6 @@ export function PremiumProfileAbout({ profile, reviews = [] }: Props) {
                 <div>
                   <div className="text-xs font-semibold text-white/90">Professional Training</div>
                   <div className="text-[11px] text-[var(--text-muted)]">{city} area</div>
-                  <div className="text-[11px] text-[var(--text-muted)]">500+ clinical hours</div>
                 </div>
               </div>
             )}

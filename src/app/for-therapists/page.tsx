@@ -98,21 +98,21 @@ const testimonials = [
       "Since listing on MasseurMatch, about 40% of my new clients mention they found me there specifically because they wanted a safe space. That alignment matters for both of us.",
     name: "Jordan T.",
     location: "Austin, TX",
-    years: "LMT, 8 years",
+    years: "8 years",
   },
   {
     quote:
       "I tried other directories but the client base here is completely different - more intentional, more respectful. My cancellation rate dropped significantly.",
     name: "Marcus R.",
     location: "Chicago, IL",
-    years: "LMT, 5 years",
+    years: "5 years",
   },
   {
     quote:
       "Setting up was fast and the verification gave me credibility I could not build on my own website alone. Clients trust the badge.",
     name: "Elena V.",
     location: "Miami, FL",
-    years: "LMT, 11 years",
+    years: "11 years",
   },
 ];
 

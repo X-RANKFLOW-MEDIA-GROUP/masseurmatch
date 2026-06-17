@@ -264,7 +264,7 @@ export function VoxProfile({
               <DetailRow Icon={Languages} label="Languages" value={profile.languages.join(", ")} />
               <DetailRow Icon={Clock} label="Member since" value={profile.memberSince} />
               {profile.isVerified && (
-                <DetailRow Icon={ShieldCheck} label="Identity" value="Verified before going live" />
+                <DetailRow Icon={ShieldCheck} label="Identity" value="Profile reviewed" />
               )}
             </aside>
           </div>
