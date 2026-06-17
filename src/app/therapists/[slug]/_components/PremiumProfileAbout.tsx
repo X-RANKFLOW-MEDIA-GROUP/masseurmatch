@@ -23,9 +23,9 @@ export function PremiumProfileAbout({ profile, reviews = [] }: Props) {
     ? profile.training.filter((item): item is Exclude<(typeof profile.training)[number], string> => typeof item === "object" && item !== null)
     : [];
   const ratedReviews = reviews.filter((r) => typeof r.rating === "number");
-  const avgRating = ratedReviews.length > 0 
+  const avgRating = ratedReviews.length > 0
     ? (ratedReviews.reduce((sum, r) => sum + (r.rating as number), 0) / ratedReviews.length).toFixed(1)
-    : "4.9";
+    : null;
   
   // Generate SEO keywords
   const keywords = [
@@ -87,17 +87,19 @@ export function PremiumProfileAbout({ profile, reviews = [] }: Props) {
 
         {/* Sidebar */}
         <div className="pp-about-sidebar">
-          {/* Rating */}
-          <div className="pp-sidebar-card">
-            <h4>Client Rating</h4>
-            <div className="pp-rating-big">{avgRating}</div>
-            <div className="pp-stars">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Star key={i} className="inline h-4 w-4 fill-current" />
-              ))}
+          {/* Rating — only shown when real reviews exist */}
+          {avgRating !== null && (
+            <div className="pp-sidebar-card">
+              <h4>Client Rating</h4>
+              <div className="pp-rating-big">{avgRating}</div>
+              <div className="pp-stars">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Star key={i} className="inline h-4 w-4 fill-current" />
+                ))}
+              </div>
+              <div className="pp-rating-count">Based on {ratedReviews.length} verified {ratedReviews.length === 1 ? "review" : "reviews"}</div>
             </div>
-            <div className="pp-rating-count">Based on {reviews.length || 48} verified reviews</div>
-          </div>
+          )}
 
           {/* License */}
           <div className="pp-sidebar-card">
