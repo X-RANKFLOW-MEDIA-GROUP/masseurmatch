@@ -65,6 +65,35 @@ const buttonVariants = cva(
           "hover:opacity-90 hover:-translate-y-px",
           "active:translate-y-0 active:opacity-100",
         ],
+        // ── Backward-compat aliases (prevent breakage in existing code) ──
+        default: [
+          "bg-[var(--color-primary)] text-white",
+          "hover:bg-[var(--color-primary-hover)] hover:-translate-y-px hover:shadow-[var(--shadow-md)]",
+          "active:translate-y-0 active:shadow-none active:bg-[var(--color-primary-active)]",
+        ],
+        destructive: [
+          "bg-[var(--color-error)] text-white",
+          "hover:opacity-90 hover:-translate-y-px",
+          "active:translate-y-0 active:opacity-100",
+        ],
+        glass: [
+          "border border-white/16 bg-white/10 text-white",
+          "hover:bg-white/18",
+        ],
+        hero: [
+          "bg-[var(--color-primary)] text-white font-bold",
+          "hover:bg-[var(--color-primary-hover)] hover:scale-[1.02]",
+          "active:scale-100",
+        ],
+        link: [
+          "bg-transparent text-[var(--color-primary)] underline-offset-4",
+          "hover:text-[var(--color-primary-hover)] hover:underline",
+        ],
+        premium: [
+          "bg-[linear-gradient(180deg,hsl(var(--primary)),hsl(var(--primary)/0.85))] text-white",
+          "hover:brightness-[1.03] hover:-translate-y-0.5",
+          "active:translate-y-0",
+        ],
       },
       size: {
         sm:   "h-8  px-3  text-xs  rounded-md",
