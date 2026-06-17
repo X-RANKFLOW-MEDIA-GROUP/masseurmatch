@@ -15,6 +15,9 @@ export type ProfileViewModel = {
   bodyType: string;
   height: string;
   weight: string;
+  rawBodyType: string | null;
+  rawHeightInches: number | null;
+  rawWeightLb: number | null;
   yearsExperience: string;
   languages: string[];
   profilePhotoUrl: string;
@@ -177,6 +180,9 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
     bodyType: profile.body_type || "Available on request",
     height: formatHeight(profile.height_inches),
     weight: formatWeight(profile.weight_lb),
+    rawBodyType: profile.body_type || null,
+    rawHeightInches: typeof profile.height_inches === "number" ? profile.height_inches : null,
+    rawWeightLb: typeof profile.weight_lb === "number" ? profile.weight_lb : null,
     yearsExperience: profile.years_experience ? `${profile.years_experience}+ years` : "Experience listed on request",
     languages: asStringArray(profile.languages).length ? asStringArray(profile.languages) : ["English"],
     profilePhotoUrl,
