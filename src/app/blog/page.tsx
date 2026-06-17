@@ -448,23 +448,6 @@ export default function BlogPage() {
             ))}
           </div>
 
-          <div style={{ textAlign: "center", marginTop: 60 }}>
-            <button
-              style={{
-                padding: "14px 40px",
-                fontSize: 12,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                fontFamily: "system-ui, sans-serif",
-                background: "transparent",
-                border: "1px solid #0B1F3A",
-                color: "#0B1F3A",
-                cursor: "pointer",
-              }}
-            >
-              Load More Articles
-            </button>
-          </div>
         </div>
 
         <section

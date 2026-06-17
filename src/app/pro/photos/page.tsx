@@ -708,7 +708,7 @@ export default function PhotoManagerPage() {
                             className="inline-flex items-center gap-1 rounded-full border border-slate-200 px-3 py-1.5 font-sans text-xs font-medium text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50"
                           >
                             <Star className="h-3.5 w-3.5" />
-                            Tornar principal
+                            Set as Primary
                           </button>
                         )}
 
@@ -718,7 +718,7 @@ export default function PhotoManagerPage() {
                           className="inline-flex items-center gap-1 rounded-full border border-rose-200 px-3 py-1.5 font-sans text-xs font-medium text-rose-700 transition-colors hover:bg-rose-50"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
-                          Remover
+                          Remove
                         </button>
                       </div>
                     </div>
