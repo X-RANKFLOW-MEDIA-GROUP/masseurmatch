@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +17,7 @@ const EMPTY_PW: PasswordState = { current: "", next: "", confirm: "" };
 export default function ProSettingsPage() {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
 
   const [pwForm, setPwForm] = useState<PasswordState>(EMPTY_PW);
   const [pwLoading, setPwLoading] = useState(false);
@@ -297,7 +299,7 @@ export default function ProSettingsPage() {
           </p>
           <Button
             variant="destructive"
-            onClick={() => signOut()}
+            onClick={async () => { await signOut(); router.push("/"); }}
             className="gap-2"
           >
             <LogOut className="h-4 w-4" />

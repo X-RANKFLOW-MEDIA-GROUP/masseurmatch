@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { envAny } from "@/app/api/_lib/env";
 
 const schema = z.object({
   name: z.string().min(1).max(100).trim(),
@@ -11,8 +12,24 @@ export async function POST(request: Request) {
     const body = await request.json();
     const data = schema.parse(body);
 
-    // Log for MVP — swap for Supabase insert or email send when ready
-    console.log("[contact-footer]", data);
+    const apiKey = envAny(["RESEND_API_KEY"]);
+    if (apiKey) {
+      const from = envAny(["RESEND_FROM_EMAIL"], "MasseurMatch <onboarding@resend.dev>");
+      await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from,
+          to: ["support@masseurmatch.com"],
+          reply_to: data.email,
+          subject: `[Footer Contact] ${data.name}`,
+          text: `Name: ${data.name}\nEmail: ${data.email}\n\n${data.message}`,
+        }),
+      });
+    }
 
     return Response.json({ ok: true });
   } catch (err) {
