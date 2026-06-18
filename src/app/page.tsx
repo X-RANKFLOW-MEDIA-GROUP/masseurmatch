@@ -11,6 +11,7 @@ import { PricingToggle } from "@/components/marketing/PricingToggle";
 import { HomeSeoLanding } from "@/app/_components/home-seo-landing";
 import { FaqAccordion } from "@/components/marketing/FaqAccordion";
 import { CityCoverageSection } from "@/components/marketing/CityCoverageSection";
+import { USStateMapGrid } from "@/components/marketing/USStateMapGrid";
 import { FinalCta } from "@/components/marketing/FinalCta";
 import {
   createPageMetadata,
@@ -324,7 +325,10 @@ export default async function HomePage() {
         {/* 9. FAQ accordion */}
         <FaqAccordion items={LANDING_FAQ} />
 
-        {/* 10. City coverage grid */}
+        {/* 10. Interactive US state map */}
+        <USStateMapGrid />
+
+        {/* Full city alphabetical list (SEO) */}
         <CityCoverageSection />
 
         {/* Final CTA */}
