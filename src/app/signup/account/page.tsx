@@ -300,11 +300,11 @@ export default function SignupAccountPage() {
                   />
                   <Label htmlFor="terms" className="text-sm leading-snug">
                     I agree to the{" "}
-                    <Link href="/terms" className="text-brand-secondary underline" target="_blank">
+                    <Link href="/terms" className="text-brand-secondary underline" target="_blank" rel="noopener noreferrer">
                       Terms of Service
                     </Link>{" "}
                     and{" "}
-                    <Link href="/privacy" className="text-brand-secondary underline" target="_blank">
+                    <Link href="/privacy" className="text-brand-secondary underline" target="_blank" rel="noopener noreferrer">
                       Privacy Policy
                     </Link>
                   </Label>
@@ -331,7 +331,7 @@ export default function SignupAccountPage() {
                   />
                   <Label htmlFor="compliance" className="text-sm leading-snug">
                     I acknowledge the{" "}
-                    <Link href="/therapist-agreement" className="text-brand-secondary underline" target="_blank">
+                    <Link href="/therapist-agreement" className="text-brand-secondary underline" target="_blank" rel="noopener noreferrer">
                       Therapist Agreement
                     </Link>{" "}
                     and platform policies

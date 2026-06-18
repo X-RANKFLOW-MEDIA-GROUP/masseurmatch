@@ -8,7 +8,6 @@ import {
   Users,
   HeartHandshake,
   MapPin,
-  ShieldCheck,
   ShieldAlert,
   Newspaper,
   Tag,
@@ -36,9 +35,7 @@ async function getAdminStats() {
 
   return {
     therapists: therapistsResult.total,
-    mrr: 0,
     cities: cities.length,
-    pendingReviews: Math.max(2, Math.floor(therapistsResult.total / 5)),
     recentTherapists: therapistsResult.items.slice(0, 5),
     pendingBookings: bookingCountResult.count ?? 0,
     smsAlerts: smsAlertCountResult.count ?? 0,
@@ -58,36 +55,12 @@ export default async function AdminOverviewPage() {
       bgColor: "bg-primary/10",
     },
     {
-      label: "Monthly Revenue",
-      value: `$${stats.mrr.toLocaleString()}`,
-      description: "Estimate — reconcile with Stripe",
-      icon: DollarSign,
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50",
-    },
-    {
       label: "Cities Covered",
       value: String(stats.cities),
       description: "Active locations",
       icon: MapPin,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
-    },
-    {
-      label: "Revenue",
-      value: "—",
-      description: "See Billing page",
-      icon: ShieldCheck,
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50",
-    },
-    {
-      label: "Moderation",
-      value: "—",
-      description: "See Moderation page",
-      icon: ShieldCheck,
-      color: "text-amber-600",
-      bgColor: "bg-amber-50",
     },
     {
       label: "Booking Approvals",
@@ -106,6 +79,23 @@ export default async function AdminOverviewPage() {
       color: "text-violet-600",
       bgColor: "bg-violet-50",
       href: "/admin/sms",
+    },
+    {
+      label: "Moderation",
+      value: "—",
+      description: "Review queued listings",
+      icon: ShieldAlert,
+      color: "text-amber-600",
+      bgColor: "bg-amber-50",
+      href: "/admin/moderation",
+    },
+    {
+      label: "Revenue",
+      value: "—",
+      description: "See Stripe dashboard",
+      icon: DollarSign,
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-50",
     },
   ];
 
