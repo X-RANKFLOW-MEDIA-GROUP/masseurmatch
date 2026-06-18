@@ -29,13 +29,13 @@ export async function POST(request: NextRequest) {
   const stripe = getStripe()
 
   const refund = await stripe.refunds.create({
-    payment_intent: tx.stripe_payment_intent_id as string,
+    payment_intent: tx.provider_transaction_id as string,
     reason: reason ?? 'requested_by_customer',
   })
 
   await supabase
     .from('payment_transactions')
-    .update({ status: 'refunded', stripe_refund_id: refund.id, updated_at: new Date().toISOString() })
+    .update({ status: 'refunded', stripe_refund_id: refund.id })
     .eq('id', transaction_id)
 
   return NextResponse.json({ refund_id: refund.id, status: refund.status })

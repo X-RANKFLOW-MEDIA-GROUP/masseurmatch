@@ -41,10 +41,12 @@ export async function POST(
 
     await adminClient
       .from("profile_reviews")
-      .update({ status: "rejected", moderation_notes: body.reason, reviewed_at: now, reviewed_by: admin.userId })
+      .update({ status: "rejected", admin_notes: body.reason, reviewed_at: now, reviewed_by: admin.userId })
       .eq("profile_id", profileId);
 
     await adminClient.from("admin_actions").insert({
+      action: "reject_profile",
+      target_table: "profiles",
       admin_id: admin.userId,
       action_type: "reject_profile",
       target_user_id: profile.user_id,

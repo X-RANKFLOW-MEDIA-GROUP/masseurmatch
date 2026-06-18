@@ -43,18 +43,18 @@ export async function GET(request: NextRequest) {
 
       if (!convMap.has(key)) {
         convMap.set(key, {
-          client_phone: clientPhone,
-          our_phone: ourPhone,
+          client_phone: clientPhone ?? "",
+          our_phone: ourPhone ?? "",
           profile_id: log.profile_id,
           messages: [],
-          last_message_at: log.created_at,
+          last_message_at: log.created_at ?? "",
           unresolved_alert: false,
           minutes_since_reply: null,
         })
       }
       const conv = convMap.get(key)!
       conv.messages.push(log as unknown as import('@/lib/sms/types').SmsLog)
-      if (log.created_at > conv.last_message_at) {
+      if (log.created_at && log.created_at > conv.last_message_at) {
         conv.last_message_at = log.created_at
       }
     }

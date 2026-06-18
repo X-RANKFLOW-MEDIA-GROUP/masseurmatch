@@ -97,8 +97,8 @@ export async function POST(request: NextRequest) {
       const pi = event.data.object as Stripe.PaymentIntent
       await supabase
         .from('payment_transactions')
-        .update({ status: 'succeeded', updated_at: new Date().toISOString() })
-        .eq('stripe_payment_intent_id', pi.id)
+        .update({ status: 'succeeded' })
+        .eq('provider_transaction_id', pi.id)
 
       if (pi.metadata.appointment_id) {
         await supabase
@@ -113,8 +113,8 @@ export async function POST(request: NextRequest) {
       const pi = event.data.object as Stripe.PaymentIntent
       await supabase
         .from('payment_transactions')
-        .update({ status: 'failed', updated_at: new Date().toISOString() })
-        .eq('stripe_payment_intent_id', pi.id)
+        .update({ status: 'failed' })
+        .eq('provider_transaction_id', pi.id)
       break
     }
 
