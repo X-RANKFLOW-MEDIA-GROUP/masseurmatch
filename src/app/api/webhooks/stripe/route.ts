@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
     // ── Subscription created — sync tier when a new subscription is created ──
     case 'customer.subscription.created': {
       const sub = event.data.object as Stripe.Subscription
-      const planKey = sub.metadata?.masseurmatch_plan
+      const planKey = sub.metadata?.plan_key ?? sub.metadata?.masseurmatch_plan
       const tier = planKeyToTier(planKey)
       await syncSubscriptionToProfile(supabase, sub, tier)
       break
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
     // ── Subscription updated — re-sync tier on plan changes ─────────────────
     case 'customer.subscription.updated': {
       const sub = event.data.object as Stripe.Subscription
-      const planKey = sub.metadata?.masseurmatch_plan
+      const planKey = sub.metadata?.plan_key ?? sub.metadata?.masseurmatch_plan
       const tier = planKeyToTier(planKey)
       await syncSubscriptionToProfile(supabase, sub, tier)
 
