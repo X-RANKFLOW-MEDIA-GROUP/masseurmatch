@@ -3165,6 +3165,8 @@ export type Database = {
           profile_id: string | null
           public_url: string | null
           rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           sort_order: number
           status: string | null
           storage_path: string
@@ -3185,6 +3187,8 @@ export type Database = {
           profile_id?: string | null
           public_url?: string | null
           rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           sort_order?: number
           status?: string | null
           storage_path: string
@@ -3205,6 +3209,8 @@ export type Database = {
           profile_id?: string | null
           public_url?: string | null
           rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           sort_order?: number
           status?: string | null
           storage_path?: string
