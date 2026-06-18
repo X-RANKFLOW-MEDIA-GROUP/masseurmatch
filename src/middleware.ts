@@ -189,15 +189,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
-  // ── 0a. Canonical host – redirect www to apex ─────────────────────────
-  const host = request.headers.get("host") || "";
-  if (host.startsWith("www.")) {
-    const url = request.nextUrl.clone();
-    url.host = host.replace(/^www\./, "");
-    url.port = "";
-    return NextResponse.redirect(url, { status: 301 });
-  }
-
   // ── 0. Supabase auth callback guard ─────────────────────────────────────
   // Supabase sometimes sends the ?code= param to the site root URL instead of
   // /auth/callback (e.g. when the Redirect URL in the Supabase dashboard is set
