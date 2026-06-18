@@ -1440,7 +1440,7 @@ export default function ExplorePageClient({
                     setLocationInput(event.target.value);
                   }}
                   list="explore-city-options"
-                  placeholder="Dallas or 75201"
+                  placeholder="City or ZIP code"
                   className="w-full bg-transparent text-sm font-medium text-text-primary outline-none placeholder:text-text-muted"
                 />
                 <button

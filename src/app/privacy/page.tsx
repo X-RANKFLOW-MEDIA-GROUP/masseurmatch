@@ -204,7 +204,7 @@ export default function PrivacyPage() {
                 fontFamily: "system-ui, sans-serif",
               }}
             >
-              Last Updated: March 1, 2025
+              Last Updated: April 27, 2026
             </p>
             <p
               style={{

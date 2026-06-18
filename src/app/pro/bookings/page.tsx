@@ -150,20 +150,28 @@ export default function ProBookingsPage() {
   )
 }
 
+const COLOR_TEXT: Record<string, string> = {
+  orange: 'text-orange-400',
+  emerald: 'text-emerald-400',
+  slate: 'text-slate-400',
+}
+
 function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
+  const textCls = COLOR_TEXT[color] ?? 'text-slate-400'
   return (
     <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
-      <p className={`text-2xl font-bold text-${color}-400`}>{value}</p>
+      <p className={`text-2xl font-bold ${textCls}`}>{value}</p>
       <p className="mt-1 text-xs text-slate-500">{label}</p>
     </div>
   )
 }
 
 function SectionHeader({ icon: Icon, label, color }: { icon: LucideIcon; label: string; color: string }) {
+  const textCls = COLOR_TEXT[color] ?? 'text-slate-400'
   return (
     <div className="mb-3 flex items-center gap-2">
-      <Icon className={`h-4 w-4 text-${color}-400`} strokeWidth={2.25} />
-      <p className={`font-mono text-[10px] uppercase tracking-[0.18em] text-${color}-400`}>{label}</p>
+      <Icon className={`h-4 w-4 ${textCls}`} strokeWidth={2.25} />
+      <p className={`font-mono text-[10px] uppercase tracking-[0.18em] ${textCls}`}>{label}</p>
     </div>
   )
 }

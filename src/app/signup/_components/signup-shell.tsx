@@ -67,7 +67,7 @@ export function SignupShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!loading && user) {
-      router.replace("/dashboard");
+      router.replace("/pro/dashboard");
     }
   }, [loading, user, router]);
 
