@@ -34,12 +34,12 @@ type TherapistProfile = {
 
 type ApprovalFilter = "all" | "pending" | "approved" | "rejected" | "changes_requested";
 
-const statusConfig: Record<TherapistProfile["status"], { label: string; icon: any; color: string }> = {
-  draft: { label: "Draft", icon: AlertCircle, color: "slate" },
-  pending_approval: { label: "Pending", icon: Clock, color: "amber" },
-  approved: { label: "Approved", icon: CheckCircle2, color: "emerald" },
-  rejected: { label: "Rejected", icon: XCircle, color: "rose" },
-  changes_requested: { label: "Changes Requested", icon: AlertCircle, color: "orange" },
+const statusConfig: Record<TherapistProfile["status"], { label: string; icon: typeof AlertCircle; badgeClasses: string }> = {
+  draft:             { label: "Draft",             icon: AlertCircle,  badgeClasses: "bg-slate-50 text-slate-700" },
+  pending_approval:  { label: "Pending",           icon: Clock,        badgeClasses: "bg-amber-50 text-amber-700" },
+  approved:          { label: "Approved",          icon: CheckCircle2, badgeClasses: "bg-emerald-50 text-emerald-700" },
+  rejected:          { label: "Rejected",          icon: XCircle,      badgeClasses: "bg-rose-50 text-rose-700" },
+  changes_requested: { label: "Changes Requested", icon: AlertCircle,  badgeClasses: "bg-orange-50 text-orange-700" },
 };
 
 export default function ApprovalsPage() {
@@ -126,7 +126,7 @@ export default function ApprovalsPage() {
                       <h3 className="font-semibold text-foreground">
                         {profile.display_name || profile.full_name}
                       </h3>
-                      <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-${config.color}-50 text-${config.color}-700`}>
+                      <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${config.badgeClasses}`}>
                         <StatusIcon className="h-3 w-3" />
                         {config.label}
                       </div>

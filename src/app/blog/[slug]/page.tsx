@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import {
   type BlogPost,
   type BlogSection,
@@ -784,7 +785,8 @@ export default async function BlogPostPage({
               paddingBottom: 2,
             }}
           >
-            &lt;- Back to All Articles
+            <ArrowLeft size={12} strokeWidth={2.25} style={{ display: "inline", marginRight: 4, verticalAlign: "middle" }} />
+            Back to All Articles
           </Link>
         </div>
       </main>

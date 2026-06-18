@@ -59,7 +59,7 @@ function StatCard({
       <div className="flex items-end gap-3">
         <span
           className={`font-display text-4xl font-medium ${
-            highlight ? "text-slate-400" : "text-slate-400"
+            highlight ? "text-white" : "text-slate-900"
           }`}
         >
           —
