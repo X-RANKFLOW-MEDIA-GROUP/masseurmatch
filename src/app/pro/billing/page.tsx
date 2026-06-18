@@ -226,10 +226,10 @@ function ProBillingPageInner() {
             </div>
           </Surface>
 
-          <Surface className="rounded-[2rem] border-brand-secondary/15 bg-[linear-gradient(180deg,rgba(12,28,51,0.98),rgba(18,53,88,0.95))] text-white">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/58">Conversion Rules</p>
-            <h2 className="font-display mt-4 text-2xl font-semibold tracking-tight">How this catalog is built to convert</h2>
-            <ul className="mt-5 space-y-3 text-sm leading-6 text-white/74">
+          <Surface className="rounded-[2rem] border-orange-400/20 bg-[linear-gradient(135deg,rgba(255,138,31,0.12)_0%,rgba(249,115,22,0.08)_50%,rgba(6,14,26,0.04)_100%)] text-foreground">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-orange-500">Conversion Rules</p>
+            <h2 className="font-display mt-4 text-2xl font-semibold tracking-tight text-foreground">How this catalog is built to convert</h2>
+            <ul className="mt-5 space-y-3 text-sm leading-6 text-text-secondary">
               <li>Lead with fast, low-friction boosts between $10 and $22 to drive impulse revenue.</li>
               <li>Use mid-ticket featured placements to capture therapists ready for a bigger visibility push.</li>
               <li>Anchor recurring value with trust, geo, and analytics products that stack month over month.</li>
@@ -237,10 +237,10 @@ function ProBillingPageInner() {
             </ul>
 
             {!subscription.subscribed ? (
-              <div className="mt-6 rounded-[1.6rem] border border-white/10 bg-white/6 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/58">Founder Deal</p>
-                <p className="mt-2 text-lg font-semibold text-white">50% off for the first 3 months after trial</p>
-                <p className="mt-2 text-sm text-white/70">
+              <div className="mt-6 rounded-[1.6rem] border border-orange-300/30 bg-orange-50/60 p-4">
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-orange-500">Founder Deal</p>
+                <p className="mt-2 text-lg font-semibold text-foreground">50% off for the first 3 months after trial</p>
+                <p className="mt-2 text-sm text-text-secondary">
                   The first 50 members keep the lower paid rate after their 14-day free trial.
                 </p>
               </div>
