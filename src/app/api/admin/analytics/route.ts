@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, requireAdminSession } from "@/app/api/_lib/supabase-server";
 
@@ -14,7 +15,7 @@ export async function GET(request: Request) {
     const { count: pendingReviews } = await adminClient
       .from("profiles")
       .select("*", { count: "exact", head: true })
-      .in("profile_status", ["pending_approval", "submitted", "under_review"]);
+      .in("profile_status", ["pending_approval", "under_review"]);
 
     const { count: verifiedIdentity } = await adminClient
       .from("profiles")

@@ -4,7 +4,9 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
+import { BRAND_ASSETS } from "@/lib/brand";
 import {
   ChevronDown,
   Menu,
@@ -83,7 +85,7 @@ function ExploreDropdown({ isDarkHero = false }: { isDarkHero?: boolean }) {
   );
 }
 
-function MobileNav({ dashboardPath, authenticated, onLogout }: { dashboardPath: string; authenticated: boolean; onLogout: () => void }) {
+function MobileNav({ dashboardPath, authenticated, onLogout }: { dashboardPath: string; authenticated: boolean | null; onLogout: () => void }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -118,8 +120,15 @@ function MobileNav({ dashboardPath, authenticated, onLogout }: { dashboardPath: 
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <Link href="/" onClick={() => setOpen(false)} className="font-display text-lg font-bold tracking-tighter text-foreground">
-            Masseur<span className="text-[#FF8A1F]">Match</span>
+          <Link href="/" onClick={() => setOpen(false)} className="flex items-center" aria-label="MasseurMatch home">
+            <Image
+              src={BRAND_ASSETS.logo}
+              alt="MasseurMatch"
+              width={150}
+              height={100}
+              priority
+              className="h-8 w-auto"
+            />
           </Link>
           <button
             type="button"
@@ -149,29 +158,42 @@ function MobileNav({ dashboardPath, authenticated, onLogout }: { dashboardPath: 
         </nav>
 
         <div className="mt-auto px-5 pb-6 pt-4 border-t border-border space-y-2">
-          <Link
-            href={authenticated ? dashboardPath : "/login"}
-            onClick={() => setOpen(false)}
-            className="block w-full text-center rounded-lg border border-border py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
-          >
-            {authenticated ? "Dashboard" : "Log In"}
-          </Link>
-          {authenticated ? (
-            <button
-              type="button"
-              onClick={() => { setOpen(false); onLogout(); }}
-              className="block w-full text-center rounded-lg bg-[#FF8A1F] py-2.5 text-sm font-semibold text-[#0B1F3A] hover:bg-[#ff9d3f] transition-colors"
-            >
-              Log Out
-            </button>
+          {authenticated === null ? (
+            <div className="h-10 animate-pulse rounded-lg bg-muted" />
+          ) : authenticated ? (
+            <>
+              <Link
+                href={dashboardPath}
+                onClick={() => setOpen(false)}
+                className="block w-full text-center rounded-lg border border-border py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+              >
+                Dashboard
+              </Link>
+              <button
+                type="button"
+                onClick={() => { setOpen(false); onLogout(); }}
+                className="block w-full text-center rounded-lg bg-[#FF8A1F] py-2.5 text-sm font-semibold text-[#0B1F3A] hover:bg-[#ff9d3f] transition-colors"
+              >
+                Log Out
+              </button>
+            </>
           ) : (
-            <Link
-              href="/signup"
-              onClick={() => setOpen(false)}
-              className="block w-full text-center rounded-lg bg-[#FF8A1F] py-2.5 text-sm font-semibold text-[#0B1F3A] hover:bg-[#ff9d3f] transition-colors"
-            >
-              Get Started
-            </Link>
+            <>
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="block w-full text-center rounded-lg border border-border py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+              >
+                Log In
+              </Link>
+              <Link
+                href="/signup"
+                onClick={() => setOpen(false)}
+                className="block w-full text-center rounded-lg bg-[#FF8A1F] py-2.5 text-sm font-semibold text-[#0B1F3A] hover:bg-[#ff9d3f] transition-colors"
+              >
+                Get Started
+              </Link>
+            </>
           )}
         </div>
       </SheetContent>
@@ -181,11 +203,12 @@ function MobileNav({ dashboardPath, authenticated, onLogout }: { dashboardPath: 
 
 export default function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [dashboardPath, setDashboardPath] = useState("/login");
   const pathname = usePathname();
   const router = useRouter();
   const isHomepage = pathname === "/";
+  const isAppSection = pathname?.startsWith("/admin") || pathname?.startsWith("/pro");
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -228,7 +251,10 @@ export default function SiteHeader() {
     router.refresh();
   }
 
-  const isDarkHero = isHomepage && !isScrolled;
+  // Don't render public marketing header on admin/pro — they have their own layout shells
+  if (isAppSection) return null;
+
+  const isDarkHero = isHomepage;
 
   return (
     <motion.header
@@ -236,14 +262,25 @@ export default function SiteHeader() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled ? "bg-[#FCFBF8]/95 backdrop-blur-xl border-b border-[#E2E6F0] shadow-sm" : isDarkHero ? "bg-transparent" : "bg-[#FCFBF8]/90 backdrop-blur-sm"
+        isDarkHero
+          ? isScrolled
+            ? "bg-[#0B1F3A]/80 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20"
+            : "bg-transparent"
+          : isScrolled
+          ? "bg-[#FCFBF8]/95 backdrop-blur-xl border-b border-[#E2E6F0] shadow-sm"
+          : "bg-[#FCFBF8]/95 backdrop-blur-md border-b border-[#E2E6F0]/50"
       }`}
     >
       <div className="w-full max-w-[1400px] mx-auto flex items-center justify-between px-6 lg:px-10 py-4">
-        <Link href="/" className="group flex items-center gap-2">
-          <span className={`font-['Georgia','Times_New_Roman',serif] text-[24px] font-bold tracking-tight transition-colors ${isDarkHero ? "text-white" : "text-[#0B1F3A]"}`}>
-            Masseur<span className="text-[#FF8A1F]">Match</span>
-          </span>
+        <Link href="/" className="group flex items-center" aria-label="MasseurMatch home">
+          <Image
+            src={BRAND_ASSETS.logo}
+            alt="MasseurMatch"
+            width={165}
+            height={110}
+            priority
+            className={`h-9 w-auto transition-all ${isDarkHero ? "drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]" : ""}`}
+          />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1">
@@ -260,7 +297,12 @@ export default function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-3">
-          {authenticated ? (
+          {authenticated === null ? (
+            /* Auth state unknown — render neutral skeleton to prevent flicker */
+            <div className="hidden md:flex items-center gap-3">
+              <div className="h-5 w-20 animate-pulse rounded bg-slate-200/20" />
+            </div>
+          ) : authenticated ? (
             <>
               <Link
                 href={dashboardPath}

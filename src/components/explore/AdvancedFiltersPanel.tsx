@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Star } from 'lucide-react';
 import type { ExploreFilters } from '@/app/_lib/explore';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -39,9 +40,9 @@ const TRAVEL_OPTIONS = [
 ];
 
 const VERIFICATION_OPTIONS = [
-  { id: 'verified', label: 'Verified' },
-  { id: 'pending', label: 'Pending Verification' },
-  { id: 'unverified', label: 'Unverified' },
+  { id: 'verified', label: 'Active' },
+  { id: 'pending', label: 'Pending Review' },
+  { id: 'unverified', label: 'Not Yet Reviewed' },
 ];
 
 const SERVICE_MODE_OPTIONS = [
@@ -62,7 +63,7 @@ const DEFAULT_LEGACY_FILTERS: FilterState = {
 
 const EXPLORE_FILTER_OPTIONS: Array<{ key: keyof Pick<ExploreFilters, 'available' | 'verified' | 'featured' | 'offers' | 'incall' | 'outcall'>; label: string }> = [
   { key: 'available', label: 'Available Now' },
-  { key: 'verified', label: 'Verified' },
+  { key: 'verified', label: 'Active' },
   { key: 'featured', label: 'Featured' },
   { key: 'offers', label: 'Offers' },
   { key: 'incall', label: 'In-Call' },
@@ -313,7 +314,14 @@ export function AdvancedFiltersPanel({
                   onClick={() => setFilters((prev) => ({ ...prev, rating }))}
                   className={filters.rating === rating ? 'bg-orange-600' : ''}
                 >
-                  {rating === null ? 'All' : `${rating}★`}
+                  {rating === null ? (
+                    'All'
+                  ) : (
+                    <span className="inline-flex items-center gap-1">
+                      {rating}
+                      <Star className="h-3.5 w-3.5 fill-current" />
+                    </span>
+                  )}
                 </Button>
               ))}
             </div>

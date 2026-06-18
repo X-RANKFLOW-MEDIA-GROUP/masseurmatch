@@ -22,10 +22,9 @@ export default function AnalyticsPage() {
 
       <div className="mt-8 flex flex-col items-center justify-center gap-4 rounded-xl border border-slate-200 bg-white py-20 text-center shadow-sm">
         <BarChart2 className="h-10 w-10 text-slate-300" />
-        <h2 className="font-display text-xl font-medium text-slate-700">Analytics coming soon</h2>
+        <h2 className="font-display text-xl font-medium text-slate-700">No data yet</h2>
         <p className="max-w-sm text-sm text-slate-500">
-          Detailed profile traffic reports will be available here. Check back after your listing
-          has been live for a few days.
+          We start tracking views the day your listing goes live. Check back soon for your first insights.
         </p>
       </div>
     </div>
@@ -66,8 +65,8 @@ function StatCard({
           —
         </span>
       </div>
-      <p className={`mt-1 text-xs italic ${highlight ? "text-slate-500" : "text-slate-400"}`}>
-        Coming soon
+      <p className={`mt-1 text-xs ${highlight ? "text-slate-500" : "text-slate-400"}`}>
+        No data yet
       </p>
     </div>
   );

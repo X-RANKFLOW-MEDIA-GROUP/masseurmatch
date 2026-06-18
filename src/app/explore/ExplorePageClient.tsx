@@ -1341,14 +1341,6 @@ export default function ExplorePageClient({
         action,
       });
 
-      void fetch("/api/swipe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          provider_id: provider.id,
-          action,
-        }),
-      }).catch(() => undefined);
     },
     [],
   );
@@ -1652,8 +1644,6 @@ export default function ExplorePageClient({
                     <CompactTherapistCard
                       key={provider.id}
                       provider={provider}
-                      selectedForCompare={compareSelection.some((item) => item.id === provider.id)}
-                      onToggleCompare={() => handleToggleCompare(provider)}
                       onOpen={handleProfileOpen}
                     />
                   ))}

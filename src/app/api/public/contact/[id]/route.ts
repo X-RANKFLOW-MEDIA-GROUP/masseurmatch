@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import { getRequestSession } from "@/app/api/_lib/session";
 import { normalizePhoneNumber } from "@/app/_lib/public-profile";
+import { createHash } from "crypto";
 
 type ContactMethod = "call" | "sms" | "whatsapp";
 
@@ -17,6 +19,11 @@ function buildContactUrl(method: ContactMethod, phone: string) {
   if (method === "call") return `tel:${normalized}`;
   if (method === "sms") return `sms:${normalized}`;
   return `https://wa.me/${digitsOnly}`;
+}
+
+function hashIp(ip: string | null): string | null {
+  if (!ip) return null;
+  return createHash("sha256").update(ip).digest("hex").slice(0, 16);
 }
 
 export async function GET(
@@ -64,13 +71,23 @@ export async function GET(
     return NextResponse.json({ error: "Contact is unavailable." }, { status: 404 });
   }
 
-  try {
-    await adminClient.rpc("increment_profile_contact_clicks", {
-      p_profile_id: profile.id,
-    });
-  } catch {
-    // Contact redirects should remain available even if analytics tracking fails.
-  }
+  // Fire-and-forget: analytics + contact event logging
+  const session = getRequestSession(request as unknown as Request);
+  const ipRaw =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    request.headers.get("x-real-ip") ??
+    null;
+
+  // Fire-and-forget; allSettled never rejects so no .catch() needed
+  void Promise.allSettled([
+    adminClient.rpc("increment_profile_contact_clicks", { p_profile_id: profile.id }),
+    adminClient.from("contact_events").insert({
+      profile_id: profile.id,
+      user_id: session?.userId ?? null,
+      method,
+      ip_hash: hashIp(ipRaw),
+    }),
+  ]);
 
   return NextResponse.redirect(redirectUrl, { status: 302 });
 }

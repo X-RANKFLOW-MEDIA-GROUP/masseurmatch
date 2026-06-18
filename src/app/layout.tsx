@@ -4,6 +4,8 @@ import { JsonLd } from "@/app/_components/json-ld";
 import { SiteFooter } from "@/app/_components/site-footer";
 import SiteHeader from "@/app/_components/site-header";
 import { CookieConsent } from "@/app/_components/CookieConsent";
+import { ChatWidget } from "@/app/_components/chat-widget";
+import { IntroVideoSplash } from "@/app/_components/IntroVideoSplash";
 import { SITE_DESCRIPTION, SITE_NAME, createPageMetadata } from "@/app/_lib/metadata";
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/app/_lib/structured-data";
 import { AppProviders } from "@/app/providers";
@@ -11,17 +13,19 @@ import { SITE_URL } from "@/lib/site";
 import "@/index.css";
 import "@/styles/mobile-responsive.css";
 import "@/styles/homepage-mobile-hotfix.css";
+import { inter, unbounded } from "./fonts";
+import SmoothScroll from "@/components/motion/SmoothScroll";
 
 // Font stacks are defined in CSS variables to keep production builds deterministic
 // even in CI environments without access to Google Fonts.
 
 const rootMetadata = createPageMetadata({
-  title: "The safest and most trusted premium male massage directory",
+  title: "Premium verified male massage therapist directory",
   description: SITE_DESCRIPTION,
   path: "/",
 });
 
-const faviconVersion = "20260508b";
+const faviconVersion = "20260603mm";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -29,12 +33,9 @@ export const metadata: Metadata = {
   manifest: `/manifest.json?v=${faviconVersion}`,
   category: "wellness",
   icons: {
-    icon: [
-      { url: `/favicon.svg?v=${faviconVersion}`, type: "image/svg+xml" },
-      { url: `/favicon.ico?v=${faviconVersion}`, type: "image/x-icon" },
-    ],
-    shortcut: `/favicon.svg?v=${faviconVersion}`,
-    apple: `/favicon.svg?v=${faviconVersion}`,
+    icon: [{ url: `/favicon.ico?v=${faviconVersion}`, type: "image/x-icon" }],
+    shortcut: `/favicon.ico?v=${faviconVersion}`,
+    apple: `/favicon.ico?v=${faviconVersion}`,
   },
   ...rootMetadata,
   alternates: {
@@ -44,17 +45,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${unbounded.variable}`}>
       <body className="theme-masseurmatch min-h-screen overflow-x-hidden font-sans text-foreground antialiased">
         <AppProviders>
+          <IntroVideoSplash />
           <JsonLd data={buildOrganizationJsonLd()} />
           <JsonLd data={buildWebsiteJsonLd()} />
           <div style={{ position: "relative", zIndex: 9999 }}>
             <SiteHeader />
           </div>
-          <AppMotionShell>{children}</AppMotionShell>
+          <AppMotionShell>
+            <SmoothScroll>{children}</SmoothScroll>
+          </AppMotionShell>
           <SiteFooter />
           <CookieConsent />
+          <ChatWidget />
         </AppProviders>
       </body>
     </html>

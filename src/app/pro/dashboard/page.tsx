@@ -5,6 +5,8 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   AlertCircle,
+  ArrowRight,
+  Sparkles,
   Car,
   CheckCircle2,
   Clock,
@@ -17,6 +19,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { normalizePlanKey } from "@/hooks/usePlanLimits";
 import { requestJson } from "@/app/_lib/request";
 
 const statusOptions = [
@@ -126,7 +129,8 @@ function ProfileStatusBanner({ status }: { status: string }) {
 }
 
 export default function DashboardHome() {
-  const { user } = useAuth();
+  const { user, subscription } = useAuth();
+  const currentTier = normalizePlanKey(subscription?.plan_key) ?? (subscription?.subscribed ? "standard" : "free");
   const [activeStatus, setActiveStatus] = useState<AvailabilityStatus>("available");
   const [statusSaving, setStatusSaving] = useState(false);
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -297,9 +301,9 @@ export default function DashboardHome() {
         <div className="space-y-6 lg:col-span-2">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             {[
-              { label: "Profile Views", icon: Eye, note: "Analytics coming soon" },
+              { label: "Profile Views", icon: Eye, note: "We start tracking views the day your listing goes live. Check back soon for your first insights." },
               { label: "Inquiries", icon: Zap, note: "Check Inquiries tab" },
-              { label: "Avg. Rating", icon: ShieldCheck, note: "Reviews coming soon" },
+              { label: "Avg. Rating", icon: ShieldCheck, note: "No reviews yet. Reviews will appear here as clients leave feedback." },
             ].map((item) => (
               <motion.div
                 key={item.label}
@@ -310,11 +314,11 @@ export default function DashboardHome() {
               >
                 <item.icon className="h-4 w-4 text-slate-400" />
                 <div>
-                  <div className="font-display text-lg font-medium text-slate-400">—</div>
+                  <div className="font-display text-lg font-medium text-slate-400">&mdash;</div>
                   <div className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-slate-500">
                     {item.label}
                   </div>
-                  <div className="mt-1 text-[10px] text-slate-400 italic">{item.note}</div>
+                  <div className="mt-1 text-[10px] text-slate-400">{item.note}</div>
                 </div>
               </motion.div>
             ))}
@@ -342,6 +346,32 @@ export default function DashboardHome() {
               ))}
             </div>
           </div>
+
+          {/* Knotty AI teaser — only shown for non-Elite plans */}
+          {currentTier !== "elite" && (
+            <div className="rounded-xl border border-slate-800 bg-slate-950 p-5 text-white">
+              <div className="flex items-start gap-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-400/15">
+                  <Sparkles className="h-4 w-4 text-amber-400" strokeWidth={2.25} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold">Knotty AI — available on Elite</p>
+                  <p className="mt-1 text-xs leading-relaxed text-white/60">
+                    Elite profiles get a Knotty AI chat widget that answers client questions 24/7
+                    directly on your listing — rates, availability, specialties, and more —
+                    without you lifting a finger.
+                  </p>
+                  <Link
+                    href="/pro/billing?upgrade=elite"
+                    className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-amber-400 hover:text-amber-300"
+                  >
+                    Upgrade to Elite
+                    <ArrowRight className="h-3 w-3" strokeWidth={2.5} />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
 
           {profileStatus === "pending_approval" && (
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">

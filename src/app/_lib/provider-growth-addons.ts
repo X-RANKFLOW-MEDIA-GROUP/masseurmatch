@@ -20,6 +20,8 @@ export interface GrowthAddon {
   scarcityNote?: string;
   includedIn?: string;
   cadence?: "one-time" | "recurring" | "usage" | "included";
+  /** When true, the add-on is not yet purchasable — join the waitlist instead. */
+  waitlist?: boolean;
 }
 
 export interface GrowthAddonCategory {
@@ -115,27 +117,27 @@ const trustAddons: GrowthAddon[] = [
   {
     slug: "verified-badge-renewal",
     categoryId: "trust",
-    name: "Verified Badge Renewal",
+    name: "Member Badge Renewal",
     priceLabel: "$39/year",
     description:
-      "Keeps your verified status active, maintaining trust and ranking priority.",
+      "Keeps your member status active, maintaining trust cues and ranking priority.",
     impactPreview: "Impact preview: keeps trust cues and ranking support visible year-round.",
     duration: "12 months",
     placement: "Profile card, profile header, trust filters",
-    bestResults: "Best results: Verified Badge Renewal + Profile Stats Badge",
+    bestResults: "Best results: Member Badge Renewal + Profile Stats Badge",
     cadence: "recurring",
   },
   {
     slug: "in-person-verified-badge",
     categoryId: "trust",
-    name: "In-Person Verified Badge",
+    name: "In-Person Member Badge",
     priceLabel: "$79 one-time",
     description:
-      "Premium verification for profiles that complete additional identity checks, increasing client confidence significantly.",
+      "Premium badge for profiles that complete additional in-person steps, increasing client confidence significantly.",
     impactPreview: "Impact preview: stronger first-contact trust when clients compare similar profiles.",
     duration: "Permanent badge",
     placement: "Profile card, profile header, trust modules",
-    bestResults: "Best results: In-Person Verified Badge + Verified Reviews Import",
+    bestResults: "Best results: In-Person Member Badge + Reviews Import",
     cadence: "one-time",
   },
   {
@@ -148,20 +150,20 @@ const trustAddons: GrowthAddon[] = [
     impactPreview: "Impact preview: visible traffic proof that reinforces profile activity and demand.",
     duration: "Monthly recurring",
     placement: "Profile card and profile quick facts",
-    bestResults: "Best results: Profile Stats Badge + Verified Badge Renewal",
+    bestResults: "Best results: Profile Stats Badge + Member Badge Renewal",
     cadence: "recurring",
   },
   {
     slug: "verified-reviews-import",
     categoryId: "trust",
-    name: "Verified Reviews Import",
+    name: "Reviews Import",
     priceLabel: "$5 per review",
     description:
-      "Import verified reviews from external platforms like Google or Yelp to strengthen your reputation.",
+      "Import reviews from external platforms like Google or Yelp to strengthen your reputation.",
     impactPreview: "Impact preview: third-party proof stacked directly inside your profile trust layer.",
     duration: "Per imported review",
     placement: "Review module and profile proof points",
-    bestResults: "Best results: Verified Reviews Import + In-Person Verified Badge",
+    bestResults: "Best results: Reviews Import + In-Person Member Badge",
     cadence: "usage",
   },
 ];
@@ -329,7 +331,7 @@ const premiumAddons: GrowthAddon[] = [
     impactPreview: "Impact preview: more visual proof for visitors deciding between similar profiles.",
     duration: "Monthly recurring",
     placement: "Public profile gallery",
-    bestResults: "Best results: Extra Gallery Space + Verified Reviews Import",
+    bestResults: "Best results: Extra Gallery Space + Reviews Import",
     cadence: "recurring",
   },
   {
@@ -345,6 +347,21 @@ const premiumAddons: GrowthAddon[] = [
     bestResults: "Best results: Geo Ads Campaign + Masseur of the Day",
     scarcityNote: "Campaign inventory is capped by market to protect performance.",
     cadence: "usage",
+  },
+  {
+    slug: "ai-voice-receptionist",
+    categoryId: "premium",
+    name: "AI Voice Receptionist",
+    priceLabel: "Coming soon — join waitlist",
+    description:
+      "An AI phone receptionist that answers calls to your listing, captures client details, and sends you a summary — so you never miss an inquiry.",
+    impactPreview: "Impact preview: 24/7 first-response capability without a personal number or answering service.",
+    duration: "Monthly recurring",
+    placement: "Phone icon on your public profile",
+    bestResults: "Best results: AI Voice Receptionist + Elite plan for maximum coverage",
+    scarcityNote: "Early-access slots limited to first 100 members.",
+    cadence: "recurring",
+    waitlist: true,
   },
 ];
 
@@ -413,7 +430,7 @@ export const PROVIDER_GROWTH_BUNDLES: GrowthBundle[] = [
     priceLabel: "$85 + $5/review",
     summary: "Layer the proof signals that reduce hesitation on first contact.",
     outcome: "Result: a more credible profile that converts traffic into outreach faster.",
-    items: ["In-Person Verified Badge", "Profile Stats Badge", "Verified Reviews Import"],
+    items: ["In-Person Member Badge", "Profile Stats Badge", "Reviews Import"],
   },
   {
     slug: "travel-launch-kit",

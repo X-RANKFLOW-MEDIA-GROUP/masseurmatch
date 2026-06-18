@@ -22,7 +22,7 @@ export const KNOTTY_EVENT_NAMES = [
   "knotty_text_clicked",
   "knotty_whatsapp_clicked",
   "profile_viewed",
-  "search_pending_approval",
+  "search_submitted",
   "filter_applied",
 ] as const;
 

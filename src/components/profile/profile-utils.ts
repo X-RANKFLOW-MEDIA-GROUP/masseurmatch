@@ -165,7 +165,7 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
   const outcallAvailable = Boolean(p.outcall_available ?? p.offers_outcall ?? profile.outcall_price ?? profile.outcall_radius_miles);
   const tier = profile.subscription_tier || String(p.tier || "");
   const seoKeywords = asStringArray(p.seo_keywords);
-  const canonicalUrl = String(p.canonical_url || `${SITE_URL}/${citySlug}/therapist/${profile.slug || profile.id}`);
+  const canonicalUrl = String(p.canonical_url || `${SITE_URL}/therapists/${profile.slug || profile.id}`);
 
   return {
     id: profile.id,

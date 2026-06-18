@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
-import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowRight, CheckCircle2, Lock, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
 
 import { ProviderGrowthMarketplace } from "@/app/_components/provider-growth-marketplace";
 import { SIGNUP_PLANS } from "@/app/signup/_lib/plans";
+import { PRICE_LOCK } from "@/lib/pricing";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -31,7 +32,7 @@ const pricingSchema = {
   mainEntity: SIGNUP_PLANS.map((plan) => ({
     "@type": "Offer",
     name: `${plan.name} Listing`,
-    price: String(plan.price / 100),
+    price: String(plan.price),
     priceCurrency: "USD",
     description: plan.description,
     eligibleCustomerType: "https://schema.org/BusinessEntityType",
@@ -109,6 +110,31 @@ export default function PricingPage() {
               <Button asChild size="lg" variant="outline">
                 <Link href="/pro/billing#addons">See add-ons</Link>
               </Button>
+            </div>
+
+            {PRICE_LOCK && (
+              <p className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-xs font-semibold text-emerald-700">
+                <Lock className="h-3.5 w-3.5" strokeWidth={2.5} />
+                Founding-member price lock — your rate never increases while subscribed
+              </p>
+            )}
+          </div>
+
+          {/* Market anchoring strip */}
+          <div className="mx-auto mt-8 max-w-3xl rounded-[1.6rem] border border-amber-200/60 bg-amber-50/70 px-6 py-4">
+            <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">How we compare</p>
+            <div className="mt-3 grid grid-cols-3 gap-3 text-center">
+              <div>
+                <p className="text-xl font-bold text-foreground">$300–$375</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">Legacy directories · one city</p>
+              </div>
+              <div className="flex flex-col items-center justify-center">
+                <p className="text-xs font-medium text-amber-700">vs. MasseurMatch Elite</p>
+              </div>
+              <div>
+                <p className="text-xl font-bold text-foreground">$149</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">3 cities + AI + Demand Radar</p>
+              </div>
             </div>
           </div>
 

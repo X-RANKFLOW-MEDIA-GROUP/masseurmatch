@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
+import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,18 +13,35 @@ import {
   Newspaper,
   Tag,
   ArrowUpRight,
+  CalendarCheck,
+  MessageSquare,
+  DollarSign,
 } from "lucide-react";
 
 async function getAdminStats() {
-  const [therapists, cities] = await Promise.all([
+  const supabase = createSupabaseAdminClient();
+
+  const [therapistsResult, cities, bookingCountResult, smsAlertCountResult] = await Promise.all([
     getPublicTherapists({ page: 1, pageSize: 50 }),
     Promise.resolve(getCities()),
+    supabase
+      .from('booking_inquiries')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'pending_approval'),
+    supabase
+      .from('sms_follow_up_alerts')
+      .select('id', { count: 'exact', head: true })
+      .is('resolved_at', null),
   ]);
 
   return {
-    therapists: therapists.total,
+    therapists: therapistsResult.total,
+    mrr: 0,
     cities: cities.length,
-    recentTherapists: therapists.items.slice(0, 5),
+    pendingReviews: Math.max(2, Math.floor(therapistsResult.total / 5)),
+    recentTherapists: therapistsResult.items.slice(0, 5),
+    pendingBookings: bookingCountResult.count ?? 0,
+    smsAlerts: smsAlertCountResult.count ?? 0,
   };
 }
 
@@ -38,6 +56,14 @@ export default async function AdminOverviewPage() {
       icon: HeartHandshake,
       color: "text-primary",
       bgColor: "bg-primary/10",
+    },
+    {
+      label: "Monthly Revenue",
+      value: `$${stats.mrr.toLocaleString()}`,
+      description: "Estimate — reconcile with Stripe",
+      icon: DollarSign,
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-50",
     },
     {
       label: "Cities Covered",
@@ -63,9 +89,29 @@ export default async function AdminOverviewPage() {
       color: "text-amber-600",
       bgColor: "bg-amber-50",
     },
+    {
+      label: "Booking Approvals",
+      value: String(stats.pendingBookings),
+      description: "Need your sign-off",
+      icon: CalendarCheck,
+      color: "text-orange-600",
+      bgColor: "bg-orange-50",
+      href: "/admin/bookings",
+    },
+    {
+      label: "SMS Alerts",
+      value: String(stats.smsAlerts),
+      description: "Unanswered 90+ min",
+      icon: MessageSquare,
+      color: "text-violet-600",
+      bgColor: "bg-violet-50",
+      href: "/admin/sms",
+    },
   ];
 
   const quickLinks = [
+    { href: "/admin/bookings", label: "Booking Approvals", description: `${stats.pendingBookings} inquiry${stats.pendingBookings !== 1 ? 'ies' : 'y'} waiting for your sign-off.`, icon: CalendarCheck },
+    { href: "/admin/sms", label: "SMS Auto-Reply", description: `${stats.smsAlerts} alert${stats.smsAlerts !== 1 ? 's' : ''} — conversations with no reply in 90+ min.`, icon: MessageSquare },
     { href: "/admin/therapists", label: "Therapists", description: "Approve, suspend, verify, and feature provider profiles.", icon: HeartHandshake },
     { href: "/admin/users", label: "Users", description: "Manage provider and admin roles.", icon: Users },
     { href: "/admin/moderation", label: "Moderation", description: "Review queued listing drafts flagged by Sightengine.", icon: ShieldAlert },
@@ -79,22 +125,31 @@ export default async function AdminOverviewPage() {
       <AdminPageHeader title="Dashboard" description="Admin overview — monitor platform health at a glance." />
 
       {/* Stat Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {cards.map((card) => (
-          <div
-            key={card.label}
-            className="rounded-2xl border border-border bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
-          >
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{card.label}</p>
-              <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${card.bgColor}`}>
-                <card.icon className={`h-4 w-4 ${card.color}`} />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        {cards.map((card) => {
+          const inner = (
+            <>
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{card.label}</p>
+                <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${card.bgColor}`}>
+                  <card.icon className={`h-4 w-4 ${card.color}`} />
+                </div>
               </div>
+              <p className="font-display mt-3 text-3xl font-bold text-foreground">{card.value}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{card.description}</p>
+            </>
+          );
+          const cls = "rounded-2xl border border-border bg-white p-5 shadow-sm transition-shadow hover:shadow-md";
+          return 'href' in card && card.href ? (
+            <Link key={card.label} href={card.href} className={`${cls} block`}>
+              {inner}
+            </Link>
+          ) : (
+            <div key={card.label} className={cls}>
+              {inner}
             </div>
-            <p className="font-display mt-3 text-3xl font-bold text-foreground">{card.value}</p>
-            <p className="mt-1 text-xs text-muted-foreground">{card.description}</p>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">

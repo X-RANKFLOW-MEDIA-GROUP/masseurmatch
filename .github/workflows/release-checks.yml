@@ -18,14 +18,39 @@ jobs:
       KNOTTY_LEARNING_ENABLED: "false"
       KNOTTY_DEBUG_RANKING: "false"
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.32.1
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
+      - name: Checkout repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git init .
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          FETCH_REF="${GITHUB_HEAD_REF:+refs/heads/${GITHUB_HEAD_REF}}"
+          FETCH_REF="${FETCH_REF:-${GITHUB_REF}}"
+          git fetch --no-tags --prune --depth=1 origin "${FETCH_REF}"
+          git checkout --force FETCH_HEAD
+      - name: Install Node.js 24 and pnpm
+        env:
+          PNPM_VERSION: 10.32.1
+        run: |
+          set -euo pipefail
+          NODE_BIN=""
+          if [ -d /opt/hostedtoolcache/node ]; then
+            NODE_BIN="$(find /opt/hostedtoolcache/node -path '*/24.*/x64/bin' -type d 2>/dev/null | sort -V | tail -n 1 || true)"
+          fi
+          if [ -z "$NODE_BIN" ]; then
+            NODE_VERSION="$(curl -fsSL https://nodejs.org/dist/index.tab | awk 'NR > 1 && $1 ~ /^v24\./ { sub(/^v/, "", $1); print $1; exit }')"
+            test -n "$NODE_VERSION"
+            mkdir -p "$RUNNER_TEMP/node"
+            curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" | tar -xJ --strip-components=1 -C "$RUNNER_TEMP/node"
+            NODE_BIN="$RUNNER_TEMP/node/bin"
+          fi
+          echo "$NODE_BIN" >> "$GITHUB_PATH"
+          export PATH="$NODE_BIN:$PATH"
+          corepack enable
+          corepack prepare "pnpm@${PNPM_VERSION}" --activate
+          node --version
+          pnpm --version
       - run: pnpm install --frozen-lockfile
       - run: git diff --exit-code package.json pnpm-lock.yaml
       - run: pnpm lint

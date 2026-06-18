@@ -1,5 +1,4 @@
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
-import { buildTherapistRevalidatePaths, triggerRevalidate } from "@/app/_lib/revalidate";
 import { assertRateLimit, sanitizeOptionalText, sanitizeStringArray, sanitizeText } from "@/app/_lib/security";
 import { requireRequestSession } from "@/app/_lib/session";
 import { getProfileByUserId, recordAuditLog, updateProfileByUserId } from "@/app/_lib/store";
@@ -57,12 +56,18 @@ function parseProfilePayload(raw: unknown) {
         bio: sanitizeText(body.bio),
         city: sanitizeText(body.city),
         state: sanitizeOptionalText(body.state),
+        neighborhood: sanitizeOptionalText(body.neighborhood),
         phone: sanitizeOptionalText(body.phone),
+        whatsapp_number: sanitizeOptionalText(body.whatsapp),
+        email_address: sanitizeOptionalText(body.email),
+        website: sanitizeOptionalText(body.website),
         specialties: sanitizeStringArray(body.specialties),
         service_categories: sanitizeStringArray(body.specialties),
         incall_price: body.incallPrice ?? null,
         outcall_price: body.outcallPrice ?? null,
         starting_price: body.incallPrice ?? body.outcallPrice ?? null,
+        offers_incall: body.locationType !== "outcall",
+        offers_outcall: body.locationType !== "incall",
         height_inches: body.heightInches ?? null,
         weight_lb: body.weightLb ?? null,
         body_type: sanitizeOptionalText(body.bodyType),
@@ -110,13 +115,12 @@ export async function POST(request: Request) {
       fields: parsed.fields,
     });
 
-    await triggerRevalidate(
-      await buildTherapistRevalidatePaths({
+    await import("@/app/_lib/revalidate").then(({ buildTherapistRevalidatePaths, triggerRevalidate }) =>
+      buildTherapistRevalidatePaths({
         id: nextProfile?.id || profile.id,
         slug: nextProfile?.slug || profile.slug,
         city: nextProfile?.city || profile.city,
-      }),
-      { request },
+      }).then((paths) => triggerRevalidate(paths, { request }))
     ).catch((error) => {
       console.error("[api/pro/profile] Revalidation failed:", error);
     });

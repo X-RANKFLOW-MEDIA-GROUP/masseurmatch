@@ -26,22 +26,22 @@ test.describe('GET /api/pro/profiles', () => {
   });
 
   test('should successfully filter profiles by technique without throwing a 500 error', async ({ request }) => {
-    // Testando a correção P0 específica: solicitando uma técnica (filtro em memória case-insensitive)
+    // Testing the specific P0 fix: requesting a technique (case-insensitive in-memory filter)
     const testTechnique = 'Deep Tissue';
     const response = await request.get(`/api/pro/profiles?technique=${encodeURIComponent(testTechnique)}`);
     
-    // 1. Garante que o endpoint não quebre (Teste de resiliência)
+    // 1. Ensure the endpoint does not break (resilience test)
     expect(response.status()).toBe(200);
 
     const data = await response.json();
     const profiles = data.profiles || [];
     
-    // 2. Valida o contrato do filtro em memória
+    // 2. Validate the in-memory filter contract
     if (profiles.length > 0) {
       for (const profile of profiles) {
         expect(profile).toHaveProperty('massage_techniques');
         
-        // Normaliza tudo para minúsculas para validar a correção case-insensitive
+        // Normalize everything to lowercase to validate the case-insensitive fix
         const hasTechnique = (profile.massage_techniques || []).some(
           (t: string) => t.toLowerCase() === testTechnique.toLowerCase()
         );

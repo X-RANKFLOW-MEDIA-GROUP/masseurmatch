@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Script from "next/script";
-import { ShieldCheck, Bot, Lock, CheckCircle2, UserCheck, EyeOff, ShieldAlert } from "lucide-react";
+import { ArrowRight, ShieldCheck, Bot, Lock, CheckCircle2, UserCheck, EyeOff, ShieldAlert } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Trust & Safety | How MasseurMatch Protects You",
@@ -58,7 +59,7 @@ export default function TrustPage() {
           </h1>
           <p className="mx-auto max-w-2xl font-sans text-lg leading-relaxed text-slate-600">
             Your safety is the foundation of MasseurMatch. We built an AI-driven and rigorously
-            verified technological infrastructure to guarantee peace of mind with every booking.
+            verified technological infrastructure for peace of mind with every connection.
           </p>
         </section>
 
@@ -82,7 +83,7 @@ export default function TrustPage() {
               <h3 className="font-display mb-3 text-2xl font-medium">AI Singleton Moderation</h3>
               <p className="mb-6 font-sans text-sm leading-relaxed text-slate-400">
                 Our proprietary Artificial Intelligence system reads and verifies every word and
-                photo pending_approval to the platform in real-time. We automatically identify and block
+                photo submitted to the platform in real-time. We automatically identify and block
                 fake profiles or inappropriate language before they ever go live.
               </p>
               <div className="flex items-center gap-2">
@@ -151,6 +152,24 @@ export default function TrustPage() {
             <RuleRow text="Profile photos must be strictly professional and free of watermarks." />
             <RuleRow text="Verbal aggression, discrimination, or harassment in chat results in an instant ban." />
             <RuleRow text="All reviews must come from real clients to combat fake reputations." />
+          </div>
+
+          <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm leading-relaxed text-slate-600 font-sans">
+            <strong className="font-semibold text-slate-800">Verified reviews require proof of contact.</strong>{" "}
+            When a client clicks a contact button (call, SMS, or WhatsApp) on a profile, we record
+            that event. Only reviewers with a documented contact event receive a &ldquo;Verified
+            contact&rdquo; label on their review — making it easy to distinguish genuine first-hand
+            experiences from unverifiable submissions.
+          </div>
+
+          <div className="mt-8 text-center">
+            <Link
+              href="/moderation-policy"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 underline-offset-2 hover:text-slate-900 hover:underline"
+            >
+              Read our full Moderation Policy
+              <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.25} />
+            </Link>
           </div>
         </section>
       </div>

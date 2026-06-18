@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { AppButton, AppInput, AppTextarea, PageSection, Surface } from "@/app/_components/primitives";
 import { updateProfileMutation, type ProProfileMutationResponse } from "@/app/_lib/mutations";
 import { requestJson } from "@/app/_lib/request";
 import { useToast } from "@/hooks/use-toast";
 import { BODY_TYPE_OPTIONS, normalizeBodyTypeValue } from "@/lib/physical-profile";
+import { US_CITIES } from "@/data/cities";
+import { Loader2, RefreshCw, AlertCircle } from "lucide-react";
 
 type ProfileResponse = {
   ok: boolean;
@@ -39,6 +41,13 @@ const EMPTY_FORM: FormState = {
   weightLb: "",
   bodyType: "",
 };
+
+const STATE_OPTIONS = Array.from(new Set(US_CITIES.map((city) => city.stateCode))).sort();
+const SPECIALTY_OPTIONS = [
+  "Deep Tissue", "Swedish", "Sports Massage", "Hot Stone", "Thai Massage", "Trigger Point",
+  "Myofascial Release", "Lymphatic Drainage", "Prenatal", "Reflexology", "Relaxation", "Stretch Therapy",
+  "Incall", "Outcall", "Couples Massage", "Chair Massage",
+];
 
 function mapProfileToForm(profile: ProfileResponse["profile"]): FormState {
   if (!profile) {
@@ -86,39 +95,42 @@ export default function ProProfilePageClient() {
   const { toast } = useToast();
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadSlow, setLoadSlow] = useState(false);
   const [saving, setSaving] = useState(false);
+  const slowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const loadProfile = useCallback(async () => {
+    setLoading(true);
+    setLoadError(null);
+    setLoadSlow(false);
+
+    slowTimerRef.current = setTimeout(() => setLoadSlow(true), 5000);
+
+    try {
+      const response = await requestJson<ProfileResponse>("/api/pro/profile");
+      setForm(mapProfileToForm(response.profile));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error.";
+      setLoadError(message);
+      toast({
+        title: "Could not load profile",
+        description: message,
+        variant: "destructive",
+      });
+    } finally {
+      if (slowTimerRef.current) clearTimeout(slowTimerRef.current);
+      setLoading(false);
+      setLoadSlow(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
-    let cancelled = false;
-
-    const loadProfile = async () => {
-      try {
-        const response = await requestJson<ProfileResponse>("/api/pro/profile");
-
-        if (!cancelled) {
-          setForm(mapProfileToForm(response.profile));
-        }
-      } catch (error) {
-        if (!cancelled) {
-          toast({
-            title: "Could not load profile",
-            description: error instanceof Error ? error.message : "Unknown error.",
-            variant: "destructive",
-          });
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
     void loadProfile();
-
     return () => {
-      cancelled = true;
+      if (slowTimerRef.current) clearTimeout(slowTimerRef.current);
     };
-  }, [toast]);
+  }, [loadProfile]);
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -167,7 +179,35 @@ export default function ProProfilePageClient() {
 
       <Surface className="mt-8">
         {loading ? (
-          <p className="text-sm text-muted-foreground">Loading profile...</p>
+          <div className="flex flex-col items-center justify-center gap-3 py-16">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" strokeWidth={2} />
+            <p className="text-sm text-muted-foreground">
+              {loadSlow ? "Taking longer than expected..." : "Loading profile..."}
+            </p>
+            {loadSlow && (
+              <button
+                type="button"
+                onClick={loadProfile}
+                className="mt-1 inline-flex items-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+              >
+                <RefreshCw className="h-3 w-3" strokeWidth={2.25} />
+                Retry
+              </button>
+            )}
+          </div>
+        ) : loadError ? (
+          <div className="flex flex-col items-center justify-center gap-3 py-16">
+            <AlertCircle className="h-6 w-6 text-destructive" strokeWidth={2} />
+            <p className="text-sm text-muted-foreground">Could not load profile: {loadError}</p>
+            <button
+              type="button"
+              onClick={loadProfile}
+              className="mt-1 inline-flex items-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+            >
+              <RefreshCw className="h-3 w-3" strokeWidth={2.25} />
+              Retry
+            </button>
+          </div>
         ) : (
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
@@ -180,21 +220,56 @@ export default function ProProfilePageClient() {
               <AppInput
                 placeholder="City"
                 value={form.city}
-                onChange={(event) => setForm((current) => ({ ...current, city: event.target.value }))}
+                onChange={(event) => {
+                  const selected = US_CITIES.find((city) => `${city.name}, ${city.stateCode}` === event.target.value);
+                  setForm((current) => ({
+                    ...current,
+                    city: selected?.name ?? event.target.value,
+                    state: selected?.stateCode ?? current.state,
+                  }));
+                }}
+                list="city-options"
                 required
               />
-              <AppInput
-                placeholder="State"
+              <datalist id="city-options">
+                {US_CITIES.map((city) => (
+                  <option key={`${city.slug}-${city.stateCode}`} value={`${city.name}, ${city.stateCode}`} />
+                ))}
+              </datalist>
+              <select
                 value={form.state}
                 onChange={(event) => setForm((current) => ({ ...current, state: event.target.value }))}
-              />
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="">State</option>
+                {STATE_OPTIONS.map((stateCode) => (
+                  <option key={stateCode} value={stateCode}>{stateCode}</option>
+                ))}
+              </select>
               <AppInput
                 placeholder="Phone"
                 value={form.phone}
                 onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))}
               />
+              <select
+                value=""
+                onChange={(event) => {
+                  const value = event.target.value;
+                  if (!value) return;
+                  const current = form.specialties.split(",").map((v) => v.trim()).filter(Boolean);
+                  if (!current.includes(value)) {
+                    setForm((prev) => ({ ...prev, specialties: [...current, value].join(", ") }));
+                  }
+                }}
+                className="md:col-span-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="">Add specialty / service option</option>
+                {SPECIALTY_OPTIONS.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
               <AppInput
-                placeholder="Specialties (comma separated)"
+                placeholder="Selected specialties (editable)"
                 value={form.specialties}
                 onChange={(event) => setForm((current) => ({ ...current, specialties: event.target.value }))}
                 className="md:col-span-2"

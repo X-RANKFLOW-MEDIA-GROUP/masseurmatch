@@ -12,6 +12,7 @@ import { absoluteUrl, getSeoBlogPosts, getSeoCities, getSeoTherapists, FEATURED_
 import { uniqueStrings } from "@/app/_lib/utils";
 import { competitorSlugs } from "@/lib/competitors";
 import { getCities, getCityInventoryMap, getPublicTherapists } from "@/app/_lib/directory";
+import { TOUR_PAGE_TIERS } from "@/lib/pricing";
 import { buildCanonicalPath } from "@/app/_lib/route-normalization";
 
 type StaticSitemapRoute = {
@@ -103,11 +104,11 @@ const CORE_STATIC_ROUTES: StaticSitemapRoute[] = [
   { path: "/platform-disclaimer", changeFrequency: "monthly", priority: 0.4 },
   { path: "/cookie-policy", changeFrequency: "monthly", priority: 0.4 },
   { path: "/therapist-agreement", changeFrequency: "monthly", priority: 0.4 },
-  { path: "/compare", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/compare", changeFrequency: "weekly", priority: 0.82 },
   ...competitorSlugs.map((slug) => ({
     path: `/compare/${slug}`,
     changeFrequency: "monthly" as const,
-    priority: 0.7,
+    priority: 0.75,
   })),
 ];
 
@@ -195,10 +196,10 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Metad
       .filter((city) => ROUTABLE_CITY_SLUGS.has(city.slug))
       .filter((city) => {
         const cityName = cityNameBySlug(city.slug);
-        return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) > 0 : false;
+        return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) >= 3 : false;
       })
       .map((city) => ({
-        url: toSitemapUrl(`/cities/${city.slug}`),
+        url: toSitemapUrl(`/${city.slug}`),
         lastModified: city.updated_at ? new Date(city.updated_at) : now,
         changeFrequency: "weekly" as const,
         priority: 0.7,
@@ -210,9 +211,9 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Metad
     .filter((path) => {
       const slug = path.split("/").filter(Boolean)[0];
       const cityName = slug ? cityNameBySlug(slug) : null;
-      return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) > 0 : false;
+      return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) >= 3 : false;
     })
-    .map((path) => buildSitemapEntry(`/cities${path}`, now, "weekly", 0.7));
+    .map((path) => buildSitemapEntry(path, now, "weekly", 0.7));
 }
 
 export async function buildServicesSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
@@ -250,6 +251,51 @@ export async function buildProfilesSitemapEntries(now = new Date()): Promise<Met
       changeFrequency: "weekly" as const,
       priority: featuredSet.has(therapist.slug) ? 0.9 : 0.7,
     }));
+}
+
+export async function buildTourPagesSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
+  const cities = getCities();
+  const citySlugSet = new Set(cities.map((c) => c.slug));
+
+  let profiles;
+  try {
+    // Fetch only tour-eligible tiers in parallel; pageSize:500 covers the full directory at launch scale
+    const [standard, pro, elite] = await Promise.all([
+      getPublicTherapists({ tier: "standard", pageSize: 500 }),
+      getPublicTherapists({ tier: "pro", pageSize: 500 }),
+      getPublicTherapists({ tier: "elite", pageSize: 500 }),
+    ]);
+    profiles = [...standard.items, ...pro.items, ...elite.items];
+  } catch {
+    return [];
+  }
+
+  const entries: MetadataRoute.Sitemap = [];
+
+  for (const profile of profiles) {
+    if (!profile.slug || !TOUR_PAGE_TIERS.has(profile.subscription_tier as "standard" | "pro" | "elite")) continue;
+    if (!Array.isArray(profile.travel_schedule)) continue;
+
+    for (const visit of profile.travel_schedule as Array<{ city: string; start_date: string; end_date: string }>) {
+      if (new Date(visit.end_date) < now) continue;
+      const citySlug = visit.city.toLowerCase().replace(/\s+/g, "-");
+      if (!citySlugSet.has(citySlug)) continue;
+      entries.push({
+        url: toSitemapUrl(`/${citySlug}/visiting/${profile.slug}`),
+        lastModified: profile.updated_at ? new Date(profile.updated_at) : now,
+        changeFrequency: "weekly" as const,
+        priority: 0.65,
+      });
+    }
+  }
+
+  // Deduplicate — multiple travel windows for the same city/therapist combo
+  const seen = new Set<string>();
+  return entries.filter((e) => {
+    if (seen.has(e.url)) return false;
+    seen.add(e.url);
+    return true;
+  });
 }
 
 export function buildGuidesSitemapEntries(now = new Date()): MetadataRoute.Sitemap {

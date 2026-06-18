@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "List Your Massage Practice on MasseurMatch",
     description:
-      "Join thousands of verified massage therapists on the leading LGBTQ+-inclusive directory.",
+      "Join verified massage therapists on the leading LGBTQ+-inclusive directory.",
     url: "https://masseurmatch.com/for-therapists",
     siteName: "MasseurMatch",
     type: "website",
@@ -98,21 +98,21 @@ const testimonials = [
       "Since listing on MasseurMatch, about 40% of my new clients mention they found me there specifically because they wanted a safe space. That alignment matters for both of us.",
     name: "Jordan T.",
     location: "Austin, TX",
-    years: "LMT, 8 years",
+    years: "8 years",
   },
   {
     quote:
       "I tried other directories but the client base here is completely different - more intentional, more respectful. My cancellation rate dropped significantly.",
     name: "Marcus R.",
     location: "Chicago, IL",
-    years: "LMT, 5 years",
+    years: "5 years",
   },
   {
     quote:
       "Setting up was fast and the verification gave me credibility I could not build on my own website alone. Clients trust the badge.",
     name: "Elena V.",
     location: "Miami, FL",
-    years: "LMT, 11 years",
+    years: "11 years",
   },
 ];
 
@@ -270,8 +270,8 @@ export default function ForTherapistsPage() {
             }}
           >
             {[
-              { value: "2,400+", label: "Active Therapist Listings" },
-              { value: "104", label: "Cities" },
+              { value: "Growing", label: "Active Therapist Listings" },
+              { value: "80+", label: "US Cities Covered" },
               { value: "$0", label: "Booking Commission" },
               { value: "48h", label: "Average Verification Time" },
             ].map((stat) => (
@@ -604,6 +604,104 @@ export default function ForTherapistsPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* Knotty AI — Elite differentiator */}
+        <section
+          style={{
+            background: "#060E1A",
+            padding: "80px 24px",
+            color: "#FCFBF8",
+          }}
+        >
+          <div style={{ maxWidth: 760, margin: "0 auto" }}>
+            <p
+              style={{
+                fontSize: 11,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                color: "#F59E0B",
+                marginBottom: 20,
+                fontFamily: "system-ui, sans-serif",
+              }}
+            >
+              Elite · AI Answering
+            </p>
+            <h2
+              style={{
+                fontSize: "clamp(26px, 4vw, 42px)",
+                fontWeight: 400,
+                lineHeight: 1.15,
+                marginBottom: 20,
+              }}
+            >
+              Knotty AI answers for you —
+              <br />
+              24 hours a day, 7 days a week.
+            </h2>
+            <p
+              style={{
+                fontSize: "clamp(14px, 2.5vw, 16px)",
+                opacity: 0.65,
+                fontFamily: "system-ui, sans-serif",
+                lineHeight: 1.7,
+                marginBottom: 36,
+                maxWidth: 540,
+              }}
+            >
+              Elite profiles get a Knotty AI chat widget embedded directly on their listing.
+              It answers client questions about rates, availability, specialties, and LGBTQ+
+              affirmation — without you needing to be online. First impressions happen at all
+              hours; Knotty makes sure yours is always ready.
+            </p>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                gap: 16,
+                marginBottom: 36,
+              }}
+            >
+              {[
+                { label: "Answers rate & availability questions", detail: "Without interrupting your schedule" },
+                { label: "Explains your services clearly", detail: "Using your own profile data" },
+                { label: "Available on every Elite listing", detail: "Not a third-party chatbot — fully integrated" },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    borderRadius: 12,
+                    padding: "16px 18px",
+                    fontFamily: "system-ui, sans-serif",
+                  }}
+                >
+                  <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{item.label}</p>
+                  <p style={{ fontSize: 12, opacity: 0.5, lineHeight: 1.5 }}>{item.detail}</p>
+                </div>
+              ))}
+            </div>
+            <Link
+              href="/pricing"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                background: "#F59E0B",
+                color: "#0B1F3A",
+                borderRadius: 99,
+                padding: "12px 24px",
+                fontSize: 13,
+                fontWeight: 700,
+                fontFamily: "system-ui, sans-serif",
+                textDecoration: "none",
+                letterSpacing: "0.03em",
+              }}
+            >
+              See Elite pricing
+            </Link>
           </div>
         </section>
 

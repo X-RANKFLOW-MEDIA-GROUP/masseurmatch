@@ -26,13 +26,15 @@ function getSessionSecret(): string {
     process.env.MM_SESSION_SECRET ??
     process.env.SESSION_SECRET ??
     process.env.MM_JWT_SECRET ??
-    process.env.JWT_SECRET ??
-    process.env.SUPABASE_SERVICE_ROLE_KEY;
+    process.env.JWT_SECRET;
   if (secret) return secret;
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('MM_SESSION_SECRET is required in production.');
+  // Only fall back to a constant for genuine local development/testing. Any
+  // deployed environment (production, preview, staging) must provide a real
+  // secret so an attacker cannot forge a signed admin cookie.
+  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+    return 'dev-only-masseurmatch-session-secret';
   }
-  return 'dev-only-masseurmatch-session-secret';
+  throw new Error('MM_SESSION_SECRET is required outside local development.');
 }
 
 function toBase64Url(bytes: Uint8Array): string {
@@ -187,6 +189,29 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
+  // ── 0a. Canonical host – redirect www to apex ─────────────────────────
+  const host = request.headers.get("host") || "";
+  if (host.startsWith("www.")) {
+    const url = request.nextUrl.clone();
+    url.host = host.replace(/^www\./, "");
+    url.port = "";
+    return NextResponse.redirect(url, { status: 301 });
+  }
+
+  // ── 0. Supabase auth callback guard ─────────────────────────────────────
+  // Supabase sometimes sends the ?code= param to the site root URL instead of
+  // /auth/callback (e.g. when the Redirect URL in the Supabase dashboard is set
+  // to https://www.masseurmatch.com instead of https://www.masseurmatch.com/auth/callback).
+  // Forward it to the real handler so the session exchange can complete.
+  if (pathname === "/" && searchParams.has("code")) {
+    const callbackUrl = new URL("/auth/callback", request.url);
+    // Preserve all query params (code, next, error, etc.)
+    searchParams.forEach((value, key) => {
+      callbackUrl.searchParams.set(key, value);
+    });
+    return NextResponse.redirect(callbackUrl, { status: 302 });
+  }
+
   // ── 1. Removed routes → 301 redirects ───────────────────────────────────
   if (pathname === "/wireframes" || pathname.startsWith("/wireframes/")) {
     return permanentRedirect("/", request);
@@ -300,8 +325,17 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
   }
 
-  // ── 7. Legacy /{city}/massage-therapists → /{city} ───────────────────────
   const topLevelParts = pathname.split("/").filter(Boolean);
+
+  // ── 7a. Legacy /{city}/therapist/{slug} → /therapists/{slug} ─────────────
+  if (topLevelParts.length === 3 && topLevelParts[1] === "therapist") {
+    const citySlug = resolveCitySlug(topLevelParts[0] || "");
+    if (citySlug) {
+      return permanentRedirect(`/therapists/${topLevelParts[2]}`, request);
+    }
+  }
+
+  // ── 7. Legacy /{city}/massage-therapists → /{city} ───────────────────────
   if (topLevelParts.length === 2 && topLevelParts[1] === "massage-therapists") {
     const citySlug = resolveCitySlug(topLevelParts[0] || "");
     if (citySlug) {
@@ -323,7 +357,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
-    if (session.role !== "provider") {
+    if (session.role !== "provider" && session.role !== "admin") {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }

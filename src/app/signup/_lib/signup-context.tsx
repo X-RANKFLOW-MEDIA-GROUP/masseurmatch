@@ -20,9 +20,8 @@ export type IdentityVerificationStatus =
 
 export type SubmissionStatus =
   | "draft"
-  | "submitted"
-  | "under_review"
   | "pending_approval"
+  | "under_review"
   | "approved"
   | "rejected";
 

@@ -20,13 +20,17 @@ function sessionSecret(): string {
     "SESSION_SECRET",
     "MM_JWT_SECRET",
     "JWT_SECRET",
-    "SUPABASE_SERVICE_ROLE_KEY",
   ]);
   if (secret) return secret;
-  if (process.env.NODE_ENV === "production") {
-    throw new Error("MM_SESSION_SECRET is required in production. Set it in your environment variables.");
+  // Only fall back to a constant for genuine local development/testing. Any
+  // deployed environment (production, preview, staging) must provide a real
+  // secret so an attacker cannot forge a signed admin cookie.
+  if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
+    return "dev-only-masseurmatch-session-secret";
   }
-  return "dev-only-masseurmatch-session-secret";
+  throw new Error(
+    "MM_SESSION_SECRET is required outside local development. Set it in your environment variables.",
+  );
 }
 
 function encodeBase64Url(value: string): string {
@@ -151,4 +155,9 @@ export function getRequestSession(request: Request): RequestSession | null {
   }
 
   return parseSessionValue(raw);
+}
+
+export function parseSessionCookieValue(rawValue: string | undefined): RequestSession | null {
+  if (!rawValue) return null;
+  return parseSessionValue(rawValue);
 }

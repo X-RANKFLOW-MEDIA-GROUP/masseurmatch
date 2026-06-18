@@ -3,29 +3,43 @@ import { SITE_URL, siteUrl } from "@/lib/site";
 import { buildCanonicalPath } from "@/app/_lib/route-normalization";
 
 export const SITE_NAME = "MasseurMatch";
-export const SITE_TAGLINE = "A national directory for verified, LGBTQ+-affirming massage therapists";
+export const SITE_TAGLINE = "A national directory for LGBTQ+-affirming independent massage therapists";
 export const SITE_DESCRIPTION =
-  "Find verified LGBTQ+-affirming massage therapists across the United States by state, city, specialty, incall, outcall, trust signals, and direct contact options.";
+  "Find LGBTQ+-affirming independent massage therapists across the United States by state, city, specialty, incall, outcall, trust signals, and direct contact options.";
 export const DEFAULT_SOCIAL_HANDLE = "@masseurmatch";
 export const appUrl = SITE_URL;
 
 export const DEFAULT_KEYWORDS = [
-  "massage therapists",
+  // Core brand & directory
+  "MasseurMatch",
   "massage therapist directory",
-  "massage therapists near me",
+  "male massage therapist directory",
   "verified massage therapists",
+  "massage therapists near me",
+  "male massage near me",
+  // LGBTQ
   "LGBTQ massage directory",
   "LGBTQ affirming massage therapists",
   "gay massage directory",
+  "gay friendly massage therapist",
+  // Services
   "male massage therapist",
-  "massage by state",
-  "massage by city",
   "outcall massage",
   "incall massage",
   "sports massage",
   "deep tissue massage",
   "swedish massage",
+  "mobile massage therapist",
+  // Discovery
+  "massage by state",
+  "massage by city",
   "premium wellness directory",
+  // Competitor alternatives — people searching these are high-intent users
+  "MasseurFinder alternative",
+  "RentMasseur alternative",
+  "MassageFinder alternative",
+  "FindAMasseur alternative",
+  "niche massage directory",
 ];
 
 type PageMetadataInput = {
@@ -463,7 +477,7 @@ export const buildLocalBusinessJsonLd = ({
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   name: `${SITE_NAME} — ${cityName}`,
-  description: `Browse ${therapistCount} verified massage therapists in ${cityName}, ${stateName}. Compare specialties, trust signals, availability, and direct contact options.`,
+  description: `Browse ${therapistCount} independent massage therapists in ${cityName}, ${stateName}. Compare specialties, trust signals, availability, and direct contact options.`,
   url: siteUrl(path),
   address: {
     "@type": "PostalAddress",

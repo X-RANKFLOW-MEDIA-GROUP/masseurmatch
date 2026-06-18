@@ -1,13 +1,11 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 
 export default function AdminHeader() {
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-border bg-white/80 px-4 backdrop-blur-xl lg:h-[60px] lg:px-6">
-      <SidebarTrigger />
       <span className="text-sm font-semibold text-muted-foreground">Admin Panel</span>
 
       <div className="flex-1" />

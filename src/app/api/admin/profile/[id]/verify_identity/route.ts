@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, recordAuditLog, requireAdminSession } from "@/app/api/_lib/supabase-server";
 
@@ -24,6 +25,7 @@ export async function POST(
       .update({
         is_verified_identity: true,
         verification_status: "verified",
+        identity_verified_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
       .eq("id", profileId);

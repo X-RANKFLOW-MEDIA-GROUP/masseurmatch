@@ -103,7 +103,7 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
         heading: ["var(--font-sora)", "Sora", "system-ui", "sans-serif"],
-        display: ["var(--font-sora)", "Sora", "system-ui", "sans-serif"],
+        display: ["var(--font-unbounded)", "var(--font-inter)", "sans-serif"],
         stat: ["var(--font-space-grotesk)", "Space Grotesk", "system-ui", "sans-serif"],
         mono: ["var(--font-space-grotesk)", "Space Grotesk", "monospace"],
       },

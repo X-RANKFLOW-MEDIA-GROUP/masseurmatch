@@ -1,8 +1,24 @@
+"use client";
+
+import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ShieldCheck, ArrowUpRight } from "lucide-react";
+import { BRAND_ASSETS } from "@/lib/brand";
+import { SiteFooterTalk } from "@/components/marketing/SiteFooterTalk";
 
 export function SiteFooter() {
   const currentYear = new Date().getFullYear();
+  const pathname = usePathname();
+
+  if (pathname === "/") {
+    return <SiteFooterTalk />;
+  }
+
+  // Admin and Pro layouts have their own chrome — hide the marketing footer
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/pro")) {
+    return null;
+  }
 
   return (
     <footer className="bg-[#060E1A] text-slate-400 pt-20 pb-10 border-t border-white/[0.06]">
@@ -12,8 +28,8 @@ export function SiteFooter() {
 
           {/* Brand Column */}
           <div className="lg:col-span-2 space-y-6">
-            <Link href="/" className="font-['Georgia','Times_New_Roman',serif] text-2xl font-bold tracking-tight text-white inline-block">
-              Masseur<span className="text-[#FF8A1F]">Match</span>
+            <Link href="/" className="inline-block">
+              <Image src={BRAND_ASSETS.logo} alt="MasseurMatch" width={160} height={32} className="h-8 w-auto" />
             </Link>
             <p className="font-sans text-sm leading-relaxed max-w-sm text-slate-400">
               A privacy-first directory connecting clients with independent LGBTQ+-affirming massage therapists across the United States.
@@ -52,6 +68,8 @@ export function SiteFooter() {
             <ul className="space-y-4 font-sans text-sm">
               <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
               <li><Link href="/trust" className="hover:text-white transition-colors">Trust &amp; Safety</Link></li>
+              <li><Link href="/verification" className="hover:text-white transition-colors">Identity Verification</Link></li>
+              <li><Link href="/moderation-policy" className="hover:text-white transition-colors">Moderation Policy</Link></li>
               <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
               <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
               <li><Link href="/contact" className="hover:text-white transition-colors">Contact Support</Link></li>

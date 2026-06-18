@@ -395,6 +395,33 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_events: {
+        Row: {
+          created_at: string
+          id: string
+          ip_hash: string | null
+          method: string
+          profile_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          method: string
+          profile_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          method?: string
+          profile_id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       contact_inquiries: {
         Row: {
           client_email: string | null
@@ -479,6 +506,45 @@ export type Database = {
           id?: string
           therapist_id?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      demand_scores: {
+        Row: {
+          city: string
+          competition_index: number
+          created_at: string
+          id: string
+          neighborhood: string | null
+          score: number
+          search_volume_index: number
+          state: string
+          trend: string
+          week_start: string
+        }
+        Insert: {
+          city: string
+          competition_index?: number
+          created_at?: string
+          id?: string
+          neighborhood?: string | null
+          score: number
+          search_volume_index?: number
+          state: string
+          trend?: string
+          week_start: string
+        }
+        Update: {
+          city?: string
+          competition_index?: number
+          created_at?: string
+          id?: string
+          neighborhood?: string | null
+          score?: number
+          search_volume_index?: number
+          state?: string
+          trend?: string
+          week_start?: string
         }
         Relationships: []
       }
@@ -1272,6 +1338,8 @@ export type Database = {
           incall_price: number | null
           is_active: boolean | null
           is_banned: boolean | null
+          identity_verified_at: string | null
+          is_demo: boolean | null
           is_featured: boolean | null
           is_suspended: boolean | null
           is_verified_identity: boolean | null
@@ -1390,6 +1458,8 @@ export type Database = {
           incall_price?: number | null
           is_active?: boolean | null
           is_banned?: boolean | null
+          identity_verified_at?: string | null
+          is_demo?: boolean | null
           is_featured?: boolean | null
           is_suspended?: boolean | null
           is_verified_identity?: boolean | null
@@ -1508,6 +1578,8 @@ export type Database = {
           incall_price?: number | null
           is_active?: boolean | null
           is_banned?: boolean | null
+          identity_verified_at?: string | null
+          is_demo?: boolean | null
           is_featured?: boolean | null
           is_suspended?: boolean | null
           is_verified_identity?: boolean | null
@@ -2801,6 +2873,231 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      booking_inquiries: {
+        Row: {
+          id: string
+          client_name: string | null
+          client_phone: string | null
+          client_email: string | null
+          client_hotel: string | null
+          service_type: string | null
+          preferred_date: string | null
+          preferred_time: string | null
+          duration_minutes: number
+          message: string | null
+          source: string
+          therapist_id: string | null
+          status: string
+          intelligence_status: string
+          intelligence_report: Json
+          ai_conversation: Json
+          confirmed_date: string | null
+          confirmed_time: string | null
+          appointment_id: string | null
+          sheets_row_id: string | null
+          admin_notes: string | null
+          reviewed_by: string | null
+          reviewed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          client_name?: string | null
+          client_phone?: string | null
+          client_email?: string | null
+          client_hotel?: string | null
+          service_type?: string | null
+          preferred_date?: string | null
+          preferred_time?: string | null
+          duration_minutes?: number
+          message?: string | null
+          source?: string
+          therapist_id?: string | null
+          status?: string
+          intelligence_status?: string
+          intelligence_report?: Json
+          ai_conversation?: Json
+          confirmed_date?: string | null
+          confirmed_time?: string | null
+          appointment_id?: string | null
+          sheets_row_id?: string | null
+          admin_notes?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          client_name?: string | null
+          client_phone?: string | null
+          client_email?: string | null
+          client_hotel?: string | null
+          service_type?: string | null
+          preferred_date?: string | null
+          preferred_time?: string | null
+          duration_minutes?: number
+          message?: string | null
+          source?: string
+          therapist_id?: string | null
+          status?: string
+          intelligence_status?: string
+          intelligence_report?: Json
+          ai_conversation?: Json
+          confirmed_date?: string | null
+          confirmed_time?: string | null
+          appointment_id?: string | null
+          sheets_row_id?: string | null
+          admin_notes?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sms_profiles: {
+        Row: {
+          id: string
+          profile_id: string
+          ready_to_reply: boolean
+          availability_mode: string
+          arrival_date: string | null
+          departure_date: string | null
+          pricing_60: string | null
+          pricing_90: string | null
+          pricing_couples: string | null
+          outcall_available: boolean
+          couples_available: boolean
+          outcall_area: string | null
+          alert_phone: string | null
+          custom_instructions: string | null
+          twilio_number: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          profile_id: string
+          ready_to_reply?: boolean
+          availability_mode?: string
+          arrival_date?: string | null
+          departure_date?: string | null
+          pricing_60?: string | null
+          pricing_90?: string | null
+          pricing_couples?: string | null
+          outcall_available?: boolean
+          couples_available?: boolean
+          outcall_area?: string | null
+          alert_phone?: string | null
+          custom_instructions?: string | null
+          twilio_number?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          profile_id?: string
+          ready_to_reply?: boolean
+          availability_mode?: string
+          arrival_date?: string | null
+          departure_date?: string | null
+          pricing_60?: string | null
+          pricing_90?: string | null
+          pricing_couples?: string | null
+          outcall_available?: boolean
+          couples_available?: boolean
+          outcall_area?: string | null
+          alert_phone?: string | null
+          custom_instructions?: string | null
+          twilio_number?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sms_logs: {
+        Row: {
+          id: string
+          profile_id: string | null
+          from_number: string
+          to_number: string
+          direction: string
+          body: string
+          twilio_sid: string | null
+          intent: string | null
+          status: string
+          is_manual: boolean
+          booking_inquiry_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          profile_id?: string | null
+          from_number: string
+          to_number: string
+          direction: string
+          body: string
+          twilio_sid?: string | null
+          intent?: string | null
+          status?: string
+          is_manual?: boolean
+          booking_inquiry_id?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          profile_id?: string | null
+          from_number?: string
+          to_number?: string
+          direction?: string
+          body?: string
+          twilio_sid?: string | null
+          intent?: string | null
+          status?: string
+          is_manual?: boolean
+          booking_inquiry_id?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      sms_follow_up_alerts: {
+        Row: {
+          id: string
+          profile_id: string | null
+          client_phone: string
+          our_phone: string
+          last_outbound_at: string
+          last_inbound_at: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          profile_id?: string | null
+          client_phone: string
+          our_phone: string
+          last_outbound_at: string
+          last_inbound_at?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          profile_id?: string | null
+          client_phone?: string
+          our_phone?: string
+          last_outbound_at?: string
+          last_inbound_at?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          created_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {

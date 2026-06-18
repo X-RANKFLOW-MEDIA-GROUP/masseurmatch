@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   AlertCircle,
+  ArrowRight,
   CheckCircle2,
   Loader2,
   Mail,
@@ -29,8 +30,9 @@ async function syncServerSession(accessToken: string | undefined) {
   });
 }
 
-export default function SignupVerifyPage() {
+function SignupVerifyPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
   const {
     state,
@@ -45,6 +47,7 @@ export default function SignupVerifyPage() {
   const [emailLoading, setEmailLoading] = useState(false);
   const [idLoading, setIdLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const autoCheckedRef = useRef(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -127,6 +130,17 @@ export default function SignupVerifyPage() {
     void checkIdentityStatus();
   }, [checkIdentityStatus, state.identityVerificationStatus, state.stripeIdentitySessionId]);
 
+  // When Stripe redirects back with ?identity_return=1, auto-check status once
+  useEffect(() => {
+    if (autoCheckedRef.current) return;
+    if (!searchParams?.get("identity_return")) return;
+    if (!state.stripeIdentitySessionId) return;
+    if (state.identityVerificationStatus === "verified") return;
+
+    autoCheckedRef.current = true;
+    void checkIdentityStatus();
+  }, [checkIdentityStatus, searchParams, state.stripeIdentitySessionId, state.identityVerificationStatus]);
+
   async function sendEmailCode() {
     if (!state.email) {
       setError("An email address is required to verify your account.");
@@ -204,11 +218,12 @@ export default function SignupVerifyPage() {
     }
   }, [setIdentityStatus, setStripeIdentitySessionId]);
 
-  const canContinue = state.emailVerified && state.identityVerificationStatus === "verified";
+  const idVerified = state.identityVerificationStatus === "verified";
+  const canContinue = state.emailVerified;
 
   function handleContinue() {
     if (!canContinue) return;
-    router.push("/signup/profile");
+    router.push(idVerified ? "/pro/listing" : "/signup/profile");
   }
 
   function renderIdButton() {
@@ -339,31 +354,47 @@ export default function SignupVerifyPage() {
 
       <Card>
         <CardContent className="space-y-4 p-6">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-brand-secondary" />
-            <h2 className="font-display text-lg font-semibold">Secure ID Check</h2>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-brand-secondary" />
+              <h2 className="font-display text-lg font-semibold">Secure ID Check</h2>
+            </div>
+            <Badge variant="outline" className="text-xs text-muted-foreground">Optional now</Badge>
           </div>
           <p className="text-sm text-muted-foreground">
-            You will complete a secure identity verification powered by Stripe. This helps
-            confirm authenticity and supports a safer experience for clients and providers.
+            Verify your identity with a government-issued ID via Stripe. Verified profiles get a
+            trust badge and are approved faster. You can complete this later from your dashboard.
           </p>
           <p className="text-xs text-muted-foreground">
-            A government-issued ID is required. Verification is handled securely by Stripe
-            Identity. MasseurMatch does not store your ID documents.
+            Verification is handled securely by Stripe Identity. MasseurMatch does not store your ID documents.
           </p>
           {renderIdButton()}
         </CardContent>
       </Card>
 
-      <Button size="lg" className="w-full" disabled={!canContinue} onClick={handleContinue}>
-        Continue to Profile
+      <Button size="lg" className="w-full gap-2" disabled={!canContinue} onClick={handleContinue}>
+        {idVerified ? "Go to Profile Editor" : "Continue to Profile"}
+        <ArrowRight className="h-4 w-4" strokeWidth={2.25} />
       </Button>
 
-      {!canContinue && (
+      {!state.emailVerified && (
         <p className="text-center text-xs text-muted-foreground">
-          Complete email and identity verification above to continue.
+          Verify your email above to continue.
+        </p>
+      )}
+      {state.emailVerified && !idVerified && (
+        <p className="text-center text-xs text-muted-foreground">
+          ID verification is optional — you can complete it later from your dashboard.
         </p>
       )}
     </div>
+  );
+}
+
+export default function SignupVerifyPage() {
+  return (
+    <Suspense>
+      <SignupVerifyPageInner />
+    </Suspense>
   );
 }

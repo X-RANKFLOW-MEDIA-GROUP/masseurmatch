@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080f1c"/><stop offset="100%" stop-color="#0c1e35"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF8A1F" stop-opacity="0.08"/><stop offset="100%" stop-color="#FF8A1F" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="gblur"><feGaussianBlur stdDeviation="25"/></filter>
+  </defs>
+  <rect width="800" height="800" fill="url(#bg)"/>
+  <rect width="800" height="400" fill="url(#sky)"/>
+  <circle cx="400" cy="200" r="200" fill="#FF8A1F" opacity="0.07" filter="url(#gblur)"/>
+  <g stroke="#fff" stroke-opacity="0.035" stroke-width="1">
+    <line x1="0" y1="200" x2="800" y2="200"/><line x1="0" y1="400" x2="800" y2="400"/>
+    <line x1="0" y1="600" x2="800" y2="600"/><line x1="200" y1="0" x2="200" y2="800"/>
+    <line x1="400" y1="0" x2="400" y2="800"/><line x1="600" y1="0" x2="600" y2="800"/>
+  </g>
+  <!-- Hills -->
+  <path d="M0 480 Q120 380 240 420 Q360 340 480 390 Q600 320 800 380 L800 800 L0 800 Z" fill="#0c1c33" opacity="0.8"/>
+  <path d="M0 520 Q100 460 200 490 Q300 450 400 470 Q500 440 600 460 Q700 440 800 455 L800 800 L0 800 Z" fill="#0e2040" opacity="0.6"/>
+  <!-- Hollywood sign letters (simplified) -->
+  <text x="400" y="340" font-family="Georgia,serif" font-size="24" font-weight="700" fill="#FF8A1F" opacity="0.3" text-anchor="middle" letter-spacing="8">HOLLYWOOD</text>
+  <!-- Palm trees -->
+  <g opacity="0.6">
+    <rect x="148" y="430" width="8" height="170" fill="#1a3563" rx="2"/>
+    <ellipse cx="144" cy="425" rx="32" ry="12" fill="#1a3563" transform="rotate(-25,144,425)"/>
+    <ellipse cx="162" cy="420" rx="30" ry="11" fill="#152e55" transform="rotate(20,162,420)"/>
+    <rect x="628" y="450" width="8" height="150" fill="#1a3563" rx="2"/>
+    <ellipse cx="624" cy="445" rx="30" ry="11" fill="#1a3563" transform="rotate(-20,624,445)"/>
+    <ellipse cx="642" cy="440" rx="28" ry="10" fill="#152e55" transform="rotate(25,642,440)"/>
+  </g>
+  <!-- Skyline -->
+  <g fill="#111f3a" opacity="0.7">
+    <rect x="220" y="470" width="45" height="130"/><rect x="275" y="450" width="55" height="150"/>
+    <rect x="340" y="430" width="60" height="170"/><rect x="410" y="440" width="50" height="160"/>
+    <rect x="470" y="455" width="55" height="145"/>
+  </g>
+  <!-- Sun/glow disc -->
+  <circle cx="400" cy="170" r="55" fill="none" stroke="#FF8A1F" stroke-width="1.5" opacity="0.25"/>
+  <circle cx="400" cy="170" r="30" fill="#FF8A1F" opacity="0.12"/>
+  <text x="400" y="686" font-family="Georgia,serif" font-size="50" font-weight="700" fill="#FCFBF8" text-anchor="middle" letter-spacing="-1">LOS ANGELES</text>
+  <text x="400" y="722" font-family="Georgia,serif" font-size="16" fill="#FF8A1F" text-anchor="middle" letter-spacing="5">CALIFORNIA</text>
+  <rect x="340" y="742" width="120" height="2" fill="#FF8A1F" opacity="0.5" rx="1"/>
+</svg>

@@ -18,7 +18,8 @@ const PUBLIC_PROFILE_SELECT = `
   is_suspended, is_banned, available_now, available_now_expires,
   lgbtq_affirming, business_hours, custom_faq, pricing_sessions, areas_served,
   outcall_radius_miles, travel_schedule, add_ons, training, education, contact_clicks,
-  seo_title, seo_description, seo_keywords, created_at
+  seo_title, seo_description, seo_keywords, created_at, is_demo,
+  identity_verified_at
 `;
 
 export interface ProfileFaqItem {
@@ -138,6 +139,8 @@ export interface PublicTherapist {
   seo_description?: string | null;
   seo_keywords?: string[] | string | null;
   created_at?: string | null;
+  is_demo?: boolean | null;
+  identity_verified_at?: string | null;
 }
 
 export interface ImportedReview {
@@ -150,14 +153,25 @@ export interface ImportedReview {
 
 export const getCities = () => US_CITIES;
 
-const buildPublicTherapistsQuery = () =>
-  supabase
+const showDemoProfiles = process.env.SHOW_DEMO_PROFILES === "true";
+
+const buildPublicTherapistsQuery = () => {
+  let q = supabase
     .from("profiles")
     .select(PUBLIC_PROFILE_SELECT, { count: "exact" })
     .eq("visibility_status", "public")
     .eq("profile_status", "approved")
     .eq("is_suspended", false)
-    .eq("is_banned", false);
+    .eq("is_banned", false)
+    // Exclude test/debug profiles from public listings
+    .not("display_name", "ilike", "%Debug%")
+    .not("display_name", "ilike", "%Test%")
+    .not("phone", "ilike", "%555%");
+  if (!showDemoProfiles) {
+    q = q.or("is_demo.is.null,is_demo.eq.false");
+  }
+  return q;
+};
 
 function isActivelyAvailable(profile: PublicTherapist) {
   return profile.available_now === true &&
@@ -179,6 +193,11 @@ function sortPublicTherapists(items: PublicTherapist[]) {
 
 function applyFallbackFilters(items: PublicTherapist[], filters?: Parameters<typeof getPublicTherapists>[0]) {
   return items.filter((profile) => {
+    // Exclude test/debug profiles from public listings
+    const name = profile.display_name?.toLowerCase() ?? "";
+    if (name.includes("debug") || name.includes("test")) return false;
+    if (profile.phone?.includes("555")) return false;
+
     if (filters?.city && profile.city?.toLowerCase() !== filters.city.toLowerCase()) return false;
     if (filters?.verified && profile.verification_status !== "verified") return false;
     if (filters?.availableToday && !isActivelyAvailable(profile)) return false;
@@ -186,6 +205,15 @@ function applyFallbackFilters(items: PublicTherapist[], filters?: Parameters<typ
     if (filters?.lgbtqAffirming && profile.lgbtq_affirming !== true) return false;
     if (filters?.keyword) {
       const keyword = filters.keyword.toLowerCase();
+
+      // If keyword is a known city name, treat as city filter in fallback too
+      const matchedCity = US_CITIES.find(
+        (c) => c.name.toLowerCase() === keyword,
+      );
+      if (matchedCity && !filters?.city) {
+        if (profile.city?.toLowerCase() !== matchedCity.name.toLowerCase()) return false;
+      }
+
       const searchable = [
         profile.bio,
         profile.display_name,
@@ -193,8 +221,10 @@ function applyFallbackFilters(items: PublicTherapist[], filters?: Parameters<typ
         profile.headline,
         profile.neighborhood,
         profile.neighborhood_name,
+        profile.city,
         ...(profile.specialties ?? []),
         ...(profile.massage_techniques ?? []),
+        ...(profile.service_categories ?? []),
       ]
         .filter(Boolean)
         .join(" ")
@@ -229,14 +259,34 @@ export const getPublicTherapists = async (filters?: {
   if (filters?.keyword) {
     const keyword = `%${filters.keyword}%`;
     const bodyTypeKeyword = matchBodyTypeKeyword(filters.keyword);
+
+    // Check if the keyword matches a known city name — if so, also filter by city
+    const matchedCity = US_CITIES.find(
+      (c) => c.name.toLowerCase() === filters.keyword!.toLowerCase(),
+    );
+    if (matchedCity && !filters?.city) {
+      query = query.ilike("city", matchedCity.name);
+    }
+
     const conditions = [
       `bio.ilike.${keyword}`,
       `display_name.ilike.${keyword}`,
       `full_name.ilike.${keyword}`,
       `headline.ilike.${keyword}`,
       `neighborhood.ilike.${keyword}`,
+      `city.ilike.${keyword}`,
+      `specialties.cs.{"${filters.keyword}"}`,
+      `massage_techniques.cs.{"${filters.keyword}"}`,
+      `service_categories.cs.{"${filters.keyword}"}`,
       ...(bodyTypeKeyword ? [`body_type.eq.${bodyTypeKeyword}`] : []),
     ];
+
+    // When matching a city, use AND (city + text match) so only that city's
+    // therapists are returned. Otherwise use OR across all text fields.
+    if (matchedCity && !filters?.city) {
+      // City filter already applied above; the OR here is for ranking/display
+      // but the city ilike narrows the result set.
+    }
     query = query.or(conditions.join(","));
   }
   if (filters?.verified) query = query.eq("verification_status", "verified");
@@ -267,22 +317,30 @@ export const getPublicTherapists = async (filters?: {
 
 export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTherapist | null> => {
   const sanitizedSlug = slug.trim();
+
+  // Reject anything that is not a plain slug or UUID before interpolating into
+  // the PostgREST `.or()` filter, so characters like "," "." or ")" cannot
+  // break out of the intended expression and alter the matching logic.
+  if (!/^[a-z0-9-]+$/i.test(sanitizedSlug)) {
+    return null;
+  }
+
   const { data: profile, error } = await buildPublicTherapistsQuery()
     .or(`slug.eq.${sanitizedSlug},id.eq.${sanitizedSlug}`)
     .maybeSingle();
 
   if (!error && profile) {
     const { data: photos } = await supabase
-      .from("therapist_photos")
-      .select("public_url, photo_type")
+      .from("profile_photos")
+      .select("storage_path, is_primary")
       .eq("profile_id", profile.id)
-      .eq("status", "approved")
+      .eq("moderation_status", "approved")
       .order("sort_order", { ascending: true });
 
-    const profile_photo = photos?.find((p) => p.photo_type === "profile")?.public_url ?? undefined;
+    const profile_photo = photos?.find((p) => p.is_primary)?.storage_path ?? undefined;
     const gallery_photos = photos
-      ?.filter((p) => p.photo_type === "gallery" && p.public_url)
-      .map((p) => p.public_url as string);
+      ?.filter((p) => !p.is_primary && p.storage_path)
+      .map((p) => p.storage_path as string);
 
     const therapist = profile as unknown as PublicTherapist;
 
@@ -308,11 +366,11 @@ export const getImportedReviews = async (profileId: string, limit = 5) => {
 export const getProfilePhotos = async (profileId: string, limit = 6) => {
   const fallback = (FALLBACK_PUBLIC_THERAPISTS as PublicTherapist[]).find((profile) => profile.id === profileId);
   const { data, error } = await supabase
-    .from("therapist_photos")
-    .select("id, public_url, storage_path, photo_type")
+    .from("profile_photos")
+    .select("id, storage_path, is_primary, sort_order")
     .eq("profile_id", profileId)
-    .eq("status", "approved")
-    .order("photo_type", { ascending: true })
+    .eq("moderation_status", "approved")
+    .order("sort_order", { ascending: true })
     .limit(limit);
 
   if (error || !data?.length) {
@@ -320,20 +378,26 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
     return [{ id: `${fallback.id}-avatar`, storage_path: fallback.avatar_url, is_primary: true }];
   }
 
-  return data.map((p) => ({
-    id: p.id,
-    storage_path: p.public_url || p.storage_path,
-    is_primary: p.photo_type === "profile",
-  }));
+  return data
+    .filter((p): p is typeof p & { storage_path: string } => p.storage_path != null)
+    .map((p) => ({
+      id: p.id,
+      storage_path: p.storage_path,
+      is_primary: p.is_primary ?? false,
+    }));
 };
 
 export async function getCityInventoryCount(cityName: string): Promise<number> {
-  const { count, error } = await supabase
+  let q = supabase
     .from("profiles")
     .select("id", { count: "exact", head: true })
     .eq("visibility_status", "public")
     .eq("profile_status", "approved")
     .ilike("city", cityName);
+  if (!showDemoProfiles) {
+    q = q.or("is_demo.is.null,is_demo.eq.false");
+  }
+  const { count, error } = await q;
 
   if (!error && count && count > 0) return count;
 

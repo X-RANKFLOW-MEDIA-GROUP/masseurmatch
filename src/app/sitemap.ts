@@ -7,25 +7,43 @@ import {
   buildProfilesSitemapEntries,
   buildGuidesSitemapEntries,
   buildBlogPostsSitemapEntries,
+  buildTourPagesSitemapEntries,
 } from "@/app/_lib/seo-routes";
 import { siteUrl } from "@/lib/site";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+// Regenerate sitemap every hour so new profiles and city pages appear promptly
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const [cities, services, profiles, blogPosts, neighborhoods, guides] = await Promise.all([
+  const [cities, services, profiles, blogPosts, neighborhoods, guides, tourPages] = await Promise.all([
     buildCitiesSitemapEntries(now),
     buildServicesSitemapEntries(now),
     buildProfilesSitemapEntries(now),
     buildBlogPostsSitemapEntries(now),
     buildNeighborhoodsSitemapEntries(now),
     buildGuidesSitemapEntries(now),
+    buildTourPagesSitemapEntries(now),
   ]);
 
   const core = buildCoreSitemapEntries(now);
-  const statesHub = [{ url: siteUrl("/states"), lastModified: now, changeFrequency: "weekly" as const, priority: 0.84 }];
 
-  return [...core, ...statesHub, ...cities, ...services, ...neighborhoods, ...profiles, ...guides, ...blogPosts];
+  // High-priority hub pages
+  const hubs: MetadataRoute.Sitemap = [
+    { url: siteUrl("/states"), lastModified: now, changeFrequency: "weekly", priority: 0.84 },
+    { url: siteUrl("/near-me"), lastModified: now, changeFrequency: "daily", priority: 0.87 },
+    { url: siteUrl("/therapists"), lastModified: now, changeFrequency: "daily", priority: 0.92 },
+  ];
+
+  return [
+    ...core,
+    ...hubs,
+    ...cities,
+    ...services,
+    ...neighborhoods,
+    ...profiles,
+    ...guides,
+    ...blogPosts,
+    ...tourPages,
+  ];
 }

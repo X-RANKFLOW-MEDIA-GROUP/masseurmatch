@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
+import { NewsletterSignup } from "./_components/NewsletterSignup";
 
 export const metadata: Metadata = {
   title: "Blog | Massage Therapy Tips, Wellness & LGBTQ+ Resources - MasseurMatch",
@@ -448,93 +449,9 @@ export default function BlogPage() {
             ))}
           </div>
 
-          <div style={{ textAlign: "center", marginTop: 60 }}>
-            <button
-              style={{
-                padding: "14px 40px",
-                fontSize: 12,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                fontFamily: "system-ui, sans-serif",
-                background: "transparent",
-                border: "1px solid #0B1F3A",
-                color: "#0B1F3A",
-                cursor: "pointer",
-              }}
-            >
-              Load More Articles
-            </button>
-          </div>
         </div>
 
-        <section
-          style={{
-            background: "#1E4B8F",
-            color: "#FCFBF8",
-            padding: "80px 24px",
-            textAlign: "center",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "clamp(24px, 3.5vw, 38px)",
-              fontWeight: 400,
-              marginBottom: 14,
-            }}
-          >
-            Stay in the loop
-          </h2>
-          <p
-            style={{
-              fontSize: 15,
-              opacity: 0.7,
-              marginBottom: 36,
-              fontFamily: "system-ui, sans-serif",
-            }}
-          >
-            New articles, wellness tips, and LGBTQ+ resources - delivered monthly.
-          </p>
-          <div
-            style={{
-              display: "flex",
-              gap: 0,
-              maxWidth: 460,
-              margin: "0 auto",
-            }}
-          >
-            <input
-              type="email"
-              placeholder="Your email address"
-              aria-label="Email address for newsletter"
-              style={{
-                flex: 1,
-                padding: "14px 20px",
-                fontSize: 14,
-                fontFamily: "system-ui, sans-serif",
-                border: "none",
-                background: "rgba(252,251,248,0.1)",
-                color: "#FCFBF8",
-                outline: "none",
-              }}
-            />
-            <button
-              style={{
-                padding: "14px 28px",
-                fontSize: 12,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                fontFamily: "system-ui, sans-serif",
-                background: "#FF8A1F",
-                color: "#0B1F3A",
-                border: "none",
-                cursor: "pointer",
-                fontWeight: 600,
-              }}
-            >
-              Subscribe
-            </button>
-          </div>
-        </section>
+        <NewsletterSignup />
       </main>
     </>
   );

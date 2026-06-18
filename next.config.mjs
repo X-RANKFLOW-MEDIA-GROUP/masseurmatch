@@ -58,9 +58,19 @@ const LEGACY_REDIRECTS = [
   { source: "/cities/dallas-tx/mobile", destination: "/dallas/wellness/mobile-massage", permanent: true },
   { source: "/cities/dallas-tx/hotel", destination: "/dallas/wellness/hotel-massage", permanent: true },
   // Global legacy aliases
-  { source: "/Auth", destination: "/auth", permanent: true },
-  { source: "/Privacy", destination: "/privacy", permanent: true },
+  // NOTE: Next.js redirect `source` matching is case-insensitive, so a redirect
+  // whose source differs from its destination only by letter case (e.g.
+  // "/Auth" -> "/auth") matches the lowercase destination too and creates an
+  // infinite 308 loop. Capitalized variants are handled safely by the
+  // case-sensitive (===) guards in src/middleware.ts instead.
   { source: "/massage-therapists", destination: "/therapists", permanent: true },
+  // Privacy policy alias — some external links use the longer form
+  { source: "/privacy-policy", destination: "/privacy", permanent: true },
+  // Legacy therapist profile URL — canonical is /therapists/:slug
+  { source: "/:city/therapist/:slug", destination: "/therapists/:slug", permanent: true },
+  // Client-side booking pages removed — clients browse without accounts
+  { source: "/client", destination: "/search", permanent: false },
+  { source: "/client/:path*", destination: "/search", permanent: false },
 ];
 
 const isDev = process.env.NODE_ENV !== "production";
@@ -72,11 +82,12 @@ const CONTENT_SECURITY_POLICY = [
   "object-src 'none'",
   "form-action 'self'",
   "img-src 'self' data: blob: https:",
+  "media-src 'self' blob: https://a9brroevex4i0bnq.public.blob.vercel-storage.com",
   "font-src 'self' data: https:",
   "style-src 'self' 'unsafe-inline' https:",
   `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}https://js.stripe.com https://vercel.live`,
-  "connect-src 'self' https://*.supabase.co https://api.stripe.com https://vercel.live https://*.vercel.app https://*.vercel.sh",
-  "frame-src 'self' http://localhost:* https://*.vusercontent.net https://*.lite.vusercontent.net https://generated.vusercontent.net https://*.vercel.net https://*.vercel.run https://*.vercel.app https://*.vercel.sh https://vercel.live https://vercel.com https://vercel.fides-cdn.ethyca.com https://js.stripe.com https://hooks.stripe.com https://*.accounts.dev https://*.clerk.accounts.dev https://ops.askchapter.org https://*.supabase.co",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://vercel.live https://*.vercel.app https://*.vercel.sh",
+  "frame-src 'self' http://localhost:* https://*.vusercontent.net https://*.lite.vusercontent.net https://generated.vusercontent.net https://*.vercel.net https://*.vercel.run https://*.vercel.app https://*.vercel.sh https://vercel.live https://vercel.com https://vercel.fides-cdn.ethyca.com https://js.stripe.com https://hooks.stripe.com https://*.accounts.dev https://*.clerk.accounts.dev https://ops.askchapter.org https://*.supabase.co https://www.google.com https://maps.google.com",
   "worker-src 'self' blob:",
   "upgrade-insecure-requests"
 ].join("; ");

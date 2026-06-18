@@ -57,7 +57,10 @@ export function ReviewsDisplay({
             <div className="flex-1 space-y-1">
               {[5, 4, 3, 2, 1].map((rating) => (
                 <div key={rating} className="flex items-center gap-2">
-                  <span className="w-8 text-xs text-slate-600">{rating}★</span>
+                  <span className="flex w-8 items-center gap-0.5 text-xs text-slate-600">
+                    {rating}
+                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                  </span>
                   <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-200">
                     <div
                       className="h-full bg-yellow-400"

@@ -23,9 +23,9 @@ export function PremiumProfileAbout({ profile, reviews = [] }: Props) {
     ? profile.training.filter((item): item is Exclude<(typeof profile.training)[number], string> => typeof item === "object" && item !== null)
     : [];
   const ratedReviews = reviews.filter((r) => typeof r.rating === "number");
-  const avgRating = ratedReviews.length > 0 
+  const avgRating = ratedReviews.length > 0
     ? (ratedReviews.reduce((sum, r) => sum + (r.rating as number), 0) / ratedReviews.length).toFixed(1)
-    : "4.9";
+    : null;
   
   // Generate SEO keywords
   const keywords = [
@@ -50,9 +50,8 @@ export function PremiumProfileAbout({ profile, reviews = [] }: Props) {
           ) : (
             <>
               <p>
-                My name is {name}, and I&apos;ve been practicing therapeutic massage in {city} for <strong>{yearsExp} years</strong>. 
-                What started as a personal interest in anatomy and wellness became a full-time calling. 
-                I hold an active <strong>Licensed Massage Therapist</strong> certification and continuously update my skills through professional development.
+                My name is {name}, and I&apos;ve been practicing therapeutic massage in {city} for <strong>{yearsExp} years</strong>.
+                What started as a personal interest in anatomy and wellness became a full-time calling, and I continuously deepen my training and techniques.
               </p>
               <p>
                 My practice is built around creating a space that is <strong>welcoming, discreet, and affirming</strong> — 
@@ -87,28 +86,19 @@ export function PremiumProfileAbout({ profile, reviews = [] }: Props) {
 
         {/* Sidebar */}
         <div className="pp-about-sidebar">
-          {/* Rating */}
-          <div className="pp-sidebar-card">
-            <h4>Client Rating</h4>
-            <div className="pp-rating-big">{avgRating}</div>
-            <div className="pp-stars">★★★★★</div>
-            <div className="pp-rating-count">Based on {reviews.length || 48} verified reviews</div>
-          </div>
-
-          {/* License */}
-          <div className="pp-sidebar-card">
-            <h4>License & Certification</h4>
-            <div className="flex gap-3 items-start">
-              <div className="w-9 h-9 rounded-lg bg-[rgba(30,75,143,0.3)] flex items-center justify-center flex-shrink-0">
-                <Award className="w-4 h-4 text-[#7ab3ff]" />
+          {/* Rating — only shown when real reviews exist */}
+          {avgRating !== null && (
+            <div className="pp-sidebar-card">
+              <h4>Client Rating</h4>
+              <div className="pp-rating-big">{avgRating}</div>
+              <div className="pp-stars">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Star key={i} className="inline h-4 w-4 fill-current" />
+                ))}
               </div>
-              <div>
-                <div className="text-xs font-semibold text-white/90">LMT Certified</div>
-                <div className="text-[11px] text-[var(--text-muted)]">Licensed Massage Therapist</div>
-                <div className="text-[11px] text-[var(--text-muted)]">Active since {new Date().getFullYear() - yearsExp}</div>
-              </div>
+              <div className="pp-rating-count">Based on {ratedReviews.length} verified {ratedReviews.length === 1 ? "review" : "reviews"}</div>
             </div>
-          </div>
+          )}
 
           {/* Training / Education */}
           <div className="pp-sidebar-card">
@@ -133,7 +123,6 @@ export function PremiumProfileAbout({ profile, reviews = [] }: Props) {
                 <div>
                   <div className="text-xs font-semibold text-white/90">Professional Training</div>
                   <div className="text-[11px] text-[var(--text-muted)]">{city} area</div>
-                  <div className="text-[11px] text-[var(--text-muted)]">500+ clinical hours</div>
                 </div>
               </div>
             )}

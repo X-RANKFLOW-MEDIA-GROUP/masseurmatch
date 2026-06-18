@@ -51,8 +51,13 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
 
   const areaLabel = formatAreaLabel(resolved.area);
-  const { total } = await getPublicTherapists({ city: city.name, keyword: areaLabel, page: 1, pageSize: 2 });
-  
+  let total = 0;
+  try {
+    ({ total } = await getPublicTherapists({ city: city.name, keyword: areaLabel, page: 1, pageSize: 2 }));
+  } catch {
+    // Supabase unavailable — fall through with zero total
+  }
+
   // noindex if fewer than 2 profiles — prevents thin-content indexation
   const noIndex = total === 0;
 

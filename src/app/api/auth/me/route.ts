@@ -3,9 +3,8 @@ import { clearSessionCookie, getRequestSession } from "@/app/api/_lib/session";
 import { getUserRole } from "@/app/api/_lib/supabase-server";
 
 function dashboardPathForRole(role: string | null | undefined) {
-  if (role === "admin") return "/admin";
-  if (role === "client") return "/client/dashboard";
-  if (role === "provider" || role === "therapist") return "/pro/dashboard";
+  if (role === "client") return "/search";
+  if (role === "admin" || role === "provider" || role === "therapist") return "/pro/dashboard";
   return "/login";
 }
 

@@ -169,7 +169,7 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
         <PremiumProfileCTA profile={profile} />
       </div>
 
-      <ProfileAIChat profile={profile} />
+      {profile.subscription_tier === "elite" && <ProfileAIChat profile={profile} />}
     </div>
   );
 }

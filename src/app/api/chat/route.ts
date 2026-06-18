@@ -1,72 +1,32 @@
-import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { NextRequest, NextResponse } from 'next/server';
+import { completeText } from '@/lib/ai/llm';
 
-const SYSTEM_PROMPT = `You are a helpful concierge assistant for MasseurMatch, a platform that connects clients with licensed massage therapists.
-
-Your role is to:
-- Help clients find the right massage therapist for their needs
-- Answer questions about massage modalities (Swedish, deep tissue, sports, etc.)
-- Explain how MasseurMatch works
-- Provide general wellness and self-care information
-
-Keep responses concise, friendly, and focused on massage therapy. If asked about specific therapist availability or pricing, direct users to search the directory.`;
-
-type ChatMessage = {
-  role: "user" | "ai";
-  content: string;
-};
-
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const body = (await request.json()) as {
-      messages: ChatMessage[];
-      userLocation?: { city?: string } | null;
-    };
+    const { message } = (await req.json()) as { message: string };
 
-    const { messages, userLocation } = body;
-
-    if (!messages?.length) {
-      return NextResponse.json({ error: "No messages provided" }, { status: 400 });
+    if (!message) {
+      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
+    const result = await completeText({
+      system:
+        'You are Knotty, a discreet, friendly AI concierge for MasseurMatch, a premium US directory of LGBTQ+-affirming male massage therapists. Be helpful, concise, and professional. Never provide sexual or explicit content.',
+      user: message,
+      temperature: 0.6,
+      maxTokens: 400,
+    });
+
+    if (!result) {
       return NextResponse.json({
-        reply: "I'm sorry, the AI assistant is not configured yet. Please contact support@masseurmatch.com for help finding the right therapist.",
+        reply:
+          "I'm having trouble reaching my AI service right now — please try again in a moment.",
       });
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    const locationContext = userLocation?.city
-      ? ` The user is located in ${userLocation.city}.`
-      : "";
-
-    const history = messages.slice(0, -1).map((m) => ({
-      role: m.role === "ai" ? "model" : "user",
-      parts: [{ text: m.content }],
-    }));
-
-    const lastMessage = messages[messages.length - 1];
-    if (!lastMessage || lastMessage.role !== "user") {
-      return NextResponse.json({ error: "Last message must be from user" }, { status: 400 });
-    }
-
-    const chat = model.startChat({
-      history,
-      systemInstruction: SYSTEM_PROMPT + locationContext,
-    });
-
-    const result = await chat.sendMessage(lastMessage.content);
-    const reply = result.response.text();
-
-    return NextResponse.json({ reply });
-  } catch (err) {
-    console.error("Chat API error:", err);
-    return NextResponse.json(
-      { error: "Failed to get response. Please try again." },
-      { status: 500 }
-    );
+    return NextResponse.json({ reply: result.text });
+  } catch (error) {
+    console.error('Chat API error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

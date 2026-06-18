@@ -33,6 +33,12 @@ export default defineConfig({
     extraHTTPHeaders: {
       // Tell the server it's a CI request so it can skip rate-limiting if needed.
       "x-playwright-ci": "1",
+      // Bypass Vercel Deployment Protection on preview deployments.
+      // Set VERCEL_PROTECTION_BYPASS as a GitHub Actions secret when using a
+      // protection-enabled preview URL as PLAYWRIGHT_BASE_URL.
+      ...(process.env.VERCEL_PROTECTION_BYPASS
+        ? { "x-vercel-protection-bypass": process.env.VERCEL_PROTECTION_BYPASS }
+        : {}),
     },
   },
   projects: [

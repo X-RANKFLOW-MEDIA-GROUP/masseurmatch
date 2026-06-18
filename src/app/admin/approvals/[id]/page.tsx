@@ -53,6 +53,7 @@ export default function ApprovalDetailPage() {
   const [profile, setProfile] = useState<TherapistProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [actioning, setActioning] = useState(false);
+  const [verifyingId, setVerifyingId] = useState(false);
   const [adminNotes, setAdminNotes] = useState("");
 
   useEffect(() => {
@@ -66,9 +67,7 @@ export default function ApprovalDetailPage() {
         setProfile(data.profile);
         setAdminNotes(data.profile.admin_notes || "");
       })
-      .catch(() => {
-        console.error("[v0] Failed to load profile");
-      })
+      .catch(() => { /* handled: UI shows "Profile Not Found" */ })
       .finally(() => setLoading(false));
   }, [profileId]);
 
@@ -82,8 +81,8 @@ export default function ApprovalDetailPage() {
         body: JSON.stringify({ action: "approve", notes: adminNotes }),
       });
       router.push("/admin/approvals?status=pending");
-    } catch (err) {
-      console.error("[v0] Approval failed", err);
+    } catch {
+      // no-op — actioning spinner reset in finally is enough
     } finally {
       setActioning(false);
     }
@@ -99,10 +98,25 @@ export default function ApprovalDetailPage() {
         body: JSON.stringify({ action: "reject", notes: adminNotes }),
       });
       router.push("/admin/approvals?status=rejected");
-    } catch (err) {
-      console.error("[v0] Rejection failed", err);
+    } catch {
+      // no-op
     } finally {
       setActioning(false);
+    }
+  }
+
+  async function handleVerifyIdentity() {
+    if (!profileId) return;
+    setVerifyingId(true);
+    try {
+      await requestJson(`/api/admin/profile/${profileId}/verify_identity`, { method: "POST" });
+      // Refresh profile so the badge updates
+      const data = await requestJson<{ ok: boolean; profile: TherapistProfile }>(`/api/admin/approvals/${profileId}`);
+      setProfile(data.profile);
+    } catch (err) {
+      console.error("[admin] Verify identity failed", err);
+    } finally {
+      setVerifyingId(false);
     }
   }
 
@@ -116,8 +130,8 @@ export default function ApprovalDetailPage() {
         body: JSON.stringify({ action: "changes_requested", notes: adminNotes }),
       });
       router.push("/admin/approvals?status=changes_requested");
-    } catch (err) {
-      console.error("[v0] Request changes failed", err);
+    } catch {
+      // no-op
     } finally {
       setActioning(false);
     }
@@ -182,6 +196,16 @@ export default function ApprovalDetailPage() {
                   <span className="font-semibold text-sm">{profile.is_verified_identity ? "ID Verified" : "ID Not Verified"}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">Stripe Identity check</p>
+                {!profile.is_verified_identity && (
+                  <button
+                    onClick={handleVerifyIdentity}
+                    disabled={verifyingId}
+                    className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60 transition-colors"
+                  >
+                    {verifyingId ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3" />}
+                    Approve ID
+                  </button>
+                )}
               </div>
               <div className={`p-4 rounded-lg border ${profile.is_verified_phone ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"}`}>
                 <div className="flex items-center gap-2 mb-1">

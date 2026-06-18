@@ -1,4 +1,5 @@
-import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
+export const dynamic = "force-dynamic";
+import { errorResponse, json } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, requireAdminSession } from "@/app/api/_lib/supabase-server";
 
 export async function GET(request: Request) {
@@ -12,7 +13,9 @@ export async function GET(request: Request) {
       .order("created_at", { ascending: false })
       .limit(100);
 
-    if (idError) throw new RouteError(500, idError.message);
+    if (idError) {
+      console.warn("[admin/verification] identity_verifications query failed:", idError.message);
+    }
 
     const { data: textRows, error: textError } = await adminClient
       .from("text_verifications")
@@ -20,7 +23,9 @@ export async function GET(request: Request) {
       .order("created_at", { ascending: false })
       .limit(100);
 
-    if (textError) throw new RouteError(500, textError.message);
+    if (textError) {
+      console.warn("[admin/verification] text_verifications query failed:", textError.message);
+    }
 
     return json({
       ok: true,

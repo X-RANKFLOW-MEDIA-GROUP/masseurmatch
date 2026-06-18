@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { STRIPE_API_VERSION } from "@/app/api/_lib/stripe-config";
+import { SITE_URL } from "@/lib/site";
 
 import {
   createSupabaseAdminClient,
@@ -56,6 +57,7 @@ export async function POST(request: NextRequest) {
     const stripe = getStripe();
     const verificationSession = await stripe.identity.verificationSessions.create({
       type: "document",
+      return_url: `${SITE_URL}/signup/verify?identity_return=1`,
       metadata: {
         userId: targetUserId,
         email: targetEmail,

@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, requireAdminSession } from "@/app/api/_lib/supabase-server";
 
@@ -18,7 +19,7 @@ export async function GET(request: Request) {
       adminClient
         .from("profiles")
         .select("id", { count: "exact", head: true })
-        .in("profile_status", ["submitted", "under_review"]),
+        .in("profile_status", ["pending_approval", "under_review"]),
       adminClient
         .from("therapist_photos")
         .select("id", { count: "exact", head: true })
