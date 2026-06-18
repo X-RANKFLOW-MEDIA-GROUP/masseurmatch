@@ -758,21 +758,28 @@ insert into storage.buckets(id,name,public) values ('identity-documents','identi
 -- select id, 'admin' from auth.users where email = 'replace-with-admin@domain.com'
 -- on conflict do nothing;
 
+-- public_therapists is a VIEW over the profiles table, not a standalone table.
+-- RLS is inherited from profiles (which has RLS enabled). Do NOT run
+-- ALTER TABLE ... ENABLE ROW SECURITY on this relation — it will fail.
+create or replace view public.public_therapists as
+  select
+    id, slug, city, state, country, display_name, full_name, headline, bio, tagline,
+    phone, whatsapp_number, email_address, website, avatar_url, photo_url,
+    service_categories, massage_techniques, specialties, languages,
+    subscription_tier, profile_status, visibility_status, verification_status,
+    moderation_status, incall_price, outcall_price, starting_price,
+    available_now, available_now_expires, neighborhood, years_experience,
+    height_inches, weight_lb, body_type, gender, latitude, longitude,
+    is_featured, updated_at, promotions, pricing_sessions,
+    is_verified_identity, is_verified_profile, is_verified_photos,
+    lgbtq_affirming, zip_code, map_enabled, location_marker_type, massage_setup,
+    payment_methods, booking_platform, booking_url, products_used, products_sold,
+    review_count, average_rating, modalities, keyword_slugs, segments,
+    view_count, profile_completion_score
+  from profiles p
+  where role = 'provider' and visibility_status = 'public';
+
 -- Supplemental app-domain tables referenced by API/routes.
-create table if not exists public.public_therapists (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references auth.users(id) on delete set null,
-  slug text,
-  full_name text,
-  bio text,
-  city text,
-  state text,
-  photo_url text,
-  services text[],
-  rates jsonb,
-  updated_at timestamptz not null default timezone('utc', now()),
-  created_at timestamptz not null default timezone('utc', now())
-);
 
 create table if not exists public.favorites (
   id uuid primary key default gen_random_uuid(),
