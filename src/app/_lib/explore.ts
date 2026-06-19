@@ -573,7 +573,11 @@ export function parseExploreSearchParams(params: SearchParamShape): ExploreFilte
 
 export function exploreFiltersToUrl(filters: ExploreFilters) {
   const params = new URLSearchParams();
-  params.set("city", filters.city);
+  // Only emit a city param when one is actually set. An empty `city=` triggers
+  // the middleware /explore?city -> /explore/usa/{slug} redirect with an empty
+  // slug, landing on /explore/usa (404). Omitting it keeps the default explore
+  // view on /explore.
+  if (filters.city) params.set("city", filters.city);
   params.set("radius", String(filters.radius));
   params.set("sort", filters.sort);
   params.set("view", filters.view);

@@ -111,7 +111,18 @@ export default function ApprovalsPage() {
           </div>
         ) : (
           profiles.map((profile) => {
-            const config = statusConfig[profile.status];
+            // Fall back gracefully when a profile has a status not present in
+            // statusConfig (e.g. legacy "pending" vs "pending_approval"), so an
+            // unmapped value can never crash the whole approvals page.
+            const config =
+              statusConfig[profile.status] ?? {
+                label:
+                  typeof profile.status === "string" && profile.status.length > 0
+                    ? profile.status.replace(/_/g, " ").replace(/\b\w/g, (ch) => ch.toUpperCase())
+                    : "Unknown",
+                icon: AlertCircle,
+                badgeClasses: "bg-slate-50 text-slate-700",
+              };
             const StatusIcon = config.icon;
 
             return (
