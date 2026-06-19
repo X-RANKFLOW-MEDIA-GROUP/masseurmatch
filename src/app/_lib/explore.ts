@@ -573,7 +573,7 @@ export function parseExploreSearchParams(params: SearchParamShape): ExploreFilte
 
 export function exploreFiltersToUrl(filters: ExploreFilters) {
   const params = new URLSearchParams();
-  params.set("city", filters.city);
+  if (filters.city) params.set("city", filters.city);
   params.set("radius", String(filters.radius));
   params.set("sort", filters.sort);
   params.set("view", filters.view);

@@ -240,7 +240,9 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // ── 2. /explore?city=X  →  301 /explore/usa/{slug} ───────────────────────
   if (pathname === "/explore" && searchParams.has("city")) {
     const slug = exploreCityToSlug(searchParams.get("city")!);
-    return permanentRedirect(`/explore/usa/${slug}`, request);
+    if (slug) {
+      return permanentRedirect(`/explore/usa/${slug}`, request);
+    }
   }
 
   // ── 3. /pt-br/  →  301 /pt-br ────────────────────────────────────────────
