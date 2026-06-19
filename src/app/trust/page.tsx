@@ -6,11 +6,11 @@ import { ArrowRight, ShieldCheck, Bot, Lock, CheckCircle2, UserCheck, EyeOff, Sh
 export const metadata: Metadata = {
   title: "Trust & Safety | How MasseurMatch Protects You",
   description:
-    "Learn how MasseurMatch verifies therapists, protects your privacy, and ensures a safe environment with AI-driven moderation and identity verification.",
+    "Learn how MasseurMatch reviews profiles, protects your privacy, and promotes a safer environment with AI-driven moderation and identity verification.",
   openGraph: {
     title: "Trust & Safety | MasseurMatch",
     description:
-      "AI-driven moderation, identity verification, and encrypted communications - uncompromising commitment to your safety.",
+      "AI-driven moderation, identity verification, and encrypted communications — our commitment to your safety.",
     url: "https://masseurmatch.com/trust",
     siteName: "MasseurMatch",
     type: "website",
@@ -58,8 +58,8 @@ export default function TrustPage() {
             <span className="text-slate-400">Uncompromising commitment.</span>
           </h1>
           <p className="mx-auto max-w-2xl font-sans text-lg leading-relaxed text-slate-600">
-            Your safety is the foundation of MasseurMatch. We built an AI-driven and rigorously
-            verified technological infrastructure for peace of mind with every connection.
+            Your safety is the foundation of MasseurMatch. We built an AI-driven moderation
+            and identity verification infrastructure for peace of mind with every connection.
           </p>
         </section>
 
@@ -151,7 +151,7 @@ export default function TrustPage() {
             <RuleRow text="Zero tolerance for solicitations of illegal or sexual services." />
             <RuleRow text="Profile photos must be strictly professional and free of watermarks." />
             <RuleRow text="Verbal aggression, discrimination, or harassment in chat results in an instant ban." />
-            <RuleRow text="All reviews must come from real clients to combat fake reputations." />
+            <RuleRow text="Reviews require a documented contact event to earn a Verified Contact label." />
           </div>
 
           <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm leading-relaxed text-slate-600 font-sans">

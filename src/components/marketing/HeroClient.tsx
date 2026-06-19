@@ -14,7 +14,7 @@ const avatarStack = [
   { id: 4, src: "/marketing/hero/avatar-4.jpg", alt: "Verified therapist", initials: "DV", color: "from-violet-600 to-purple-700" },
 ];
 
-const headlineLines = ["The", "Safest", "Massage", "Directory."];
+const headlineLines = ["The", "Trusted", "Massage", "Directory."];
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const CHAR_STAGGER = 0.045;
@@ -186,8 +186,8 @@ export default function HeroClient() {
               transition={{ duration: reducedMotion ? 0 : 0.7, ease: customEase, delay: reducedMotion ? 0 : TYPING_END + 0.1 }}
               className="speakable-intro mb-8 max-w-xl text-lg leading-relaxed text-muted-foreground lg:text-xl"
             >
-              Premium male massage therapists across the US — real profiles, real reviews,
-              and AI-powered search with Knotty. Available in {LIVE_COVERAGE_CITIES}+ cities nationwide.
+              Identity-verified male massage therapists across the US — reviewed profiles,
+              client feedback, and AI-powered search with Knotty. Available in {LIVE_COVERAGE_CITIES}+ cities nationwide.
             </motion.p>
 
             <motion.div
