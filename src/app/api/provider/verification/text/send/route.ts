@@ -31,7 +31,6 @@ export async function POST(request: Request) {
     const arr = new Uint32Array(1);
     crypto.getRandomValues(arr);
     const code = (100000 + (arr[0] % 900000)).toString();
-    const expiresAt = new Date(Date.now() + CODE_TTL_MINUTES * 60 * 1000).toISOString();
 
     await client.messages.create({
       body: `Your MasseurMatch verification code is: ${code}`,
