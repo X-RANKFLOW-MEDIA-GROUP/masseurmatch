@@ -1036,12 +1036,13 @@ alter table public.admin_actions
   add column if not exists action text,
   add column if not exists target_table text;
 
--- therapist_analytics_daily: view aggregating ranking_events by day per profile
+-- therapist_analytics_daily: view aggregating analytics_events by day per profile
 create or replace view public.therapist_analytics_daily as
   select
-    profile_id as therapist_profile_id,
+    therapist_profile_id,
+    date_trunc('day', created_at)::date as event_date,
     event_name,
-    created_at::date as event_date,
     count(*) as event_count
-  from public.ranking_events
-  group by profile_id, event_name, created_at::date;
+  from public.analytics_events
+  where therapist_profile_id is not null
+  group by therapist_profile_id, date_trunc('day', created_at)::date, event_name;
