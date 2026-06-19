@@ -325,8 +325,19 @@ export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTher
     return null;
   }
 
+  // The `id` column is a UUID. Only compare against it when the input is a
+  // valid UUID — otherwise Postgres raises `invalid input syntax for type uuid`
+  // (22P02), which fails the whole request and makes every slug-based profile
+  // page return 404. For plain slugs, match by `slug` only.
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    sanitizedSlug,
+  );
+  const orFilter = isUuid
+    ? `slug.eq.${sanitizedSlug},id.eq.${sanitizedSlug}`
+    : `slug.eq.${sanitizedSlug}`;
+
   const { data: profile, error } = await buildPublicTherapistsQuery()
-    .or(`slug.eq.${sanitizedSlug},id.eq.${sanitizedSlug}`)
+    .or(orFilter)
     .maybeSingle();
 
   if (!error && profile) {
