@@ -8,6 +8,7 @@ import {
   Heart,
   Building2,
   Search,
+  Menu,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -52,6 +53,66 @@ export default function HomeTestPage() {
 
   return (
     <div style={{ backgroundColor: "#F5F5F5", minHeight: "100vh" }}>
+      {/* ─── HEADER/NAVIGATION ────────────────────────────────────────── */}
+      <header className="sticky top-0 z-50" style={{ backgroundColor: "#FFFFFF", borderBottom: "1px solid #D0D0D0" }}>
+        <div className="px-4 py-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl flex items-center justify-between">
+            {/* Logo */}
+            <div className="flex items-center gap-2">
+              <span className="font-black text-lg" style={{ color: "#BB1D00" }}>
+                MM
+              </span>
+              <span className="font-black text-sm tracking-tight" style={{ color: "#000000" }}>
+                MASSEURMATCH
+              </span>
+            </div>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-8">
+              <a href="#" className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#000000" }}>
+                HOME
+              </a>
+              <a href="#" className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#000000" }}>
+                MASSEURES
+              </a>
+              <a href="#" className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#000000" }}>
+                HOW IT WORKS
+              </a>
+              <a href="#" className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#000000" }}>
+                MASSAGE PROFILE
+              </a>
+              <a href="#" className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#000000" }}>
+                CONTACT
+              </a>
+            </nav>
+
+            {/* Right: Buttons */}
+            <div className="flex items-center gap-3">
+              <button
+                className="text-xs font-semibold uppercase tracking-wider px-4 py-2 rounded-lg transition-colors"
+                style={{
+                  color: "#000000",
+                  backgroundColor: "transparent",
+                  border: "1px solid #D0D0D0",
+                }}
+              >
+                LOGIN
+              </button>
+              <button
+                className="text-xs font-semibold uppercase tracking-wider px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90"
+                style={{ backgroundColor: "#BB1D00" }}
+              >
+                GET STARTED
+              </button>
+              {/* Mobile menu button */}
+              <button className="md:hidden p-2" style={{ color: "#000000" }}>
+                <Menu className="w-6 h-6" strokeWidth={2.25} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
       {/* ─── HERO SECTION ──────────────────────────────────────────────── */}
       <section className="px-4 py-16 sm:px-6 lg:px-8" style={{ backgroundColor: "#FFFFFF" }}>
         <div className="mx-auto max-w-7xl">
