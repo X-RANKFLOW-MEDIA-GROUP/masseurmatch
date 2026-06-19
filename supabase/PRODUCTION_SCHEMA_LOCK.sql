@@ -993,3 +993,55 @@ create table if not exists public.sms_follow_up_alerts (
   resolved_by      uuid references auth.users(id) on delete set null,
   created_at       timestamptz default now()
 );
+
+-- ── Schema-drift catch-up (additive only) ───────────────────────────────────
+
+-- contact_inquiries: fields used by the inquiries dashboard
+alter table public.contact_inquiries
+  add column if not exists client_name text,
+  add column if not exists client_phone text,
+  add column if not exists preferred_contact text;
+
+-- moderation_queue: content_type column used by photos page
+alter table public.moderation_queue
+  add column if not exists content_type text;
+
+-- payment_transactions: Stripe-specific columns
+alter table public.payment_transactions
+  add column if not exists provider_transaction_id text,
+  add column if not exists provider text;
+
+-- appointments: column aliases used by booking routes
+alter table public.appointments
+  add column if not exists user_id uuid references auth.users(id) on delete set null,
+  add column if not exists starts_at timestamptz,
+  add column if not exists ends_at timestamptz;
+
+-- text_verifications: OTP fields
+alter table public.text_verifications
+  add column if not exists submitted_text text,
+  add column if not exists code text;
+
+-- profile_reviews: admin notes column
+alter table public.profile_reviews
+  add column if not exists admin_notes text;
+
+-- therapist_photos: legacy columns used by upload/approval routes
+alter table public.therapist_photos
+  add column if not exists therapist_profile_id uuid,
+  add column if not exists approval_status text;
+
+-- admin_actions: shorthand columns (action/target_table) alongside action_type
+alter table public.admin_actions
+  add column if not exists action text,
+  add column if not exists target_table text;
+
+-- therapist_analytics_daily: view aggregating ranking_events by day per profile
+create or replace view public.therapist_analytics_daily as
+  select
+    profile_id as therapist_profile_id,
+    event_name,
+    created_at::date as event_date,
+    count(*) as event_count
+  from public.ranking_events
+  group by profile_id, event_name, created_at::date;
