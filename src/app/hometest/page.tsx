@@ -79,7 +79,7 @@ export default function HomeTestPage() {
               <h1
                 className="text-5xl lg:text-6xl font-black leading-tight mb-2 tracking-tight"
                 style={{
-                  fontFamily: '"Unbounded", sans-serif',
+                  fontFamily: "var(--font-unbounded)",
                   fontWeight: 900,
                   color: "#000000",
                 }}
@@ -89,7 +89,7 @@ export default function HomeTestPage() {
               <h2
                 className="text-5xl lg:text-6xl font-black leading-tight mb-8 tracking-tight"
                 style={{
-                  fontFamily: '"Unbounded", sans-serif',
+                  fontFamily: "var(--font-unbounded)",
                   fontWeight: 900,
                   color: "#BB1D00",
                 }}
@@ -247,7 +247,7 @@ export default function HomeTestPage() {
           <h2
             className="text-5xl font-black text-center mb-16 tracking-tight"
             style={{
-              fontFamily: '"Unbounded", sans-serif',
+              fontFamily: "var(--font-unbounded)",
               fontWeight: 900,
               color: "#000000",
             }}
@@ -286,7 +286,7 @@ export default function HomeTestPage() {
               <h3
                 className="font-black text-2xl text-center tracking-tight"
                 style={{
-                  fontFamily: '"Unbounded", sans-serif',
+                  fontFamily: "var(--font-unbounded)",
                   fontWeight: 900,
                   color: "#000000",
                 }}
@@ -343,7 +343,7 @@ export default function HomeTestPage() {
               <h3
                 className="font-black text-2xl text-center tracking-tight"
                 style={{
-                  fontFamily: '"Unbounded", sans-serif',
+                  fontFamily: "var(--font-unbounded)",
                   fontWeight: 900,
                   color: "#000000",
                 }}
@@ -370,7 +370,7 @@ export default function HomeTestPage() {
           <h3
             className="text-3xl font-black text-center mb-12 tracking-tight"
             style={{
-              fontFamily: '"Unbounded", sans-serif',
+              fontFamily: "var(--font-unbounded)",
               fontWeight: 900,
               color: "#000000",
             }}
