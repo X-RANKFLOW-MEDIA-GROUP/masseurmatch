@@ -7,13 +7,8 @@ import {
   BarChart3,
   Heart,
   Building2,
-  ArrowRight,
   Search,
-  Filter,
-  Mail,
 } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Home Test - Premium Directory | MasseurMatch",
@@ -21,7 +16,6 @@ export const metadata: Metadata = {
 };
 
 export default function HomeTestPage() {
-  // Mock therapist profiles
   const therapists = [
     {
       name: "Daniel M.",
@@ -57,41 +51,83 @@ export default function HomeTestPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div style={{ backgroundColor: "#F5F5F5", minHeight: "100vh" }}>
       {/* ─── HERO SECTION ──────────────────────────────────────────────── */}
-      <section className="px-4 py-16 sm:px-6 lg:px-8 bg-white">
+      <section className="px-4 py-16 sm:px-6 lg:px-8" style={{ backgroundColor: "#FFFFFF" }}>
         <div className="mx-auto max-w-7xl">
+          {/* Eyebrow */}
+          <p
+            className="font-mono text-[10px] uppercase tracking-[0.18em] mb-8 text-center"
+            style={{ color: "#666666" }}
+          >
+            Premium. Professional. Personal.
+          </p>
+
           <div className="grid lg:grid-cols-3 gap-8 items-center">
             {/* Left: Large hero image */}
             <div className="lg:col-span-1">
-              <div className="w-full aspect-square bg-gray-500 rounded-2xl overflow-hidden shadow-lg flex items-center justify-center text-8xl">
+              <div
+                className="w-full aspect-square rounded-2xl overflow-hidden shadow-lg flex items-center justify-center text-8xl"
+                style={{ backgroundColor: "#999999" }}
+              >
                 👨‍💼
               </div>
             </div>
 
             {/* Center: Main content */}
             <div className="lg:col-span-1">
-              <h1 className="font-display text-5xl lg:text-6xl font-black text-black leading-tight mb-2 tracking-tight">
+              <h1
+                className="text-5xl lg:text-6xl font-black leading-tight mb-2 tracking-tight"
+                style={{
+                  fontFamily: '"Unbounded", sans-serif',
+                  fontWeight: 900,
+                  color: "#000000",
+                }}
+              >
                 Find The Right Massage.
               </h1>
-              <h2 className="font-display text-5xl lg:text-6xl font-black text-[#FF8A1F] leading-tight mb-8 tracking-tight">
+              <h2
+                className="text-5xl lg:text-6xl font-black leading-tight mb-8 tracking-tight"
+                style={{
+                  fontFamily: '"Unbounded", sans-serif',
+                  fontWeight: 900,
+                  color: "#BB1D00",
+                }}
+              >
                 Every Time.
               </h2>
 
               {/* Search bar */}
               <div className="flex flex-col sm:flex-row gap-2 mb-6">
-                <div className="flex-1 flex items-center gap-2 bg-white border-2 border-gray-300 rounded-full px-4 py-3">
-                  <Search className="w-5 h-5 text-gray-400" strokeWidth={2.25} />
+                <div
+                  className="flex-1 flex items-center gap-2 rounded-full px-4 py-3 border-2"
+                  style={{
+                    backgroundColor: "#FFFFFF",
+                    borderColor: "#D0D0D0",
+                  }}
+                >
+                  <Search className="w-5 h-5" strokeWidth={2.25} style={{ color: "#999999" }} />
                   <input
                     type="text"
                     placeholder="Search by string"
                     className="flex-1 outline-none text-sm bg-transparent"
+                    style={{ color: "#000000" }}
                   />
                 </div>
-                <select className="border-2 border-gray-300 rounded-full px-4 py-3 text-sm bg-white font-medium">
+                <select
+                  className="border-2 rounded-full px-4 py-3 text-sm font-medium"
+                  style={{
+                    backgroundColor: "#FFFFFF",
+                    borderColor: "#D0D0D0",
+                    color: "#000000",
+                  }}
+                >
                   <option>All dates</option>
                 </select>
-                <button className="bg-[#FF8A1F] hover:bg-orange-600 text-white px-8 py-3 rounded-full font-bold transition-colors">
+                <button
+                  className="text-white px-8 py-3 rounded-full font-black transition-colors hover:opacity-90"
+                  style={{ backgroundColor: "#E84C3D" }}
+                >
                   SEARCH
                 </button>
               </div>
@@ -102,26 +138,36 @@ export default function HomeTestPage() {
               {therapists.map((therapist, i) => (
                 <div
                   key={i}
-                  className="bg-gray-100 rounded-2xl p-4 hover:shadow-md transition-shadow flex items-start gap-3 relative"
+                  className="rounded-2xl p-4 hover:shadow-md transition-shadow flex items-start gap-3 relative"
+                  style={{ backgroundColor: "#EEEEEE" }}
                 >
-                  <div className="w-14 h-14 rounded-full bg-gray-300 flex items-center justify-center text-3xl flex-shrink-0">
+                  <div
+                    className="w-14 h-14 rounded-full flex items-center justify-center text-3xl flex-shrink-0"
+                    style={{ backgroundColor: "#D0D0D0" }}
+                  >
                     {therapist.image}
                   </div>
                   <div className="flex-1 min-w-0 pt-1">
-                    <h3 className="font-black text-gray-900 text-sm">
+                    <h3
+                      className="font-black text-sm"
+                      style={{ color: "#000000" }}
+                    >
                       {therapist.name}
                     </h3>
-                    <p className="text-xs text-gray-700 line-clamp-2">
+                    <p className="text-xs line-clamp-2" style={{ color: "#666666" }}>
                       {therapist.description}
                     </p>
                     <div className="flex items-center gap-1 mt-1">
-                      <span className="text-xs font-bold text-gray-900">
+                      <span className="text-xs font-black" style={{ color: "#000000" }}>
                         ${therapist.rating}
                       </span>
                     </div>
                   </div>
-                  {/* Orange badge on right */}
-                  <div className="absolute right-3 top-3 bg-[#FF8A1F] rounded-full p-2 text-white">
+                  {/* Burgundy badge on right */}
+                  <div
+                    className="absolute right-3 top-3 rounded-full p-2 text-white"
+                    style={{ backgroundColor: "#BB1D00" }}
+                  >
                     <Gem className="w-4 h-4" strokeWidth={2.5} />
                   </div>
                 </div>
@@ -132,7 +178,13 @@ export default function HomeTestPage() {
       </section>
 
       {/* ─── FEATURES & STATS BAND ────────────────────────────────────── */}
-      <section className="px-4 py-12 sm:px-6 lg:px-8 bg-gray-50 border-t border-b border-gray-200">
+      <section
+        className="px-4 py-12 sm:px-6 lg:px-8 border-t border-b"
+        style={{
+          backgroundColor: "#F5F5F5",
+          borderColor: "#D0D0D0",
+        }}
+      >
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {/* Feature icons */}
@@ -141,10 +193,14 @@ export default function HomeTestPage() {
               return (
                 <div key={i} className="flex items-center gap-3">
                   <Icon
-                    className="w-5 h-5 text-gray-600 flex-shrink-0"
+                    className="w-5 h-5 flex-shrink-0"
                     strokeWidth={2.25}
+                    style={{ color: "#666666" }}
                   />
-                  <span className="text-sm font-semibold text-gray-700">
+                  <span
+                    className="text-sm font-bold"
+                    style={{ color: "#333333" }}
+                  >
                     {stat.label}
                   </span>
                 </div>
@@ -157,12 +213,20 @@ export default function HomeTestPage() {
               return (
                 <div key={`stat-${i}`} className="flex items-center gap-3">
                   <Icon
-                    className="w-5 h-5 text-gray-600 flex-shrink-0"
+                    className="w-5 h-5 flex-shrink-0"
                     strokeWidth={2.25}
+                    style={{ color: "#666666" }}
                   />
                   <div>
-                    <div className="font-black text-gray-900 text-sm">{stat.value}</div>
-                    <div className="text-xs text-gray-600">{stat.label}</div>
+                    <div
+                      className="font-black text-sm"
+                      style={{ color: "#000000" }}
+                    >
+                      {stat.value}
+                    </div>
+                    <div className="text-xs" style={{ color: "#999999" }}>
+                      {stat.label}
+                    </div>
                   </div>
                 </div>
               );
@@ -172,12 +236,22 @@ export default function HomeTestPage() {
       </section>
 
       {/* ─── ILLUSTRATED THERAPIST PROFILES ────────────────────────────── */}
-      <section className="px-4 py-20 sm:px-6 lg:px-8 bg-white">
+      <section className="px-4 py-20 sm:px-6 lg:px-8" style={{ backgroundColor: "#FFFFFF" }}>
         <div className="mx-auto max-w-7xl">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-600 text-center mb-4">
+          <p
+            className="font-mono text-[10px] uppercase tracking-[0.18em] text-center mb-4"
+            style={{ color: "#999999" }}
+          >
             premium benefits
           </p>
-          <h2 className="font-display text-5xl font-black text-black text-center mb-16 tracking-tight">
+          <h2
+            className="text-5xl font-black text-center mb-16 tracking-tight"
+            style={{
+              fontFamily: '"Unbounded", sans-serif',
+              fontWeight: 900,
+              color: "#000000",
+            }}
+          >
             Meet Our Verified Therapists
           </h2>
 
@@ -186,27 +260,40 @@ export default function HomeTestPage() {
             <div className="flex flex-col items-center">
               <div className="relative w-80 h-80 mb-8">
                 {/* Outer gray circle */}
-                <div className="absolute inset-0 rounded-full border-8 border-gray-300"></div>
+                <div
+                  className="absolute inset-0 rounded-full border-8"
+                  style={{ borderColor: "#CCCCCC" }}
+                ></div>
 
-                {/* Orange accent arc */}
+                {/* Burgundy accent arc */}
                 <div
                   className="absolute inset-0 rounded-full"
                   style={{
                     background:
-                      "conic-gradient(#FF8A1F 0deg 90deg, transparent 90deg)",
+                      "conic-gradient(#BB1D00 0deg 90deg, transparent 90deg)",
                     maskImage: "radial-gradient(circle, transparent 60%, black 80%)",
                   }}
                 ></div>
 
                 {/* Avatar placeholder */}
-                <div className="absolute inset-12 bg-gray-200 rounded-full flex items-center justify-center text-8xl shadow-lg">
+                <div
+                  className="absolute inset-12 rounded-full flex items-center justify-center text-8xl shadow-lg"
+                  style={{ backgroundColor: "#D0D0D0" }}
+                >
                   🧘‍♂️
                 </div>
               </div>
-              <h3 className="font-black text-2xl text-black text-center">
+              <h3
+                className="font-black text-2xl text-center tracking-tight"
+                style={{
+                  fontFamily: '"Unbounded", sans-serif',
+                  fontWeight: 900,
+                  color: "#000000",
+                }}
+              >
                 Verified Professional
               </h3>
-              <p className="text-sm text-gray-700 text-center mt-3">
+              <p className="text-sm text-center mt-3" style={{ color: "#666666" }}>
                 Certified therapist with protective circle verification
               </p>
             </div>
@@ -215,25 +302,37 @@ export default function HomeTestPage() {
             <div className="flex flex-col items-center">
               <div className="relative w-80 h-80 mb-8">
                 {/* Outer gray circle */}
-                <div className="absolute inset-0 rounded-full border-8 border-gray-400"></div>
+                <div
+                  className="absolute inset-0 rounded-full border-8"
+                  style={{ borderColor: "#999999" }}
+                ></div>
 
-                {/* Orange accent arcs */}
+                {/* Burgundy accent arcs */}
                 <div
                   className="absolute inset-0 rounded-full"
                   style={{
                     background:
-                      "conic-gradient(transparent 0deg, transparent 90deg, #FF8A1F 180deg 270deg, transparent 270deg)",
+                      "conic-gradient(transparent 0deg, transparent 90deg, #BB1D00 180deg 270deg, transparent 270deg)",
                     maskImage: "radial-gradient(circle, transparent 60%, black 80%)",
                   }}
                 ></div>
 
                 {/* Avatar placeholder */}
-                <div className="absolute inset-12 bg-gray-200 rounded-full flex items-center justify-center text-8xl shadow-lg">
+                <div
+                  className="absolute inset-12 rounded-full flex items-center justify-center text-8xl shadow-lg"
+                  style={{ backgroundColor: "#D0D0D0" }}
+                >
                   💆‍♂️
                 </div>
 
                 {/* Verified checkmark badge */}
-                <div className="absolute bottom-8 right-8 bg-[#FF8A1F] rounded-full p-5 shadow-2xl border-4 border-white">
+                <div
+                  className="absolute bottom-8 right-8 rounded-full p-5 shadow-2xl border-4 text-white"
+                  style={{
+                    backgroundColor: "#E84C3D",
+                    borderColor: "#FFFFFF",
+                  }}
+                >
                   <CheckCircle2
                     className="w-8 h-8 text-white"
                     strokeWidth={3}
@@ -241,10 +340,17 @@ export default function HomeTestPage() {
                   />
                 </div>
               </div>
-              <h3 className="font-black text-2xl text-black text-center">
+              <h3
+                className="font-black text-2xl text-center tracking-tight"
+                style={{
+                  fontFamily: '"Unbounded", sans-serif',
+                  fontWeight: 900,
+                  color: "#000000",
+                }}
+              >
                 Premium Verified
               </h3>
-              <p className="text-sm text-gray-700 text-center mt-3">
+              <p className="text-sm text-center mt-3" style={{ color: "#666666" }}>
                 Top-rated therapist with verified checkmark credential
               </p>
             </div>
@@ -253,69 +359,134 @@ export default function HomeTestPage() {
       </section>
 
       {/* ─── TRUST & VERIFICATION ICONS SECTION ────────────────────────── */}
-      <section className="px-4 py-16 sm:px-6 lg:px-8 bg-gray-50 border-t border-gray-200">
+      <section
+        className="px-4 py-16 sm:px-6 lg:px-8 border-t"
+        style={{
+          backgroundColor: "#F5F5F5",
+          borderColor: "#D0D0D0",
+        }}
+      >
         <div className="mx-auto max-w-7xl">
-          <h3 className="font-display text-3xl font-black text-black text-center mb-12 tracking-tight">
+          <h3
+            className="text-3xl font-black text-center mb-12 tracking-tight"
+            style={{
+              fontFamily: '"Unbounded", sans-serif',
+              fontWeight: 900,
+              color: "#000000",
+            }}
+          >
             Verification & Trust Icons
           </h3>
 
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="flex flex-col items-center p-8 bg-white rounded-2xl border border-gray-200">
-              <div className="bg-orange-100 p-4 rounded-full mb-4">
+            <div
+              className="flex flex-col items-center p-8 rounded-2xl border"
+              style={{
+                backgroundColor: "#FFFFFF",
+                borderColor: "#D0D0D0",
+              }}
+            >
+              <div
+                className="p-4 rounded-full mb-4"
+                style={{ backgroundColor: "#FFE8E8" }}
+              >
                 <CheckCircle2
-                  className="w-8 h-8 text-[#FF8A1F]"
+                  className="w-8 h-8"
                   strokeWidth={2.25}
+                  style={{ color: "#E84C3D" }}
                 />
               </div>
-              <h4 className="font-black text-gray-900 text-center text-sm">
+              <h4
+                className="font-black text-center text-sm"
+                style={{ color: "#000000" }}
+              >
                 Verified Therapists
               </h4>
-              <p className="text-xs text-gray-600 text-center mt-2">
+              <p className="text-xs text-center mt-2" style={{ color: "#999999" }}>
                 All profiles reviewed and confirmed
               </p>
             </div>
 
-            <div className="flex flex-col items-center p-8 bg-white rounded-2xl border border-gray-200">
-              <div className="bg-emerald-100 p-4 rounded-full mb-4">
+            <div
+              className="flex flex-col items-center p-8 rounded-2xl border"
+              style={{
+                backgroundColor: "#FFFFFF",
+                borderColor: "#D0D0D0",
+              }}
+            >
+              <div
+                className="p-4 rounded-full mb-4"
+                style={{ backgroundColor: "#E8F5E9" }}
+              >
                 <Heart
-                  className="w-8 h-8 text-emerald-500"
+                  className="w-8 h-8"
                   strokeWidth={2.25}
+                  style={{ color: "#4CAF50" }}
                 />
               </div>
-              <h4 className="font-black text-gray-900 text-center text-sm">
+              <h4
+                className="font-black text-center text-sm"
+                style={{ color: "#000000" }}
+              >
                 Professional Care
               </h4>
-              <p className="text-xs text-gray-600 text-center mt-2">
+              <p className="text-xs text-center mt-2" style={{ color: "#999999" }}>
                 Licensed and certified experts
               </p>
             </div>
 
-            <div className="flex flex-col items-center p-8 bg-white rounded-2xl border border-gray-200">
-              <div className="bg-blue-100 p-4 rounded-full mb-4">
+            <div
+              className="flex flex-col items-center p-8 rounded-2xl border"
+              style={{
+                backgroundColor: "#FFFFFF",
+                borderColor: "#D0D0D0",
+              }}
+            >
+              <div
+                className="p-4 rounded-full mb-4"
+                style={{ backgroundColor: "#E3F2FD" }}
+              >
                 <Users
-                  className="w-8 h-8 text-blue-500"
+                  className="w-8 h-8"
                   strokeWidth={2.25}
+                  style={{ color: "#2196F3" }}
                 />
               </div>
-              <h4 className="font-black text-gray-900 text-center text-sm">
+              <h4
+                className="font-black text-center text-sm"
+                style={{ color: "#000000" }}
+              >
                 LGBTQ+ Affirming
               </h4>
-              <p className="text-xs text-gray-600 text-center mt-2">
+              <p className="text-xs text-center mt-2" style={{ color: "#999999" }}>
                 Safe, welcoming, and inclusive space
               </p>
             </div>
 
-            <div className="flex flex-col items-center p-8 bg-white rounded-2xl border border-gray-200">
-              <div className="bg-purple-100 p-4 rounded-full mb-4">
+            <div
+              className="flex flex-col items-center p-8 rounded-2xl border"
+              style={{
+                backgroundColor: "#FFFFFF",
+                borderColor: "#D0D0D0",
+              }}
+            >
+              <div
+                className="p-4 rounded-full mb-4"
+                style={{ backgroundColor: "#F3E5F5" }}
+              >
                 <TrendingUp
-                  className="w-8 h-8 text-purple-500"
+                  className="w-8 h-8"
                   strokeWidth={2.25}
+                  style={{ color: "#9C27B0" }}
                 />
               </div>
-              <h4 className="font-black text-gray-900 text-center text-sm">
+              <h4
+                className="font-black text-center text-sm"
+                style={{ color: "#000000" }}
+              >
                 Top Rated
               </h4>
-              <p className="text-xs text-gray-600 text-center mt-2">
+              <p className="text-xs text-center mt-2" style={{ color: "#999999" }}>
                 Premium therapists with high ratings
               </p>
             </div>
@@ -324,13 +495,15 @@ export default function HomeTestPage() {
       </section>
 
       {/* ─── DARK FOOTER SECTION ──────────────────────────────────────── */}
-      <section className="px-4 py-8 sm:px-6 lg:px-8 bg-gray-800 text-white text-center">
+      <section className="px-4 py-8 sm:px-6 lg:px-8 text-white text-center" style={{ backgroundColor: "#333333" }}>
         <div className="mx-auto max-w-7xl">
           <h3 className="text-lg font-black mb-2 tracking-tight">MASSEURMATCH</h3>
-          <p className="text-gray-300 text-xs mb-4">
+          <p className="text-xs mb-4" style={{ color: "#CCCCCC" }}>
             © masseurmatch.com • masseurmatch@masseurmatch.com
           </p>
-          <p className="text-gray-400 text-xs">☎️ (000) 255-0775</p>
+          <p className="text-xs" style={{ color: "#999999" }}>
+            ☎️ (000) 255-0775
+          </p>
         </div>
       </section>
     </div>
