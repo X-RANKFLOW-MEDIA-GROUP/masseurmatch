@@ -18,7 +18,7 @@ const PUBLIC_PROFILE_SELECT = `
   is_suspended, is_banned, available_now, available_now_expires,
   lgbtq_affirming, business_hours, custom_faq, pricing_sessions, areas_served,
   outcall_radius_miles, travel_schedule, add_ons, training, education, contact_clicks,
-  seo_title, seo_description, seo_keywords, created_at, is_demo,
+  seo_title, seo_description, seo_keywords, created_at,
   identity_verified_at
 `;
 
@@ -300,8 +300,8 @@ export const getPublicTherapists = async (filters?: {
   const { data: rawData, error, count } = await query;
   const data = rawData ? sortPublicTherapists(rawData as unknown as PublicTherapist[]) : [];
 
-  if (!error && data.length > 0) {
-    return { items: data, total: count || data.length, page, pageSize };
+  if (!error) {
+    return { items: data, total: count ?? data.length, page, pageSize };
   }
 
   const fallbackItems = sortPublicTherapists(

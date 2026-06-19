@@ -19,7 +19,7 @@ interface Props {
 export function PremiumProfileHero({ profile, cityPath, reviews = [] }: Props) {
   const name = getPublicProfileName(profile);
   const { callHref, smsHref, whatsappHref } = getPublicContactLinks(profile.phone, profile.whatsapp_number);
-  const neighborhood = profile.neighborhood || profile.city;
+  const neighborhood = profile.neighborhood;
   
   const { trackContact } = useKnottyProfileAttribution({
     therapistId: profile.id,

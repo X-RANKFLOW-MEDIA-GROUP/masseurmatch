@@ -270,6 +270,7 @@ export default function PhotoManagerPage() {
         const insertedPhoto = photoRecord as { id: string };
 
         const { error: queueInsertError } = await supabase.from("moderation_queue").insert({
+          content_type: "photo",
           profile_id: profile.id,
           user_id: profile.user_id,
           target_id: insertedPhoto.id,
@@ -277,7 +278,7 @@ export default function PhotoManagerPage() {
           source: "pro_photos",
           field_name: null,
           status: "pending",
-          priority: "normal",
+          priority: 1,
           moderation_provider: "sightengine",
           moderation_reason: "queued_for_ai_review",
           snapshot: {

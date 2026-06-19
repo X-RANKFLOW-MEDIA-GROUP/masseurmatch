@@ -141,26 +141,9 @@ export default function SmsAdminPage() {
 
       {/* Content */}
       <div className="mx-auto max-w-6xl px-6 py-6">
-        {!twilioLoading && !twilio?.connected ? (
-          <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] py-20 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-500/10">
-              <MessageSquare className="h-8 w-8 text-slate-400" strokeWidth={2} />
-            </div>
-            <div>
-              <p className="font-semibold text-white">SMS auto-reply is not yet configured</p>
-              <p className="mx-auto mt-2 max-w-md text-sm text-slate-400">
-                Connect a Twilio account to enable automated SMS responses. Once configured,
-                you can manage conversations, set up auto-replies, and receive follow-up alerts here.
-              </p>
-            </div>
-          </div>
-        ) : (
-          <>
-            {tab === 'conversations' && <ConversationsTab />}
-            {tab === 'alerts' && <AlertsTab onResolved={loadStatus} />}
-            {tab === 'profiles' && <ProfilesTab />}
-          </>
-        )}
+        {tab === 'conversations' && <ConversationsTab twilioReady={twilio?.connected ?? false} twilioLoading={twilioLoading} />}
+        {tab === 'alerts' && <AlertsTab onResolved={loadStatus} />}
+        {tab === 'profiles' && <ProfilesTab />}
       </div>
     </div>
   )
@@ -168,7 +151,7 @@ export default function SmsAdminPage() {
 
 // ─── Conversations Tab ────────────────────────────────────────────────────────
 
-function ConversationsTab() {
+function ConversationsTab({ twilioReady, twilioLoading }: { twilioReady: boolean; twilioLoading: boolean }) {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedConv, setSelectedConv] = useState<Conversation | null>(null)
@@ -185,6 +168,23 @@ function ConversationsTab() {
   }, [])
 
   useEffect(() => { load() }, [load])
+
+  if (!twilioLoading && !twilioReady) {
+    return (
+      <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] py-20 text-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-500/10">
+          <MessageSquare className="h-8 w-8 text-slate-400" strokeWidth={2} />
+        </div>
+        <div>
+          <p className="font-semibold text-white">SMS auto-reply is not yet configured</p>
+          <p className="mx-auto mt-2 max-w-md text-sm text-slate-400">
+            Connect a Twilio account to enable automated SMS responses. Once configured,
+            you can manage conversations, set up auto-replies, and receive follow-up alerts here.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   async function sendReply() {
     if (!replyText.trim() || !selectedConv) return

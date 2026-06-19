@@ -758,21 +758,28 @@ insert into storage.buckets(id,name,public) values ('identity-documents','identi
 -- select id, 'admin' from auth.users where email = 'replace-with-admin@domain.com'
 -- on conflict do nothing;
 
+-- public_therapists is a VIEW over the profiles table, not a standalone table.
+-- RLS is inherited from profiles (which has RLS enabled). Do NOT run
+-- ALTER TABLE ... ENABLE ROW SECURITY on this relation — it will fail.
+create or replace view public.public_therapists as
+  select
+    id, slug, city, state, country, display_name, full_name, headline, bio, tagline,
+    phone, whatsapp_number, email_address, website, avatar_url, photo_url,
+    service_categories, massage_techniques, specialties, languages,
+    subscription_tier, profile_status, visibility_status, verification_status,
+    moderation_status, incall_price, outcall_price, starting_price,
+    available_now, available_now_expires, neighborhood, years_experience,
+    height_inches, weight_lb, body_type, gender, latitude, longitude,
+    is_featured, updated_at, promotions, pricing_sessions,
+    is_verified_identity, is_verified_profile, is_verified_photos,
+    lgbtq_affirming, zip_code, map_enabled, location_marker_type, massage_setup,
+    payment_methods, booking_platform, booking_url, products_used, products_sold,
+    review_count, average_rating, modalities, keyword_slugs, segments,
+    view_count, profile_completion_score
+  from profiles p
+  where role = 'provider' and visibility_status = 'public';
+
 -- Supplemental app-domain tables referenced by API/routes.
-create table if not exists public.public_therapists (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references auth.users(id) on delete set null,
-  slug text,
-  full_name text,
-  bio text,
-  city text,
-  state text,
-  photo_url text,
-  services text[],
-  rates jsonb,
-  updated_at timestamptz not null default timezone('utc', now()),
-  created_at timestamptz not null default timezone('utc', now())
-);
 
 create table if not exists public.favorites (
   id uuid primary key default gen_random_uuid(),
@@ -986,3 +993,56 @@ create table if not exists public.sms_follow_up_alerts (
   resolved_by      uuid references auth.users(id) on delete set null,
   created_at       timestamptz default now()
 );
+
+-- ── Schema-drift catch-up (additive only) ───────────────────────────────────
+
+-- contact_inquiries: fields used by the inquiries dashboard
+alter table public.contact_inquiries
+  add column if not exists client_name text,
+  add column if not exists client_phone text,
+  add column if not exists preferred_contact text;
+
+-- moderation_queue: content_type column used by photos page
+alter table public.moderation_queue
+  add column if not exists content_type text;
+
+-- payment_transactions: Stripe-specific columns
+alter table public.payment_transactions
+  add column if not exists provider_transaction_id text,
+  add column if not exists provider text;
+
+-- appointments: column aliases used by booking routes
+alter table public.appointments
+  add column if not exists user_id uuid references auth.users(id) on delete set null,
+  add column if not exists starts_at timestamptz,
+  add column if not exists ends_at timestamptz;
+
+-- text_verifications: OTP fields
+alter table public.text_verifications
+  add column if not exists submitted_text text,
+  add column if not exists code text;
+
+-- profile_reviews: admin notes column
+alter table public.profile_reviews
+  add column if not exists admin_notes text;
+
+-- therapist_photos: legacy columns used by upload/approval routes
+alter table public.therapist_photos
+  add column if not exists therapist_profile_id uuid,
+  add column if not exists approval_status text;
+
+-- admin_actions: shorthand columns (action/target_table) alongside action_type
+alter table public.admin_actions
+  add column if not exists action text,
+  add column if not exists target_table text;
+
+-- therapist_analytics_daily: view aggregating analytics_events by day per profile
+create or replace view public.therapist_analytics_daily as
+  select
+    therapist_profile_id,
+    date_trunc('day', created_at)::date as event_date,
+    event_name,
+    count(*) as event_count
+  from public.analytics_events
+  where therapist_profile_id is not null
+  group by therapist_profile_id, date_trunc('day', created_at)::date, event_name;

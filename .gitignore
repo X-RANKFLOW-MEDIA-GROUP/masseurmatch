@@ -1,6 +1,6 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Claude Code local settings (machine-specific, not for version control)
+# Claude Code local settings and worktrees (machine-specific, not for version control)
 .claude/settings.local.json
 .claude/worktrees/
 

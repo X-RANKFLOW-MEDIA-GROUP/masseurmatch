@@ -6,19 +6,6 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-type ProjectTable<
-  Row extends Record<string, unknown>,
-  Insert extends Record<string, unknown> = Partial<Row>,
-  Update extends Record<string, unknown> = Partial<Row>,
-> = {
-  Row: Row
-  Insert: Insert
-  Update: Update
-  Relationships: []
-}
-
-type FlexibleProjectTable = ProjectTable<Record<string, Json | undefined>>
-
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
@@ -31,50 +18,50 @@ export type Database = {
         Row: {
           action: string
           action_type: string | null
-          admin_id: string | null
           actor_profile_id: string | null
+          admin_id: string | null
           after_data: Json | null
           before_data: Json | null
           created_at: string
           id: string
+          metadata: Json | null
+          reason: string | null
           target_id: string | null
           target_profile_id: string | null
           target_table: string
           target_user_id: string | null
-          reason: string | null
-          metadata: Json | null
         }
         Insert: {
-          action?: string
+          action: string
           action_type?: string | null
-          admin_id?: string | null
           actor_profile_id?: string | null
+          admin_id?: string | null
           after_data?: Json | null
           before_data?: Json | null
           created_at?: string
           id?: string
+          metadata?: Json | null
+          reason?: string | null
           target_id?: string | null
           target_profile_id?: string | null
-          target_table?: string
+          target_table: string
           target_user_id?: string | null
-          reason?: string | null
-          metadata?: Json | null
         }
         Update: {
           action?: string
           action_type?: string | null
-          admin_id?: string | null
           actor_profile_id?: string | null
+          admin_id?: string | null
           after_data?: Json | null
           before_data?: Json | null
           created_at?: string
           id?: string
+          metadata?: Json | null
+          reason?: string | null
           target_id?: string | null
           target_profile_id?: string | null
           target_table?: string
           target_user_id?: string | null
-          reason?: string | null
-          metadata?: Json | null
         }
         Relationships: [
           {
@@ -88,7 +75,7 @@ export type Database = {
             foreignKeyName: "admin_actions_actor_profile_id_fkey"
             columns: ["actor_profile_id"]
             isOneToOne: false
-            referencedRelation: "public_therapists_api"
+            referencedRelation: "public_therapists"
             referencedColumns: ["id"]
           },
         ]
@@ -157,9 +144,71 @@ export type Database = {
           },
         ]
       }
+      appointments: {
+        Row: {
+          created_at: string
+          ends_at: string | null
+          id: string
+          notes: string | null
+          profile_id: string | null
+          starts_at: string | null
+          status: string
+          therapist_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          notes?: string | null
+          profile_id?: string | null
+          starts_at?: string | null
+          status?: string
+          therapist_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          notes?: string | null
+          profile_id?: string | null
+          starts_at?: string | null
+          status?: string
+          therapist_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_therapists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_therapist_id_fkey"
+            columns: ["therapist_id"]
+            isOneToOne: false
+            referencedRelation: "therapists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: string
+          admin_id: string | null
           admin_user_id: string | null
           created_at: string
           details: Json | null
@@ -168,7 +217,8 @@ export type Database = {
           target_type: string | null
         }
         Insert: {
-          action?: string
+          action: string
+          admin_id?: string | null
           admin_user_id?: string | null
           created_at?: string
           details?: Json | null
@@ -178,6 +228,7 @@ export type Database = {
         }
         Update: {
           action?: string
+          admin_id?: string | null
           admin_user_id?: string | null
           created_at?: string
           details?: Json | null
@@ -222,54 +273,141 @@ export type Database = {
       }
       blog_posts: {
         Row: {
-          id: string
-          slug: string
-          title: string
-          excerpt: string | null
-          content: Json | null
-          tags: string[] | null
-          published_at: string | null
-          updated_at: string | null
+          content: string
           created_at: string
-          seo_description: string | null
-          seo_title: string | null
-          status: string | null
-          author_name: string | null
-          cover_image: string | null
+          excerpt: string
+          id: string
+          published_at: string
+          seo_description: string
+          slug: string
+          tags: string[]
+          title: string
+          updated_at: string
         }
         Insert: {
-          id?: string
-          slug: string
-          title: string
-          excerpt?: string | null
-          content?: Json | null
-          tags?: string[] | null
-          published_at?: string | null
-          updated_at?: string | null
+          content: string
           created_at?: string
-          seo_description?: string | null
-          seo_title?: string | null
-          status?: string | null
-          author_name?: string | null
-          cover_image?: string | null
+          excerpt: string
+          id?: string
+          published_at?: string
+          seo_description: string
+          slug: string
+          tags?: string[]
+          title: string
+          updated_at?: string
         }
         Update: {
-          id?: string
-          slug?: string
-          title?: string
-          excerpt?: string | null
-          content?: Json | null
-          tags?: string[] | null
-          published_at?: string | null
-          updated_at?: string | null
+          content?: string
           created_at?: string
-          seo_description?: string | null
-          seo_title?: string | null
-          status?: string | null
-          author_name?: string | null
-          cover_image?: string | null
+          excerpt?: string
+          id?: string
+          published_at?: string
+          seo_description?: string
+          slug?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
         }
         Relationships: []
+      }
+      booking_inquiries: {
+        Row: {
+          admin_notes: string | null
+          ai_conversation: Json | null
+          appointment_id: string | null
+          client_email: string | null
+          client_hotel: string | null
+          client_name: string | null
+          client_phone: string | null
+          confirmed_date: string | null
+          confirmed_time: string | null
+          created_at: string | null
+          duration_minutes: number | null
+          id: string
+          intelligence_report: Json | null
+          intelligence_status: string
+          message: string | null
+          preferred_date: string | null
+          preferred_time: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          service_type: string | null
+          sheets_row_id: string | null
+          source: string | null
+          status: string
+          therapist_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          ai_conversation?: Json | null
+          appointment_id?: string | null
+          client_email?: string | null
+          client_hotel?: string | null
+          client_name?: string | null
+          client_phone?: string | null
+          confirmed_date?: string | null
+          confirmed_time?: string | null
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          intelligence_report?: Json | null
+          intelligence_status?: string
+          message?: string | null
+          preferred_date?: string | null
+          preferred_time?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          service_type?: string | null
+          sheets_row_id?: string | null
+          source?: string | null
+          status?: string
+          therapist_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          ai_conversation?: Json | null
+          appointment_id?: string | null
+          client_email?: string | null
+          client_hotel?: string | null
+          client_name?: string | null
+          client_phone?: string | null
+          confirmed_date?: string | null
+          confirmed_time?: string | null
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          intelligence_report?: Json | null
+          intelligence_status?: string
+          message?: string | null
+          preferred_date?: string | null
+          preferred_time?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          service_type?: string | null
+          sheets_row_id?: string | null
+          source?: string | null
+          status?: string
+          therapist_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_inquiries_therapist_id_fkey"
+            columns: ["therapist_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_inquiries_therapist_id_fkey"
+            columns: ["therapist_id"]
+            isOneToOne: false
+            referencedRelation: "public_therapists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       checkout_sessions: {
         Row: {
@@ -327,7 +465,7 @@ export type Database = {
             foreignKeyName: "checkout_sessions_profile_id_fkey"
             columns: ["profile_id"]
             isOneToOne: false
-            referencedRelation: "public_therapists_api"
+            referencedRelation: "public_therapists"
             referencedColumns: ["id"]
           },
           {
@@ -395,6 +533,81 @@ export type Database = {
         }
         Relationships: []
       }
+      client_favorites: {
+        Row: {
+          client_user_id: string | null
+          created_at: string | null
+          id: string
+          profile_id: string | null
+          therapist_id: string | null
+          therapist_profile_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          client_user_id?: string | null
+          created_at?: string | null
+          id?: string
+          profile_id?: string | null
+          therapist_id?: string | null
+          therapist_profile_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          client_user_id?: string | null
+          created_at?: string | null
+          id?: string
+          profile_id?: string | null
+          therapist_id?: string | null
+          therapist_profile_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      complaints: {
+        Row: {
+          admin_notes: string | null
+          category: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          message: string | null
+          profile_id: string | null
+          reported_profile_id: string | null
+          reporter_email: string | null
+          reporter_id: string | null
+          resolved_at: string | null
+          status: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          message?: string | null
+          profile_id?: string | null
+          reported_profile_id?: string | null
+          reporter_email?: string | null
+          reporter_id?: string | null
+          resolved_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          message?: string | null
+          profile_id?: string | null
+          reported_profile_id?: string | null
+          reporter_email?: string | null
+          reporter_id?: string | null
+          resolved_at?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       contact_events: {
         Row: {
           created_at: string
@@ -420,7 +633,22 @@ export type Database = {
           profile_id?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "contact_events_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contact_events_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_therapists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       contact_inquiries: {
         Row: {
@@ -471,7 +699,7 @@ export type Database = {
             foreignKeyName: "contact_inquiries_profile_id_fkey"
             columns: ["profile_id"]
             isOneToOne: false
-            referencedRelation: "public_therapists_api"
+            referencedRelation: "public_therapists"
             referencedColumns: ["id"]
           },
         ]
@@ -508,6 +736,55 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      conversations: {
+        Row: {
+          created_at: string
+          id: string
+          profile_id: string | null
+          therapist_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          therapist_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          therapist_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_therapists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_therapist_id_fkey"
+            columns: ["therapist_id"]
+            isOneToOne: false
+            referencedRelation: "therapists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       demand_scores: {
         Row: {
@@ -614,6 +891,88 @@ export type Database = {
         }
         Relationships: []
       }
+      favorites: {
+        Row: {
+          created_at: string
+          id: string
+          profile_id: string | null
+          therapist_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          therapist_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          therapist_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_therapists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_therapist_id_fkey"
+            columns: ["therapist_id"]
+            isOneToOne: false
+            referencedRelation: "therapists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      featured_masters: {
+        Row: {
+          city: string | null
+          created_at: string | null
+          display_order: number | null
+          ends_at: string | null
+          featured_by: string | null
+          id: string
+          is_active: boolean | null
+          profile_id: string | null
+          starts_at: string | null
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          ends_at?: string | null
+          featured_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          profile_id?: string | null
+          starts_at?: string | null
+        }
+        Update: {
+          city?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          ends_at?: string | null
+          featured_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          profile_id?: string | null
+          starts_at?: string | null
+        }
+        Relationships: []
+      }
       identity_verifications: {
         Row: {
           created_at: string
@@ -666,10 +1025,73 @@ export type Database = {
             foreignKeyName: "identity_verifications_profile_id_fkey"
             columns: ["profile_id"]
             isOneToOne: false
-            referencedRelation: "public_therapists_api"
+            referencedRelation: "public_therapists"
             referencedColumns: ["id"]
           },
         ]
+      }
+      imported_profile_data: {
+        Row: {
+          created_at: string | null
+          id: string
+          payload: Json | null
+          profile_id: string | null
+          source_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          payload?: Json | null
+          profile_id?: string | null
+          source_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          payload?: Json | null
+          profile_id?: string | null
+          source_url?: string | null
+        }
+        Relationships: []
+      }
+      imported_reviews: {
+        Row: {
+          created_at: string | null
+          id: string
+          imported_at: string | null
+          profile_id: string | null
+          rating: number | null
+          review_date: string | null
+          review_text: string | null
+          reviewer_name: string | null
+          source_platform: string | null
+          source_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          imported_at?: string | null
+          profile_id?: string | null
+          rating?: number | null
+          review_date?: string | null
+          review_text?: string | null
+          reviewer_name?: string | null
+          source_platform?: string | null
+          source_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          imported_at?: string | null
+          profile_id?: string | null
+          rating?: number | null
+          review_date?: string | null
+          review_text?: string | null
+          reviewer_name?: string | null
+          source_platform?: string | null
+          source_url?: string | null
+        }
+        Relationships: []
       }
       keywords: {
         Row: {
@@ -833,27 +1255,63 @@ export type Database = {
         }
         Relationships: []
       }
+      messages: {
+        Row: {
+          body: string | null
+          conversation_id: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          read_at: string | null
+          sender_user_id: string | null
+        }
+        Insert: {
+          body?: string | null
+          conversation_id: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          read_at?: string | null
+          sender_user_id?: string | null
+        }
+        Update: {
+          body?: string | null
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          read_at?: string | null
+          sender_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       moderation_queue: {
         Row: {
           admin_reason: string | null
           ai_response: Json | null
           content_id: string | null
-          content_type: string | null
+          content_type: string
           created_at: string
           field_name: string | null
           id: string
           item_type: string | null
           moderation_provider: string | null
-          moderation_notes: string | null
-          content_hash: string | null
-          resolved_at: string | null
           moderation_reason: string | null
           notes: string | null
           payload: Json | null
           photo_id: string | null
-          priority: string | number | null
+          priority: number | null
           profile_id: string | null
           queue_type: string | null
+          resolved_at: string | null
           resolved_by: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -869,22 +1327,20 @@ export type Database = {
           admin_reason?: string | null
           ai_response?: Json | null
           content_id?: string | null
-          content_type?: string | null
+          content_type: string
           created_at?: string
           field_name?: string | null
           id?: string
           item_type?: string | null
           moderation_provider?: string | null
-          moderation_notes?: string | null
-          content_hash?: string | null
-          resolved_at?: string | null
           moderation_reason?: string | null
           notes?: string | null
           payload?: Json | null
           photo_id?: string | null
-          priority?: string | number | null
+          priority?: number | null
           profile_id?: string | null
           queue_type?: string | null
+          resolved_at?: string | null
           resolved_by?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -900,22 +1356,20 @@ export type Database = {
           admin_reason?: string | null
           ai_response?: Json | null
           content_id?: string | null
-          content_type?: string | null
+          content_type?: string
           created_at?: string
           field_name?: string | null
           id?: string
           item_type?: string | null
           moderation_provider?: string | null
-          moderation_notes?: string | null
-          content_hash?: string | null
-          resolved_at?: string | null
           moderation_reason?: string | null
           notes?: string | null
           payload?: Json | null
           photo_id?: string | null
-          priority?: string | number | null
+          priority?: number | null
           profile_id?: string | null
           queue_type?: string | null
+          resolved_at?: string | null
           resolved_by?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -939,7 +1393,7 @@ export type Database = {
             foreignKeyName: "moderation_queue_reviewed_by_fkey"
             columns: ["reviewed_by"]
             isOneToOne: false
-            referencedRelation: "public_therapists_api"
+            referencedRelation: "public_therapists"
             referencedColumns: ["id"]
           },
           {
@@ -965,86 +1419,66 @@ export type Database = {
           },
         ]
       }
-      appointments: FlexibleProjectTable
-      client_favorites: ProjectTable<{
-        id: string
-        user_id: string | null
-        client_user_id: string | null
-        profile_id: string | null
-        therapist_id: string | null
-        therapist_profile_id: string | null
-        created_at: string | null
-      }>
-      complaints: FlexibleProjectTable
-      conversations: FlexibleProjectTable
-      favorites: FlexibleProjectTable
-      featured_masters: ProjectTable<{
-        id: string
-        profile_id: string
-        featured_by: string | null
-        city: string | null
-        is_active: boolean
-        display_order: number | null
-        created_at: string | null
-        updated_at: string | null
-      }>
-      imported_profile_data: ProjectTable<{
-        id: string
-        profile_id: string | null
-        source_url: string | null
-        payload: Json | null
-        created_at: string | null
-      }>
-      messages: FlexibleProjectTable
-      notification_deliveries: FlexibleProjectTable
-      payment_transactions: FlexibleProjectTable
-      photo_moderations: FlexibleProjectTable
-      profile_documents: FlexibleProjectTable
-      push_subscriptions: FlexibleProjectTable
-      ranking_events: ProjectTable<{
-        id: string
-        profile_id: string | null
-        event_type: string | null
-        event_name: string
-        weight: number | null
-        metadata: Json | null
-        created_at: string | null
-      }>
-      segments: FlexibleProjectTable
-      site_settings: FlexibleProjectTable
-      subscriptions: FlexibleProjectTable
-      therapist_availability: FlexibleProjectTable
-      therapist_learning_scores: ProjectTable<{
-        id: string
-        profile_id: string | null
-        therapist_id: string | null
-        city: string | null
-        intent: string | null
-        score: number | null
-        weighted_score: number | null
-        impressions: number | null
-        profile_clicks: number | null
-        contact_clicks: number | null
-        ctr: number | null
-        contact_rate: number | null
-        created_at: string | null
-        updated_at: string | null
-      }>
-      user_notification_preferences: ProjectTable<{
-        id: string
-        user_id: string | null
-        email_enabled: boolean | null
-        sms_enabled: boolean | null
-        push_enabled: boolean | null
-        marketing_enabled: boolean | null
-        phone_e164: string | null
-        timezone: string | null
-        quiet_hours_start: string | null
-        quiet_hours_end: string | null
-        created_at: string | null
-        updated_at: string | null
-      }>
-      user_suspensions: FlexibleProjectTable
+      newsletter_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      notification_deliveries: {
+        Row: {
+          channel: string | null
+          created_at: string | null
+          destination: string | null
+          error_message: string | null
+          id: string
+          notification_id: string | null
+          payload: Json | null
+          provider: string | null
+          provider_message_id: string | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          channel?: string | null
+          created_at?: string | null
+          destination?: string | null
+          error_message?: string | null
+          id?: string
+          notification_id?: string | null
+          payload?: Json | null
+          provider?: string | null
+          provider_message_id?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          channel?: string | null
+          created_at?: string | null
+          destination?: string | null
+          error_message?: string | null
+          id?: string
+          notification_id?: string | null
+          payload?: Json | null
+          provider?: string | null
+          provider_message_id?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null
@@ -1052,8 +1486,8 @@ export type Database = {
           data: Json | null
           id: string
           is_read: boolean | null
-          message: string | null
           metadata: Json | null
+          read_at: string | null
           title: string | null
           type: string | null
           user_id: string | null
@@ -1064,8 +1498,8 @@ export type Database = {
           data?: Json | null
           id?: string
           is_read?: boolean | null
-          message?: string | null
           metadata?: Json | null
+          read_at?: string | null
           title?: string | null
           type?: string | null
           user_id?: string | null
@@ -1076,11 +1510,146 @@ export type Database = {
           data?: Json | null
           id?: string
           is_read?: boolean | null
-          message?: string | null
           metadata?: Json | null
+          read_at?: string | null
           title?: string | null
           type?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      payment_transactions: {
+        Row: {
+          amount_cents: number | null
+          appointment_id: string | null
+          created_at: string
+          currency: string | null
+          id: string
+          metadata: Json | null
+          provider: string | null
+          provider_transaction_id: string | null
+          status: string | null
+          stripe_refund_id: string | null
+          therapist_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount_cents?: number | null
+          appointment_id?: string | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          metadata?: Json | null
+          provider?: string | null
+          provider_transaction_id?: string | null
+          status?: string | null
+          stripe_refund_id?: string | null
+          therapist_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount_cents?: number | null
+          appointment_id?: string | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          metadata?: Json | null
+          provider?: string | null
+          provider_transaction_id?: string | null
+          status?: string | null
+          stripe_refund_id?: string | null
+          therapist_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_transactions_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transactions_therapist_id_fkey"
+            columns: ["therapist_id"]
+            isOneToOne: false
+            referencedRelation: "therapists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      photo_moderations: {
+        Row: {
+          admin_notes: string | null
+          created_at: string | null
+          flagged_at: string | null
+          id: string
+          photo_id: string | null
+          reason: string | null
+          reviewed_at: string | null
+          status: string | null
+          therapist_id: string | null
+          type: string | null
+          url: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string | null
+          flagged_at?: string | null
+          id?: string
+          photo_id?: string | null
+          reason?: string | null
+          reviewed_at?: string | null
+          status?: string | null
+          therapist_id?: string | null
+          type?: string | null
+          url?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string | null
+          flagged_at?: string | null
+          id?: string
+          photo_id?: string | null
+          reason?: string | null
+          reviewed_at?: string | null
+          status?: string | null
+          therapist_id?: string | null
+          type?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
+      profile_documents: {
+        Row: {
+          created_at: string | null
+          document_type: string | null
+          id: string
+          profile_id: string | null
+          status: string | null
+          storage_path: string | null
+          type: string | null
+          url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          document_type?: string | null
+          id?: string
+          profile_id?: string | null
+          status?: string | null
+          storage_path?: string | null
+          type?: string | null
+          url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          document_type?: string | null
+          id?: string
+          profile_id?: string | null
+          status?: string | null
+          storage_path?: string | null
+          type?: string | null
+          url?: string | null
         }
         Relationships: []
       }
@@ -1091,7 +1660,6 @@ export type Database = {
           is_primary: boolean | null
           moderation_reason: string | null
           moderation_status: string | null
-          status: string | null
           profile_id: string | null
           sort_order: number | null
           storage_path: string | null
@@ -1105,7 +1673,6 @@ export type Database = {
           is_primary?: boolean | null
           moderation_reason?: string | null
           moderation_status?: string | null
-          status?: string | null
           profile_id?: string | null
           sort_order?: number | null
           storage_path?: string | null
@@ -1119,7 +1686,6 @@ export type Database = {
           is_primary?: boolean | null
           moderation_reason?: string | null
           moderation_status?: string | null
-          status?: string | null
           profile_id?: string | null
           sort_order?: number | null
           storage_path?: string | null
@@ -1139,7 +1705,7 @@ export type Database = {
             foreignKeyName: "profile_photos_profile_id_fkey"
             columns: ["profile_id"]
             isOneToOne: false
-            referencedRelation: "public_therapists_api"
+            referencedRelation: "public_therapists"
             referencedColumns: ["id"]
           },
         ]
@@ -1152,7 +1718,6 @@ export type Database = {
           profile_id: string | null
           reviewed_at: string | null
           reviewed_by: string | null
-          moderation_notes: string | null
           status: string
           submitted_at: string | null
           updated_at: string
@@ -1165,7 +1730,6 @@ export type Database = {
           profile_id?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
-          moderation_notes?: string | null
           status?: string
           submitted_at?: string | null
           updated_at?: string
@@ -1178,7 +1742,6 @@ export type Database = {
           profile_id?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
-          moderation_notes?: string | null
           status?: string
           submitted_at?: string | null
           updated_at?: string
@@ -1196,49 +1759,10 @@ export type Database = {
             foreignKeyName: "profile_reviews_profile_id_fkey"
             columns: ["profile_id"]
             isOneToOne: false
-            referencedRelation: "public_therapists_api"
+            referencedRelation: "public_therapists"
             referencedColumns: ["id"]
           },
         ]
-      }
-      imported_reviews: {
-        Row: {
-          id: string
-          profile_id: string
-          source_url: string | null
-          reviewer_name: string | null
-          review_text: string | null
-          rating: number | null
-          review_date: string | null
-          source_platform: string | null
-          imported_at: string | null
-          created_at: string | null
-        }
-        Insert: {
-          id?: string
-          profile_id?: string
-          source_url?: string | null
-          reviewer_name?: string | null
-          review_text?: string | null
-          rating?: number | null
-          review_date?: string | null
-          source_platform?: string | null
-          imported_at?: string | null
-          created_at?: string | null
-        }
-        Update: {
-          id?: string
-          profile_id?: string
-          source_url?: string | null
-          reviewer_name?: string | null
-          review_text?: string | null
-          rating?: number | null
-          review_date?: string | null
-          source_platform?: string | null
-          imported_at?: string | null
-          created_at?: string | null
-        }
-        Relationships: []
       }
       profile_sections: {
         Row: {
@@ -1258,7 +1782,7 @@ export type Database = {
           is_editable?: boolean
           is_visible?: boolean
           section_key: string
-          therapist_profile_id?: string
+          therapist_profile_id: string
           updated_at?: string
         }
         Update: {
@@ -1298,11 +1822,21 @@ export type Database = {
       profiles: {
         Row: {
           _tier: string | null
+          accepts_all_genders: boolean | null
+          accessibility_features: string[] | null
           account_status: string
           add_ons: Json | null
+          additional_services: string[] | null
+          admin_notes: string | null
+          affiliations: string[] | null
+          mobile_hours: Json | null
+          rate_disclaimers: string[] | null
+          studio_amenities: string[] | null
+          studio_hours: Json | null
           approved_at: string | null
           approved_by: string | null
           areas_served: string[] | null
+          availability_note: string | null
           available_now: boolean | null
           available_now_expires: string | null
           avatar_url: string | null
@@ -1310,19 +1844,22 @@ export type Database = {
           banned_reason: string | null
           bio: string | null
           body_type: string | null
+          booking_link: string | null
           booking_platform: string | null
           booking_url: string | null
-          business_trips: Json | null
           business_hours: Json | null
-          custom_faq: Json | null
-          current_status: string | null
-          service_radius_km: number | null
-          travel_destination: string | null
+          business_trips: Json | null
+          canonical_city_slug: string | null
           certifications: string | null
           city: string | null
+          completion_percentage: number | null
+          completion_score: number | null
           contact_clicks: number
+          country: string | null
           created_at: string
           current_period_end: string | null
+          current_status: string | null
+          custom_faq: Json | null
           day_of_week_discount: Json | null
           display_name: string | null
           education: string | null
@@ -1331,65 +1868,97 @@ export type Database = {
           email_address: string | null
           featured_until: string | null
           full_name: string | null
+          gender: string | null
           headline: string | null
           height_inches: number | null
           id: string
+          identity_verified_at: string | null
+          incall: boolean | null
           incall_amenities: string[] | null
+          incall_details: string | null
           incall_price: number | null
+          inquiry_count: number | null
           is_active: boolean | null
           is_banned: boolean | null
-          identity_verified_at: string | null
           is_demo: boolean | null
           is_featured: boolean | null
           is_suspended: boolean | null
+          is_verified_email: boolean | null
           is_verified_identity: boolean | null
           is_verified_phone: boolean | null
           is_verified_photos: boolean | null
           is_verified_profile: boolean | null
+          keyword_slugs: string[] | null
           languages: string[] | null
           languages_spoken: string[] | null
+          last_active_at: string | null
           last_seen_at: string | null
+          latitude: number | null
           lgbtq_affirming: boolean | null
           location_marker_type: string | null
+          location_type: string | null
+          longitude: number | null
           map_enabled: boolean | null
           massage_setup: string[] | null
           massage_techniques: string[] | null
-          modality: string | null
           mobile_extras: string[] | null
+          modalities: string[] | null
+          modality: string | null
           moderation_notes: string | null
+          moderation_status: string | null
           neighborhood: string | null
           neighborhood_name: string | null
           offers_incall: boolean | null
           offers_outcall: boolean | null
+          outcall: boolean | null
+          outcall_details: string | null
           outcall_price: number | null
           outcall_radius: number | null
           outcall_radius_miles: number | null
           payment_methods: string[] | null
           phone: string | null
           phone_number: string | null
-          whatsapp: string | null
-          session_lengths: number[] | null
           photo_limit: number | null
+          photo_url: string | null
+          presentation_video_url: string | null
+          price_max: number | null
+          price_min: number | null
           pricing_sessions: Json | null
+          primary_area: string | null
           products_sold: string[] | null
           products_used: string[] | null
+          profile_completeness: number | null
+          profile_completion_score: number | null
           profile_status: string | null
+          profile_views: number | null
+          promotions: Json | null
+          rates: Json | null
+          rating_average: number | null
+          regular_discounts: Json | null
           rejected_at: string | null
           rejected_by: string | null
-          location_type: string | null
-          sms_enabled: boolean | null
-          promotions: Json | null
-          regular_discounts: Json | null
           rejection_reason: string | null
           review_count: number
+          reviewed_at: string | null
+          reviewed_by: string | null
           role: string
+          segments: string[] | null
           seo_description: string | null
           seo_keywords: string[] | null
           seo_title: string | null
           service_categories: string[] | null
+          service_radius_km: number | null
+          service_radius_miles: number | null
+          session_duration: number | null
+          session_lengths: number[] | null
           slug: string | null
+          social_media: Json | null
           specialties: string[] | null
+          specialty: string | null
+          start_date: string | null
+          start_year: number | null
           starting_price: number | null
+          starting_rate: number | null
           state: string | null
           status: string | null
           street_reference: string | null
@@ -1397,32 +1966,51 @@ export type Database = {
           stripe_subscription_id: string | null
           stripe_verification_session_id: string | null
           submitted_at: string | null
+          subscription_cancel_at_period_end: boolean | null
+          subscription_current_period_end: string | null
+          subscription_current_period_start: string | null
+          subscription_plan: string | null
+          subscription_status: string | null
           subscription_tier: string | null
           suspension_reason: string | null
           tagline: string | null
           terms_accepted_at: string | null
-          tier: string | null
           training: string | null
+          travel_destination: string | null
           travel_schedule: Json | null
+          traveling: boolean | null
           updated_at: string
           user_id: string | null
           verification_status: string | null
+          view_count: number | null
           visibility_level: number | null
           visibility_status: string | null
+          visiting: boolean | null
           website: string | null
           weekly_special: Json | null
           weight_lb: number | null
+          whatsapp: string | null
           whatsapp_number: string | null
           years_experience: number | null
           zip_code: string | null
         }
         Insert: {
           _tier?: string | null
+          accepts_all_genders?: boolean | null
+          accessibility_features?: string[] | null
           account_status?: string
           add_ons?: Json | null
+          additional_services?: string[] | null
+          admin_notes?: string | null
+          affiliations?: string[] | null
+          mobile_hours?: Json | null
+          rate_disclaimers?: string[] | null
+          studio_amenities?: string[] | null
+          studio_hours?: Json | null
           approved_at?: string | null
           approved_by?: string | null
           areas_served?: string[] | null
+          availability_note?: string | null
           available_now?: boolean | null
           available_now_expires?: string | null
           avatar_url?: string | null
@@ -1430,19 +2018,22 @@ export type Database = {
           banned_reason?: string | null
           bio?: string | null
           body_type?: string | null
+          booking_link?: string | null
           booking_platform?: string | null
           booking_url?: string | null
-          business_trips?: Json | null
           business_hours?: Json | null
-          custom_faq?: Json | null
-          current_status?: string | null
-          service_radius_km?: number | null
-          travel_destination?: string | null
+          business_trips?: Json | null
+          canonical_city_slug?: string | null
           certifications?: string | null
           city?: string | null
+          completion_percentage?: number | null
+          completion_score?: number | null
           contact_clicks?: number
+          country?: string | null
           created_at?: string
           current_period_end?: string | null
+          current_status?: string | null
+          custom_faq?: Json | null
           day_of_week_discount?: Json | null
           display_name?: string | null
           education?: string | null
@@ -1451,65 +2042,97 @@ export type Database = {
           email_address?: string | null
           featured_until?: string | null
           full_name?: string | null
+          gender?: string | null
           headline?: string | null
           height_inches?: number | null
           id: string
+          identity_verified_at?: string | null
+          incall?: boolean | null
           incall_amenities?: string[] | null
+          incall_details?: string | null
           incall_price?: number | null
+          inquiry_count?: number | null
           is_active?: boolean | null
           is_banned?: boolean | null
-          identity_verified_at?: string | null
           is_demo?: boolean | null
           is_featured?: boolean | null
           is_suspended?: boolean | null
+          is_verified_email?: boolean | null
           is_verified_identity?: boolean | null
           is_verified_phone?: boolean | null
           is_verified_photos?: boolean | null
           is_verified_profile?: boolean | null
+          keyword_slugs?: string[] | null
           languages?: string[] | null
           languages_spoken?: string[] | null
+          last_active_at?: string | null
           last_seen_at?: string | null
+          latitude?: number | null
           lgbtq_affirming?: boolean | null
           location_marker_type?: string | null
+          location_type?: string | null
+          longitude?: number | null
           map_enabled?: boolean | null
           massage_setup?: string[] | null
           massage_techniques?: string[] | null
-          modality?: string | null
           mobile_extras?: string[] | null
+          modalities?: string[] | null
+          modality?: string | null
           moderation_notes?: string | null
+          moderation_status?: string | null
           neighborhood?: string | null
           neighborhood_name?: string | null
           offers_incall?: boolean | null
           offers_outcall?: boolean | null
+          outcall?: boolean | null
+          outcall_details?: string | null
           outcall_price?: number | null
           outcall_radius?: number | null
           outcall_radius_miles?: number | null
           payment_methods?: string[] | null
           phone?: string | null
           phone_number?: string | null
-          whatsapp?: string | null
-          session_lengths?: number[] | null
           photo_limit?: number | null
+          photo_url?: string | null
+          presentation_video_url?: string | null
+          price_max?: number | null
+          price_min?: number | null
           pricing_sessions?: Json | null
+          primary_area?: string | null
           products_sold?: string[] | null
           products_used?: string[] | null
+          profile_completeness?: number | null
+          profile_completion_score?: number | null
           profile_status?: string | null
+          profile_views?: number | null
+          promotions?: Json | null
+          rates?: Json | null
+          rating_average?: number | null
+          regular_discounts?: Json | null
           rejected_at?: string | null
           rejected_by?: string | null
-          location_type?: string | null
-          sms_enabled?: boolean | null
-          promotions?: Json | null
-          regular_discounts?: Json | null
           rejection_reason?: string | null
           review_count?: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           role?: string
+          segments?: string[] | null
           seo_description?: string | null
           seo_keywords?: string[] | null
           seo_title?: string | null
           service_categories?: string[] | null
+          service_radius_km?: number | null
+          service_radius_miles?: number | null
+          session_duration?: number | null
+          session_lengths?: number[] | null
           slug?: string | null
+          social_media?: Json | null
           specialties?: string[] | null
+          specialty?: string | null
+          start_date?: string | null
+          start_year?: number | null
           starting_price?: number | null
+          starting_rate?: number | null
           state?: string | null
           status?: string | null
           street_reference?: string | null
@@ -1517,32 +2140,51 @@ export type Database = {
           stripe_subscription_id?: string | null
           stripe_verification_session_id?: string | null
           submitted_at?: string | null
+          subscription_cancel_at_period_end?: boolean | null
+          subscription_current_period_end?: string | null
+          subscription_current_period_start?: string | null
+          subscription_plan?: string | null
+          subscription_status?: string | null
           subscription_tier?: string | null
           suspension_reason?: string | null
           tagline?: string | null
           terms_accepted_at?: string | null
-          tier?: string | null
           training?: string | null
+          travel_destination?: string | null
           travel_schedule?: Json | null
+          traveling?: boolean | null
           updated_at?: string
           user_id?: string | null
           verification_status?: string | null
+          view_count?: number | null
           visibility_level?: number | null
           visibility_status?: string | null
+          visiting?: boolean | null
           website?: string | null
           weekly_special?: Json | null
           weight_lb?: number | null
+          whatsapp?: string | null
           whatsapp_number?: string | null
           years_experience?: number | null
           zip_code?: string | null
         }
         Update: {
           _tier?: string | null
+          accepts_all_genders?: boolean | null
+          accessibility_features?: string[] | null
           account_status?: string
           add_ons?: Json | null
+          additional_services?: string[] | null
+          admin_notes?: string | null
+          affiliations?: string[] | null
+          mobile_hours?: Json | null
+          rate_disclaimers?: string[] | null
+          studio_amenities?: string[] | null
+          studio_hours?: Json | null
           approved_at?: string | null
           approved_by?: string | null
           areas_served?: string[] | null
+          availability_note?: string | null
           available_now?: boolean | null
           available_now_expires?: string | null
           avatar_url?: string | null
@@ -1550,19 +2192,22 @@ export type Database = {
           banned_reason?: string | null
           bio?: string | null
           body_type?: string | null
+          booking_link?: string | null
           booking_platform?: string | null
           booking_url?: string | null
-          business_trips?: Json | null
           business_hours?: Json | null
-          custom_faq?: Json | null
-          current_status?: string | null
-          service_radius_km?: number | null
-          travel_destination?: string | null
+          business_trips?: Json | null
+          canonical_city_slug?: string | null
           certifications?: string | null
           city?: string | null
+          completion_percentage?: number | null
+          completion_score?: number | null
           contact_clicks?: number
+          country?: string | null
           created_at?: string
           current_period_end?: string | null
+          current_status?: string | null
+          custom_faq?: Json | null
           day_of_week_discount?: Json | null
           display_name?: string | null
           education?: string | null
@@ -1571,65 +2216,97 @@ export type Database = {
           email_address?: string | null
           featured_until?: string | null
           full_name?: string | null
+          gender?: string | null
           headline?: string | null
           height_inches?: number | null
           id?: string
+          identity_verified_at?: string | null
+          incall?: boolean | null
           incall_amenities?: string[] | null
+          incall_details?: string | null
           incall_price?: number | null
+          inquiry_count?: number | null
           is_active?: boolean | null
           is_banned?: boolean | null
-          identity_verified_at?: string | null
           is_demo?: boolean | null
           is_featured?: boolean | null
           is_suspended?: boolean | null
+          is_verified_email?: boolean | null
           is_verified_identity?: boolean | null
           is_verified_phone?: boolean | null
           is_verified_photos?: boolean | null
           is_verified_profile?: boolean | null
+          keyword_slugs?: string[] | null
           languages?: string[] | null
           languages_spoken?: string[] | null
+          last_active_at?: string | null
           last_seen_at?: string | null
+          latitude?: number | null
           lgbtq_affirming?: boolean | null
           location_marker_type?: string | null
+          location_type?: string | null
+          longitude?: number | null
           map_enabled?: boolean | null
           massage_setup?: string[] | null
           massage_techniques?: string[] | null
-          modality?: string | null
           mobile_extras?: string[] | null
+          modalities?: string[] | null
+          modality?: string | null
           moderation_notes?: string | null
+          moderation_status?: string | null
           neighborhood?: string | null
           neighborhood_name?: string | null
           offers_incall?: boolean | null
           offers_outcall?: boolean | null
+          outcall?: boolean | null
+          outcall_details?: string | null
           outcall_price?: number | null
           outcall_radius?: number | null
           outcall_radius_miles?: number | null
           payment_methods?: string[] | null
           phone?: string | null
           phone_number?: string | null
-          whatsapp?: string | null
-          session_lengths?: number[] | null
           photo_limit?: number | null
+          photo_url?: string | null
+          presentation_video_url?: string | null
+          price_max?: number | null
+          price_min?: number | null
           pricing_sessions?: Json | null
+          primary_area?: string | null
           products_sold?: string[] | null
           products_used?: string[] | null
+          profile_completeness?: number | null
+          profile_completion_score?: number | null
           profile_status?: string | null
+          profile_views?: number | null
+          promotions?: Json | null
+          rates?: Json | null
+          rating_average?: number | null
+          regular_discounts?: Json | null
           rejected_at?: string | null
           rejected_by?: string | null
-          location_type?: string | null
-          sms_enabled?: boolean | null
-          promotions?: Json | null
-          regular_discounts?: Json | null
           rejection_reason?: string | null
           review_count?: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           role?: string
+          segments?: string[] | null
           seo_description?: string | null
           seo_keywords?: string[] | null
           seo_title?: string | null
           service_categories?: string[] | null
+          service_radius_km?: number | null
+          service_radius_miles?: number | null
+          session_duration?: number | null
+          session_lengths?: number[] | null
           slug?: string | null
+          social_media?: Json | null
           specialties?: string[] | null
+          specialty?: string | null
+          start_date?: string | null
+          start_year?: number | null
           starting_price?: number | null
+          starting_rate?: number | null
           state?: string | null
           status?: string | null
           street_reference?: string | null
@@ -1637,239 +2314,134 @@ export type Database = {
           stripe_subscription_id?: string | null
           stripe_verification_session_id?: string | null
           submitted_at?: string | null
+          subscription_cancel_at_period_end?: boolean | null
+          subscription_current_period_end?: string | null
+          subscription_current_period_start?: string | null
+          subscription_plan?: string | null
+          subscription_status?: string | null
           subscription_tier?: string | null
           suspension_reason?: string | null
           tagline?: string | null
           terms_accepted_at?: string | null
-          tier?: string | null
           training?: string | null
+          travel_destination?: string | null
           travel_schedule?: Json | null
+          traveling?: boolean | null
           updated_at?: string
           user_id?: string | null
           verification_status?: string | null
+          view_count?: number | null
           visibility_level?: number | null
           visibility_status?: string | null
+          visiting?: boolean | null
           website?: string | null
           weekly_special?: Json | null
           weight_lb?: number | null
+          whatsapp?: string | null
           whatsapp_number?: string | null
           years_experience?: number | null
           zip_code?: string | null
         }
         Relationships: []
       }
-      public_therapists: {
+      provider_travel: {
         Row: {
-          _tier: string | null
-          available_now: boolean | null
-          available_now_expires: string | null
-          avatar_url: string | null
-          bio: string | null
-          body_type: string | null
-          booking_platform: string | null
-          booking_url: string | null
-          city: string | null
-          display_name: string | null
-          email_address: string | null
-          full_name: string | null
-          gallery_photos: string[] | null
-          headline: string | null
-          height_inches: number | null
+          created_at: string | null
+          destination_city: string | null
+          end_date: string | null
           id: string
-          incall_price: number | null
-          is_featured: boolean
-          is_verified_identity: boolean | null
-          is_verified_photos: boolean | null
-          is_verified_profile: boolean | null
-          languages: string[] | null
-          lgbtq_affirming: boolean
-          location_marker_type: string | null
-          map_enabled: boolean | null
-          massage_setup: string[] | null
-          massage_techniques: string[] | null
-          modality: string | null
-          neighborhood: string | null
-          neighborhood_name: string | null
-          outcall_price: number | null
-          payment_methods: string[] | null
-          phone: string | null
-          phone_number: string | null
-          whatsapp: string | null
-          session_lengths: number[] | null
-          pricing_sessions: Json | null
-          primary_area: string | null
-          products_sold: string[] | null
-          products_used: string[] | null
-          profile_photo: string | null
-          profile_status: string | null
-          rejected_at: string | null
-          rejected_by: string | null
-          location_type: string | null
-          sms_enabled: boolean | null
-          promotions: Json | null
-          review_count: number | null
-          service_categories: string[] | null
-          slug: string | null
-          specialties: string[] | null
-          start_year: number | null
-          starting_price: number | null
-          state: string | null
-          subscription_tier: string | null
-          updated_at: string
-          verification_status: string | null
-          visibility_status: string | null
-          website: string | null
-          weight_lb: number | null
-          whatsapp_number: string | null
-          years_experience: number | null
-          zip_code: string | null
+          is_active: boolean | null
+          profile_id: string | null
+          start_date: string | null
         }
         Insert: {
-          _tier?: string | null
-          available_now?: boolean | null
-          available_now_expires?: string | null
-          avatar_url?: string | null
-          bio?: string | null
-          body_type?: string | null
-          booking_platform?: string | null
-          booking_url?: string | null
-          city?: string | null
-          display_name?: string | null
-          email_address?: string | null
-          full_name?: string | null
-          gallery_photos?: string[] | null
-          headline?: string | null
-          height_inches?: number | null
-          id: string
-          incall_price?: number | null
-          is_featured?: boolean
-          is_verified_identity?: boolean | null
-          is_verified_photos?: boolean | null
-          is_verified_profile?: boolean | null
-          languages?: string[] | null
-          lgbtq_affirming?: boolean
-          location_marker_type?: string | null
-          map_enabled?: boolean | null
-          massage_setup?: string[] | null
-          massage_techniques?: string[] | null
-          modality?: string | null
-          neighborhood?: string | null
-          neighborhood_name?: string | null
-          outcall_price?: number | null
-          payment_methods?: string[] | null
-          phone?: string | null
-          phone_number?: string | null
-          whatsapp?: string | null
-          session_lengths?: number[] | null
-          pricing_sessions?: Json | null
-          primary_area?: string | null
-          products_sold?: string[] | null
-          products_used?: string[] | null
-          profile_photo?: string | null
-          profile_status?: string | null
-          rejected_at?: string | null
-          rejected_by?: string | null
-          location_type?: string | null
-          sms_enabled?: boolean | null
-          promotions?: Json | null
-          review_count?: number | null
-          service_categories?: string[] | null
-          slug?: string | null
-          specialties?: string[] | null
-          start_year?: number | null
-          starting_price?: number | null
-          state?: string | null
-          subscription_tier?: string | null
-          updated_at?: string
-          verification_status?: string | null
-          visibility_status?: string | null
-          website?: string | null
-          weight_lb?: number | null
-          whatsapp_number?: string | null
-          years_experience?: number | null
-          zip_code?: string | null
+          created_at?: string | null
+          destination_city?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          profile_id?: string | null
+          start_date?: string | null
         }
         Update: {
-          _tier?: string | null
-          available_now?: boolean | null
-          available_now_expires?: string | null
-          avatar_url?: string | null
-          bio?: string | null
-          body_type?: string | null
-          booking_platform?: string | null
-          booking_url?: string | null
-          city?: string | null
-          display_name?: string | null
-          email_address?: string | null
-          full_name?: string | null
-          gallery_photos?: string[] | null
-          headline?: string | null
-          height_inches?: number | null
+          created_at?: string | null
+          destination_city?: string | null
+          end_date?: string | null
           id?: string
-          incall_price?: number | null
-          is_featured?: boolean
-          is_verified_identity?: boolean | null
-          is_verified_photos?: boolean | null
-          is_verified_profile?: boolean | null
-          languages?: string[] | null
-          lgbtq_affirming?: boolean
-          location_marker_type?: string | null
-          map_enabled?: boolean | null
-          massage_setup?: string[] | null
-          massage_techniques?: string[] | null
-          modality?: string | null
-          neighborhood?: string | null
-          neighborhood_name?: string | null
-          outcall_price?: number | null
-          payment_methods?: string[] | null
-          phone?: string | null
-          phone_number?: string | null
-          whatsapp?: string | null
-          session_lengths?: number[] | null
-          pricing_sessions?: Json | null
-          primary_area?: string | null
-          products_sold?: string[] | null
-          products_used?: string[] | null
-          profile_photo?: string | null
-          profile_status?: string | null
-          rejected_at?: string | null
-          rejected_by?: string | null
-          location_type?: string | null
-          sms_enabled?: boolean | null
-          promotions?: Json | null
-          review_count?: number | null
-          service_categories?: string[] | null
-          slug?: string | null
-          specialties?: string[] | null
-          start_year?: number | null
-          starting_price?: number | null
-          state?: string | null
-          subscription_tier?: string | null
-          updated_at?: string
-          verification_status?: string | null
-          visibility_status?: string | null
-          website?: string | null
-          weight_lb?: number | null
-          whatsapp_number?: string | null
-          years_experience?: number | null
-          zip_code?: string | null
+          is_active?: boolean | null
+          profile_id?: string | null
+          start_date?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "public_therapists_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_therapists_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "public_therapists_api"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string | null
+          created_at: string | null
+          endpoint: string | null
+          id: string
+          is_active: boolean | null
+          keys: Json | null
+          p256dh: string | null
+          updated_at: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          auth?: string | null
+          created_at?: string | null
+          endpoint?: string | null
+          id?: string
+          is_active?: boolean | null
+          keys?: Json | null
+          p256dh?: string | null
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          auth?: string | null
+          created_at?: string | null
+          endpoint?: string | null
+          id?: string
+          is_active?: boolean | null
+          keys?: Json | null
+          p256dh?: string | null
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      ranking_events: {
+        Row: {
+          created_at: string | null
+          event_name: string | null
+          event_type: string | null
+          id: string
+          metadata: Json | null
+          profile_id: string | null
+          weight: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_name?: string | null
+          event_type?: string | null
+          id?: string
+          metadata?: Json | null
+          profile_id?: string | null
+          weight?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          event_name?: string | null
+          event_type?: string | null
+          id?: string
+          metadata?: Json | null
+          profile_id?: string | null
+          weight?: number | null
+        }
+        Relationships: []
       }
       reviews: {
         Row: {
@@ -1941,7 +2513,7 @@ export type Database = {
             foreignKeyName: "reviews_profile_id_fkey"
             columns: ["profile_id"]
             isOneToOne: false
-            referencedRelation: "public_therapists_api"
+            referencedRelation: "public_therapists"
             referencedColumns: ["id"]
           },
         ]
@@ -1993,6 +2565,251 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      site_settings: {
+        Row: {
+          allow_public_profiles: boolean
+          billing_email: string
+          id: string
+          key: string | null
+          legal_email: string
+          maintenance_mode: boolean
+          max_elite_photos: number
+          max_free_photos: number
+          max_pro_photos: number
+          max_standard_photos: number
+          require_identity_verification: boolean
+          require_manual_profile_review: boolean
+          require_photo_review: boolean
+          require_text_verification: boolean
+          signup_enabled: boolean
+          support_email: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          allow_public_profiles?: boolean
+          billing_email?: string
+          id?: string
+          key?: string | null
+          legal_email?: string
+          maintenance_mode?: boolean
+          max_elite_photos?: number
+          max_free_photos?: number
+          max_pro_photos?: number
+          max_standard_photos?: number
+          require_identity_verification?: boolean
+          require_manual_profile_review?: boolean
+          require_photo_review?: boolean
+          require_text_verification?: boolean
+          signup_enabled?: boolean
+          support_email?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          allow_public_profiles?: boolean
+          billing_email?: string
+          id?: string
+          key?: string | null
+          legal_email?: string
+          maintenance_mode?: boolean
+          max_elite_photos?: number
+          max_free_photos?: number
+          max_pro_photos?: number
+          max_standard_photos?: number
+          require_identity_verification?: boolean
+          require_manual_profile_review?: boolean
+          require_photo_review?: boolean
+          require_text_verification?: boolean
+          signup_enabled?: boolean
+          support_email?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
+      sms_follow_up_alerts: {
+        Row: {
+          client_phone: string
+          created_at: string | null
+          id: string
+          last_inbound_at: string | null
+          last_outbound_at: string
+          our_phone: string
+          profile_id: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+        }
+        Insert: {
+          client_phone: string
+          created_at?: string | null
+          id?: string
+          last_inbound_at?: string | null
+          last_outbound_at: string
+          our_phone: string
+          profile_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+        }
+        Update: {
+          client_phone?: string
+          created_at?: string | null
+          id?: string
+          last_inbound_at?: string | null
+          last_outbound_at?: string
+          our_phone?: string
+          profile_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_follow_up_alerts_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "sms_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sms_logs: {
+        Row: {
+          body: string
+          booking_inquiry_id: string | null
+          created_at: string | null
+          direction: string
+          from_number: string
+          id: string
+          intent: string | null
+          is_manual: boolean
+          profile_id: string | null
+          status: string | null
+          to_number: string
+          twilio_sid: string | null
+        }
+        Insert: {
+          body: string
+          booking_inquiry_id?: string | null
+          created_at?: string | null
+          direction: string
+          from_number: string
+          id?: string
+          intent?: string | null
+          is_manual?: boolean
+          profile_id?: string | null
+          status?: string | null
+          to_number: string
+          twilio_sid?: string | null
+        }
+        Update: {
+          body?: string
+          booking_inquiry_id?: string | null
+          created_at?: string | null
+          direction?: string
+          from_number?: string
+          id?: string
+          intent?: string | null
+          is_manual?: boolean
+          profile_id?: string | null
+          status?: string | null
+          to_number?: string
+          twilio_sid?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_logs_booking_inquiry_id_fkey"
+            columns: ["booking_inquiry_id"]
+            isOneToOne: false
+            referencedRelation: "booking_inquiries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_logs_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "sms_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sms_profiles: {
+        Row: {
+          alert_phone: string | null
+          arrival_date: string | null
+          availability_mode: string
+          couples_available: boolean
+          created_at: string | null
+          custom_instructions: string | null
+          departure_date: string | null
+          id: string
+          outcall_area: string | null
+          outcall_available: boolean
+          pricing_60: string | null
+          pricing_90: string | null
+          pricing_couples: string | null
+          profile_id: string
+          ready_to_reply: boolean
+          twilio_number: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          alert_phone?: string | null
+          arrival_date?: string | null
+          availability_mode?: string
+          couples_available?: boolean
+          created_at?: string | null
+          custom_instructions?: string | null
+          departure_date?: string | null
+          id?: string
+          outcall_area?: string | null
+          outcall_available?: boolean
+          pricing_60?: string | null
+          pricing_90?: string | null
+          pricing_couples?: string | null
+          profile_id: string
+          ready_to_reply?: boolean
+          twilio_number?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          alert_phone?: string | null
+          arrival_date?: string | null
+          availability_mode?: string
+          couples_available?: boolean
+          created_at?: string | null
+          custom_instructions?: string | null
+          departure_date?: string | null
+          id?: string
+          outcall_area?: string | null
+          outcall_available?: boolean
+          pricing_60?: string | null
+          pricing_90?: string | null
+          pricing_couples?: string | null
+          profile_id?: string
+          ready_to_reply?: boolean
+          twilio_number?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_profiles_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_profiles_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_therapists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       stripe_events: {
         Row: {
@@ -2078,23 +2895,59 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          id: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          tier: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          tier?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          tier?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       text_verifications: {
         Row: {
           code: string | null
-          verification_code: string | null
-          phone: string | null
-          provider: string | null
-          attempt_count: number
-          sent_at: string | null
-          verified_at: string | null
-          expires_at: string | null
           created_at: string
           id: string
           profile_id: string | null
           rejection_reason: string | null
           reviewed_at: string | null
           reviewed_by: string | null
-          moderation_notes: string | null
           status: string
           submitted_text: string | null
           updated_at: string
@@ -2102,20 +2955,12 @@ export type Database = {
         }
         Insert: {
           code?: string | null
-          verification_code?: string | null
-          phone?: string | null
-          provider?: string | null
-          attempt_count?: number
-          sent_at?: string | null
-          verified_at?: string | null
-          expires_at?: string | null
           created_at?: string
           id?: string
           profile_id?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
-          moderation_notes?: string | null
           status?: string
           submitted_text?: string | null
           updated_at?: string
@@ -2123,20 +2968,12 @@ export type Database = {
         }
         Update: {
           code?: string | null
-          verification_code?: string | null
-          phone?: string | null
-          provider?: string | null
-          attempt_count?: number
-          sent_at?: string | null
-          verified_at?: string | null
-          expires_at?: string | null
           created_at?: string
           id?: string
           profile_id?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
-          moderation_notes?: string | null
           status?: string
           submitted_text?: string | null
           updated_at?: string
@@ -2154,10 +2991,119 @@ export type Database = {
             foreignKeyName: "text_verifications_profile_id_fkey"
             columns: ["profile_id"]
             isOneToOne: false
-            referencedRelation: "public_therapists_api"
+            referencedRelation: "public_therapists"
             referencedColumns: ["id"]
           },
         ]
+      }
+      therapist_availability: {
+        Row: {
+          created_at: string
+          day_of_week: number | null
+          end_time: string | null
+          id: string
+          is_available: boolean
+          profile_id: string | null
+          start_time: string | null
+          therapist_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week?: number | null
+          end_time?: string | null
+          id?: string
+          is_available?: boolean
+          profile_id?: string | null
+          start_time?: string | null
+          therapist_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: number | null
+          end_time?: string | null
+          id?: string
+          is_available?: boolean
+          profile_id?: string | null
+          start_time?: string | null
+          therapist_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "therapist_availability_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "therapist_availability_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_therapists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "therapist_availability_therapist_id_fkey"
+            columns: ["therapist_id"]
+            isOneToOne: false
+            referencedRelation: "therapists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      therapist_learning_scores: {
+        Row: {
+          city: string | null
+          contact_clicks: number | null
+          contact_rate: number | null
+          created_at: string | null
+          ctr: number | null
+          id: string
+          impressions: number | null
+          intent: string | null
+          profile_clicks: number | null
+          profile_id: string | null
+          score: number | null
+          therapist_id: string | null
+          updated_at: string | null
+          weighted_score: number | null
+        }
+        Insert: {
+          city?: string | null
+          contact_clicks?: number | null
+          contact_rate?: number | null
+          created_at?: string | null
+          ctr?: number | null
+          id?: string
+          impressions?: number | null
+          intent?: string | null
+          profile_clicks?: number | null
+          profile_id?: string | null
+          score?: number | null
+          therapist_id?: string | null
+          updated_at?: string | null
+          weighted_score?: number | null
+        }
+        Update: {
+          city?: string | null
+          contact_clicks?: number | null
+          contact_rate?: number | null
+          created_at?: string | null
+          ctr?: number | null
+          id?: string
+          impressions?: number | null
+          intent?: string | null
+          profile_clicks?: number | null
+          profile_id?: string | null
+          score?: number | null
+          therapist_id?: string | null
+          updated_at?: string | null
+          weighted_score?: number | null
+        }
+        Relationships: []
       }
       therapist_locations: {
         Row: {
@@ -2187,7 +3133,7 @@ export type Database = {
           longitude?: number | null
           neighborhood?: string | null
           state?: string | null
-          therapist_profile_id?: string
+          therapist_profile_id: string
           updated_at?: string
         }
         Update: {
@@ -2237,6 +3183,7 @@ export type Database = {
           file_size: number | null
           id: string
           is_primary: boolean
+          main_profile_id: string | null
           mime_type: string | null
           photo_type: string | null
           profile_id: string | null
@@ -2258,6 +3205,7 @@ export type Database = {
           file_size?: number | null
           id?: string
           is_primary?: boolean
+          main_profile_id?: string | null
           mime_type?: string | null
           photo_type?: string | null
           profile_id?: string | null
@@ -2268,7 +3216,7 @@ export type Database = {
           sort_order?: number
           status?: string | null
           storage_path: string
-          therapist_profile_id?: string
+          therapist_profile_id: string
           updated_at?: string
           user_id?: string | null
         }
@@ -2279,6 +3227,7 @@ export type Database = {
           file_size?: number | null
           id?: string
           is_primary?: boolean
+          main_profile_id?: string | null
           mime_type?: string | null
           photo_type?: string | null
           profile_id?: string | null
@@ -2294,6 +3243,20 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "therapist_photos_main_profile_id_fkey"
+            columns: ["main_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "therapist_photos_main_profile_id_fkey"
+            columns: ["main_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_therapists"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "therapist_photos_therapist_profile_id_fkey"
             columns: ["therapist_profile_id"]
@@ -2326,6 +3289,7 @@ export type Database = {
           id: string
           is_visible: boolean
           price_cents: number
+          profile_id: string | null
           session_type: string
           therapist_profile_id: string
           updated_at: string
@@ -2338,8 +3302,9 @@ export type Database = {
           id?: string
           is_visible?: boolean
           price_cents: number
+          profile_id?: string | null
           session_type: string
-          therapist_profile_id?: string
+          therapist_profile_id: string
           updated_at?: string
         }
         Update: {
@@ -2350,11 +3315,26 @@ export type Database = {
           id?: string
           is_visible?: boolean
           price_cents?: number
+          profile_id?: string | null
           session_type?: string
           therapist_profile_id?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "therapist_pricing_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "therapist_pricing_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_therapists"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "therapist_pricing_therapist_profile_id_fkey"
             columns: ["therapist_profile_id"]
@@ -2402,9 +3382,6 @@ export type Database = {
           offers_outcall: boolean
           outcall_details: string | null
           phone: string | null
-          phone_number: string | null
-          whatsapp: string | null
-          session_lengths: number[] | null
           profile_completion_score: number
           profile_id: string
           seo_description: string | null
@@ -2440,9 +3417,6 @@ export type Database = {
           offers_outcall?: boolean
           outcall_details?: string | null
           phone?: string | null
-          phone_number?: string | null
-          whatsapp?: string | null
-          session_lengths?: number[] | null
           profile_completion_score?: number
           profile_id: string
           seo_description?: string | null
@@ -2478,9 +3452,6 @@ export type Database = {
           offers_outcall?: boolean
           outcall_details?: string | null
           phone?: string | null
-          phone_number?: string | null
-          whatsapp?: string | null
-          session_lengths?: number[] | null
           profile_completion_score?: number
           profile_id?: string
           seo_description?: string | null
@@ -2505,7 +3476,7 @@ export type Database = {
             foreignKeyName: "therapist_profiles_profile_id_fkey"
             columns: ["profile_id"]
             isOneToOne: true
-            referencedRelation: "public_therapists_api"
+            referencedRelation: "public_therapists"
             referencedColumns: ["id"]
           },
         ]
@@ -2517,6 +3488,7 @@ export type Database = {
           description: string | null
           id: string
           is_visible: boolean
+          profile_id: string | null
           service_name: string
           sort_order: number
           therapist_profile_id: string
@@ -2528,9 +3500,10 @@ export type Database = {
           description?: string | null
           id?: string
           is_visible?: boolean
+          profile_id?: string | null
           service_name: string
           sort_order?: number
-          therapist_profile_id?: string
+          therapist_profile_id: string
           updated_at?: string
         }
         Update: {
@@ -2539,12 +3512,27 @@ export type Database = {
           description?: string | null
           id?: string
           is_visible?: boolean
+          profile_id?: string | null
           service_name?: string
           sort_order?: number
           therapist_profile_id?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "therapist_services_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "therapist_services_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_therapists"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "therapist_services_therapist_profile_id_fkey"
             columns: ["therapist_profile_id"]
@@ -2576,6 +3564,7 @@ export type Database = {
           current_period_start: string | null
           id: string
           plan_id: string
+          profile_id: string | null
           provider: string | null
           provider_subscription_id: string | null
           status: string
@@ -2589,10 +3578,11 @@ export type Database = {
           current_period_start?: string | null
           id?: string
           plan_id: string
+          profile_id?: string | null
           provider?: string | null
           provider_subscription_id?: string | null
           status?: string
-          therapist_profile_id?: string
+          therapist_profile_id: string
           updated_at?: string
         }
         Update: {
@@ -2602,6 +3592,7 @@ export type Database = {
           current_period_start?: string | null
           id?: string
           plan_id?: string
+          profile_id?: string | null
           provider?: string | null
           provider_subscription_id?: string | null
           status?: string
@@ -2614,6 +3605,20 @@ export type Database = {
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "therapist_subscriptions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "therapist_subscriptions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_therapists"
             referencedColumns: ["id"]
           },
           {
@@ -2727,7 +3732,7 @@ export type Database = {
           reason?: string | null
           score?: number
           status?: string
-          therapist_profile_id?: string
+          therapist_profile_id: string
           updated_at?: string
         }
         Update: {
@@ -2765,6 +3770,51 @@ export type Database = {
           },
         ]
       }
+      user_notification_preferences: {
+        Row: {
+          created_at: string | null
+          email_enabled: boolean | null
+          id: string
+          marketing_enabled: boolean | null
+          phone_e164: string | null
+          push_enabled: boolean | null
+          quiet_hours_end: string | null
+          quiet_hours_start: string | null
+          sms_enabled: boolean | null
+          timezone: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email_enabled?: boolean | null
+          id?: string
+          marketing_enabled?: boolean | null
+          phone_e164?: string | null
+          push_enabled?: boolean | null
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          sms_enabled?: boolean | null
+          timezone?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email_enabled?: boolean | null
+          id?: string
+          marketing_enabled?: boolean | null
+          phone_e164?: string | null
+          push_enabled?: boolean | null
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          sms_enabled?: boolean | null
+          timezone?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -2783,6 +3833,42 @@ export type Database = {
           role?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_suspensions: {
+        Row: {
+          admin_id: string | null
+          created_at: string | null
+          duration_days: number | null
+          ends_at: string | null
+          id: string
+          reason: string | null
+          reason_detail: string | null
+          type: string | null
+          user_id: string | null
+        }
+        Insert: {
+          admin_id?: string | null
+          created_at?: string | null
+          duration_days?: number | null
+          ends_at?: string | null
+          id?: string
+          reason?: string | null
+          reason_detail?: string | null
+          type?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          admin_id?: string | null
+          created_at?: string | null
+          duration_days?: number | null
+          ends_at?: string | null
+          id?: string
+          reason?: string | null
+          reason_detail?: string | null
+          type?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -2835,7 +3921,7 @@ export type Database = {
           priority_rank?: number
           starts_at?: string
           status?: string
-          therapist_profile_id?: string
+          therapist_profile_id: string
           updated_at?: string
         }
         Update: {
@@ -2874,228 +3960,120 @@ export type Database = {
           },
         ]
       }
-      booking_inquiries: {
+      waitlist_events: {
         Row: {
+          created_at: string
+          email: string | null
+          event_name: string
           id: string
-          client_name: string | null
-          client_phone: string | null
-          client_email: string | null
-          client_hotel: string | null
-          service_type: string | null
-          preferred_date: string | null
-          preferred_time: string | null
-          duration_minutes: number
-          message: string | null
+          metadata: Json
+          normalized_email: string | null
+          page_path: string | null
+          referrer: string | null
           source: string
-          therapist_id: string | null
-          status: string
-          intelligence_status: string
-          intelligence_report: Json
-          ai_conversation: Json
-          confirmed_date: string | null
-          confirmed_time: string | null
-          appointment_id: string | null
-          sheets_row_id: string | null
-          admin_notes: string | null
-          reviewed_by: string | null
-          reviewed_at: string | null
-          created_at: string
-          updated_at: string
+          user_agent: string | null
         }
         Insert: {
+          created_at?: string
+          email?: string | null
+          event_name: string
           id?: string
-          client_name?: string | null
-          client_phone?: string | null
-          client_email?: string | null
-          client_hotel?: string | null
-          service_type?: string | null
-          preferred_date?: string | null
-          preferred_time?: string | null
-          duration_minutes?: number
-          message?: string | null
+          metadata?: Json
+          normalized_email?: string | null
+          page_path?: string | null
+          referrer?: string | null
           source?: string
-          therapist_id?: string | null
-          status?: string
-          intelligence_status?: string
-          intelligence_report?: Json
-          ai_conversation?: Json
-          confirmed_date?: string | null
-          confirmed_time?: string | null
-          appointment_id?: string | null
-          sheets_row_id?: string | null
-          admin_notes?: string | null
-          reviewed_by?: string | null
-          reviewed_at?: string | null
-          created_at?: string
-          updated_at?: string
+          user_agent?: string | null
         }
         Update: {
+          created_at?: string
+          email?: string | null
+          event_name?: string
           id?: string
-          client_name?: string | null
-          client_phone?: string | null
-          client_email?: string | null
-          client_hotel?: string | null
-          service_type?: string | null
-          preferred_date?: string | null
-          preferred_time?: string | null
-          duration_minutes?: number
-          message?: string | null
+          metadata?: Json
+          normalized_email?: string | null
+          page_path?: string | null
+          referrer?: string | null
           source?: string
-          therapist_id?: string | null
-          status?: string
-          intelligence_status?: string
-          intelligence_report?: Json
-          ai_conversation?: Json
-          confirmed_date?: string | null
-          confirmed_time?: string | null
-          appointment_id?: string | null
-          sheets_row_id?: string | null
-          admin_notes?: string | null
-          reviewed_by?: string | null
-          reviewed_at?: string | null
-          created_at?: string
-          updated_at?: string
+          user_agent?: string | null
         }
         Relationships: []
       }
-      sms_profiles: {
+      waitlist_rate_limits: {
         Row: {
-          id: string
-          profile_id: string
-          ready_to_reply: boolean
-          availability_mode: string
-          arrival_date: string | null
-          departure_date: string | null
-          pricing_60: string | null
-          pricing_90: string | null
-          pricing_couples: string | null
-          outcall_available: boolean
-          couples_available: boolean
-          outcall_area: string | null
-          alert_phone: string | null
-          custom_instructions: string | null
-          twilio_number: string | null
-          created_at: string
+          blocked_until: string | null
+          fingerprint: string
+          request_count: number
           updated_at: string
+          window_start: string
         }
         Insert: {
-          id?: string
-          profile_id: string
-          ready_to_reply?: boolean
-          availability_mode?: string
-          arrival_date?: string | null
-          departure_date?: string | null
-          pricing_60?: string | null
-          pricing_90?: string | null
-          pricing_couples?: string | null
-          outcall_available?: boolean
-          couples_available?: boolean
-          outcall_area?: string | null
-          alert_phone?: string | null
-          custom_instructions?: string | null
-          twilio_number?: string | null
-          created_at?: string
+          blocked_until?: string | null
+          fingerprint: string
+          request_count?: number
           updated_at?: string
+          window_start?: string
         }
         Update: {
-          id?: string
-          profile_id?: string
-          ready_to_reply?: boolean
-          availability_mode?: string
-          arrival_date?: string | null
-          departure_date?: string | null
-          pricing_60?: string | null
-          pricing_90?: string | null
-          pricing_couples?: string | null
-          outcall_available?: boolean
-          couples_available?: boolean
-          outcall_area?: string | null
-          alert_phone?: string | null
-          custom_instructions?: string | null
-          twilio_number?: string | null
-          created_at?: string
+          blocked_until?: string | null
+          fingerprint?: string
+          request_count?: number
           updated_at?: string
+          window_start?: string
         }
         Relationships: []
       }
-      sms_logs: {
+      waitlist_signups: {
         Row: {
-          id: string
-          profile_id: string | null
-          from_number: string
-          to_number: string
-          direction: string
-          body: string
-          twilio_sid: string | null
-          intent: string | null
-          status: string
-          is_manual: boolean
-          booking_inquiry_id: string | null
+          campaign: string | null
+          confirmation_sent_at: string | null
+          confirmation_token: string | null
+          confirmed_at: string | null
           created_at: string
+          email: string
+          id: string
+          metadata: Json
+          normalized_email: string | null
+          page_path: string | null
+          referrer: string | null
+          role: string
+          source: string
+          updated_at: string
+          user_agent: string | null
         }
         Insert: {
-          id?: string
-          profile_id?: string | null
-          from_number: string
-          to_number: string
-          direction: string
-          body: string
-          twilio_sid?: string | null
-          intent?: string | null
-          status?: string
-          is_manual?: boolean
-          booking_inquiry_id?: string | null
+          campaign?: string | null
+          confirmation_sent_at?: string | null
+          confirmation_token?: string | null
+          confirmed_at?: string | null
           created_at?: string
+          email: string
+          id?: string
+          metadata?: Json
+          normalized_email?: string | null
+          page_path?: string | null
+          referrer?: string | null
+          role?: string
+          source?: string
+          updated_at?: string
+          user_agent?: string | null
         }
         Update: {
-          id?: string
-          profile_id?: string | null
-          from_number?: string
-          to_number?: string
-          direction?: string
-          body?: string
-          twilio_sid?: string | null
-          intent?: string | null
-          status?: string
-          is_manual?: boolean
-          booking_inquiry_id?: string | null
+          campaign?: string | null
+          confirmation_sent_at?: string | null
+          confirmation_token?: string | null
+          confirmed_at?: string | null
           created_at?: string
-        }
-        Relationships: []
-      }
-      sms_follow_up_alerts: {
-        Row: {
-          id: string
-          profile_id: string | null
-          client_phone: string
-          our_phone: string
-          last_outbound_at: string
-          last_inbound_at: string | null
-          resolved_at: string | null
-          resolved_by: string | null
-          created_at: string
-        }
-        Insert: {
+          email?: string
           id?: string
-          profile_id?: string | null
-          client_phone: string
-          our_phone: string
-          last_outbound_at: string
-          last_inbound_at?: string | null
-          resolved_at?: string | null
-          resolved_by?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          profile_id?: string | null
-          client_phone?: string
-          our_phone?: string
-          last_outbound_at?: string
-          last_inbound_at?: string | null
-          resolved_at?: string | null
-          resolved_by?: string | null
-          created_at?: string
+          metadata?: Json
+          normalized_email?: string | null
+          page_path?: string | null
+          referrer?: string | null
+          role?: string
+          source?: string
+          updated_at?: string
+          user_agent?: string | null
         }
         Relationships: []
       }
@@ -3119,10 +4097,6 @@ export type Database = {
           offers_outcall: boolean | null
           profile_completion_score: number | null
           profile_status: string | null
-          rejected_at: string | null
-          rejected_by: string | null
-          location_type: string | null
-          sms_enabled: boolean | null
           seo_description: string | null
           seo_title: string | null
           service_radius_miles: number | null
@@ -3149,10 +4123,6 @@ export type Database = {
           offers_outcall?: boolean | null
           profile_completion_score?: number | null
           profile_status?: string | null
-          rejected_at?: string | null
-          rejected_by?: string | null
-          location_type?: string | null
-          sms_enabled?: boolean | null
           seo_description?: string | null
           seo_title?: string | null
           service_radius_miles?: number | null
@@ -3179,10 +4149,6 @@ export type Database = {
           offers_outcall?: boolean | null
           profile_completion_score?: number | null
           profile_status?: string | null
-          rejected_at?: string | null
-          rejected_by?: string | null
-          location_type?: string | null
-          sms_enabled?: boolean | null
           seo_description?: string | null
           seo_title?: string | null
           service_radius_miles?: number | null
@@ -3212,10 +4178,6 @@ export type Database = {
           offers_outcall: boolean | null
           profile_completion_score: number | null
           profile_status: string | null
-          rejected_at: string | null
-          rejected_by: string | null
-          location_type: string | null
-          sms_enabled: boolean | null
           seo_description: string | null
           seo_title: string | null
           service_radius_miles: number | null
@@ -3242,10 +4204,6 @@ export type Database = {
           offers_outcall?: boolean | null
           profile_completion_score?: number | null
           profile_status?: string | null
-          rejected_at?: string | null
-          rejected_by?: string | null
-          location_type?: string | null
-          sms_enabled?: boolean | null
           seo_description?: string | null
           seo_title?: string | null
           service_radius_miles?: number | null
@@ -3272,10 +4230,6 @@ export type Database = {
           offers_outcall?: boolean | null
           profile_completion_score?: number | null
           profile_status?: string | null
-          rejected_at?: string | null
-          rejected_by?: string | null
-          location_type?: string | null
-          sms_enabled?: boolean | null
           seo_description?: string | null
           seo_title?: string | null
           service_radius_miles?: number | null
@@ -3287,81 +4241,198 @@ export type Database = {
         }
         Relationships: []
       }
-      public_therapists_api: {
+      public_therapists: {
         Row: {
-          _tier: string | null
-          add_ons: Json | null
-          areas_served: string[] | null
           available_now: boolean | null
           available_now_expires: string | null
           avatar_url: string | null
           average_rating: number | null
           bio: string | null
           body_type: string | null
-          certifications: string | null
+          booking_platform: string | null
+          booking_url: string | null
           city: string | null
-          contact_clicks: number | null
+          country: string | null
           display_name: string | null
-          education: string | null
-          email: string | null
           email_address: string | null
           full_name: string | null
-          gallery_photos: string[] | null
+          gender: string | null
           headline: string | null
           height_inches: number | null
           id: string | null
           incall_price: number | null
-          is_active: boolean | null
-          is_banned: boolean | null
           is_featured: boolean | null
-          is_suspended: boolean | null
           is_verified_identity: boolean | null
-          is_verified_phone: boolean | null
           is_verified_photos: boolean | null
           is_verified_profile: boolean | null
+          keyword_slugs: string[] | null
           languages: string[] | null
-          languages_spoken: string[] | null
+          latitude: number | null
           lgbtq_affirming: boolean | null
+          location_marker_type: string | null
+          longitude: number | null
+          map_enabled: boolean | null
+          massage_setup: string[] | null
           massage_techniques: string[] | null
-          modality: string | null
+          modalities: string[] | null
+          moderation_status: string | null
           neighborhood: string | null
-          neighborhood_name: string | null
           outcall_price: number | null
-          outcall_radius_miles: number | null
+          payment_methods: string[] | null
           phone: string | null
-          phone_number: string | null
-          whatsapp: string | null
-          session_lengths: number[] | null
+          photo_url: string | null
           pricing_sessions: Json | null
-          primary_area: string | null
-          profile_photo: string | null
+          products_sold: string[] | null
+          products_used: string[] | null
+          profile_completion_score: number | null
           profile_status: string | null
-          rejected_at: string | null
-          rejected_by: string | null
-          location_type: string | null
-          sms_enabled: boolean | null
           promotions: Json | null
           review_count: number | null
+          segments: string[] | null
           service_categories: string[] | null
           slug: string | null
           specialties: string[] | null
-          start_year: number | null
           starting_price: number | null
           state: string | null
-          status: string | null
           subscription_tier: string | null
           tagline: string | null
-          tier: string | null
-          training: string | null
-          travel_schedule: Json | null
           updated_at: string | null
-          user_id: string | null
           verification_status: string | null
+          view_count: number | null
           visibility_status: string | null
           website: string | null
           weight_lb: number | null
           whatsapp_number: string | null
           years_experience: number | null
+          zip_code: string | null
+        }
+        Insert: {
+          available_now?: boolean | null
+          available_now_expires?: string | null
+          avatar_url?: string | null
+          average_rating?: number | null
+          bio?: string | null
+          body_type?: string | null
+          booking_platform?: string | null
+          booking_url?: string | null
+          city?: string | null
+          country?: string | null
+          display_name?: string | null
+          email_address?: string | null
+          full_name?: string | null
+          gender?: string | null
+          headline?: string | null
+          height_inches?: number | null
+          id?: string | null
+          incall_price?: number | null
+          is_featured?: boolean | null
+          is_verified_identity?: boolean | null
+          is_verified_photos?: boolean | null
+          is_verified_profile?: boolean | null
+          keyword_slugs?: string[] | null
+          languages?: string[] | null
+          latitude?: number | null
+          lgbtq_affirming?: boolean | null
+          location_marker_type?: string | null
+          longitude?: number | null
+          map_enabled?: boolean | null
+          massage_setup?: string[] | null
+          massage_techniques?: string[] | null
+          modalities?: string[] | null
+          moderation_status?: string | null
+          neighborhood?: string | null
+          outcall_price?: number | null
+          payment_methods?: string[] | null
+          phone?: string | null
+          photo_url?: string | null
+          pricing_sessions?: Json | null
+          products_sold?: string[] | null
+          products_used?: string[] | null
+          profile_completion_score?: number | null
+          profile_status?: string | null
+          promotions?: Json | null
+          review_count?: number | null
+          segments?: string[] | null
+          service_categories?: string[] | null
+          slug?: string | null
+          specialties?: string[] | null
+          starting_price?: number | null
+          state?: string | null
+          subscription_tier?: string | null
+          tagline?: string | null
+          updated_at?: string | null
+          verification_status?: string | null
+          view_count?: number | null
+          visibility_status?: string | null
+          website?: string | null
+          weight_lb?: number | null
+          whatsapp_number?: string | null
+          years_experience?: number | null
+          zip_code?: string | null
+        }
+        Update: {
+          available_now?: boolean | null
+          available_now_expires?: string | null
+          avatar_url?: string | null
+          average_rating?: number | null
+          bio?: string | null
+          body_type?: string | null
+          booking_platform?: string | null
+          booking_url?: string | null
+          city?: string | null
+          country?: string | null
+          display_name?: string | null
+          email_address?: string | null
+          full_name?: string | null
+          gender?: string | null
+          headline?: string | null
+          height_inches?: number | null
+          id?: string | null
+          incall_price?: number | null
+          is_featured?: boolean | null
+          is_verified_identity?: boolean | null
+          is_verified_photos?: boolean | null
+          is_verified_profile?: boolean | null
+          keyword_slugs?: string[] | null
+          languages?: string[] | null
+          latitude?: number | null
+          lgbtq_affirming?: boolean | null
+          location_marker_type?: string | null
+          longitude?: number | null
+          map_enabled?: boolean | null
+          massage_setup?: string[] | null
+          massage_techniques?: string[] | null
+          modalities?: string[] | null
+          moderation_status?: string | null
+          neighborhood?: string | null
+          outcall_price?: number | null
+          payment_methods?: string[] | null
+          phone?: string | null
+          photo_url?: string | null
+          pricing_sessions?: Json | null
+          products_sold?: string[] | null
+          products_used?: string[] | null
+          profile_completion_score?: number | null
+          profile_status?: string | null
+          promotions?: Json | null
+          review_count?: number | null
+          segments?: string[] | null
+          service_categories?: string[] | null
+          slug?: string | null
+          specialties?: string[] | null
+          starting_price?: number | null
+          state?: string | null
+          subscription_tier?: string | null
+          tagline?: string | null
+          updated_at?: string | null
+          verification_status?: string | null
+          view_count?: number | null
+          visibility_status?: string | null
+          website?: string | null
+          weight_lb?: number | null
+          whatsapp_number?: string | null
+          years_experience?: number | null
+          zip_code?: string | null
         }
         Relationships: []
       }
@@ -3398,13 +4469,10 @@ export type Database = {
       }
     }
     Functions: {
+      current_user_role: { Args: never; Returns: string }
       ensure_therapist_profile_for_profile: {
         Args: { p_profile_id: string }
         Returns: string
-      }
-      get_ranking_event_counts: {
-        Args: Record<PropertyKey, never>
-        Returns: Record<string, number>
       }
       increment_profile_contact_clicks: {
         Args: { p_profile_id: string }

@@ -100,6 +100,7 @@ const nextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "*.supabase.co" },
+      { protocol: "https", hostname: "*.blob.vercel-storage.com" },
     ],
   },
   webpack(config, { dev }) {

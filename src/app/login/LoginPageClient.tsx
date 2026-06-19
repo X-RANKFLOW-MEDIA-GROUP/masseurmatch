@@ -56,7 +56,9 @@ function LoginPageContent() {
         </div>
         {oauthError && (
           <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-            {oauthError}
+            {oauthError === "auth_callback_failed"
+              ? "Sign-in failed — please try again. If the issue persists, clear your cookies and retry."
+              : oauthError}
           </div>
         )}
         <AuthForms mode="login" redirectTo={redirectTo} />
