@@ -189,15 +189,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
-  // ── 0a. Canonical host – redirect www to apex ─────────────────────────
-  const host = request.headers.get("host") || "";
-  if (host.startsWith("www.")) {
-    const url = request.nextUrl.clone();
-    url.host = host.replace(/^www\./, "");
-    url.port = "";
-    return NextResponse.redirect(url, { status: 301 });
-  }
-
   // ── 0. Supabase auth callback guard ─────────────────────────────────────
   // Supabase sometimes sends the ?code= param to the site root URL instead of
   // /auth/callback (e.g. when the Redirect URL in the Supabase dashboard is set
@@ -247,9 +238,12 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   }
 
   // ── 2. /explore?city=X  →  301 /explore/usa/{slug} ───────────────────────
-  if (pathname === "/explore" && searchParams.has("city")) {
+  if (pathname === "/explore" && searchParams.get("city")) {
     const slug = exploreCityToSlug(searchParams.get("city")!);
-    return permanentRedirect(`/explore/usa/${slug}`, request);
+    // Guard against an empty slug, which would redirect to /explore/usa (404).
+    if (slug) {
+      return permanentRedirect(`/explore/usa/${slug}`, request);
+    }
   }
 
   // ── 3. /pt-br/  →  301 /pt-br ────────────────────────────────────────────

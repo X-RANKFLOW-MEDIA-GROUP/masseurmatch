@@ -32,15 +32,15 @@ export async function GET(request: NextRequest) {
   // Load all confirmed appointments in that range
   const { data: booked } = await supabase
     .from('appointments')
-    .select('start_time, end_time')
+    .select('starts_at, ends_at')
     .eq('therapist_id', therapistId)
     .in('status', ['pending', 'confirmed'])
-    .gte('start_time', today.toISOString())
-    .lte('start_time', endDate.toISOString())
+    .gte('starts_at', today.toISOString())
+    .lte('starts_at', endDate.toISOString())
 
   const bookedTimes = new Set(
     (booked ?? []).map(a => {
-      const d = new Date(a.start_time as string)
+      const d = new Date(a.starts_at as string)
       return `${format(d, 'yyyy-MM-dd')}_${format(d, 'HH:mm')}`
     })
   )

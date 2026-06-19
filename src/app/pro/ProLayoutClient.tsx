@@ -14,6 +14,7 @@ import {
   Mail,
   Menu,
   Settings,
+  TrendingUp,
   UserCircle,
   X,
 } from "lucide-react";
@@ -24,6 +25,7 @@ const navItems = [
   { name: "Dashboard", href: "/pro/dashboard", icon: LayoutDashboard },
   { name: "My Profile", href: "/pro/listing", icon: UserCircle },
   { name: "Photos", href: "/pro/photos", icon: ImageIcon },
+  { name: "Growth Tools", href: "/pro/growth", icon: TrendingUp },
   { name: "Inquiries", href: "/pro/inquiries", icon: Mail },
   { name: "Analytics", href: "/pro/analytics", icon: BarChart },
   { name: "Subscription", href: "/pro/subscription", icon: CreditCard },

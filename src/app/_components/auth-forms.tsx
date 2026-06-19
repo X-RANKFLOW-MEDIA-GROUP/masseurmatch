@@ -10,7 +10,7 @@ import { resendConfirmationMutation } from "@/app/_lib/mutations";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-function SocialButtons({ label, redirectTo = "/dashboard" }: { label: string; redirectTo?: string }) {
+function SocialButtons({ label, redirectTo = "/pro/dashboard" }: { label: string; redirectTo?: string }) {
   const [loading, setLoading] = useState<string | null>(null);
 
   const handleOAuth = async (provider: "google" | "apple") => {
@@ -66,7 +66,7 @@ function OrDivider() {
 
 export function AuthForms({
   mode,
-  redirectTo = "/dashboard",
+  redirectTo = "/pro/dashboard",
 }: {
   mode: "login" | "register";
   redirectTo?: string;

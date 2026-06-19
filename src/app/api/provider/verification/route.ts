@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     // Text verification
     const { data: textRow } = await adminClient
       .from("text_verifications")
-      .select("id, status, phone, attempt_count, verified_at, created_at")
+      .select("id, status, created_at")
       .eq("user_id", session.userId)
       .order("created_at", { ascending: false })
       .limit(1)
@@ -39,9 +39,6 @@ export async function GET(request: Request) {
         ? {
             id: textRow.id,
             status: textRow.status,
-            phone: textRow.phone,
-            attemptCount: textRow.attempt_count,
-            verifiedAt: textRow.verified_at,
             createdAt: textRow.created_at,
           }
         : { status: "not_started" },

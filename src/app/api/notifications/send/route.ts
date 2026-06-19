@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
           user_id: body.userId,
           type: body.type,
           title: body.title,
-          message: body.message ?? null,
+          body: body.message ?? null,
           data: (body.data ?? {}) as Json,
         })
         .select("id")

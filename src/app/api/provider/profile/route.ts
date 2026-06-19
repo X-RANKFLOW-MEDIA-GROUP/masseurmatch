@@ -73,7 +73,7 @@ export async function PATCH(request: Request) {
     if (body.heightInches !== undefined) updatePayload.height_inches = body.heightInches;
     if (body.weightLb !== undefined) updatePayload.weight_lb = body.weightLb;
     if (body.bodyType !== undefined) updatePayload.body_type = body.bodyType || null;
-    if (body.smsEnabled !== undefined) updatePayload.sms_enabled = body.smsEnabled;
+    // sms_enabled field was removed from the profiles schema
     if (body.languages !== undefined) updatePayload.languages_spoken = body.languages;
     updatePayload.updated_at = new Date().toISOString();
 

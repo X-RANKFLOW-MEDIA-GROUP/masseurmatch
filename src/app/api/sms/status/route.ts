@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminSession } from '@/app/api/_lib/supabase-server'
-import { errorResponse } from '@/app/api/_lib/http'
+import { RouteError } from '@/app/api/_lib/http'
 import { getTwilioClient } from '@/lib/sms/twilio-utils'
 
 // GET /api/sms/status — Twilio connectivity check + active profile counts
 export async function GET(request: NextRequest) {
   try {
     await requireAdminSession(request as unknown as Request)
+  } catch (err) {
+    if (err instanceof RouteError) {
+      return NextResponse.json({ ok: false, error: err.message }, { status: err.status })
+    }
+    return NextResponse.json({ ok: false, error: 'Server error' }, { status: 500 })
+  }
+
+  try {
     const client = getTwilioClient()
 
     let twilioConnected = false
@@ -41,6 +49,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (err) {
-    return errorResponse(err)
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    return NextResponse.json({ ok: false, error: message }, { status: 500 })
   }
 }

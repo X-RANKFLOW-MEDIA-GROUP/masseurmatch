@@ -70,19 +70,16 @@ export async function POST(request: NextRequest) {
 
     // On approval, create an appointment record if confirmed_date/time are set
     if (body.action === 'approve' && typed.confirmed_date && typed.confirmed_time && typed.therapist_id) {
-      const [hour, minute] = typed.confirmed_time.split(':').map(Number)
       const startTime = new Date(`${typed.confirmed_date}T${typed.confirmed_time}:00`)
       const endTime = new Date(startTime.getTime() + (typed.duration_minutes ?? 60) * 60 * 1000)
 
       const { data: appt } = await supabase
         .from('appointments')
         .insert({
-          client_id: session.userId, // placeholder — in full impl would be client's auth id
+          user_id: session.userId, // placeholder — in full impl would be client's auth id
           therapist_id: typed.therapist_id,
-          start_time: startTime.toISOString(),
-          end_time: endTime.toISOString(),
-          service_type: typed.service_type ?? 'massage',
-          location_type: typed.client_hotel ? 'client_location' : 'therapist_location',
+          starts_at: startTime.toISOString(),
+          ends_at: endTime.toISOString(),
           notes: `Hotel: ${typed.client_hotel ?? 'N/A'} | Inquiry: ${typed.id}`,
           status: 'confirmed',
         })

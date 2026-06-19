@@ -99,16 +99,8 @@ export async function getSeoCities(): Promise<SeoCity[]> {
 }
 
 export async function getSeoSegments(): Promise<SeoSegment[]> {
-  const dbSegments = await tryFetchAllRows<SeoSegment>(
-    "segments",
-    "slug, updated_at",
-    (query) => query.eq("is_active", true).not("slug", "is", null).order("slug"),
-  );
-
-  if (dbSegments) {
-    return dbSegments.filter((segment) => typeof segment.slug === "string" && segment.slug.length > 0);
-  }
-
+  // The "segments" table was removed from the live schema.
+  // Fall back to the static directory taxonomy.
   return DIRECTORY_SEGMENTS.map((segment) => ({
     slug: segment.slug,
     updated_at: null,

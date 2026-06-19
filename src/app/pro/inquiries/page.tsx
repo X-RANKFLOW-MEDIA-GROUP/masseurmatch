@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, CheckCircle2, Mail, Phone, MessageCircle, Archive, Eye, EyeOff } from 'lucide-react';
+import { Loader2, CheckCircle2, Mail, Phone, MessageCircle, Archive, Eye } from 'lucide-react';
+import { requestJson } from '@/app/_lib/request';
 import { formatDistanceToNow } from 'date-fns';
 
 interface ContactInquiry {
@@ -21,7 +21,7 @@ interface ContactInquiry {
   created_at: string;
 }
 
-const supabase = createClient();
+type InquiriesResponse = { ok: boolean; inquiries: ContactInquiry[] };
 
 export default function InquiriesDashboard() {
   const [inquiries, setInquiries] = useState<ContactInquiry[]>([]);
@@ -32,49 +32,13 @@ export default function InquiriesDashboard() {
 
   useEffect(() => {
     loadInquiries();
-    
-    // Subscribe to real-time updates
-    const channel = supabase
-      .channel('contact_inquiries_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'contact_inquiries',
-        },
-        () => {
-          loadInquiries();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      channel.unsubscribe();
-    };
   }, []);
 
   async function loadInquiries() {
     try {
       setError('');
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { setError('Not authenticated'); setLoading(false); return; }
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
-      if (!profile) { setLoading(false); return; }
-
-      const { data, error: err } = await supabase
-        .from('contact_inquiries')
-        .select('*')
-        .eq('profile_id', profile.id)
-        .order('created_at', { ascending: false });
-
-      if (err) throw err;
-      setInquiries(data || []);
+      const res = await requestJson<InquiriesResponse>('/api/contact/inquiries');
+      setInquiries(res.inquiries);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load inquiries');
     } finally {
@@ -84,20 +48,18 @@ export default function InquiriesDashboard() {
 
   async function updateStatus(id: string, status: string) {
     try {
-      const { error: err } = await supabase
-        .from('contact_inquiries')
-        .update({ status })
-        .eq('id', id);
-
-      if (err) throw err;
-      loadInquiries();
+      await requestJson(`/api/contact/inquiries?id=${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    });
+      setInquiries((prev) => prev.map((i) => (i.id === id ? { ...i, status } : i)));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update status');
     }
   }
 
   const statusCounts = {
-    new: inquiries.filter((i) => i.status === 'new').length,
+    new: inquiries.filter((i) => i.status === 'new' || !i.status).length,
     viewed: inquiries.filter((i) => i.status === 'viewed').length,
     responded: inquiries.filter((i) => i.status === 'responded').length,
     archived: inquiries.filter((i) => i.status === 'archived').length,
@@ -105,6 +67,7 @@ export default function InquiriesDashboard() {
 
   const filteredInquiries = inquiries.filter((i) => {
     if (selectedTab === 'all') return true;
+    if (selectedTab === 'new') return i.status === 'new' || !i.status;
     return i.status === selectedTab;
   });
 
@@ -125,12 +88,9 @@ export default function InquiriesDashboard() {
 
   const getContactIcon = (method: string) => {
     switch (method) {
-      case 'phone':
-        return <Phone className="w-4 h-4" />;
-      case 'whatsapp':
-        return <MessageCircle className="w-4 h-4" />;
-      default:
-        return <Mail className="w-4 h-4" />;
+      case 'phone': return <Phone className="w-4 h-4" />;
+      case 'whatsapp': return <MessageCircle className="w-4 h-4" />;
+      default: return <Mail className="w-4 h-4" />;
     }
   };
 
@@ -145,7 +105,6 @@ export default function InquiriesDashboard() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
         <div>
           <h1 className="text-3xl font-bold">Contact Inquiries</h1>
           <p className="text-muted-foreground">Manage client inquiries and messages</p>
@@ -157,7 +116,6 @@ export default function InquiriesDashboard() {
           </Alert>
         )}
 
-        {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: 'New', count: statusCounts.new, color: 'bg-blue-50 border-blue-200' },
@@ -174,7 +132,6 @@ export default function InquiriesDashboard() {
           ))}
         </div>
 
-        {/* Tabs */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab}>
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="all">All</TabsTrigger>
@@ -214,13 +171,11 @@ export default function InquiriesDashboard() {
 
                   {expandedId === inquiry.id && (
                     <CardContent className="space-y-4">
-                      {/* Message */}
                       <div>
                         <label className="text-sm font-medium">Message</label>
                         <p className="mt-1 p-3 rounded bg-muted text-sm">{inquiry.message}</p>
                       </div>
 
-                      {/* Contact Info */}
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
                           <label className="text-sm font-medium">Email</label>
@@ -238,35 +193,21 @@ export default function InquiriesDashboard() {
                         )}
                       </div>
 
-
-                      {/* Actions */}
                       <div className="flex gap-2 flex-wrap">
                         {inquiry.status !== 'viewed' && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => updateStatus(inquiry.id, 'viewed')}
-                          >
+                          <Button size="sm" variant="outline" onClick={() => updateStatus(inquiry.id, 'viewed')}>
                             <Eye className="w-4 h-4 mr-1" />
                             Mark as Viewed
                           </Button>
                         )}
                         {inquiry.status !== 'responded' && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => updateStatus(inquiry.id, 'responded')}
-                          >
+                          <Button size="sm" variant="outline" onClick={() => updateStatus(inquiry.id, 'responded')}>
                             <CheckCircle2 className="w-4 h-4 mr-1" />
                             Mark as Responded
                           </Button>
                         )}
                         {inquiry.status !== 'archived' && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => updateStatus(inquiry.id, 'archived')}
-                          >
+                          <Button size="sm" variant="outline" onClick={() => updateStatus(inquiry.id, 'archived')}>
                             <Archive className="w-4 h-4 mr-1" />
                             Archive
                           </Button>
@@ -277,14 +218,12 @@ export default function InquiriesDashboard() {
 
                   <div className="px-6 py-3 border-t flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">
-                      {(inquiry.message ?? '').substring(0, 100)}...
+                      {(inquiry.message ?? '').substring(0, 100)}{(inquiry.message?.length ?? 0) > 100 ? '...' : ''}
                     </span>
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() =>
-                        setExpandedId(expandedId === inquiry.id ? null : inquiry.id)
-                      }
+                      onClick={() => setExpandedId(expandedId === inquiry.id ? null : inquiry.id)}
                     >
                       {expandedId === inquiry.id ? 'Hide' : 'View'}
                     </Button>
