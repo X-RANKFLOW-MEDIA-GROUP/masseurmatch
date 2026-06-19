@@ -129,6 +129,8 @@ export const proProfileSchema = z.object({
   heightInches: z.number().int().min(48).max(96).nullable().optional(),
   weightLb: z.number().int().min(80).max(450).nullable().optional(),
   bodyType: z.enum(BODY_TYPES).nullable().optional(),
+  rulesAccepted: z.boolean().optional(),
+  moderationPassed: z.boolean().optional(),
 });
 
 export type AuthLoginInput = z.infer<typeof authLoginSchema>;

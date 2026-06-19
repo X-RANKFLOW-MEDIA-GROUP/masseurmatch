@@ -432,7 +432,11 @@ export default function MyListingPage() {
         heightInches: parseWholeNumber(form.heightInches),
         weightLb: parseWholeNumber(form.weightLb),
         bodyType: normalizeBodyTypeValue(form.bodyType),
+        rulesAccepted: agreedToTerms,
+        moderationPassed: !moderationUnavailable,
       });
+
+      const wasAutoApproved = (response as Record<string, unknown>).autoApproved === true;
 
       setForm(mapProfileToForm(response.profile));
       setProfileId(response.profile?.id ?? profileId);
@@ -440,10 +444,16 @@ export default function MyListingPage() {
       setSaveState("success");
 
       toast({
-        title: moderationUnavailable ? "Changes saved for review" : "Changes saved",
+        title: moderationUnavailable
+          ? "Changes saved for review"
+          : wasAutoApproved
+            ? "Profile approved"
+            : "Changes saved",
         description: moderationUnavailable
           ? "Screening was unavailable — sent for manual review."
-          : "Your profile has been updated and sent to the review queue.",
+          : wasAutoApproved
+            ? "Your changes passed review and your profile is live."
+            : "Your profile has been updated.",
       });
 
       window.setTimeout(() => setSaveState("idle"), 3200);

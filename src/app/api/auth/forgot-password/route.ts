@@ -1,5 +1,5 @@
 import { errorResponse, json, parseJsonBody } from "@/app/api/_lib/http";
-import { createSupabasePublicClient } from "@/app/api/_lib/supabase-server";
+import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { assertRateLimit } from "@/app/_lib/security";
 import { forgotPasswordSchema } from "@/app/_lib/validation";
 
@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     assertRateLimit(request, "auth-forgot-password", { limit: 5, windowMs: 60_000 });
     const body = await parseJsonBody(request, forgotPasswordSchema);
     try {
-      const supabase = createSupabasePublicClient();
+      const supabase = createSupabaseAdminClient();
       const requestUrl = new URL(request.url);
       const redirectPath = body.redirectTo || DEFAULT_RESET_PATH;
       let redirectTo = new URL(DEFAULT_RESET_PATH, requestUrl.origin).toString();
