@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminSession } from '@/app/api/_lib/supabase-server'
 import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
+import { errorResponse } from '@/app/api/_lib/http'
 import type { Conversation } from '@/lib/sms/types'
 
 // GET /api/sms/logs?profile_id=xxx&phone=xxx&limit=50
@@ -89,7 +90,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ ok: true, conversations })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ ok: false, error: message }, { status: 500 })
+    return errorResponse(err)
   }
 }

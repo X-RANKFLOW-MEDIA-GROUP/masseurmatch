@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminSession } from '@/app/api/_lib/supabase-server'
+import { errorResponse } from '@/app/api/_lib/http'
 import { getTwilioClient } from '@/lib/sms/twilio-utils'
 
 // GET /api/sms/status — Twilio connectivity check + active profile counts
@@ -40,7 +41,6 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ ok: false, error: message }, { status: 500 })
+    return errorResponse(err)
   }
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseAdminClient, requireAdminSession } from '@/app/api/_lib/supabase-server'
+import { errorResponse } from '@/app/api/_lib/http'
 
 // GET /api/sms/profile?profile_id=xxx — get SMS profile config
 export async function GET(request: NextRequest) {
@@ -22,8 +23,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ ok: true, profiles: data ?? [] })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ ok: false, error: message }, { status: 500 })
+    return errorResponse(err)
   }
 }
 
@@ -47,8 +47,7 @@ export async function POST(request: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     return NextResponse.json({ ok: true, profile: data })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ ok: false, error: message }, { status: 500 })
+    return errorResponse(err)
   }
 }
 
@@ -74,7 +73,6 @@ export async function PATCH(request: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     return NextResponse.json({ ok: true, profile: data })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ ok: false, error: message }, { status: 500 })
+    return errorResponse(err)
   }
 }
