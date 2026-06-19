@@ -77,22 +77,14 @@ export default function HomeTestPage() {
             {/* Center: Main content */}
             <div className="lg:col-span-1">
               <h1
-                className="text-5xl lg:text-6xl font-black leading-tight mb-2 tracking-tight"
-                style={{
-                  fontFamily: "var(--font-unbounded)",
-                  fontWeight: 900,
-                  color: "#000000",
-                }}
+                className="text-5xl lg:text-6xl font-display font-black leading-tight mb-2 tracking-tight"
+                style={{ color: "#000000" }}
               >
                 Find The Right Massage.
               </h1>
               <h2
-                className="text-5xl lg:text-6xl font-black leading-tight mb-8 tracking-tight"
-                style={{
-                  fontFamily: "var(--font-unbounded)",
-                  fontWeight: 900,
-                  color: "#BB1D00",
-                }}
+                className="text-5xl lg:text-6xl font-display font-black leading-tight mb-8 tracking-tight"
+                style={{ color: "#BB1D00" }}
               >
                 Every Time.
               </h2>
@@ -245,12 +237,8 @@ export default function HomeTestPage() {
             premium benefits
           </p>
           <h2
-            className="text-5xl font-black text-center mb-16 tracking-tight"
-            style={{
-              fontFamily: "var(--font-unbounded)",
-              fontWeight: 900,
-              color: "#000000",
-            }}
+            className="text-5xl font-display font-black text-center mb-16 tracking-tight"
+            style={{ color: "#000000" }}
           >
             Meet Our Verified Therapists
           </h2>
@@ -284,12 +272,8 @@ export default function HomeTestPage() {
                 </div>
               </div>
               <h3
-                className="font-black text-2xl text-center tracking-tight"
-                style={{
-                  fontFamily: "var(--font-unbounded)",
-                  fontWeight: 900,
-                  color: "#000000",
-                }}
+                className="font-display font-black text-2xl text-center tracking-tight"
+                style={{ color: "#000000" }}
               >
                 Verified Professional
               </h3>
@@ -341,12 +325,8 @@ export default function HomeTestPage() {
                 </div>
               </div>
               <h3
-                className="font-black text-2xl text-center tracking-tight"
-                style={{
-                  fontFamily: "var(--font-unbounded)",
-                  fontWeight: 900,
-                  color: "#000000",
-                }}
+                className="font-display font-black text-2xl text-center tracking-tight"
+                style={{ color: "#000000" }}
               >
                 Premium Verified
               </h3>
@@ -368,12 +348,8 @@ export default function HomeTestPage() {
       >
         <div className="mx-auto max-w-7xl">
           <h3
-            className="text-3xl font-black text-center mb-12 tracking-tight"
-            style={{
-              fontFamily: "var(--font-unbounded)",
-              fontWeight: 900,
-              color: "#000000",
-            }}
+            className="text-3xl font-display font-black text-center mb-12 tracking-tight"
+            style={{ color: "#000000" }}
           >
             Verification & Trust Icons
           </h3>
