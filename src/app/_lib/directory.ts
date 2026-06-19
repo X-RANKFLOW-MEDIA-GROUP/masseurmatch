@@ -300,8 +300,8 @@ export const getPublicTherapists = async (filters?: {
   const { data: rawData, error, count } = await query;
   const data = rawData ? sortPublicTherapists(rawData as unknown as PublicTherapist[]) : [];
 
-  if (!error && data.length > 0) {
-    return { items: data, total: count || data.length, page, pageSize };
+  if (!error) {
+    return { items: data, total: count ?? data.length, page, pageSize };
   }
 
   const fallbackItems = sortPublicTherapists(

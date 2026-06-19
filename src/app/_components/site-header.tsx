@@ -64,7 +64,7 @@ function ExploreDropdown({ isDarkHero = false }: { isDarkHero?: boolean }) {
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.15 }}
             role="menu"
-            className="absolute top-full left-0 mt-3 w-52 bg-white/95 backdrop-blur-xl border border-slate-200 rounded-xl p-1.5 shadow-xl"
+            className="absolute top-full left-0 mt-3 w-52 bg-white/95 backdrop-blur-xl border border-slate-200 rounded-xl p-1.5 shadow-xl z-[60]"
           >
             {exploreItems.map(({ href, label, icon: Icon }) => (
               <Link
