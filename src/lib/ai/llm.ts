@@ -89,6 +89,112 @@ async function tryGemini(apiKey: string, o: CompleteOptions): Promise<string | n
   return result.response.text().trim() || null;
 }
 
+// ── Multi-turn chat ──────────────────────────────────────────────────────────
+
+export type ChatMessage = {
+  role: "system" | "user" | "assistant";
+  content: string;
+};
+
+async function tryOpenAIChat(
+  apiKey: string,
+  messages: ChatMessage[],
+  o: { temperature?: number; maxTokens?: number; timeoutMs?: number },
+): Promise<string | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), o.timeoutMs ?? 8000);
+  try {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: OPENAI_MODEL,
+        temperature: o.temperature ?? 0.7,
+        max_tokens: o.maxTokens ?? 400,
+        messages,
+      }),
+      signal: controller.signal,
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+    return data.choices?.[0]?.message?.content?.trim() || null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function tryGeminiChat(
+  apiKey: string,
+  messages: ChatMessage[],
+  o: { temperature?: number; maxTokens?: number; timeoutMs?: number },
+): Promise<string | null> {
+  const systemMsg = messages.find((m) => m.role === "system");
+  const turns = messages.filter((m) => m.role !== "system");
+  const lastTurn = turns[turns.length - 1];
+  if (!lastTurn) return null;
+
+  const client = new GoogleGenerativeAI(apiKey);
+  const model = client.getGenerativeModel(
+    {
+      model: GEMINI_MODEL,
+      safetySettings: [
+        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE },
+        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+      ],
+    },
+    { timeout: o.timeoutMs ?? 8000 },
+  );
+
+  const historyTurns = turns.slice(0, -1).map((m) => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: m.content }],
+  }));
+
+  // Prepend system context to first user message since Gemini 1.5-flash
+  // doesn't have a dedicated systemInstruction field in the SDK version used.
+  const firstContent = systemMsg
+    ? `${systemMsg.content}\n\n${lastTurn.content}`
+    : lastTurn.content;
+
+  const chat = model.startChat({ history: historyTurns });
+  const result = await chat.sendMessage(firstContent);
+  return result.response.text().trim() || null;
+}
+
+/**
+ * Send a multi-turn conversation to the LLM, preferring OpenAI then Gemini.
+ * The `messages` array should follow the standard chat format with a leading
+ * system message and alternating user/assistant turns ending on user.
+ */
+export async function chatMessages(
+  messages: ChatMessage[],
+  o: { temperature?: number; maxTokens?: number; timeoutMs?: number } = {},
+): Promise<LlmResult> {
+  const openaiKey = envAny(["OPENAI_API_KEY"], "");
+  if (openaiKey) {
+    try {
+      const text = await tryOpenAIChat(openaiKey, messages, o);
+      if (text) return { text, provider: "openai", model: OPENAI_MODEL };
+    } catch {
+      // fall through
+    }
+  }
+
+  const geminiKey = envAny(["GEMINI_API_KEY", "GOOGLE_API_KEY"], "");
+  if (geminiKey) {
+    try {
+      const text = await tryGeminiChat(geminiKey, messages, o);
+      if (text) return { text, provider: "gemini", model: GEMINI_MODEL };
+    } catch {
+      // fall through
+    }
+  }
+
+  return null;
+}
+
+// ── Single-turn completion (kept for moderation / one-shot callers) ──────────
+
 /** Complete a prompt, preferring OpenAI then Gemini. */
 export async function completeText(o: CompleteOptions): Promise<LlmResult> {
   const openaiKey = envAny(["OPENAI_API_KEY"], "");
