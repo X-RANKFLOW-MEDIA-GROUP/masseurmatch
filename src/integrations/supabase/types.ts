@@ -1880,6 +1880,7 @@ export type Database = {
           inquiry_count: number | null
           is_active: boolean | null
           is_banned: boolean | null
+          is_demo: boolean | null
           is_featured: boolean | null
           is_suspended: boolean | null
           is_verified_email: boolean | null
@@ -2053,6 +2054,7 @@ export type Database = {
           inquiry_count?: number | null
           is_active?: boolean | null
           is_banned?: boolean | null
+          is_demo?: boolean | null
           is_featured?: boolean | null
           is_suspended?: boolean | null
           is_verified_email?: boolean | null
@@ -2226,6 +2228,7 @@ export type Database = {
           inquiry_count?: number | null
           is_active?: boolean | null
           is_banned?: boolean | null
+          is_demo?: boolean | null
           is_featured?: boolean | null
           is_suspended?: boolean | null
           is_verified_email?: boolean | null
