@@ -1,341 +1,171 @@
 import type { Metadata } from "next";
 import {
-  ShieldCheck,
+  Gem,
   CheckCircle2,
   Users,
   TrendingUp,
-  Zap,
+  BarChart3,
   Heart,
-  MessageCircle,
-  MapPin,
-  Clock,
-  DollarSign,
-  Star,
-  Lock,
-  Verified,
-  ThumbsUp,
+  Building2,
   ArrowRight,
   Search,
   Filter,
-  Phone,
   Mail,
-  Globe,
-  Calendar,
-  Award,
-  Trophy,
-  Sparkles,
-  Target,
-  BarChart3,
-  Send,
-  BadgeCheck,
-  Eye,
-  Hand,
-  Wind,
-  Activity,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Home Test - Icon Showcase | MasseurMatch",
-  description: "Test page showcasing premium icon implementation with lucide-react",
+  title: "Home Test - Premium Directory | MasseurMatch",
+  description: "Premium male massage therapist directory showcase",
 };
 
 export default function HomeTestPage() {
-  const features = [
+  // Mock therapist profiles
+  const therapists = [
     {
-      icon: ShieldCheck,
-      label: "Verified Profiles",
-      description: "All therapists reviewed and vetted before launch",
+      name: "Daniel M.",
+      image: "👨‍⚕️",
+      description: "Professional therapist with 10+ years massage and healthcare exp.",
+      rating: 4.9,
     },
     {
-      icon: BadgeCheck,
-      label: "Trusted & Safe",
-      description: "Premium vetting for your peace of mind",
+      name: "Lucas S.",
+      image: "👨‍⚕️",
+      description: "Certified massage therapist specialized in deep tissue.",
+      rating: 4.8,
     },
     {
-      icon: Users,
-      label: "LGBTQ+ Affirming",
-      description: "Welcoming professionals across the community",
-    },
-    {
-      icon: TrendingUp,
-      label: "Top Specialists",
-      description: "The best therapists in your area",
-    },
-    {
-      icon: Zap,
-      label: "Quick Booking",
-      description: "Direct contact—no middleman required",
-    },
-    {
-      icon: Heart,
-      label: "Wellness Focus",
-      description: "Premium therapeutic experience",
+      name: "Anderson R.",
+      image: "👨‍⚕️",
+      description: "Professional therapist with expertise in sports massage and care.",
+      rating: 4.9,
     },
   ];
 
-  const services = [
-    { icon: MessageCircle, label: "Chat Support" },
-    { icon: MapPin, label: "Local Search" },
-    { icon: Clock, label: "Availability" },
-    { icon: DollarSign, label: "Transparent Pricing" },
-    { icon: Phone, label: "Direct Contact" },
-    { icon: Calendar, label: "Schedule Now" },
+  const featureStats = [
+    { icon: Gem, label: "Features" },
+    { icon: CheckCircle2, label: "For appreciated bodies" },
+    { icon: Users, label: "Professional therapists" },
+    { icon: Building2, label: "100% healthfulness" },
   ];
 
-  const statsIcons = [
-    { icon: Users, label: "45,000+", description: "Therapists Reviewed" },
-    { icon: MapPin, label: "80+", description: "Cities Covered" },
-    { icon: TrendingUp, label: "5.3x", description: "Faster Matches" },
-    { icon: Trophy, label: "23", description: "Premium Features" },
-  ];
-
-  const socialProof = [
-    { icon: Star, label: "Top Rated" },
-    { icon: Award, label: "Industry Leading" },
-    { icon: CheckCircle2, label: "Verified Listings" },
-    { icon: Sparkles, label: "Premium Quality" },
+  const numberStats = [
+    { icon: Users, value: "45,000+", label: "licensed therapists" },
+    { icon: BarChart3, value: "3.3x+", label: "faster therapy booking" },
+    { icon: Building2, value: "23+", label: "premium benefits" },
   ];
 
   return (
     <div className="min-h-screen bg-background">
-      {/* ─── DARK HERO SECTION ─────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-[#060E1A] px-4 py-20 sm:px-6 lg:px-8">
+      {/* ─── HERO SECTION ──────────────────────────────────────────────── */}
+      <section className="px-4 py-16 sm:px-6 lg:px-8 bg-gray-50">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-8">
-            {/* Left: Text content */}
-            <div className="flex flex-col justify-center">
-              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-400 mb-4">
-                Premium Icons Showcase
-              </p>
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight mb-6">
-                Find the Right Massage.{" "}
-                <span className="text-orange-400">Every Time.</span>
-              </h1>
-              <p className="text-lg text-white/80 mb-8 max-w-lg">
-                A premium directory of LGBTQ+-affirming male massage therapists
-                across 80+ US cities. Verified, trusted, and easy to find.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded font-semibold flex items-center justify-center gap-2 transition-colors">
-                  <Search className="w-5 h-5" strokeWidth={2.25} />
-                  Search Therapists
-                </button>
-                <Link
-                  href="/"
-                  className="border border-white/20 text-white px-6 py-3 rounded font-semibold flex items-center justify-center gap-2 hover:bg-white/5 transition-colors"
-                >
-                  Back to Home
-                  <ArrowRight className="w-5 h-5" strokeWidth={2.25} />
-                </Link>
+          {/* Eyebrow */}
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-600 mb-8 text-center">
+            Premium. Professional. Personal.
+          </p>
+
+          <div className="grid lg:grid-cols-3 gap-8 items-center">
+            {/* Left: Large hero image */}
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-lg overflow-hidden shadow-lg">
+                <div className="aspect-square bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-6xl">
+                  👨‍💼
+                </div>
               </div>
             </div>
 
-            {/* Right: Feature icons grid */}
-            <div className="grid grid-cols-2 gap-4 self-center">
-              {[
-                { icon: ShieldCheck, color: "text-emerald-400" },
-                { icon: Heart, color: "text-orange-400" },
-                { icon: Users, color: "text-blue-400" },
-                { icon: Star, color: "text-yellow-400" },
-              ].map((item, i) => {
-                const Icon = item.icon;
-                return (
-                  <div
-                    key={i}
-                    className="bg-white/5 border border-white/10 rounded-lg p-6 flex items-center justify-center backdrop-blur"
-                  >
-                    <Icon className={`w-12 h-12 ${item.color}`} strokeWidth={2} />
+            {/* Center: Main content */}
+            <div className="lg:col-span-1">
+              <h1 className="font-display text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight mb-8">
+                Find The Right Massage. <br />
+                <span className="text-orange-500">Every Time.</span>
+              </h1>
+
+              {/* Search bar */}
+              <div className="flex gap-2 mb-4">
+                <div className="flex-1 flex items-center gap-2 bg-white border border-gray-300 rounded px-4 py-3">
+                  <Search className="w-5 h-5 text-gray-400" strokeWidth={2.25} />
+                  <input
+                    type="text"
+                    placeholder="Search by string"
+                    className="flex-1 outline-none text-sm"
+                  />
+                </div>
+                <select className="border border-gray-300 rounded px-4 py-3 text-sm bg-white">
+                  <option>All dates</option>
+                </select>
+                <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded font-semibold transition-colors">
+                  SEARCH
+                </button>
+              </div>
+            </div>
+
+            {/* Right: Therapist cards */}
+            <div className="lg:col-span-1 space-y-3">
+              {therapists.map((therapist, i) => (
+                <div
+                  key={i}
+                  className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex gap-3">
+                    <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-2xl flex-shrink-0">
+                      {therapist.image}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900">
+                        {therapist.name}
+                      </h3>
+                      <p className="text-xs text-gray-600 line-clamp-2">
+                        {therapist.description}
+                      </p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <span className="text-xs font-semibold text-gray-900">
+                          ${therapist.rating}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* ─── FEATURES SECTION ──────────────────────────────────────────── */}
-      <section className="px-4 py-20 sm:px-6 lg:px-8 bg-white">
+      {/* ─── FEATURES & STATS BAND ────────────────────────────────────── */}
+      <section className="px-4 py-12 sm:px-6 lg:px-8 bg-white border-t border-b border-gray-200">
         <div className="mx-auto max-w-7xl">
-          <div className="text-center mb-16">
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-400 mb-4">
-              Why Choose Us
-            </p>
-            <h2 className="font-display text-4xl font-extrabold text-gray-900 mb-4">
-              Premium Features
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Every element designed to build trust and make finding your perfect
-              therapist effortless
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, i) => {
-              const Icon = feature.icon;
-              return (
-                <div
-                  key={i}
-                  className="border border-gray-200 rounded-lg p-8 hover:shadow-lg transition-shadow"
-                >
-                  <div className="mb-4">
-                    <Icon
-                      className="w-8 h-8 text-orange-500"
-                      strokeWidth={2.25}
-                    />
-                  </div>
-                  <h3 className="font-semibold text-lg text-gray-900 mb-2">
-                    {feature.label}
-                  </h3>
-                  <p className="text-gray-600">{feature.description}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── STATS SECTION WITH ICONS ─────────────────────────────────── */}
-      <section className="px-4 py-20 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="mx-auto max-w-7xl">
-          <h2 className="font-display text-4xl font-extrabold text-gray-900 text-center mb-16">
-            By the Numbers
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {statsIcons.map((stat, i) => {
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {/* Feature icons */}
+            {featureStats.map((stat, i) => {
               const Icon = stat.icon;
               return (
-                <div key={i} className="text-center">
-                  <div className="flex justify-center mb-4">
-                    <div className="bg-orange-100 p-4 rounded-full">
-                      <Icon
-                        className="w-8 h-8 text-orange-500"
-                        strokeWidth={2.25}
-                      />
-                    </div>
-                  </div>
-                  <div className="font-display text-3xl font-extrabold text-gray-900 mb-2">
-                    {stat.label}
-                  </div>
-                  <p className="text-gray-600">{stat.description}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── SERVICES ICONS GRID ──────────────────────────────────────── */}
-      <section className="px-4 py-20 sm:px-6 lg:px-8 bg-white">
-        <div className="mx-auto max-w-7xl">
-          <h2 className="font-display text-4xl font-extrabold text-gray-900 text-center mb-16">
-            Available Services
-          </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((service, i) => {
-              const Icon = service.icon;
-              return (
-                <div
-                  key={i}
-                  className="flex items-center gap-4 p-6 bg-gray-50 rounded-lg hover:bg-orange-50 transition-colors"
-                >
+                <div key={i} className="flex items-center gap-3">
                   <Icon
-                    className="w-6 h-6 text-orange-500 flex-shrink-0"
+                    className="w-5 h-5 text-gray-700 flex-shrink-0"
                     strokeWidth={2.25}
                   />
-                  <span className="font-semibold text-gray-900">
-                    {service.label}
+                  <span className="text-sm font-medium text-gray-700">
+                    {stat.label}
                   </span>
                 </div>
               );
             })}
-          </div>
-        </div>
-      </section>
 
-      {/* ─── COMPREHENSIVE ICON SHOWCASE ──────────────────────────────── */}
-      <section className="px-4 py-20 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="mx-auto max-w-7xl">
-          <h2 className="font-display text-4xl font-extrabold text-gray-900 text-center mb-4">
-            Icon Library
-          </h2>
-          <p className="text-center text-gray-600 mb-16 max-w-2xl mx-auto">
-            All icons use lucide-react with intentional strokeWidth and sizing
-            in rem units for consistency
-          </p>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-            {[
-              { name: "ShieldCheck", Icon: ShieldCheck },
-              { name: "BadgeCheck", Icon: BadgeCheck },
-              { name: "CheckCircle2", Icon: CheckCircle2 },
-              { name: "Heart", Icon: Heart },
-              { name: "Star", Icon: Star },
-              { name: "Trophy", Icon: Trophy },
-              { name: "Award", Icon: Award },
-              { name: "Sparkles", Icon: Sparkles },
-              { name: "Users", Icon: Users },
-              { name: "MapPin", Icon: MapPin },
-              { name: "Clock", Icon: Clock },
-              { name: "Phone", Icon: Phone },
-              { name: "Mail", Icon: Mail },
-              { name: "Send", Icon: Send },
-              { name: "Search", Icon: Search },
-              { name: "Filter", Icon: Filter },
-              { name: "ArrowRight", Icon: ArrowRight },
-              { name: "TrendingUp", Icon: TrendingUp },
-              { name: "BarChart3", Icon: BarChart3 },
-              { name: "Target", Icon: Target },
-              { name: "Eye", Icon: Eye },
-              { name: "Lock", Icon: Lock },
-              { name: "Verified", Icon: Verified },
-              { name: "Calendar", Icon: Calendar },
-              { name: "Activity", Icon: Activity },
-              { name: "Hand", Icon: Hand },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="flex flex-col items-center gap-3 p-4 bg-white rounded-lg border border-gray-200 hover:border-orange-400 transition-colors"
-              >
-                <item.Icon
-                  className="w-6 h-6 text-orange-500"
-                  strokeWidth={2.25}
-                />
-                <span className="text-xs text-gray-600 text-center font-mono">
-                  {item.name}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── DARK SECTION WITH ICONS ──────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-[#060E1A] px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <h2 className="font-display text-4xl font-extrabold text-white text-center mb-16">
-            Why <span className="text-orange-400">MasseurMatch</span>
-          </h2>
-
-          <div className="grid md:grid-cols-2 gap-12">
-            {socialProof.map((item, i) => {
-              const Icon = item.icon;
+            {/* Number stats */}
+            {numberStats.map((stat, i) => {
+              const Icon = stat.icon;
               return (
-                <div
-                  key={i}
-                  className="flex items-start gap-4 p-6 bg-white/5 border border-white/10 rounded-lg backdrop-blur"
-                >
+                <div key={`stat-${i}`} className="flex items-center gap-3">
                   <Icon
-                    className="w-6 h-6 text-emerald-400 flex-shrink-0 mt-1"
+                    className="w-5 h-5 text-gray-700 flex-shrink-0"
                     strokeWidth={2.25}
                   />
                   <div>
-                    <h3 className="font-semibold text-white mb-2">
-                      {item.label}
-                    </h3>
-                    <p className="text-white/70">
-                      Premium quality and trust are our foundation
-                    </p>
+                    <div className="font-bold text-gray-900">{stat.value}</div>
+                    <div className="text-xs text-gray-600">{stat.label}</div>
                   </div>
                 </div>
               );
@@ -344,28 +174,157 @@ export default function HomeTestPage() {
         </div>
       </section>
 
-      {/* ─── FOOTER CTA ───────────────────────────────────────────────── */}
-      <section className="px-4 py-16 sm:px-6 lg:px-8 bg-white">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-display text-3xl font-extrabold text-gray-900 mb-4">
-            Ready to find your perfect therapist?
+      {/* ─── ILLUSTRATED THERAPIST PROFILES ────────────────────────────── */}
+      <section className="px-4 py-20 sm:px-6 lg:px-8 bg-white">
+        <div className="mx-auto max-w-7xl">
+          <h2 className="font-display text-4xl font-extrabold text-gray-900 text-center mb-16">
+            Meet Our Verified Therapists
           </h2>
-          <p className="text-lg text-gray-600 mb-8">
-            Browse verified professionals in 80+ US cities
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded font-semibold flex items-center justify-center gap-2 transition-colors">
-              <Search className="w-5 h-5" strokeWidth={2.25} />
-              Search Now
-            </button>
-            <Link
-              href="/"
-              className="border-2 border-orange-500 text-orange-500 hover:bg-orange-50 px-8 py-3 rounded font-semibold flex items-center justify-center gap-2 transition-colors"
-            >
-              Back Home
-              <ArrowRight className="w-5 h-5" strokeWidth={2.25} />
-            </Link>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-12 max-w-2xl mx-auto">
+            {/* Profile 1 - With protective circle */}
+            <div className="flex flex-col items-center">
+              <div className="relative w-64 h-64 mb-6">
+                {/* Circular protective design */}
+                <div className="absolute inset-0 rounded-full border-4 border-gray-300"></div>
+                <div
+                  className="absolute inset-4 rounded-full"
+                  style={{
+                    background:
+                      "conic-gradient(#FF8A1F 0deg 90deg, transparent 90deg 180deg, #E5E7EB 180deg 270deg, transparent 270deg)",
+                  }}
+                ></div>
+
+                {/* Avatar placeholder with therapeutic massage illustration */}
+                <div className="absolute inset-8 bg-gray-200 rounded-full flex items-center justify-center text-7xl shadow-lg">
+                  🧘‍♂️
+                </div>
+              </div>
+              <h3 className="font-semibold text-lg text-gray-900 text-center">
+                Verified Professional
+              </h3>
+              <p className="text-sm text-gray-600 text-center mt-2">
+                Certified therapist with protective circle verification
+              </p>
+            </div>
+
+            {/* Profile 2 - With verified checkmark badge */}
+            <div className="flex flex-col items-center">
+              <div className="relative w-64 h-64 mb-6">
+                {/* Circular protective design */}
+                <div className="absolute inset-0 rounded-full border-4 border-gray-400"></div>
+                <div
+                  className="absolute inset-4 rounded-full"
+                  style={{
+                    background:
+                      "conic-gradient(#E5E7EB 0deg 180deg, #FF8A1F 180deg 270deg, transparent 270deg)",
+                  }}
+                ></div>
+
+                {/* Avatar placeholder */}
+                <div className="absolute inset-8 bg-gray-200 rounded-full flex items-center justify-center text-7xl shadow-lg">
+                  💆‍♂️
+                </div>
+
+                {/* Verified checkmark badge */}
+                <div className="absolute bottom-4 right-4 bg-orange-500 rounded-full p-3 shadow-lg border-4 border-white">
+                  <CheckCircle2
+                    className="w-8 h-8 text-white"
+                    strokeWidth={2.5}
+                    fill="currentColor"
+                  />
+                </div>
+              </div>
+              <h3 className="font-semibold text-lg text-gray-900 text-center">
+                Premium Verified
+              </h3>
+              <p className="text-sm text-gray-600 text-center mt-2">
+                Top-rated therapist with verified checkmark credential
+              </p>
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* ─── TRUST & VERIFICATION ICONS SECTION ────────────────────────── */}
+      <section className="px-4 py-16 sm:px-6 lg:px-8 bg-gray-50 border-t border-gray-200">
+        <div className="mx-auto max-w-7xl">
+          <h3 className="font-display text-2xl font-extrabold text-gray-900 text-center mb-12">
+            Verification & Trust Icons
+          </h3>
+
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="flex flex-col items-center p-6 bg-white rounded-lg border border-gray-200">
+              <div className="bg-orange-100 p-4 rounded-full mb-4">
+                <CheckCircle2
+                  className="w-8 h-8 text-orange-500"
+                  strokeWidth={2.25}
+                />
+              </div>
+              <h4 className="font-semibold text-gray-900 text-center">
+                Verified Therapists
+              </h4>
+              <p className="text-xs text-gray-600 text-center mt-2">
+                All profiles reviewed and confirmed
+              </p>
+            </div>
+
+            <div className="flex flex-col items-center p-6 bg-white rounded-lg border border-gray-200">
+              <div className="bg-emerald-100 p-4 rounded-full mb-4">
+                <Heart
+                  className="w-8 h-8 text-emerald-500"
+                  strokeWidth={2.25}
+                />
+              </div>
+              <h4 className="font-semibold text-gray-900 text-center">
+                Professional Care
+              </h4>
+              <p className="text-xs text-gray-600 text-center mt-2">
+                Licensed and certified experts
+              </p>
+            </div>
+
+            <div className="flex flex-col items-center p-6 bg-white rounded-lg border border-gray-200">
+              <div className="bg-blue-100 p-4 rounded-full mb-4">
+                <Users
+                  className="w-8 h-8 text-blue-500"
+                  strokeWidth={2.25}
+                />
+              </div>
+              <h4 className="font-semibold text-gray-900 text-center">
+                LGBTQ+ Affirming
+              </h4>
+              <p className="text-xs text-gray-600 text-center mt-2">
+                Safe, welcoming, and inclusive space
+              </p>
+            </div>
+
+            <div className="flex flex-col items-center p-6 bg-white rounded-lg border border-gray-200">
+              <div className="bg-purple-100 p-4 rounded-full mb-4">
+                <TrendingUp
+                  className="w-8 h-8 text-purple-500"
+                  strokeWidth={2.25}
+                />
+              </div>
+              <h4 className="font-semibold text-gray-900 text-center">
+                Top Rated
+              </h4>
+              <p className="text-xs text-gray-600 text-center mt-2">
+                Premium therapists with high ratings
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── DARK FOOTER SECTION ──────────────────────────────────────── */}
+      <section className="px-4 py-8 sm:px-6 lg:px-8 bg-gray-900 text-white text-center">
+        <div className="mx-auto max-w-7xl">
+          <h3 className="text-xl font-bold mb-2">MASSEURMATCH</h3>
+          <p className="text-gray-400 text-sm mb-4">
+            © masseurmatch.com • masseurmatch@masseurmatch.com
+          </p>
+          <p className="text-gray-500 text-xs">☎️ (000) 255-0775</p>
         </div>
       </section>
     </div>
