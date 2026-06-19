@@ -7,16 +7,17 @@ import { envAny } from "@/app/api/_lib/env";
 
 /**
  * Shared text-completion helper for MasseurMatch's AI features (Knotty, the
- * chat route, content moderation). Prefers OpenAI (`gpt-4o-mini`), falls back
- * to Google Gemini (`gemini-1.5-flash`), and returns null if neither provider
- * key is configured or both fail — callers then use their own deterministic
- * fallback. Server-only.
+ * chat route, content moderation). Provider priority: OpenAI (`gpt-4o-mini`) →
+ * DeepSeek (`deepseek-chat`) → Google Gemini (`gemini-1.5-flash`). Returns null
+ * if no provider key is configured or all fail — callers use their own
+ * deterministic fallback. Server-only.
  */
 
 export const OPENAI_MODEL = "gpt-4o-mini";
+export const DEEPSEEK_MODEL = "deepseek-chat";
 export const GEMINI_MODEL = "gemini-1.5-flash";
 
-export type LlmProvider = "openai" | "gemini";
+export type LlmProvider = "openai" | "deepseek" | "gemini";
 export type LlmResult = { text: string; provider: LlmProvider; model: string } | null;
 
 export type CompleteOptions = {
@@ -30,7 +31,7 @@ export type CompleteOptions = {
 };
 
 export function hasAnyLlmKey(): boolean {
-  return Boolean(envAny(["OPENAI_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY"], ""));
+  return Boolean(envAny(["OPENAI_API_KEY", "DEEPSEEK_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY"], ""));
 }
 
 async function tryOpenAI(apiKey: string, o: CompleteOptions): Promise<string | null> {
@@ -45,6 +46,38 @@ async function tryOpenAI(apiKey: string, o: CompleteOptions): Promise<string | n
       },
       body: JSON.stringify({
         model: OPENAI_MODEL,
+        temperature: o.temperature ?? 0.5,
+        max_tokens: o.maxTokens ?? 200,
+        ...(o.json ? { response_format: { type: "json_object" } } : {}),
+        messages: [
+          { role: "system", content: o.system },
+          { role: "user", content: o.user },
+        ],
+      }),
+      signal: controller.signal,
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
+    return data.choices?.[0]?.message?.content?.trim() || null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function tryDeepSeek(apiKey: string, o: CompleteOptions): Promise<string | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), o.timeoutMs ?? 5000);
+  try {
+    const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: DEEPSEEK_MODEL,
         temperature: o.temperature ?? 0.5,
         max_tokens: o.maxTokens ?? 200,
         ...(o.json ? { response_format: { type: "json_object" } } : {}),
@@ -123,6 +156,33 @@ async function tryOpenAIChat(
   }
 }
 
+async function tryDeepSeekChat(
+  apiKey: string,
+  messages: ChatMessage[],
+  o: { temperature?: number; maxTokens?: number; timeoutMs?: number },
+): Promise<string | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), o.timeoutMs ?? 8000);
+  try {
+    const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: DEEPSEEK_MODEL,
+        temperature: o.temperature ?? 0.7,
+        max_tokens: o.maxTokens ?? 400,
+        messages,
+      }),
+      signal: controller.signal,
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+    return data.choices?.[0]?.message?.content?.trim() || null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function tryGeminiChat(
   apiKey: string,
   messages: ChatMessage[],
@@ -162,9 +222,8 @@ async function tryGeminiChat(
 }
 
 /**
- * Send a multi-turn conversation to the LLM, preferring OpenAI then Gemini.
- * The `messages` array should follow the standard chat format with a leading
- * system message and alternating user/assistant turns ending on user.
+ * Send a multi-turn conversation to the LLM. Provider order: OpenAI →
+ * DeepSeek → Gemini. Falls through to null if all fail.
  */
 export async function chatMessages(
   messages: ChatMessage[],
@@ -175,6 +234,16 @@ export async function chatMessages(
     try {
       const text = await tryOpenAIChat(openaiKey, messages, o);
       if (text) return { text, provider: "openai", model: OPENAI_MODEL };
+    } catch {
+      // fall through
+    }
+  }
+
+  const deepseekKey = envAny(["DEEPSEEK_API_KEY"], "");
+  if (deepseekKey) {
+    try {
+      const text = await tryDeepSeekChat(deepseekKey, messages, o);
+      if (text) return { text, provider: "deepseek", model: DEEPSEEK_MODEL };
     } catch {
       // fall through
     }
@@ -195,7 +264,7 @@ export async function chatMessages(
 
 // ── Single-turn completion (kept for moderation / one-shot callers) ──────────
 
-/** Complete a prompt, preferring OpenAI then Gemini. */
+/** Complete a prompt. Provider order: OpenAI → DeepSeek → Gemini. */
 export async function completeText(o: CompleteOptions): Promise<LlmResult> {
   const openaiKey = envAny(["OPENAI_API_KEY"], "");
   if (openaiKey) {
@@ -204,6 +273,16 @@ export async function completeText(o: CompleteOptions): Promise<LlmResult> {
       if (text) return { text, provider: "openai", model: OPENAI_MODEL };
     } catch {
       // fall through to the next provider
+    }
+  }
+
+  const deepseekKey = envAny(["DEEPSEEK_API_KEY"], "");
+  if (deepseekKey) {
+    try {
+      const text = await tryDeepSeek(deepseekKey, o);
+      if (text) return { text, provider: "deepseek", model: DEEPSEEK_MODEL };
+    } catch {
+      // fall through
     }
   }
 
