@@ -1826,7 +1826,13 @@ export type Database = {
           accessibility_features: string[] | null
           account_status: string
           add_ons: Json | null
+          additional_services: string[] | null
           admin_notes: string | null
+          affiliations: string[] | null
+          mobile_hours: Json | null
+          rate_disclaimers: string[] | null
+          studio_amenities: string[] | null
+          studio_hours: Json | null
           approved_at: string | null
           approved_by: string | null
           areas_served: string[] | null
@@ -1948,6 +1954,7 @@ export type Database = {
           social_media: Json | null
           specialties: string[] | null
           specialty: string | null
+          start_date: string | null
           start_year: number | null
           starting_price: number | null
           starting_rate: number | null
@@ -1992,7 +1999,13 @@ export type Database = {
           accessibility_features?: string[] | null
           account_status?: string
           add_ons?: Json | null
+          additional_services?: string[] | null
           admin_notes?: string | null
+          affiliations?: string[] | null
+          mobile_hours?: Json | null
+          rate_disclaimers?: string[] | null
+          studio_amenities?: string[] | null
+          studio_hours?: Json | null
           approved_at?: string | null
           approved_by?: string | null
           areas_served?: string[] | null
@@ -2114,6 +2127,7 @@ export type Database = {
           social_media?: Json | null
           specialties?: string[] | null
           specialty?: string | null
+          start_date?: string | null
           start_year?: number | null
           starting_price?: number | null
           starting_rate?: number | null
@@ -2158,7 +2172,13 @@ export type Database = {
           accessibility_features?: string[] | null
           account_status?: string
           add_ons?: Json | null
+          additional_services?: string[] | null
           admin_notes?: string | null
+          affiliations?: string[] | null
+          mobile_hours?: Json | null
+          rate_disclaimers?: string[] | null
+          studio_amenities?: string[] | null
+          studio_hours?: Json | null
           approved_at?: string | null
           approved_by?: string | null
           areas_served?: string[] | null
@@ -2280,6 +2300,7 @@ export type Database = {
           social_media?: Json | null
           specialties?: string[] | null
           specialty?: string | null
+          start_date?: string | null
           start_year?: number | null
           starting_price?: number | null
           starting_rate?: number | null
