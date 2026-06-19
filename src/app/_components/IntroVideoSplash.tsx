@@ -25,7 +25,7 @@ export function IntroVideoSplash() {
 
   const dismiss = useCallback(() => {
     try {
-      window.sessionStorage.setItem(SESSION_KEY, "true");
+      window.localStorage.setItem(SESSION_KEY, "true");
     } catch {
       // Ignore storage failures (private mode, etc.) — worst case it replays.
     }
@@ -43,7 +43,7 @@ export function IntroVideoSplash() {
 
     let alreadySeen = false;
     try {
-      alreadySeen = window.sessionStorage.getItem(SESSION_KEY) === "true";
+      alreadySeen = window.localStorage.getItem(SESSION_KEY) === "true";
     } catch {
       alreadySeen = false;
     }

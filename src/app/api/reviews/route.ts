@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
         user_id: therapistProfile.user_id,
         type: "new_review",
         title: "New Review Received",
-        message: `You received a ${rating}-star review${title ? `: "${title}"` : ""}`,
+        body: `You received a ${rating}-star review${title ? `: "${title}"` : ""}`,
         data: { review_id: data.id, rating },
       });
     }

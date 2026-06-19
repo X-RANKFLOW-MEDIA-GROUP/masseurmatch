@@ -1,6 +1,9 @@
 export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
+import React from "react";
 import { requireAdminSession, createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import { sendEmail } from "@/app/api/_lib/email";
+import ProfileApprovedEmail from "@/emails/ProfileApprovedEmail";
 
 export async function GET(
   request: NextRequest,
@@ -93,6 +96,26 @@ export async function POST(
       .eq("id", id);
 
     if (error) throw error;
+
+    if (action === "approve") {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("email_address, slug, display_name")
+        .eq("id", id)
+        .single();
+
+      if (profile?.email_address) {
+        const profileSlug = profile.slug ?? id;
+        await sendEmail({
+          to: profile.email_address,
+          subject: "Your MasseurMatch Profile is Approved!",
+          react: React.createElement(ProfileApprovedEmail, {
+            profileUrl: `https://masseurmatch.com/therapists/${profileSlug}`,
+            dashboardUrl: "https://masseurmatch.com/pro/dashboard",
+          }),
+        });
+      }
+    }
 
     return NextResponse.json({ ok: true });
   } catch (error) {

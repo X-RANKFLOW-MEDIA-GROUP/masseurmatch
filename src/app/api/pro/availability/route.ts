@@ -25,6 +25,8 @@ export async function POST(request: Request) {
 
     const nextProfile = await updateProfileByUserId(session.userId, {
       current_status: body.status,
+      available_now: body.status === "available",
+      is_active: body.status !== "hidden",
       service_radius_km: body.radius ?? 15,
       travel_destination: body.travelDestination ?? null,
     });

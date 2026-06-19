@@ -332,7 +332,7 @@ function SignupVerifyPageInner() {
                       placeholder="000000"
                       maxLength={6}
                     />
-                    <Button onClick={verifyEmailCode} disabled={emailLoading || emailOtp.length < 4}>
+                    <Button onClick={verifyEmailCode} disabled={emailLoading || emailOtp.length !== 6}>
                       {emailLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                       Verify
                     </Button>
