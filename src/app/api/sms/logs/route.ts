@@ -1,12 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminSession } from '@/app/api/_lib/supabase-server'
-import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
+import { requireAdminSession, createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
+import { RouteError } from '@/app/api/_lib/http'
 import type { Conversation } from '@/lib/sms/types'
+
+function errResponse(err: unknown) {
+  if (err instanceof RouteError) {
+    return NextResponse.json({ ok: false, error: err.message }, { status: err.status })
+  }
+  const message = err instanceof Error ? err.message : 'Unknown error'
+  return NextResponse.json({ ok: false, error: message }, { status: 500 })
+}
 
 // GET /api/sms/logs?profile_id=xxx&phone=xxx&limit=50
 export async function GET(request: NextRequest) {
   try {
     await requireAdminSession(request as unknown as Request)
+  } catch (err) { return errResponse(err) }
+
+  try {
     const { searchParams } = new URL(request.url)
     const profileId = searchParams.get('profile_id')
     const phone = searchParams.get('phone')
@@ -27,7 +38,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { data: logs, error } = await query
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
 
     if (view === 'flat') {
       return NextResponse.json({ ok: true, logs: logs ?? [] })
@@ -88,8 +99,5 @@ export async function GET(request: NextRequest) {
     })
 
     return NextResponse.json({ ok: true, conversations })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ ok: false, error: message }, { status: 500 })
-  }
+  } catch (err) { return errResponse(err) }
 }
