@@ -56,7 +56,7 @@ export default function CityDigestEmail({
     { day: "15", month: "OCT", title: "LGBTQ+ Health Panel", location: "Dallas Community Center", url: "#" }
   ],
   articles = [
-    { title: "5 Signs Your Muscles Need Deep Tissue Work", readTime: "4 min", url: "https://masseurmatch.com/blog/deep-tissue-signs" }
+    { title: "How to Choose the Right Massage Therapist", readTime: "5 min", url: "https://masseurmatch.com/blog/how-to-choose-a-massage-therapist" }
   ]
 }: CityDigestEmailProps) {
   return (
