@@ -132,7 +132,7 @@ export default function PricingPage() {
                 <p className="text-xs font-medium text-amber-700">vs. MasseurMatch Elite</p>
               </div>
               <div>
-                <p className="text-xl font-bold text-foreground">$149</p>
+                <p className="text-xl font-bold text-foreground">$99</p>
                 <p className="mt-0.5 text-xs text-muted-foreground">3 cities + AI + Demand Radar</p>
               </div>
             </div>
