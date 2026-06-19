@@ -73,7 +73,7 @@ export default function AboutContent() {
           <ValueCard
             icon={Sparkles}
             title="Absolute Privacy"
-            text="Your wellness journey is personal. Our technological infrastructure guarantees encrypted communications and total discretion."
+            text="Your wellness journey is personal. Our infrastructure uses encrypted communications and is designed to protect your discretion."
           />
         </div>
       </section>

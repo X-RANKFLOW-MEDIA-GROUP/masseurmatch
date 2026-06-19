@@ -1,11 +1,14 @@
+import React from "react";
 import { z } from "zod";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
+import { sendEmail } from "@/app/api/_lib/email";
 import { assertRateLimit, sanitizeOptionalText, sanitizeStringArray, sanitizeText } from "@/app/_lib/security";
 import { requireRequestSession } from "@/app/_lib/session";
 import { getProfileByUserId, recordAuditLog, updateProfileByUserId } from "@/app/_lib/store";
 import { proProfileSchema } from "@/app/_lib/validation";
 import { massageTherapistProfileSchema } from "@/app/_lib/validation.massagist";
+import ProfileApprovedEmail from "@/emails/ProfileApprovedEmail";
 import type { TablesUpdate } from "@/integrations/supabase/types";
 
 function parseProfilePayload(raw: unknown) {
@@ -74,6 +77,14 @@ function parseProfilePayload(raw: unknown) {
         height_inches: body.heightInches ?? null,
         weight_lb: body.weightLb ?? null,
         body_type: sanitizeOptionalText(body.bodyType),
+        ...(body.travelSchedule !== undefined && {
+          travel_schedule: body.travelSchedule.map((t) => ({
+            city: sanitizeText(t.city),
+            state: sanitizeOptionalText(t.state) ?? null,
+            start_date: t.start_date,
+            end_date: t.end_date,
+          })),
+        }),
       },
     };
   }
@@ -108,15 +119,55 @@ export async function POST(request: Request) {
     });
     const parsed = parseProfilePayload(rawBody);
 
+    const rulesAccepted = rawBody && typeof rawBody === "object" && (rawBody as Record<string, unknown>).rulesAccepted === true;
+    const moderationPassed = rawBody && typeof rawBody === "object" && (rawBody as Record<string, unknown>).moderationPassed === true;
+
+    const wasApproved = profile.profile_status === "approved" || profile.profile_status === "under_review";
+    const canAutoApprove = wasApproved && rulesAccepted && moderationPassed;
+
+    const now = new Date().toISOString();
+    const nextStatus = canAutoApprove ? "approved" : (
+      profile.profile_status === "approved" ? "under_review" : profile.profile_status
+    );
+
+    const statusUpdates: Record<string, unknown> = {
+      profile_status: nextStatus,
+      updated_at: now,
+    };
+    if (canAutoApprove) {
+      statusUpdates.approved_at = now;
+      statusUpdates.visibility_status = "public";
+    }
+    if (rulesAccepted) {
+      statusUpdates.terms_accepted_at = now;
+    }
+
     const nextProfile = await updateProfileByUserId(session.userId, {
       ...parsed.updates,
-      profile_status: profile.profile_status === "approved" ? "under_review" : profile.profile_status,
-      updated_at: new Date().toISOString(),
+      ...statusUpdates,
     });
 
     await recordAuditLog(session.userId, "provider.profile.update", "profile", profile.id, {
       fields: parsed.fields,
+      autoApproved: canAutoApprove,
     });
+
+    if (canAutoApprove) {
+      const emailAddress = (nextProfile as Record<string, unknown>)?.email_address as string | null
+        || profile.email_address as string | null;
+      const slug = nextProfile?.slug || profile.slug;
+      if (emailAddress) {
+        sendEmail({
+          to: emailAddress,
+          subject: "Your MasseurMatch Profile is Approved!",
+          react: React.createElement(ProfileApprovedEmail, {
+            profileUrl: `https://masseurmatch.com/therapists/${slug || profile.id}`,
+          }),
+        }).catch((err) => {
+          console.error("[api/pro/profile] Approval email failed:", err);
+        });
+      }
+    }
 
     await import("@/app/_lib/revalidate").then(({ buildTherapistRevalidatePaths, triggerRevalidate }) =>
       buildTherapistRevalidatePaths({
@@ -128,7 +179,7 @@ export async function POST(request: Request) {
       console.error("[api/pro/profile] Revalidation failed:", error);
     });
 
-    return json({ ok: true, profile: nextProfile });
+    return json({ ok: true, profile: nextProfile, autoApproved: canAutoApprove });
   } catch (error) {
     return errorResponse(error);
   }

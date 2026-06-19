@@ -23,6 +23,7 @@ const PROFILE_SELECT = `
   photo_limit, visibility_level, featured_until,
   current_status, service_radius_km, travel_destination,
   promotions, seo_title, seo_description, seo_keywords,
+  travel_schedule,
   updated_at, created_at
 `;
 
