@@ -3,6 +3,7 @@ import { GalleryGrid } from "./GalleryGrid";
 import { PricingCard } from "./PricingCard";
 import { ProfileStats } from "./ProfileStats";
 import { ServiceTags } from "./ServiceTags";
+import { MassageBodyMap } from "@/components/ui/MassageBodyMap";
 import type { ProfileViewModel } from "./profile-utils";
 import { contactHref } from "./profile-utils";
 
@@ -21,6 +22,17 @@ export function SeoContentSections({ profile }: { profile: ProfileViewModel }) {
   ].filter(([, href]) => Boolean(href));
   return <div className="space-y-8">
     <Card id="summary" title="Profile Summary"><ProfileStats profile={profile} /></Card>
+    {(profile.rawBodyType || profile.rawHeightInches || profile.rawWeightLb) && (
+      <Card id="physique" title="Physique">
+        <div className="flex flex-col items-center gap-2 py-4">
+          <MassageBodyMap
+            bodyType={profile.rawBodyType}
+            heightInches={profile.rawHeightInches}
+            weightLb={profile.rawWeightLb}
+          />
+        </div>
+      </Card>
+    )}
     <Card id="about" title={`About ${profile.name}`}><p>{profile.bio}</p></Card>
     <Card id="services" title="Services"><div className="space-y-6"><ServiceTags title="Services" values={profile.services} /><ServiceTags title="Specialties" values={profile.specialties} /><ServiceTags title="Massage types" values={profile.massageTypes} /></div></Card>
     <Card id="seo-services" title={`Massage Services in ${profile.city}`}><p>{profile.name} offers {profile.services.join(", ").toLowerCase()} in {profile.city}, {profile.state}, with specialties including {profile.specialties.join(", ").toLowerCase()}. This profile is built for clients comparing professional massage services, availability, pricing, incall options, outcall travel, and trust details before making contact.</p></Card>

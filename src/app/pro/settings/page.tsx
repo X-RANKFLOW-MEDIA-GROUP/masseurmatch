@@ -15,9 +15,9 @@ type PasswordState = { current: string; next: string; confirm: string };
 const EMPTY_PW: PasswordState = { current: "", next: "", confirm: "" };
 
 export default function ProSettingsPage() {
+  const router = useRouter();
   const { user, signOut } = useAuth();
   const { toast } = useToast();
-  const router = useRouter();
 
   const [pwForm, setPwForm] = useState<PasswordState>(EMPTY_PW);
   const [pwLoading, setPwLoading] = useState(false);

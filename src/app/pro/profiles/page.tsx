@@ -222,7 +222,7 @@ function ProfileForm({
             />
           </div>
           <div>
-            <label className={labelCls}>ETA (opcional)</label>
+            <label className={labelCls}>ETA (optional)</label>
             <input
               className={inputCls}
               placeholder="Ex: ~15 min"
@@ -245,7 +245,7 @@ function ProfileForm({
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={labelCls}>60 minutos</label>
+                <label className={labelCls}>60 min</label>
                 <div className="relative">
                   <span className="absolute left-3 top-2 font-sans text-sm text-slate-400">$</span>
                   <input
@@ -257,7 +257,7 @@ function ProfileForm({
                 </div>
               </div>
               <div>
-                <label className={labelCls}>90 minutos</label>
+                <label className={labelCls}>90 min</label>
                 <div className="relative">
                   <span className="absolute left-3 top-2 font-sans text-sm text-slate-400">$</span>
                   <input
@@ -271,14 +271,14 @@ function ProfileForm({
             </div>
           </div>
 
-          {/* Casais */}
+          {/* Couples */}
           <div className="space-y-3 border border-slate-100 p-4">
             <p className="font-mono text-[10px] uppercase tracking-widest text-slate-500">
               Couples (Total)
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={labelCls}>60 minutos</label>
+                <label className={labelCls}>60 min</label>
                 <div className="relative">
                   <span className="absolute left-3 top-2 font-sans text-sm text-slate-400">$</span>
                   <input
@@ -290,7 +290,7 @@ function ProfileForm({
                 </div>
               </div>
               <div>
-                <label className={labelCls}>90 minutos</label>
+                <label className={labelCls}>90 min</label>
                 <div className="relative">
                   <span className="absolute left-3 top-2 font-sans text-sm text-slate-400">$</span>
                   <input
@@ -424,7 +424,7 @@ function ProfileCard({
             {profile.aiResponses && (
               <span className="flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-indigo-500">
                 <Bot className="h-3 w-3" />
-                IA
+                AI
               </span>
             )}
           </div>

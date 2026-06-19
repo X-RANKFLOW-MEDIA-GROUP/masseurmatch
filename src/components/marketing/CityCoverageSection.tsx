@@ -16,14 +16,10 @@ export function CityCoverageSection() {
     <section className="py-20 lg:py-32">
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
         <div className="mb-10">
-          <p className="text-sm uppercase tracking-widest text-muted-foreground">City coverage</p>
-          <h2 className="mt-3 font-display text-[clamp(2.5rem,5vw,4.5rem)] font-extrabold leading-[0.95] tracking-tight">
-            Find a therapist in your city.
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">All cities A–Z</p>
+          <h2 className="mt-3 font-display text-2xl font-bold tracking-tight text-foreground">
+            Browse all {sorted.length} covered cities
           </h2>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-            MasseurMatch covers every major US market. Select your city to browse verified therapists,
-            compare session types, and contact directly.
-          </p>
         </div>
 
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">

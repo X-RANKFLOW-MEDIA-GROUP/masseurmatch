@@ -270,7 +270,7 @@ export default function ForTherapistsPage() {
             }}
           >
             {[
-              { value: "Growing", label: "Active Therapist Listings" },
+              { value: "Join Early", label: "Be Among the First Listed" },
               { value: "80+", label: "US Cities Covered" },
               { value: "$0", label: "Booking Commission" },
               { value: "48h", label: "Average Verification Time" },
