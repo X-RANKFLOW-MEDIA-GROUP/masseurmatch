@@ -74,6 +74,14 @@ function parseProfilePayload(raw: unknown) {
         height_inches: body.heightInches ?? null,
         weight_lb: body.weightLb ?? null,
         body_type: sanitizeOptionalText(body.bodyType),
+        ...(body.travelSchedule !== undefined && {
+          travel_schedule: body.travelSchedule.map((t) => ({
+            city: sanitizeText(t.city),
+            state: sanitizeOptionalText(t.state) ?? null,
+            start_date: t.start_date,
+            end_date: t.end_date,
+          })),
+        }),
       },
     };
   }

@@ -129,6 +129,12 @@ export const proProfileSchema = z.object({
   heightInches: z.number().int().min(48).max(96).nullable().optional(),
   weightLb: z.number().int().min(80).max(450).nullable().optional(),
   bodyType: z.enum(BODY_TYPES).nullable().optional(),
+  travelSchedule: z.array(z.object({
+    city: z.string().min(1).max(120),
+    state: z.string().max(10).nullable().optional(),
+    start_date: z.string().min(1).max(30),
+    end_date: z.string().min(1).max(30),
+  })).max(20).optional(),
   rulesAccepted: z.boolean().optional(),
   moderationPassed: z.boolean().optional(),
 });

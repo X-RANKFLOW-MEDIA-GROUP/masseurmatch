@@ -22,6 +22,7 @@ const PROFILE_SELECT = `
   stripe_customer_id, stripe_subscription_id, current_period_end,
   photo_limit, visibility_level, featured_until,
   promotions, seo_title, seo_description, seo_keywords,
+  travel_schedule,
   updated_at, created_at
 `;
 

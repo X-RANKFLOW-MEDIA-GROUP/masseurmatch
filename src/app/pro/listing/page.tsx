@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Bot,
+  CalendarDays,
   CheckCircle2,
   DollarSign,
   Globe,
@@ -12,12 +13,15 @@ import {
   MapPin,
   MessageCircle,
   Phone,
+  Plane,
+  Plus,
   Ruler,
   Save,
   Scale,
   ShieldAlert,
   ShieldCheck,
   Sparkles,
+  Trash2,
   User,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -26,6 +30,8 @@ import { updateProfileMutation, type ProProfileMutationResponse } from "@/app/_l
 import { ApiError, postJson, requestJson } from "@/app/_lib/request";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
+import { CityAutocomplete } from "@/components/ui/city-autocomplete";
 import { BODY_TYPE_OPTIONS, normalizeBodyTypeValue } from "@/lib/physical-profile";
 import { lookupZipArea } from "@/lib/profile-autofill";
 
@@ -62,6 +68,13 @@ type ProfileResponse = {
   profile: ExtendedProfile | null;
 };
 
+type TravelEntry = {
+  city: string;
+  state: string;
+  start_date: string;
+  end_date: string;
+};
+
 type FormState = {
   displayName: string;
   bio: string;
@@ -80,6 +93,7 @@ type FormState = {
   heightInches: string;
   weightLb: string;
   bodyType: string;
+  travelSchedule: TravelEntry[];
 };
 
 type SaveState = "idle" | "scanning" | "success" | "flagged";
@@ -111,7 +125,21 @@ const EMPTY_FORM: FormState = {
   heightInches: "",
   weightLb: "",
   bodyType: "",
+  travelSchedule: [],
 };
+
+function parseTravelSchedule(raw: unknown): TravelEntry[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter(
+    (item): item is TravelEntry =>
+      typeof item === "object" && item !== null && typeof (item as TravelEntry).city === "string",
+  ).map((t) => ({
+    city: t.city,
+    state: t.state || "",
+    start_date: t.start_date || "",
+    end_date: t.end_date || "",
+  }));
+}
 
 function mapProfileToForm(profile: ExtendedProfile | null | undefined): FormState {
   if (!profile) return EMPTY_FORM;
@@ -139,6 +167,7 @@ function mapProfileToForm(profile: ExtendedProfile | null | undefined): FormStat
     heightInches: typeof profile.height_inches === "number" ? String(profile.height_inches) : "",
     weightLb: typeof profile.weight_lb === "number" ? String(profile.weight_lb) : "",
     bodyType: normalizeBodyTypeValue(profile.body_type) || "",
+    travelSchedule: parseTravelSchedule((profile as Record<string, unknown>).travel_schedule),
   };
 }
 
@@ -261,6 +290,7 @@ export default function MyListingPage() {
   const [scanLabel, setScanLabel] = useState("listing");
   const [flagReason, setFlagReason] = useState("");
   const [zipStatus, setZipStatus] = useState<string | null>(null);
+  const { maxTravelSchedules } = usePlanLimits();
 
   useEffect(() => {
     let cancelled = false;
@@ -331,6 +361,39 @@ export default function MyListingPage() {
         }
       })
       .catch(() => setZipStatus("Not found — enter manually"));
+  }
+
+  const travelLimitReached = maxTravelSchedules !== -1 && form.travelSchedule.length >= maxTravelSchedules;
+
+  function addTrip() {
+    if (travelLimitReached) return;
+    setForm((f) => ({
+      ...f,
+      travelSchedule: [...f.travelSchedule, { city: "", state: "", start_date: "", end_date: "" }],
+    }));
+  }
+
+  function removeTrip(index: number) {
+    setForm((f) => ({
+      ...f,
+      travelSchedule: f.travelSchedule.filter((_, i) => i !== index),
+    }));
+  }
+
+  function updateTrip(index: number, field: keyof TravelEntry, value: string) {
+    setForm((f) => ({
+      ...f,
+      travelSchedule: f.travelSchedule.map((t, i) => (i === index ? { ...t, [field]: value } : t)),
+    }));
+  }
+
+  function handleTripCitySelect(index: number, city: { name: string; stateCode: string }) {
+    setForm((f) => ({
+      ...f,
+      travelSchedule: f.travelSchedule.map((t, i) =>
+        i === index ? { ...t, city: city.name, state: city.stateCode } : t,
+      ),
+    }));
   }
 
   const handleKnottyAIMagic = async () => {
@@ -414,6 +477,8 @@ export default function MyListingPage() {
       const remaining = Math.max(0, 1600 - (Date.now() - startedAt));
       if (remaining > 0) await delay(remaining);
 
+      const validTrips = form.travelSchedule.filter((t) => t.city && t.start_date && t.end_date);
+
       const response = await updateProfileMutation({
         displayName: form.displayName,
         bio: form.bio,
@@ -432,6 +497,7 @@ export default function MyListingPage() {
         heightInches: parseWholeNumber(form.heightInches),
         weightLb: parseWholeNumber(form.weightLb),
         bodyType: normalizeBodyTypeValue(form.bodyType),
+        travelSchedule: validTrips,
         rulesAccepted: agreedToTerms,
         moderationPassed: !moderationUnavailable,
       });
@@ -725,6 +791,93 @@ export default function MyListingPage() {
             </select>
           </Field>
         </div>
+      </SectionCard>
+
+      {/* ── Section 7: Travel Schedule ──────────────────────── */}
+      <SectionCard id="travel" icon={Plane} title="Travel Schedule" subtitle="Let clients know when you're visiting other cities">
+        {form.travelSchedule.length === 0 && (
+          <p className="text-sm text-slate-400">No upcoming trips. Add a city you're visiting to attract advance inquiries.</p>
+        )}
+
+        <div className="space-y-4">
+          {form.travelSchedule.map((trip, index) => (
+            <div key={index} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Trip {index + 1}</span>
+                <button
+                  type="button"
+                  onClick={() => removeTrip(index)}
+                  className="flex items-center gap-1 text-xs font-medium text-rose-500 hover:text-rose-700 transition-colors"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Remove
+                </button>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Field>
+                  <FieldLabel required>Destination City</FieldLabel>
+                  <CityAutocomplete
+                    value={trip.city ? `${trip.city}${trip.state ? `, ${trip.state}` : ""}` : ""}
+                    onChange={(raw) => {
+                      updateTrip(index, "city", raw);
+                    }}
+                    onCitySelect={(city) => handleTripCitySelect(index, city)}
+                    placeholder="Search city..."
+                  />
+                </Field>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field>
+                    <FieldLabel required>Start Date</FieldLabel>
+                    <div className="relative">
+                      <CalendarDays className="absolute left-3 top-3 h-4 w-4 text-slate-400 pointer-events-none" />
+                      <input
+                        type="date"
+                        className={inputCls("pl-10")}
+                        value={trip.start_date}
+                        onChange={(e) => updateTrip(index, "start_date", e.target.value)}
+                      />
+                    </div>
+                  </Field>
+                  <Field>
+                    <FieldLabel required>End Date</FieldLabel>
+                    <div className="relative">
+                      <CalendarDays className="absolute left-3 top-3 h-4 w-4 text-slate-400 pointer-events-none" />
+                      <input
+                        type="date"
+                        className={inputCls("pl-10")}
+                        value={trip.end_date}
+                        min={trip.start_date || undefined}
+                        onChange={(e) => updateTrip(index, "end_date", e.target.value)}
+                      />
+                    </div>
+                  </Field>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={addTrip}
+          disabled={travelLimitReached}
+          className={`flex items-center gap-2 rounded-xl border border-dashed px-4 py-3 text-sm font-medium transition w-full justify-center ${
+            travelLimitReached
+              ? "border-slate-200 text-slate-300 cursor-not-allowed"
+              : "border-slate-300 text-slate-600 hover:border-slate-400 hover:bg-slate-50"
+          }`}
+        >
+          <Plus className="h-4 w-4" />
+          Add trip
+        </button>
+
+        {travelLimitReached && (
+          <p className="text-xs text-amber-600">
+            Your plan allows up to {maxTravelSchedules} {maxTravelSchedules === 1 ? "trip" : "trips"}.{" "}
+            <Link href="/pro/billing" className="font-semibold underline underline-offset-2">Upgrade</Link> for more.
+          </p>
+        )}
       </SectionCard>
 
       {/* ── Submit bar ──────────────────────────────────────── */}
