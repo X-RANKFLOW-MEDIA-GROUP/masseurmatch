@@ -20,7 +20,18 @@ export async function GET(request: Request) {
       .maybeSingle();
 
     if (profileError) throw new RouteError(500, profileError.message);
-    if (!profile) throw new RouteError(404, "Profile not found.");
+
+    // No profile yet (e.g. setup incomplete) — return zeros so the page
+    // renders the "No visits yet" empty state instead of an error.
+    if (!profile) {
+      const since = new Date(Date.now() - (WINDOW_DAYS - 1) * 86_400_000);
+      since.setUTCHours(0, 0, 0, 0);
+      const series = Array.from({ length: WINDOW_DAYS }, (_, i) => ({
+        date: dayKey(new Date(since.getTime() + i * 86_400_000).toISOString()),
+        visitors: 0,
+      }));
+      return json({ ok: true, windowDays: WINDOW_DAYS, series, totals: { windowViews: 0, windowUniqueVisitors: 0, allTimeViews: 0, allTimeContactClicks: 0 } });
+    }
 
     const since = new Date(Date.now() - (WINDOW_DAYS - 1) * 86_400_000);
     since.setUTCHours(0, 0, 0, 0);
