@@ -194,7 +194,7 @@ export function CityCaseStudies({ launchCities }: Props) {
         <div className="absolute -right-[8%] top-1/4 h-[38vw] max-h-[460px] w-[38vw] max-w-[460px] rounded-full bg-[radial-gradient(circle,rgba(58,208,255,0.2),transparent_65%)] blur-3xl" />
         <div className="absolute bottom-0 left-1/3 h-[30vw] max-h-[360px] w-[50vw] max-w-[640px] rounded-full bg-[radial-gradient(circle,rgba(200,16,46,0.18),transparent_65%)] blur-3xl" />
         {/* Vignette */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(3,6,13,0.7)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(17,17,17,0.7)_100%)]" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
