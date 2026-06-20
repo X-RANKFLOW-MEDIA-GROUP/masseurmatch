@@ -6,16 +6,17 @@
 :root {
   --mm-bg:          #FFFFFF;
   --mm-dark:        #1A1A1A;
-  --mm-accent:      #C8102E;
-  --mm-accent-hover:#A80D24;
+  --mm-accent:      #CC2424;
+  --mm-accent-hover:#A81D1D;
   --mm-gray:        #666666;
   --mm-muted:       #999999;
   --mm-border:      rgba(0,0,0,0.08);
   --mm-white:       #FFFFFF;
-  --mm-light:       #F5F5F5;
+  --mm-light:       #F4F5F6;
+  --mm-med:         #E2E4E6;
 
-  --mm-font-heading: var(--font-oswald), 'Oswald', 'Arial Narrow', sans-serif;
-  --mm-font-body:    var(--font-inter), system-ui, -apple-system, sans-serif;
+  --mm-font-heading: var(--font-montserrat), 'Montserrat', system-ui, sans-serif;
+  --mm-font-body:    var(--font-montserrat), 'Montserrat', system-ui, sans-serif;
 
   --mm-label-size:    11px;
   --mm-label-spacing: 0.22em;
@@ -129,7 +130,7 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration: none;
 }
 .mm-city-card:hover {
-  border-bottom-color: #C8102E;
+  border-bottom-color: #CC2424;
   background: #FAFAFA;
 }
 
@@ -144,7 +145,7 @@ h1, h2, h3, h4, h5, h6 {
   transition: border-bottom-color 0.2s ease, background 0.2s ease;
 }
 .mm-service-link:hover {
-  border-bottom-color: #C8102E;
+  border-bottom-color: #CC2424;
   background: #ffffff;
 }
 .mm-service-link .mm-arrow {

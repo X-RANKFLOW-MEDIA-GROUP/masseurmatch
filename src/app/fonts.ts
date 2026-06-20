@@ -1,16 +1,10 @@
-import { Inter, Oswald } from "next/font/google";
+import { Montserrat } from "next/font/google";
 
-export const inter = Inter({
+export const montserrat = Montserrat({
   subsets: ["latin"],
-  variable: "--font-inter",
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-montserrat",
   display: "swap",
 });
 
-export const oswald = Oswald({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-oswald",
-  display: "swap",
-});
-
-export default { inter, oswald };
+export default { montserrat };
