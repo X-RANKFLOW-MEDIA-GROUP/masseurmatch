@@ -33,7 +33,7 @@ export function SiteFooterTalk() {
   }
 
   return (
-    <footer className="border-t border-white/[0.06] bg-[#060E1A] text-slate-400">
+    <footer className="border-t border-white/[0.06] bg-[#1A1A1A] text-slate-400">
       <div className="mx-auto max-w-[1200px] px-4 pb-12 pt-20 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
 
@@ -59,14 +59,14 @@ export function SiteFooterTalk() {
                   type="text"
                   placeholder="Your name"
                   required
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:border-primary/60 focus:outline-none"
+                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:border-[#C8102E]/60 focus:outline-none"
                 />
                 <input
                   name="email"
                   type="email"
                   placeholder="Email address"
                   required
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:border-primary/60 focus:outline-none"
+                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:border-[#C8102E]/60 focus:outline-none"
                 />
                 <textarea
                   name="message"
@@ -74,7 +74,7 @@ export function SiteFooterTalk() {
                   required
                   minLength={10}
                   rows={4}
-                  className="w-full resize-none rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:border-primary/60 focus:outline-none"
+                  className="w-full resize-none rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:border-[#C8102E]/60 focus:outline-none"
                 />
                 {formState === "error" && (
                   <p className="text-xs text-red-400">Something went wrong — please try again.</p>
@@ -82,9 +82,9 @@ export function SiteFooterTalk() {
                 <button
                   type="submit"
                   disabled={formState === "loading"}
-                  className="inline-flex h-12 w-full items-center justify-center rounded-full bg-primary px-8 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 disabled:opacity-60"
+                  className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#C8102E] px-8 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-60"
                 >
-                  {formState === "loading" ? "Sending…" : "Send message"}
+                  {formState === "loading" ? "Sending..." : "Send message"}
                 </button>
               </form>
             )}
@@ -124,7 +124,7 @@ export function SiteFooterTalk() {
             </div>
 
             <div className="mt-12 flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-emerald-400" />
+              <ShieldCheck className="h-5 w-5 text-emerald-400" strokeWidth={2.25} />
               <span className="font-mono text-[10px] uppercase tracking-widest text-slate-400">
                 Verified Secure Network
               </span>
@@ -141,7 +141,7 @@ export function SiteFooterTalk() {
             <Link href="/cookie-policy" className="transition-colors hover:text-white">Cookies</Link>
             <Link href="/accessibility" className="transition-colors hover:text-white">Accessibility</Link>
             <span className="flex items-center gap-1">
-              United States <ArrowUpRight className="h-3 w-3 text-[#FF8A1F]" />
+              United States <ArrowUpRight className="h-3 w-3 text-[#C8102E]" strokeWidth={2.25} />
             </span>
           </div>
         </div>

@@ -176,7 +176,7 @@ function SpotlightProfileCard({ therapist, index }: { therapist: ShowcaseCard; i
         index === 4 && "lg:translate-y-10",
       )}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(30,75,143,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(255,138,31,0.10),transparent_26%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(200,16,46,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(200,16,46,0.10),transparent_26%)]" />
       <div className="relative">
         <div className="flex items-center justify-between gap-3">
           <span className="inline-flex rounded-full border border-white/12 bg-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/72">
@@ -263,13 +263,13 @@ export function KnottyHeroSpotlight({ therapists, therapistCount, cityCount }: K
 
   return (
     <div className="relative overflow-hidden rounded-[36px] border border-white/8 bg-black text-white shadow-[0_30px_120px_rgba(0,0,0,0.55)]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_left_top,rgba(255,255,255,0.06),transparent_24%),radial-gradient(circle_at_right_center,rgba(30,75,143,0.14),transparent_30%),radial-gradient(circle_at_20%_80%,rgba(255,138,31,0.12),transparent_24%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_left_top,rgba(255,255,255,0.06),transparent_24%),radial-gradient(circle_at_right_center,rgba(200,16,46,0.14),transparent_30%),radial-gradient(circle_at_20%_80%,rgba(200,16,46,0.12),transparent_24%)]" />
       <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(to_right,rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:44px_44px]" />
 
       <div className="relative grid gap-6 p-4 sm:p-6 xl:min-h-[calc(100vh-7rem)] xl:grid-cols-[minmax(0,0.9fr),minmax(360px,0.85fr)]">
         <div className="grid gap-6 xl:grid-rows-[minmax(0,1fr),auto]">
           <div className="relative overflow-hidden rounded-[34px] border border-white/8 bg-[linear-gradient(135deg,rgba(17,21,30,0.96),rgba(8,8,8,0.98))] px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,138,31,0.20),transparent_22%),radial-gradient(circle_at_left_center,rgba(255,255,255,0.08),transparent_28%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(200,16,46,0.20),transparent_22%),radial-gradient(circle_at_left_center,rgba(255,255,255,0.08),transparent_28%)]" />
 
             <div className="relative flex h-full flex-col justify-between">
               <div>
@@ -320,7 +320,7 @@ export function KnottyHeroSpotlight({ therapists, therapistCount, cityCount }: K
           </div>
 
           <div className="relative overflow-hidden rounded-[32px] border border-white/8 bg-[linear-gradient(180deg,rgba(14,14,16,0.96),rgba(5,5,6,0.98))] p-4 sm:p-5">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_left_top,rgba(255,255,255,0.06),transparent_25%),radial-gradient(circle_at_bottom_right,rgba(30,75,143,0.12),transparent_22%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_left_top,rgba(255,255,255,0.06),transparent_25%),radial-gradient(circle_at_bottom_right,rgba(200,16,46,0.12),transparent_22%)]" />
 
             <div className="relative">
               <div className="max-w-[36rem] rounded-[24px] bg-white/10 px-5 py-4 text-xl font-semibold leading-8 text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">

@@ -102,12 +102,12 @@ function CityPlatform({
           style={{ rotateX: rotX, rotateY: rotY, transformStyle: "preserve-3d" }}
           whileHover={reducedMotion ? undefined : { scale: 1.03 }}
           transition={{ type: "spring", stiffness: 200, damping: 20 }}
-          className={`relative aspect-[4/5] overflow-hidden rounded-[1.4rem] bg-[#0a1424] shadow-[0_30px_70px_-22px_rgba(0,0,0,0.85)] ring-1 transition-shadow duration-300 group-hover:ring-primary/50 ${
+          className={`relative aspect-[4/5] overflow-hidden rounded-[1.4rem] bg-[#1A1A1A] shadow-[0_30px_70px_-22px_rgba(0,0,0,0.85)] ring-1 transition-shadow duration-300 group-hover:ring-primary/50 ${
             featured ? "ring-primary/40" : "ring-white/15"
           }`}
         >
           {!hasPhoto || imgError ? (
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,138,31,0.35),transparent_55%),linear-gradient(150deg,#0d2038,#060d1b)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(200,16,46,0.35),transparent_55%),linear-gradient(150deg,#2A2A2A,#1A1A1A)]" />
           ) : (
             <Image
               src={`/marketing/cities/${entry.city.slug}.${photoExt ?? "jpg"}`}
@@ -130,7 +130,7 @@ function CityPlatform({
           />
 
           {/* Legibility gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#03060d] via-[#03060d]/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#111111] via-[#111111]/30 to-transparent" />
 
           {/* Cursor glare */}
           {!reducedMotion && (
@@ -177,7 +177,7 @@ export function CityCaseStudies({ launchCities }: Props) {
   const featuredSlug = "new-york";
 
   return (
-    <section className="relative overflow-hidden bg-[#070d18] py-20 text-white lg:py-28">
+    <section className="relative overflow-hidden bg-[#1A1A1A] py-20 text-white lg:py-28">
       {/* ── Cinematic night-rooftop backdrop ─────────────────────────── */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <Image
@@ -188,11 +188,11 @@ export function CityCaseStudies({ launchCities }: Props) {
           sizes="100vw"
         />
         {/* Night wash + rooftop floor */}
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,#070d18_0%,rgba(7,13,24,0.65)_30%,rgba(7,13,24,0.85)_70%,#070d18_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#1A1A1A_0%,rgba(26,26,26,0.65)_30%,rgba(26,26,26,0.85)_70%,#1A1A1A_100%)]" />
         {/* Rainbow ambient glows */}
         <div className="absolute -left-[10%] top-1/3 h-[40vw] max-h-[480px] w-[40vw] max-w-[480px] rounded-full bg-[radial-gradient(circle,rgba(161,123,255,0.22),transparent_65%)] blur-3xl" />
         <div className="absolute -right-[8%] top-1/4 h-[38vw] max-h-[460px] w-[38vw] max-w-[460px] rounded-full bg-[radial-gradient(circle,rgba(58,208,255,0.2),transparent_65%)] blur-3xl" />
-        <div className="absolute bottom-0 left-1/3 h-[30vw] max-h-[360px] w-[50vw] max-w-[640px] rounded-full bg-[radial-gradient(circle,rgba(255,138,31,0.18),transparent_65%)] blur-3xl" />
+        <div className="absolute bottom-0 left-1/3 h-[30vw] max-h-[360px] w-[50vw] max-w-[640px] rounded-full bg-[radial-gradient(circle,rgba(200,16,46,0.18),transparent_65%)] blur-3xl" />
         {/* Vignette */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(3,6,13,0.7)_100%)]" />
       </div>

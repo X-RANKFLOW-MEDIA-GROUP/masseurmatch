@@ -15,7 +15,7 @@ export function HomeSeoLanding({ comparisonLinks, guides }: HomeSeoLandingProps)
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
 
         {/* Comparison hub */}
-        <div className="rounded-[2rem] border border-border bg-card p-7 shadow-[0_18px_42px_rgba(11,31,58,0.18)]">
+        <div className="rounded-[2rem] border border-border bg-card p-7 shadow-[0_18px_42px_rgba(26,26,26,0.18)]">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-primary/10 text-primary">
               <Scale className="h-5 w-5" />
@@ -54,7 +54,7 @@ export function HomeSeoLanding({ comparisonLinks, guides }: HomeSeoLandingProps)
         </div>
 
         {/* Guides */}
-        <div className="rounded-[2rem] border border-border bg-card p-7 shadow-[0_18px_42px_rgba(11,31,58,0.18)]">
+        <div className="rounded-[2rem] border border-border bg-card p-7 shadow-[0_18px_42px_rgba(26,26,26,0.18)]">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-primary/10 text-primary">
               <BookOpenText className="h-5 w-5" />

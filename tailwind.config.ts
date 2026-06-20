@@ -102,10 +102,10 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
-        heading: ["var(--font-sora)", "Sora", "system-ui", "sans-serif"],
-        display: ["var(--font-unbounded)", "var(--font-inter)", "sans-serif"],
-        stat: ["var(--font-space-grotesk)", "Space Grotesk", "system-ui", "sans-serif"],
-        mono: ["var(--font-space-grotesk)", "Space Grotesk", "monospace"],
+        heading: ["var(--font-oswald)", "Oswald", "Arial Narrow", "sans-serif"],
+        display: ["var(--font-oswald)", "Oswald", "Arial Narrow", "sans-serif"],
+        stat: ["var(--font-oswald)", "Oswald", "Arial Narrow", "sans-serif"],
+        mono: ["ui-monospace", "SFMono-Regular", "Roboto Mono", "Consolas", "monospace"],
       },
       borderRadius: {
         xl: "1.25rem",

@@ -1,30 +1,55 @@
 "use client";
 
-import { Users, MapPin, Sparkles, BadgeDollarSign } from "lucide-react";
+import { Diamond, CheckCircle, UserCheck, Smile, TrendingUp, Users, Award, LayoutGrid } from "lucide-react";
 import Counter from "@/components/motion/Counter";
 import FadeUp from "@/components/motion/FadeUp";
-import { TOTAL_PROFILES, LIVE_COVERAGE_CITIES, TOTAL_SERVICES } from "@/lib/site-stats";
+
+const FEATURES = [
+  { icon: Diamond, label: "Features guarantee" },
+  { icon: CheckCircle, label: "For specialized technique" },
+  { icon: UserCheck, label: "Professional profilers" },
+  { icon: Smile, label: "100% hospitable and human" },
+] as const;
 
 const STATS = [
-  { value: TOTAL_PROFILES, suffix: "+", label: "Professional profiles", icon: Users },
-  { value: LIVE_COVERAGE_CITIES, suffix: "+", label: "US cities", icon: MapPin },
-  { value: TOTAL_SERVICES, suffix: "+", label: "Services listed", icon: Sparkles },
-  { value: 100, suffix: "%", label: "Free to browse", icon: BadgeDollarSign },
+  { icon: TrendingUp, value: 0, suffix: "", label: "Statistics" },
+  { icon: Users, value: 45000, suffix: "", label: "45,000 mass allowvers" },
+  { icon: Award, value: 2300, suffix: "+", label: "2,300+ verified trackers" },
+  { icon: LayoutGrid, value: 23, suffix: "+", label: "23+ masseur decks" },
 ] as const;
 
 export function StatsBand() {
   return (
-    <section className="border-y border-border/60 bg-card py-12 lg:py-16">
+    <section className="bg-[#F5F5F5] py-16 lg:py-20">
       <div className="mx-auto max-w-[1200px] px-4">
         <FadeUp>
-          <div className="grid grid-cols-2 divide-x divide-border/60 lg:grid-cols-4">
-            {STATS.map(({ value, suffix, label, icon: Icon }) => (
-              <div key={label} className="px-6 py-2 first:pl-0 last:pr-0 lg:px-10">
-                <Icon className="mb-3 h-5 w-5 text-primary" strokeWidth={2} />
-                <div className="font-display font-extrabold text-[clamp(2.25rem,5vw,4rem)] leading-none tracking-[-0.03em] text-foreground">
-                  <Counter to={value} suffix={suffix} />
+          {/* Row 1: Features */}
+          <div className="grid grid-cols-2 gap-8 lg:grid-cols-4 mb-12">
+            {FEATURES.map(({ icon: Icon, label }) => (
+              <div key={label} className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-full border border-[#E5E5E5] flex items-center justify-center mb-3">
+                  <Icon className="w-5 h-5 text-[#1A1A1A]" strokeWidth={2.25} />
                 </div>
-                <p className="mt-2 text-xs uppercase tracking-widest text-muted-foreground">
+                <p className="text-sm text-[#1A1A1A] font-medium">
+                  {label}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Row 2: Stats */}
+          <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
+            {STATS.map(({ icon: Icon, value, suffix, label }) => (
+              <div key={label} className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-full border border-[#E5E5E5] flex items-center justify-center mb-3">
+                  <Icon className="w-5 h-5 text-[#1A1A1A]" strokeWidth={2.25} />
+                </div>
+                {value > 0 ? (
+                  <div className="font-display font-extrabold text-[clamp(1.5rem,3vw,2.5rem)] leading-none tracking-tight text-[#1A1A1A] mb-1">
+                    <Counter to={value} suffix={suffix} />
+                  </div>
+                ) : null}
+                <p className="text-sm text-gray-600">
                   {label}
                 </p>
               </div>

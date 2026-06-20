@@ -1,10 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShieldCheck, ArrowUpRight } from "lucide-react";
-import { BRAND_ASSETS } from "@/lib/brand";
+import { Phone, Mail, ShieldCheck } from "lucide-react";
 import { SiteFooterTalk } from "@/components/marketing/SiteFooterTalk";
 
 export function SiteFooter() {
@@ -21,74 +19,53 @@ export function SiteFooter() {
   }
 
   return (
-    <footer className="bg-[#060E1A] text-slate-400 pt-20 pb-10 border-t border-white/[0.06]">
+    <footer className="bg-[#1A1A1A] text-gray-400 pt-16 pb-8">
       <div className="container mx-auto px-4 md:px-6 max-w-7xl">
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 lg:gap-8 mb-16">
+        <div className="flex flex-col md:flex-row items-start justify-between gap-10 mb-12">
 
-          {/* Brand Column */}
-          <div className="lg:col-span-2 space-y-6">
+          {/* Left side: Logo text + email */}
+          <div className="space-y-3">
             <Link href="/" className="inline-block">
-              <Image src={BRAND_ASSETS.logo} alt="MasseurMatch" width={160} height={32} className="h-8 w-auto" />
+              <span className="font-display text-2xl font-extrabold tracking-tight text-white">
+                MASSEUR MATCH
+              </span>
             </Link>
-            <p className="font-sans text-sm leading-relaxed max-w-sm text-slate-400">
-              A privacy-first directory connecting clients with independent LGBTQ+-affirming massage therapists across the United States.
+            <p className="text-sm text-gray-400">
+              e.mail@masseurmatch.com
             </p>
             <div className="flex items-center gap-2 mt-4">
-              <ShieldCheck className="w-5 h-5 text-emerald-400" />
-              <span className="font-mono text-[10px] uppercase tracking-widest text-slate-400">Verified Secure Network</span>
+              <ShieldCheck className="w-[1.1rem] h-[1.1rem] text-emerald-400" strokeWidth={2.25} />
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-500">
+                Verified Secure Network
+              </span>
             </div>
           </div>
 
-          {/* Links: Explore */}
-          <div className="space-y-6">
-            <h4 className="font-mono text-xs uppercase tracking-widest text-white">Explore</h4>
-            <ul className="space-y-4 font-sans text-sm">
-              <li><Link href="/search" className="hover:text-white transition-colors">Find a Therapist</Link></li>
-              <li><Link href="/near-me" className="hover:text-white transition-colors">Therapists Near Me</Link></li>
-              <li><Link href="/cities" className="hover:text-white transition-colors">Browse by City</Link></li>
-              <li><Link href="/blog" className="hover:text-white transition-colors">Wellness Journal</Link></li>
-            </ul>
-          </div>
-
-          {/* Links: For Professionals */}
-          <div className="space-y-6">
-            <h4 className="font-mono text-xs uppercase tracking-widest text-white">For Professionals</h4>
-            <ul className="space-y-4 font-sans text-sm">
-              <li><Link href="/for-therapists" className="hover:text-white transition-colors">Join the Network</Link></li>
-              <li><Link href="/pricing" className="hover:text-white transition-colors">Plans &amp; Pricing</Link></li>
-              <li><Link href="/login" className="hover:text-white transition-colors">Provider Login</Link></li>
-              <li><Link href="/trust" className="hover:text-white transition-colors">Quality Guidelines</Link></li>
-            </ul>
-          </div>
-
-          {/* Links: Trust & Legal */}
-          <div className="space-y-6">
-            <h4 className="font-mono text-xs uppercase tracking-widest text-white">Trust &amp; Legal</h4>
-            <ul className="space-y-4 font-sans text-sm">
-              <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
-              <li><Link href="/trust" className="hover:text-white transition-colors">Trust &amp; Safety</Link></li>
-              <li><Link href="/verification" className="hover:text-white transition-colors">Identity Verification</Link></li>
-              <li><Link href="/moderation-policy" className="hover:text-white transition-colors">Moderation Policy</Link></li>
-              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
-              <li><Link href="/contact" className="hover:text-white transition-colors">Contact Support</Link></li>
-            </ul>
+          {/* Right side: Contact info */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+            <div className="flex items-center gap-3">
+              <Phone className="w-[1.1rem] h-[1.1rem] text-white" strokeWidth={2.25} />
+              <span className="text-sm text-white">+(00) 234-6870</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Mail className="w-[1.1rem] h-[1.1rem] text-white" strokeWidth={2.25} />
+              <span className="text-sm text-white">+(519) 255-6779</span>
+            </div>
           </div>
 
         </div>
 
-        {/* Bottom Bar: Copyright & Location */}
-        <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-white/[0.06] gap-4">
-          <p className="font-sans text-xs text-slate-500">
+        {/* Bottom Bar: Copyright & Links */}
+        <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-white/[0.08] gap-4">
+          <p className="font-sans text-xs text-gray-500">
             &copy; {currentYear} MasseurMatch. All rights reserved.
           </p>
-          <div className="flex items-center gap-6 font-mono text-[10px] uppercase tracking-widest text-slate-500">
+          <div className="flex items-center gap-6 font-mono text-[10px] uppercase tracking-[0.18em] text-gray-500">
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
             <Link href="/cookie-policy" className="hover:text-white transition-colors">Cookies</Link>
             <Link href="/accessibility" className="hover:text-white transition-colors">Accessibility</Link>
-            <span className="flex items-center gap-1">
-              United States <ArrowUpRight className="w-3 h-3 text-[#FF8A1F]" />
-            </span>
           </div>
         </div>
 

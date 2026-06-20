@@ -1,4 +1,4 @@
-import { Inter, Unbounded } from "next/font/google";
+import { Inter, Oswald } from "next/font/google";
 
 export const inter = Inter({
   subsets: ["latin"],
@@ -6,11 +6,11 @@ export const inter = Inter({
   display: "swap",
 });
 
-export const unbounded = Unbounded({
+export const oswald = Oswald({
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800", "900"],
-  variable: "--font-unbounded",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-oswald",
   display: "swap",
 });
 
-export default { inter, unbounded };
+export default { inter, oswald };
