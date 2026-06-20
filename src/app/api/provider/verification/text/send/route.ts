@@ -11,6 +11,7 @@ const sendSchema = z.object({
 const TWILIO_SID = process.env.TWILIO_ACCOUNT_SID;
 const TWILIO_AUTH = process.env.TWILIO_AUTH_TOKEN;
 const TWILIO_PHONE = process.env.TWILIO_PHONE_NUMBER;
+const CODE_TTL_MINUTES = 10;
 
 export async function POST(request: Request) {
   try {
