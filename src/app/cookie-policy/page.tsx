@@ -56,16 +56,16 @@ export default function CookiePolicyPage() {
 
       <main
         style={{
-          background: "#FCFBF8",
-          color: "#0B1F3A",
+          background: "#FFFFFF",
+          color: "#1A1A1A",
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
       >
         <section
           style={{
-            background: "#0B1F3A",
-            color: "#FCFBF8",
+            background: "#1A1A1A",
+            color: "#FFFFFF",
             padding: "80px 24px 72px",
           }}
         >
@@ -75,7 +75,7 @@ export default function CookiePolicyPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#FF8A1F",
+                color: "#C8102E",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -119,7 +119,7 @@ export default function CookiePolicyPage() {
                 fontWeight: 400,
                 marginBottom: 12,
                 paddingBottom: 10,
-                borderBottom: "1px solid rgba(11,31,58,0.1)",
+                borderBottom: "1px solid rgba(26,26,26,0.1)",
                 fontFamily: "system-ui, sans-serif",
               }}
             >
@@ -147,7 +147,7 @@ export default function CookiePolicyPage() {
                 fontWeight: 400,
                 marginBottom: 20,
                 paddingBottom: 10,
-                borderBottom: "1px solid rgba(11,31,58,0.1)",
+                borderBottom: "1px solid rgba(26,26,26,0.1)",
                 fontFamily: "system-ui, sans-serif",
               }}
             >
@@ -161,7 +161,7 @@ export default function CookiePolicyPage() {
                   marginBottom: 28,
                   padding: 20,
                   background: "#fff",
-                  border: "1px solid rgba(11,31,58,0.08)",
+                  border: "1px solid rgba(26,26,26,0.08)",
                   borderRadius: 8,
                 }}
               >
@@ -174,7 +174,7 @@ export default function CookiePolicyPage() {
                     fontFamily: "system-ui, sans-serif",
                   }}
                 >
-                  <h3 style={{ fontSize: 16, fontWeight: 600, color: "#0B1F3A", margin: 0 }}>
+                  <h3 style={{ fontSize: 16, fontWeight: 600, color: "#1A1A1A", margin: 0 }}>
                     {type.name}
                   </h3>
                   <span
@@ -185,7 +185,7 @@ export default function CookiePolicyPage() {
                       textTransform: "uppercase",
                       padding: "2px 8px",
                       borderRadius: 99,
-                      background: type.required ? "rgba(16,185,129,0.1)" : "rgba(11,31,58,0.07)",
+                      background: type.required ? "rgba(16,185,129,0.1)" : "rgba(26,26,26,0.07)",
                       color: type.required ? "#059669" : "#6B7280",
                     }}
                   >
@@ -224,7 +224,7 @@ export default function CookiePolicyPage() {
                 fontWeight: 400,
                 marginBottom: 12,
                 paddingBottom: 10,
-                borderBottom: "1px solid rgba(11,31,58,0.1)",
+                borderBottom: "1px solid rgba(26,26,26,0.1)",
                 fontFamily: "system-ui, sans-serif",
               }}
             >
@@ -252,7 +252,7 @@ export default function CookiePolicyPage() {
                 fontWeight: 400,
                 marginBottom: 12,
                 paddingBottom: 10,
-                borderBottom: "1px solid rgba(11,31,58,0.1)",
+                borderBottom: "1px solid rgba(26,26,26,0.1)",
                 fontFamily: "system-ui, sans-serif",
               }}
             >
@@ -269,12 +269,12 @@ export default function CookiePolicyPage() {
               Questions about our use of cookies? Email{" "}
               <a
                 href="mailto:privacy@masseurmatch.com"
-                style={{ color: "#FF8A1F", textDecoration: "none" }}
+                style={{ color: "#C8102E", textDecoration: "none" }}
               >
                 privacy@masseurmatch.com
               </a>
               . For broader privacy rights, see our{" "}
-              <Link href="/privacy" style={{ color: "#FF8A1F", textDecoration: "none" }}>
+              <Link href="/privacy" style={{ color: "#C8102E", textDecoration: "none" }}>
                 Privacy Policy
               </Link>
               .

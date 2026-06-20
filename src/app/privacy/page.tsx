@@ -161,16 +161,16 @@ export default function PrivacyPage() {
 
       <main
         style={{
-          background: "#FCFBF8",
-          color: "#0B1F3A",
+          background: "#FFFFFF",
+          color: "#1A1A1A",
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
       >
         <section
           style={{
-            background: "#0B1F3A",
-            color: "#FCFBF8",
+            background: "#1A1A1A",
+            color: "#FFFFFF",
             padding: "80px 24px 72px",
           }}
         >
@@ -180,7 +180,7 @@ export default function PrivacyPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#FF8A1F",
+                color: "#C8102E",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -247,7 +247,7 @@ export default function PrivacyPage() {
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
                 fontFamily: "system-ui, sans-serif",
-                color: "#FF8A1F",
+                color: "#C8102E",
                 marginBottom: 16,
               }}
             >
@@ -285,7 +285,7 @@ export default function PrivacyPage() {
                     fontWeight: 400,
                     marginBottom: 16,
                     paddingBottom: 12,
-                    borderBottom: "1px solid rgba(11,31,58,0.1)",
+                    borderBottom: "1px solid rgba(26,26,26,0.1)",
                   }}
                 >
                   {section.title}

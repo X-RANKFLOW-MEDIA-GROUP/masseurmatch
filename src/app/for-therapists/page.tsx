@@ -127,16 +127,16 @@ export default function ForTherapistsPage() {
 
       <main
         style={{
-          background: "#FCFBF8",
-          color: "#0B1F3A",
+          background: "#FFFFFF",
+          color: "#1A1A1A",
           fontFamily: "'Georgia', 'Times New Roman', serif",
         }}
       >
         {/* Hero */}
         <section
           style={{
-            background: "#0B1F3A",
-            color: "#FCFBF8",
+            background: "#1A1A1A",
+            color: "#FFFFFF",
             padding: "110px 24px 100px",
             textAlign: "center",
             position: "relative",
@@ -152,7 +152,7 @@ export default function ForTherapistsPage() {
                 width: size,
                 height: size,
                 borderRadius: "50%",
-                border: "1px solid rgba(255,138,31,0.07)",
+                border: "1px solid rgba(200,16,46,0.07)",
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%,-50%)",
@@ -166,7 +166,7 @@ export default function ForTherapistsPage() {
               fontSize: 11,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "#FF8A1F",
+              color: "#C8102E",
               marginBottom: 24,
               fontFamily: "system-ui, sans-serif",
               position: "relative",
@@ -185,7 +185,7 @@ export default function ForTherapistsPage() {
             }}
           >
             Your practice deserves{" "}
-            <em style={{ color: "#FF8A1F", fontStyle: "italic" }}>
+            <em style={{ color: "#C8102E", fontStyle: "italic" }}>
               the right clients.
             </em>
           </h1>
@@ -223,8 +223,8 @@ export default function ForTherapistsPage() {
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
                 fontFamily: "system-ui, sans-serif",
-                background: "#FF8A1F",
-                color: "#0B1F3A",
+                background: "#C8102E",
+                color: "#1A1A1A",
                 textDecoration: "none",
                 fontWeight: 700,
               }}
@@ -241,7 +241,7 @@ export default function ForTherapistsPage() {
                 textTransform: "uppercase",
                 fontFamily: "system-ui, sans-serif",
                 background: "transparent",
-                color: "#FCFBF8",
+                color: "#FFFFFF",
                 textDecoration: "none",
                 border: "1px solid rgba(252,251,248,0.25)",
               }}
@@ -254,8 +254,8 @@ export default function ForTherapistsPage() {
         {/* Social Proof Bar */}
         <section
           style={{
-            background: "#1E4B8F",
-            color: "#FCFBF8",
+            background: "#C8102E",
+            color: "#FFFFFF",
             padding: "32px 24px",
           }}
         >
@@ -280,7 +280,7 @@ export default function ForTherapistsPage() {
                   style={{
                     fontSize: 28,
                     fontWeight: 700,
-                    color: "#FF8A1F",
+                    color: "#C8102E",
                     fontFamily: "system-ui, sans-serif",
                   }}
                 >
@@ -311,7 +311,7 @@ export default function ForTherapistsPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#FF8A1F",
+                color: "#C8102E",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -342,7 +342,7 @@ export default function ForTherapistsPage() {
                   style={{ background: "#fff", padding: "40px 36px" }}
                 >
                   <div
-                    style={{ fontSize: 26, color: "#FF8A1F", marginBottom: 18 }}
+                    style={{ fontSize: 26, color: "#C8102E", marginBottom: 18 }}
                   >
                     {benefit.icon}
                   </div>
@@ -375,8 +375,8 @@ export default function ForTherapistsPage() {
         {/* How It Works */}
         <section
           style={{
-            background: "#0B1F3A",
-            color: "#FCFBF8",
+            background: "#1A1A1A",
+            color: "#FFFFFF",
             padding: "100px 24px",
           }}
         >
@@ -386,7 +386,7 @@ export default function ForTherapistsPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#FF8A1F",
+                color: "#C8102E",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
                 textAlign: "center",
@@ -424,7 +424,7 @@ export default function ForTherapistsPage() {
                     style={{
                       fontSize: 32,
                       fontWeight: 700,
-                      color: "rgba(255,138,31,0.25)",
+                      color: "rgba(200,16,46,0.25)",
                       fontFamily: "system-ui, sans-serif",
                       marginBottom: 16,
                       lineHeight: 1,
@@ -465,7 +465,7 @@ export default function ForTherapistsPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#FF8A1F",
+                color: "#C8102E",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -495,7 +495,7 @@ export default function ForTherapistsPage() {
                     background: "#fff",
                     padding: "40px 36px",
                     margin: 0,
-                    borderTop: "3px solid #FF8A1F",
+                    borderTop: "3px solid #C8102E",
                   }}
                 >
                   <p
@@ -515,7 +515,7 @@ export default function ForTherapistsPage() {
                       style={{
                         fontSize: 14,
                         fontWeight: 600,
-                        color: "#0B1F3A",
+                        color: "#1A1A1A",
                         fontFamily: "system-ui, sans-serif",
                       }}
                     >
@@ -541,8 +541,8 @@ export default function ForTherapistsPage() {
         {/* Requirements */}
         <section
           style={{
-            background: "#FCFBF8",
-            borderTop: "1px solid rgba(11,31,58,0.08)",
+            background: "#FFFFFF",
+            borderTop: "1px solid rgba(26,26,26,0.08)",
             padding: "80px 24px",
           }}
         >
@@ -588,7 +588,7 @@ export default function ForTherapistsPage() {
                     background: "#fff",
                   }}
                 >
-                  <span style={{ color: "#FF8A1F", marginTop: 2, flexShrink: 0 }}>
+                  <span style={{ color: "#C8102E", marginTop: 2, flexShrink: 0 }}>
                     +
                   </span>
                   <span
@@ -610,9 +610,9 @@ export default function ForTherapistsPage() {
         {/* Knotty AI — Elite differentiator */}
         <section
           style={{
-            background: "#060E1A",
+            background: "#1A1A1A",
             padding: "80px 24px",
-            color: "#FCFBF8",
+            color: "#FFFFFF",
           }}
         >
           <div style={{ maxWidth: 760, margin: "0 auto" }}>
@@ -690,7 +690,7 @@ export default function ForTherapistsPage() {
                 alignItems: "center",
                 gap: 8,
                 background: "#F59E0B",
-                color: "#0B1F3A",
+                color: "#1A1A1A",
                 borderRadius: 99,
                 padding: "12px 24px",
                 fontSize: 13,
@@ -708,7 +708,7 @@ export default function ForTherapistsPage() {
         {/* CTA */}
         <section
           style={{
-            background: "#FF8A1F",
+            background: "#C8102E",
             padding: "88px 24px",
             textAlign: "center",
           }}
@@ -717,7 +717,7 @@ export default function ForTherapistsPage() {
             style={{
               fontSize: "clamp(28px, 4.5vw, 48px)",
               fontWeight: 400,
-              color: "#0B1F3A",
+              color: "#1A1A1A",
               marginBottom: 16,
               lineHeight: 1.15,
             }}
@@ -729,7 +729,7 @@ export default function ForTherapistsPage() {
           <p
             style={{
               fontSize: 16,
-              color: "rgba(11,31,58,0.7)",
+              color: "rgba(26,26,26,0.7)",
               marginBottom: 40,
               fontFamily: "system-ui, sans-serif",
             }}
@@ -753,8 +753,8 @@ export default function ForTherapistsPage() {
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
                 fontFamily: "system-ui, sans-serif",
-                background: "#0B1F3A",
-                color: "#FCFBF8",
+                background: "#1A1A1A",
+                color: "#FFFFFF",
                 textDecoration: "none",
                 fontWeight: 700,
               }}
@@ -771,9 +771,9 @@ export default function ForTherapistsPage() {
                 textTransform: "uppercase",
                 fontFamily: "system-ui, sans-serif",
                 background: "transparent",
-                color: "#0B1F3A",
+                color: "#1A1A1A",
                 textDecoration: "none",
-                border: "1px solid rgba(11,31,58,0.35)",
+                border: "1px solid rgba(26,26,26,0.35)",
               }}
             >
               View Plans

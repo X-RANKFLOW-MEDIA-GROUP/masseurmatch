@@ -12,7 +12,7 @@ export default async function Image() {
     (
       <div
         style={{
-          background: "#0B1F3A",
+          background: "#1A1A1A",
           width: "100%",
           height: "100%",
           display: "flex",
@@ -34,8 +34,8 @@ export default async function Image() {
             marginBottom: 24,
           }}
         >
-          <span style={{ color: "#FCFBF8" }}>Masseur</span>
-          <span style={{ color: "#FF8A1F" }}>Match</span>
+          <span style={{ color: "#FFFFFF" }}>Masseur</span>
+          <span style={{ color: "#C8102E" }}>Match</span>
         </div>
 
         <div
@@ -56,7 +56,7 @@ export default async function Image() {
             display: "flex",
             width: 80,
             height: 3,
-            background: "#FF8A1F",
+            background: "#C8102E",
             marginTop: 36,
           }}
         />

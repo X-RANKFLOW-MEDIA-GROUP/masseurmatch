@@ -9,7 +9,7 @@ export function VoxFaqAccordion({ items }: { items: ProfileFaqItem[] }) {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <div className="divide-y divide-[#efe3d8] overflow-hidden rounded-3xl border border-[#efe3d8] bg-white">
+    <div className="divide-y divide-[#E5E5E5] overflow-hidden rounded-3xl border border-[#E5E5E5] bg-white">
       {items.map((item, index) => {
         const isOpen = open === index;
         return (
@@ -24,7 +24,7 @@ export function VoxFaqAccordion({ items }: { items: ProfileFaqItem[] }) {
                 {item.question}
               </span>
               <ChevronDown
-                className={`h-5 w-5 flex-shrink-0 text-[#FF8A1F] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+                className={`h-5 w-5 flex-shrink-0 text-[#C8102E] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
                 strokeWidth={2.5}
               />
             </button>

@@ -43,15 +43,15 @@ export default function BlogPage() {
 
       <main
         style={{
-          background: "#FCFBF8",
-          color: "#0B1F3A",
+          background: "#FFFFFF",
+          color: "#1A1A1A",
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
       >
         <section
           style={{
-            background: "#0B1F3A",
+            background: "#1A1A1A",
             padding: "80px 24px 72px",
             textAlign: "center",
           }}
@@ -61,7 +61,7 @@ export default function BlogPage() {
               fontSize: 11,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "#FF8A1F",
+              color: "#C8102E",
               marginBottom: 20,
               fontFamily: "system-ui, sans-serif",
             }}
@@ -72,7 +72,7 @@ export default function BlogPage() {
             style={{
               fontSize: "clamp(36px, 6vw, 64px)",
               fontWeight: 400,
-              color: "#FCFBF8",
+              color: "#FFFFFF",
               lineHeight: 1.1,
               marginBottom: 20,
             }}

@@ -175,8 +175,8 @@ export function ProfileAIChat({ profile }: Props) {
             aria-label="Ask Knotty AI"
             className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full"
             style={{
-              background: "linear-gradient(135deg, #FF8A1F 0%, #ff6000 100%)",
-              boxShadow: "0 8px 32px rgba(255,138,31,0.45), 0 2px 8px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.3)",
+              background: "linear-gradient(135deg, #C8102E 0%, #A80D24 100%)",
+              boxShadow: "0 8px 32px rgba(200,16,46,0.45), 0 2px 8px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.3)",
             }}
           >
             <Sparkles className="h-6 w-6 text-white" strokeWidth={2} />
@@ -203,13 +203,13 @@ export function ProfileAIChat({ profile }: Props) {
               WebkitBackdropFilter: "blur(28px) saturate(180%)",
               border: "1px solid rgba(255,255,255,0.85)",
               boxShadow: [
-                "0 0 0 1px rgba(255,138,31,0.12)",         /* brand ring */
+                "0 0 0 1px rgba(200,16,46,0.12)",         /* brand ring */
                 "0 4px 0 -1px rgba(255,255,255,0.9)",      /* top-face highlight */
-                "0 8px 24px rgba(11,31,58,0.10)",          /* mid shadow */
-                "0 24px 56px rgba(11,31,58,0.16)",         /* depth shadow */
-                "0 48px 96px rgba(11,31,58,0.10)",         /* ambient */
+                "0 8px 24px rgba(26,26,26,0.10)",          /* mid shadow */
+                "0 24px 56px rgba(26,26,26,0.16)",         /* depth shadow */
+                "0 48px 96px rgba(26,26,26,0.10)",         /* ambient */
                 "inset 0 1px 0 rgba(255,255,255,1)",       /* inner top-edge */
-                "inset 0 -1px 0 rgba(11,31,58,0.06)",      /* inner bottom-edge */
+                "inset 0 -1px 0 rgba(26,26,26,0.06)",      /* inner bottom-edge */
               ].join(", "),
               /* subtle 3-D tilt — feels like a physical card */
               perspective: "1200px",
@@ -221,8 +221,8 @@ export function ProfileAIChat({ profile }: Props) {
             <div
               className="flex shrink-0 items-center justify-between px-5 py-4"
               style={{
-                background: "linear-gradient(135deg, rgba(255,138,31,0.12) 0%, rgba(255,100,0,0.06) 100%)",
-                borderBottom: "1px solid rgba(11,31,58,0.06)",
+                background: "linear-gradient(135deg, rgba(200,16,46,0.12) 0%, rgba(255,100,0,0.06) 100%)",
+                borderBottom: "1px solid rgba(26,26,26,0.06)",
               }}
             >
               <div className="flex items-center gap-3">
@@ -230,8 +230,8 @@ export function ProfileAIChat({ profile }: Props) {
                 <div
                   className="flex h-10 w-10 items-center justify-center rounded-full"
                   style={{
-                    background: "linear-gradient(135deg, #FF8A1F 0%, #ff5f00 100%)",
-                    boxShadow: "0 4px 12px rgba(255,138,31,0.4), inset 0 1px 0 rgba(255,255,255,0.3)",
+                    background: "linear-gradient(135deg, #C8102E 0%, #A80D24 100%)",
+                    boxShadow: "0 4px 12px rgba(200,16,46,0.4), inset 0 1px 0 rgba(255,255,255,0.3)",
                   }}
                 >
                   <Bot className="h-5 w-5 text-white" strokeWidth={2} />
@@ -255,7 +255,7 @@ export function ProfileAIChat({ profile }: Props) {
                   setIsOpen(false);
                 }}
                 className="flex h-8 w-8 items-center justify-center rounded-full transition"
-                style={{ background: "rgba(11,31,58,0.06)" }}
+                style={{ background: "rgba(26,26,26,0.06)" }}
                 aria-label="Close chat"
               >
                 <X className="h-4 w-4 text-slate-500" strokeWidth={2} />
@@ -268,7 +268,7 @@ export function ProfileAIChat({ profile }: Props) {
               className="flex-1 space-y-3 overflow-y-auto px-4 py-4"
               style={{
                 scrollbarWidth: "thin",
-                scrollbarColor: "rgba(11,31,58,0.1) transparent",
+                scrollbarColor: "rgba(26,26,26,0.1) transparent",
               }}
             >
               {messages.map((msg) => (
@@ -286,14 +286,14 @@ export function ProfileAIChat({ profile }: Props) {
                     msg.role === "ai"
                       ? {
                           background: "rgba(255,255,255,0.9)",
-                          border: "1px solid rgba(11,31,58,0.07)",
+                          border: "1px solid rgba(26,26,26,0.07)",
                           color: "#1e293b",
-                          boxShadow: "0 2px 8px rgba(11,31,58,0.06), inset 0 1px 0 rgba(255,255,255,0.8)",
+                          boxShadow: "0 2px 8px rgba(26,26,26,0.06), inset 0 1px 0 rgba(255,255,255,0.8)",
                         }
                       : {
-                          background: "linear-gradient(135deg, #FF8A1F 0%, #ff5f00 100%)",
+                          background: "linear-gradient(135deg, #C8102E 0%, #A80D24 100%)",
                           color: "#fff",
-                          boxShadow: "0 4px 12px rgba(255,138,31,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
+                          boxShadow: "0 4px 12px rgba(200,16,46,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
                         }
                   }
                 >
@@ -309,8 +309,8 @@ export function ProfileAIChat({ profile }: Props) {
                   className="mr-auto flex max-w-[85%] items-center gap-2.5 rounded-[18px] px-4 py-3"
                   style={{
                     background: "rgba(255,255,255,0.9)",
-                    border: "1px solid rgba(11,31,58,0.07)",
-                    boxShadow: "0 2px 8px rgba(11,31,58,0.06)",
+                    border: "1px solid rgba(26,26,26,0.07)",
+                    boxShadow: "0 2px 8px rgba(26,26,26,0.06)",
                   }}
                 >
                   <Sparkles
@@ -330,16 +330,16 @@ export function ProfileAIChat({ profile }: Props) {
                   className="mr-auto max-w-[85%] whitespace-pre-line rounded-[18px] px-4 py-3 text-sm leading-relaxed"
                   style={{
                     background: "rgba(255,255,255,0.9)",
-                    border: "1px solid rgba(11,31,58,0.07)",
+                    border: "1px solid rgba(26,26,26,0.07)",
                     color: "#1e293b",
-                    boxShadow: "0 2px 8px rgba(11,31,58,0.06), inset 0 1px 0 rgba(255,255,255,0.8)",
+                    boxShadow: "0 2px 8px rgba(26,26,26,0.06), inset 0 1px 0 rgba(255,255,255,0.8)",
                   }}
                 >
                   {streamText}
                   <span
                     className="ml-0.5 inline-block h-3.5 w-0.5 align-middle"
                     style={{
-                      background: "#FF8A1F",
+                      background: "#C8102E",
                       animation: "blink 0.7s step-end infinite",
                     }}
                   />
@@ -358,7 +358,7 @@ export function ProfileAIChat({ profile }: Props) {
                 >
                   <p
                     className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em]"
-                    style={{ color: "rgba(11,31,58,0.35)" }}
+                    style={{ color: "rgba(26,26,26,0.35)" }}
                   >
                     Quick questions
                   </p>
@@ -369,8 +369,8 @@ export function ProfileAIChat({ profile }: Props) {
                         onClick={() => handleQuick(q)}
                         className="rounded-full px-3 py-1.5 text-[11px] font-medium transition"
                         style={{
-                          background: "rgba(255,138,31,0.08)",
-                          border: "1px solid rgba(255,138,31,0.2)",
+                          background: "rgba(200,16,46,0.08)",
+                          border: "1px solid rgba(200,16,46,0.2)",
                           color: "#b45309",
                         }}
                       >
@@ -385,14 +385,14 @@ export function ProfileAIChat({ profile }: Props) {
             {/* ── Input bar ── */}
             <div
               className="shrink-0 px-4 py-3"
-              style={{ borderTop: "1px solid rgba(11,31,58,0.06)", background: "rgba(255,255,255,0.6)" }}
+              style={{ borderTop: "1px solid rgba(26,26,26,0.06)", background: "rgba(255,255,255,0.6)" }}
             >
               <div
                 className="flex items-center gap-2 rounded-full px-4 py-2"
                 style={{
                   background: "rgba(255,255,255,0.95)",
-                  border: "1px solid rgba(11,31,58,0.1)",
-                  boxShadow: "0 2px 8px rgba(11,31,58,0.06), inset 0 1px 0 rgba(255,255,255,0.9)",
+                  border: "1px solid rgba(26,26,26,0.1)",
+                  boxShadow: "0 2px 8px rgba(26,26,26,0.06), inset 0 1px 0 rgba(255,255,255,0.9)",
                 }}
               >
                 <input
@@ -409,15 +409,15 @@ export function ProfileAIChat({ profile }: Props) {
                   disabled={!input.trim() || phase !== "idle"}
                   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition disabled:opacity-30"
                   style={{
-                    background: "linear-gradient(135deg, #FF8A1F 0%, #ff5f00 100%)",
-                    boxShadow: "0 2px 8px rgba(255,138,31,0.4)",
+                    background: "linear-gradient(135deg, #C8102E 0%, #A80D24 100%)",
+                    boxShadow: "0 2px 8px rgba(200,16,46,0.4)",
                   }}
                   aria-label="Send"
                 >
                   <Send className="h-3.5 w-3.5 text-white" strokeWidth={2.25} />
                 </button>
               </div>
-              <p className="mt-1.5 text-center text-[10px]" style={{ color: "rgba(11,31,58,0.25)" }}>
+              <p className="mt-1.5 text-center text-[10px]" style={{ color: "rgba(26,26,26,0.25)" }}>
                 Powered by Knotty AI · Elite feature
               </p>
             </div>

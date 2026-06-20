@@ -81,7 +81,7 @@ const heading = {
   fontSize: '24px',
   fontWeight: '600',
   margin: '16px 0',
-  color: '#0B1F3A',
+  color: '#1A1A1A',
 };
 
 const paragraph = {
@@ -120,7 +120,7 @@ const reviewerText = {
 };
 
 const button = {
-  backgroundColor: '#FF8A1F',
+  backgroundColor: '#C8102E',
   borderRadius: '8px',
   color: '#fff',
   fontSize: '14px',

@@ -142,8 +142,8 @@ export default function TermsPage() {
 
       <main
         style={{
-          background: "#FCFBF8",
-          color: "#0B1F3A",
+          background: "#FFFFFF",
+          color: "#1A1A1A",
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
@@ -151,8 +151,8 @@ export default function TermsPage() {
         {/* ── Header ── */}
         <section
           style={{
-            background: "#0B1F3A",
-            color: "#FCFBF8",
+            background: "#1A1A1A",
+            color: "#FFFFFF",
             padding: "clamp(56px, 8vw, 80px) 20px clamp(48px, 7vw, 72px)",
           }}
         >
@@ -162,7 +162,7 @@ export default function TermsPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#FF8A1F",
+                color: "#C8102E",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -228,7 +228,7 @@ export default function TermsPage() {
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
                 fontFamily: "system-ui, sans-serif",
-                color: "#FF8A1F",
+                color: "#C8102E",
                 marginBottom: 16,
               }}
             >
@@ -257,8 +257,8 @@ export default function TermsPage() {
           <div>
             <div
               style={{
-                background: "#1E4B8F",
-                color: "#FCFBF8",
+                background: "#C8102E",
+                color: "#FFFFFF",
                 padding: "18px 18px",
                 marginBottom: 48,
                 fontSize: 14,
@@ -284,7 +284,7 @@ export default function TermsPage() {
                     fontWeight: 400,
                     marginBottom: 16,
                     paddingBottom: 12,
-                    borderBottom: "1px solid rgba(11,31,58,0.1)",
+                    borderBottom: "1px solid rgba(26,26,26,0.1)",
                   }}
                 >
                   {s.title}
