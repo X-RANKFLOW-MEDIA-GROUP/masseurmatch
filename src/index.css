@@ -154,6 +154,21 @@
     --color-background-secondary-rgb: 255 255 255;
     --color-border-tertiary: #EEEEEE;
     --color-border-tertiary-rgb: 238 238 238;
+
+    /* Component token bridge (Button, TherapistCardTilt, etc.) */
+    --color-primary: #CC2424;
+    --color-primary-hover: #A81D1D;
+    --color-primary-active: #8B1919;
+    --color-error: #DC2626;
+    --color-success: #16A34A;
+    --color-surface: #FFFFFF;
+    --color-surface-offset: #F4F5F6;
+    --color-surface-dynamic: #E2E4E6;
+    --color-text: #1A1A1A;
+    --color-text-faint: #999999;
+    --color-border: #E2E4E6;
+    --color-divider: #E2E4E6;
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
   }
 
   .theme-masseurmatch {
