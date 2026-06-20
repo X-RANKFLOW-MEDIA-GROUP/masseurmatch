@@ -64,8 +64,8 @@ export default function TrustPage() {
         </section>
 
         <section className="container mx-auto mb-16 max-w-3xl px-4 md:px-6">
-          <div className="flex items-start gap-4 rounded-2xl border border-orange-200 bg-orange-50 p-6 shadow-sm md:p-8">
-            <ShieldAlert className="mt-1 h-10 w-10 flex-shrink-0 text-orange-500" />
+          <div className="flex items-start gap-4 rounded-2xl border border-red-200 bg-red-50 p-6 shadow-sm md:p-8">
+            <ShieldAlert className="mt-1 h-10 w-10 flex-shrink-0 text-red-600" />
             <div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Important Platform Disclaimer</h3>
               <p className="text-gray-700 font-medium">
@@ -107,7 +107,7 @@ export default function TrustPage() {
                 government-issued documents. Look for the blue &ldquo;Verified&rdquo; badge for
                 professionals who have passed our strictest audit.
                 <br />
-                <span className="mt-2 block font-semibold text-orange-700">
+                <span className="mt-2 block font-semibold text-red-700">
                   Note: Identity verification confirms a person&apos;s legal identity, <u>not</u>{" "}
                   their professional licensure.
                 </span>

@@ -313,11 +313,11 @@ export const KnottyChat = ({
               setIsOpen(true);
               trackOpen();
             }}
-            className="group relative h-16 w-16 rounded-full border border-white/20 bg-[linear-gradient(180deg,#FF8A1F,#e67a10)] shadow-[0_20px_48px_rgba(255,138,31,0.35)]"
+            className="group relative h-16 w-16 rounded-full border border-white/20 bg-[linear-gradient(180deg,#C8102E,#A80D24)] shadow-[0_20px_48px_rgba(200,16,46,0.35)]"
             aria-label="Open Knotty chat"
           >
             <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.35),transparent_58%)]" />
-            <div className="absolute -inset-2 rounded-full bg-[radial-gradient(circle,rgba(255,138,31,0.5),transparent_65%)] opacity-75 blur-2xl transition group-hover:opacity-100" />
+            <div className="absolute -inset-2 rounded-full bg-[radial-gradient(circle,rgba(200,16,46,0.5),transparent_65%)] opacity-75 blur-2xl transition group-hover:opacity-100" />
             <div className="relative flex h-full w-full items-center justify-center text-white">
               <Sparkles className="h-6 w-6" strokeWidth={2.25} />
             </div>

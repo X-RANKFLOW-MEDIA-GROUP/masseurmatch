@@ -346,7 +346,7 @@ export default async function BlogPostPage({
               gap: 8,
               fontSize: 12,
               fontFamily: "system-ui, sans-serif",
-              color: "rgba(252,251,248,0.4)",
+              color: "rgba(255,255,255,0.4)",
             }}
           >
             <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>
@@ -737,7 +737,7 @@ export default async function BlogPostPage({
                   fontSize: 13,
                   fontFamily: "system-ui, sans-serif",
                   border: "none",
-                  background: "rgba(252,251,248,0.1)",
+                  background: "rgba(255,255,255,0.1)",
                   color: "#FFFFFF",
                   marginBottom: 8,
                   boxSizing: "border-box",

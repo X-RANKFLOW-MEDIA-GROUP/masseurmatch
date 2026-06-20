@@ -19,7 +19,7 @@ function getPasswordStrength(pw: string): { label: string; color: string; percen
   if (/[0-9]/.test(pw)) score++;
   if (/[^A-Za-z0-9]/.test(pw)) score++;
   if (score <= 1) return { label: "Weak", color: "bg-red-500", percent: 20 };
-  if (score <= 2) return { label: "Fair", color: "bg-orange-500", percent: 40 };
+  if (score <= 2) return { label: "Fair", color: "bg-amber-500", percent: 40 };
   if (score <= 3) return { label: "Good", color: "bg-yellow-500", percent: 60 };
   if (score <= 4) return { label: "Strong", color: "bg-green-500", percent: 80 };
   return { label: "Very Strong", color: "bg-green-600", percent: 100 };

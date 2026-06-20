@@ -15,8 +15,7 @@ import {
 import { useHotelSearch } from "@/hooks/useHotelSearch";
 
 // Self-contained widget: no dependency on a specific UI component library.
-// Plain Tailwind classes + lucide icons. Swap the orange-600 accent for your
-// brand token if you prefer (e.g. text-primary / bg-primary).
+// Plain Tailwind classes + lucide icons.
 
 export function HotelSearchWidget() {
   const { data, loading, error, search } = useHotelSearch();
@@ -36,7 +35,7 @@ export function HotelSearchWidget() {
   return (
     <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
       <div className="mb-6 flex items-center gap-3">
-        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-100 text-orange-600">
+        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-red-100 text-red-600">
           <Hotel className="h-5 w-5" />
         </span>
         <div>
@@ -60,7 +59,7 @@ export function HotelSearchWidget() {
               onChange={(event) => setCity(event.target.value)}
               placeholder="e.g. Indianapolis"
               required
-              className="w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+              className="w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/20"
             />
           </div>
         </div>
@@ -76,7 +75,7 @@ export function HotelSearchWidget() {
               value={checkIn}
               onChange={(event) => setCheckIn(event.target.value)}
               required
-              className="w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+              className="w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/20"
             />
           </div>
         </div>
@@ -92,7 +91,7 @@ export function HotelSearchWidget() {
               value={checkOut}
               onChange={(event) => setCheckOut(event.target.value)}
               required
-              className="w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+              className="w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/20"
             />
           </div>
         </div>
@@ -101,7 +100,7 @@ export function HotelSearchWidget() {
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-orange-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? (
               <>
@@ -129,7 +128,7 @@ export function HotelSearchWidget() {
           <div className="flex flex-wrap items-center gap-3">
             <h3 className="text-xl font-semibold text-gray-900">{data.city}</h3>
             {data.gayArea ? (
-              <span className="rounded-full bg-orange-600 px-3 py-1 text-xs font-medium text-white">
+              <span className="rounded-full bg-red-600 px-3 py-1 text-xs font-medium text-white">
                 {data.gayArea}
               </span>
             ) : null}
@@ -138,7 +137,7 @@ export function HotelSearchWidget() {
           {data.streetMeterInfo?.rate ? (
             <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
               <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
-                <ParkingMeter className="h-4 w-4 text-orange-600" />
+                <ParkingMeter className="h-4 w-4 text-red-600" />
                 Street meters
               </div>
               <p className="mt-2 text-sm text-gray-500">
@@ -214,7 +213,7 @@ function Detail({ icon, label, value }: { icon: React.ReactNode; label: string; 
   return (
     <div>
       <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">
-        <span className="text-orange-600">{icon}</span>
+        <span className="text-red-600">{icon}</span>
         {label}
       </div>
       <p className="mt-1 text-gray-900">{value}</p>

@@ -42,7 +42,7 @@ export default async function Image() {
           style={{
             display: "flex",
             fontSize: 22,
-            color: "rgba(252,251,248,0.6)",
+            color: "rgba(255,255,255,0.6)",
             fontFamily: "system-ui, sans-serif",
             fontWeight: 300,
             letterSpacing: "0.04em",

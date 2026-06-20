@@ -228,7 +228,7 @@ export function BlogContent() {
                     fontSize: 10,
                     letterSpacing: "0.16em",
                     textTransform: "uppercase",
-                    color: "rgba(252,251,248,0.5)",
+                    color: "rgba(255,255,255,0.5)",
                     fontFamily: "system-ui, sans-serif",
                   }}
                 >

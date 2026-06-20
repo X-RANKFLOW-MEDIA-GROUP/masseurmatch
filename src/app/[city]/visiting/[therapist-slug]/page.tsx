@@ -88,12 +88,12 @@ export default async function TourPage({
   const nextVisit = cityVisits[0];
 
   return (
-    <main className="min-h-screen bg-[#FCFBF8]" style={{ fontFamily: "system-ui, sans-serif" }}>
+    <main className="min-h-screen bg-[#FFFFFF]" style={{ fontFamily: "system-ui, sans-serif" }}>
       {/* Hero */}
       <section
         style={{
-          background: "#0B1F3A",
-          color: "#FCFBF8",
+          background: "#1A1A1A",
+          color: "#FFFFFF",
           padding: "clamp(48px, 7vw, 72px) 20px",
         }}
       >
@@ -103,14 +103,14 @@ export default async function TourPage({
               display: "inline-flex",
               alignItems: "center",
               gap: 6,
-              background: "rgba(255,138,31,0.12)",
-              border: "1px solid rgba(255,138,31,0.3)",
+              background: "rgba(200,16,46,0.12)",
+              border: "1px solid rgba(200,16,46,0.3)",
               borderRadius: 99,
               padding: "4px 12px",
               fontSize: 11,
               letterSpacing: "0.18em",
               textTransform: "uppercase",
-              color: "#FF8A1F",
+              color: "#C8102E",
               marginBottom: 20,
             }}
           >
@@ -158,17 +158,17 @@ export default async function TourPage({
                   display: "flex",
                   alignItems: "center",
                   gap: 12,
-                  border: "1px solid rgba(11,31,58,0.1)",
+                  border: "1px solid rgba(26,26,26,0.1)",
                   borderRadius: 12,
                   padding: "12px 16px",
                   background: "#fff",
                 }}
               >
                 <CalendarDays
-                  style={{ width: 16, height: 16, color: "#FF8A1F", flexShrink: 0 }}
+                  style={{ width: 16, height: 16, color: "#C8102E", flexShrink: 0 }}
                   strokeWidth={2}
                 />
-                <span style={{ fontSize: 15, color: "#0B1F3A" }}>
+                <span style={{ fontSize: 15, color: "#1A1A1A" }}>
                   {formatDateRange(visit.start_date, visit.end_date)}
                 </span>
               </li>
@@ -212,7 +212,7 @@ export default async function TourPage({
                 <span
                   key={cat}
                   style={{
-                    border: "1px solid rgba(11,31,58,0.12)",
+                    border: "1px solid rgba(26,26,26,0.12)",
                     borderRadius: 99,
                     padding: "4px 12px",
                     fontSize: 13,
@@ -234,8 +234,8 @@ export default async function TourPage({
               display: "inline-flex",
               alignItems: "center",
               gap: 6,
-              background: "#0B1F3A",
-              color: "#FCFBF8",
+              background: "#1A1A1A",
+              color: "#FFFFFF",
               borderRadius: 99,
               padding: "12px 22px",
               fontSize: 14,
@@ -254,7 +254,7 @@ export default async function TourPage({
               gap: 6,
               background: "transparent",
               color: "#374151",
-              border: "1px solid rgba(11,31,58,0.15)",
+              border: "1px solid rgba(26,26,26,0.15)",
               borderRadius: 99,
               padding: "12px 22px",
               fontSize: 14,

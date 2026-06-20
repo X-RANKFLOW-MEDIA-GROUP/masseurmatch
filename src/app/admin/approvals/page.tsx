@@ -39,7 +39,7 @@ const statusConfig: Record<TherapistProfile["status"], { label: string; icon: ty
   pending_approval:  { label: "Pending",           icon: Clock,        badgeClasses: "bg-amber-50 text-amber-700" },
   approved:          { label: "Approved",          icon: CheckCircle2, badgeClasses: "bg-emerald-50 text-emerald-700" },
   rejected:          { label: "Rejected",          icon: XCircle,      badgeClasses: "bg-rose-50 text-rose-700" },
-  changes_requested: { label: "Changes Requested", icon: AlertCircle,  badgeClasses: "bg-orange-50 text-orange-700" },
+  changes_requested: { label: "Changes Requested", icon: AlertCircle,  badgeClasses: "bg-red-50 text-red-700" },
 };
 
 export default function ApprovalsPage() {

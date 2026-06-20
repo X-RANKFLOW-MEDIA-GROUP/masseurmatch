@@ -82,7 +82,7 @@ export default function BlogPage() {
           <p
             style={{
               fontSize: 17,
-              color: "rgba(252,251,248,0.65)",
+              color: "rgba(255,255,255,0.65)",
               fontFamily: "system-ui, sans-serif",
               fontWeight: 300,
               maxWidth: 520,
