@@ -144,12 +144,12 @@ export function VoxProfile({
                 {profile.name}
               </h1>
               <p className="mt-2 flex items-center gap-1.5 text-[#5a5147]">
-                <MapPin className="h-4 w-4 text-[#C8102E]" strokeWidth={2.25} />
+                <MapPin className="h-4 w-4 text-[#CC2424]" strokeWidth={2.25} />
                 {profile.neighborhood}, {profile.city}
               </p>
               {typeof rating === "number" && (
                 <div className="mt-3 flex items-center gap-2">
-                  <span className="flex items-center gap-0.5 text-[#C8102E]">
+                  <span className="flex items-center gap-0.5 text-[#CC2424]">
                     {[0, 1, 2, 3, 4].map((i) => (
                       <Star key={i} className="h-4 w-4 fill-current" strokeWidth={0} />
                     ))}
@@ -178,7 +178,7 @@ export function VoxProfile({
                 {phoneHref && (
                   <a
                     href={phoneHref}
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#C8102E] px-6 font-semibold text-[#FFFFFF] shadow-[0_10px_24px_rgba(200,16,46,0.3)] transition-transform hover:-translate-y-0.5"
+                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#CC2424] px-6 font-semibold text-[#FFFFFF] shadow-[0_10px_24px_rgba(204,36,36,0.3)] transition-transform hover:-translate-y-0.5"
                   >
                     <Phone className="h-4 w-4" strokeWidth={2.5} />
                     Text {firstName}
@@ -195,14 +195,14 @@ export function VoxProfile({
                 )}
                 {profile.phone && (
                   <span className="inline-flex h-12 items-center gap-2 rounded-full border border-[#E5E5E5] bg-white px-5 font-semibold text-[#1A1A1A]">
-                    <Phone className="h-4 w-4 text-[#C8102E]" strokeWidth={2.5} />
+                    <Phone className="h-4 w-4 text-[#CC2424]" strokeWidth={2.5} />
                     {profile.phone}
                   </span>
                 )}
                 {emailHref && !phoneHref && !whatsappHref && (
                   <a
                     href={emailHref}
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#C8102E] px-6 font-semibold text-[#FFFFFF]"
+                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#CC2424] px-6 font-semibold text-[#FFFFFF]"
                   >
                     <Mail className="h-4 w-4" strokeWidth={2.5} />
                     Email {firstName}
@@ -226,7 +226,7 @@ export function VoxProfile({
             <div className="grid gap-4 md:grid-cols-3">
               {reviews.slice(0, 6).map((review, index) => (
                 <figure key={index} className="flex h-full flex-col rounded-3xl border border-[#E5E5E5] bg-white p-6">
-                  <span className="mb-3 flex items-center gap-0.5 text-[#C8102E]">
+                  <span className="mb-3 flex items-center gap-0.5 text-[#CC2424]">
                     {[0, 1, 2, 3, 4].map((i) => (
                       <Star key={i} className="h-4 w-4 fill-current" strokeWidth={0} />
                     ))}
@@ -278,7 +278,7 @@ export function VoxProfile({
                 const Icon = iconForService(service);
                 return (
                   <div key={service} className="flex items-start gap-3 rounded-2xl border border-[#E5E5E5] bg-white p-4">
-                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#FDE8EC] text-[#C8102E]">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#FDE8EC] text-[#CC2424]">
                       <Icon className="h-5 w-5" strokeWidth={2.25} />
                     </span>
                     <span className="pt-1.5 text-sm font-semibold text-[#1a1a1a]">{service}</span>
@@ -332,7 +332,7 @@ export function VoxProfile({
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="rounded-3xl border border-[#E5E5E5] bg-white p-6">
               <div className="mb-4 flex items-center gap-2">
-                <CalendarDays className="h-5 w-5 text-[#C8102E]" strokeWidth={2.25} />
+                <CalendarDays className="h-5 w-5 text-[#CC2424]" strokeWidth={2.25} />
                 <h3 className="font-display text-lg font-bold text-[#1A1A1A]">Availability</h3>
               </div>
               {profile.availabilityDays.length > 0 ? (
@@ -356,7 +356,7 @@ export function VoxProfile({
             </div>
             <div className="rounded-3xl border border-[#E5E5E5] bg-white p-6">
               <div className="mb-4 flex items-center gap-2">
-                <Car className="h-5 w-5 text-[#C8102E]" strokeWidth={2.25} />
+                <Car className="h-5 w-5 text-[#CC2424]" strokeWidth={2.25} />
                 <h3 className="font-display text-lg font-bold text-[#1A1A1A]">Incall & outcall</h3>
               </div>
               <ul className="space-y-2.5 text-sm text-[#3f3a33]">
@@ -371,7 +371,7 @@ export function VoxProfile({
                   {hasRate(profile.outcallPrice) ? ` · from ${profile.outcallPrice}` : ""}
                 </li>
                 <li className="flex items-center gap-2">
-                  <Car className="h-4 w-4 text-[#C8102E]" strokeWidth={2.25} />
+                  <Car className="h-4 w-4 text-[#CC2424]" strokeWidth={2.25} />
                   {profile.travelRadius}
                 </li>
               </ul>
@@ -399,7 +399,7 @@ export function VoxProfile({
               </div>
             )}
             <div className="flex items-center gap-2 px-6 py-4 text-sm text-[#5a5147]">
-              <MapPin className="h-4 w-4 text-[#C8102E]" strokeWidth={2.25} />
+              <MapPin className="h-4 w-4 text-[#CC2424]" strokeWidth={2.25} />
               Serving {profile.serviceArea}
             </div>
           </div>
@@ -431,7 +431,7 @@ export function VoxProfile({
                 <Link
                   key={related.slug}
                   href={`/therapists/${related.slug}`}
-                  className="flex items-center gap-3 rounded-2xl border border-[#E5E5E5] bg-white p-3 transition-colors hover:border-[#C8102E]/40"
+                  className="flex items-center gap-3 rounded-2xl border border-[#E5E5E5] bg-white p-3 transition-colors hover:border-[#CC2424]/40"
                 >
                   <span className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-[#f3e9df]">
                     {related.profilePhotoUrl ? (
@@ -463,7 +463,7 @@ export function VoxProfile({
             {(phoneHref || whatsappHref || emailHref) && (
               <a
                 href={phoneHref || whatsappHref || emailHref || "#contact"}
-                className="inline-flex h-12 items-center gap-2 rounded-full bg-[#C8102E] px-7 font-semibold text-[#FFFFFF] transition-transform hover:-translate-y-0.5"
+                className="inline-flex h-12 items-center gap-2 rounded-full bg-[#CC2424] px-7 font-semibold text-[#FFFFFF] transition-transform hover:-translate-y-0.5"
               >
                 <Sparkles className="h-4 w-4" strokeWidth={2.5} />
                 Contact {firstName}
@@ -508,7 +508,7 @@ function Section({
 }) {
   return (
     <section id={id} className="mt-10 scroll-mt-24 sm:mt-14">
-      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#C8102E]">{eyebrow}</p>
+      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#CC2424]">{eyebrow}</p>
       <h2 className="mb-5 mt-1.5 font-display text-2xl font-extrabold tracking-tight text-[#1A1A1A] sm:text-3xl">
         {title}
       </h2>
@@ -542,7 +542,7 @@ function Badge({
 function DetailRow({ Icon, label, value }: { Icon: typeof MapPin; label: string; value: string }) {
   return (
     <div className="flex items-start gap-3 rounded-2xl border border-[#E5E5E5] bg-white p-4">
-      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#FDE8EC] text-[#C8102E]">
+      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#FDE8EC] text-[#CC2424]">
         <Icon className="h-4 w-4" strokeWidth={2.25} />
       </span>
       <span>
@@ -556,7 +556,7 @@ function DetailRow({ Icon, label, value }: { Icon: typeof MapPin; label: string;
 function TrustCard({ Icon, title, body }: { Icon: typeof ShieldCheck; title: string; body: string }) {
   return (
     <div className="rounded-3xl border border-[#E5E5E5] bg-white p-6">
-      <span className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FDE8EC] text-[#C8102E]">
+      <span className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FDE8EC] text-[#CC2424]">
         <Icon className="h-5 w-5" strokeWidth={2.25} />
       </span>
       <h3 className="font-display text-base font-bold text-[#1A1A1A]">{title}</h3>

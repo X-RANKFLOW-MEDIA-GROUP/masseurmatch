@@ -24,7 +24,7 @@ export function VoxStickyContact({
         {phoneHref && (
           <a
             href={phoneHref}
-            className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-[#C8102E] font-semibold text-[#FFFFFF]"
+            className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-[#CC2424] font-semibold text-[#FFFFFF]"
           >
             <Phone className="h-4 w-4" strokeWidth={2.5} />
             Text {name.split(" ")[0]}

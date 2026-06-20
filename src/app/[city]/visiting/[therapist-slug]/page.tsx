@@ -103,14 +103,14 @@ export default async function TourPage({
               display: "inline-flex",
               alignItems: "center",
               gap: 6,
-              background: "rgba(200,16,46,0.12)",
-              border: "1px solid rgba(200,16,46,0.3)",
+              background: "rgba(204,36,36,0.12)",
+              border: "1px solid rgba(204,36,36,0.3)",
               borderRadius: 99,
               padding: "4px 12px",
               fontSize: 11,
               letterSpacing: "0.18em",
               textTransform: "uppercase",
-              color: "#C8102E",
+              color: "#CC2424",
               marginBottom: 20,
             }}
           >
@@ -165,7 +165,7 @@ export default async function TourPage({
                 }}
               >
                 <CalendarDays
-                  style={{ width: 16, height: 16, color: "#C8102E", flexShrink: 0 }}
+                  style={{ width: 16, height: 16, color: "#CC2424", flexShrink: 0 }}
                   strokeWidth={2}
                 />
                 <span style={{ fontSize: 15, color: "#1A1A1A" }}>

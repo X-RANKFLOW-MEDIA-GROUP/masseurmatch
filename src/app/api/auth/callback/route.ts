@@ -147,10 +147,10 @@ function buildWelcomeHtml(name: string): string {
           </ol>
         </td></tr>
         <tr><td align="center" style="padding:0 28px 24px">
-          <a href="https://masseurmatch.com/signup/plan" style="display:inline-block;background:#C8102E;color:#FFFFFF;text-decoration:none;font-size:15px;font-weight:700;padding:12px 24px;border-radius:8px">Complete Your Profile</a>
+          <a href="https://masseurmatch.com/signup/plan" style="display:inline-block;background:#CC2424;color:#FFFFFF;text-decoration:none;font-size:15px;font-weight:700;padding:12px 24px;border-radius:8px">Complete Your Profile</a>
         </td></tr>
         <tr><td style="padding:0 28px 20px;font-size:12px;color:#71717a;line-height:1.5">
-          You received this because you created a MasseurMatch account. <a href="{{unsubscribe_url}}" style="color:#C8102E">Unsubscribe</a>.
+          You received this because you created a MasseurMatch account. <a href="{{unsubscribe_url}}" style="color:#CC2424">Unsubscribe</a>.
         </td></tr>
       </table>
     </td></tr>

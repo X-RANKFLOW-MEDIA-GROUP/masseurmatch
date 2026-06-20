@@ -175,8 +175,8 @@ export function ProfileAIChat({ profile }: Props) {
             aria-label="Ask Knotty AI"
             className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full"
             style={{
-              background: "linear-gradient(135deg, #C8102E 0%, #A80D24 100%)",
-              boxShadow: "0 8px 32px rgba(200,16,46,0.45), 0 2px 8px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.3)",
+              background: "linear-gradient(135deg, #CC2424 0%, #A81D1D 100%)",
+              boxShadow: "0 8px 32px rgba(204,36,36,0.45), 0 2px 8px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.3)",
             }}
           >
             <Sparkles className="h-6 w-6 text-white" strokeWidth={2} />
@@ -203,7 +203,7 @@ export function ProfileAIChat({ profile }: Props) {
               WebkitBackdropFilter: "blur(28px) saturate(180%)",
               border: "1px solid rgba(255,255,255,0.85)",
               boxShadow: [
-                "0 0 0 1px rgba(200,16,46,0.12)",         /* brand ring */
+                "0 0 0 1px rgba(204,36,36,0.12)",         /* brand ring */
                 "0 4px 0 -1px rgba(255,255,255,0.9)",      /* top-face highlight */
                 "0 8px 24px rgba(26,26,26,0.10)",          /* mid shadow */
                 "0 24px 56px rgba(26,26,26,0.16)",         /* depth shadow */
@@ -221,7 +221,7 @@ export function ProfileAIChat({ profile }: Props) {
             <div
               className="flex shrink-0 items-center justify-between px-5 py-4"
               style={{
-                background: "linear-gradient(135deg, rgba(200,16,46,0.12) 0%, rgba(255,100,0,0.06) 100%)",
+                background: "linear-gradient(135deg, rgba(204,36,36,0.12) 0%, rgba(255,100,0,0.06) 100%)",
                 borderBottom: "1px solid rgba(26,26,26,0.06)",
               }}
             >
@@ -230,8 +230,8 @@ export function ProfileAIChat({ profile }: Props) {
                 <div
                   className="flex h-10 w-10 items-center justify-center rounded-full"
                   style={{
-                    background: "linear-gradient(135deg, #C8102E 0%, #A80D24 100%)",
-                    boxShadow: "0 4px 12px rgba(200,16,46,0.4), inset 0 1px 0 rgba(255,255,255,0.3)",
+                    background: "linear-gradient(135deg, #CC2424 0%, #A81D1D 100%)",
+                    boxShadow: "0 4px 12px rgba(204,36,36,0.4), inset 0 1px 0 rgba(255,255,255,0.3)",
                   }}
                 >
                   <Bot className="h-5 w-5 text-white" strokeWidth={2} />
@@ -291,9 +291,9 @@ export function ProfileAIChat({ profile }: Props) {
                           boxShadow: "0 2px 8px rgba(26,26,26,0.06), inset 0 1px 0 rgba(255,255,255,0.8)",
                         }
                       : {
-                          background: "linear-gradient(135deg, #C8102E 0%, #A80D24 100%)",
+                          background: "linear-gradient(135deg, #CC2424 0%, #A81D1D 100%)",
                           color: "#fff",
-                          boxShadow: "0 4px 12px rgba(200,16,46,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
+                          boxShadow: "0 4px 12px rgba(204,36,36,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
                         }
                   }
                 >
@@ -339,7 +339,7 @@ export function ProfileAIChat({ profile }: Props) {
                   <span
                     className="ml-0.5 inline-block h-3.5 w-0.5 align-middle"
                     style={{
-                      background: "#C8102E",
+                      background: "#CC2424",
                       animation: "blink 0.7s step-end infinite",
                     }}
                   />
@@ -369,8 +369,8 @@ export function ProfileAIChat({ profile }: Props) {
                         onClick={() => handleQuick(q)}
                         className="rounded-full px-3 py-1.5 text-[11px] font-medium transition"
                         style={{
-                          background: "rgba(200,16,46,0.08)",
-                          border: "1px solid rgba(200,16,46,0.2)",
+                          background: "rgba(204,36,36,0.08)",
+                          border: "1px solid rgba(204,36,36,0.2)",
                           color: "#b45309",
                         }}
                       >
@@ -409,8 +409,8 @@ export function ProfileAIChat({ profile }: Props) {
                   disabled={!input.trim() || phase !== "idle"}
                   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition disabled:opacity-30"
                   style={{
-                    background: "linear-gradient(135deg, #C8102E 0%, #A80D24 100%)",
-                    boxShadow: "0 2px 8px rgba(200,16,46,0.4)",
+                    background: "linear-gradient(135deg, #CC2424 0%, #A81D1D 100%)",
+                    boxShadow: "0 2px 8px rgba(204,36,36,0.4)",
                   }}
                   aria-label="Send"
                 >

@@ -211,7 +211,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
         <button
           type="submit"
           disabled={loading}
-          className="flex items-center justify-center gap-2 rounded-lg bg-[#C8102E] px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-red-400 disabled:opacity-60"
+          className="flex items-center justify-center gap-2 rounded-lg bg-[#CC2424] px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-red-400 disabled:opacity-60"
         >
           {loading ? (
             <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2.25} />
@@ -236,7 +236,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
               <div
                 className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                   msg.role === 'user'
-                    ? 'bg-[#C8102E]/90 text-white'
+                    ? 'bg-[#CC2424]/90 text-white'
                     : 'bg-white/[0.08] text-slate-200'
                 }`}
               >
@@ -269,7 +269,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
           <button
             onClick={sendChatMessage}
             disabled={loading || !chatInput.trim()}
-            className="flex items-center justify-center rounded-lg bg-[#C8102E] px-3 py-2.5 transition-all hover:bg-red-400 disabled:opacity-60"
+            className="flex items-center justify-center rounded-lg bg-[#CC2424] px-3 py-2.5 transition-all hover:bg-red-400 disabled:opacity-60"
           >
             <Send className="h-4 w-4 text-white" strokeWidth={2.25} />
           </button>

@@ -31,7 +31,7 @@ export function PremiumProfileLocation({ profile }: Props) {
           <div 
             className="w-4 h-4 rounded-full bg-[var(--orange)]"
             style={{ 
-              boxShadow: "0 0 0 8px rgba(200,16,46,0.2), 0 0 0 16px rgba(200,16,46,0.08)",
+              boxShadow: "0 0 0 8px rgba(204,36,36,0.2), 0 0 0 16px rgba(204,36,36,0.08)",
               animation: "pp-pulse 2s infinite"
             }}
           />

@@ -81,8 +81,8 @@ const posts = [
 ];
 
 const categoryColors: Record<string, string> = {
-  "LGBTQ+ Health": "#C8102E",
-  "Wellness Tips": "#C8102E",
+  "LGBTQ+ Health": "#CC2424",
+  "Wellness Tips": "#CC2424",
   "For Therapists": "#1A1A1A",
   "City Guides": "#6B7280",
   "Industry News": "#374151",
@@ -128,9 +128,9 @@ export function BlogContent() {
                 border: "none",
                 borderBottom:
                   category === active
-                    ? "2px solid #C8102E"
+                    ? "2px solid #CC2424"
                     : "2px solid transparent",
-                color: category === active ? "#C8102E" : "#6B7280",
+                color: category === active ? "#CC2424" : "#6B7280",
                 cursor: "pointer",
                 whiteSpace: "nowrap",
                 transition: "color 0.15s, border-color 0.15s",
@@ -157,7 +157,7 @@ export function BlogContent() {
             <div
               style={{
                 background:
-                  "linear-gradient(135deg, #C8102E 0%, #1A1A1A 100%)",
+                  "linear-gradient(135deg, #CC2424 0%, #1A1A1A 100%)",
                 minHeight: 360,
                 display: "flex",
                 alignItems: "center",
@@ -173,7 +173,7 @@ export function BlogContent() {
                   width: 300,
                   height: 300,
                   borderRadius: "50%",
-                  border: "1px solid rgba(200,16,46,0.2)",
+                  border: "1px solid rgba(204,36,36,0.2)",
                   top: "50%",
                   left: "50%",
                   transform: "translate(-50%,-50%)",
@@ -186,7 +186,7 @@ export function BlogContent() {
                   width: 180,
                   height: 180,
                   borderRadius: "50%",
-                  border: "1px solid rgba(200,16,46,0.35)",
+                  border: "1px solid rgba(204,36,36,0.35)",
                   top: "50%",
                   left: "50%",
                   transform: "translate(-50%,-50%)",
@@ -215,9 +215,9 @@ export function BlogContent() {
                     fontSize: 10,
                     letterSpacing: "0.18em",
                     textTransform: "uppercase",
-                    color: "#C8102E",
+                    color: "#CC2424",
                     fontFamily: "system-ui, sans-serif",
-                    background: "rgba(200,16,46,0.12)",
+                    background: "rgba(204,36,36,0.12)",
                     padding: "4px 10px",
                   }}
                 >
@@ -286,10 +286,10 @@ export function BlogContent() {
                     fontSize: 11,
                     letterSpacing: "0.16em",
                     textTransform: "uppercase",
-                    color: "#C8102E",
+                    color: "#CC2424",
                     textDecoration: "none",
                     fontFamily: "system-ui, sans-serif",
-                    borderBottom: "1px solid #C8102E",
+                    borderBottom: "1px solid #CC2424",
                     paddingBottom: 2,
                   }}
                 >
@@ -332,7 +332,7 @@ export function BlogContent() {
                 }}
                 onMouseEnter={(e) =>
                   ((e.currentTarget as HTMLElement).style.borderBottomColor =
-                    categoryColors[post.category] ?? "#C8102E")
+                    categoryColors[post.category] ?? "#CC2424")
                 }
                 onMouseLeave={(e) =>
                   ((e.currentTarget as HTMLElement).style.borderBottomColor =

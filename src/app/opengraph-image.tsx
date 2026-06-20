@@ -35,7 +35,7 @@ export default async function Image() {
           }}
         >
           <span style={{ color: "#FFFFFF" }}>Masseur</span>
-          <span style={{ color: "#C8102E" }}>Match</span>
+          <span style={{ color: "#CC2424" }}>Match</span>
         </div>
 
         <div
@@ -56,7 +56,7 @@ export default async function Image() {
             display: "flex",
             width: 80,
             height: 3,
-            background: "#C8102E",
+            background: "#CC2424",
             marginTop: 36,
           }}
         />
