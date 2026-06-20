@@ -683,7 +683,7 @@ export default function ForTherapistsPage() {
                 </div>
               ))}
             </div>
-            <a
+            <Link
               href="/pricing"
               style={{
                 display: "inline-flex",
@@ -701,7 +701,7 @@ export default function ForTherapistsPage() {
               }}
             >
               See Elite pricing
-            </a>
+            </Link>
           </div>
         </section>
 

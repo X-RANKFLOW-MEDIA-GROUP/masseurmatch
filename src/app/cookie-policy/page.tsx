@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Script from "next/script";
 
 export const metadata: Metadata = {
@@ -273,9 +274,9 @@ export default function CookiePolicyPage() {
                 privacy@masseurmatch.com
               </a>
               . For broader privacy rights, see our{" "}
-              <a href="/privacy" style={{ color: "#FF8A1F", textDecoration: "none" }}>
+              <Link href="/privacy" style={{ color: "#FF8A1F", textDecoration: "none" }}>
                 Privacy Policy
-              </a>
+              </Link>
               .
             </p>
           </section>
