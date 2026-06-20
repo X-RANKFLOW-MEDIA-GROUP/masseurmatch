@@ -16,6 +16,7 @@ import {
 
 import { postJson, requestJson } from "@/app/_lib/request";
 import { useToast } from "@/hooks/use-toast";
+import { US_CITIES } from "@/data/cities";
 
 type TravelEntry = {
   city: string;
@@ -83,7 +84,7 @@ function formatCountdown(expiresAt: string | null): string | null {
 }
 
 function inputCls(extra = "") {
-  return `w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-100 ${extra}`;
+  return `w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-100 [color-scheme:light] ${extra}`;
 }
 
 function Panel({
@@ -317,13 +318,35 @@ export default function GrowthPage() {
                 <div className="relative">
                   <MapPin className="absolute left-3 top-3 h-4 w-4 text-slate-400" strokeWidth={2.25} />
                   <input
+                    list={`travel-cities-${index}`}
                     className={inputCls("pl-9")}
                     value={entry.city}
                     placeholder="City"
-                    onChange={(e) =>
-                      setTravel((rows) => rows.map((r, i) => (i === index ? { ...r, city: e.target.value } : r)))
-                    }
+                    onChange={(e) => {
+                      const raw = e.target.value;
+                      const match = US_CITIES.find(
+                        (c) => `${c.name}, ${c.stateCode}` === raw,
+                      );
+                      setTravel((rows) =>
+                        rows.map((r, i) =>
+                          i === index
+                            ? { ...r, city: match ? match.name : raw, state: match ? match.stateCode : r.state }
+                            : r,
+                        ),
+                      );
+                    }}
                   />
+                  <datalist id={`travel-cities-${index}`}>
+                    {US_CITIES.filter((c) => {
+                      const q = entry.city.trim().toLowerCase();
+                      if (!q) return true;
+                      return c.name.toLowerCase().includes(q) || c.stateCode.toLowerCase() === q;
+                    })
+                      .slice(0, 20)
+                      .map((c) => (
+                        <option key={`${c.slug}-${c.stateCode}`} value={`${c.name}, ${c.stateCode}`} />
+                      ))}
+                  </datalist>
                 </div>
                 <input
                   className={inputCls()}
