@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
@@ -58,7 +59,9 @@ const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export default function HeroClient() {
   const reducedMotion = useReducedMotion();
+  const router = useRouter();
   const [activeSpotlight, setActiveSpotlight] = useState(0);
+  const [searchLocation, setSearchLocation] = useState("");
 
   const dur = reducedMotion ? 0 : 0.7;
   const noDelay = reducedMotion ? 0 : undefined;
@@ -169,24 +172,26 @@ export default function HeroClient() {
               <input
                 type="text"
                 placeholder="Search by location"
+                value={searchLocation}
+                onChange={(e) => setSearchLocation(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const q = searchLocation.trim();
+                    router.push(q ? `/explore?q=${encodeURIComponent(q)}` : "/explore");
+                  }
+                }}
                 className="w-full bg-transparent text-sm text-[#1A1A1A] placeholder-[#999999] outline-none"
               />
-            </div>
-
-            {/* Date select */}
-            <div className="flex flex-1 items-center gap-2 border-b border-gray-200 px-4 py-3 sm:border-b-0 sm:border-r">
-              <Calendar
-                size={18}
-                strokeWidth={2.25}
-                className="flex-shrink-0 text-[#999999]"
-              />
-              <span className="text-sm text-[#999999]">Select date</span>
             </div>
 
             {/* Search button */}
             <button
               type="button"
-              className="flex items-center justify-center gap-2 bg-[#CC2424] px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#a00d25]"
+              onClick={() => {
+                const q = searchLocation.trim();
+                router.push(q ? `/explore?q=${encodeURIComponent(q)}` : "/explore");
+              }}
+              className="flex items-center justify-center gap-2 bg-[#CC2424] px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#A81D1D]"
             >
               FIND A MASSEUR
               <ArrowRight size={16} strokeWidth={2.5} />

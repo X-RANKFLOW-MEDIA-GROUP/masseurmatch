@@ -5,12 +5,7 @@ import { CityMarquee } from "@/components/marketing/CityMarquee";
 import { StatsBand } from "@/components/marketing/StatsBand";
 import { CityCaseStudies } from "@/components/marketing/CityCaseStudies";
 import { FeaturedTherapistsEditorial } from "@/components/marketing/FeaturedTherapistsEditorial";
-import { MeetKnotty } from "@/components/marketing/MeetKnotty";
-import { WhyUsSplit } from "@/components/marketing/WhyUsSplit";
-import { PricingToggle } from "@/components/marketing/PricingToggle";
-import { HomeSeoLanding } from "@/app/_components/home-seo-landing";
 import { FaqAccordion } from "@/components/marketing/FaqAccordion";
-import { CityCoverageSection } from "@/components/marketing/CityCoverageSection";
 import { USStateMapGrid } from "@/components/marketing/USStateMapGrid";
 import { FinalCta } from "@/components/marketing/FinalCta";
 import {
@@ -25,15 +20,12 @@ import {
 } from "@/app/_lib/seo";
 import { siteUrl } from "@/lib/site";
 import { getPublicTherapists, getCities } from "@/app/_lib/directory";
-import { competitorsByTier } from "@/lib/competitors";
-import { GUIDES } from "@/app/guides/data";
 import {
   PRIORITY_CITY_SLUGS,
   CITY_ROUTE_COUNTS,
   CITY_HIGHLIGHTS,
   LANDING_FAQ,
 } from "@/lib/marketing/home-data";
-import type { CityData } from "@/data/cities";
 
 export const revalidate = 3600;
 
@@ -191,12 +183,6 @@ export default async function HomePage() {
     ];
   });
 
-  // Top comparison competitors for the homepage hub
-  const comparisonLinks = competitorsByTier.slice(0, 6);
-
-  // Top guides
-  const guides = GUIDES.slice(0, 4);
-
   // JSON-LD: top city list for ItemList schema
   const topCityItems = launchCities.map((entry) => ({
     name: `Massage Therapists in ${entry.city.name}, ${entry.city.stateCode}`,
@@ -241,26 +227,6 @@ export default async function HomePage() {
         })}
       />
 
-      {/* Competitor comparison ItemList */}
-      <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@type": "ItemList",
-          name: "MasseurMatch Comparison Pages — Alternatives to MasseurFinder, RentMasseur & More",
-          description:
-            "Compare MasseurMatch against leading massage directories including MasseurFinder, RentMasseur, MassageFinder, FindAMasseur, and others.",
-          url: siteUrl("/compare"),
-          numberOfItems: comparisonLinks.length,
-          itemListElement: comparisonLinks.map((competitor, index) => ({
-            "@type": "ListItem",
-            position: index + 1,
-            name: `MasseurMatch vs ${competitor.name}`,
-            url: siteUrl(`/compare/${competitor.slug}`),
-            description: competitor.hubDescription,
-          })),
-        }}
-      />
-
       {/* FAQPage */}
       <JsonLd data={buildFaqJsonLd(HOME_FAQ)} />
 
@@ -301,37 +267,11 @@ export default async function HomePage() {
         </div>
 
         {/* ── LIGHT BODY ─────────────────────────────────────────────── */}
-        {/* 3. Animated stats band */}
         <StatsBand />
-
-        {/* 4. Editorial city case studies */}
         <CityCaseStudies launchCities={launchCities} />
-
-        {/* 5. Featured therapist profiles */}
         <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
-
-        {/* 5b. Meet Knotty — AI assistant */}
-        <MeetKnotty />
-
-        {/* 6. Why Us split with giant stats */}
-        <WhyUsSplit />
-
-        {/* 7. Pricing toggle */}
-        <PricingToggle />
-
-        {/* 8. Comparison hub + guides */}
-        <HomeSeoLanding comparisonLinks={comparisonLinks} guides={guides} />
-
-        {/* 9. FAQ accordion */}
-        <FaqAccordion items={LANDING_FAQ} />
-
-        {/* 10. Interactive US state map */}
         <USStateMapGrid />
-
-        {/* Full city alphabetical list (SEO) */}
-        <CityCoverageSection />
-
-        {/* Final CTA */}
+        <FaqAccordion items={LANDING_FAQ} />
         <FinalCta />
       </div>
     </>

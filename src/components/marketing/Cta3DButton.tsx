@@ -25,16 +25,16 @@ export function Cta3DButton({
 }) {
   const edge =
     variant === "primary"
-      ? "bg-[linear-gradient(to_left,hsl(28_90%_28%)_0%,hsl(28_90%_22%)_8%,hsl(28_90%_22%)_92%,hsl(28_90%_28%)_100%)]"
+      ? "bg-[linear-gradient(to_left,hsl(0_70%_30%)_0%,hsl(0_70%_25%)_8%,hsl(0_70%_25%)_92%,hsl(0_70%_30%)_100%)]"
       : variant === "dark"
         ? "bg-[linear-gradient(to_left,#020610_0%,#020610_100%)]"
         : "bg-[linear-gradient(to_left,rgba(0,0,0,0.35),rgba(0,0,0,0.35))]";
 
   const face =
     variant === "primary"
-      ? "bg-gradient-to-b from-[#FFA64D] to-[#CC2424] text-[#3a1c00]"
+      ? "bg-gradient-to-b from-[#E04040] to-[#CC2424] text-white"
       : variant === "dark"
-        ? "bg-gradient-to-b from-[#11233f] to-[#1A1A1A] text-white ring-1 ring-white/10"
+        ? "bg-gradient-to-b from-[#333333] to-[#1A1A1A] text-white ring-1 ring-white/10"
         : "bg-white/10 text-white ring-1 ring-white/25 backdrop-blur-md";
 
   return (
