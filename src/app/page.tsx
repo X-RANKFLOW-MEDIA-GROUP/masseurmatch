@@ -19,13 +19,8 @@ import {
   SITE_DESCRIPTION,
 } from "@/app/_lib/seo";
 import { siteUrl } from "@/lib/site";
-import { getPublicTherapists, getCities } from "@/app/_lib/directory";
-import {
-  PRIORITY_CITY_SLUGS,
-  CITY_ROUTE_COUNTS,
-  CITY_HIGHLIGHTS,
-  LANDING_FAQ,
-} from "@/lib/marketing/home-data";
+import { getPublicTherapists } from "@/app/_lib/directory";
+import { LANDING_FAQ } from "@/lib/marketing/home-data";
 
 export const revalidate = 3600;
 
@@ -167,27 +162,16 @@ export default async function HomePage() {
     featuredTherapists = [];
   }
 
-  // Build city cards from static priority list
-  const allCities = getCities();
-  const launchCities = PRIORITY_CITY_SLUGS.flatMap((slug) => {
-    const city = allCities.find((c) => c.slug === slug);
-    if (!city) return [];
-    return [
-      {
-        href: `/${slug}`,
-        city,
-        listingCount: 0,
-        routeCount: CITY_ROUTE_COUNTS[slug] ?? 12,
-        highlights: CITY_HIGHLIGHTS[slug] ?? ["Verified Profiles", "Incall & Outcall"],
-      },
-    ];
-  });
-
-  // JSON-LD: top city list for ItemList schema
-  const topCityItems = launchCities.map((entry) => ({
-    name: `Massage Therapists in ${entry.city.name}, ${entry.city.stateCode}`,
-    path: entry.href,
-  }));
+  const topCityItems = [
+    { name: "Massage Therapists in New York, NY", path: "/new-york" },
+    { name: "Massage Therapists in Los Angeles, CA", path: "/los-angeles" },
+    { name: "Massage Therapists in Miami, FL", path: "/miami" },
+    { name: "Massage Therapists in Chicago, IL", path: "/chicago" },
+    { name: "Massage Therapists in Dallas, TX", path: "/dallas" },
+    { name: "Massage Therapists in Houston, TX", path: "/houston" },
+    { name: "Massage Therapists in Atlanta, GA", path: "/atlanta" },
+    { name: "Massage Therapists in Washington, DC", path: "/washington-dc" },
+  ];
 
   return (
     <>
@@ -268,7 +252,7 @@ export default async function HomePage() {
 
         {/* ── LIGHT BODY ─────────────────────────────────────────────── */}
         <StatsBand />
-        <CityCaseStudies launchCities={launchCities} />
+        <CityCaseStudies />
         <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
         <USStateMapGrid />
         <FaqAccordion items={LANDING_FAQ} />
