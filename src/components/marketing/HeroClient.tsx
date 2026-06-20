@@ -100,7 +100,7 @@ export default function HeroClient() {
               ease: customEase,
               delay: noDelay ?? 0.2,
             }}
-            className="mb-4 font-mono text-[10px] uppercase tracking-[0.3em] text-[#C8102E] sm:text-xs"
+            className="mb-4 font-mono text-[10px] uppercase tracking-[0.3em] text-[#CC2424] sm:text-xs"
           >
             PREMIUM.&nbsp;&nbsp;PROFESSIONAL.&nbsp;&nbsp;PERSONAL.
           </motion.p>
@@ -118,7 +118,7 @@ export default function HeroClient() {
             style={{ fontSize: "clamp(2.5rem, 5vw, 4.5rem)" }}
           >
             <span className="block text-[#1A1A1A]">FIND THE RIGHT</span>
-            <span className="block text-[#C8102E]">MASSAGE. EVERY TIME.</span>
+            <span className="block text-[#CC2424]">MASSAGE. EVERY TIME.</span>
           </motion.h1>
 
           {/* Red separator bar */}
@@ -130,7 +130,7 @@ export default function HeroClient() {
               ease: customEase,
               delay: noDelay ?? 0.4,
             }}
-            className="mb-5 h-1 w-16 origin-left bg-[#C8102E]"
+            className="mb-5 h-1 w-16 origin-left bg-[#CC2424]"
           />
 
           {/* Subtitle */}
@@ -186,7 +186,7 @@ export default function HeroClient() {
             {/* Search button */}
             <button
               type="button"
-              className="flex items-center justify-center gap-2 bg-[#C8102E] px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#a00d25]"
+              className="flex items-center justify-center gap-2 bg-[#CC2424] px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#a00d25]"
             >
               FIND A MASSEUR
               <ArrowRight size={16} strokeWidth={2.5} />
@@ -211,7 +211,7 @@ export default function HeroClient() {
               <button
                 key={tag}
                 type="button"
-                className="rounded-full border border-gray-200 px-4 py-1.5 text-xs font-medium text-[#1A1A1A] transition-colors hover:border-[#C8102E] hover:text-[#C8102E]"
+                className="rounded-full border border-gray-200 px-4 py-1.5 text-xs font-medium text-[#1A1A1A] transition-colors hover:border-[#CC2424] hover:text-[#CC2424]"
               >
                 {tag}
               </button>
@@ -231,7 +231,7 @@ export default function HeroClient() {
           className="flex w-full flex-col justify-center px-6 py-8 lg:w-[27%] lg:px-6 lg:py-0"
         >
           {/* Section header */}
-          <h2 className="mb-5 font-display text-sm font-bold uppercase tracking-wider text-[#C8102E]">
+          <h2 className="mb-5 font-display text-sm font-bold uppercase tracking-wider text-[#CC2424]">
             SPOTLIGHTS OF THE WEEK
           </h2>
 
@@ -245,7 +245,7 @@ export default function HeroClient() {
                 {/* Favorite icon */}
                 <button
                   type="button"
-                  className="absolute right-3 top-3 text-gray-300 transition-colors hover:text-[#C8102E]"
+                  className="absolute right-3 top-3 text-gray-300 transition-colors hover:text-[#CC2424]"
                   aria-label={`Save ${therapist.name}`}
                 >
                   <Heart size={16} strokeWidth={2.25} />
@@ -253,7 +253,7 @@ export default function HeroClient() {
 
                 {/* Avatar + Name row */}
                 <div className="mb-3 flex items-center gap-3">
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#C8102E] to-[#8B0A1E] text-xs font-bold text-white">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#CC2424] to-[#8B0A1E] text-xs font-bold text-white">
                     {therapist.initials}
                   </div>
                   <div className="min-w-0">
@@ -301,7 +301,7 @@ export default function HeroClient() {
                 {/* CTA */}
                 <button
                   type="button"
-                  className="w-full rounded-md bg-[#C8102E] px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#a00d25]"
+                  className="w-full rounded-md bg-[#CC2424] px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#a00d25]"
                 >
                   VIEW PROFILE
                 </button>
@@ -321,8 +321,8 @@ export default function HeroClient() {
                   aria-label={`Go to spotlight ${idx + 1}`}
                   className={`h-2 w-2 rounded-full transition-colors ${
                     idx === activeSpotlight
-                      ? "bg-[#C8102E]"
-                      : "bg-[#C8102E]/25"
+                      ? "bg-[#CC2424]"
+                      : "bg-[#CC2424]/25"
                   }`}
                 />
               ))}
@@ -337,7 +337,7 @@ export default function HeroClient() {
                     prev === 0 ? spotlights.length - 1 : prev - 1
                   )
                 }
-                className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-[#666666] transition-colors hover:border-[#C8102E] hover:text-[#C8102E]"
+                className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-[#666666] transition-colors hover:border-[#CC2424] hover:text-[#CC2424]"
                 aria-label="Previous spotlight"
               >
                 <ChevronLeft size={14} strokeWidth={2.5} />
@@ -349,7 +349,7 @@ export default function HeroClient() {
                     prev === spotlights.length - 1 ? 0 : prev + 1
                   )
                 }
-                className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-[#666666] transition-colors hover:border-[#C8102E] hover:text-[#C8102E]"
+                className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-[#666666] transition-colors hover:border-[#CC2424] hover:text-[#CC2424]"
                 aria-label="Next spotlight"
               >
                 <ChevronRight size={14} strokeWidth={2.5} />

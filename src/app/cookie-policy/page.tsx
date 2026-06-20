@@ -75,7 +75,7 @@ export default function CookiePolicyPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#C8102E",
+                color: "#CC2424",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -269,12 +269,12 @@ export default function CookiePolicyPage() {
               Questions about our use of cookies? Email{" "}
               <a
                 href="mailto:privacy@masseurmatch.com"
-                style={{ color: "#C8102E", textDecoration: "none" }}
+                style={{ color: "#CC2424", textDecoration: "none" }}
               >
                 privacy@masseurmatch.com
               </a>
               . For broader privacy rights, see our{" "}
-              <Link href="/privacy" style={{ color: "#C8102E", textDecoration: "none" }}>
+              <Link href="/privacy" style={{ color: "#CC2424", textDecoration: "none" }}>
                 Privacy Policy
               </Link>
               .

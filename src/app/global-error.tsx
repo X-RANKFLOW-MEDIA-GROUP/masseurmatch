@@ -45,8 +45,8 @@ export default function GlobalError({
               width: '64px',
               height: '64px',
               borderRadius: '9999px',
-              background: 'rgba(200,16,46,0.12)',
-              color: '#C8102E',
+              background: 'rgba(204,36,36,0.12)',
+              color: '#CC2424',
               marginBottom: '24px',
             }}
           >
@@ -73,7 +73,7 @@ export default function GlobalError({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                background: '#C8102E',
+                background: '#CC2424',
                 color: '#1A1A1A',
                 fontWeight: 700,
                 border: 'none',

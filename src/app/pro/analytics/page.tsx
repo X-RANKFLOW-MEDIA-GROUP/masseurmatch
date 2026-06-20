@@ -109,8 +109,8 @@ export default function AnalyticsPage() {
               <AreaChart data={series} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
                 <defs>
                   <linearGradient id="visitorFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#C8102E" stopOpacity={0.28} />
-                    <stop offset="100%" stopColor="#C8102E" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#CC2424" stopOpacity={0.28} />
+                    <stop offset="100%" stopColor="#CC2424" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid stroke="#eef2f7" vertical={false} />
@@ -130,7 +130,7 @@ export default function AnalyticsPage() {
                   width={32}
                 />
                 <Tooltip
-                  cursor={{ stroke: "#C8102E", strokeWidth: 1, strokeDasharray: "4 4" }}
+                  cursor={{ stroke: "#CC2424", strokeWidth: 1, strokeDasharray: "4 4" }}
                   labelFormatter={(label) => formatTick(String(label))}
                   formatter={(value: number) => [`${value} visitor${value === 1 ? "" : "s"}`, "Unique"]}
                   contentStyle={{
@@ -143,11 +143,11 @@ export default function AnalyticsPage() {
                 <Area
                   type="monotone"
                   dataKey="visitors"
-                  stroke="#C8102E"
+                  stroke="#CC2424"
                   strokeWidth={2.25}
                   fill="url(#visitorFill)"
                   dot={false}
-                  activeDot={{ r: 4, fill: "#C8102E" }}
+                  activeDot={{ r: 4, fill: "#CC2424" }}
                 />
               </AreaChart>
             </ResponsiveContainer>

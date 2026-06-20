@@ -83,7 +83,7 @@ export default function SmsAdminPage() {
       <div className="border-b border-white/[0.06] px-6 py-6">
         <div className="mx-auto max-w-6xl flex items-center justify-between">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#C8102E]">Admin</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#CC2424]">Admin</p>
             <h1 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-white">SMS Center</h1>
             <p className="mt-1 text-sm text-slate-400">Automated SMS responses, logs, and follow-up alerts.</p>
           </div>
@@ -122,7 +122,7 @@ export default function SmsAdminPage() {
                 onClick={() => setTab(t.id)}
                 className={`flex items-center gap-2 border-b-2 px-4 py-4 text-sm font-medium transition-colors ${
                   tab === t.id
-                    ? 'border-[#C8102E] text-white'
+                    ? 'border-[#CC2424] text-white'
                     : 'border-transparent text-slate-500 hover:text-slate-300'
                 }`}
               >
@@ -283,7 +283,7 @@ function ConversationsTab({ twilioReady, twilioLoading }: { twilioReady: boolean
                       ? 'bg-white/[0.08] text-slate-200'
                       : msg.is_manual
                       ? 'bg-sky-500/20 text-sky-200'
-                      : 'bg-[#C8102E]/20 text-red-200'
+                      : 'bg-[#CC2424]/20 text-red-200'
                   }`}>
                     <p className="text-sm leading-relaxed">{msg.body}</p>
                     <p className="mt-1 text-[10px] opacity-50">
@@ -308,7 +308,7 @@ function ConversationsTab({ twilioReady, twilioLoading }: { twilioReady: boolean
               <button
                 onClick={sendReply}
                 disabled={replySending || !replyText.trim()}
-                className="flex items-center justify-center rounded-lg bg-[#C8102E] px-3 py-2 transition-all hover:bg-red-400 disabled:opacity-60"
+                className="flex items-center justify-center rounded-lg bg-[#CC2424] px-3 py-2 transition-all hover:bg-red-400 disabled:opacity-60"
               >
                 {replySending ? (
                   <Loader2 className="h-4 w-4 animate-spin text-white" strokeWidth={2.25} />
@@ -693,7 +693,7 @@ function ProfilesTab() {
                   <button
                     onClick={() => saveProfile(profile)}
                     disabled={saving === profile.id}
-                    className="flex items-center justify-center gap-2 rounded-lg bg-[#C8102E] px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-red-400 disabled:opacity-60"
+                    className="flex items-center justify-center gap-2 rounded-lg bg-[#CC2424] px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-red-400 disabled:opacity-60"
                   >
                     {saving === profile.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2.25} />

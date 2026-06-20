@@ -10,7 +10,7 @@ export default function TrustAndSafetyPage() {
   return (
     <main className="min-h-screen bg-[#FFFFFF] px-6 py-28 text-[#1A1A1A]">
       <section className="mx-auto max-w-3xl">
-        <Link href="/" className="font-sans text-xs uppercase tracking-[0.22em] text-[#C8102E]">Back to MasseurMatch</Link>
+        <Link href="/" className="font-sans text-xs uppercase tracking-[0.22em] text-[#CC2424]">Back to MasseurMatch</Link>
         <h1 className="mt-8 font-['Georgia','Times_New_Roman',serif] text-5xl font-normal tracking-[-0.04em] md:text-7xl">Trust & Safety</h1>
         <p className="mt-6 font-sans text-lg leading-8 text-slate-600">
           MasseurMatch is a discovery directory. We help users find independent massage therapists and review profile information. MasseurMatch does not manage bookings, payments, calendars, sessions, reviews, or therapist license verification.

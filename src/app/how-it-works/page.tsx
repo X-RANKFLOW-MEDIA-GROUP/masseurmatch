@@ -157,7 +157,7 @@ export default function HowItWorksPage() {
               fontSize: 11,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "#C8102E",
+              color: "#CC2424",
               marginBottom: 20,
               fontFamily: "system-ui, sans-serif",
             }}
@@ -175,7 +175,7 @@ export default function HowItWorksPage() {
           >
             Finding your therapist
             <br />
-            <em style={{ color: "#C8102E", fontStyle: "italic" }}>
+            <em style={{ color: "#CC2424", fontStyle: "italic" }}>
               takes minutes.
             </em>
           </h1>
@@ -203,7 +203,7 @@ export default function HowItWorksPage() {
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
                 fontFamily: "system-ui, sans-serif",
-                background: "#C8102E",
+                background: "#CC2424",
                 color: "#1A1A1A",
                 textDecoration: "none",
                 fontWeight: 700,
@@ -234,7 +234,7 @@ export default function HowItWorksPage() {
         {/* ── Model Explainer ── */}
         <section
           style={{
-            background: "#C8102E",
+            background: "#CC2424",
             padding: "clamp(28px, 5vw, 40px) 20px",
             textAlign: "center",
           }}
@@ -264,7 +264,7 @@ export default function HowItWorksPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#C8102E",
+                color: "#CC2424",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -302,7 +302,7 @@ export default function HowItWorksPage() {
                     style={{
                       fontSize: 36,
                       fontWeight: 700,
-                      color: "rgba(200,16,46,0.2)",
+                      color: "rgba(204,36,36,0.2)",
                       fontFamily: "system-ui, sans-serif",
                       lineHeight: 1,
                       paddingTop: 4,
@@ -337,8 +337,8 @@ export default function HowItWorksPage() {
                       letterSpacing: "0.1em",
                       textTransform: "uppercase",
                       fontFamily: "system-ui, sans-serif",
-                      color: "#C8102E",
-                      background: "rgba(200,16,46,0.08)",
+                      color: "#CC2424",
+                      background: "rgba(204,36,36,0.08)",
                       padding: "6px 12px",
                       whiteSpace: "nowrap",
                       alignSelf: "center",
@@ -366,7 +366,7 @@ export default function HowItWorksPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#C8102E",
+                color: "#CC2424",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
                 textAlign: "center",
@@ -392,14 +392,14 @@ export default function HowItWorksPage() {
               }}
             >
               {/* MasseurMatch column */}
-              <div style={{ background: "#C8102E", padding: "40px 36px" }}>
+              <div style={{ background: "#CC2424", padding: "40px 36px" }}>
                 <div
                   style={{
                     fontSize: 12,
                     letterSpacing: "0.14em",
                     textTransform: "uppercase",
                     fontFamily: "system-ui, sans-serif",
-                    color: "#C8102E",
+                    color: "#CC2424",
                     marginBottom: 24,
                     fontWeight: 700,
                   }}
@@ -427,7 +427,7 @@ export default function HowItWorksPage() {
                       fontSize: 14,
                     }}
                   >
-                    <Check className="inline h-4 w-4 shrink-0" style={{ color: "#C8102E" }} strokeWidth={2.5} />
+                    <Check className="inline h-4 w-4 shrink-0" style={{ color: "#CC2424" }} strokeWidth={2.5} />
                     {item}
                   </div>
                 ))}
@@ -499,7 +499,7 @@ export default function HowItWorksPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#C8102E",
+                color: "#CC2424",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -533,7 +533,7 @@ export default function HowItWorksPage() {
                     style={{
                       fontSize: 28,
                       fontWeight: 700,
-                      color: "rgba(200,16,46,0.2)",
+                      color: "rgba(204,36,36,0.2)",
                       fontFamily: "system-ui, sans-serif",
                       lineHeight: 1,
                       marginBottom: 16,
@@ -568,9 +568,9 @@ export default function HowItWorksPage() {
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
                   fontFamily: "system-ui, sans-serif",
-                  color: "#C8102E",
+                  color: "#CC2424",
                   textDecoration: "none",
-                  borderBottom: "1px solid #C8102E",
+                  borderBottom: "1px solid #CC2424",
                   paddingBottom: 2,
                 }}
               >
@@ -636,7 +636,7 @@ export default function HowItWorksPage() {
               }}
             >
               More questions?{" "}
-              <Link href="/faq" style={{ color: "#C8102E" }}>
+              <Link href="/faq" style={{ color: "#CC2424" }}>
                 Full FAQ <ArrowRight className="inline h-3.5 w-3.5" strokeWidth={2.25} />
               </Link>
             </p>
@@ -680,7 +680,7 @@ export default function HowItWorksPage() {
               letterSpacing: "0.14em",
               textTransform: "uppercase",
               fontFamily: "system-ui, sans-serif",
-              background: "#C8102E",
+              background: "#CC2424",
               color: "#1A1A1A",
               textDecoration: "none",
               fontWeight: 700,

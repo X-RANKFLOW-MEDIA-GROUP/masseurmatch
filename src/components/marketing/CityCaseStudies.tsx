@@ -107,7 +107,7 @@ function CityPlatform({
           }`}
         >
           {!hasPhoto || imgError ? (
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(200,16,46,0.35),transparent_55%),linear-gradient(150deg,#2A2A2A,#1A1A1A)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(204,36,36,0.35),transparent_55%),linear-gradient(150deg,#2A2A2A,#1A1A1A)]" />
           ) : (
             <Image
               src={`/marketing/cities/${entry.city.slug}.${photoExt ?? "jpg"}`}
@@ -192,7 +192,7 @@ export function CityCaseStudies({ launchCities }: Props) {
         {/* Rainbow ambient glows */}
         <div className="absolute -left-[10%] top-1/3 h-[40vw] max-h-[480px] w-[40vw] max-w-[480px] rounded-full bg-[radial-gradient(circle,rgba(161,123,255,0.22),transparent_65%)] blur-3xl" />
         <div className="absolute -right-[8%] top-1/4 h-[38vw] max-h-[460px] w-[38vw] max-w-[460px] rounded-full bg-[radial-gradient(circle,rgba(58,208,255,0.2),transparent_65%)] blur-3xl" />
-        <div className="absolute bottom-0 left-1/3 h-[30vw] max-h-[360px] w-[50vw] max-w-[640px] rounded-full bg-[radial-gradient(circle,rgba(200,16,46,0.18),transparent_65%)] blur-3xl" />
+        <div className="absolute bottom-0 left-1/3 h-[30vw] max-h-[360px] w-[50vw] max-w-[640px] rounded-full bg-[radial-gradient(circle,rgba(204,36,36,0.18),transparent_65%)] blur-3xl" />
         {/* Vignette */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(17,17,17,0.7)_100%)]" />
       </div>

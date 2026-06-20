@@ -162,7 +162,7 @@ export default function TermsPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#C8102E",
+                color: "#CC2424",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -228,7 +228,7 @@ export default function TermsPage() {
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
                 fontFamily: "system-ui, sans-serif",
-                color: "#C8102E",
+                color: "#CC2424",
                 marginBottom: 16,
               }}
             >
@@ -257,7 +257,7 @@ export default function TermsPage() {
           <div>
             <div
               style={{
-                background: "#C8102E",
+                background: "#CC2424",
                 color: "#FFFFFF",
                 padding: "18px 18px",
                 marginBottom: 48,

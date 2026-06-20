@@ -155,7 +155,7 @@ export function USStateMapGrid() {
                           rotateX: reduced ? 0 : -8,
                           scale: reduced ? 1 : 1.08,
                           filter:
-                            "drop-shadow(0 16px 28px rgba(200,16,46,0.55))",
+                            "drop-shadow(0 16px 28px rgba(204,36,36,0.55))",
                           zIndex: 20,
                         }
                       : {
@@ -182,11 +182,11 @@ export function USStateMapGrid() {
                   aria-label={`${state.name} — ${isActive ? "browse cities" : "coming soon"}`}
                   className={[
                     "relative flex flex-col items-center justify-center rounded-xl",
-                    "border text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E] transition-colors cursor-pointer",
+                    "border text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CC2424] transition-colors cursor-pointer",
                     isSelected
-                      ? "bg-[#C8102E] border-[#C8102E] text-white shadow-lg"
+                      ? "bg-[#CC2424] border-[#CC2424] text-white shadow-lg"
                       : isActive
-                        ? "bg-white border-border text-foreground hover:border-[#C8102E]/50 hover:bg-red-50/50"
+                        ? "bg-white border-border text-foreground hover:border-[#CC2424]/50 hover:bg-red-50/50"
                         : "bg-muted/40 border-border/50 text-muted-foreground/60 cursor-default",
                   ].join(" ")}
                 >
@@ -236,8 +236,8 @@ export function USStateMapGrid() {
 
               {/* Header */}
               <div className="mb-5 flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#C8102E]/10">
-                  <MapPin className="h-4 w-4 text-[#C8102E]" strokeWidth={2.25} />
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#CC2424]/10">
+                  <MapPin className="h-4 w-4 text-[#CC2424]" strokeWidth={2.25} />
                 </div>
                 <div>
                   <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
@@ -265,10 +265,10 @@ export function USStateMapGrid() {
                     >
                       <Link
                         href={`/${city.slug}`}
-                        className="group flex items-center gap-1 rounded-lg border border-transparent px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-[#C8102E]/25 hover:bg-red-50/60 hover:text-[#C8102E]"
+                        className="group flex items-center gap-1 rounded-lg border border-transparent px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-[#CC2424]/25 hover:bg-red-50/60 hover:text-[#CC2424]"
                       >
                         <ChevronRight
-                          className="h-3 w-3 shrink-0 text-[#C8102E]/0 transition group-hover:text-[#C8102E]/80"
+                          className="h-3 w-3 shrink-0 text-[#CC2424]/0 transition group-hover:text-[#CC2424]/80"
                           strokeWidth={2.5}
                         />
                         {city.name}

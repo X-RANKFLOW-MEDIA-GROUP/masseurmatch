@@ -120,7 +120,7 @@ const reviewerText = {
 };
 
 const button = {
-  backgroundColor: '#C8102E',
+  backgroundColor: '#CC2424',
   borderRadius: '8px',
   color: '#fff',
   fontSize: '14px',

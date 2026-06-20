@@ -59,14 +59,14 @@ export function SiteFooterTalk() {
                   type="text"
                   placeholder="Your name"
                   required
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:border-[#C8102E]/60 focus:outline-none"
+                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:border-[#CC2424]/60 focus:outline-none"
                 />
                 <input
                   name="email"
                   type="email"
                   placeholder="Email address"
                   required
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:border-[#C8102E]/60 focus:outline-none"
+                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:border-[#CC2424]/60 focus:outline-none"
                 />
                 <textarea
                   name="message"
@@ -74,7 +74,7 @@ export function SiteFooterTalk() {
                   required
                   minLength={10}
                   rows={4}
-                  className="w-full resize-none rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:border-[#C8102E]/60 focus:outline-none"
+                  className="w-full resize-none rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-slate-500 focus:border-[#CC2424]/60 focus:outline-none"
                 />
                 {formState === "error" && (
                   <p className="text-xs text-red-400">Something went wrong — please try again.</p>
@@ -82,7 +82,7 @@ export function SiteFooterTalk() {
                 <button
                   type="submit"
                   disabled={formState === "loading"}
-                  className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#C8102E] px-8 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-60"
+                  className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#CC2424] px-8 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-60"
                 >
                   {formState === "loading" ? "Sending..." : "Send message"}
                 </button>
@@ -141,7 +141,7 @@ export function SiteFooterTalk() {
             <Link href="/cookie-policy" className="transition-colors hover:text-white">Cookies</Link>
             <Link href="/accessibility" className="transition-colors hover:text-white">Accessibility</Link>
             <span className="flex items-center gap-1">
-              United States <ArrowUpRight className="h-3 w-3 text-[#C8102E]" strokeWidth={2.25} />
+              United States <ArrowUpRight className="h-3 w-3 text-[#CC2424]" strokeWidth={2.25} />
             </span>
           </div>
         </div>

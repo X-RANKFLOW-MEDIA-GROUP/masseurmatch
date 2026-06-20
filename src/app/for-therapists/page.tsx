@@ -152,7 +152,7 @@ export default function ForTherapistsPage() {
                 width: size,
                 height: size,
                 borderRadius: "50%",
-                border: "1px solid rgba(200,16,46,0.07)",
+                border: "1px solid rgba(204,36,36,0.07)",
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%,-50%)",
@@ -166,7 +166,7 @@ export default function ForTherapistsPage() {
               fontSize: 11,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "#C8102E",
+              color: "#CC2424",
               marginBottom: 24,
               fontFamily: "system-ui, sans-serif",
               position: "relative",
@@ -185,7 +185,7 @@ export default function ForTherapistsPage() {
             }}
           >
             Your practice deserves{" "}
-            <em style={{ color: "#C8102E", fontStyle: "italic" }}>
+            <em style={{ color: "#CC2424", fontStyle: "italic" }}>
               the right clients.
             </em>
           </h1>
@@ -223,7 +223,7 @@ export default function ForTherapistsPage() {
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
                 fontFamily: "system-ui, sans-serif",
-                background: "#C8102E",
+                background: "#CC2424",
                 color: "#1A1A1A",
                 textDecoration: "none",
                 fontWeight: 700,
@@ -254,7 +254,7 @@ export default function ForTherapistsPage() {
         {/* Social Proof Bar */}
         <section
           style={{
-            background: "#C8102E",
+            background: "#CC2424",
             color: "#FFFFFF",
             padding: "32px 24px",
           }}
@@ -280,7 +280,7 @@ export default function ForTherapistsPage() {
                   style={{
                     fontSize: 28,
                     fontWeight: 700,
-                    color: "#C8102E",
+                    color: "#CC2424",
                     fontFamily: "system-ui, sans-serif",
                   }}
                 >
@@ -311,7 +311,7 @@ export default function ForTherapistsPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#C8102E",
+                color: "#CC2424",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -342,7 +342,7 @@ export default function ForTherapistsPage() {
                   style={{ background: "#fff", padding: "40px 36px" }}
                 >
                   <div
-                    style={{ fontSize: 26, color: "#C8102E", marginBottom: 18 }}
+                    style={{ fontSize: 26, color: "#CC2424", marginBottom: 18 }}
                   >
                     {benefit.icon}
                   </div>
@@ -386,7 +386,7 @@ export default function ForTherapistsPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#C8102E",
+                color: "#CC2424",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
                 textAlign: "center",
@@ -424,7 +424,7 @@ export default function ForTherapistsPage() {
                     style={{
                       fontSize: 32,
                       fontWeight: 700,
-                      color: "rgba(200,16,46,0.25)",
+                      color: "rgba(204,36,36,0.25)",
                       fontFamily: "system-ui, sans-serif",
                       marginBottom: 16,
                       lineHeight: 1,
@@ -465,7 +465,7 @@ export default function ForTherapistsPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#C8102E",
+                color: "#CC2424",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -495,7 +495,7 @@ export default function ForTherapistsPage() {
                     background: "#fff",
                     padding: "40px 36px",
                     margin: 0,
-                    borderTop: "3px solid #C8102E",
+                    borderTop: "3px solid #CC2424",
                   }}
                 >
                   <p
@@ -588,7 +588,7 @@ export default function ForTherapistsPage() {
                     background: "#fff",
                   }}
                 >
-                  <span style={{ color: "#C8102E", marginTop: 2, flexShrink: 0 }}>
+                  <span style={{ color: "#CC2424", marginTop: 2, flexShrink: 0 }}>
                     +
                   </span>
                   <span
@@ -708,7 +708,7 @@ export default function ForTherapistsPage() {
         {/* CTA */}
         <section
           style={{
-            background: "#C8102E",
+            background: "#CC2424",
             padding: "88px 24px",
             textAlign: "center",
           }}

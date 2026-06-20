@@ -108,7 +108,7 @@ export default function ModerationPolicyPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#C8102E",
+                color: "#CC2424",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -171,7 +171,7 @@ export default function ModerationPolicyPage() {
                 lineHeight: 1.7,
               }}
             >
-              <strong style={{ color: "#C8102E" }}>Transparency principle:</strong>{" "}
+              <strong style={{ color: "#CC2424" }}>Transparency principle:</strong>{" "}
               Every moderation action we take — warning, removal, suspension, or ban — is logged
               with a written reason. Affected users receive that reason. We do not take silent
               action without documentation.
@@ -352,7 +352,7 @@ export default function ModerationPolicyPage() {
                 fontSize: 11,
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
-                color: "#C8102E",
+                color: "#CC2424",
                 marginBottom: 10,
               }}
             >
@@ -370,7 +370,7 @@ export default function ModerationPolicyPage() {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 6,
-                  background: "#C8102E",
+                  background: "#CC2424",
                   color: "#fff",
                   borderRadius: 99,
                   padding: "10px 20px",
