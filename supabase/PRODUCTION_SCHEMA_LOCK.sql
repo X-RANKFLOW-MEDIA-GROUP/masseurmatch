@@ -170,7 +170,8 @@ alter table public.profiles
   add column if not exists admin_notes text,
   add column if not exists moderation_notes text,
   add column if not exists rejection_reason text,
-  add column if not exists last_active_at timestamptz;
+  add column if not exists last_active_at timestamptz,
+  add column if not exists regular_discounts jsonb;
 
 alter table public.profiles drop constraint if exists profiles_status_check;
 alter table public.profiles add constraint profiles_status_check check (status in ('draft','pending','pending_approval','under_review','approved','suspended','rejected','changes_requested'));
@@ -601,7 +602,13 @@ create table if not exists public.complaints (
   status text default 'new',
   admin_notes text,
   resolved_at timestamptz,
-  created_at timestamptz default timezone('utc', now())
+  created_at timestamptz default timezone('utc', now()),
+  complainant_id uuid references auth.users(id) on delete set null,
+  respondent_id uuid references auth.users(id) on delete cascade,
+  title text,
+  reviewed_by uuid references auth.users(id),
+  reviewed_at timestamptz,
+  updated_at timestamptz default now()
 );
 
 create table if not exists public.photo_moderations (
