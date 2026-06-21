@@ -1,42 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
+import { cookies } from "next/headers";
 
 import { setSessionCookie } from "@/app/api/_lib/session";
 import { ensureUserProfileAndRole, type AppRole } from "@/app/api/_lib/supabase-server";
+import { assertRateLimit } from "@/app/_lib/security";
 
 type SessionRole = AppRole | null;
-
-function getSupabaseUrl() {
-  return (
-    process.env.SUPABASE_URL ||
-    process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    process.env.VITE_SUPABASE_URL ||
-    ""
-  );
-}
-
-function getAnonKey() {
-  return (
-    process.env.SUPABASE_ANON_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-    process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-    ""
-  );
-}
-
-function getServiceRoleKey() {
-  return process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-}
 
 function sanitizeRedirect(next: string | null): string {
   const fallback = "/pro/dashboard";
   if (!next) return fallback;
-  // Must start with "/" and not "//" (protocol-relative URL attack)
   if (!next.startsWith("/") || next.startsWith("//")) return fallback;
   return next;
 }
 
 export async function GET(request: NextRequest) {
+  assertRateLimit(request, "api-auth-callback", { limit: 30, windowMs: 60_000 });
+
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
   const next = sanitizeRedirect(searchParams.get("next"));
@@ -45,17 +27,21 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/login?error=no_code", origin));
   }
 
-  const supabaseUrl = getSupabaseUrl();
-  const anonKey = getAnonKey();
-  const serviceKey = getServiceRoleKey();
-
-  if (!supabaseUrl || !anonKey) {
-    return NextResponse.redirect(new URL("/login?error=config", origin));
-  }
-
-  const supabase = createClient(supabaseUrl, anonKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return cookieStore.getAll(); },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
 
   const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
@@ -64,6 +50,12 @@ export async function GET(request: NextRequest) {
   }
 
   const user = data.session.user;
+
+  if (!user.email) {
+    console.error("[api/auth/callback] user missing email");
+    return NextResponse.redirect(new URL("/login?error=auth_callback_failed", origin));
+  }
+
   let role: SessionRole = null;
   let profileCreated = false;
   let fullName =
@@ -71,43 +63,48 @@ export async function GET(request: NextRequest) {
       ? user.user_metadata.full_name
       : typeof user.user_metadata?.name === "string"
         ? user.user_metadata.name
-        : user.email?.split("@")[0] || "there";
+        : user.email.split("@")[0] || "there";
 
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (serviceKey) {
-    const adminClient = createClient(supabaseUrl, serviceKey, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    });
+    const adminClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      serviceKey,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    );
 
     const defaultRole: AppRole = "provider";
-    const ensured = await ensureUserProfileAndRole(user, {
-      defaultRole,
-    });
+    try {
+      const ensured = await ensureUserProfileAndRole(user, { defaultRole });
+      role = ensured.role as SessionRole;
+      profileCreated = ensured.profileCreated;
+      fullName = ensured.fullName;
 
-    role = ensured.role as SessionRole;
-    profileCreated = ensured.profileCreated;
-    fullName = ensured.fullName;
-
-    if (profileCreated) {
-      try {
-        await adminClient.from("lifecycle_email_queue").insert({
-          user_id: user.id,
-          recipient_email: user.email,
-          recipient_name: fullName,
-          segment: "new_signup",
-          campaign_key: "welcome_post_signup",
-          flow_key: "post_signup",
-          template_key: "welcome_v1",
-          send_category: "transactional",
-          subject: "Welcome to MasseurMatch!",
-          body_html: buildWelcomeHtml(fullName),
-          body_text: "Welcome to MasseurMatch! Complete your profile to start getting discovered.",
-          scheduled_for: new Date().toISOString(),
-          status: "pending",
-          idempotency_key: `welcome:${user.id}:${new Date().toISOString().slice(0, 10)}`,
-        });
-      } catch {
-        // Best-effort only. Email queue issues should not block auth.
+      if (profileCreated) {
+        try {
+          await adminClient.from("lifecycle_email_queue").insert({
+            user_id: user.id,
+            recipient_email: user.email,
+            recipient_name: fullName,
+            segment: "new_signup",
+            campaign_key: "welcome_post_signup",
+            flow_key: "post_signup",
+            template_key: "welcome_v1",
+            send_category: "transactional",
+            subject: "Welcome to MasseurMatch!",
+            body_html: buildWelcomeHtml(fullName),
+            body_text: "Welcome to MasseurMatch! Complete your profile to start getting discovered.",
+            scheduled_for: new Date().toISOString(),
+            status: "pending",
+            idempotency_key: `welcome:${user.id}:${new Date().toISOString().slice(0, 10)}`,
+          });
+        } catch {
+          // Best-effort only. Email queue issues should not block auth.
+        }
       }
+    } catch (error) {
+      console.error("[api/auth/callback] failed to ensure profile:", error);
+      return NextResponse.redirect(new URL("/login?error=profile_creation_failed", origin));
     }
   }
 
@@ -118,7 +115,7 @@ export async function GET(request: NextRequest) {
     "Set-Cookie",
     setSessionCookie({
       userId: user.id,
-      email: user.email ?? "",
+      email: user.email,
       role,
     }),
   );

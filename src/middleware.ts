@@ -32,9 +32,11 @@ function getSessionSecret(): string {
   // deployed environment (production, preview, staging) must provide a real
   // secret so an attacker cannot forge a signed admin cookie.
   if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
-    return 'dev-only-masseurmatch-session-secret';
+    const devSecret = 'dev-only-masseurmatch-session-secret';
+    console.warn('Using hardcoded development session secret. This is only safe in local development.');
+    return devSecret;
   }
-  throw new Error('MM_SESSION_SECRET is required outside local development.');
+  throw new Error('MM_SESSION_SECRET is required for session validation. Check your environment variables.');
 }
 
 function toBase64Url(bytes: Uint8Array): string {
