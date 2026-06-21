@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { US_CITIES } from "@/data/cities";
 
@@ -67,7 +68,10 @@ function Row() {
 }
 
 export function CityMarquee() {
-  const reduced = useReducedMotion();
+  const prefersReduced = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const reduced = mounted && prefersReduced;
 
   return (
     <div className="relative overflow-hidden border-y border-white/10 bg-[#1A1A1A] py-6 lg:py-8">
