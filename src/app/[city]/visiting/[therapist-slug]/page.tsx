@@ -67,8 +67,8 @@ export async function generateMetadata({
   const dateLabel = formatDateRange(nextVisit.start_date, nextVisit.end_date);
 
   return {
-    title: `${name} Visiting ${cityMeta.label} | MasseurMatch`,
-    description: `${name} is visiting ${cityMeta.label} ${dateLabel}. Book a session with this LGBTQ+-affirming massage therapist during their travel stay.`,
+    title: `${name} Visiting ${cityMeta.name} | MasseurMatch`,
+    description: `${name} is visiting ${cityMeta.name} ${dateLabel}. Book a session with this LGBTQ+-affirming massage therapist during their travel stay.`,
     alternates: { canonical: `https://masseurmatch.com/${city}/visiting/${slug}` },
     robots: { index: true, follow: true },
   };
@@ -115,7 +115,7 @@ export default async function TourPage({
             }}
           >
             <MapPin style={{ width: 11, height: 11 }} strokeWidth={2.25} />
-            Visiting {cityMeta.label}
+            Visiting {cityMeta.name}
           </div>
           <h1
             style={{
@@ -262,7 +262,7 @@ export default async function TourPage({
               textDecoration: "none",
             }}
           >
-            All therapists in {cityMeta.label}
+            All therapists in {cityMeta.name}
           </Link>
         </div>
 
@@ -276,7 +276,7 @@ export default async function TourPage({
               lineHeight: 1.6,
             }}
           >
-            {name} will be in {cityMeta.label}{" "}
+            {name} will be in {cityMeta.name}{" "}
             {formatDateRange(nextVisit.start_date, nextVisit.end_date)}.
             Contact them early — availability during travel visits fills quickly.
           </p>

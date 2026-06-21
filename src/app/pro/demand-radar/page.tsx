@@ -102,15 +102,9 @@ export default function DemandRadarPage() {
   useEffect(() => {
     if (!isElite) return;
     setLoading(true);
-    supabase
-      .from("demand_scores")
-      .select("id,city,state,neighborhood,score,trend,search_volume_index,competition_index,week_start")
-      .order("score", { ascending: false })
-      .limit(200)
-      .then(({ data, error }) => {
-        if (!error && data) setRows(data as DemandScore[]);
-        setLoading(false);
-      });
+    // demand_scores table not available in current schema
+    setRows([]);
+    setLoading(false);
   }, [isElite]);
 
   // Group by city
