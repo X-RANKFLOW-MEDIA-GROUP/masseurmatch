@@ -13,7 +13,7 @@ function errResponse(err: unknown) {
 // GET /api/sms/alerts — follow-up alerts (90+ min no-reply)
 export async function GET(request: NextRequest) {
   try {
-    await requireAdminSession(request as unknown as Request)
+    await requireAdminSession(request)
   } catch (err) { return errResponse(err) }
 
   try {
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   let session: Awaited<ReturnType<typeof requireAdminSession>>
   try {
-    session = await requireAdminSession(request as unknown as Request)
+    session = await requireAdminSession(request)
   } catch (err) { return errResponse(err) }
 
   try {
