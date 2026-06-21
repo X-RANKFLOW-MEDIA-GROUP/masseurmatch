@@ -1,29 +1,27 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────
-   MasseurMatch Design System
-   Tokens extracted from /how-it-works
+   MasseurMatch Design System — Red/Black/White
    ──────────────────────────────────────────── */
 :root {
-  /* Colors */
-  --mm-bg:          #FCFBF8;   /* page background */
-  --mm-dark:        #0B1F3A;   /* primary dark / headings */
-  --mm-accent:      #FF8A1F;   /* orange accent */
-  --mm-blue:        #1E4B8F;   /* mid blue */
-  --mm-muted:       #6B7280;   /* body muted text */
-  --mm-border:      rgba(11,31,58,0.08);
+  --mm-bg:          #FFFFFF;
+  --mm-dark:        #1A1A1A;
+  --mm-accent:      #CC2424;
+  --mm-accent-hover:#A81D1D;
+  --mm-gray:        #666666;
+  --mm-muted:       #999999;
+  --mm-border:      rgba(0,0,0,0.08);
   --mm-white:       #FFFFFF;
+  --mm-light:       #F4F5F6;
+  --mm-med:         #E2E4E6;
 
-  /* Typography */
-  --mm-font-heading: 'Georgia', 'Times New Roman', serif;
-  --mm-font-body:    system-ui, -apple-system, sans-serif;
+  --mm-font-heading: var(--font-montserrat), 'Montserrat', system-ui, sans-serif;
+  --mm-font-body:    var(--font-montserrat), 'Montserrat', system-ui, sans-serif;
 
-  /* Label style */
   --mm-label-size:    11px;
   --mm-label-spacing: 0.22em;
 }
 
-/* ── Base ── */
 html {
   background: var(--mm-bg);
   color: var(--mm-dark);
@@ -36,14 +34,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── Headings use serif like how-it-works ── */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--mm-font-heading);
-  font-weight: 400;
+  font-weight: 700;
   color: var(--mm-dark);
 }
 
-/* ── Eyebrow / section label utility ── */
 .mm-label {
   font-family: var(--mm-font-body);
   font-size: var(--mm-label-size);
@@ -52,7 +48,6 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--mm-accent);
 }
 
-/* ── CTA buttons ── */
 .mm-btn-primary {
   display: inline-flex;
   align-items: center;
@@ -64,14 +59,14 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   background: var(--mm-accent);
-  color: var(--mm-dark);
+  color: #FFFFFF;
   text-decoration: none;
   border: none;
   cursor: pointer;
   transition: background 0.2s;
 }
 .mm-btn-primary:hover {
-  background: #ff9d3f;
+  background: var(--mm-accent-hover);
 }
 
 .mm-btn-outline {
@@ -87,7 +82,7 @@ h1, h2, h3, h4, h5, h6 {
   background: transparent;
   color: var(--mm-dark);
   text-decoration: none;
-  border: 1px solid rgba(11,31,58,0.2);
+  border: 1px solid rgba(0,0,0,0.2);
   cursor: pointer;
   transition: border-color 0.2s, color 0.2s;
 }
@@ -95,30 +90,26 @@ h1, h2, h3, h4, h5, h6 {
   border-color: var(--mm-dark);
 }
 
-/* On dark backgrounds */
 .mm-btn-outline-light {
-  color: #FCFBF8;
-  border-color: rgba(252,251,248,0.2);
+  color: #FFFFFF;
+  border-color: rgba(255,255,255,0.2);
 }
 .mm-btn-outline-light:hover {
-  border-color: rgba(252,251,248,0.6);
+  border-color: rgba(255,255,255,0.6);
 }
 
-/* ── Section dividers ── */
 .mm-divider {
   border: none;
   border-top: 1px solid var(--mm-border);
 }
 
-/* ── Muted body text ── */
 .mm-body {
   font-family: var(--mm-font-body);
   font-size: 14px;
   line-height: 1.75;
-  color: var(--mm-muted);
+  color: var(--mm-gray);
 }
 
-/* ── Keyword marquee ticker ── */
 @keyframes mm-marquee {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
@@ -131,7 +122,6 @@ h1, h2, h3, h4, h5, h6 {
   will-change: transform;
 }
 
-/* ── City card (homepage grid) ── */
 .mm-city-card {
   background: #ffffff;
   border-bottom: 3px solid transparent;
@@ -140,23 +130,22 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration: none;
 }
 .mm-city-card:hover {
-  border-bottom-color: #FF8A1F;
-  background: #FCFBF8;
+  border-bottom-color: #CC2424;
+  background: #FAFAFA;
 }
 
-/* ── Service style link ── */
 .mm-service-link {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 18px 22px;
-  background: #FCFBF8;
+  background: #FAFAFA;
   text-decoration: none;
   border-bottom: 2px solid transparent;
   transition: border-bottom-color 0.2s ease, background 0.2s ease;
 }
 .mm-service-link:hover {
-  border-bottom-color: #FF8A1F;
+  border-bottom-color: #CC2424;
   background: #ffffff;
 }
 .mm-service-link .mm-arrow {
@@ -167,7 +156,6 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 1;
 }
 
-/* ── Tailwind custom utilities ── */
 @layer utilities {
   .font-display {
     font-family: var(--mm-font-heading);

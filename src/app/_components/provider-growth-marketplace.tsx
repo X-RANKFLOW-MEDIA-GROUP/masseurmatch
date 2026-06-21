@@ -28,7 +28,7 @@ const CATEGORY_STYLES: Record<
   }
 > = {
   visibility: {
-    glow: "from-amber-100 via-orange-50 to-white",
+    glow: "from-amber-100 via-red-50 to-white",
     accent: "bg-amber-500/10 text-amber-900",
     softText: "text-amber-700",
     border: "border-amber-200/80",

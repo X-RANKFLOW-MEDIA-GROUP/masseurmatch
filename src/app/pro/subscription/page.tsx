@@ -58,7 +58,7 @@ export default function SubscriptionPage() {
               key={tier.id}
               className={`flex flex-col ${
                 tier.highlighted
-                  ? "ring-2 ring-orange-500 shadow-lg lg:scale-105"
+                  ? "ring-2 ring-red-600 shadow-lg lg:scale-105"
                   : "border-slate-200"
               } ${isCurrent ? "ring-2 ring-indigo-500" : ""}`}
             >
@@ -97,7 +97,7 @@ export default function SubscriptionPage() {
                     asChild
                     className={`w-full ${
                       tier.highlighted
-                        ? "bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white"
+                        ? "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white"
                         : "bg-slate-900 text-white hover:bg-slate-800"
                     }`}
                   >

@@ -86,7 +86,7 @@ const heading = {
   fontWeight: '600',
   margin: '16px 0',
   padding: '0',
-  color: '#0B1F3A',
+  color: '#1A1A1A',
 };
 
 const paragraph = {
@@ -119,7 +119,7 @@ const valueText = {
 };
 
 const button = {
-  backgroundColor: '#FF8A1F',
+  backgroundColor: '#CC2424',
   borderRadius: '8px',
   color: '#fff',
   fontSize: '14px',

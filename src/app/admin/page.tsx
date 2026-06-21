@@ -67,8 +67,8 @@ export default async function AdminOverviewPage() {
       value: String(stats.pendingBookings),
       description: "Need your sign-off",
       icon: CalendarCheck,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
+      color: "text-red-600",
+      bgColor: "bg-red-50",
       href: "/admin/bookings",
     },
     {

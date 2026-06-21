@@ -98,18 +98,18 @@ export function VoxProfile({
       <div className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:px-6 lg:pb-16">
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="mb-5 flex flex-wrap items-center gap-1.5 text-sm text-[#8a7d6f]">
-          <Link href={`/${profile.citySlug}`} className="hover:text-[#060E1A]">{profile.city}</Link>
+          <Link href={`/${profile.citySlug}`} className="hover:text-[#1A1A1A]">{profile.city}</Link>
           <span aria-hidden>/</span>
-          <Link href="/therapists" className="hover:text-[#060E1A]">Massage Therapists</Link>
+          <Link href="/therapists" className="hover:text-[#1A1A1A]">Massage Therapists</Link>
           <span aria-hidden>/</span>
           <span className="font-medium text-[#5a5147]">{firstName}</span>
         </nav>
 
         {/* ── Hero card ─────────────────────────────────────────────────── */}
-        <section className="overflow-hidden rounded-[2rem] border border-[#efe3d8] bg-gradient-to-br from-white to-[#FDEFE6] p-4 shadow-[0_24px_60px_rgba(214,160,110,0.12)] sm:p-6 lg:p-8">
+        <section className="overflow-hidden rounded-[2rem] border border-[#E5E5E5] bg-gradient-to-br from-white to-[#FDE8EC] p-4 shadow-[0_24px_60px_rgba(214,160,110,0.12)] sm:p-6 lg:p-8">
           <div className="grid gap-6 lg:grid-cols-[minmax(0,360px)_1fr] lg:gap-10">
             {/* Photo */}
-            <div className="relative aspect-[4/5] overflow-hidden rounded-3xl border border-[#efe3d8] bg-[#f3e9df]">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-3xl border border-[#E5E5E5] bg-[#f3e9df]">
               <Image
                 src={profile.profilePhotoUrl}
                 alt={`${profile.name}, massage therapist in ${profile.city}`}
@@ -140,16 +140,16 @@ export function VoxProfile({
                 )}
               </div>
 
-              <h1 className="font-display text-4xl font-extrabold tracking-tight text-[#060E1A] sm:text-5xl">
+              <h1 className="font-display text-4xl font-extrabold tracking-tight text-[#1A1A1A] sm:text-5xl">
                 {profile.name}
               </h1>
               <p className="mt-2 flex items-center gap-1.5 text-[#5a5147]">
-                <MapPin className="h-4 w-4 text-[#FF8A1F]" strokeWidth={2.25} />
+                <MapPin className="h-4 w-4 text-[#CC2424]" strokeWidth={2.25} />
                 {profile.neighborhood}, {profile.city}
               </p>
               {typeof rating === "number" && (
                 <div className="mt-3 flex items-center gap-2">
-                  <span className="flex items-center gap-0.5 text-[#FF8A1F]">
+                  <span className="flex items-center gap-0.5 text-[#CC2424]">
                     {[0, 1, 2, 3, 4].map((i) => (
                       <Star key={i} className="h-4 w-4 fill-current" strokeWidth={0} />
                     ))}
@@ -163,9 +163,9 @@ export function VoxProfile({
               {/* Stat chips */}
               <div className="mt-6 grid max-w-md grid-cols-3 gap-3">
                 {stats.map((stat) => (
-                  <div key={stat.label} className="rounded-2xl border border-[#efe3d8] bg-white/70 px-4 py-3">
+                  <div key={stat.label} className="rounded-2xl border border-[#E5E5E5] bg-white/70 px-4 py-3">
                     <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a1927f]">{stat.label}</p>
-                    <p className="mt-1 text-lg font-bold text-[#060E1A]">
+                    <p className="mt-1 text-lg font-bold text-[#1A1A1A]">
                       {stat.value}
                       {stat.suffix ? <span className="ml-1 text-sm font-medium text-[#8a7d6f]">{stat.suffix}</span> : null}
                     </p>
@@ -178,7 +178,7 @@ export function VoxProfile({
                 {phoneHref && (
                   <a
                     href={phoneHref}
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#FF8A1F] px-6 font-semibold text-[#3a1c00] shadow-[0_10px_24px_rgba(255,138,31,0.3)] transition-transform hover:-translate-y-0.5"
+                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#CC2424] px-6 font-semibold text-[#FFFFFF] shadow-[0_10px_24px_rgba(204,36,36,0.3)] transition-transform hover:-translate-y-0.5"
                   >
                     <Phone className="h-4 w-4" strokeWidth={2.5} />
                     Text {firstName}
@@ -187,22 +187,22 @@ export function VoxProfile({
                 {whatsappHref && (
                   <a
                     href={whatsappHref}
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#060E1A] px-6 font-semibold text-white transition-transform hover:-translate-y-0.5"
+                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#1A1A1A] px-6 font-semibold text-white transition-transform hover:-translate-y-0.5"
                   >
                     <MessageCircle className="h-4 w-4" strokeWidth={2.5} />
                     WhatsApp
                   </a>
                 )}
                 {profile.phone && (
-                  <span className="inline-flex h-12 items-center gap-2 rounded-full border border-[#efe3d8] bg-white px-5 font-semibold text-[#060E1A]">
-                    <Phone className="h-4 w-4 text-[#FF8A1F]" strokeWidth={2.5} />
+                  <span className="inline-flex h-12 items-center gap-2 rounded-full border border-[#E5E5E5] bg-white px-5 font-semibold text-[#1A1A1A]">
+                    <Phone className="h-4 w-4 text-[#CC2424]" strokeWidth={2.5} />
                     {profile.phone}
                   </span>
                 )}
                 {emailHref && !phoneHref && !whatsappHref && (
                   <a
                     href={emailHref}
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#FF8A1F] px-6 font-semibold text-[#3a1c00]"
+                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#CC2424] px-6 font-semibold text-[#FFFFFF]"
                   >
                     <Mail className="h-4 w-4" strokeWidth={2.5} />
                     Email {firstName}
@@ -225,8 +225,8 @@ export function VoxProfile({
           <Section id="reviews" eyebrow="Testimonials" title="Client reviews">
             <div className="grid gap-4 md:grid-cols-3">
               {reviews.slice(0, 6).map((review, index) => (
-                <figure key={index} className="flex h-full flex-col rounded-3xl border border-[#efe3d8] bg-white p-6">
-                  <span className="mb-3 flex items-center gap-0.5 text-[#FF8A1F]">
+                <figure key={index} className="flex h-full flex-col rounded-3xl border border-[#E5E5E5] bg-white p-6">
+                  <span className="mb-3 flex items-center gap-0.5 text-[#CC2424]">
                     {[0, 1, 2, 3, 4].map((i) => (
                       <Star key={i} className="h-4 w-4 fill-current" strokeWidth={0} />
                     ))}
@@ -234,7 +234,7 @@ export function VoxProfile({
                   <blockquote className="flex-1 text-[15px] leading-7 text-[#3f3a33]">
                     &ldquo;{review.quote}&rdquo;
                   </blockquote>
-                  <figcaption className="mt-4 text-sm font-semibold text-[#060E1A]">
+                  <figcaption className="mt-4 text-sm font-semibold text-[#1A1A1A]">
                     {review.author}
                     {review.date ? <span className="ml-2 font-normal text-[#8a7d6f]">{review.date}</span> : null}
                   </figcaption>
@@ -247,12 +247,12 @@ export function VoxProfile({
         {/* ── About ─────────────────────────────────────────────────────── */}
         <Section id="about" eyebrow="Profile" title={`About ${firstName}`}>
           <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-            <div className="rounded-3xl border border-[#efe3d8] bg-white p-6 sm:p-8">
+            <div className="rounded-3xl border border-[#E5E5E5] bg-white p-6 sm:p-8">
               <p className="whitespace-pre-line text-[15px] leading-7 text-[#3f3a33]">{profile.bio}</p>
               {profile.specialties.length > 0 && (
                 <div className="mt-6 flex flex-wrap gap-2">
                   {profile.specialties.slice(0, 8).map((item) => (
-                    <span key={item} className="rounded-full bg-[#FDEFE6] px-3 py-1.5 text-sm font-medium text-[#8a5a2b]">
+                    <span key={item} className="rounded-full bg-[#FDE8EC] px-3 py-1.5 text-sm font-medium text-[#8a5a2b]">
                       {item}
                     </span>
                   ))}
@@ -277,8 +277,8 @@ export function VoxProfile({
               {allServices.slice(0, 12).map((service) => {
                 const Icon = iconForService(service);
                 return (
-                  <div key={service} className="flex items-start gap-3 rounded-2xl border border-[#efe3d8] bg-white p-4">
-                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#FDEFE6] text-[#FF8A1F]">
+                  <div key={service} className="flex items-start gap-3 rounded-2xl border border-[#E5E5E5] bg-white p-4">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#FDE8EC] text-[#CC2424]">
                       <Icon className="h-5 w-5" strokeWidth={2.25} />
                     </span>
                     <span className="pt-1.5 text-sm font-semibold text-[#1a1a1a]">{service}</span>
@@ -292,8 +292,8 @@ export function VoxProfile({
         {/* ── Pricing ───────────────────────────────────────────────────── */}
         {(profile.pricing.length > 0 || hasRate(profile.incallPrice) || hasRate(profile.outcallPrice)) && (
           <Section id="rates" eyebrow="Transparent pricing" title="Session rates">
-            <div className="overflow-hidden rounded-3xl border border-[#efe3d8] bg-white">
-              <div className="grid grid-cols-[1.4fr_1fr_1fr] gap-2 bg-[#060E1A] px-5 py-3.5 text-xs font-mono uppercase tracking-[0.14em] text-white/70 sm:px-7">
+            <div className="overflow-hidden rounded-3xl border border-[#E5E5E5] bg-white">
+              <div className="grid grid-cols-[1.4fr_1fr_1fr] gap-2 bg-[#1A1A1A] px-5 py-3.5 text-xs font-mono uppercase tracking-[0.14em] text-white/70 sm:px-7">
                 <span>Session</span>
                 <span className="text-right">Incall</span>
                 <span className="text-right">Outcall</span>
@@ -308,15 +308,15 @@ export function VoxProfile({
                       <p className="font-semibold text-[#1a1a1a]">{row.name}</p>
                       <p className="text-sm text-[#8a7d6f]">{row.duration}</p>
                     </div>
-                    <span className="text-right font-semibold text-[#060E1A]">{row.incall}</span>
-                    <span className="text-right font-semibold text-[#060E1A]">{row.outcall}</span>
+                    <span className="text-right font-semibold text-[#1A1A1A]">{row.incall}</span>
+                    <span className="text-right font-semibold text-[#1A1A1A]">{row.outcall}</span>
                   </div>
                 ))
               ) : (
                 <div className="grid grid-cols-[1.4fr_1fr_1fr] items-center gap-2 px-5 py-4 sm:px-7">
                   <p className="font-semibold text-[#1a1a1a]">Custom session</p>
-                  <span className="text-right font-semibold text-[#060E1A]">{profile.incallPrice}</span>
-                  <span className="text-right font-semibold text-[#060E1A]">{profile.outcallPrice}</span>
+                  <span className="text-right font-semibold text-[#1A1A1A]">{profile.incallPrice}</span>
+                  <span className="text-right font-semibold text-[#1A1A1A]">{profile.outcallPrice}</span>
                 </div>
               )}
             </div>
@@ -330,10 +330,10 @@ export function VoxProfile({
         {/* ── Availability & Travel ─────────────────────────────────────── */}
         <Section id="availability" eyebrow="Planning" title="Availability & travel">
           <div className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-3xl border border-[#efe3d8] bg-white p-6">
+            <div className="rounded-3xl border border-[#E5E5E5] bg-white p-6">
               <div className="mb-4 flex items-center gap-2">
-                <CalendarDays className="h-5 w-5 text-[#FF8A1F]" strokeWidth={2.25} />
-                <h3 className="font-display text-lg font-bold text-[#060E1A]">Availability</h3>
+                <CalendarDays className="h-5 w-5 text-[#CC2424]" strokeWidth={2.25} />
+                <h3 className="font-display text-lg font-bold text-[#1A1A1A]">Availability</h3>
               </div>
               {profile.availabilityDays.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
@@ -343,7 +343,7 @@ export function VoxProfile({
                       <span
                         key={day}
                         className={`flex h-9 w-12 items-center justify-center rounded-xl text-sm font-semibold ${
-                          open ? "bg-[#FDEFE6] text-[#8a5a2b]" : "bg-[#f4ede4] text-[#bcae9d] line-through"
+                          open ? "bg-[#FDE8EC] text-[#8a5a2b]" : "bg-[#f4ede4] text-[#bcae9d] line-through"
                         }`}
                       >
                         {day}
@@ -354,10 +354,10 @@ export function VoxProfile({
               ) : null}
               <p className="mt-4 text-sm text-[#5a5147]">{profile.availabilityHours}</p>
             </div>
-            <div className="rounded-3xl border border-[#efe3d8] bg-white p-6">
+            <div className="rounded-3xl border border-[#E5E5E5] bg-white p-6">
               <div className="mb-4 flex items-center gap-2">
-                <Car className="h-5 w-5 text-[#FF8A1F]" strokeWidth={2.25} />
-                <h3 className="font-display text-lg font-bold text-[#060E1A]">Incall & outcall</h3>
+                <Car className="h-5 w-5 text-[#CC2424]" strokeWidth={2.25} />
+                <h3 className="font-display text-lg font-bold text-[#1A1A1A]">Incall & outcall</h3>
               </div>
               <ul className="space-y-2.5 text-sm text-[#3f3a33]">
                 <li className="flex items-center gap-2">
@@ -371,7 +371,7 @@ export function VoxProfile({
                   {hasRate(profile.outcallPrice) ? ` · from ${profile.outcallPrice}` : ""}
                 </li>
                 <li className="flex items-center gap-2">
-                  <Car className="h-4 w-4 text-[#FF8A1F]" strokeWidth={2.25} />
+                  <Car className="h-4 w-4 text-[#CC2424]" strokeWidth={2.25} />
                   {profile.travelRadius}
                 </li>
               </ul>
@@ -381,7 +381,7 @@ export function VoxProfile({
 
         {/* ── Location ──────────────────────────────────────────────────── */}
         <Section id="location" eyebrow="Where" title="Location">
-          <div className="overflow-hidden rounded-3xl border border-[#efe3d8] bg-white">
+          <div className="overflow-hidden rounded-3xl border border-[#E5E5E5] bg-white">
             {profile.mapLat !== null && profile.mapLng !== null ? (
               <iframe
                 title={`Map of ${profile.neighborhood}, ${profile.city}`}
@@ -391,7 +391,7 @@ export function VoxProfile({
                 src={`https://maps.google.com/maps?q=${profile.mapLat},${profile.mapLng}&z=12&output=embed`}
               />
             ) : (
-              <div className="flex h-56 items-center justify-center bg-[#FDEFE6]">
+              <div className="flex h-56 items-center justify-center bg-[#FDE8EC]">
                 <span className="flex items-center gap-2 text-[#8a5a2b]">
                   <MapPin className="h-5 w-5" strokeWidth={2.25} />
                   {profile.neighborhood}, {profile.city}, {profile.state}
@@ -399,7 +399,7 @@ export function VoxProfile({
               </div>
             )}
             <div className="flex items-center gap-2 px-6 py-4 text-sm text-[#5a5147]">
-              <MapPin className="h-4 w-4 text-[#FF8A1F]" strokeWidth={2.25} />
+              <MapPin className="h-4 w-4 text-[#CC2424]" strokeWidth={2.25} />
               Serving {profile.serviceArea}
             </div>
           </div>
@@ -431,7 +431,7 @@ export function VoxProfile({
                 <Link
                   key={related.slug}
                   href={`/therapists/${related.slug}`}
-                  className="flex items-center gap-3 rounded-2xl border border-[#efe3d8] bg-white p-3 transition-colors hover:border-[#FF8A1F]/40"
+                  className="flex items-center gap-3 rounded-2xl border border-[#E5E5E5] bg-white p-3 transition-colors hover:border-[#CC2424]/40"
                 >
                   <span className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-[#f3e9df]">
                     {related.profilePhotoUrl ? (
@@ -450,8 +450,8 @@ export function VoxProfile({
       </div>
 
       {/* ── Final CTA band ──────────────────────────────────────────────── */}
-      <section className="bg-[#060E1A] px-4 py-14 sm:py-20">
-        <div className="mx-auto flex max-w-4xl flex-col items-center gap-6 rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#0a1628] to-[#060E1A] px-6 py-12 text-center">
+      <section className="bg-[#1A1A1A] px-4 py-14 sm:py-20">
+        <div className="mx-auto flex max-w-4xl flex-col items-center gap-6 rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#1A1A1A] to-[#1A1A1A] px-6 py-12 text-center">
           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/55">Ready when you are</p>
           <h2 className="font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
             Book your tailored session with {firstName}.
@@ -463,7 +463,7 @@ export function VoxProfile({
             {(phoneHref || whatsappHref || emailHref) && (
               <a
                 href={phoneHref || whatsappHref || emailHref || "#contact"}
-                className="inline-flex h-12 items-center gap-2 rounded-full bg-[#FF8A1F] px-7 font-semibold text-[#3a1c00] transition-transform hover:-translate-y-0.5"
+                className="inline-flex h-12 items-center gap-2 rounded-full bg-[#CC2424] px-7 font-semibold text-[#FFFFFF] transition-transform hover:-translate-y-0.5"
               >
                 <Sparkles className="h-4 w-4" strokeWidth={2.5} />
                 Contact {firstName}
@@ -508,8 +508,8 @@ function Section({
 }) {
   return (
     <section id={id} className="mt-10 scroll-mt-24 sm:mt-14">
-      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#FF8A1F]">{eyebrow}</p>
-      <h2 className="mb-5 mt-1.5 font-display text-2xl font-extrabold tracking-tight text-[#060E1A] sm:text-3xl">
+      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#CC2424]">{eyebrow}</p>
+      <h2 className="mb-5 mt-1.5 font-display text-2xl font-extrabold tracking-tight text-[#1A1A1A] sm:text-3xl">
         {title}
       </h2>
       {children}
@@ -541,8 +541,8 @@ function Badge({
 
 function DetailRow({ Icon, label, value }: { Icon: typeof MapPin; label: string; value: string }) {
   return (
-    <div className="flex items-start gap-3 rounded-2xl border border-[#efe3d8] bg-white p-4">
-      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#FDEFE6] text-[#FF8A1F]">
+    <div className="flex items-start gap-3 rounded-2xl border border-[#E5E5E5] bg-white p-4">
+      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#FDE8EC] text-[#CC2424]">
         <Icon className="h-4 w-4" strokeWidth={2.25} />
       </span>
       <span>
@@ -555,11 +555,11 @@ function DetailRow({ Icon, label, value }: { Icon: typeof MapPin; label: string;
 
 function TrustCard({ Icon, title, body }: { Icon: typeof ShieldCheck; title: string; body: string }) {
   return (
-    <div className="rounded-3xl border border-[#efe3d8] bg-white p-6">
-      <span className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FDEFE6] text-[#FF8A1F]">
+    <div className="rounded-3xl border border-[#E5E5E5] bg-white p-6">
+      <span className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FDE8EC] text-[#CC2424]">
         <Icon className="h-5 w-5" strokeWidth={2.25} />
       </span>
-      <h3 className="font-display text-base font-bold text-[#060E1A]">{title}</h3>
+      <h3 className="font-display text-base font-bold text-[#1A1A1A]">{title}</h3>
       <p className="mt-1.5 text-sm leading-6 text-[#5a5147]">{body}</p>
     </div>
   );

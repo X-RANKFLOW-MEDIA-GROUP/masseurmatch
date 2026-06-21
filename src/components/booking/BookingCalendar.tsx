@@ -95,13 +95,13 @@ export function BookingCalendar({ therapistId, onSlotSelected, selectedSlot }: P
                     onClick={() => onSlotSelected(slot)}
                     className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm transition-all ${
                       isSelected
-                        ? 'border-orange-500 bg-orange-500/10 text-orange-400'
+                        ? 'border-red-600 bg-red-600/10 text-red-400'
                         : 'border-white/10 bg-white/[0.04] text-slate-300 hover:border-white/20 hover:bg-white/[0.07]'
                     }`}
                   >
                     <Clock className="h-3.5 w-3.5 shrink-0 opacity-70" strokeWidth={2.25} />
                     {format(parseISO(`${slot.date}T${slot.time}`), 'h:mm a')}
-                    {isSelected && <ChevronRight className="ml-auto h-3.5 w-3.5 text-orange-400" strokeWidth={2.25} />}
+                    {isSelected && <ChevronRight className="ml-auto h-3.5 w-3.5 text-red-400" strokeWidth={2.25} />}
                   </button>
                 )
               })}

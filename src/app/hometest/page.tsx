@@ -100,24 +100,24 @@ export default function HomeTestPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* ─── DARK HERO SECTION ─────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-[#060E1A] px-4 py-20 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden bg-[#1A1A1A] px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-8">
             {/* Left: Text content */}
             <div className="flex flex-col justify-center">
-              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-400 mb-4">
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-red-400 mb-4">
                 Premium Icons Showcase
               </p>
               <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight mb-6">
                 Find the Right Massage.{" "}
-                <span className="text-orange-400">Every Time.</span>
+                <span className="text-red-400">Every Time.</span>
               </h1>
               <p className="text-lg text-white/80 mb-8 max-w-lg">
                 A premium directory of LGBTQ+-affirming male massage therapists
                 across 80+ US cities. Verified, trusted, and easy to find.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded font-semibold flex items-center justify-center gap-2 transition-colors">
+                <button className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded font-semibold flex items-center justify-center gap-2 transition-colors">
                   <Search className="w-5 h-5" strokeWidth={2.25} />
                   Search Therapists
                 </button>
@@ -135,7 +135,7 @@ export default function HomeTestPage() {
             <div className="grid grid-cols-2 gap-4 self-center">
               {[
                 { icon: ShieldCheck, color: "text-emerald-400" },
-                { icon: Heart, color: "text-orange-400" },
+                { icon: Heart, color: "text-red-400" },
                 { icon: Users, color: "text-blue-400" },
                 { icon: Star, color: "text-yellow-400" },
               ].map((item, i) => {
@@ -158,7 +158,7 @@ export default function HomeTestPage() {
       <section className="px-4 py-20 sm:px-6 lg:px-8 bg-white">
         <div className="mx-auto max-w-7xl">
           <div className="text-center mb-16">
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-orange-400 mb-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-red-400 mb-4">
               Why Choose Us
             </p>
             <h2 className="font-display text-4xl font-extrabold text-gray-900 mb-4">
@@ -180,7 +180,7 @@ export default function HomeTestPage() {
                 >
                   <div className="mb-4">
                     <Icon
-                      className="w-8 h-8 text-orange-500"
+                      className="w-8 h-8 text-red-500"
                       strokeWidth={2.25}
                     />
                   </div>
@@ -207,9 +207,9 @@ export default function HomeTestPage() {
               return (
                 <div key={i} className="text-center">
                   <div className="flex justify-center mb-4">
-                    <div className="bg-orange-100 p-4 rounded-full">
+                    <div className="bg-red-100 p-4 rounded-full">
                       <Icon
-                        className="w-8 h-8 text-orange-500"
+                        className="w-8 h-8 text-red-500"
                         strokeWidth={2.25}
                       />
                     </div>
@@ -237,10 +237,10 @@ export default function HomeTestPage() {
               return (
                 <div
                   key={i}
-                  className="flex items-center gap-4 p-6 bg-gray-50 rounded-lg hover:bg-orange-50 transition-colors"
+                  className="flex items-center gap-4 p-6 bg-gray-50 rounded-lg hover:bg-red-50 transition-colors"
                 >
                   <Icon
-                    className="w-6 h-6 text-orange-500 flex-shrink-0"
+                    className="w-6 h-6 text-red-500 flex-shrink-0"
                     strokeWidth={2.25}
                   />
                   <span className="font-semibold text-gray-900">
@@ -295,10 +295,10 @@ export default function HomeTestPage() {
             ].map((item, i) => (
               <div
                 key={i}
-                className="flex flex-col items-center gap-3 p-4 bg-white rounded-lg border border-gray-200 hover:border-orange-400 transition-colors"
+                className="flex flex-col items-center gap-3 p-4 bg-white rounded-lg border border-gray-200 hover:border-red-400 transition-colors"
               >
                 <item.Icon
-                  className="w-6 h-6 text-orange-500"
+                  className="w-6 h-6 text-red-500"
                   strokeWidth={2.25}
                 />
                 <span className="text-xs text-gray-600 text-center font-mono">
@@ -311,10 +311,10 @@ export default function HomeTestPage() {
       </section>
 
       {/* ─── DARK SECTION WITH ICONS ──────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-[#060E1A] px-4 py-20 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden bg-[#1A1A1A] px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <h2 className="font-display text-4xl font-extrabold text-white text-center mb-16">
-            Why <span className="text-orange-400">MasseurMatch</span>
+            Why <span className="text-red-400">MasseurMatch</span>
           </h2>
 
           <div className="grid md:grid-cols-2 gap-12">
@@ -354,13 +354,13 @@ export default function HomeTestPage() {
             Browse verified professionals in 80+ US cities
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded font-semibold flex items-center justify-center gap-2 transition-colors">
+            <button className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded font-semibold flex items-center justify-center gap-2 transition-colors">
               <Search className="w-5 h-5" strokeWidth={2.25} />
               Search Now
             </button>
             <Link
               href="/"
-              className="border-2 border-orange-500 text-orange-500 hover:bg-orange-50 px-8 py-3 rounded font-semibold flex items-center justify-center gap-2 transition-colors"
+              className="border-2 border-red-500 text-red-500 hover:bg-red-50 px-8 py-3 rounded font-semibold flex items-center justify-center gap-2 transition-colors"
             >
               Back Home
               <ArrowRight className="w-5 h-5" strokeWidth={2.25} />
