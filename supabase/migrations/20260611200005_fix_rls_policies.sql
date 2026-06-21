@@ -13,7 +13,7 @@ CREATE POLICY "Elite subscribers can read demand scores"
       SELECT 1 FROM subscriptions s
       WHERE s.user_id = auth.uid()
         AND s.status = 'active'
-        AND s.plan_key ILIKE 'elite%'
+        AND s.tier ILIKE 'elite%'
     )
   );
 

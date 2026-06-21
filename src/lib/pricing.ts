@@ -79,7 +79,7 @@ export const PLANS: Plan[] = [
   {
     id: "elite",
     name: "Elite",
-    price: 149,
+    price: 99,
     trialDays: 14,
     features: [
       "Everything in Pro",
@@ -89,7 +89,7 @@ export const PLANS: Plan[] = [
       "Auto tour pages for travel schedules",
       "Priority support",
     ],
-    anchor: "Three cities + AI for less than half of one legacy city ad",
+    anchor: "Three cities + AI for a fraction of one legacy city ad",
   },
 ];
 

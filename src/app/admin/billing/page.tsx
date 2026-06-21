@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CreditCard, DollarSign, TrendingUp, Users, Loader2, RefreshCw } from "lucide-react";
+import { CreditCard, DollarSign, TrendingUp, Users, Loader2, RefreshCw, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface StripeData {
@@ -63,31 +63,49 @@ export default function AdminBillingPage() {
   const [data, setData] = useState<StripeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loadSlow, setLoadSlow] = useState(false);
+  const slowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
     setError(null);
+    setLoadSlow(false);
+    slowTimerRef.current = setTimeout(() => setLoadSlow(true), 5000);
     try {
       const res = await fetch("/api/admin/stripe");
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       setData(json);
-    } catch (err: any) {
-      setError(err.message ?? "Failed to load billing data.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to load billing data.");
     } finally {
+      if (slowTimerRef.current) clearTimeout(slowTimerRef.current);
       setLoading(false);
+      setLoadSlow(false);
     }
   };
 
   useEffect(() => {
     fetchData();
+    return () => {
+      if (slowTimerRef.current) clearTimeout(slowTimerRef.current);
+    };
   }, []);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        <span className="ml-2 text-sm text-muted-foreground">Loading Stripe data…</span>
+      <div className="flex flex-col items-center justify-center gap-3 py-20">
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <span className="text-sm text-muted-foreground">
+            {loadSlow ? "Taking longer than expected..." : "Loading Stripe data..."}
+          </span>
+        </div>
+        {loadSlow && (
+          <Button variant="outline" size="sm" onClick={fetchData}>
+            <RefreshCw className="mr-1.5 h-3.5 w-3.5" /> Retry
+          </Button>
+        )}
       </div>
     );
   }
@@ -96,8 +114,14 @@ export default function AdminBillingPage() {
     return (
       <div className="space-y-6">
         <AdminPageHeader title="Billing" description="Revenue, subscriptions, and payment overview." />
-        <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-muted-foreground">
-          Could not load billing data: {error}
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-8 text-center">
+          <AlertCircle className="h-6 w-6 text-destructive" />
+          <p className="text-sm text-muted-foreground">
+            Could not load billing data: {error}
+          </p>
+          <Button variant="outline" size="sm" onClick={fetchData}>
+            <RefreshCw className="mr-1.5 h-3.5 w-3.5" /> Retry
+          </Button>
         </div>
       </div>
     );

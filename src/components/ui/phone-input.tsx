@@ -72,6 +72,9 @@ interface PhoneInputProps {
   className?: string;
   id?: string;
   disabled?: boolean;
+  onBlur?: () => void;
+  "aria-invalid"?: boolean;
+  "aria-describedby"?: string;
 }
 
 export function PhoneInput({
@@ -81,6 +84,9 @@ export function PhoneInput({
   className,
   id,
   disabled = false,
+  onBlur,
+  "aria-invalid": ariaInvalid,
+  "aria-describedby": ariaDescribedby,
 }: PhoneInputProps) {
   const [countryCode, setCountryCode] = React.useState("US");
   const [localNumber, setLocalNumber] = React.useState("");
@@ -161,9 +167,12 @@ export function PhoneInput({
         type="tel"
         value={formatPhoneDisplay(localNumber)}
         onChange={handleNumberChange}
+        onBlur={onBlur}
         placeholder={placeholder}
         disabled={disabled}
         className="flex-1"
+        aria-invalid={ariaInvalid}
+        aria-describedby={ariaDescribedby}
       />
     </div>
   );

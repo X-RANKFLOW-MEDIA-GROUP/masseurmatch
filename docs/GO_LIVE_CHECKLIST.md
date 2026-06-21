@@ -2,12 +2,23 @@
 
 This checklist defines the minimum release gates required before sending MasseurMatch to production.
 
-> **Final closure pass (2026-06-03):** the full repository gate (section 1) was
-> re-run and passes end to end. The session signing secret is now
-> `MM_SESSION_SECRET` only — the `SUPABASE_SERVICE_ROLE_KEY` fallback has been
-> removed from both `src/app/api/_lib/session.ts` and `src/middleware.ts`, so
-> `MM_SESSION_SECRET` must be present in every deployed environment (it is
-> already set in production).
+> **Final closure pass (2026-06-19):** full repository gate (section 1) passes end to end.
+>
+> Changes since last closure (2026-06-19):
+> - Legacy artifacts removed: `package-lock.json`, `src/pages/500.tsx`, `issue-pre-lancamento.md`.
+> - `therapist_analytics_daily` added to `PRODUCTION_SCHEMA_LOCK.sql` (fixes `validate:db-contract`).
+> - SMS API routes now return proper 401/403 via `errorResponse()` instead of 500.
+> - Console errors fixed: analytics API 500, cloudinary-sign CORS, contact inquiries 403, customer-portal 500.
+> - Liability-risk language removed across marketing pages and locales.
+> - Travel schedule editing UI added to provider profile editor.
+>
+> Previous closure (2026-06-17):
+> - `profile_status: "submitted"` replaced with `"pending_approval"` everywhere.
+>   `"submitted"` remains only in the `profile_reviews` review-workflow table constraint.
+> - OAuth callback redirects new profiles to `/pro/onboard` (→ `/signup/plan`).
+> - `release:audit` fails if `STRIPE_SECRET_KEY` is set but any `STRIPE_PRICE_*`
+>   ID is missing or malformed.
+> - `MM_SESSION_SECRET` is the only valid session secret in production.
 
 ## 1. Repository gates
 

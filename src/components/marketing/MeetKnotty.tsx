@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { MessageCircle, Search, Sparkles } from "lucide-react";
+import { ArrowUp, MessageCircle, Search, Sparkles } from "lucide-react";
 
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -32,7 +32,7 @@ const SCRIPT: { role: "user" | "bot"; text: string }[] = [
   { role: "user", text: "Deep tissue in Miami this weekend, outcall under $150?" },
   {
     role: "bot",
-    text: "Found 7 therapists in Miami offering deep-tissue outcall this weekend under $150. Top match: Marcus R. — 4.9★, books Saturday evenings.",
+    text: "Found 7 therapists in Miami offering deep-tissue outcall this weekend under $150. Top match: Marcus R. — available Saturday evenings.",
   },
   { role: "user", text: "Who's available Sunday morning?" },
   { role: "bot", text: "3 of them have Sunday-morning slots. Want me to sort by distance from South Beach?" },
@@ -289,7 +289,7 @@ export function MeetKnotty() {
                     aria-label="Send"
                     className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition hover:scale-105 disabled:opacity-40"
                   >
-                    ↑
+                    <ArrowUp className="h-4 w-4" />
                   </button>
                 </form>
               </div>

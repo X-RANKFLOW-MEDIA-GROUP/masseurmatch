@@ -1,3 +1,12 @@
+-- Ensure the updated_at helper exists before any table that uses it
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$;
+
 -- Booking inquiry system: tracks massage inquiries from first contact through approval
 CREATE TABLE IF NOT EXISTS public.booking_inquiries (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

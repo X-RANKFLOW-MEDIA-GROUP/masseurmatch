@@ -63,6 +63,7 @@ export async function POST(request: Request) {
     const { data: photoRow, error: insertError } = await adminClient
       .from("therapist_photos")
       .insert({
+        therapist_profile_id: profile.id,
         user_id: session.userId,
         profile_id: profile.id,
         storage_path: fileName,

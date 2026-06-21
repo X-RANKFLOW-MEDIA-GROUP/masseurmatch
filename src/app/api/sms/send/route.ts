@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminSession } from '@/app/api/_lib/supabase-server'
-import { sendSms, logSms, upsertFollowUpAlert } from '@/lib/sms/twilio-utils'
 import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
+import { errorResponse } from '@/app/api/_lib/http'
+import { sendSms, logSms, upsertFollowUpAlert } from '@/lib/sms/twilio-utils'
 
 // POST /api/sms/send — manual outbound SMS (admin or operator)
 export async function POST(request: NextRequest) {
@@ -52,7 +53,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, sid })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ ok: false, error: message }, { status: 500 })
+    return errorResponse(err)
   }
 }

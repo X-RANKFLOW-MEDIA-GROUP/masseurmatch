@@ -21,18 +21,18 @@ export async function GET(request: NextRequest) {
     (txns ?? []).map(t => t.appointment_id as string).filter(Boolean)
   )]
 
-  const appointmentsById: Record<string, { id: string; start_time: string; service_type: string; therapist_id: string }> = {}
+  const appointmentsById: Record<string, { id: string; starts_at: string | null; therapist_id: string | null }> = {}
   if (appointmentIds.length > 0) {
     const { data: appts } = await supabase
       .from('appointments')
-      .select('id, start_time, service_type, therapist_id')
+      .select('id, starts_at, therapist_id')
       .in('id', appointmentIds)
     appts?.forEach(a => { appointmentsById[a.id as string] = a as typeof appointmentsById[string] })
   }
 
   // Collect therapist IDs from appointments and fetch profiles separately
   const therapistIds = [...new Set(
-    Object.values(appointmentsById).map(a => a.therapist_id).filter(Boolean)
+    Object.values(appointmentsById).map(a => a.therapist_id).filter((id): id is string => id !== null)
   )]
 
   const profilesById: Record<string, { id: string; full_name: string | null; avatar_url: string | null }> = {}
@@ -55,8 +55,7 @@ export async function GET(request: NextRequest) {
       appointment: appt
         ? {
             id: appt.id,
-            start_time: appt.start_time,
-            service_type: appt.service_type,
+            starts_at: appt.starts_at,
             therapist: appt.therapist_id ? (profilesById[appt.therapist_id] ?? null) : null,
           }
         : null,

@@ -21,13 +21,9 @@ export async function GET(request: Request) {
     }
 
     // Fetch recent ranking events count by event_name
-    const { data: eventCounts, error: eventsError } = await adminClient
-      .rpc("get_ranking_event_counts")
-      .maybeSingle();
-
-    // If RPC doesn't exist, do a direct count approach
-    let eventBreakdown: Record<string, number> = {};
-    if (eventsError || !eventCounts) {
+    // Direct count approach (get_ranking_event_counts RPC not in live schema)
+    const eventBreakdown: Record<string, number> = {};
+    {
       const { data: events } = await adminClient
         .from("ranking_events")
         .select("event_name")
@@ -36,11 +32,11 @@ export async function GET(request: Request) {
 
       if (events) {
         for (const e of events) {
-          eventBreakdown[e.event_name] = (eventBreakdown[e.event_name] || 0) + 1;
+          if (e.event_name) {
+            eventBreakdown[e.event_name] = (eventBreakdown[e.event_name] || 0) + 1;
+          }
         }
       }
-    } else {
-      eventBreakdown = eventCounts as Record<string, number>;
     }
 
     // Fetch total profiles count

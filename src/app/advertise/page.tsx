@@ -1,23 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Check } from "lucide-react";
 import { JsonLd } from "@/app/_components/JsonLd";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
   createPageMetadata,
 } from "@/app/_lib/seo";
-
-type Plan = {
-  name: "Free" | "Pro" | "Featured";
-  price: string;
-  points: string[];
-};
-
-const plans: Plan[] = [
-  { name: "Free", price: "$0", points: ["Basic profile", "Local indexing", "Direct contact"] },
-  { name: "Pro", price: "$29/mo", points: ["Priority placement", "More galleries", "Expanded SEO"] },
-  { name: "Featured", price: "$79/mo", points: ["Premium placement", "Top city slots", "Growth support"] },
-];
+import { PLANS } from "@/lib/pricing";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Advertise on MasseurMatch",
@@ -52,14 +42,24 @@ export default function AdvertisePage() {
           profiles, and specialty discovery paths.
         </p>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
-          {plans.map((plan) => (
-            <article key={plan.name} className="rounded-3xl border border-border p-5 shadow-sm">
+        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {PLANS.map((plan) => (
+            <article
+              key={plan.id}
+              className={`rounded-3xl border p-5 shadow-sm ${
+                plan.mostPopular ? "border-primary ring-2 ring-primary" : "border-border"
+              }`}
+            >
               <h2 className="text-xl font-semibold text-foreground">{plan.name}</h2>
-              <p className="mt-2 text-3xl font-bold text-foreground">{plan.price}</p>
+              <p className="mt-2 text-3xl font-bold text-foreground">
+                {plan.price === 0 ? "Free" : `$${plan.price}/mo`}
+              </p>
               <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-                {plan.points.map((point) => (
-                  <li key={point}>{point}</li>
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" strokeWidth={2.5} />
+                    {f}
+                  </li>
                 ))}
               </ul>
             </article>

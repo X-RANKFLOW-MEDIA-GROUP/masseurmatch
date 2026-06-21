@@ -270,6 +270,7 @@ export default function PhotoManagerPage() {
         const insertedPhoto = photoRecord as { id: string };
 
         const { error: queueInsertError } = await supabase.from("moderation_queue").insert({
+          content_type: "photo",
           profile_id: profile.id,
           user_id: profile.user_id,
           target_id: insertedPhoto.id,
@@ -277,7 +278,7 @@ export default function PhotoManagerPage() {
           source: "pro_photos",
           field_name: null,
           status: "pending",
-          priority: "normal",
+          priority: 1,
           moderation_provider: "sightengine",
           moderation_reason: "queued_for_ai_review",
           snapshot: {
@@ -708,7 +709,7 @@ export default function PhotoManagerPage() {
                             className="inline-flex items-center gap-1 rounded-full border border-slate-200 px-3 py-1.5 font-sans text-xs font-medium text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50"
                           >
                             <Star className="h-3.5 w-3.5" />
-                            Tornar principal
+                            Set as Primary
                           </button>
                         )}
 
@@ -718,7 +719,7 @@ export default function PhotoManagerPage() {
                           className="inline-flex items-center gap-1 rounded-full border border-rose-200 px-3 py-1.5 font-sans text-xs font-medium text-rose-700 transition-colors hover:bg-rose-50"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
-                          Remover
+                          Remove
                         </button>
                       </div>
                     </div>

@@ -1,8 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ShieldCheck, ArrowUpRight } from "lucide-react";
+import { BRAND_ASSETS } from "@/lib/brand";
 import { SiteFooterTalk } from "@/components/marketing/SiteFooterTalk";
 
 export function SiteFooter() {
@@ -13,6 +15,11 @@ export function SiteFooter() {
     return <SiteFooterTalk />;
   }
 
+  // Admin and Pro layouts have their own chrome — hide the marketing footer
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/pro")) {
+    return null;
+  }
+
   return (
     <footer className="bg-[#060E1A] text-slate-400 pt-20 pb-10 border-t border-white/[0.06]">
       <div className="container mx-auto px-4 md:px-6 max-w-7xl">
@@ -21,8 +28,8 @@ export function SiteFooter() {
 
           {/* Brand Column */}
           <div className="lg:col-span-2 space-y-6">
-            <Link href="/" className="font-['Georgia','Times_New_Roman',serif] text-2xl font-bold tracking-tight text-white inline-block">
-              Masseur<span className="text-[#FF8A1F]">Match</span>
+            <Link href="/" className="inline-block">
+              <Image src={BRAND_ASSETS.logo} alt="MasseurMatch" width={160} height={32} className="h-8 w-auto" />
             </Link>
             <p className="font-sans text-sm leading-relaxed max-w-sm text-slate-400">
               A privacy-first directory connecting clients with independent LGBTQ+-affirming massage therapists across the United States.
