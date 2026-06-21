@@ -115,6 +115,12 @@ const config: Config = {
         soft: "var(--shadow-subtle)",
         brand: "var(--shadow-card)",
       },
+      transitionTimingFunction: {
+        "smooth-out": "cubic-bezier(0.16, 1, 0.3, 1)",
+      },
+      transitionDuration: {
+        600: "600ms",
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },

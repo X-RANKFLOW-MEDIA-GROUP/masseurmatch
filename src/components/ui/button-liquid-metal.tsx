@@ -46,7 +46,7 @@ export function ButtonLiquidMetal({
         // Base
         "group relative inline-flex items-center justify-center font-sans font-semibold",
         "tracking-tight select-none overflow-hidden",
-        "transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]",
+        "transition-all duration-200 ease-smooth-out",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2",
         "disabled:pointer-events-none disabled:opacity-50",
         // Size
@@ -59,7 +59,7 @@ export function ButtonLiquidMetal({
         // Shimmer sweep on hover
         "after:absolute after:inset-0 after:rounded-[inherit]",
         "after:bg-[linear-gradient(110deg,transparent_20%,rgba(255,255,255,0.25)_50%,transparent_80%)]",
-        "after:translate-x-[-150%] after:transition-transform after:duration-500 after:ease-[cubic-bezier(0.16,1,0.3,1)]",
+        "after:translate-x-[-150%] after:transition-transform after:duration-500 after:ease-smooth-out",
         "hover:after:translate-x-[150%]",
         // Lift
         "hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(196,98,42,0.35)]",
