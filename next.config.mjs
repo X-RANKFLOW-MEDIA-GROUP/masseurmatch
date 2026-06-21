@@ -86,7 +86,7 @@ const CONTENT_SECURITY_POLICY = [
   "font-src 'self' data: https:",
   "style-src 'self' 'unsafe-inline' https:",
   `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}https://js.stripe.com https://vercel.live`,
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://vercel.live https://*.vercel.app https://*.vercel.sh",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://api.cloudinary.com https://vercel.live https://*.vercel.app https://*.vercel.sh",
   "frame-src 'self' http://localhost:* https://*.vusercontent.net https://*.lite.vusercontent.net https://generated.vusercontent.net https://*.vercel.net https://*.vercel.run https://*.vercel.app https://*.vercel.sh https://vercel.live https://vercel.com https://vercel.fides-cdn.ethyca.com https://js.stripe.com https://hooks.stripe.com https://*.accounts.dev https://*.clerk.accounts.dev https://ops.askchapter.org https://*.supabase.co https://www.google.com https://maps.google.com",
   "worker-src 'self' blob:",
   "upgrade-insecure-requests"
@@ -101,6 +101,7 @@ const nextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "*.supabase.co" },
       { protocol: "https", hostname: "*.blob.vercel-storage.com" },
+      { protocol: "https", hostname: "res.cloudinary.com" },
     ],
   },
   webpack(config, { dev }) {

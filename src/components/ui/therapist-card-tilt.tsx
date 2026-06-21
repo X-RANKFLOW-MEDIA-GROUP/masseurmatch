@@ -94,7 +94,7 @@ export function TherapistCardTilt({
       className={cn(
         "group relative rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)]",
         "p-5 shadow-[var(--shadow-sm)] cursor-pointer",
-        "transition-[box-shadow] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]",
+        "transition-[box-shadow] duration-200 ease-smooth-out",
         "hover:shadow-[var(--shadow-lg)]",
         "will-change-transform",
         className

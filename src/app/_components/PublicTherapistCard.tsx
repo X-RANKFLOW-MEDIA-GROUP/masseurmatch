@@ -102,7 +102,7 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
             alt={`${name} – massage therapist in ${city || "your area"}`}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover object-top transition-transform duration-[600ms] ease-out group-hover:scale-[1.04]"
+            className="object-cover object-top transition-transform duration-600 ease-out group-hover:scale-[1.04]"
             priority={priority}
             itemProp="image"
           />

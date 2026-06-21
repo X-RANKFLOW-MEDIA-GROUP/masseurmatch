@@ -30,7 +30,7 @@ const buttonVariants = cva(
     "inline-flex items-center justify-center gap-2",
     "font-sans font-medium tracking-tight",
     "select-none whitespace-nowrap",
-    "transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)]",
+    "transition-all duration-150 ease-smooth-out",
     "focus-visible:outline-none",
     "focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2",
     "disabled:pointer-events-none disabled:opacity-50",

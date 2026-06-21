@@ -3,15 +3,22 @@ import type { NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { setSessionCookie } from "@/app/api/_lib/session";
+import { ensureUserProfileAndRole } from "@/app/api/_lib/supabase-server";
+import { assertRateLimit } from "@/app/_lib/security";
+
+function sanitizeRedirect(next: string | null): string {
+  const fallback = "/pro/dashboard";
+  if (!next) return fallback;
+  if (!next.startsWith("/") || next.startsWith("//")) return fallback;
+  return next;
+}
 
 export async function GET(request: NextRequest) {
+  assertRateLimit(request, "auth-callback", { limit: 30, windowMs: 60_000 });
+
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/pro/dashboard";
-  const safeNext =
-    typeof next === "string" && next.startsWith("/") && !next.startsWith("//")
-      ? next
-      : "/pro/dashboard";
+  const next = sanitizeRedirect(searchParams.get("next"));
 
   if (!code) {
     return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
@@ -43,28 +50,36 @@ export async function GET(request: NextRequest) {
 
   const user = sessionData.user;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, display_name, headline")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  if (!user.email) {
+    console.error("[auth/callback] user missing email");
+    return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+  }
 
-  const role = (profile?.role as "admin" | "provider" | "client" | null) ?? null;
+  let role: "admin" | "provider" | "client" | null = null;
+  let isNewProfile = false;
+
+  try {
+    const ensured = await ensureUserProfileAndRole(user, { defaultRole: "provider" });
+    role = ensured.role as "admin" | "provider" | "client" | null;
+    isNewProfile = ensured.profileCreated;
+  } catch (error) {
+    console.error("[auth/callback] failed to ensure profile:", error);
+    return NextResponse.redirect(`${origin}/login?error=profile_creation_failed`);
+  }
 
   const sessionCookieHeader = setSessionCookie({
     userId: user.id,
-    email: user.email ?? "",
+    email: user.email,
     role,
   });
 
-  // Redirect new OAuth users (no display name or headline set) to onboarding,
+  // Redirect new OAuth users (new profile created) to onboarding,
   // unless they explicitly requested a different destination via the `next` param.
-  const isNewProfile = !profile?.display_name && !profile?.headline;
-  const requestedOnboard = safeNext === "/pro/onboard";
+  const requestedOnboard = next === "/pro/onboard";
   const destination =
-    isNewProfile && !requestedOnboard && (safeNext === "/pro/dashboard" || safeNext === "/dashboard")
+    isNewProfile && !requestedOnboard && (next === "/pro/dashboard" || next === "/dashboard")
       ? "/pro/onboard"
-      : safeNext;
+      : next;
 
   const redirectResponse = NextResponse.redirect(`${origin}${destination}`);
   redirectResponse.headers.append("Set-Cookie", sessionCookieHeader);

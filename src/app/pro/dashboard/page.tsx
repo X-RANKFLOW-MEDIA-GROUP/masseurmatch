@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -23,7 +24,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { normalizePlanKey } from "@/hooks/usePlanLimits";
-import { requestJson } from "@/app/_lib/request";
+import { requestJson, ApiError } from "@/app/_lib/request";
 
 const statusOptions = [
   { key: "available", label: "Available Now", icon: Zap, color: "emerald" },
@@ -172,6 +173,7 @@ function ProfileStatusBanner({ status }: { status: string }) {
 }
 
 export default function DashboardHome() {
+  const router = useRouter();
   const { user, subscription } = useAuth();
   const currentTier = normalizePlanKey(subscription?.plan_key) ?? (subscription?.subscribed ? "standard" : "free");
   const [activeStatus, setActiveStatus] = useState<AvailabilityStatus>("available");
@@ -197,9 +199,15 @@ export default function DashboardHome() {
           setActiveStatus("hidden");
         }
       })
-      .catch(() => null)
+      .catch((error) => {
+        if (error instanceof ApiError && error.status === 401) {
+          router.push("/login");
+        } else {
+          setProfile(null);
+        }
+      })
       .finally(() => setProfileLoading(false));
-  }, []);
+  }, [router]);
 
   async function handleStatusChange(status: AvailabilityStatus) {
     setActiveStatus(status);
