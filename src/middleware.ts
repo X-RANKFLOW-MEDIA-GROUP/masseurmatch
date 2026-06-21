@@ -319,6 +319,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
   }
 
+  // ── 7. Legacy /{city}/massage-therapists → /{city} ───────────────────────
   const topLevelParts = pathname.split("/").filter(Boolean);
 
   // ── 7a. Legacy /{city}/therapist/{slug} → /therapists/{slug} ─────────────
@@ -328,8 +329,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       return permanentRedirect(`/therapists/${topLevelParts[2]}`, request);
     }
   }
-
-  // ── 7. Legacy /{city}/massage-therapists → /{city} ───────────────────────
   if (topLevelParts.length === 2 && topLevelParts[1] === "massage-therapists") {
     const citySlug = resolveCitySlug(topLevelParts[0] || "");
     if (citySlug) {

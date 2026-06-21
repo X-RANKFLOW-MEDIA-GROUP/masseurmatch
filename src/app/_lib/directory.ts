@@ -18,8 +18,7 @@ const PUBLIC_PROFILE_SELECT = `
   is_suspended, is_banned, available_now, available_now_expires,
   lgbtq_affirming, business_hours, custom_faq, pricing_sessions, areas_served,
   outcall_radius_miles, travel_schedule, add_ons, training, education, contact_clicks,
-  seo_title, seo_description, seo_keywords, created_at,
-  identity_verified_at
+  seo_title, seo_description, seo_keywords, created_at
 `;
 
 export interface ProfileFaqItem {
@@ -156,20 +155,14 @@ export const getCities = () => US_CITIES;
 const showDemoProfiles = process.env.SHOW_DEMO_PROFILES === "true";
 
 const buildPublicTherapistsQuery = () => {
-  let q = supabase
+  const q = supabase
     .from("profiles")
     .select(PUBLIC_PROFILE_SELECT, { count: "exact" })
     .eq("visibility_status", "public")
     .eq("profile_status", "approved")
     .eq("is_suspended", false)
-    .eq("is_banned", false)
-    // Exclude test/debug profiles from public listings
-    .not("display_name", "ilike", "%Debug%")
-    .not("display_name", "ilike", "%Test%")
-    .not("phone", "ilike", "%555%");
-  if (!showDemoProfiles) {
-    q = q.or("is_demo.is.null,is_demo.eq.false");
-  }
+    .eq("is_banned", false);
+  // Note: is_demo column does not exist in production schema; skipping demo profile filter
   return q;
 };
 
