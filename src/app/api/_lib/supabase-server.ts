@@ -79,8 +79,8 @@ export async function getUserRole(userId: string): Promise<AppRole | null> {
   return normalizeAppRole(data?.role);
 }
 
-export async function requireSession(request: Request): Promise<RequestSession> {
-  const session = getRequestSession(request);
+export async function requireSession(request: Request | { headers: { get: (name: string) => string | null } }): Promise<RequestSession> {
+  const session = getRequestSession(request as Request);
 
   if (!session) {
     throw new RouteError(401, "Authentication required.");
@@ -89,7 +89,7 @@ export async function requireSession(request: Request): Promise<RequestSession> 
   return session;
 }
 
-export async function requireAdminSession(request: Request): Promise<RequestSession> {
+export async function requireAdminSession(request: Request | { headers: { get: (name: string) => string | null } }): Promise<RequestSession> {
   const session = await requireSession(request);
   const role = await getUserRole(session.userId);
 
