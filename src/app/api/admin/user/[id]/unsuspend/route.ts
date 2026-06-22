@@ -21,9 +21,9 @@ export async function POST(
 
     await adminClient.from("admin_actions").insert({
       action: "unsuspend_user",
-      target_table: "profiles",
-      admin_id: admin.userId,
       action_type: "unsuspend_user",
+      target_table: "users",
+      admin_id: admin.userId,
       target_user_id: userId,
     });
 

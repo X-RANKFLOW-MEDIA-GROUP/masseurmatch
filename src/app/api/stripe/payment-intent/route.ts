@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
   await supabase.from('payment_transactions').insert({
     user_id: session.userId,
     appointment_id,
-    provider_transaction_id: paymentIntent.id,
     provider: 'stripe',
+    provider_transaction_id: paymentIntent.id,
     amount_cents,
     currency: 'usd',
     status: 'pending',

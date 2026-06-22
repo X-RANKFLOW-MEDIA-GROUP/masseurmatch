@@ -71,7 +71,7 @@ export async function loadImportedReviews(): Promise<AdminLoadResult<AdminImport
     }
 
     const reviewRows = (data || []) as AdminImportedReview[];
-    const profileIds = [...new Set(reviewRows.map((review) => review.profile_id).filter((id): id is string => id !== null))];
+    const profileIds = [...new Set(reviewRows.map((review) => review.profile_id).filter((id): id is string => id != null))];
     const profileMap = new Map<string, AdminImportedReview["profile"]>();
 
     if (profileIds.length > 0) {
@@ -101,7 +101,7 @@ export async function loadImportedReviews(): Promise<AdminLoadResult<AdminImport
     return {
       items: reviewRows.map((review) => ({
         ...review,
-        profile: review.profile_id ? (profileMap.get(review.profile_id) ?? null) : null,
+        profile: (review.profile_id ? profileMap.get(review.profile_id) : undefined) || null,
       })),
       error: null,
     };

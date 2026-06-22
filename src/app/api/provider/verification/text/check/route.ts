@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     // Get the latest pending verification for this user
     const { data: verification, error: fetchError } = await adminClient
       .from("text_verifications")
-      .select("id, code, status")
+      .select("id, code")
       .eq("user_id", session.userId)
       .eq("status", "pending")
       .order("created_at", { ascending: false })
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     // Mark as verified
     await adminClient
       .from("text_verifications")
-      .update({ status: "verified", updated_at: now })
+      .update({ status: "verified", reviewed_at: now, updated_at: now })
       .eq("id", verification.id);
 
     // Update profile phone verification flag

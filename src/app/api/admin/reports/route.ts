@@ -32,9 +32,8 @@ export async function GET(request: Request) {
 
       if (events) {
         for (const e of events) {
-          if (e.event_name) {
-            eventBreakdown[e.event_name] = (eventBreakdown[e.event_name] || 0) + 1;
-          }
+          const name = e.event_name ?? "unknown";
+          eventBreakdown[name] = (eventBreakdown[name] || 0) + 1;
         }
       }
     }

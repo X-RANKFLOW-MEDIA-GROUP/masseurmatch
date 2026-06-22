@@ -37,9 +37,9 @@ export async function POST(
 
     await adminClient.from("admin_actions").insert({
       action: "reject_photo",
+      action_type: "reject_photo",
       target_table: "profile_photos",
       admin_id: admin.userId,
-      action_type: "reject_photo",
       target_user_id: photo.user_id,
       target_profile_id: photo.profile_id,
       reason: body.reason || null,

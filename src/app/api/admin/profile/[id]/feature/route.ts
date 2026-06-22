@@ -76,9 +76,9 @@ export async function POST(
 
     await adminClient.from("admin_actions").insert({
       action: isFeaturing ? "feature_profile" : "unfeature_profile",
+      action_type: isFeaturing ? "feature_profile" : "unfeature_profile",
       target_table: "profiles",
       admin_id: admin.userId,
-      action_type: isFeaturing ? "feature_profile" : "unfeature_profile",
       target_user_id: profile.user_id,
       target_profile_id: profileId,
       reason: body.reason || null,

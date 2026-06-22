@@ -52,8 +52,8 @@ export async function POST(request: Request) {
       .insert({
         user_id: session.userId,
         code,
-        status: "pending",
         submitted_text: phone,
+        status: "pending",
       });
 
     if (verificationError) {
