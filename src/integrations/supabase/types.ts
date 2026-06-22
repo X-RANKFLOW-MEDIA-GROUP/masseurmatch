@@ -567,6 +567,7 @@ export type Database = {
         Row: {
           admin_notes: string | null
           category: string | null
+          complainant_id: string | null
           created_at: string | null
           description: string | null
           id: string
@@ -576,11 +577,17 @@ export type Database = {
           reporter_email: string | null
           reporter_id: string | null
           resolved_at: string | null
+          respondent_id: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: string | null
+          title: string | null
+          updated_at: string | null
         }
         Insert: {
           admin_notes?: string | null
           category?: string | null
+          complainant_id?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
@@ -590,11 +597,17 @@ export type Database = {
           reporter_email?: string | null
           reporter_id?: string | null
           resolved_at?: string | null
+          respondent_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string | null
+          title?: string | null
+          updated_at?: string | null
         }
         Update: {
           admin_notes?: string | null
           category?: string | null
+          complainant_id?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
@@ -604,7 +617,12 @@ export type Database = {
           reporter_email?: string | null
           reporter_id?: string | null
           resolved_at?: string | null
+          respondent_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string | null
+          title?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -1293,6 +1311,57 @@ export type Database = {
           },
         ]
       }
+      moderation_actions: {
+        Row: {
+          action_type: string
+          actor_admin_id: string | null
+          created_at: string
+          detail: string | null
+          id: string
+          reason: string
+          resolved_at: string | null
+          target_profile_id: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          actor_admin_id?: string | null
+          created_at?: string
+          detail?: string | null
+          id?: string
+          reason: string
+          resolved_at?: string | null
+          target_profile_id?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          actor_admin_id?: string | null
+          created_at?: string
+          detail?: string | null
+          id?: string
+          reason?: string
+          resolved_at?: string | null
+          target_profile_id?: string | null
+          target_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderation_actions_target_profile_id_fkey"
+            columns: ["target_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "moderation_actions_target_profile_id_fkey"
+            columns: ["target_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_therapists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       moderation_queue: {
         Row: {
           admin_reason: string | null
@@ -1829,10 +1898,6 @@ export type Database = {
           additional_services: string[] | null
           admin_notes: string | null
           affiliations: string[] | null
-          mobile_hours: Json | null
-          rate_disclaimers: string[] | null
-          studio_amenities: string[] | null
-          studio_hours: Json | null
           approved_at: string | null
           approved_by: string | null
           areas_served: string[] | null
@@ -1880,7 +1945,7 @@ export type Database = {
           inquiry_count: number | null
           is_active: boolean | null
           is_banned: boolean | null
-          is_demo: boolean | null
+          is_demo: boolean
           is_featured: boolean | null
           is_suspended: boolean | null
           is_verified_email: boolean | null
@@ -1902,6 +1967,7 @@ export type Database = {
           massage_setup: string[] | null
           massage_techniques: string[] | null
           mobile_extras: string[] | null
+          mobile_hours: Json | null
           modalities: string[] | null
           modality: string | null
           moderation_notes: string | null
@@ -1932,6 +1998,7 @@ export type Database = {
           profile_status: string | null
           profile_views: number | null
           promotions: Json | null
+          rate_disclaimers: string[] | null
           rates: Json | null
           rating_average: number | null
           regular_discounts: Json | null
@@ -1965,6 +2032,8 @@ export type Database = {
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           stripe_verification_session_id: string | null
+          studio_amenities: string[] | null
+          studio_hours: Json | null
           submitted_at: string | null
           subscription_cancel_at_period_end: boolean | null
           subscription_current_period_end: string | null
@@ -2003,10 +2072,6 @@ export type Database = {
           additional_services?: string[] | null
           admin_notes?: string | null
           affiliations?: string[] | null
-          mobile_hours?: Json | null
-          rate_disclaimers?: string[] | null
-          studio_amenities?: string[] | null
-          studio_hours?: Json | null
           approved_at?: string | null
           approved_by?: string | null
           areas_served?: string[] | null
@@ -2054,7 +2119,7 @@ export type Database = {
           inquiry_count?: number | null
           is_active?: boolean | null
           is_banned?: boolean | null
-          is_demo?: boolean | null
+          is_demo?: boolean
           is_featured?: boolean | null
           is_suspended?: boolean | null
           is_verified_email?: boolean | null
@@ -2076,6 +2141,7 @@ export type Database = {
           massage_setup?: string[] | null
           massage_techniques?: string[] | null
           mobile_extras?: string[] | null
+          mobile_hours?: Json | null
           modalities?: string[] | null
           modality?: string | null
           moderation_notes?: string | null
@@ -2106,6 +2172,7 @@ export type Database = {
           profile_status?: string | null
           profile_views?: number | null
           promotions?: Json | null
+          rate_disclaimers?: string[] | null
           rates?: Json | null
           rating_average?: number | null
           regular_discounts?: Json | null
@@ -2139,6 +2206,8 @@ export type Database = {
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           stripe_verification_session_id?: string | null
+          studio_amenities?: string[] | null
+          studio_hours?: Json | null
           submitted_at?: string | null
           subscription_cancel_at_period_end?: boolean | null
           subscription_current_period_end?: string | null
@@ -2177,10 +2246,6 @@ export type Database = {
           additional_services?: string[] | null
           admin_notes?: string | null
           affiliations?: string[] | null
-          mobile_hours?: Json | null
-          rate_disclaimers?: string[] | null
-          studio_amenities?: string[] | null
-          studio_hours?: Json | null
           approved_at?: string | null
           approved_by?: string | null
           areas_served?: string[] | null
@@ -2228,7 +2293,7 @@ export type Database = {
           inquiry_count?: number | null
           is_active?: boolean | null
           is_banned?: boolean | null
-          is_demo?: boolean | null
+          is_demo?: boolean
           is_featured?: boolean | null
           is_suspended?: boolean | null
           is_verified_email?: boolean | null
@@ -2250,6 +2315,7 @@ export type Database = {
           massage_setup?: string[] | null
           massage_techniques?: string[] | null
           mobile_extras?: string[] | null
+          mobile_hours?: Json | null
           modalities?: string[] | null
           modality?: string | null
           moderation_notes?: string | null
@@ -2280,6 +2346,7 @@ export type Database = {
           profile_status?: string | null
           profile_views?: number | null
           promotions?: Json | null
+          rate_disclaimers?: string[] | null
           rates?: Json | null
           rating_average?: number | null
           regular_discounts?: Json | null
@@ -2313,6 +2380,8 @@ export type Database = {
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           stripe_verification_session_id?: string | null
+          studio_amenities?: string[] | null
+          studio_hours?: Json | null
           submitted_at?: string | null
           subscription_cancel_at_period_end?: boolean | null
           subscription_current_period_end?: string | null
@@ -2939,6 +3008,98 @@ export type Database = {
           },
         ]
       }
+      support_ticket_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          sender_id: string
+          sender_role: string
+          ticket_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          sender_id: string
+          sender_role: string
+          ticket_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          sender_id?: string
+          sender_role?: string
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_ticket_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_tickets: {
+        Row: {
+          assigned_to: string | null
+          category: string
+          created_at: string
+          id: string
+          priority: string
+          profile_id: string | null
+          resolved_at: string | null
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          priority?: string
+          profile_id?: string | null
+          resolved_at?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          priority?: string
+          profile_id?: string | null
+          resolved_at?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_tickets_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_therapists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       text_verifications: {
         Row: {
           code: string | null
@@ -3185,6 +3346,8 @@ export type Database = {
           is_primary: boolean
           main_profile_id: string | null
           mime_type: string | null
+          moderation_confidence: number | null
+          moderation_notes: string | null
           photo_type: string | null
           profile_id: string | null
           public_url: string | null
@@ -3207,6 +3370,8 @@ export type Database = {
           is_primary?: boolean
           main_profile_id?: string | null
           mime_type?: string | null
+          moderation_confidence?: number | null
+          moderation_notes?: string | null
           photo_type?: string | null
           profile_id?: string | null
           public_url?: string | null
@@ -3229,6 +3394,8 @@ export type Database = {
           is_primary?: boolean
           main_profile_id?: string | null
           mime_type?: string | null
+          moderation_confidence?: number | null
+          moderation_notes?: string | null
           photo_type?: string | null
           profile_id?: string | null
           public_url?: string | null
@@ -4076,6 +4243,45 @@ export type Database = {
           user_agent?: string | null
         }
         Relationships: []
+      }
+      waitlist_voice_ai: {
+        Row: {
+          created_at: string
+          id: string
+          plan_tier: string
+          profile_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          plan_tier?: string
+          profile_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          plan_tier?: string
+          profile_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waitlist_voice_ai_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "waitlist_voice_ai_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_therapists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

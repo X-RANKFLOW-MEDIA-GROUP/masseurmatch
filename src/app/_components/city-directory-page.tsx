@@ -127,7 +127,7 @@ export function CityDirectoryPage({
             </div>
           </Surface>
 
-          <div className="rounded-[32px] border border-[#eadfcd] bg-[linear-gradient(135deg,#f7f2e9_0%,#ffffff_100%)] p-6 shadow-[0_16px_36px_rgba(11,31,58,0.05)]">
+          <div className="rounded-[32px] border border-[#eadfcd] bg-[linear-gradient(135deg,#f7f2e9_0%,#ffffff_100%)] p-6 shadow-[0_16px_36px_rgba(26,26,26,0.05)]">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#a56b21]">
               Why this page feels safer
             </p>

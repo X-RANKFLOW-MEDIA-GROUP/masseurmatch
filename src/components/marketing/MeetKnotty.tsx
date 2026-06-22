@@ -203,12 +203,12 @@ export function MeetKnotty() {
               {/* Ambient glow */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute -inset-6 -z-10 rounded-[2.5rem] bg-[radial-gradient(circle_at_60%_0%,rgba(255,138,31,0.22),transparent_70%)] blur-2xl"
+                className="pointer-events-none absolute -inset-6 -z-10 rounded-[2.5rem] bg-[radial-gradient(circle_at_60%_0%,rgba(204,36,36,0.22),transparent_70%)] blur-2xl"
               />
 
-              <div className="overflow-hidden rounded-3xl bg-white shadow-[0_30px_80px_-20px_rgba(11,31,58,0.28)] ring-1 ring-slate-200">
+              <div className="overflow-hidden rounded-3xl bg-white shadow-[0_30px_80px_-20px_rgba(26,26,26,0.28)] ring-1 ring-slate-200">
                 {/* Chat header — vibrant gradient */}
-                <div className="flex items-center gap-3 bg-gradient-to-r from-primary via-orange-500 to-amber-500 px-5 py-4">
+                <div className="flex items-center gap-3 bg-gradient-to-r from-primary via-red-600 to-red-500 px-5 py-4">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white ring-1 ring-white/30 backdrop-blur">
                     <Sparkles className="h-5 w-5" />
                   </span>

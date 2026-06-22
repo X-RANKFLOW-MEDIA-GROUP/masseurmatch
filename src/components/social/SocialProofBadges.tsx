@@ -54,14 +54,14 @@ export function SocialProofBadges({
 
       {/* Rising Star Badge */}
       {isRising && (
-        <Card className="border-orange-200 bg-orange-50">
+        <Card className="border-red-200 bg-red-50">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="p-2 bg-orange-100 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-orange-600" />
+            <div className="p-2 bg-red-100 rounded-lg">
+              <TrendingUp className="h-5 w-5 text-red-600" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-orange-900 uppercase">Rising Star</p>
-              <p className="text-sm text-orange-800">{viewCount} views</p>
+              <p className="text-xs font-semibold text-red-900 uppercase">Rising Star</p>
+              <p className="text-sm text-red-800">{viewCount} views</p>
             </div>
           </CardContent>
         </Card>

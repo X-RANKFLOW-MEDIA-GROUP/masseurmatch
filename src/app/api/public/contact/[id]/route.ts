@@ -79,15 +79,7 @@ export async function GET(
     null;
 
   // Fire-and-forget; allSettled never rejects so no .catch() needed
-  void Promise.allSettled([
-    adminClient.rpc("increment_profile_contact_clicks", { p_profile_id: profile.id }),
-    adminClient.from("contact_events").insert({
-      profile_id: profile.id,
-      user_id: session?.userId ?? null,
-      method,
-      ip_hash: hashIp(ipRaw),
-    }),
-  ]);
+  void adminClient.rpc("increment_profile_contact_clicks", { p_profile_id: profile.id });
 
   return NextResponse.redirect(redirectUrl, { status: 302 });
 }

@@ -41,6 +41,10 @@ function getPhotoUrl(photo: PhotoRecord) {
 }
 
 function getUploadError(error: unknown) {
+  if (error instanceof TypeError) {
+    return "Network error — check your connection and try again. If the problem persists, the upload service may be temporarily unavailable.";
+  }
+
   if (error instanceof Error && error.message) {
     return error.message;
   }

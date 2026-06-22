@@ -88,8 +88,8 @@ export default function ModerationPolicyPage() {
 
       <main
         style={{
-          background: "#FCFBF8",
-          color: "#0B1F3A",
+          background: "#FFFFFF",
+          color: "#1A1A1A",
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
@@ -97,8 +97,8 @@ export default function ModerationPolicyPage() {
         {/* Header */}
         <section
           style={{
-            background: "#0B1F3A",
-            color: "#FCFBF8",
+            background: "#1A1A1A",
+            color: "#FFFFFF",
             padding: "clamp(56px, 8vw, 80px) 20px clamp(48px, 7vw, 72px)",
           }}
         >
@@ -108,7 +108,7 @@ export default function ModerationPolicyPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#FF8A1F",
+                color: "#CC2424",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -162,8 +162,8 @@ export default function ModerationPolicyPage() {
           <section style={{ marginBottom: 56 }}>
             <div
               style={{
-                background: "#0B1F3A",
-                color: "#FCFBF8",
+                background: "#1A1A1A",
+                color: "#FFFFFF",
                 borderRadius: 14,
                 padding: "22px 24px",
                 fontFamily: "system-ui, sans-serif",
@@ -171,7 +171,7 @@ export default function ModerationPolicyPage() {
                 lineHeight: 1.7,
               }}
             >
-              <strong style={{ color: "#FF8A1F" }}>Transparency principle:</strong>{" "}
+              <strong style={{ color: "#CC2424" }}>Transparency principle:</strong>{" "}
               Every moderation action we take — warning, removal, suspension, or ban — is logged
               with a written reason. Affected users receive that reason. We do not take silent
               action without documentation.
@@ -219,7 +219,7 @@ export default function ModerationPolicyPage() {
                     <a.icon style={{ width: 18, height: 18, color: a.color }} strokeWidth={2} />
                   </div>
                   <div>
-                    <p style={{ fontSize: 15, fontWeight: 700, color: "#0B1F3A", marginBottom: 4 }}>
+                    <p style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A", marginBottom: 4 }}>
                       {a.action}
                     </p>
                     <p style={{ fontSize: 13, lineHeight: 1.65, color: "#374151", marginBottom: 6 }}>
@@ -248,7 +248,7 @@ export default function ModerationPolicyPage() {
             </h2>
             <div
               style={{
-                border: "1px solid rgba(11,31,58,0.1)",
+                border: "1px solid rgba(26,26,26,0.1)",
                 borderRadius: 14,
                 overflow: "hidden",
                 fontFamily: "system-ui, sans-serif",
@@ -261,13 +261,13 @@ export default function ModerationPolicyPage() {
                     display: "flex",
                     justifyContent: "space-between",
                     padding: "13px 20px",
-                    background: i % 2 === 0 ? "#fff" : "rgba(11,31,58,0.02)",
-                    borderBottom: i < slaRows.length - 1 ? "1px solid rgba(11,31,58,0.06)" : "none",
+                    background: i % 2 === 0 ? "#fff" : "rgba(26,26,26,0.02)",
+                    borderBottom: i < slaRows.length - 1 ? "1px solid rgba(26,26,26,0.06)" : "none",
                     fontSize: 14,
                   }}
                 >
                   <span style={{ color: "#374151" }}>{row.action}</span>
-                  <span style={{ fontWeight: 600, color: "#0B1F3A" }}>{row.response}</span>
+                  <span style={{ fontWeight: 600, color: "#1A1A1A" }}>{row.response}</span>
                 </div>
               ))}
             </div>
@@ -328,7 +328,7 @@ export default function ModerationPolicyPage() {
                 Send appeals to{" "}
                 <a
                   href="mailto:appeals@masseurmatch.com"
-                  style={{ color: "#0B1F3A", fontWeight: 600 }}
+                  style={{ color: "#1A1A1A", fontWeight: 600 }}
                 >
                   appeals@masseurmatch.com
                 </a>
@@ -340,8 +340,8 @@ export default function ModerationPolicyPage() {
           {/* Report & contact */}
           <section
             style={{
-              background: "#0B1F3A",
-              color: "#FCFBF8",
+              background: "#1A1A1A",
+              color: "#FFFFFF",
               borderRadius: 16,
               padding: "28px 28px",
               fontFamily: "system-ui, sans-serif",
@@ -352,7 +352,7 @@ export default function ModerationPolicyPage() {
                 fontSize: 11,
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
-                color: "#FF8A1F",
+                color: "#CC2424",
                 marginBottom: 10,
               }}
             >
@@ -370,7 +370,7 @@ export default function ModerationPolicyPage() {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 6,
-                  background: "#FF8A1F",
+                  background: "#CC2424",
                   color: "#fff",
                   borderRadius: 99,
                   padding: "10px 20px",

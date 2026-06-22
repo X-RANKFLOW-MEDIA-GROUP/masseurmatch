@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { US_CITIES } from "@/data/cities";
 
@@ -67,13 +68,16 @@ function Row() {
 }
 
 export function CityMarquee() {
-  const reduced = useReducedMotion();
+  const prefersReduced = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const reduced = mounted && prefersReduced;
 
   return (
-    <div className="relative overflow-hidden border-y border-white/10 bg-[#091a31] py-6 lg:py-8">
+    <div className="relative overflow-hidden border-y border-white/10 bg-[#1A1A1A] py-6 lg:py-8">
       {/* Edge fades */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[#091a31] to-transparent lg:w-40" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[#091a31] to-transparent lg:w-40" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[#1A1A1A] to-transparent lg:w-40" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[#1A1A1A] to-transparent lg:w-40" />
 
       {reduced ? (
         <div className="flex">

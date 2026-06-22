@@ -13,7 +13,7 @@ function errResponse(err: unknown) {
 // GET /api/sms/profile?profile_id=xxx — get SMS profile config
 export async function GET(request: NextRequest) {
   try {
-    await requireAdminSession(request as unknown as Request)
+    await requireAdminSession(request)
   } catch (err) { return errResponse(err) }
 
   try {
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 // POST /api/sms/profile — upsert SMS profile config
 export async function POST(request: NextRequest) {
   try {
-    await requireAdminSession(request as unknown as Request)
+    await requireAdminSession(request)
   } catch (err) { return errResponse(err) }
 
   try {
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 // PATCH /api/sms/profile?id=xxx — toggle ready_to_reply or partial update
 export async function PATCH(request: NextRequest) {
   try {
-    await requireAdminSession(request as unknown as Request)
+    await requireAdminSession(request)
   } catch (err) { return errResponse(err) }
 
   try {

@@ -106,14 +106,21 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const authHeader = req.headers.get("Authorization")!;
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("No authorization header");
     const token = authHeader.replace("Bearer ", "");
     const { data } = await supabaseClient.auth.getUser(token);
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { email: user.email });
 
-    const { plan_key } = await req.json();
+    let body: { plan_key?: string };
+    try {
+      body = await req.json();
+    } catch {
+      throw new Error("Invalid request body - must be valid JSON");
+    }
+    const { plan_key } = body;
     if (!plan_key || !PLANS[plan_key]) {
       throw new Error(`Invalid plan: ${plan_key}. Valid plans: ${Object.keys(PLANS).join(", ")}`);
     }

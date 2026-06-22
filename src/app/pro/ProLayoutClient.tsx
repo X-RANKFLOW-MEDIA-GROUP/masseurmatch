@@ -52,6 +52,13 @@ export default function ProLayoutClient({
     }
   }, [loading, router, user]);
 
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
+
   if (!loading && !user) {
     return null;
   }
@@ -107,7 +114,7 @@ export default function ProLayoutClient({
   );
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
+    <div className="-mt-16 flex h-dvh overflow-hidden bg-slate-50">
       <aside className="z-20 hidden w-64 flex-col border-r border-slate-900 bg-slate-950 text-slate-300 shadow-2xl md:flex">
         {sidebarContent}
       </aside>

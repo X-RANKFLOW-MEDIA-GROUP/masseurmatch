@@ -40,6 +40,7 @@ export async function POST(request: Request) {
     });
 
     const supabase = createSupabaseAdminClient();
+    const expiresAt = new Date(Date.now() + CODE_TTL_MINUTES * 60 * 1000).toISOString();
 
     await supabase
       .from("profiles")

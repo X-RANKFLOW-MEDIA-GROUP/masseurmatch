@@ -138,16 +138,16 @@ export default function HowItWorksPage() {
 
       <main
         style={{
-          background: "#FCFBF8",
-          color: "#0B1F3A",
+          background: "#FFFFFF",
+          color: "#1A1A1A",
           fontFamily: "'Georgia', 'Times New Roman', serif",
         }}
       >
         {/* ── Hero ── */}
         <section
           style={{
-            background: "#0B1F3A",
-            color: "#FCFBF8",
+            background: "#1A1A1A",
+            color: "#FFFFFF",
             padding: "clamp(64px, 10vw, 100px) 20px clamp(56px, 8vw, 90px)",
             textAlign: "center",
           }}
@@ -157,7 +157,7 @@ export default function HowItWorksPage() {
               fontSize: 11,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "#FF8A1F",
+              color: "#CC2424",
               marginBottom: 20,
               fontFamily: "system-ui, sans-serif",
             }}
@@ -175,7 +175,7 @@ export default function HowItWorksPage() {
           >
             Finding your therapist
             <br />
-            <em style={{ color: "#FF8A1F", fontStyle: "italic" }}>
+            <em style={{ color: "#CC2424", fontStyle: "italic" }}>
               takes minutes.
             </em>
           </h1>
@@ -203,8 +203,8 @@ export default function HowItWorksPage() {
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
                 fontFamily: "system-ui, sans-serif",
-                background: "#FF8A1F",
-                color: "#0B1F3A",
+                background: "#CC2424",
+                color: "#1A1A1A",
                 textDecoration: "none",
                 fontWeight: 700,
               }}
@@ -221,7 +221,7 @@ export default function HowItWorksPage() {
                 textTransform: "uppercase",
                 fontFamily: "system-ui, sans-serif",
                 background: "transparent",
-                color: "#FCFBF8",
+                color: "#FFFFFF",
                 textDecoration: "none",
                 border: "1px solid rgba(252,251,248,0.2)",
               }}
@@ -234,7 +234,7 @@ export default function HowItWorksPage() {
         {/* ── Model Explainer ── */}
         <section
           style={{
-            background: "#FF8A1F",
+            background: "#CC2424",
             padding: "clamp(28px, 5vw, 40px) 20px",
             textAlign: "center",
           }}
@@ -243,7 +243,7 @@ export default function HowItWorksPage() {
             style={{
               fontSize: 15,
               fontFamily: "system-ui, sans-serif",
-              color: "#0B1F3A",
+              color: "#1A1A1A",
               fontWeight: 500,
               maxWidth: 680,
               margin: "0 auto",
@@ -264,7 +264,7 @@ export default function HowItWorksPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#FF8A1F",
+                color: "#CC2424",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -294,15 +294,15 @@ export default function HowItWorksPage() {
                     gap: 32,
                     alignItems: "start",
                     padding: "36px 0",
-                    borderBottom: "1px solid rgba(11,31,58,0.08)",
-                    borderTop: i === 0 ? "1px solid rgba(11,31,58,0.08)" : "none",
+                    borderBottom: "1px solid rgba(26,26,26,0.08)",
+                    borderTop: i === 0 ? "1px solid rgba(26,26,26,0.08)" : "none",
                   }}
                 >
                   <div
                     style={{
                       fontSize: 36,
                       fontWeight: 700,
-                      color: "rgba(255,138,31,0.2)",
+                      color: "rgba(204,36,36,0.2)",
                       fontFamily: "system-ui, sans-serif",
                       lineHeight: 1,
                       paddingTop: 4,
@@ -337,8 +337,8 @@ export default function HowItWorksPage() {
                       letterSpacing: "0.1em",
                       textTransform: "uppercase",
                       fontFamily: "system-ui, sans-serif",
-                      color: "#FF8A1F",
-                      background: "rgba(255,138,31,0.08)",
+                      color: "#CC2424",
+                      background: "rgba(204,36,36,0.08)",
                       padding: "6px 12px",
                       whiteSpace: "nowrap",
                       alignSelf: "center",
@@ -355,8 +355,8 @@ export default function HowItWorksPage() {
         {/* ── Comparison ── */}
         <section
           style={{
-            background: "#0B1F3A",
-            color: "#FCFBF8",
+            background: "#1A1A1A",
+            color: "#FFFFFF",
             padding: "100px 24px",
           }}
         >
@@ -366,7 +366,7 @@ export default function HowItWorksPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#FF8A1F",
+                color: "#CC2424",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
                 textAlign: "center",
@@ -392,14 +392,14 @@ export default function HowItWorksPage() {
               }}
             >
               {/* MasseurMatch column */}
-              <div style={{ background: "#1E4B8F", padding: "40px 36px" }}>
+              <div style={{ background: "#CC2424", padding: "40px 36px" }}>
                 <div
                   style={{
                     fontSize: 12,
                     letterSpacing: "0.14em",
                     textTransform: "uppercase",
                     fontFamily: "system-ui, sans-serif",
-                    color: "#FF8A1F",
+                    color: "#CC2424",
                     marginBottom: 24,
                     fontWeight: 700,
                   }}
@@ -427,7 +427,7 @@ export default function HowItWorksPage() {
                       fontSize: 14,
                     }}
                   >
-                    <Check className="inline h-4 w-4 shrink-0" style={{ color: "#FF8A1F" }} strokeWidth={2.5} />
+                    <Check className="inline h-4 w-4 shrink-0" style={{ color: "#CC2424" }} strokeWidth={2.5} />
                     {item}
                   </div>
                 ))}
@@ -499,7 +499,7 @@ export default function HowItWorksPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#FF8A1F",
+                color: "#CC2424",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -533,7 +533,7 @@ export default function HowItWorksPage() {
                     style={{
                       fontSize: 28,
                       fontWeight: 700,
-                      color: "rgba(255,138,31,0.2)",
+                      color: "rgba(204,36,36,0.2)",
                       fontFamily: "system-ui, sans-serif",
                       lineHeight: 1,
                       marginBottom: 16,
@@ -568,9 +568,9 @@ export default function HowItWorksPage() {
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
                   fontFamily: "system-ui, sans-serif",
-                  color: "#FF8A1F",
+                  color: "#CC2424",
                   textDecoration: "none",
-                  borderBottom: "1px solid #FF8A1F",
+                  borderBottom: "1px solid #CC2424",
                   paddingBottom: 2,
                 }}
               >
@@ -583,8 +583,8 @@ export default function HowItWorksPage() {
         {/* ── Quick FAQ ── */}
         <section
           style={{
-            background: "#FCFBF8",
-            borderTop: "1px solid rgba(11,31,58,0.08)",
+            background: "#FFFFFF",
+            borderTop: "1px solid rgba(26,26,26,0.08)",
             padding: "80px 24px",
           }}
         >
@@ -603,7 +603,7 @@ export default function HowItWorksPage() {
                 key={i}
                 style={{
                   padding: "24px 0",
-                  borderBottom: "1px solid rgba(11,31,58,0.08)",
+                  borderBottom: "1px solid rgba(26,26,26,0.08)",
                 }}
               >
                 <h3
@@ -636,7 +636,7 @@ export default function HowItWorksPage() {
               }}
             >
               More questions?{" "}
-              <Link href="/faq" style={{ color: "#1E4B8F" }}>
+              <Link href="/faq" style={{ color: "#CC2424" }}>
                 Full FAQ <ArrowRight className="inline h-3.5 w-3.5" strokeWidth={2.25} />
               </Link>
             </p>
@@ -646,8 +646,8 @@ export default function HowItWorksPage() {
         {/* ── CTA ── */}
         <section
           style={{
-            background: "#0B1F3A",
-            color: "#FCFBF8",
+            background: "#1A1A1A",
+            color: "#FFFFFF",
             padding: "80px 24px",
             textAlign: "center",
           }}
@@ -680,8 +680,8 @@ export default function HowItWorksPage() {
               letterSpacing: "0.14em",
               textTransform: "uppercase",
               fontFamily: "system-ui, sans-serif",
-              background: "#FF8A1F",
-              color: "#0B1F3A",
+              background: "#CC2424",
+              color: "#1A1A1A",
               textDecoration: "none",
               fontWeight: 700,
             }}

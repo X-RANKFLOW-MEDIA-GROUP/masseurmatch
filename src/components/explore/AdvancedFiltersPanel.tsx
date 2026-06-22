@@ -211,7 +211,7 @@ export function AdvancedFiltersPanel({
           <div className="flex w-full items-center justify-between">
             <SheetTitle>Advanced Filters</SheetTitle>
             {activeFilterCount > 0 ? (
-              <Button variant="ghost" size="sm" onClick={handleReset} className="text-orange-600 hover:text-orange-700">
+              <Button variant="ghost" size="sm" onClick={handleReset} className="text-red-600 hover:text-red-700">
                 Clear All
               </Button>
             ) : null}
@@ -312,7 +312,7 @@ export function AdvancedFiltersPanel({
                   variant={filters.rating === rating ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setFilters((prev) => ({ ...prev, rating }))}
-                  className={filters.rating === rating ? 'bg-orange-600' : ''}
+                  className={filters.rating === rating ? 'bg-red-600' : ''}
                 >
                   {rating === null ? (
                     'All'
@@ -342,10 +342,10 @@ export function AdvancedFiltersPanel({
           <Button variant="outline" onClick={onClose} className="flex-1">
             Cancel
           </Button>
-          <Button onClick={handleApply} className="flex-1 bg-orange-600 hover:bg-orange-700">
+          <Button onClick={handleApply} className="flex-1 bg-red-600 hover:bg-red-700">
             Apply Filters
             {activeFilterCount > 0 ? (
-              <span className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs font-bold text-orange-600">
+              <span className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs font-bold text-red-600">
                 {activeFilterCount}
               </span>
             ) : null}

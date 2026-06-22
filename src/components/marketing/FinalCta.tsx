@@ -15,7 +15,7 @@ export function FinalCta() {
           sizes="100vw"
           aria-hidden="true"
         />
-        <div className="absolute inset-0 bg-[#0B1F3A]/85" />
+        <div className="absolute inset-0 bg-[#1A1A1A]/85" />
       </div>
 
       {/* Orange glow */}
@@ -39,7 +39,7 @@ export function FinalCta() {
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/for-therapists"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-primary px-8 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 hover:shadow-[0_0_40px_rgba(255,138,31,0.35)]"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-primary px-8 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 hover:shadow-[0_0_40px_rgba(204,36,36,0.35)]"
             >
               List your practice
             </Link>

@@ -18,7 +18,7 @@ export function WhyUsSplit() {
 
           {/* Left — cinematic image with overlaid stat */}
           <FadeUp delay={0.05}>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-[#0a1628]">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-[#1A1A1A]">
               <Image
                 src="/marketing/hero/cover.jpg"
                 alt="Verified massage therapy session"

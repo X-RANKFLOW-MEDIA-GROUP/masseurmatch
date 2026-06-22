@@ -14,7 +14,7 @@ function errResponse(err: unknown) {
 // GET /api/sms/logs?profile_id=xxx&phone=xxx&limit=50
 export async function GET(request: NextRequest) {
   try {
-    await requireAdminSession(request as unknown as Request)
+    await requireAdminSession(request)
   } catch (err) { return errResponse(err) }
 
   try {

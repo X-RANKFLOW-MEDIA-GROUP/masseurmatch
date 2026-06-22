@@ -25,8 +25,8 @@ export function NewsletterSignup() {
   return (
     <section
       style={{
-        background: "#1E4B8F",
-        color: "#FCFBF8",
+        background: "#CC2424",
+        color: "#FFFFFF",
         padding: "80px 24px",
         textAlign: "center",
       }}
@@ -52,7 +52,7 @@ export function NewsletterSignup() {
       </p>
 
       {status === "success" ? (
-        <p style={{ fontSize: 15, color: "#FCFBF8", fontFamily: "system-ui, sans-serif" }}>
+        <p style={{ fontSize: 15, color: "#FFFFFF", fontFamily: "system-ui, sans-serif" }}>
           You&apos;re subscribed. Welcome aboard.
         </p>
       ) : (
@@ -73,8 +73,8 @@ export function NewsletterSignup() {
               fontSize: 14,
               fontFamily: "system-ui, sans-serif",
               border: "none",
-              background: "rgba(252,251,248,0.1)",
-              color: "#FCFBF8",
+              background: "rgba(255,255,255,0.1)",
+              color: "#FFFFFF",
               outline: "none",
             }}
           />
@@ -87,8 +87,8 @@ export function NewsletterSignup() {
               letterSpacing: "0.14em",
               textTransform: "uppercase",
               fontFamily: "system-ui, sans-serif",
-              background: "#FF8A1F",
-              color: "#0B1F3A",
+              background: "#CC2424",
+              color: "#1A1A1A",
               border: "none",
               cursor: status === "loading" ? "wait" : "pointer",
               fontWeight: 600,
@@ -105,7 +105,7 @@ export function NewsletterSignup() {
           style={{
             marginTop: 12,
             fontSize: 13,
-            color: "#FF8A1F",
+            color: "#CC2424",
             fontFamily: "system-ui, sans-serif",
           }}
         >
