@@ -10,6 +10,7 @@ import { TOUR_PAGE_TIERS } from "@/lib/pricing";
 
 type Params = { city: string; "therapist-slug": string };
 
+// Force Vercel cache invalidation
 function formatDateRange(start: string, end: string) {
   const opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
   const s = new Date(start);
