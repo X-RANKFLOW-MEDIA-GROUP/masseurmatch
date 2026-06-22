@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { z } from "zod";
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, recordAuditLog, requireAdminSession } from "@/app/api/_lib/supabase-server";
-import type { Json } from "@/integrations/supabase/types";
+import type { Json, TablesUpdate } from "@/integrations/supabase/types";
 
 const patchSchema = z.object({
   requireIdentityVerification: z.boolean().optional(),
@@ -46,7 +46,7 @@ export async function PATCH(request: Request) {
     const body = await parseJsonBody(request, patchSchema);
     const adminClient = createSupabaseAdminClient();
 
-    const updatePayload: Record<string, Json | undefined> = {
+    const updatePayload: TablesUpdate<"site_settings"> = {
       updated_by: admin.userId,
       updated_at: new Date().toISOString(),
     };

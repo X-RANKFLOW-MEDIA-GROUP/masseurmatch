@@ -1093,7 +1093,12 @@ export default function ExplorePageClient({
   useEffect(() => {
     const trimmed = deferredLocationInput.trim();
     if (!trimmed) {
-      if (filters.city !== EXPLORE_DEFAULT_CITY || filters.zip) {
+      // Only clear the city when the user explicitly emptied the input. When the
+      // location was auto-detected (geolocation), `locationInput` can momentarily
+      // be empty while the deferred value trails behind `setLocationInput`, and
+      // resetting here would fight the geoCity effect and cause an infinite
+      // update loop (React error #185).
+      if (!usingDetectedLocation && (filters.city !== EXPLORE_DEFAULT_CITY || filters.zip)) {
         applyFilters({ ...filters, city: EXPLORE_DEFAULT_CITY, zip: "" });
       }
       return;
@@ -1106,7 +1111,7 @@ export default function ExplorePageClient({
     }
 
     applyFilters({ ...filters, city: nextCity, zip: nextZip });
-  }, [applyFilters, deferredLocationInput, filters]);
+  }, [applyFilters, deferredLocationInput, filters, usingDetectedLocation]);
 
   useEffect(() => {
     if (hasExplicitLocation || typeof window === "undefined") {
@@ -1440,7 +1445,7 @@ export default function ExplorePageClient({
                     setLocationInput(event.target.value);
                   }}
                   list="explore-city-options"
-                  placeholder="Dallas or 75201"
+                  placeholder="City or ZIP code"
                   className="w-full bg-transparent text-sm font-medium text-text-primary outline-none placeholder:text-text-muted"
                 />
                 <button

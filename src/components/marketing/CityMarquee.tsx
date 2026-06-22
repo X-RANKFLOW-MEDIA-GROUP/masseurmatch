@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
+import { US_CITIES } from "@/data/cities";
 
 /**
  * Animated marquee of top MasseurMatch cities. Names scroll continuously to the
@@ -8,30 +9,38 @@ import { motion, useReducedMotion } from "framer-motion";
  * "city skyline" sense of depth. Sits on the dark first-fold band.
  */
 
-type City = { name: string; tier: 1 | 2 | 3 };
+type CityTier = 1 | 2 | 3;
+type City = { name: string; tier: CityTier };
 
-// tier 1 = hero markets (big & bright), 2 = mid, 3 = supporting (small & dim)
-const CITIES: City[] = [
-  { name: "New York", tier: 1 },
-  { name: "Philadelphia", tier: 3 },
-  { name: "Miami", tier: 1 },
-  { name: "Sarasota", tier: 3 },
-  { name: "Los Angeles", tier: 1 },
-  { name: "Orlando", tier: 2 },
-  { name: "Houston", tier: 1 },
-  { name: "Tampa", tier: 3 },
-  { name: "Atlanta", tier: 1 },
-  { name: "Las Vegas", tier: 2 },
-  { name: "Chicago", tier: 1 },
-  { name: "Boston", tier: 2 },
-  { name: "Dallas", tier: 1 },
-  { name: "Seattle", tier: 3 },
-  { name: "Washington DC", tier: 2 },
-  { name: "Denver", tier: 3 },
-  { name: "San Francisco", tier: 2 },
-  { name: "Austin", tier: 3 },
-  { name: "Phoenix", tier: 3 },
+// tier 1 = hero markets (big & bright), 2 = mid, 3 = supporting (small & dim).
+// Driven by slug so display names resolve from the canonical city dataset and
+// any city dropped from the directory automatically disappears from the marquee.
+const CITY_TIERS: { slug: string; tier: CityTier }[] = [
+  { slug: "new-york", tier: 1 },
+  { slug: "philadelphia", tier: 3 },
+  { slug: "miami", tier: 1 },
+  { slug: "sarasota", tier: 3 },
+  { slug: "los-angeles", tier: 1 },
+  { slug: "orlando", tier: 2 },
+  { slug: "houston", tier: 1 },
+  { slug: "tampa", tier: 3 },
+  { slug: "atlanta", tier: 1 },
+  { slug: "las-vegas", tier: 2 },
+  { slug: "chicago", tier: 1 },
+  { slug: "boston", tier: 2 },
+  { slug: "dallas", tier: 1 },
+  { slug: "seattle", tier: 3 },
+  { slug: "washington-dc", tier: 2 },
+  { slug: "denver", tier: 3 },
+  { slug: "san-francisco", tier: 2 },
+  { slug: "austin", tier: 3 },
+  { slug: "phoenix", tier: 3 },
 ];
+
+const CITIES: City[] = CITY_TIERS.flatMap(({ slug, tier }) => {
+  const city = US_CITIES.find((c) => c.slug === slug);
+  return city ? [{ name: city.name, tier }] : [];
+});
 
 const TIER_STYLES: Record<City["tier"], string> = {
   1: "text-[clamp(1.75rem,4vw,3.25rem)] text-white",

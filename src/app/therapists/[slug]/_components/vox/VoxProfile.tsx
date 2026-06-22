@@ -88,9 +88,9 @@ export function VoxProfile({
   ).filter(Boolean);
 
   const stats = [
-    { label: "Experience", value: profile.yearsExperience.replace(/\s*years?/i, "").trim() || "—", suffix: /year/i.test(profile.yearsExperience) ? "yrs" : "" },
+    { label: "Experience", value: profile.yearsExperience.replace(/\s*years?/i, "").trim() || "—", suffix: /year/i.test(profile.yearsExperience) ? "years" : "" },
     { label: "Response", value: profile.responseTime.length > 18 ? "Fast" : profile.responseTime, suffix: "" },
-    { label: "Languages", value: String(profile.languages.length), suffix: profile.languages.length === 1 ? "lang" : "langs" },
+    { label: "Languages", value: String(profile.languages.length), suffix: profile.languages.length === 1 ? "language" : "languages" },
   ];
 
   return (
@@ -264,7 +264,7 @@ export function VoxProfile({
               <DetailRow Icon={Languages} label="Languages" value={profile.languages.join(", ")} />
               <DetailRow Icon={Clock} label="Member since" value={profile.memberSince} />
               {profile.isVerified && (
-                <DetailRow Icon={ShieldCheck} label="Identity" value="Verified before going live" />
+                <DetailRow Icon={ShieldCheck} label="Identity" value="Profile reviewed" />
               )}
             </aside>
           </div>

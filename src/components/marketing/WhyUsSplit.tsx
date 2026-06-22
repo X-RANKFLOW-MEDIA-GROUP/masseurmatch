@@ -3,10 +3,10 @@ import { Check, ShieldCheck } from "lucide-react";
 import FadeUp from "@/components/motion/FadeUp";
 
 const TRUST_POINTS = [
-  "Multi-step identity & credential review",
+  "Multi-step identity & profile review",
   "Photo quality check before publishing",
   "No anonymous or unverified listings",
-  "Real client reviews, never incentivised",
+  "Client reviews from documented contacts",
 ];
 
 export function WhyUsSplit() {
@@ -80,8 +80,8 @@ export function WhyUsSplit() {
                   <ShieldCheck className="h-6 w-6" />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold text-foreground">Real reviews, never incentivised</p>
-                  <p className="text-xs text-muted-foreground">Posted only by people who booked</p>
+                  <p className="text-sm font-semibold text-foreground">Reviews from documented contacts</p>
+                  <p className="text-xs text-muted-foreground">Only clients with a verified contact event can review</p>
                 </div>
               </div>
             </div>

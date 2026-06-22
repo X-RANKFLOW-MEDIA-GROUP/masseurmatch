@@ -9,7 +9,7 @@ export interface TherapistProfile {
   id: string;
   name: string;
   image: string;
-  rating: number;
+  rating?: number;
   reviews: number;
   specialties: string[];
   priceRange: {
@@ -22,8 +22,8 @@ export interface TherapistProfile {
   };
   incall: boolean;
   outcall: boolean;
-  experience: number;
-  responseTime: string;
+  experience?: number;
+  responseTime?: string;
   features: Record<string, boolean>;
 }
 
@@ -118,7 +118,7 @@ export function TherapistComparison({
                   {profile.name}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Rating {profile.rating} ({profile.reviews})
+                  {profile.rating ? `Rating ${profile.rating} (${profile.reviews})` : "New listing"}
                 </div>
               </motion.button>
             );
@@ -152,7 +152,7 @@ export function TherapistComparison({
                         {profile.name}
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        Rating {profile.rating}
+                        {profile.rating ? `Rating ${profile.rating}` : "New listing"}
                       </div>
                     </motion.div>
                   </th>

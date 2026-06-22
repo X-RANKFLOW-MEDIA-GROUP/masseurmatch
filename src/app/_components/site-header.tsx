@@ -64,7 +64,7 @@ function ExploreDropdown({ isDarkHero = false }: { isDarkHero?: boolean }) {
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.15 }}
             role="menu"
-            className="absolute top-full left-0 mt-3 w-52 bg-white/95 backdrop-blur-xl border border-slate-200 rounded-xl p-1.5 shadow-xl"
+            className="absolute top-full left-0 mt-3 w-52 bg-white/95 backdrop-blur-xl border border-slate-200 rounded-xl p-1.5 shadow-xl z-[60]"
           >
             {exploreItems.map(({ href, label, icon: Icon }) => (
               <Link
@@ -85,7 +85,7 @@ function ExploreDropdown({ isDarkHero = false }: { isDarkHero?: boolean }) {
   );
 }
 
-function MobileNav({ dashboardPath, authenticated, onLogout }: { dashboardPath: string; authenticated: boolean; onLogout: () => void }) {
+function MobileNav({ dashboardPath, authenticated, onLogout }: { dashboardPath: string; authenticated: boolean | null; onLogout: () => void }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -158,29 +158,42 @@ function MobileNav({ dashboardPath, authenticated, onLogout }: { dashboardPath: 
         </nav>
 
         <div className="mt-auto px-5 pb-6 pt-4 border-t border-border space-y-2">
-          <Link
-            href={authenticated ? dashboardPath : "/login"}
-            onClick={() => setOpen(false)}
-            className="block w-full text-center rounded-lg border border-border py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
-          >
-            {authenticated ? "Dashboard" : "Log In"}
-          </Link>
-          {authenticated ? (
-            <button
-              type="button"
-              onClick={() => { setOpen(false); onLogout(); }}
-              className="block w-full text-center rounded-lg bg-[#FF8A1F] py-2.5 text-sm font-semibold text-[#0B1F3A] hover:bg-[#ff9d3f] transition-colors"
-            >
-              Log Out
-            </button>
+          {authenticated === null ? (
+            <div className="h-10 animate-pulse rounded-lg bg-muted" />
+          ) : authenticated ? (
+            <>
+              <Link
+                href={dashboardPath}
+                onClick={() => setOpen(false)}
+                className="block w-full text-center rounded-lg border border-border py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+              >
+                Dashboard
+              </Link>
+              <button
+                type="button"
+                onClick={() => { setOpen(false); onLogout(); }}
+                className="block w-full text-center rounded-lg bg-[#FF8A1F] py-2.5 text-sm font-semibold text-[#0B1F3A] hover:bg-[#ff9d3f] transition-colors"
+              >
+                Log Out
+              </button>
+            </>
           ) : (
-            <Link
-              href="/signup"
-              onClick={() => setOpen(false)}
-              className="block w-full text-center rounded-lg bg-[#FF8A1F] py-2.5 text-sm font-semibold text-[#0B1F3A] hover:bg-[#ff9d3f] transition-colors"
-            >
-              Get Started
-            </Link>
+            <>
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="block w-full text-center rounded-lg border border-border py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+              >
+                Log In
+              </Link>
+              <Link
+                href="/signup"
+                onClick={() => setOpen(false)}
+                className="block w-full text-center rounded-lg bg-[#FF8A1F] py-2.5 text-sm font-semibold text-[#0B1F3A] hover:bg-[#ff9d3f] transition-colors"
+              >
+                Get Started
+              </Link>
+            </>
           )}
         </div>
       </SheetContent>
@@ -190,11 +203,12 @@ function MobileNav({ dashboardPath, authenticated, onLogout }: { dashboardPath: 
 
 export default function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [dashboardPath, setDashboardPath] = useState("/login");
   const pathname = usePathname();
   const router = useRouter();
   const isHomepage = pathname === "/";
+  const isAppSection = pathname?.startsWith("/admin") || pathname?.startsWith("/pro");
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -237,6 +251,9 @@ export default function SiteHeader() {
     router.refresh();
   }
 
+  // Don't render public marketing header on admin/pro — they have their own layout shells
+  if (isAppSection) return null;
+
   const isDarkHero = isHomepage;
 
   return (
@@ -251,7 +268,7 @@ export default function SiteHeader() {
             : "bg-transparent"
           : isScrolled
           ? "bg-[#FCFBF8]/95 backdrop-blur-xl border-b border-[#E2E6F0] shadow-sm"
-          : "bg-[#FCFBF8]/90 backdrop-blur-sm"
+          : "bg-[#FCFBF8]/95 backdrop-blur-md border-b border-[#E2E6F0]/50"
       }`}
     >
       <div className="w-full max-w-[1400px] mx-auto flex items-center justify-between px-6 lg:px-10 py-4">
@@ -280,7 +297,12 @@ export default function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-3">
-          {authenticated ? (
+          {authenticated === null ? (
+            /* Auth state unknown — render neutral skeleton to prevent flicker */
+            <div className="hidden md:flex items-center gap-3">
+              <div className="h-5 w-20 animate-pulse rounded bg-slate-200/20" />
+            </div>
+          ) : authenticated ? (
             <>
               <Link
                 href={dashboardPath}

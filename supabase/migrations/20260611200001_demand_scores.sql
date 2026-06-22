@@ -14,8 +14,10 @@ CREATE TABLE IF NOT EXISTS demand_scores (
   week_start          date        NOT NULL,
   created_at          timestamptz DEFAULT now() NOT NULL,
 
-  UNIQUE (city, state, COALESCE(neighborhood, ''), week_start)
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS demand_scores_city_state_neighborhood_week_start_idx
+  ON demand_scores (city, state, COALESCE(neighborhood, ''), week_start);
 
 ALTER TABLE demand_scores ENABLE ROW LEVEL SECURITY;
 

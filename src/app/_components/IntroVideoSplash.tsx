@@ -1,22 +1,41 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { X, Volume2, VolumeX } from "lucide-react";
 import { BRAND_ASSETS } from "@/lib/brand";
 
 const SESSION_KEY = "mm_intro_seen";
+// If playback hasn't started by now the asset is stalling — bail so we never
+// trap the visitor behind a frozen overlay.
+const STALL_TIMEOUT_MS = 4000;
+// Absolute ceiling: the splash can never hold the page longer than this,
+// regardless of what the <video> element reports.
+const MAX_VISIBLE_MS = 12000;
 
-// Full-screen opening video shown once per browser session on first visit.
+// Full-screen opening video shown once per browser session on the homepage.
 // Muted autoplay (browser policy), with a Skip control and an optional unmute
-// toggle. Auto-dismisses when the video ends or fails, and is skipped entirely
-// for visitors who prefer reduced motion.
+// toggle. Auto-dismisses when the video ends, fails, stalls, or hits the hard
+// cap — and only mounts on "/", so it can never block /login, /signup, etc.
 export function IntroVideoSplash() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
   const [muted, setMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
+  const dismiss = useCallback(() => {
+    try {
+      window.localStorage.setItem(SESSION_KEY, "true");
+    } catch {
+      // Ignore storage failures (private mode, etc.) — worst case it replays.
+    }
+    setVisible(false);
+  }, []);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
+    // Homepage only — never overlay functional routes like /login or /signup.
+    if (pathname !== "/") return;
 
     const prefersReducedMotion = window.matchMedia?.(
       "(prefers-reduced-motion: reduce)",
@@ -24,7 +43,7 @@ export function IntroVideoSplash() {
 
     let alreadySeen = false;
     try {
-      alreadySeen = window.sessionStorage.getItem(SESSION_KEY) === "true";
+      alreadySeen = window.localStorage.getItem(SESSION_KEY) === "true";
     } catch {
       alreadySeen = false;
     }
@@ -32,26 +51,32 @@ export function IntroVideoSplash() {
     if (!alreadySeen && !prefersReducedMotion) {
       setVisible(true);
     }
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     if (!visible) return;
+
     // Lock background scroll while the splash is open.
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+
+    // Watchdog 1: if playback never starts (stalled/blocked download), bail.
+    const stallTimer = window.setTimeout(() => {
+      const video = videoRef.current;
+      if (!video || video.paused || video.readyState < 3 || video.currentTime === 0) {
+        dismiss();
+      }
+    }, STALL_TIMEOUT_MS);
+
+    // Watchdog 2: hard ceiling so the overlay can never trap the page.
+    const hardCapTimer = window.setTimeout(dismiss, MAX_VISIBLE_MS);
+
     return () => {
       document.body.style.overflow = previousOverflow;
+      window.clearTimeout(stallTimer);
+      window.clearTimeout(hardCapTimer);
     };
-  }, [visible]);
-
-  const dismiss = () => {
-    try {
-      window.sessionStorage.setItem(SESSION_KEY, "true");
-    } catch {
-      // Ignore storage failures (private mode, etc.) — worst case it replays.
-    }
-    setVisible(false);
-  };
+  }, [visible, dismiss]);
 
   const toggleMute = () => {
     const next = !muted;
@@ -80,6 +105,7 @@ export function IntroVideoSplash() {
         poster={BRAND_ASSETS.heroPoster}
         onEnded={dismiss}
         onError={dismiss}
+        onStalled={dismiss}
       >
         <source src={BRAND_ASSETS.introVideo} type="video/mp4" />
       </video>

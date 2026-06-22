@@ -199,7 +199,7 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Metad
         return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) >= 3 : false;
       })
       .map((city) => ({
-        url: toSitemapUrl(`/cities/${city.slug}`),
+        url: toSitemapUrl(`/${city.slug}`),
         lastModified: city.updated_at ? new Date(city.updated_at) : now,
         changeFrequency: "weekly" as const,
         priority: 0.7,
@@ -213,7 +213,7 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Metad
       const cityName = slug ? cityNameBySlug(slug) : null;
       return cityName ? (inventoryMap.get(cityName.toLowerCase()) ?? 0) >= 3 : false;
     })
-    .map((path) => buildSitemapEntry(`/cities${path}`, now, "weekly", 0.7));
+    .map((path) => buildSitemapEntry(path, now, "weekly", 0.7));
 }
 
 export async function buildServicesSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {

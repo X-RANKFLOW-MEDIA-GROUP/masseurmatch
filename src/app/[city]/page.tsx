@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     ? `${inventoryCount}+ Verified Male Massage Therapists in ${cityLabel}`
     : `Verified Male Massage Therapists in ${cityLabel} | MasseurMatch`;
 
-  const description = `Find trusted, verified male massage therapists in ${cityLabel}. LGBTQ+-friendly directory with identity-verified professionals, real reviews, and direct contact. Compare rates, specialties & availability.`;
+  const description = `Find trusted male massage therapists in ${cityLabel}. LGBTQ+-friendly directory with identity-verified professionals, client reviews, and direct contact. Compare rates, specialties & availability.`;
 
   return createPageMetadata({
     title,
@@ -130,7 +130,6 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
     id: item.id,
     name: item.display_name || item.full_name || `Therapist ${idx + 1}`,
     image: item.avatar_url || "",
-    rating: 4.8,
     reviews: item.review_count || 0,
     specialties: item.specialties || [],
     priceRange: {
@@ -138,13 +137,11 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
       max: item.outcall_price || item.incall_price || 140,
     },
     availability: {
-      available: true,
-      nextAvailable: "Today",
+      available: item.available_now === true,
     },
     incall: Boolean(item.incall_price),
     outcall: Boolean(item.outcall_price),
-    experience: 4 + idx,
-    responseTime: "Within 2 hours",
+    experience: item.years_experience ?? undefined,
     features: {
       incall: Boolean(item.incall_price),
       outcall: Boolean(item.outcall_price),

@@ -33,8 +33,8 @@ const PLANS: Record<string, { name: string; amount: number; features: string; is
   },
   elite: {
     name: "Elite",
-    amount: 9900,
-    features: "12 photos plus video, top search placement, Available Now for 4 hours, unlimited travel schedules, views and clicks analytics, homepage rotation, weekly specials, verified badge, 2 active ads across 2 cities",
+    amount: 14900,
+    features: "Everything in Pro, 3 active cities, Knotty AI answering on your profile 24/7, Demand Radar, auto tour pages for travel schedules, priority support",
   },
 };
 

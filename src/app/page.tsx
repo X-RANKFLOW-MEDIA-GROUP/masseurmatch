@@ -11,6 +11,7 @@ import { PricingToggle } from "@/components/marketing/PricingToggle";
 import { HomeSeoLanding } from "@/app/_components/home-seo-landing";
 import { FaqAccordion } from "@/components/marketing/FaqAccordion";
 import { CityCoverageSection } from "@/components/marketing/CityCoverageSection";
+import { USStateMapGrid } from "@/components/marketing/USStateMapGrid";
 import { FinalCta } from "@/components/marketing/FinalCta";
 import {
   createPageMetadata,
@@ -41,7 +42,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = createPageMetadata({
   title: "Find Verified Male Massage Therapists Near You | MasseurMatch",
   description:
-    "MasseurMatch is the premium US directory for verified LGBTQ+-affirming male massage therapists. Search Dallas, Miami, NYC, LA, Chicago & 80+ cities across 278 city pages. Compare deep tissue, Swedish, outcall & incall options. A modern alternative to MasseurFinder and RentMasseur.",
+    "MasseurMatch is the premium US directory for verified LGBTQ+-affirming male massage therapists. Search Dallas, Miami, NYC, LA, Chicago & cities across the US. Compare deep tissue, Swedish, outcall & incall options. A modern alternative to MasseurFinder and RentMasseur.",
   path: "/",
   keywords: [
     // Brand
@@ -324,7 +325,10 @@ export default async function HomePage() {
         {/* 9. FAQ accordion */}
         <FaqAccordion items={LANDING_FAQ} />
 
-        {/* 10. City coverage grid */}
+        {/* 10. Interactive US state map */}
+        <USStateMapGrid />
+
+        {/* Full city alphabetical list (SEO) */}
         <CityCoverageSection />
 
         {/* Final CTA */}

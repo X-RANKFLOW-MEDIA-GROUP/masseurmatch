@@ -111,7 +111,9 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const response = NextResponse.redirect(new URL(next, origin));
+  // New profiles should complete onboarding; existing users go where they requested.
+  const destination = profileCreated ? "/pro/onboard" : next;
+  const response = NextResponse.redirect(new URL(destination, origin));
   response.headers.append(
     "Set-Cookie",
     setSessionCookie({

@@ -40,7 +40,11 @@ export function getCanonicalCitySlug(citySlug: string): string {
     return citySlug;
   }
 
-  return `${city.slug}-${city.stateCode.toLowerCase()}`;
+  const suffix = `-${city.stateCode.toLowerCase()}`;
+  if (city.slug.endsWith(suffix)) {
+    return city.slug;
+  }
+  return `${city.slug}${suffix}`;
 }
 
 export function resolveCitySlug(value: string): string | null {

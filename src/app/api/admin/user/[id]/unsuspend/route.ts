@@ -20,6 +20,8 @@ export async function POST(
     if (error) throw new RouteError(500, error.message);
 
     await adminClient.from("admin_actions").insert({
+      action: "unsuspend_user",
+      target_table: "profiles",
       admin_id: admin.userId,
       action_type: "unsuspend_user",
       target_user_id: userId,

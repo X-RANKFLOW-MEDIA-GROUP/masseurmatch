@@ -110,6 +110,17 @@ function checkForbiddenPhrases() {
   }
 }
 
+function checkStripePriceIds() {
+  // If Stripe is configured, all price IDs must be present.
+  const stripeKey = process.env.STRIPE_SECRET_KEY;
+  if (!stripeKey) return; // Stripe not configured — skip (non-production environment).
+  const required = ["STRIPE_PRICE_STANDARD", "STRIPE_PRICE_PRO", "STRIPE_PRICE_ELITE"];
+  for (const key of required) {
+    const value = process.env[key];
+    assert(value && value.startsWith("price_"), `${key} must be set to a valid Stripe price ID (price_...) when STRIPE_SECRET_KEY is configured`);
+  }
+}
+
 function checkCriticalTodoFixme() {
   const criticalDirs = ["src/app", "src/app/api"];
   for (const relDir of criticalDirs) {
@@ -144,6 +155,7 @@ function run() {
   checkSitemapPrivacyRules();
   checkBuildScripts();
   checkForbiddenPhrases();
+  checkStripePriceIds();
   checkCriticalTodoFixme();
   console.log("[release-audit] OK");
 }

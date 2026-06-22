@@ -5,86 +5,26 @@ import { Check, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
+import { PLANS } from "@/lib/pricing";
 
-const SUBSCRIPTION_TIERS = [
-  {
-    id: "free",
-    name: "Free",
-    price: "$0",
-    period: "Forever",
-    description: "Get started with basic visibility",
-    features: [
-      "1 photo",
-      "Bottom search placement",
-      "No 'Available Now' status",
-      "1 travel schedule per month",
-      "No analytics",
-      "Basic listing watermark",
-    ],
-    cta: "Current Plan",
-    highlighted: false,
-    isFree: true,
-  },
-  {
-    id: "standard",
-    name: "Standard",
-    price: "$39",
-    period: "per month",
-    description: "Popular for growing therapists",
-    features: [
-      "6 photos",
-      "Middle search placement",
-      "'Available Now' for 2 hours",
-      "3 travel schedules per month",
-      "Views analytics",
-      "Newsletter promotion chance",
-    ],
-    cta: "Upgrade to Standard",
-    highlighted: false,
-    isFree: false,
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    price: "$79",
-    period: "per month",
-    description: "Maximum visibility and features",
-    features: [
-      "12 photos + video",
-      "Top search placement",
-      "'Available Now' for 3 hours",
-      "Unlimited travel schedules",
-      "Views & clicks analytics",
-      "Homepage rotation",
-      "Weekly specials",
-      "Verified badge",
-    ],
-    cta: "Upgrade to Pro",
-    highlighted: true,
-    isFree: false,
-  },
-  {
-    id: "elite",
-    name: "Elite",
-    price: "$99",
-    period: "per month",
-    description: "Premium placement across cities",
-    features: [
-      "12 photos + video",
-      "Top search placement",
-      "'Available Now' for 4 hours",
-      "Unlimited travel schedules",
-      "Full analytics suite",
-      "Homepage rotation",
-      "Weekly specials",
-      "Verified badge",
-      "2 active ads across 2 cities",
-    ],
-    cta: "Upgrade to Elite",
-    highlighted: false,
-    isFree: false,
-  },
-];
+const SUBSCRIPTION_TIERS = PLANS.map((plan) => ({
+  id: plan.id,
+  name: plan.name,
+  price: plan.price === 0 ? "$0" : `$${plan.price}`,
+  period: plan.price === 0 ? "Forever" : "per month",
+  description:
+    plan.id === "free"
+      ? "Get started with basic visibility"
+      : plan.id === "standard"
+        ? "A stronger everyday plan with better placement"
+        : plan.id === "pro"
+          ? "Maximum visibility and features"
+          : "Premium placement across cities",
+  features: [...plan.features],
+  cta: plan.price === 0 ? "Current Plan" : `Upgrade to ${plan.name}`,
+  highlighted: plan.mostPopular ?? false,
+  isFree: plan.price === 0,
+}));
 
 export default function SubscriptionPage() {
   const { subscription } = useAuth();

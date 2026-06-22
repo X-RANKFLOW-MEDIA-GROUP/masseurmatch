@@ -81,7 +81,7 @@ const FALLBACK_SHOWCASE_CARDS: ShowcaseCard[] = [
     showcaseKey: "fallback-nyc-standard",
     name: "Uptown Flow",
     cityLabel: "New York, NY",
-    tierLabel: "Verified",
+    tierLabel: "Listed",
     detailLabel: "Swedish, mobility, recharge",
     profilePath: "/therapists",
     avatarUrl: null,
@@ -121,7 +121,7 @@ function getTierLabel(tier: PublicTherapist["_tier"]) {
   }
 
   if (tier === "standard") {
-    return "Verified";
+    return "Listed";
   }
 
   return "Directory";
