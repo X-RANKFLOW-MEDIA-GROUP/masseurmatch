@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShieldCheck, ArrowUpRight } from "lucide-react";
+import { ShieldCheck, ArrowUpRight, Phone, Mail } from "lucide-react";
 import { SiteFooterTalk } from "@/components/marketing/SiteFooterTalk";
 
 export function SiteFooter() {
@@ -27,6 +27,16 @@ export function SiteFooter() {
             <p className="font-sans text-sm leading-relaxed max-w-sm text-slate-400">
               A privacy-first directory connecting clients with independent LGBTQ+-affirming massage therapists across the United States.
             </p>
+            <div className="space-y-2">
+              <a href="tel:+19786277387" className="flex items-center gap-2 font-sans text-sm text-slate-400 hover:text-white transition-colors">
+                <Phone className="w-[0.9rem] h-[0.9rem] shrink-0" strokeWidth={2.25} />
+                978-MASSEUR (627-7387)
+              </a>
+              <a href="mailto:support@masseurmatch.com" className="flex items-center gap-2 font-sans text-sm text-slate-400 hover:text-white transition-colors">
+                <Mail className="w-[0.9rem] h-[0.9rem] shrink-0" strokeWidth={2.25} />
+                support@masseurmatch.com
+              </a>
+            </div>
             <div className="flex items-center gap-2 mt-4">
               <ShieldCheck className="w-5 h-5 text-emerald-400" />
               <span className="font-mono text-[10px] uppercase tracking-widest text-slate-400">Verified Secure Network</span>
