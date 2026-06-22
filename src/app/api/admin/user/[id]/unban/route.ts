@@ -25,7 +25,9 @@ export async function POST(
       action: "unban_user",
       target_table: "profiles",
       admin_id: admin.userId,
+      action: "unban_user",
       action_type: "unban_user",
+      target_table: "users",
       target_user_id: userId,
     });
 

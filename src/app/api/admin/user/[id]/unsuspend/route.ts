@@ -23,7 +23,9 @@ export async function POST(
       action: "unsuspend_user",
       target_table: "profiles",
       admin_id: admin.userId,
+      action: "unsuspend_user",
       action_type: "unsuspend_user",
+      target_table: "users",
       target_user_id: userId,
     });
 

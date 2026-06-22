@@ -27,12 +27,12 @@ export async function GET(request: NextRequest) {
       .from('appointments')
       .select('id, starts_at, therapist_id')
       .in('id', appointmentIds)
-    appts?.forEach(a => { appointmentsById[a.id as string] = a as typeof appointmentsById[string] })
+    appts?.forEach(a => { appointmentsById[a.id] = a })
   }
 
   // Collect therapist IDs from appointments and fetch profiles separately
   const therapistIds = [...new Set(
-    Object.values(appointmentsById).map(a => a.therapist_id).filter((id): id is string => id !== null)
+    Object.values(appointmentsById).map(a => a.therapist_id).filter((id): id is string => Boolean(id))
   )]
 
   const profilesById: Record<string, { id: string; full_name: string | null; avatar_url: string | null }> = {}

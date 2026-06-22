@@ -30,7 +30,9 @@ export async function POST(
       action: "ban_user",
       target_table: "profiles",
       admin_id: admin.userId,
+      action: "ban_user",
       action_type: "ban_user",
+      target_table: "users",
       target_user_id: userId,
       reason: body.reason,
     });

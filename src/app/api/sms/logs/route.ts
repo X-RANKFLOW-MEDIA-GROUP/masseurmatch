@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
           our_phone: ourPhone ?? "",
           profile_id: log.profile_id,
           messages: [],
-          last_message_at: log.created_at ?? "",
+          last_message_at: log.created_at ?? new Date().toISOString(),
           unresolved_alert: false,
           minutes_since_reply: null,
         })

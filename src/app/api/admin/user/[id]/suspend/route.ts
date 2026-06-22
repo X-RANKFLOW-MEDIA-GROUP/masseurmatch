@@ -27,7 +27,9 @@ export async function POST(
       action: "suspend_user",
       target_table: "profiles",
       admin_id: admin.userId,
+      action: "suspend_user",
       action_type: "suspend_user",
+      target_table: "users",
       target_user_id: userId,
       reason: body.reason || null,
     });

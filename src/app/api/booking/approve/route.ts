@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
           therapist_id: typed.therapist_id,
           starts_at: startTime.toISOString(),
           ends_at: endTime.toISOString(),
-          notes: `Hotel: ${typed.client_hotel ?? 'N/A'} | Inquiry: ${typed.id}`,
+          notes: `Service: ${typed.service_type ?? 'massage'} | Location: ${typed.client_hotel ? 'client_location' : 'therapist_location'} | Hotel: ${typed.client_hotel ?? 'N/A'} | Inquiry: ${typed.id}`,
           status: 'confirmed',
         })
         .select('id')

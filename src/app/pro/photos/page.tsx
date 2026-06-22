@@ -282,7 +282,7 @@ export default function PhotoManagerPage() {
           source: "pro_photos",
           field_name: null,
           status: "pending",
-          priority: 1,
+          priority: 0,
           moderation_provider: "sightengine",
           moderation_reason: "queued_for_ai_review",
           snapshot: {
