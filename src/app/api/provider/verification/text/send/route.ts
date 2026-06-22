@@ -54,7 +54,6 @@ export async function POST(request: Request) {
         code,
         status: "pending",
         submitted_text: phone,
-        expires_at: expiresAt,
       });
 
     if (verificationError) {
