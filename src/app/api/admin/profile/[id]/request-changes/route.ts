@@ -49,11 +49,9 @@ export async function POST(
 
     await adminClient.from("admin_actions").insert({
       action: "request_profile_changes",
-      target_table: "profiles",
-      admin_id: admin.userId,
-      action: "request_profile_changes",
       action_type: "request_profile_changes",
       target_table: "profiles",
+      admin_id: admin.userId,
       target_user_id: profile.user_id,
       target_profile_id: profileId,
       reason: body.reason,

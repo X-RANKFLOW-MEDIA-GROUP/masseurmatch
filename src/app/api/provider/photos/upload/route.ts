@@ -66,7 +66,6 @@ export async function POST(request: Request) {
         therapist_profile_id: profile.id,
         user_id: session.userId,
         profile_id: profile.id,
-        therapist_profile_id: profile.id,
         storage_path: fileName,
         public_url: publicUrl,
         photo_type: photoType,
