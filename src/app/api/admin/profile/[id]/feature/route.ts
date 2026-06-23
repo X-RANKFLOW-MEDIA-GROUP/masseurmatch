@@ -34,7 +34,7 @@ export async function POST(
       ? {
           is_featured: true,
           featured_until: new Date(now.getTime() + (body.days ?? 30) * 24 * 60 * 60 * 1000).toISOString(),
-          visibility_status: "featured",
+          visibility_status: "public",
           updated_at: now.toISOString(),
         }
       : {
