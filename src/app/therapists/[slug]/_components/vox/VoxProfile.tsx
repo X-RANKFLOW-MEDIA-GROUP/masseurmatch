@@ -97,13 +97,13 @@ export function VoxProfile({
   ];
 
   return (
-    <main className="min-h-screen bg-white text-[#1a1a1a]">
+    <div className="min-h-screen bg-white text-[#1a1a1a]">
 
       {/* ── Dark navy hero ─────────────────────────────────────────────────── */}
       <section className="relative bg-[#060E1A] px-4 pb-14 pt-8 sm:px-6 lg:pb-16 lg:pt-10">
         {/* Subtle radial glow */}
         <div
-          aria-hidden
+          aria-hidden="true"
           className="pointer-events-none absolute inset-0 overflow-hidden"
         >
           <div className="absolute -left-40 -top-20 h-96 w-96 rounded-full bg-[#FF8A1F]/[0.06] blur-3xl" />
@@ -564,7 +564,7 @@ export function VoxProfile({
         phoneHref={phoneHref}
         whatsappHref={whatsappHref}
       />
-    </main>
+    </div>
   );
 }
 
