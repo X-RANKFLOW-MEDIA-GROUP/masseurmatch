@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { CityGlobe } from "@/components/marketing/CityGlobe";
 import { Cta3DButton } from "@/components/marketing/Cta3DButton";
 import { HeroMediaBanner } from "@/components/marketing/HeroMediaBanner";
+import type { PublicTherapist } from "@/app/_lib/directory";
 
 const avatarStack = [
   { id: 1, src: "/marketing/hero/avatar-1.jpg", alt: "Verified therapist", initials: "JM", color: "from-orange-500 to-amber-600" },
@@ -28,7 +29,7 @@ for (const line of headlineLines) {
 }
 const TYPING_END = TYPE_START + _charCount * CHAR_STAGGER;
 
-export default function HeroClient() {
+export default function HeroClient({ therapists = [] }: { therapists?: PublicTherapist[] }) {
   const reducedMotion = useReducedMotion();
 
   return (
@@ -227,7 +228,7 @@ export default function HeroClient() {
         transition={{ duration: reducedMotion ? 0 : 1.0, ease: customEase }}
         className="relative z-10 w-full overflow-hidden"
       >
-        <HeroMediaBanner reducedMotion={!!reducedMotion} />
+        <HeroMediaBanner reducedMotion={!!reducedMotion} therapists={therapists} />
       </motion.div>
     </section>
   );

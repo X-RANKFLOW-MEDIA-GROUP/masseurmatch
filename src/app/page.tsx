@@ -293,7 +293,7 @@ export default async function HomePage() {
         {/* ── FIRST FOLD — dark navy ─────────────────────────────────── */}
         <div className="home-dark relative">
           {/* 1. Editorial hero */}
-          <Hero />
+          <Hero therapists={featuredTherapists} />
 
           {/* 2. Animated top-cities marquee */}
           <CityMarquee />
