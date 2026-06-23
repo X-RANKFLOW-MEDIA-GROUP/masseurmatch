@@ -87,7 +87,8 @@ async function readSessionCookie(request: NextRequest): Promise<MiddlewareSessio
   try {
     const parsed = JSON.parse(decoder.decode(fromBase64Url(payload))) as MiddlewareSession;
     if (!parsed.userId || !parsed.email || !parsed.expiresAt) return null;
-    if (new Date(parsed.expiresAt).getTime() <= Date.now()) return null;
+    const expiryMs = new Date(parsed.expiresAt).getTime();
+    if (Number.isNaN(expiryMs) || expiryMs <= Date.now()) return null;
     return parsed;
   } catch {
     return null;

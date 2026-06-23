@@ -101,7 +101,8 @@ function parseSessionValue(value: string): RequestSession | null {
       return null;
     }
 
-    if (new Date(parsed.expiresAt).getTime() <= Date.now()) {
+    const expiryMs = new Date(parsed.expiresAt).getTime();
+    if (Number.isNaN(expiryMs) || expiryMs <= Date.now()) {
       return null;
     }
 
