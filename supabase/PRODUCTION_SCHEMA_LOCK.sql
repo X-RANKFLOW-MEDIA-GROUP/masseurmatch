@@ -879,3 +879,80 @@ create table if not exists public.waitlist_signups (
   metadata         jsonb default '{}'::jsonb,
   created_at       timestamptz not null default now()
 );
+
+create table if not exists public.booking_inquiries (
+  id                   uuid primary key default gen_random_uuid(),
+  client_name          text,
+  client_phone         text,
+  client_email         text,
+  client_hotel         text,
+  service_type         text default 'massage',
+  preferred_date       date,
+  preferred_time       text,
+  duration_minutes     integer default 60,
+  message              text,
+  source               text default 'website' check (source in ('website','sms','whatsapp','direct')),
+  therapist_id         uuid references public.profiles(id) on delete set null,
+  status               text not null default 'new' check (status in ('new','checking','pending_approval','approved','denied','completed','cancelled')),
+  intelligence_status  text not null default 'pending' check (intelligence_status in ('pending','running','clean','flagged','inconclusive')),
+  intelligence_report  jsonb default '{}',
+  ai_conversation      jsonb default '[]',
+  confirmed_date       date,
+  confirmed_time       text,
+  appointment_id       uuid references public.appointments(id) on delete set null,
+  sheets_row_id        text,
+  admin_notes          text,
+  reviewed_by          uuid references auth.users(id) on delete set null,
+  reviewed_at          timestamptz,
+  created_at           timestamptz default now(),
+  updated_at           timestamptz default now()
+);
+
+create table if not exists public.sms_profiles (
+  id                   uuid primary key default gen_random_uuid(),
+  profile_id           uuid not null references public.profiles(id) on delete cascade,
+  ready_to_reply       boolean not null default false,
+  availability_mode    text not null default 'in_city' check (availability_mode in ('in_city','traveling','arrival_window','unavailable')),
+  arrival_date         date,
+  departure_date       date,
+  pricing_60           text,
+  pricing_90           text,
+  pricing_couples      text,
+  outcall_available    boolean not null default false,
+  couples_available    boolean not null default false,
+  outcall_area         text,
+  alert_phone          text,
+  custom_instructions  text,
+  twilio_number        text,
+  created_at           timestamptz default now(),
+  updated_at           timestamptz default now(),
+  unique(profile_id)
+);
+
+create table if not exists public.sms_logs (
+  id                  uuid primary key default gen_random_uuid(),
+  profile_id          uuid references public.sms_profiles(id) on delete set null,
+  from_number         text not null,
+  to_number           text not null,
+  direction           text not null check (direction in ('inbound','outbound')),
+  body                text not null,
+  twilio_sid          text,
+  intent              text,
+  status              text default 'received' check (status in ('received','queued','sent','delivered','failed','undelivered')),
+  is_manual           boolean not null default false,
+  booking_inquiry_id  uuid references public.booking_inquiries(id) on delete set null,
+  created_at          timestamptz default now()
+);
+
+create table if not exists public.sms_follow_up_alerts (
+  id               uuid primary key default gen_random_uuid(),
+  profile_id       uuid references public.sms_profiles(id) on delete cascade,
+  client_phone     text not null,
+  our_phone        text not null,
+  last_outbound_at timestamptz not null,
+  last_inbound_at  timestamptz,
+  resolved_at      timestamptz,
+  resolved_by      uuid references auth.users(id) on delete set null,
+  created_at       timestamptz default now(),
+  unique(profile_id, client_phone, our_phone)
+);
