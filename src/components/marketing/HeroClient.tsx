@@ -296,6 +296,62 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             <ArrowRight size={18} strokeWidth={2.5} />
           </motion.button>
         </div>
+                >
+                  VIEW PROFILE
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Navigation */}
+          <div className="mt-4 flex items-center justify-between">
+            {/* Dots */}
+            <div className="flex gap-1.5">
+              {spotlights.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setActiveSpotlight(idx)}
+                  aria-label={`Go to spotlight ${idx + 1}`}
+                  className={`h-2 w-2 rounded-full transition-colors ${
+                    idx === activeSpotlight
+                      ? "bg-[#CC2424]"
+                      : "bg-[#CC2424]/25"
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* Arrows */}
+            <div className="flex gap-1">
+              <button
+                type="button"
+                onClick={() =>
+                  setActiveSpotlight((prev) =>
+                    prev === 0 ? spotlights.length - 1 : prev - 1
+                  )
+                }
+                className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-[#666666] transition-colors hover:border-[#CC2424] hover:text-[#CC2424]"
+                aria-label="Previous spotlight"
+              >
+                <ChevronLeft size={14} strokeWidth={2.5} />
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setActiveSpotlight((prev) =>
+                    prev === spotlights.length - 1 ? 0 : prev + 1
+                  )
+                }
+                className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-[#666666] transition-colors hover:border-[#CC2424] hover:text-[#CC2424]"
+                aria-label="Next spotlight"
+              >
+                <ChevronRight size={14} strokeWidth={2.5} />
+              </button>
+            </div>
+          </div>
+        </motion.div>
+>>>>>>> 63b0014 (Fix: Add onClick handlers to hero buttons and popular searches)
       </div>
 
       {/* ── Cinematic cover band (video on desktop, still on mobile) ──── */}
