@@ -73,14 +73,14 @@ const HOME_FAQ = [
       "MasseurMatch covers 250+ US cities including Dallas, Miami, New York, Los Angeles, Chicago, Houston, Atlanta, Washington DC, San Francisco, Seattle, Denver, Boston, Phoenix, Las Vegas, New Orleans, and many more.",
   },
   {
-    question: "Is MasseurMatch a good alternative to MasseurFinder?",
+    question: "What makes MasseurMatch different?",
     answer:
-      "Yes. MasseurMatch is a modern alternative to MasseurFinder, built around city-first local SEO, cleaner premium profiles, stronger trust signals, and a professional wellness-forward brand — without the legacy directory feel.",
+      "MasseurMatch is built for serious wellness seekers. Premium verified profiles, identity checks, transparent pricing, LGBTQ+-affirming therapists, and a professional brand that respects both clients and providers. No booking middleman — just direct contact, clear terms, and trust signals.",
   },
   {
-    question: "How does MasseurMatch compare to RentMasseur?",
+    question: "How do I know if a therapist is verified on MasseurMatch?",
     answer:
-      "MasseurMatch offers a cleaner professional experience than RentMasseur. The focus is on wellness-forward discovery: verified profiles, transparent pricing, and direct contact without the mixed-intent marketplace environment.",
+      "Verified therapists display trust signals on their profiles: identity verification badges, review counts, availability status, years of experience, and professional credentials. Elite tier therapists have enhanced verification and premium features.",
   },
   {
     question: "Can I find outcall and incall massage options on MasseurMatch?",
