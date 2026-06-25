@@ -63,7 +63,7 @@ const clientSteps = [
     n: "01",
     title: "Search your city",
     body: "Enter your city or ZIP. Filter by modality — Swedish, deep tissue, sports, and more. Set your price range.",
-    detail: "104 cities covered across the US",
+    detail: "250+ cities covered across the US",
   },
   {
     n: "02",

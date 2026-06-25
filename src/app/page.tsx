@@ -70,7 +70,7 @@ const HOME_FAQ = [
   {
     question: "Which cities does MasseurMatch cover?",
     answer:
-      "MasseurMatch covers 80+ US cities including Dallas, Miami, New York, Los Angeles, Chicago, Houston, Atlanta, Washington DC, San Francisco, Seattle, Denver, Boston, Phoenix, Las Vegas, New Orleans, and many more.",
+      "MasseurMatch covers 250+ US cities including Dallas, Miami, New York, Los Angeles, Chicago, Houston, Atlanta, Washington DC, San Francisco, Seattle, Denver, Boston, Phoenix, Las Vegas, New Orleans, and many more.",
   },
   {
     question: "Is MasseurMatch a good alternative to MasseurFinder?",
