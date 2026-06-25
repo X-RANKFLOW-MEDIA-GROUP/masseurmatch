@@ -199,7 +199,7 @@ export default function DashboardHome() {
         </div>
       </header>
 
-      <ProfileStatusBanner status={profileStatus} />
+      {!profileLoading && <ProfileStatusBanner status={profileStatus} />}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
