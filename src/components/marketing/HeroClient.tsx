@@ -3,25 +3,73 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { CityGlobe } from "@/components/marketing/CityGlobe";
-import { Cta3DButton } from "@/components/marketing/Cta3DButton";
+import {
+  Heart,
+  MapPin,
+  Star,
+  Clock,
+  BadgeCheck,
+  Sparkles,
+  MessageCircle,
+  Send,
+  ArrowRight,
+} from "lucide-react";
 import { HeroMediaBanner } from "@/components/marketing/HeroMediaBanner";
 import type { PublicTherapist } from "@/app/_lib/directory";
 
-const avatarStack = [
-  { id: 1, src: "/marketing/hero/avatar-1.jpg", alt: "Verified therapist", initials: "JM", color: "from-orange-500 to-amber-600" },
-  { id: 2, src: "/marketing/hero/avatar-2.jpg", alt: "Verified therapist", initials: "RK", color: "from-blue-600 to-indigo-700" },
-  { id: 3, src: "/marketing/hero/avatar-3.jpg", alt: "Verified therapist", initials: "AL", color: "from-teal-500 to-cyan-600" },
-  { id: 4, src: "/marketing/hero/avatar-4.jpg", alt: "Verified therapist", initials: "DV", color: "from-violet-600 to-purple-700" },
-];
+interface HeroClientProps {
+  featuredTherapists?: PublicTherapist[];
+}
 
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-function isRealProfile(profile: PublicTherapist) {
+const CARD_POSITIONS = [
+  "rotate-[-4deg] -translate-y-4",
+  "",
+  "rotate-[4deg] -translate-y-4",
+];
+
+const trustItems = [
+  { label: "Reviewed before going live", icon: BadgeCheck },
+  { label: "LGBTQ+ affirming", icon: Star },
+  { label: "Real providers, real photos", icon: Sparkles },
+];
+
+const quickPrompts = [
+  "Deep tissue in NYC",
+  "Available tonight",
+  "Outcall provider",
+  "LGBTQ+ friendly",
+];
+
+function getLocation(profile: PublicTherapist): string {
+  const parts = [profile.neighborhood ?? profile.neighborhood_name, profile.city, profile.state].filter(Boolean);
+  return parts.join(", ") || "Location not listed";
+}
+
+function getProfileHref(profile: PublicTherapist): string {
+  return `/therapists/${profile.slug ?? profile.id}`;
+}
+
+function getPrice(profile: PublicTherapist): string {
+  const price = profile.starting_price ?? profile.incall_price;
+  return price ? `From $${price}` : "Contact for pricing";
+}
+
+function getInitials(profile: PublicTherapist): string {
+  const name = profile.display_name ?? profile.full_name ?? "";
+  return name
+    .split(" ")
+    .slice(0, 2)
+    .map((w) => w[0] ?? "")
+    .join("")
+    .toUpperCase() || "MM";
+}
+
+function isRealProfile(profile: PublicTherapist): boolean {
   const id = profile.id?.toLowerCase() ?? "";
   const name = (profile.display_name ?? profile.full_name ?? "").toLowerCase();
   const phone = profile.phone ?? "";
-
   return (
     !profile.is_demo &&
     !id.startsWith("fallback-") &&
@@ -32,8 +80,15 @@ function isRealProfile(profile: PublicTherapist) {
   );
 }
 
-export default function HeroClient({ therapists = [] }: { therapists?: PublicTherapist[] }) {
-  const reducedMotion = useReducedMotion();
+function TherapistCard({ profile, index }: { profile: PublicTherapist; index: number }) {
+  const router = useRouter();
+  const cardPosition = CARD_POSITIONS[index % CARD_POSITIONS.length] ?? "";
+  const photoSrc = profile.avatar_url ?? undefined;
+  const name = profile.display_name ?? profile.full_name ?? "Therapist";
+  const initials = getInitials(profile);
+  const specialty = profile.specialties?.[0] ?? profile.service_categories?.[0] ?? profile.modality ?? "";
+  const rating = profile.average_rating ?? profile.rating_average;
+  const reviewCount = profile.review_count ?? 0;
 
   return (
     <motion.article
@@ -52,12 +107,10 @@ export default function HeroClient({ therapists = [] }: { therapists?: PublicThe
 
       <div className="absolute inset-x-3 -top-20 flex h-56 items-end justify-center overflow-hidden rounded-[1.5rem] bg-gradient-to-b from-slate-50 via-white to-white">
         {photoSrc ? (
-          // Use a plain image so live Supabase public URLs and remote provider photos render without extra Next image config friction.
-          // The frame is intentionally background-light; profiles with transparent/background-removed photos pop out naturally.
           <img
             src={photoSrc}
             alt={`${name} profile photo`}
-            loading={index === 1 ? "eager" : "lazy"}
+            loading={index === 0 ? "eager" : "lazy"}
             className="h-full w-full object-cover object-top mix-blend-multiply"
           />
         ) : (
@@ -82,11 +135,13 @@ export default function HeroClient({ therapists = [] }: { therapists?: PublicThe
           <MapPin size={15} strokeWidth={2.3} className="text-[#9AA0AA]" />
           <span className="line-clamp-1">{getLocation(profile)}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Star size={16} strokeWidth={2.25} className="fill-amber-400 text-amber-400" />
-          <span className="font-bold text-[#151515]">{rating}</span>
-          <span className="text-[#7B8190]">({reviewCount} reviews)</span>
-        </div>
+        {rating != null && (
+          <div className="flex items-center gap-2">
+            <Star size={16} strokeWidth={2.25} className="fill-amber-400 text-amber-400" />
+            <span className="font-bold text-[#151515]">{rating}</span>
+            <span className="text-[#7B8190]">({reviewCount} reviews)</span>
+          </div>
+        )}
         <div className="flex items-center gap-4 text-[#5F6673]">
           <span className="flex items-center gap-1.5">
             <Clock size={15} strokeWidth={2.25} className="text-[#9AA0AA]" />
@@ -298,7 +353,6 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
         </div>
       </div>
 
-      {/* ── Cinematic cover band (video on desktop, still on mobile) ──── */}
       <motion.div
         initial={{ clipPath: "inset(100% 0 0 0)" }}
         whileInView={{ clipPath: "inset(0% 0 0 0)" }}
@@ -306,7 +360,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
         transition={{ duration: reducedMotion ? 0 : 1.0, ease: customEase }}
         className="relative z-10 w-full overflow-hidden"
       >
-        <HeroMediaBanner reducedMotion={!!reducedMotion} therapists={therapists} />
+        <HeroMediaBanner reducedMotion={!!reducedMotion} therapists={realProfiles} />
       </motion.div>
     </section>
   );
