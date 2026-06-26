@@ -41,3 +41,12 @@ create table if not exists public.profiles (
   created_at timestamptz default timezone('utc', now()),
   updated_at timestamptz default timezone('utc', now())
 );
+
+-- is_admin() is used throughout RLS policies as an admin-check helper
+create or replace function public.is_admin()
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (
+    select 1 from public.user_roles
+    where user_id = auth.uid() and role = 'admin'
+  )
+$$;

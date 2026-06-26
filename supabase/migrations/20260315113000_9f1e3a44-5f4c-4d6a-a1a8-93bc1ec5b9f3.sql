@@ -27,7 +27,7 @@ CREATE POLICY "Users can insert own marketing preferences"
 
 CREATE POLICY "Admins can manage marketing preferences"
   ON public.marketing_preferences FOR ALL TO authenticated
-  USING (has_role(auth.uid(), 'admin'::app_role));
+  USING (public.is_admin());
 
 
 -- 2) Suppression table for bounces/complaints/manual unsubscribes
@@ -49,7 +49,7 @@ ALTER TABLE public.email_suppressions ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Admins can manage suppressions"
   ON public.email_suppressions FOR ALL TO authenticated
-  USING (has_role(auth.uid(), 'admin'::app_role));
+  USING (public.is_admin());
 
 
 -- 3) Provider event stream (for segmentation and complaint monitoring)
@@ -74,11 +74,11 @@ ALTER TABLE public.email_provider_events ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Admins can read provider events"
   ON public.email_provider_events FOR SELECT TO authenticated
-  USING (has_role(auth.uid(), 'admin'::app_role));
+  USING (public.is_admin());
 
 CREATE POLICY "Service role can insert provider events"
   ON public.email_provider_events FOR INSERT TO authenticated
-  WITH CHECK (has_role(auth.uid(), 'admin'::app_role));
+  WITH CHECK (public.is_admin());
 
 
 -- 4) Lifecycle queue and send log
@@ -127,7 +127,7 @@ ALTER TABLE public.lifecycle_email_queue ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Admins can manage lifecycle queue"
   ON public.lifecycle_email_queue FOR ALL TO authenticated
-  USING (has_role(auth.uid(), 'admin'::app_role));
+  USING (public.is_admin());
 
 
 CREATE TABLE IF NOT EXISTS public.lifecycle_email_log (
@@ -159,7 +159,7 @@ ALTER TABLE public.lifecycle_email_log ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Admins can read lifecycle log"
   ON public.lifecycle_email_log FOR SELECT TO authenticated
-  USING (has_role(auth.uid(), 'admin'::app_role));
+  USING (public.is_admin());
 
 
 -- 5) Helper trigger for updated_at
