@@ -1,0 +1,244 @@
+AUTO FIX REPO LOG
+
+
+===== install dependencies =====
+$ pnpm install
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +6 -6
+++++++------
+Progress: resolved 6, reused 0, downloaded 0, added 0
+Progress: resolved 6, reused 1, downloaded 0, added 0
+â€‰WARNâ€‰ Request took 31578ms: https://registry.npmjs.org/pnpm
+
+   â•­â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®
+   â”‚                                         â”‚
+   â”‚   Update available! 10.32.1 â†’ 11.9.0.   â”‚
+   â”‚   Changelog: https://pnpm.io/v/11.9.0   â”‚
+   â”‚    To update, run: pnpm add -g pnpm     â”‚
+   â”‚                                         â”‚
+   â•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯
+
+Progress: resolved 6, reused 2, downloaded 0, added 0
+Progress: resolved 6, reused 2, downloaded 0, added 1
+Progress: resolved 6, reused 2, downloaded 1, added 2
+Progress: resolved 6, reused 2, downloaded 2, added 4
+Progress: resolved 6, reused 2, downloaded 3, added 5
+Progress: resolved 6, reused 3, downloaded 3, added 5
+Progress: resolved 6, reused 3, downloaded 3, added 6
+Progress: resolved 6, reused 3, downloaded 3, added 6, done
+
+devDependencies:
+- @playwright/test 1.58.2
++ @playwright/test 1.61.1
+
+Done in 1m 34s using pnpm v10.32.1
+
+
+EXIT_CODE=0
+
+
+===== lint autofix =====
+$ pnpm run lint -- --fix
+
+> masseurmatch@1.0.0 lint C:\Users\admin\masseurmatch\masseurmatch
+> eslint . "--" "--fix"
+
+â€‰ELIFECYCLEâ€‰ Command failed with exit code 2.
+
+
+Oops! Something went wrong! :(
+
+ESLint: 9.39.4
+
+No files matching the pattern "--fix" were found.
+Please check for typing mistakes in the pattern.
+
+
+EXIT_CODE=2
+
+
+===== validate:db-contract =====
+$ pnpm run validate:db-contract
+
+> masseurmatch@1.0.0 validate:db-contract C:\Users\admin\masseurmatch\masseurmatch
+> node scripts/validate-db-contract.mjs
+
+DB contract OK
+
+
+EXIT_CODE=0
+
+
+===== lint =====
+$ pnpm run lint
+
+> masseurmatch@1.0.0 lint C:\Users\admin\masseurmatch\masseurmatch
+> eslint .
+
+
+
+EXIT_CODE=0
+
+
+===== typecheck =====
+$ pnpm run typecheck
+
+> masseurmatch@1.0.0 typecheck C:\Users\admin\masseurmatch\masseurmatch
+> tsc --noEmit -p tsconfig.typecheck.json
+
+
+
+EXIT_CODE=0
+
+
+===== test =====
+$ pnpm test
+
+> masseurmatch@1.0.0 test C:\Users\admin\masseurmatch\masseurmatch
+> pnpm run test:api
+
+
+> masseurmatch@1.0.0 test:api C:\Users\admin\masseurmatch\masseurmatch
+> node scripts/test-api-routes.mjs
+
+API smoke tests passed (8 checks): forgot-password, contact, og, admin-blog-unauthorized, pro-profile-unauthorized, login-validation, register-validation, logout
+
+
+EXIT_CODE=0
+
+
+===== build =====
+$ pnpm run build
+
+> masseurmatch@1.0.0 build C:\Users\admin\masseurmatch\masseurmatch
+> pnpm run clean:next && next build
+
+
+> masseurmatch@1.0.0 clean:next C:\Users\admin\masseurmatch\masseurmatch
+> node scripts/clean-next.mjs
+
+   â–² Next.js 15.5.18
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+â€‰ELIFECYCLEâ€‰ Command failed with exit code 1.
+
+ âš  Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\admin\masseurmatch\pnpm-lock.yaml as the root directory.
+ To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+ Detected additional lockfiles: 
+   * C:\Users\admin\masseurmatch\masseurmatch\pnpm-lock.yaml
+
+Failed to compile.
+
+./src/app/_lib/directory.ts
+Error:   [31mx[0m 'import', and 'export' cannot be used outside of module code
+     ,-[[36;1;4mC:\Users\admin\masseurmatch\masseurmatch\src\app\_lib\directory.ts[0m:232:1]
+ [2m229[0m |   });
+ [2m230[0m | }
+ [2m231[0m | 
+ [2m232[0m | export const getPublicTherapists = async (filters?: {
+     : [35;1m^^^^^^[0m
+ [2m233[0m |   city?: string;
+ [2m234[0m |   modality?: string;
+ [2m235[0m |   keyword?: string;
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/_lib/directory.ts
+./src/app/_lib/explore.ts
+./src/app/explore/ExplorePageClient.tsx
+
+./src/components/marketing/HeroClient.tsx
+Module parse failed: Duplicate export 'default' (207:7)
+File was processed with these loaders:
+ * ./node_modules/.pnpm/next@15.5.18_@opentelemetry_3b41f51af0182b31360fcad9c8153b39/node_modules/next/dist/build/webpack/loaders/next-flight-client-module-loader.js
+ * ./node_modules/.pnpm/next@15.5.18_@opentelemetry_3b41f51af0182b31360fcad9c8153b39/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+You may need an additional loader to handle the result of these loaders.
+|     });
+| }
+> export default function HeroClient({ featuredTherapists = [] }) {
+|     const reducedMotion = useReducedMotion();
+|     const router1 = useRouter();
+
+Import trace for requested module:
+./src/components/marketing/HeroClient.tsx
+
+./src/app/_lib/directory.ts
+Error:   [31mx[0m 'import', and 'export' cannot be used outside of module code
+     ,-[[36;1;4mC:\Users\admin\masseurmatch\masseurmatch\src\app\_lib\directory.ts[0m:232:1]
+ [2m229[0m |   });
+ [2m230[0m | }
+ [2m231[0m | 
+ [2m232[0m | export const getPublicTherapists = async (filters?: {
+     : [35;1m^^^^^^[0m
+ [2m233[0m |   city?: string;
+ [2m234[0m |   modality?: string;
+ [2m235[0m |   keyword?: string;
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/_lib/directory.ts
+./src/app/search/page.tsx
+
+./src/components/marketing/HeroClient.tsx
+Module parse failed: Duplicate export 'default' (8:7)
+File was processed with these loaders:
+ * ./node_modules/.pnpm/next@15.5.18_@opentelemetry_3b41f51af0182b31360fcad9c8153b39/node_modules/next/dist/build/webpack/loaders/next-flight-loader/index.js
+ * ./node_modules/.pnpm/next@15.5.18_@opentelemetry_3b41f51af0182b31360fcad9c8153b39/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+You may need an additional loader to handle the result of these loaders.
+| "default",
+| );
+> export default registerClientReference(
+| function() { throw new Error("Attempted to call the default export of \"C:\\\\Users\\\\admin\\\\masseurmatch\\\\masseurmatch\\\\src\\\\components\\\\marketing\\\\HeroClient.tsx\" from the server, but it's on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component."); },
+| "C:\\Users\\admin\\masseurmatch\\masseurmatch\\src\\components\\marketing\\HeroClient.tsx",
+
+Import trace for requested module:
+./src/components/marketing/HeroClient.tsx
+./src/components/marketing/Hero.tsx
+./src/app/page.tsx
+
+
+> Build failed because of webpack errors
+
+EXIT_CODE=1
+
+
+===== claude auto repair from audit report =====
+$ claude 
+You are inside this repo.
+
+Read:
+- repo-audit-report/audit-log.txt
+- repo-audit-report/summary.json
+
+Fix all real failures from the latest run.
+Do not add new product features.
+Do not rewrite the app.
+Preserve current design and scope.
+Fix the smallest safe issue that makes CI and build pass.
+
+After fixing, rerun:
+python scripts/auto_fix_repo.py
+
+Repeat until these pass:
+- validate:db-contract
+- lint
+- typecheck, if available
+- test, if available
+- build
+
+If only missing env vars or secrets remain, stop and list the exact names needed.
+
+
+Error: Input must be provided either through stdin or as a prompt argument when using --print
+
+EXIT_CODE=1
