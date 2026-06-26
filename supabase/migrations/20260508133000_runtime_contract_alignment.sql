@@ -460,6 +460,8 @@ create table if not exists public.therapists (
 alter table public.therapists
   add column if not exists user_id uuid,
   add column if not exists contact_email text,
+  add column if not exists city text,
+  add column if not exists state text,
   add column if not exists photo_url text,
   add column if not exists status text default 'approved',
   add column if not exists updated_at timestamptz not null default timezone('utc', now());
