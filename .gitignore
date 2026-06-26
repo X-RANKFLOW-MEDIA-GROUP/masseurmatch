@@ -86,3 +86,10 @@ issue-*.md
 
 .vercel
 .vscode/
+
+# Local audit/debug scripts (not part of codebase)
+scripts/audit_bugs.py
+scripts/auto_fix_repo.py
+enterprise-audit-prompt.txt
+bug-audit-report/
+repo-audit-report/

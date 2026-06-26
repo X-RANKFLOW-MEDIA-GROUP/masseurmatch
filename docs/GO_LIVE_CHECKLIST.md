@@ -2,9 +2,23 @@
 
 This checklist defines the minimum release gates required before sending MasseurMatch to production.
 
-> **Final closure pass (2026-06-19):** full repository gate (section 1) passes end to end.
+> **Final closure pass (2026-06-26 — pass 2):** full repository gate (section 1) passes end to end.
 >
-> Changes since last closure (2026-06-19):
+> Changes in this pass (2026-06-26):
+> - `scripts/test-api-routes.mjs`: delete `.next/server/pages` before spawning the Next.js dev server so stale CJS production build artifacts do not conflict with ESM dev mode. Fixes `pnpm test:api` after a `pnpm build`.
+> - `prisma/schema.prisma`: translated Portuguese comment to English (`"Prisma schema para o perfil do massagista"` → `"Massage therapist profile model (reference only)."`).
+> - `.gitignore`: added `repo-audit-report/` to the local-audit-artifact exclusion block.
+>
+> Previous closure (2026-06-26 — pass 1):
+> - CI workflow (`ci.yml`) fixed: all GitHub Actions pinned to `@v4` (were using non-existent `@v6` which caused CI failures).
+> - `actions/cache` bumped to `@v4` in the build job.
+> - No legacy artifacts, no `profile_status: "submitted"` references detected.
+> - OAuth callback already redirects new profiles to `/pro/onboard`; existing users go to their requested path.
+> - Stripe checkout sends `user_id` in session metadata and subscription metadata.
+> - Stripe webhook correctly syncs `subscription_tier`, `_tier`, `photo_limit`, `visibility_level`, `stripe_customer_id`, `stripe_subscription_id`, and `current_period_end`; cancellation downgrades to free.
+> - `validate:db-contract`, `release:audit`, `validate:sitemap`, lint, typecheck, and unit tests all pass.
+>
+> Previous closure (2026-06-19):
 > - Legacy artifacts removed: `package-lock.json`, `src/pages/500.tsx`, `issue-pre-lancamento.md`.
 > - `therapist_analytics_daily` added to `PRODUCTION_SCHEMA_LOCK.sql` (fixes `validate:db-contract`).
 > - SMS API routes now return proper 401/403 via `errorResponse()` instead of 500.
