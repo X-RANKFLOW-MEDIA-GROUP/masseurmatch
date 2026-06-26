@@ -12,10 +12,10 @@ const FEATURES = [
 ] as const;
 
 const STATS = [
-  { icon: TrendingUp, value: 80, suffix: "+", label: "US cities covered" },
-  { icon: Users, value: 2300, suffix: "+", label: "Registered therapists" },
+  { icon: TrendingUp, value: 250, suffix: "+", label: "US cities covered" },
+  { icon: Users, value: 48, suffix: "+", label: "States with listings" },
   { icon: Award, value: 6, suffix: "", label: "Massage specialties" },
-  { icon: LayoutGrid, value: 50, suffix: "+", label: "States with listings" },
+  { icon: LayoutGrid, value: 10, suffix: "+", label: "Verified therapist listings" },
 ] as const;
 
 export function StatsBand() {
