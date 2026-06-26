@@ -1,4 +1,4 @@
-import { ImageResponse } from "next/og";
+﻿import { ImageResponse } from "next/og";
 
 export const alt = "MasseurMatch – LGBTQ+-Inclusive Massage Therapist Directory";
 export const size = {
@@ -35,7 +35,7 @@ export default async function Image() {
           }}
         >
           <span style={{ color: "#FFFFFF" }}>Masseur</span>
-          <span style={{ color: "#CC2424" }}>Match</span>
+          <span style={{ color: "#FF8A1F" }}>Match</span>
         </div>
 
         <div
@@ -56,7 +56,7 @@ export default async function Image() {
             display: "flex",
             width: 80,
             height: 3,
-            background: "#CC2424",
+            background: "#FF8A1F",
             marginTop: 36,
           }}
         />

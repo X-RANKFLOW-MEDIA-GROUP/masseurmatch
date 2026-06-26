@@ -1,4 +1,4 @@
-// src/app/_components/SiteHeader.tsx
+﻿// src/app/_components/SiteHeader.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -87,7 +87,7 @@ function MobileNav({
             className="flex items-center gap-2"
             aria-label="MasseurMatch home"
           >
-            <div className="w-8 h-8 rounded-md bg-[#CC2424] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-md bg-[#FF8A1F] flex items-center justify-center">
               <span className="text-white font-extrabold text-sm leading-none">
                 MM
               </span>
@@ -115,7 +115,7 @@ function MobileNav({
                 onClick={() => setOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   active
-                    ? "bg-[#CC2424] text-white"
+                    ? "bg-[#FF8A1F] text-white"
                     : "text-[#666666] hover:bg-[#F5F5F5] hover:text-[#1A1A1A]"
                 }`}
               >
@@ -147,7 +147,7 @@ function MobileNav({
                   setOpen(false);
                   onLogout();
                 }}
-                className="block w-full text-center rounded-full bg-[#CC2424] py-2.5 text-sm font-semibold text-white hover:bg-[#A81D1D] transition-colors"
+                className="block w-full text-center rounded-full bg-[#FF8A1F] py-2.5 text-sm font-semibold text-white hover:bg-[#E67600] transition-colors"
               >
                 Log Out
               </button>
@@ -164,7 +164,7 @@ function MobileNav({
               <Link
                 href="/signup"
                 onClick={() => setOpen(false)}
-                className="block w-full text-center rounded-full bg-[#CC2424] py-2.5 text-sm font-semibold text-white hover:bg-[#A81D1D] transition-colors"
+                className="block w-full text-center rounded-full bg-[#FF8A1F] py-2.5 text-sm font-semibold text-white hover:bg-[#E67600] transition-colors"
               >
                 Get Started
               </Link>
@@ -252,7 +252,7 @@ export default function SiteHeader() {
           className="group flex items-center gap-3 shrink-0"
           aria-label="MasseurMatch home"
         >
-          <div className="relative w-10 h-10 rounded-lg bg-[#CC2424] flex items-center justify-center shadow-sm">
+          <div className="relative w-10 h-10 rounded-lg bg-[#FF8A1F] flex items-center justify-center shadow-sm">
             <span className="text-white font-extrabold text-base leading-none tracking-tight">
               MM
             </span>
@@ -291,7 +291,7 @@ export default function SiteHeader() {
                   href={href}
                   className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md transition-colors ${
                     active
-                      ? "bg-[#CC2424] text-white shadow-sm"
+                      ? "bg-[#FF8A1F] text-white shadow-sm"
                       : "text-[#666666] hover:text-[#1A1A1A] hover:bg-[#F5F5F5]"
                   }`}
                 >
@@ -353,7 +353,7 @@ export default function SiteHeader() {
               onClick={handleLogout}
               whileHover={shouldReduceMotion ? undefined : { scale: 1.05 }}
               whileTap={shouldReduceMotion ? undefined : { scale: 0.95 }}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#666666] hover:text-[#CC2424] hover:bg-red-50 transition-colors"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#666666] hover:text-[#FF8A1F] hover:bg-orange-50 transition-colors"
             >
               <LogOut className="w-[0.9rem] h-[0.9rem]" strokeWidth={2.35} />
               Log out
@@ -366,7 +366,7 @@ export default function SiteHeader() {
           >
             <Link
               href="/signup"
-              className="hidden sm:flex h-10 px-6 items-center justify-center rounded-full text-sm font-bold transition-all duration-200 bg-[#CC2424] text-white hover:bg-[#A81D1D] hover:shadow-lg hover:shadow-[#CC2424]/20"
+              className="hidden sm:flex h-10 px-6 items-center justify-center rounded-full text-sm font-bold transition-all duration-200 bg-[#FF8A1F] text-white hover:bg-[#E67600] hover:shadow-lg hover:shadow-[#FF8A1F]/20"
             >
               GET STARTED
             </Link>

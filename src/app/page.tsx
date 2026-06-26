@@ -8,6 +8,8 @@ import { FeaturedTherapistsEditorial } from "@/components/marketing/FeaturedTher
 import { FaqAccordion } from "@/components/marketing/FaqAccordion";
 import { USStateMapGrid } from "@/components/marketing/USStateMapGrid";
 import { FinalCta } from "@/components/marketing/FinalCta";
+import { HowItWorksTease } from "@/components/marketing/HowItWorksTease";
+import { WhyMasseurMatch } from "@/components/marketing/WhyMasseurMatch";
 import {
   createPageMetadata,
   buildFaqJsonLd,
@@ -15,7 +17,6 @@ import {
   buildOrganizationJsonLd,
   buildWebsiteJsonLd,
   buildCollectionPageJsonLd,
-  SITE_NAME,
   SITE_DESCRIPTION,
 } from "@/app/_lib/seo";
 import { siteUrl } from "@/lib/site";
@@ -186,6 +187,22 @@ export default async function HomePage() {
       {/* FAQPage */}
       <JsonLd data={buildFaqJsonLd(HOME_FAQ)} />
 
+      {/* Standalone BreadcrumbList */}
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Home",
+              item: siteUrl("/"),
+            },
+          ],
+        }}
+      />
+
       {/* SpeakableSpecification */}
       <JsonLd
         data={{
@@ -197,17 +214,6 @@ export default async function HomePage() {
           speakable: {
             "@type": "SpeakableSpecification",
             cssSelector: ["h1", ".speakable-intro"],
-          },
-          breadcrumb: {
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              {
-                "@type": "ListItem",
-                position: 1,
-                name: "Home",
-                item: siteUrl("/"),
-              },
-            ],
           },
         }}
       />
@@ -225,7 +231,9 @@ export default async function HomePage() {
         {/* ── LIGHT BODY ─────────────────────────────────────────────── */}
         <StatsBand />
         <CityCaseStudies />
+        <HowItWorksTease />
         <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
+        <WhyMasseurMatch />
         <USStateMapGrid />
         <FaqAccordion items={LANDING_FAQ} />
         <FinalCta />
