@@ -506,11 +506,17 @@ create table if not exists public.therapist_learning_scores (
 
 create table if not exists public.ranking_events (
   id uuid primary key default gen_random_uuid(),
-  profile_id uuid,
-  event_type text,
-  event_name text,
-  weight numeric,
-  metadata jsonb,
+  session_id text not null,
+  user_id uuid,
+  therapist_id uuid references public.profiles(id),
+  event_name text not null,
+  city text,
+  neighborhood text,
+  intent text not null default 'browse',
+  device_type text,
+  position_in_results integer,
+  recommendation_source text,
+  metadata jsonb default '{}'::jsonb,
   created_at timestamptz default timezone('utc', now())
 );
 
