@@ -12,8 +12,7 @@ CREATE TABLE IF NOT EXISTS demand_scores (
   search_volume_index int         NOT NULL DEFAULT 0 CHECK (search_volume_index BETWEEN 0 AND 100),
   competition_index   int         NOT NULL DEFAULT 0 CHECK (competition_index BETWEEN 0 AND 100),
   week_start          date        NOT NULL,
-  created_at          timestamptz DEFAULT now() NOT NULL,
-
+  created_at          timestamptz DEFAULT now() NOT NULL
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS demand_scores_city_state_neighborhood_week_start_idx
