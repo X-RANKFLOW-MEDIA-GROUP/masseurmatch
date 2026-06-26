@@ -19,15 +19,7 @@ const CITIES: CityEntry[] = [
   { name: "Dallas", state: "TX", slug: "dallas" },
   { name: "Houston", state: "TX", slug: "houston" },
   { name: "Atlanta", state: "GA", slug: "atlanta" },
-  { name: "Washington", state: "DC", slug: "washington-dc" },
-  { name: "San Francisco", state: "CA", slug: "san-francisco" },
-  { name: "Seattle", state: "WA", slug: "seattle" },
-  { name: "Denver", state: "CO", slug: "denver" },
-  { name: "Boston", state: "MA", slug: "boston" },
-  { name: "Phoenix", state: "AZ", slug: "phoenix" },
   { name: "Las Vegas", state: "NV", slug: "las-vegas" },
-  { name: "Austin", state: "TX", slug: "austin" },
-  { name: "New Orleans", state: "LA", slug: "new-orleans" },
 ];
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
