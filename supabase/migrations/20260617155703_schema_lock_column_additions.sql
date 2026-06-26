@@ -1,2 +1,0 @@
--- Migration placeholder for remote history alignment.
--- No local SQL changes are required for this version.
