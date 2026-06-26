@@ -165,6 +165,10 @@ const config: Config = {
           '33%': { transform: 'translate(-45%, -55%) scale(1.15)', opacity: '0.5' },
           '66%': { transform: 'translate(-55%, -45%) scale(0.9)', opacity: '0.35' },
         },
+        "knotty-pulse": {
+          '0%, 80%, 100%': { opacity: '0.3', transform: 'scale(0.85)' },
+          '40%': { opacity: '1', transform: 'scale(1.1)' },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -175,6 +179,7 @@ const config: Config = {
         "aurora-3": "aurora-3 20s ease-in-out infinite",
         "aurora-4": "aurora-4 22s ease-in-out infinite",
         "aurora-5": "aurora-5 25s ease-in-out infinite",
+        "knotty-pulse": "knotty-pulse 1.4s ease-in-out infinite",
       },
     },
   },

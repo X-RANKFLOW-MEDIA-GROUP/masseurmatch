@@ -2,15 +2,20 @@
 -- (therapist_id, author_name, rating, body, status). Later migrations add indexes
 -- on columns that don't exist yet. Add them here with ADD COLUMN IF NOT EXISTS.
 
-alter table public.reviews
-  add column if not exists client_id       uuid references auth.users(id) on delete cascade,
-  add column if not exists client_email    text,
-  add column if not exists reviewer_name  text,
-  add column if not exists title          text,
-  add column if not exists content        text,
-  add column if not exists review_text    text,
-  add column if not exists review_date    date,
-  add column if not exists source_platform text,
-  add column if not exists is_verified    boolean default false,
-  add column if not exists is_public      boolean default true,
-  add column if not exists helpful_count  integer default 0;
+DO $$
+BEGIN
+  IF to_regclass('public.reviews') IS NOT NULL THEN
+    ALTER TABLE public.reviews
+      ADD COLUMN IF NOT EXISTS client_id       uuid references auth.users(id) on delete cascade,
+      ADD COLUMN IF NOT EXISTS client_email    text,
+      ADD COLUMN IF NOT EXISTS reviewer_name  text,
+      ADD COLUMN IF NOT EXISTS title          text,
+      ADD COLUMN IF NOT EXISTS content        text,
+      ADD COLUMN IF NOT EXISTS review_text    text,
+      ADD COLUMN IF NOT EXISTS review_date    date,
+      ADD COLUMN IF NOT EXISTS source_platform text,
+      ADD COLUMN IF NOT EXISTS is_verified    boolean default false,
+      ADD COLUMN IF NOT EXISTS is_public      boolean default true,
+      ADD COLUMN IF NOT EXISTS helpful_count  integer default 0;
+  END IF;
+END $$;

@@ -3,6 +3,11 @@
 -- indexes reviews(profile_id, is_public, created_at desc) which fails.
 -- Add profile_id here so that index succeeds.
 
-alter table public.reviews
-  add column if not exists profile_id  uuid references public.profiles(id) on delete cascade,
-  add column if not exists updated_at  timestamptz not null default timezone('utc', now());
+DO $$
+BEGIN
+  IF to_regclass('public.reviews') IS NOT NULL THEN
+    ALTER TABLE public.reviews
+      ADD COLUMN IF NOT EXISTS profile_id  uuid references public.profiles(id) on delete cascade,
+      ADD COLUMN IF NOT EXISTS updated_at  timestamptz not null default timezone('utc', now());
+  END IF;
+END $$;

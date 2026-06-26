@@ -51,9 +51,11 @@ export async function POST(request: Request) {
       .from("text_verifications")
       .insert({
         user_id: session.userId,
+        phone,
         code,
         submitted_text: phone,
         status: "pending",
+        expires_at: expiresAt,
       });
 
     if (verificationError) {

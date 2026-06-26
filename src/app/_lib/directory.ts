@@ -7,7 +7,7 @@ export type TherapistTier = "free" | "standard" | "pro" | "elite";
 
 const PUBLIC_PROFILE_SELECT = `
   id, slug, display_name, full_name, headline, bio, city, state, neighborhood,
-  phone, whatsapp_number, email_address, website,
+  phone, whatsapp_number, email_address, show_email, website,
   service_categories, massage_techniques, specialties,
   incall_price, outcall_price, starting_price,
   offers_incall, offers_outcall, outcall_radius,
@@ -81,6 +81,7 @@ export interface PublicTherapist {
   phone: string | null;
   whatsapp_number: string | null;
   email_address: string | null;
+  show_email: boolean | null;
   website: string | null;
   service_categories: string[] | null;
   massage_techniques: string[] | null;
