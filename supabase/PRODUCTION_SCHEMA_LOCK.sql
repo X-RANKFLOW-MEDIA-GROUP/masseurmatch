@@ -66,6 +66,7 @@ alter table public.profiles
   add column if not exists whatsapp text,
   add column if not exists whatsapp_number text,
   add column if not exists email_address text,
+  add column if not exists show_email boolean not null default false,
   add column if not exists website text,
   add column if not exists booking_link text,
   add column if not exists specialties text[] default '{}',
@@ -507,12 +508,18 @@ create table if not exists public.therapist_learning_scores (
 
 create table if not exists public.ranking_events (
   id uuid primary key default gen_random_uuid(),
-  profile_id uuid,
-  event_type text,
-  event_name text,
-  weight numeric,
-  metadata jsonb,
-  created_at timestamptz default timezone('utc', now())
+  session_id text not null,
+  user_id uuid null references auth.users (id) on delete set null,
+  therapist_id uuid null references public.profiles (id) on delete cascade,
+  event_name text not null,
+  city text null,
+  neighborhood text null,
+  intent text not null default 'general',
+  device_type text null,
+  position_in_results integer null,
+  recommendation_source text null,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default timezone('utc', now())
 );
 
 create table if not exists public.imported_profile_data (

@@ -3,5 +3,10 @@
 -- CREATE TABLE IF NOT EXISTS but then INSERTs with city which doesn't exist.
 -- The ALTER TABLE in that migration omits city, so add it here.
 
-alter table public.therapists
-  add column if not exists city text;
+DO $$
+BEGIN
+  IF to_regclass('public.therapists') IS NOT NULL THEN
+    ALTER TABLE public.therapists
+      ADD COLUMN IF NOT EXISTS city text;
+  END IF;
+END $$;

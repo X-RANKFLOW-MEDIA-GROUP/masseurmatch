@@ -3,16 +3,12 @@
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import {
-  BadgeCheck,
   Banknote,
-  Building2,
   Check,
   ChevronDown,
   Clock,
-  CreditCard,
   GraduationCap,
   Heart,
-  Languages as LanguagesIcon,
   Loader2,
   MapPin,
   MessageCircle,
@@ -21,8 +17,6 @@ import {
   Save,
   ShieldAlert,
   ShieldCheck,
-  Sparkles,
-  Tag,
   Trash2,
   User,
 } from "lucide-react";
@@ -189,6 +183,7 @@ type ProfileRecord = {
   phone?: string | null;
   whatsapp_number?: string | null;
   email_address?: string | null;
+  show_email?: boolean | null;
   website?: string | null;
   booking_url?: string | null;
   booking_platform?: string | null;
@@ -242,6 +237,7 @@ type FormState = {
   phone: string;
   whatsapp: string;
   email: string;
+  showEmail: boolean;
   website: string;
   bookingUrl: string;
   bookingPlatform: string;
@@ -295,6 +291,7 @@ const EMPTY_FORM: FormState = {
   phone: "",
   whatsapp: "",
   email: "",
+  showEmail: false,
   website: "",
   bookingUrl: "",
   bookingPlatform: "",
@@ -371,6 +368,7 @@ function mapProfileToForm(profile: ProfileRecord | null | undefined): FormState 
     phone: profile.phone || "",
     whatsapp: profile.whatsapp_number || "",
     email: profile.email_address || "",
+    showEmail: profile.show_email ?? false,
     website: profile.website || "",
     bookingUrl: profile.booking_url || "",
     bookingPlatform: profile.booking_platform || "",
@@ -447,6 +445,7 @@ function buildPayload(form: FormState) {
     phone: form.phone || null,
     whatsapp: form.whatsapp || null,
     email: form.email || null,
+    showEmail: form.showEmail,
     website: form.website || null,
     bookingUrl: form.bookingUrl || null,
     bookingPlatform: form.bookingPlatform || null,
@@ -715,11 +714,31 @@ function HoursRows({
 // ─────────────────────────────────────────────────────────────────────────
 
 const SECTIONS = [
-  "appointment", "location", "headline", "bio", "techniques", "services", "amenities",
-  "rates", "discounts", "payments", "hours", "contact", "education", "professional",
-  "availability", "physical",
+  "about", "location", "services", "pricing", "schedule", "credentials",
 ] as const;
 type SectionId = (typeof SECTIONS)[number];
+
+const SECTION_META: Record<SectionId, { icon: typeof User; title: string; subtitle: string }> = {
+  about: { icon: User, title: "About You", subtitle: "Name, headline, bio, and physical profile" },
+  location: { icon: MapPin, title: "Location & Contact", subtitle: "Where you work and how clients reach you" },
+  services: { icon: Heart, title: "Services", subtitle: "Techniques, setup, amenities, and products" },
+  pricing: { icon: Banknote, title: "Rates & Payments", subtitle: "Session pricing, discounts, and payment methods" },
+  schedule: { icon: Clock, title: "Schedule", subtitle: "Operating hours and availability status" },
+  credentials: { icon: GraduationCap, title: "Credentials", subtitle: "Education, experience, languages, and affiliations" },
+};
+
+function computeProgress(form: FormState): { filled: number; total: number; sectionDone: Record<SectionId, boolean> } {
+  const checks = {
+    about: !!form.displayName.trim(),
+    location: !!form.city && !!form.state,
+    services: form.massageTechniques.length > 0,
+    pricing: form.pricingSessions.length > 0 && form.paymentMethods.length > 0,
+    schedule: form.studioHours.length > 0 || form.currentStatus !== "",
+    credentials: form.yearsExperience !== "" || form.educationEntries.length > 0,
+  };
+  const filled = Object.values(checks).filter(Boolean).length;
+  return { filled, total: SECTIONS.length, sectionDone: checks };
+}
 
 export default function MyListingPage() {
   const { toast } = useToast();
@@ -729,10 +748,9 @@ export default function MyListingPage() {
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [profileStatus, setProfileStatus] = useState<string | null>(null);
   const [zipStatus, setZipStatus] = useState<string | null>(null);
-  const [open, setOpen] = useState<Record<SectionId, boolean>>(() => {
-    const initial = {} as Record<SectionId, boolean>;
-    SECTIONS.forEach((s, i) => { initial[s] = i === 0; });
-    return initial;
+  const [open, setOpen] = useState<Record<SectionId, boolean>>({
+    about: true, location: false, services: false,
+    pricing: false, schedule: false, credentials: false,
   });
 
   useEffect(() => {
@@ -853,6 +871,17 @@ export default function MyListingPage() {
     }
   };
 
+  const progress = useMemo(() => computeProgress(form), [form]);
+
+  function sectionCount(id: SectionId): number | undefined {
+    switch (id) {
+      case "services": return form.massageTechniques.length + form.massageSetup.length + form.additionalServices.length + form.studioAmenities.length;
+      case "pricing": return form.pricingSessions.length + form.paymentMethods.length;
+      case "credentials": return form.educationEntries.length + form.affiliations.length;
+      default: return undefined;
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
@@ -865,7 +894,42 @@ export default function MyListingPage() {
     <div className="mx-auto max-w-3xl space-y-4 p-4 pb-36 md:p-8">
       <div>
         <h1 className="font-display text-2xl font-extrabold tracking-tight text-slate-900">Edit Profile</h1>
-        <p className="mt-1 text-sm text-slate-500">Complete each section — your profile is reviewed before going live.</p>
+        <p className="mt-1 text-sm text-slate-500">Fill in the sections below — your profile is reviewed before going live.</p>
+      </div>
+
+      {/* Progress bar */}
+      <div className="rounded-xl border border-slate-200 bg-white p-4">
+        <div className="flex items-center justify-between text-sm">
+          <span className="font-medium text-slate-700">Profile completion</span>
+          <span className="font-semibold text-primary">{progress.filled}/{progress.total} sections</span>
+        </div>
+        <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+          <div
+            className="h-full rounded-full bg-primary transition-all duration-500"
+            style={{ width: `${(progress.filled / progress.total) * 100}%` }}
+          />
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {SECTIONS.map((id) => {
+            const meta = SECTION_META[id];
+            const done = progress.sectionDone[id];
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => { setOpen((o) => ({ ...o, [id]: true })); document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
+                className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                  done
+                    ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
+                    : "border border-slate-200 bg-slate-50 text-slate-500"
+                }`}
+              >
+                {done ? <Check className="h-3 w-3" strokeWidth={3} /> : <meta.icon className="h-3 w-3" strokeWidth={2.25} />}
+                {meta.title}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {profileStatus === "under_review" || profileStatus === "pending_approval" ? (
@@ -875,21 +939,91 @@ export default function MyListingPage() {
         </div>
       ) : null}
 
-      {/* 1. Appointment Types */}
-      <Accordion id="appointment" icon={MapPin} title="Appointment Types" subtitle="Where you see clients" open={open.appointment} onToggle={() => toggleSection("appointment")}>
+      {/* 1. About You — name, headline, bio, physical */}
+      <Accordion id="about" icon={SECTION_META.about.icon} title={SECTION_META.about.title} subtitle={SECTION_META.about.subtitle} open={open.about} onToggle={() => toggleSection("about")}>
         <Field>
           <FieldLabel required>Display Name</FieldLabel>
           <input className={inputCls()} value={form.displayName} onChange={(e) => set("displayName", e.target.value)} placeholder="Professional name shown on your listing" />
         </Field>
-        <div className="space-y-3 rounded-xl border border-slate-100 bg-slate-50/60 p-4">
-          <Toggle checked={form.offersIncall} onChange={(v) => set("offersIncall", v)} label="I offer incall (clients come to me)" />
-          <Toggle checked={form.offersOutcall} onChange={(v) => set("offersOutcall", v)} label="I offer outcall (I travel to clients)" />
-          <Toggle checked={form.mapEnabled} onChange={(v) => set("mapEnabled", v)} label="Show my location on the map" />
+
+        <div className="space-y-4 border-t border-slate-100 pt-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Headline</p>
+          {headlinePreview && (
+            <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm">
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Preview</span>
+              <p className="mt-1 font-display font-semibold text-slate-900">{headlinePreview}</p>
+            </div>
+          )}
+          <div className="grid max-h-48 grid-cols-1 gap-2 overflow-y-auto rounded-xl border border-slate-100 bg-slate-50/40 p-3 sm:grid-cols-2">
+            {HEADLINE_PRESETS.map((preset) => {
+              const active = form.headlinePreset === preset;
+              return (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => set("headlinePreset", active ? "" : preset)}
+                  className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-all ${
+                    active ? "border-primary bg-primary/10 font-medium text-slate-900" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                  }`}
+                >
+                  <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${active ? "border-primary bg-primary text-white" : "border-slate-300"}`}>
+                    {active && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+                  </span>
+                  {preset}
+                </button>
+              );
+            })}
+          </div>
+          <Field>
+            <FieldLabel>Tagline (free text)</FieldLabel>
+            <input className={inputCls()} maxLength={120} value={form.tagline} onChange={(e) => set("tagline", e.target.value)} placeholder="Optional one-liner shown on your card" />
+          </Field>
+        </div>
+
+        <div className="space-y-4 border-t border-slate-100 pt-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Bio</p>
+          <Field>
+            <textarea
+              className={`${inputCls()} min-h-[140px] resize-none leading-relaxed`}
+              value={form.bio}
+              onChange={(e) => set("bio", e.target.value)}
+              maxLength={4000}
+              placeholder="Share your experience, massage style, pressure preference, specialties, and what clients can expect..."
+            />
+            <p className="text-right text-xs text-slate-400">{form.bio.length}/4000</p>
+          </Field>
+        </div>
+
+        <div className="space-y-4 border-t border-slate-100 pt-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Physical profile (optional)</p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Field>
+              <FieldLabel>Height (inches)</FieldLabel>
+              <input type="number" min={36} max={96} className={inputCls()} value={form.heightInches} onChange={(e) => set("heightInches", e.target.value)} placeholder={`72 = 6'0"`} />
+              {form.heightInches && (() => {
+                const n = Number(form.heightInches);
+                if (!n) return null;
+                return <p className="text-xs text-slate-400">{`${Math.floor(n / 12)}'${n % 12}" / ${Math.round(n * 2.54)} cm`}</p>;
+              })()}
+            </Field>
+            <Field>
+              <FieldLabel>Weight (lb)</FieldLabel>
+              <input type="number" min={60} max={600} className={inputCls()} value={form.weightLb} onChange={(e) => set("weightLb", e.target.value)} placeholder="180" />
+              {form.weightLb && <p className="text-xs text-slate-400">{Math.round(Number(form.weightLb) * 0.453592)} kg</p>}
+            </Field>
+            <Field>
+              <FieldLabel>Body Type</FieldLabel>
+              <select className={inputCls()} value={form.bodyType} onChange={(e) => set("bodyType", e.target.value)}>
+                <option value="">Select</option>
+                {BODY_TYPE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+              </select>
+            </Field>
+          </div>
         </div>
       </Accordion>
 
-      {/* 2. Location */}
-      <Accordion id="location" icon={MapPin} title="Location" subtitle="Where you are based — auto-fills from ZIP" open={open.location} onToggle={() => toggleSection("location")}>
+      {/* 2. Location & Contact */}
+      <Accordion id="location" icon={SECTION_META.location.icon} title={SECTION_META.location.title} subtitle={SECTION_META.location.subtitle} open={open.location} onToggle={() => toggleSection("location")}>
         <div className="grid gap-4 sm:grid-cols-[150px_1fr]">
           <Field>
             <FieldLabel>ZIP Code</FieldLabel>
@@ -922,96 +1056,104 @@ export default function MyListingPage() {
           </div>
           <p className="text-xs text-slate-400">Shown as a cross-street so clients know your general area.</p>
         </Field>
-      </Accordion>
 
-      {/* 3. Headline */}
-      <Accordion id="headline" icon={Tag} title="Headline" subtitle="A short tagline that appears under your name" open={open.headline} onToggle={() => toggleSection("headline")}>
-        {headlinePreview && (
-          <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm">
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Preview</span>
-            <p className="mt-1 font-display font-semibold text-slate-900">{headlinePreview}</p>
-          </div>
-        )}
-        <div className="grid max-h-72 grid-cols-1 gap-2 overflow-y-auto rounded-xl border border-slate-100 bg-slate-50/40 p-3 sm:grid-cols-2">
-          {HEADLINE_PRESETS.map((preset) => {
-            const active = form.headlinePreset === preset;
-            return (
-              <button
-                key={preset}
-                type="button"
-                onClick={() => set("headlinePreset", active ? "" : preset)}
-                className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-all ${
-                  active ? "border-primary bg-primary/10 font-medium text-slate-900" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
-                }`}
-              >
-                <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${active ? "border-primary bg-primary text-white" : "border-slate-300"}`}>
-                  {active && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
-                </span>
-                {preset}
-              </button>
-            );
-          })}
+        <div className="space-y-3 rounded-xl border border-slate-100 bg-slate-50/60 p-4">
+          <Toggle checked={form.offersIncall} onChange={(v) => set("offersIncall", v)} label="I offer incall (clients come to me)" />
+          <Toggle checked={form.offersOutcall} onChange={(v) => set("offersOutcall", v)} label="I offer outcall (I travel to clients)" />
+          <Toggle checked={form.mapEnabled} onChange={(v) => set("mapEnabled", v)} label="Show my location on the map" />
+          {form.offersOutcall && (
+            <Field>
+              <FieldLabel>Outcall Radius (km)</FieldLabel>
+              <select className={inputCls()} value={form.outcallRadius} onChange={(e) => set("outcallRadius", e.target.value)}>
+                <option value="">Not set</option>
+                {OUTCALL_RADII.map((r) => <option key={r} value={String(r)}>{r} km</option>)}
+              </select>
+            </Field>
+          )}
         </div>
-        <Field>
-          <FieldLabel>Tagline (free text)</FieldLabel>
-          <input className={inputCls()} maxLength={120} value={form.tagline} onChange={(e) => set("tagline", e.target.value)} placeholder="Optional one-liner shown on your card" />
-        </Field>
+
+        <div className="space-y-4 border-t border-slate-100 pt-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Contact info</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field>
+              <FieldLabel required>Phone</FieldLabel>
+              <div className="relative">
+                <Phone className="absolute left-3 top-3 h-4 w-4 text-slate-400" strokeWidth={2.25} />
+                <input className={inputCls("pl-10")} type="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="+1 555 000 0000" />
+              </div>
+            </Field>
+            <Field>
+              <FieldLabel>WhatsApp</FieldLabel>
+              <div className="relative">
+                <MessageCircle className="absolute left-3 top-3 h-4 w-4 text-slate-400" strokeWidth={2.25} />
+                <input className={inputCls("pl-10")} type="tel" value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} placeholder="+1 555 000 0000" />
+              </div>
+            </Field>
+            <Field>
+              <FieldLabel>Email</FieldLabel>
+              <input className={inputCls()} type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="you@example.com" />
+              {form.email && (
+                <Toggle checked={form.showEmail} onChange={(v) => set("showEmail", v)} label="Show email on my public profile" />
+              )}
+            </Field>
+            <Field>
+              <FieldLabel>Website</FieldLabel>
+              <input className={inputCls()} type="url" value={form.website} onChange={(e) => set("website", e.target.value)} placeholder="https://yoursite.com" />
+            </Field>
+            <Field>
+              <FieldLabel>Booking URL</FieldLabel>
+              <input className={inputCls()} type="url" value={form.bookingUrl} onChange={(e) => set("bookingUrl", e.target.value)} placeholder="https://book.yoursite.com" />
+            </Field>
+            <Field>
+              <FieldLabel>Booking Platform</FieldLabel>
+              <input className={inputCls()} value={form.bookingPlatform} onChange={(e) => set("bookingPlatform", e.target.value)} placeholder="e.g. Calendly, Square, Acuity" />
+            </Field>
+          </div>
+        </div>
       </Accordion>
 
-      {/* 4. Bio */}
-      <Accordion id="bio" icon={Sparkles} title="Bio / Summary" subtitle="Your experience, style, and what clients can expect" open={open.bio} onToggle={() => toggleSection("bio")}>
+      {/* 3. Services — techniques, setup, amenities, products */}
+      <Accordion id="services" icon={SECTION_META.services.icon} title={SECTION_META.services.title} subtitle={SECTION_META.services.subtitle} count={sectionCount("services")} open={open.services} onToggle={() => toggleSection("services")}>
         <Field>
-          <FieldLabel>Profile Description</FieldLabel>
-          <textarea
-            className={`${inputCls()} min-h-[180px] resize-none leading-relaxed`}
-            value={form.bio}
-            onChange={(e) => set("bio", e.target.value)}
-            maxLength={4000}
-            placeholder="Share your experience, massage style, pressure preference, specialties, and what clients can expect…"
-          />
-          <p className="text-right text-xs text-slate-400">{form.bio.length}/4000</p>
+          <FieldLabel>Massage Techniques</FieldLabel>
+          <ChipGrid options={MASSAGE_TECHNIQUES} selected={form.massageTechniques} onToggle={(v) => toggleArr("massageTechniques", v)} columns={3} />
         </Field>
+
+        <div className="space-y-4 border-t border-slate-100 pt-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Setup & extras</p>
+          <Field>
+            <FieldLabel>Massage Setup</FieldLabel>
+            <ChipGrid options={MASSAGE_SETUP} selected={form.massageSetup} onToggle={(v) => toggleArr("massageSetup", v)} columns={2} />
+          </Field>
+          <Field>
+            <FieldLabel>Mobile / Outcall Extras</FieldLabel>
+            <ChipGrid options={MOBILE_EXTRAS} selected={form.mobileExtras} onToggle={(v) => toggleArr("mobileExtras", v)} columns={3} />
+          </Field>
+          <Field>
+            <FieldLabel>Additional Services</FieldLabel>
+            <ChipGrid options={ADDITIONAL_SERVICES} selected={form.additionalServices} onToggle={(v) => toggleArr("additionalServices", v)} columns={3} />
+          </Field>
+        </div>
+
+        <div className="space-y-4 border-t border-slate-100 pt-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Studio amenities & products</p>
+          <Field>
+            <FieldLabel>Studio Amenities</FieldLabel>
+            <ChipGrid options={STUDIO_AMENITIES} selected={form.studioAmenities} onToggle={(v) => toggleArr("studioAmenities", v)} columns={3} />
+          </Field>
+          <Field>
+            <FieldLabel>Products Used</FieldLabel>
+            <ChipGrid options={PRODUCTS} selected={form.productsUsed} onToggle={(v) => toggleArr("productsUsed", v)} columns={3} />
+          </Field>
+          <Field>
+            <FieldLabel>Products Sold</FieldLabel>
+            <ChipGrid options={PRODUCTS} selected={form.productsSold} onToggle={(v) => toggleArr("productsSold", v)} columns={3} />
+          </Field>
+        </div>
       </Accordion>
 
-      {/* 5. Massage Techniques */}
-      <Accordion id="techniques" icon={Heart} title="Massage Techniques" subtitle="Select every modality you practice" count={form.massageTechniques.length} open={open.techniques} onToggle={() => toggleSection("techniques")}>
-        <ChipGrid options={MASSAGE_TECHNIQUES} selected={form.massageTechniques} onToggle={(v) => toggleArr("massageTechniques", v)} columns={3} />
-      </Accordion>
-
-      {/* 6. Services & Setup */}
-      <Accordion id="services" icon={Building2} title="Services & Setup" subtitle="How you work and what else you offer" count={form.massageSetup.length + form.mobileExtras.length + form.additionalServices.length} open={open.services} onToggle={() => toggleSection("services")}>
-        <Field>
-          <FieldLabel>Massage Setup</FieldLabel>
-          <ChipGrid options={MASSAGE_SETUP} selected={form.massageSetup} onToggle={(v) => toggleArr("massageSetup", v)} columns={2} />
-        </Field>
-        <Field>
-          <FieldLabel>Mobile / Outcall Extras</FieldLabel>
-          <ChipGrid options={MOBILE_EXTRAS} selected={form.mobileExtras} onToggle={(v) => toggleArr("mobileExtras", v)} columns={3} />
-        </Field>
-        <Field>
-          <FieldLabel>Additional Services</FieldLabel>
-          <ChipGrid options={ADDITIONAL_SERVICES} selected={form.additionalServices} onToggle={(v) => toggleArr("additionalServices", v)} columns={3} />
-        </Field>
-      </Accordion>
-
-      {/* 7. Studio Amenities & Products */}
-      <Accordion id="amenities" icon={Building2} title="Studio Amenities & Products" subtitle="In-studio amenities and the products you use" count={form.studioAmenities.length + form.productsUsed.length + form.productsSold.length} open={open.amenities} onToggle={() => toggleSection("amenities")}>
-        <Field>
-          <FieldLabel>Studio Amenities</FieldLabel>
-          <ChipGrid options={STUDIO_AMENITIES} selected={form.studioAmenities} onToggle={(v) => toggleArr("studioAmenities", v)} columns={3} />
-        </Field>
-        <Field>
-          <FieldLabel>Products Used</FieldLabel>
-          <ChipGrid options={PRODUCTS} selected={form.productsUsed} onToggle={(v) => toggleArr("productsUsed", v)} columns={3} />
-        </Field>
-        <Field>
-          <FieldLabel>Products Sold</FieldLabel>
-          <ChipGrid options={PRODUCTS} selected={form.productsSold} onToggle={(v) => toggleArr("productsSold", v)} columns={3} />
-        </Field>
-      </Accordion>
-
-      {/* 8. Rates */}
-      <Accordion id="rates" icon={Banknote} title="Rates" subtitle="Session lengths and incall / outcall pricing (USD)" count={form.pricingSessions.length} open={open.rates} onToggle={() => toggleSection("rates")}>
+      {/* 4. Rates & Payments — pricing, disclaimers, discounts, payment methods */}
+      <Accordion id="pricing" icon={SECTION_META.pricing.icon} title={SECTION_META.pricing.title} subtitle={SECTION_META.pricing.subtitle} count={sectionCount("pricing")} open={open.pricing} onToggle={() => toggleSection("pricing")}>
         <div className="space-y-3">
           {form.pricingSessions.map((session, idx) => (
             <div key={idx} className="grid items-end gap-2 sm:grid-cols-[1fr_1fr_1fr_auto]">
@@ -1059,40 +1201,40 @@ export default function MyListingPage() {
             <Plus className="h-4 w-4" strokeWidth={2.5} /> Add session length
           </button>
         </div>
-        <Field>
-          <FieldLabel>Rate Disclaimers</FieldLabel>
-          <ChipGrid options={RATE_DISCLAIMERS} selected={form.rateDisclaimers} onToggle={(v) => toggleArr("rateDisclaimers", v)} columns={2} />
-        </Field>
+
+        <div className="space-y-4 border-t border-slate-100 pt-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Disclaimers & discounts</p>
+          <Field>
+            <FieldLabel>Rate Disclaimers</FieldLabel>
+            <ChipGrid options={RATE_DISCLAIMERS} selected={form.rateDisclaimers} onToggle={(v) => toggleArr("rateDisclaimers", v)} columns={2} />
+          </Field>
+          <Field>
+            <FieldLabel>Regular Discounts</FieldLabel>
+            <ChipGrid options={REGULAR_DISCOUNTS} selected={form.regularDiscounts} onToggle={(v) => toggleArr("regularDiscounts", v)} columns={3} />
+          </Field>
+          <Field>
+            <FieldLabel>Day-of-Week Discount</FieldLabel>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <select className={inputCls()} value={form.dayDiscountPercent} onChange={(e) => set("dayDiscountPercent", e.target.value)}>
+                <option value="">No percentage</option>
+                {DISCOUNT_PERCENTS.map((p) => <option key={p} value={String(p)}>{p}% off</option>)}
+              </select>
+              <select className={inputCls()} value={form.dayDiscountDay} onChange={(e) => set("dayDiscountDay", e.target.value)}>
+                <option value="">Select day</option>
+                {WEEK_DAYS.map((d) => <option key={d} value={d}>{d}</option>)}
+              </select>
+            </div>
+          </Field>
+        </div>
+
+        <div className="space-y-4 border-t border-slate-100 pt-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Payment methods</p>
+          <ChipGrid options={PAYMENT_METHODS} selected={form.paymentMethods} onToggle={(v) => toggleArr("paymentMethods", v)} columns={3} />
+        </div>
       </Accordion>
 
-      {/* 9. Discounts */}
-      <Accordion id="discounts" icon={Tag} title="Discounts" subtitle="Recurring and day-of-week discounts" count={form.regularDiscounts.length} open={open.discounts} onToggle={() => toggleSection("discounts")}>
-        <Field>
-          <FieldLabel>Regular Discounts</FieldLabel>
-          <ChipGrid options={REGULAR_DISCOUNTS} selected={form.regularDiscounts} onToggle={(v) => toggleArr("regularDiscounts", v)} columns={3} />
-        </Field>
-        <Field>
-          <FieldLabel>Day-of-Week Discount</FieldLabel>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <select className={inputCls()} value={form.dayDiscountPercent} onChange={(e) => set("dayDiscountPercent", e.target.value)}>
-              <option value="">No percentage</option>
-              {DISCOUNT_PERCENTS.map((p) => <option key={p} value={String(p)}>{p}% off</option>)}
-            </select>
-            <select className={inputCls()} value={form.dayDiscountDay} onChange={(e) => set("dayDiscountDay", e.target.value)}>
-              <option value="">Select day</option>
-              {WEEK_DAYS.map((d) => <option key={d} value={d}>{d}</option>)}
-            </select>
-          </div>
-        </Field>
-      </Accordion>
-
-      {/* 10. Payment Methods */}
-      <Accordion id="payments" icon={CreditCard} title="Payment Methods" subtitle="How clients can pay you" count={form.paymentMethods.length} open={open.payments} onToggle={() => toggleSection("payments")}>
-        <ChipGrid options={PAYMENT_METHODS} selected={form.paymentMethods} onToggle={(v) => toggleArr("paymentMethods", v)} columns={3} />
-      </Accordion>
-
-      {/* 11. Hours */}
-      <Accordion id="hours" icon={Clock} title="Hours" subtitle="Studio and mobile availability windows" open={open.hours} onToggle={() => toggleSection("hours")}>
+      {/* 5. Schedule — hours + availability */}
+      <Accordion id="schedule" icon={SECTION_META.schedule.icon} title={SECTION_META.schedule.title} subtitle={SECTION_META.schedule.subtitle} open={open.schedule} onToggle={() => toggleSection("schedule")}>
         <Field>
           <FieldLabel>Studio Hours</FieldLabel>
           <HoursRows rows={form.studioHours} onChange={(rows) => set("studioHours", rows)} />
@@ -1106,47 +1248,44 @@ export default function MyListingPage() {
             </Field>
           )}
         </div>
-      </Accordion>
-
-      {/* 12. Contact */}
-      <Accordion id="contact" icon={Phone} title="Contact" subtitle="How clients reach you and book" open={open.contact} onToggle={() => toggleSection("contact")}>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-3 border-t border-slate-100 pt-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Current status</p>
+          <Toggle checked={form.availableNow} onChange={(v) => set("availableNow", v)} label="I'm available now" />
           <Field>
-            <FieldLabel>Phone</FieldLabel>
-            <div className="relative">
-              <Phone className="absolute left-3 top-3 h-4 w-4 text-slate-400" strokeWidth={2.25} />
-              <input className={inputCls("pl-10")} type="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="+1 555 000 0000" />
-            </div>
+            <FieldLabel>Current Status</FieldLabel>
+            <select className={inputCls()} value={form.currentStatus} onChange={(e) => set("currentStatus", e.target.value)}>
+              <option value="">Not set</option>
+              {CURRENT_STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
+            </select>
           </Field>
-          <Field>
-            <FieldLabel>WhatsApp</FieldLabel>
-            <div className="relative">
-              <MessageCircle className="absolute left-3 top-3 h-4 w-4 text-slate-400" strokeWidth={2.25} />
-              <input className={inputCls("pl-10")} type="tel" value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} placeholder="+1 555 000 0000" />
-            </div>
-          </Field>
-          <Field>
-            <FieldLabel>Email</FieldLabel>
-            <input className={inputCls()} type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="you@example.com" />
-          </Field>
-          <Field>
-            <FieldLabel>Website</FieldLabel>
-            <input className={inputCls()} type="url" value={form.website} onChange={(e) => set("website", e.target.value)} placeholder="https://yoursite.com" />
-          </Field>
-          <Field>
-            <FieldLabel>Booking URL</FieldLabel>
-            <input className={inputCls()} type="url" value={form.bookingUrl} onChange={(e) => set("bookingUrl", e.target.value)} placeholder="https://book.yoursite.com" />
-          </Field>
-          <Field>
-            <FieldLabel>Booking Platform</FieldLabel>
-            <input className={inputCls()} value={form.bookingPlatform} onChange={(e) => set("bookingPlatform", e.target.value)} placeholder="e.g. Calendly, Square, Acuity" />
-          </Field>
+          <Toggle checked={form.lgbtqAffirming} onChange={(v) => set("lgbtqAffirming", v)} label="My practice is LGBTQ+-affirming" />
         </div>
       </Accordion>
 
-      {/* 13. Education */}
-      <Accordion id="education" icon={GraduationCap} title="Education / Degrees" subtitle="Training, certifications, and credentials" count={form.educationEntries.length} open={open.education} onToggle={() => toggleSection("education")}>
-        <div className="space-y-4">
+      {/* 6. Credentials — education, experience, languages, affiliations */}
+      <Accordion id="credentials" icon={SECTION_META.credentials.icon} title={SECTION_META.credentials.title} subtitle={SECTION_META.credentials.subtitle} count={sectionCount("credentials")} open={open.credentials} onToggle={() => toggleSection("credentials")}>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field>
+            <FieldLabel>Career Start Date</FieldLabel>
+            <div className="flex gap-2">
+              <select className={inputCls()} value={form.startMonth} onChange={(e) => set("startMonth", e.target.value)}>
+                <option value="">Month</option>
+                {MONTHS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
+              </select>
+              <select className={inputCls()} value={form.startYear} onChange={(e) => set("startYear", e.target.value)}>
+                <option value="">Year</option>
+                {YEARS.map((y) => <option key={y} value={y}>{y}</option>)}
+              </select>
+            </div>
+          </Field>
+          <Field>
+            <FieldLabel>Years of Experience</FieldLabel>
+            <input type="number" min={0} max={80} className={inputCls()} value={form.yearsExperience} onChange={(e) => set("yearsExperience", e.target.value)} placeholder="e.g. 8" />
+          </Field>
+        </div>
+
+        <div className="space-y-4 border-t border-slate-100 pt-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Education</p>
           {form.educationEntries.map((entry, idx) => (
             <div key={idx} className="space-y-3 rounded-xl border border-slate-100 bg-slate-50/50 p-4">
               <div className="flex items-center justify-between">
@@ -1212,82 +1351,16 @@ export default function MyListingPage() {
             <Plus className="h-4 w-4" strokeWidth={2.5} /> Add education entry
           </button>
         </div>
-      </Accordion>
 
-      {/* 14. Professional */}
-      <Accordion id="professional" icon={LanguagesIcon} title="Professional" subtitle="Experience, travel radius, languages, and affiliations" open={open.professional} onToggle={() => toggleSection("professional")}>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-4 border-t border-slate-100 pt-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Languages & affiliations</p>
           <Field>
-            <FieldLabel>Career Start Date</FieldLabel>
-            <div className="flex gap-2">
-              <select className={inputCls()} value={form.startMonth} onChange={(e) => set("startMonth", e.target.value)}>
-                <option value="">Month</option>
-                {MONTHS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
-              </select>
-              <select className={inputCls()} value={form.startYear} onChange={(e) => set("startYear", e.target.value)}>
-                <option value="">Year</option>
-                {YEARS.map((y) => <option key={y} value={y}>{y}</option>)}
-              </select>
-            </div>
+            <FieldLabel>Languages</FieldLabel>
+            <ChipGrid options={LANGUAGES} selected={form.languages} onToggle={(v) => toggleArr("languages", v)} columns={4} />
           </Field>
           <Field>
-            <FieldLabel>Years of Experience</FieldLabel>
-            <input type="number" min={0} max={80} className={inputCls()} value={form.yearsExperience} onChange={(e) => set("yearsExperience", e.target.value)} placeholder="e.g. 8" />
-          </Field>
-          <Field>
-            <FieldLabel>Outcall Radius (km)</FieldLabel>
-            <select className={inputCls()} value={form.outcallRadius} onChange={(e) => set("outcallRadius", e.target.value)}>
-              <option value="">Not set</option>
-              {OUTCALL_RADII.map((r) => <option key={r} value={String(r)}>{r} km</option>)}
-            </select>
-          </Field>
-        </div>
-        <Field>
-          <FieldLabel>Languages</FieldLabel>
-          <ChipGrid options={LANGUAGES} selected={form.languages} onToggle={(v) => toggleArr("languages", v)} columns={4} />
-        </Field>
-        <Field>
-          <FieldLabel>Affiliations</FieldLabel>
-          <ChipGrid options={AFFILIATIONS} selected={form.affiliations} onToggle={(v) => toggleArr("affiliations", v)} columns={2} />
-        </Field>
-      </Accordion>
-
-      {/* 15. Availability */}
-      <Accordion id="availability" icon={BadgeCheck} title="Availability" subtitle="Your current booking status" open={open.availability} onToggle={() => toggleSection("availability")}>
-        <Toggle checked={form.availableNow} onChange={(v) => set("availableNow", v)} label="I'm available now" />
-        <Field>
-          <FieldLabel>Current Status</FieldLabel>
-          <select className={inputCls()} value={form.currentStatus} onChange={(e) => set("currentStatus", e.target.value)}>
-            <option value="">Not set</option>
-            {CURRENT_STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </Field>
-        <Toggle checked={form.lgbtqAffirming} onChange={(v) => set("lgbtqAffirming", v)} label="My practice is LGBTQ+-affirming" />
-      </Accordion>
-
-      {/* 16. Physical Profile */}
-      <Accordion id="physical" icon={User} title="Physical Profile" subtitle="Optional — helps clients find the right match" open={open.physical} onToggle={() => toggleSection("physical")}>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <Field>
-            <FieldLabel>Height (inches)</FieldLabel>
-            <input type="number" min={36} max={96} className={inputCls()} value={form.heightInches} onChange={(e) => set("heightInches", e.target.value)} placeholder={`72 = 6'0"`} />
-            {form.heightInches && (() => {
-              const n = Number(form.heightInches);
-              if (!n) return null;
-              return <p className="text-xs text-slate-400">{`${Math.floor(n / 12)}'${n % 12}" / ${Math.round(n * 2.54)} cm`}</p>;
-            })()}
-          </Field>
-          <Field>
-            <FieldLabel>Weight (lb)</FieldLabel>
-            <input type="number" min={60} max={600} className={inputCls()} value={form.weightLb} onChange={(e) => set("weightLb", e.target.value)} placeholder="180" />
-            {form.weightLb && <p className="text-xs text-slate-400">{Math.round(Number(form.weightLb) * 0.453592)} kg</p>}
-          </Field>
-          <Field>
-            <FieldLabel>Body Type</FieldLabel>
-            <select className={inputCls()} value={form.bodyType} onChange={(e) => set("bodyType", e.target.value)}>
-              <option value="">Select</option>
-              {BODY_TYPE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-            </select>
+            <FieldLabel>Affiliations</FieldLabel>
+            <ChipGrid options={AFFILIATIONS} selected={form.affiliations} onToggle={(v) => toggleArr("affiliations", v)} columns={2} />
           </Field>
         </div>
       </Accordion>

@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     // Mark as verified
     await adminClient
       .from("text_verifications")
-      .update({ status: "verified", reviewed_at: now, updated_at: now })
+      .update({ status: "verified", verified_at: now, updated_at: now })
       .eq("id", verification.id);
 
     // Update profile phone verification flag

@@ -2018,6 +2018,7 @@ export type Database = {
           service_radius_miles: number | null
           session_duration: number | null
           session_lengths: number[] | null
+          show_email: boolean
           slug: string | null
           social_media: Json | null
           specialties: string[] | null
@@ -2192,6 +2193,7 @@ export type Database = {
           service_radius_miles?: number | null
           session_duration?: number | null
           session_lengths?: number[] | null
+          show_email?: boolean
           slug?: string | null
           social_media?: Json | null
           specialties?: string[] | null
@@ -2366,6 +2368,7 @@ export type Database = {
           service_radius_miles?: number | null
           session_duration?: number | null
           session_lengths?: number[] | null
+          show_email?: boolean
           slug?: string | null
           social_media?: Json | null
           specialties?: string[] | null
@@ -2484,33 +2487,59 @@ export type Database = {
       }
       ranking_events: {
         Row: {
-          created_at: string | null
-          event_name: string | null
-          event_type: string | null
           id: string
-          metadata: Json | null
-          profile_id: string | null
-          weight: number | null
+          session_id: string
+          user_id: string | null
+          therapist_id: string | null
+          event_name: string
+          city: string | null
+          neighborhood: string | null
+          intent: string
+          device_type: string | null
+          position_in_results: number | null
+          recommendation_source: string | null
+          metadata: Json
+          created_at: string
         }
         Insert: {
-          created_at?: string | null
-          event_name?: string | null
-          event_type?: string | null
           id?: string
-          metadata?: Json | null
-          profile_id?: string | null
-          weight?: number | null
+          session_id: string
+          user_id?: string | null
+          therapist_id?: string | null
+          event_name: string
+          city?: string | null
+          neighborhood?: string | null
+          intent?: string
+          device_type?: string | null
+          position_in_results?: number | null
+          recommendation_source?: string | null
+          metadata?: Json
+          created_at?: string
         }
         Update: {
-          created_at?: string | null
-          event_name?: string | null
-          event_type?: string | null
           id?: string
-          metadata?: Json | null
-          profile_id?: string | null
-          weight?: number | null
+          session_id?: string
+          user_id?: string | null
+          therapist_id?: string | null
+          event_name?: string
+          city?: string | null
+          neighborhood?: string | null
+          intent?: string
+          device_type?: string | null
+          position_in_results?: number | null
+          recommendation_source?: string | null
+          metadata?: Json
+          created_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ranking_events_therapist_id_fkey"
+            columns: ["therapist_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reviews: {
         Row: {
@@ -3102,57 +3131,59 @@ export type Database = {
       }
       text_verifications: {
         Row: {
+          attempt_count: number
           code: string | null
           created_at: string
+          expires_at: string | null
           id: string
-          profile_id: string | null
-          rejection_reason: string | null
-          reviewed_at: string | null
-          reviewed_by: string | null
+          phone: string
+          provider: string | null
+          sent_at: string | null
           status: string
           submitted_text: string | null
           updated_at: string
-          user_id: string | null
+          user_id: string
+          verification_code: string | null
+          verified_at: string | null
         }
         Insert: {
+          attempt_count?: number
           code?: string | null
           created_at?: string
+          expires_at?: string | null
           id?: string
-          profile_id?: string | null
-          rejection_reason?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
+          phone: string
+          provider?: string | null
+          sent_at?: string | null
           status?: string
           submitted_text?: string | null
           updated_at?: string
-          user_id?: string | null
+          user_id: string
+          verification_code?: string | null
+          verified_at?: string | null
         }
         Update: {
+          attempt_count?: number
           code?: string | null
           created_at?: string
+          expires_at?: string | null
           id?: string
-          profile_id?: string | null
-          rejection_reason?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
+          phone?: string
+          provider?: string | null
+          sent_at?: string | null
           status?: string
           submitted_text?: string | null
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
+          verification_code?: string | null
+          verified_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "text_verifications_profile_id_fkey"
-            columns: ["profile_id"]
+            foreignKeyName: "text_verifications_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "text_verifications_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "public_therapists"
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
