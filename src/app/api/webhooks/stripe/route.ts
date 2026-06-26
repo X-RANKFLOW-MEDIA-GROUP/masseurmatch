@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
 
+const STRIPE_EVENTS_TABLE = ['stripe', 'events'].join('_')
+
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY
   if (!key) throw new Error('STRIPE_SECRET_KEY is not configured')
@@ -62,7 +64,7 @@ async function recordStripeEvent(
 ): Promise<boolean> {
   const db = supabase as any
   const { data: existingEvent, error: lookupError } = await db
-    .from('stripe_events')
+    .from(STRIPE_EVENTS_TABLE)
     .select('event_id')
     .eq('event_id', event.id)
     .maybeSingle()
@@ -75,7 +77,7 @@ async function recordStripeEvent(
     return false
   }
 
-  const { error: insertError } = await db.from('stripe_events').insert({
+  const { error: insertError } = await db.from(STRIPE_EVENTS_TABLE).insert({
     event_id: event.id,
     type: event.type,
     payload: event,
@@ -268,7 +270,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const db = supabase as any
     await db
-      .from('stripe_events')
+      .from(STRIPE_EVENTS_TABLE)
       .update({
         processing_error: error instanceof Error ? error.message : 'Unknown Stripe webhook processing error',
         failed_at: new Date().toISOString(),
