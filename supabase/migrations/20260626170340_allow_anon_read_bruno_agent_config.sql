@@ -1,0 +1,5 @@
+-- Remote migration history placeholder.
+-- This migration version is already recorded in the remote Supabase project.
+-- It was applied remotely outside this repository.
+-- Keep this file so local Supabase CLI migration history stays aligned.
+-- Do not add schema changes here. Create a new migration for future changes.
