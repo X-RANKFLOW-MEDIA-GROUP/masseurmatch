@@ -36,7 +36,7 @@ interface NavLink {
 
 const navLinks: NavLink[] = [
   { href: "/", label: "Home", icon: Home },
-  { href: "/therapists", label: "Masseurs", icon: Users },
+  { href: "/therapists", label: "Therapists", icon: Users },
   { href: "/how-it-works", label: "How it Works", icon: Heart },
   { href: "/pricing", label: "Pricing", icon: Tag },
   { href: "/about", label: "About", icon: Info },

@@ -262,6 +262,7 @@ create table if not exists public.text_verifications (
   attempt_count integer not null default 0,
   sent_at timestamptz,
   verified_at timestamptz,
+  reviewed_at timestamptz,
   expires_at timestamptz,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
@@ -731,6 +732,7 @@ create index if not exists idx_therapist_photos_user on public.therapist_photos(
 create index if not exists idx_therapist_photos_profile on public.therapist_photos(profile_id, status);
 create index if not exists idx_therapist_photos_pending on public.therapist_photos(status, created_at) where status = 'pending_review';
 create index if not exists idx_text_verifications_user on public.text_verifications(user_id, status);
+create index if not exists idx_text_verifications_reviewed_at on public.text_verifications(reviewed_at desc) where status = 'verified';
 create index if not exists idx_admin_actions_admin on public.admin_actions(admin_id, created_at desc);
 create index if not exists idx_admin_actions_target_user on public.admin_actions(target_user_id, created_at desc);
 create index if not exists idx_admin_actions_type on public.admin_actions(action_type, created_at desc);
@@ -1132,3 +1134,33 @@ create table if not exists admin_actions (
   metadata          jsonb,
   created_at        timestamptz not null default now()
 );
+
+-- ── Pre-launch audit features ─────────────────────────────────────────────────
+
+alter table public.profiles add column if not exists identity_verified_at timestamptz;
+
+create table if not exists public.contact_events (
+  id          uuid primary key default gen_random_uuid(),
+  profile_id  uuid not null references public.profiles(id) on delete cascade,
+  user_id     uuid references auth.users(id) on delete set null,
+  method      text not null,
+  ip_hash     text,
+  created_at  timestamptz not null default now()
+);
+
+-- ── Schema-drift catch-up (additive only) ─────────────────────────────────────
+
+alter table public.contact_inquiries
+  add column if not exists client_name text,
+  add column if not exists client_phone text,
+  add column if not exists preferred_contact text;
+
+create or replace view public.therapist_analytics_daily as
+  select
+    therapist_profile_id,
+    date_trunc('day', created_at)::date as event_date,
+    event_name,
+    count(*) as event_count
+  from public.analytics_events
+  where therapist_profile_id is not null
+  group by therapist_profile_id, date_trunc('day', created_at)::date, event_name;

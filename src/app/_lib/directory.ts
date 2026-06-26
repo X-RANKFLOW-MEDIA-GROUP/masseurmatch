@@ -162,7 +162,19 @@ const buildPublicTherapistsQuery = () => {
     .eq("visibility_status", "public")
     .eq("profile_status", "approved")
     .eq("is_suspended", false)
-    .eq("is_banned", false);
+    .eq("is_banned", false)
+    .or("email_address.is.null,not.email_address.ilike.%@example%")
+    .or("email_address.is.null,not.email_address.ilike.%admin.dev@%")
+    .not("display_name", "ilike", "%test%")
+    .not("display_name", "ilike", "%debug%")
+    .not("display_name", "ilike", "%admin%")
+    .not("display_name", "ilike", "%example%")
+    .not("display_name", "ilike", "%demo%")
+    .not("slug", "ilike", "%admin%")
+    .not("slug", "ilike", "%test%")
+    .not("slug", "ilike", "%example%")
+    .not("slug", "ilike", "%dev%")
+    .not("phone", "ilike", "%555%");
   return q;
 };
 

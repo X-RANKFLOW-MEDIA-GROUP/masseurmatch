@@ -32,7 +32,9 @@ export function SiteFooter() {
               </span>
             </Link>
             <p className="text-sm text-gray-400">
-              e.mail@masseurmatch.com
+              <a href="mailto:support@masseurmatch.com" className="hover:text-white transition-colors">
+                support@masseurmatch.com
+              </a>
             </p>
             <div className="space-y-2">
               <a href="tel:+19786277387" className="flex items-center gap-2 font-sans text-sm text-slate-400 hover:text-white transition-colors">
@@ -56,11 +58,15 @@ export function SiteFooter() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             <div className="flex items-center gap-3">
               <Phone className="w-[1.1rem] h-[1.1rem] text-white" strokeWidth={2.25} />
-              <span className="text-sm text-white">+(00) 234-6870</span>
+              <a href="tel:978-627-7387" className="text-sm text-white hover:text-orange-400 transition-colors">
+                978-MASSEUR (627-7387)
+              </a>
             </div>
             <div className="flex items-center gap-3">
               <Mail className="w-[1.1rem] h-[1.1rem] text-white" strokeWidth={2.25} />
-              <span className="text-sm text-white">+(519) 255-6779</span>
+              <a href="mailto:support@masseurmatch.com" className="text-sm text-white hover:text-orange-400 transition-colors">
+                support@masseurmatch.com
+              </a>
             </div>
           </div>
 
