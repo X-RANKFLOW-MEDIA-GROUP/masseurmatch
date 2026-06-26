@@ -991,7 +991,119 @@ create table if not exists public.sms_follow_up_alerts (
   unique(profile_id, client_phone, our_phone)
 );
 
-create table if not exists public.demand_scores (
+-- Tables added to satisfy validate:db-contract
+
+create table if not exists moderation_queue (
+  id                   uuid primary key default gen_random_uuid(),
+  therapist_profile_id uuid,
+  content_type         text not null,
+  content_id           uuid,
+  status               text not null default 'pending',
+  notes                text,
+  profile_id           uuid,
+  user_id              uuid,
+  target_id            uuid,
+  item_type            text,
+  source               text,
+  field_name           text,
+  priority             integer default 0,
+  moderation_provider  text,
+  moderation_reason    text,
+  admin_reason         text,
+  snapshot             jsonb,
+  ai_response          jsonb,
+  resolved_by          uuid,
+  resolved_at          timestamptz,
+  reviewed_at          timestamptz,
+  reviewed_by          uuid,
+  photo_id             uuid,
+  queue_type           text,
+  payload              jsonb,
+  created_at           timestamptz not null default now(),
+  updated_at           timestamptz not null default now()
+);
+
+create table if not exists payment_transactions (
+  id                      uuid primary key default gen_random_uuid(),
+  appointment_id          uuid,
+  user_id                 uuid,
+  therapist_id            uuid,
+  amount_cents            integer,
+  currency                text default 'USD',
+  status                  text default 'pending',
+  provider                text,
+  provider_transaction_id text,
+  stripe_refund_id        text,
+  metadata                jsonb,
+  created_at              timestamptz not null default now()
+);
+
+create table if not exists appointments (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid,
+  therapist_id uuid,
+  profile_id   uuid,
+  starts_at    timestamptz,
+  ends_at      timestamptz,
+  status       text not null default 'pending',
+  notes        text,
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now()
+);
+
+create table if not exists text_verifications (
+  id               uuid primary key default gen_random_uuid(),
+  user_id          uuid,
+  profile_id       uuid,
+  status           text not null default 'pending',
+  code             text,
+  submitted_text   text,
+  reviewed_by      uuid,
+  reviewed_at      timestamptz,
+  rejection_reason text,
+  created_at       timestamptz not null default now(),
+  updated_at       timestamptz not null default now()
+);
+
+create table if not exists profile_reviews (
+  id           uuid primary key default gen_random_uuid(),
+  profile_id   uuid,
+  user_id      uuid,
+  status       text not null default 'pending_approval',
+  submitted_at timestamptz,
+  reviewed_at  timestamptz,
+  reviewed_by  uuid,
+  admin_notes  text,
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now()
+);
+
+create table if not exists therapist_photos (
+  id                    uuid primary key default gen_random_uuid(),
+  therapist_profile_id  uuid not null,
+  storage_path          text not null,
+  public_url            text,
+  alt_text              text,
+  is_primary            boolean not null default false,
+  approval_status       text not null default 'pending',
+  sort_order            integer not null default 0,
+  user_id               uuid,
+  profile_id            uuid,
+  main_profile_id       uuid,
+  photo_type            text default 'gallery',
+  status                text default 'pending_review',
+  rejection_reason      text,
+  mime_type             text,
+  file_size             integer,
+  reviewed_at           timestamptz,
+  reviewed_by           uuid,
+  moderation_notes      text,
+  moderation_confidence numeric,
+  created_at            timestamptz not null default now(),
+  updated_at            timestamptz not null default now()
+);
+
+create table if not exists demand_scores (
   id                  uuid primary key default gen_random_uuid(),
   city                text not null,
   state               text not null,
@@ -1002,4 +1114,21 @@ create table if not exists public.demand_scores (
   competition_index   integer not null default 0,
   week_start          date not null,
   created_at          timestamptz not null default now()
+);
+
+create table if not exists admin_actions (
+  id                uuid primary key default gen_random_uuid(),
+  actor_profile_id  uuid,
+  admin_id          uuid,
+  target_table      text not null,
+  target_id         uuid,
+  target_user_id    uuid,
+  target_profile_id uuid,
+  action            text not null,
+  action_type       text,
+  reason            text,
+  before_data       jsonb,
+  after_data        jsonb,
+  metadata          jsonb,
+  created_at        timestamptz not null default now()
 );
