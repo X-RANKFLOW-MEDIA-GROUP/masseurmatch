@@ -22,8 +22,10 @@ export async function POST(
     await adminClient.auth.admin.updateUserById(userId, { ban_duration: "0s" });
 
     await adminClient.from("admin_actions").insert({
-      admin_id: admin.userId,
+      action: "unban_user",
       action_type: "unban_user",
+      target_table: "users",
+      admin_id: admin.userId,
       target_user_id: userId,
     });
 

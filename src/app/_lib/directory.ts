@@ -138,6 +138,8 @@ export interface PublicTherapist {
   seo_description?: string | null;
   seo_keywords?: string[] | string | null;
   created_at?: string | null;
+  is_demo?: boolean | null;
+  identity_verified_at?: string | null;
 }
 
 export interface ImportedReview {
@@ -150,8 +152,10 @@ export interface ImportedReview {
 
 export const getCities = () => US_CITIES;
 
-const buildPublicTherapistsQuery = () =>
-  supabase
+const showDemoProfiles = process.env.SHOW_DEMO_PROFILES === "true";
+
+const buildPublicTherapistsQuery = () => {
+  const q = supabase
     .from("profiles")
     .select(PUBLIC_PROFILE_SELECT, { count: "exact" })
     .eq("visibility_status", "public")
@@ -183,6 +187,11 @@ function sortPublicTherapists(items: PublicTherapist[]) {
 
 function applyFallbackFilters(items: PublicTherapist[], filters?: Parameters<typeof getPublicTherapists>[0]) {
   return items.filter((profile) => {
+    // Exclude test/debug profiles from public listings
+    const name = profile.display_name?.toLowerCase() ?? "";
+    if (name.includes("debug") || name.includes("test")) return false;
+    if (profile.phone?.includes("555")) return false;
+
     if (filters?.city && profile.city?.toLowerCase() !== filters.city.toLowerCase()) return false;
     if (filters?.verified && profile.verification_status !== "verified") return false;
     if (filters?.availableToday && !isActivelyAvailable(profile)) return false;
@@ -190,6 +199,15 @@ function applyFallbackFilters(items: PublicTherapist[], filters?: Parameters<typ
     if (filters?.lgbtqAffirming && profile.lgbtq_affirming !== true) return false;
     if (filters?.keyword) {
       const keyword = filters.keyword.toLowerCase();
+
+      // If keyword is a known city name, treat as city filter in fallback too
+      const matchedCity = US_CITIES.find(
+        (c) => c.name.toLowerCase() === keyword,
+      );
+      if (matchedCity && !filters?.city) {
+        if (profile.city?.toLowerCase() !== matchedCity.name.toLowerCase()) return false;
+      }
+
       const searchable = [
         profile.bio,
         profile.display_name,
@@ -197,8 +215,10 @@ function applyFallbackFilters(items: PublicTherapist[], filters?: Parameters<typ
         profile.headline,
         profile.neighborhood,
         profile.neighborhood_name,
+        profile.city,
         ...(profile.specialties ?? []),
         ...(profile.massage_techniques ?? []),
+        ...(profile.service_categories ?? []),
       ]
         .filter(Boolean)
         .join(" ")
@@ -233,14 +253,34 @@ export const getPublicTherapists = async (filters?: {
   if (filters?.keyword) {
     const keyword = `%${filters.keyword}%`;
     const bodyTypeKeyword = matchBodyTypeKeyword(filters.keyword);
+
+    // Check if the keyword matches a known city name — if so, also filter by city
+    const matchedCity = US_CITIES.find(
+      (c) => c.name.toLowerCase() === filters.keyword!.toLowerCase(),
+    );
+    if (matchedCity && !filters?.city) {
+      query = query.ilike("city", matchedCity.name);
+    }
+
     const conditions = [
       `bio.ilike.${keyword}`,
       `display_name.ilike.${keyword}`,
       `full_name.ilike.${keyword}`,
       `headline.ilike.${keyword}`,
       `neighborhood.ilike.${keyword}`,
+      `city.ilike.${keyword}`,
+      `specialties.cs.{"${filters.keyword}"}`,
+      `massage_techniques.cs.{"${filters.keyword}"}`,
+      `service_categories.cs.{"${filters.keyword}"}`,
       ...(bodyTypeKeyword ? [`body_type.eq.${bodyTypeKeyword}`] : []),
     ];
+
+    // When matching a city, use AND (city + text match) so only that city's
+    // therapists are returned. Otherwise use OR across all text fields.
+    if (matchedCity && !filters?.city) {
+      // City filter already applied above; the OR here is for ranking/display
+      // but the city ilike narrows the result set.
+    }
     query = query.or(conditions.join(","));
   }
   if (filters?.verified) query = query.eq("verification_status", "verified");
@@ -254,8 +294,8 @@ export const getPublicTherapists = async (filters?: {
   const { data: rawData, error, count } = await query;
   const data = rawData ? sortPublicTherapists(rawData as unknown as PublicTherapist[]) : [];
 
-  if (!error && data.length > 0) {
-    return { items: data, total: count || data.length, page, pageSize };
+  if (!error) {
+    return { items: data, total: count ?? data.length, page, pageSize };
   }
 
   const fallbackItems = sortPublicTherapists(
@@ -279,8 +319,19 @@ export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTher
     return null;
   }
 
+  // The `id` column is a UUID. Only compare against it when the input is a
+  // valid UUID — otherwise Postgres raises `invalid input syntax for type uuid`
+  // (22P02), which fails the whole request and makes every slug-based profile
+  // page return 404. For plain slugs, match by `slug` only.
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    sanitizedSlug,
+  );
+  const orFilter = isUuid
+    ? `slug.eq.${sanitizedSlug},id.eq.${sanitizedSlug}`
+    : `slug.eq.${sanitizedSlug}`;
+
   const { data: profile, error } = await buildPublicTherapistsQuery()
-    .or(`slug.eq.${sanitizedSlug},id.eq.${sanitizedSlug}`)
+    .or(orFilter)
     .maybeSingle();
 
   if (!error && profile) {
@@ -342,12 +393,16 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
 };
 
 export async function getCityInventoryCount(cityName: string): Promise<number> {
-  const { count, error } = await supabase
+  let q = supabase
     .from("profiles")
     .select("id", { count: "exact", head: true })
     .eq("visibility_status", "public")
     .eq("profile_status", "approved")
     .ilike("city", cityName);
+  if (!showDemoProfiles) {
+    q = q.or("is_demo.is.null,is_demo.eq.false");
+  }
+  const { count, error } = await q;
 
   if (!error && count && count > 0) return count;
 

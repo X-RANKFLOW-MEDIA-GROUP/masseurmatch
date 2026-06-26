@@ -105,7 +105,11 @@ export async function POST(request: NextRequest) {
       .eq("user_id", session.userId)
       .maybeSingle();
 
-    const { data: inquiry } = userProfile?.email
+    // Skip contact_events check as table doesn't exist in schema
+    const hasContactEvent = false;
+
+    // Fallback: contact_inquiries (email-based inquiry form)
+    const { data: inquiry } = !hasContactEvent && userProfile?.email
       ? await supabase
           .from("contact_inquiries")
           .select("id")
@@ -114,7 +118,7 @@ export async function POST(request: NextRequest) {
           .maybeSingle()
       : { data: null };
 
-    const isVerified = !!inquiry;
+    const isVerified = hasContactEvent || !!inquiry;
 
     const { data, error } = await supabase
       .from("reviews")
@@ -144,7 +148,7 @@ export async function POST(request: NextRequest) {
         user_id: therapistProfile.user_id,
         type: "new_review",
         title: "New Review Received",
-        message: `You received a ${rating}-star review${title ? `: "${title}"` : ""}`,
+        body: `You received a ${rating}-star review${title ? `: "${title}"` : ""}`,
         data: { review_id: data.id, rating },
       });
     }

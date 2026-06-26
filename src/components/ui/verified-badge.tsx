@@ -1,37 +1,65 @@
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { CheckCircle2 } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface VerifiedBadgeProps {
   size?: "sm" | "md";
   className?: string;
+  /** ISO timestamp from identity_verified_at; shows "Stripe Identity · Mon YYYY" when provided */
+  verifiedAt?: string | null;
+  /** Set to false when the badge is already inside a Link to avoid nested anchors (default: true for md, false for sm) */
+  asLink?: boolean;
 }
 
-export const VerifiedBadge = ({ size = "md", className }: VerifiedBadgeProps) => {
-  const isSmall = size === "sm";
+function formatVerifiedMonth(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  } catch {
+    return "";
+  }
+}
 
-  return (
+export const VerifiedBadge = ({ size = "md", className, verifiedAt, asLink }: VerifiedBadgeProps) => {
+  const isSmall = size === "sm";
+  const shouldLink = asLink ?? !isSmall;
+  const dateLabel = verifiedAt ? formatVerifiedMonth(verifiedAt) : null;
+
+  const inner = (
     <motion.div
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       className={cn(
         "relative inline-flex items-center gap-1.5 rounded-full font-semibold select-none",
         isSmall ? "px-2 py-0.5 text-[10px]" : "px-3 py-1 text-xs",
-        "bg-primary/10 text-primary border border-primary/25",
+        "bg-emerald-50 text-emerald-700 border border-emerald-200",
         "backdrop-blur-sm",
         className,
       )}
     >
-      {/* Soft shadow glow */}
       <span
         className="absolute -inset-[2px] rounded-full pointer-events-none"
         style={{
-          boxShadow: "0 0 10px 2px hsl(var(--primary) / 0.24), 0 0 20px 4px hsl(var(--primary) / 0.12)",
+          boxShadow: "0 0 10px 2px rgba(16,185,129,0.15), 0 0 20px 4px rgba(16,185,129,0.08)",
         }}
       />
-
-      <CheckCircle2 className={cn("shrink-0", isSmall ? "w-2.5 h-2.5" : "w-3.5 h-3.5")} />
-      <span className="relative z-10 tracking-wide uppercase">Active</span>
+      <ShieldCheck className={cn("shrink-0", isSmall ? "w-2.5 h-2.5" : "w-3.5 h-3.5")} strokeWidth={2.25} />
+      <span className="relative z-10 tracking-wide">
+        Verified
+        {dateLabel && !isSmall && (
+          <span className="ml-1 opacity-70">· Stripe Identity · {dateLabel}</span>
+        )}
+      </span>
     </motion.div>
   );
+
+  if (shouldLink) {
+    return (
+      <Link href="/verification" title="What does verified mean?" className="inline-flex">
+        {inner}
+      </Link>
+    );
+  }
+
+  return inner;
 };

@@ -38,7 +38,7 @@ export default function AdminSettingsPage() {
                 </div>
                 <div className="grid gap-2">
                   <label htmlFor="site-url" className="text-sm font-medium text-foreground">Site URL</label>
-                  <Input id="site-url" defaultValue="https://www.masseurmatch.com" className="bg-secondary/30 border-border" />
+                  <Input id="site-url" defaultValue="https://masseurmatch.com" className="bg-secondary/30 border-border" />
                 </div>
                 <div className="grid gap-2">
                   <label htmlFor="admin-email" className="text-sm font-medium text-foreground">Admin Email</label>

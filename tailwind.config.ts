@@ -101,11 +101,11 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
-        heading: ["var(--font-sora)", "Sora", "system-ui", "sans-serif"],
-        display: ["var(--font-unbounded)", "var(--font-inter)", "sans-serif"],
-        stat: ["var(--font-space-grotesk)", "Space Grotesk", "system-ui", "sans-serif"],
-        mono: ["var(--font-space-grotesk)", "Space Grotesk", "monospace"],
+        sans: ["var(--font-montserrat)", "Montserrat", "system-ui", "sans-serif"],
+        heading: ["var(--font-montserrat)", "Montserrat", "system-ui", "sans-serif"],
+        display: ["var(--font-montserrat)", "Montserrat", "system-ui", "sans-serif"],
+        stat: ["var(--font-montserrat)", "Montserrat", "system-ui", "sans-serif"],
+        mono: ["ui-monospace", "SFMono-Regular", "Roboto Mono", "Consolas", "monospace"],
       },
       borderRadius: {
         xl: "1.25rem",
@@ -114,6 +114,12 @@ const config: Config = {
       boxShadow: {
         soft: "var(--shadow-subtle)",
         brand: "var(--shadow-card)",
+      },
+      transitionTimingFunction: {
+        "smooth-out": "cubic-bezier(0.16, 1, 0.3, 1)",
+      },
+      transitionDuration: {
+        600: "600ms",
       },
       keyframes: {
         "accordion-down": {

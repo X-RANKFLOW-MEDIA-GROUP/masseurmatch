@@ -219,10 +219,10 @@ export function AdvancedDirectoryFilter({
                 <Search className="h-4 w-4 shrink-0 text-slate-400" />
                 <div className="min-w-0 flex-1">
                   <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
-                    Search Vector
+                    Search
                   </p>
                   <input
-                    type="text"
+                    type="search"
                     value={filters.keyword}
                     onChange={(event) => onChange({ keyword: event.target.value })}
                     placeholder="Specialty, therapist name, or pain point"
@@ -250,10 +250,10 @@ export function AdvancedDirectoryFilter({
                   <SlidersHorizontal className="h-4 w-4" />
                   <div>
                     <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
-                      Control
+                      Filters
                     </p>
                     <p className="mt-1 font-sans text-sm font-medium">
-                      {isExpanded ? "Close Parameters" : "Open Parameters"}
+                      {isExpanded ? "Close Filters" : "Open Filters"}
                     </p>
                   </div>
                 </div>
@@ -266,10 +266,10 @@ export function AdvancedDirectoryFilter({
 
           <div className="mt-4 overflow-x-auto scrollbar-none">
             <div className="flex min-w-max gap-3">
-              <FilterMetric label="Objective" value={activeObjective.label} />
-              <FilterMetric label="Session" value={sessionLabel} compact />
-              <FilterMetric label="Tier" value={tierLabel} compact />
-              <FilterMetric label="Trust" value={trustLabel} compact />
+              <FilterMetric label="Looking for" value={activeObjective.label} />
+              <FilterMetric label="Session type" value={sessionLabel} compact />
+              <FilterMetric label="Therapist tier" value={tierLabel} compact />
+              <FilterMetric label="Verification" value={trustLabel} compact />
               {filters.availableToday ? <FilterMetric label="Availability" value="Today" compact /> : null}
               {filters.masterOnly ? <FilterMetric label="Experience" value="10+ Years" compact /> : null}
               {filters.lgbtqAffirming ? <FilterMetric label="Inclusivity" value="LGBTQ+" compact /> : null}
@@ -291,7 +291,7 @@ export function AdvancedDirectoryFilter({
                 <div className="space-y-7">
                   <div>
                     <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
-                      Treatment Objective
+                      Looking for
                     </p>
                     <div className="mt-4 flex flex-wrap gap-2">
                       {DIRECTORY_OBJECTIVES.map((objective) => {
@@ -340,7 +340,7 @@ export function AdvancedDirectoryFilter({
 
                     <div className="space-y-2">
                       <span className="block font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
-                        Session Format
+                        Session type
                       </span>
                       <div className="grid min-h-12 grid-cols-3 overflow-hidden border border-slate-200 bg-white">
                         {[
@@ -366,7 +366,7 @@ export function AdvancedDirectoryFilter({
 
                     <label className="space-y-2">
                       <span className="block font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
-                        Listing Tier
+                        Therapist tier
                       </span>
                       <select
                         value={filters.tier}
@@ -412,7 +412,7 @@ export function AdvancedDirectoryFilter({
                       />
                       <div className="h-px bg-slate-100" />
                       <FilterToggle
-                        label="Master Level (10+ Yrs Exp)"
+                        label="Master Level (10+ years experience)"
                         checked={filters.masterOnly}
                         onChange={(checked) => onChange({ masterOnly: checked })}
                       />

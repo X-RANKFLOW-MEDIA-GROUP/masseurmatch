@@ -33,8 +33,8 @@ const PLANS: Record<string, { name: string; amount: number; features: string; is
   },
   elite: {
     name: "Elite",
-    amount: 9900,
-    features: "12 photos plus video, top search placement, Available Now for 4 hours, unlimited travel schedules, views and clicks analytics, homepage rotation, weekly specials, verified badge, 2 active ads across 2 cities",
+    amount: 14900,
+    features: "Everything in Pro, 3 active cities, Knotty AI answering on your profile 24/7, Demand Radar, auto tour pages for travel schedules, priority support",
   },
 };
 
@@ -106,14 +106,21 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const authHeader = req.headers.get("Authorization")!;
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("No authorization header");
     const token = authHeader.replace("Bearer ", "");
     const { data } = await supabaseClient.auth.getUser(token);
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { email: user.email });
 
-    const { plan_key } = await req.json();
+    let body: { plan_key?: string };
+    try {
+      body = await req.json();
+    } catch {
+      throw new Error("Invalid request body - must be valid JSON");
+    }
+    const { plan_key } = body;
     if (!plan_key || !PLANS[plan_key]) {
       throw new Error(`Invalid plan: ${plan_key}. Valid plans: ${Object.keys(PLANS).join(", ")}`);
     }

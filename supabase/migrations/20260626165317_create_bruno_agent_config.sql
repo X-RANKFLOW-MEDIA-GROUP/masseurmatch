@@ -1,0 +1,13 @@
+-- Remote migration history placeholder.
+--
+-- Supabase project ijsdpozjfjjufjsoexod already has this migration version
+-- recorded in supabase_migrations.schema_migrations as:
+--   20260626165317_create_bruno_agent_config
+--
+-- The SQL was applied remotely outside this repository. This placeholder keeps
+-- the local supabase/migrations directory aligned with remote migration history
+-- so Supabase CLI commands such as `supabase db pull`, `supabase db push`, and
+-- `supabase migration list` do not fail with:
+--   Remote migration versions not found in local migrations directory.
+--
+-- Do not add schema changes to this placeholder. Create a new migration instead.

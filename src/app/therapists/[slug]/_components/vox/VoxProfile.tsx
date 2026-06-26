@@ -91,9 +91,9 @@ export function VoxProfile({
   ).filter(Boolean);
 
   const stats = [
-    { label: "Experience", value: profile.yearsExperience.replace(/\s*years?/i, "").trim() || "—", suffix: /year/i.test(profile.yearsExperience) ? "yrs" : "" },
+    { label: "Experience", value: profile.yearsExperience.replace(/\s*years?/i, "").trim() || "—", suffix: /year/i.test(profile.yearsExperience) ? "years" : "" },
     { label: "Response", value: profile.responseTime.length > 18 ? "Fast" : profile.responseTime, suffix: "" },
-    { label: "Languages", value: String(profile.languages.length), suffix: profile.languages.length === 1 ? "lang" : "langs" },
+    { label: "Languages", value: String(profile.languages.length), suffix: profile.languages.length === 1 ? "language" : "languages" },
   ];
 
   return (
@@ -283,7 +283,7 @@ export function VoxProfile({
                   <blockquote className="flex-1 text-[15px] leading-7 text-[#3f3a33]">
                     &ldquo;{review.quote}&rdquo;
                   </blockquote>
-                  <figcaption className="mt-4 text-sm font-semibold text-[#060E1A]">
+                  <figcaption className="mt-4 text-sm font-semibold text-[#1A1A1A]">
                     {review.author}
                     {review.date ? <span className="ml-2 font-normal text-[#8a7d6f]">{review.date}</span> : null}
                   </figcaption>
@@ -316,7 +316,7 @@ export function VoxProfile({
               <DetailRow Icon={Languages} label="Languages" value={profile.languages.join(", ")} />
               <DetailRow Icon={Clock} label="Member since" value={profile.memberSince} />
               {profile.isVerified && (
-                <DetailRow Icon={ShieldCheck} label="Identity" value="Verified before going live" />
+                <DetailRow Icon={ShieldCheck} label="Identity" value="Profile reviewed" />
               )}
             </aside>
           </div>
@@ -363,15 +363,15 @@ export function VoxProfile({
                       <p className="font-semibold text-[#1a1a1a]">{row.name}</p>
                       <p className="text-sm text-[#8a7d6f]">{row.duration}</p>
                     </div>
-                    <span className="text-right font-semibold text-[#060E1A]">{row.incall}</span>
-                    <span className="text-right font-semibold text-[#060E1A]">{row.outcall}</span>
+                    <span className="text-right font-semibold text-[#1A1A1A]">{row.incall}</span>
+                    <span className="text-right font-semibold text-[#1A1A1A]">{row.outcall}</span>
                   </div>
                 ))
               ) : (
                 <div className="grid grid-cols-[1.4fr_1fr_1fr] items-center gap-2 bg-white px-5 py-4 sm:px-7">
                   <p className="font-semibold text-[#1a1a1a]">Custom session</p>
-                  <span className="text-right font-semibold text-[#060E1A]">{profile.incallPrice}</span>
-                  <span className="text-right font-semibold text-[#060E1A]">{profile.outcallPrice}</span>
+                  <span className="text-right font-semibold text-[#1A1A1A]">{profile.incallPrice}</span>
+                  <span className="text-right font-semibold text-[#1A1A1A]">{profile.outcallPrice}</span>
                 </div>
               )}
             </div>
@@ -387,8 +387,8 @@ export function VoxProfile({
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="rounded-2xl border border-[#e8e0d8] bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center gap-2">
-                <CalendarDays className="h-5 w-5 text-[#FF8A1F]" strokeWidth={2.25} />
-                <h3 className="font-display text-lg font-bold text-[#060E1A]">Availability</h3>
+                <CalendarDays className="h-5 w-5 text-[#CC2424]" strokeWidth={2.25} />
+                <h3 className="font-display text-lg font-bold text-[#1A1A1A]">Availability</h3>
               </div>
               {profile.availabilityDays.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
@@ -413,8 +413,8 @@ export function VoxProfile({
             </div>
             <div className="rounded-2xl border border-[#e8e0d8] bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center gap-2">
-                <Car className="h-5 w-5 text-[#FF8A1F]" strokeWidth={2.25} />
-                <h3 className="font-display text-lg font-bold text-[#060E1A]">Incall & outcall</h3>
+                <Car className="h-5 w-5 text-[#CC2424]" strokeWidth={2.25} />
+                <h3 className="font-display text-lg font-bold text-[#1A1A1A]">Incall & outcall</h3>
               </div>
               <ul className="space-y-2.5 text-sm text-[#3f3a33]">
                 <li className="flex items-center gap-2">
@@ -428,7 +428,7 @@ export function VoxProfile({
                   {hasRate(profile.outcallPrice) ? ` · from ${profile.outcallPrice}` : ""}
                 </li>
                 <li className="flex items-center gap-2">
-                  <Car className="h-4 w-4 text-[#FF8A1F]" strokeWidth={2.25} />
+                  <Car className="h-4 w-4 text-[#CC2424]" strokeWidth={2.25} />
                   {profile.travelRadius}
                 </li>
               </ul>
@@ -636,7 +636,7 @@ function TrustCard({ Icon, title, body }: { Icon: typeof ShieldCheck; title: str
       <span className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-[#FFF4EA] text-[#FF8A1F]">
         <Icon className="h-5 w-5" strokeWidth={2.25} />
       </span>
-      <h3 className="font-display text-base font-bold text-[#060E1A]">{title}</h3>
+      <h3 className="font-display text-base font-bold text-[#1A1A1A]">{title}</h3>
       <p className="mt-1.5 text-sm leading-6 text-[#5a5147]">{body}</p>
     </div>
   );

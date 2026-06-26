@@ -1,85 +1,85 @@
 "use client";
 
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { Building2 } from "lucide-react";
+import { US_CITIES } from "@/data/cities";
 
 /**
- * Animated marquee of top MasseurMatch cities. Names scroll continuously to the
- * left, each rendered at a different size and brightness to create an editorial
- * "city skyline" sense of depth. Sits on the dark first-fold band.
+ * Slim popular-cities strip for the first fold. It keeps the editorial movement
+ * from the old marquee but uses a shorter conversion-focused bar so the hero
+ * profile cards and AI match assistant remain the primary visual focus.
  */
 
-type City = { name: string; tier: 1 | 2 | 3 };
+type City = { name: string; slug: string };
 
-// tier 1 = hero markets (big & bright), 2 = mid, 3 = supporting (small & dim)
-const CITIES: City[] = [
-  { name: "New York", tier: 1 },
-  { name: "Philadelphia", tier: 3 },
-  { name: "Miami", tier: 1 },
-  { name: "Sarasota", tier: 3 },
-  { name: "Los Angeles", tier: 1 },
-  { name: "Orlando", tier: 2 },
-  { name: "Houston", tier: 1 },
-  { name: "Tampa", tier: 3 },
-  { name: "Atlanta", tier: 1 },
-  { name: "Las Vegas", tier: 2 },
-  { name: "Chicago", tier: 1 },
-  { name: "Boston", tier: 2 },
-  { name: "Dallas", tier: 1 },
-  { name: "Seattle", tier: 3 },
-  { name: "Washington DC", tier: 2 },
-  { name: "Denver", tier: 3 },
-  { name: "San Francisco", tier: 2 },
-  { name: "Austin", tier: 3 },
-  { name: "Phoenix", tier: 3 },
+const CITY_SLUGS = [
+  "dallas",
+  "miami",
+  "los-angeles",
+  "new-york",
+  "houston",
+  "atlanta",
+  "orlando",
+  "chicago",
+  "las-vegas",
+  "washington-dc",
 ];
 
-const TIER_STYLES: Record<City["tier"], string> = {
-  1: "text-[clamp(1.75rem,4vw,3.25rem)] text-white",
-  2: "text-[clamp(1.25rem,2.6vw,2.1rem)] text-white/55",
-  3: "text-[clamp(0.95rem,1.8vw,1.4rem)] text-white/30",
-};
+const CITIES: City[] = CITY_SLUGS.flatMap((slug) => {
+  const city = US_CITIES.find((c) => c.slug === slug);
+  return city ? [{ name: city.name, slug: city.slug }] : [];
+});
 
 function Row() {
   return (
-    <div className="flex shrink-0 items-baseline gap-8 px-4 lg:gap-12">
-      {CITIES.map((city, i) => (
-        <span
-          key={`${city.name}-${i}`}
-          className={`flex items-baseline whitespace-nowrap font-display font-extrabold uppercase tracking-tight ${TIER_STYLES[city.tier]}`}
+    <div className="flex shrink-0 items-center gap-4 px-4 text-sm font-black uppercase tracking-[0.08em] text-white/80 lg:gap-7">
+      {CITIES.map((city, index) => (
+        <Link
+          key={`${city.slug}-${index}`}
+          href={`/${city.slug}`}
+          className="whitespace-nowrap transition hover:text-white"
         >
-          {city.name}
-          {city.tier === 1 && (
-            <span className="ml-2 inline-block h-[0.35em] w-[0.35em] translate-y-[-0.15em] rounded-full bg-primary" />
-          )}
-        </span>
+          <span className={index === 0 ? "text-[#CC2424]" : ""}>{city.name}</span>
+        </Link>
       ))}
     </div>
   );
 }
 
 export function CityMarquee() {
-  const reduced = useReducedMotion();
+  const prefersReduced = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const reduced = mounted && prefersReduced;
 
   return (
-    <div className="relative overflow-hidden border-y border-white/10 bg-[#091a31] py-6 lg:py-8">
-      {/* Edge fades */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[#091a31] to-transparent lg:w-40" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[#091a31] to-transparent lg:w-40" />
-
-      {reduced ? (
-        <div className="flex">
-          <Row />
+    <div className="bg-white px-5 pb-10 sm:px-8 lg:px-10">
+      <div className="relative mx-auto flex max-w-[1500px] items-center overflow-hidden rounded-2xl border border-white/10 bg-[#181818] py-4 shadow-[0_16px_45px_rgba(15,23,42,0.18)]">
+        <div className="z-20 flex shrink-0 items-center gap-3 border-r border-white/15 bg-[#181818] px-5 text-xs font-black uppercase tracking-[0.12em] text-white/75 lg:px-7">
+          <Building2 size={17} className="text-white/65" />
+          Popular Cities
         </div>
-      ) : (
-        <motion.div
-          className="flex"
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ repeat: Infinity, ease: "linear", duration: 45 }}
-        >
-          <Row />
-          <Row />
-        </motion.div>
-      )}
+
+        <div className="pointer-events-none absolute inset-y-0 left-36 z-10 w-16 bg-gradient-to-r from-[#181818] to-transparent lg:left-48" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#181818] to-transparent" />
+
+        {reduced ? (
+          <div className="flex min-w-0 overflow-hidden">
+            <Row />
+          </div>
+        ) : (
+          <motion.div
+            className="flex min-w-0"
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{ repeat: Infinity, ease: "linear", duration: 42 }}
+          >
+            <Row />
+            <Row />
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 }

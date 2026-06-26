@@ -97,8 +97,8 @@ export async function POST(request: NextRequest) {
       const pi = event.data.object as Stripe.PaymentIntent
       await supabase
         .from('payment_transactions')
-        .update({ status: 'succeeded', updated_at: new Date().toISOString() })
-        .eq('stripe_payment_intent_id', pi.id)
+        .update({ status: 'succeeded' })
+        .eq('provider_transaction_id', pi.id)
 
       if (pi.metadata.appointment_id) {
         await supabase
@@ -113,8 +113,8 @@ export async function POST(request: NextRequest) {
       const pi = event.data.object as Stripe.PaymentIntent
       await supabase
         .from('payment_transactions')
-        .update({ status: 'failed', updated_at: new Date().toISOString() })
-        .eq('stripe_payment_intent_id', pi.id)
+        .update({ status: 'failed' })
+        .eq('provider_transaction_id', pi.id)
       break
     }
 
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
     // ── Subscription created — sync tier when a new subscription is created ──
     case 'customer.subscription.created': {
       const sub = event.data.object as Stripe.Subscription
-      const planKey = sub.metadata?.masseurmatch_plan
+      const planKey = sub.metadata?.plan_key ?? sub.metadata?.masseurmatch_plan
       const tier = planKeyToTier(planKey)
       await syncSubscriptionToProfile(supabase, sub, tier)
       break
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
     // ── Subscription updated — re-sync tier on plan changes ─────────────────
     case 'customer.subscription.updated': {
       const sub = event.data.object as Stripe.Subscription
-      const planKey = sub.metadata?.masseurmatch_plan
+      const planKey = sub.metadata?.plan_key ?? sub.metadata?.masseurmatch_plan
       const tier = planKeyToTier(planKey)
       await syncSubscriptionToProfile(supabase, sub, tier)
 

@@ -41,15 +41,17 @@ export async function POST(
       .from("profile_reviews")
       .update({
         status: "changes_requested",
-        moderation_notes: body.reason,
+        admin_notes: body.reason,
         reviewed_at: now,
         reviewed_by: admin.userId,
       })
       .eq("profile_id", profileId);
 
     await adminClient.from("admin_actions").insert({
-      admin_id: admin.userId,
+      action: "request_profile_changes",
       action_type: "request_profile_changes",
+      target_table: "profiles",
+      admin_id: admin.userId,
       target_user_id: profile.user_id,
       target_profile_id: profileId,
       reason: body.reason,

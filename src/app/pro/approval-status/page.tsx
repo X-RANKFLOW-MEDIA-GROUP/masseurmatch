@@ -73,57 +73,71 @@ export default function ApprovalStatusPage() {
     );
   }
 
-  const statusConfig: Record<ProfileStatus["status"], any> = {
+  const statusConfig: Record<ProfileStatus["status"], {
+    title: string;
+    icon: typeof AlertCircle;
+    cardClasses: string;
+    iconClass: string;
+    titleClass: string;
+    descClass: string;
+    btnClass: string;
+    action: { label: string; href: string } | null;
+    description: string;
+  }> = {
     draft: {
       title: "Profile Draft",
       icon: AlertCircle,
-      color: "slate",
-      description:
-        "Your profile is incomplete. Complete all required fields and submit for review.",
-      action: {
-        label: "Continue Setup",
-        href: "/pro/listing",
-      },
+      cardClasses: "border border-slate-200 bg-slate-50",
+      iconClass: "h-6 w-6 text-slate-600 shrink-0 mt-0.5",
+      titleClass: "font-semibold text-lg text-slate-900",
+      descClass: "mt-1 text-sm text-slate-700",
+      btnClass: "inline-flex items-center gap-2 px-4 py-2.5 font-medium rounded-lg transition-colors bg-slate-600 text-white hover:bg-slate-700",
+      description: "Your profile is incomplete. Complete all required fields and submit for review.",
+      action: { label: "Continue Setup", href: "/pro/listing" },
     },
     pending_approval: {
       title: "Pending Review",
       icon: Clock,
-      color: "amber",
-      description:
-        "Your profile has been submitted and is under review. We typically review profiles within 1-2 business days.",
+      cardClasses: "border border-amber-200 bg-amber-50",
+      iconClass: "h-6 w-6 text-amber-600 shrink-0 mt-0.5",
+      titleClass: "font-semibold text-lg text-amber-900",
+      descClass: "mt-1 text-sm text-amber-700",
+      btnClass: "inline-flex items-center gap-2 px-4 py-2.5 font-medium rounded-lg transition-colors bg-amber-600 text-white hover:bg-amber-700",
+      description: "Your profile has been submitted and is under review. We typically review profiles within 1-2 business days.",
       action: null,
     },
     approved: {
       title: "Profile Approved",
       icon: CheckCircle2,
-      color: "emerald",
+      cardClasses: "border border-emerald-200 bg-emerald-50",
+      iconClass: "h-6 w-6 text-emerald-600 shrink-0 mt-0.5",
+      titleClass: "font-semibold text-lg text-emerald-900",
+      descClass: "mt-1 text-sm text-emerald-700",
+      btnClass: "inline-flex items-center gap-2 px-4 py-2.5 font-medium rounded-lg transition-colors bg-emerald-600 text-white hover:bg-emerald-700",
       description: "Your profile is live and visible to clients on MasseurMatch!",
-      action: {
-        label: "View Profile",
-        href: "/pro/profile",
-      },
+      action: { label: "View Profile", href: "/pro/profile" },
     },
     rejected: {
       title: "Profile Rejected",
       icon: AlertCircle,
-      color: "rose",
-      description:
-        "Your profile was not approved. Please review the feedback and update your profile.",
-      action: {
-        label: "Update Profile",
-        href: "/pro/listing",
-      },
+      cardClasses: "border border-rose-200 bg-rose-50",
+      iconClass: "h-6 w-6 text-rose-600 shrink-0 mt-0.5",
+      titleClass: "font-semibold text-lg text-rose-900",
+      descClass: "mt-1 text-sm text-rose-700",
+      btnClass: "inline-flex items-center gap-2 px-4 py-2.5 font-medium rounded-lg transition-colors bg-rose-600 text-white hover:bg-rose-700",
+      description: "Your profile was not approved. Please review the feedback and update your profile.",
+      action: { label: "Update Profile", href: "/pro/listing" },
     },
     changes_requested: {
       title: "Changes Requested",
       icon: AlertCircle,
-      color: "orange",
-      description:
-        "Our team has requested some changes to your profile. Please review the feedback and update accordingly.",
-      action: {
-        label: "Update Profile",
-        href: "/pro/listing",
-      },
+      cardClasses: "border border-red-200 bg-red-50",
+      iconClass: "h-6 w-6 text-red-600 shrink-0 mt-0.5",
+      titleClass: "font-semibold text-lg text-red-900",
+      descClass: "mt-1 text-sm text-red-700",
+      btnClass: "inline-flex items-center gap-2 px-4 py-2.5 font-medium rounded-lg transition-colors bg-red-600 text-white hover:bg-red-700",
+      description: "Our team has requested some changes to your profile. Please review the feedback and update accordingly.",
+      action: { label: "Update Profile", href: "/pro/listing" },
     },
   };
 
@@ -165,24 +179,21 @@ export default function ApprovalStatusPage() {
       </div>
 
       {/* Status Card */}
-      <div className={`border border-${config.color}-200 bg-${config.color}-50 rounded-lg p-6 space-y-4`}>
+      <div className={`${config.cardClasses} rounded-lg p-6 space-y-4`}>
         <div className="flex items-start gap-3">
-          <StatusIcon className={`h-6 w-6 text-${config.color}-600 shrink-0 mt-0.5`} />
+          <StatusIcon className={config.iconClass} />
           <div className="flex-1">
-            <h2 className={`font-semibold text-lg text-${config.color}-900`}>
+            <h2 className={config.titleClass}>
               {config.title}
             </h2>
-            <p className={`mt-1 text-sm text-${config.color}-700`}>
+            <p className={config.descClass}>
               {config.description}
             </p>
           </div>
         </div>
 
         {config.action && (
-          <Link
-            href={config.action.href}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 font-medium rounded-lg transition-colors bg-${config.color}-600 text-white hover:bg-${config.color}-700`}
-          >
+          <Link href={config.action.href} className={config.btnClass}>
             {config.action.label}
             <ArrowRight className="h-4 w-4" />
           </Link>

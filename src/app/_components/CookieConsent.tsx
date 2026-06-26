@@ -39,7 +39,7 @@ export function CookieConsent() {
             <p className="mt-1.5 text-sm leading-6 text-slate-600">
               We use essential cookies for site function and optional cookies to improve the
               experience. Review our{" "}
-              <Link href="/cookie-policy" className="font-semibold text-[#0B1F3A] underline underline-offset-2 hover:text-[#FF8A1F]">
+              <Link href="/cookie-policy" className="font-semibold text-[#1A1A1A] underline underline-offset-2 hover:text-[#CC2424]">
                 Cookie Policy
               </Link>
               .
@@ -57,7 +57,7 @@ export function CookieConsent() {
             <button
               type="button"
               onClick={() => savePreference("accepted")}
-              className="min-h-10 rounded-lg bg-[#FF8A1F] px-3 text-sm font-semibold text-[#0B1F3A] shadow-sm transition-colors hover:bg-[#ff9d3f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8A1F]"
+              className="min-h-10 rounded-lg bg-[#CC2424] px-3 text-sm font-semibold text-[#1A1A1A] shadow-sm transition-colors hover:bg-[#A81D1D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#CC2424]"
             >
               Accept
             </button>

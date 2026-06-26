@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { BookOpenText, ChevronRight, Scale } from "lucide-react";
+import { BookOpenText, ChevronRight, Scale, Wand2 } from "lucide-react";
 import type { GuideArticle } from "@/app/guides/data";
 import type { Competitor } from "@/lib/competitors";
+import { getAllServices } from "@/app/_lib/service-data";
 import { US_CITIES } from "@/data/cities";
 
 type HomeSeoLandingProps = {
@@ -10,12 +11,14 @@ type HomeSeoLandingProps = {
 };
 
 export function HomeSeoLanding({ comparisonLinks, guides }: HomeSeoLandingProps) {
+  const services = getAllServices().slice(0, 4);
+
   return (
     <section className="page-shell py-10 sm:py-12">
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,0.9fr)]">
 
         {/* Comparison hub */}
-        <div className="rounded-[2rem] border border-border bg-card p-7 shadow-[0_18px_42px_rgba(11,31,58,0.18)]">
+        <div className="rounded-[2rem] border border-border bg-card p-7 shadow-[0_18px_42px_rgba(26,26,26,0.18)]">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-primary/10 text-primary">
               <Scale className="h-5 w-5" />
@@ -54,7 +57,7 @@ export function HomeSeoLanding({ comparisonLinks, guides }: HomeSeoLandingProps)
         </div>
 
         {/* Guides */}
-        <div className="rounded-[2rem] border border-border bg-card p-7 shadow-[0_18px_42px_rgba(11,31,58,0.18)]">
+        <div className="rounded-[2rem] border border-border bg-card p-7 shadow-[0_18px_42px_rgba(26,26,26,0.18)]">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-primary/10 text-primary">
               <BookOpenText className="h-5 w-5" />
@@ -85,6 +88,50 @@ export function HomeSeoLanding({ comparisonLinks, guides }: HomeSeoLandingProps)
                 <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-primary transition group-hover:translate-x-1" />
               </Link>
             ))}
+          </div>
+        </div>
+
+        {/* Services */}
+        <div className="rounded-[2rem] border border-border bg-card p-7 shadow-[0_18px_42px_rgba(11,31,58,0.18)]">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-primary/10 text-primary">
+              <Wand2 className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Services</p>
+              <h2 className="mt-1 text-2xl font-semibold text-foreground">
+                Specialties that match specific massage needs.
+              </h2>
+            </div>
+          </div>
+          <p className="mt-5 text-sm leading-7 text-muted-foreground">
+            Service pages capture high-intent queries for specific massage types. From deep tissue and sports recovery
+            to Thai massage and lymphatic drainage, each specialty page connects searchers to the right therapists.
+          </p>
+          <div className="mt-6 space-y-3">
+            {services.map((service) => (
+              <Link
+                key={service.slug}
+                href={`/services/${service.slug}`}
+                className="group flex items-start justify-between gap-4 rounded-[1.4rem] border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
+              >
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{service.label} Massage</p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{service.longTailKeywords[0]}</p>
+                </div>
+                <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-primary transition group-hover:translate-x-1" />
+              </Link>
+            ))}
+            <Link
+              href="/services"
+              className="group flex items-start justify-between gap-4 rounded-[1.4rem] border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
+            >
+              <div>
+                <p className="text-sm font-semibold text-foreground">View All Services</p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">Browse complete service directory</p>
+              </div>
+              <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-primary transition group-hover:translate-x-1" />
+            </Link>
           </div>
         </div>
 

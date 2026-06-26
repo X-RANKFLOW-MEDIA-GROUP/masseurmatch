@@ -1,10 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseAdminClient, requireAdminSession } from '@/app/api/_lib/supabase-server'
+import { RouteError } from '@/app/api/_lib/http'
+
+function errResponse(err: unknown) {
+  if (err instanceof RouteError) {
+    return NextResponse.json({ ok: false, error: err.message }, { status: err.status })
+  }
+  const message = err instanceof Error ? err.message : 'Unknown error'
+  return NextResponse.json({ ok: false, error: message }, { status: 500 })
+}
 
 // GET /api/sms/profile?profile_id=xxx — get SMS profile config
 export async function GET(request: NextRequest) {
   try {
-    await requireAdminSession(request as unknown as Request)
+    await requireAdminSession(request)
+  } catch (err) { return errResponse(err) }
+
+  try {
     const { searchParams } = new URL(request.url)
     const profileId = searchParams.get('profile_id')
 
@@ -18,23 +30,23 @@ export async function GET(request: NextRequest) {
     }
 
     const { data, error } = await query.order('created_at', { ascending: false })
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
 
     return NextResponse.json({ ok: true, profiles: data ?? [] })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ ok: false, error: message }, { status: 500 })
-  }
+  } catch (err) { return errResponse(err) }
 }
 
 // POST /api/sms/profile — upsert SMS profile config
 export async function POST(request: NextRequest) {
   try {
-    await requireAdminSession(request as unknown as Request)
+    await requireAdminSession(request)
+  } catch (err) { return errResponse(err) }
+
+  try {
     const body = await request.json() as Record<string, unknown>
 
     if (!body.profile_id) {
-      return NextResponse.json({ error: 'profile_id required' }, { status: 400 })
+      return NextResponse.json({ ok: false, error: 'profile_id required' }, { status: 400 })
     }
 
     const supabase = createSupabaseAdminClient()
@@ -44,22 +56,22 @@ export async function POST(request: NextRequest) {
       .select()
       .single()
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
     return NextResponse.json({ ok: true, profile: data })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ ok: false, error: message }, { status: 500 })
-  }
+  } catch (err) { return errResponse(err) }
 }
 
 // PATCH /api/sms/profile?id=xxx — toggle ready_to_reply or partial update
 export async function PATCH(request: NextRequest) {
   try {
-    await requireAdminSession(request as unknown as Request)
+    await requireAdminSession(request)
+  } catch (err) { return errResponse(err) }
+
+  try {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
 
-    if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
+    if (!id) return NextResponse.json({ ok: false, error: 'id required' }, { status: 400 })
 
     const body = await request.json() as Record<string, unknown>
     const supabase = createSupabaseAdminClient()
@@ -71,10 +83,7 @@ export async function PATCH(request: NextRequest) {
       .select()
       .single()
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
     return NextResponse.json({ ok: true, profile: data })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ ok: false, error: message }, { status: 500 })
-  }
+  } catch (err) { return errResponse(err) }
 }

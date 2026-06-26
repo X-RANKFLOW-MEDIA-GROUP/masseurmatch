@@ -42,6 +42,10 @@ export default function SignupReviewPage() {
         throw new Error("You must acknowledge the Therapist Agreement and platform policies.");
       }
 
+      if (!state.selectedPlanTier) {
+        throw new Error("Please select a subscription plan before submitting.");
+      }
+
       // Submit the profile for moderation
       const res = await fetch("/api/signup/submit", {
         method: "POST",

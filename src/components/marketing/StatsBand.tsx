@@ -1,29 +1,53 @@
 "use client";
 
-import { Users, MapPin, Sparkles, BadgeDollarSign } from "lucide-react";
+import { Diamond, CheckCircle, UserCheck, Smile, TrendingUp, Users, Award, LayoutGrid } from "lucide-react";
 import Counter from "@/components/motion/Counter";
 import FadeUp from "@/components/motion/FadeUp";
 
+const FEATURES = [
+  { icon: Diamond, label: "Premium profiles" },
+  { icon: CheckCircle, label: "Identity verified" },
+  { icon: UserCheck, label: "LGBTQ+ affirming" },
+  { icon: Smile, label: "Direct contact" },
+] as const;
+
 const STATS = [
-  { value: 500, suffix: "+", label: "Professional profiles", icon: Users },
-  { value: 80, suffix: "+", label: "US cities", icon: MapPin },
-  { value: 1200, suffix: "+", label: "Services listed", icon: Sparkles },
-  { value: 100, suffix: "%", label: "Free to browse", icon: BadgeDollarSign },
+  { icon: TrendingUp, value: 80, suffix: "+", label: "US cities covered" },
+  { icon: Users, value: 2300, suffix: "+", label: "Registered therapists" },
+  { icon: Award, value: 6, suffix: "", label: "Massage specialties" },
+  { icon: LayoutGrid, value: 50, suffix: "+", label: "States with listings" },
 ] as const;
 
 export function StatsBand() {
   return (
-    <section className="border-y border-border/60 bg-card py-12 lg:py-16">
+    <section className="bg-[#F4F5F6] py-16 lg:py-20">
       <div className="mx-auto max-w-[1200px] px-4">
         <FadeUp>
-          <div className="grid grid-cols-2 divide-x divide-border/60 lg:grid-cols-4">
-            {STATS.map(({ value, suffix, label, icon: Icon }) => (
-              <div key={label} className="px-6 py-2 first:pl-0 last:pr-0 lg:px-10">
-                <Icon className="mb-3 h-5 w-5 text-primary" strokeWidth={2} />
-                <div className="font-display font-extrabold text-[clamp(2.25rem,5vw,4rem)] leading-none tracking-[-0.03em] text-foreground">
+          {/* Row 1: Features */}
+          <div className="grid grid-cols-2 gap-8 lg:grid-cols-4 mb-12">
+            {FEATURES.map(({ icon: Icon, label }) => (
+              <div key={label} className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-full border border-[#E2E4E6] flex items-center justify-center mb-3">
+                  <Icon className="w-5 h-5 text-[#1A1A1A]" strokeWidth={2.25} />
+                </div>
+                <p className="text-sm text-[#1A1A1A] font-medium">
+                  {label}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Row 2: Stats */}
+          <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
+            {STATS.map(({ icon: Icon, value, suffix, label }) => (
+              <div key={label} className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-full border border-[#E2E4E6] flex items-center justify-center mb-3">
+                  <Icon className="w-5 h-5 text-[#1A1A1A]" strokeWidth={2.25} />
+                </div>
+                <div className="font-display font-extrabold text-[clamp(1.5rem,3vw,2.5rem)] leading-none tracking-tight text-[#1A1A1A] mb-1">
                   <Counter to={value} suffix={suffix} />
                 </div>
-                <p className="mt-2 text-xs uppercase tracking-widest text-muted-foreground">
+                <p className="text-sm text-[#666666]">
                   {label}
                 </p>
               </div>

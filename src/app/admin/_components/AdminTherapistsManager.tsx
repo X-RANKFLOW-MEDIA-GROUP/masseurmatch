@@ -16,7 +16,8 @@ type TherapistAction =
   | "ban"
   | "verify_identity"
   | "feature"
-  | "unfeature";
+  | "unfeature"
+  | "upgrade";
 
 type AdminTherapist = {
   id: string;
@@ -38,6 +39,8 @@ type ActionDraft = {
   reason: string;
   days: string;
   displayOrder: string;
+  upgradeTier: string;
+  discountPercent: string;
 };
 
 const DEFAULT_ACTION: ActionDraft = {
@@ -45,6 +48,8 @@ const DEFAULT_ACTION: ActionDraft = {
   reason: "",
   days: "",
   displayOrder: "",
+  upgradeTier: "free",
+  discountPercent: "",
 };
 
 function buildDrafts(therapists: AdminTherapist[]) {
@@ -52,6 +57,7 @@ function buildDrafts(therapists: AdminTherapist[]) {
     accumulator[therapist.id] = {
       ...DEFAULT_ACTION,
       action: therapist.is_featured ? "unfeature" : "approve",
+      upgradeTier: therapist.subscription_tier || "free",
     };
     return accumulator;
   }, {});
@@ -64,6 +70,10 @@ function buildAdminActionEndpoint(therapist: AdminTherapist, action: TherapistAc
 
   if (action === "feature" || action === "unfeature") {
     return `/api/admin/profile/${therapist.id}/feature`;
+  }
+
+  if (action === "upgrade") {
+    return `/api/admin/profile/${therapist.id}/upgrade`;
   }
 
   return `/api/admin/profile/${therapist.id}/${action}`;
@@ -101,10 +111,22 @@ export default function AdminTherapistsManager({
     try {
       const endpoint = buildAdminActionEndpoint(therapist, draft.action);
 
-      await postJson(endpoint, {
+      const payload: Record<string, unknown> = {
         reason: draft.reason || undefined,
-        days: draft.action === "suspend" && draft.days ? Number(draft.days) : undefined,
-      });
+      };
+
+      if (draft.action === "suspend" && draft.days) {
+        payload.days = Number(draft.days);
+      }
+
+      if (draft.action === "upgrade") {
+        payload.subscription_tier = draft.upgradeTier;
+        if (draft.discountPercent) {
+          payload.discount_percent = Number(draft.discountPercent);
+        }
+      }
+
+      await postJson(endpoint, payload);
 
       toast({
         title: "Therapist updated",
@@ -213,6 +235,7 @@ export default function AdminTherapistsManager({
                   <option value="verify_identity">Verify Identity</option>
                   <option value="feature">Feature Profile</option>
                   <option value="unfeature">Unfeature Profile</option>
+                  <option value="upgrade">Upgrade / Discount</option>
                 </select>
                 <Input
                   aria-label={`Reason for admin action on ${name}`}
@@ -220,19 +243,56 @@ export default function AdminTherapistsManager({
                   value={draft.reason}
                   onChange={(event) => updateDraft(therapist.id, { reason: event.target.value })}
                 />
-                <Input
-                  aria-label={`Suspension duration in days for ${name}`}
-                  type="number"
-                  min="1"
-                  placeholder="Suspend days"
-                  value={draft.days}
-                  disabled={draft.action !== "suspend"}
-                  onChange={(event) => updateDraft(therapist.id, { days: event.target.value })}
-                />
-                <Button 
-                  type="button" 
+                {draft.action === "suspend" && (
+                  <Input
+                    aria-label={`Suspension duration in days for ${name}`}
+                    type="number"
+                    min="1"
+                    placeholder="Suspend days"
+                    value={draft.days}
+                    onChange={(event) => updateDraft(therapist.id, { days: event.target.value })}
+                  />
+                )}
+                {draft.action === "upgrade" && (
+                  <>
+                    <select
+                      aria-label={`Target tier for ${name}`}
+                      title={`Target tier for ${name}`}
+                      value={draft.upgradeTier}
+                      onChange={(event) => updateDraft(therapist.id, { upgradeTier: event.target.value })}
+                      className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-900/5"
+                    >
+                      <option value="free">Free</option>
+                      <option value="standard">Standard</option>
+                      <option value="pro">Pro</option>
+                      <option value="elite">Elite</option>
+                    </select>
+                    <Input
+                      aria-label={`Discount percent for ${name}`}
+                      type="number"
+                      min="0"
+                      max="100"
+                      placeholder="Discount % (optional)"
+                      value={draft.discountPercent}
+                      onChange={(event) => updateDraft(therapist.id, { discountPercent: event.target.value })}
+                    />
+                  </>
+                )}
+                {draft.action !== "suspend" && draft.action !== "upgrade" && (
+                  <Input
+                    aria-label={`Suspension duration in days for ${name}`}
+                    type="number"
+                    min="1"
+                    placeholder="Suspend days"
+                    value={draft.days}
+                    disabled
+                    onChange={(event) => updateDraft(therapist.id, { days: event.target.value })}
+                  />
+                )}
+                <Button
+                  type="button"
                   className="bg-slate-900 text-white hover:bg-slate-800"
-                  disabled={busyId === therapist.id} 
+                  disabled={busyId === therapist.id}
                   onClick={() => void handleApply(therapist)}
                 >
                   {busyId === therapist.id ? "Applying..." : "Apply Action"}

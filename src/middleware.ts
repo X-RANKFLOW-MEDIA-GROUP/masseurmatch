@@ -32,9 +32,11 @@ function getSessionSecret(): string {
   // deployed environment (production, preview, staging) must provide a real
   // secret so an attacker cannot forge a signed admin cookie.
   if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
-    return 'dev-only-masseurmatch-session-secret';
+    const devSecret = 'dev-only-masseurmatch-session-secret';
+    console.warn('Using hardcoded development session secret. This is only safe in local development.');
+    return devSecret;
   }
-  throw new Error('MM_SESSION_SECRET is required outside local development.');
+  throw new Error('MM_SESSION_SECRET is required for session validation. Check your environment variables.');
 }
 
 function toBase64Url(bytes: Uint8Array): string {
@@ -256,9 +258,12 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   }
 
   // ── 2. /explore?city=X  →  301 /explore/usa/{slug} ───────────────────────
-  if (pathname === "/explore" && searchParams.has("city")) {
+  if (pathname === "/explore" && searchParams.get("city")) {
     const slug = exploreCityToSlug(searchParams.get("city")!);
-    return permanentRedirect(`/explore/usa/${slug}`, request);
+    // Guard against an empty slug, which would redirect to /explore/usa (404).
+    if (slug) {
+      return permanentRedirect(`/explore/usa/${slug}`, request);
+    }
   }
 
   // ── 3. /pt-br/  →  301 /pt-br ────────────────────────────────────────────
@@ -336,6 +341,14 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   // ── 7. Legacy /{city}/massage-therapists → /{city} ───────────────────────
   const topLevelParts = pathname.split("/").filter(Boolean);
+
+  // ── 7a. Legacy /{city}/therapist/{slug} → /therapists/{slug} ─────────────
+  if (topLevelParts.length === 3 && topLevelParts[1] === "therapist") {
+    const citySlug = resolveCitySlug(topLevelParts[0] || "");
+    if (citySlug) {
+      return permanentRedirect(`/therapists/${topLevelParts[2]}`, request);
+    }
+  }
   if (topLevelParts.length === 2 && topLevelParts[1] === "massage-therapists") {
     const citySlug = resolveCitySlug(topLevelParts[0] || "");
     if (citySlug) {

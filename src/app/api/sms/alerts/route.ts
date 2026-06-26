@@ -1,10 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseAdminClient, requireAdminSession } from '@/app/api/_lib/supabase-server'
+import { RouteError } from '@/app/api/_lib/http'
+
+function errResponse(err: unknown) {
+  if (err instanceof RouteError) {
+    return NextResponse.json({ ok: false, error: err.message }, { status: err.status })
+  }
+  const message = err instanceof Error ? err.message : 'Unknown error'
+  return NextResponse.json({ ok: false, error: message }, { status: 500 })
+}
 
 // GET /api/sms/alerts — follow-up alerts (90+ min no-reply)
 export async function GET(request: NextRequest) {
   try {
-    await requireAdminSession(request as unknown as Request)
+    await requireAdminSession(request)
+  } catch (err) { return errResponse(err) }
+
+  try {
     const supabase = createSupabaseAdminClient()
 
     const { data, error } = await supabase
@@ -13,9 +25,8 @@ export async function GET(request: NextRequest) {
       .is('resolved_at', null)
       .order('last_outbound_at', { ascending: true })
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
 
-    // Calculate minutes since last outbound and filter to 90+
     const now = Date.now()
     const alerts = (data ?? [])
       .map(a => ({
@@ -25,19 +36,19 @@ export async function GET(request: NextRequest) {
       .filter(a => a.minutes_waiting >= 90)
 
     return NextResponse.json({ ok: true, alerts, total: alerts.length })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ ok: false, error: message }, { status: 500 })
-  }
+  } catch (err) { return errResponse(err) }
 }
 
 // POST /api/sms/alerts — resolve an alert
 export async function POST(request: NextRequest) {
+  let session: Awaited<ReturnType<typeof requireAdminSession>>
   try {
-    const session = await requireAdminSession(request as unknown as Request)
-    const body = await request.json() as { alert_id: string }
+    session = await requireAdminSession(request)
+  } catch (err) { return errResponse(err) }
 
-    if (!body.alert_id) return NextResponse.json({ error: 'alert_id required' }, { status: 400 })
+  try {
+    const body = await request.json() as { alert_id: string }
+    if (!body.alert_id) return NextResponse.json({ ok: false, error: 'alert_id required' }, { status: 400 })
 
     const supabase = createSupabaseAdminClient()
     const { error } = await supabase
@@ -45,10 +56,7 @@ export async function POST(request: NextRequest) {
       .update({ resolved_at: new Date().toISOString(), resolved_by: session.userId })
       .eq('id', body.alert_id)
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
     return NextResponse.json({ ok: true })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ ok: false, error: message }, { status: 500 })
-  }
+  } catch (err) { return errResponse(err) }
 }

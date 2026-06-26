@@ -8,14 +8,13 @@ import {
   Users,
   HeartHandshake,
   MapPin,
-  DollarSign,
-  ShieldCheck,
   ShieldAlert,
   Newspaper,
   Tag,
   ArrowUpRight,
   CalendarCheck,
   MessageSquare,
+  DollarSign,
 } from "lucide-react";
 
 async function getAdminStats() {
@@ -36,9 +35,7 @@ async function getAdminStats() {
 
   return {
     therapists: therapistsResult.total,
-    mrr: therapistsResult.total * 29,
     cities: cities.length,
-    pendingReviews: Math.max(2, Math.floor(therapistsResult.total / 5)),
     recentTherapists: therapistsResult.items.slice(0, 5),
     pendingBookings: bookingCountResult.count ?? 0,
     smsAlerts: smsAlertCountResult.count ?? 0,
@@ -58,14 +55,6 @@ export default async function AdminOverviewPage() {
       bgColor: "bg-primary/10",
     },
     {
-      label: "Monthly Revenue",
-      value: `$${stats.mrr.toLocaleString()}`,
-      description: "Estimated MRR",
-      icon: DollarSign,
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50",
-    },
-    {
       label: "Cities Covered",
       value: String(stats.cities),
       description: "Active locations",
@@ -74,20 +63,12 @@ export default async function AdminOverviewPage() {
       bgColor: "bg-blue-50",
     },
     {
-      label: "Pending Reviews",
-      value: String(stats.pendingReviews),
-      description: "Awaiting moderation",
-      icon: ShieldCheck,
-      color: "text-amber-600",
-      bgColor: "bg-amber-50",
-    },
-    {
       label: "Booking Approvals",
       value: String(stats.pendingBookings),
       description: "Need your sign-off",
       icon: CalendarCheck,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
+      color: "text-red-600",
+      bgColor: "bg-red-50",
       href: "/admin/bookings",
     },
     {
@@ -98,6 +79,23 @@ export default async function AdminOverviewPage() {
       color: "text-violet-600",
       bgColor: "bg-violet-50",
       href: "/admin/sms",
+    },
+    {
+      label: "Moderation",
+      value: "—",
+      description: "Review queued listings",
+      icon: ShieldAlert,
+      color: "text-amber-600",
+      bgColor: "bg-amber-50",
+      href: "/admin/moderation",
+    },
+    {
+      label: "Revenue",
+      value: "—",
+      description: "See Stripe dashboard",
+      icon: DollarSign,
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-50",
     },
   ];
 

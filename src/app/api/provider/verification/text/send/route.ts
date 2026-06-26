@@ -29,8 +29,9 @@ export async function POST(request: Request) {
     }
 
     const client = twilio(TWILIO_SID, TWILIO_AUTH);
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + CODE_TTL_MINUTES * 60 * 1000).toISOString();
+    const arr = new Uint32Array(1);
+    crypto.getRandomValues(arr);
+    const code = (100000 + (arr[0] % 900000)).toString();
 
     await client.messages.create({
       body: `Your MasseurMatch verification code is: ${code}`,
@@ -39,6 +40,7 @@ export async function POST(request: Request) {
     });
 
     const supabase = createSupabaseAdminClient();
+    const expiresAt = new Date(Date.now() + CODE_TTL_MINUTES * 60 * 1000).toISOString();
 
     await supabase
       .from("profiles")
@@ -49,13 +51,9 @@ export async function POST(request: Request) {
       .from("text_verifications")
       .insert({
         user_id: session.userId,
-        phone,
-        verification_code: code,
+        code,
+        submitted_text: phone,
         status: "pending",
-        provider: "twilio",
-        attempt_count: 1,
-        sent_at: new Date().toISOString(),
-        expires_at: expiresAt,
       });
 
     if (verificationError) {
@@ -63,8 +61,9 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
     console.error("Twilio send error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

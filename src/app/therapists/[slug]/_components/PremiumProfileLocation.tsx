@@ -25,13 +25,13 @@ export function PremiumProfileLocation({ profile }: Props) {
       {/* Map placeholder */}
       <div 
         className="h-[200px] rounded-[var(--radius)] border border-[var(--glass-border)] flex items-center justify-center relative overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #0d2444 0%, #0B1F3A 100%)" }}
+        style={{ background: "linear-gradient(135deg, #2A2A2A 0%, #1A1A1A 100%)" }}
       >
         <div className="flex flex-col items-center gap-3 text-[var(--text-muted)]">
           <div 
             className="w-4 h-4 rounded-full bg-[var(--orange)]"
             style={{ 
-              boxShadow: "0 0 0 8px rgba(255,138,31,0.2), 0 0 0 16px rgba(255,138,31,0.08)",
+              boxShadow: "0 0 0 8px rgba(204,36,36,0.2), 0 0 0 16px rgba(204,36,36,0.08)",
               animation: "pp-pulse 2s infinite"
             }}
           />

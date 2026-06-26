@@ -51,8 +51,10 @@ export async function POST(
 
     // Log admin action
     await adminClient.from("admin_actions").insert({
-      admin_id: admin.userId,
+      action: "approve_profile",
       action_type: "approve_profile",
+      target_table: "profiles",
+      admin_id: admin.userId,
       target_user_id: profile.user_id,
       target_profile_id: profileId,
       reason: body.reason || null,

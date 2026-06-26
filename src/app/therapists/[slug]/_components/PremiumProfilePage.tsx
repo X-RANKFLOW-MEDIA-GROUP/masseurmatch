@@ -80,7 +80,7 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
           <section className="pp-section pp-fade-in" id="reviews">
             <div className="pp-section-header">
               <h2 className="pp-section-title">Client Reviews</h2>
-              <span className="text-sm text-slate-500">{reviews.length} verified reviews</span>
+              <span className="text-sm text-slate-500">{reviews.length} {reviews.length === 1 ? "review" : "reviews"}</span>
             </div>
             <ReviewsDisplay
               reviews={reviews.map((review) => ({
@@ -169,7 +169,7 @@ export function PremiumProfilePage({ profile, photos, reviews, cityPath }: Props
         <PremiumProfileCTA profile={profile} />
       </div>
 
-      <ProfileAIChat profile={profile} />
+      {profile.subscription_tier === "elite" && <ProfileAIChat profile={profile} />}
     </div>
   );
 }

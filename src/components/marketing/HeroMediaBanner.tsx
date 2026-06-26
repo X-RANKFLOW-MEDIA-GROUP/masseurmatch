@@ -136,7 +136,7 @@ function ProfileCard({ therapist }: { therapist: PublicTherapist }) {
 function Overlay() {
   return (
     <>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#060E1A]/85 via-[#060E1A]/20 to-transparent" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/85 via-[#1A1A1A]/20 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-4 px-6 pb-8 text-center sm:pb-12">
         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/70">
           Vetted · Discreet · Nationwide

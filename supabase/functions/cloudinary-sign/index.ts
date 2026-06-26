@@ -4,7 +4,7 @@ import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 // Generate a Cloudinary upload signature.
@@ -44,9 +44,35 @@ serve(async (req: Request) => {
       );
     }
 
-    const cloudName = Deno.env.get("CLOUDINARY_CLOUD_NAME");
-    const apiKey = Deno.env.get("CLOUDINARY_API_KEY");
-    const apiSecret = Deno.env.get("CLOUDINARY_API_SECRET");
+    // Support both direct credentials and cloudinary:// URL format
+    let cloudName = Deno.env.get("CLOUDINARY_CLOUD_NAME");
+    let apiKey = Deno.env.get("CLOUDINARY_API_KEY");
+    let apiSecret = Deno.env.get("CLOUDINARY_API_SECRET");
+
+    // If credentials come as a cloudinary:// URL, parse them
+    const cloudinaryUrl = Deno.env.get("CLOUDINARY_URL");
+    if (cloudinaryUrl && cloudinaryUrl.startsWith("cloudinary://")) {
+      try {
+        const urlObj = new URL(cloudinaryUrl);
+        apiKey = urlObj.username;
+        apiSecret = urlObj.password;
+        cloudName = urlObj.hostname;
+      } catch {
+        // Fall through to direct credentials
+      }
+    }
+
+    // Alternatively, if api_key contains the full URL format, extract it
+    if (apiKey?.includes("cloudinary://")) {
+      try {
+        const urlObj = new URL(apiKey);
+        apiKey = urlObj.username;
+        apiSecret = urlObj.password;
+        cloudName = urlObj.hostname;
+      } catch {
+        // Invalid format, will fail below
+      }
+    }
 
     if (!cloudName || !apiKey || !apiSecret) {
       return new Response(

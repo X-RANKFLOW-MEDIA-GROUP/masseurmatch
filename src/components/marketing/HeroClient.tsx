@@ -1,6 +1,7 @@
 "use client";
 
-import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { CityGlobe } from "@/components/marketing/CityGlobe";
 import { Cta3DButton } from "@/components/marketing/Cta3DButton";
@@ -14,209 +15,286 @@ const avatarStack = [
   { id: 4, src: "/marketing/hero/avatar-4.jpg", alt: "Verified therapist", initials: "DV", color: "from-violet-600 to-purple-700" },
 ];
 
-const headlineLines = ["The", "Safest", "Massage", "Directory."];
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-const CHAR_STAGGER = 0.045;
-const TYPE_START = 0.3;
+function isRealProfile(profile: PublicTherapist) {
+  const id = profile.id?.toLowerCase() ?? "";
+  const name = (profile.display_name ?? profile.full_name ?? "").toLowerCase();
+  const phone = profile.phone ?? "";
 
-// Pre-compute per-line start delays and total typing duration
-const lineStartDelays: number[] = [];
-let _charCount = 0;
-for (const line of headlineLines) {
-  lineStartDelays.push(TYPE_START + _charCount * CHAR_STAGGER);
-  _charCount += line.length;
+  return (
+    !profile.is_demo &&
+    !id.startsWith("fallback-") &&
+    !name.includes("demo") &&
+    !name.includes("test") &&
+    !name.includes("debug") &&
+    !phone.includes("555")
+  );
 }
-const TYPING_END = TYPE_START + _charCount * CHAR_STAGGER;
 
 export default function HeroClient({ therapists = [] }: { therapists?: PublicTherapist[] }) {
   const reducedMotion = useReducedMotion();
 
   return (
-    <section className="relative overflow-hidden bg-background text-foreground">
-      {!reducedMotion && (
-        <style>{`
-          @keyframes _blink{0%,100%{opacity:1}50%{opacity:0}}
-          ._cursor{animation:_blink 0.65s step-end infinite}
-          @keyframes _dotping{0%{transform:scale(1);opacity:.55}70%,100%{transform:scale(2.6);opacity:0}}
-          ._dotping{animation:_dotping 2.4s cubic-bezier(0,0,.2,1) infinite}
-          ._dotping2{animation:_dotping 2.4s cubic-bezier(0,0,.2,1) infinite 1.2s}
-          @keyframes _dotglow{0%,100%{box-shadow:0 0 14px 2px rgba(255,138,31,.35)}50%{box-shadow:0 0 24px 6px rgba(255,138,31,.6)}}
-          ._dotcore{animation:_dotglow 2.4s ease-in-out infinite}
-        `}</style>
-      )}
+    <motion.article
+      initial={{ opacity: 0, y: 36, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.65, ease: customEase, delay: 0.15 + index * 0.08 }}
+      className={`relative flex min-w-[250px] flex-1 flex-col rounded-[1.75rem] border border-black/5 bg-white/95 p-4 pt-36 shadow-[0_28px_70px_rgba(15,23,42,0.13)] backdrop-blur ${cardPosition}`}
+    >
+      <button
+        type="button"
+        aria-label={`Save ${name}`}
+        className="absolute right-5 top-5 z-20 rounded-full bg-white/80 p-2 text-slate-400 shadow-sm transition hover:text-[#CC2424]"
+      >
+        <Heart size={17} strokeWidth={2.25} />
+      </button>
 
-      {/* ── Animated first-fold backdrop ─────────────────────────────── */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        {/* Faint grid, radially masked */}
-        <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,.7)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.7)_1px,transparent_1px)] [background-size:54px_54px] [mask-image:radial-gradient(ellipse_at_50%_35%,black,transparent_72%)]" />
-        {/* Orange aurora */}
-        <motion.div
-          className="absolute -right-[12%] -top-[18%] h-[60vw] max-h-[640px] w-[60vw] max-w-[640px] rounded-full blur-[90px]"
-          style={{ background: "radial-gradient(circle, rgba(255,138,31,0.42), transparent 65%)" }}
-          animate={reducedMotion ? undefined : { x: [0, 30, 0], y: [0, 24, 0], scale: [1, 1.08, 1] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-        />
-        {/* Blue aurora */}
-        <motion.div
-          className="absolute -bottom-[22%] -left-[10%] h-[55vw] max-h-[580px] w-[55vw] max-w-[580px] rounded-full blur-[90px]"
-          style={{ background: "radial-gradient(circle, rgba(30,75,143,0.5), transparent 65%)" }}
-          animate={reducedMotion ? undefined : { x: [0, -26, 0], y: [0, -20, 0], scale: [1, 1.1, 1] }}
-          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-        />
-        {/* Soft top glow */}
-        <div className="absolute left-1/2 top-0 h-[40vh] w-[80vw] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,138,31,0.10),transparent_70%)] blur-2xl" />
+      <div className="absolute inset-x-3 -top-20 flex h-56 items-end justify-center overflow-hidden rounded-[1.5rem] bg-gradient-to-b from-slate-50 via-white to-white">
+        {photoSrc ? (
+          // Use a plain image so live Supabase public URLs and remote provider photos render without extra Next image config friction.
+          // The frame is intentionally background-light; profiles with transparent/background-removed photos pop out naturally.
+          <img
+            src={photoSrc}
+            alt={`${name} profile photo`}
+            loading={index === 1 ? "eager" : "lazy"}
+            className="h-full w-full object-cover object-top mix-blend-multiply"
+          />
+        ) : (
+          <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-[#CC2424] to-[#8B0A1E] text-2xl font-black text-white shadow-xl">
+            {initials}
+          </div>
+        )}
       </div>
 
-      <div className="relative z-10 mx-auto max-w-[1280px] px-4 pb-16 pt-24 sm:px-6 lg:px-8 lg:pb-20 lg:pt-28">
-        <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
-          {/* ── Left: copy ─────────────────────────────────────────────── */}
-          <div>
-            <div className="mb-8 flex items-center gap-3 lg:mb-10">
-              <div className="flex -space-x-3">
-                {avatarStack.map((avatar, index) => (
-                  <motion.div
-                    key={avatar.id}
-                    initial={{ opacity: 0, y: 40 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: reducedMotion ? 0 : 0.7,
-                      ease: customEase,
-                      delay: reducedMotion ? 0 : 0.1 + index * 0.08,
-                    }}
-                    className={`relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-full bg-gradient-to-br ring-2 ring-background ${avatar.color} flex items-center justify-center`}
+      <div className="relative z-10 mt-3 flex items-start gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#CC2424] to-[#8B0A1E] text-xs font-black text-white shadow-md">
+          {initials}
+        </div>
+        <div className="min-w-0">
+          <h3 className="truncate font-display text-lg font-black text-[#151515]">{name}</h3>
+          <p className="line-clamp-1 text-sm text-[#5F6673]">{specialty}</p>
+        </div>
+      </div>
+
+      <div className="mt-5 space-y-3 text-sm">
+        <div className="flex items-center gap-2 text-[#7B8190]">
+          <MapPin size={15} strokeWidth={2.3} className="text-[#9AA0AA]" />
+          <span className="line-clamp-1">{getLocation(profile)}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Star size={16} strokeWidth={2.25} className="fill-amber-400 text-amber-400" />
+          <span className="font-bold text-[#151515]">{rating}</span>
+          <span className="text-[#7B8190]">({reviewCount} reviews)</span>
+        </div>
+        <div className="flex items-center gap-4 text-[#5F6673]">
+          <span className="flex items-center gap-1.5">
+            <Clock size={15} strokeWidth={2.25} className="text-[#9AA0AA]" />
+            60 min
+          </span>
+          <span className="font-black text-[#151515]">{getPrice(profile)}</span>
+        </div>
+      </div>
+
+      <div className="mt-5 flex flex-wrap gap-2">
+        {(profile.is_verified_photos || profile.verification_status === "verified") && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 text-[11px] font-bold text-slate-700">
+            <BadgeCheck size={13} className="text-[#CC2424]" />
+            Verified Photo
+          </span>
+        )}
+        {profile.available_now && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1.5 text-[11px] font-bold text-emerald-700">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            Available Now
+          </span>
+        )}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => router.push(getProfileHref(profile))}
+        className="mt-5 w-full rounded-xl bg-[#CC2424] px-5 py-3 text-sm font-black uppercase tracking-wide text-white shadow-lg shadow-[#CC2424]/20 transition hover:bg-[#A81D1D]"
+      >
+        View Profile
+      </button>
+    </motion.article>
+  );
+}
+
+export default function HeroClient({ featuredTherapists = [] }: HeroClientProps) {
+  const reducedMotion = useReducedMotion();
+  const router = useRouter();
+  const [assistantInput, setAssistantInput] = useState("");
+
+  const realProfiles = useMemo(
+    () => featuredTherapists.filter(isRealProfile).slice(0, 3),
+    [featuredTherapists],
+  );
+
+  const dur = reducedMotion ? 0 : 0.7;
+  const noDelay = reducedMotion ? 0 : undefined;
+
+  const submitAssistantPrompt = (prompt = assistantInput) => {
+    const q = prompt.trim();
+    router.push(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
+  };
+
+  return (
+    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_24%_18%,rgba(204,36,36,0.08),transparent_28%),linear-gradient(180deg,#ffffff_0%,#fbfaf8_100%)] text-[#151515]">
+      <div className="mx-auto grid min-h-[680px] max-w-[1500px] items-center gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1.03fr_0.97fr] lg:px-10 lg:py-16">
+        <div className="relative order-2 lg:order-1">
+          <div className="pointer-events-none absolute -left-10 top-12 h-72 w-72 rounded-full bg-[#CC2424]/8 blur-3xl" />
+
+          {realProfiles.length > 0 ? (
+            <div className="relative flex snap-x gap-4 overflow-x-auto pb-6 pt-24 lg:overflow-visible lg:pb-0 lg:pt-28">
+              {realProfiles.map((profile, index) => (
+                <TherapistCard key={profile.id} profile={profile} index={index} />
+              ))}
+            </div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: dur, ease: customEase }}
+              className="rounded-[2rem] border border-dashed border-[#CC2424]/30 bg-white/80 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.09)]"
+            >
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#CC2424]/10 text-[#CC2424]">
+                <Sparkles size={24} />
+              </div>
+              <h2 className="font-display text-2xl font-black text-[#151515]">Live profile cards are ready.</h2>
+              <p className="mt-3 max-w-lg text-sm leading-6 text-[#667085]">
+                The hero only shows approved public profiles from Supabase. No demo names are rendered in this first fold.
+              </p>
+            </motion.div>
+          )}
+        </div>
+
+        <div className="order-1 flex flex-col justify-center lg:order-2">
+          <motion.p
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.12 }}
+            className="mb-4 font-mono text-[10px] uppercase tracking-[0.34em] text-[#CC2424] sm:text-xs"
+          >
+            PREMIUM.&nbsp;&nbsp;PROFESSIONAL.&nbsp;&nbsp;PERSONAL.
+          </motion.p>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.2 }}
+            className="mb-5 max-w-3xl font-display font-black leading-[0.96] tracking-tight"
+            style={{ fontSize: "clamp(3rem, 6vw, 6.5rem)" }}
+          >
+            <span className="block text-[#151515]">Find the Right</span>
+            <span className="block"><span className="text-[#CC2424]">Masseur</span> Near You.</span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.28 }}
+            className="mb-7 max-w-2xl text-base leading-8 text-[#667085] lg:text-lg"
+          >
+            Browse professional massage providers by city, technique, availability, and style — with help from our AI assistant.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.36 }}
+            className="overflow-hidden rounded-[1.75rem] border border-black/10 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.10)]"
+          >
+            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#CC2424]/10 text-[#CC2424]">
+                  <MessageCircle size={23} strokeWidth={2.4} />
+                </div>
+                <div>
+                  <p className="font-display text-base font-black text-[#151515]">AI Match Assistant</p>
+                  <p className="text-xs font-semibold text-[#7B8190]">Ask Knotty AI</p>
+                </div>
+              </div>
+              <Sparkles size={20} className="text-[#CC2424]" />
+            </div>
+
+            <div className="space-y-4 px-5 py-5">
+              <div className="ml-auto max-w-[78%] rounded-2xl rounded-tr-md bg-slate-100 px-4 py-3 text-sm font-medium leading-6 text-[#2B3038]">
+                I need a deep tissue masseur in Dallas tonight.
+                <span className="mt-1 block text-right text-[11px] text-[#98A2B3]">10:24 AM</span>
+              </div>
+              <div className="flex max-w-[86%] items-start gap-3">
+                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#CC2424]/10 text-[#CC2424]">
+                  <Sparkles size={16} />
+                </div>
+                <div className="rounded-2xl rounded-tl-md bg-[#F7F7F8] px-4 py-3 text-sm font-medium leading-6 text-[#2B3038]">
+                  I can help with that. Do you prefer in-call or outcall, and what area of Dallas works best for you?
+                  <span className="mt-1 block text-[11px] text-[#98A2B3]">10:24 AM</span>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2 pt-1">
+                {quickPrompts.map((prompt) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    onClick={() => submitAssistantPrompt(prompt)}
+                    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-black text-[#151515] transition hover:border-[#CC2424] hover:text-[#CC2424]"
                   >
-                    <span className="absolute inset-0 z-0 flex select-none items-center justify-center text-[10px] font-bold text-white/80">
-                      {avatar.initials}
-                    </span>
-                    <Image src={avatar.src} alt={avatar.alt} fill className="z-10 object-cover" sizes="44px" />
-                  </motion.div>
+                    {prompt}
+                  </button>
                 ))}
               </div>
 
-              <motion.span
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: reducedMotion ? 0 : 0.7,
-                  ease: customEase,
-                  delay: reducedMotion ? 0 : 0.1 + avatarStack.length * 0.08,
-                }}
-                className="text-sm font-medium text-muted-foreground md:text-base"
-              >
-                500+ professional therapists nationwide
-              </motion.span>
-            </div>
-
-            <h1 className="mb-6 font-display text-[clamp(3rem,8.5vw,6.5rem)] font-extrabold uppercase leading-[0.85] tracking-[-0.05em]">
-              {headlineLines.map((line, i) => (
-                <motion.span
-                  key={`${line}-${i}`}
-                  initial="hidden"
-                  animate="visible"
-                  variants={{
-                    hidden: {},
-                    visible: {
-                      transition: {
-                        staggerChildren: reducedMotion ? 0 : CHAR_STAGGER,
-                        delayChildren: reducedMotion ? 0 : lineStartDelays[i],
-                      },
-                    },
+              <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-2">
+                <input
+                  value={assistantInput}
+                  onChange={(event) => setAssistantInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") submitAssistantPrompt();
                   }}
-                  className="block"
+                  placeholder="Describe what you need..."
+                  aria-label="Ask Knotty AI what massage provider you need"
+                  className="min-w-0 flex-1 bg-transparent px-3 text-sm text-[#151515] outline-none placeholder:text-[#98A2B3]"
+                />
+                <button
+                  type="button"
+                  onClick={() => submitAssistantPrompt()}
+                  aria-label="Send AI match request"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#CC2424] text-white shadow-lg shadow-[#CC2424]/25 transition hover:bg-[#A81D1D]"
                 >
-                  {line.split("").map((char, j) => (
-                    <motion.span
-                      key={j}
-                      variants={{
-                        hidden: { opacity: reducedMotion ? 1 : 0 },
-                        visible: { opacity: 1, transition: { duration: 0 } },
-                      }}
-                    >
-                      {char}
-                    </motion.span>
-                  ))}
-
-                  {line === "Massage" && (
-                    <motion.span
-                      aria-hidden="true"
-                      variants={
-                        reducedMotion
-                          ? {}
-                          : {
-                              hidden: { opacity: 0, scale: 0 },
-                              visible: { opacity: 1, scale: 1, transition: { duration: 0.35, ease: customEase } },
-                            }
-                      }
-                      className="relative ml-2 inline-flex h-[0.8em] w-[0.8em] align-middle"
-                    >
-                      {/* Expanding "live signal" rings */}
-                      {!reducedMotion && (
-                        <>
-                          <span className="_dotping absolute inset-0 rounded-full bg-primary/60" />
-                          <span className="_dotping2 absolute inset-0 rounded-full bg-primary/40" />
-                        </>
-                      )}
-                      {/* Core dot with a soft breathing glow */}
-                      <span className="_dotcore relative inline-block h-full w-full rounded-full bg-primary" />
-                    </motion.span>
-                  )}
-
-                  {i === headlineLines.length - 1 && !reducedMotion && (
-                    <motion.span
-                      aria-hidden="true"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: [0, 1, 1, 0] }}
-                      transition={{ delay: TYPING_END, duration: 2.0, times: [0, 0.04, 0.85, 1], ease: "linear" }}
-                      className="relative -top-[0.04em] ml-2 inline-block align-middle"
-                    >
-                      <span className="_cursor inline-block h-[0.8em] w-[0.055em] bg-current" />
-                    </motion.span>
-                  )}
-                </motion.span>
-              ))}
-            </h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: reducedMotion ? 0 : 0.7, ease: customEase, delay: reducedMotion ? 0 : TYPING_END + 0.1 }}
-              className="speakable-intro mb-8 max-w-xl text-lg leading-relaxed text-muted-foreground lg:text-xl"
-            >
-              Premium male massage therapists across the US — real profiles, real reviews,
-              and AI-powered search with Knotty. Dallas, Houston, Miami, NYC, and 80+ cities.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: reducedMotion ? 0 : 0.7, ease: customEase, delay: reducedMotion ? 0 : TYPING_END + 0.2 }}
-              className="flex flex-wrap items-center gap-4"
-            >
-              <Cta3DButton href="/search" variant="primary">
-                Find a therapist
-              </Cta3DButton>
-              <Cta3DButton href="/for-therapists" variant="dark" withIcon={false}>
-                List your practice
-              </Cta3DButton>
-            </motion.div>
-          </div>
-
-          {/* ── Right: interactive 3D globe ────────────────────────────── */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: reducedMotion ? 0 : 1.1, ease: customEase, delay: reducedMotion ? 0 : 0.2 }}
-            className="relative"
-          >
-            <CityGlobe />
-            <div className="pointer-events-none mt-2 flex items-center justify-center gap-2 text-center">
-              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-primary" />
-              <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                Live coverage · 57+ cities · drag to explore
-              </span>
+                  <Send size={18} fill="currentColor" />
+                </button>
+              </div>
             </div>
           </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.46 }}
+            className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-semibold text-[#667085]"
+          >
+            {trustItems.map(({ label, icon: Icon }) => (
+              <span key={label} className="inline-flex items-center gap-2">
+                <Icon size={17} strokeWidth={2.25} className="text-[#151515]" />
+                {label}
+              </span>
+            ))}
+          </motion.div>
+
+          <motion.button
+            type="button"
+            onClick={() => router.push("/search")}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.52 }}
+            className="mt-7 inline-flex w-fit items-center gap-2 rounded-2xl bg-[#CC2424] px-6 py-4 text-sm font-black uppercase tracking-wide text-white shadow-xl shadow-[#CC2424]/20 transition hover:bg-[#A81D1D]"
+          >
+            Find a Masseur
+            <ArrowRight size={18} strokeWidth={2.5} />
+          </motion.button>
         </div>
       </div>
 

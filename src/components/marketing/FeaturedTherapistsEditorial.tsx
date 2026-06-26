@@ -63,7 +63,7 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
               <FadeUp key={profileHref} delay={i * 0.07}>
                 <Link
                   href={profileHref}
-                  className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-[0_2px_12px_rgba(11,31,58,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_20px_50px_-12px_rgba(11,31,58,0.18)]"
+                  className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-[0_2px_12px_rgba(26,26,26,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_20px_50px_-12px_rgba(26,26,26,0.18)]"
                 >
                   {/* Portrait image */}
                   <div className="relative aspect-[3/4] overflow-hidden bg-muted">

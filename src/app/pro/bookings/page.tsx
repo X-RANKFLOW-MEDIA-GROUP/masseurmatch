@@ -24,7 +24,7 @@ const supabase = createClient()
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   new: { label: 'New', color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
   checking: { label: 'In Review', color: 'text-sky-400 bg-sky-500/10 border-sky-500/20' },
-  pending_approval: { label: 'Pending Approval', color: 'text-orange-400 bg-orange-500/10 border-orange-500/20' },
+  pending_approval: { label: 'Pending Approval', color: 'text-red-400 bg-red-500/10 border-red-500/20' },
   approved: { label: 'Confirmed', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
   denied: { label: 'Denied', color: 'text-rose-400 bg-rose-500/10 border-rose-500/20' },
   completed: { label: 'Completed', color: 'text-slate-400 bg-slate-500/10 border-slate-500/20' },
@@ -82,17 +82,17 @@ export default function ProBookingsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#060E1A]">
+      <div className="flex min-h-screen items-center justify-center bg-[#1A1A1A]">
         <Loader2 className="h-6 w-6 animate-spin text-slate-500" strokeWidth={2} />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#060E1A] p-6">
+    <div className="min-h-screen bg-[#1A1A1A] p-6">
       <div className="mx-auto max-w-4xl">
         <div className="mb-8">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#FF8A1F]">Your Dashboard</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#CC2424]">Your Dashboard</p>
           <h1 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-white">Bookings</h1>
           <p className="mt-1 text-sm text-slate-400">Incoming booking inquiries for your massage services.</p>
         </div>
@@ -150,20 +150,28 @@ export default function ProBookingsPage() {
   )
 }
 
+const COLOR_TEXT: Record<string, string> = {
+  orange: 'text-red-400',
+  emerald: 'text-emerald-400',
+  slate: 'text-slate-400',
+}
+
 function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
+  const textCls = COLOR_TEXT[color] ?? 'text-slate-400'
   return (
     <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
-      <p className={`text-2xl font-bold text-${color}-400`}>{value}</p>
+      <p className={`text-2xl font-bold ${textCls}`}>{value}</p>
       <p className="mt-1 text-xs text-slate-500">{label}</p>
     </div>
   )
 }
 
 function SectionHeader({ icon: Icon, label, color }: { icon: LucideIcon; label: string; color: string }) {
+  const textCls = COLOR_TEXT[color] ?? 'text-slate-400'
   return (
     <div className="mb-3 flex items-center gap-2">
-      <Icon className={`h-4 w-4 text-${color}-400`} strokeWidth={2.25} />
-      <p className={`font-mono text-[10px] uppercase tracking-[0.18em] text-${color}-400`}>{label}</p>
+      <Icon className={`h-4 w-4 ${textCls}`} strokeWidth={2.25} />
+      <p className={`font-mono text-[10px] uppercase tracking-[0.18em] ${textCls}`}>{label}</p>
     </div>
   )
 }
@@ -225,7 +233,7 @@ function InquiryCard({ inquiry: inq, expanded, onToggle }: { inquiry: BookingInq
               <div className="flex flex-col gap-2 max-h-40 overflow-y-auto">
                 {inq.ai_conversation.map((msg, i) => (
                   <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] rounded-xl px-3 py-1.5 text-xs ${msg.role === 'user' ? 'bg-[#FF8A1F]/20 text-orange-200' : 'bg-white/[0.06] text-slate-300'}`}>
+                    <div className={`max-w-[80%] rounded-xl px-3 py-1.5 text-xs ${msg.role === 'user' ? 'bg-[#CC2424]/20 text-red-200' : 'bg-white/[0.06] text-slate-300'}`}>
                       {msg.content}
                     </div>
                   </div>

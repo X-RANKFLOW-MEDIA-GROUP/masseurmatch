@@ -16,9 +16,8 @@ export async function POST(request: Request) {
     // Get the latest pending verification for this user
     const { data: verification, error: fetchError } = await adminClient
       .from("text_verifications")
-      .select("id, verification_code, expires_at")
+      .select("id, code")
       .eq("user_id", session.userId)
-      .eq("phone", body.phone)
       .eq("status", "pending")
       .order("created_at", { ascending: false })
       .limit(1)
@@ -28,17 +27,8 @@ export async function POST(request: Request) {
       throw new RouteError(400, "No pending verification found for this phone number.");
     }
 
-    // Check expiry
-    if (!verification.expires_at || new Date(verification.expires_at) < new Date()) {
-      await adminClient
-        .from("text_verifications")
-        .update({ status: "expired", updated_at: new Date().toISOString() })
-        .eq("id", verification.id);
-      throw new RouteError(400, "Verification code has expired.");
-    }
-
     // Check code
-    if (verification.verification_code !== body.token) {
+    if (verification.code !== body.token) {
       throw new RouteError(400, "Invalid verification code.");
     }
 
@@ -47,16 +37,16 @@ export async function POST(request: Request) {
     // Mark as verified
     await adminClient
       .from("text_verifications")
-      .update({ status: "verified", verified_at: now, updated_at: now })
+      .update({ status: "verified", reviewed_at: now, updated_at: now })
       .eq("id", verification.id);
 
     // Update profile phone verification flag
     await adminClient
       .from("profiles")
-      .update({ 
-        is_verified_phone: true, 
+      .update({
+        is_verified_phone: true,
         phone: body.phone,
-        updated_at: now 
+        updated_at: now
       })
       .eq("user_id", session.userId);
 

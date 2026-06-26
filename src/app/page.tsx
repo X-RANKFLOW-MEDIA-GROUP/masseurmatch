@@ -5,12 +5,8 @@ import { CityMarquee } from "@/components/marketing/CityMarquee";
 import { StatsBand } from "@/components/marketing/StatsBand";
 import { CityCaseStudies } from "@/components/marketing/CityCaseStudies";
 import { FeaturedTherapistsEditorial } from "@/components/marketing/FeaturedTherapistsEditorial";
-import { MeetKnotty } from "@/components/marketing/MeetKnotty";
-import { WhyUsSplit } from "@/components/marketing/WhyUsSplit";
-import { PricingToggle } from "@/components/marketing/PricingToggle";
-import { HomeSeoLanding } from "@/app/_components/home-seo-landing";
 import { FaqAccordion } from "@/components/marketing/FaqAccordion";
-import { CityCoverageSection } from "@/components/marketing/CityCoverageSection";
+import { USStateMapGrid } from "@/components/marketing/USStateMapGrid";
 import { FinalCta } from "@/components/marketing/FinalCta";
 import {
   createPageMetadata,
@@ -23,16 +19,8 @@ import {
   SITE_DESCRIPTION,
 } from "@/app/_lib/seo";
 import { siteUrl } from "@/lib/site";
-import { getPublicTherapists, getCities } from "@/app/_lib/directory";
-import { competitorsByTier } from "@/lib/competitors";
-import { GUIDES } from "@/app/guides/data";
-import {
-  PRIORITY_CITY_SLUGS,
-  CITY_ROUTE_COUNTS,
-  CITY_HIGHLIGHTS,
-  LANDING_FAQ,
-} from "@/lib/marketing/home-data";
-import type { CityData } from "@/data/cities";
+import { getProfilePhotos, getPublicTherapists } from "@/app/_lib/directory";
+import { LANDING_FAQ } from "@/lib/marketing/home-data";
 
 export const revalidate = 3600;
 
@@ -41,7 +29,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = createPageMetadata({
   title: "Find Verified Male Massage Therapists Near You | MasseurMatch",
   description:
-    "MasseurMatch is the premium US directory for verified LGBTQ+-affirming male massage therapists. Search Dallas, Miami, NYC, LA, Chicago & 80+ cities. Compare deep tissue, Swedish, outcall & incall options. A modern alternative to MasseurFinder and RentMasseur.",
+    "MasseurMatch is the premium US directory for verified LGBTQ+-affirming male massage therapists. Search Dallas, Miami, NYC, LA, Chicago & cities across the US. Compare deep tissue, Swedish, outcall & incall options. A modern alternative to MasseurFinder and RentMasseur.",
   path: "/",
   keywords: [
     // Brand
@@ -160,8 +148,14 @@ const HOME_FAQ = [
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
+function isRealProfileId(id: string | null | undefined) {
+  return Boolean(id && !id.toLowerCase().startsWith("fallback-"));
+}
+
 export default async function HomePage() {
-  // Fetch featured therapists — graceful fallback if DB unavailable
+  // Fetch featured therapists — graceful fallback if DB unavailable.
+  // The hero itself filters out fallback/demo/test profiles so the first fold only
+  // renders approved live profiles from Supabase.
   let featuredTherapists: Awaited<ReturnType<typeof getPublicTherapists>>["items"] = [];
   try {
     const result = await getPublicTherapists({ page: 1, pageSize: 6, lgbtqAffirming: true });
@@ -170,37 +164,32 @@ export default async function HomePage() {
       const fallback = await getPublicTherapists({ page: 1, pageSize: 6 });
       featuredTherapists = fallback.items;
     }
+
+    featuredTherapists = await Promise.all(
+      featuredTherapists.map(async (therapist) => {
+        if (!isRealProfileId(therapist.id)) return therapist;
+        const photos = await getProfilePhotos(therapist.id, 1);
+        const primaryPhoto = photos.find((photo) => photo.is_primary) ?? photos[0];
+        return {
+          ...therapist,
+          profile_photo: primaryPhoto?.storage_path ?? therapist.profile_photo,
+        };
+      }),
+    );
   } catch {
     featuredTherapists = [];
   }
 
-  // Build city cards from static priority list
-  const allCities = getCities();
-  const launchCities = PRIORITY_CITY_SLUGS.flatMap((slug) => {
-    const city = allCities.find((c) => c.slug === slug);
-    if (!city) return [];
-    return [
-      {
-        href: `/${slug}`,
-        city,
-        listingCount: 0,
-        routeCount: CITY_ROUTE_COUNTS[slug] ?? 12,
-        highlights: CITY_HIGHLIGHTS[slug] ?? ["Verified Profiles", "Incall & Outcall"],
-      },
-    ];
-  });
-
-  // Top comparison competitors for the homepage hub
-  const comparisonLinks = competitorsByTier.slice(0, 6);
-
-  // Top guides
-  const guides = GUIDES.slice(0, 4);
-
-  // JSON-LD: top city list for ItemList schema
-  const topCityItems = launchCities.map((entry) => ({
-    name: `Massage Therapists in ${entry.city.name}, ${entry.city.stateCode}`,
-    path: entry.href,
-  }));
+  const topCityItems = [
+    { name: "Massage Therapists in New York, NY", path: "/new-york" },
+    { name: "Massage Therapists in Los Angeles, CA", path: "/los-angeles" },
+    { name: "Massage Therapists in Miami, FL", path: "/miami" },
+    { name: "Massage Therapists in Chicago, IL", path: "/chicago" },
+    { name: "Massage Therapists in Dallas, TX", path: "/dallas" },
+    { name: "Massage Therapists in Houston, TX", path: "/houston" },
+    { name: "Massage Therapists in Atlanta, GA", path: "/atlanta" },
+    { name: "Massage Therapists in Washington, DC", path: "/washington-dc" },
+  ];
 
   return (
     <>
@@ -240,26 +229,6 @@ export default async function HomePage() {
         })}
       />
 
-      {/* Competitor comparison ItemList */}
-      <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@type": "ItemList",
-          name: "MasseurMatch Comparison Pages — Alternatives to MasseurFinder, RentMasseur & More",
-          description:
-            "Compare MasseurMatch against leading massage directories including MasseurFinder, RentMasseur, MassageFinder, FindAMasseur, and others.",
-          url: siteUrl("/compare"),
-          numberOfItems: comparisonLinks.length,
-          itemListElement: comparisonLinks.map((competitor, index) => ({
-            "@type": "ListItem",
-            position: index + 1,
-            name: `MasseurMatch vs ${competitor.name}`,
-            url: siteUrl(`/compare/${competitor.slug}`),
-            description: competitor.hubDescription,
-          })),
-        }}
-      />
-
       {/* FAQPage */}
       <JsonLd data={buildFaqJsonLd(HOME_FAQ)} />
 
@@ -290,44 +259,21 @@ export default async function HomePage() {
       />
 
       <div className="relative min-h-screen overflow-x-hidden bg-background">
-        {/* ── FIRST FOLD — dark navy ─────────────────────────────────── */}
+        {/* ── FIRST FOLD — live profiles + AI assistant ─────────────────── */}
         <div className="home-dark relative">
           {/* 1. Editorial hero */}
           <Hero therapists={featuredTherapists} />
 
-          {/* 2. Animated top-cities marquee */}
+          {/* 2. Slim popular-cities marquee */}
           <CityMarquee />
         </div>
 
         {/* ── LIGHT BODY ─────────────────────────────────────────────── */}
-        {/* 3. Animated stats band */}
         <StatsBand />
-
-        {/* 4. Editorial city case studies */}
-        <CityCaseStudies launchCities={launchCities} />
-
-        {/* 5. Featured therapist profiles */}
+        <CityCaseStudies />
         <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
-
-        {/* 5b. Meet Knotty — AI assistant */}
-        <MeetKnotty />
-
-        {/* 6. Why Us split with giant stats */}
-        <WhyUsSplit />
-
-        {/* 7. Pricing toggle */}
-        <PricingToggle />
-
-        {/* 8. Comparison hub + guides */}
-        <HomeSeoLanding comparisonLinks={comparisonLinks} guides={guides} />
-
-        {/* 9. FAQ accordion */}
+        <USStateMapGrid />
         <FaqAccordion items={LANDING_FAQ} />
-
-        {/* 10. City coverage grid */}
-        <CityCoverageSection />
-
-        {/* Final CTA */}
         <FinalCta />
       </div>
     </>

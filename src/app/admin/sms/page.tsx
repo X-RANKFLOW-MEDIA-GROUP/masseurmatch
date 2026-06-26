@@ -78,12 +78,12 @@ export default function SmsAdminPage() {
   ] as const
 
   return (
-    <div className="min-h-screen bg-[#060E1A]">
+    <div className="min-h-screen bg-[#1A1A1A]">
       {/* Header */}
       <div className="border-b border-white/[0.06] px-6 py-6">
         <div className="mx-auto max-w-6xl flex items-center justify-between">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#FF8A1F]">Admin</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#CC2424]">Admin</p>
             <h1 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-white">SMS Center</h1>
             <p className="mt-1 text-sm text-slate-400">Automated SMS responses, logs, and follow-up alerts.</p>
           </div>
@@ -96,8 +96,8 @@ export default function SmsAdminPage() {
                 <Wifi className="h-3.5 w-3.5" strokeWidth={2.25} /> Connected
               </span>
             ) : (
-              <span className="flex items-center gap-1.5 rounded-full border border-rose-500/20 bg-rose-500/10 px-3 py-1.5 text-xs text-rose-400">
-                <WifiOff className="h-3.5 w-3.5" strokeWidth={2.25} /> Disconnected
+              <span className="flex items-center gap-1.5 rounded-full border border-slate-500/20 bg-slate-500/10 px-3 py-1.5 text-xs text-slate-400">
+                <WifiOff className="h-3.5 w-3.5" strokeWidth={2.25} /> Not configured
               </span>
             )}
             <button
@@ -122,7 +122,7 @@ export default function SmsAdminPage() {
                 onClick={() => setTab(t.id)}
                 className={`flex items-center gap-2 border-b-2 px-4 py-4 text-sm font-medium transition-colors ${
                   tab === t.id
-                    ? 'border-[#FF8A1F] text-white'
+                    ? 'border-[#CC2424] text-white'
                     : 'border-transparent text-slate-500 hover:text-slate-300'
                 }`}
               >
@@ -141,7 +141,7 @@ export default function SmsAdminPage() {
 
       {/* Content */}
       <div className="mx-auto max-w-6xl px-6 py-6">
-        {tab === 'conversations' && <ConversationsTab />}
+        {tab === 'conversations' && <ConversationsTab twilioReady={twilio?.connected ?? false} twilioLoading={twilioLoading} />}
         {tab === 'alerts' && <AlertsTab onResolved={loadStatus} />}
         {tab === 'profiles' && <ProfilesTab />}
       </div>
@@ -151,7 +151,7 @@ export default function SmsAdminPage() {
 
 // ─── Conversations Tab ────────────────────────────────────────────────────────
 
-function ConversationsTab() {
+function ConversationsTab({ twilioReady, twilioLoading }: { twilioReady: boolean; twilioLoading: boolean }) {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedConv, setSelectedConv] = useState<Conversation | null>(null)
@@ -168,6 +168,23 @@ function ConversationsTab() {
   }, [])
 
   useEffect(() => { load() }, [load])
+
+  if (!twilioLoading && !twilioReady) {
+    return (
+      <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] py-20 text-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-500/10">
+          <MessageSquare className="h-8 w-8 text-slate-400" strokeWidth={2} />
+        </div>
+        <div>
+          <p className="font-semibold text-white">SMS auto-reply is not yet configured</p>
+          <p className="mx-auto mt-2 max-w-md text-sm text-slate-400">
+            Connect a Twilio account to enable automated SMS responses. Once configured,
+            you can manage conversations, set up auto-replies, and receive follow-up alerts here.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   async function sendReply() {
     if (!replyText.trim() || !selectedConv) return
@@ -210,7 +227,7 @@ function ConversationsTab() {
             onClick={() => setSelectedConv(conv)}
             className={`w-full rounded-xl border p-3 text-left transition-all ${
               selectedConv?.client_phone === conv.client_phone && selectedConv?.our_phone === conv.our_phone
-                ? 'border-orange-500/40 bg-orange-500/5'
+                ? 'border-red-500/40 bg-red-500/5'
                 : conv.unresolved_alert
                 ? 'border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50'
                 : 'border-white/[0.06] bg-white/[0.02] hover:border-white/10'
@@ -266,7 +283,7 @@ function ConversationsTab() {
                       ? 'bg-white/[0.08] text-slate-200'
                       : msg.is_manual
                       ? 'bg-sky-500/20 text-sky-200'
-                      : 'bg-[#FF8A1F]/20 text-orange-200'
+                      : 'bg-[#CC2424]/20 text-red-200'
                   }`}>
                     <p className="text-sm leading-relaxed">{msg.body}</p>
                     <p className="mt-1 text-[10px] opacity-50">
@@ -286,12 +303,12 @@ function ConversationsTab() {
                 onChange={e => setReplyText(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendReply()}
                 placeholder="Manual reply…"
-                className="flex-1 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-orange-500/50 focus:outline-none"
+                className="flex-1 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-red-500/50 focus:outline-none"
               />
               <button
                 onClick={sendReply}
                 disabled={replySending || !replyText.trim()}
-                className="flex items-center justify-center rounded-lg bg-[#FF8A1F] px-3 py-2 transition-all hover:bg-orange-400 disabled:opacity-60"
+                className="flex items-center justify-center rounded-lg bg-[#CC2424] px-3 py-2 transition-all hover:bg-red-400 disabled:opacity-60"
               >
                 {replySending ? (
                   <Loader2 className="h-4 w-4 animate-spin text-white" strokeWidth={2.25} />
@@ -548,7 +565,7 @@ function ProfilesTab() {
                         onClick={() => patch(profile.id, 'availability_mode', mode)}
                         className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all capitalize ${
                           merged.availability_mode === mode
-                            ? 'border-orange-500/40 bg-orange-500/10 text-orange-400'
+                            ? 'border-red-500/40 bg-red-500/10 text-red-400'
                             : 'border-white/10 bg-white/[0.04] text-slate-400 hover:text-white'
                         }`}
                       >
@@ -676,7 +693,7 @@ function ProfilesTab() {
                   <button
                     onClick={() => saveProfile(profile)}
                     disabled={saving === profile.id}
-                    className="flex items-center justify-center gap-2 rounded-lg bg-[#FF8A1F] px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-orange-400 disabled:opacity-60"
+                    className="flex items-center justify-center gap-2 rounded-lg bg-[#CC2424] px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-red-400 disabled:opacity-60"
                   >
                     {saving === profile.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2.25} />
@@ -694,7 +711,7 @@ function ProfilesTab() {
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
-const inputCls = "mt-1 w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-orange-500/50 focus:outline-none"
+const inputCls = "mt-1 w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-red-500/50 focus:outline-none"
 
 function Label({ children, muted }: { children: React.ReactNode; muted?: boolean }) {
   return (
