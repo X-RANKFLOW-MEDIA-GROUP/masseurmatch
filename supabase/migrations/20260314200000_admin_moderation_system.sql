@@ -2,7 +2,6 @@
 -- MasseurMatch Admin & Moderation System Database Migration
 -- ============================================================================
 -- Adds approval workflow, moderation tables, and analytics support
--- Run this migration in Supabase SQL Editor
 
 -- ============================================================================
 -- 1. ALTER PROFILES TABLE - Add Approval Workflow Columns
@@ -16,7 +15,6 @@ ALTER TABLE profiles ADD COLUMN IF NOT EXISTS reviewed_by UUID REFERENCES auth.u
 
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS reviewed_at TIMESTAMP WITH TIME ZONE;
 
--- Index for status queries
 CREATE INDEX IF NOT EXISTS idx_profiles_status ON profiles(status);
 CREATE INDEX IF NOT EXISTS idx_profiles_reviewed_at ON profiles(reviewed_at DESC);
 
@@ -41,28 +39,23 @@ CREATE INDEX IF NOT EXISTS idx_photo_verifications_therapist_id ON photo_verific
 CREATE INDEX IF NOT EXISTS idx_photo_verifications_status ON photo_verifications(status);
 CREATE INDEX IF NOT EXISTS idx_photo_verifications_created_at ON photo_verifications(created_at DESC);
 
--- RLS Policies for photo_verifications
 ALTER TABLE photo_verifications ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view their own photo verifications" ON photo_verifications;
 CREATE POLICY "Users can view their own photo verifications" ON photo_verifications
   FOR SELECT USING (auth.uid() = therapist_id);
 
+DROP POLICY IF EXISTS "Admins can view all photo verifications" ON photo_verifications;
 CREATE POLICY "Admins can view all photo verifications" ON photo_verifications
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
-    )
-  );
+  FOR SELECT USING (public.is_admin());
 
+DROP POLICY IF EXISTS "Users can insert their own photos" ON photo_verifications;
 CREATE POLICY "Users can insert their own photos" ON photo_verifications
   FOR INSERT WITH CHECK (auth.uid() = therapist_id);
 
+DROP POLICY IF EXISTS "Admins can update photo status" ON photo_verifications;
 CREATE POLICY "Admins can update photo status" ON photo_verifications
-  FOR UPDATE USING (
-    EXISTS (
-      SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
-    )
-  );
+  FOR UPDATE USING (public.is_admin());
 
 -- ============================================================================
 -- 3. CREATE COMPLAINTS TABLE
@@ -87,28 +80,23 @@ CREATE INDEX IF NOT EXISTS idx_complaints_respondent_id ON complaints(respondent
 CREATE INDEX IF NOT EXISTS idx_complaints_status ON complaints(status);
 CREATE INDEX IF NOT EXISTS idx_complaints_created_at ON complaints(created_at DESC);
 
--- RLS Policies for complaints
 ALTER TABLE complaints ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view their own complaints" ON complaints;
 CREATE POLICY "Users can view their own complaints" ON complaints
   FOR SELECT USING (auth.uid() = complainant_id OR auth.uid() = respondent_id);
 
+DROP POLICY IF EXISTS "Admins can view all complaints" ON complaints;
 CREATE POLICY "Admins can view all complaints" ON complaints
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
-    )
-  );
+  FOR SELECT USING (public.is_admin());
 
+DROP POLICY IF EXISTS "Users can file complaints" ON complaints;
 CREATE POLICY "Users can file complaints" ON complaints
   FOR INSERT WITH CHECK (auth.uid() = complainant_id);
 
+DROP POLICY IF EXISTS "Admins can update complaint status" ON complaints;
 CREATE POLICY "Admins can update complaint status" ON complaints
-  FOR UPDATE USING (
-    EXISTS (
-      SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
-    )
-  );
+  FOR UPDATE USING (public.is_admin());
 
 -- ============================================================================
 -- 4. CREATE THERAPIST_AVAILABILITY TABLE
@@ -128,19 +116,17 @@ CREATE TABLE IF NOT EXISTS therapist_availability (
 CREATE INDEX IF NOT EXISTS idx_therapist_availability_therapist_id ON therapist_availability(therapist_id);
 CREATE INDEX IF NOT EXISTS idx_therapist_availability_day ON therapist_availability(day_of_week);
 
--- RLS Policies for therapist_availability
 ALTER TABLE therapist_availability ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view their own availability" ON therapist_availability;
 CREATE POLICY "Users can view their own availability" ON therapist_availability
   FOR SELECT USING (auth.uid() = therapist_id);
 
+DROP POLICY IF EXISTS "Admins can view all availability" ON therapist_availability;
 CREATE POLICY "Admins can view all availability" ON therapist_availability
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
-    )
-  );
+  FOR SELECT USING (public.is_admin());
 
+DROP POLICY IF EXISTS "Users can manage their own availability" ON therapist_availability;
 CREATE POLICY "Users can manage their own availability" ON therapist_availability
   FOR ALL USING (auth.uid() = therapist_id);
 
@@ -163,15 +149,11 @@ CREATE INDEX IF NOT EXISTS idx_admin_audit_log_admin_id ON admin_audit_log(admin
 CREATE INDEX IF NOT EXISTS idx_admin_audit_log_created_at ON admin_audit_log(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_admin_audit_log_resource ON admin_audit_log(resource_type, resource_id);
 
--- RLS Policies for admin_audit_log
 ALTER TABLE admin_audit_log ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins can view audit log" ON admin_audit_log;
 CREATE POLICY "Admins can view audit log" ON admin_audit_log
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
-    )
-  );
+  FOR SELECT USING (public.is_admin());
 
 -- ============================================================================
 -- 6. CREATE FUNCTION FOR UPDATED_AT TRIGGER
@@ -215,15 +197,3 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON photo_verifications TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON complaints TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON therapist_availability TO authenticated;
 GRANT SELECT ON admin_audit_log TO authenticated;
-
--- ============================================================================
--- MIGRATION COMPLETE
--- ============================================================================
--- Summary of changes:
--- 1. Added approval workflow to profiles (status, admin_notes, reviewed_by, reviewed_at)
--- 2. Created photo_verifications table for photo/document moderation
--- 3. Created complaints table for user complaints
--- 4. Created therapist_availability table for scheduling
--- 5. Created admin_audit_log table for admin actions
--- 6. Added RLS policies for security
--- 7. Added indexes for performance
