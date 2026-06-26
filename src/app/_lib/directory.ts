@@ -166,6 +166,8 @@ const buildPublicTherapistsQuery = () => {
     .or("email_address.is.null,not.email_address.ilike.%@example%")
     .or("email_address.is.null,not.email_address.ilike.%admin.dev@%")
     .or("display_name.is.null,not.display_name.ilike.%debug%");
+  return q;
+};
 
 function isActivelyAvailable(profile: PublicTherapist) {
   return profile.available_now === true &&

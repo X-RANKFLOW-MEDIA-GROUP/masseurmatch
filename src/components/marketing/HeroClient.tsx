@@ -3,19 +3,35 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { CityGlobe } from "@/components/marketing/CityGlobe";
-import { Cta3DButton } from "@/components/marketing/Cta3DButton";
+import {
+  ArrowRight,
+  BadgeCheck,
+  Clock,
+  Heart,
+  MapPin,
+  MessageCircle,
+  Send,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Users,
+} from "lucide-react";
 import { HeroMediaBanner } from "@/components/marketing/HeroMediaBanner";
 import type { PublicTherapist } from "@/app/_lib/directory";
 
-const avatarStack = [
-  { id: 1, src: "/marketing/hero/avatar-1.jpg", alt: "Verified therapist", initials: "JM", color: "from-orange-500 to-amber-600" },
-  { id: 2, src: "/marketing/hero/avatar-2.jpg", alt: "Verified therapist", initials: "RK", color: "from-blue-600 to-indigo-700" },
-  { id: 3, src: "/marketing/hero/avatar-3.jpg", alt: "Verified therapist", initials: "AL", color: "from-teal-500 to-cyan-600" },
-  { id: 4, src: "/marketing/hero/avatar-4.jpg", alt: "Verified therapist", initials: "DV", color: "from-violet-600 to-purple-700" },
+const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+const quickPrompts = [
+  "Deep tissue in Dallas",
+  "Sports massage near me",
+  "Available tonight",
 ];
 
-const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const trustItems = [
+  { label: "Verified Providers", icon: ShieldCheck },
+  { label: "Real Reviews", icon: Star },
+  { label: "LGBTQ+ Affirming", icon: Users },
+];
 
 function isRealProfile(profile: PublicTherapist) {
   const id = profile.id?.toLowerCase() ?? "";
@@ -32,8 +48,25 @@ function isRealProfile(profile: PublicTherapist) {
   );
 }
 
-export default function HeroClient({ therapists = [] }: { therapists?: PublicTherapist[] }) {
-  const reducedMotion = useReducedMotion();
+function getProfileHref(profile: PublicTherapist) {
+  return profile.slug ? `/therapists/${profile.slug}` : `/therapists/${profile.id}`;
+}
+
+function getLocation(profile: PublicTherapist) {
+  return [profile.neighborhood ?? profile.city, profile.state].filter(Boolean).join(", ") || "United States";
+}
+
+function getPrice(profile: PublicTherapist) {
+  const price = profile.starting_price ?? profile.incall_price ?? profile.outcall_price;
+  return price ? `$${price}` : "Contact";
+}
+
+function TherapistCard({ profile, index, router }: { profile: PublicTherapist; index: number; router: ReturnType<typeof useRouter> }) {
+  const name = profile.display_name ?? profile.full_name ?? "Therapist";
+  const initials = name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+  const specialty = profile.specialties?.[0] ?? profile.massage_techniques?.[0] ?? "Massage Therapist";
+  const photoSrc = profile.avatar_url ?? profile.profile_photo ?? null;
+  const cardPosition = index === 1 ? "z-10 scale-[1.03]" : "opacity-90";
 
   return (
     <motion.article
@@ -52,8 +85,6 @@ export default function HeroClient({ therapists = [] }: { therapists?: PublicThe
 
       <div className="absolute inset-x-3 -top-20 flex h-56 items-end justify-center overflow-hidden rounded-[1.5rem] bg-gradient-to-b from-slate-50 via-white to-white">
         {photoSrc ? (
-          // Use a plain image so live Supabase public URLs and remote provider photos render without extra Next image config friction.
-          // The frame is intentionally background-light; profiles with transparent/background-removed photos pop out naturally.
           <img
             src={photoSrc}
             alt={`${name} profile photo`}
@@ -82,11 +113,12 @@ export default function HeroClient({ therapists = [] }: { therapists?: PublicThe
           <MapPin size={15} strokeWidth={2.3} className="text-[#9AA0AA]" />
           <span className="line-clamp-1">{getLocation(profile)}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Star size={16} strokeWidth={2.25} className="fill-amber-400 text-amber-400" />
-          <span className="font-bold text-[#151515]">{rating}</span>
-          <span className="text-[#7B8190]">({reviewCount} reviews)</span>
-        </div>
+        {profile.verification_status === "verified" && (
+          <div className="flex items-center gap-2">
+            <BadgeCheck size={16} strokeWidth={2.25} className="text-[#CC2424]" />
+            <span className="font-bold text-[#151515]">Verified</span>
+          </div>
+        )}
         <div className="flex items-center gap-4 text-[#5F6673]">
           <span className="flex items-center gap-1.5">
             <Clock size={15} strokeWidth={2.25} className="text-[#9AA0AA]" />
@@ -122,14 +154,14 @@ export default function HeroClient({ therapists = [] }: { therapists?: PublicThe
   );
 }
 
-export default function HeroClient({ featuredTherapists = [] }: HeroClientProps) {
+export default function HeroClient({ therapists = [] }: { therapists?: PublicTherapist[] }) {
   const reducedMotion = useReducedMotion();
   const router = useRouter();
   const [assistantInput, setAssistantInput] = useState("");
 
   const realProfiles = useMemo(
-    () => featuredTherapists.filter(isRealProfile).slice(0, 3),
-    [featuredTherapists],
+    () => therapists.filter(isRealProfile).slice(0, 3),
+    [therapists],
   );
 
   const dur = reducedMotion ? 0 : 0.7;
@@ -149,7 +181,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
           {realProfiles.length > 0 ? (
             <div className="relative flex snap-x gap-4 overflow-x-auto pb-6 pt-24 lg:overflow-visible lg:pb-0 lg:pt-28">
               {realProfiles.map((profile, index) => (
-                <TherapistCard key={profile.id} profile={profile} index={index} />
+                <TherapistCard key={profile.id} profile={profile} index={index} router={router} />
               ))}
             </div>
           ) : (
@@ -298,7 +330,6 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
         </div>
       </div>
 
-      {/* ── Cinematic cover band (video on desktop, still on mobile) ──── */}
       <motion.div
         initial={{ clipPath: "inset(100% 0 0 0)" }}
         whileInView={{ clipPath: "inset(0% 0 0 0)" }}

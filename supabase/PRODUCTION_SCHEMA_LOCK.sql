@@ -257,6 +257,12 @@ create table if not exists public.text_verifications (
   sent_at timestamptz,
   verified_at timestamptz,
   expires_at timestamptz,
+  profile_id uuid,
+  submitted_text text,
+  code text,
+  reviewed_by uuid,
+  reviewed_at timestamptz,
+  rejection_reason text,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
@@ -970,3 +976,44 @@ create table if not exists public.sms_follow_up_alerts (
   created_at       timestamptz default now(),
   unique(profile_id, client_phone, our_phone)
 );
+
+create table if not exists public.demand_scores (
+  id uuid primary key default gen_random_uuid(),
+  city text not null,
+  state text not null,
+  neighborhood text,
+  score numeric not null,
+  search_volume_index numeric not null default 0,
+  competition_index numeric not null default 0,
+  trend text not null default 'stable',
+  week_start date not null,
+  created_at timestamptz not null default timezone('utc', now())
+);
+
+alter table public.contact_inquiries
+  add column if not exists client_name text,
+  add column if not exists client_phone text,
+  add column if not exists preferred_contact text;
+
+alter table public.moderation_queue
+  add column if not exists content_type text;
+
+alter table public.payment_transactions
+  add column if not exists provider_transaction_id text,
+  add column if not exists provider text;
+
+alter table public.appointments
+  add column if not exists user_id uuid references auth.users(id) on delete set null,
+  add column if not exists starts_at timestamptz,
+  add column if not exists ends_at timestamptz;
+
+alter table public.profile_reviews
+  add column if not exists admin_notes text;
+
+alter table public.therapist_photos
+  add column if not exists therapist_profile_id uuid,
+  add column if not exists approval_status text;
+
+alter table public.admin_actions
+  add column if not exists action text,
+  add column if not exists target_table text;
