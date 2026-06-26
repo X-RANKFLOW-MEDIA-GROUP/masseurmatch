@@ -2484,33 +2484,59 @@ export type Database = {
       }
       ranking_events: {
         Row: {
-          created_at: string | null
-          event_name: string | null
-          event_type: string | null
           id: string
-          metadata: Json | null
-          profile_id: string | null
-          weight: number | null
+          session_id: string
+          user_id: string | null
+          therapist_id: string | null
+          event_name: string
+          city: string | null
+          neighborhood: string | null
+          intent: string
+          device_type: string | null
+          position_in_results: number | null
+          recommendation_source: string | null
+          metadata: Json
+          created_at: string
         }
         Insert: {
-          created_at?: string | null
-          event_name?: string | null
-          event_type?: string | null
           id?: string
-          metadata?: Json | null
-          profile_id?: string | null
-          weight?: number | null
+          session_id: string
+          user_id?: string | null
+          therapist_id?: string | null
+          event_name: string
+          city?: string | null
+          neighborhood?: string | null
+          intent?: string
+          device_type?: string | null
+          position_in_results?: number | null
+          recommendation_source?: string | null
+          metadata?: Json
+          created_at?: string
         }
         Update: {
-          created_at?: string | null
-          event_name?: string | null
-          event_type?: string | null
           id?: string
-          metadata?: Json | null
-          profile_id?: string | null
-          weight?: number | null
+          session_id?: string
+          user_id?: string | null
+          therapist_id?: string | null
+          event_name?: string
+          city?: string | null
+          neighborhood?: string | null
+          intent?: string
+          device_type?: string | null
+          position_in_results?: number | null
+          recommendation_source?: string | null
+          metadata?: Json
+          created_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ranking_events_therapist_id_fkey"
+            columns: ["therapist_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reviews: {
         Row: {

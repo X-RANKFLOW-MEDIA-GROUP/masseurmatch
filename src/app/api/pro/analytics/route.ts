@@ -39,7 +39,7 @@ export async function GET(request: Request) {
     const { data: events, error: eventsError } = await admin
       .from("ranking_events")
       .select("event_name, created_at")
-      .eq("profile_id", profile.id)
+      .eq("therapist_id", profile.id)
       .eq("event_name", "profile_viewed")
       .gte("created_at", since.toISOString());
 
