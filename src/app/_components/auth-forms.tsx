@@ -159,14 +159,13 @@ export function AuthForms({
       description: isLogin ? undefined : "You can continue into onboarding now.",
     });
 
-    // Use window.location for a full page navigation to ensure cookies are read properly
     const role = (result as { role?: string | null }).role;
     const destination = !isLogin
       ? "/pro/onboard"
       : role === "client"
         ? "/dashboard"
         : sanitizedRedirectTo;
-    window.location.href = destination;
+    router.push(destination);
   };
 
   const resendConfirmation = async () => {

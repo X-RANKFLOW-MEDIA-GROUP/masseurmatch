@@ -84,14 +84,23 @@ export const StepProfile = ({ onComplete }: StepProfileProps) => {
       const photo = photos[i];
       try {
         const filePath = `${user!.id}/${Date.now()}_${photo.file.name}`;
+
+        const { error: storageError } = await supabase.storage
+          .from("therapist-photos")
+          .upload(filePath, photo.file, { contentType: photo.file.type, upsert: false });
+
+        if (storageError) {
+          console.warn("[StepProfile] Storage upload failed:", storageError.message);
+        }
+
         const photoPayload = {
           profile_id: profileId,
           storage_path: filePath,
           is_primary: i === 0,
           sort_order: i,
         };
-        
-        const { data: photoRecord, error: insertError } = await (supabase as any)
+
+        const { data: photoRecord, error: insertError } = await supabase
           .from('profile_photos')
           .insert(photoPayload)
           .select()

@@ -23,6 +23,8 @@ test.describe("Signup plan page", () => {
 
   test("/signup/plan shows correct prices from canonical source", async ({ page }) => {
     await page.goto("/signup/plan");
+    // Wait for plan cards to hydrate (loading spinner disappears)
+    await expect(page.getByText(/Loading available plan/i)).toBeHidden({ timeout: 15_000 });
     const bodyText = await page.textContent("body");
 
     // Prices must match lib/pricing.ts — never the old $49 'Verified' tier
