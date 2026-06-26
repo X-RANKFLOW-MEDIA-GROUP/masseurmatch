@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
@@ -182,6 +182,7 @@ export default function SiteHeader() {
   const [dashboardPath, setDashboardPath] = useState("/login");
   const pathname = usePathname();
   const router = useRouter();
+  const shouldReduceMotion = useReducedMotion();
   const isAppSection =
     pathname?.startsWith("/admin") || pathname?.startsWith("/pro");
 
@@ -235,9 +236,9 @@ export default function SiteHeader() {
 
   return (
     <motion.header
-      initial={{ opacity: 0, y: -20 }}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: shouldReduceMotion ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 bg-white transition-shadow duration-300 ${
         isScrolled
           ? "shadow-[0_2px_8px_rgba(0,0,0,0.08)] border-b border-[#E5E5E5]"
@@ -282,8 +283,8 @@ export default function SiteHeader() {
             return (
               <motion.div
                 key={href}
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.97 }}
+                whileHover={shouldReduceMotion ? undefined : { scale: 1.04 }}
+                whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 400, damping: 20 }}
               >
                 <Link
@@ -350,8 +351,8 @@ export default function SiteHeader() {
             <motion.button
               type="button"
               onClick={handleLogout}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={shouldReduceMotion ? undefined : { scale: 1.05 }}
+              whileTap={shouldReduceMotion ? undefined : { scale: 0.95 }}
               className="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#666666] hover:text-[#CC2424] hover:bg-red-50 transition-colors"
             >
               <LogOut className="w-[0.9rem] h-[0.9rem]" strokeWidth={2.35} />
@@ -359,8 +360,8 @@ export default function SiteHeader() {
             </motion.button>
           )}
           <motion.div
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+            whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
+            whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
             transition={{ type: "spring", stiffness: 400, damping: 20 }}
           >
             <Link

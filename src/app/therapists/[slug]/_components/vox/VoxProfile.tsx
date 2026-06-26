@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -27,6 +29,7 @@ import {
   ChevronRight,
   Users,
   FileCheck,
+  Zap,
 } from "lucide-react";
 import type { ProfileViewModel } from "@/components/profile/profile-utils";
 import { contactHref } from "@/components/profile/profile-utils";
@@ -74,8 +77,7 @@ export function VoxProfile({
   availableNow: boolean;
   lgbtqAffirming: boolean;
   knottyPrompt: string;
-  // Optional, showcase-only social proof. Real directory profiles never pass
-  // these, so no ratings or testimonials are ever fabricated for live listings.
+  // Optional showcase-only social proof. Real directory profiles never pass these.
   reviews?: Review[];
   rating?: number;
   reviewCount?: number;
@@ -91,24 +93,44 @@ export function VoxProfile({
   ).filter(Boolean);
 
   const stats = [
-    { label: "Experience", value: profile.yearsExperience.replace(/\s*years?/i, "").trim() || "—", suffix: /year/i.test(profile.yearsExperience) ? "years" : "" },
+    { label: "Experience", value: profile.yearsExperience.replace(/\s*years?/i, "").trim() || "—", suffix: /year/i.test(profile.yearsExperience) ? "yrs" : "" },
     { label: "Response", value: profile.responseTime.length > 18 ? "Fast" : profile.responseTime, suffix: "" },
-    { label: "Languages", value: String(profile.languages.length), suffix: profile.languages.length === 1 ? "language" : "languages" },
+    { label: "Languages", value: String(profile.languages.length), suffix: profile.languages.length === 1 ? "lang" : "langs" },
   ];
 
+  const quickNavItems = [
+    profile.galleryImages.length > 1 && { label: "Gallery", href: "#gallery" },
+    allServices.length > 0 && { label: "Services", href: "#services" },
+    (profile.pricing.length > 0 || hasRate(profile.incallPrice)) && { label: "Rates", href: "#rates" },
+    { label: "Availability", href: "#availability" },
+    { label: "Contact", href: "#contact" },
+  ].filter(Boolean) as { label: string; href: string }[];
+
   return (
-    <div className="min-h-screen bg-white text-[#1a1a1a]">
+    <div className="min-h-screen bg-[#FAF8F5] text-[#1a1a1a]">
 
       {/* ── Dark navy hero ─────────────────────────────────────────────────── */}
-      <section className="relative bg-[#060E1A] px-4 pb-14 pt-8 sm:px-6 lg:pb-16 lg:pt-10">
-        {/* Subtle radial glow */}
+      <section className="relative bg-[#060E1A] px-4 pb-16 pt-8 sm:px-6 lg:pb-20 lg:pt-12">
+        {/* Dot-grid texture overlay */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 overflow-hidden"
-        >
-          <div className="absolute -left-40 -top-20 h-96 w-96 rounded-full bg-[#FF8A1F]/[0.06] blur-3xl" />
-          <div className="absolute -right-40 bottom-0 h-80 w-80 rounded-full bg-emerald-500/[0.05] blur-3xl" />
+          style={{
+            backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px)",
+            backgroundSize: "28px 28px",
+          }}
+        />
+        {/* Glows */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -left-40 -top-20 h-96 w-96 rounded-full bg-[#FF8A1F]/[0.07] blur-3xl" />
+          <div className="absolute -right-40 bottom-0 h-80 w-80 rounded-full bg-emerald-500/[0.06] blur-3xl" />
         </div>
+        {/* Bottom gradient hairline */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-px"
+          style={{ background: "linear-gradient(to right, transparent, rgba(255,138,31,0.15), transparent)" }}
+        />
 
         <div className="relative mx-auto max-w-6xl">
           {/* Breadcrumb */}
@@ -131,7 +153,7 @@ export function VoxProfile({
           <div className="grid gap-8 lg:grid-cols-[360px_1fr] lg:items-start lg:gap-14">
 
             {/* ── Photo ───────────────────────── */}
-            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-white/10 shadow-[0_32px_64px_rgba(0,0,0,0.5)]">
+            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-white/10 shadow-[0_32px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,138,31,0.08)]">
               <Image
                 src={profile.profilePhotoUrl}
                 alt={`${profile.name}, massage therapist in ${profile.city}`}
@@ -140,10 +162,9 @@ export function VoxProfile({
                 sizes="(min-width: 1024px) 360px, 100vw"
                 className="object-cover object-[50%_15%]"
               />
-              {/* Gradient fade at bottom for text legibility */}
-              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/50 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/60 to-transparent" />
               {availableNow && (
-                <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white shadow-lg">
+                <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white shadow-[0_0_16px_rgba(52,211,153,0.5)]">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
                   Available now
                 </span>
@@ -195,12 +216,12 @@ export function VoxProfile({
                 {stats.map((stat) => (
                   <div
                     key={stat.label}
-                    className="rounded-xl border border-white/[0.08] bg-white/[0.05] px-4 py-3 backdrop-blur-sm"
+                    className="rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-3.5 backdrop-blur-sm"
                   >
                     <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40">{stat.label}</p>
                     <p className="mt-1.5 text-lg font-bold text-white">
                       {stat.value}
-                      {stat.suffix && <span className="ml-1 text-sm font-medium text-white/50">{stat.suffix}</span>}
+                      {stat.suffix && <span className="ml-1 text-xs font-medium text-white/45">{stat.suffix}</span>}
                     </p>
                   </div>
                 ))}
@@ -211,7 +232,7 @@ export function VoxProfile({
                 {phoneHref && (
                   <a
                     href={phoneHref}
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#FF8A1F] px-7 font-semibold text-[#1a0a00] shadow-[0_0_28px_rgba(255,138,31,0.35)] transition-transform hover:-translate-y-0.5"
+                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#FF8A1F] px-7 font-semibold text-[#1a0a00] shadow-[0_0_32px_rgba(255,138,31,0.4)] transition-transform hover:-translate-y-0.5"
                   >
                     <Phone className="h-4 w-4" strokeWidth={2.5} />
                     Text {firstName}
@@ -251,6 +272,21 @@ export function VoxProfile({
                   </a>
                 )}
               </div>
+
+              {/* Quick anchor nav */}
+              {quickNavItems.length > 0 && (
+                <div className="mt-8 flex flex-wrap gap-2">
+                  {quickNavItems.map((item) => (
+                    <a
+                      key={item.href}
+                      href={item.href}
+                      className="inline-flex items-center gap-1 rounded-full border border-white/[0.1] bg-white/[0.04] px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-white/50 transition-colors hover:border-[#FF8A1F]/40 hover:text-white/80"
+                    >
+                      {item.label}
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -266,7 +302,7 @@ export function VoxProfile({
           </Section>
         )}
 
-        {/* ── Reviews (showcase only) ──────────────────────────────────────── */}
+        {/* ── Reviews (showcase only — never shown for real directory profiles) */}
         {reviews.length > 0 && (
           <Section id="reviews" eyebrow="Testimonials" title="Client reviews">
             <div className="grid gap-4 md:grid-cols-3">
@@ -303,7 +339,7 @@ export function VoxProfile({
                   {profile.specialties.slice(0, 8).map((item) => (
                     <span
                       key={item}
-                      className="rounded-full border border-[#FF8A1F]/20 bg-[#FFF4EA] px-3 py-1.5 text-sm font-medium text-[#8a5a2b]"
+                      className="rounded-full border border-[#FF8A1F]/25 bg-gradient-to-br from-[#FFF4EA] to-[#FFF0DE] px-3 py-1.5 text-sm font-medium text-[#8a5a2b]"
                     >
                       {item}
                     </span>
@@ -331,9 +367,9 @@ export function VoxProfile({
                 return (
                   <div
                     key={service}
-                    className="flex items-start gap-3 rounded-2xl border border-[#e8e0d8] bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+                    className="group flex items-start gap-3 rounded-2xl border border-[#e8e0d8] bg-white p-4 shadow-sm transition-all hover:border-[#FF8A1F]/30 hover:shadow-[0_4px_24px_rgba(255,138,31,0.1)]"
                   >
-                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#FFF4EA] text-[#FF8A1F]">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#FFF4EA] to-[#FFECD4] text-[#FF8A1F] transition-transform group-hover:scale-105">
                       <Icon className="h-5 w-5" strokeWidth={2.25} />
                     </span>
                     <span className="pt-1.5 text-sm font-semibold text-[#1a1a1a]">{service}</span>
@@ -348,7 +384,7 @@ export function VoxProfile({
         {(profile.pricing.length > 0 || hasRate(profile.incallPrice) || hasRate(profile.outcallPrice)) && (
           <Section id="rates" eyebrow="Transparent pricing" title="Session rates">
             <div className="overflow-hidden rounded-2xl border border-[#e8e0d8] shadow-sm">
-              <div className="grid grid-cols-[1.4fr_1fr_1fr] gap-2 bg-[#060E1A] px-5 py-3.5 font-mono text-xs uppercase tracking-[0.14em] text-white/60 sm:px-7">
+              <div className="grid grid-cols-[1.4fr_1fr_1fr] gap-2 bg-[#060E1A] px-5 py-4 font-mono text-xs uppercase tracking-[0.14em] text-white/60 sm:px-7">
                 <span>Session</span>
                 <span className="text-right">Incall</span>
                 <span className="text-right">Outcall</span>
@@ -387,7 +423,7 @@ export function VoxProfile({
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="rounded-2xl border border-[#e8e0d8] bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center gap-2">
-                <CalendarDays className="h-5 w-5 text-[#CC2424]" strokeWidth={2.25} />
+                <CalendarDays className="h-5 w-5 text-emerald-600" strokeWidth={2.25} />
                 <h3 className="font-display text-lg font-bold text-[#1A1A1A]">Availability</h3>
               </div>
               {profile.availabilityDays.length > 0 ? (
@@ -397,9 +433,9 @@ export function VoxProfile({
                     return (
                       <span
                         key={day}
-                        className={`flex h-9 w-12 items-center justify-center rounded-lg text-sm font-semibold ${
+                        className={`flex h-9 w-12 items-center justify-center rounded-lg text-sm font-semibold transition-colors ${
                           open
-                            ? "bg-[#FFF4EA] text-[#8a5a2b]"
+                            ? "bg-gradient-to-b from-[#FFF4EA] to-[#FFECD4] text-[#8a5a2b] shadow-sm"
                             : "bg-slate-50 text-slate-300 line-through"
                         }`}
                       >
@@ -413,7 +449,7 @@ export function VoxProfile({
             </div>
             <div className="rounded-2xl border border-[#e8e0d8] bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center gap-2">
-                <Car className="h-5 w-5 text-[#CC2424]" strokeWidth={2.25} />
+                <Car className="h-5 w-5 text-[#FF8A1F]" strokeWidth={2.25} />
                 <h3 className="font-display text-lg font-bold text-[#1A1A1A]">Incall & outcall</h3>
               </div>
               <ul className="space-y-2.5 text-sm text-[#3f3a33]">
@@ -428,7 +464,7 @@ export function VoxProfile({
                   {hasRate(profile.outcallPrice) ? ` · from ${profile.outcallPrice}` : ""}
                 </li>
                 <li className="flex items-center gap-2">
-                  <Car className="h-4 w-4 text-[#CC2424]" strokeWidth={2.25} />
+                  <Zap className="h-4 w-4 text-[#FF8A1F]" strokeWidth={2.25} />
                   {profile.travelRadius}
                 </li>
               </ul>
@@ -467,16 +503,22 @@ export function VoxProfile({
           <div className="grid gap-3 sm:grid-cols-3">
             <TrustCard
               Icon={ShieldCheck}
+              iconColor="text-emerald-600"
+              iconBg="bg-emerald-50"
               title="Reviewed before going live"
               body="Every profile is checked by our team before it appears in the directory."
             />
             <TrustCard
               Icon={Users}
+              iconColor="text-[#FF8A1F]"
+              iconBg="bg-gradient-to-br from-[#FFF4EA] to-[#FFECD4]"
               title="Real, independent pros"
               body="You message the therapist directly — no middlemen, no booking fees."
             />
             <TrustCard
               Icon={FileCheck}
+              iconColor="text-emerald-600"
+              iconBg="bg-emerald-50"
               title="Clear, upfront details"
               body="Services, areas, and rates are listed on the profile so you know before you reach out."
             />
@@ -500,9 +542,9 @@ export function VoxProfile({
                 <Link
                   key={related.slug}
                   href={`/therapists/${related.slug}`}
-                  className="flex items-center gap-3 rounded-2xl border border-[#e8e0d8] bg-white p-3 shadow-sm transition-all hover:border-[#FF8A1F]/40 hover:shadow-md"
+                  className="group flex items-center gap-3 rounded-2xl border border-[#e8e0d8] bg-white p-3 shadow-sm transition-all hover:border-[#FF8A1F]/40 hover:shadow-[0_4px_20px_rgba(255,138,31,0.08)]"
                 >
-                  <span className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                  <span className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100 ring-2 ring-transparent transition-all group-hover:ring-[#FF8A1F]/30">
                     {related.profilePhotoUrl ? (
                       <Image
                         src={related.profilePhotoUrl}
@@ -515,7 +557,10 @@ export function VoxProfile({
                   </span>
                   <span>
                     <p className="font-semibold text-[#1a1a1a]">{related.name}</p>
-                    <p className="text-sm text-[#8a7d6f]">{related.city}</p>
+                    <p className="flex items-center gap-1 text-sm text-[#8a7d6f]">
+                      <MapPin className="h-3 w-3" strokeWidth={2} />
+                      {related.city}
+                    </p>
                   </span>
                 </Link>
               ))}
@@ -525,8 +570,16 @@ export function VoxProfile({
       </div>
 
       {/* ── Final CTA band ──────────────────────────────────────────────────── */}
-      <section className="bg-[#060E1A] px-4 py-14 sm:py-20">
-        <div className="mx-auto flex max-w-4xl flex-col items-center gap-6 rounded-2xl border border-white/[0.06] bg-gradient-to-br from-[#0a1628] to-[#060E1A] px-6 py-14 text-center">
+      <section className="relative bg-[#060E1A] px-4 py-14 sm:py-20">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 overflow-hidden"
+          style={{
+            backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px)",
+            backgroundSize: "28px 28px",
+          }}
+        />
+        <div className="relative mx-auto flex max-w-4xl flex-col items-center gap-6 rounded-2xl border border-white/[0.06] bg-gradient-to-br from-[#0a1628] to-[#060E1A] px-6 py-14 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/40">Ready when you are</p>
           <h2 className="font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
             Book your tailored session with {firstName}.
@@ -538,7 +591,7 @@ export function VoxProfile({
             {(phoneHref || whatsappHref || emailHref) && (
               <a
                 href={phoneHref || whatsappHref || emailHref || "#contact"}
-                className="inline-flex h-12 items-center gap-2 rounded-full bg-[#FF8A1F] px-7 font-semibold text-[#1a0a00] shadow-[0_0_28px_rgba(255,138,31,0.3)] transition-transform hover:-translate-y-0.5"
+                className="inline-flex h-12 items-center gap-2 rounded-full bg-[#FF8A1F] px-7 font-semibold text-[#1a0a00] shadow-[0_0_32px_rgba(255,138,31,0.35)] transition-transform hover:-translate-y-0.5"
               >
                 <Sparkles className="h-4 w-4" strokeWidth={2.5} />
                 Contact {firstName}
@@ -619,7 +672,7 @@ function HeroBadge({
 function DetailRow({ Icon, label, value }: { Icon: typeof MapPin; label: string; value: string }) {
   return (
     <div className="flex items-start gap-3 rounded-2xl border border-[#e8e0d8] bg-white p-4 shadow-sm">
-      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#FFF4EA] text-[#FF8A1F]">
+      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#FFF4EA] to-[#FFECD4] text-[#FF8A1F]">
         <Icon className="h-4 w-4" strokeWidth={2.25} />
       </span>
       <span>
@@ -630,10 +683,22 @@ function DetailRow({ Icon, label, value }: { Icon: typeof MapPin; label: string;
   );
 }
 
-function TrustCard({ Icon, title, body }: { Icon: typeof ShieldCheck; title: string; body: string }) {
+function TrustCard({
+  Icon,
+  iconColor,
+  iconBg,
+  title,
+  body,
+}: {
+  Icon: typeof ShieldCheck;
+  iconColor: string;
+  iconBg: string;
+  title: string;
+  body: string;
+}) {
   return (
     <div className="rounded-2xl border border-[#e8e0d8] bg-white p-6 shadow-sm">
-      <span className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-[#FFF4EA] text-[#FF8A1F]">
+      <span className={`mb-3 inline-flex h-11 w-11 items-center justify-center rounded-xl ${iconBg} ${iconColor}`}>
         <Icon className="h-5 w-5" strokeWidth={2.25} />
       </span>
       <h3 className="font-display text-base font-bold text-[#1A1A1A]">{title}</h3>

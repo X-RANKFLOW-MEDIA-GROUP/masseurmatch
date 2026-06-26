@@ -119,9 +119,9 @@ function RecommendationCard({
         ) : null}
       </div>
 
-      <ul className="mt-3 space-y-2 text-sm leading-6 text-white/78">
+      <ul className="mt-3 list-disc list-inside space-y-2 text-sm leading-6 text-white/78">
         {recommendation.why.map((reason) => (
-          <li key={`${recommendation.therapistId}-${reason}`}>• {reason}</li>
+          <li key={`${recommendation.therapistId}-${reason}`}>{reason}</li>
         ))}
       </ul>
 
