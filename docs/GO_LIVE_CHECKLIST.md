@@ -6,7 +6,7 @@ This checklist defines the minimum release gates required before sending Masseur
 >
 > Changes in this pass (2026-06-26):
 > - `scripts/test-api-routes.mjs`: delete `.next/server/pages` before spawning the Next.js dev server so stale CJS production build artifacts do not conflict with ESM dev mode. Fixes `pnpm test:api` after a `pnpm build`.
-> - `prisma/schema.prisma`: translated Portuguese comment to English (`"Prisma schema para o perfil do massagista"` → `"Massage therapist profile model (reference only.)."`).
+> - `prisma/schema.prisma`: translated Portuguese comment to English (`"Prisma schema para o perfil do massagista"` → `"Massage therapist profile model (reference only)."`). 
 > - `.gitignore`: added `repo-audit-report/` to the local-audit-artifact exclusion block.
 >
 > Previous closure (2026-06-26 — pass 1):
