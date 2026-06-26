@@ -193,16 +193,17 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // Rewrite admin.masseurmatch.com/* → /admin/* (requires domain alias in Vercel)
   const host = request.headers.get("host") ?? "";
   if (host === "admin.masseurmatch.com") {
+    const adminPathname = pathname === "/" ? "/admin" : pathname.startsWith("/admin") ? pathname : `/admin${pathname}`;
     if (!session) {
       const loginUrl = new URL("https://masseurmatch.com/login");
-      loginUrl.searchParams.set("redirect", pathname === "/" ? "/admin" : `/admin${pathname}`);
+      loginUrl.searchParams.set("redirect", adminPathname);
       return NextResponse.redirect(loginUrl);
     }
     if (session.role !== "admin") {
       return NextResponse.redirect(new URL("https://masseurmatch.com/"));
     }
     const rewriteUrl = request.nextUrl.clone();
-    rewriteUrl.pathname = pathname === "/" ? "/admin" : `/admin${pathname}`;
+    rewriteUrl.pathname = adminPathname;
     return NextResponse.rewrite(rewriteUrl);
   }
 
