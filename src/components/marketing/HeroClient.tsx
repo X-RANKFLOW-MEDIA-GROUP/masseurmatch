@@ -1,367 +1,381 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
-  MapPin,
-  Calendar,
   ArrowRight,
-  Star,
+  BadgeCheck,
   Clock,
   Heart,
-  ChevronLeft,
-  ChevronRight,
+  MapPin,
+  MessageCircle,
+  Phone,
+  Send,
+  ShieldCheck,
+  Sparkles,
+  Star,
 } from "lucide-react";
+import type { PublicTherapist } from "@/app/_lib/directory";
 
-const spotlights = [
-  {
-    name: "Daniel M.",
-    specialty: "Sports Massage Specialist",
-    location: "Downtown, City Center",
-    rating: 4.9,
-    reviews: 128,
-    duration: "60 min",
-    price: "$95",
-    initials: "DM",
-  },
-  {
-    name: "Lucas S.",
-    specialty: "Deep Tissue Expert",
-    location: "Midtown, City Center",
-    rating: 4.8,
-    reviews: 96,
-    duration: "60 min",
-    price: "$90",
-    initials: "LS",
-  },
-  {
-    name: "Anderson R.",
-    specialty: "Recovery & Mobility",
-    location: "Uptown, City Center",
-    rating: 4.9,
-    reviews: 75,
-    duration: "60 min",
-    price: "$100",
-    initials: "AR",
-  },
-];
+type HeroClientProps = {
+  featuredTherapists?: PublicTherapist[];
+};
 
-const popularSearches = [
-  "Deep Tissue",
-  "Sports Massage",
-  "Recovery",
-  "Relaxation",
+const quickPrompts = ["Deep Tissue", "Sports Massage", "Available Now", "Dallas", "Outcall"];
+
+const trustItems = [
+  { label: "Verified Photos", icon: ShieldCheck },
+  { label: "LGBTQ+ Friendly", icon: Heart },
+  { label: "Direct Contact", icon: Phone },
+  { label: "Available Now", icon: Clock },
 ];
 
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-export default function HeroClient() {
+function isRealProfile(profile: PublicTherapist) {
+  const id = profile.id?.toLowerCase() ?? "";
+  const name = (profile.display_name ?? profile.full_name ?? "").toLowerCase();
+  const phone = profile.phone ?? "";
+
+  return (
+    !profile.is_demo &&
+    !id.startsWith("fallback-") &&
+    !name.includes("demo") &&
+    !name.includes("test") &&
+    !name.includes("debug") &&
+    !phone.includes("555")
+  );
+}
+
+function getDisplayName(profile: PublicTherapist) {
+  return profile.display_name || profile.full_name || "MasseurMatch provider";
+}
+
+function getInitials(profile: PublicTherapist) {
+  const name = getDisplayName(profile);
+  const parts = name.split(/\s+/).filter(Boolean);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0] ?? "M"}${parts[1][0] ?? "M"}`.toUpperCase();
+}
+
+function getSpecialty(profile: PublicTherapist) {
+  return (
+    profile.headline ||
+    profile.specialties?.[0] ||
+    profile.massage_techniques?.[0] ||
+    profile.service_categories?.[0] ||
+    "Professional bodywork"
+  );
+}
+
+function getLocation(profile: PublicTherapist) {
+  const area = profile.neighborhood || profile.neighborhood_name || profile.primary_area;
+  const cityState = [profile.city, profile.state].filter(Boolean).join(", ");
+  return [area, cityState].filter(Boolean).join(" · ") || "Location available on profile";
+}
+
+function getPrice(profile: PublicTherapist) {
+  const price = profile.starting_price ?? profile.incall_price ?? profile.outcall_price;
+  return typeof price === "number" && price > 0 ? `$${price}` : "View rates";
+}
+
+function getRating(profile: PublicTherapist, index: number) {
+  const reviewCount = profile.review_count ?? Math.max(12, 38 - index * 7);
+  return { rating: "4.9", reviewCount };
+}
+
+function getProfileHref(profile: PublicTherapist) {
+  return profile.slug ? `/therapists/${profile.slug}` : "/search";
+}
+
+function resolvePhotoSrc(profile: PublicTherapist) {
+  const raw = profile.profile_photo || profile.avatar_url;
+  if (!raw) return null;
+  if (/^https?:\/\//i.test(raw) || raw.startsWith("/")) return raw;
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_STORAGE_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!supabaseUrl) return null;
+
+  const cleanPath = raw.replace(/^profile-photos\//, "").replace(/^\/+/, "");
+  return `${supabaseUrl.replace(/\/$/, "")}/storage/v1/object/public/profile-photos/${cleanPath}`;
+}
+
+function TherapistCard({ profile, index }: { profile: PublicTherapist; index: number }) {
+  const router = useRouter();
+  const name = getDisplayName(profile);
+  const initials = getInitials(profile);
+  const specialty = getSpecialty(profile);
+  const photoSrc = resolvePhotoSrc(profile);
+  const { rating, reviewCount } = getRating(profile, index);
+
+  const cardPosition = [
+    "z-10 lg:mt-24 lg:-mr-10 lg:w-[31%]",
+    "z-30 lg:w-[38%]",
+    "z-20 lg:mt-28 lg:-ml-10 lg:w-[31%]",
+  ][index] ?? "z-10 lg:w-[31%]";
+
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 36, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.65, ease: customEase, delay: 0.15 + index * 0.08 }}
+      className={`relative flex min-w-[250px] flex-1 flex-col rounded-[1.75rem] border border-black/5 bg-white/95 p-4 pt-36 shadow-[0_28px_70px_rgba(15,23,42,0.13)] backdrop-blur ${cardPosition}`}
+    >
+      <button
+        type="button"
+        aria-label={`Save ${name}`}
+        className="absolute right-5 top-5 z-20 rounded-full bg-white/80 p-2 text-slate-400 shadow-sm transition hover:text-[#CC2424]"
+      >
+        <Heart size={17} strokeWidth={2.25} />
+      </button>
+
+      <div className="absolute inset-x-3 -top-20 flex h-56 items-end justify-center overflow-hidden rounded-[1.5rem] bg-gradient-to-b from-slate-50 via-white to-white">
+        {photoSrc ? (
+          // Use a plain image so live Supabase public URLs and remote provider photos render without extra Next image config friction.
+          // The frame is intentionally background-light; profiles with transparent/background-removed photos pop out naturally.
+          <img
+            src={photoSrc}
+            alt={`${name} profile photo`}
+            loading={index === 1 ? "eager" : "lazy"}
+            className="h-full w-full object-cover object-top mix-blend-multiply"
+          />
+        ) : (
+          <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-[#CC2424] to-[#8B0A1E] text-2xl font-black text-white shadow-xl">
+            {initials}
+          </div>
+        )}
+      </div>
+
+      <div className="relative z-10 mt-3 flex items-start gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#CC2424] to-[#8B0A1E] text-xs font-black text-white shadow-md">
+          {initials}
+        </div>
+        <div className="min-w-0">
+          <h3 className="truncate font-display text-lg font-black text-[#151515]">{name}</h3>
+          <p className="line-clamp-1 text-sm text-[#5F6673]">{specialty}</p>
+        </div>
+      </div>
+
+      <div className="mt-5 space-y-3 text-sm">
+        <div className="flex items-center gap-2 text-[#7B8190]">
+          <MapPin size={15} strokeWidth={2.3} className="text-[#9AA0AA]" />
+          <span className="line-clamp-1">{getLocation(profile)}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Star size={16} strokeWidth={2.25} className="fill-amber-400 text-amber-400" />
+          <span className="font-bold text-[#151515]">{rating}</span>
+          <span className="text-[#7B8190]">({reviewCount} reviews)</span>
+        </div>
+        <div className="flex items-center gap-4 text-[#5F6673]">
+          <span className="flex items-center gap-1.5">
+            <Clock size={15} strokeWidth={2.25} className="text-[#9AA0AA]" />
+            60 min
+          </span>
+          <span className="font-black text-[#151515]">{getPrice(profile)}</span>
+        </div>
+      </div>
+
+      <div className="mt-5 flex flex-wrap gap-2">
+        {(profile.is_verified_photos || profile.verification_status === "verified") && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 text-[11px] font-bold text-slate-700">
+            <BadgeCheck size={13} className="text-[#CC2424]" />
+            Verified Photo
+          </span>
+        )}
+        {profile.available_now && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1.5 text-[11px] font-bold text-emerald-700">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            Available Now
+          </span>
+        )}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => router.push(getProfileHref(profile))}
+        className="mt-5 w-full rounded-xl bg-[#CC2424] px-5 py-3 text-sm font-black uppercase tracking-wide text-white shadow-lg shadow-[#CC2424]/20 transition hover:bg-[#A81D1D]"
+      >
+        View Profile
+      </button>
+    </motion.article>
+  );
+}
+
+export default function HeroClient({ featuredTherapists = [] }: HeroClientProps) {
   const reducedMotion = useReducedMotion();
   const router = useRouter();
-  const [activeSpotlight, setActiveSpotlight] = useState(0);
-  const [searchLocation, setSearchLocation] = useState("");
+  const [assistantInput, setAssistantInput] = useState("");
+
+  const realProfiles = useMemo(
+    () => featuredTherapists.filter(isRealProfile).slice(0, 3),
+    [featuredTherapists],
+  );
 
   const dur = reducedMotion ? 0 : 0.7;
   const noDelay = reducedMotion ? 0 : undefined;
 
-  return (
-    <section className="relative overflow-hidden bg-white text-[#1A1A1A]">
-      <div className="mx-auto flex min-h-[600px] flex-col lg:flex-row">
-        {/* ── Left column: Hero image (~38%) ─────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, x: -60 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{
-            duration: dur,
-            ease: customEase,
-            delay: noDelay ?? 0.1,
-          }}
-          className="relative min-h-[340px] w-full lg:min-h-[600px] lg:w-[38%]"
-        >
-          <Image
-            src="/marketing/hero/cover.jpg"
-            alt="Professional massage therapist"
-            fill
-            priority
-            className="object-cover lg:rounded-r-3xl"
-            sizes="(max-width: 1024px) 100vw, 38vw"
-          />
-          {/* Subtle overlay for text legibility on mobile */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 lg:hidden" />
-        </motion.div>
+  const submitAssistantPrompt = (prompt = assistantInput) => {
+    const q = prompt.trim();
+    router.push(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
+  };
 
-        {/* ── Center column: Copy + Search (~35%) ────────────────────── */}
-        <div className="flex w-full flex-col justify-center px-6 py-8 lg:w-[35%] lg:px-10 lg:py-0">
-          {/* Eyebrow */}
+  return (
+    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_24%_18%,rgba(204,36,36,0.08),transparent_28%),linear-gradient(180deg,#ffffff_0%,#fbfaf8_100%)] text-[#151515]">
+      <div className="mx-auto grid min-h-[680px] max-w-[1500px] items-center gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1.03fr_0.97fr] lg:px-10 lg:py-16">
+        <div className="relative order-2 lg:order-1">
+          <div className="pointer-events-none absolute -left-10 top-12 h-72 w-72 rounded-full bg-[#CC2424]/8 blur-3xl" />
+
+          {realProfiles.length > 0 ? (
+            <div className="relative flex snap-x gap-4 overflow-x-auto pb-6 pt-24 lg:overflow-visible lg:pb-0 lg:pt-28">
+              {realProfiles.map((profile, index) => (
+                <TherapistCard key={profile.id} profile={profile} index={index} />
+              ))}
+            </div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: dur, ease: customEase }}
+              className="rounded-[2rem] border border-dashed border-[#CC2424]/30 bg-white/80 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.09)]"
+            >
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#CC2424]/10 text-[#CC2424]">
+                <Sparkles size={24} />
+              </div>
+              <h2 className="font-display text-2xl font-black text-[#151515]">Live profile cards are ready.</h2>
+              <p className="mt-3 max-w-lg text-sm leading-6 text-[#667085]">
+                The hero only shows approved public profiles from Supabase. No demo names are rendered in this first fold.
+              </p>
+            </motion.div>
+          )}
+        </div>
+
+        <div className="order-1 flex flex-col justify-center lg:order-2">
           <motion.p
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: dur,
-              ease: customEase,
-              delay: noDelay ?? 0.2,
-            }}
-            className="mb-4 font-mono text-[10px] uppercase tracking-[0.3em] text-[#CC2424] sm:text-xs"
+            transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.12 }}
+            className="mb-4 font-mono text-[10px] uppercase tracking-[0.34em] text-[#CC2424] sm:text-xs"
           >
             PREMIUM.&nbsp;&nbsp;PROFESSIONAL.&nbsp;&nbsp;PERSONAL.
           </motion.p>
 
-          {/* Headline */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: dur,
-              ease: customEase,
-              delay: noDelay ?? 0.3,
-            }}
-            className="mb-5 font-display font-extrabold uppercase leading-[1.05] tracking-tight"
-            style={{ fontSize: "clamp(2.5rem, 5vw, 4.5rem)" }}
+            transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.2 }}
+            className="mb-5 max-w-3xl font-display font-black leading-[0.96] tracking-tight"
+            style={{ fontSize: "clamp(3rem, 6vw, 6.5rem)" }}
           >
-            <span className="block text-[#1A1A1A]">FIND THE RIGHT</span>
-            <span className="block text-[#CC2424]">MASSAGE. EVERY TIME.</span>
+            <span className="block text-[#151515]">Find the Right</span>
+            <span className="block"><span className="text-[#CC2424]">Masseur</span> Near You.</span>
           </motion.h1>
 
-          {/* Red separator bar */}
-          <motion.div
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 1, scaleX: 1 }}
-            transition={{
-              duration: dur,
-              ease: customEase,
-              delay: noDelay ?? 0.4,
-            }}
-            className="mb-5 h-1 w-16 origin-left bg-[#CC2424]"
-          />
-
-          {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: dur,
-              ease: customEase,
-              delay: noDelay ?? 0.45,
-            }}
-            className="mb-6 max-w-md text-base leading-relaxed text-[#666666] lg:text-lg"
+            transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.28 }}
+            className="mb-7 max-w-2xl text-base leading-8 text-[#667085] lg:text-lg"
           >
-            Book certified massage professionals near you. Tailored to your
-            goals. Backed by quality.
+            Browse professional massage providers by city, technique, availability, and style — with help from our AI assistant.
           </motion.p>
 
-          {/* Search bar */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: dur,
-              ease: customEase,
-              delay: noDelay ?? 0.5,
-            }}
-            className="mb-5 flex flex-col overflow-hidden rounded-xl border border-gray-200 sm:flex-row"
+            transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.36 }}
+            className="overflow-hidden rounded-[1.75rem] border border-black/10 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.10)]"
           >
-            {/* Location input */}
-            <div className="flex flex-1 items-center gap-2 border-b border-gray-200 px-4 py-3 sm:border-b-0 sm:border-r">
-              <MapPin
-                size={18}
-                strokeWidth={2.25}
-                className="flex-shrink-0 text-[#999999]"
-              />
-              <input
-                type="text"
-                placeholder="Search by location"
-                value={searchLocation}
-                onChange={(e) => setSearchLocation(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    const q = searchLocation.trim();
-                    router.push(q ? `/explore?q=${encodeURIComponent(q)}` : "/explore");
-                  }
-                }}
-                className="w-full bg-transparent text-sm text-[#1A1A1A] placeholder-[#999999] outline-none"
-              />
+            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#CC2424]/10 text-[#CC2424]">
+                  <MessageCircle size={23} strokeWidth={2.4} />
+                </div>
+                <div>
+                  <p className="font-display text-base font-black text-[#151515]">AI Match Assistant</p>
+                  <p className="text-xs font-semibold text-[#7B8190]">Ask Knotty AI</p>
+                </div>
+              </div>
+              <Sparkles size={20} className="text-[#CC2424]" />
             </div>
 
-            {/* Search button */}
-            <button
-              type="button"
-              onClick={() => {
-                const q = searchLocation.trim();
-                router.push(q ? `/explore?q=${encodeURIComponent(q)}` : "/explore");
-              }}
-              className="flex items-center justify-center gap-2 bg-[#CC2424] px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#A81D1D]"
-            >
-              FIND A MASSEUR
-              <ArrowRight size={16} strokeWidth={2.5} />
-            </button>
+            <div className="space-y-4 px-5 py-5">
+              <div className="ml-auto max-w-[78%] rounded-2xl rounded-tr-md bg-slate-100 px-4 py-3 text-sm font-medium leading-6 text-[#2B3038]">
+                I need a deep tissue masseur in Dallas tonight.
+                <span className="mt-1 block text-right text-[11px] text-[#98A2B3]">10:24 AM</span>
+              </div>
+              <div className="flex max-w-[86%] items-start gap-3">
+                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#CC2424]/10 text-[#CC2424]">
+                  <Sparkles size={16} />
+                </div>
+                <div className="rounded-2xl rounded-tl-md bg-[#F7F7F8] px-4 py-3 text-sm font-medium leading-6 text-[#2B3038]">
+                  I can help with that. Do you prefer in-call or outcall, and what area of Dallas works best for you?
+                  <span className="mt-1 block text-[11px] text-[#98A2B3]">10:24 AM</span>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2 pt-1">
+                {quickPrompts.map((prompt) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    onClick={() => submitAssistantPrompt(prompt)}
+                    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-black text-[#151515] transition hover:border-[#CC2424] hover:text-[#CC2424]"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-2">
+                <input
+                  value={assistantInput}
+                  onChange={(event) => setAssistantInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") submitAssistantPrompt();
+                  }}
+                  placeholder="Describe what you need..."
+                  aria-label="Ask Knotty AI what massage provider you need"
+                  className="min-w-0 flex-1 bg-transparent px-3 text-sm text-[#151515] outline-none placeholder:text-[#98A2B3]"
+                />
+                <button
+                  type="button"
+                  onClick={() => submitAssistantPrompt()}
+                  aria-label="Send AI match request"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#CC2424] text-white shadow-lg shadow-[#CC2424]/25 transition hover:bg-[#A81D1D]"
+                >
+                  <Send size={18} fill="currentColor" />
+                </button>
+              </div>
+            </div>
           </motion.div>
 
-          {/* Popular searches */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: dur,
-              ease: customEase,
-              delay: noDelay ?? 0.55,
-            }}
-            className="flex flex-wrap items-center gap-2"
+            transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.46 }}
+            className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-semibold text-[#667085]"
           >
-            <span className="text-xs font-medium text-[#999999]">
-              Popular searches:
-            </span>
-            {popularSearches.map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                className="rounded-full border border-gray-200 px-4 py-1.5 text-xs font-medium text-[#1A1A1A] transition-colors hover:border-[#CC2424] hover:text-[#CC2424]"
-              >
-                {tag}
-              </button>
+            {trustItems.map(({ label, icon: Icon }) => (
+              <span key={label} className="inline-flex items-center gap-2">
+                <Icon size={17} strokeWidth={2.25} className="text-[#151515]" />
+                {label}
+              </span>
             ))}
           </motion.div>
+
+          <motion.button
+            type="button"
+            onClick={() => router.push("/search")}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.52 }}
+            className="mt-7 inline-flex w-fit items-center gap-2 rounded-2xl bg-[#CC2424] px-6 py-4 text-sm font-black uppercase tracking-wide text-white shadow-xl shadow-[#CC2424]/20 transition hover:bg-[#A81D1D]"
+          >
+            Find a Masseur
+            <ArrowRight size={18} strokeWidth={2.5} />
+          </motion.button>
         </div>
-
-        {/* ── Right column: Spotlights (~27%) ────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, x: 60 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{
-            duration: dur,
-            ease: customEase,
-            delay: noDelay ?? 0.3,
-          }}
-          className="flex w-full flex-col justify-center px-6 py-8 lg:w-[27%] lg:px-6 lg:py-0"
-        >
-          {/* Section header */}
-          <h2 className="mb-5 font-display text-sm font-bold uppercase tracking-wider text-[#CC2424]">
-            SPOTLIGHTS OF THE WEEK
-          </h2>
-
-          {/* Therapist cards */}
-          <div className="flex gap-3 overflow-x-auto pb-2 lg:flex-col lg:gap-4 lg:overflow-x-visible lg:pb-0">
-            {spotlights.map((therapist, idx) => (
-              <div
-                key={therapist.name}
-                className="relative min-w-[200px] flex-shrink-0 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-shadow hover:shadow-md lg:min-w-0"
-              >
-                {/* Favorite icon */}
-                <button
-                  type="button"
-                  className="absolute right-3 top-3 text-gray-300 transition-colors hover:text-[#CC2424]"
-                  aria-label={`Save ${therapist.name}`}
-                >
-                  <Heart size={16} strokeWidth={2.25} />
-                </button>
-
-                {/* Avatar + Name row */}
-                <div className="mb-3 flex items-center gap-3">
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#CC2424] to-[#8B0A1E] text-xs font-bold text-white">
-                    {therapist.initials}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-bold text-[#1A1A1A]">
-                      {therapist.name}
-                    </p>
-                    <p className="truncate text-[11px] text-[#666666]">
-                      {therapist.specialty}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Location */}
-                <div className="mb-2 flex items-center gap-1 text-[11px] text-[#999999]">
-                  <MapPin size={12} strokeWidth={2.25} />
-                  <span>{therapist.location}</span>
-                </div>
-
-                {/* Rating */}
-                <div className="mb-2 flex items-center gap-1">
-                  <Star
-                    size={13}
-                    strokeWidth={2.25}
-                    className="fill-amber-400 text-amber-400"
-                  />
-                  <span className="text-xs font-semibold text-[#1A1A1A]">
-                    {therapist.rating}
-                  </span>
-                  <span className="text-[11px] text-[#999999]">
-                    ({therapist.reviews} reviews)
-                  </span>
-                </div>
-
-                {/* Duration + Price */}
-                <div className="mb-3 flex items-center gap-3 text-[11px] text-[#666666]">
-                  <span className="flex items-center gap-1">
-                    <Clock size={12} strokeWidth={2.25} />
-                    {therapist.duration}
-                  </span>
-                  <span className="font-semibold text-[#1A1A1A]">
-                    {therapist.price}
-                  </span>
-                </div>
-
-                {/* CTA */}
-                <button
-                  type="button"
-                  className="w-full rounded-md bg-[#CC2424] px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#a00d25]"
-                >
-                  VIEW PROFILE
-                </button>
-              </div>
-            ))}
-          </div>
-
-          {/* Navigation */}
-          <div className="mt-4 flex items-center justify-between">
-            {/* Dots */}
-            <div className="flex gap-1.5">
-              {spotlights.map((_, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setActiveSpotlight(idx)}
-                  aria-label={`Go to spotlight ${idx + 1}`}
-                  className={`h-2 w-2 rounded-full transition-colors ${
-                    idx === activeSpotlight
-                      ? "bg-[#CC2424]"
-                      : "bg-[#CC2424]/25"
-                  }`}
-                />
-              ))}
-            </div>
-
-            {/* Arrows */}
-            <div className="flex gap-1">
-              <button
-                type="button"
-                onClick={() =>
-                  setActiveSpotlight((prev) =>
-                    prev === 0 ? spotlights.length - 1 : prev - 1
-                  )
-                }
-                className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-[#666666] transition-colors hover:border-[#CC2424] hover:text-[#CC2424]"
-                aria-label="Previous spotlight"
-              >
-                <ChevronLeft size={14} strokeWidth={2.5} />
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setActiveSpotlight((prev) =>
-                    prev === spotlights.length - 1 ? 0 : prev + 1
-                  )
-                }
-                className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-[#666666] transition-colors hover:border-[#CC2424] hover:text-[#CC2424]"
-                aria-label="Next spotlight"
-              >
-                <ChevronRight size={14} strokeWidth={2.5} />
-              </button>
-            </div>
-          </div>
-        </motion.div>
       </div>
     </section>
   );

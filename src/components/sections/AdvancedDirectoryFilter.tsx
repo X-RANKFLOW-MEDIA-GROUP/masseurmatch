@@ -222,7 +222,7 @@ export function AdvancedDirectoryFilter({
                     Search
                   </p>
                   <input
-                    type="text"
+                    type="search"
                     value={filters.keyword}
                     onChange={(event) => onChange({ keyword: event.target.value })}
                     placeholder="Specialty, therapist name, or pain point"
