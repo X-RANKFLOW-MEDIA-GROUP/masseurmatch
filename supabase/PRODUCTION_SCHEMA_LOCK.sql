@@ -256,6 +256,7 @@ create table if not exists public.text_verifications (
   attempt_count integer not null default 0,
   sent_at timestamptz,
   verified_at timestamptz,
+  reviewed_at timestamptz,
   expires_at timestamptz,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
@@ -716,6 +717,7 @@ create index if not exists idx_therapist_photos_user on public.therapist_photos(
 create index if not exists idx_therapist_photos_profile on public.therapist_photos(profile_id, status);
 create index if not exists idx_therapist_photos_pending on public.therapist_photos(status, created_at) where status = 'pending_review';
 create index if not exists idx_text_verifications_user on public.text_verifications(user_id, status);
+create index if not exists idx_text_verifications_reviewed_at on public.text_verifications(reviewed_at desc) where status = 'verified';
 create index if not exists idx_admin_actions_admin on public.admin_actions(admin_id, created_at desc);
 create index if not exists idx_admin_actions_target_user on public.admin_actions(target_user_id, created_at desc);
 create index if not exists idx_admin_actions_type on public.admin_actions(action_type, created_at desc);
