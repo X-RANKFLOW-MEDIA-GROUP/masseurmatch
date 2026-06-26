@@ -406,6 +406,7 @@ create table if not exists public.reviews (
 
 alter table public.reviews
   add column if not exists client_id uuid,
+  add column if not exists profile_id uuid,
   add column if not exists content text,
   add column if not exists helpful_count integer not null default 0,
   add column if not exists updated_at timestamptz not null default timezone('utc', now()),
