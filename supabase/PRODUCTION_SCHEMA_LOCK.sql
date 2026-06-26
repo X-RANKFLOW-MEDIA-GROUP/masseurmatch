@@ -404,6 +404,10 @@ create table if not exists public.reviews (
   created_at timestamptz default timezone('utc', now())
 );
 
+alter table public.reviews
+  add column if not exists source_platform text,
+  add column if not exists helpful_count integer default 0;
+
 create table if not exists public.client_favorites (
   id uuid primary key default gen_random_uuid(),
   user_id uuid,
