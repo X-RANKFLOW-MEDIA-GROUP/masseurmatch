@@ -19,7 +19,7 @@ import {
   SITE_DESCRIPTION,
 } from "@/app/_lib/seo";
 import { siteUrl } from "@/lib/site";
-import { getProfilePhotos, getPublicTherapists } from "@/app/_lib/directory";
+import { getProfilePhotosBatch, getPublicTherapists } from "@/app/_lib/directory";
 import { LANDING_FAQ } from "@/lib/marketing/home-data";
 
 export const revalidate = 3600;
@@ -106,29 +106,30 @@ function isRealProfileId(id: string | null | undefined) {
 }
 
 export default async function HomePage() {
-  // Fetch featured therapists — graceful fallback if DB unavailable.
-  // The hero itself filters out fallback/demo/test profiles so the first fold only
-  // renders approved live profiles from Supabase.
   let featuredTherapists: Awaited<ReturnType<typeof getPublicTherapists>>["items"] = [];
   try {
-    const result = await getPublicTherapists({ page: 1, pageSize: 6, lgbtqAffirming: true });
-    featuredTherapists = result.items;
-    if (featuredTherapists.length === 0) {
-      const fallback = await getPublicTherapists({ page: 1, pageSize: 6 });
-      featuredTherapists = fallback.items;
-    }
+    // Run both queries in parallel — lgbtq-affirming preferred, broad as fallback
+    const [lgbtqResult, broadResult] = await Promise.all([
+      getPublicTherapists({ page: 1, pageSize: 6, lgbtqAffirming: true }),
+      getPublicTherapists({ page: 1, pageSize: 6 }),
+    ]);
+    featuredTherapists = lgbtqResult.items.length > 0 ? lgbtqResult.items : broadResult.items;
 
-    featuredTherapists = await Promise.all(
-      featuredTherapists.map(async (therapist) => {
+    const realIds = featuredTherapists
+      .filter((t) => isRealProfileId(t.id))
+      .map((t) => t.id);
+
+    if (realIds.length > 0) {
+      const photoBatch = await getProfilePhotosBatch(realIds, 1);
+      featuredTherapists = featuredTherapists.map((therapist) => {
         if (!isRealProfileId(therapist.id)) return therapist;
-        const photos = await getProfilePhotos(therapist.id, 1);
+        const photos = photoBatch.get(therapist.id) ?? [];
         const primaryPhoto = photos.find((photo) => photo.is_primary) ?? photos[0];
-        return {
-          ...therapist,
-          profile_photo: primaryPhoto?.storage_path ?? therapist.profile_photo,
-        };
-      }),
-    );
+        return primaryPhoto
+          ? { ...therapist, profile_photo: primaryPhoto.storage_path }
+          : therapist;
+      });
+    }
   } catch {
     featuredTherapists = [];
   }

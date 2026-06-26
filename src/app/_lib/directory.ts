@@ -405,6 +405,34 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
     }));
 };
 
+export const getProfilePhotosBatch = async (
+  profileIds: string[],
+  limitPerProfile = 1,
+): Promise<Map<string, ProfilePhoto[]>> => {
+  const result = new Map<string, ProfilePhoto[]>();
+  if (!profileIds.length) return result;
+
+  const { data, error } = await supabase
+    .from("profile_photos")
+    .select("id, profile_id, storage_path, is_primary, sort_order")
+    .in("profile_id", profileIds)
+    .eq("moderation_status", "approved")
+    .order("sort_order", { ascending: true });
+
+  if (error || !data?.length) return result;
+
+  for (const row of data) {
+    if (!row.profile_id || !row.storage_path) continue;
+    const existing = result.get(row.profile_id) ?? [];
+    if (existing.length < limitPerProfile) {
+      existing.push({ id: row.id, storage_path: row.storage_path, is_primary: row.is_primary ?? false });
+      result.set(row.profile_id, existing);
+    }
+  }
+
+  return result;
+};
+
 export async function getCityInventoryCount(cityName: string): Promise<number> {
   let q = supabase
     .from("profiles")

@@ -4,7 +4,8 @@ import { JsonLd } from "@/app/_components/JsonLd";
 import {
   type TherapistTier,
   getPublicTherapists,
-} from "@/app/_lib/directory";
+  getProfilePhotosBatch,
+} from "@/app/_lib/directory"; // getProfilePhotosBatch used below
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,

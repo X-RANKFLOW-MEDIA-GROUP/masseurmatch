@@ -75,12 +75,14 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
   const state = therapist.state || null;
   const locationLabel = [city, state].filter(Boolean).join(", ");
 
-  const profileImage = useMemo(
-    () =>
-      therapist.avatar_url ||
-      therapist.profile_photo ||
-      "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=900&h=700&fit=crop",
-    [therapist.avatar_url, therapist.profile_photo],
+  const profileImage = therapist.profile_photo || therapist.avatar_url || null;
+  const initials = (
+    (therapist.display_name || therapist.full_name || "")
+      .split(" ")
+      .slice(0, 2)
+      .map((w) => w[0] ?? "")
+      .join("")
+      .toUpperCase() || "MM"
   );
 
   return (
@@ -97,15 +99,26 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
       >
         {/* Photo */}
         <div className="relative aspect-square overflow-hidden bg-neutral-100">
-          <Image
-            src={profileImage}
-            alt={`${name} – massage therapist in ${city || "your area"}`}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover object-top transition-transform duration-600 ease-out group-hover:scale-[1.04]"
-            priority={priority}
-            itemProp="image"
-          />
+          {profileImage ? (
+            <Image
+              src={profileImage}
+              alt={`${name} – massage therapist in ${city || "your area"}`}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              className="object-cover object-top transition-transform duration-600 ease-out group-hover:scale-[1.04]"
+              priority={priority}
+              itemProp="image"
+            />
+          ) : (
+            <div
+              className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200"
+              aria-label={`${name} – no photo`}
+            >
+              <span className="font-display text-4xl font-extrabold text-neutral-300">
+                {initials}
+              </span>
+            </div>
+          )}
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
 
