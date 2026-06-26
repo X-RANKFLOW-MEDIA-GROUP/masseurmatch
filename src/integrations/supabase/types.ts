@@ -3102,57 +3102,59 @@ export type Database = {
       }
       text_verifications: {
         Row: {
+          attempt_count: number
           code: string | null
           created_at: string
+          expires_at: string | null
           id: string
-          profile_id: string | null
-          rejection_reason: string | null
-          reviewed_at: string | null
-          reviewed_by: string | null
+          phone: string
+          provider: string | null
+          sent_at: string | null
           status: string
           submitted_text: string | null
           updated_at: string
-          user_id: string | null
+          user_id: string
+          verification_code: string | null
+          verified_at: string | null
         }
         Insert: {
+          attempt_count?: number
           code?: string | null
           created_at?: string
+          expires_at?: string | null
           id?: string
-          profile_id?: string | null
-          rejection_reason?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
+          phone: string
+          provider?: string | null
+          sent_at?: string | null
           status?: string
           submitted_text?: string | null
           updated_at?: string
-          user_id?: string | null
+          user_id: string
+          verification_code?: string | null
+          verified_at?: string | null
         }
         Update: {
+          attempt_count?: number
           code?: string | null
           created_at?: string
+          expires_at?: string | null
           id?: string
-          profile_id?: string | null
-          rejection_reason?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
+          phone?: string
+          provider?: string | null
+          sent_at?: string | null
           status?: string
           submitted_text?: string | null
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
+          verification_code?: string | null
+          verified_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "text_verifications_profile_id_fkey"
-            columns: ["profile_id"]
+            foreignKeyName: "text_verifications_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "text_verifications_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "public_therapists"
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]

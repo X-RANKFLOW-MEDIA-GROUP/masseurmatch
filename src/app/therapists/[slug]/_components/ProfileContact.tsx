@@ -5,6 +5,17 @@ import type { PublicTherapist } from "@/app/_lib/directory";
 import { getPublicContactLinks } from "@/app/_lib/public-profile";
 import { useKnottyProfileAttribution } from "./useKnottyProfileAttribution";
 
+function formatPhoneDisplay(phone: string) {
+  const digits = phone.replace(/[^\d]/g, "");
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
+  if (digits.length === 11 && digits.startsWith("1")) {
+    return `+1 (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`;
+  }
+  return phone;
+}
+
 interface Props {
   profile: PublicTherapist;
 }
@@ -33,10 +44,24 @@ export function ProfileContact({ profile }: Props) {
 
       {profile.phone ? (
         <div className="profile-panel-soft mt-4 rounded-[1.5rem] px-4 py-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-            Contact line
+          <div className="flex items-center gap-2">
+            <Phone className="h-4 w-4 text-brand-secondary" strokeWidth={2.25} />
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              Phone
+            </p>
+          </div>
+          <p className="mt-1 text-lg font-semibold tracking-wide text-foreground">
+            {formatPhoneDisplay(profile.phone)}
           </p>
-          <p className="mt-1 text-base font-semibold text-foreground">Protected contact enabled</p>
+        </div>
+      ) : null}
+
+      {profile.email_address ? (
+        <div className="profile-panel-soft mt-3 rounded-[1.5rem] px-4 py-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            Email
+          </p>
+          <p className="mt-1 text-sm font-medium text-foreground">{profile.email_address}</p>
         </div>
       ) : null}
 

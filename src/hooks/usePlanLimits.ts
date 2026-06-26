@@ -97,7 +97,7 @@ const PLAN_LIMITS: Record<SupportedPlanKey, PlanLimits> = {
     availableNowConfig: {
       enabled: true,
       durationHours: 1,
-      cooldownHours: 24,
+      cooldownHours: 12,
       maxPerDay: 1,
       rankPriority: 3,
       badgeLabel: "Available Now",
@@ -117,8 +117,8 @@ const PLAN_LIMITS: Record<SupportedPlanKey, PlanLimits> = {
     availableNowConfig: {
       enabled: true,
       durationHours: 2,
-      cooldownHours: 8,
-      maxPerDay: 2,
+      cooldownHours: 6,
+      maxPerDay: 3,
       rankPriority: 2,
       badgeLabel: "Available Now",
     },
@@ -141,11 +141,11 @@ const PLAN_LIMITS: Record<SupportedPlanKey, PlanLimits> = {
     maxPhotos: 12,
     maxCities: 2,
     hasAvailableNow: true,
-    availableNowMinutes: 120,
+    availableNowMinutes: 180,
     availableNowConfig: {
       enabled: true,
-      durationHours: 2,
-      cooldownHours: 4,
+      durationHours: 3,
+      cooldownHours: 2,
       maxPerDay: -1, // unlimited
       rankPriority: 1,
       badgeLabel: "Available Now",

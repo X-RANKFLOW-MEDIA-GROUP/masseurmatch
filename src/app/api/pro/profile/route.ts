@@ -204,6 +204,26 @@ const pricingSessionSchema = z.object({
   outcall_rate: z.number().int().min(0).nullable(),
 });
 
+function validatePricingMarkup(sessions: z.infer<typeof pricingSessionSchema>[]) {
+  if (sessions.length < 2) return true;
+  const base = sessions.find((s) => s.minutes === 60);
+  if (!base) return true;
+
+  for (const s of sessions) {
+    if (s.minutes === 60) continue;
+    const ratio = s.minutes / 60;
+    if (s.incall_rate != null && base.incall_rate != null && base.incall_rate > 0) {
+      const maxRate = Math.ceil(base.incall_rate * ratio * 1.3334);
+      if (s.incall_rate > maxRate) return false;
+    }
+    if (s.outcall_rate != null && base.outcall_rate != null && base.outcall_rate > 0) {
+      const maxRate = Math.ceil(base.outcall_rate * ratio * 1.3334);
+      if (s.outcall_rate > maxRate) return false;
+    }
+  }
+  return true;
+}
+
 const educationEntrySchema = z.object({
   degree: z.string().max(120).default(""),
   institution: z.string().max(160).default(""),
@@ -334,7 +354,12 @@ export async function PATCH(request: Request) {
     if (body.rateDisclaimers !== undefined) updates.rate_disclaimers = body.rateDisclaimers;
     if (body.regularDiscounts !== undefined) updates.regular_discounts = body.regularDiscounts;
 
-    if (body.pricingSessions !== undefined) updates.pricing_sessions = body.pricingSessions;
+    if (body.pricingSessions !== undefined) {
+      if (!validatePricingMarkup(body.pricingSessions)) {
+        throw new RouteError(400, "Rates cannot exceed 33.33% above the 60-minute base rate.");
+      }
+      updates.pricing_sessions = body.pricingSessions;
+    }
     if (body.dayOfWeekDiscount !== undefined) updates.day_of_week_discount = body.dayOfWeekDiscount;
     if (body.educationEntries !== undefined) updates.education_entries = body.educationEntries;
     if (body.studioHours !== undefined) updates.studio_hours = body.studioHours;
