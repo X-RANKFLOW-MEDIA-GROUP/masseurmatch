@@ -41,9 +41,9 @@ type GrowthProfile = {
 
 const TIER_AVAILABLE_NOW_HOURS: Record<string, number | null> = {
   free: null,
-  standard: 2,
-  pro: 3,
-  elite: 4,
+  standard: 1,
+  pro: 2,
+  elite: 3,
 };
 
 function normalizeTravel(value: unknown): TravelEntry[] {

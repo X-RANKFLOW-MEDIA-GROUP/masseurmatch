@@ -29,7 +29,8 @@ export function ProfileContact({ profile }: Props) {
     neighborhood,
   });
 
-  if (!callHref && !whatsappHref && !smsHref) return null;
+  const hasEmail = profile.show_email && !!profile.email_address;
+  if (!callHref && !whatsappHref && !smsHref && !hasEmail) return null;
 
   return (
     <section id="contact" className="profile-panel scroll-mt-24 p-6 md:p-7">
