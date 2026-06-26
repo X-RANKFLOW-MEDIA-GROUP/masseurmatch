@@ -1114,3 +1114,33 @@ create table if not exists admin_actions (
   metadata          jsonb,
   created_at        timestamptz not null default now()
 );
+
+-- ── Pre-launch audit features ─────────────────────────────────────────────────
+
+alter table public.profiles add column if not exists identity_verified_at timestamptz;
+
+create table if not exists public.contact_events (
+  id          uuid primary key default gen_random_uuid(),
+  profile_id  uuid not null references public.profiles(id) on delete cascade,
+  user_id     uuid references auth.users(id) on delete set null,
+  method      text not null,
+  ip_hash     text,
+  created_at  timestamptz not null default now()
+);
+
+-- ── Schema-drift catch-up (additive only) ─────────────────────────────────────
+
+alter table public.contact_inquiries
+  add column if not exists client_name text,
+  add column if not exists client_phone text,
+  add column if not exists preferred_contact text;
+
+create or replace view public.therapist_analytics_daily as
+  select
+    therapist_profile_id,
+    date_trunc('day', created_at)::date as event_date,
+    event_name,
+    count(*) as event_count
+  from public.analytics_events
+  where therapist_profile_id is not null
+  group by therapist_profile_id, date_trunc('day', created_at)::date, event_name;
