@@ -224,6 +224,16 @@ export const KnottyChat = ({
     }
   }, [isEmbedded, trackOpen]);
 
+  // Auto-open floating chat after 3 seconds on page load.
+  useEffect(() => {
+    if (isEmbedded) return;
+    const timer = setTimeout(() => {
+      setIsOpen(true);
+      trackOpen();
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [isEmbedded, trackOpen]);
+
   // Allow any part of the app to open the floating chat (optionally with a
   // prefilled prompt) by dispatching a `knotty:open` window event.
   useEffect(() => {
