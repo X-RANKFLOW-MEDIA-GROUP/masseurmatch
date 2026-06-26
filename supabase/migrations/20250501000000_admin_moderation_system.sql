@@ -1,0 +1,2 @@
+-- Migration placeholder for remote history alignment.
+-- Actual schema lives in 20260314200000_admin_moderation_system.sql.

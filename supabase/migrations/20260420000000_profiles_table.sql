@@ -1,0 +1,2 @@
+-- Migration placeholder for remote history alignment.
+-- Actual schema lives in 20260314100000_profiles_table.sql.
