@@ -55,7 +55,7 @@ export function ProfilePricing({ profile }: Props) {
               </span>
               {hasIncall && (
                 <span
-                  className={`text-right text-foreground ${isOverLimit(baseIncall, s.incall) ? 'bg-yellow-100 text-orange-700 font-bold px-1 rounded' : ''}`}
+                  className={`text-right text-foreground ${isOverLimit(baseIncall, s.incall) ? 'bg-yellow-100 text-red-700 font-bold px-1 rounded' : ''}`}
                   title={isOverLimit(baseIncall, s.incall) ? 'Exceeds +33.33% of base price' : ''}
                 >
                   {s.incall ? `$${s.incall}` : "Ask me"}
@@ -63,7 +63,7 @@ export function ProfilePricing({ profile }: Props) {
               )}
               {hasOutcall && (
                 <span
-                  className={`text-right text-foreground ${isOverLimit(baseOutcall, s.outcall) ? 'bg-yellow-100 text-orange-700 font-bold px-1 rounded' : ''}`}
+                  className={`text-right text-foreground ${isOverLimit(baseOutcall, s.outcall) ? 'bg-yellow-100 text-red-700 font-bold px-1 rounded' : ''}`}
                   title={isOverLimit(baseOutcall, s.outcall) ? 'Exceeds +33.33% of base price' : ''}
                 >
                   {s.outcall ? `$${s.outcall}` : "Ask me"}
@@ -71,7 +71,7 @@ export function ProfilePricing({ profile }: Props) {
               )}
             </div>
           ))}
-          <div className="text-xs text-orange-700 mt-2 px-4">
+          <div className="text-xs text-red-700 mt-2 px-4">
             * Valores destacados excedem +33.33% do valor base de 60min.
           </div>
         </div>

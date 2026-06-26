@@ -5,28 +5,12 @@ type Credential = { "@type": string; credentialCategory: string; name: string; d
 
 function buildCredentials(profile: ProfileViewModel) {
   const credentials: Credential[] = [];
-  if (profile.licenseOptional) {
-    credentials.push({
-      "@type": "EducationalOccupationalCredential",
-      credentialCategory: "license",
-      name: "Licensed Massage Therapist",
-      description: profile.licenseOptional,
-    });
-  }
-  if (profile.backgroundChecked) {
-    credentials.push({
-      "@type": "EducationalOccupationalCredential",
-      credentialCategory: "certification",
-      name: "Identity & Background Verified",
-      description: "Identity and background verified by MasseurMatch",
-    });
-  }
-  if (profile.isVerified && !profile.backgroundChecked) {
+  if (profile.isVerified) {
     credentials.push({
       "@type": "EducationalOccupationalCredential",
       credentialCategory: "certification",
       name: "Platform Verified",
-      description: "Profile verified by MasseurMatch",
+      description: "Profile reviewed by MasseurMatch before listing",
     });
   }
   return credentials;

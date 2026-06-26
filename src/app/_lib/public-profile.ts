@@ -4,13 +4,27 @@ export function getPublicProfileName(profile: Pick<PublicTherapist, "display_nam
   return profile.display_name || profile.full_name || "Therapist";
 }
 
-export function isVerifiedDirectoryProfile(profile: Pick<PublicTherapist, "subscription_tier" | "verification_status">) {
+/**
+ * Whether the profile should appear in the directory (has a paid tier or passed review).
+ * NOTE: This does NOT mean identity is verified — use `isIdentityVerified()` for that.
+ */
+export function isVerifiedDirectoryProfile(
+  profile: Pick<PublicTherapist, "subscription_tier" | "verification_status" | "is_demo">,
+) {
+  if (profile.is_demo) return false;
   return (
     profile.subscription_tier === "standard" ||
     profile.subscription_tier === "pro" ||
     profile.subscription_tier === "elite" ||
     profile.verification_status === "verified"
   );
+}
+
+/** Whether the therapist has completed real Stripe Identity verification. */
+export function isIdentityVerified(
+  profile: Pick<PublicTherapist, "verification_status">,
+) {
+  return profile.verification_status === "verified";
 }
 
 export function getDirectoryTierLabel(profile: Pick<PublicTherapist, "subscription_tier">) {

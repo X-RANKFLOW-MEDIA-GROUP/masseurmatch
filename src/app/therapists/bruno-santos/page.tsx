@@ -5,14 +5,15 @@ import { ProfileStructuredData } from "@/components/profile/ProfileStructuredDat
 import { buildProfileFaq } from "@/components/profile/profile-faq";
 import { VoxProfile } from "@/app/therapists/[slug]/_components/vox/VoxProfile";
 import { BRUNO_PROFILE, BRUNO_REVIEWS } from "@/app/therapists/[slug]/_components/vox/bruno-demo";
+import { DemoProfileBanner } from "@/app/_components/demo-profile-banner";
 
 // Alternate showcase URL for the same Bruno sample profile. Canonicalized to
 // the primary URL to avoid duplicate content.
 export const metadata: Metadata = {
   title: BRUNO_PROFILE.seoTitle,
   description: BRUNO_PROFILE.seoDescription,
-  alternates: { canonical: "/therapists/bruno-dallas-tx" },
-  robots: { index: false, follow: true },
+  alternates: { canonical: "https://masseurmatch.com/therapists/bruno-dallas-tx" },
+  robots: { index: false, follow: false },
 };
 
 export default function BrunoSantosPage() {
@@ -20,6 +21,7 @@ export default function BrunoSantosPage() {
 
   return (
     <>
+      <DemoProfileBanner />
       <JsonLd
         data={buildBreadcrumbJsonLd([
           { name: "Home", path: "/" },

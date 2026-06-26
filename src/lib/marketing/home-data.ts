@@ -1,4 +1,5 @@
 import type { CityData } from "@/data/cities";
+import { LIVE_COVERAGE_CITIES } from "@/lib/site-stats";
 
 export type FaqItem = {
   question: string;
@@ -14,7 +15,7 @@ export const LANDING_FAQ: FaqItem[] = [
   {
     question: "Which cities have live MasseurMatch landing pages?",
     answer:
-      "MasseurMatch covers 80+ US cities including Dallas, Miami, New York, Los Angeles, Chicago, Houston, Atlanta, Washington DC, San Francisco, Seattle, Denver, Phoenix, Las Vegas, Boston, New Orleans, and more.",
+      `MasseurMatch covers ${LIVE_COVERAGE_CITIES}+ US cities including Dallas, Miami, New York, Los Angeles, Chicago, Houston, Atlanta, Washington DC, San Francisco, Seattle, Denver, Phoenix, Las Vegas, Boston, New Orleans, and more.`,
   },
   {
     question: "Can I compare deep tissue, Swedish, hotel, and outcall options?",

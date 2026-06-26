@@ -1,4 +1,4 @@
-import { completeText } from "@/lib/ai/llm";
+import { chatMessages, type ChatMessage } from "@/lib/ai/llm";
 import { getPublicTherapists } from "@/app/_lib/directory";
 import { sanitizeText } from "@/app/_lib/security";
 import { getRequestSession } from "@/app/api/_lib/session";
@@ -14,6 +14,7 @@ import type {
   KnottyCandidate,
   KnottyContext,
   KnottyIntent,
+  KnottyMessage,
   KnottyQuickAction,
   KnottyRequestPayload,
   KnottyResponsePayload,
@@ -315,64 +316,136 @@ function buildDeterministicReply(input: {
 
 type ReplyInput = {
   question: string;
+  history: KnottyMessage[];
   intent: KnottyIntent;
   primary: KnottyResponsePayload["primary"];
   alternatives: KnottyResponsePayload["alternatives"];
+  candidates: KnottyCandidate[];
   city: string | null;
 };
 
-/** Build the shared system + user prompt from the ranked recommendations. */
-function buildKnottyPrompt(input: ReplyInput) {
-  const items = [input.primary, ...input.alternatives].filter(
-    (item): item is NonNullable<typeof item> => Boolean(item),
-  );
-  const candidateSummary = items
-    .map(
-      (item, index) =>
-        `${index === 0 ? "Primary" : `Alternative ${index}`}: ${item.name} | ${item.specialty} | ${item.why.join(", ")}`,
-    )
-    .join("\n");
+function formatCandidateLine(c: KnottyCandidate, rank: number): string {
+  const name = c.display_name || c.full_name || `Therapist ${rank}`;
+  const loc = [c.neighborhood_name || c.primary_area, c.city].filter(Boolean).join(", ");
+  const price =
+    c.incall_price
+      ? `$${c.incall_price} incall`
+      : c.outcall_price
+        ? `$${c.outcall_price} outcall`
+        : null;
+  const flags = [
+    c.available_now ? "available now" : null,
+    c.is_verified_identity || c.is_verified_profile ? "verified" : null,
+    c.years_experience ? `${c.years_experience} yrs exp` : null,
+  ].filter(Boolean).join(", ");
+  const specialties = c.specialties?.slice(0, 3).join(", ") || null;
 
-  const system = [
-    "You are Knotty, a discreet and welcoming AI concierge for a wellness directory.",
-    "Do not invent facts or change the recommendation order.",
-    "Use only the ranked options provided.",
-    "Keep the reply under 70 words.",
-    "Sound polished, direct, and reassuring.",
-  ].join(" ");
+  const meta = [loc, price, flags, specialties ? `specialties: ${specialties}` : null]
+    .filter(Boolean)
+    .join(" · ");
 
-  const user = [
-    `User request: ${input.question}`,
-    `Intent: ${input.intent}`,
-    `City context: ${input.city || "not specified"}`,
-    candidateSummary,
-    "Explain why the primary match stands out and optionally mention one backup.",
-  ].join("\n");
+  return `${rank}. ${name}${meta ? ` — ${meta}` : ""}`;
+}
 
-  return { system, user };
+function buildKnottySystemPrompt(input: {
+  city: string | null;
+  candidates: KnottyCandidate[];
+  ranked: KnottyResponsePayload["primary"] | null;
+  alternatives: KnottyResponsePayload["alternatives"];
+}): string {
+  const lines: string[] = [
+    "You are Knotty, a warm and genuine AI concierge for MasseurMatch — a premium US directory of LGBTQ+-affirming male massage therapists.",
+    "",
+    "You have real conversations. You can recommend specific therapists, answer questions about the platform (pricing, booking, how it works), help someone figure out what kind of massage they need, or simply chat. Be genuine, warm, and direct — like a knowledgeable friend, not a bot.",
+    "",
+    "Rules:",
+    "• Keep replies concise and conversational — 1 to 3 sentences is usually enough",
+    "• When recommending therapists, use the ranked list below; explain briefly why someone stands out",
+    "• MasseurMatch is a directory only: clients contact providers directly via phone, WhatsApp, or email listed on the profile",
+    "• Don't invent details not present in the data below",
+    "• Never say 'As an AI' — you are Knotty",
+  ];
+
+  if (input.city) {
+    lines.push("", `Location context: ${input.city}`);
+  }
+
+  const primary = input.ranked;
+  const alts = input.alternatives;
+  const rankedNames = [
+    primary ? `1. ${primary.name} (top match — ${primary.why.slice(0, 2).join(", ")})` : null,
+    ...alts.slice(0, 2).map((a, i) => `${i + 2}. ${a.name} — ${a.why[0] || ""}`),
+  ].filter((x): x is string => Boolean(x));
+
+  if (rankedNames.length > 0) {
+    lines.push("", "Ranked matches for this request:", ...rankedNames);
+  }
+
+  if (input.candidates.length > 0) {
+    lines.push("", "Full available roster:");
+    input.candidates.slice(0, 8).forEach((c, i) => {
+      lines.push(formatCandidateLine(c, i + 1));
+    });
+  } else {
+    lines.push("", "No therapist data is available for this location yet. Encourage the person to browse /explore or /search.");
+  }
+
+  return lines.join("\n");
+}
+
+function buildConversationMessages(input: {
+  history: KnottyMessage[];
+  candidates: KnottyCandidate[];
+  primary: KnottyResponsePayload["primary"] | null;
+  alternatives: KnottyResponsePayload["alternatives"];
+  city: string | null;
+  intent: KnottyIntent;
+}): ChatMessage[] {
+  const system = buildKnottySystemPrompt({
+    city: input.city,
+    candidates: input.candidates,
+    ranked: input.primary,
+    alternatives: input.alternatives,
+  });
+
+  return [
+    { role: "system" as const, content: system },
+    ...input.history
+      .slice(-10) // keep last 10 turns for context
+      .map((m) => ({
+        role: (m.role === "assistant" ? "assistant" : "user") as "user" | "assistant",
+        content: m.content,
+      })),
+  ];
 }
 
 async function composeReply(input: ReplyInput) {
-  const fallback = buildDeterministicReply(input);
-  if (!input.primary) {
-    return { reply: fallback, model: null, fallbackUsed: true };
-  }
+  const messages = buildConversationMessages({
+    history: input.history,
+    candidates: input.candidates,
+    primary: input.primary,
+    alternatives: input.alternatives,
+    city: input.city,
+    intent: input.intent,
+  });
 
-  // OpenAI → Gemini → deterministic, handled by the shared LLM helper.
-  const { system, user } = buildKnottyPrompt(input);
-  const result = await completeText({
-    system,
-    user,
-    temperature: 0.5,
-    maxTokens: 160,
-    timeoutMs: 4000,
+  const result = await chatMessages(messages, {
+    temperature: 0.72,
+    maxTokens: 380,
+    timeoutMs: 6000,
   });
 
   if (result) {
     return { reply: result.text, model: result.model, fallbackUsed: false };
   }
 
-  return { reply: fallback, model: null, fallbackUsed: true };
+  // LLM unavailable — try FAQ then deterministic
+  const faqAnswer = await getKnottyFaqAnswer(input.question);
+  if (faqAnswer) {
+    return { reply: faqAnswer.answer, model: null, fallbackUsed: true };
+  }
+
+  return { reply: buildDeterministicReply(input), model: null, fallbackUsed: true };
 }
 
 export async function handleKnottyRequest(
@@ -410,35 +483,6 @@ export async function handleKnottyRequest(
         model: null,
         fallbackUsed: true,
         matchedTerms: guardrails.matches,
-        cityHint: intentMatch.cityHint,
-      },
-    };
-  }
-
-  const faqAnswer = await getKnottyFaqAnswer(question);
-  if (faqAnswer) {
-    return {
-      ok: true,
-      intent: intentMatch.intent,
-      blocked: false,
-      primary: null,
-      alternatives: [],
-      reply: faqAnswer.answer,
-      nextStep: faqAnswer.nextStepLabel
-        ? {
-            label: faqAnswer.nextStepLabel,
-            href: faqAnswer.nextStepHref || null,
-          }
-        : null,
-      tracking: {
-        sessionId,
-        recommendationSource: "knotty",
-        recommendationIds: [],
-      },
-      debug: {
-        learningEnabled: isKnottyLearningEnabled(),
-        model: null,
-        fallbackUsed: true,
         cityHint: intentMatch.cityHint,
       },
     };
@@ -513,9 +557,11 @@ export async function handleKnottyRequest(
   const [primary, ...alternatives] = recommendations;
   const replyResult = await composeReply({
     question,
+    history: payload.messages || [],
     intent: intentMatch.intent,
     primary: primary || null,
     alternatives,
+    candidates: candidatePool,
     city: resolvedCity,
   });
 

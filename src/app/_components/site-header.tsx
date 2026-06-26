@@ -2,20 +2,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { BRAND_ASSETS } from "@/lib/brand";
 import {
-  ChevronDown,
+  Home,
+  Users,
+  Heart,
+  Tag,
+  Info,
+  Phone,
+  UserCircle,
   Menu,
   X,
-  MapPin,
-  Users,
-  Navigation,
-  ArrowUpRight,
-  LogIn,
   LogOut,
 } from "lucide-react";
 import {
@@ -25,83 +26,40 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-const exploreItems = [
-  { href: "/explore", label: "Explore", icon: Navigation },
-  { href: "/therapists", label: "Therapists", icon: Users },
-  { href: "/cities", label: "Cities", icon: MapPin },
-];
+import type { LucideIcon } from "lucide-react";
 
-const navLinks = [
-  { href: "/therapists", label: "Therapists" },
-  { href: "/how-it-works", label: "How it Works" },
-  { href: "/for-therapists", label: "For Therapists" },
-  { href: "/trust", label: "Trust" },
-];
-
-function ExploreDropdown({ isDarkHero = false }: { isDarkHero?: boolean }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        aria-haspopup="menu"
-        className={`flex items-center gap-1 font-sans text-sm font-medium transition-colors ${
-          isDarkHero ? "text-white/80 hover:text-white" : "text-[#4A4F5C] hover:text-[#0B1F3A]"
-        }`}
-      >
-        Explore
-        <ChevronDown className={`w-3 h-3 opacity-50 transition-transform ${open ? "rotate-180" : ""}`} />
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 6 }}
-            transition={{ duration: 0.15 }}
-            role="menu"
-            className="absolute top-full left-0 mt-3 w-52 bg-white/95 backdrop-blur-xl border border-slate-200 rounded-xl p-1.5 shadow-xl"
-          >
-            {exploreItems.map(({ href, label, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                role="menuitem"
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-lg transition-colors"
-              >
-                <Icon className="w-4 h-4 opacity-60" />
-                {label}
-              </Link>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+interface NavLink {
+  href: string;
+  label: string;
+  icon: LucideIcon;
 }
 
-function MobileNav({ dashboardPath, authenticated, onLogout }: { dashboardPath: string; authenticated: boolean; onLogout: () => void }) {
+const navLinks: NavLink[] = [
+  { href: "/", label: "Home", icon: Home },
+  { href: "/therapists", label: "Masseurs", icon: Users },
+  { href: "/how-it-works", label: "How it Works", icon: Heart },
+  { href: "/pricing", label: "Pricing", icon: Tag },
+  { href: "/about", label: "About", icon: Info },
+  { href: "/contact", label: "Contact", icon: Phone },
+];
+
+function MobileNav({
+  dashboardPath,
+  authenticated,
+  onLogout,
+}: {
+  dashboardPath: string;
+  authenticated: boolean | null;
+  onLogout: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
-  const allLinks = [
-    { href: "/explore", label: "Explore" },
-    { href: "/therapists", label: "Therapists" },
-    { href: "/cities", label: "Cities" },
-    { href: "/blog", label: "Blog" },
-    { href: "/for-therapists", label: "For Therapists" },
-    { href: "/how-it-works", label: "How it Works" },
-    { href: "/trust", label: "Trust & Safety" },
-    { href: "/faq", label: "FAQ" },
-    { href: "/contact", label: "Contact" },
+  const allLinks: NavLink[] = [
+    ...navLinks,
     authenticated
-      ? { href: dashboardPath, label: "Dashboard" }
-      : { href: "/login", label: "Login / Sign up" },
+      ? { href: dashboardPath, label: "Dashboard", icon: UserCircle }
+      : { href: "/login", label: "Login", icon: UserCircle },
   ];
 
   return (
@@ -110,77 +68,107 @@ function MobileNav({ dashboardPath, authenticated, onLogout }: { dashboardPath: 
         <button
           type="button"
           aria-label="Open menu"
-          className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg text-[#1A1A1A] hover:bg-[#F5F5F5] transition-colors"
         >
           <Menu className="w-5 h-5" />
         </button>
       </SheetTrigger>
 
-      <SheetContent side="right" className="w-[280px] bg-background border-border p-0">
+      <SheetContent
+        side="right"
+        className="w-[300px] bg-white border-l border-[#E5E5E5] p-0"
+      >
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <Link href="/" onClick={() => setOpen(false)} className="flex items-center" aria-label="MasseurMatch home">
-            <Image
-              src={BRAND_ASSETS.logo}
-              alt="MasseurMatch"
-              width={150}
-              height={100}
-              priority
-              className="h-8 w-auto"
-            />
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#E5E5E5]">
+          <Link
+            href="/"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2"
+            aria-label="MasseurMatch home"
+          >
+            <div className="w-8 h-8 rounded-md bg-[#CC2424] flex items-center justify-center">
+              <span className="text-white font-extrabold text-sm leading-none">
+                MM
+              </span>
+            </div>
+            <span className="font-bold text-[#1A1A1A] text-sm tracking-tight">
+              MASSEURMATCH
+            </span>
           </Link>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-[#666666] hover:text-[#1A1A1A] hover:bg-[#F5F5F5] transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <nav className="flex flex-col px-3 py-4 gap-0.5">
-          {allLinks.map(({ href, label }) => {
+          {allLinks.map(({ href, label, icon: Icon }) => {
             const active = pathname === href;
             return (
               <Link
                 key={href}
                 href={href}
                 onClick={() => setOpen(false)}
-                className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  active ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  active
+                    ? "bg-[#CC2424] text-white"
+                    : "text-[#666666] hover:bg-[#F5F5F5] hover:text-[#1A1A1A]"
                 }`}
               >
+                <Icon
+                  className="w-4 h-4"
+                  strokeWidth={2.25}
+                />
                 {label}
               </Link>
             );
           })}
         </nav>
 
-        <div className="mt-auto px-5 pb-6 pt-4 border-t border-border space-y-2">
-          <Link
-            href={authenticated ? dashboardPath : "/login"}
-            onClick={() => setOpen(false)}
-            className="block w-full text-center rounded-lg border border-border py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
-          >
-            {authenticated ? "Dashboard" : "Log In"}
-          </Link>
-          {authenticated ? (
-            <button
-              type="button"
-              onClick={() => { setOpen(false); onLogout(); }}
-              className="block w-full text-center rounded-lg bg-[#FF8A1F] py-2.5 text-sm font-semibold text-[#0B1F3A] hover:bg-[#ff9d3f] transition-colors"
-            >
-              Log Out
-            </button>
+        <div className="mt-auto px-5 pb-6 pt-4 border-t border-[#E5E5E5] space-y-2">
+          {authenticated === null ? (
+            <div className="h-10 animate-pulse rounded-lg bg-[#F5F5F5]" />
+          ) : authenticated ? (
+            <>
+              <Link
+                href={dashboardPath}
+                onClick={() => setOpen(false)}
+                className="block w-full text-center rounded-lg border border-[#E5E5E5] py-2.5 text-sm font-medium text-[#1A1A1A] hover:bg-[#F5F5F5] transition-colors"
+              >
+                Dashboard
+              </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  onLogout();
+                }}
+                className="block w-full text-center rounded-full bg-[#CC2424] py-2.5 text-sm font-semibold text-white hover:bg-[#A81D1D] transition-colors"
+              >
+                Log Out
+              </button>
+            </>
           ) : (
-            <Link
-              href="/signup"
-              onClick={() => setOpen(false)}
-              className="block w-full text-center rounded-lg bg-[#FF8A1F] py-2.5 text-sm font-semibold text-[#0B1F3A] hover:bg-[#ff9d3f] transition-colors"
-            >
-              Get Started
-            </Link>
+            <>
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="block w-full text-center rounded-lg border border-[#E5E5E5] py-2.5 text-sm font-medium text-[#1A1A1A] hover:bg-[#F5F5F5] transition-colors"
+              >
+                Log In
+              </Link>
+              <Link
+                href="/signup"
+                onClick={() => setOpen(false)}
+                className="block w-full text-center rounded-full bg-[#CC2424] py-2.5 text-sm font-semibold text-white hover:bg-[#A81D1D] transition-colors"
+              >
+                Get Started
+              </Link>
+            </>
           )}
         </div>
       </SheetContent>
@@ -190,11 +178,12 @@ function MobileNav({ dashboardPath, authenticated, onLogout }: { dashboardPath: 
 
 export default function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [dashboardPath, setDashboardPath] = useState("/login");
   const pathname = usePathname();
   const router = useRouter();
-  const isHomepage = pathname === "/";
+  const isAppSection =
+    pathname?.startsWith("/admin") || pathname?.startsWith("/pro");
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -210,7 +199,11 @@ export default function SiteHeader() {
         if (!mounted) return;
         const isAuthenticated = Boolean(data?.authenticated);
         setAuthenticated(isAuthenticated);
-        setDashboardPath(isAuthenticated && data?.dashboardPath ? data.dashboardPath : "/login");
+        setDashboardPath(
+          isAuthenticated && data?.dashboardPath
+            ? data.dashboardPath
+            : "/login"
+        );
       })
       .catch(() => {
         if (!mounted) return;
@@ -237,85 +230,151 @@ export default function SiteHeader() {
     router.refresh();
   }
 
-  const isDarkHero = isHomepage;
+  // Don't render public marketing header on admin/pro -- they have their own layout shells
+  if (isAppSection) return null;
 
   return (
     <motion.header
-      initial={{ opacity: 0, y: -10 }}
+      initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isDarkHero
-          ? isScrolled
-            ? "bg-[#0B1F3A]/80 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20"
-            : "bg-transparent"
-          : isScrolled
-          ? "bg-[#FCFBF8]/95 backdrop-blur-xl border-b border-[#E2E6F0] shadow-sm"
-          : "bg-[#FCFBF8]/90 backdrop-blur-sm"
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className={`fixed top-0 left-0 right-0 z-50 bg-white transition-shadow duration-300 ${
+        isScrolled
+          ? "shadow-[0_2px_8px_rgba(0,0,0,0.08)] border-b border-[#E5E5E5]"
+          : "border-b border-transparent"
       }`}
     >
-      <div className="w-full max-w-[1400px] mx-auto flex items-center justify-between px-6 lg:px-10 py-4">
-        <Link href="/" className="group flex items-center" aria-label="MasseurMatch home">
+      <div className="w-full max-w-[1400px] mx-auto flex items-center justify-between px-6 lg:px-10 py-3">
+        {/* Left: Logo area */}
+        <Link
+          href="/"
+          className="group flex items-center gap-3 shrink-0"
+          aria-label="MasseurMatch home"
+        >
+          <div className="relative w-10 h-10 rounded-lg bg-[#CC2424] flex items-center justify-center shadow-sm">
+            <span className="text-white font-extrabold text-base leading-none tracking-tight">
+              MM
+            </span>
+          </div>
+          <div className="hidden sm:flex flex-col">
+            <span className="font-extrabold text-[#1A1A1A] text-[15px] tracking-tight leading-tight">
+              MASSEURMATCH
+            </span>
+            <span className="text-[9px] font-semibold text-[#666666] tracking-[0.12em] uppercase leading-tight">
+              Premium Sports Recovery &amp; Wellness
+            </span>
+          </div>
+          {/* Keep Image import used -- hidden fallback */}
           <Image
             src={BRAND_ASSETS.logo}
             alt="MasseurMatch"
-            width={165}
-            height={110}
+            width={1}
+            height={1}
             priority
-            className={`h-9 w-auto transition-all ${isDarkHero ? "drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]" : ""}`}
+            className="sr-only"
           />
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-1">
-          <ExploreDropdown isDarkHero={isDarkHero} />
-          {navLinks.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className={`px-4 py-2 text-sm font-medium transition-colors rounded-lg ${isDarkHero ? "text-white/80 hover:text-white hover:bg-white/10" : "text-[#4A4F5C] hover:text-[#0B1F3A] hover:bg-[#F4F6F9]"}`}
-            >
-              {label}
-            </Link>
-          ))}
-        </nav>
+        {/* Center: Navigation */}
+        <nav className="hidden lg:flex items-center gap-0.5">
+          {navLinks.map(({ href, label, icon: Icon }) => {
+            const active = pathname === href;
+            return (
+              <motion.div
+                key={href}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              >
+                <Link
+                  href={href}
+                  className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md transition-colors ${
+                    active
+                      ? "bg-[#CC2424] text-white shadow-sm"
+                      : "text-[#666666] hover:text-[#1A1A1A] hover:bg-[#F5F5F5]"
+                  }`}
+                >
+                  <Icon
+                    className="w-[0.9rem] h-[0.9rem]"
+                    strokeWidth={2.35}
+                  />
+                  {label}
+                </Link>
+              </motion.div>
+            );
+          })}
 
-        <div className="flex items-center gap-3">
-          {authenticated ? (
-            <>
+          {/* LOGIN nav item */}
+          {authenticated === null ? (
+            <div className="w-16 h-8 animate-pulse rounded-md bg-[#F5F5F5] ml-0.5" />
+          ) : authenticated ? (
+            <motion.div
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            >
               <Link
                 href={dashboardPath}
-                className={`hidden md:flex px-4 py-2 text-sm font-medium transition-colors items-center gap-2 ${isDarkHero ? "text-white/80 hover:text-white" : "text-[#4A4F5C] hover:text-[#0B1F3A]"}`}
+                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#666666] hover:text-[#1A1A1A] hover:bg-[#F5F5F5] transition-colors"
               >
+                <UserCircle
+                  className="w-[0.9rem] h-[0.9rem]"
+                  strokeWidth={2.35}
+                />
                 Dashboard
               </Link>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className={`hidden md:flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors rounded-lg ${isDarkHero ? "text-white/70 hover:text-white hover:bg-white/10" : "text-[#4A4F5C] hover:text-[#0B1F3A] hover:bg-[#F4F6F9]"}`}
-              >
-                <LogOut className="w-4 h-4" />
-                Log out
-              </button>
-            </>
+            </motion.div>
           ) : (
-            <>
+            <motion.div
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            >
               <Link
                 href="/login"
-                className={`hidden md:flex px-4 py-2 text-sm font-medium transition-colors items-center gap-2 ${isDarkHero ? "text-white/80 hover:text-white" : "text-[#4A4F5C] hover:text-[#0B1F3A]"}`}
+                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#666666] hover:text-[#1A1A1A] hover:bg-[#F5F5F5] transition-colors"
               >
-                <LogIn className="w-4 h-4" />
-                Log in
+                <UserCircle
+                  className="w-[0.9rem] h-[0.9rem]"
+                  strokeWidth={2.35}
+                />
+                Login
               </Link>
-              <Link
-                href="/signup"
-                className="hidden sm:flex h-10 px-6 items-center justify-center rounded-full text-sm font-semibold transition-all duration-300 bg-[#FF8A1F] text-[#0B1F3A] hover:bg-[#ff9d3f] hover:shadow-lg hover:shadow-[#FF8A1F]/30 hover:scale-[1.02]"
-              >
-                Get Started
-                <ArrowUpRight className="ml-2 w-4 h-4" />
-              </Link>
-            </>
+            </motion.div>
           )}
-          <MobileNav dashboardPath={dashboardPath} authenticated={authenticated} onLogout={handleLogout} />
+        </nav>
+
+        {/* Right: CTA + auth actions + mobile nav */}
+        <div className="flex items-center gap-3 shrink-0">
+          {authenticated !== null && authenticated && (
+            <motion.button
+              type="button"
+              onClick={handleLogout}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#666666] hover:text-[#CC2424] hover:bg-red-50 transition-colors"
+            >
+              <LogOut className="w-[0.9rem] h-[0.9rem]" strokeWidth={2.35} />
+              Log out
+            </motion.button>
+          )}
+          <motion.div
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+          >
+            <Link
+              href="/signup"
+              className="hidden sm:flex h-10 px-6 items-center justify-center rounded-full text-sm font-bold transition-all duration-200 bg-[#CC2424] text-white hover:bg-[#A81D1D] hover:shadow-lg hover:shadow-[#CC2424]/20"
+            >
+              GET STARTED
+            </Link>
+          </motion.div>
+          <MobileNav
+            dashboardPath={dashboardPath}
+            authenticated={authenticated}
+            onLogout={handleLogout}
+          />
         </div>
       </div>
     </motion.header>

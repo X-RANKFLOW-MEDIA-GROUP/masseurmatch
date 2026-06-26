@@ -49,14 +49,10 @@ type SightengineTextResponse = {
   };
 } & Record<string, SightengineTextCategory | unknown>;
 
-function getCredentials() {
+function getCredentials(): { apiUser: string; apiSecret: string } | null {
   const apiUser = Deno.env.get("SIGHTENGINE_API_USER") ?? "";
   const apiSecret = Deno.env.get("SIGHTENGINE_API_SECRET") ?? "";
-
-  if (!apiUser || !apiSecret) {
-    throw new Error("Sightengine credentials are not configured.");
-  }
-
+  if (!apiUser || !apiSecret) return null;
   return { apiUser, apiSecret };
 }
 
@@ -100,7 +96,22 @@ serve(async (request) => {
       );
     }
 
-    const { apiUser, apiSecret } = getCredentials();
+    const creds = getCredentials();
+    if (!creds) {
+      return new Response(
+        JSON.stringify({
+          approved: true,
+          reason: "moderation_unavailable",
+          provider: "none",
+          matches: [],
+          categories: [],
+          field_name: payload.field_name ?? null,
+          profile_id: payload.profile_id ?? null,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+    const { apiUser, apiSecret } = creds;
     const formData = new FormData();
     formData.append("text", text);
     formData.append("mode", "rules");

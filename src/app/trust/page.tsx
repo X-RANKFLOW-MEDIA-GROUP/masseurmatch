@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Script from "next/script";
-import { ShieldCheck, Bot, Lock, CheckCircle2, UserCheck, EyeOff, ShieldAlert } from "lucide-react";
+import { ArrowRight, ShieldCheck, Bot, Lock, CheckCircle2, UserCheck, EyeOff, ShieldAlert } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Trust & Safety | How MasseurMatch Protects You",
   description:
-    "Learn how MasseurMatch verifies therapists, protects your privacy, and ensures a safe environment with AI-driven moderation and identity verification.",
+    "Learn how MasseurMatch reviews profiles, protects your privacy, and promotes a safer environment with AI-driven moderation and identity verification.",
   openGraph: {
     title: "Trust & Safety | MasseurMatch",
     description:
-      "AI-driven moderation, identity verification, and encrypted communications - uncompromising commitment to your safety.",
+      "AI-driven moderation, identity verification, and encrypted communications — our commitment to your safety.",
     url: "https://masseurmatch.com/trust",
     siteName: "MasseurMatch",
     type: "website",
@@ -57,14 +58,14 @@ export default function TrustPage() {
             <span className="text-slate-400">Uncompromising commitment.</span>
           </h1>
           <p className="mx-auto max-w-2xl font-sans text-lg leading-relaxed text-slate-600">
-            Your safety is the foundation of MasseurMatch. We built an AI-driven and rigorously
-            verified technological infrastructure to guarantee peace of mind with every booking.
+            Your safety is the foundation of MasseurMatch. We built an AI-driven moderation
+            and identity verification infrastructure for peace of mind with every connection.
           </p>
         </section>
 
         <section className="container mx-auto mb-16 max-w-3xl px-4 md:px-6">
-          <div className="flex items-start gap-4 rounded-2xl border border-orange-200 bg-orange-50 p-6 shadow-sm md:p-8">
-            <ShieldAlert className="mt-1 h-10 w-10 flex-shrink-0 text-orange-500" />
+          <div className="flex items-start gap-4 rounded-2xl border border-red-200 bg-red-50 p-6 shadow-sm md:p-8">
+            <ShieldAlert className="mt-1 h-10 w-10 flex-shrink-0 text-red-600" />
             <div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Important Platform Disclaimer</h3>
               <p className="text-gray-700 font-medium">
@@ -106,7 +107,7 @@ export default function TrustPage() {
                 government-issued documents. Look for the blue &ldquo;Verified&rdquo; badge for
                 professionals who have passed our strictest audit.
                 <br />
-                <span className="mt-2 block font-semibold text-orange-700">
+                <span className="mt-2 block font-semibold text-red-700">
                   Note: Identity verification confirms a person&apos;s legal identity, <u>not</u>{" "}
                   their professional licensure.
                 </span>
@@ -150,7 +151,25 @@ export default function TrustPage() {
             <RuleRow text="Zero tolerance for solicitations of illegal or sexual services." />
             <RuleRow text="Profile photos must be strictly professional and free of watermarks." />
             <RuleRow text="Verbal aggression, discrimination, or harassment in chat results in an instant ban." />
-            <RuleRow text="All reviews must come from real clients to combat fake reputations." />
+            <RuleRow text="Reviews require a documented contact event to earn a Verified Contact label." />
+          </div>
+
+          <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm leading-relaxed text-slate-600 font-sans">
+            <strong className="font-semibold text-slate-800">Verified reviews require proof of contact.</strong>{" "}
+            When a client clicks a contact button (call, SMS, or WhatsApp) on a profile, we record
+            that event. Only reviewers with a documented contact event receive a &ldquo;Verified
+            contact&rdquo; label on their review — making it easy to distinguish genuine first-hand
+            experiences from unverifiable submissions.
+          </div>
+
+          <div className="mt-8 text-center">
+            <Link
+              href="/moderation-policy"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 underline-offset-2 hover:text-slate-900 hover:underline"
+            >
+              Read our full Moderation Policy
+              <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.25} />
+            </Link>
           </div>
         </section>
       </div>

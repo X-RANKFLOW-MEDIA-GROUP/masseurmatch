@@ -22,21 +22,21 @@ import { format, parseISO } from 'date-fns'
 import type { BookingInquiry } from '@/lib/booking/types'
 
 const STATUS_CONFIG = {
-  new: { label: 'New', icon: Clock, color: 'amber' },
-  checking: { label: 'Reviewing', icon: AlertCircle, color: 'sky' },
-  pending_approval: { label: 'Needs Approval', icon: AlertCircle, color: 'orange' },
-  approved: { label: 'Approved', icon: CheckCircle2, color: 'emerald' },
-  denied: { label: 'Denied', icon: XCircle, color: 'rose' },
-  completed: { label: 'Completed', icon: CheckCircle2, color: 'slate' },
-  cancelled: { label: 'Cancelled', icon: XCircle, color: 'slate' },
+  new:              { label: 'New',             icon: Clock,        iconBg: 'bg-amber-500/10',   iconText: 'text-amber-400',   badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+  checking:         { label: 'Reviewing',       icon: AlertCircle,  iconBg: 'bg-sky-500/10',     iconText: 'text-sky-400',     badge: 'bg-sky-500/10 text-sky-400 border-sky-500/20' },
+  pending_approval: { label: 'Needs Approval',  icon: AlertCircle,  iconBg: 'bg-red-500/10',  iconText: 'text-red-400',  badge: 'bg-red-500/10 text-red-400 border-red-500/20' },
+  approved:         { label: 'Approved',         icon: CheckCircle2, iconBg: 'bg-emerald-500/10', iconText: 'text-emerald-400', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+  denied:           { label: 'Denied',           icon: XCircle,      iconBg: 'bg-rose-500/10',    iconText: 'text-rose-400',    badge: 'bg-rose-500/10 text-rose-400 border-rose-500/20' },
+  completed:        { label: 'Completed',        icon: CheckCircle2, iconBg: 'bg-slate-500/10',   iconText: 'text-slate-400',   badge: 'bg-slate-500/10 text-slate-400 border-slate-500/20' },
+  cancelled:        { label: 'Cancelled',        icon: XCircle,      iconBg: 'bg-slate-500/10',   iconText: 'text-slate-400',   badge: 'bg-slate-500/10 text-slate-400 border-slate-500/20' },
 } as const
 
 const INTEL_CONFIG = {
-  pending: { label: 'Pending', icon: Clock, color: 'slate' },
-  running: { label: 'Checking', icon: Loader2, color: 'sky' },
-  clean: { label: 'Clean', icon: ShieldCheck, color: 'emerald' },
-  flagged: { label: 'Flagged', icon: ShieldAlert, color: 'rose' },
-  inconclusive: { label: 'Inconclusive', icon: AlertCircle, color: 'amber' },
+  pending:      { label: 'Pending',      icon: Clock,        iconBg: 'bg-slate-500/10',   iconText: 'text-slate-400',   badge: 'bg-slate-500/10 text-slate-400 border-slate-500/20' },
+  running:      { label: 'Checking',     icon: Loader2,      iconBg: 'bg-sky-500/10',     iconText: 'text-sky-400',     badge: 'bg-sky-500/10 text-sky-400 border-sky-500/20' },
+  clean:        { label: 'Clean',        icon: ShieldCheck,  iconBg: 'bg-emerald-500/10', iconText: 'text-emerald-400', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+  flagged:      { label: 'Flagged',      icon: ShieldAlert,  iconBg: 'bg-rose-500/10',    iconText: 'text-rose-400',    badge: 'bg-rose-500/10 text-rose-400 border-rose-500/20' },
+  inconclusive: { label: 'Inconclusive', icon: AlertCircle,  iconBg: 'bg-amber-500/10',   iconText: 'text-amber-400',   badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
 } as const
 
 type FilterType = 'all' | BookingInquiry['status']
@@ -110,10 +110,10 @@ export default function AdminBookingsPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#060E1A] p-6">
+    <div className="min-h-screen bg-[#1A1A1A] p-6">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#FF8A1F]">Admin</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#CC2424]">Admin</p>
           <h1 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-white">
             Booking Inquiries
           </h1>
@@ -128,7 +128,7 @@ export default function AdminBookingsPage() {
               onClick={() => setFilter(f.value)}
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
                 filter === f.value
-                  ? 'bg-[#FF8A1F] text-white'
+                  ? 'bg-[#CC2424] text-white'
                   : 'border border-white/10 bg-white/[0.04] text-slate-400 hover:text-white'
               }`}
             >
@@ -166,18 +166,18 @@ export default function AdminBookingsPage() {
                     className="flex w-full items-start gap-4 p-5 text-left hover:bg-white/[0.02] transition-colors"
                   >
                     {/* Status indicator */}
-                    <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-${statusCfg.color}-500/10`}>
-                      <StatusIcon className={`h-4 w-4 text-${statusCfg.color}-400`} strokeWidth={2.25} />
+                    <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${statusCfg.iconBg}`}>
+                      <StatusIcon className={`h-4 w-4 ${statusCfg.iconText}`} strokeWidth={2.25} />
                     </div>
 
                     {/* Main info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-semibold text-white">{inq.client_name ?? 'Unknown Client'}</span>
-                        <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest bg-${statusCfg.color}-500/10 text-${statusCfg.color}-400 border border-${statusCfg.color}-500/20`}>
+                        <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest border ${statusCfg.badge}`}>
                           {statusCfg.label}
                         </span>
-                        <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest bg-${intelCfg.color}-500/10 text-${intelCfg.color}-400 border border-${intelCfg.color}-500/20`}>
+                        <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest border ${intelCfg.badge}`}>
                           {intelCfg.label}
                         </span>
                         {riskBadge(inq.intelligence_report?.riskLevel)}
@@ -262,7 +262,7 @@ export default function AdminBookingsPage() {
                           <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
                             {inq.ai_conversation.map((msg, i) => (
                               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-[85%] rounded-xl px-3 py-2 text-xs ${msg.role === 'user' ? 'bg-[#FF8A1F]/20 text-orange-200' : 'bg-white/[0.06] text-slate-300'}`}>
+                                <div className={`max-w-[85%] rounded-xl px-3 py-2 text-xs ${msg.role === 'user' ? 'bg-[#CC2424]/20 text-red-200' : 'bg-white/[0.06] text-slate-300'}`}>
                                   {msg.content}
                                 </div>
                               </div>
@@ -279,7 +279,7 @@ export default function AdminBookingsPage() {
                             placeholder="Admin notes (optional)…"
                             value={adminNotes[inq.id] ?? ''}
                             onChange={e => setAdminNotes(prev => ({ ...prev, [inq.id]: e.target.value }))}
-                            className="resize-none rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-orange-500/50 focus:outline-none"
+                            className="resize-none rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-red-500/50 focus:outline-none"
                           />
                           <div className="flex gap-3">
                             <button

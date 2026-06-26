@@ -32,8 +32,10 @@ export async function POST(
     if (updateError) throw new RouteError(500, updateError.message);
 
     await adminClient.from("admin_actions").insert({
-      admin_id: admin.userId,
+      action: "verify_identity",
       action_type: "verify_identity",
+      target_table: "profiles",
+      admin_id: admin.userId,
       target_user_id: profile.user_id,
       target_profile_id: profileId,
       reason: null,

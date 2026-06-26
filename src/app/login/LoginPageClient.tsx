@@ -6,7 +6,7 @@ import { AuthForms } from "@/app/_components/auth-forms";
 import { useAuth } from "@/contexts/AuthContext";
 
 function sanitizeRedirectTo(value: string | null) {
-  const fallback = "/dashboard";
+  const fallback = "/pro/dashboard";
 
   if (!value) {
     return fallback;
@@ -29,6 +29,7 @@ function LoginPageContent() {
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams?.toString() ?? "");
   const redirectTo = sanitizeRedirectTo(params.get("redirect"));
+  const oauthError = params.get("error_description") ?? params.get("error");
 
   useEffect(() => {
     if (loading || !user) {
@@ -40,8 +41,8 @@ function LoginPageContent() {
 
   return (
     <div className="relative isolate overflow-hidden px-4 py-10 sm:py-14">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(30,64,175,0.18),transparent_40%),radial-gradient(circle_at_82%_18%,rgba(249,115,22,0.16),transparent_34%)]" />
-      <div className="pointer-events-none absolute -top-16 left-1/2 -z-10 h-56 w-56 -translate-x-1/2 rounded-full bg-orange-300/20 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(204,36,36,0.14),transparent_40%),radial-gradient(circle_at_82%_18%,rgba(204,36,36,0.10),transparent_34%)]" />
+      <div className="pointer-events-none absolute -top-16 left-1/2 -z-10 h-56 w-56 -translate-x-1/2 rounded-full bg-red-300/20 blur-3xl" />
 
       <div className="mx-auto max-w-5xl rounded-[32px] border border-border-subtle bg-white/85 p-4 shadow-[0_24px_60px_rgb(var(--color-brand-primary-rgb)/0.08)] backdrop-blur-xl sm:p-8">
         <div className="mb-6 text-center sm:mb-8">
@@ -53,6 +54,13 @@ function LoginPageContent() {
             Sign in to manage your profile, respond to leads faster, and keep your listing optimized for local discovery.
           </p>
         </div>
+        {oauthError && (
+          <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            {oauthError === "auth_callback_failed"
+              ? "Sign-in failed — please try again. If the issue persists, clear your cookies and retry."
+              : oauthError}
+          </div>
+        )}
         <AuthForms mode="login" redirectTo={redirectTo} />
       </div>
     </div>

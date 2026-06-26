@@ -36,6 +36,13 @@ const isLikelyApiTestNextProcess = (value) => {
 	);
 };
 
+// Claude Code's Bash tool wraps commands in a shell-snapshot eval; the parent
+// bash process retains the original command line (e.g. "eval 'pnpm dev'") even
+// after the actual Next server child has exited. Ignore these.
+const isClaudeCodeShellSnapshot = (value) => {
+	return value.includes(".claude/shell-snapshots/");
+};
+
 const getWindowsProcessCommands = () => {
 	const output = execFileSync(
 		"powershell.exe",
@@ -105,7 +112,9 @@ const ensureChunkDirectories = () => {
 if (process.env[OVERRIDE_ENV] !== "1") {
 	const serverProcesses = findRunningNextServerProcesses();
 
-		const blockingProcesses = serverProcesses.filter((item) => !isLikelyApiTestNextProcess(item.command));
+		const blockingProcesses = serverProcesses.filter(
+			(item) => !isLikelyApiTestNextProcess(item.command) && !isClaudeCodeShellSnapshot(item.command),
+		);
 
 		if (blockingProcesses.length > 0) {
 			console.error(

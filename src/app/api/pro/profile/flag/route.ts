@@ -49,6 +49,7 @@ export async function POST(request: Request) {
     };
 
     const queuePayload: TablesInsert<"moderation_queue"> = {
+      content_type: "text",
       profile_id: profile.id,
       user_id: session.userId,
       target_id: null,
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
       source: "pro_listing",
       field_name: body.flaggedField,
       status: "pending",
-      priority: "normal",
+      priority: 0,
       moderation_provider: sanitizeOptionalText(body.moderationProvider) || "sightengine",
       moderation_reason: sanitizeText(body.moderationReason),
       snapshot: snapshot as Json,

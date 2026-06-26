@@ -13,6 +13,7 @@ import {
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
 import { createPageMetadata } from "@/app/_lib/metadata";
 import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildFaqJsonLd, buildItemListJsonLd } from "@/app/_lib/structured-data";
+import { NATIONAL_SERVICE_SLUGS, getServiceMetadata } from "@/app/_lib/service-data";
 
 type Params = { city: string };
 
@@ -169,13 +170,22 @@ export default async function CanonicalCityPage({ params }: { params: Promise<Pa
           </header>
 
           <section className="rounded-3xl border border-border bg-background p-6">
-            <h2 className="text-2xl font-semibold text-foreground">Popular Services</h2>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {DALLAS_SERVICE_SLUGS.map((slug) => (
-                <Link key={slug} href={`${canonicalCityPath}/${slug}`} className="rounded-full border border-border px-3 py-2 text-xs font-semibold text-foreground">
-                  {categoryLabel(slug)}
-                </Link>
-              ))}
+            <h2 className="text-2xl font-semibold text-foreground">Popular Services in {cityName}</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Find {cityName} therapists specializing in these massage types:</p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+              {NATIONAL_SERVICE_SLUGS.slice(0, 6).map((slug) => {
+                const service = getServiceMetadata(slug);
+                if (!service) return null;
+                return (
+                  <Link
+                    key={slug}
+                    href={`/cities/${canonicalCity}/services/${slug}`}
+                    className="rounded-xl border border-border px-3 py-2 text-xs font-semibold text-foreground hover:bg-accent"
+                  >
+                    {service.label} Massage
+                  </Link>
+                );
+              })}
             </div>
 
             <h2 className="mt-6 text-2xl font-semibold text-foreground">Session Formats</h2>

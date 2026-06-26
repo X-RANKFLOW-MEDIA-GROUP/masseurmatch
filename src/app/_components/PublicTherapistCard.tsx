@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, MapPin, ShieldCheck, Star } from "lucide-react";
+import { ArrowUpRight, MapPin, Navigation, ShieldCheck, Sparkles, Star, Zap } from "lucide-react";
 import { useMemo } from "react";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import {
   getPublicProfileName,
   isVerifiedDirectoryProfile,
+  isIdentityVerified,
 } from "@/app/_lib/public-profile";
 
 const formatCurrency = (value: number | null) => {
@@ -39,12 +40,33 @@ const beginRouteTransition = () => {
   window.setTimeout(() => document.body.classList.remove("route-dissolve-out"), 420);
 };
 
-export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist }) {
+export function PublicTherapistCard({ therapist, priority = false }: { therapist: PublicTherapist; priority?: boolean }) {
   const name = getPublicProfileName(therapist);
   const profilePath = `/therapists/${therapist.slug || therapist.id}`;
-  const isVerified = isVerifiedDirectoryProfile(therapist);
+  const isDirectoryListed = isVerifiedDirectoryProfile(therapist);
+  const hasIdentityVerification = isIdentityVerified(therapist);
   const isElite = therapist._tier === "elite";
   const availableNow = therapist.available_now === true;
+
+  const isNewProfile = useMemo(() => {
+    if (!therapist.created_at) return false;
+    const ageMs = Date.now() - new Date(therapist.created_at).getTime();
+    return ageMs < 30 * 24 * 60 * 60 * 1000;
+  }, [therapist.created_at]);
+
+  const travelBadge = useMemo(() => {
+    const schedule = therapist.travel_schedule;
+    if (!Array.isArray(schedule) || schedule.length === 0) return null;
+    const now = Date.now();
+    for (const entry of schedule) {
+      const start = new Date(entry.start_date).getTime();
+      const end = new Date(entry.end_date).getTime();
+      if (now >= start && now <= end) return { label: "Traveling", city: entry.city };
+      const daysUntil = (start - now) / (1000 * 60 * 60 * 24);
+      if (daysUntil > 0 && daysUntil <= 14) return { label: "Arriving soon", city: entry.city };
+    }
+    return null;
+  }, [therapist.travel_schedule]);
 
   const startingPrice = getStartingPrice(therapist);
   const priceLabel = formatCurrency(startingPrice);
@@ -80,8 +102,8 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
             alt={`${name} – massage therapist in ${city || "your area"}`}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover object-top transition-transform duration-[600ms] ease-out group-hover:scale-[1.04]"
-            priority={false}
+            className="object-cover object-top transition-transform duration-600 ease-out group-hover:scale-[1.04]"
+            priority={priority}
             itemProp="image"
           />
 
@@ -89,14 +111,32 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
 
           {/* Top badges */}
           <div className="absolute inset-x-2.5 top-2.5 flex items-start justify-between gap-2">
-            {isVerified ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/92 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 shadow-sm backdrop-blur-sm">
-                <ShieldCheck className="h-3 w-3 text-emerald-500" strokeWidth={2.5} />
-                {isElite ? "Elite" : "Verified"}
-              </span>
-            ) : (
-              <span />
-            )}
+            <div className="flex flex-col items-start gap-1">
+              {isDirectoryListed && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/92 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 shadow-sm backdrop-blur-sm">
+                  <ShieldCheck className="h-3 w-3 text-emerald-500" strokeWidth={2.5} />
+                  {isElite ? "Elite" : hasIdentityVerification ? "Verified" : "Listed"}
+                </span>
+              )}
+              {isNewProfile && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-indigo-600/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur-sm">
+                  <Sparkles className="h-3 w-3" strokeWidth={2.5} />
+                  New
+                </span>
+              )}
+              {travelBadge && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-sky-600/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur-sm">
+                  <Navigation className="h-3 w-3" strokeWidth={2.5} />
+                  {travelBadge.label}
+                </span>
+              )}
+              {therapist.is_featured && !isElite && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur-sm">
+                  <Zap className="h-3 w-3" strokeWidth={2.5} />
+                  Featured
+                </span>
+              )}
+            </div>
             {therapist.review_count ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-black/45 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
                 <Star className="h-3 w-3 fill-primary text-primary" strokeWidth={2.5} />
@@ -139,17 +179,31 @@ export function PublicTherapistCard({ therapist }: { therapist: PublicTherapist 
             )}
             {availableNow && (
               <p className="mt-0.5 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-600">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
                 Available now
+              </p>
+            )}
+            {!availableNow && travelBadge && (
+              <p className="mt-0.5 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-sky-600">
+                <Navigation className="h-2.5 w-2.5" strokeWidth={2.5} />
+                {travelBadge.label} · {travelBadge.city}
               </p>
             )}
           </div>
 
           <div className="shrink-0 text-right">
-            <p className="text-[9px] uppercase tracking-widest text-neutral-400">From</p>
-            <p className="text-sm font-semibold text-neutral-900" itemProp="priceRange">
-              {priceLabel ?? "Contact"}
-            </p>
+            {priceLabel ? (
+              <>
+                <p className="text-[9px] uppercase tracking-widest text-neutral-400">From</p>
+                <p className="text-sm font-semibold text-neutral-900" itemProp="priceRange">
+                  {priceLabel}
+                </p>
+              </>
+            ) : (
+              <p className="text-xs font-medium text-neutral-500" itemProp="priceRange">
+                Contact for rates
+              </p>
+            )}
           </div>
         </div>
       </Link>
