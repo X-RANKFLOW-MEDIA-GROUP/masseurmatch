@@ -3,19 +3,69 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { CityGlobe } from "@/components/marketing/CityGlobe";
-import { Cta3DButton } from "@/components/marketing/Cta3DButton";
+import {
+  Sparkles,
+  MessageCircle,
+  Send,
+  ArrowRight,
+  Check,
+  Lock,
+  Shield,
+} from "lucide-react";
 import { HeroMediaBanner } from "@/components/marketing/HeroMediaBanner";
 import type { PublicTherapist } from "@/app/_lib/directory";
 
-const avatarStack = [
-  { id: 1, src: "/marketing/hero/avatar-1.jpg", alt: "Verified therapist", initials: "JM", color: "from-orange-500 to-amber-600" },
-  { id: 2, src: "/marketing/hero/avatar-2.jpg", alt: "Verified therapist", initials: "RK", color: "from-blue-600 to-indigo-700" },
-  { id: 3, src: "/marketing/hero/avatar-3.jpg", alt: "Verified therapist", initials: "AL", color: "from-teal-500 to-cyan-600" },
-  { id: 4, src: "/marketing/hero/avatar-4.jpg", alt: "Verified therapist", initials: "DV", color: "from-violet-600 to-purple-700" },
+const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+const quickPrompts = [
+  "Deep tissue in my area",
+  "Available today",
+  "Outcall services",
+  "New therapists",
 ];
 
-const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const trustItems = [
+  { label: "Verified profiles", icon: Check },
+  { label: "Secure & private", icon: Lock },
+  { label: "Trusted reviews", icon: Shield },
+];
+
+function TherapistCard({ profile, index }: { profile: PublicTherapist; index: number }) {
+  const router = useRouter();
+  const displayName = profile.display_name || profile.full_name || "Therapist";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 36, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.65, ease: customEase, delay: 0.15 + index * 0.08 }}
+      className="relative flex min-w-[250px] flex-1 flex-col rounded-[1.75rem] border border-black/5 bg-white/95 p-4 pt-36 shadow-[0_28px_70px_rgba(15,23,42,0.13)] backdrop-blur"
+      onClick={() => router.push(`/therapists/${profile.slug || profile.id}`)}
+    >
+      {profile.profile_photo && (
+        <div className="absolute inset-x-3 -top-20 flex h-56 items-end justify-center overflow-hidden rounded-[1.5rem] bg-gradient-to-b from-slate-50 via-white to-white">
+          <img
+            src={profile.profile_photo}
+            alt={`${displayName} profile photo`}
+            loading={index === 0 ? "eager" : "lazy"}
+            className="h-full w-full object-cover object-top mix-blend-multiply"
+          />
+        </div>
+      )}
+      <div className="mt-3">
+        <h3 className="font-display text-lg font-black text-[#151515]">{displayName}</h3>
+        <p className="text-sm text-[#5F6673]">{profile.city || "Location"}</p>
+      </div>
+      <button
+        type="button"
+        onClick={() => router.push(`/therapists/${profile.slug || profile.id}`)}
+        className="mt-5 w-full rounded-xl bg-[#CC2424] px-5 py-3 text-sm font-black uppercase tracking-wide text-white shadow-lg shadow-[#CC2424]/20 transition hover:bg-[#A81D1D]"
+      >
+        View Profile
+      </button>
+    </motion.div>
+  );
+}
 
 function isRealProfile(profile: PublicTherapist) {
   const id = profile.id?.toLowerCase() ?? "";
@@ -32,94 +82,8 @@ function isRealProfile(profile: PublicTherapist) {
   );
 }
 
-export default function HeroClient({ therapists = [] }: { therapists?: PublicTherapist[] }) {
-  const reducedMotion = useReducedMotion();
-
-  return (
-    <motion.article
-      initial={{ opacity: 0, y: 36, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.65, ease: customEase, delay: 0.15 + index * 0.08 }}
-      className={`relative flex min-w-[250px] flex-1 flex-col rounded-[1.75rem] border border-black/5 bg-white/95 p-4 pt-36 shadow-[0_28px_70px_rgba(15,23,42,0.13)] backdrop-blur ${cardPosition}`}
-    >
-      <button
-        type="button"
-        aria-label={`Save ${name}`}
-        className="absolute right-5 top-5 z-20 rounded-full bg-white/80 p-2 text-slate-400 shadow-sm transition hover:text-[#CC2424]"
-      >
-        <Heart size={17} strokeWidth={2.25} />
-      </button>
-
-      <div className="absolute inset-x-3 -top-20 flex h-56 items-end justify-center overflow-hidden rounded-[1.5rem] bg-gradient-to-b from-slate-50 via-white to-white">
-        {photoSrc ? (
-          // Use a plain image so live Supabase public URLs and remote provider photos render without extra Next image config friction.
-          // The frame is intentionally background-light; profiles with transparent/background-removed photos pop out naturally.
-          <img
-            src={photoSrc}
-            alt={`${name} profile photo`}
-            loading={index === 1 ? "eager" : "lazy"}
-            className="h-full w-full object-cover object-top mix-blend-multiply"
-          />
-        ) : (
-          <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-[#CC2424] to-[#8B0A1E] text-2xl font-black text-white shadow-xl">
-            {initials}
-          </div>
-        )}
-      </div>
-
-      <div className="relative z-10 mt-3 flex items-start gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#CC2424] to-[#8B0A1E] text-xs font-black text-white shadow-md">
-          {initials}
-        </div>
-        <div className="min-w-0">
-          <h3 className="truncate font-display text-lg font-black text-[#151515]">{name}</h3>
-          <p className="line-clamp-1 text-sm text-[#5F6673]">{specialty}</p>
-        </div>
-      </div>
-
-      <div className="mt-5 space-y-3 text-sm">
-        <div className="flex items-center gap-2 text-[#7B8190]">
-          <MapPin size={15} strokeWidth={2.3} className="text-[#9AA0AA]" />
-          <span className="line-clamp-1">{getLocation(profile)}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Star size={16} strokeWidth={2.25} className="fill-amber-400 text-amber-400" />
-          <span className="font-bold text-[#151515]">{rating}</span>
-          <span className="text-[#7B8190]">({reviewCount} reviews)</span>
-        </div>
-        <div className="flex items-center gap-4 text-[#5F6673]">
-          <span className="flex items-center gap-1.5">
-            <Clock size={15} strokeWidth={2.25} className="text-[#9AA0AA]" />
-            60 min
-          </span>
-          <span className="font-black text-[#151515]">{getPrice(profile)}</span>
-        </div>
-      </div>
-
-      <div className="mt-5 flex flex-wrap gap-2">
-        {(profile.is_verified_photos || profile.verification_status === "verified") && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 text-[11px] font-bold text-slate-700">
-            <BadgeCheck size={13} className="text-[#CC2424]" />
-            Verified Photo
-          </span>
-        )}
-        {profile.available_now && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1.5 text-[11px] font-bold text-emerald-700">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            Available Now
-          </span>
-        )}
-      </div>
-
-      <button
-        type="button"
-        onClick={() => router.push(getProfileHref(profile))}
-        className="mt-5 w-full rounded-xl bg-[#CC2424] px-5 py-3 text-sm font-black uppercase tracking-wide text-white shadow-lg shadow-[#CC2424]/20 transition hover:bg-[#A81D1D]"
-      >
-        View Profile
-      </button>
-    </motion.article>
-  );
+interface HeroClientProps {
+  featuredTherapists?: PublicTherapist[];
 }
 
 export default function HeroClient({ featuredTherapists = [] }: HeroClientProps) {
@@ -306,7 +270,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
         transition={{ duration: reducedMotion ? 0 : 1.0, ease: customEase }}
         className="relative z-10 w-full overflow-hidden"
       >
-        <HeroMediaBanner reducedMotion={!!reducedMotion} therapists={therapists} />
+        <HeroMediaBanner reducedMotion={!!reducedMotion} therapists={featuredTherapists} />
       </motion.div>
     </section>
   );
