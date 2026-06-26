@@ -40,7 +40,12 @@ create table if not exists public.therapist_profiles (
 
 -- therapist_photos UPDATE in runtime_contract_alignment references these columns
 -- which are absent from the 20260427200000 CREATE TABLE definition.
-alter table public.therapist_photos
-  add column if not exists therapist_profile_id uuid references public.therapist_profiles(id) on delete cascade,
-  add column if not exists is_primary            boolean default false,
-  add column if not exists approval_status       text default 'pending';
+DO $$
+BEGIN
+  IF to_regclass('public.therapist_photos') IS NOT NULL THEN
+    ALTER TABLE public.therapist_photos
+      ADD COLUMN IF NOT EXISTS therapist_profile_id uuid references public.therapist_profiles(id) on delete cascade,
+      ADD COLUMN IF NOT EXISTS is_primary            boolean default false,
+      ADD COLUMN IF NOT EXISTS approval_status       text default 'pending';
+  END IF;
+END $$;
