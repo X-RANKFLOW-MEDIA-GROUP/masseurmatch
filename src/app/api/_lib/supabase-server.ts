@@ -53,7 +53,7 @@ export function createSupabasePublicClient() {
   return createClient<Database>(url, anonKey, baseOptions());
 }
 
-export function createSupabaseAdminClient() {
+export function createSupabaseWebhookAdminClient() {
   const url = getSupabaseUrl();
   const serviceRoleKey = getServiceRoleKey();
   assertConfig(url, "SUPABASE_URL");
@@ -62,8 +62,36 @@ export function createSupabaseAdminClient() {
   return createClient<Database>(url, serviceRoleKey, baseOptions());
 }
 
+export function createSupabaseAdminDashboardClient(session: RequestSession) {
+  if (session.role !== "admin") {
+    throw new RouteError(403, "Admin access required.");
+  }
+
+  const url = getSupabaseUrl();
+  const serviceRoleKey = getServiceRoleKey();
+  assertConfig(url, "SUPABASE_URL");
+  assertConfig(serviceRoleKey, "SUPABASE_SERVICE_ROLE_KEY");
+
+  return createClient<Database>(url, serviceRoleKey, {
+    ...baseOptions(),
+    global: {
+      headers: {
+        "x-admin-user-id": session.userId,
+      },
+    },
+  });
+}
+
+/**
+ * @deprecated Prefer createSupabaseWebhookAdminClient for webhooks/background
+ * jobs and createSupabaseAdminDashboardClient(session) for admin routes.
+ */
+export function createSupabaseAdminClient() {
+  return createSupabaseWebhookAdminClient();
+}
+
 export async function getUserRole(userId: string): Promise<AppRole | null> {
-  const adminClient = createSupabaseAdminClient();
+  const adminClient = createSupabaseWebhookAdminClient();
   const { data, error } = await adminClient
     .from("user_roles")
     .select("role")
@@ -111,7 +139,7 @@ export async function recordAuditLog(
   details?: Json,
 ) {
   try {
-    const adminClient = createSupabaseAdminClient();
+    const adminClient = createSupabaseWebhookAdminClient();
     await adminClient.from("audit_log").insert({
       admin_user_id: adminUserId,
       action,
@@ -125,7 +153,7 @@ export async function recordAuditLog(
 }
 
 export async function getUserByEmail(email: string): Promise<User | null> {
-  const adminClient = createSupabaseAdminClient();
+  const adminClient = createSupabaseWebhookAdminClient();
   const normalizedEmail = email.trim().toLowerCase();
   let page = 1;
 
@@ -220,7 +248,7 @@ export async function ensureUserProfileAndRole(
     fallbackName?: string;
   } = {},
 ) {
-  const adminClient = createSupabaseAdminClient();
+  const adminClient = createSupabaseWebhookAdminClient();
   const defaultRole = options.defaultRole ?? "provider";
   const fullName = deriveUserDisplayName(user, options.fallbackName);
 
@@ -258,113 +286,19 @@ export async function ensureUserProfileAndRole(
     profileCreated = true;
   }
 
-  let role = await getUserRole(user.id);
-  if (!role) {
-    const { error: roleError } = await adminClient.from("user_roles").insert({
-      user_id: user.id,
-      role: defaultRole,
-    });
-
-    if (roleError) {
-      throw new RouteError(500, roleError.message);
-    }
-
-    role = defaultRole;
-  }
-
-  if (user.email) {
-    try {
-      await adminClient.from("users").upsert(
-        {
-          id: user.id,
-          email: user.email,
-          full_name: fullName,
-          role,
-        },
-        { onConflict: "id" },
-      );
-    } catch {
-      // Legacy public.users sync is best-effort only.
-    }
-  }
-
-  return {
-    role,
-    profileCreated,
-    fullName,
-  };
-}
-
-export async function createTherapistUser(input: {
-  fullName: string;
-  email: string;
-  password: string;
-  emailRedirectTo: string;
-}) {
-  const publicClient = createSupabasePublicClient();
-
-  const signUpPayload: Parameters<typeof publicClient.auth.signUp>[0] = {
-    email: input.email,
-    password: input.password,
-    options: {
-      emailRedirectTo: input.emailRedirectTo,
-      data: {
-        full_name: input.fullName,
-        role: "provider",
+  const { error: roleError } = await adminClient
+    .from("user_roles")
+    .upsert(
+      {
+        user_id: user.id,
+        role: defaultRole,
       },
-    },
-  };
+      { onConflict: "user_id,role" },
+    );
 
-  const { data, error } = await publicClient.auth.signUp(signUpPayload);
-
-  if (!error && data.user) {
-    return {
-      user: data.user,
-      role: null,
-      session: data.session ?? null,
-    };
+  if (roleError) {
+    throw new RouteError(500, roleError.message);
   }
 
-  const canFallbackToAdminCreate =
-    error?.message?.toLowerCase().includes("sending confirmation email") ||
-    error?.message?.toLowerCase().includes("email");
-
-  if (!canFallbackToAdminCreate) {
-    throw new RouteError(400, error?.message || "Could not create account.");
-  }
-
-  const adminClient = createSupabaseAdminClient();
-  const { data: created, error: createError } = await adminClient.auth.admin.createUser({
-    email: input.email,
-    password: input.password,
-    email_confirm: true,
-    user_metadata: {
-      full_name: input.fullName,
-      role: "provider",
-    },
-  });
-
-  if (createError || !created.user) {
-    throw new RouteError(400, createError?.message || "Could not create account.");
-  }
-
-  await ensureUserProfileAndRole(created.user, {
-    defaultRole: "provider",
-    fallbackName: input.fullName,
-  });
-
-  const { data: sessionData, error: signInError } = await publicClient.auth.signInWithPassword({
-    email: input.email,
-    password: input.password,
-  });
-
-  if (signInError || !sessionData.session) {
-    throw new RouteError(400, signInError?.message || "Could not create account session.");
-  }
-
-  return {
-    user: created.user,
-    role: null,
-    session: sessionData.session,
-  };
+  return { profileCreated };
 }
