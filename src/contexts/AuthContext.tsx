@@ -169,7 +169,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
+      // Only clear loading after the initial getSession() has resolved.
+      // If INITIAL_SESSION fires before getSession() completes and returns null,
+      // this prevents prematurely setting loading=false with user=null which
+      // would trigger a redirect-to-login loop on the pro dashboard.
+      if (initialLoadDone) {
+        setLoading(false);
+      }
       if (event === "SIGNED_IN" && initialLoadDone) {
         // Only refresh on explicit sign-in events, not on initial session restore
         setTimeout(() => refreshSubscription(), 0);

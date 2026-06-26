@@ -161,10 +161,11 @@ const buildPublicTherapistsQuery = () => {
     .eq("visibility_status", "public")
     .eq("profile_status", "approved")
     .eq("is_suspended", false)
-    .eq("is_banned", false);
-  // Note: is_demo column does not exist in production schema; skipping demo profile filter
-  return q;
-};
+    .eq("is_banned", false)
+    // Exclude internal dev/test accounts by email domain or slug pattern
+    .not("email_address", "ilike", "%@example%")
+    .not("email_address", "ilike", "%admin.dev@%")
+    .not("display_name", "ilike", "%debug%");
 
 function isActivelyAvailable(profile: PublicTherapist) {
   return profile.available_now === true &&

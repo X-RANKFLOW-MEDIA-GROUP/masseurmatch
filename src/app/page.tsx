@@ -261,8 +261,8 @@ export default async function HomePage() {
       <div className="relative min-h-screen overflow-x-hidden bg-background">
         {/* ── FIRST FOLD — live profiles + AI assistant ─────────────────── */}
         <div className="home-dark relative">
-          {/* 1. AI match hero with real Supabase profile cards */}
-          <Hero featuredTherapists={featuredTherapists} />
+          {/* 1. Editorial hero */}
+          <Hero therapists={featuredTherapists} />
 
           {/* 2. Slim popular-cities marquee */}
           <CityMarquee />
