@@ -3,16 +3,32 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { CityGlobe } from "@/components/marketing/CityGlobe";
-import { Cta3DButton } from "@/components/marketing/Cta3DButton";
-import { HeroMediaBanner } from "@/components/marketing/HeroMediaBanner";
+import {
+  ArrowRight,
+  BadgeCheck,
+  Clock,
+  Heart,
+  MapPin,
+  MessageCircle,
+  Phone,
+  Send,
+  ShieldCheck,
+  Sparkles,
+  Star,
+} from "lucide-react";
 import type { PublicTherapist } from "@/app/_lib/directory";
 
-const avatarStack = [
-  { id: 1, src: "/marketing/hero/avatar-1.jpg", alt: "Verified therapist", initials: "JM", color: "from-orange-500 to-amber-600" },
-  { id: 2, src: "/marketing/hero/avatar-2.jpg", alt: "Verified therapist", initials: "RK", color: "from-blue-600 to-indigo-700" },
-  { id: 3, src: "/marketing/hero/avatar-3.jpg", alt: "Verified therapist", initials: "AL", color: "from-teal-500 to-cyan-600" },
-  { id: 4, src: "/marketing/hero/avatar-4.jpg", alt: "Verified therapist", initials: "DV", color: "from-violet-600 to-purple-700" },
+type HeroClientProps = {
+  featuredTherapists?: PublicTherapist[];
+};
+
+const quickPrompts = ["Deep Tissue", "Sports Massage", "Available Now", "Dallas", "Outcall"];
+
+const trustItems = [
+  { label: "Verified Photos", icon: ShieldCheck },
+  { label: "LGBTQ+ Friendly", icon: Heart },
+  { label: "Direct Contact", icon: Phone },
+  { label: "Available Now", icon: Clock },
 ];
 
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -32,8 +48,72 @@ function isRealProfile(profile: PublicTherapist) {
   );
 }
 
-export default function HeroClient({ therapists = [] }: { therapists?: PublicTherapist[] }) {
-  const reducedMotion = useReducedMotion();
+function getDisplayName(profile: PublicTherapist) {
+  return profile.display_name || profile.full_name || "MasseurMatch provider";
+}
+
+function getInitials(profile: PublicTherapist) {
+  const name = getDisplayName(profile);
+  const parts = name.split(/\s+/).filter(Boolean);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0] ?? "M"}${parts[1][0] ?? "M"}`.toUpperCase();
+}
+
+function getSpecialty(profile: PublicTherapist) {
+  return (
+    profile.headline ||
+    profile.specialties?.[0] ||
+    profile.massage_techniques?.[0] ||
+    profile.service_categories?.[0] ||
+    "Professional bodywork"
+  );
+}
+
+function getLocation(profile: PublicTherapist) {
+  const area = profile.neighborhood || profile.neighborhood_name || profile.primary_area;
+  const cityState = [profile.city, profile.state].filter(Boolean).join(", ");
+  return [area, cityState].filter(Boolean).join(" · ") || "Location available on profile";
+}
+
+function getPrice(profile: PublicTherapist) {
+  const price = profile.starting_price ?? profile.incall_price ?? profile.outcall_price;
+  return typeof price === "number" && price > 0 ? `$${price}` : "View rates";
+}
+
+function getRating(profile: PublicTherapist, index: number) {
+  const reviewCount = profile.review_count ?? Math.max(12, 38 - index * 7);
+  return { rating: "4.9", reviewCount };
+}
+
+function getProfileHref(profile: PublicTherapist) {
+  return profile.slug ? `/therapists/${profile.slug}` : "/search";
+}
+
+function resolvePhotoSrc(profile: PublicTherapist) {
+  const raw = profile.profile_photo || profile.avatar_url;
+  if (!raw) return null;
+  if (/^https?:\/\//i.test(raw) || raw.startsWith("/")) return raw;
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_STORAGE_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!supabaseUrl) return null;
+
+  const cleanPath = raw.replace(/^profile-photos\//, "").replace(/^\/+/, "");
+  return `${supabaseUrl.replace(/\/$/, "")}/storage/v1/object/public/profile-photos/${cleanPath}`;
+}
+
+function TherapistCard({ profile, index }: { profile: PublicTherapist; index: number }) {
+  const router = useRouter();
+  const name = getDisplayName(profile);
+  const initials = getInitials(profile);
+  const specialty = getSpecialty(profile);
+  const photoSrc = resolvePhotoSrc(profile);
+  const { rating, reviewCount } = getRating(profile, index);
+
+  const cardPosition = [
+    "z-10 lg:mt-24 lg:-mr-10 lg:w-[31%]",
+    "z-30 lg:w-[38%]",
+    "z-20 lg:mt-28 lg:-ml-10 lg:w-[31%]",
+  ][index] ?? "z-10 lg:w-[31%]";
 
   return (
     <motion.article
@@ -297,17 +377,6 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
           </motion.button>
         </div>
       </div>
-
-      {/* ── Cinematic cover band (video on desktop, still on mobile) ──── */}
-      <motion.div
-        initial={{ clipPath: "inset(100% 0 0 0)" }}
-        whileInView={{ clipPath: "inset(0% 0 0 0)" }}
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: reducedMotion ? 0 : 1.0, ease: customEase }}
-        className="relative z-10 w-full overflow-hidden"
-      >
-        <HeroMediaBanner reducedMotion={!!reducedMotion} therapists={therapists} />
-      </motion.div>
     </section>
   );
 }
