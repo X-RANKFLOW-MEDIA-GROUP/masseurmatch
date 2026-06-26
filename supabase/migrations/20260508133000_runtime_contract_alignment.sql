@@ -607,6 +607,9 @@ end;
 $$;
 
 alter table public.therapist_photos
+  add column if not exists therapist_profile_id uuid,
+  add column if not exists is_primary boolean default false,
+  add column if not exists approval_status text default 'pending',
   add column if not exists profile_id uuid,
   add column if not exists user_id uuid,
   add column if not exists photo_type text default 'gallery',
