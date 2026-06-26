@@ -33,14 +33,22 @@ const trustItems = [
 function TherapistCard({ profile, index }: { profile: PublicTherapist; index: number }) {
   const router = useRouter();
   const displayName = profile.display_name || profile.full_name || "Therapist";
+  const profilePath = profile.slug || profile.id;
+
+  const handleNavigate = () => {
+    if (profilePath) {
+      router.push(`/therapists/${profilePath}`);
+    }
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 36, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.65, ease: customEase, delay: 0.15 + index * 0.08 }}
-      className="relative flex min-w-[250px] flex-1 flex-col rounded-[1.75rem] border border-black/5 bg-white/95 p-4 pt-36 shadow-[0_28px_70px_rgba(15,23,42,0.13)] backdrop-blur"
-      onClick={() => router.push(`/therapists/${profile.slug || profile.id}`)}
+      className="relative flex min-w-[250px] flex-1 flex-col rounded-[1.75rem] border border-black/5 bg-white/95 p-4 pt-36 shadow-[0_28px_70px_rgba(15,23,42,0.13)] backdrop-blur cursor-pointer"
+      onClick={handleNavigate}
+      data-testid="therapist-card"
     >
       {profile.profile_photo && (
         <div className="absolute inset-x-3 -top-20 flex h-56 items-end justify-center overflow-hidden rounded-[1.5rem] bg-gradient-to-b from-slate-50 via-white to-white">
@@ -58,7 +66,7 @@ function TherapistCard({ profile, index }: { profile: PublicTherapist; index: nu
       </div>
       <button
         type="button"
-        onClick={() => router.push(`/therapists/${profile.slug || profile.id}`)}
+        onClick={handleNavigate}
         className="mt-5 w-full rounded-xl bg-[#FF8A1F] px-5 py-3 text-sm font-black uppercase tracking-wide text-white shadow-lg shadow-[#FF8A1F]/20 transition hover:bg-[#E67600]"
       >
         View Profile
