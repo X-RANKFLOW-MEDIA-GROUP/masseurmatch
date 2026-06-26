@@ -66,6 +66,7 @@ alter table public.profiles
   add column if not exists whatsapp text,
   add column if not exists whatsapp_number text,
   add column if not exists email_address text,
+  add column if not exists show_email boolean not null default false,
   add column if not exists website text,
   add column if not exists booking_link text,
   add column if not exists specialties text[] default '{}',

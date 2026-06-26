@@ -2018,6 +2018,7 @@ export type Database = {
           service_radius_miles: number | null
           session_duration: number | null
           session_lengths: number[] | null
+          show_email: boolean
           slug: string | null
           social_media: Json | null
           specialties: string[] | null
@@ -2192,6 +2193,7 @@ export type Database = {
           service_radius_miles?: number | null
           session_duration?: number | null
           session_lengths?: number[] | null
+          show_email?: boolean
           slug?: string | null
           social_media?: Json | null
           specialties?: string[] | null
@@ -2366,6 +2368,7 @@ export type Database = {
           service_radius_miles?: number | null
           session_duration?: number | null
           session_lengths?: number[] | null
+          show_email?: boolean
           slug?: string | null
           social_media?: Json | null
           specialties?: string[] | null

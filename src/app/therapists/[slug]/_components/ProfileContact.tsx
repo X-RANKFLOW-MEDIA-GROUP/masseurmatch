@@ -56,7 +56,7 @@ export function ProfileContact({ profile }: Props) {
         </div>
       ) : null}
 
-      {profile.email_address ? (
+      {profile.show_email && profile.email_address ? (
         <div className="profile-panel-soft mt-3 rounded-[1.5rem] px-4 py-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             Email

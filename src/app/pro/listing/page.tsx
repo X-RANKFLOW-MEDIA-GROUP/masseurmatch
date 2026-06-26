@@ -183,6 +183,7 @@ type ProfileRecord = {
   phone?: string | null;
   whatsapp_number?: string | null;
   email_address?: string | null;
+  show_email?: boolean | null;
   website?: string | null;
   booking_url?: string | null;
   booking_platform?: string | null;
@@ -236,6 +237,7 @@ type FormState = {
   phone: string;
   whatsapp: string;
   email: string;
+  showEmail: boolean;
   website: string;
   bookingUrl: string;
   bookingPlatform: string;
@@ -289,6 +291,7 @@ const EMPTY_FORM: FormState = {
   phone: "",
   whatsapp: "",
   email: "",
+  showEmail: false,
   website: "",
   bookingUrl: "",
   bookingPlatform: "",
@@ -365,6 +368,7 @@ function mapProfileToForm(profile: ProfileRecord | null | undefined): FormState 
     phone: profile.phone || "",
     whatsapp: profile.whatsapp_number || "",
     email: profile.email_address || "",
+    showEmail: profile.show_email ?? false,
     website: profile.website || "",
     bookingUrl: profile.booking_url || "",
     bookingPlatform: profile.booking_platform || "",
@@ -441,6 +445,7 @@ function buildPayload(form: FormState) {
     phone: form.phone || null,
     whatsapp: form.whatsapp || null,
     email: form.email || null,
+    showEmail: form.showEmail,
     website: form.website || null,
     bookingUrl: form.bookingUrl || null,
     bookingPlatform: form.bookingPlatform || null,
@@ -1087,6 +1092,9 @@ export default function MyListingPage() {
             <Field>
               <FieldLabel>Email</FieldLabel>
               <input className={inputCls()} type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="you@example.com" />
+              {form.email && (
+                <Toggle checked={form.showEmail} onChange={(v) => set("showEmail", v)} label="Show email on my public profile" />
+              )}
             </Field>
             <Field>
               <FieldLabel>Website</FieldLabel>

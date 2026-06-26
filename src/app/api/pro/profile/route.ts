@@ -257,6 +257,7 @@ const fullProfileSchema = z.object({
   phone: z.string().max(40).optional().nullable(),
   whatsapp: z.string().max(40).optional().nullable(),
   email: z.string().max(160).optional().nullable(),
+  showEmail: z.boolean().optional(),
   website: z.string().max(255).optional().nullable(),
   bookingUrl: z.string().max(255).optional().nullable(),
   bookingPlatform: z.string().max(80).optional().nullable(),
@@ -330,6 +331,7 @@ export async function PATCH(request: Request) {
     if (body.phone !== undefined) updates.phone = text(body.phone);
     if (body.whatsapp !== undefined) updates.whatsapp_number = text(body.whatsapp);
     if (body.email !== undefined) updates.email_address = text(body.email);
+    if (body.showEmail !== undefined) updates.show_email = body.showEmail;
     if (body.website !== undefined) updates.website = text(body.website);
     if (body.bookingUrl !== undefined) updates.booking_url = text(body.bookingUrl);
     if (body.bookingPlatform !== undefined) updates.booking_platform = text(body.bookingPlatform);
