@@ -8,7 +8,8 @@ on conflict (id) do update set
   public = excluded.public;
 
 -- Allow authenticated providers to upload their own profile photo objects.
-create policy if not exists "Authenticated users can upload therapist photos"
+drop policy if exists "Authenticated users can upload therapist photos" on storage.objects;
+create policy "Authenticated users can upload therapist photos"
 on storage.objects
 for insert
 to authenticated
@@ -18,7 +19,8 @@ with check (
 );
 
 -- Allow authenticated users to update their own therapist photo objects.
-create policy if not exists "Authenticated users can update own therapist photos"
+drop policy if exists "Authenticated users can update own therapist photos" on storage.objects;
+create policy "Authenticated users can update own therapist photos"
 on storage.objects
 for update
 to authenticated
@@ -32,7 +34,8 @@ with check (
 );
 
 -- Public read is required because dashboard stores public_url and profile photos are publicly displayed after review.
-create policy if not exists "Public can read therapist photos"
+drop policy if exists "Public can read therapist photos" on storage.objects;
+create policy "Public can read therapist photos"
 on storage.objects
 for select
 to public

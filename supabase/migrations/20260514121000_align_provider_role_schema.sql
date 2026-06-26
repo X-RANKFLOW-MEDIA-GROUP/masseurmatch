@@ -39,6 +39,9 @@ update public.profiles
 set role = 'provider', updated_at = timezone('utc', now())
 where role = 'therapist';
 
+alter table public.user_roles
+  add column if not exists updated_at timestamptz not null default timezone('utc', now());
+
 update public.user_roles
 set role = 'provider', updated_at = now()
 where role = 'therapist';

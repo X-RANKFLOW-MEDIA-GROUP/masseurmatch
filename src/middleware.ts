@@ -191,6 +191,24 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
+  // ── 0a. Admin subdomain routing ──────────────────────────────────────────
+  // Rewrite admin.masseurmatch.com/* → /admin/* (requires domain alias in Vercel)
+  const host = request.headers.get("host") ?? "";
+  if (host === "admin.masseurmatch.com") {
+    const adminPathname = pathname === "/" ? "/admin" : pathname.startsWith("/admin") ? pathname : `/admin${pathname}`;
+    if (!session) {
+      const loginUrl = new URL("https://masseurmatch.com/login");
+      loginUrl.searchParams.set("redirect", adminPathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    if (session.role !== "admin") {
+      return NextResponse.redirect(new URL("https://masseurmatch.com/"));
+    }
+    const rewriteUrl = request.nextUrl.clone();
+    rewriteUrl.pathname = adminPathname;
+    return NextResponse.rewrite(rewriteUrl);
+  }
+
   // ── 0. Supabase auth callback guard ─────────────────────────────────────
   // Supabase sometimes sends the ?code= param to the site root URL instead of
   // /auth/callback (e.g. when the Redirect URL in the Supabase dashboard is set

@@ -19,7 +19,7 @@ import {
   SITE_DESCRIPTION,
 } from "@/app/_lib/seo";
 import { siteUrl } from "@/lib/site";
-import { getPublicTherapists } from "@/app/_lib/directory";
+import { getProfilePhotos, getPublicTherapists } from "@/app/_lib/directory";
 import { LANDING_FAQ } from "@/lib/marketing/home-data";
 
 export const revalidate = 3600;
@@ -148,8 +148,14 @@ const HOME_FAQ = [
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
+function isRealProfileId(id: string | null | undefined) {
+  return Boolean(id && !id.toLowerCase().startsWith("fallback-"));
+}
+
 export default async function HomePage() {
-  // Fetch featured therapists — graceful fallback if DB unavailable
+  // Fetch featured therapists — graceful fallback if DB unavailable.
+  // The hero itself filters out fallback/demo/test profiles so the first fold only
+  // renders approved live profiles from Supabase.
   let featuredTherapists: Awaited<ReturnType<typeof getPublicTherapists>>["items"] = [];
   try {
     const result = await getPublicTherapists({ page: 1, pageSize: 6, lgbtqAffirming: true });
@@ -158,6 +164,18 @@ export default async function HomePage() {
       const fallback = await getPublicTherapists({ page: 1, pageSize: 6 });
       featuredTherapists = fallback.items;
     }
+
+    featuredTherapists = await Promise.all(
+      featuredTherapists.map(async (therapist) => {
+        if (!isRealProfileId(therapist.id)) return therapist;
+        const photos = await getProfilePhotos(therapist.id, 1);
+        const primaryPhoto = photos.find((photo) => photo.is_primary) ?? photos[0];
+        return {
+          ...therapist,
+          profile_photo: primaryPhoto?.storage_path ?? therapist.profile_photo,
+        };
+      }),
+    );
   } catch {
     featuredTherapists = [];
   }
@@ -241,12 +259,12 @@ export default async function HomePage() {
       />
 
       <div className="relative min-h-screen overflow-x-hidden bg-background">
-        {/* ── FIRST FOLD — dark navy ─────────────────────────────────── */}
+        {/* ── FIRST FOLD — live profiles + AI assistant ─────────────────── */}
         <div className="home-dark relative">
           {/* 1. Editorial hero */}
-          <Hero />
+          <Hero therapists={featuredTherapists} />
 
-          {/* 2. Animated top-cities marquee */}
+          {/* 2. Slim popular-cities marquee */}
           <CityMarquee />
         </div>
 
