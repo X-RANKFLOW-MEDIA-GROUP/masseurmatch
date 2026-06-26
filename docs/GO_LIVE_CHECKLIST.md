@@ -2,12 +2,17 @@
 
 This checklist defines the minimum release gates required before sending MasseurMatch to production.
 
-> **Final closure pass (2026-06-26):** full repository gate (section 1) passes end to end.
+> **Final closure pass (2026-06-26 — pass 2):** full repository gate (section 1) passes end to end.
 >
-> Changes since last closure (2026-06-26):
+> Changes in this pass (2026-06-26):
+> - `scripts/test-api-routes.mjs`: delete `.next/server/pages` before spawning the Next.js dev server so stale CJS production build artifacts do not conflict with ESM dev mode. Fixes `pnpm test:api` after a `pnpm build`.
+> - `prisma/schema.prisma`: translated Portuguese comment to English (`"Prisma schema para o perfil do massagista"` → `"Massage therapist profile model (reference only)."`).
+> - `.gitignore`: added `repo-audit-report/` to the local-audit-artifact exclusion block.
+>
+> Previous closure (2026-06-26 — pass 1):
 > - CI workflow (`ci.yml`) fixed: all GitHub Actions pinned to `@v4` (were using non-existent `@v6` which caused CI failures).
 > - `actions/cache` bumped to `@v4` in the build job.
-> - No legacy artifacts, no Portuguese comments, no `profile_status: "submitted"` references detected.
+> - No legacy artifacts, no `profile_status: "submitted"` references detected.
 > - OAuth callback already redirects new profiles to `/pro/onboard`; existing users go to their requested path.
 > - Stripe checkout sends `user_id` in session metadata and subscription metadata.
 > - Stripe webhook correctly syncs `subscription_tier`, `_tier`, `photo_limit`, `visibility_level`, `stripe_customer_id`, `stripe_subscription_id`, and `current_period_end`; cancellation downgrades to free.
