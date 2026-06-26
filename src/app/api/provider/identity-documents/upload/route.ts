@@ -65,7 +65,8 @@ export async function POST(request: Request) {
       .insert({ profile_id: profile.id, url: storagePath, type: docType });
 
     if (insertError) {
-      console.warn("[identity-documents/upload] DB record failed:", insertError.message);
+      await adminClient.storage.from("identity-documents").remove([storagePath]);
+      throw new RouteError(500, "Could not save document record. Please try again.");
     }
 
     return json({ ok: true, path: storagePath });
