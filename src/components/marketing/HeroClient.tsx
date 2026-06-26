@@ -18,7 +18,7 @@ import { HeroMediaBanner } from "@/components/marketing/HeroMediaBanner";
 import type { PublicTherapist } from "@/app/_lib/directory";
 
 interface HeroClientProps {
-  featuredTherapists?: PublicTherapist[];
+  therapists?: PublicTherapist[];
 }
 
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -87,7 +87,7 @@ function TherapistCard({ profile, index }: { profile: PublicTherapist; index: nu
   const name = profile.display_name ?? profile.full_name ?? "Therapist";
   const initials = getInitials(profile);
   const specialty = profile.specialties?.[0] ?? profile.service_categories?.[0] ?? profile.modality ?? "";
-  const rating = profile.average_rating ?? profile.rating_average;
+  const rating: number | null = null;
   const reviewCount = profile.review_count ?? 0;
 
   return (
@@ -177,14 +177,14 @@ function TherapistCard({ profile, index }: { profile: PublicTherapist; index: nu
   );
 }
 
-export default function HeroClient({ featuredTherapists = [] }: HeroClientProps) {
+export default function HeroClient({ therapists = [] }: HeroClientProps) {
   const reducedMotion = useReducedMotion();
   const router = useRouter();
   const [assistantInput, setAssistantInput] = useState("");
 
   const realProfiles = useMemo(
-    () => featuredTherapists.filter(isRealProfile).slice(0, 3),
-    [featuredTherapists],
+    () => therapists.filter(isRealProfile).slice(0, 3),
+    [therapists],
   );
 
   const dur = reducedMotion ? 0 : 0.7;
