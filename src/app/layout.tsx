@@ -8,7 +8,7 @@ import { IntroVideoSplash } from "@/app/_components/IntroVideoSplash";
 import { SITE_DESCRIPTION, SITE_NAME, createPageMetadata } from "@/app/_lib/metadata";
 import { AppProviders } from "@/app/providers";
 import { SITE_URL } from "@/lib/site";
-import { SketchFilters } from "@/components/ui/sketch-filters";
+import { SketchFilter } from "@/components/icons";
 import "@/index.css";
 import "@/styles/mobile-responsive.css";
 import "@/styles/homepage-mobile-hotfix.css";
@@ -44,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={satoshi.variable}>
       <body className="theme-masseurmatch min-h-screen overflow-x-hidden font-sans text-foreground antialiased">
         <AppProviders>
-          <SketchFilters />
+          <SketchFilter />
           <IntroVideoSplash />
           <div style={{ position: "relative", zIndex: 9999 }}>
             <SiteHeader />

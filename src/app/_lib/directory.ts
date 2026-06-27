@@ -346,17 +346,22 @@ export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTher
     .maybeSingle();
 
   if (!error && profile) {
+    // Photos live in `profile_photos` (the table the live Cloudinary upload
+    // flow in /pro/photos writes to). `storage_path` holds the full image URL.
     const { data: photos } = await supabase
       .from("profile_photos")
-      .select("storage_path, is_primary")
+      .select("storage_path, url, is_primary")
       .eq("profile_id", profile.id)
       .eq("moderation_status", "approved")
       .order("sort_order", { ascending: true });
 
-    const profile_photo = photos?.find((p) => p.is_primary)?.storage_path ?? undefined;
-    const gallery_photos = photos
-      ?.filter((p) => !p.is_primary && p.storage_path)
-      .map((p) => p.storage_path as string);
+    const approved = photos ?? [];
+    const primary = approved.find((p) => p.is_primary) ?? approved[0];
+    const profile_photo = resolvePhotoUrl(primary);
+    const gallery_photos = approved
+      .filter((p) => p !== primary)
+      .map((p) => resolvePhotoUrl(p))
+      .filter((url): url is string => Boolean(url));
 
     const therapist = profile as unknown as PublicTherapist;
 
@@ -379,11 +384,18 @@ export const getImportedReviews = async (profileId: string, limit = 5) => {
   return (data || []) as unknown as ImportedReview[];
 };
 
+// Resolves the displayable image URL for a profile_photos row. The live
+// Cloudinary upload path stores the full URL in `storage_path`; `url` is a
+// legacy fallback.
+const resolvePhotoUrl = (
+  row: { storage_path?: string | null; url?: string | null } | null | undefined,
+): string | undefined => row?.storage_path || row?.url || undefined;
+
 export const getProfilePhotos = async (profileId: string, limit = 6) => {
   const fallback = (FALLBACK_PUBLIC_THERAPISTS as PublicTherapist[]).find((profile) => profile.id === profileId);
   const { data, error } = await supabase
     .from("profile_photos")
-    .select("id, storage_path, is_primary, sort_order")
+    .select("id, storage_path, url, is_primary, sort_order")
     .eq("profile_id", profileId)
     .eq("moderation_status", "approved")
     .order("sort_order", { ascending: true })
@@ -395,12 +407,12 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
   }
 
   return data
-    .filter((p): p is typeof p & { storage_path: string } => p.storage_path != null)
     .map((p) => ({
       id: p.id,
-      storage_path: p.storage_path,
+      storage_path: resolvePhotoUrl(p),
       is_primary: p.is_primary ?? false,
-    }));
+    }))
+    .filter((p): p is ProfilePhoto => Boolean(p.storage_path));
 };
 
 export const getProfilePhotosBatch = async (
@@ -410,20 +422,39 @@ export const getProfilePhotosBatch = async (
   const result = new Map<string, ProfilePhoto[]>();
   if (!profileIds.length) return result;
 
-  const { data, error } = await supabase
-    .from("profile_photos")
-    .select("id, profile_id, storage_path, is_primary, sort_order")
-    .in("profile_id", profileIds)
-    .eq("moderation_status", "approved")
-    .order("sort_order", { ascending: true });
+  // Chunk the id list before querying: Supabase encodes `.in()` arrays into
+  // the request URL, so a large directory (e.g. 200 UUIDs from /explore) can
+  // exceed URL length limits and fail the whole request. Query in batches and
+  // merge the rows.
+  const CHUNK_SIZE = 100;
+  const chunks: string[][] = [];
+  for (let i = 0; i < profileIds.length; i += CHUNK_SIZE) {
+    chunks.push(profileIds.slice(i, i + CHUNK_SIZE));
+  }
 
-  if (error || !data?.length) return result;
+  const responses = await Promise.all(
+    chunks.map((chunk) =>
+      supabase
+        .from("profile_photos")
+        .select("id, profile_id, storage_path, url, is_primary, sort_order")
+        .in("profile_id", chunk)
+        .eq("moderation_status", "approved")
+        .order("sort_order", { ascending: true }),
+    ),
+  );
 
-  for (const row of data) {
-    if (!row.profile_id || !row.storage_path) continue;
+  const data = responses.flatMap((response) => response.data ?? []);
+  if (!data.length) return result;
+
+  // Surface the primary photo first so a limit of 1 keeps the avatar.
+  const ordered = [...data].sort((a, b) => Number(b.is_primary) - Number(a.is_primary));
+
+  for (const row of ordered) {
+    const url = resolvePhotoUrl(row);
+    if (!row.profile_id || !url) continue;
     const existing = result.get(row.profile_id) ?? [];
     if (existing.length < limitPerProfile) {
-      existing.push({ id: row.id, storage_path: row.storage_path, is_primary: row.is_primary ?? false });
+      existing.push({ id: row.id, storage_path: url, is_primary: row.is_primary ?? false });
       result.set(row.profile_id, existing);
     }
   }
