@@ -7,7 +7,7 @@ const STEPS = [
     n: "01",
     icon: Search,
     title: "Search your city",
-    body: "Enter any US city — or browse 250+ markets. Filter by technique, price, incall / outcall, and LGBTQ+ affirmation.",
+    body: "Enter any US city — or browse cities nationwide. Filter by technique, price, incall / outcall, and LGBTQ+ affirmation.",
   },
   {
     n: "02",

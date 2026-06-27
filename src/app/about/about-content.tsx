@@ -74,9 +74,9 @@ export default function AboutContent() {
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.18 }}
           className="relative mx-auto mt-16 grid max-w-3xl grid-cols-3 gap-8 border-t border-white/[0.08] pt-12"
         >
-          <Stat value="250+" label="US cities covered" />
-          <Stat value="48+" label="States with listings" />
-          <Stat value="6+" label="Massage specialties" />
+          <Stat value="Nationwide" label="City pages across the US" />
+          <Stat value="Specialized" label="Deep tissue, Swedish & more" />
+          <Stat value="Reviewed" label="Profiles before they go live" />
         </motion.div>
       </section>
 
@@ -139,7 +139,7 @@ export default function AboutContent() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {[
               { icon: Users, label: "Independent therapists", text: "Profiles owned by the professional — not a platform." },
-              { icon: Globe, label: "250+ US cities", text: "National reach from Dallas to New York to LA and beyond." },
+              { icon: Globe, label: "Nationwide cities", text: "National reach from Dallas to New York to LA and beyond." },
               { icon: BadgeCheck, label: "Identity verified", text: "Each profile reviewed and approved before going live." },
               { icon: ShieldCheck, label: "LGBTQ+ affirming", text: "Inclusive by design — every profile clearly marked." },
             ].map(({ icon: Icon, label, text }) => (

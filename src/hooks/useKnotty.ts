@@ -8,6 +8,7 @@ import {
   getOrCreateKnottySessionId,
   sendKnottyEvent,
 } from "@/lib/knotty/client";
+import { KNOTTY_GREETING, KNOTTY_GREETING_ID } from "@/lib/knotty/intro";
 import type {
   KnottyMessage,
   KnottyQuickAction,
@@ -20,6 +21,15 @@ type ConversationMessage = {
   role: "user" | "assistant";
   content: string;
   response?: KnottyResponsePayload;
+  /** Seeded client-side (e.g. the opening greeting) — not part of LLM history. */
+  seeded?: boolean;
+};
+
+const GREETING_MESSAGE: ConversationMessage = {
+  id: KNOTTY_GREETING_ID,
+  role: "assistant",
+  content: KNOTTY_GREETING,
+  seeded: true,
 };
 
 type SendMessageOptions = {
@@ -35,13 +45,14 @@ function nextMessageId() {
 
 export function useKnotty() {
   const sessionIdRef = useRef(getOrCreateKnottySessionId());
-  const [messages, setMessages] = useState<ConversationMessage[]>([]);
+  const [messages, setMessages] = useState<ConversationMessage[]>([GREETING_MESSAGE]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
   const conversationHistory = useMemo<KnottyMessage[]>(
     () =>
       messages
+        .filter((message) => !message.seeded)
         .slice(-8)
         .map((message) => ({
           role: message.role,

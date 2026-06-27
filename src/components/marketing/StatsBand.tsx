@@ -1,7 +1,6 @@
 "use client";
 
-import { Diamond, CheckCircle, UserCheck, Smile, TrendingUp, Users, Award, LayoutGrid } from "lucide-react";
-import Counter from "@/components/motion/Counter";
+import { Diamond, CheckCircle, UserCheck, Smile, MapPin, Layers, ShieldCheck, Wallet } from "lucide-react";
 import FadeUp from "@/components/motion/FadeUp";
 
 const FEATURES = [
@@ -11,11 +10,12 @@ const FEATURES = [
   { icon: Smile, label: "Direct contact" },
 ] as const;
 
+// Honest, non-numeric value statements — no fabricated counts pre-launch.
 const STATS = [
-  { icon: TrendingUp, value: 250, suffix: "+", label: "US cities ready to search" },
-  { icon: Users, value: 48, suffix: "", label: "States in our coverage" },
-  { icon: Award, value: 6, suffix: "", label: "Massage specialties" },
-  { icon: LayoutGrid, value: 10, suffix: "+", label: "Verified therapists & growing" },
+  { icon: MapPin, headline: "Nationwide", label: "City pages across the US" },
+  { icon: Layers, headline: "Specialized", label: "Deep tissue, Swedish, sports & more" },
+  { icon: ShieldCheck, headline: "Reviewed", label: "Every profile before it goes live" },
+  { icon: Wallet, headline: "Transparent", label: "Direct contact, no booking fees" },
 ] as const;
 
 export function StatsBand() {
@@ -37,15 +37,15 @@ export function StatsBand() {
             ))}
           </div>
 
-          {/* Row 2: Stats */}
+          {/* Row 2: Honest value statements (non-numeric) */}
           <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
-            {STATS.map(({ icon: Icon, value, suffix, label }) => (
-              <div key={label} className="flex flex-col items-center text-center">
+            {STATS.map(({ icon: Icon, headline, label }) => (
+              <div key={headline} className="flex flex-col items-center text-center">
                 <div className="w-12 h-12 rounded-full border border-[#E2E4E6] flex items-center justify-center mb-3">
                   <Icon className="w-5 h-5 text-[#1A1A1A]" strokeWidth={2.25} />
                 </div>
                 <div className="font-display font-extrabold text-[clamp(1.5rem,3vw,2.5rem)] leading-none tracking-tight text-[#1A1A1A] mb-1">
-                  <Counter to={value} suffix={suffix} />
+                  {headline}
                 </div>
                 <p className="text-sm text-[#666666]">
                   {label}
