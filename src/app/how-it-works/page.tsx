@@ -33,7 +33,7 @@ const howItWorksSchema = {
       "@type": "HowToStep",
       position: 1,
       name: "Search Your City",
-      text: "Enter your city or browse top markets — Dallas, Miami, New York, LA, Chicago and 250+ more. Filter by massage modality, incall or outcall, and price range.",
+      text: "Enter your city or browse top markets — Dallas, Miami, New York, LA, Chicago and many more. Filter by massage modality, incall or outcall, and price range.",
       url: siteUrl("/search"),
     },
     {
@@ -92,7 +92,7 @@ const clientSteps = [
     icon: Users,
     title: "Search your city",
     body: "Enter any US city — or browse the top markets. Filter by technique, incall/outcall, price range, and LGBTQ+ affirmation.",
-    badge: "250+ cities",
+    badge: "US cities",
   },
   {
     n: "02",
