@@ -51,15 +51,10 @@ export default function TherapistsPageClient({
         try {
           const { latitude, longitude } = position.coords;
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
-            { headers: { "Accept-Language": "en-US,en" } }
+            `/api/reverse-geocode?lat=${latitude}&lng=${longitude}`,
           );
-          const data = (await res.json()) as { address?: { city?: string; town?: string; municipality?: string } };
-          const detected =
-            data.address?.city ||
-            data.address?.town ||
-            data.address?.municipality ||
-            "";
+          const data = (await res.json()) as { city?: string };
+          const detected = data.city || "";
           if (detected) {
             setDetectedCity(detected);
             setCity(detected);
