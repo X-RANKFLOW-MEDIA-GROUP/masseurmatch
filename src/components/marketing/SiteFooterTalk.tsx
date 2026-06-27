@@ -134,10 +134,10 @@ export function SiteFooterTalk() {
 
         {/* Bottom bar */}
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/[0.06] pt-8 md:flex-row">
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-400">
             &copy; {currentYear} MasseurMatch. All rights reserved.
           </p>
-          <div className="flex items-center gap-6 font-mono text-[10px] uppercase tracking-widest text-slate-500">
+          <div className="flex items-center gap-6 font-mono text-[10px] uppercase tracking-widest text-slate-400">
             <Link href="/cookie-policy" className="transition-colors hover:text-white">Cookies</Link>
             <Link href="/accessibility" className="transition-colors hover:text-white">Accessibility</Link>
             <span className="flex items-center gap-1">

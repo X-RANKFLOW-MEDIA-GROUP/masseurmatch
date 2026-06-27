@@ -1496,7 +1496,7 @@ export default function ExplorePageClient({
                 value={filters.sort}
                 onValueChange={(value) => handleSortChange(value as ExploreFilters["sort"])}
               >
-                <SelectTrigger className="h-12 rounded-full border-border-subtle bg-white/90 px-4">
+                <SelectTrigger className="h-12 rounded-full border-border-subtle bg-white/90 px-4" aria-label="Sort by">
                   <SelectValue placeholder="Sort" />
                 </SelectTrigger>
                 <SelectContent>

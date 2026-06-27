@@ -136,16 +136,16 @@ export function VoxProfile({
           {/* Breadcrumb */}
           <nav
             aria-label="Breadcrumb"
-            className="mb-8 flex flex-wrap items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/40"
+            className="mb-8 flex flex-wrap items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/60"
           >
             <Link href={`/${profile.citySlug}`} className="transition-colors hover:text-white/70">
               {profile.city}
             </Link>
-            <ChevronRight className="h-3 w-3 text-white/20" strokeWidth={2} />
+            <ChevronRight className="h-3 w-3 text-white/50" strokeWidth={2} />
             <Link href="/therapists" className="transition-colors hover:text-white/70">
               Therapists
             </Link>
-            <ChevronRight className="h-3 w-3 text-white/20" strokeWidth={2} />
+            <ChevronRight className="h-3 w-3 text-white/50" strokeWidth={2} />
             <span className="text-white/60">{firstName}</span>
           </nav>
 
@@ -218,10 +218,10 @@ export function VoxProfile({
                     key={stat.label}
                     className="rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-3.5 backdrop-blur-sm"
                   >
-                    <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40">{stat.label}</p>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/60">{stat.label}</p>
                     <p className="mt-1.5 text-lg font-bold text-white">
                       {stat.value}
-                      {stat.suffix && <span className="ml-1 text-xs font-medium text-white/45">{stat.suffix}</span>}
+                      {stat.suffix && <span className="ml-1 text-xs font-medium text-white/55">{stat.suffix}</span>}
                     </p>
                   </div>
                 ))}
@@ -280,7 +280,7 @@ export function VoxProfile({
                     <a
                       key={item.href}
                       href={item.href}
-                      className="inline-flex items-center gap-1 rounded-full border border-white/[0.1] bg-white/[0.04] px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-white/50 transition-colors hover:border-[#8B1E2D]/40 hover:text-white/80"
+                      className="inline-flex items-center gap-1 rounded-full border border-white/[0.1] bg-white/[0.04] px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-white/60 transition-colors hover:border-[#8B1E2D]/40 hover:text-white/80"
                     >
                       {item.label}
                     </a>
@@ -580,7 +580,7 @@ export function VoxProfile({
           }}
         />
         <div className="relative mx-auto flex max-w-4xl flex-col items-center gap-6 rounded-2xl border border-white/[0.06] bg-gradient-to-br from-[#0a1628] to-[#060E1A] px-6 py-14 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/40">Ready when you are</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/60">Ready when you are</p>
           <h2 className="font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
             Book your tailored session with {firstName}.
           </h2>

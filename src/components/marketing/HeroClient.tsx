@@ -187,7 +187,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                 </div>
                 <div>
                   <p className="font-display text-base font-black text-[#151515]">AI Match Assistant</p>
-                  <p className="text-xs font-semibold text-[#7B8190]">Ask Knotty AI</p>
+                  <p className="text-xs font-semibold text-[#656B78]">Ask Knotty AI</p>
                 </div>
               </div>
               <Sparkles size={20} className="text-[#8B1E2D]" />
@@ -196,7 +196,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             <div className="space-y-4 px-5 py-5">
               <div className="ml-auto max-w-[78%] rounded-2xl rounded-tr-md bg-slate-100 px-4 py-3 text-sm font-medium leading-6 text-[#2B3038]">
                 I need a deep tissue masseur in Dallas tonight.
-                <span className="mt-1 block text-right text-[11px] text-[#98A2B3]">10:24 AM</span>
+                <span className="mt-1 block text-right text-[11px] text-[#64748B]">10:24 AM</span>
               </div>
               <div className="flex max-w-[86%] items-start gap-3">
                 <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#8B1E2D]/10 text-[#8B1E2D]">
@@ -204,7 +204,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                 </div>
                 <div className="rounded-2xl rounded-tl-md bg-[#F7F7F8] px-4 py-3 text-sm font-medium leading-6 text-[#2B3038]">
                   I can help with that. Do you prefer in-call or outcall, and what area of Dallas works best for you?
-                  <span className="mt-1 block text-[11px] text-[#98A2B3]">10:24 AM</span>
+                  <span className="mt-1 block text-[11px] text-[#64748B]">10:24 AM</span>
                 </div>
               </div>
 
@@ -230,7 +230,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                   }}
                   placeholder="Describe what you need..."
                   aria-label="Ask Knotty AI what massage provider you need"
-                  className="min-w-0 flex-1 bg-transparent px-3 text-sm text-[#151515] outline-none placeholder:text-[#98A2B3]"
+                  className="min-w-0 flex-1 bg-transparent px-3 text-sm text-[#151515] outline-none placeholder:text-[#64748B]"
                 />
                 <button
                   type="button"

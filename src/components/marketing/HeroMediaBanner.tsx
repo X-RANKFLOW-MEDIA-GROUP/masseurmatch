@@ -75,7 +75,7 @@ function ProfilesBand({ therapists }: { therapists: PublicTherapist[] }) {
     <div className="w-full bg-[#060E1A]">
       <div className="h-px w-full bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
       <div className="px-4 pb-10 pt-8 sm:px-6 lg:px-8 lg:pb-14 lg:pt-10">
-        <p className="mb-6 text-center font-mono text-[10px] uppercase tracking-[0.18em] text-white/40">
+        <p className="mb-6 text-center font-mono text-[10px] uppercase tracking-[0.18em] text-white/60">
           Featured therapists
         </p>
 
