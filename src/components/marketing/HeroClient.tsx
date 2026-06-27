@@ -115,7 +115,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
   };
 
   return (
-    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_24%_18%,rgba(204,36,36,0.08),transparent_28%),linear-gradient(180deg,#ffffff_0%,#fbfaf8_100%)] text-[#151515]">
+    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_24%_18%,rgba(255,138,31,0.08),transparent_28%),linear-gradient(180deg,#ffffff_0%,#fbfaf8_100%)] text-[#151515]">
       <div className="mx-auto grid min-h-[680px] max-w-[1500px] items-center gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1.03fr_0.97fr] lg:px-10 lg:py-16">
         <div className="relative order-2 lg:order-1">
           <div className="pointer-events-none absolute -left-10 top-12 h-72 w-72 rounded-full bg-[#FF8A1F]/8 blur-3xl" />

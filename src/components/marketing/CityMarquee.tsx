@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { MapPin, ArrowRight } from "lucide-react";
 
 const TOP_CITIES = [
   { name: "New York", slug: "new-york" },
@@ -33,9 +33,10 @@ export function CityMarquee() {
         ))}
         <Link
           href="/cities"
-          className="ml-1 rounded-full border border-[#FF8A1F]/30 bg-[#FF8A1F]/[0.06] px-3 py-1 text-[11px] font-semibold text-[#FF8A1F] transition hover:bg-[#FF8A1F]/[0.12]"
+          className="ml-1 inline-flex items-center gap-1 rounded-full border border-[#FF8A1F]/30 bg-[#FF8A1F]/[0.06] px-3 py-1 text-[11px] font-semibold text-[#FF8A1F] transition hover:bg-[#FF8A1F]/[0.12]"
         >
-          All cities →
+          All cities
+          <ArrowRight size={11} strokeWidth={2.5} />
         </Link>
       </div>
     </div>
