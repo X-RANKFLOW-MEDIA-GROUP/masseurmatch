@@ -353,7 +353,7 @@ export default function SiteHeader() {
               onClick={handleLogout}
               whileHover={shouldReduceMotion ? undefined : { scale: 1.05 }}
               whileTap={shouldReduceMotion ? undefined : { scale: 0.95 }}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#666666] hover:text-[#8B1E2D] hover:bg-orange-50 transition-colors"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#666666] hover:text-[#8B1E2D] hover:bg-red-50 transition-colors"
             >
               <LogOut className="w-[0.9rem] h-[0.9rem]" strokeWidth={2.35} />
               Log out

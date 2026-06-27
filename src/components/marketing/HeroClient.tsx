@@ -67,7 +67,7 @@ function TherapistCard({ profile, index }: { profile: PublicTherapist; index: nu
       <button
         type="button"
         onClick={handleNavigate}
-        className="mt-5 w-full rounded-xl bg-[#FF8A1F] px-5 py-3 text-sm font-black uppercase tracking-wide text-white shadow-lg shadow-[#FF8A1F]/20 transition hover:bg-[#E67600]"
+        className="mt-5 w-full rounded-xl bg-[#8B1E2D] px-5 py-3 text-sm font-black uppercase tracking-wide text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
       >
         View Profile
       </button>

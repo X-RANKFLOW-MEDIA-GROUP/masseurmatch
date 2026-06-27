@@ -255,7 +255,7 @@ export default function VerificationPage() {
                 <li
                   key={c.label}
                   style={{
-                    background: "#FFF7ED",
+                    background: "#F8EDEE",
                     border: "1px solid rgba(249,115,22,0.2)",
                     borderRadius: 12,
                     padding: "14px 18px",

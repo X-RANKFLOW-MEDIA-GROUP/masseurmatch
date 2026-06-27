@@ -69,7 +69,7 @@ export default function CompareHubPage() {
 
       <div className="bg-[#fbfaf7] text-text-primary">
         <section className="relative isolate overflow-hidden bg-brand-primary text-white">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,179,71,0.18),transparent_26%),radial-gradient(circle_at_78%_18%,rgba(47,111,228,0.18),transparent_30%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(165, 37, 56,0.18),transparent_26%),radial-gradient(circle_at_78%_18%,rgba(47,111,228,0.18),transparent_30%)]" />
           <div className="page-shell relative py-14 sm:py-18">
             <div className="max-w-4xl">
               <Badge variant="premium" className="border-0 px-4 py-2 text-[11px] tracking-[0.22em]">

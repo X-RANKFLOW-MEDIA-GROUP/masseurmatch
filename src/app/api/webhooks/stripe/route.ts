@@ -191,12 +191,15 @@ export async function POST(request: NextRequest) {
         break
     }
   } catch (error) {
+    // Hoisted out of the .update({}) literal: a ternary colon inside the
+    // object value confuses validate:db-contract into reading a phantom
+    // `message` column on stripe_events.
     const processingError = error instanceof Error ? error.message : 'Unknown Stripe webhook processing error'
     await supabase
       .from('stripe_events')
       .update({
         processing_error: processingError,
-        failed_at:        new Date().toISOString(),
+        failed_at: new Date().toISOString(),
       })
       .eq('stripe_event_id', event.id)
 

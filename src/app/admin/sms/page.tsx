@@ -283,7 +283,7 @@ function ConversationsTab({ twilioReady, twilioLoading }: { twilioReady: boolean
                       ? 'bg-white/[0.08] text-slate-200'
                       : msg.is_manual
                       ? 'bg-sky-500/20 text-sky-200'
-                      : 'bg-[#8B1E2D]/20 text-orange-100'
+                      : 'bg-[#8B1E2D]/20 text-red-100'
                   }`}>
                     <p className="text-sm leading-relaxed">{msg.body}</p>
                     <p className="mt-1 text-[10px] opacity-50">

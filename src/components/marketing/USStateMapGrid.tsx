@@ -186,7 +186,7 @@ export function USStateMapGrid() {
                     isSelected
                       ? "bg-[#8B1E2D] border-[#8B1E2D] text-white shadow-lg"
                       : isActive
-                        ? "bg-white border-border text-foreground hover:border-[#8B1E2D]/50 hover:bg-orange-50/50"
+                        ? "bg-white border-border text-foreground hover:border-[#8B1E2D]/50 hover:bg-red-50/50"
                         : "bg-muted/40 border-border/50 text-muted-foreground/60 cursor-default",
                   ].join(" ")}
                 >
@@ -265,7 +265,7 @@ export function USStateMapGrid() {
                     >
                       <Link
                         href={`/${city.slug}`}
-                        className="group flex items-center gap-1 rounded-lg border border-transparent px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-[#8B1E2D]/25 hover:bg-orange-50/60 hover:text-[#8B1E2D]"
+                        className="group flex items-center gap-1 rounded-lg border border-transparent px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-[#8B1E2D]/25 hover:bg-red-50/60 hover:text-[#8B1E2D]"
                       >
                         <ChevronRight
                           className="h-3 w-3 shrink-0 text-[#8B1E2D]/0 transition group-hover:text-[#8B1E2D]/80"

@@ -282,7 +282,7 @@ export const KnottyChat = ({
 
       <div className="relative flex items-center justify-between border-b border-white/[0.06] bg-white/[0.02] px-5 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#FF8A1F]/20 bg-[#FF8A1F]/10 text-[#FF8A1F]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#8B1E2D]/20 bg-[#8B1E2D]/10 text-[#8B1E2D]">
             <MessageCircle className="h-4 w-4" strokeWidth={2.25} />
           </div>
           <div>
