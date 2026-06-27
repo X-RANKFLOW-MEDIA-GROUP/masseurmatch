@@ -48,19 +48,19 @@ function CityLink({
         href={`/${city.slug}`}
         className={`group relative flex items-center justify-between overflow-hidden rounded-xl border px-5 py-4 transition-all duration-300 ${
           city.featured
-            ? "border-[#E2E4E6] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:border-[#FF8A1F]/40 hover:shadow-[0_8px_30px_rgba(204,36,36,0.08)]"
-            : "border-[#E2E4E6]/60 bg-[#FAFAFA] hover:border-[#FF8A1F]/30 hover:bg-white hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)]"
+            ? "border-[#E2E4E6] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:border-[#8B1E2D]/40 hover:shadow-[0_8px_30px_rgba(204,36,36,0.08)]"
+            : "border-[#E2E4E6]/60 bg-[#FAFAFA] hover:border-[#8B1E2D]/30 hover:bg-white hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)]"
         }`}
       >
         {/* Red accent bar on hover */}
-        <div className="absolute inset-y-0 left-0 w-0.5 bg-[#FF8A1F] opacity-0 transition-all duration-300 group-hover:opacity-100" />
+        <div className="absolute inset-y-0 left-0 w-0.5 bg-[#8B1E2D] opacity-0 transition-all duration-300 group-hover:opacity-100" />
 
         <div className="flex items-center gap-3">
           <div
             className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-300 ${
               city.featured
-                ? "bg-[#FF8A1F]/8 group-hover:bg-[#FF8A1F]/12"
-                : "bg-[#F4F5F6] group-hover:bg-[#FF8A1F]/8"
+                ? "bg-[#8B1E2D]/8 group-hover:bg-[#8B1E2D]/12"
+                : "bg-[#F4F5F6] group-hover:bg-[#8B1E2D]/8"
             }`}
           >
             <MapPin
@@ -68,8 +68,8 @@ function CityLink({
               strokeWidth={2.25}
               className={`transition-colors duration-300 ${
                 city.featured
-                  ? "text-[#FF8A1F]"
-                  : "text-[#999999] group-hover:text-[#FF8A1F]"
+                  ? "text-[#8B1E2D]"
+                  : "text-[#999999] group-hover:text-[#8B1E2D]"
               }`}
             />
           </div>
@@ -86,7 +86,7 @@ function CityLink({
         <ArrowUpRight
           size={16}
           strokeWidth={2.25}
-          className="text-[#CCCCCC] transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#FF8A1F]"
+          className="text-[#CCCCCC] transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#8B1E2D]"
         />
       </Link>
     </motion.div>
@@ -107,7 +107,7 @@ export function CityCaseStudies() {
             viewport={{ once: true }}
             transition={{ duration: reduced ? 0 : 0.6, ease }}
           >
-            <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.3em] text-[#FF8A1F]">
+            <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.3em] text-[#8B1E2D]">
               BROWSE BY CITY
             </p>
             <h2
@@ -130,7 +130,7 @@ export function CityCaseStudies() {
           >
             <Link
               href="/cities"
-              className="inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold uppercase tracking-widest text-[#FF8A1F] transition-opacity hover:opacity-70"
+              className="inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold uppercase tracking-widest text-[#8B1E2D] transition-opacity hover:opacity-70"
             >
               ALL CITIES
               <ArrowUpRight size={14} strokeWidth={2.5} />

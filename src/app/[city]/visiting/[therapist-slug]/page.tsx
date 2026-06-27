@@ -111,7 +111,7 @@ export default async function TourPage({
               fontSize: 11,
               letterSpacing: "0.18em",
               textTransform: "uppercase",
-              color: "#FF8A1F",
+              color: "#8B1E2D",
               marginBottom: 20,
             }}
           >
@@ -166,7 +166,7 @@ export default async function TourPage({
                 }}
               >
                 <CalendarDays
-                  style={{ width: 16, height: 16, color: "#FF8A1F", flexShrink: 0 }}
+                  style={{ width: 16, height: 16, color: "#8B1E2D", flexShrink: 0 }}
                   strokeWidth={2}
                 />
                 <span style={{ fontSize: 15, color: "#1A1A1A" }}>

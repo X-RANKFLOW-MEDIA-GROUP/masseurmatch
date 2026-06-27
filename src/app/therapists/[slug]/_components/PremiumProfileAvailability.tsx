@@ -89,7 +89,7 @@ export function PremiumProfileAvailability({ profile }: Props) {
 function SlotBadge({ type, children }: { type: "open" | "limited" | "off"; children: React.ReactNode }) {
   const styles = {
     open: "bg-[var(--green-dim)] text-[var(--green)] border-[rgba(46,204,138,0.2)]",
-    limited: "bg-[var(--orange-dim)] text-[var(--orange)] border-[rgba(255,138,31,0.2)]",
+    limited: "bg-[var(--orange-dim)] text-[var(--orange)] border-[rgba(139, 30, 45,0.2)]",
     off: "text-[var(--text-muted)]",
   };
 

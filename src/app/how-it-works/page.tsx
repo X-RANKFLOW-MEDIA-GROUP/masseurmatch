@@ -183,16 +183,16 @@ export default function HowItWorksPage() {
               backgroundSize: "30px 30px",
             }}
           />
-          <div aria-hidden="true" className="pointer-events-none absolute -right-32 top-0 h-96 w-96 rounded-full bg-[#FF8A1F]/[0.07] blur-3xl" />
+          <div aria-hidden="true" className="pointer-events-none absolute -right-32 top-0 h-96 w-96 rounded-full bg-[#8B1E2D]/[0.07] blur-3xl" />
 
           <div className="relative mx-auto max-w-[1200px] px-4 pb-20 pt-28 sm:px-6 lg:px-8 lg:pb-24 lg:pt-32">
-            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#FF8A1F]">
+            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">
               How It Works
             </p>
             <h1 className="mt-4 font-display text-[clamp(2.5rem,6vw,5rem)] font-extrabold leading-[0.96] tracking-tight text-white">
               Finding your therapist
               <br />
-              <span className="text-[#FF8A1F]">takes minutes.</span>
+              <span className="text-[#8B1E2D]">takes minutes.</span>
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-white/55 lg:text-lg">
               MasseurMatch is a discovery directory — we connect you with verified,
@@ -201,7 +201,7 @@ export default function HowItWorksPage() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/search"
-                className="inline-flex items-center gap-2 rounded-full bg-[#FF8A1F] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-[#FF8A1F]/20 transition hover:bg-[#e67600]"
+                className="inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#e67600]"
               >
                 Search therapists
                 <ArrowRight size={16} strokeWidth={2.5} />
@@ -217,7 +217,7 @@ export default function HowItWorksPage() {
         </section>
 
         {/* ── Model explainer bar ──────────────────────────────────────────── */}
-        <div className="bg-[#FF8A1F] px-4 py-4 text-center">
+        <div className="bg-[#8B1E2D] px-4 py-4 text-center">
           <p className="mx-auto max-w-2xl text-sm font-semibold leading-6 text-white">
             <strong className="font-extrabold">MasseurMatch is a directory service.</strong>{" "}
             We connect you with therapists and facilitate direct contact.
@@ -228,7 +228,7 @@ export default function HowItWorksPage() {
         {/* ── Client steps ─────────────────────────────────────────────────── */}
         <section className="px-4 py-20 sm:px-6 lg:py-28">
           <div className="mx-auto max-w-[1100px]">
-            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#FF8A1F]">For clients</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">For clients</p>
             <h2 className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold leading-tight tracking-tight text-[#1A1A1A]">
               Connect directly in four steps.
             </h2>
@@ -237,14 +237,14 @@ export default function HowItWorksPage() {
               {clientSteps.map(({ n, icon: Icon, title, body, badge }) => (
                 <div key={n} className="flex flex-col bg-white p-8">
                   <div className="mb-5 flex items-center justify-between">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FF8A1F]/10">
-                      <Icon size={20} className="text-[#FF8A1F]" strokeWidth={2.25} />
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#8B1E2D]/10">
+                      <Icon size={20} className="text-[#8B1E2D]" strokeWidth={2.25} />
                     </div>
                     <span className="font-display text-4xl font-extrabold text-[#F0F0F0]">{n}</span>
                   </div>
                   <h3 className="font-display text-lg font-bold text-[#1A1A1A]">{title}</h3>
                   <p className="mt-2 flex-1 text-sm leading-6 text-[#666666]">{body}</p>
-                  <span className="mt-5 inline-block rounded-full bg-[#FF8A1F]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#FF8A1F]">
+                  <span className="mt-5 inline-block rounded-full bg-[#8B1E2D]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#8B1E2D]">
                     {badge}
                   </span>
                 </div>
@@ -256,7 +256,7 @@ export default function HowItWorksPage() {
         {/* ── Comparison table ─────────────────────────────────────────────── */}
         <section className="bg-[#060E1A] px-4 py-20 sm:px-6 lg:py-28">
           <div className="mx-auto max-w-[1000px]">
-            <p className="text-center font-mono text-[10px] uppercase tracking-[0.28em] text-[#FF8A1F]">
+            <p className="text-center font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">
               The difference
             </p>
             <h2 className="mt-3 text-center font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold tracking-tight text-white">
@@ -266,7 +266,7 @@ export default function HowItWorksPage() {
             <div className="mt-12 grid grid-cols-1 gap-px bg-white/[0.06] sm:grid-cols-2">
               {/* MasseurMatch */}
               <div className="flex flex-col bg-[#0E1C2E] p-8">
-                <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#FF8A1F]">MasseurMatch</p>
+                <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#8B1E2D]">MasseurMatch</p>
                 <div className="mt-6 space-y-0 divide-y divide-white/[0.06]">
                   {comparison.us.map((item) => (
                     <div key={item} className="flex items-center gap-3 py-3">
@@ -303,7 +303,7 @@ export default function HowItWorksPage() {
         {/* ── For therapists ───────────────────────────────────────────────── */}
         <section id="for-therapists" className="scroll-mt-20 px-4 py-20 sm:px-6 lg:py-28">
           <div className="mx-auto max-w-[1100px]">
-            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#FF8A1F]">For therapists</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">For therapists</p>
             <h2 className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold leading-tight tracking-tight text-[#1A1A1A]">
               Get your practice listed.
             </h2>
@@ -323,7 +323,7 @@ export default function HowItWorksPage() {
             <div className="mt-8">
               <Link
                 href="/for-therapists"
-                className="inline-flex items-center gap-2 text-sm font-bold text-[#FF8A1F] transition hover:opacity-75"
+                className="inline-flex items-center gap-2 text-sm font-bold text-[#8B1E2D] transition hover:opacity-75"
               >
                 Full therapist guide
                 <ArrowUpRight size={15} strokeWidth={2.5} />
@@ -348,7 +348,7 @@ export default function HowItWorksPage() {
             </dl>
             <p className="mt-8 text-sm text-[#999999]">
               More questions?{" "}
-              <Link href="/contact" className="font-semibold text-[#FF8A1F] hover:underline">
+              <Link href="/contact" className="font-semibold text-[#8B1E2D] hover:underline">
                 Contact us
               </Link>
             </p>
@@ -358,7 +358,7 @@ export default function HowItWorksPage() {
         {/* ── CTA ─────────────────────────────────────────────────────────── */}
         <section className="relative overflow-hidden bg-[#060E1A] px-4 py-20 text-center sm:px-6">
           <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-            <div className="absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 rounded-full bg-[#FF8A1F]/[0.08] blur-3xl" />
+            <div className="absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 rounded-full bg-[#8B1E2D]/[0.08] blur-3xl" />
           </div>
           <div className="relative mx-auto max-w-xl">
             <h2 className="font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold tracking-tight text-white">
@@ -369,7 +369,7 @@ export default function HowItWorksPage() {
             </p>
             <Link
               href="/search"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#FF8A1F] px-8 py-4 text-sm font-bold uppercase tracking-wide text-white shadow-xl shadow-[#FF8A1F]/20 transition hover:bg-[#e67600]"
+              className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-8 py-4 text-sm font-bold uppercase tracking-wide text-white shadow-xl shadow-[#8B1E2D]/20 transition hover:bg-[#e67600]"
             >
               Search therapists now
               <ArrowRight size={16} strokeWidth={2.5} />

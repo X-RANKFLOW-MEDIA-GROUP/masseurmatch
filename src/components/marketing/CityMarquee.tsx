@@ -19,7 +19,7 @@ export function CityMarquee() {
     <div className="border-t border-white/[0.06] bg-[#060E1A] px-4 py-4 sm:px-8">
       <div className="mx-auto flex max-w-[1500px] flex-wrap items-center gap-x-1 gap-y-1">
         <span className="flex items-center gap-1.5 pr-3 font-mono text-[9px] uppercase tracking-[0.2em] text-white/35 sm:text-[10px]">
-          <MapPin size={10} className="text-[#FF8A1F]" />
+          <MapPin size={10} className="text-[#8B1E2D]" />
           Browse by city
         </span>
         {TOP_CITIES.map((city, i) => (
@@ -33,7 +33,7 @@ export function CityMarquee() {
         ))}
         <Link
           href="/cities"
-          className="ml-1 rounded-full border border-[#FF8A1F]/30 bg-[#FF8A1F]/[0.06] px-3 py-1 text-[11px] font-semibold text-[#FF8A1F] transition hover:bg-[#FF8A1F]/[0.12]"
+          className="ml-1 rounded-full border border-[#8B1E2D]/30 bg-[#8B1E2D]/[0.06] px-3 py-1 text-[11px] font-semibold text-[#8B1E2D] transition hover:bg-[#8B1E2D]/[0.12]"
         >
           All cities →
         </Link>

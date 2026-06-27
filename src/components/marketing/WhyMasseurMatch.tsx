@@ -31,7 +31,7 @@ export function WhyMasseurMatch() {
 
         <FadeUp>
           <div className="text-center">
-            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#FF8A1F]">
+            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">
               Why MasseurMatch
             </p>
             <h2 className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold tracking-tight text-white">
@@ -49,7 +49,7 @@ export function WhyMasseurMatch() {
 
             {/* MasseurMatch column */}
             <div className="bg-[#0B1829] p-8 lg:p-10">
-              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-[#FF8A1F]">
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-[#8B1E2D]">
                 MasseurMatch
               </p>
               <p className="mt-1 text-xs text-white/35">Premium verified directory</p>
@@ -92,7 +92,7 @@ export function WhyMasseurMatch() {
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link
               href="/search"
-              className="inline-flex items-center gap-2 rounded-full bg-[#FF8A1F] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#FF8A1F]/20 transition hover:bg-[#e67600]"
+              className="inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#e67600]"
             >
               Search therapists
               <ArrowRight size={15} strokeWidth={2.5} />

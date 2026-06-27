@@ -138,7 +138,7 @@ export default function TherapistsPageClient({
       {/* ── Search & filter bar ──────────────────────────────────────────── */}
       <div className="rounded-2xl border border-[#e8e0d8] bg-white p-4 shadow-sm">
         <div className="mb-3 flex items-center gap-2">
-          <SlidersHorizontal className="h-4 w-4 text-[#FF8A1F]" strokeWidth={2.25} />
+          <SlidersHorizontal className="h-4 w-4 text-[#8B1E2D]" strokeWidth={2.25} />
           <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a1927f]">Filter directory</span>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -153,7 +153,7 @@ export default function TherapistsPageClient({
                 setParam("city", e.target.value);
               }}
               placeholder="City or area…"
-              className="w-full rounded-xl border border-[#e8e0d8] bg-[#FAF8F5] py-2.5 pl-9 pr-3 text-sm text-[#1a1a1a] placeholder:text-[#a1927f] focus:border-[#FF8A1F]/50 focus:outline-none focus:ring-2 focus:ring-[#FF8A1F]/20"
+              className="w-full rounded-xl border border-[#e8e0d8] bg-[#FAF8F5] py-2.5 pl-9 pr-3 text-sm text-[#1a1a1a] placeholder:text-[#a1927f] focus:border-[#8B1E2D]/50 focus:outline-none focus:ring-2 focus:ring-[#8B1E2D]/20"
             />
           </div>
           <div className="relative">
@@ -167,7 +167,7 @@ export default function TherapistsPageClient({
                 setParam("modality", e.target.value);
               }}
               placeholder="Specialty or technique…"
-              className="w-full rounded-xl border border-[#e8e0d8] bg-[#FAF8F5] py-2.5 pl-9 pr-3 text-sm text-[#1a1a1a] placeholder:text-[#a1927f] focus:border-[#FF8A1F]/50 focus:outline-none focus:ring-2 focus:ring-[#FF8A1F]/20"
+              className="w-full rounded-xl border border-[#e8e0d8] bg-[#FAF8F5] py-2.5 pl-9 pr-3 text-sm text-[#1a1a1a] placeholder:text-[#a1927f] focus:border-[#8B1E2D]/50 focus:outline-none focus:ring-2 focus:ring-[#8B1E2D]/20"
             />
           </div>
         </div>
@@ -178,13 +178,13 @@ export default function TherapistsPageClient({
         <p className="text-sm text-[#5a5147]" aria-live="polite">
           <span className="font-semibold text-[#1a1a1a]">{total}</span>
           {" "}public {total === 1 ? "listing" : "listings"}
-          {city ? <> near <span className="font-medium text-[#FF8A1F]">{city}</span></> : ""}
+          {city ? <> near <span className="font-medium text-[#8B1E2D]">{city}</span></> : ""}
         </p>
         {hasFilters && (
           <button
             type="button"
             onClick={clearAll}
-            className="flex items-center gap-1.5 text-sm font-semibold text-[#FF8A1F] hover:text-[#e67600]"
+            className="flex items-center gap-1.5 text-sm font-semibold text-[#8B1E2D] hover:text-[#e67600]"
           >
             <X className="h-3.5 w-3.5" strokeWidth={2.5} />
             Clear filters
@@ -201,7 +201,7 @@ export default function TherapistsPageClient({
         </div>
       ) : (
         <div className="mt-6 rounded-3xl border border-dashed border-[#e8e0d8] px-6 py-12 text-center">
-          <MapPin className="mx-auto mb-3 h-8 w-8 text-[#FF8A1F]/40" strokeWidth={1.5} />
+          <MapPin className="mx-auto mb-3 h-8 w-8 text-[#8B1E2D]/40" strokeWidth={1.5} />
           <h2 className="text-lg font-semibold text-[#1a1a1a]">No listings matched this view.</h2>
           <p className="mt-2 text-sm leading-6 text-[#5a5147]">
             Clear the filters to return to the full directory or try a broader city or specialty.
@@ -209,7 +209,7 @@ export default function TherapistsPageClient({
           <button
             type="button"
             onClick={clearAll}
-            className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#FF8A1F] px-5 py-2 text-sm font-semibold text-[#1a0a00]"
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-5 py-2 text-sm font-semibold text-[#1a0a00]"
           >
             <X className="h-3.5 w-3.5" strokeWidth={2.5} />
             Clear filters
@@ -225,7 +225,7 @@ export default function TherapistsPageClient({
             disabled={page <= 1}
             aria-label="Go to previous directory page"
             onClick={() => setParam("page", String(Math.max(1, page - 1)))}
-            className="rounded-xl border border-[#e8e0d8] bg-white px-4 py-2 text-sm font-semibold text-[#1a1a1a] shadow-sm disabled:opacity-40 hover:border-[#FF8A1F]/40"
+            className="rounded-xl border border-[#e8e0d8] bg-white px-4 py-2 text-sm font-semibold text-[#1a1a1a] shadow-sm disabled:opacity-40 hover:border-[#8B1E2D]/40"
           >
             Prev
           </button>
@@ -237,7 +237,7 @@ export default function TherapistsPageClient({
             disabled={page >= totalPages}
             aria-label="Go to next directory page"
             onClick={() => setParam("page", String(Math.min(totalPages, page + 1)))}
-            className="rounded-xl border border-[#e8e0d8] bg-white px-4 py-2 text-sm font-semibold text-[#1a1a1a] shadow-sm disabled:opacity-40 hover:border-[#FF8A1F]/40"
+            className="rounded-xl border border-[#e8e0d8] bg-white px-4 py-2 text-sm font-semibold text-[#1a1a1a] shadow-sm disabled:opacity-40 hover:border-[#8B1E2D]/40"
           >
             Next
           </button>

@@ -8,9 +8,9 @@ const C = {
   serif: "'Georgia', 'Times New Roman', serif" as const,
   sans: "system-ui, -apple-system, sans-serif" as const,
   dark: "#1A1A1A",
-  blue: "#FF8A1F",
-  orange: "#FF8A1F",
-  amber: "#FFB347",
+  blue: "#8B1E2D",
+  orange: "#8B1E2D",
+  amber: "#A52538",
   cream: "#FFFFFF",
   white: "#ffffff",
   muted: "#C9D2DF",
@@ -133,7 +133,7 @@ function FloatingParticles() {
         const y = p.y * window.innerHeight;
         const pulse = 0.62 + Math.sin(frame * 0.018 + x * 0.01) * 0.38;
         ctx.beginPath();
-        ctx.fillStyle = `rgba(255, 179, 71, ${p.a * pulse})`;
+        ctx.fillStyle = `rgba(165, 37, 56, ${p.a * pulse})`;
         ctx.arc(x, y, p.r, 0, Math.PI * 2);
         ctx.fill();
       }
@@ -199,7 +199,7 @@ function KnottyConcierge() {
         </div>
       </div>
       <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 8, marginTop: 18 }}>
-        {[["clients", "For clients"], ["therapists", "For therapists"], ["safety", "Safety"], ["launch", "Launch"]].map(([key, label]) => <button key={key} type="button" onClick={() => { setAnswerKey(key); trackWaitlistEvent("knotty_question", { topic: key }); }} style={{ border: "1px solid rgba(255,255,255,.13)", background: answerKey === key ? "rgba(204,36,36,.16)" : "rgba(255,255,255,.045)", color: answerKey === key ? "#FFE3C7" : "rgba(252,251,248,.66)", padding: "8px 12px", fontFamily: C.sans, fontSize: 12, cursor: "pointer" }}>{label}</button>)}
+        {[["clients", "For clients"], ["therapists", "For therapists"], ["safety", "Safety"], ["launch", "Launch"]].map(([key, label]) => <button key={key} type="button" onClick={() => { setAnswerKey(key); trackWaitlistEvent("knotty_question", { topic: key }); }} style={{ border: "1px solid rgba(255,255,255,.13)", background: answerKey === key ? "rgba(204,36,36,.16)" : "rgba(255,255,255,.045)", color: answerKey === key ? "#F8EDEE" : "rgba(252,251,248,.66)", padding: "8px 12px", fontFamily: C.sans, fontSize: 12, cursor: "pointer" }}>{label}</button>)}
       </div>
       <motion.p key={answerKey} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} style={{ maxWidth: 640, margin: "16px auto 0", fontFamily: C.sans, fontSize: 14, lineHeight: 1.75, color: "rgba(252,251,248,.68)", textAlign: "center" }}>{knottyAnswers[answerKey]}</motion.p>
     </motion.div>
@@ -262,12 +262,12 @@ export function MasseurMatchComingSoon() {
             <input aria-hidden="true" tabIndex={-1} autoComplete="off" value={company} onChange={(event) => setCompany(event.target.value)} name="company" style={{ position: "absolute", left: -9999, width: 1, height: 1, opacity: 0 }} />
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
               <div style={{ flex: "1 1 260px", minHeight: 58, display: "flex", alignItems: "center", gap: 12, background: "rgba(0,0,0,.22)", padding: "0 18px" }}>
-                <div style={{ width: 22, height: 22, color: "rgba(255,179,71,.72)" }}><LuxuryIcon type="signal" /></div>
+                <div style={{ width: 22, height: 22, color: "rgba(165, 37, 56,.72)" }}><LuxuryIcon type="signal" /></div>
                 <input id="email" name="email" type="email" required value={email} onChange={(event) => setEmail(event.target.value)} onFocus={() => trackWaitlistEvent("waitlist_focus")} placeholder="Enter your email for early access" style={{ width: "100%", background: "transparent", border: 0, outline: 0, color: C.white, fontFamily: C.sans, fontSize: 14 }} />
               </div>
               <MagneticButton disabled={status === "loading"}>{status === "loading" ? "Locking..." : status === "success" ? "Joined" : "Get notified"}</MagneticButton>
             </div>
-            <motion.p key={message} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} style={{ margin: "12px 8px 0", fontFamily: C.sans, fontSize: 12, lineHeight: 1.6, color: status === "error" ? "#FFC4B8" : status === "success" ? "#FFE3C7" : "rgba(252,251,248,.44)" }}>{message}</motion.p>
+            <motion.p key={message} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} style={{ margin: "12px 8px 0", fontFamily: C.sans, fontSize: 12, lineHeight: 1.6, color: status === "error" ? "#FFC4B8" : status === "success" ? "#F8EDEE" : "rgba(252,251,248,.44)" }}>{message}</motion.p>
           </motion.form>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "34px auto 0", maxWidth: 920, width: "100%" }}>

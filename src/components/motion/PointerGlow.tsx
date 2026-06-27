@@ -29,7 +29,7 @@ export function PointerGlow() {
         width: 280,
         height: 280,
         borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(255,138,31,.16), transparent 66%)",
+        background: "radial-gradient(circle, rgba(139, 30, 45,.16), transparent 66%)",
         pointerEvents: "none",
         mixBlendMode: "screen",
       }}

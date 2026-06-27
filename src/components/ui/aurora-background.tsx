@@ -151,7 +151,7 @@ export function AuroraBackgroundLight({
         <div
           className="absolute -bottom-1/4 -left-1/4 w-[55%] h-[55%] rounded-full blur-3xl animate-aurora-3"
           style={{
-            background: "radial-gradient(circle, rgba(251, 146, 60, 0.1) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(139, 30, 45, 0.1) 0%, transparent 70%)",
           }}
         />
         <div
