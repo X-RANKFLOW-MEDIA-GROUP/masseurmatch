@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -121,5 +121,15 @@ function SignupPlanPageContent() {
 }
 
 export default function SignupPlanPage() {
-  return <SignupPlanPageContent />;
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <p className="text-muted-foreground">Loading plans…</p>
+        </div>
+      }
+    >
+      <SignupPlanPageContent />
+    </Suspense>
+  );
 }
