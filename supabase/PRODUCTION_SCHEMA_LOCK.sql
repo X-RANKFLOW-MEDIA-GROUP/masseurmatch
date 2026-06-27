@@ -1168,3 +1168,15 @@ create or replace view public.therapist_analytics_daily as
   from public.analytics_events
   where therapist_profile_id is not null
   group by therapist_profile_id, date_trunc('day', created_at)::date, event_name;
+
+-- Stripe webhook idempotency ledger (added via migration 20260626193000_stripe_events.sql).
+-- Referenced by src/app/api/webhooks/stripe/route.ts; tracked here so validate:db-contract passes.
+create table if not exists public.stripe_events (
+  id uuid primary key default gen_random_uuid(),
+  event_id text not null unique,
+  type text not null,
+  payload jsonb not null,
+  processed_at timestamptz not null default now(),
+  failed_at timestamptz,
+  processing_error text
+);
