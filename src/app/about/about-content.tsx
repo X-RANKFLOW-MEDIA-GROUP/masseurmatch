@@ -1,94 +1,182 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Star, Shield, Sparkles } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import { ShieldCheck, Star, Lock, ArrowRight, Users, Globe, BadgeCheck } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const } },
-};
-
-function ValueCard({ icon: Icon, title, text }: { icon: typeof Shield; title: string; text: string }) {
+function Pillar({ icon: Icon, title, text }: { icon: typeof ShieldCheck; title: string; text: string }) {
   return (
-    <div className="bg-white border border-slate-200 p-8 shadow-sm hover:shadow-md transition-shadow">
-      <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-6">
-        <Icon className="w-6 h-6 text-slate-900" />
+    <div className="flex flex-col gap-4 border border-white/[0.08] bg-white/[0.03] p-8 backdrop-blur-sm">
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/[0.10] bg-[#FF8A1F]/10">
+        <Icon className="h-5 w-5 text-[#FF8A1F]" strokeWidth={2.25} />
       </div>
-      <h3 className="font-display text-xl font-medium text-slate-900 mb-3">{title}</h3>
-      <p className="font-sans text-sm text-slate-600 leading-relaxed">{text}</p>
+      <h3 className="font-display text-lg font-bold text-white">{title}</h3>
+      <p className="text-sm leading-6 text-white/55">{text}</p>
+    </div>
+  );
+}
+
+function Stat({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="text-center">
+      <p className="font-display text-[clamp(2rem,4vw,3.5rem)] font-extrabold leading-none tracking-tight text-white">
+        {value}
+      </p>
+      <p className="mt-2 text-sm font-medium text-white/50">{label}</p>
     </div>
   );
 }
 
 export default function AboutContent() {
-  return (
-    <div className="bg-slate-50 min-h-screen pt-24 pb-32">
+  const reduced = useReducedMotion();
 
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 md:px-6 max-w-5xl mb-24">
-        <motion.div initial="hidden" animate="show" variants={fadeUp} className="text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-200/50 border border-slate-300">
-            <span className="font-mono text-xs uppercase tracking-widest text-slate-600">Our Manifesto</span>
-          </div>
-          <h1 className="font-display text-5xl md:text-7xl font-medium tracking-tight text-slate-900 leading-[1.05] max-w-4xl mx-auto">
-            Elevating the standard of <br className="hidden md:block" />
-            <span className="text-slate-400">holistic wellness.</span>
-          </h1>
-          <p className="font-sans text-lg md:text-xl font-light text-slate-600 max-w-2xl mx-auto leading-relaxed mt-6">
-            MasseurMatch isn&apos;t just a directory. It&apos;s an exclusive network where professional excellence meets absolute trust.
+  return (
+    <div className="bg-[#060E1A] text-white">
+
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden px-4 pb-24 pt-28 sm:px-6 lg:pb-32 lg:pt-36">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px)",
+            backgroundSize: "30px 30px",
+          }}
+        />
+        <div aria-hidden="true" className="pointer-events-none absolute -right-40 top-0 h-[500px] w-[500px] rounded-full bg-[#FF8A1F]/[0.06] blur-3xl" />
+
+        <motion.div
+          initial={reduced ? false : { opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="relative mx-auto max-w-[1100px] text-center"
+        >
+          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#FF8A1F]">
+            Our Manifesto
           </p>
+          <h1 className="mt-5 font-display text-[clamp(2.5rem,6vw,5.5rem)] font-extrabold leading-[0.95] tracking-tight">
+            Elevating the standard
+            <br />
+            <span className="text-[#FF8A1F]">of wellness discovery.</span>
+          </h1>
+          <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-white/55 lg:text-lg">
+            MasseurMatch is a premium US directory that connects clients with verified,
+            LGBTQ+-affirming male massage therapists. We built it to replace guesswork
+            with trust — and to give independent therapists a professional platform
+            that respects their work.
+          </p>
+        </motion.div>
+
+        {/* Stats strip */}
+        <motion.div
+          initial={reduced ? false : { opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.18 }}
+          className="relative mx-auto mt-16 grid max-w-3xl grid-cols-3 gap-8 border-t border-white/[0.08] pt-12"
+        >
+          <Stat value="250+" label="US cities covered" />
+          <Stat value="48+" label="States with listings" />
+          <Stat value="6+" label="Massage specialties" />
         </motion.div>
       </section>
 
-      {/* Editorial Image (Full Width) */}
-      <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3, duration: 1 }} className="w-full h-[60vh] md:h-[70vh] relative mb-24">
-        <Image
-          src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=2000&auto=format&fit=crop"
-          alt="Luxury massage and wellness"
-          fill
-          className="object-cover object-center grayscale-[20%]"
-        />
-        <div className="absolute inset-0 bg-slate-950/20" />
-      </motion.section>
+      {/* ── Brand hairline ────────────────────────────────────────────────── */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-[#FF8A1F]/30 to-transparent" />
 
-      {/* Core Pillars (Tech-Luxury Grid) */}
-      <section className="container mx-auto px-4 md:px-6 max-w-5xl space-y-16">
-        <div className="text-center">
-          <h2 className="font-display text-3xl md:text-4xl font-medium text-slate-900">Our Core Pillars</h2>
-        </div>
+      {/* ── Core pillars ─────────────────────────────────────────────────── */}
+      <section className="px-4 py-20 sm:px-6 lg:py-28">
+        <div className="mx-auto max-w-[1100px]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#FF8A1F]">
+            What we stand for
+          </p>
+          <h2 className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold tracking-tight text-white">
+            Built on three pillars.
+          </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <ValueCard
-            icon={Shield}
-            title="Rigorous Curation"
-            text="We don't accept everyone. Each therapist on our platform goes through identity and profile verification before being published."
-          />
-          <ValueCard
-            icon={Star}
-            title="Elite Standard"
-            text="We focus on quality, not quantity. You will only find professionals dedicated to real results and a premium client experience."
-          />
-          <ValueCard
-            icon={Sparkles}
-            title="Absolute Privacy"
-            text="Your wellness journey is personal. Our infrastructure uses encrypted communications and is designed to protect your discretion."
-          />
+          <div className="mt-10 grid grid-cols-1 gap-px bg-white/[0.04] sm:grid-cols-3">
+            <Pillar
+              icon={ShieldCheck}
+              title="Rigorous verification"
+              text="Every profile is reviewed before going live. Identity checks, photo moderation, and profile approval ensure only legitimate, professional therapists are listed."
+            />
+            <Pillar
+              icon={Star}
+              title="Elite standards"
+              text="We focus on quality over quantity. Only professionals dedicated to real results and a premium client experience appear in our directory."
+            />
+            <Pillar
+              icon={Lock}
+              title="Absolute privacy"
+              text="Your wellness journey is personal. Our platform is built with encrypted communications and no data selling — ever."
+            />
+          </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="container mx-auto px-4 md:px-6 max-w-4xl mt-32">
-        <div className="bg-slate-950 text-white p-10 md:p-16 text-center space-y-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/20 blur-[80px] rounded-full pointer-events-none" />
-          <h2 className="font-display text-4xl font-medium relative z-10">Join the Wellness Elite</h2>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
-            <Link href="/search" className="bg-white text-slate-950 px-8 py-4 font-sans text-sm font-semibold hover:bg-slate-200 transition-colors">
-              Find a Therapist
+      {/* ── Why we built it ──────────────────────────────────────────────── */}
+      <section className="border-t border-white/[0.06] px-4 py-20 sm:px-6 lg:py-28">
+        <div className="mx-auto grid max-w-[1100px] gap-16 lg:grid-cols-2 lg:items-center">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#FF8A1F]">
+              Why we exist
+            </p>
+            <h2 className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.5rem)] font-extrabold leading-tight tracking-tight text-white">
+              The directory the community deserved.
+            </h2>
+            <p className="mt-5 text-sm leading-7 text-white/55">
+              Existing platforms were either anonymous, unverified, or operated behind
+              booking middlemen taking 20–30% commissions. Independent therapists had
+              no premium home — and clients had no way to compare therapists with real
+              trust signals.
+            </p>
+            <p className="mt-4 text-sm leading-7 text-white/55">
+              MasseurMatch was built to fix that: a professional, LGBTQ+-affirming
+              directory where therapists own their profiles and clients get transparent,
+              searchable information — with no platform in the middle.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {[
+              { icon: Users, label: "Independent therapists", text: "Profiles owned by the professional — not a platform." },
+              { icon: Globe, label: "250+ US cities", text: "National reach from Dallas to New York to LA and beyond." },
+              { icon: BadgeCheck, label: "Identity verified", text: "Each profile reviewed and approved before going live." },
+              { icon: ShieldCheck, label: "LGBTQ+ affirming", text: "Inclusive by design — every profile clearly marked." },
+            ].map(({ icon: Icon, label, text }) => (
+              <div key={label} className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FF8A1F]/10">
+                  <Icon className="h-4 w-4 text-[#FF8A1F]" strokeWidth={2.25} />
+                </div>
+                <p className="mt-3 text-sm font-bold text-white">{label}</p>
+                <p className="mt-1 text-xs leading-5 text-white/50">{text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA ─────────────────────────────────────────────────────────── */}
+      <section className="border-t border-white/[0.06] px-4 py-20 text-center sm:px-6">
+        <div className="mx-auto max-w-xl">
+          <h2 className="font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold tracking-tight text-white">
+            Join the community.
+          </h2>
+          <p className="mt-4 text-base leading-7 text-white/50">
+            Free for clients. Professional for therapists.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Link
+              href="/search"
+              className="inline-flex items-center gap-2 rounded-full bg-[#FF8A1F] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#FF8A1F]/20 transition hover:bg-[#e67600]"
+            >
+              Find a therapist
+              <ArrowRight size={15} strokeWidth={2.5} />
             </Link>
-            <Link href="/for-therapists" className="border border-slate-700 text-slate-300 px-8 py-4 font-mono text-xs uppercase tracking-wider hover:bg-slate-900 hover:text-white transition-colors">
-              I am a Professional
+            <Link
+              href="/for-therapists"
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-white/[0.10]"
+            >
+              List your practice
             </Link>
           </div>
         </div>

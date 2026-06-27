@@ -24,7 +24,7 @@ export function HeroMediaBanner({
 
   return (
     <div className="relative w-full">
-      {/* Desktop / tablet (sm and up) */}
+      {/* Desktop / tablet — lazy-loaded, it's below the hero text fold */}
       <div className="relative hidden aspect-video w-full overflow-hidden sm:block lg:aspect-[21/9]">
         {showVideo ? (
           <video
@@ -33,7 +33,7 @@ export function HeroMediaBanner({
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="none"
             poster={BRAND_ASSETS.heroPoster}
             onError={() => setVideoFailed(true)}
           >
@@ -44,8 +44,7 @@ export function HeroMediaBanner({
             src={BRAND_ASSETS.heroPoster}
             alt="Premium male massage therapy"
             fill
-            priority
-            fetchPriority="high"
+            loading="lazy"
             className="object-cover"
             sizes="100vw"
           />
@@ -53,14 +52,13 @@ export function HeroMediaBanner({
         <Overlay />
       </div>
 
-      {/* Mobile (below sm) */}
+      {/* Mobile */}
       <div className="relative block aspect-[9/14] w-full overflow-hidden sm:hidden">
         <Image
           src={BRAND_ASSETS.heroMobile}
           alt="Premium male massage therapy"
           fill
-          priority
-          fetchPriority="high"
+          loading="lazy"
           className="object-cover"
           sizes="100vw"
         />
@@ -110,6 +108,7 @@ function ProfileCard({ therapist }: { therapist: PublicTherapist }) {
             src={photo}
             alt={name}
             fill
+            loading="lazy"
             className="object-cover object-[50%_15%] transition-transform duration-700 group-hover:scale-105"
             sizes="(max-width: 640px) 33vw, (max-width: 1024px) 16vw, 200px"
           />

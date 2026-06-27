@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 
@@ -166,7 +166,7 @@ export default function ForTherapistsPage() {
               fontSize: 11,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "#CC2424",
+              color: "#FF8A1F",
               marginBottom: 24,
               fontFamily: "system-ui, sans-serif",
               position: "relative",
@@ -185,7 +185,7 @@ export default function ForTherapistsPage() {
             }}
           >
             Your practice deserves{" "}
-            <em style={{ color: "#CC2424", fontStyle: "italic" }}>
+            <em style={{ color: "#FF8A1F", fontStyle: "italic" }}>
               the right clients.
             </em>
           </h1>
@@ -223,7 +223,7 @@ export default function ForTherapistsPage() {
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
                 fontFamily: "system-ui, sans-serif",
-                background: "#CC2424",
+                background: "#FF8A1F",
                 color: "#1A1A1A",
                 textDecoration: "none",
                 fontWeight: 700,
@@ -254,7 +254,7 @@ export default function ForTherapistsPage() {
         {/* Social Proof Bar */}
         <section
           style={{
-            background: "#CC2424",
+            background: "#FF8A1F",
             color: "#FFFFFF",
             padding: "32px 24px",
           }}
@@ -280,7 +280,7 @@ export default function ForTherapistsPage() {
                   style={{
                     fontSize: 28,
                     fontWeight: 700,
-                    color: "#CC2424",
+                    color: "#FF8A1F",
                     fontFamily: "system-ui, sans-serif",
                   }}
                 >
@@ -311,7 +311,7 @@ export default function ForTherapistsPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#CC2424",
+                color: "#FF8A1F",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -342,7 +342,7 @@ export default function ForTherapistsPage() {
                   style={{ background: "#fff", padding: "40px 36px" }}
                 >
                   <div
-                    style={{ fontSize: 26, color: "#CC2424", marginBottom: 18 }}
+                    style={{ fontSize: 26, color: "#FF8A1F", marginBottom: 18 }}
                   >
                     {benefit.icon}
                   </div>
@@ -386,7 +386,7 @@ export default function ForTherapistsPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#CC2424",
+                color: "#FF8A1F",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
                 textAlign: "center",
@@ -465,7 +465,7 @@ export default function ForTherapistsPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#CC2424",
+                color: "#FF8A1F",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -495,7 +495,7 @@ export default function ForTherapistsPage() {
                     background: "#fff",
                     padding: "40px 36px",
                     margin: 0,
-                    borderTop: "3px solid #CC2424",
+                    borderTop: "3px solid #FF8A1F",
                   }}
                 >
                   <p
@@ -588,7 +588,7 @@ export default function ForTherapistsPage() {
                     background: "#fff",
                   }}
                 >
-                  <span style={{ color: "#CC2424", marginTop: 2, flexShrink: 0 }}>
+                  <span style={{ color: "#FF8A1F", marginTop: 2, flexShrink: 0 }}>
                     +
                   </span>
                   <span
@@ -708,7 +708,7 @@ export default function ForTherapistsPage() {
         {/* CTA */}
         <section
           style={{
-            background: "#CC2424",
+            background: "#FF8A1F",
             padding: "88px 24px",
             textAlign: "center",
           }}

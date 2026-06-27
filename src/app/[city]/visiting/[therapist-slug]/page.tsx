@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
@@ -111,7 +111,7 @@ export default async function TourPage({
               fontSize: 11,
               letterSpacing: "0.18em",
               textTransform: "uppercase",
-              color: "#CC2424",
+              color: "#FF8A1F",
               marginBottom: 20,
             }}
           >
@@ -166,7 +166,7 @@ export default async function TourPage({
                 }}
               >
                 <CalendarDays
-                  style={{ width: 16, height: 16, color: "#CC2424", flexShrink: 0 }}
+                  style={{ width: 16, height: 16, color: "#FF8A1F", flexShrink: 0 }}
                   strokeWidth={2}
                 />
                 <span style={{ fontSize: 15, color: "#1A1A1A" }}>

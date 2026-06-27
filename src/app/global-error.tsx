@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 // Global error boundary. Unlike app/error.tsx, this also catches errors thrown
 // in the root layout and its providers, replacing the bare browser "Application
@@ -46,7 +46,7 @@ export default function GlobalError({
               height: '64px',
               borderRadius: '9999px',
               background: 'rgba(204,36,36,0.12)',
-              color: '#CC2424',
+              color: '#FF8A1F',
               marginBottom: '24px',
             }}
           >
@@ -73,7 +73,7 @@ export default function GlobalError({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                background: '#CC2424',
+                background: '#FF8A1F',
                 color: '#1A1A1A',
                 fontWeight: 700,
                 border: 'none',

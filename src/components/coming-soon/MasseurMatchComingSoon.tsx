@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { FormEvent, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -8,8 +8,8 @@ const C = {
   serif: "'Georgia', 'Times New Roman', serif" as const,
   sans: "system-ui, -apple-system, sans-serif" as const,
   dark: "#1A1A1A",
-  blue: "#CC2424",
-  orange: "#CC2424",
+  blue: "#FF8A1F",
+  orange: "#FF8A1F",
   amber: "#FFB347",
   cream: "#FFFFFF",
   white: "#ffffff",

@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { Body, Button, Container, Head, Hr, Html, Preview, Section, Text } from '@react-email/components';
 
 interface InquiryReceivedEmailProps {
@@ -119,7 +119,7 @@ const valueText = {
 };
 
 const button = {
-  backgroundColor: '#CC2424',
+  backgroundColor: '#FF8A1F',
   borderRadius: '8px',
   color: '#fff',
   fontSize: '14px',

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import {
@@ -100,7 +100,7 @@ export function HotelSearchWidget() {
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#FF8A1F] px-5 py-2.5 text-sm font-semibold text-[#1a0a00] transition hover:bg-[#E67600] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? (
               <>
@@ -128,7 +128,7 @@ export function HotelSearchWidget() {
           <div className="flex flex-wrap items-center gap-3">
             <h3 className="text-xl font-semibold text-gray-900">{data.city}</h3>
             {data.gayArea ? (
-              <span className="rounded-full bg-red-600 px-3 py-1 text-xs font-medium text-white">
+              <span className="rounded-full bg-[#FF8A1F] px-3 py-1 text-xs font-medium text-[#1a0a00]">
                 {data.gayArea}
               </span>
             ) : null}

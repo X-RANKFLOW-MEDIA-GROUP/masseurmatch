@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 /* ─────────────────────────────────────────────
    MasseurMatch Design System — Red/Black/White
@@ -6,8 +6,8 @@
 :root {
   --mm-bg:          #FFFFFF;
   --mm-dark:        #1A1A1A;
-  --mm-accent:      #CC2424;
-  --mm-accent-hover:#A81D1D;
+  --mm-accent:      #FF8A1F;
+  --mm-accent-hover:#E67600;
   --mm-gray:        #666666;
   --mm-muted:       #999999;
   --mm-border:      rgba(0,0,0,0.08);
@@ -130,7 +130,7 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration: none;
 }
 .mm-city-card:hover {
-  border-bottom-color: #CC2424;
+  border-bottom-color: #FF8A1F;
   background: #FAFAFA;
 }
 
@@ -145,7 +145,7 @@ h1, h2, h3, h4, h5, h6 {
   transition: border-bottom-color 0.2s ease, background 0.2s ease;
 }
 .mm-service-link:hover {
-  border-bottom-color: #CC2424;
+  border-bottom-color: #FF8A1F;
   background: #ffffff;
 }
 .mm-service-link .mm-arrow {

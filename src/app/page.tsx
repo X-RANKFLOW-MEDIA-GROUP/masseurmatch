@@ -8,6 +8,8 @@ import { FeaturedTherapistsEditorial } from "@/components/marketing/FeaturedTher
 import { FaqAccordion } from "@/components/marketing/FaqAccordion";
 import { USStateMapGrid } from "@/components/marketing/USStateMapGrid";
 import { FinalCta } from "@/components/marketing/FinalCta";
+import { HowItWorksTease } from "@/components/marketing/HowItWorksTease";
+import { WhyMasseurMatch } from "@/components/marketing/WhyMasseurMatch";
 import {
   createPageMetadata,
   buildFaqJsonLd,
@@ -15,11 +17,10 @@ import {
   buildOrganizationJsonLd,
   buildWebsiteJsonLd,
   buildCollectionPageJsonLd,
-  SITE_NAME,
   SITE_DESCRIPTION,
 } from "@/app/_lib/seo";
 import { siteUrl } from "@/lib/site";
-import { getProfilePhotos, getPublicTherapists } from "@/app/_lib/directory";
+import { getProfilePhotosBatch, getPublicTherapists } from "@/app/_lib/directory";
 import { LANDING_FAQ } from "@/lib/marketing/home-data";
 
 export const revalidate = 3600;
@@ -106,29 +107,30 @@ function isRealProfileId(id: string | null | undefined) {
 }
 
 export default async function HomePage() {
-  // Fetch featured therapists — graceful fallback if DB unavailable.
-  // The hero itself filters out fallback/demo/test profiles so the first fold only
-  // renders approved live profiles from Supabase.
   let featuredTherapists: Awaited<ReturnType<typeof getPublicTherapists>>["items"] = [];
   try {
-    const result = await getPublicTherapists({ page: 1, pageSize: 6, lgbtqAffirming: true });
-    featuredTherapists = result.items;
-    if (featuredTherapists.length === 0) {
-      const fallback = await getPublicTherapists({ page: 1, pageSize: 6 });
-      featuredTherapists = fallback.items;
-    }
+    // Run both queries in parallel — lgbtq-affirming preferred, broad as fallback
+    const [lgbtqResult, broadResult] = await Promise.all([
+      getPublicTherapists({ page: 1, pageSize: 6, lgbtqAffirming: true }),
+      getPublicTherapists({ page: 1, pageSize: 6 }),
+    ]);
+    featuredTherapists = lgbtqResult.items.length > 0 ? lgbtqResult.items : broadResult.items;
 
-    featuredTherapists = await Promise.all(
-      featuredTherapists.map(async (therapist) => {
+    const realIds = featuredTherapists
+      .filter((t) => isRealProfileId(t.id))
+      .map((t) => t.id);
+
+    if (realIds.length > 0) {
+      const photoBatch = await getProfilePhotosBatch(realIds, 1);
+      featuredTherapists = featuredTherapists.map((therapist) => {
         if (!isRealProfileId(therapist.id)) return therapist;
-        const photos = await getProfilePhotos(therapist.id, 1);
+        const photos = photoBatch.get(therapist.id) ?? [];
         const primaryPhoto = photos.find((photo) => photo.is_primary) ?? photos[0];
-        return {
-          ...therapist,
-          profile_photo: primaryPhoto?.storage_path ?? therapist.profile_photo,
-        };
-      }),
-    );
+        return primaryPhoto
+          ? { ...therapist, profile_photo: primaryPhoto.storage_path }
+          : therapist;
+      });
+    }
   } catch {
     featuredTherapists = [];
   }
@@ -185,6 +187,22 @@ export default async function HomePage() {
       {/* FAQPage */}
       <JsonLd data={buildFaqJsonLd(HOME_FAQ)} />
 
+      {/* Standalone BreadcrumbList */}
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Home",
+              item: siteUrl("/"),
+            },
+          ],
+        }}
+      />
+
       {/* SpeakableSpecification */}
       <JsonLd
         data={{
@@ -196,17 +214,6 @@ export default async function HomePage() {
           speakable: {
             "@type": "SpeakableSpecification",
             cssSelector: ["h1", ".speakable-intro"],
-          },
-          breadcrumb: {
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              {
-                "@type": "ListItem",
-                position: 1,
-                name: "Home",
-                item: siteUrl("/"),
-              },
-            ],
           },
         }}
       />
@@ -224,7 +231,9 @@ export default async function HomePage() {
         {/* ── LIGHT BODY ─────────────────────────────────────────────── */}
         <StatsBand />
         <CityCaseStudies />
+        <HowItWorksTease />
         <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
+        <WhyMasseurMatch />
         <USStateMapGrid />
         <FaqAccordion items={LANDING_FAQ} />
         <FinalCta />

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 
@@ -25,7 +25,7 @@ export function NewsletterSignup() {
   return (
     <section
       style={{
-        background: "#CC2424",
+        background: "#FF8A1F",
         color: "#FFFFFF",
         padding: "80px 24px",
         textAlign: "center",
@@ -87,7 +87,7 @@ export function NewsletterSignup() {
               letterSpacing: "0.14em",
               textTransform: "uppercase",
               fontFamily: "system-ui, sans-serif",
-              background: "#CC2424",
+              background: "#FF8A1F",
               color: "#1A1A1A",
               border: "none",
               cursor: status === "loading" ? "wait" : "pointer",
@@ -105,7 +105,7 @@ export function NewsletterSignup() {
           style={{
             marginTop: 12,
             fontSize: 13,
-            color: "#CC2424",
+            color: "#FF8A1F",
             fontFamily: "system-ui, sans-serif",
           }}
         >

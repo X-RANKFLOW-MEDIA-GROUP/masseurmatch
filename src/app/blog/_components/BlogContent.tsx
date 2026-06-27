@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -81,8 +81,8 @@ const posts = [
 ];
 
 const categoryColors: Record<string, string> = {
-  "LGBTQ+ Health": "#CC2424",
-  "Wellness Tips": "#CC2424",
+  "LGBTQ+ Health": "#FF8A1F",
+  "Wellness Tips": "#FF8A1F",
   "For Therapists": "#1A1A1A",
   "City Guides": "#6B7280",
   "Industry News": "#374151",
@@ -128,9 +128,9 @@ export function BlogContent() {
                 border: "none",
                 borderBottom:
                   category === active
-                    ? "2px solid #CC2424"
+                    ? "2px solid #FF8A1F"
                     : "2px solid transparent",
-                color: category === active ? "#CC2424" : "#6B7280",
+                color: category === active ? "#FF8A1F" : "#6B7280",
                 cursor: "pointer",
                 whiteSpace: "nowrap",
                 transition: "color 0.15s, border-color 0.15s",
@@ -157,7 +157,7 @@ export function BlogContent() {
             <div
               style={{
                 background:
-                  "linear-gradient(135deg, #CC2424 0%, #1A1A1A 100%)",
+                  "linear-gradient(135deg, #FF8A1F 0%, #1A1A1A 100%)",
                 minHeight: 360,
                 display: "flex",
                 alignItems: "center",
@@ -215,7 +215,7 @@ export function BlogContent() {
                     fontSize: 10,
                     letterSpacing: "0.18em",
                     textTransform: "uppercase",
-                    color: "#CC2424",
+                    color: "#FF8A1F",
                     fontFamily: "system-ui, sans-serif",
                     background: "rgba(204,36,36,0.12)",
                     padding: "4px 10px",
@@ -286,10 +286,10 @@ export function BlogContent() {
                     fontSize: 11,
                     letterSpacing: "0.16em",
                     textTransform: "uppercase",
-                    color: "#CC2424",
+                    color: "#FF8A1F",
                     textDecoration: "none",
                     fontFamily: "system-ui, sans-serif",
-                    borderBottom: "1px solid #CC2424",
+                    borderBottom: "1px solid #FF8A1F",
                     paddingBottom: 2,
                   }}
                 >
@@ -332,7 +332,7 @@ export function BlogContent() {
                 }}
                 onMouseEnter={(e) =>
                   ((e.currentTarget as HTMLElement).style.borderBottomColor =
-                    categoryColors[post.category] ?? "#CC2424")
+                    categoryColors[post.category] ?? "#FF8A1F")
                 }
                 onMouseLeave={(e) =>
                   ((e.currentTarget as HTMLElement).style.borderBottomColor =

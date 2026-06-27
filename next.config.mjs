@@ -120,18 +120,22 @@ const nextConfig = {
     return LEGACY_REDIRECTS;
   },
   async headers() {
-    return [
-      {
-        source: "/:path*",
-        headers: [
-          { key: "Content-Security-Policy", value: CONTENT_SECURITY_POLICY },
-          { key: "X-Frame-Options", value: "SAMEORIGIN" },
-          { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self)" },
-        ],
-      },
+    const securityHeaders = [
+      { key: "Content-Security-Policy", value: CONTENT_SECURITY_POLICY },
+      { key: "X-Frame-Options", value: "SAMEORIGIN" },
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self)" },
     ];
+
+    if (!isDev) {
+      securityHeaders.push({
+        key: "Strict-Transport-Security",
+        value: "max-age=63072000; includeSubDomains; preload",
+      });
+    }
+
+    return [{ source: "/:path*", headers: securityHeaders }];
   },
 };
 

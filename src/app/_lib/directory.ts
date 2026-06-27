@@ -81,7 +81,7 @@ export interface PublicTherapist {
   phone: string | null;
   whatsapp_number: string | null;
   email_address: string | null;
-  show_email: boolean;
+  show_email: boolean | null;
   website: string | null;
   service_categories: string[] | null;
   massage_techniques: string[] | null;
@@ -401,6 +401,34 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
       storage_path: p.storage_path,
       is_primary: p.is_primary ?? false,
     }));
+};
+
+export const getProfilePhotosBatch = async (
+  profileIds: string[],
+  limitPerProfile = 1,
+): Promise<Map<string, ProfilePhoto[]>> => {
+  const result = new Map<string, ProfilePhoto[]>();
+  if (!profileIds.length) return result;
+
+  const { data, error } = await supabase
+    .from("profile_photos")
+    .select("id, profile_id, storage_path, is_primary, sort_order")
+    .in("profile_id", profileIds)
+    .eq("moderation_status", "approved")
+    .order("sort_order", { ascending: true });
+
+  if (error || !data?.length) return result;
+
+  for (const row of data) {
+    if (!row.profile_id || !row.storage_path) continue;
+    const existing = result.get(row.profile_id) ?? [];
+    if (existing.length < limitPerProfile) {
+      existing.push({ id: row.id, storage_path: row.storage_path, is_primary: row.is_primary ?? false });
+      result.set(row.profile_id, existing);
+    }
+  }
+
+  return result;
 };
 
 export async function getCityInventoryCount(cityName: string): Promise<number> {

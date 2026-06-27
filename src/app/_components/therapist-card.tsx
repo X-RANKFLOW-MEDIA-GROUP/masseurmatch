@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { MapPin, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,10 +18,11 @@ interface TherapistCardProps {
 export default function TechLuxuryTherapistCard({
   id, name, specialty, price, distance, rating, imageUrl
 }: TherapistCardProps) {
+  const shouldReduceMotion = useReducedMotion();
   return (
     <Link href={`/therapists/${id}`} className="block group h-full">
-      <motion.div 
-        whileHover={{ y: -4 }}
+      <motion.div
+        whileHover={shouldReduceMotion ? undefined : { y: -4 }}
         className="flex flex-col h-full bg-white border border-slate-200/60 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]"
       >
         {/* Image Wrapper with Ken Burns Effect */}
@@ -62,7 +63,7 @@ export default function TechLuxuryTherapistCard({
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1.5 text-slate-500">
               <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
-              <span className="truncate">{distance} km</span>
+              <span className="truncate">{distance} mi</span>
             </div>
             <div className="text-right">
               <span className="font-semibold text-slate-900">${price}</span>
