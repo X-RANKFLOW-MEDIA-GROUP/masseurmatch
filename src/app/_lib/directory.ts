@@ -346,18 +346,17 @@ export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTher
     .maybeSingle();
 
   if (!error && profile) {
-    // Photos live in `therapist_photos` (the table the upload + admin-approval
-    // flow writes to). `public_url` is the loadable URL; `storage_path` is a
-    // bucket key fallback. The primary image is the `profile` photo_type.
+    // Photos live in `profile_photos` (the table the live Cloudinary upload
+    // flow in /pro/photos writes to). `storage_path` holds the full image URL.
     const { data: photos } = await supabase
-      .from("therapist_photos")
-      .select("storage_path, public_url, photo_type")
+      .from("profile_photos")
+      .select("storage_path, url, is_primary")
       .eq("profile_id", profile.id)
-      .eq("status", "approved")
+      .eq("moderation_status", "approved")
       .order("sort_order", { ascending: true });
 
     const approved = photos ?? [];
-    const primary = approved.find((p) => p.photo_type === "profile") ?? approved[0];
+    const primary = approved.find((p) => p.is_primary) ?? approved[0];
     const profile_photo = resolvePhotoUrl(primary);
     const gallery_photos = approved
       .filter((p) => p !== primary)
@@ -385,19 +384,20 @@ export const getImportedReviews = async (profileId: string, limit = 5) => {
   return (data || []) as unknown as ImportedReview[];
 };
 
-// Resolves the displayable URL for a therapist_photos row: the moderated
-// `public_url`, falling back to the raw storage bucket key.
+// Resolves the displayable image URL for a profile_photos row. The live
+// Cloudinary upload path stores the full URL in `storage_path`; `url` is a
+// legacy fallback.
 const resolvePhotoUrl = (
-  row: { public_url?: string | null; storage_path?: string | null } | null | undefined,
-): string | undefined => row?.public_url || row?.storage_path || undefined;
+  row: { storage_path?: string | null; url?: string | null } | null | undefined,
+): string | undefined => row?.storage_path || row?.url || undefined;
 
 export const getProfilePhotos = async (profileId: string, limit = 6) => {
   const fallback = (FALLBACK_PUBLIC_THERAPISTS as PublicTherapist[]).find((profile) => profile.id === profileId);
   const { data, error } = await supabase
-    .from("therapist_photos")
-    .select("id, storage_path, public_url, photo_type, sort_order")
+    .from("profile_photos")
+    .select("id, storage_path, url, is_primary, sort_order")
     .eq("profile_id", profileId)
-    .eq("status", "approved")
+    .eq("moderation_status", "approved")
     .order("sort_order", { ascending: true })
     .limit(limit);
 
@@ -410,7 +410,7 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
     .map((p) => ({
       id: p.id,
       storage_path: resolvePhotoUrl(p),
-      is_primary: p.photo_type === "profile",
+      is_primary: p.is_primary ?? false,
     }))
     .filter((p): p is ProfilePhoto => Boolean(p.storage_path));
 };
@@ -423,25 +423,23 @@ export const getProfilePhotosBatch = async (
   if (!profileIds.length) return result;
 
   const { data, error } = await supabase
-    .from("therapist_photos")
-    .select("id, profile_id, storage_path, public_url, photo_type, sort_order")
+    .from("profile_photos")
+    .select("id, profile_id, storage_path, url, is_primary, sort_order")
     .in("profile_id", profileIds)
-    .eq("status", "approved")
+    .eq("moderation_status", "approved")
     .order("sort_order", { ascending: true });
 
   if (error || !data?.length) return result;
 
-  // Surface the primary (profile) photo first so a limit of 1 keeps the avatar.
-  const ordered = [...data].sort(
-    (a, b) => Number(b.photo_type === "profile") - Number(a.photo_type === "profile"),
-  );
+  // Surface the primary photo first so a limit of 1 keeps the avatar.
+  const ordered = [...data].sort((a, b) => Number(b.is_primary) - Number(a.is_primary));
 
   for (const row of ordered) {
     const url = resolvePhotoUrl(row);
     if (!row.profile_id || !url) continue;
     const existing = result.get(row.profile_id) ?? [];
     if (existing.length < limitPerProfile) {
-      existing.push({ id: row.id, storage_path: url, is_primary: row.photo_type === "profile" });
+      existing.push({ id: row.id, storage_path: url, is_primary: row.is_primary ?? false });
       result.set(row.profile_id, existing);
     }
   }
