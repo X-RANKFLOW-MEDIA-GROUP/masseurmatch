@@ -7,8 +7,8 @@ import { envAny } from "@/app/api/_lib/env";
 
 /**
  * Shared text-completion helper for MasseurMatch's AI features (Knotty, the
- * chat route, content moderation). Provider priority: OpenAI (`gpt-4o-mini`) →
- * DeepSeek (`deepseek-chat`) → Google Gemini (`gemini-1.5-flash`). Returns null
+ * chat route, content moderation). Provider priority: DeepSeek (`deepseek-chat`)
+ * → OpenAI (`gpt-4o-mini`) → Google Gemini (`gemini-1.5-flash`). Returns null
  * if no provider key is configured or all fail — callers use their own
  * deterministic fallback. Server-only.
  */
@@ -222,28 +222,28 @@ async function tryGeminiChat(
 }
 
 /**
- * Send a multi-turn conversation to the LLM. Provider order: OpenAI →
- * DeepSeek → Gemini. Falls through to null if all fail.
+ * Send a multi-turn conversation to the LLM. Provider order: DeepSeek →
+ * OpenAI → Gemini. Falls through to null if all fail.
  */
 export async function chatMessages(
   messages: ChatMessage[],
   o: { temperature?: number; maxTokens?: number; timeoutMs?: number } = {},
 ): Promise<LlmResult> {
-  const openaiKey = envAny(["OPENAI_API_KEY"], "");
-  if (openaiKey) {
-    try {
-      const text = await tryOpenAIChat(openaiKey, messages, o);
-      if (text) return { text, provider: "openai", model: OPENAI_MODEL };
-    } catch {
-      // fall through
-    }
-  }
-
   const deepseekKey = envAny(["DEEPSEEK_API_KEY"], "");
   if (deepseekKey) {
     try {
       const text = await tryDeepSeekChat(deepseekKey, messages, o);
       if (text) return { text, provider: "deepseek", model: DEEPSEEK_MODEL };
+    } catch {
+      // fall through
+    }
+  }
+
+  const openaiKey = envAny(["OPENAI_API_KEY"], "");
+  if (openaiKey) {
+    try {
+      const text = await tryOpenAIChat(openaiKey, messages, o);
+      if (text) return { text, provider: "openai", model: OPENAI_MODEL };
     } catch {
       // fall through
     }
@@ -264,23 +264,23 @@ export async function chatMessages(
 
 // ── Single-turn completion (kept for moderation / one-shot callers) ──────────
 
-/** Complete a prompt. Provider order: OpenAI → DeepSeek → Gemini. */
+/** Complete a prompt. Provider order: DeepSeek → OpenAI → Gemini. */
 export async function completeText(o: CompleteOptions): Promise<LlmResult> {
-  const openaiKey = envAny(["OPENAI_API_KEY"], "");
-  if (openaiKey) {
-    try {
-      const text = await tryOpenAI(openaiKey, o);
-      if (text) return { text, provider: "openai", model: OPENAI_MODEL };
-    } catch {
-      // fall through to the next provider
-    }
-  }
-
   const deepseekKey = envAny(["DEEPSEEK_API_KEY"], "");
   if (deepseekKey) {
     try {
       const text = await tryDeepSeek(deepseekKey, o);
       if (text) return { text, provider: "deepseek", model: DEEPSEEK_MODEL };
+    } catch {
+      // fall through
+    }
+  }
+
+  const openaiKey = envAny(["OPENAI_API_KEY"], "");
+  if (openaiKey) {
+    try {
+      const text = await tryOpenAI(openaiKey, o);
+      if (text) return { text, provider: "openai", model: OPENAI_MODEL };
     } catch {
       // fall through
     }
