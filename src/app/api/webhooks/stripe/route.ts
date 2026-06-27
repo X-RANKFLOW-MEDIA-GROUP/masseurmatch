@@ -191,10 +191,11 @@ export async function POST(request: NextRequest) {
         break
     }
   } catch (error) {
+    const processingError = error instanceof Error ? error.message : 'Unknown Stripe webhook processing error'
     await supabase
       .from('stripe_events')
       .update({
-        processing_error: error instanceof Error ? error.message : 'Unknown Stripe webhook processing error',
+        processing_error: processingError,
         failed_at:        new Date().toISOString(),
       })
       .eq('stripe_event_id', event.id)
