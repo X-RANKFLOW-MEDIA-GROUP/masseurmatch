@@ -101,10 +101,10 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-montserrat)", "Montserrat", "system-ui", "sans-serif"],
-        heading: ["var(--font-montserrat)", "Montserrat", "system-ui", "sans-serif"],
-        display: ["var(--font-montserrat)", "Montserrat", "system-ui", "sans-serif"],
-        stat: ["var(--font-montserrat)", "Montserrat", "system-ui", "sans-serif"],
+        sans: ["var(--font-satoshi)", "Satoshi", "Arial", "sans-serif"],
+        heading: ["var(--font-satoshi)", "Satoshi", "Arial", "sans-serif"],
+        display: ["var(--font-satoshi)", "Satoshi", "Arial", "sans-serif"],
+        stat: ["var(--font-satoshi)", "Satoshi", "Arial", "sans-serif"],
         mono: ["ui-monospace", "SFMono-Regular", "Roboto Mono", "Consolas", "monospace"],
       },
       borderRadius: {

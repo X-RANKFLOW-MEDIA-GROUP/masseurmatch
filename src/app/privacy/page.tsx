@@ -180,7 +180,7 @@ export default function PrivacyPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#FF8A1F",
+                color: "#8B1E2D",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -247,7 +247,7 @@ export default function PrivacyPage() {
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
                 fontFamily: "system-ui, sans-serif",
-                color: "#FF8A1F",
+                color: "#8B1E2D",
                 marginBottom: 16,
               }}
             >

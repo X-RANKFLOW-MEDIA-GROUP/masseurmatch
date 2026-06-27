@@ -1,10 +1,15 @@
-import { Montserrat } from "next/font/google";
+import localFont from "next/font/local";
 
-export const montserrat = Montserrat({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  variable: "--font-montserrat",
+export const satoshi = localFont({
+  src: [
+    {
+      path: "../../public/fonts/Satoshi-Variable.woff2",
+      style: "normal",
+    },
+  ],
+  variable: "--font-satoshi",
   display: "swap",
+  weight: "300 900",
 });
 
-export default { montserrat };
+export default { satoshi };

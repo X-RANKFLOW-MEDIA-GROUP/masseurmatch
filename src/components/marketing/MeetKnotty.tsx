@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -49,7 +49,7 @@ const ANSWERS: Record<string, string> = {
     "Incall = you visit the therapist's studio. Outcall = they travel to your home or hotel. Many offer both.",
 };
 const FALLBACK =
-  "Great question — in the live app I'll search that instantly. Open Knotty search to try it for real.";
+  "Great question — in the live app I'll search that instantly. Open Knotty search to try it for real ↗";
 
 /**
  * "Meet Knotty" — introduces the site's AI assistant with a live, interactive
@@ -203,7 +203,7 @@ export function MeetKnotty() {
               {/* Ambient glow */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute -inset-6 -z-10 rounded-[2.5rem] bg-[radial-gradient(circle_at_60%_0%,rgba(255,138,31,0.22),transparent_70%)] blur-2xl"
+                className="pointer-events-none absolute -inset-6 -z-10 rounded-[2.5rem] bg-[radial-gradient(circle_at_60%_0%,rgba(139,30,45,0.22),transparent_70%)] blur-2xl"
               />
 
               <div className="overflow-hidden rounded-3xl bg-white shadow-[0_30px_80px_-20px_rgba(26,26,26,0.28)] ring-1 ring-slate-200">

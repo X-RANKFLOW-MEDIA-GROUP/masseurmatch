@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion, useReducedMotion } from "framer-motion";
 import { ShieldCheck, Star, Lock, ArrowRight, Users, Globe, BadgeCheck } from "lucide-react";
@@ -7,8 +7,8 @@ import Link from "next/link";
 function Pillar({ icon: Icon, title, text }: { icon: typeof ShieldCheck; title: string; text: string }) {
   return (
     <div className="flex flex-col gap-4 border border-white/[0.08] bg-white/[0.03] p-8 backdrop-blur-sm">
-      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/[0.10] bg-[#FF8A1F]/10">
-        <Icon className="h-5 w-5 text-[#FF8A1F]" strokeWidth={2.25} />
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/[0.10] bg-[#8B1E2D]/10">
+        <Icon className="h-5 w-5 text-[#8B1E2D]" strokeWidth={2.25} />
       </div>
       <h3 className="font-display text-lg font-bold text-white">{title}</h3>
       <p className="text-sm leading-6 text-white/55">{text}</p>
@@ -43,7 +43,7 @@ export default function AboutContent() {
             backgroundSize: "30px 30px",
           }}
         />
-        <div aria-hidden="true" className="pointer-events-none absolute -right-40 top-0 h-[500px] w-[500px] rounded-full bg-[#FF8A1F]/[0.06] blur-3xl" />
+        <div aria-hidden="true" className="pointer-events-none absolute -right-40 top-0 h-[500px] w-[500px] rounded-full bg-[#8B1E2D]/[0.06] blur-3xl" />
 
         <motion.div
           initial={reduced ? false : { opacity: 0, y: 24 }}
@@ -51,13 +51,13 @@ export default function AboutContent() {
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="relative mx-auto max-w-[1100px] text-center"
         >
-          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#FF8A1F]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">
             Our Manifesto
           </p>
           <h1 className="mt-5 font-display text-[clamp(2.5rem,6vw,5.5rem)] font-extrabold leading-[0.95] tracking-tight">
             Elevating the standard
             <br />
-            <span className="text-[#FF8A1F]">of wellness discovery.</span>
+            <span className="text-[#8B1E2D]">of wellness discovery.</span>
           </h1>
           <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-white/55 lg:text-lg">
             MasseurMatch is a premium US directory that connects clients with verified,
@@ -81,12 +81,12 @@ export default function AboutContent() {
       </section>
 
       {/* ── Brand hairline ────────────────────────────────────────────────── */}
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-[#FF8A1F]/30 to-transparent" />
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-[#8B1E2D]/30 to-transparent" />
 
       {/* ── Core pillars ─────────────────────────────────────────────────── */}
       <section className="px-4 py-20 sm:px-6 lg:py-28">
         <div className="mx-auto max-w-[1100px]">
-          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#FF8A1F]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">
             What we stand for
           </p>
           <h2 className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold tracking-tight text-white">
@@ -117,7 +117,7 @@ export default function AboutContent() {
       <section className="border-t border-white/[0.06] px-4 py-20 sm:px-6 lg:py-28">
         <div className="mx-auto grid max-w-[1100px] gap-16 lg:grid-cols-2 lg:items-center">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#FF8A1F]">
+            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">
               Why we exist
             </p>
             <h2 className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.5rem)] font-extrabold leading-tight tracking-tight text-white">
@@ -144,8 +144,8 @@ export default function AboutContent() {
               { icon: ShieldCheck, label: "LGBTQ+ affirming", text: "Inclusive by design — every profile clearly marked." },
             ].map(({ icon: Icon, label, text }) => (
               <div key={label} className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FF8A1F]/10">
-                  <Icon className="h-4 w-4 text-[#FF8A1F]" strokeWidth={2.25} />
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#8B1E2D]/10">
+                  <Icon className="h-4 w-4 text-[#8B1E2D]" strokeWidth={2.25} />
                 </div>
                 <p className="mt-3 text-sm font-bold text-white">{label}</p>
                 <p className="mt-1 text-xs leading-5 text-white/50">{text}</p>
@@ -167,7 +167,7 @@ export default function AboutContent() {
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               href="/search"
-              className="inline-flex items-center gap-2 rounded-full bg-[#FF8A1F] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#FF8A1F]/20 transition hover:bg-[#e67600]"
+              className="inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
             >
               Find a therapist
               <ArrowRight size={15} strokeWidth={2.5} />

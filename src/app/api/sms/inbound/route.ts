@@ -52,9 +52,9 @@ export async function POST(request: NextRequest) {
     return twimlResponse(buildTwimlEmpty())
   }
 
-  // Validate Twilio signature in production. The URL must match the public
-  // webhook URL configured in Twilio, including protocol and host.
-  if (process.env.NODE_ENV === 'production') {
+  // Validate Twilio signature whenever the auth token is configured.
+  // Skipping only when no token is present (local dev without Twilio credentials).
+  if (process.env.TWILIO_AUTH_TOKEN) {
     const signature = request.headers.get('x-twilio-signature') ?? ''
     const url = getPublicWebhookUrl(request)
     if (!signature || !validateTwilioSignature(signature, url, params)) {

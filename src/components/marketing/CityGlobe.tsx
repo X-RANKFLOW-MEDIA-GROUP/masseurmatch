@@ -140,14 +140,14 @@ export function CityGlobe() {
       {/* Ambient glow behind the globe */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,138,31,0.22),transparent_62%)] blur-2xl"
+        className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-[radial-gradient(circle_at_center,rgba(139, 30, 45,0.22),transparent_62%)] blur-2xl"
       />
       {/* Styled CSS-sphere fallback for devices without WebGL */}
       {!webglOk && (
         <div
           role="img"
           aria-label="Globe highlighting MasseurMatch cities across the United States"
-          className="absolute inset-0 grid place-items-center overflow-hidden rounded-full bg-[radial-gradient(circle_at_35%_30%,#16365c,#0a1a2e_55%,#060d1b)] shadow-[0_0_80px_rgba(255,138,31,0.18)] ring-1 ring-white/10"
+          className="absolute inset-0 grid place-items-center overflow-hidden rounded-full bg-[radial-gradient(circle_at_35%_30%,#16365c,#0a1a2e_55%,#060d1b)] shadow-[0_0_80px_rgba(139, 30, 45,0.18)] ring-1 ring-white/10"
         >
           <div className="absolute inset-0 animate-spin rounded-full border border-dashed border-white/10 [animation-duration:40s]" />
           <div className="absolute inset-6 rounded-full border border-white/10" />

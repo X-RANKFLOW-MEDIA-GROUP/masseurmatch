@@ -58,13 +58,13 @@ export function SiteFooter() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             <div className="flex items-center gap-3">
               <Phone className="w-[1.1rem] h-[1.1rem] text-white" strokeWidth={2.25} />
-              <a href="tel:978-627-7387" className="text-sm text-white hover:text-orange-400 transition-colors">
+              <a href="tel:978-627-7387" className="text-sm text-white hover:text-red-400 transition-colors">
                 978-MASSEUR (627-7387)
               </a>
             </div>
             <div className="flex items-center gap-3">
               <Mail className="w-[1.1rem] h-[1.1rem] text-white" strokeWidth={2.25} />
-              <a href="mailto:support@masseurmatch.com" className="text-sm text-white hover:text-orange-400 transition-colors">
+              <a href="mailto:support@masseurmatch.com" className="text-sm text-white hover:text-red-400 transition-colors">
                 support@masseurmatch.com
               </a>
             </div>

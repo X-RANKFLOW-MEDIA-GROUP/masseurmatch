@@ -34,13 +34,12 @@ export async function POST(
       ? {
           is_featured: true,
           featured_until: new Date(now.getTime() + (body.days ?? 30) * 24 * 60 * 60 * 1000).toISOString(),
-          visibility_status: "public",
+          visibility_status: "public" as const,
           updated_at: now.toISOString(),
         }
       : {
           is_featured: false,
-          featured_until: null,
-          visibility_status: "public",
+          featured_until: null as string | null,
           updated_at: now.toISOString(),
         };
 
@@ -51,46 +50,57 @@ export async function POST(
 
     if (profileUpdateError) throw new RouteError(500, profileUpdateError.message);
 
-    if (isFeaturing) {
-      const { error: featureError } = await adminClient
-        .from("featured_masters")
-        .upsert(
-          {
-            profile_id: profileId,
-            featured_by: admin.userId,
-            city: profile.city || null,
-            is_active: true,
-          },
-          { onConflict: "profile_id" },
-        );
+    // Sync featured_masters — non-critical; errors here are logged but never block the toggle.
+    try {
+      if (isFeaturing) {
+        const { error: featureError } = await adminClient
+          .from("featured_masters")
+          .upsert(
+            {
+              profile_id: profileId,
+              featured_by: admin.userId,
+              city: profile.city ?? null,
+              is_active: true,
+            },
+            { onConflict: "profile_id" },
+          );
 
-      if (featureError) throw new RouteError(500, featureError.message);
-    } else {
-      const { error: unfeatureError } = await adminClient
-        .from("featured_masters")
-        .update({ is_active: false })
-        .eq("profile_id", profileId);
+        if (featureError) {
+          console.error("[feature] featured_masters upsert failed:", featureError.message);
+        }
+      } else {
+        const { error: unfeatureError } = await adminClient
+          .from("featured_masters")
+          .update({ is_active: false })
+          .eq("profile_id", profileId);
 
-      if (unfeatureError) throw new RouteError(500, unfeatureError.message);
+        if (unfeatureError) {
+          console.error("[feature] featured_masters update failed:", unfeatureError.message);
+        }
+      }
+    } catch (syncErr) {
+      console.error("[feature] featured_masters sync threw:", syncErr);
     }
 
-    await adminClient.from("admin_actions").insert({
-      action: isFeaturing ? "feature_profile" : "unfeature_profile",
-      action_type: isFeaturing ? "feature_profile" : "unfeature_profile",
-      target_table: "profiles",
-      admin_id: admin.userId,
-      target_user_id: profile.user_id,
-      target_profile_id: profileId,
-      reason: body.reason || null,
-    });
-
-    await recordAuditLog(
-      admin.userId,
-      isFeaturing ? "feature_profile" : "unfeature_profile",
-      "profile",
-      profileId,
-      { reason: body.reason, days: body.days ?? null },
-    );
+    // Audit logging — always non-blocking.
+    Promise.allSettled([
+      adminClient.from("admin_actions").insert({
+        action: isFeaturing ? "feature_profile" : "unfeature_profile",
+        action_type: isFeaturing ? "feature_profile" : "unfeature_profile",
+        target_table: "profiles",
+        admin_id: admin.userId,
+        target_user_id: profile.user_id,
+        target_profile_id: profileId,
+        reason: body.reason ?? null,
+      }),
+      recordAuditLog(
+        admin.userId,
+        isFeaturing ? "feature_profile" : "unfeature_profile",
+        "profile",
+        profileId,
+        { reason: body.reason ?? null, days: body.days ?? null },
+      ),
+    ]).catch(() => { /* best-effort */ });
 
     return json({ ok: true, profileId, featured: isFeaturing });
   } catch (error) {

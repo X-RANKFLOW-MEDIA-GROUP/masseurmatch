@@ -43,7 +43,7 @@ export function FloatingParticles() {
         const y = p.y * window.innerHeight;
         const pulse = 0.62 + Math.sin(frame * 0.018 + x * 0.01) * 0.38;
         ctx.beginPath();
-        ctx.fillStyle = `rgba(255, 179, 71, ${p.a * pulse})`;
+        ctx.fillStyle = `rgba(165, 37, 56, ${p.a * pulse})`;
         ctx.arc(x, y, p.r, 0, Math.PI * 2);
         ctx.fill();
       }

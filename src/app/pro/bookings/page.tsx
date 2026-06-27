@@ -92,7 +92,7 @@ export default function ProBookingsPage() {
     <div className="min-h-screen bg-[#1A1A1A] p-6">
       <div className="mx-auto max-w-4xl">
         <div className="mb-8">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#FF8A1F]">Your Dashboard</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#8B1E2D]">Your Dashboard</p>
           <h1 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-white">Bookings</h1>
           <p className="mt-1 text-sm text-slate-400">Incoming booking inquiries for your massage services.</p>
         </div>
@@ -233,7 +233,7 @@ function InquiryCard({ inquiry: inq, expanded, onToggle }: { inquiry: BookingInq
               <div className="flex flex-col gap-2 max-h-40 overflow-y-auto">
                 {inq.ai_conversation.map((msg, i) => (
                   <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] rounded-xl px-3 py-1.5 text-xs ${msg.role === 'user' ? 'bg-[#FF8A1F]/20 text-orange-100' : 'bg-white/[0.06] text-slate-300'}`}>
+                    <div className={`max-w-[80%] rounded-xl px-3 py-1.5 text-xs ${msg.role === 'user' ? 'bg-[#8B1E2D]/20 text-red-100' : 'bg-white/[0.06] text-slate-300'}`}>
                       {msg.content}
                     </div>
                   </div>
