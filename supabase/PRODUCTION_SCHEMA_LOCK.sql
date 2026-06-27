@@ -380,6 +380,18 @@ create table if not exists public.subscriptions (
   updated_at timestamptz default timezone('utc', now())
 );
 
+-- Stripe webhook idempotency ledger (see migrations 20260626193000_*).
+-- Referenced by src/app/api/webhooks/stripe/route.ts.
+create table if not exists public.stripe_events (
+  id uuid primary key default gen_random_uuid(),
+  event_id text not null unique,
+  type text not null,
+  payload jsonb not null,
+  processed_at timestamptz not null default timezone('utc', now()),
+  failed_at timestamptz,
+  processing_error text
+);
+
 create table if not exists public.blog_posts (
   id uuid primary key default gen_random_uuid(),
   slug text unique,

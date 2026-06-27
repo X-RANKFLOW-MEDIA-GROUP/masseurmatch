@@ -93,3 +93,7 @@ scripts/auto_fix_repo.py
 enterprise-audit-prompt.txt
 bug-audit-report/
 repo-audit-report/
+
+# pnpm-only project: block stray npm/yarn lockfiles
+package-lock.json
+yarn.lock
