@@ -57,7 +57,7 @@ export function CookieConsent() {
             <button
               type="button"
               onClick={() => savePreference("accepted")}
-              className="min-h-10 rounded-lg bg-[#8B1E2D] px-3 text-sm font-semibold text-[#1A1A1A] shadow-sm transition-colors hover:bg-[#E67600] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B1E2D]"
+              className="min-h-10 rounded-lg bg-[#8B1E2D] px-3 text-sm font-semibold text-[#1A1A1A] shadow-sm transition-colors hover:bg-[#6E1521] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B1E2D]"
             >
               Accept
             </button>

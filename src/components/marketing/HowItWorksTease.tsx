@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { Search, ShieldCheck, MessageCircle, ArrowRight } from "lucide-react";
 import FadeUp from "@/components/motion/FadeUp";
 

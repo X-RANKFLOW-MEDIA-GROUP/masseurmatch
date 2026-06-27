@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/app/_components/JsonLd";
 import {
@@ -134,7 +134,7 @@ export default async function TherapistsPage({ searchParams }: TherapistsPagePro
               Your location is detected automatically — or search by city and specialty.
             </p>
             <div className="mt-5 flex flex-wrap gap-4 text-sm">
-              <Link href="/cities" className="font-semibold text-[#8B1E2D] hover:text-[#e67600]">
+              <Link href="/cities" className="font-semibold text-[#8B1E2D] hover:text-[#6E1521]">
                 Browse by city
               </Link>
               <Link href="/search" className="font-semibold text-white/60 hover:text-white">

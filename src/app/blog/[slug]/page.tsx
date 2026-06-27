@@ -230,7 +230,7 @@ function Section({ section }: { section: BlogSection }) {
                 fontWeight: 700,
                 color: "#8B1E2D",
                 fontFamily: sans,
-                background: "rgba(204,36,36,0.1)",
+                background: "rgba(139,30,45,0.1)",
                 padding: "2px 8px",
                 flexShrink: 0,
                 marginTop: 2,
@@ -254,7 +254,7 @@ function Section({ section }: { section: BlogSection }) {
           margin: "32px 0",
           padding: "24px 28px",
           borderLeft: "3px solid #8B1E2D",
-          background: "rgba(204,36,36,0.04)",
+          background: "rgba(139,30,45,0.04)",
           fontStyle: "italic",
           fontSize: 17,
           lineHeight: 1.75,
@@ -381,7 +381,7 @@ export default async function BlogPostPage({
                   textTransform: "uppercase",
                   fontFamily: "system-ui, sans-serif",
                   color: "#8B1E2D",
-                  background: "rgba(204,36,36,0.12)",
+                  background: "rgba(139,30,45,0.12)",
                   padding: "4px 10px",
                   fontWeight: 700,
                 }}
@@ -514,7 +514,7 @@ export default async function BlogPostPage({
                     fontFamily: "system-ui, sans-serif",
                     color: "#8B1E2D",
                     textDecoration: "none",
-                    background: "rgba(204,36,36,0.06)",
+                    background: "rgba(139,30,45,0.06)",
                     padding: "4px 10px",
                   }}
                 >

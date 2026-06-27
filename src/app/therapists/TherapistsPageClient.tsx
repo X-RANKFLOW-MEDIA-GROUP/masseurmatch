@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -184,7 +184,7 @@ export default function TherapistsPageClient({
           <button
             type="button"
             onClick={clearAll}
-            className="flex items-center gap-1.5 text-sm font-semibold text-[#8B1E2D] hover:text-[#e67600]"
+            className="flex items-center gap-1.5 text-sm font-semibold text-[#8B1E2D] hover:text-[#6E1521]"
           >
             <X className="h-3.5 w-3.5" strokeWidth={2.5} />
             Clear filters

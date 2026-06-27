@@ -67,7 +67,7 @@ function TherapistCard({ profile, index }: { profile: PublicTherapist; index: nu
       <button
         type="button"
         onClick={handleNavigate}
-        className="mt-5 w-full rounded-xl bg-[#8B1E2D] px-5 py-3 text-sm font-black uppercase tracking-wide text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#E67600]"
+        className="mt-5 w-full rounded-xl bg-[#8B1E2D] px-5 py-3 text-sm font-black uppercase tracking-wide text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
       >
         View Profile
       </button>
@@ -115,7 +115,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
   };
 
   return (
-    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_24%_18%,rgba(204,36,36,0.08),transparent_28%),linear-gradient(180deg,#ffffff_0%,#fbfaf8_100%)] text-[#151515]">
+    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_24%_18%,rgba(139,30,45,0.08),transparent_28%),linear-gradient(180deg,#ffffff_0%,#fbfaf8_100%)] text-[#151515]">
       <div className="mx-auto grid min-h-[680px] max-w-[1500px] items-center gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1.03fr_0.97fr] lg:px-10 lg:py-16">
         <div className="relative order-2 lg:order-1">
           <div className="pointer-events-none absolute -left-10 top-12 h-72 w-72 rounded-full bg-[#8B1E2D]/8 blur-3xl" />
@@ -236,7 +236,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                   type="button"
                   onClick={() => submitAssistantPrompt()}
                   aria-label="Send AI match request"
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#8B1E2D] text-white shadow-lg shadow-[#8B1E2D]/25 transition hover:bg-[#E67600]"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#8B1E2D] text-white shadow-lg shadow-[#8B1E2D]/25 transition hover:bg-[#6E1521]"
                 >
                   <Send size={18} fill="currentColor" />
                 </button>
@@ -264,7 +264,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.52 }}
-            className="mt-7 inline-flex w-fit items-center gap-2 rounded-2xl bg-[#8B1E2D] px-6 py-4 text-sm font-black uppercase tracking-wide text-white shadow-xl shadow-[#8B1E2D]/20 transition hover:bg-[#E67600]"
+            className="mt-7 inline-flex w-fit items-center gap-2 rounded-2xl bg-[#8B1E2D] px-6 py-4 text-sm font-black uppercase tracking-wide text-white shadow-xl shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
           >
             Find a Masseur
             <ArrowRight size={18} strokeWidth={2.5} />

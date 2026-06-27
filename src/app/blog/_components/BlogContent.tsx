@@ -173,7 +173,7 @@ export function BlogContent() {
                   width: 300,
                   height: 300,
                   borderRadius: "50%",
-                  border: "1px solid rgba(204,36,36,0.2)",
+                  border: "1px solid rgba(139,30,45,0.2)",
                   top: "50%",
                   left: "50%",
                   transform: "translate(-50%,-50%)",
@@ -186,7 +186,7 @@ export function BlogContent() {
                   width: 180,
                   height: 180,
                   borderRadius: "50%",
-                  border: "1px solid rgba(204,36,36,0.35)",
+                  border: "1px solid rgba(139,30,45,0.35)",
                   top: "50%",
                   left: "50%",
                   transform: "translate(-50%,-50%)",
@@ -217,7 +217,7 @@ export function BlogContent() {
                     textTransform: "uppercase",
                     color: "#8B1E2D",
                     fontFamily: "system-ui, sans-serif",
-                    background: "rgba(204,36,36,0.12)",
+                    background: "rgba(139,30,45,0.12)",
                     padding: "4px 10px",
                   }}
                 >

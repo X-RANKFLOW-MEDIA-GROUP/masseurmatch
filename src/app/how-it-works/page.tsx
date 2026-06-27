@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check, ShieldCheck, Users, MessageCircle, Star, ArrowUpRight, X } from "lucide-react";
 import { JsonLd } from "@/app/_components/json-ld";
@@ -201,7 +201,7 @@ export default function HowItWorksPage() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/search"
-                className="inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#e67600]"
+                className="inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
               >
                 Search therapists
                 <ArrowRight size={16} strokeWidth={2.5} />
@@ -369,7 +369,7 @@ export default function HowItWorksPage() {
             </p>
             <Link
               href="/search"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-8 py-4 text-sm font-bold uppercase tracking-wide text-white shadow-xl shadow-[#8B1E2D]/20 transition hover:bg-[#e67600]"
+              className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-8 py-4 text-sm font-bold uppercase tracking-wide text-white shadow-xl shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
             >
               Search therapists now
               <ArrowRight size={16} strokeWidth={2.5} />

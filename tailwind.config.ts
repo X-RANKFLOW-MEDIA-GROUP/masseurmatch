@@ -101,10 +101,10 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-satoshi)", "Satoshi", "Arial", "sans-serif"],
-        heading: ["var(--font-satoshi)", "Satoshi", "Arial", "sans-serif"],
-        display: ["var(--font-satoshi)", "Satoshi", "Arial", "sans-serif"],
-        stat: ["var(--font-satoshi)", "Satoshi", "Arial", "sans-serif"],
+        sans: ["Satoshi", "system-ui", "sans-serif"],
+        heading: ["Satoshi", "system-ui", "sans-serif"],
+        display: ["Satoshi", "system-ui", "sans-serif"],
+        stat: ["Satoshi", "system-ui", "sans-serif"],
         mono: ["ui-monospace", "SFMono-Regular", "Roboto Mono", "Consolas", "monospace"],
       },
       borderRadius: {

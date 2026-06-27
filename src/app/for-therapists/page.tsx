@@ -152,7 +152,7 @@ export default function ForTherapistsPage() {
                 width: size,
                 height: size,
                 borderRadius: "50%",
-                border: "1px solid rgba(204,36,36,0.07)",
+                border: "1px solid rgba(139,30,45,0.07)",
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%,-50%)",
@@ -424,7 +424,7 @@ export default function ForTherapistsPage() {
                     style={{
                       fontSize: 32,
                       fontWeight: 700,
-                      color: "rgba(204,36,36,0.25)",
+                      color: "rgba(139,30,45,0.25)",
                       fontFamily: "system-ui, sans-serif",
                       marginBottom: 16,
                       lineHeight: 1,

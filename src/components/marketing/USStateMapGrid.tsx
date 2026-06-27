@@ -155,7 +155,7 @@ export function USStateMapGrid() {
                           rotateX: reduced ? 0 : -8,
                           scale: reduced ? 1 : 1.08,
                           filter:
-                            "drop-shadow(0 16px 28px rgba(204,36,36,0.55))",
+                            "drop-shadow(0 16px 28px rgba(139,30,45,0.55))",
                           zIndex: 20,
                         }
                       : {

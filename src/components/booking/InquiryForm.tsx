@@ -211,7 +211,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
         <button
           type="submit"
           disabled={loading}
-          className="flex items-center justify-center gap-2 rounded-lg bg-[#8B1E2D] px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-[#E67600] disabled:opacity-60"
+          className="flex items-center justify-center gap-2 rounded-lg bg-[#8B1E2D] px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-[#6E1521] disabled:opacity-60"
         >
           {loading ? (
             <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2.25} />
@@ -269,7 +269,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
           <button
             onClick={sendChatMessage}
             disabled={loading || !chatInput.trim()}
-            className="flex items-center justify-center rounded-lg bg-[#8B1E2D] px-3 py-2.5 transition-all hover:bg-[#E67600] disabled:opacity-60"
+            className="flex items-center justify-center rounded-lg bg-[#8B1E2D] px-3 py-2.5 transition-all hover:bg-[#6E1521] disabled:opacity-60"
           >
             <Send className="h-4 w-4 text-white" strokeWidth={2.25} />
           </button>

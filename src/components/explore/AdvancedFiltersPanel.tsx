@@ -342,7 +342,7 @@ export function AdvancedFiltersPanel({
           <Button variant="outline" onClick={onClose} className="flex-1">
             Cancel
           </Button>
-          <Button onClick={handleApply} className="flex-1 bg-[#8B1E2D] hover:bg-[#E67600]">
+          <Button onClick={handleApply} className="flex-1 bg-[#8B1E2D] hover:bg-[#6E1521]">
             Apply Filters
             {activeFilterCount > 0 ? (
               <span className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs font-bold text-red-600">

@@ -147,7 +147,7 @@ function MobileNav({
                   setOpen(false);
                   onLogout();
                 }}
-                className="block w-full text-center rounded-full bg-[#8B1E2D] py-2.5 text-sm font-semibold text-white hover:bg-[#E67600] transition-colors"
+                className="block w-full text-center rounded-full bg-[#8B1E2D] py-2.5 text-sm font-semibold text-white hover:bg-[#6E1521] transition-colors"
               >
                 Log Out
               </button>
@@ -164,7 +164,7 @@ function MobileNav({
               <Link
                 href="/signup"
                 onClick={() => setOpen(false)}
-                className="block w-full text-center rounded-full bg-[#8B1E2D] py-2.5 text-sm font-semibold text-white hover:bg-[#E67600] transition-colors"
+                className="block w-full text-center rounded-full bg-[#8B1E2D] py-2.5 text-sm font-semibold text-white hover:bg-[#6E1521] transition-colors"
               >
                 Get Started
               </Link>
@@ -366,7 +366,7 @@ export default function SiteHeader() {
           >
             <Link
               href="/signup"
-              className="hidden sm:flex h-10 px-6 items-center justify-center rounded-full text-sm font-bold transition-all duration-200 bg-[#8B1E2D] text-white hover:bg-[#E67600] hover:shadow-lg hover:shadow-[#8B1E2D]/20"
+              className="hidden sm:flex h-10 px-6 items-center justify-center rounded-full text-sm font-bold transition-all duration-200 bg-[#8B1E2D] text-white hover:bg-[#6E1521] hover:shadow-lg hover:shadow-[#8B1E2D]/20"
             >
               GET STARTED
             </Link>

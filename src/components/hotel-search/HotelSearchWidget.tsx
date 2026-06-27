@@ -100,7 +100,7 @@ export function HotelSearchWidget() {
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#8B1E2D] px-5 py-2.5 text-sm font-semibold text-[#1a0a00] transition hover:bg-[#E67600] disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#8B1E2D] px-5 py-2.5 text-sm font-semibold text-[#1a0a00] transition hover:bg-[#6E1521] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? (
               <>

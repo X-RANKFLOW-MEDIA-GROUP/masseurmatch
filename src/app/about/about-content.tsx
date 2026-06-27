@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion, useReducedMotion } from "framer-motion";
 import { ShieldCheck, Star, Lock, ArrowRight, Users, Globe, BadgeCheck } from "lucide-react";
@@ -167,7 +167,7 @@ export default function AboutContent() {
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               href="/search"
-              className="inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#e67600]"
+              className="inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
             >
               Find a therapist
               <ArrowRight size={15} strokeWidth={2.5} />

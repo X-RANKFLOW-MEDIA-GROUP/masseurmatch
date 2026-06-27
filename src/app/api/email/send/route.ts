@@ -101,7 +101,7 @@ function renderNewInquiryEmail(data: Record<string, any>): string {
     <style>
       body { font-family: sans-serif; color: #333; }
       .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-      .header { background: linear-gradient(135deg, #8B1E2D 0%, #A52538 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0; }
+      .header { background: linear-gradient(135deg, #8B1E2D 0%, #A5243A 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0; }
       .content { border: 1px solid #ddd; border-radius: 0 0 8px 8px; padding: 20px; }
       .info-block { background: #f5f5f5; padding: 15px; border-radius: 6px; margin: 15px 0; }
       .button { background: #8B1E2D; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin-top: 15px; }
@@ -159,7 +159,7 @@ function renderInquiryReceivedEmail(data: Record<string, any>): string {
     <style>
       body { font-family: sans-serif; color: #333; }
       .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-      .header { background: linear-gradient(135deg, #8B1E2D 0%, #A52538 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0; }
+      .header { background: linear-gradient(135deg, #8B1E2D 0%, #A5243A 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0; }
       .content { border: 1px solid #ddd; border-radius: 0 0 8px 8px; padding: 20px; }
       .info-block { background: #f5f5f5; padding: 15px; border-radius: 6px; margin: 15px 0; }
       .footer { font-size: 12px; color: #999; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 20px; }

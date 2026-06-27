@@ -32,7 +32,7 @@ export function Cta3DButton({
 
   const face =
     variant === "primary"
-      ? "bg-gradient-to-b from-[#A52538] to-[#8B1E2D] text-white"
+      ? "bg-gradient-to-b from-[#A5243A] to-[#8B1E2D] text-white"
       : variant === "dark"
         ? "bg-gradient-to-b from-[#333333] to-[#1A1A1A] text-white ring-1 ring-white/10"
         : "bg-white/10 text-white ring-1 ring-white/25 backdrop-blur-md";

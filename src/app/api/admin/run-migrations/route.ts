@@ -4,13 +4,11 @@ import { NextResponse } from "next/server";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { readdirSync } from "fs";
-import { requireAdminSession, createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import { requireAdminClient, recordAuditLog } from "@/app/api/_lib/supabase-server";
 
 export async function POST(request: NextRequest) {
   try {
-    await requireAdminSession(request as unknown as Request);
-
-    const supabase = createSupabaseAdminClient();
+    const { client: supabase, session: admin } = await requireAdminClient(request as unknown as Request);
 
     // Get all migration files from supabase/migrations
     const migrationsDir = join(process.cwd(), "supabase", "migrations");
@@ -64,6 +62,13 @@ export async function POST(request: NextRequest) {
         console.error(`[Migrations] Failed ${file}: ${errorMsg}`);
       }
     }
+
+    await recordAuditLog(admin.userId, "run_migrations", "system", undefined, {
+      total: migrationFiles.length,
+      executed,
+      skipped,
+      errors,
+    });
 
     return NextResponse.json({
       success: errors === 0,

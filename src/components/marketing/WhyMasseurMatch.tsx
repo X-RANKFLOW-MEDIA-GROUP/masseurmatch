@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { Check, X, ArrowRight } from "lucide-react";
 import FadeUp from "@/components/motion/FadeUp";
 
@@ -92,7 +92,7 @@ export function WhyMasseurMatch() {
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link
               href="/search"
-              className="inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#e67600]"
+              className="inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
             >
               Search therapists
               <ArrowRight size={15} strokeWidth={2.5} />

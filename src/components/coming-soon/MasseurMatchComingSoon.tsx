@@ -10,7 +10,7 @@ const C = {
   dark: "#1A1A1A",
   blue: "#8B1E2D",
   orange: "#8B1E2D",
-  amber: "#A52538",
+  amber: "#FFB347",
   cream: "#FFFFFF",
   white: "#ffffff",
   muted: "#C9D2DF",
@@ -133,7 +133,7 @@ function FloatingParticles() {
         const y = p.y * window.innerHeight;
         const pulse = 0.62 + Math.sin(frame * 0.018 + x * 0.01) * 0.38;
         ctx.beginPath();
-        ctx.fillStyle = `rgba(165, 37, 56, ${p.a * pulse})`;
+        ctx.fillStyle = `rgba(255, 179, 71, ${p.a * pulse})`;
         ctx.arc(x, y, p.r, 0, Math.PI * 2);
         ctx.fill();
       }
@@ -157,7 +157,7 @@ function PointerGlow() {
     window.addEventListener("pointermove", handleMove);
     return () => window.removeEventListener("pointermove", handleMove);
   }, [x, y]);
-  return <motion.div aria-hidden="true" style={{ x: springX, y: springY, position: "fixed", zIndex: 0, width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(204,36,36,.16), transparent 66%)", pointerEvents: "none", mixBlendMode: "screen" }} />;
+  return <motion.div aria-hidden="true" style={{ x: springX, y: springY, position: "fixed", zIndex: 0, width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(139,30,45,.16), transparent 66%)", pointerEvents: "none", mixBlendMode: "screen" }} />;
 }
 
 function MagneticButton({ children, disabled }: { children: React.ReactNode; disabled?: boolean }) {
@@ -171,7 +171,7 @@ function MagneticButton({ children, disabled }: { children: React.ReactNode; dis
     y.set((event.clientY - rect.top - rect.height / 2) * 0.16);
   }
   return (
-    <motion.button type="submit" disabled={disabled} onMouseMove={handleMove} onMouseLeave={() => { x.set(0); y.set(0); }} style={{ x: springX, y: springY, minHeight: 58, border: 0, borderRadius: 999, padding: "0 26px", color: C.dark, background: `linear-gradient(135deg, ${C.orange}, ${C.amber})`, fontFamily: C.sans, fontWeight: 800, letterSpacing: "0.01em", cursor: disabled ? "not-allowed" : "pointer", boxShadow: "0 18px 54px rgba(204,36,36,.28)", opacity: disabled ? 0.72 : 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 10 }} whileTap={{ scale: 0.98 }}>
+    <motion.button type="submit" disabled={disabled} onMouseMove={handleMove} onMouseLeave={() => { x.set(0); y.set(0); }} style={{ x: springX, y: springY, minHeight: 58, border: 0, borderRadius: 999, padding: "0 26px", color: C.dark, background: `linear-gradient(135deg, ${C.orange}, ${C.amber})`, fontFamily: C.sans, fontWeight: 800, letterSpacing: "0.01em", cursor: disabled ? "not-allowed" : "pointer", boxShadow: "0 18px 54px rgba(139,30,45,.28)", opacity: disabled ? 0.72 : 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 10 }} whileTap={{ scale: 0.98 }}>
       {children}
     </motion.button>
   );
@@ -199,7 +199,7 @@ function KnottyConcierge() {
         </div>
       </div>
       <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 8, marginTop: 18 }}>
-        {[["clients", "For clients"], ["therapists", "For therapists"], ["safety", "Safety"], ["launch", "Launch"]].map(([key, label]) => <button key={key} type="button" onClick={() => { setAnswerKey(key); trackWaitlistEvent("knotty_question", { topic: key }); }} style={{ border: "1px solid rgba(255,255,255,.13)", background: answerKey === key ? "rgba(204,36,36,.16)" : "rgba(255,255,255,.045)", color: answerKey === key ? "#F8EDEE" : "rgba(252,251,248,.66)", padding: "8px 12px", fontFamily: C.sans, fontSize: 12, cursor: "pointer" }}>{label}</button>)}
+        {[["clients", "For clients"], ["therapists", "For therapists"], ["safety", "Safety"], ["launch", "Launch"]].map(([key, label]) => <button key={key} type="button" onClick={() => { setAnswerKey(key); trackWaitlistEvent("knotty_question", { topic: key }); }} style={{ border: "1px solid rgba(255,255,255,.13)", background: answerKey === key ? "rgba(139,30,45,.16)" : "rgba(255,255,255,.045)", color: answerKey === key ? "#FFE3C7" : "rgba(252,251,248,.66)", padding: "8px 12px", fontFamily: C.sans, fontSize: 12, cursor: "pointer" }}>{label}</button>)}
       </div>
       <motion.p key={answerKey} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} style={{ maxWidth: 640, margin: "16px auto 0", fontFamily: C.sans, fontSize: 14, lineHeight: 1.75, color: "rgba(252,251,248,.68)", textAlign: "center" }}>{knottyAnswers[answerKey]}</motion.p>
     </motion.div>
@@ -241,8 +241,8 @@ export function MasseurMatchComingSoon() {
         <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
           <FloatingParticles />
           <div aria-hidden="true" style={{ position: "absolute", inset: 0, opacity: 0.075, mixBlendMode: "screen", backgroundImage: "radial-gradient(circle at 20% 20%, rgba(255,255,255,.35) 0 1px, transparent 1px), radial-gradient(circle at 80% 30%, rgba(255,255,255,.24) 0 1px, transparent 1px), radial-gradient(circle at 40% 80%, rgba(255,255,255,.18) 0 1px, transparent 1px)", backgroundSize: "7px 7px, 11px 11px, 15px 15px" }} />
-          <motion.div animate={{ y: [-18, 18, -18], scale: [1, 1.04, 1] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }} style={{ position: "absolute", right: "-180px", top: "-180px", width: 620, height: 620, borderRadius: "50%", background: "rgba(204,36,36,0.15)", filter: "blur(120px)" }} />
-          <motion.div animate={{ y: [16, -16, 16], scale: [1, 1.06, 1] }} transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 1.3 }} style={{ position: "absolute", left: "-150px", bottom: "-120px", width: 540, height: 540, borderRadius: "50%", background: "rgba(204,36,36,0.58)", filter: "blur(110px)" }} />
+          <motion.div animate={{ y: [-18, 18, -18], scale: [1, 1.04, 1] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }} style={{ position: "absolute", right: "-180px", top: "-180px", width: 620, height: 620, borderRadius: "50%", background: "rgba(139,30,45,0.15)", filter: "blur(120px)" }} />
+          <motion.div animate={{ y: [16, -16, 16], scale: [1, 1.06, 1] }} transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 1.3 }} style={{ position: "absolute", left: "-150px", bottom: "-120px", width: 540, height: 540, borderRadius: "50%", background: "rgba(139,30,45,0.58)", filter: "blur(110px)" }} />
         </div>
 
         <section style={{ position: "relative", zIndex: 1, maxWidth: 1180, margin: "0 auto", padding: "clamp(64px, 10vw, 104px) 20px 34px", minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", textAlign: "center" }}>
@@ -262,12 +262,12 @@ export function MasseurMatchComingSoon() {
             <input aria-hidden="true" tabIndex={-1} autoComplete="off" value={company} onChange={(event) => setCompany(event.target.value)} name="company" style={{ position: "absolute", left: -9999, width: 1, height: 1, opacity: 0 }} />
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
               <div style={{ flex: "1 1 260px", minHeight: 58, display: "flex", alignItems: "center", gap: 12, background: "rgba(0,0,0,.22)", padding: "0 18px" }}>
-                <div style={{ width: 22, height: 22, color: "rgba(165, 37, 56,.72)" }}><LuxuryIcon type="signal" /></div>
+                <div style={{ width: 22, height: 22, color: "rgba(255,179,71,.72)" }}><LuxuryIcon type="signal" /></div>
                 <input id="email" name="email" type="email" required value={email} onChange={(event) => setEmail(event.target.value)} onFocus={() => trackWaitlistEvent("waitlist_focus")} placeholder="Enter your email for early access" style={{ width: "100%", background: "transparent", border: 0, outline: 0, color: C.white, fontFamily: C.sans, fontSize: 14 }} />
               </div>
               <MagneticButton disabled={status === "loading"}>{status === "loading" ? "Locking..." : status === "success" ? "Joined" : "Get notified"}</MagneticButton>
             </div>
-            <motion.p key={message} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} style={{ margin: "12px 8px 0", fontFamily: C.sans, fontSize: 12, lineHeight: 1.6, color: status === "error" ? "#FFC4B8" : status === "success" ? "#F8EDEE" : "rgba(252,251,248,.44)" }}>{message}</motion.p>
+            <motion.p key={message} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} style={{ margin: "12px 8px 0", fontFamily: C.sans, fontSize: 12, lineHeight: 1.6, color: status === "error" ? "#FFC4B8" : status === "success" ? "#FFE3C7" : "rgba(252,251,248,.44)" }}>{message}</motion.p>
           </motion.form>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "34px auto 0", maxWidth: 920, width: "100%" }}>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -132,7 +132,7 @@ function RecommendationCard({
           className={cn(
             "inline-flex min-h-11 items-center justify-center rounded-full px-4 text-sm font-semibold uppercase tracking-[0.12em] transition",
             featured
-              ? "bg-[#8B1E2D] text-white hover:bg-[#6E1521]"
+              ? "bg-[#8B1E2D] text-white hover:bg-[#E87A15]"
               : "border border-white/[0.1] bg-white/[0.06] text-white hover:bg-white/[0.12]",
           )}
         >
@@ -160,7 +160,7 @@ function ChatBubble({
   if (isUser) {
     return (
       <div className="flex justify-end">
-        <div className="max-w-[82%] rounded-[20px] rounded-br-sm bg-gradient-to-br from-[#8B1E2D] to-[#6E1521] px-4 py-3 text-sm leading-relaxed text-white shadow-[0_12px_32px_rgba(139, 30, 45,0.18)]">
+        <div className="max-w-[82%] rounded-[20px] rounded-br-sm bg-gradient-to-br from-[#8B1E2D] to-[#E87A15] px-4 py-3 text-sm leading-relaxed text-white shadow-[0_12px_32px_rgba(255,138,31,0.18)]">
           {message.content}
         </div>
       </div>
@@ -262,7 +262,7 @@ export const KnottyChat = ({
       key={action.key}
       type="button"
       onClick={() => void sendMessage({ quickAction: action.key })}
-      className="rounded-full border border-[#8B1E2D]/25 bg-[#8B1E2D]/[0.07] px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#A52538] transition hover:border-[#8B1E2D]/50 hover:bg-[#8B1E2D]/15 hover:text-[#F8EDEE]"
+      className="rounded-full border border-[#8B1E2D]/25 bg-[#8B1E2D]/[0.07] px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#FFB366] transition hover:border-[#8B1E2D]/50 hover:bg-[#8B1E2D]/15 hover:text-[#FFD199]"
     >
       {action.label}
     </button>
@@ -278,7 +278,7 @@ export const KnottyChat = ({
         className,
       )}
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139, 30, 45,0.06),transparent_50%),radial-gradient(circle_at_bottom_left,rgba(6,14,26,0.8),transparent_56%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,138,31,0.06),transparent_50%),radial-gradient(circle_at_bottom_left,rgba(6,14,26,0.8),transparent_56%)]" />
 
       <div className="relative flex items-center justify-between border-b border-white/[0.06] bg-white/[0.02] px-5 py-4">
         <div className="flex items-center gap-3">
@@ -348,7 +348,7 @@ export const KnottyChat = ({
           <button
             type="submit"
             disabled={!input.trim() || isTyping}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#8B1E2D] text-white transition hover:bg-[#6E1521] disabled:cursor-not-allowed disabled:opacity-35"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#8B1E2D] text-white transition hover:bg-[#E87A15] disabled:cursor-not-allowed disabled:opacity-35"
             aria-label="Send message"
           >
             <ArrowUp className="h-4 w-4" strokeWidth={2.5} />
@@ -377,11 +377,11 @@ export const KnottyChat = ({
               setIsOpen(true);
               trackOpen();
             }}
-            className="group relative h-16 w-16 rounded-full border border-white/20 bg-[linear-gradient(180deg,#8B1E2D,#E06B00)] shadow-[0_20px_48px_rgba(139, 30, 45,0.3)]"
+            className="group relative h-16 w-16 rounded-full border border-white/20 bg-[linear-gradient(180deg,#8B1E2D,#E06B00)] shadow-[0_20px_48px_rgba(255,138,31,0.3)]"
             aria-label="Open Knotty chat"
           >
             <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.3),transparent_58%)]" />
-            <div className="absolute -inset-2 rounded-full bg-[radial-gradient(circle,rgba(139, 30, 45,0.45),transparent_65%)] opacity-75 blur-2xl transition group-hover:opacity-100" />
+            <div className="absolute -inset-2 rounded-full bg-[radial-gradient(circle,rgba(255,138,31,0.45),transparent_65%)] opacity-75 blur-2xl transition group-hover:opacity-100" />
             <div className="relative flex h-full w-full items-center justify-center text-white">
               <MessageCircle className="h-6 w-6" strokeWidth={2.25} />
             </div>
