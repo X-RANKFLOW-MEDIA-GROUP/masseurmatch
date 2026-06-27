@@ -1,22 +1,23 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 
 /* ─────────────────────────────────────────────
-   MasseurMatch Design System — Red/Black/White
+   MasseurMatch Design System — Sober Red/Black/White
    ──────────────────────────────────────────── */
 :root {
   --mm-bg:          #FFFFFF;
-  --mm-dark:        #1A1A1A;
-  --mm-accent:      #FF8A1F;
-  --mm-accent-hover:#E67600;
-  --mm-gray:        #666666;
-  --mm-muted:       #999999;
+  --mm-dark:        #111111;
+  --mm-accent:      #8B1E2D;
+  --mm-accent-hover:#6E1521;
+  --mm-accent-soft: #F8EDEE;
+  --mm-gray:        #6F6F6F;
+  --mm-muted:       #8E8E8E;
   --mm-border:      rgba(0,0,0,0.08);
   --mm-white:       #FFFFFF;
-  --mm-light:       #F4F5F6;
-  --mm-med:         #E2E4E6;
+  --mm-light:       #F7F7F7;
+  --mm-med:         #E8E8E8;
 
-  --mm-font-heading: var(--font-montserrat), 'Montserrat', system-ui, sans-serif;
-  --mm-font-body:    var(--font-montserrat), 'Montserrat', system-ui, sans-serif;
+  --mm-font-heading: var(--font-satoshi), 'Satoshi', Arial, sans-serif;
+  --mm-font-body:    var(--font-satoshi), 'Satoshi', Arial, sans-serif;
 
   --mm-label-size:    11px;
   --mm-label-spacing: 0.22em;
@@ -62,11 +63,21 @@ h1, h2, h3, h4, h5, h6 {
   color: #FFFFFF;
   text-decoration: none;
   border: none;
+  border-radius: 999px;
   cursor: pointer;
-  transition: background 0.2s;
+  box-shadow: 0 10px 24px rgba(139,30,45,0.18);
+  transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
 }
 .mm-btn-primary:hover {
   background: var(--mm-accent-hover);
+  transform: translateY(-1px);
+}
+.mm-btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+.mm-btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(139, 30, 45, 0.18);
 }
 
 .mm-btn-outline {
@@ -82,12 +93,17 @@ h1, h2, h3, h4, h5, h6 {
   background: transparent;
   color: var(--mm-dark);
   text-decoration: none;
-  border: 1px solid rgba(0,0,0,0.2);
+  border: 1px solid var(--mm-med);
+  border-radius: 999px;
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
+  transition: border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
 }
 .mm-btn-outline:hover {
   border-color: var(--mm-dark);
+  transform: translateY(-1px);
+}
+.mm-btn-outline:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .mm-btn-outline-light {
@@ -125,12 +141,12 @@ h1, h2, h3, h4, h5, h6 {
 .mm-city-card {
   background: #ffffff;
   border-bottom: 3px solid transparent;
-  transition: border-bottom-color 0.2s ease, background 0.2s ease;
+  transition: border-bottom-color 0.18s ease, background 0.18s ease;
   display: block;
   text-decoration: none;
 }
 .mm-city-card:hover {
-  border-bottom-color: #FF8A1F;
+  border-bottom-color: #8B1E2D;
   background: #FAFAFA;
 }
 
@@ -142,15 +158,15 @@ h1, h2, h3, h4, h5, h6 {
   background: #FAFAFA;
   text-decoration: none;
   border-bottom: 2px solid transparent;
-  transition: border-bottom-color 0.2s ease, background 0.2s ease;
+  transition: border-bottom-color 0.18s ease, background 0.18s ease;
 }
 .mm-service-link:hover {
-  border-bottom-color: #FF8A1F;
+  border-bottom-color: #8B1E2D;
   background: #ffffff;
 }
 .mm-service-link .mm-arrow {
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.18s ease;
 }
 .mm-service-link:hover .mm-arrow {
   opacity: 1;
