@@ -50,16 +50,15 @@ export default function TherapistsPageClient({
       async (position) => {
         try {
           const { latitude, longitude } = position.coords;
+          // Route through our own proxy: the browser cannot call Nominatim
+          // directly (CSP + Nominatim usage policy). The proxy geocodes
+          // server-side and resolves to a supported city.
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
-            { headers: { "Accept-Language": "en-US,en" } }
+            `/api/reverse-geocode?lat=${latitude}&lng=${longitude}`,
+            { headers: { Accept: "application/json" } }
           );
-          const data = (await res.json()) as { address?: { city?: string; town?: string; municipality?: string } };
-          const detected =
-            data.address?.city ||
-            data.address?.town ||
-            data.address?.municipality ||
-            "";
+          const data = (await res.json()) as { city?: string | null };
+          const detected = data.city || "";
           if (detected) {
             setDetectedCity(detected);
             setCity(detected);
