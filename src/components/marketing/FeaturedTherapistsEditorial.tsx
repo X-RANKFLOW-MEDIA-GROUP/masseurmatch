@@ -67,9 +67,9 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
                 >
                   {/* Portrait image */}
                   <div className="relative aspect-[3/4] overflow-hidden bg-muted">
-                    {therapist.avatar_url ? (
+                    {(therapist.profile_photo || therapist.avatar_url) ? (
                       <Image
-                        src={therapist.avatar_url}
+                        src={(therapist.profile_photo || therapist.avatar_url) as string}
                         alt={therapist.display_name || therapist.full_name || "Therapist"}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"

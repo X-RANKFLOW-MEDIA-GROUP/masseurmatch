@@ -33,23 +33,15 @@ function nextMessageId() {
     : `knotty-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-const INITIAL_ASSISTANT_MESSAGE: ConversationMessage = {
-  id: "knotty-intro",
-  role: "assistant",
-  content:
-    "Hey! I’m Knotty. Tell me what you’re looking for — availability, location, type of massage, whatever matters most — and I’ll find the right match for you.",
-};
-
 export function useKnotty() {
   const sessionIdRef = useRef(getOrCreateKnottySessionId());
-  const [messages, setMessages] = useState<ConversationMessage[]>([INITIAL_ASSISTANT_MESSAGE]);
+  const [messages, setMessages] = useState<ConversationMessage[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
   const conversationHistory = useMemo<KnottyMessage[]>(
     () =>
       messages
-        .filter((message) => message.id !== INITIAL_ASSISTANT_MESSAGE.id)
         .slice(-8)
         .map((message) => ({
           role: message.role,

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -175,7 +175,7 @@ export function ProfileAIChat({ profile }: Props) {
             aria-label="Ask Knotty AI"
             className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full"
             style={{
-              background: "linear-gradient(135deg, #CC2424 0%, #A81D1D 100%)",
+              background: "linear-gradient(135deg, #FF8A1F 0%, #E67600 100%)",
               boxShadow: "0 8px 32px rgba(204,36,36,0.45), 0 2px 8px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.3)",
             }}
           >
@@ -230,7 +230,7 @@ export function ProfileAIChat({ profile }: Props) {
                 <div
                   className="flex h-10 w-10 items-center justify-center rounded-full"
                   style={{
-                    background: "linear-gradient(135deg, #CC2424 0%, #A81D1D 100%)",
+                    background: "linear-gradient(135deg, #FF8A1F 0%, #E67600 100%)",
                     boxShadow: "0 4px 12px rgba(204,36,36,0.4), inset 0 1px 0 rgba(255,255,255,0.3)",
                   }}
                 >
@@ -291,7 +291,7 @@ export function ProfileAIChat({ profile }: Props) {
                           boxShadow: "0 2px 8px rgba(26,26,26,0.06), inset 0 1px 0 rgba(255,255,255,0.8)",
                         }
                       : {
-                          background: "linear-gradient(135deg, #CC2424 0%, #A81D1D 100%)",
+                          background: "linear-gradient(135deg, #FF8A1F 0%, #E67600 100%)",
                           color: "#fff",
                           boxShadow: "0 4px 12px rgba(204,36,36,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
                         }
@@ -339,7 +339,7 @@ export function ProfileAIChat({ profile }: Props) {
                   <span
                     className="ml-0.5 inline-block h-3.5 w-0.5 align-middle"
                     style={{
-                      background: "#CC2424",
+                      background: "#FF8A1F",
                       animation: "blink 0.7s step-end infinite",
                     }}
                   />
@@ -409,7 +409,7 @@ export function ProfileAIChat({ profile }: Props) {
                   disabled={!input.trim() || phase !== "idle"}
                   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition disabled:opacity-30"
                   style={{
-                    background: "linear-gradient(135deg, #CC2424 0%, #A81D1D 100%)",
+                    background: "linear-gradient(135deg, #FF8A1F 0%, #E67600 100%)",
                     boxShadow: "0 2px 8px rgba(204,36,36,0.4)",
                   }}
                   aria-label="Send"

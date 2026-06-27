@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Clock3, MapPinned, ArrowUp, ShieldCheck, Sparkles, X } from "lucide-react";
+import { ArrowUpRight, Clock3, MapPinned, ArrowUp, MessageCircle, ShieldCheck, X } from "lucide-react";
 import { useKnotty } from "@/hooks/useKnotty";
 import { cn } from "@/lib/utils";
 import type { KnottyRecommendation } from "@/lib/knotty/types";
@@ -119,9 +119,9 @@ function RecommendationCard({
         ) : null}
       </div>
 
-      <ul className="mt-3 space-y-2 text-sm leading-6 text-white/78">
+      <ul className="mt-3 list-disc list-inside space-y-2 text-sm leading-6 text-white/78">
         {recommendation.why.map((reason) => (
-          <li key={`${recommendation.therapistId}-${reason}`}>• {reason}</li>
+          <li key={`${recommendation.therapistId}-${reason}`}>{reason}</li>
         ))}
       </ul>
 
@@ -224,6 +224,16 @@ export const KnottyChat = ({
     }
   }, [isEmbedded, trackOpen]);
 
+  // Auto-open floating chat after 3 seconds on page load.
+  useEffect(() => {
+    if (isEmbedded) return;
+    const timer = setTimeout(() => {
+      setIsOpen(true);
+      trackOpen();
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [isEmbedded, trackOpen]);
+
   // Allow any part of the app to open the floating chat (optionally with a
   // prefilled prompt) by dispatching a `knotty:open` window event.
   useEffect(() => {
@@ -273,7 +283,7 @@ export const KnottyChat = ({
       <div className="relative flex items-center justify-between border-b border-white/[0.06] bg-white/[0.02] px-5 py-4">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#FF8A1F]/20 bg-[#FF8A1F]/10 text-[#FF8A1F]">
-            <Sparkles className="h-4 w-4" strokeWidth={2.25} />
+            <MessageCircle className="h-4 w-4" strokeWidth={2.25} />
           </div>
           <div>
             <p className="text-sm font-semibold text-white/90">Knotty</p>
@@ -373,7 +383,7 @@ export const KnottyChat = ({
             <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.3),transparent_58%)]" />
             <div className="absolute -inset-2 rounded-full bg-[radial-gradient(circle,rgba(255,138,31,0.45),transparent_65%)] opacity-75 blur-2xl transition group-hover:opacity-100" />
             <div className="relative flex h-full w-full items-center justify-center text-white">
-              <Sparkles className="h-6 w-6" strokeWidth={2.25} />
+              <MessageCircle className="h-6 w-6" strokeWidth={2.25} />
             </div>
           </motion.button>
         ) : (

@@ -163,10 +163,8 @@ const buildPublicTherapistsQuery = () => {
     .eq("profile_status", "approved")
     .eq("is_suspended", false)
     .eq("is_banned", false)
-    // Exclude internal dev/test accounts by email domain
     .or("email_address.is.null,not.email_address.ilike.%@example%")
     .or("email_address.is.null,not.email_address.ilike.%admin.dev@%")
-    // Exclude technical/demo profiles by name/slug/phone patterns
     .not("display_name", "ilike", "%test%")
     .not("display_name", "ilike", "%debug%")
     .not("display_name", "ilike", "%admin%")
@@ -403,6 +401,34 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
       storage_path: p.storage_path,
       is_primary: p.is_primary ?? false,
     }));
+};
+
+export const getProfilePhotosBatch = async (
+  profileIds: string[],
+  limitPerProfile = 1,
+): Promise<Map<string, ProfilePhoto[]>> => {
+  const result = new Map<string, ProfilePhoto[]>();
+  if (!profileIds.length) return result;
+
+  const { data, error } = await supabase
+    .from("profile_photos")
+    .select("id, profile_id, storage_path, is_primary, sort_order")
+    .in("profile_id", profileIds)
+    .eq("moderation_status", "approved")
+    .order("sort_order", { ascending: true });
+
+  if (error || !data?.length) return result;
+
+  for (const row of data) {
+    if (!row.profile_id || !row.storage_path) continue;
+    const existing = result.get(row.profile_id) ?? [];
+    if (existing.length < limitPerProfile) {
+      existing.push({ id: row.id, storage_path: row.storage_path, is_primary: row.is_primary ?? false });
+      result.set(row.profile_id, existing);
+    }
+  }
+
+  return result;
 };
 
 export async function getCityInventoryCount(cityName: string): Promise<number> {

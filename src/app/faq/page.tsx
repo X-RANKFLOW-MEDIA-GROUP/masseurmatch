@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
 
@@ -147,7 +147,7 @@ export default function FAQPage() {
               fontSize: 11,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "#CC2424",
+              color: "#FF8A1F",
               marginBottom: 20,
               fontFamily: "system-ui, sans-serif",
             }}
@@ -195,7 +195,7 @@ export default function FAQPage() {
                   style={{
                     width: 32,
                     height: 1,
-                    background: "#CC2424",
+                    background: "#FF8A1F",
                   }}
                 />
                 <h2
@@ -204,7 +204,7 @@ export default function FAQPage() {
                     letterSpacing: "0.22em",
                     textTransform: "uppercase",
                     fontFamily: "system-ui, sans-serif",
-                    color: "#CC2424",
+                    color: "#FF8A1F",
                     margin: 0,
                   }}
                 >
@@ -237,7 +237,7 @@ export default function FAQPage() {
                       <span
                         style={{
                           fontSize: 20,
-                          color: "#CC2424",
+                          color: "#FF8A1F",
                           flexShrink: 0,
                           marginLeft: 16,
                         }}
@@ -302,7 +302,7 @@ export default function FAQPage() {
               letterSpacing: "0.14em",
               textTransform: "uppercase",
               fontFamily: "system-ui, sans-serif",
-              background: "#CC2424",
+              background: "#FF8A1F",
               color: "#1A1A1A",
               textDecoration: "none",
               fontWeight: 700,

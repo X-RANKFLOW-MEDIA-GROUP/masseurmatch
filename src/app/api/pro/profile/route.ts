@@ -120,10 +120,10 @@ export async function POST(request: Request) {
     const parsed = parseProfilePayload(rawBody);
 
     const rulesAccepted = rawBody && typeof rawBody === "object" && (rawBody as Record<string, unknown>).rulesAccepted === true;
-    const moderationPassed = rawBody && typeof rawBody === "object" && (rawBody as Record<string, unknown>).moderationPassed === true;
 
-    const wasApproved = profile.profile_status === "approved" || profile.profile_status === "under_review";
-    const canAutoApprove = wasApproved && rulesAccepted && moderationPassed;
+    // Auto-approve is never granted based on client-supplied flags.
+    // Profile edits always go through admin review (under_review → approved).
+    const canAutoApprove = false;
 
     const now = new Date().toISOString();
     const nextStatus = canAutoApprove ? "approved" : (

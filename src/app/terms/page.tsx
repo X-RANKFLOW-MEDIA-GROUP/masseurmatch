@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Script from "next/script";
 
 export const metadata: Metadata = {
@@ -162,7 +162,7 @@ export default function TermsPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#CC2424",
+                color: "#FF8A1F",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -228,7 +228,7 @@ export default function TermsPage() {
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
                 fontFamily: "system-ui, sans-serif",
-                color: "#CC2424",
+                color: "#FF8A1F",
                 marginBottom: 16,
               }}
             >
@@ -257,7 +257,7 @@ export default function TermsPage() {
           <div>
             <div
               style={{
-                background: "#CC2424",
+                background: "#FF8A1F",
                 color: "#FFFFFF",
                 padding: "18px 18px",
                 marginBottom: 48,

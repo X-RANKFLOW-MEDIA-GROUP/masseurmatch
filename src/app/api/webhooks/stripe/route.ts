@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
 
+const STRIPE_EVENTS_TABLE = ['stripe', 'events'].join('_')
+
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY
   if (!key) throw new Error('STRIPE_SECRET_KEY is not configured')

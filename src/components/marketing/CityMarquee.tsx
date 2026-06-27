@@ -1,84 +1,42 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
-import { Building2 } from "lucide-react";
-import { US_CITIES } from "@/data/cities";
+import { MapPin } from "lucide-react";
 
-/**
- * Slim popular-cities strip for the first fold. It keeps the editorial movement
- * from the old marquee but uses a shorter conversion-focused bar so the hero
- * profile cards and AI match assistant remain the primary visual focus.
- */
-
-type City = { name: string; slug: string };
-
-const CITY_SLUGS = [
-  "dallas",
-  "miami",
-  "los-angeles",
-  "new-york",
-  "houston",
-  "atlanta",
-  "orlando",
-  "chicago",
-  "las-vegas",
-  "washington-dc",
+const TOP_CITIES = [
+  { name: "New York", slug: "new-york" },
+  { name: "Los Angeles", slug: "los-angeles" },
+  { name: "Miami", slug: "miami" },
+  { name: "Chicago", slug: "chicago" },
+  { name: "Dallas", slug: "dallas" },
+  { name: "Houston", slug: "houston" },
+  { name: "Atlanta", slug: "atlanta" },
+  { name: "Las Vegas", slug: "las-vegas" },
 ];
 
-const CITIES: City[] = CITY_SLUGS.flatMap((slug) => {
-  const city = US_CITIES.find((c) => c.slug === slug);
-  return city ? [{ name: city.name, slug: city.slug }] : [];
-});
-
-function Row() {
-  return (
-    <div className="flex shrink-0 items-center gap-4 px-4 text-sm font-black uppercase tracking-[0.08em] text-white/80 lg:gap-7">
-      {CITIES.map((city, index) => (
-        <Link
-          key={`${city.slug}-${index}`}
-          href={`/${city.slug}`}
-          className="whitespace-nowrap transition hover:text-white"
-        >
-          <span className={index === 0 ? "text-[#CC2424]" : ""}>{city.name}</span>
-        </Link>
-      ))}
-    </div>
-  );
-}
-
 export function CityMarquee() {
-  const prefersReduced = useReducedMotion();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  const reduced = mounted && prefersReduced;
-
   return (
-    <div className="bg-white px-5 pb-10 sm:px-8 lg:px-10">
-      <div className="relative mx-auto flex max-w-[1500px] items-center overflow-hidden rounded-2xl border border-white/10 bg-[#181818] py-4 shadow-[0_16px_45px_rgba(15,23,42,0.18)]">
-        <div className="z-20 flex shrink-0 items-center gap-3 border-r border-white/15 bg-[#181818] px-5 text-xs font-black uppercase tracking-[0.12em] text-white/75 lg:px-7">
-          <Building2 size={17} className="text-white/65" />
-          Popular Cities
-        </div>
-
-        <div className="pointer-events-none absolute inset-y-0 left-36 z-10 w-16 bg-gradient-to-r from-[#181818] to-transparent lg:left-48" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#181818] to-transparent" />
-
-        {reduced ? (
-          <div className="flex min-w-0 overflow-hidden">
-            <Row />
-          </div>
-        ) : (
-          <motion.div
-            className="flex min-w-0"
-            animate={{ x: ["0%", "-50%"] }}
-            transition={{ repeat: Infinity, ease: "linear", duration: 42 }}
+    <div className="border-t border-white/[0.06] bg-[#060E1A] px-4 py-4 sm:px-8">
+      <div className="mx-auto flex max-w-[1500px] flex-wrap items-center gap-x-1 gap-y-1">
+        <span className="flex items-center gap-1.5 pr-3 font-mono text-[9px] uppercase tracking-[0.2em] text-white/35 sm:text-[10px]">
+          <MapPin size={10} className="text-[#FF8A1F]" />
+          Browse by city
+        </span>
+        {TOP_CITIES.map((city, i) => (
+          <Link
+            key={city.slug}
+            href={`/${city.slug}`}
+            className="rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-[11px] font-medium text-white/55 transition hover:border-white/20 hover:text-white/90"
           >
-            <Row />
-            <Row />
-          </motion.div>
-        )}
+            {city.name}
+          </Link>
+        ))}
+        <Link
+          href="/cities"
+          className="ml-1 rounded-full border border-[#FF8A1F]/30 bg-[#FF8A1F]/[0.06] px-3 py-1 text-[11px] font-semibold text-[#FF8A1F] transition hover:bg-[#FF8A1F]/[0.12]"
+        >
+          All cities →
+        </Link>
       </div>
     </div>
   );
