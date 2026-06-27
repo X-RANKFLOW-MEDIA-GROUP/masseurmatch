@@ -1,8 +1,9 @@
 ﻿"use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { useKnotty } from "@/hooks/useKnotty";
 import {
   Sparkles,
   MessageCircle,
@@ -97,7 +98,14 @@ interface HeroClientProps {
 export default function HeroClient({ featuredTherapists = [] }: HeroClientProps) {
   const reducedMotion = useReducedMotion();
   const router = useRouter();
-  const [assistantInput, setAssistantInput] = useState("");
+  const {
+    input: assistantInput,
+    setInput: setAssistantInput,
+    messages: knottyMessages,
+    isTyping,
+    sendMessage,
+  } = useKnotty();
+  const conversationEndRef = useRef<HTMLDivElement>(null);
 
   const realProfiles = useMemo(
     () => featuredTherapists.filter(isRealProfile).slice(0, 3),
@@ -107,12 +115,16 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
   const dur = reducedMotion ? 0 : 0.7;
   const noDelay = reducedMotion ? 0 : undefined;
 
-  const submitAssistantPrompt = (prompt = assistantInput) => {
-    const q = prompt.trim();
+  // The hero card holds a real conversation inline (greeting + live replies).
+  const submitAssistantPrompt = (prompt?: string) => {
+    const q = (prompt ?? assistantInput).trim();
     if (!q) return;
-    setAssistantInput("");
-    window.dispatchEvent(new CustomEvent("knotty:open", { detail: { prompt: q } }));
+    void sendMessage({ content: q });
   };
+
+  useEffect(() => {
+    conversationEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [knottyMessages, isTyping]);
 
   return (
     <section className="relative overflow-hidden bg-[radial-gradient(circle_at_24%_18%,rgba(139,30,45,0.08),transparent_28%),linear-gradient(180deg,#ffffff_0%,#fbfaf8_100%)] text-[#151515]">
@@ -194,18 +206,43 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             </div>
 
             <div className="space-y-4 px-5 py-5">
-              <div className="ml-auto max-w-[78%] rounded-2xl rounded-tr-md bg-slate-100 px-4 py-3 text-sm font-medium leading-6 text-[#2B3038]">
-                I need a deep tissue masseur in Dallas tonight.
-                <span className="mt-1 block text-right text-[11px] text-[#98A2B3]">10:24 AM</span>
-              </div>
-              <div className="flex max-w-[86%] items-start gap-3">
-                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#8B1E2D]/10 text-[#8B1E2D]">
-                  <Sparkles size={16} />
-                </div>
-                <div className="rounded-2xl rounded-tl-md bg-[#F7F7F8] px-4 py-3 text-sm font-medium leading-6 text-[#2B3038]">
-                  I can help with that. Do you prefer in-call or outcall, and what area of Dallas works best for you?
-                  <span className="mt-1 block text-[11px] text-[#98A2B3]">10:24 AM</span>
-                </div>
+              <div className="max-h-[224px] space-y-4 overflow-y-auto pr-1">
+                {knottyMessages.map((message) =>
+                  message.role === "user" ? (
+                    <div
+                      key={message.id}
+                      className="ml-auto max-w-[78%] rounded-2xl rounded-tr-md bg-[#8B1E2D] px-4 py-3 text-sm font-medium leading-6 text-white"
+                    >
+                      {message.content}
+                    </div>
+                  ) : (
+                    <div key={message.id} className="flex max-w-[90%] items-start gap-3">
+                      <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#8B1E2D]/10 text-[#8B1E2D]">
+                        <Sparkles size={16} />
+                      </div>
+                      <div className="rounded-2xl rounded-tl-md bg-[#F7F7F8] px-4 py-3 text-sm font-medium leading-6 text-[#2B3038]">
+                        {message.content}
+                      </div>
+                    </div>
+                  ),
+                )}
+                {isTyping ? (
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#8B1E2D]/10 text-[#8B1E2D]">
+                      <Sparkles size={16} />
+                    </div>
+                    <div className="flex items-center gap-1.5 rounded-2xl rounded-tl-md bg-[#F7F7F8] px-4 py-3.5">
+                      {[0, 1, 2].map((dot) => (
+                        <span
+                          key={dot}
+                          className="h-[7px] w-[7px] animate-knotty-pulse rounded-full bg-[#8B1E2D]/60"
+                          style={{ animationDelay: `${dot * 180}ms` }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+                <div ref={conversationEndRef} />
               </div>
 
               <div className="flex flex-wrap gap-2 pt-1">
@@ -228,7 +265,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                   onKeyDown={(event) => {
                     if (event.key === "Enter") submitAssistantPrompt();
                   }}
-                  placeholder="Describe what you need..."
+                  placeholder="Ask Knotty anything..."
                   aria-label="Ask Knotty AI what massage provider you need"
                   className="min-w-0 flex-1 bg-transparent px-3 text-sm text-[#151515] outline-none placeholder:text-[#98A2B3]"
                 />
