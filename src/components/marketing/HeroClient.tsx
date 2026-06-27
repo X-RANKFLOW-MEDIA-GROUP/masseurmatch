@@ -101,7 +101,9 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
 
   const submitAssistantPrompt = (prompt = assistantInput) => {
     const q = prompt.trim();
-    router.push(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
+    if (!q) return;
+    setAssistantInput("");
+    window.dispatchEvent(new CustomEvent("knotty:open", { detail: { prompt: q } }));
   };
 
   return (
