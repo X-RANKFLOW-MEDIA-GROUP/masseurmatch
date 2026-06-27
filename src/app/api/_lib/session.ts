@@ -54,6 +54,7 @@ function serializeCookie(
     path?: string;
     sameSite?: "Lax" | "Strict" | "None";
     secure?: boolean;
+    domain?: string;
   } = {},
 ) {
   const parts = [`${name}=${encodeURIComponent(value)}`];
@@ -64,6 +65,10 @@ function serializeCookie(
 
   parts.push(`Path=${options.path ?? "/"}`);
   parts.push(`SameSite=${options.sameSite ?? "Lax"}`);
+
+  if (options.domain) {
+    parts.push(`Domain=${options.domain}`);
+  }
 
   if (options.httpOnly !== false) {
     parts.push("HttpOnly");
@@ -132,6 +137,7 @@ export function setSessionCookie(session: Omit<RequestSession, "expiresAt"> & { 
     path: "/",
     sameSite: "Lax",
     secure,
+    domain: secure ? ".masseurmatch.com" : undefined,
   });
 }
 
@@ -144,6 +150,7 @@ export function clearSessionCookie(): string {
     path: "/",
     sameSite: "Lax",
     secure,
+    domain: secure ? ".masseurmatch.com" : undefined,
   });
 }
 

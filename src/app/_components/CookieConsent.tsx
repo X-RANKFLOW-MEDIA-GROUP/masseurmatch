@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -39,7 +39,7 @@ export function CookieConsent() {
             <p className="mt-1.5 text-sm leading-6 text-slate-600">
               We use essential cookies for site function and optional cookies to improve the
               experience. Review our{" "}
-              <Link href="/cookie-policy" className="font-semibold text-[#1A1A1A] underline underline-offset-2 hover:text-[#CC2424]">
+              <Link href="/cookie-policy" className="font-semibold text-[#1A1A1A] underline underline-offset-2 hover:text-[#FF8A1F]">
                 Cookie Policy
               </Link>
               .
@@ -57,7 +57,7 @@ export function CookieConsent() {
             <button
               type="button"
               onClick={() => savePreference("accepted")}
-              className="min-h-10 rounded-lg bg-[#CC2424] px-3 text-sm font-semibold text-[#1A1A1A] shadow-sm transition-colors hover:bg-[#A81D1D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#CC2424]"
+              className="min-h-10 rounded-lg bg-[#FF8A1F] px-3 text-sm font-semibold text-[#1A1A1A] shadow-sm transition-colors hover:bg-[#E67600] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF8A1F]"
             >
               Accept
             </button>

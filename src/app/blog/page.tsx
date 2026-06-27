@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Script from "next/script";
 import { BlogContent } from "./_components/BlogContent";
 import { NewsletterSignup } from "./_components/NewsletterSignup";
@@ -61,7 +61,7 @@ export default function BlogPage() {
               fontSize: 11,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "#CC2424",
+              color: "#FF8A1F",
               marginBottom: 20,
               fontFamily: "system-ui, sans-serif",
             }}

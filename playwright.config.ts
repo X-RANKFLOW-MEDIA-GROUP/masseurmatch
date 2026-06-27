@@ -17,6 +17,7 @@ const shouldManageWebServer = !process.env.PLAYWRIGHT_BASE_URL;
 
 export default defineConfig({
   testDir: "./tests",
+  testIgnore: ["**/unit/**"],
   timeout: 30_000,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["list"]] : [["list"]],

@@ -1,21 +1,26 @@
 "use client";
 
 import Link from "next/link";
+import {
+  Waves, Zap, Dumbbell, Leaf, HeartPulse, Users,
+  Flame, Mountain, Flower2, PersonStanding, Wind, Footprints,
+  type LucideIcon,
+} from "lucide-react";
 import type { PublicTherapist } from "@/app/_lib/directory";
 
-const SERVICE_ICONS: Record<string, string> = {
-  swedish: "🤲",
-  "deep tissue": "💪",
-  sports: "🏃",
-  relaxing: "✨",
-  therapeutic: "🧠",
-  couples: "👥",
-  hot: "🔥",
-  stone: "🪨",
-  aromatherapy: "🌸",
-  thai: "🧘",
-  shiatsu: "🎎",
-  reflexology: "🦶",
+const SERVICE_ICONS: Record<string, LucideIcon> = {
+  swedish: Waves,
+  "deep tissue": Zap,
+  sports: Dumbbell,
+  relaxing: Leaf,
+  therapeutic: HeartPulse,
+  couples: Users,
+  hot: Flame,
+  stone: Mountain,
+  aromatherapy: Flower2,
+  thai: PersonStanding,
+  shiatsu: Wind,
+  reflexology: Footprints,
 };
 
 const SERVICE_DESCRIPTIONS: Record<string, string> = {
@@ -43,26 +48,23 @@ export function PremiumProfileServices({ profile }: Props) {
   // Get service cards from specialties
   const serviceCards = specialties.slice(0, 6).map((specialty) => {
     const key = specialty.toLowerCase();
-    const icon = SERVICE_ICONS[key] || "💆";
+    const Icon = SERVICE_ICONS[key] || HeartPulse;
     const desc = SERVICE_DESCRIPTIONS[key] || `Professional ${specialty.toLowerCase()} massage tailored to your needs.`;
     const isFeatured = key === "swedish" || key === "deep tissue";
     
     return {
       name: specialty,
-      icon,
+      Icon,
       desc,
       isFeatured,
       href: city ? `/${city}/${key.replace(/\s+/g, "-")}-massage` : `/search?q=${encodeURIComponent(specialty)}`,
     };
   });
 
-  // Service tags
   const tags = [
     profile.lgbtq_affirming && "LGBTQ+ Affirming",
     profile.outcall_price && "Outcall Available",
     profile.incall_price && "Incall Available",
-    "Same Day Booking",
-    "Hotel Sessions",
     profile.city && profile.neighborhood_name && profile.neighborhood_name,
   ].filter(Boolean);
 
@@ -79,7 +81,7 @@ export function PremiumProfileServices({ profile }: Props) {
             href={service.href}
             className={`pp-service-card ${service.isFeatured ? "featured" : ""}`}
           >
-            <div className="pp-service-icon">{service.icon}</div>
+            <div className="pp-service-icon"><service.Icon size={22} strokeWidth={2.25} /></div>
             <div className="pp-service-name">{service.name}</div>
             <div className="pp-service-desc">{service.desc}</div>
           </Link>

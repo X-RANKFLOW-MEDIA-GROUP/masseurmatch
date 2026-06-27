@@ -1,37 +1,71 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
-  ArrowRight,
-  BadgeCheck,
-  Clock,
-  Heart,
-  MapPin,
-  MessageCircle,
-  Phone,
-  Send,
-  ShieldCheck,
   Sparkles,
-  Star,
+  MessageCircle,
+  Send,
+  ArrowRight,
+  Check,
+  Lock,
+  Shield,
 } from "lucide-react";
+import { HeroMediaBanner } from "@/components/marketing/HeroMediaBanner";
 import type { PublicTherapist } from "@/app/_lib/directory";
 
-type HeroClientProps = {
-  featuredTherapists?: PublicTherapist[];
-};
+const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-const quickPrompts = ["Deep Tissue", "Sports Massage", "Available Now", "Dallas", "Outcall"];
-
-const trustItems = [
-  { label: "Verified Photos", icon: ShieldCheck },
-  { label: "LGBTQ+ Friendly", icon: Heart },
-  { label: "Direct Contact", icon: Phone },
-  { label: "Available Now", icon: Clock },
+const quickPrompts = [
+  "Deep tissue in my area",
+  "Available today",
+  "Outcall services",
+  "New therapists",
 ];
 
-const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const trustItems = [
+  { label: "Verified profiles", icon: Check },
+  { label: "Secure & private", icon: Lock },
+  { label: "Trusted reviews", icon: Shield },
+];
+
+function TherapistCard({ profile, index }: { profile: PublicTherapist; index: number }) {
+  const router = useRouter();
+  const displayName = profile.display_name || profile.full_name || "Therapist";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 36, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.65, ease: customEase, delay: 0.15 + index * 0.08 }}
+      className="relative flex min-w-[250px] flex-1 flex-col rounded-[1.75rem] border border-black/5 bg-white/95 p-4 pt-36 shadow-[0_28px_70px_rgba(15,23,42,0.13)] backdrop-blur"
+      onClick={() => router.push(`/therapists/${profile.slug || profile.id}`)}
+    >
+      {profile.profile_photo && (
+        <div className="absolute inset-x-3 -top-20 flex h-56 items-end justify-center overflow-hidden rounded-[1.5rem] bg-gradient-to-b from-slate-50 via-white to-white">
+          <img
+            src={profile.profile_photo}
+            alt={`${displayName} profile photo`}
+            loading={index === 0 ? "eager" : "lazy"}
+            className="h-full w-full object-cover object-top mix-blend-multiply"
+          />
+        </div>
+      )}
+      <div className="mt-3">
+        <h3 className="font-display text-lg font-black text-[#151515]">{displayName}</h3>
+        <p className="text-sm text-[#5F6673]">{profile.city || "Location"}</p>
+      </div>
+      <button
+        type="button"
+        onClick={() => router.push(`/therapists/${profile.slug || profile.id}`)}
+        className="mt-5 w-full rounded-xl bg-[#FF8A1F] px-5 py-3 text-sm font-black uppercase tracking-wide text-white shadow-lg shadow-[#FF8A1F]/20 transition hover:bg-[#E67600]"
+      >
+        View Profile
+      </button>
+    </motion.div>
+  );
+}
 
 function isRealProfile(profile: PublicTherapist) {
   const id = profile.id?.toLowerCase() ?? "";
@@ -48,158 +82,8 @@ function isRealProfile(profile: PublicTherapist) {
   );
 }
 
-function getDisplayName(profile: PublicTherapist) {
-  return profile.display_name || profile.full_name || "MasseurMatch provider";
-}
-
-function getInitials(profile: PublicTherapist) {
-  const name = getDisplayName(profile);
-  const parts = name.split(/\s+/).filter(Boolean);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return `${parts[0][0] ?? "M"}${parts[1][0] ?? "M"}`.toUpperCase();
-}
-
-function getSpecialty(profile: PublicTherapist) {
-  return (
-    profile.headline ||
-    profile.specialties?.[0] ||
-    profile.massage_techniques?.[0] ||
-    profile.service_categories?.[0] ||
-    "Professional bodywork"
-  );
-}
-
-function getLocation(profile: PublicTherapist) {
-  const area = profile.neighborhood || profile.neighborhood_name || profile.primary_area;
-  const cityState = [profile.city, profile.state].filter(Boolean).join(", ");
-  return [area, cityState].filter(Boolean).join(" · ") || "Location available on profile";
-}
-
-function getPrice(profile: PublicTherapist) {
-  const price = profile.starting_price ?? profile.incall_price ?? profile.outcall_price;
-  return typeof price === "number" && price > 0 ? `$${price}` : "View rates";
-}
-
-function getRating(profile: PublicTherapist, index: number) {
-  const reviewCount = profile.review_count ?? Math.max(12, 38 - index * 7);
-  return { rating: "4.9", reviewCount };
-}
-
-function getProfileHref(profile: PublicTherapist) {
-  return profile.slug ? `/therapists/${profile.slug}` : "/search";
-}
-
-function resolvePhotoSrc(profile: PublicTherapist) {
-  const raw = profile.profile_photo || profile.avatar_url;
-  if (!raw) return null;
-  if (/^https?:\/\//i.test(raw) || raw.startsWith("/")) return raw;
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_STORAGE_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (!supabaseUrl) return null;
-
-  const cleanPath = raw.replace(/^profile-photos\//, "").replace(/^\/+/, "");
-  return `${supabaseUrl.replace(/\/$/, "")}/storage/v1/object/public/profile-photos/${cleanPath}`;
-}
-
-function TherapistCard({ profile, index }: { profile: PublicTherapist; index: number }) {
-  const router = useRouter();
-  const name = getDisplayName(profile);
-  const initials = getInitials(profile);
-  const specialty = getSpecialty(profile);
-  const photoSrc = resolvePhotoSrc(profile);
-  const { rating, reviewCount } = getRating(profile, index);
-
-  const cardPosition = [
-    "z-10 lg:mt-24 lg:-mr-10 lg:w-[31%]",
-    "z-30 lg:w-[38%]",
-    "z-20 lg:mt-28 lg:-ml-10 lg:w-[31%]",
-  ][index] ?? "z-10 lg:w-[31%]";
-
-  return (
-    <motion.article
-      initial={{ opacity: 0, y: 36, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.65, ease: customEase, delay: 0.15 + index * 0.08 }}
-      className={`relative flex min-w-[250px] flex-1 flex-col rounded-[1.75rem] border border-black/5 bg-white/95 p-4 pt-36 shadow-[0_28px_70px_rgba(15,23,42,0.13)] backdrop-blur ${cardPosition}`}
-    >
-      <button
-        type="button"
-        aria-label={`Save ${name}`}
-        className="absolute right-5 top-5 z-20 rounded-full bg-white/80 p-2 text-slate-400 shadow-sm transition hover:text-[#CC2424]"
-      >
-        <Heart size={17} strokeWidth={2.25} />
-      </button>
-
-      <div className="absolute inset-x-3 -top-20 flex h-56 items-end justify-center overflow-hidden rounded-[1.5rem] bg-gradient-to-b from-slate-50 via-white to-white">
-        {photoSrc ? (
-          // Use a plain image so live Supabase public URLs and remote provider photos render without extra Next image config friction.
-          // The frame is intentionally background-light; profiles with transparent/background-removed photos pop out naturally.
-          <img
-            src={photoSrc}
-            alt={`${name} profile photo`}
-            loading={index === 1 ? "eager" : "lazy"}
-            className="h-full w-full object-cover object-top mix-blend-multiply"
-          />
-        ) : (
-          <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-[#CC2424] to-[#8B0A1E] text-2xl font-black text-white shadow-xl">
-            {initials}
-          </div>
-        )}
-      </div>
-
-      <div className="relative z-10 mt-3 flex items-start gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#CC2424] to-[#8B0A1E] text-xs font-black text-white shadow-md">
-          {initials}
-        </div>
-        <div className="min-w-0">
-          <h3 className="truncate font-display text-lg font-black text-[#151515]">{name}</h3>
-          <p className="line-clamp-1 text-sm text-[#5F6673]">{specialty}</p>
-        </div>
-      </div>
-
-      <div className="mt-5 space-y-3 text-sm">
-        <div className="flex items-center gap-2 text-[#7B8190]">
-          <MapPin size={15} strokeWidth={2.3} className="text-[#9AA0AA]" />
-          <span className="line-clamp-1">{getLocation(profile)}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Star size={16} strokeWidth={2.25} className="fill-amber-400 text-amber-400" />
-          <span className="font-bold text-[#151515]">{rating}</span>
-          <span className="text-[#7B8190]">({reviewCount} reviews)</span>
-        </div>
-        <div className="flex items-center gap-4 text-[#5F6673]">
-          <span className="flex items-center gap-1.5">
-            <Clock size={15} strokeWidth={2.25} className="text-[#9AA0AA]" />
-            60 min
-          </span>
-          <span className="font-black text-[#151515]">{getPrice(profile)}</span>
-        </div>
-      </div>
-
-      <div className="mt-5 flex flex-wrap gap-2">
-        {(profile.is_verified_photos || profile.verification_status === "verified") && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 text-[11px] font-bold text-slate-700">
-            <BadgeCheck size={13} className="text-[#CC2424]" />
-            Verified Photo
-          </span>
-        )}
-        {profile.available_now && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1.5 text-[11px] font-bold text-emerald-700">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            Available Now
-          </span>
-        )}
-      </div>
-
-      <button
-        type="button"
-        onClick={() => router.push(getProfileHref(profile))}
-        className="mt-5 w-full rounded-xl bg-[#CC2424] px-5 py-3 text-sm font-black uppercase tracking-wide text-white shadow-lg shadow-[#CC2424]/20 transition hover:bg-[#A81D1D]"
-      >
-        View Profile
-      </button>
-    </motion.article>
-  );
+interface HeroClientProps {
+  featuredTherapists?: PublicTherapist[];
 }
 
 export default function HeroClient({ featuredTherapists = [] }: HeroClientProps) {
@@ -224,7 +108,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
     <section className="relative overflow-hidden bg-[radial-gradient(circle_at_24%_18%,rgba(204,36,36,0.08),transparent_28%),linear-gradient(180deg,#ffffff_0%,#fbfaf8_100%)] text-[#151515]">
       <div className="mx-auto grid min-h-[680px] max-w-[1500px] items-center gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1.03fr_0.97fr] lg:px-10 lg:py-16">
         <div className="relative order-2 lg:order-1">
-          <div className="pointer-events-none absolute -left-10 top-12 h-72 w-72 rounded-full bg-[#CC2424]/8 blur-3xl" />
+          <div className="pointer-events-none absolute -left-10 top-12 h-72 w-72 rounded-full bg-[#FF8A1F]/8 blur-3xl" />
 
           {realProfiles.length > 0 ? (
             <div className="relative flex snap-x gap-4 overflow-x-auto pb-6 pt-24 lg:overflow-visible lg:pb-0 lg:pt-28">
@@ -237,9 +121,9 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: dur, ease: customEase }}
-              className="rounded-[2rem] border border-dashed border-[#CC2424]/30 bg-white/80 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.09)]"
+              className="rounded-[2rem] border border-dashed border-[#FF8A1F]/30 bg-white/80 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.09)]"
             >
-              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#CC2424]/10 text-[#CC2424]">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FF8A1F]/10 text-[#FF8A1F]">
                 <Sparkles size={24} />
               </div>
               <h2 className="font-display text-2xl font-black text-[#151515]">Live profile cards are ready.</h2>
@@ -255,7 +139,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.12 }}
-            className="mb-4 font-mono text-[10px] uppercase tracking-[0.34em] text-[#CC2424] sm:text-xs"
+            className="mb-4 font-mono text-[10px] uppercase tracking-[0.34em] text-[#FF8A1F] sm:text-xs"
           >
             PREMIUM.&nbsp;&nbsp;PROFESSIONAL.&nbsp;&nbsp;PERSONAL.
           </motion.p>
@@ -268,7 +152,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             style={{ fontSize: "clamp(3rem, 6vw, 6.5rem)" }}
           >
             <span className="block text-[#151515]">Find the Right</span>
-            <span className="block"><span className="text-[#CC2424]">Masseur</span> Near You.</span>
+            <span className="block"><span className="text-[#FF8A1F]">Masseur</span> Near You.</span>
           </motion.h1>
 
           <motion.p
@@ -288,7 +172,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
           >
             <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#CC2424]/10 text-[#CC2424]">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FF8A1F]/10 text-[#FF8A1F]">
                   <MessageCircle size={23} strokeWidth={2.4} />
                 </div>
                 <div>
@@ -296,7 +180,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                   <p className="text-xs font-semibold text-[#7B8190]">Ask Knotty AI</p>
                 </div>
               </div>
-              <Sparkles size={20} className="text-[#CC2424]" />
+              <Sparkles size={20} className="text-[#FF8A1F]" />
             </div>
 
             <div className="space-y-4 px-5 py-5">
@@ -305,7 +189,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                 <span className="mt-1 block text-right text-[11px] text-[#98A2B3]">10:24 AM</span>
               </div>
               <div className="flex max-w-[86%] items-start gap-3">
-                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#CC2424]/10 text-[#CC2424]">
+                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FF8A1F]/10 text-[#FF8A1F]">
                   <Sparkles size={16} />
                 </div>
                 <div className="rounded-2xl rounded-tl-md bg-[#F7F7F8] px-4 py-3 text-sm font-medium leading-6 text-[#2B3038]">
@@ -320,7 +204,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                     key={prompt}
                     type="button"
                     onClick={() => submitAssistantPrompt(prompt)}
-                    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-black text-[#151515] transition hover:border-[#CC2424] hover:text-[#CC2424]"
+                    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-black text-[#151515] transition hover:border-[#FF8A1F] hover:text-[#FF8A1F]"
                   >
                     {prompt}
                   </button>
@@ -342,7 +226,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                   type="button"
                   onClick={() => submitAssistantPrompt()}
                   aria-label="Send AI match request"
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#CC2424] text-white shadow-lg shadow-[#CC2424]/25 transition hover:bg-[#A81D1D]"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#FF8A1F] text-white shadow-lg shadow-[#FF8A1F]/25 transition hover:bg-[#E67600]"
                 >
                   <Send size={18} fill="currentColor" />
                 </button>
@@ -370,13 +254,24 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.52 }}
-            className="mt-7 inline-flex w-fit items-center gap-2 rounded-2xl bg-[#CC2424] px-6 py-4 text-sm font-black uppercase tracking-wide text-white shadow-xl shadow-[#CC2424]/20 transition hover:bg-[#A81D1D]"
+            className="mt-7 inline-flex w-fit items-center gap-2 rounded-2xl bg-[#FF8A1F] px-6 py-4 text-sm font-black uppercase tracking-wide text-white shadow-xl shadow-[#FF8A1F]/20 transition hover:bg-[#E67600]"
           >
             Find a Masseur
             <ArrowRight size={18} strokeWidth={2.5} />
           </motion.button>
         </div>
       </div>
+
+      {/* ── Cinematic cover band (video on desktop, still on mobile) ──── */}
+      <motion.div
+        initial={{ clipPath: "inset(100% 0 0 0)" }}
+        whileInView={{ clipPath: "inset(0% 0 0 0)" }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: reducedMotion ? 0 : 1.0, ease: customEase }}
+        className="relative z-10 w-full overflow-hidden"
+      >
+        <HeroMediaBanner reducedMotion={!!reducedMotion} therapists={featuredTherapists} />
+      </motion.div>
     </section>
   );
 }

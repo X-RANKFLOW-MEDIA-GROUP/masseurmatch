@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 
@@ -75,7 +75,7 @@ export default function CookiePolicyPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#CC2424",
+                color: "#FF8A1F",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -269,12 +269,12 @@ export default function CookiePolicyPage() {
               Questions about our use of cookies? Email{" "}
               <a
                 href="mailto:privacy@masseurmatch.com"
-                style={{ color: "#CC2424", textDecoration: "none" }}
+                style={{ color: "#FF8A1F", textDecoration: "none" }}
               >
                 privacy@masseurmatch.com
               </a>
               . For broader privacy rights, see our{" "}
-              <Link href="/privacy" style={{ color: "#CC2424", textDecoration: "none" }}>
+              <Link href="/privacy" style={{ color: "#FF8A1F", textDecoration: "none" }}>
                 Privacy Policy
               </Link>
               .

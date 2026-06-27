@@ -114,7 +114,7 @@ export default function ProLayoutClient({
   );
 
   return (
-    <div className="-mt-16 flex h-dvh overflow-hidden bg-slate-50">
+    <div className="flex h-dvh overflow-hidden bg-slate-50">
       <aside className="z-20 hidden w-64 flex-col border-r border-slate-900 bg-slate-950 text-slate-300 shadow-2xl md:flex">
         {sidebarContent}
       </aside>

@@ -260,6 +260,7 @@ export default function PhotoManagerPage() {
           .from("profile_photos")
           .insert({
             profile_id: profile.id,
+            user_id: profile.user_id,
             storage_path: imageUrl,
             is_primary: photos.length === 0 && index === 0,
             sort_order: nextPosition,

@@ -8,6 +8,8 @@ import { FeaturedTherapistsEditorial } from "@/components/marketing/FeaturedTher
 import { FaqAccordion } from "@/components/marketing/FaqAccordion";
 import { USStateMapGrid } from "@/components/marketing/USStateMapGrid";
 import { FinalCta } from "@/components/marketing/FinalCta";
+import { HowItWorksTease } from "@/components/marketing/HowItWorksTease";
+import { WhyMasseurMatch } from "@/components/marketing/WhyMasseurMatch";
 import {
   createPageMetadata,
   buildFaqJsonLd,
@@ -15,11 +17,10 @@ import {
   buildOrganizationJsonLd,
   buildWebsiteJsonLd,
   buildCollectionPageJsonLd,
-  SITE_NAME,
   SITE_DESCRIPTION,
 } from "@/app/_lib/seo";
 import { siteUrl } from "@/lib/site";
-import { getProfilePhotos, getPublicTherapists } from "@/app/_lib/directory";
+import { getProfilePhotosBatch, getPublicTherapists } from "@/app/_lib/directory";
 import { LANDING_FAQ } from "@/lib/marketing/home-data";
 
 export const revalidate = 3600;
@@ -34,70 +35,23 @@ export const metadata: Metadata = createPageMetadata({
   keywords: [
     // Brand
     "MasseurMatch",
-    "masseurmatch.com",
-    "MasseurMatch directory",
-    // Primary search intent
     "male massage therapist directory",
+    // Primary search intent
     "verified male massage therapist",
     "male massage therapist near me",
     "massage therapist near me",
-    "massage therapist directory USA",
-    "male massage near me",
-    "male to male massage near me",
-    "massage for men",
-    "male massage therapist",
-    // LGBTQ
-    "LGBTQ massage therapist",
     "LGBTQ affirming massage",
-    "gay massage directory",
-    "gay massage therapist near me",
     "gay friendly massage therapist",
-    // Competitor capture — people searching these are potential users
-    "MasseurFinder",
-    "MasseurFinder alternative",
-    "masseurfinder.com",
-    "masseurfinder alternative",
-    "RentMasseur",
-    "RentMasseur alternative",
-    "rentmasseur.com",
-    "better than RentMasseur",
-    "alternative to RentMasseur",
-    "MasseurFinder vs MasseurMatch",
-    "RentMasseur vs MasseurMatch",
-    "MassageFinder",
-    "MassageFinder alternative",
-    "FindAMasseur",
-    "FindAMasseur alternative",
-    "MassageM4M",
-    "MassageM4M alternative",
-    "SexyMasseur",
-    "SexyMasseur alternative",
-    "ProMasseurs",
-    "ProMasseurs alternative",
-    "GayWellness",
-    "FriendlyMasseurs",
-    "niche massage directory",
-    "best massage therapist directory",
     // Services
-    "deep tissue massage therapist",
-    "Swedish massage therapist",
-    "outcall massage therapist",
-    "incall massage therapist",
-    "sports massage therapist",
-    "mobile massage therapist",
-    "hotel massage service",
-    "therapeutic massage near me",
+    "deep tissue massage",
+    "Swedish massage",
+    "outcall massage service",
+    "incall massage",
     // Cities (top markets)
     "massage therapist Dallas",
     "massage therapist Miami",
     "massage therapist New York",
     "massage therapist Los Angeles",
-    "massage therapist Chicago",
-    "massage therapist Houston",
-    "massage therapist Atlanta",
-    "massage therapist Washington DC",
-    "massage therapist San Francisco",
-    "massage therapist Seattle",
   ],
 });
 
@@ -117,17 +71,17 @@ const HOME_FAQ = [
   {
     question: "Which cities does MasseurMatch cover?",
     answer:
-      "MasseurMatch covers 80+ US cities including Dallas, Miami, New York, Los Angeles, Chicago, Houston, Atlanta, Washington DC, San Francisco, Seattle, Denver, Boston, Phoenix, Las Vegas, New Orleans, and many more.",
+      "MasseurMatch covers 250+ US cities including Dallas, Miami, New York, Los Angeles, Chicago, Houston, Atlanta, Washington DC, San Francisco, Seattle, Denver, Boston, Phoenix, Las Vegas, New Orleans, and many more.",
   },
   {
-    question: "Is MasseurMatch a good alternative to MasseurFinder?",
+    question: "What makes MasseurMatch different?",
     answer:
-      "Yes. MasseurMatch is a modern alternative to MasseurFinder, built around city-first local SEO, cleaner premium profiles, stronger trust signals, and a professional wellness-forward brand — without the legacy directory feel.",
+      "MasseurMatch is built for serious wellness seekers. Premium verified profiles, identity checks, transparent pricing, LGBTQ+-affirming therapists, and a professional brand that respects both clients and providers. No booking middleman — just direct contact, clear terms, and trust signals.",
   },
   {
-    question: "How does MasseurMatch compare to RentMasseur?",
+    question: "How do I know if a therapist is verified on MasseurMatch?",
     answer:
-      "MasseurMatch offers a cleaner professional experience than RentMasseur. The focus is on wellness-forward discovery: verified profiles, transparent pricing, and direct contact without the mixed-intent marketplace environment.",
+      "Verified therapists display trust signals on their profiles: identity verification badges, review counts, availability status, years of experience, and professional credentials. Elite tier therapists have enhanced verification and premium features.",
   },
   {
     question: "Can I find outcall and incall massage options on MasseurMatch?",
@@ -153,29 +107,30 @@ function isRealProfileId(id: string | null | undefined) {
 }
 
 export default async function HomePage() {
-  // Fetch featured therapists — graceful fallback if DB unavailable.
-  // The hero itself filters out fallback/demo/test profiles so the first fold only
-  // renders approved live profiles from Supabase.
   let featuredTherapists: Awaited<ReturnType<typeof getPublicTherapists>>["items"] = [];
   try {
-    const result = await getPublicTherapists({ page: 1, pageSize: 6, lgbtqAffirming: true });
-    featuredTherapists = result.items;
-    if (featuredTherapists.length === 0) {
-      const fallback = await getPublicTherapists({ page: 1, pageSize: 6 });
-      featuredTherapists = fallback.items;
-    }
+    // Run both queries in parallel — lgbtq-affirming preferred, broad as fallback
+    const [lgbtqResult, broadResult] = await Promise.all([
+      getPublicTherapists({ page: 1, pageSize: 6, lgbtqAffirming: true }),
+      getPublicTherapists({ page: 1, pageSize: 6 }),
+    ]);
+    featuredTherapists = lgbtqResult.items.length > 0 ? lgbtqResult.items : broadResult.items;
 
-    featuredTherapists = await Promise.all(
-      featuredTherapists.map(async (therapist) => {
+    const realIds = featuredTherapists
+      .filter((t) => isRealProfileId(t.id))
+      .map((t) => t.id);
+
+    if (realIds.length > 0) {
+      const photoBatch = await getProfilePhotosBatch(realIds, 1);
+      featuredTherapists = featuredTherapists.map((therapist) => {
         if (!isRealProfileId(therapist.id)) return therapist;
-        const photos = await getProfilePhotos(therapist.id, 1);
+        const photos = photoBatch.get(therapist.id) ?? [];
         const primaryPhoto = photos.find((photo) => photo.is_primary) ?? photos[0];
-        return {
-          ...therapist,
-          profile_photo: primaryPhoto?.storage_path ?? therapist.profile_photo,
-        };
-      }),
-    );
+        return primaryPhoto
+          ? { ...therapist, profile_photo: primaryPhoto.storage_path }
+          : therapist;
+      });
+    }
   } catch {
     featuredTherapists = [];
   }
@@ -232,6 +187,22 @@ export default async function HomePage() {
       {/* FAQPage */}
       <JsonLd data={buildFaqJsonLd(HOME_FAQ)} />
 
+      {/* Standalone BreadcrumbList */}
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Home",
+              item: siteUrl("/"),
+            },
+          ],
+        }}
+      />
+
       {/* SpeakableSpecification */}
       <JsonLd
         data={{
@@ -244,25 +215,14 @@ export default async function HomePage() {
             "@type": "SpeakableSpecification",
             cssSelector: ["h1", ".speakable-intro"],
           },
-          breadcrumb: {
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              {
-                "@type": "ListItem",
-                position: 1,
-                name: "Home",
-                item: siteUrl("/"),
-              },
-            ],
-          },
         }}
       />
 
       <div className="relative min-h-screen overflow-x-hidden bg-background">
         {/* ── FIRST FOLD — live profiles + AI assistant ─────────────────── */}
         <div className="home-dark relative">
-          {/* 1. AI match hero with real Supabase profile cards */}
-          <Hero featuredTherapists={featuredTherapists} />
+          {/* 1. Editorial hero */}
+          <Hero therapists={featuredTherapists} />
 
           {/* 2. Slim popular-cities marquee */}
           <CityMarquee />
@@ -271,7 +231,9 @@ export default async function HomePage() {
         {/* ── LIGHT BODY ─────────────────────────────────────────────── */}
         <StatsBand />
         <CityCaseStudies />
+        <HowItWorksTease />
         <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
+        <WhyMasseurMatch />
         <USStateMapGrid />
         <FaqAccordion items={LANDING_FAQ} />
         <FinalCta />

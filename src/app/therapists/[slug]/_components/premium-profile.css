@@ -1,4 +1,4 @@
-/* ══════════════════════════════════════════════════════════════════
+﻿/* ══════════════════════════════════════════════════════════════════
    PREMIUM THERAPIST PROFILE — WORLD-CLASS DESIGN SYSTEM
    ══════════════════════════════════════════════════════════════════ */
 
@@ -6,8 +6,8 @@
   --navy: #1A1A1A;
   --navy-light: #2A2A2A;
   --navy-mid: #333333;
-  --blue: #CC2424;
-  --orange: #CC2424;
+  --blue: #FF8A1F;
+  --orange: #FF8A1F;
   --orange-dim: rgba(204,36,36,0.15);
   --cream: #FFFFFF;
   --cream-dim: rgba(255,255,255,0.07);
@@ -259,7 +259,7 @@
   font-size: 15px;
 }
 .pp-btn-primary:hover { 
-  background: #A81D1D;
+  background: #E67600;
   transform: translateY(-1px); 
 }
 
@@ -686,7 +686,7 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--orange) 0%, #A81D1D 100%);
+  background: linear-gradient(135deg, var(--orange) 0%, #E67600 100%);
   border: none;
   cursor: pointer;
   display: flex;

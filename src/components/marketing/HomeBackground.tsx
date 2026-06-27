@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { FloatingParticles } from "@/components/motion/FloatingParticles";
@@ -14,7 +14,7 @@ export function HomeBackground() {
       <motion.div
         aria-hidden="true"
         className="pointer-events-none fixed right-[-10vw] top-[-10vh] z-0 h-[55vw] max-h-[700px] w-[55vw] max-w-[700px] rounded-full opacity-[0.18]"
-        style={{ background: "radial-gradient(circle, #CC2424 0%, transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, #FF8A1F 0%, transparent 70%)" }}
         animate={{ y: [-18, 18, -18], scale: [1, 1.04, 1] }}
         transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
       />

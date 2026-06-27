@@ -16,9 +16,9 @@ type TierRule = {
 
 const TIER_RULES: Record<SubscriptionTier, TierRule | null> = {
   free: null,
-  standard: { durationHours: 2 },
-  pro: { durationHours: 3 },
-  elite: { durationHours: 4 },
+  standard: { durationHours: 1 },
+  pro: { durationHours: 2 },
+  elite: { durationHours: 3 },
 };
 
 const VALID_TIERS = new Set<SubscriptionTier>(["free", "standard", "pro", "elite"]);

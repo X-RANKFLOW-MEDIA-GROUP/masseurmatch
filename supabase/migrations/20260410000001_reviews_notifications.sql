@@ -14,6 +14,14 @@ CREATE TABLE IF NOT EXISTS reviews (
   UNIQUE(client_id, therapist_id)
 );
 
+-- Backfill columns when the table was created by an earlier migration with a smaller schema
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS client_id UUID REFERENCES auth.users(id) ON DELETE CASCADE;
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS title VARCHAR(200);
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS content TEXT;
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT false;
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS is_public BOOLEAN DEFAULT true;
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS helpful_count INTEGER DEFAULT 0;
+
 -- Index for fast lookups
 CREATE INDEX IF NOT EXISTS idx_reviews_therapist ON reviews(therapist_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_client ON reviews(client_id);

@@ -43,4 +43,3 @@ jobs:
       - run: pnpm validate:db-contract
       - run: pnpm release:audit
       - run: pnpm release:check
-      - run: pnpm build

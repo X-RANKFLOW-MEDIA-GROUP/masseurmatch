@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import type { LucideIcon } from 'lucide-react'
@@ -113,7 +113,7 @@ export default function AdminBookingsPage() {
     <div className="min-h-screen bg-[#1A1A1A] p-6">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#CC2424]">Admin</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#FF8A1F]">Admin</p>
           <h1 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-white">
             Booking Inquiries
           </h1>
@@ -128,7 +128,7 @@ export default function AdminBookingsPage() {
               onClick={() => setFilter(f.value)}
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
                 filter === f.value
-                  ? 'bg-[#CC2424] text-white'
+                  ? 'bg-[#FF8A1F] text-white'
                   : 'border border-white/10 bg-white/[0.04] text-slate-400 hover:text-white'
               }`}
             >
@@ -262,7 +262,7 @@ export default function AdminBookingsPage() {
                           <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
                             {inq.ai_conversation.map((msg, i) => (
                               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-[85%] rounded-xl px-3 py-2 text-xs ${msg.role === 'user' ? 'bg-[#CC2424]/20 text-red-200' : 'bg-white/[0.06] text-slate-300'}`}>
+                                <div className={`max-w-[85%] rounded-xl px-3 py-2 text-xs ${msg.role === 'user' ? 'bg-[#FF8A1F]/20 text-orange-100' : 'bg-white/[0.06] text-slate-300'}`}>
                                   {msg.content}
                                 </div>
                               </div>

@@ -3,7 +3,7 @@
 // No Prisma client is used in runtime application code.
 // Do NOT run prisma generate or prisma migrate against this file.
 
-// Prisma schema para o perfil do massagista
+// Massage therapist profile model (reference only).
 model MassageTherapistProfile {
   id                 String   @id @default(uuid())
   full_name          String

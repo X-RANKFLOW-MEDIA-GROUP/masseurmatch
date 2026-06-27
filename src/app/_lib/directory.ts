@@ -7,7 +7,7 @@ export type TherapistTier = "free" | "standard" | "pro" | "elite";
 
 const PUBLIC_PROFILE_SELECT = `
   id, slug, display_name, full_name, headline, bio, city, state, neighborhood,
-  phone, whatsapp_number, email_address, website,
+  phone, whatsapp_number, email_address, show_email, website,
   service_categories, massage_techniques, specialties,
   incall_price, outcall_price, starting_price,
   offers_incall, offers_outcall, outcall_radius,
@@ -81,6 +81,7 @@ export interface PublicTherapist {
   phone: string | null;
   whatsapp_number: string | null;
   email_address: string | null;
+  show_email: boolean | null;
   website: string | null;
   service_categories: string[] | null;
   massage_techniques: string[] | null;
@@ -161,8 +162,21 @@ const buildPublicTherapistsQuery = () => {
     .eq("visibility_status", "public")
     .eq("profile_status", "approved")
     .eq("is_suspended", false)
-    .eq("is_banned", false);
-  // Note: is_demo column does not exist in production schema; skipping demo profile filter
+    .eq("is_banned", false)
+    // Exclude internal dev/test accounts by email domain
+    .or("email_address.is.null,not.email_address.ilike.%@example%")
+    .or("email_address.is.null,not.email_address.ilike.%admin.dev@%")
+    // Exclude technical/demo profiles by name/slug/phone patterns
+    .not("display_name", "ilike", "%test%")
+    .not("display_name", "ilike", "%debug%")
+    .not("display_name", "ilike", "%admin%")
+    .not("display_name", "ilike", "%example%")
+    .not("display_name", "ilike", "%demo%")
+    .not("slug", "ilike", "%admin%")
+    .not("slug", "ilike", "%test%")
+    .not("slug", "ilike", "%example%")
+    .not("slug", "ilike", "%dev%")
+    .not("phone", "ilike", "%555%");
   return q;
 };
 
@@ -389,6 +403,34 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
       storage_path: p.storage_path,
       is_primary: p.is_primary ?? false,
     }));
+};
+
+export const getProfilePhotosBatch = async (
+  profileIds: string[],
+  limitPerProfile = 1,
+): Promise<Map<string, ProfilePhoto[]>> => {
+  const result = new Map<string, ProfilePhoto[]>();
+  if (!profileIds.length) return result;
+
+  const { data, error } = await supabase
+    .from("profile_photos")
+    .select("id, profile_id, storage_path, is_primary, sort_order")
+    .in("profile_id", profileIds)
+    .eq("moderation_status", "approved")
+    .order("sort_order", { ascending: true });
+
+  if (error || !data?.length) return result;
+
+  for (const row of data) {
+    if (!row.profile_id || !row.storage_path) continue;
+    const existing = result.get(row.profile_id) ?? [];
+    if (existing.length < limitPerProfile) {
+      existing.push({ id: row.id, storage_path: row.storage_path, is_primary: row.is_primary ?? false });
+      result.set(row.profile_id, existing);
+    }
+  }
+
+  return result;
 };
 
 export async function getCityInventoryCount(cityName: string): Promise<number> {

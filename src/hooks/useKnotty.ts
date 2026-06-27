@@ -37,7 +37,7 @@ const INITIAL_ASSISTANT_MESSAGE: ConversationMessage = {
   id: "knotty-intro",
   role: "assistant",
   content:
-    "Tell me what matters most right now and I’ll narrow this down into a clear match with the next best backups.",
+    "Hey! I’m Knotty. Tell me what you’re looking for — availability, location, type of massage, whatever matters most — and I’ll find the right match for you.",
 };
 
 export function useKnotty() {

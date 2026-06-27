@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 import { AppMotionShell } from "@/app/_components/app-motion-shell";
-import { JsonLd } from "@/app/_components/json-ld";
 import { SiteFooter } from "@/app/_components/site-footer";
 import SiteHeader from "@/app/_components/site-header";
 import { CookieConsent } from "@/app/_components/CookieConsent";
 import { ChatWidget } from "@/app/_components/chat-widget";
 import { IntroVideoSplash } from "@/app/_components/IntroVideoSplash";
 import { SITE_DESCRIPTION, SITE_NAME, createPageMetadata } from "@/app/_lib/metadata";
-import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/app/_lib/structured-data";
 import { AppProviders } from "@/app/providers";
 import { SITE_URL } from "@/lib/site";
 import "@/index.css";
@@ -49,8 +47,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="theme-masseurmatch min-h-screen overflow-x-hidden font-sans text-foreground antialiased">
         <AppProviders>
           <IntroVideoSplash />
-          <JsonLd data={buildOrganizationJsonLd()} />
-          <JsonLd data={buildWebsiteJsonLd()} />
           <div style={{ position: "relative", zIndex: 9999 }}>
             <SiteHeader />
           </div>

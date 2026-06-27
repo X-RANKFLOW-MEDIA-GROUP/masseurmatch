@@ -4,7 +4,8 @@ import { JsonLd } from "@/app/_components/JsonLd";
 import {
   type TherapistTier,
   getPublicTherapists,
-} from "@/app/_lib/directory";
+  getProfilePhotosBatch,
+} from "@/app/_lib/directory"; // getProfilePhotosBatch used below
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
@@ -36,8 +37,8 @@ export async function generateMetadata({ searchParams }: TherapistsPageProps): P
   return createPageMetadata({
     title: city ? `Massage therapists in ${city}` : "Verified massage therapists across the United States",
     description: city
-      ? `Browse verified massage therapists in ${city}. Compare specialties, incall, outcall, trust signals, profile tiers, and direct contact details.`
-      : "Browse verified LGBTQ+-affirming massage therapists across the United States by state, city, specialty, incall, outcall, trust signals, and direct contact options.",
+      ? `Browse verified massage therapists in ${city}. Compare specialties, incall, outcall, trust signals, and direct contact details.`
+      : "Browse verified LGBTQ+-affirming massage therapists across the United States by state, city, specialty, incall, outcall, and direct contact options.",
     path: "/therapists",
     keywords: [
       "national massage therapist directory",
@@ -66,6 +67,19 @@ export default async function TherapistsPage({ searchParams }: TherapistsPagePro
     page,
     pageSize: PAGE_SIZE,
   });
+
+  const realIds = results.items
+    .filter((t) => t.id && !t.id.startsWith("fallback-"))
+    .map((t) => t.id);
+  const photoBatch = realIds.length > 0 ? await getProfilePhotosBatch(realIds, 1) : new Map();
+
+  const itemsWithPhotos = results.items.map((t) => {
+    if (!t.id || t.id.startsWith("fallback-")) return t;
+    const photos = photoBatch.get(t.id) ?? [];
+    const primary = photos.find((p) => p.is_primary) ?? photos[0];
+    return primary ? { ...t, profile_photo: primary.storage_path } : t;
+  });
+
   const totalPages = Math.max(1, Math.ceil(results.total / PAGE_SIZE));
 
   return (
@@ -80,7 +94,7 @@ export default async function TherapistsPage({ searchParams }: TherapistsPagePro
         data={buildCollectionPageJsonLd({
           name: "Verified massage therapists across the United States",
           description:
-            "Browse public massage therapist listings across the United States, move into state and city discovery paths, and compare specialties, trust signals, incall, outcall, and direct contact options.",
+            "Browse public massage therapist listings across the United States.",
           path: "/therapists",
         })}
       />
@@ -95,40 +109,54 @@ export default async function TherapistsPage({ searchParams }: TherapistsPagePro
         })}
       />
 
-      <div className="container mx-auto px-4 py-10">
-        <div className="max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">National directory</p>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground">
-            Browse verified massage therapists across the United States.
-          </h1>
-          <p className="mt-4 text-base leading-7 text-muted-foreground">
-            Search MasseurMatch by state, city, specialty, incall, outcall, availability, profile tier, and trust signals.
-            Each public profile links into local discovery paths while filtered views stay out of the index to avoid thin duplicate pages.
-          </p>
-          <div className="mt-5 flex flex-wrap gap-3 text-sm font-semibold">
-            <Link href="/cities" className="text-primary hover:underline">
-              Browse cities
-            </Link>
-            <Link href="/search" className="text-primary hover:underline">
-              Search by city or specialty
-            </Link>
-            <Link href="/for-therapists" className="text-primary hover:underline">
-              List your profile
-            </Link>
+      <div className="min-h-screen bg-[#FAF8F5]">
+        {/* ── Hero / page header ──────────────────────────────────────────── */}
+        <div className="relative bg-[#060E1A] px-4 py-12 sm:px-6 sm:py-16">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 overflow-hidden"
+            style={{
+              backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px)",
+              backgroundSize: "28px 28px",
+            }}
+          />
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute -left-40 top-0 h-80 w-80 rounded-full bg-[#FF8A1F]/[0.06] blur-3xl" />
+            <div className="absolute -right-40 bottom-0 h-72 w-72 rounded-full bg-emerald-500/[0.05] blur-3xl" />
+          </div>
+          <div className="relative mx-auto max-w-6xl">
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#FF8A1F]">National directory</p>
+            <h1 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+              Find your massage therapist.
+            </h1>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-white/55">
+              Browse verified LGBTQ+-affirming therapists across the United States.
+              Your location is detected automatically — or search by city and specialty.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-4 text-sm">
+              <Link href="/cities" className="font-semibold text-[#FF8A1F] hover:text-[#e67600]">
+                Browse by city
+              </Link>
+              <Link href="/search" className="font-semibold text-white/60 hover:text-white">
+                Advanced search
+              </Link>
+              <Link href="/for-therapists" className="font-semibold text-white/60 hover:text-white">
+                List your profile
+              </Link>
+            </div>
           </div>
         </div>
 
-        <TherapistsPageClient
-          items={results.items}
-          total={results.total}
-          page={page}
-          totalPages={totalPages}
-          filters={{
-            city,
-            modality,
-            tier,
-          }}
-        />
+        {/* ── Explore section (filter + grid) ────────────────────────────── */}
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+          <TherapistsPageClient
+            items={itemsWithPhotos}
+            total={results.total}
+            page={page}
+            totalPages={totalPages}
+            filters={{ city, modality, tier }}
+          />
+        </div>
       </div>
     </>
   );

@@ -66,6 +66,7 @@ alter table public.profiles
   add column if not exists whatsapp text,
   add column if not exists whatsapp_number text,
   add column if not exists email_address text,
+  add column if not exists show_email boolean not null default false,
   add column if not exists website text,
   add column if not exists booking_link text,
   add column if not exists specialties text[] default '{}',
@@ -256,6 +257,7 @@ create table if not exists public.text_verifications (
   attempt_count integer not null default 0,
   sent_at timestamptz,
   verified_at timestamptz,
+  reviewed_at timestamptz,
   expires_at timestamptz,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
@@ -402,6 +404,10 @@ create table if not exists public.reviews (
   created_at timestamptz default timezone('utc', now())
 );
 
+alter table public.reviews
+  add column if not exists source_platform text,
+  add column if not exists helpful_count integer default 0;
+
 create table if not exists public.client_favorites (
   id uuid primary key default gen_random_uuid(),
   user_id uuid,
@@ -507,17 +513,17 @@ create table if not exists public.therapist_learning_scores (
 create table if not exists public.ranking_events (
   id uuid primary key default gen_random_uuid(),
   session_id text not null,
-  user_id uuid,
-  therapist_id uuid references public.profiles(id),
+  user_id uuid null references auth.users (id) on delete set null,
+  therapist_id uuid null references public.profiles (id) on delete cascade,
   event_name text not null,
-  city text,
-  neighborhood text,
-  intent text not null default 'browse',
-  device_type text,
-  position_in_results integer,
-  recommendation_source text,
-  metadata jsonb default '{}'::jsonb,
-  created_at timestamptz default timezone('utc', now())
+  city text null,
+  neighborhood text null,
+  intent text not null default 'general',
+  device_type text null,
+  position_in_results integer null,
+  recommendation_source text null,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default timezone('utc', now())
 );
 
 create table if not exists public.imported_profile_data (
@@ -722,6 +728,7 @@ create index if not exists idx_therapist_photos_user on public.therapist_photos(
 create index if not exists idx_therapist_photos_profile on public.therapist_photos(profile_id, status);
 create index if not exists idx_therapist_photos_pending on public.therapist_photos(status, created_at) where status = 'pending_review';
 create index if not exists idx_text_verifications_user on public.text_verifications(user_id, status);
+create index if not exists idx_text_verifications_reviewed_at on public.text_verifications(reviewed_at desc) where status = 'verified';
 create index if not exists idx_admin_actions_admin on public.admin_actions(admin_id, created_at desc);
 create index if not exists idx_admin_actions_target_user on public.admin_actions(target_user_id, created_at desc);
 create index if not exists idx_admin_actions_type on public.admin_actions(action_type, created_at desc);
@@ -900,24 +907,196 @@ create table if not exists public.waitlist_signups (
   created_at       timestamptz not null default now()
 );
 
--- ── Pre-launch audit features ────────────────────────────────────────────────
--- Mirrors migrations 20260611000000 / 000001 / 200001 / 200002 / 200004.
-
--- Public verified-badge timestamp (migration 20260611200002).
-alter table public.profiles add column if not exists identity_verified_at timestamptz;
-
--- Visitor contact-event log; gates verified review eligibility (migration 20260611200004).
-create table if not exists public.contact_events (
-  id          uuid primary key default gen_random_uuid(),
-  profile_id  uuid not null references public.profiles(id) on delete cascade,
-  user_id     uuid references auth.users(id) on delete set null,
-  method      text not null,
-  ip_hash     text,
-  created_at  timestamptz not null default now()
+create table if not exists public.booking_inquiries (
+  id                   uuid primary key default gen_random_uuid(),
+  client_name          text,
+  client_phone         text,
+  client_email         text,
+  client_hotel         text,
+  service_type         text default 'massage',
+  preferred_date       date,
+  preferred_time       text,
+  duration_minutes     integer default 60,
+  message              text,
+  source               text default 'website' check (source in ('website','sms','whatsapp','direct')),
+  therapist_id         uuid references public.profiles(id) on delete set null,
+  status               text not null default 'new' check (status in ('new','checking','pending_approval','approved','denied','completed','cancelled')),
+  intelligence_status  text not null default 'pending' check (intelligence_status in ('pending','running','clean','flagged','inconclusive')),
+  intelligence_report  jsonb default '{}',
+  ai_conversation      jsonb default '[]',
+  confirmed_date       date,
+  confirmed_time       text,
+  appointment_id       uuid references public.appointments(id) on delete set null,
+  sheets_row_id        text,
+  admin_notes          text,
+  reviewed_by          uuid references auth.users(id) on delete set null,
+  reviewed_at          timestamptz,
+  created_at           timestamptz default now(),
+  updated_at           timestamptz default now()
 );
 
--- Demand Radar scores, Elite-gated (migration 20260611200001).
-create table if not exists public.demand_scores (
+create table if not exists public.sms_profiles (
+  id                   uuid primary key default gen_random_uuid(),
+  profile_id           uuid not null references public.profiles(id) on delete cascade,
+  ready_to_reply       boolean not null default false,
+  availability_mode    text not null default 'in_city' check (availability_mode in ('in_city','traveling','arrival_window','unavailable')),
+  arrival_date         date,
+  departure_date       date,
+  pricing_60           text,
+  pricing_90           text,
+  pricing_couples      text,
+  outcall_available    boolean not null default false,
+  couples_available    boolean not null default false,
+  outcall_area         text,
+  alert_phone          text,
+  custom_instructions  text,
+  twilio_number        text,
+  created_at           timestamptz default now(),
+  updated_at           timestamptz default now(),
+  unique(profile_id)
+);
+
+create table if not exists public.sms_logs (
+  id                  uuid primary key default gen_random_uuid(),
+  profile_id          uuid references public.sms_profiles(id) on delete set null,
+  from_number         text not null,
+  to_number           text not null,
+  direction           text not null check (direction in ('inbound','outbound')),
+  body                text not null,
+  twilio_sid          text,
+  intent              text,
+  status              text default 'received' check (status in ('received','queued','sent','delivered','failed','undelivered')),
+  is_manual           boolean not null default false,
+  booking_inquiry_id  uuid references public.booking_inquiries(id) on delete set null,
+  created_at          timestamptz default now()
+);
+
+create table if not exists public.sms_follow_up_alerts (
+  id               uuid primary key default gen_random_uuid(),
+  profile_id       uuid references public.sms_profiles(id) on delete cascade,
+  client_phone     text not null,
+  our_phone        text not null,
+  last_outbound_at timestamptz not null,
+  last_inbound_at  timestamptz,
+  resolved_at      timestamptz,
+  resolved_by      uuid references auth.users(id) on delete set null,
+  created_at       timestamptz default now(),
+  unique(profile_id, client_phone, our_phone)
+);
+
+-- Tables added to satisfy validate:db-contract
+
+create table if not exists moderation_queue (
+  id                   uuid primary key default gen_random_uuid(),
+  therapist_profile_id uuid,
+  content_type         text not null,
+  content_id           uuid,
+  status               text not null default 'pending',
+  notes                text,
+  profile_id           uuid,
+  user_id              uuid,
+  target_id            uuid,
+  item_type            text,
+  source               text,
+  field_name           text,
+  priority             integer default 0,
+  moderation_provider  text,
+  moderation_reason    text,
+  admin_reason         text,
+  snapshot             jsonb,
+  ai_response          jsonb,
+  resolved_by          uuid,
+  resolved_at          timestamptz,
+  reviewed_at          timestamptz,
+  reviewed_by          uuid,
+  photo_id             uuid,
+  queue_type           text,
+  payload              jsonb,
+  created_at           timestamptz not null default now(),
+  updated_at           timestamptz not null default now()
+);
+
+create table if not exists payment_transactions (
+  id                      uuid primary key default gen_random_uuid(),
+  appointment_id          uuid,
+  user_id                 uuid,
+  therapist_id            uuid,
+  amount_cents            integer,
+  currency                text default 'USD',
+  status                  text default 'pending',
+  provider                text,
+  provider_transaction_id text,
+  stripe_refund_id        text,
+  metadata                jsonb,
+  created_at              timestamptz not null default now()
+);
+
+create table if not exists appointments (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid,
+  therapist_id uuid,
+  profile_id   uuid,
+  starts_at    timestamptz,
+  ends_at      timestamptz,
+  status       text not null default 'pending',
+  notes        text,
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now()
+);
+
+create table if not exists text_verifications (
+  id               uuid primary key default gen_random_uuid(),
+  user_id          uuid,
+  profile_id       uuid,
+  status           text not null default 'pending',
+  code             text,
+  submitted_text   text,
+  reviewed_by      uuid,
+  reviewed_at      timestamptz,
+  rejection_reason text,
+  created_at       timestamptz not null default now(),
+  updated_at       timestamptz not null default now()
+);
+
+create table if not exists profile_reviews (
+  id           uuid primary key default gen_random_uuid(),
+  profile_id   uuid,
+  user_id      uuid,
+  status       text not null default 'pending_approval',
+  submitted_at timestamptz,
+  reviewed_at  timestamptz,
+  reviewed_by  uuid,
+  admin_notes  text,
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now()
+);
+
+create table if not exists therapist_photos (
+  id                    uuid primary key default gen_random_uuid(),
+  therapist_profile_id  uuid not null,
+  storage_path          text not null,
+  public_url            text,
+  alt_text              text,
+  is_primary            boolean not null default false,
+  approval_status       text not null default 'pending',
+  sort_order            integer not null default 0,
+  user_id               uuid,
+  profile_id            uuid,
+  main_profile_id       uuid,
+  photo_type            text default 'gallery',
+  status                text default 'pending_review',
+  rejection_reason      text,
+  mime_type             text,
+  file_size             integer,
+  reviewed_at           timestamptz,
+  reviewed_by           uuid,
+  moderation_notes      text,
+  moderation_confidence numeric,
+  created_at            timestamptz not null default now(),
+  updated_at            timestamptz not null default now()
+);
+
+create table if not exists demand_scores (
   id                  uuid primary key default gen_random_uuid(),
   city                text not null,
   state               text not null,
@@ -930,126 +1109,43 @@ create table if not exists public.demand_scores (
   created_at          timestamptz not null default now()
 );
 
--- Booking inquiry intake (migration 20260611000000).
-create table if not exists public.booking_inquiries (
-  id                  uuid primary key default gen_random_uuid(),
-  client_name         text,
-  client_phone        text,
-  client_email        text,
-  client_hotel        text,
-  service_type        text default 'massage',
-  preferred_date      date,
-  preferred_time      text,
-  duration_minutes    integer default 60,
-  message             text,
-  source              text default 'website',
-  therapist_id        uuid references public.profiles(id) on delete set null,
-  status              text not null default 'new',
-  intelligence_status text not null default 'pending',
-  intelligence_report jsonb default '{}',
-  ai_conversation     jsonb default '[]',
-  confirmed_date      date,
-  confirmed_time      text,
-  appointment_id      uuid,
-  sheets_row_id       text,
-  admin_notes         text,
-  reviewed_by         uuid references auth.users(id) on delete set null,
-  reviewed_at         timestamptz,
-  created_at          timestamptz default now(),
-  updated_at          timestamptz default now()
+create table if not exists admin_actions (
+  id                uuid primary key default gen_random_uuid(),
+  actor_profile_id  uuid,
+  admin_id          uuid,
+  target_table      text not null,
+  target_id         uuid,
+  target_user_id    uuid,
+  target_profile_id uuid,
+  action            text not null,
+  action_type       text,
+  reason            text,
+  before_data       jsonb,
+  after_data        jsonb,
+  metadata          jsonb,
+  created_at        timestamptz not null default now()
 );
 
--- SMS auto-reply system (migration 20260611000001).
-create table if not exists public.sms_profiles (
-  id                  uuid primary key default gen_random_uuid(),
-  profile_id          uuid not null references public.profiles(id) on delete cascade,
-  ready_to_reply      boolean not null default false,
-  availability_mode   text not null default 'in_city',
-  arrival_date        date,
-  departure_date      date,
-  pricing_60          text,
-  pricing_90          text,
-  pricing_couples     text,
-  outcall_available   boolean not null default false,
-  couples_available   boolean not null default false,
-  outcall_area        text,
-  alert_phone         text,
-  custom_instructions text,
-  twilio_number       text,
-  created_at          timestamptz default now(),
-  updated_at          timestamptz default now()
+-- ── Pre-launch audit features ─────────────────────────────────────────────────
+
+alter table public.profiles add column if not exists identity_verified_at timestamptz;
+
+create table if not exists public.contact_events (
+  id          uuid primary key default gen_random_uuid(),
+  profile_id  uuid not null references public.profiles(id) on delete cascade,
+  user_id     uuid references auth.users(id) on delete set null,
+  method      text not null,
+  ip_hash     text,
+  created_at  timestamptz not null default now()
 );
 
-create table if not exists public.sms_logs (
-  id                 uuid primary key default gen_random_uuid(),
-  profile_id         uuid references public.sms_profiles(id) on delete set null,
-  from_number        text not null,
-  to_number          text not null,
-  direction          text not null,
-  body               text not null,
-  twilio_sid         text,
-  intent             text,
-  status             text default 'received',
-  is_manual          boolean not null default false,
-  booking_inquiry_id uuid references public.booking_inquiries(id) on delete set null,
-  created_at         timestamptz default now()
-);
+-- ── Schema-drift catch-up (additive only) ─────────────────────────────────────
 
-create table if not exists public.sms_follow_up_alerts (
-  id               uuid primary key default gen_random_uuid(),
-  profile_id       uuid references public.sms_profiles(id) on delete cascade,
-  client_phone     text not null,
-  our_phone        text not null,
-  last_outbound_at timestamptz not null,
-  last_inbound_at  timestamptz,
-  resolved_at      timestamptz,
-  resolved_by      uuid references auth.users(id) on delete set null,
-  created_at       timestamptz default now()
-);
-
--- ── Schema-drift catch-up (additive only) ───────────────────────────────────
-
--- contact_inquiries: fields used by the inquiries dashboard
 alter table public.contact_inquiries
   add column if not exists client_name text,
   add column if not exists client_phone text,
   add column if not exists preferred_contact text;
 
--- moderation_queue: content_type column used by photos page
-alter table public.moderation_queue
-  add column if not exists content_type text;
-
--- payment_transactions: Stripe-specific columns
-alter table public.payment_transactions
-  add column if not exists provider_transaction_id text,
-  add column if not exists provider text;
-
--- appointments: column aliases used by booking routes
-alter table public.appointments
-  add column if not exists user_id uuid references auth.users(id) on delete set null,
-  add column if not exists starts_at timestamptz,
-  add column if not exists ends_at timestamptz;
-
--- text_verifications: OTP fields
-alter table public.text_verifications
-  add column if not exists submitted_text text,
-  add column if not exists code text;
-
--- profile_reviews: admin notes column
-alter table public.profile_reviews
-  add column if not exists admin_notes text;
-
--- therapist_photos: legacy columns used by upload/approval routes
-alter table public.therapist_photos
-  add column if not exists therapist_profile_id uuid,
-  add column if not exists approval_status text;
-
--- admin_actions: shorthand columns (action/target_table) alongside action_type
-alter table public.admin_actions
-  add column if not exists action text,
-  add column if not exists target_table text;
-
--- therapist_analytics_daily: view aggregating analytics_events by day per profile
 create or replace view public.therapist_analytics_daily as
   select
     therapist_profile_id,

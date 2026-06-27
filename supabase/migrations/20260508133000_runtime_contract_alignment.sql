@@ -406,6 +406,7 @@ create table if not exists public.reviews (
 
 alter table public.reviews
   add column if not exists client_id uuid,
+  add column if not exists profile_id uuid,
   add column if not exists content text,
   add column if not exists helpful_count integer not null default 0,
   add column if not exists updated_at timestamptz not null default timezone('utc', now()),
@@ -459,6 +460,8 @@ create table if not exists public.therapists (
 alter table public.therapists
   add column if not exists user_id uuid,
   add column if not exists contact_email text,
+  add column if not exists city text,
+  add column if not exists state text,
   add column if not exists photo_url text,
   add column if not exists status text default 'approved',
   add column if not exists updated_at timestamptz not null default timezone('utc', now());
@@ -604,6 +607,9 @@ end;
 $$;
 
 alter table public.therapist_photos
+  add column if not exists therapist_profile_id uuid,
+  add column if not exists is_primary boolean default false,
+  add column if not exists approval_status text default 'pending',
   add column if not exists profile_id uuid,
   add column if not exists user_id uuid,
   add column if not exists photo_type text default 'gallery',

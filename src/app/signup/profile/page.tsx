@@ -174,11 +174,11 @@ export default function SignupProfilePage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="rounded-2xl border border-border/70 p-4">
                   <h3 className="mb-3 flex items-center gap-2 font-semibold"><Info className="h-4 w-4" /> Profile description</h3>
-                  <ul className="space-y-2 text-sm text-muted-foreground">{PROFILE_RULES.map((rule) => <li key={rule}>• {rule}</li>)}</ul>
+                  <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">{PROFILE_RULES.map((rule) => <li key={rule}>{rule}</li>)}</ul>
                 </div>
                 <div className="rounded-2xl border border-border/70 p-4">
                   <h3 className="mb-3 flex items-center gap-2 font-semibold"><Camera className="h-4 w-4" /> Photos</h3>
-                  <ul className="space-y-2 text-sm text-muted-foreground">{PHOTO_RULES.map((rule) => <li key={rule}>• {rule}</li>)}</ul>
+                  <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">{PHOTO_RULES.map((rule) => <li key={rule}>{rule}</li>)}</ul>
                 </div>
               </div>
             </CardContent>

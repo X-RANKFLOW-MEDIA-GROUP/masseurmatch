@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { rmSync } from "node:fs";
 import { spawn } from "node:child_process";
 import path from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
@@ -109,6 +110,13 @@ async function stopServer(child) {
     setTimeout(resolve, 5000);
   });
 }
+
+// Remove stale production pages dir before spawning the dev server.
+// A previous `pnpm build` writes pages/_document.js as a CJS bundle; when
+// `next dev` then starts it tries to load that file via require(), which fails
+// in an ESM project. Deleting the directory forces Next to regenerate it in
+// dev mode with the correct module format.
+rmSync(path.join(process.cwd(), ".next", "server", "pages"), { recursive: true, force: true });
 
 const server = spawn(serverCommand, serverArgs, {
   cwd: process.cwd(),
