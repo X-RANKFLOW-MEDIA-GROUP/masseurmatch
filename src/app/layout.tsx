@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AppMotionShell } from "@/app/_components/app-motion-shell";
+import { GoogleAnalytics } from "@/app/_components/google-analytics";
 import { SiteFooter } from "@/app/_components/site-footer";
 import SiteHeader from "@/app/_components/site-header";
 import { CookieConsent } from "@/app/_components/CookieConsent";
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={satoshi.variable}>
       <body className="theme-masseurmatch min-h-screen overflow-x-hidden font-sans text-foreground antialiased">
+        <GoogleAnalytics />
         <AppProviders>
           <SketchFilter />
           <IntroVideoSplash />
