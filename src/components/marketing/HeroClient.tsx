@@ -1,9 +1,11 @@
 ﻿"use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useKnotty } from "@/hooks/useKnotty";
+import type { KnottyRecommendation } from "@/lib/knotty/types";
 import {
   Sparkles,
   MessageCircle,
@@ -104,6 +106,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
     messages: knottyMessages,
     isTyping,
     sendMessage,
+    trackRecommendationClick,
   } = useKnotty();
   const conversationEndRef = useRef<HTMLDivElement>(null);
 
@@ -220,8 +223,33 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                       <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#8B1E2D]/10 text-[#8B1E2D]">
                         <Sparkles size={16} />
                       </div>
-                      <div className="rounded-2xl rounded-tl-md bg-[#F7F7F8] px-4 py-3 text-sm font-medium leading-6 text-[#2B3038]">
+                      <div className="min-w-0 rounded-2xl rounded-tl-md bg-[#F7F7F8] px-4 py-3 text-sm font-medium leading-6 text-[#2B3038]">
                         {message.content}
+                        {(() => {
+                          const recs = [
+                            message.response?.primary,
+                            ...(message.response?.alternatives ?? []),
+                          ].filter((r): r is KnottyRecommendation => Boolean(r));
+                          if (recs.length === 0) return null;
+                          return (
+                            <div className="mt-2.5 space-y-1.5">
+                              {recs.map((rec) => (
+                                <Link
+                                  key={`${rec.therapistId}-${rec.position}`}
+                                  href={rec.profilePath}
+                                  onClick={() => trackRecommendationClick(rec)}
+                                  className="flex items-center justify-between gap-2 rounded-xl border border-[#8B1E2D]/20 bg-white px-3 py-2 text-xs font-bold text-[#8B1E2D] transition hover:bg-[#8B1E2D]/[0.06]"
+                                >
+                                  <span className="truncate">
+                                    {rec.name}
+                                    {rec.neighborhood || rec.city ? ` · ${rec.neighborhood || rec.city}` : ""}
+                                  </span>
+                                  <ArrowRight size={14} strokeWidth={2.5} className="shrink-0" />
+                                </Link>
+                              ))}
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   ),
