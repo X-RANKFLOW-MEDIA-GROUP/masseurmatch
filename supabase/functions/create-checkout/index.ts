@@ -40,6 +40,38 @@ const PLANS: Record<string, { name: string; amount: number; features: string; is
 
 // Promotion codes are now entered by users at checkout (allow_promotion_codes: true)
 
+// Fixed Stripe price IDs (preferred). Set these as Supabase Edge Function
+// secrets so checkout uses your curated Stripe catalog instead of minting
+// products/prices at runtime:
+//   STRIPE_PRICE_STANDARD / STRIPE_PRICE_PRO / STRIPE_PRICE_ELITE
+const PLAN_PRICE_ENV: Record<string, string> = {
+  standard: "STRIPE_PRICE_STANDARD",
+  pro: "STRIPE_PRICE_PRO",
+  elite: "STRIPE_PRICE_ELITE",
+};
+
+function getConfiguredPriceId(planKey: string): string | null {
+  const envName = PLAN_PRICE_ENV[planKey];
+  if (!envName) return null;
+  const priceId = Deno.env.get(envName)?.trim();
+  return priceId && priceId.startsWith("price_") ? priceId : null;
+}
+
+// Resolve the price for a plan: use the configured fixed price ID when set,
+// otherwise fall back to lazily searching/creating one in Stripe (dev only).
+async function resolvePriceId(stripe: Stripe, planKey: string): Promise<string> {
+  const configured = getConfiguredPriceId(planKey);
+  if (configured) {
+    logStep("Using configured price ID", { planKey, priceId: configured });
+    return configured;
+  }
+  logStep("No fixed price ID configured; falling back to lazy price creation", {
+    planKey,
+    envVar: PLAN_PRICE_ENV[planKey] ?? null,
+  });
+  return getOrCreatePrice(stripe, planKey);
+}
+
 async function getOrCreatePrice(stripe: Stripe, planKey: string): Promise<string> {
   const plan = PLANS[planKey];
   // Search for existing product by metadata
@@ -180,7 +212,7 @@ serve(async (req) => {
 
     // For free plan: create a trial subscription without requiring a credit card
     if (plan.isFree) {
-      const priceId = await getOrCreatePrice(stripe, "standard"); // Use standard as the base
+      const priceId = await resolvePriceId(stripe, "standard"); // Use standard as the base
 
       // Create or reuse customer
       if (!customerId) {
@@ -219,7 +251,7 @@ serve(async (req) => {
     }
 
     // ── Paid plan checkout ──
-    const priceId = await getOrCreatePrice(stripe, plan_key);
+    const priceId = await resolvePriceId(stripe, plan_key);
 
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       customer: customerId,
