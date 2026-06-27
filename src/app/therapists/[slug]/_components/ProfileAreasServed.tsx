@@ -79,7 +79,7 @@ export function ProfileAreasServed({ profile }: Props) {
       {/* Base Location */}
       <div className="pp-location-header">
         <div className="flex items-center gap-2">
-          <div className="p-2.5 rounded-lg bg-[rgba(255,138,31,0.15)] border border-[rgba(255,138,31,0.2)]">
+          <div className="p-2.5 rounded-lg bg-[rgba(139, 30, 45,0.15)] border border-[rgba(139, 30, 45,0.2)]">
             <MapPin className="w-5 h-5 text-[var(--orange)]" />
           </div>
           <div>
@@ -131,7 +131,7 @@ export function ProfileAreasServed({ profile }: Props) {
             {areas.map((area) => (
               <span
                 key={area}
-                className="px-3.5 py-2.5 rounded-full border border-[var(--glass-border)] bg-[var(--cream-dim)] text-[var(--cream-soft)] text-xs font-500 flex items-center gap-2 hover:border-[rgba(255,138,31,0.3)] hover:bg-[rgba(255,138,31,0.08)] transition"
+                className="px-3.5 py-2.5 rounded-full border border-[var(--glass-border)] bg-[var(--cream-dim)] text-[var(--cream-soft)] text-xs font-500 flex items-center gap-2 hover:border-[rgba(139, 30, 45,0.3)] hover:bg-[rgba(139, 30, 45,0.08)] transition"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-[var(--orange)] flex-shrink-0" />
                 {area}

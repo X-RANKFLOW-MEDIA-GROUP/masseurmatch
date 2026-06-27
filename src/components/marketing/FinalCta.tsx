@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Image from "next/image";
 import FadeUp from "@/components/motion/FadeUp";
 
@@ -39,7 +39,7 @@ export function FinalCta() {
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/for-therapists"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-primary px-8 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 hover:shadow-[0_0_40px_rgba(204,36,36,0.35)]"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-primary px-8 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 hover:shadow-[0_0_40px_rgba(139,30,45,0.35)]"
             >
               List your practice
             </Link>

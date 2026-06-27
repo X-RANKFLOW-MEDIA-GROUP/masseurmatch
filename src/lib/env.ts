@@ -61,14 +61,6 @@ export const serverEnv = {
   verificationApiKey: value(VERIFICATION_API_KEY),
 };
 
-/**
- * @deprecated Use clientEnv in browser-safe code and serverEnv only in server code.
- */
-export const env = {
-  ...clientEnv,
-  ...serverEnv,
-};
-
 export const hasSupabase = Boolean(serverEnv.supabaseUrl && serverEnv.supabaseAnonKey);
 export const hasSupabaseAdmin = Boolean(serverEnv.supabaseUrl && serverEnv.supabaseServiceRoleKey);
 export const hasStripe = has(STRIPE_SECRET_KEY, STRIPE_MCP_KEY);

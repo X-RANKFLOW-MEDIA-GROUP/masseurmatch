@@ -44,6 +44,22 @@ function baseOptions() {
   };
 }
 
+// Scoped alias for webhook handlers — service-role but clearly labelled so it
+// is never accidentally used in user-facing request paths.
+export function createSupabaseWebhookClient() {
+  return createSupabaseAdminClient();
+}
+
+// Validates the incoming request has an active admin session, then returns both
+// the service-role client and the verified session together so callers cannot
+// accidentally skip the auth gate.
+export async function requireAdminClient(
+  request: Request | { headers: { get: (name: string) => string | null } },
+): Promise<{ client: ReturnType<typeof createSupabaseAdminClient>; session: RequestSession }> {
+  const session = await requireAdminSession(request);
+  return { client: createSupabaseAdminClient(), session };
+}
+
 export function createSupabasePublicClient() {
   const url = getSupabaseUrl();
   const anonKey = getAnonKey();

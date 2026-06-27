@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { cn } from "@/lib/utils";
 
@@ -19,19 +19,19 @@ export function AuroraBackground({
     default: {
       primary: "rgba(125, 211, 252, 0.35)",    // sky-300
       secondary: "rgba(167, 139, 250, 0.35)",  // violet-400
-      tertiary: "rgba(204, 36, 36, 0.25)",      // red-600
+      tertiary: "rgba(139, 30, 45, 0.25)",      // red-600
       accent: "rgba(52, 211, 153, 0.3)",       // emerald-400
     },
     subtle: {
       primary: "rgba(125, 211, 252, 0.2)",
       secondary: "rgba(167, 139, 250, 0.2)",
-      tertiary: "rgba(204, 36, 36, 0.15)",
+      tertiary: "rgba(139, 30, 45, 0.15)",
       accent: "rgba(52, 211, 153, 0.15)",
     },
     vibrant: {
       primary: "rgba(56, 189, 248, 0.5)",      // sky-400
       secondary: "rgba(139, 92, 246, 0.5)",    // violet-500
-      tertiary: "rgba(204, 36, 36, 0.4)",      // red-600
+      tertiary: "rgba(139, 30, 45, 0.4)",      // red-600
       accent: "rgba(16, 185, 129, 0.4)",       // emerald-500
     },
   };
@@ -151,7 +151,7 @@ export function AuroraBackgroundLight({
         <div
           className="absolute -bottom-1/4 -left-1/4 w-[55%] h-[55%] rounded-full blur-3xl animate-aurora-3"
           style={{
-            background: "radial-gradient(circle, rgba(251, 146, 60, 0.1) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(139, 30, 45, 0.1) 0%, transparent 70%)",
           }}
         />
         <div

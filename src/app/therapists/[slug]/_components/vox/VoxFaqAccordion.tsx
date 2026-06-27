@@ -24,7 +24,7 @@ export function VoxFaqAccordion({ items }: { items: ProfileFaqItem[] }) {
                 {item.question}
               </span>
               <ChevronDown
-                className={`h-5 w-5 flex-shrink-0 text-[#FF8A1F] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+                className={`h-5 w-5 flex-shrink-0 text-[#8B1E2D] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
                 strokeWidth={2.5}
               />
             </button>

@@ -263,6 +263,7 @@ function extractObjectKeys(objectBody) {
   const ignoredKeys = new Set(["true", "false", "null", "undefined"]);
   let depth = 0;
   let quote = null;
+  let inValue = false; // true after key: — suppresses ternary `:` false positives
 
   for (let index = 0; index < objectBody.length; index += 1) {
     const char = objectBody[index];
@@ -285,15 +286,25 @@ function extractObjectKeys(objectBody) {
 
     if (char === "}" || char === "]") {
       depth = Math.max(0, depth - 1);
+      if (depth === 0) inValue = false;
       continue;
     }
 
-    if (char !== ":" || depth !== 1) continue;
+    // A comma at depth 1 means we moved to the next key-value pair
+    if (char === "," && depth === 1) {
+      inValue = false;
+      continue;
+    }
+
+    if (char !== ":" || depth !== 1 || inValue) continue;
 
     const before = objectBody.slice(0, index);
     const match = before.match(new RegExp(`(${IDENTIFIER})\\s*$`));
     const key = match?.[1];
-    if (key && !ignoredKeys.has(key) && key === key.toLowerCase()) keys.add(key);
+    if (key && !ignoredKeys.has(key) && key === key.toLowerCase()) {
+      keys.add(key);
+      inValue = true; // suppress ternary `:` until next comma at depth 1
+    }
   }
 
   return [...keys];

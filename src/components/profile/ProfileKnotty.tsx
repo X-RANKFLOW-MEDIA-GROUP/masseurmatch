@@ -148,8 +148,8 @@ export function ProfileKnotty({ facts }: { facts: KnottyProfileFacts }) {
       id="ask-knotty"
       className="overflow-hidden rounded-[24px] border border-white/5 bg-[#101C2B]/90 shadow-2xl backdrop-blur-xl"
     >
-      <div className="flex items-center gap-3 border-b border-white/5 bg-gradient-to-r from-[#FF8A1F]/10 to-transparent px-7 py-5">
-        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FF8A1F] to-[#E67600] text-[#1A1A1A]">
+      <div className="flex items-center gap-3 border-b border-white/5 bg-gradient-to-r from-[#8B1E2D]/10 to-transparent px-7 py-5">
+        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#8B1E2D] to-[#6E1521] text-[#1A1A1A]">
           <Sparkles className="h-5 w-5" strokeWidth={2.25} />
         </span>
         <div>
@@ -170,7 +170,7 @@ export function ProfileKnotty({ facts }: { facts: KnottyProfileFacts }) {
             className={`max-w-[88%] whitespace-pre-line rounded-[18px] px-4 py-3 text-sm leading-relaxed ${
               msg.role === "ai"
                 ? "mr-auto border border-white/5 bg-white/[0.05] text-[#E2E8F0]"
-                : "ml-auto bg-gradient-to-r from-[#FF8A1F] to-[#E67600] text-white"
+                : "ml-auto bg-gradient-to-r from-[#8B1E2D] to-[#6E1521] text-white"
             }`}
           >
             {msg.text}
@@ -212,14 +212,14 @@ export function ProfileKnotty({ facts }: { facts: KnottyProfileFacts }) {
             onKeyDown={(event) => event.key === "Enter" && send(input)}
             placeholder={`Ask about ${firstName}…`}
             aria-label={`Ask Knotty a question about ${facts.name}`}
-            className="flex-1 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-[#FF8A1F]/50 focus:outline-none"
+            className="flex-1 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-[#8B1E2D]/50 focus:outline-none"
           />
           <button
             type="button"
             onClick={() => send(input)}
             disabled={!input.trim()}
             aria-label="Send question"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#FF8A1F] text-[#1A1A1A] transition hover:bg-[#E67600] disabled:opacity-40"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#8B1E2D] text-[#1A1A1A] transition hover:bg-[#6E1521] disabled:opacity-40"
           >
             <Send className="h-4 w-4" strokeWidth={2.5} />
           </button>
