@@ -129,7 +129,7 @@ export function VoxProfile({
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 bottom-0 h-px"
-          style={{ background: "linear-gradient(to right, transparent, rgba(255,138,31,0.15), transparent)" }}
+          style={{ background: "linear-gradient(to right, transparent, rgba(139, 30, 45,0.15), transparent)" }}
         />
 
         <div className="relative mx-auto max-w-6xl">
@@ -153,7 +153,7 @@ export function VoxProfile({
           <div className="grid gap-8 lg:grid-cols-[360px_1fr] lg:items-start lg:gap-14">
 
             {/* ── Photo ───────────────────────── */}
-            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-white/10 shadow-[0_32px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,138,31,0.08)]">
+            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-white/10 shadow-[0_32px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(139, 30, 45,0.08)]">
               <Image
                 src={profile.profilePhotoUrl}
                 alt={`${profile.name}, massage therapist in ${profile.city}`}
@@ -232,7 +232,7 @@ export function VoxProfile({
                 {phoneHref && (
                   <a
                     href={phoneHref}
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-[#1a0a00] shadow-[0_0_32px_rgba(255,138,31,0.4)] transition-transform hover:-translate-y-0.5"
+                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-[#1a0a00] shadow-[0_0_32px_rgba(139, 30, 45,0.4)] transition-transform hover:-translate-y-0.5"
                   >
                     <Phone className="h-4 w-4" strokeWidth={2.5} />
                     Text {firstName}
@@ -367,7 +367,7 @@ export function VoxProfile({
                 return (
                   <div
                     key={service}
-                    className="group flex items-start gap-3 rounded-2xl border border-[#e8e0d8] bg-white p-4 shadow-sm transition-all hover:border-[#8B1E2D]/30 hover:shadow-[0_4px_24px_rgba(255,138,31,0.1)]"
+                    className="group flex items-start gap-3 rounded-2xl border border-[#e8e0d8] bg-white p-4 shadow-sm transition-all hover:border-[#8B1E2D]/30 hover:shadow-[0_4px_24px_rgba(139, 30, 45,0.1)]"
                   >
                     <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#FFF4EA] to-[#FFECD4] text-[#8B1E2D] transition-transform group-hover:scale-105">
                       <Icon className="h-5 w-5" strokeWidth={2.25} />
@@ -542,7 +542,7 @@ export function VoxProfile({
                 <Link
                   key={related.slug}
                   href={`/therapists/${related.slug}`}
-                  className="group flex items-center gap-3 rounded-2xl border border-[#e8e0d8] bg-white p-3 shadow-sm transition-all hover:border-[#8B1E2D]/40 hover:shadow-[0_4px_20px_rgba(255,138,31,0.08)]"
+                  className="group flex items-center gap-3 rounded-2xl border border-[#e8e0d8] bg-white p-3 shadow-sm transition-all hover:border-[#8B1E2D]/40 hover:shadow-[0_4px_20px_rgba(139, 30, 45,0.08)]"
                 >
                   <span className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100 ring-2 ring-transparent transition-all group-hover:ring-[#8B1E2D]/30">
                     {related.profilePhotoUrl ? (
@@ -591,7 +591,7 @@ export function VoxProfile({
             {(phoneHref || whatsappHref || emailHref) && (
               <a
                 href={phoneHref || whatsappHref || emailHref || "#contact"}
-                className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-[#1a0a00] shadow-[0_0_32px_rgba(255,138,31,0.35)] transition-transform hover:-translate-y-0.5"
+                className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-[#1a0a00] shadow-[0_0_32px_rgba(139, 30, 45,0.35)] transition-transform hover:-translate-y-0.5"
               >
                 <Sparkles className="h-4 w-4" strokeWidth={2.5} />
                 Contact {firstName}
