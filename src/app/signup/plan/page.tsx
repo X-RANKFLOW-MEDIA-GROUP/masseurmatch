@@ -120,32 +120,15 @@ function SignupPlanPageContent() {
   );
 }
 
-function SignupPlanFallback() {
-  return (
-    <div className="space-y-6 py-8">
-      <div className="text-center">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          Choose Your Listing Plan
-        </h1>
-        <p className="mt-3 text-muted-foreground">
-          Loading available plan options...
-        </p>
-      </div>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <div
-            key={index}
-            className="h-72 animate-pulse rounded-3xl border border-border bg-card"
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function SignupPlanPage() {
   return (
-    <Suspense fallback={<SignupPlanFallback />}>
+    <Suspense
+      fallback={
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <p className="text-muted-foreground">Loading plans…</p>
+        </div>
+      }
+    >
       <SignupPlanPageContent />
     </Suspense>
   );
