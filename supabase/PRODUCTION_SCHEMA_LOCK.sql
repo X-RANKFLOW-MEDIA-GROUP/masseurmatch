@@ -203,10 +203,12 @@ create table if not exists public.therapist_photos (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   profile_id uuid,
+  therapist_profile_id uuid,
   storage_path text,
   public_url text,
   photo_type text not null default 'gallery' check (photo_type in ('profile','gallery')),
   status text not null default 'draft' check (status in ('draft','pending_review','approved','rejected','removed')),
+  approval_status text default 'pending',
   rejection_reason text,
   sort_order integer not null default 0,
   width integer,
@@ -226,6 +228,7 @@ create table if not exists public.profile_reviews (
   status text not null default 'draft' check (status in ('draft','pending_approval','submitted','under_review','approved','rejected','changes_requested')),
   moderation_notes text,
   submitted_at timestamptz,
+  admin_notes text,
   reviewed_at timestamptz,
   reviewed_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default timezone('utc', now()),
@@ -251,6 +254,8 @@ create table if not exists public.text_verifications (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   phone text not null,
+  submitted_text text,
+  code text,
   verification_code text,
   status text not null default 'not_started' check (status in ('not_started','pending','verified','failed','expired')),
   provider text,
@@ -266,9 +271,11 @@ create table if not exists public.text_verifications (
 create table if not exists public.admin_actions (
   id uuid primary key default gen_random_uuid(),
   admin_id uuid not null references auth.users(id) on delete cascade,
+  action text,
   action_type text not null,
   target_user_id uuid references auth.users(id) on delete set null,
   target_profile_id uuid,
+  target_table text,
   reason text,
   metadata jsonb,
   created_at timestamptz not null default timezone('utc', now())
@@ -403,6 +410,10 @@ create table if not exists public.reviews (
   is_verified boolean default false,
   created_at timestamptz default timezone('utc', now())
 );
+
+alter table public.reviews
+  add column if not exists source_platform text,
+  add column if not exists helpful_count integer default 0;
 
 create table if not exists public.client_favorites (
   id uuid primary key default gen_random_uuid(),
@@ -558,6 +569,7 @@ create table if not exists public.moderation_queue (
   moderation_reason text,
   admin_reason text,
   snapshot jsonb,
+  content_type text,
   status text default 'pending',
   payload jsonb,
   resolved_by uuid,
@@ -806,6 +818,7 @@ create table if not exists public.favorites (
 
 create table if not exists public.appointments (
   id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete set null,
   client_id uuid not null references auth.users(id) on delete cascade,
   therapist_id uuid not null references auth.users(id) on delete cascade,
   status text not null default 'pending',
@@ -814,6 +827,8 @@ create table if not exists public.appointments (
   notes text,
   start_time timestamptz not null,
   end_time timestamptz not null,
+  starts_at timestamptz,
+  ends_at timestamptz,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
@@ -822,6 +837,8 @@ create table if not exists public.payment_transactions (
   id uuid primary key default gen_random_uuid(),
   appointment_id uuid references public.appointments(id) on delete set null,
   stripe_payment_intent_id text unique,
+  provider_transaction_id text,
+  provider text,
   amount integer,
   currency text,
   status text not null default 'pending',

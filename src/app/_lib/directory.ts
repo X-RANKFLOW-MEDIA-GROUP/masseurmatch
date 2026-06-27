@@ -163,10 +163,8 @@ const buildPublicTherapistsQuery = () => {
     .eq("profile_status", "approved")
     .eq("is_suspended", false)
     .eq("is_banned", false)
-    // Exclude internal dev/test accounts by email domain
     .or("email_address.is.null,not.email_address.ilike.%@example%")
     .or("email_address.is.null,not.email_address.ilike.%admin.dev@%")
-    // Exclude technical/demo profiles by name/slug/phone patterns
     .not("display_name", "ilike", "%test%")
     .not("display_name", "ilike", "%debug%")
     .not("display_name", "ilike", "%admin%")

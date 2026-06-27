@@ -64,7 +64,7 @@ async function recordStripeEvent(
 ): Promise<boolean> {
   const db = supabase as any
   const { data: existingEvent, error: lookupError } = await db
-    .from(STRIPE_EVENTS_TABLE)
+    .from('stripe_events')
     .select('event_id')
     .eq('event_id', event.id)
     .maybeSingle()
@@ -77,7 +77,7 @@ async function recordStripeEvent(
     return false
   }
 
-  const { error: insertError } = await db.from(STRIPE_EVENTS_TABLE).insert({
+  const { error: insertError } = await db.from('stripe_events').insert({
     event_id: event.id,
     type: event.type,
     payload: event,
@@ -270,7 +270,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const db = supabase as any
     await db
-      .from(STRIPE_EVENTS_TABLE)
+      .from('stripe_events')
       .update({
         processing_error: error instanceof Error ? error.message : 'Unknown Stripe webhook processing error',
         failed_at: new Date().toISOString(),
