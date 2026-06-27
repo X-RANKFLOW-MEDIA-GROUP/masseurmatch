@@ -9,10 +9,10 @@ import { SITE_DESCRIPTION, SITE_NAME, createPageMetadata } from "@/app/_lib/meta
 import { AppProviders } from "@/app/providers";
 import { SITE_URL } from "@/lib/site";
 import { SketchFilters } from "@/components/ui/sketch-filters";
-import { satoshi } from "@/app/fonts";
 import "@/index.css";
 import "@/styles/mobile-responsive.css";
 import "@/styles/homepage-mobile-hotfix.css";
+import { satoshi } from "./fonts";
 import SmoothScroll from "@/components/motion/SmoothScroll";
 
 const rootMetadata = createPageMetadata({
