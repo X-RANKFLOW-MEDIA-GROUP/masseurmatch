@@ -107,10 +107,10 @@ export function VoxProfile({
   ].filter(Boolean) as { label: string; href: string }[];
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-[#1a1a1a]">
+    <div className="min-h-screen bg-[#FAFAFA] text-[#111111]">
 
       {/* ── Dark navy hero ─────────────────────────────────────────────────── */}
-      <section className="relative bg-[#060E1A] px-4 pb-16 pt-8 sm:px-6 lg:pb-20 lg:pt-12">
+      <section className="relative bg-[#111111] px-4 pb-16 pt-8 sm:px-6 lg:pb-20 lg:pt-12">
         {/* Dot-grid texture overlay */}
         <div
           aria-hidden="true"
@@ -122,14 +122,14 @@ export function VoxProfile({
         />
         {/* Glows */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -left-40 -top-20 h-96 w-96 rounded-full bg-[#FF8A1F]/[0.07] blur-3xl" />
+          <div className="absolute -left-40 -top-20 h-96 w-96 rounded-full bg-[#8B1E2D]/[0.07] blur-3xl" />
           <div className="absolute -right-40 bottom-0 h-80 w-80 rounded-full bg-emerald-500/[0.06] blur-3xl" />
         </div>
         {/* Bottom gradient hairline */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 bottom-0 h-px"
-          style={{ background: "linear-gradient(to right, transparent, rgba(255,138,31,0.15), transparent)" }}
+          style={{ background: "linear-gradient(to right, transparent, rgba(139,30,45,0.15), transparent)" }}
         />
 
         <div className="relative mx-auto max-w-6xl">
@@ -153,7 +153,7 @@ export function VoxProfile({
           <div className="grid gap-8 lg:grid-cols-[360px_1fr] lg:items-start lg:gap-14">
 
             {/* ── Photo ───────────────────────── */}
-            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-white/10 shadow-[0_32px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,138,31,0.08)]">
+            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-white/10 shadow-[0_32px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(139,30,45,0.08)]">
               <Image
                 src={profile.profilePhotoUrl}
                 alt={`${profile.name}, massage therapist in ${profile.city}`}
@@ -191,13 +191,13 @@ export function VoxProfile({
               </h1>
 
               <p className="mt-3 flex items-center gap-2 font-sans text-white/55">
-                <MapPin className="h-4 w-4 text-[#FF8A1F]" strokeWidth={2.25} />
+                <MapPin className="h-4 w-4 text-[#8B1E2D]" strokeWidth={2.25} />
                 {profile.neighborhood}, {profile.city}
               </p>
 
               {typeof rating === "number" && (
                 <div className="mt-4 flex items-center gap-2">
-                  <span className="flex items-center gap-0.5 text-[#FF8A1F]">
+                  <span className="flex items-center gap-0.5 text-[#8B1E2D]">
                     {[0, 1, 2, 3, 4].map((i) => (
                       <Star key={i} className="h-4 w-4 fill-current" strokeWidth={0} />
                     ))}
@@ -232,7 +232,7 @@ export function VoxProfile({
                 {phoneHref && (
                   <a
                     href={phoneHref}
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#FF8A1F] px-7 font-semibold text-[#1a0a00] shadow-[0_0_32px_rgba(255,138,31,0.4)] transition-transform hover:-translate-y-0.5"
+                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-[#FFFFFF] shadow-[0_0_32px_rgba(139,30,45,0.4)] transition-transform hover:-translate-y-0.5"
                   >
                     <Phone className="h-4 w-4" strokeWidth={2.5} />
                     Text {firstName}
@@ -249,14 +249,14 @@ export function VoxProfile({
                 )}
                 {profile.phone && !phoneHref && (
                   <span className="inline-flex h-12 items-center gap-2 rounded-full border border-white/20 bg-white/[0.07] px-5 font-semibold text-white">
-                    <Phone className="h-4 w-4 text-[#FF8A1F]" strokeWidth={2.5} />
+                    <Phone className="h-4 w-4 text-[#8B1E2D]" strokeWidth={2.5} />
                     {profile.phone}
                   </span>
                 )}
                 {emailHref && !phoneHref && !whatsappHref && (
                   <a
                     href={emailHref}
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#FF8A1F] px-7 font-semibold text-[#1a0a00]"
+                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-[#FFFFFF]"
                   >
                     <Mail className="h-4 w-4" strokeWidth={2.5} />
                     Email {firstName}
@@ -280,7 +280,7 @@ export function VoxProfile({
                     <a
                       key={item.href}
                       href={item.href}
-                      className="inline-flex items-center gap-1 rounded-full border border-white/[0.1] bg-white/[0.04] px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-white/50 transition-colors hover:border-[#FF8A1F]/40 hover:text-white/80"
+                      className="inline-flex items-center gap-1 rounded-full border border-white/[0.1] bg-white/[0.04] px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-white/50 transition-colors hover:border-[#8B1E2D]/40 hover:text-white/80"
                     >
                       {item.label}
                     </a>
@@ -309,9 +309,9 @@ export function VoxProfile({
               {reviews.slice(0, 6).map((review, index) => (
                 <figure
                   key={index}
-                  className="flex h-full flex-col rounded-2xl border border-[#e8e0d8] bg-white p-6 shadow-sm"
+                  className="flex h-full flex-col rounded-2xl border border-[#E8E8E8] bg-white p-6 shadow-sm"
                 >
-                  <span className="mb-3 flex items-center gap-0.5 text-[#FF8A1F]">
+                  <span className="mb-3 flex items-center gap-0.5 text-[#8B1E2D]">
                     {[0, 1, 2, 3, 4].map((i) => (
                       <Star key={i} className="h-4 w-4 fill-current" strokeWidth={0} />
                     ))}
@@ -319,7 +319,7 @@ export function VoxProfile({
                   <blockquote className="flex-1 text-[15px] leading-7 text-[#3f3a33]">
                     &ldquo;{review.quote}&rdquo;
                   </blockquote>
-                  <figcaption className="mt-4 text-sm font-semibold text-[#1A1A1A]">
+                  <figcaption className="mt-4 text-sm font-semibold text-[#111111]">
                     {review.author}
                     {review.date ? <span className="ml-2 font-normal text-[#8a7d6f]">{review.date}</span> : null}
                   </figcaption>
@@ -332,14 +332,14 @@ export function VoxProfile({
         {/* ── About ───────────────────────────────────────────────────────── */}
         <Section id="about" eyebrow="Profile" title={`About ${firstName}`}>
           <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
-            <div className="rounded-2xl border border-[#e8e0d8] bg-white p-6 shadow-sm sm:p-8">
+            <div className="rounded-2xl border border-[#E8E8E8] bg-white p-6 shadow-sm sm:p-8">
               <p className="whitespace-pre-line text-[15px] leading-7 text-[#3f3a33]">{profile.bio}</p>
               {profile.specialties.length > 0 && (
                 <div className="mt-6 flex flex-wrap gap-2">
                   {profile.specialties.slice(0, 8).map((item) => (
                     <span
                       key={item}
-                      className="rounded-full border border-[#FF8A1F]/25 bg-gradient-to-br from-[#FFF4EA] to-[#FFF0DE] px-3 py-1.5 text-sm font-medium text-[#8a5a2b]"
+                      className="rounded-full border border-[#8B1E2D]/25 bg-gradient-to-br from-[#F8EDEE] to-[#F8EDEE] px-3 py-1.5 text-sm font-medium text-[#8B1E2D]"
                     >
                       {item}
                     </span>
@@ -367,12 +367,12 @@ export function VoxProfile({
                 return (
                   <div
                     key={service}
-                    className="group flex items-start gap-3 rounded-2xl border border-[#e8e0d8] bg-white p-4 shadow-sm transition-all hover:border-[#FF8A1F]/30 hover:shadow-[0_4px_24px_rgba(255,138,31,0.1)]"
+                    className="group flex items-start gap-3 rounded-2xl border border-[#E8E8E8] bg-white p-4 shadow-sm transition-all hover:border-[#8B1E2D]/30 hover:shadow-[0_4px_24px_rgba(139,30,45,0.1)]"
                   >
-                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#FFF4EA] to-[#FFECD4] text-[#FF8A1F] transition-transform group-hover:scale-105">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#F8EDEE] to-[#F8EDEE] text-[#8B1E2D] transition-transform group-hover:scale-105">
                       <Icon className="h-5 w-5" strokeWidth={2.25} />
                     </span>
-                    <span className="pt-1.5 text-sm font-semibold text-[#1a1a1a]">{service}</span>
+                    <span className="pt-1.5 text-sm font-semibold text-[#111111]">{service}</span>
                   </div>
                 );
               })}
@@ -383,8 +383,8 @@ export function VoxProfile({
         {/* ── Pricing ─────────────────────────────────────────────────────── */}
         {(profile.pricing.length > 0 || hasRate(profile.incallPrice) || hasRate(profile.outcallPrice)) && (
           <Section id="rates" eyebrow="Transparent pricing" title="Session rates">
-            <div className="overflow-hidden rounded-2xl border border-[#e8e0d8] shadow-sm">
-              <div className="grid grid-cols-[1.4fr_1fr_1fr] gap-2 bg-[#060E1A] px-5 py-4 font-mono text-xs uppercase tracking-[0.14em] text-white/60 sm:px-7">
+            <div className="overflow-hidden rounded-2xl border border-[#E8E8E8] shadow-sm">
+              <div className="grid grid-cols-[1.4fr_1fr_1fr] gap-2 bg-[#111111] px-5 py-4 font-mono text-xs uppercase tracking-[0.14em] text-white/60 sm:px-7">
                 <span>Session</span>
                 <span className="text-right">Incall</span>
                 <span className="text-right">Outcall</span>
@@ -396,18 +396,18 @@ export function VoxProfile({
                     className="grid grid-cols-[1.4fr_1fr_1fr] items-center gap-2 border-t border-[#f0e8e0] bg-white px-5 py-4 sm:px-7"
                   >
                     <div>
-                      <p className="font-semibold text-[#1a1a1a]">{row.name}</p>
+                      <p className="font-semibold text-[#111111]">{row.name}</p>
                       <p className="text-sm text-[#8a7d6f]">{row.duration}</p>
                     </div>
-                    <span className="text-right font-semibold text-[#1A1A1A]">{row.incall}</span>
-                    <span className="text-right font-semibold text-[#1A1A1A]">{row.outcall}</span>
+                    <span className="text-right font-semibold text-[#111111]">{row.incall}</span>
+                    <span className="text-right font-semibold text-[#111111]">{row.outcall}</span>
                   </div>
                 ))
               ) : (
                 <div className="grid grid-cols-[1.4fr_1fr_1fr] items-center gap-2 bg-white px-5 py-4 sm:px-7">
-                  <p className="font-semibold text-[#1a1a1a]">Custom session</p>
-                  <span className="text-right font-semibold text-[#1A1A1A]">{profile.incallPrice}</span>
-                  <span className="text-right font-semibold text-[#1A1A1A]">{profile.outcallPrice}</span>
+                  <p className="font-semibold text-[#111111]">Custom session</p>
+                  <span className="text-right font-semibold text-[#111111]">{profile.incallPrice}</span>
+                  <span className="text-right font-semibold text-[#111111]">{profile.outcallPrice}</span>
                 </div>
               )}
             </div>
@@ -421,10 +421,10 @@ export function VoxProfile({
         {/* ── Availability & Travel ────────────────────────────────────────── */}
         <Section id="availability" eyebrow="Planning" title="Availability & travel">
           <div className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-2xl border border-[#e8e0d8] bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border border-[#E8E8E8] bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center gap-2">
                 <CalendarDays className="h-5 w-5 text-emerald-600" strokeWidth={2.25} />
-                <h3 className="font-display text-lg font-bold text-[#1A1A1A]">Availability</h3>
+                <h3 className="font-display text-lg font-bold text-[#111111]">Availability</h3>
               </div>
               {profile.availabilityDays.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
@@ -435,7 +435,7 @@ export function VoxProfile({
                         key={day}
                         className={`flex h-9 w-12 items-center justify-center rounded-lg text-sm font-semibold transition-colors ${
                           open
-                            ? "bg-gradient-to-b from-[#FFF4EA] to-[#FFECD4] text-[#8a5a2b] shadow-sm"
+                            ? "bg-gradient-to-b from-[#F8EDEE] to-[#F8EDEE] text-[#8B1E2D] shadow-sm"
                             : "bg-slate-50 text-slate-300 line-through"
                         }`}
                       >
@@ -447,10 +447,10 @@ export function VoxProfile({
               ) : null}
               <p className="mt-4 text-sm text-[#5a5147]">{profile.availabilityHours}</p>
             </div>
-            <div className="rounded-2xl border border-[#e8e0d8] bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border border-[#E8E8E8] bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center gap-2">
-                <Car className="h-5 w-5 text-[#FF8A1F]" strokeWidth={2.25} />
-                <h3 className="font-display text-lg font-bold text-[#1A1A1A]">Incall & outcall</h3>
+                <Car className="h-5 w-5 text-[#8B1E2D]" strokeWidth={2.25} />
+                <h3 className="font-display text-lg font-bold text-[#111111]">Incall & outcall</h3>
               </div>
               <ul className="space-y-2.5 text-sm text-[#3f3a33]">
                 <li className="flex items-center gap-2">
@@ -464,7 +464,7 @@ export function VoxProfile({
                   {hasRate(profile.outcallPrice) ? ` · from ${profile.outcallPrice}` : ""}
                 </li>
                 <li className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-[#FF8A1F]" strokeWidth={2.25} />
+                  <Zap className="h-4 w-4 text-[#8B1E2D]" strokeWidth={2.25} />
                   {profile.travelRadius}
                 </li>
               </ul>
@@ -474,7 +474,7 @@ export function VoxProfile({
 
         {/* ── Location ────────────────────────────────────────────────────── */}
         <Section id="location" eyebrow="Where" title="Location">
-          <div className="overflow-hidden rounded-2xl border border-[#e8e0d8] shadow-sm">
+          <div className="overflow-hidden rounded-2xl border border-[#E8E8E8] shadow-sm">
             {profile.mapLat !== null && profile.mapLng !== null ? (
               <iframe
                 title={`Map of ${profile.neighborhood}, ${profile.city}`}
@@ -486,13 +486,13 @@ export function VoxProfile({
             ) : (
               <div className="flex h-56 items-center justify-center bg-slate-50">
                 <span className="flex items-center gap-2 text-[#5a5147]">
-                  <MapPin className="h-5 w-5 text-[#FF8A1F]" strokeWidth={2.25} />
+                  <MapPin className="h-5 w-5 text-[#8B1E2D]" strokeWidth={2.25} />
                   {profile.neighborhood}, {profile.city}, {profile.state}
                 </span>
               </div>
             )}
             <div className="flex items-center gap-2 bg-white px-6 py-4 text-sm text-[#5a5147]">
-              <MapPin className="h-4 w-4 text-[#FF8A1F]" strokeWidth={2.25} />
+              <MapPin className="h-4 w-4 text-[#8B1E2D]" strokeWidth={2.25} />
               Serving {profile.serviceArea}
             </div>
           </div>
@@ -510,8 +510,8 @@ export function VoxProfile({
             />
             <TrustCard
               Icon={Users}
-              iconColor="text-[#FF8A1F]"
-              iconBg="bg-gradient-to-br from-[#FFF4EA] to-[#FFECD4]"
+              iconColor="text-[#8B1E2D]"
+              iconBg="bg-gradient-to-br from-[#F8EDEE] to-[#F8EDEE]"
               title="Real, independent pros"
               body="You message the therapist directly — no middlemen, no booking fees."
             />
@@ -542,9 +542,9 @@ export function VoxProfile({
                 <Link
                   key={related.slug}
                   href={`/therapists/${related.slug}`}
-                  className="group flex items-center gap-3 rounded-2xl border border-[#e8e0d8] bg-white p-3 shadow-sm transition-all hover:border-[#FF8A1F]/40 hover:shadow-[0_4px_20px_rgba(255,138,31,0.08)]"
+                  className="group flex items-center gap-3 rounded-2xl border border-[#E8E8E8] bg-white p-3 shadow-sm transition-all hover:border-[#8B1E2D]/40 hover:shadow-[0_4px_20px_rgba(139,30,45,0.08)]"
                 >
-                  <span className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100 ring-2 ring-transparent transition-all group-hover:ring-[#FF8A1F]/30">
+                  <span className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100 ring-2 ring-transparent transition-all group-hover:ring-[#8B1E2D]/30">
                     {related.profilePhotoUrl ? (
                       <Image
                         src={related.profilePhotoUrl}
@@ -556,7 +556,7 @@ export function VoxProfile({
                     ) : null}
                   </span>
                   <span>
-                    <p className="font-semibold text-[#1a1a1a]">{related.name}</p>
+                    <p className="font-semibold text-[#111111]">{related.name}</p>
                     <p className="flex items-center gap-1 text-sm text-[#8a7d6f]">
                       <MapPin className="h-3 w-3" strokeWidth={2} />
                       {related.city}
@@ -570,7 +570,7 @@ export function VoxProfile({
       </div>
 
       {/* ── Final CTA band ──────────────────────────────────────────────────── */}
-      <section className="relative bg-[#060E1A] px-4 py-14 sm:py-20">
+      <section className="relative bg-[#111111] px-4 py-14 sm:py-20">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -579,7 +579,7 @@ export function VoxProfile({
             backgroundSize: "28px 28px",
           }}
         />
-        <div className="relative mx-auto flex max-w-4xl flex-col items-center gap-6 rounded-2xl border border-white/[0.06] bg-gradient-to-br from-[#0a1628] to-[#060E1A] px-6 py-14 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+        <div className="relative mx-auto flex max-w-4xl flex-col items-center gap-6 rounded-2xl border border-white/[0.06] bg-gradient-to-br from-[#0a1628] to-[#111111] px-6 py-14 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/40">Ready when you are</p>
           <h2 className="font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
             Book your tailored session with {firstName}.
@@ -591,7 +591,7 @@ export function VoxProfile({
             {(phoneHref || whatsappHref || emailHref) && (
               <a
                 href={phoneHref || whatsappHref || emailHref || "#contact"}
-                className="inline-flex h-12 items-center gap-2 rounded-full bg-[#FF8A1F] px-7 font-semibold text-[#1a0a00] shadow-[0_0_32px_rgba(255,138,31,0.35)] transition-transform hover:-translate-y-0.5"
+                className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-[#FFFFFF] shadow-[0_0_32px_rgba(139,30,45,0.35)] transition-transform hover:-translate-y-0.5"
               >
                 <Sparkles className="h-4 w-4" strokeWidth={2.5} />
                 Contact {firstName}
@@ -636,8 +636,8 @@ function Section({
 }) {
   return (
     <section id={id} className="mt-12 scroll-mt-24 sm:mt-16">
-      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#FF8A1F]">{eyebrow}</p>
-      <h2 className="mb-6 mt-1.5 font-display text-2xl font-extrabold tracking-tight text-[#060E1A] sm:text-3xl">
+      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#8B1E2D]">{eyebrow}</p>
+      <h2 className="mb-6 mt-1.5 font-display text-2xl font-extrabold tracking-tight text-[#111111] sm:text-3xl">
         {title}
       </h2>
       {children}
@@ -671,13 +671,13 @@ function HeroBadge({
 
 function DetailRow({ Icon, label, value }: { Icon: typeof MapPin; label: string; value: string }) {
   return (
-    <div className="flex items-start gap-3 rounded-2xl border border-[#e8e0d8] bg-white p-4 shadow-sm">
-      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#FFF4EA] to-[#FFECD4] text-[#FF8A1F]">
+    <div className="flex items-start gap-3 rounded-2xl border border-[#E8E8E8] bg-white p-4 shadow-sm">
+      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#F8EDEE] to-[#F8EDEE] text-[#8B1E2D]">
         <Icon className="h-4 w-4" strokeWidth={2.25} />
       </span>
       <span>
-        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#a1927f]">{label}</p>
-        <p className="text-sm font-semibold text-[#1a1a1a]">{value}</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#8E8E8E]">{label}</p>
+        <p className="text-sm font-semibold text-[#111111]">{value}</p>
       </span>
     </div>
   );
@@ -697,11 +697,11 @@ function TrustCard({
   body: string;
 }) {
   return (
-    <div className="rounded-2xl border border-[#e8e0d8] bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-[#E8E8E8] bg-white p-6 shadow-sm">
       <span className={`mb-3 inline-flex h-11 w-11 items-center justify-center rounded-xl ${iconBg} ${iconColor}`}>
         <Icon className="h-5 w-5" strokeWidth={2.25} />
       </span>
-      <h3 className="font-display text-base font-bold text-[#1A1A1A]">{title}</h3>
+      <h3 className="font-display text-base font-bold text-[#111111]">{title}</h3>
       <p className="mt-1.5 text-sm leading-6 text-[#5a5147]">{body}</p>
     </div>
   );

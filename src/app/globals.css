@@ -5,18 +5,25 @@
    ──────────────────────────────────────────── */
 :root {
   --mm-bg:          #FFFFFF;
-  --mm-dark:        #1A1A1A;
-  --mm-accent:      #CC2424;
-  --mm-accent-hover:#A81D1D;
-  --mm-gray:        #666666;
-  --mm-muted:       #999999;
-  --mm-border:      rgba(0,0,0,0.08);
+  --mm-dark:        #111111;
+  --mm-dark-strong: #1F1F1F;
+  --mm-dark-soft:   #2B2B2B;
+  --mm-accent:      #8B1E2D;
+  --mm-accent-hover:#6E1521;
+  --mm-gray:        #6F6F6F;
+  --mm-muted:       #8E8E8E;
+  --mm-border:      #E8E8E8;
+  --mm-border-soft: #D9D9D9;
+  --mm-border-div:  #B5B5B5;
   --mm-white:       #FFFFFF;
-  --mm-light:       #F4F5F6;
-  --mm-med:         #E2E4E6;
+  --mm-light:       #F7F7F7;
+  --mm-surface:     #FAFAFA;
+  --mm-badge-bg:    #F8EDEE;
+  --mm-verified-bg: #EEF8F1;
+  --mm-success:     #1E7A46;
 
-  --mm-font-heading: var(--font-montserrat), 'Montserrat', system-ui, sans-serif;
-  --mm-font-body:    var(--font-montserrat), 'Montserrat', system-ui, sans-serif;
+  --mm-font-heading: var(--font-satoshi), 'Satoshi', Arial, sans-serif;
+  --mm-font-body:    var(--font-satoshi), 'Satoshi', Arial, sans-serif;
 
   --mm-label-size:    11px;
   --mm-label-spacing: 0.22em;
@@ -130,7 +137,7 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration: none;
 }
 .mm-city-card:hover {
-  border-bottom-color: #CC2424;
+  border-bottom-color: #8B1E2D;
   background: #FAFAFA;
 }
 
@@ -145,7 +152,7 @@ h1, h2, h3, h4, h5, h6 {
   transition: border-bottom-color 0.2s ease, background 0.2s ease;
 }
 .mm-service-link:hover {
-  border-bottom-color: #CC2424;
+  border-bottom-color: #8B1E2D;
   background: #ffffff;
 }
 .mm-service-link .mm-arrow {
@@ -170,7 +177,7 @@ h1, h2, h3, h4, h5, h6 {
     120deg,
     currentColor 0%,
     currentColor 35%,
-    rgba(204, 36, 36, 0.65) 50%,
+    rgba(139, 30, 45, 0.65) 50%,
     currentColor 65%,
     currentColor 100%
   );

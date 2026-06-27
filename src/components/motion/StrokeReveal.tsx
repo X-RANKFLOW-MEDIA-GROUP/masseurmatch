@@ -20,7 +20,7 @@ export function StrokeReveal({
   d,
   width = 200,
   height = 60,
-  strokeColor = "#CC2424",
+  strokeColor = "#8B1E2D",
   strokeWidth = 2,
   duration = 1.2,
   delay = 0,

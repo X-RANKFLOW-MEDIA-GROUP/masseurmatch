@@ -11,7 +11,7 @@ import { SITE_URL } from "@/lib/site";
 import "@/index.css";
 import "@/styles/mobile-responsive.css";
 import "@/styles/homepage-mobile-hotfix.css";
-import { montserrat } from "./fonts";
+import { satoshi } from "./fonts";
 import SmoothScroll from "@/components/motion/SmoothScroll";
 
 // Font stacks are defined in CSS variables to keep production builds deterministic
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={montserrat.variable}>
+    <html lang="en" className={satoshi.variable}>
       <body className="theme-masseurmatch min-h-screen overflow-x-hidden font-sans text-foreground antialiased">
         <AppProviders>
           <IntroVideoSplash />

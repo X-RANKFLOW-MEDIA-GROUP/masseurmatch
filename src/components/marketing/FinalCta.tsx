@@ -25,12 +25,12 @@ export function FinalCta() {
           />
         </div>
       </ParallaxLayer>
-      <div className="absolute inset-0 bg-[#1A1A1A]/85" />
+      <div className="absolute inset-0 bg-[#111111]/85" />
       <GrainOverlay opacity={0.04} />
 
       {/* Breathing glow */}
       <BreathingGlow
-        color="rgba(204, 36, 36, 0.12)"
+        color="rgba(139, 30, 45, 0.12)"
         size={500}
         duration={6}
         className="left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
@@ -60,7 +60,7 @@ export function FinalCta() {
             <MagneticHover strength={0.2} radius={120}>
               <Link
                 href="/for-therapists"
-                className="inline-flex h-12 items-center justify-center rounded-full bg-primary px-8 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 hover:shadow-[0_0_40px_rgba(204,36,36,0.35)]"
+                className="inline-flex h-12 items-center justify-center rounded-full bg-primary px-8 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 hover:shadow-[0_0_40px_rgba(139,30,45,0.35)]"
               >
                 List your practice
               </Link>

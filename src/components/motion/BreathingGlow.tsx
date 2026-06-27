@@ -10,7 +10,7 @@ type BreathingGlowProps = {
 };
 
 export function BreathingGlow({
-  color = "rgba(204, 36, 36, 0.15)",
+  color = "rgba(139, 30, 45, 0.15)",
   size = 400,
   duration = 5,
   className = "",

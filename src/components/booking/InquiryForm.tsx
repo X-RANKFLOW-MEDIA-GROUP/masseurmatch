@@ -175,7 +175,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
             <select
               value={form.service_type}
               onChange={e => setForm(f => ({ ...f, service_type: e.target.value }))}
-              className="rounded-lg border border-white/10 bg-[#1A1A1A] px-3 py-2.5 text-sm text-white focus:border-red-500/50 focus:outline-none focus:ring-1 focus:ring-red-500/20"
+              className="rounded-lg border border-white/10 bg-[#111111] px-3 py-2.5 text-sm text-white focus:border-red-500/50 focus:outline-none focus:ring-1 focus:ring-red-500/20"
             >
               <option value="swedish">Swedish</option>
               <option value="deep_tissue">Deep Tissue</option>
@@ -190,7 +190,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
             <select
               value={form.duration_minutes}
               onChange={e => setForm(f => ({ ...f, duration_minutes: e.target.value }))}
-              className="rounded-lg border border-white/10 bg-[#1A1A1A] px-3 py-2.5 text-sm text-white focus:border-red-500/50 focus:outline-none focus:ring-1 focus:ring-red-500/20"
+              className="rounded-lg border border-white/10 bg-[#111111] px-3 py-2.5 text-sm text-white focus:border-red-500/50 focus:outline-none focus:ring-1 focus:ring-red-500/20"
             >
               <option value="60">60 min</option>
               <option value="90">90 min</option>
@@ -211,7 +211,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
         <button
           type="submit"
           disabled={loading}
-          className="flex items-center justify-center gap-2 rounded-lg bg-[#CC2424] px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-red-400 disabled:opacity-60"
+          className="flex items-center justify-center gap-2 rounded-lg bg-[#8B1E2D] px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-red-400 disabled:opacity-60"
         >
           {loading ? (
             <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2.25} />
@@ -236,7 +236,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
               <div
                 className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                   msg.role === 'user'
-                    ? 'bg-[#CC2424]/90 text-white'
+                    ? 'bg-[#8B1E2D]/90 text-white'
                     : 'bg-white/[0.08] text-slate-200'
                 }`}
               >
@@ -269,7 +269,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
           <button
             onClick={sendChatMessage}
             disabled={loading || !chatInput.trim()}
-            className="flex items-center justify-center rounded-lg bg-[#CC2424] px-3 py-2.5 transition-all hover:bg-red-400 disabled:opacity-60"
+            className="flex items-center justify-center rounded-lg bg-[#8B1E2D] px-3 py-2.5 transition-all hover:bg-red-400 disabled:opacity-60"
           >
             <Send className="h-4 w-4 text-white" strokeWidth={2.25} />
           </button>

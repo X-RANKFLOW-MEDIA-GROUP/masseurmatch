@@ -52,7 +52,7 @@ export default function HomeTestPage() {
   ];
 
   return (
-    <div style={{ backgroundColor: "#F5F5F5", minHeight: "100vh" }}>
+    <div style={{ backgroundColor: "#F7F7F7", minHeight: "100vh" }}>
       {/* ─── HEADER/NAVIGATION ────────────────────────────────────────── */}
       <header className="sticky top-0 z-50" style={{ backgroundColor: "#FFFFFF", borderBottom: "1px solid #D0D0D0" }}>
         <div className="px-4 py-4 sm:px-6 lg:px-8">
@@ -119,7 +119,7 @@ export default function HomeTestPage() {
           {/* Eyebrow */}
           <p
             className="font-mono text-[10px] uppercase tracking-[0.18em] mb-8 text-center"
-            style={{ color: "#666666" }}
+            style={{ color: "#6F6F6F" }}
           >
             Premium. Professional. Personal.
           </p>
@@ -207,7 +207,7 @@ export default function HomeTestPage() {
                     >
                       {therapist.name}
                     </h3>
-                    <p className="text-xs line-clamp-2" style={{ color: "#666666" }}>
+                    <p className="text-xs line-clamp-2" style={{ color: "#6F6F6F" }}>
                       {therapist.description}
                     </p>
                     <div className="flex items-center gap-1 mt-1">
@@ -234,7 +234,7 @@ export default function HomeTestPage() {
       <section
         className="px-4 py-12 sm:px-6 lg:px-8 border-t border-b"
         style={{
-          backgroundColor: "#F5F5F5",
+          backgroundColor: "#F7F7F7",
           borderColor: "#D0D0D0",
         }}
       >
@@ -248,7 +248,7 @@ export default function HomeTestPage() {
                   <Icon
                     className="w-5 h-5 flex-shrink-0"
                     strokeWidth={2.25}
-                    style={{ color: "#666666" }}
+                    style={{ color: "#6F6F6F" }}
                   />
                   <span
                     className="text-sm font-bold"
@@ -268,7 +268,7 @@ export default function HomeTestPage() {
                   <Icon
                     className="w-5 h-5 flex-shrink-0"
                     strokeWidth={2.25}
-                    style={{ color: "#666666" }}
+                    style={{ color: "#6F6F6F" }}
                   />
                   <div>
                     <div
@@ -338,7 +338,7 @@ export default function HomeTestPage() {
               >
                 Verified Professional
               </h3>
-              <p className="text-sm text-center mt-3" style={{ color: "#666666" }}>
+              <p className="text-sm text-center mt-3" style={{ color: "#6F6F6F" }}>
                 Certified therapist with protective circle verification
               </p>
             </div>
@@ -391,7 +391,7 @@ export default function HomeTestPage() {
               >
                 Premium Verified
               </h3>
-              <p className="text-sm text-center mt-3" style={{ color: "#666666" }}>
+              <p className="text-sm text-center mt-3" style={{ color: "#6F6F6F" }}>
                 Top-rated therapist with verified checkmark credential
               </p>
             </div>
@@ -403,7 +403,7 @@ export default function HomeTestPage() {
       <section
         className="px-4 py-16 sm:px-6 lg:px-8 border-t"
         style={{
-          backgroundColor: "#F5F5F5",
+          backgroundColor: "#F7F7F7",
           borderColor: "#D0D0D0",
         }}
       >

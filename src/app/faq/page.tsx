@@ -128,7 +128,7 @@ export default function FAQPage() {
       <main
         style={{
           background: "#FFFFFF",
-          color: "#1A1A1A",
+          color: "#111111",
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
@@ -136,7 +136,7 @@ export default function FAQPage() {
         {/* ── Hero ── */}
         <section
           style={{
-            background: "#1A1A1A",
+            background: "#111111",
             color: "#FFFFFF",
             padding: "88px 24px 80px",
             textAlign: "center",
@@ -147,7 +147,7 @@ export default function FAQPage() {
               fontSize: 11,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "#CC2424",
+              color: "#8B1E2D",
               marginBottom: 20,
               fontFamily: "system-ui, sans-serif",
             }}
@@ -195,7 +195,7 @@ export default function FAQPage() {
                   style={{
                     width: 32,
                     height: 1,
-                    background: "#CC2424",
+                    background: "#8B1E2D",
                   }}
                 />
                 <h2
@@ -204,7 +204,7 @@ export default function FAQPage() {
                     letterSpacing: "0.22em",
                     textTransform: "uppercase",
                     fontFamily: "system-ui, sans-serif",
-                    color: "#CC2424",
+                    color: "#8B1E2D",
                     margin: 0,
                   }}
                 >
@@ -237,7 +237,7 @@ export default function FAQPage() {
                       <span
                         style={{
                           fontSize: 20,
-                          color: "#CC2424",
+                          color: "#8B1E2D",
                           flexShrink: 0,
                           marginLeft: 16,
                         }}
@@ -268,7 +268,7 @@ export default function FAQPage() {
         {/* ── Still Have Questions ── */}
         <section
           style={{
-            background: "#1A1A1A",
+            background: "#111111",
             color: "#FFFFFF",
             padding: "72px 24px",
             textAlign: "center",
@@ -302,8 +302,8 @@ export default function FAQPage() {
               letterSpacing: "0.14em",
               textTransform: "uppercase",
               fontFamily: "system-ui, sans-serif",
-              background: "#CC2424",
-              color: "#1A1A1A",
+              background: "#8B1E2D",
+              color: "#111111",
               textDecoration: "none",
               fontWeight: 700,
             }}

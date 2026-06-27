@@ -68,7 +68,7 @@ function MobileNav({
         <button
           type="button"
           aria-label="Open menu"
-          className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg text-[#1A1A1A] hover:bg-[#F5F5F5] transition-colors"
+          className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg text-[#111111] hover:bg-[#F7F7F7] transition-colors"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -87,19 +87,19 @@ function MobileNav({
             className="flex items-center gap-2"
             aria-label="MasseurMatch home"
           >
-            <div className="w-8 h-8 rounded-md bg-[#CC2424] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-md bg-[#8B1E2D] flex items-center justify-center">
               <span className="text-white font-extrabold text-sm leading-none">
                 MM
               </span>
             </div>
-            <span className="font-bold text-[#1A1A1A] text-sm tracking-tight">
+            <span className="font-bold text-[#111111] text-sm tracking-tight">
               MASSEURMATCH
             </span>
           </Link>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-[#666666] hover:text-[#1A1A1A] hover:bg-[#F5F5F5] transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-[#6F6F6F] hover:text-[#111111] hover:bg-[#F7F7F7] transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -115,8 +115,8 @@ function MobileNav({
                 onClick={() => setOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   active
-                    ? "bg-[#CC2424] text-white"
-                    : "text-[#666666] hover:bg-[#F5F5F5] hover:text-[#1A1A1A]"
+                    ? "bg-[#8B1E2D] text-white"
+                    : "text-[#6F6F6F] hover:bg-[#F7F7F7] hover:text-[#111111]"
                 }`}
               >
                 <Icon
@@ -131,13 +131,13 @@ function MobileNav({
 
         <div className="mt-auto px-5 pb-6 pt-4 border-t border-[#E5E5E5] space-y-2">
           {authenticated === null ? (
-            <div className="h-10 animate-pulse rounded-lg bg-[#F5F5F5]" />
+            <div className="h-10 animate-pulse rounded-lg bg-[#F7F7F7]" />
           ) : authenticated ? (
             <>
               <Link
                 href={dashboardPath}
                 onClick={() => setOpen(false)}
-                className="block w-full text-center rounded-lg border border-[#E5E5E5] py-2.5 text-sm font-medium text-[#1A1A1A] hover:bg-[#F5F5F5] transition-colors"
+                className="block w-full text-center rounded-lg border border-[#E5E5E5] py-2.5 text-sm font-medium text-[#111111] hover:bg-[#F7F7F7] transition-colors"
               >
                 Dashboard
               </Link>
@@ -147,7 +147,7 @@ function MobileNav({
                   setOpen(false);
                   onLogout();
                 }}
-                className="block w-full text-center rounded-full bg-[#CC2424] py-2.5 text-sm font-semibold text-white hover:bg-[#A81D1D] transition-colors"
+                className="block w-full text-center rounded-full bg-[#8B1E2D] py-2.5 text-sm font-semibold text-white hover:bg-[#6E1521] transition-colors"
               >
                 Log Out
               </button>
@@ -157,14 +157,14 @@ function MobileNav({
               <Link
                 href="/login"
                 onClick={() => setOpen(false)}
-                className="block w-full text-center rounded-lg border border-[#E5E5E5] py-2.5 text-sm font-medium text-[#1A1A1A] hover:bg-[#F5F5F5] transition-colors"
+                className="block w-full text-center rounded-lg border border-[#E5E5E5] py-2.5 text-sm font-medium text-[#111111] hover:bg-[#F7F7F7] transition-colors"
               >
                 Log In
               </Link>
               <Link
                 href="/signup"
                 onClick={() => setOpen(false)}
-                className="block w-full text-center rounded-full bg-[#CC2424] py-2.5 text-sm font-semibold text-white hover:bg-[#A81D1D] transition-colors"
+                className="block w-full text-center rounded-full bg-[#8B1E2D] py-2.5 text-sm font-semibold text-white hover:bg-[#6E1521] transition-colors"
               >
                 Get Started
               </Link>
@@ -252,16 +252,16 @@ export default function SiteHeader() {
           className="group flex items-center gap-3 shrink-0"
           aria-label="MasseurMatch home"
         >
-          <div className="relative w-10 h-10 rounded-lg bg-[#CC2424] flex items-center justify-center shadow-sm">
+          <div className="relative w-10 h-10 rounded-lg bg-[#8B1E2D] flex items-center justify-center shadow-sm">
             <span className="text-white font-extrabold text-base leading-none tracking-tight">
               MM
             </span>
           </div>
           <div className="hidden sm:flex flex-col">
-            <span className="font-extrabold text-[#1A1A1A] text-[15px] tracking-tight leading-tight">
+            <span className="font-extrabold text-[#111111] text-[15px] tracking-tight leading-tight">
               MASSEURMATCH
             </span>
-            <span className="text-[9px] font-semibold text-[#666666] tracking-[0.12em] uppercase leading-tight">
+            <span className="text-[9px] font-semibold text-[#6F6F6F] tracking-[0.12em] uppercase leading-tight">
               Premium Sports Recovery &amp; Wellness
             </span>
           </div>
@@ -291,8 +291,8 @@ export default function SiteHeader() {
                   href={href}
                   className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md transition-colors ${
                     active
-                      ? "bg-[#CC2424] text-white shadow-sm"
-                      : "text-[#666666] hover:text-[#1A1A1A] hover:bg-[#F5F5F5]"
+                      ? "bg-[#8B1E2D] text-white shadow-sm"
+                      : "text-[#6F6F6F] hover:text-[#111111] hover:bg-[#F7F7F7]"
                   }`}
                 >
                   <Icon
@@ -307,7 +307,7 @@ export default function SiteHeader() {
 
           {/* LOGIN nav item */}
           {authenticated === null ? (
-            <div className="w-16 h-8 animate-pulse rounded-md bg-[#F5F5F5] ml-0.5" />
+            <div className="w-16 h-8 animate-pulse rounded-md bg-[#F7F7F7] ml-0.5" />
           ) : authenticated ? (
             <motion.div
               whileHover={{ scale: 1.04 }}
@@ -316,7 +316,7 @@ export default function SiteHeader() {
             >
               <Link
                 href={dashboardPath}
-                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#666666] hover:text-[#1A1A1A] hover:bg-[#F5F5F5] transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#6F6F6F] hover:text-[#111111] hover:bg-[#F7F7F7] transition-colors"
               >
                 <UserCircle
                   className="w-[0.9rem] h-[0.9rem]"
@@ -333,7 +333,7 @@ export default function SiteHeader() {
             >
               <Link
                 href="/login"
-                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#666666] hover:text-[#1A1A1A] hover:bg-[#F5F5F5] transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#6F6F6F] hover:text-[#111111] hover:bg-[#F7F7F7] transition-colors"
               >
                 <UserCircle
                   className="w-[0.9rem] h-[0.9rem]"
@@ -353,7 +353,7 @@ export default function SiteHeader() {
               onClick={handleLogout}
               whileHover={shouldReduceMotion ? undefined : { scale: 1.05 }}
               whileTap={shouldReduceMotion ? undefined : { scale: 0.95 }}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#666666] hover:text-[#CC2424] hover:bg-red-50 transition-colors"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#6F6F6F] hover:text-[#8B1E2D] hover:bg-red-50 transition-colors"
             >
               <LogOut className="w-[0.9rem] h-[0.9rem]" strokeWidth={2.35} />
               Log out
@@ -366,7 +366,7 @@ export default function SiteHeader() {
           >
             <Link
               href="/signup"
-              className="hidden sm:flex h-10 px-6 items-center justify-center rounded-full text-sm font-bold transition-all duration-200 bg-[#CC2424] text-white hover:bg-[#A81D1D] hover:shadow-lg hover:shadow-[#CC2424]/20"
+              className="hidden sm:flex h-10 px-6 items-center justify-center rounded-full text-sm font-bold transition-all duration-200 bg-[#8B1E2D] text-white hover:bg-[#6E1521] hover:shadow-lg hover:shadow-[#8B1E2D]/20"
             >
               GET STARTED
             </Link>

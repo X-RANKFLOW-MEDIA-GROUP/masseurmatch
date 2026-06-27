@@ -162,14 +162,14 @@ export default function PrivacyPage() {
       <main
         style={{
           background: "#FFFFFF",
-          color: "#1A1A1A",
+          color: "#111111",
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
       >
         <section
           style={{
-            background: "#1A1A1A",
+            background: "#111111",
             color: "#FFFFFF",
             padding: "80px 24px 72px",
           }}
@@ -180,7 +180,7 @@ export default function PrivacyPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#CC2424",
+                color: "#8B1E2D",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -247,7 +247,7 @@ export default function PrivacyPage() {
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
                 fontFamily: "system-ui, sans-serif",
-                color: "#CC2424",
+                color: "#8B1E2D",
                 marginBottom: 16,
               }}
             >
