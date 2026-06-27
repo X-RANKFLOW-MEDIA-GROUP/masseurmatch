@@ -422,14 +422,29 @@ export const getProfilePhotosBatch = async (
   const result = new Map<string, ProfilePhoto[]>();
   if (!profileIds.length) return result;
 
-  const { data, error } = await supabase
-    .from("profile_photos")
-    .select("id, profile_id, storage_path, url, is_primary, sort_order")
-    .in("profile_id", profileIds)
-    .eq("moderation_status", "approved")
-    .order("sort_order", { ascending: true });
+  // Chunk the id list before querying: Supabase encodes `.in()` arrays into
+  // the request URL, so a large directory (e.g. 200 UUIDs from /explore) can
+  // exceed URL length limits and fail the whole request. Query in batches and
+  // merge the rows.
+  const CHUNK_SIZE = 100;
+  const chunks: string[][] = [];
+  for (let i = 0; i < profileIds.length; i += CHUNK_SIZE) {
+    chunks.push(profileIds.slice(i, i + CHUNK_SIZE));
+  }
 
-  if (error || !data?.length) return result;
+  const responses = await Promise.all(
+    chunks.map((chunk) =>
+      supabase
+        .from("profile_photos")
+        .select("id, profile_id, storage_path, url, is_primary, sort_order")
+        .in("profile_id", chunk)
+        .eq("moderation_status", "approved")
+        .order("sort_order", { ascending: true }),
+    ),
+  );
+
+  const data = responses.flatMap((response) => response.data ?? []);
+  if (!data.length) return result;
 
   // Surface the primary photo first so a limit of 1 keeps the avatar.
   const ordered = [...data].sort((a, b) => Number(b.is_primary) - Number(a.is_primary));
