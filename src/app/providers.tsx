@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React, { useState } from "react";
 
-import { AnalyticsPageTracker } from "@/app/_components/analytics-page-tracker";
+import { BugsnagClient } from "@/app/_components/bugsnag-client";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -47,9 +47,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
       <I18nProvider>
         <AuthProvider>
           <TooltipProvider>
-            <React.Suspense fallback={null}>
-              <AnalyticsPageTracker />
-            </React.Suspense>
+            <BugsnagClient />
             {children}
             <Toaster />
             <Sonner />
