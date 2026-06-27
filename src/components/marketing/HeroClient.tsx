@@ -115,10 +115,10 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
   };
 
   return (
-    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_24%_18%,rgba(204,36,36,0.08),transparent_28%),linear-gradient(180deg,#ffffff_0%,#fbfaf8_100%)] text-[#151515]">
+    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_24%_18%,rgba(139,30,45,0.08),transparent_28%),linear-gradient(180deg,#ffffff_0%,#fbfaf8_100%)] text-[#151515]">
       <div className="mx-auto grid min-h-[680px] max-w-[1500px] items-center gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1.03fr_0.97fr] lg:px-10 lg:py-16">
         <div className="relative order-2 lg:order-1">
-          <div className="pointer-events-none absolute -left-10 top-12 h-72 w-72 rounded-full bg-[#FF8A1F]/8 blur-3xl" />
+          <div className="pointer-events-none absolute -left-10 top-12 h-72 w-72 rounded-full bg-[#8B1E2D]/8 blur-3xl" />
 
           {realProfiles.length > 0 ? (
             <div className="relative flex snap-x gap-4 overflow-x-auto pb-6 pt-24 lg:overflow-visible lg:pb-0 lg:pt-28">
@@ -131,9 +131,9 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: dur, ease: customEase }}
-              className="rounded-[2rem] border border-dashed border-[#FF8A1F]/30 bg-white/80 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.09)]"
+              className="rounded-[2rem] border border-dashed border-[#8B1E2D]/30 bg-white/80 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.09)]"
             >
-              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FF8A1F]/10 text-[#FF8A1F]">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#8B1E2D]/10 text-[#8B1E2D]">
                 <Sparkles size={24} />
               </div>
               <h2 className="font-display text-2xl font-black text-[#151515]">Live profile cards are ready.</h2>
@@ -149,7 +149,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.12 }}
-            className="mb-4 font-mono text-[10px] uppercase tracking-[0.34em] text-[#FF8A1F] sm:text-xs"
+            className="mb-4 font-mono text-[10px] uppercase tracking-[0.34em] text-[#8B1E2D] sm:text-xs"
           >
             PREMIUM.&nbsp;&nbsp;PROFESSIONAL.&nbsp;&nbsp;PERSONAL.
           </motion.p>
@@ -162,7 +162,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             style={{ fontSize: "clamp(3rem, 6vw, 6.5rem)" }}
           >
             <span className="block text-[#151515]">Find the Right</span>
-            <span className="block"><span className="text-[#FF8A1F]">Masseur</span> Near You.</span>
+            <span className="block"><span className="text-[#8B1E2D]">Masseur</span> Near You.</span>
           </motion.h1>
 
           <motion.p
@@ -182,7 +182,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
           >
             <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FF8A1F]/10 text-[#FF8A1F]">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#8B1E2D]/10 text-[#8B1E2D]">
                   <MessageCircle size={23} strokeWidth={2.4} />
                 </div>
                 <div>
@@ -190,7 +190,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                   <p className="text-xs font-semibold text-[#7B8190]">Ask Knotty AI</p>
                 </div>
               </div>
-              <Sparkles size={20} className="text-[#FF8A1F]" />
+              <Sparkles size={20} className="text-[#8B1E2D]" />
             </div>
 
             <div className="space-y-4 px-5 py-5">
@@ -199,7 +199,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                 <span className="mt-1 block text-right text-[11px] text-[#98A2B3]">10:24 AM</span>
               </div>
               <div className="flex max-w-[86%] items-start gap-3">
-                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FF8A1F]/10 text-[#FF8A1F]">
+                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#8B1E2D]/10 text-[#8B1E2D]">
                   <Sparkles size={16} />
                 </div>
                 <div className="rounded-2xl rounded-tl-md bg-[#F7F7F8] px-4 py-3 text-sm font-medium leading-6 text-[#2B3038]">
@@ -214,7 +214,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                     key={prompt}
                     type="button"
                     onClick={() => submitAssistantPrompt(prompt)}
-                    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-black text-[#151515] transition hover:border-[#FF8A1F] hover:text-[#FF8A1F]"
+                    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-black text-[#151515] transition hover:border-[#8B1E2D] hover:text-[#8B1E2D]"
                   >
                     {prompt}
                   </button>
@@ -236,7 +236,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                   type="button"
                   onClick={() => submitAssistantPrompt()}
                   aria-label="Send AI match request"
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#FF8A1F] text-white shadow-lg shadow-[#FF8A1F]/25 transition hover:bg-[#E67600]"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#8B1E2D] text-white shadow-lg shadow-[#8B1E2D]/25 transition hover:bg-[#6E1521]"
                 >
                   <Send size={18} fill="currentColor" />
                 </button>
@@ -264,7 +264,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.52 }}
-            className="mt-7 inline-flex w-fit items-center gap-2 rounded-2xl bg-[#FF8A1F] px-6 py-4 text-sm font-black uppercase tracking-wide text-white shadow-xl shadow-[#FF8A1F]/20 transition hover:bg-[#E67600]"
+            className="mt-7 inline-flex w-fit items-center gap-2 rounded-2xl bg-[#8B1E2D] px-6 py-4 text-sm font-black uppercase tracking-wide text-white shadow-xl shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
           >
             Find a Masseur
             <ArrowRight size={18} strokeWidth={2.5} />

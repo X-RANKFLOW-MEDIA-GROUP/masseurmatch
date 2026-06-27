@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/app/_components/JsonLd";
 import {
@@ -121,11 +121,11 @@ export default async function TherapistsPage({ searchParams }: TherapistsPagePro
             }}
           />
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute -left-40 top-0 h-80 w-80 rounded-full bg-[#FF8A1F]/[0.06] blur-3xl" />
+            <div className="absolute -left-40 top-0 h-80 w-80 rounded-full bg-[#8B1E2D]/[0.06] blur-3xl" />
             <div className="absolute -right-40 bottom-0 h-72 w-72 rounded-full bg-emerald-500/[0.05] blur-3xl" />
           </div>
           <div className="relative mx-auto max-w-6xl">
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#FF8A1F]">National directory</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#8B1E2D]">National directory</p>
             <h1 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
               Find your massage therapist.
             </h1>
@@ -134,7 +134,7 @@ export default async function TherapistsPage({ searchParams }: TherapistsPagePro
               Your location is detected automatically — or search by city and specialty.
             </p>
             <div className="mt-5 flex flex-wrap gap-4 text-sm">
-              <Link href="/cities" className="font-semibold text-[#FF8A1F] hover:text-[#e67600]">
+              <Link href="/cities" className="font-semibold text-[#8B1E2D] hover:text-[#6E1521]">
                 Browse by city
               </Link>
               <Link href="/search" className="font-semibold text-white/60 hover:text-white">

@@ -227,6 +227,7 @@ create table if not exists public.profile_reviews (
   user_id uuid not null references auth.users(id) on delete cascade,
   status text not null default 'draft' check (status in ('draft','pending_approval','submitted','under_review','approved','rejected','changes_requested')),
   moderation_notes text,
+  admin_notes text,
   submitted_at timestamptz,
   admin_notes text,
   reviewed_at timestamptz,
@@ -264,6 +265,8 @@ create table if not exists public.text_verifications (
   verified_at timestamptz,
   reviewed_at timestamptz,
   expires_at timestamptz,
+  submitted_text text,
+  code text,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
@@ -273,6 +276,7 @@ create table if not exists public.admin_actions (
   admin_id uuid not null references auth.users(id) on delete cascade,
   action text,
   action_type text not null,
+  action text,
   target_user_id uuid references auth.users(id) on delete set null,
   target_profile_id uuid,
   target_table text,
@@ -574,6 +578,7 @@ create table if not exists public.moderation_queue (
   payload jsonb,
   resolved_by uuid,
   resolved_at timestamptz,
+  content_type text,
   created_at timestamptz default timezone('utc', now()),
   updated_at timestamptz default timezone('utc', now())
 );
@@ -600,7 +605,7 @@ create table if not exists public.user_suspensions (
 
 create table if not exists public.featured_masters (
   id uuid primary key default gen_random_uuid(),
-  profile_id uuid,
+  profile_id uuid unique,
   city text,
   display_order integer default 0,
   is_active boolean default true,
@@ -609,6 +614,17 @@ create table if not exists public.featured_masters (
   ends_at timestamptz,
   created_at timestamptz default timezone('utc', now())
 );
+
+do $$ begin
+  if not exists (
+    select 1 from information_schema.table_constraints
+    where table_schema = 'public' and table_name = 'featured_masters'
+      and constraint_name = 'featured_masters_profile_id_key'
+  ) then
+    alter table public.featured_masters
+      add constraint featured_masters_profile_id_key unique (profile_id);
+  end if;
+end $$;
 
 create table if not exists public.complaints (
   id uuid primary key default gen_random_uuid(),
@@ -740,6 +756,8 @@ create index if not exists idx_text_verifications_reviewed_at on public.text_ver
 create index if not exists idx_admin_actions_admin on public.admin_actions(admin_id, created_at desc);
 create index if not exists idx_admin_actions_target_user on public.admin_actions(target_user_id, created_at desc);
 create index if not exists idx_admin_actions_type on public.admin_actions(action_type, created_at desc);
+create index if not exists idx_demand_scores_location on public.demand_scores(location);
+create index if not exists idx_appointments_user_id on public.appointments(user_id);
 
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path=public as $$
@@ -821,6 +839,7 @@ create table if not exists public.appointments (
   user_id uuid references auth.users(id) on delete set null,
   client_id uuid not null references auth.users(id) on delete cascade,
   therapist_id uuid not null references auth.users(id) on delete cascade,
+  user_id uuid references auth.users(id) on delete cascade,
   status text not null default 'pending',
   service_type text,
   location_type text,
@@ -842,6 +861,8 @@ create table if not exists public.payment_transactions (
   amount integer,
   currency text,
   status text not null default 'pending',
+  provider_transaction_id text,
+  provider text,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
@@ -1158,6 +1179,20 @@ alter table public.contact_inquiries
   add column if not exists client_name text,
   add column if not exists client_phone text,
   add column if not exists preferred_contact text;
+
+create table if not exists public.stripe_events (
+  id uuid primary key default gen_random_uuid(),
+  stripe_event_id text not null unique,
+  event_type text not null,
+  payload jsonb not null,
+  processed_at timestamptz not null default timezone('utc', now()),
+  processing_error text,
+  failed_at timestamptz
+);
+
+alter table public.stripe_events
+  add column if not exists processing_error text,
+  add column if not exists failed_at timestamptz;
 
 create or replace view public.therapist_analytics_daily as
   select

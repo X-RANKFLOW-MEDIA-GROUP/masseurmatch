@@ -45,14 +45,20 @@ const statusConfig: Record<TherapistProfile["status"], { label: string; icon: ty
 export default function ApprovalsPage() {
   const [profiles, setProfiles] = useState<TherapistProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<ApprovalFilter>("pending");
 
   useEffect(() => {
+    setLoading(true);
+    setError(null);
     requestJson<{ ok: boolean; profiles: TherapistProfile[] }>(`/api/admin/approvals?status=${filter}`)
       .then((data) => {
         setProfiles(data.profiles || []);
       })
-      .catch(() => { /* UI shows empty list */ })
+      .catch((err) => {
+        setError(err instanceof Error ? err.message : "Failed to load profiles.");
+        setProfiles([]);
+      })
       .finally(() => setLoading(false));
   }, [filter]);
 
@@ -104,6 +110,10 @@ export default function ApprovalsPage() {
         {loading ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">Loading profiles...</p>
+          </div>
+        ) : error ? (
+          <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-5 py-4 text-sm text-destructive">
+            {error}
           </div>
         ) : profiles.length === 0 ? (
           <div className="text-center py-12">

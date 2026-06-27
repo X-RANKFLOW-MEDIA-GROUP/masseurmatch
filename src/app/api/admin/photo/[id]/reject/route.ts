@@ -17,7 +17,7 @@ export async function POST(
 
     const { data: photo, error: fetchError } = await adminClient
       .from("therapist_photos")
-      .select("id, profile_id, user_id")
+      .select("id, profile_id, user_id, storage_path")
       .eq("id", photoId)
       .maybeSingle();
 
@@ -34,6 +34,12 @@ export async function POST(
       .eq("id", photoId);
 
     if (updateError) throw new RouteError(500, updateError.message);
+
+    // Remove the actual storage object so the CDN URL returns 404 immediately.
+    // Best-effort: a missing or already-deleted path should not fail the request.
+    if (photo.storage_path && !photo.storage_path.startsWith("http")) {
+      await adminClient.storage.from("therapist-photos").remove([photo.storage_path]);
+    }
 
     await adminClient.from("admin_actions").insert({
       action: "reject_photo",
