@@ -143,7 +143,7 @@ export default function TermsPage() {
       <main
         style={{
           background: "#FFFFFF",
-          color: "#1A1A1A",
+          color: "#111111",
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
@@ -151,7 +151,7 @@ export default function TermsPage() {
         {/* ── Header ── */}
         <section
           style={{
-            background: "#1A1A1A",
+            background: "#111111",
             color: "#FFFFFF",
             padding: "clamp(56px, 8vw, 80px) 20px clamp(48px, 7vw, 72px)",
           }}
@@ -162,7 +162,7 @@ export default function TermsPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#CC2424",
+                color: "#8B1E2D",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -228,7 +228,7 @@ export default function TermsPage() {
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
                 fontFamily: "system-ui, sans-serif",
-                color: "#CC2424",
+                color: "#8B1E2D",
                 marginBottom: 16,
               }}
             >
@@ -257,7 +257,7 @@ export default function TermsPage() {
           <div>
             <div
               style={{
-                background: "#CC2424",
+                background: "#8B1E2D",
                 color: "#FFFFFF",
                 padding: "18px 18px",
                 marginBottom: 48,

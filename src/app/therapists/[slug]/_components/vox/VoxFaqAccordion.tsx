@@ -20,11 +20,11 @@ export function VoxFaqAccordion({ items }: { items: ProfileFaqItem[] }) {
               aria-expanded={isOpen}
               className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left sm:px-7"
             >
-              <span itemProp="name" className="text-base font-semibold text-[#1a1a1a]">
+              <span itemProp="name" className="text-base font-semibold text-[#111111]">
                 {item.question}
               </span>
               <ChevronDown
-                className={`h-5 w-5 flex-shrink-0 text-[#CC2424] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+                className={`h-5 w-5 flex-shrink-0 text-[#8B1E2D] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
                 strokeWidth={2.5}
               />
             </button>

@@ -136,7 +136,7 @@ function Section({ section }: { section: BlogSection }) {
         style={{
           fontSize: "clamp(20px, 2.5vw, 26px)",
           fontWeight: 400,
-          color: "#1A1A1A",
+          color: "#111111",
           marginTop: 48,
           marginBottom: 18,
           paddingBottom: 12,
@@ -155,7 +155,7 @@ function Section({ section }: { section: BlogSection }) {
         style={{
           fontSize: 18,
           fontWeight: 400,
-          color: "#1A1A1A",
+          color: "#111111",
           marginTop: 32,
           marginBottom: 14,
           fontFamily: serif,
@@ -191,7 +191,7 @@ function Section({ section }: { section: BlogSection }) {
               fontFamily: sans,
             }}
           >
-            <span style={{ color: "#CC2424", flexShrink: 0, marginTop: 3 }}>*</span>
+            <span style={{ color: "#8B1E2D", flexShrink: 0, marginTop: 3 }}>*</span>
             {item}
           </li>
         ))}
@@ -228,9 +228,9 @@ function Section({ section }: { section: BlogSection }) {
               style={{
                 fontSize: 12,
                 fontWeight: 700,
-                color: "#CC2424",
+                color: "#8B1E2D",
                 fontFamily: sans,
-                background: "rgba(204,36,36,0.1)",
+                background: "rgba(139,30,45,0.1)",
                 padding: "2px 8px",
                 flexShrink: 0,
                 marginTop: 2,
@@ -253,8 +253,8 @@ function Section({ section }: { section: BlogSection }) {
         style={{
           margin: "32px 0",
           padding: "24px 28px",
-          borderLeft: "3px solid #CC2424",
-          background: "rgba(204,36,36,0.04)",
+          borderLeft: "3px solid #8B1E2D",
+          background: "rgba(139,30,45,0.04)",
           fontStyle: "italic",
           fontSize: 17,
           lineHeight: 1.75,
@@ -273,9 +273,9 @@ function Section({ section }: { section: BlogSection }) {
         style={{
           margin: "32px 0",
           padding: "24px 28px",
-          background: "#1A1A1A",
+          background: "#111111",
           color: "#FFFFFF",
-          borderLeft: "3px solid #CC2424",
+          borderLeft: "3px solid #8B1E2D",
         }}
       >
         <p
@@ -330,13 +330,13 @@ export default async function BlogPostPage({
       <main
         style={{
           background: "#FFFFFF",
-          color: "#1A1A1A",
+          color: "#111111",
           fontFamily: "'Georgia', serif",
         }}
       >
         <nav
           aria-label="Breadcrumb"
-          style={{ background: "#1A1A1A", padding: "14px 24px 0" }}
+          style={{ background: "#111111", padding: "14px 24px 0" }}
         >
           <div
             style={{
@@ -359,7 +359,7 @@ export default async function BlogPostPage({
             <span>&gt;</span>
             <span
               style={{
-                color: "#CC2424",
+                color: "#8B1E2D",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
@@ -371,7 +371,7 @@ export default async function BlogPostPage({
           </div>
         </nav>
 
-        <header style={{ background: "#1A1A1A", color: "#FFFFFF", padding: "48px 24px 72px" }}>
+        <header style={{ background: "#111111", color: "#FFFFFF", padding: "48px 24px 72px" }}>
           <div style={{ maxWidth: 1060, margin: "0 auto" }}>
             <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 24 }}>
               <span
@@ -380,8 +380,8 @@ export default async function BlogPostPage({
                   letterSpacing: "0.18em",
                   textTransform: "uppercase",
                   fontFamily: "system-ui, sans-serif",
-                  color: "#CC2424",
-                  background: "rgba(204,36,36,0.12)",
+                  color: "#8B1E2D",
+                  background: "rgba(139,30,45,0.12)",
                   padding: "4px 10px",
                   fontWeight: 700,
                 }}
@@ -431,12 +431,12 @@ export default async function BlogPostPage({
                   width: 36,
                   height: 36,
                   borderRadius: "50%",
-                  background: "#CC2424",
+                  background: "#8B1E2D",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   fontSize: 14,
-                  color: "#CC2424",
+                  color: "#8B1E2D",
                   flexShrink: 0,
                 }}
               >
@@ -512,9 +512,9 @@ export default async function BlogPostPage({
                   style={{
                     fontSize: 11,
                     fontFamily: "system-ui, sans-serif",
-                    color: "#CC2424",
+                    color: "#8B1E2D",
                     textDecoration: "none",
-                    background: "rgba(204,36,36,0.06)",
+                    background: "rgba(139,30,45,0.06)",
                     padding: "4px 10px",
                   }}
                 >
@@ -531,7 +531,7 @@ export default async function BlogPostPage({
                 display: "flex",
                 gap: 20,
                 alignItems: "flex-start",
-                borderLeft: "3px solid #CC2424",
+                borderLeft: "3px solid #8B1E2D",
               }}
             >
               <div
@@ -539,12 +539,12 @@ export default async function BlogPostPage({
                   width: 44,
                   height: 44,
                   borderRadius: "50%",
-                  background: "#1A1A1A",
+                  background: "#111111",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   fontSize: 18,
-                  color: "#CC2424",
+                  color: "#8B1E2D",
                   flexShrink: 0,
                 }}
               >
@@ -556,7 +556,7 @@ export default async function BlogPostPage({
                     fontSize: 14,
                     fontWeight: 600,
                     fontFamily: "system-ui, sans-serif",
-                    color: "#1A1A1A",
+                    color: "#111111",
                     marginBottom: 4,
                   }}
                 >
@@ -568,7 +568,7 @@ export default async function BlogPostPage({
                     letterSpacing: "0.1em",
                     textTransform: "uppercase",
                     fontFamily: "system-ui, sans-serif",
-                    color: "#CC2424",
+                    color: "#8B1E2D",
                     marginBottom: 8,
                   }}
                 >
@@ -592,7 +592,7 @@ export default async function BlogPostPage({
           <aside style={{ position: "sticky", top: 100 }}>
             <div
               style={{
-                background: "#1A1A1A",
+                background: "#111111",
                 color: "#FFFFFF",
                 padding: "32px 28px",
                 marginBottom: 24,
@@ -604,7 +604,7 @@ export default async function BlogPostPage({
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
                   fontFamily: "system-ui, sans-serif",
-                  color: "#CC2424",
+                  color: "#8B1E2D",
                   marginBottom: 12,
                 }}
               >
@@ -631,8 +631,8 @@ export default async function BlogPostPage({
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
                   fontFamily: "system-ui, sans-serif",
-                  background: "#CC2424",
-                  color: "#1A1A1A",
+                  background: "#8B1E2D",
+                  color: "#111111",
                   textDecoration: "none",
                   fontWeight: 700,
                 }}
@@ -649,7 +649,7 @@ export default async function BlogPostPage({
                     letterSpacing: "0.18em",
                     textTransform: "uppercase",
                     fontFamily: "system-ui, sans-serif",
-                    color: "#CC2424",
+                    color: "#8B1E2D",
                     marginBottom: 16,
                   }}
                 >
@@ -665,7 +665,7 @@ export default async function BlogPostPage({
                         background: "#fff",
                         padding: "20px",
                         textDecoration: "none",
-                        color: "#1A1A1A",
+                        color: "#111111",
                       }}
                     >
                       <span
@@ -674,7 +674,7 @@ export default async function BlogPostPage({
                           letterSpacing: "0.16em",
                           textTransform: "uppercase",
                           fontFamily: "system-ui, sans-serif",
-                          color: "#CC2424",
+                          color: "#8B1E2D",
                           display: "block",
                           marginBottom: 6,
                         }}
@@ -708,7 +708,7 @@ export default async function BlogPostPage({
 
             <div
               style={{
-                background: "#CC2424",
+                background: "#8B1E2D",
                 color: "#FFFFFF",
                 padding: "28px",
                 marginTop: 24,
@@ -752,8 +752,8 @@ export default async function BlogPostPage({
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
                   fontFamily: "system-ui, sans-serif",
-                  background: "#CC2424",
-                  color: "#1A1A1A",
+                  background: "#8B1E2D",
+                  color: "#111111",
                   border: "none",
                   cursor: "pointer",
                   fontWeight: 700,
@@ -779,9 +779,9 @@ export default async function BlogPostPage({
               letterSpacing: "0.14em",
               textTransform: "uppercase",
               fontFamily: "system-ui, sans-serif",
-              color: "#CC2424",
+              color: "#8B1E2D",
               textDecoration: "none",
-              borderBottom: "1px solid #CC2424",
+              borderBottom: "1px solid #8B1E2D",
               paddingBottom: 2,
             }}
           >

@@ -25,7 +25,7 @@ export function NewsletterSignup() {
   return (
     <section
       style={{
-        background: "#CC2424",
+        background: "#8B1E2D",
         color: "#FFFFFF",
         padding: "80px 24px",
         textAlign: "center",
@@ -87,8 +87,8 @@ export function NewsletterSignup() {
               letterSpacing: "0.14em",
               textTransform: "uppercase",
               fontFamily: "system-ui, sans-serif",
-              background: "#CC2424",
-              color: "#1A1A1A",
+              background: "#8B1E2D",
+              color: "#111111",
               border: "none",
               cursor: status === "loading" ? "wait" : "pointer",
               fontWeight: 600,
@@ -105,7 +105,7 @@ export function NewsletterSignup() {
           style={{
             marginTop: 12,
             fontSize: 13,
-            color: "#CC2424",
+            color: "#8B1E2D",
             fontFamily: "system-ui, sans-serif",
           }}
         >

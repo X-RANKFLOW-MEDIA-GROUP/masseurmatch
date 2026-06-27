@@ -81,9 +81,9 @@ const posts = [
 ];
 
 const categoryColors: Record<string, string> = {
-  "LGBTQ+ Health": "#CC2424",
-  "Wellness Tips": "#CC2424",
-  "For Therapists": "#1A1A1A",
+  "LGBTQ+ Health": "#8B1E2D",
+  "Wellness Tips": "#8B1E2D",
+  "For Therapists": "#111111",
   "City Guides": "#6B7280",
   "Industry News": "#374151",
 };
@@ -128,9 +128,9 @@ export function BlogContent() {
                 border: "none",
                 borderBottom:
                   category === active
-                    ? "2px solid #CC2424"
+                    ? "2px solid #8B1E2D"
                     : "2px solid transparent",
-                color: category === active ? "#CC2424" : "#6B7280",
+                color: category === active ? "#8B1E2D" : "#6B7280",
                 cursor: "pointer",
                 whiteSpace: "nowrap",
                 transition: "color 0.15s, border-color 0.15s",
@@ -150,14 +150,14 @@ export function BlogContent() {
               gridTemplateColumns: "1fr 1fr",
               gap: 0,
               marginBottom: 80,
-              background: "#1A1A1A",
+              background: "#111111",
               color: "#FFFFFF",
             }}
           >
             <div
               style={{
                 background:
-                  "linear-gradient(135deg, #CC2424 0%, #1A1A1A 100%)",
+                  "linear-gradient(135deg, #8B1E2D 0%, #111111 100%)",
                 minHeight: 360,
                 display: "flex",
                 alignItems: "center",
@@ -173,7 +173,7 @@ export function BlogContent() {
                   width: 300,
                   height: 300,
                   borderRadius: "50%",
-                  border: "1px solid rgba(204,36,36,0.2)",
+                  border: "1px solid rgba(139,30,45,0.2)",
                   top: "50%",
                   left: "50%",
                   transform: "translate(-50%,-50%)",
@@ -186,7 +186,7 @@ export function BlogContent() {
                   width: 180,
                   height: 180,
                   borderRadius: "50%",
-                  border: "1px solid rgba(204,36,36,0.35)",
+                  border: "1px solid rgba(139,30,45,0.35)",
                   top: "50%",
                   left: "50%",
                   transform: "translate(-50%,-50%)",
@@ -215,9 +215,9 @@ export function BlogContent() {
                     fontSize: 10,
                     letterSpacing: "0.18em",
                     textTransform: "uppercase",
-                    color: "#CC2424",
+                    color: "#8B1E2D",
                     fontFamily: "system-ui, sans-serif",
-                    background: "rgba(204,36,36,0.12)",
+                    background: "rgba(139,30,45,0.12)",
                     padding: "4px 10px",
                   }}
                 >
@@ -286,10 +286,10 @@ export function BlogContent() {
                     fontSize: 11,
                     letterSpacing: "0.16em",
                     textTransform: "uppercase",
-                    color: "#CC2424",
+                    color: "#8B1E2D",
                     textDecoration: "none",
                     fontFamily: "system-ui, sans-serif",
-                    borderBottom: "1px solid #CC2424",
+                    borderBottom: "1px solid #8B1E2D",
                     paddingBottom: 2,
                   }}
                 >
@@ -332,7 +332,7 @@ export function BlogContent() {
                 }}
                 onMouseEnter={(e) =>
                   ((e.currentTarget as HTMLElement).style.borderBottomColor =
-                    categoryColors[post.category] ?? "#CC2424")
+                    categoryColors[post.category] ?? "#8B1E2D")
                 }
                 onMouseLeave={(e) =>
                   ((e.currentTarget as HTMLElement).style.borderBottomColor =
@@ -363,7 +363,7 @@ export function BlogContent() {
                       fontWeight: 400,
                       lineHeight: 1.3,
                       marginBottom: 14,
-                      color: "#1A1A1A",
+                      color: "#111111",
                     }}
                   >
                     {post.title}
@@ -405,7 +405,7 @@ export function BlogContent() {
                       fontSize: 11,
                       letterSpacing: "0.14em",
                       textTransform: "uppercase",
-                      color: "#1A1A1A",
+                      color: "#111111",
                       textDecoration: "none",
                       fontFamily: "system-ui, sans-serif",
                     }}
