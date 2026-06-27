@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { MapPin, ArrowUpRight } from "lucide-react";
+import { StrokeReveal } from "@/components/motion/StrokeReveal";
+import { SplitTextReveal } from "@/components/motion/SplitTextReveal";
 
 type CityEntry = {
   name: string;
@@ -110,12 +112,23 @@ export function CityCaseStudies() {
             <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.3em] text-[#CC2424]">
               BROWSE BY CITY
             </p>
-            <h2
-              className="font-display font-extrabold uppercase leading-[1.05] tracking-tight text-[#1A1A1A]"
-              style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)" }}
-            >
-              YOUR CITY. YOUR THERAPIST.
-            </h2>
+            <SplitTextReveal
+              text="YOUR CITY. YOUR THERAPIST."
+              tag="h2"
+              wordMode
+              charDelay={0.07}
+              className="font-display font-extrabold uppercase leading-[1.05] tracking-tight text-[#1A1A1A] text-[clamp(1.75rem,3.5vw,2.75rem)]"
+            />
+            <StrokeReveal
+              d="M0 30 Q50 0, 100 30 T200 30"
+              width={200}
+              height={40}
+              strokeColor="#CC2424"
+              strokeWidth={1.5}
+              duration={1}
+              delay={0.4}
+              className="mt-2 opacity-40"
+            />
             <p className="mt-3 max-w-lg text-sm leading-relaxed text-[#666666] lg:text-base">
               Explore verified massage professionals across the country.
               Every city page connects you with local, trusted therapists.

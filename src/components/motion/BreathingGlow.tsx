@@ -1,0 +1,34 @@
+"use client";
+
+import { useReducedMotion } from "framer-motion";
+
+type BreathingGlowProps = {
+  color?: string;
+  size?: number;
+  duration?: number;
+  className?: string;
+};
+
+export function BreathingGlow({
+  color = "rgba(204, 36, 36, 0.15)",
+  size = 400,
+  duration = 5,
+  className = "",
+}: BreathingGlowProps) {
+  const reduced = useReducedMotion();
+
+  if (reduced) return null;
+
+  return (
+    <span
+      aria-hidden="true"
+      className={`pointer-events-none absolute rounded-full mm-breathing-glow ${className}`}
+      style={{
+        width: size,
+        height: size,
+        background: `radial-gradient(circle, ${color}, transparent 70%)`,
+        "--glow-duration": `${duration}s`,
+      } as React.CSSProperties}
+    />
+  );
+}

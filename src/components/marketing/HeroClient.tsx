@@ -13,6 +13,10 @@ import {
   Shield,
 } from "lucide-react";
 import { HeroMediaBanner } from "@/components/marketing/HeroMediaBanner";
+import { MagneticHover } from "@/components/motion/MagneticHover";
+import { TextShimmer } from "@/components/motion/TextShimmer";
+import { BreathingGlow } from "@/components/motion/BreathingGlow";
+import { GrainOverlay } from "@/components/motion/GrainOverlay";
 import type { PublicTherapist } from "@/app/_lib/directory";
 
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -106,9 +110,10 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
 
   return (
     <section className="relative overflow-hidden bg-[radial-gradient(circle_at_24%_18%,rgba(204,36,36,0.08),transparent_28%),linear-gradient(180deg,#ffffff_0%,#fbfaf8_100%)] text-[#151515]">
+      <GrainOverlay opacity={0.02} />
       <div className="mx-auto grid min-h-[680px] max-w-[1500px] items-center gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1.03fr_0.97fr] lg:px-10 lg:py-16">
         <div className="relative order-2 lg:order-1">
-          <div className="pointer-events-none absolute -left-10 top-12 h-72 w-72 rounded-full bg-[#CC2424]/8 blur-3xl" />
+          <BreathingGlow color="rgba(204, 36, 36, 0.06)" size={350} duration={6} className="-left-10 top-12" />
 
           {realProfiles.length > 0 ? (
             <div className="relative flex snap-x gap-4 overflow-x-auto pb-6 pt-24 lg:overflow-visible lg:pb-0 lg:pt-28">
@@ -141,7 +146,9 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.12 }}
             className="mb-4 font-mono text-[10px] uppercase tracking-[0.34em] text-[#CC2424] sm:text-xs"
           >
-            PREMIUM.&nbsp;&nbsp;PROFESSIONAL.&nbsp;&nbsp;PERSONAL.
+            <TextShimmer duration={4} delay={1.5}>
+              PREMIUM.&nbsp;&nbsp;PROFESSIONAL.&nbsp;&nbsp;PERSONAL.
+            </TextShimmer>
           </motion.p>
 
           <motion.h1
@@ -168,8 +175,14 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.36 }}
-            className="overflow-hidden rounded-[1.75rem] border border-black/10 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.10)]"
+            className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.10)]"
           >
+            <BreathingGlow
+              color="rgba(204, 36, 36, 0.04)"
+              size={300}
+              duration={7}
+              className="-right-20 -top-20"
+            />
             <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#CC2424]/10 text-[#CC2424]">
@@ -248,17 +261,23 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             ))}
           </motion.div>
 
-          <motion.button
-            type="button"
-            onClick={() => router.push("/search")}
+          <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.52 }}
-            className="mt-7 inline-flex w-fit items-center gap-2 rounded-2xl bg-[#CC2424] px-6 py-4 text-sm font-black uppercase tracking-wide text-white shadow-xl shadow-[#CC2424]/20 transition hover:bg-[#A81D1D]"
+            className="mt-7 w-fit"
           >
-            Find a Masseur
-            <ArrowRight size={18} strokeWidth={2.5} />
-          </motion.button>
+            <MagneticHover strength={0.25} radius={150}>
+              <button
+                type="button"
+                onClick={() => router.push("/search")}
+                className="inline-flex items-center gap-2 rounded-2xl bg-[#CC2424] px-6 py-4 text-sm font-black uppercase tracking-wide text-white shadow-xl shadow-[#CC2424]/20 transition hover:bg-[#A81D1D]"
+              >
+                Find a Masseur
+                <ArrowRight size={18} strokeWidth={2.5} />
+              </button>
+            </MagneticHover>
+          </motion.div>
         </div>
       </div>
 

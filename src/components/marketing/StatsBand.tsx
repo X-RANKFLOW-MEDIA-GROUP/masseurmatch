@@ -2,7 +2,8 @@
 
 import { Diamond, CheckCircle, UserCheck, Smile, TrendingUp, Users, Award, LayoutGrid } from "lucide-react";
 import Counter from "@/components/motion/Counter";
-import FadeUp from "@/components/motion/FadeUp";
+import { InkReveal } from "@/components/motion/InkReveal";
+import { StaggerReveal } from "@/components/motion/StaggerReveal";
 
 const FEATURES = [
   { icon: Diamond, label: "Premium profiles" },
@@ -22,38 +23,48 @@ export function StatsBand() {
   return (
     <section className="bg-[#F4F5F6] py-16 lg:py-20">
       <div className="mx-auto max-w-[1200px] px-4">
-        <FadeUp>
-          {/* Row 1: Features */}
-          <div className="grid grid-cols-2 gap-8 lg:grid-cols-4 mb-12">
-            {FEATURES.map(({ icon: Icon, label }) => (
-              <div key={label} className="flex flex-col items-center text-center">
+        {/* Row 1: Features */}
+        <StaggerReveal
+          className="grid grid-cols-2 gap-8 lg:grid-cols-4 mb-12"
+          stagger={0.08}
+          blur
+        >
+          {FEATURES.map(({ icon: Icon, label }) => (
+            <div key={label} className="flex flex-col items-center text-center">
+              <InkReveal origin="center" duration={0.7}>
                 <div className="w-12 h-12 rounded-full border border-[#E2E4E6] flex items-center justify-center mb-3">
                   <Icon className="w-5 h-5 text-[#1A1A1A]" strokeWidth={2.25} />
                 </div>
-                <p className="text-sm text-[#1A1A1A] font-medium">
-                  {label}
-                </p>
-              </div>
-            ))}
-          </div>
+              </InkReveal>
+              <p className="text-sm text-[#1A1A1A] font-medium">
+                {label}
+              </p>
+            </div>
+          ))}
+        </StaggerReveal>
 
-          {/* Row 2: Stats */}
-          <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
-            {STATS.map(({ icon: Icon, value, suffix, label }) => (
-              <div key={label} className="flex flex-col items-center text-center">
+        {/* Row 2: Stats */}
+        <StaggerReveal
+          className="grid grid-cols-2 gap-8 lg:grid-cols-4"
+          stagger={0.1}
+          blur
+        >
+          {STATS.map(({ icon: Icon, value, suffix, label }) => (
+            <div key={label} className="flex flex-col items-center text-center">
+              <InkReveal origin="center" duration={0.7}>
                 <div className="w-12 h-12 rounded-full border border-[#E2E4E6] flex items-center justify-center mb-3">
                   <Icon className="w-5 h-5 text-[#1A1A1A]" strokeWidth={2.25} />
                 </div>
-                <div className="font-display font-extrabold text-[clamp(1.5rem,3vw,2.5rem)] leading-none tracking-tight text-[#1A1A1A] mb-1">
-                  <Counter to={value} suffix={suffix} />
-                </div>
-                <p className="text-sm text-[#666666]">
-                  {label}
-                </p>
+              </InkReveal>
+              <div className="font-display font-extrabold text-[clamp(1.5rem,3vw,2.5rem)] leading-none tracking-tight text-[#1A1A1A] mb-1">
+                <Counter to={value} suffix={suffix} />
               </div>
-            ))}
-          </div>
-        </FadeUp>
+              <p className="text-sm text-[#666666]">
+                {label}
+              </p>
+            </div>
+          ))}
+        </StaggerReveal>
       </div>
     </section>
   );
