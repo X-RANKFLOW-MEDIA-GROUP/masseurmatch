@@ -93,7 +93,7 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
                     </div>
                   )}
                   {isVerified && (
-                    <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full glass-dark px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">
+                    <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full glass-dark px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
                       <BadgeCheck className="h-3 w-3 text-primary" />
                       Pro
                     </div>
