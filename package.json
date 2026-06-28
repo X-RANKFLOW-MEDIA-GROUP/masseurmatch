@@ -37,11 +37,7 @@
   },
   "dependencies": {
     "@bugsnag/browser-performance": "^3.4.1",
-<<<<<<< HEAD
     "@bugsnag/js": "^8.9.0",
-=======
-    "@bugsnag/js": "^8.5.0",
->>>>>>> 27e9e6f (fix(deps): correct @bugsnag/browser-performance version to ^3.4.1)
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.11",

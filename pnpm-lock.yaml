@@ -24,11 +24,7 @@ importers:
         specifier: ^3.4.1
         version: 3.4.1
       '@bugsnag/js':
-<<<<<<< HEAD
         specifier: ^8.9.0
-=======
-        specifier: ^8.5.0
->>>>>>> 27e9e6f (fix(deps): correct @bugsnag/browser-performance version to ^3.4.1)
         version: 8.9.0
       '@google/generative-ai':
         specifier: ^0.24.1
