@@ -81,7 +81,7 @@ function RecommendationCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8E8E8E]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6F6F6F]">
             {featured ? "Top Match" : `Alternative ${recommendation.position}`}
           </p>
           <h3 className="mt-1 text-lg font-semibold text-[#151515]">{recommendation.name}</h3>
@@ -206,7 +206,7 @@ function ChatBubble({
 
 function KnottyDisclaimer() {
   return (
-    <p className="px-5 pb-4 pt-1 text-[11px] leading-5 text-[#9A9A9A]">
+    <p className="px-5 pb-4 pt-1 text-[11px] leading-5 text-[#6F6F6F]">
       Knotty is an AI assistant.{" "}
       <Link href="/platform-disclaimer" className="text-[#8B1E2D] underline-offset-2 hover:underline">
         Not medical or legal advice
@@ -290,7 +290,7 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
             <p className="text-sm font-extrabold uppercase tracking-[0.04em] text-white">
               Knotty <span className="text-[#E0566B]">AI</span>
             </p>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/45">
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/60">
               MasseurMatch concierge
             </p>
           </div>
