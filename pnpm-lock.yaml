@@ -21,10 +21,10 @@ importers:
   .:
     dependencies:
       '@bugsnag/browser-performance':
-        specifier: ^3.4.1
-        version: 3.4.1
+        specifier: ^2.15.0
+        version: 2.15.0
       '@bugsnag/js':
-        specifier: ^8.9.0
+        specifier: ^8.5.0
         version: 8.9.0
       '@google/generative-ai':
         specifier: ^0.24.1
@@ -366,14 +366,14 @@ packages:
     resolution: {integrity: sha512-LwdZHpScM4Qz8Xw2iKSzS+cfglZzJGvofQICy7W7v4caru4EaAmyUuO6BGrbyQ2mYV11W0U8j5mBhd14dd3B0A==}
     engines: {node: '>=6.9.0'}
 
-  '@bugsnag/browser-performance@3.4.1':
-    resolution: {integrity: sha512-kAg8SkB/qKoCTwJ3wOmgaeTu+lXVscwjaQQa0lf0OHIhRBUh5voCRZc+rxo+XqqkXa2nQzGuBBlYx6e9ZcnJ+A==}
+  '@bugsnag/browser-performance@2.15.0':
+    resolution: {integrity: sha512-9wcyhuYWHKegCC/v3E0SyZ28lOOyt0zUpZYWaCGptr1etQS1jjmV1Pt+cLPAhvqTWju3/Mg8OeJ+A5fgnW4qzA==}
 
   '@bugsnag/browser@8.9.0':
     resolution: {integrity: sha512-lsreEdlIQxEzJxFzp1T2yKH4Jzzm5YiXez0UK734XXfBRx8ZR2SDcNljo2EqctrRIqVrCM6wp6RvEo9hzlpeBg==}
 
-  '@bugsnag/core-performance@3.2.0':
-    resolution: {integrity: sha512-g2tNpwhme3l0QvOe3VVUhAFXDubPfm/9kRg++ELrAPiA2QVMQNPwBUS73ICFfLBCnPIa+P8StsGpYg6vUddfEA==}
+  '@bugsnag/core-performance@2.15.0':
+    resolution: {integrity: sha512-YljaoA6ZktR7Cvfm6+HnR3Ul4zmT9URdtfLoZ8aTWI6oDQI2+LL7VL1Zg2ZjczaUiGiMbRNM/z/90zYSe/TYiQ==}
 
   '@bugsnag/core@8.9.0':
     resolution: {integrity: sha512-SrXO0isIZfrCem06/WDvC5MSd1Tj6Yjm4Wqdlv6jyjTvsow+cppvt7rS9Bps3qOeXfYCqWHN4ev02OdwnfZ1PQ==}
@@ -381,8 +381,8 @@ packages:
   '@bugsnag/cuid@3.2.2':
     resolution: {integrity: sha512-7onuYLTMqMmHE9BBPG0YER4nFsU1rB+me1/YIeMusqcLbVbKKuG9u9+BDVDpje5e0llkkrVNOKYwmzM9DRIo7A==}
 
-  '@bugsnag/delivery-fetch-performance@3.2.0':
-    resolution: {integrity: sha512-U5CzG7cN0z4CimaWeIXnkBm7D01OPXZItYRviTVtBOnl2FLY4xuHa+B8Veh39WKLztqG0RMI9YlD4I0zI09faA==}
+  '@bugsnag/delivery-fetch-performance@2.15.0':
+    resolution: {integrity: sha512-r0UblsakJXx0q7nORCkDcH6pexQutwLIf4N1Czku5lB/StFawpTs2TEJIvEU+LCl2zrqdGwQtdxcVdsfXsl93w==}
 
   '@bugsnag/js@8.9.0':
     resolution: {integrity: sha512-ChjKFVBF2CgepDXfMBkbEdcFUniJNN8py5V+tinaB8+vpJbr/fD1+VLFhkruSEn3jOafXrc1XJe9WHtsu9ht0g==}
@@ -390,8 +390,8 @@ packages:
   '@bugsnag/node@8.9.0':
     resolution: {integrity: sha512-WpogbMCY8/Rmg+1nsetp3GcPnXj5rpK1YxSmgEfiBM8B2nr/riYqrzuXIkrb1FZN1ti+Hfn1IecRAyGx3rUBBA==}
 
-  '@bugsnag/request-tracker-performance@3.2.0':
-    resolution: {integrity: sha512-mo9UcwynXL3vUB/g4TR4r7nZpc/l/IFHYUoamboBILidJmsZZvFA3fXw60o02jCs8sMu54EbRuL0l01Q5hysjg==}
+  '@bugsnag/request-tracker-performance@2.15.0':
+    resolution: {integrity: sha512-e2ogRBO4NABjnXXGtWEK/YPO41bjPTd+a9AhIzJGXyvtZxSg73UNOM71a0Vm1q74eCovuswD3VD1UaxOVt7nbA==}
 
   '@bugsnag/safe-json-stringify@6.1.0':
     resolution: {integrity: sha512-ImA35rnM7bGr+J30R979FQ95BhRB4UO1KfJA0J2sVqc8nwnrS9hhE5mkTmQWMs8Vh1Da+hkLKs5jJB4JjNZp4A==}
@@ -5233,18 +5233,18 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
-  '@bugsnag/browser-performance@3.4.1':
+  '@bugsnag/browser-performance@2.15.0':
     dependencies:
-      '@bugsnag/core-performance': 3.2.0
+      '@bugsnag/core-performance': 2.15.0
       '@bugsnag/cuid': 3.2.2
-      '@bugsnag/delivery-fetch-performance': 3.2.0
-      '@bugsnag/request-tracker-performance': 3.2.0
+      '@bugsnag/delivery-fetch-performance': 2.15.0
+      '@bugsnag/request-tracker-performance': 2.15.0
 
   '@bugsnag/browser@8.9.0':
     dependencies:
       '@bugsnag/core': 8.9.0
 
-  '@bugsnag/core-performance@3.2.0':
+  '@bugsnag/core-performance@2.15.0':
     dependencies:
       '@bugsnag/cuid': 3.2.2
 
@@ -5258,9 +5258,9 @@ snapshots:
 
   '@bugsnag/cuid@3.2.2': {}
 
-  '@bugsnag/delivery-fetch-performance@3.2.0':
+  '@bugsnag/delivery-fetch-performance@2.15.0':
     dependencies:
-      '@bugsnag/core-performance': 3.2.0
+      '@bugsnag/core-performance': 2.15.0
 
   '@bugsnag/js@8.9.0':
     dependencies:
@@ -5276,9 +5276,9 @@ snapshots:
       pump: 3.0.4
       stack-generator: 2.0.10
 
-  '@bugsnag/request-tracker-performance@3.2.0':
+  '@bugsnag/request-tracker-performance@2.15.0':
     dependencies:
-      '@bugsnag/core-performance': 3.2.0
+      '@bugsnag/core-performance': 2.15.0
 
   '@bugsnag/safe-json-stringify@6.1.0': {}
 

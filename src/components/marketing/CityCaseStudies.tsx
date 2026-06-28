@@ -69,7 +69,7 @@ function CityLink({
               className={`transition-colors duration-300 ${
                 city.featured
                   ? "text-[#8B1E2D]"
-                  : "text-[#999999] group-hover:text-[#8B1E2D]"
+                  : "text-[#6F6F6F] group-hover:text-[#8B1E2D]"
               }`}
             />
           </div>
@@ -77,7 +77,7 @@ function CityLink({
             <p className="text-sm font-semibold text-[#1A1A1A]">
               {city.name}
             </p>
-            <p className="text-[11px] font-medium text-[#999999]">
+            <p className="text-[11px] font-medium text-[#6F6F6F]">
               {city.state}
             </p>
           </div>

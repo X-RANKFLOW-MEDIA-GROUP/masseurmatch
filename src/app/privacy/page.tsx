@@ -180,7 +180,7 @@ export default function PrivacyPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#8B1E2D",
+                color: "#D4717E",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -193,6 +193,7 @@ export default function PrivacyPage() {
                 fontWeight: 400,
                 lineHeight: 1.1,
                 marginBottom: 20,
+                color: "#FFFFFF",
               }}
             >
               Privacy Policy
@@ -200,7 +201,7 @@ export default function PrivacyPage() {
             <p
               style={{
                 fontSize: 14,
-                opacity: 0.5,
+                color: "#9CA3AF",
                 fontFamily: "system-ui, sans-serif",
               }}
             >
@@ -209,7 +210,7 @@ export default function PrivacyPage() {
             <p
               style={{
                 fontSize: 16,
-                opacity: 0.65,
+                color: "#B0B8C4",
                 marginTop: 16,
                 fontFamily: "system-ui, sans-serif",
                 lineHeight: 1.7,

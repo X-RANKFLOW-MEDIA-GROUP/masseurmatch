@@ -202,7 +202,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                 </div>
                 <div>
                   <p className="font-display text-base font-black text-[#151515]">AI Match Assistant</p>
-                  <p className="text-xs font-semibold text-[#7B8190]">Ask Knotty AI</p>
+                  <p className="text-xs font-semibold text-[#656B78]">Ask Knotty AI</p>
                 </div>
               </div>
               <Sparkles size={20} className="text-[#8B1E2D]" />
@@ -295,7 +295,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                   }}
                   placeholder="Ask Knotty anything..."
                   aria-label="Ask Knotty AI what massage provider you need"
-                  className="min-w-0 flex-1 bg-transparent px-3 text-sm text-[#151515] outline-none placeholder:text-[#98A2B3]"
+                  className="min-w-0 flex-1 bg-transparent px-3 text-sm text-[#151515] outline-none placeholder:text-[#64748B]"
                 />
                 <button
                   type="button"
