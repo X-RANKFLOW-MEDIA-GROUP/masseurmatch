@@ -10,19 +10,30 @@ import { useSignup } from "../_lib/signup-context";
 import { useAuth } from "@/contexts/AuthContext";
 import { SIGNUP_PLANS, type SignupPlanTier } from "../_lib/plans";
 
-function SignupPlanPageContent() {
-  const router = useRouter();
+/**
+ * Reads the optional `?selected=` query param and preselects that plan.
+ * Isolated in its own Suspense boundary so `useSearchParams()` only opts THIS
+ * leaf out of static rendering — the plan grid below still renders server-side
+ * with real prices (otherwise SSR shows only the "Loading plans…" fallback).
+ */
+function PreselectFromQuery() {
   const searchParams = useSearchParams();
-  const { state, setPlan } = useSignup();
-  const { user } = useAuth();
+  const { setPlan } = useSignup();
 
-  // Auto-select from query param
   useEffect(() => {
     const preselected = searchParams?.get("selected") as SignupPlanTier | null;
     if (preselected && SIGNUP_PLANS.some((p) => p.tier === preselected)) {
       setPlan(preselected);
     }
   }, [searchParams, setPlan]);
+
+  return null;
+}
+
+function SignupPlanPageContent() {
+  const router = useRouter();
+  const { state, setPlan } = useSignup();
+  const { user } = useAuth();
 
   function handleSelect(tier: SignupPlanTier) {
     setPlan(tier);
@@ -37,6 +48,9 @@ function SignupPlanPageContent() {
 
   return (
     <div className="space-y-8 py-8">
+      <Suspense fallback={null}>
+        <PreselectFromQuery />
+      </Suspense>
       <div className="text-center">
         <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
           Choose Your Listing Plan
@@ -120,33 +134,9 @@ function SignupPlanPageContent() {
   );
 }
 
-function SignupPlanFallback() {
-  return (
-    <div className="space-y-6 py-8">
-      <div className="text-center">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          Choose Your Listing Plan
-        </h1>
-        <p className="mt-3 text-muted-foreground">
-          Loading available plan options...
-        </p>
-      </div>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <div
-            key={index}
-            className="h-72 animate-pulse rounded-3xl border border-border bg-card"
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function SignupPlanPage() {
-  return (
-    <Suspense fallback={<SignupPlanFallback />}>
-      <SignupPlanPageContent />
-    </Suspense>
-  );
+  // The plan grid renders server-side (static prices). Only the optional
+  // query-param preselect uses useSearchParams, scoped to its own Suspense
+  // boundary inside SignupPlanPageContent.
+  return <SignupPlanPageContent />;
 }

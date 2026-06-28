@@ -1,12 +1,26 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { ArrowRight, ArrowUp, MapPin, MessageSquare, Sparkles } from "lucide-react";
 import { useState } from "react";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import { cn } from "@/lib/utils";
+
+const SPRING = { type: "spring", stiffness: 340, damping: 24 } as const;
+const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
+const heroContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
+};
+
+const heroItem = {
+  hidden: { opacity: 0, y: 22, filter: "blur(10px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.65, ease: EASE } },
+};
 
 type KnottyHeroSpotlightProps = {
   therapists: PublicTherapist[];
@@ -165,18 +179,24 @@ function buildShowcaseTherapists(therapists: PublicTherapist[]) {
 
 function SpotlightProfileCard({ therapist, index }: { therapist: ShowcaseCard; index: number }) {
   const avatarFallback = getAvatarFallback(therapist.name);
+  const reduceMotion = useReducedMotion();
 
   return (
-    <article
+    <motion.article
       className={cn(
         "group relative overflow-hidden rounded-[28px] border border-white/8 bg-[#0e0e0f] p-4 shadow-[0_24px_50px_rgba(0,0,0,0.42)]",
-        "transition duration-300 hover:-translate-y-1 hover:border-white/16",
+        "transition-[border-color] duration-300 hover:border-white/16",
         index === 1 && "lg:translate-y-7",
         index === 3 && "lg:-translate-y-1",
         index === 4 && "lg:translate-y-10",
       )}
+      initial={reduceMotion ? false : { opacity: 0, y: 28, filter: "blur(8px)" }}
+      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, filter: "blur(0px)" }}
+      whileHover={reduceMotion ? undefined : { y: -6, transition: SPRING }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ delay: index * 0.07, duration: 0.55, ease: EASE }}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(204,36,36,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(204,36,36,0.10),transparent_26%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,30,45,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(139,30,45,0.10),transparent_26%)]" />
       <div className="relative">
         <div className="flex items-center justify-between gap-3">
           <span className="inline-flex rounded-full border border-white/12 bg-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/72">
@@ -234,7 +254,7 @@ function SpotlightProfileCard({ therapist, index }: { therapist: ShowcaseCard; i
           </Link>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
@@ -263,31 +283,36 @@ export function KnottyHeroSpotlight({ therapists, therapistCount, cityCount }: K
 
   return (
     <div className="relative overflow-hidden rounded-[36px] border border-white/8 bg-black text-white shadow-[0_30px_120px_rgba(0,0,0,0.55)]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_left_top,rgba(255,255,255,0.06),transparent_24%),radial-gradient(circle_at_right_center,rgba(204,36,36,0.14),transparent_30%),radial-gradient(circle_at_20%_80%,rgba(204,36,36,0.12),transparent_24%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_left_top,rgba(255,255,255,0.06),transparent_24%),radial-gradient(circle_at_right_center,rgba(139,30,45,0.14),transparent_30%),radial-gradient(circle_at_20%_80%,rgba(139,30,45,0.12),transparent_24%)]" />
       <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(to_right,rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:44px_44px]" />
 
       <div className="relative grid gap-6 p-4 sm:p-6 xl:min-h-[calc(100vh-7rem)] xl:grid-cols-[minmax(0,0.9fr),minmax(360px,0.85fr)]">
         <div className="grid gap-6 xl:grid-rows-[minmax(0,1fr),auto]">
           <div className="relative overflow-hidden rounded-[34px] border border-white/8 bg-[linear-gradient(135deg,rgba(17,21,30,0.96),rgba(8,8,8,0.98))] px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(204,36,36,0.20),transparent_22%),radial-gradient(circle_at_left_center,rgba(255,255,255,0.08),transparent_28%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,30,45,0.20),transparent_22%),radial-gradient(circle_at_left_center,rgba(255,255,255,0.08),transparent_28%)]" />
 
-            <div className="relative flex h-full flex-col justify-between">
+            <motion.div
+              className="relative flex h-full flex-col justify-between"
+              variants={heroContainer}
+              initial="hidden"
+              animate="visible"
+            >
               <div>
-                <div className="inline-flex rounded-full border border-white/14 bg-white/8 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.26em] text-white/74">
+                <motion.div variants={heroItem} className="inline-flex rounded-full border border-white/14 bg-white/8 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.26em] text-white/74">
                   Premium Verified Professionals
-                </div>
+                </motion.div>
 
-                <h1 className="mt-6 max-w-[10ch] text-5xl font-black leading-[0.88] tracking-tight text-white sm:text-6xl lg:text-[5.4rem]">
+                <motion.h1 variants={heroItem} className="mt-6 max-w-[10ch] text-5xl font-black leading-[0.88] tracking-tight text-white sm:text-6xl lg:text-[5.4rem]">
                   Elite Massage Professionals
-                </h1>
+                </motion.h1>
 
-                <p className="mt-6 max-w-2xl text-lg leading-9 text-white/70 sm:text-xl">
+                <motion.p variants={heroItem} className="mt-6 max-w-2xl text-lg leading-9 text-white/70 sm:text-xl">
                   Discreet. Professional. Verified. Connect with top-rated massage therapists and discover standout
                   profiles built for faster trust.
-                </p>
+                </motion.p>
               </div>
 
-              <div className="mt-8">
+              <motion.div variants={heroItem} className="mt-8">
                 <div className="flex flex-wrap gap-3">
                   <Link
                     href="/therapists"
@@ -315,12 +340,17 @@ export function KnottyHeroSpotlight({ therapists, therapistCount, cityCount }: K
                     Live AI concierge
                   </div>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
 
-          <div className="relative overflow-hidden rounded-[32px] border border-white/8 bg-[linear-gradient(180deg,rgba(14,14,16,0.96),rgba(5,5,6,0.98))] p-4 sm:p-5">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_left_top,rgba(255,255,255,0.06),transparent_25%),radial-gradient(circle_at_bottom_right,rgba(204,36,36,0.12),transparent_22%)]" />
+          <motion.div
+            className="relative overflow-hidden rounded-[32px] border border-white/8 bg-[linear-gradient(180deg,rgba(14,14,16,0.96),rgba(5,5,6,0.98))] p-4 sm:p-5"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45, duration: 0.6, ease: EASE }}
+          >
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_left_top,rgba(255,255,255,0.06),transparent_25%),radial-gradient(circle_at_bottom_right,rgba(139,30,45,0.12),transparent_22%)]" />
 
             <div className="relative">
               <div className="max-w-[36rem] rounded-[24px] bg-white/10 px-5 py-4 text-xl font-semibold leading-8 text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
@@ -373,10 +403,15 @@ export function KnottyHeroSpotlight({ therapists, therapistCount, cityCount }: K
                 </div>
               </form>
             </div>
-          </div>
+          </motion.div>
         </div>
 
-        <aside className="rounded-[32px] border border-white/8 bg-[linear-gradient(180deg,rgba(10,10,10,0.9),rgba(3,3,3,0.98))] p-5 sm:p-6">
+        <motion.aside
+          className="rounded-[32px] border border-white/8 bg-[linear-gradient(180deg,rgba(10,10,10,0.9),rgba(3,3,3,0.98))] p-5 sm:p-6"
+          initial={{ opacity: 0, x: 32 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2, duration: 0.7, ease: EASE }}
+        >
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/45">
@@ -404,7 +439,7 @@ export function KnottyHeroSpotlight({ therapists, therapistCount, cityCount }: K
               <SpotlightProfileCard key={therapist.showcaseKey} therapist={therapist} index={index} />
             ))}
           </div>
-        </aside>
+        </motion.aside>
       </div>
     </div>
   );

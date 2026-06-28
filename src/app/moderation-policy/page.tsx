@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import { AlertTriangle, ArrowRight, Ban, CheckCircle2, Clock, ShieldAlert } from "lucide-react";

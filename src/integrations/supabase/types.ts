@@ -2912,23 +2912,29 @@ export type Database = {
       stripe_events: {
         Row: {
           event_type: string
+          failed_at: string | null
           id: string
           payload: Json
           processed_at: string
+          processing_error: string | null
           stripe_event_id: string
         }
         Insert: {
           event_type: string
+          failed_at?: string | null
           id?: string
           payload: Json
           processed_at?: string
+          processing_error?: string | null
           stripe_event_id: string
         }
         Update: {
           event_type?: string
+          failed_at?: string | null
           id?: string
           payload?: Json
           processed_at?: string
+          processing_error?: string | null
           stripe_event_id?: string
         }
         Relationships: []
@@ -4706,6 +4712,35 @@ export type Database = {
       }
     }
     Functions: {
+      process_stripe_payment_intent_succeeded: {
+        Args: { p_provider_transaction_id: string; p_appointment_id?: string | null }
+        Returns: undefined
+      }
+      process_stripe_payment_intent_failed: {
+        Args: { p_provider_transaction_id: string }
+        Returns: undefined
+      }
+      sync_stripe_subscription: {
+        Args: {
+          p_user_id: string | null
+          p_stripe_customer_id: string | null
+          p_stripe_subscription_id: string
+          p_tier: string
+          p_photo_limit: number
+          p_visibility_level: number
+          p_current_period_end: string | null
+          p_subscription_status?: string | null
+        }
+        Returns: undefined
+      }
+      process_stripe_identity_verified: {
+        Args: { p_stripe_session_id: string; p_user_id: string }
+        Returns: undefined
+      }
+      process_stripe_identity_requires_input: {
+        Args: { p_stripe_session_id: string; p_last_error_reason?: string | null }
+        Returns: undefined
+      }
       current_user_role: { Args: never; Returns: string }
       ensure_therapist_profile_for_profile: {
         Args: { p_profile_id: string }

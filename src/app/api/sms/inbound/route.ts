@@ -24,6 +24,19 @@ function twimlResponse(body: string) {
   })
 }
 
+function getPublicWebhookUrl(request: NextRequest) {
+  const configuredBaseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || process.env.SITE_URL
+
+  if (configuredBaseUrl) {
+    return `${configuredBaseUrl.replace(/\/$/, '')}/api/sms/inbound`
+  }
+
+  const forwardedProto = request.headers.get('x-forwarded-proto') || 'https'
+  const forwardedHost = request.headers.get('x-forwarded-host') || request.headers.get('host') || ''
+
+  return `${forwardedProto}://${forwardedHost}/api/sms/inbound`
+}
+
 export async function POST(request: NextRequest) {
   // Parse Twilio form-encoded body
   const formData = await request.formData()
@@ -39,11 +52,12 @@ export async function POST(request: NextRequest) {
     return twimlResponse(buildTwimlEmpty())
   }
 
-  // Validate Twilio signature (skip in dev)
-  if (process.env.NODE_ENV === 'production') {
-    const signature = request.headers.get('X-Twilio-Signature') ?? ''
-    const url = `${process.env.NEXT_PUBLIC_BASE_URL ?? ''}/api/sms/inbound`
-    if (!validateTwilioSignature(signature, url, params)) {
+  // Validate Twilio signature whenever the auth token is configured.
+  // Skipping only when no token is present (local dev without Twilio credentials).
+  if (process.env.TWILIO_AUTH_TOKEN) {
+    const signature = request.headers.get('x-twilio-signature') ?? ''
+    const url = getPublicWebhookUrl(request)
+    if (!signature || !validateTwilioSignature(signature, url, params)) {
       return new NextResponse('Forbidden', { status: 403 })
     }
   }
@@ -83,7 +97,7 @@ export async function POST(request: NextRequest) {
   if (shouldEscalate(intent, smsProfile)) {
     // Send operator alert if alert_phone is configured
     if (smsProfile.alert_phone) {
-      const alertMsg = `⚠️ ALERT: ${from} texted "${body}" — needs manual response (${intent})`
+      const alertMsg = `ALERT: ${from} texted "${body}" — needs manual response (${intent})`
       await sendSms(smsProfile.alert_phone, alertMsg)
     }
     // Don't auto-reply for escalated intents — human handles it

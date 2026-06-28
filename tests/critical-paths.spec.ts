@@ -51,8 +51,8 @@ test.describe("Critical user paths", () => {
   });
 
   test("therapist profile page loads (sample)", async ({ page }) => {
-    // Use sample profile from directory-fallback
-    const sampleSlug = "bruno-santos";
+    // Use sample profile from directory-fallback (ethan-cole is in FALLBACK_PUBLIC_THERAPISTS)
+    const sampleSlug = "ethan-cole";
 
     await page.goto(`/therapists/${sampleSlug}`, {
       waitUntil: "networkidle",
@@ -153,7 +153,7 @@ test.describe("Critical user paths", () => {
   });
 
   test("images load on therapist profile", async ({ page }) => {
-    await page.goto("/therapists/bruno-santos", {
+    await page.goto("/therapists/ethan-cole", {
       waitUntil: "networkidle",
     });
 
@@ -217,7 +217,7 @@ test.describe("Mobile responsiveness", () => {
   });
 
   test("therapist profile page is mobile responsive", async ({ page }) => {
-    await page.goto("/therapists/bruno-santos", {
+    await page.goto("/therapists/ethan-cole", {
       waitUntil: "networkidle",
     });
 
@@ -253,7 +253,7 @@ test.describe("SEO and metadata", () => {
   });
 
   test("therapist profile has schema markup", async ({ page }) => {
-    await page.goto("/therapists/bruno-santos", {
+    await page.goto("/therapists/ethan-cole", {
       waitUntil: "networkidle",
     });
 

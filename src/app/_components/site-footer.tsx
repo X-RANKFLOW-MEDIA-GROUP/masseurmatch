@@ -48,7 +48,7 @@ export function SiteFooter() {
             </div>
             <div className="flex items-center gap-2 mt-4">
               <ShieldCheck className="w-[1.1rem] h-[1.1rem] text-emerald-400" strokeWidth={2.25} />
-              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-500">
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400">
                 Verified Secure Network
               </span>
             </div>
@@ -58,13 +58,13 @@ export function SiteFooter() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             <div className="flex items-center gap-3">
               <Phone className="w-[1.1rem] h-[1.1rem] text-white" strokeWidth={2.25} />
-              <a href="tel:978-627-7387" className="text-sm text-white hover:text-orange-400 transition-colors">
+              <a href="tel:978-627-7387" className="text-sm text-white hover:text-red-400 transition-colors">
                 978-MASSEUR (627-7387)
               </a>
             </div>
             <div className="flex items-center gap-3">
               <Mail className="w-[1.1rem] h-[1.1rem] text-white" strokeWidth={2.25} />
-              <a href="mailto:support@masseurmatch.com" className="text-sm text-white hover:text-orange-400 transition-colors">
+              <a href="mailto:support@masseurmatch.com" className="text-sm text-white hover:text-red-400 transition-colors">
                 support@masseurmatch.com
               </a>
             </div>
@@ -74,10 +74,10 @@ export function SiteFooter() {
 
         {/* Bottom Bar: Copyright & Links */}
         <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-white/[0.08] gap-4">
-          <p className="font-sans text-xs text-gray-500">
+          <p className="font-sans text-xs text-gray-400">
             &copy; {currentYear} MasseurMatch. All rights reserved.
           </p>
-          <div className="flex items-center gap-6 font-mono text-[10px] uppercase tracking-[0.18em] text-gray-500">
+          <div className="flex items-center gap-6 font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400">
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
             <Link href="/cookie-policy" className="hover:text-white transition-colors">Cookies</Link>

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
 
@@ -128,7 +128,7 @@ export default function FAQPage() {
       <main
         style={{
           background: "#FFFFFF",
-          color: "#111111",
+          color: "#1A1A1A",
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
@@ -136,7 +136,7 @@ export default function FAQPage() {
         {/* ── Hero ── */}
         <section
           style={{
-            background: "#111111",
+            background: "#1A1A1A",
             color: "#FFFFFF",
             padding: "88px 24px 80px",
             textAlign: "center",
@@ -268,7 +268,7 @@ export default function FAQPage() {
         {/* ── Still Have Questions ── */}
         <section
           style={{
-            background: "#111111",
+            background: "#1A1A1A",
             color: "#FFFFFF",
             padding: "72px 24px",
             textAlign: "center",
@@ -303,7 +303,7 @@ export default function FAQPage() {
               textTransform: "uppercase",
               fontFamily: "system-ui, sans-serif",
               background: "#8B1E2D",
-              color: "#111111",
+              color: "#1A1A1A",
               textDecoration: "none",
               fontWeight: 700,
             }}

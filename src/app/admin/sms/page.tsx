@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import {
@@ -78,7 +78,7 @@ export default function SmsAdminPage() {
   ] as const
 
   return (
-    <div className="min-h-screen bg-[#111111]">
+    <div className="min-h-screen bg-[#1A1A1A]">
       {/* Header */}
       <div className="border-b border-white/[0.06] px-6 py-6">
         <div className="mx-auto max-w-6xl flex items-center justify-between">
@@ -283,7 +283,7 @@ function ConversationsTab({ twilioReady, twilioLoading }: { twilioReady: boolean
                       ? 'bg-white/[0.08] text-slate-200'
                       : msg.is_manual
                       ? 'bg-sky-500/20 text-sky-200'
-                      : 'bg-[#8B1E2D]/20 text-red-200'
+                      : 'bg-[#8B1E2D]/20 text-red-100'
                   }`}>
                     <p className="text-sm leading-relaxed">{msg.body}</p>
                     <p className="mt-1 text-[10px] opacity-50">

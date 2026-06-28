@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Script from "next/script";
 import { BlogContent } from "./_components/BlogContent";
 import { NewsletterSignup } from "./_components/NewsletterSignup";

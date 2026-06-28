@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import type { LucideIcon } from 'lucide-react'
@@ -110,7 +110,7 @@ export default function AdminBookingsPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#111111] p-6">
+    <div className="min-h-screen bg-[#1A1A1A] p-6">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#8B1E2D]">Admin</p>
@@ -262,7 +262,7 @@ export default function AdminBookingsPage() {
                           <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
                             {inq.ai_conversation.map((msg, i) => (
                               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-[85%] rounded-xl px-3 py-2 text-xs ${msg.role === 'user' ? 'bg-[#8B1E2D]/20 text-red-200' : 'bg-white/[0.06] text-slate-300'}`}>
+                                <div className={`max-w-[85%] rounded-xl px-3 py-2 text-xs ${msg.role === 'user' ? 'bg-[#8B1E2D]/20 text-red-100' : 'bg-white/[0.06] text-slate-300'}`}>
                                   {msg.content}
                                 </div>
                               </div>

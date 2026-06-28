@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Script from "next/script";
 
 export const metadata: Metadata = {
@@ -143,7 +143,7 @@ export default function TermsPage() {
       <main
         style={{
           background: "#FFFFFF",
-          color: "#111111",
+          color: "#1A1A1A",
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
@@ -151,7 +151,7 @@ export default function TermsPage() {
         {/* ── Header ── */}
         <section
           style={{
-            background: "#111111",
+            background: "#1A1A1A",
             color: "#FFFFFF",
             padding: "clamp(56px, 8vw, 80px) 20px clamp(48px, 7vw, 72px)",
           }}
@@ -162,7 +162,7 @@ export default function TermsPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#8B1E2D",
+                color: "#D4717E",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -175,6 +175,7 @@ export default function TermsPage() {
                 fontWeight: 400,
                 lineHeight: 1.1,
                 marginBottom: 20,
+                color: "#FFFFFF",
               }}
             >
               Terms of Service
@@ -182,7 +183,7 @@ export default function TermsPage() {
             <p
               style={{
                 fontSize: "clamp(12px, 2.5vw, 14px)",
-                opacity: 0.5,
+                color: "#9CA3AF",
                 fontFamily: "system-ui, sans-serif",
               }}
             >
@@ -191,7 +192,7 @@ export default function TermsPage() {
             <p
               style={{
                 fontSize: "clamp(14px, 2.8vw, 16px)",
-                opacity: 0.65,
+                color: "#B0B8C4",
                 marginTop: 16,
                 fontFamily: "system-ui, sans-serif",
                 lineHeight: 1.7,

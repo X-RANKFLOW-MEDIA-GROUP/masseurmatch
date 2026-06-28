@@ -81,7 +81,7 @@ export function PremiumProfilePricing({ profile }: Props) {
           {promotions.map((promo, i) => (
             <div
               key={i}
-              className="flex items-start gap-3 rounded-lg border border-[rgba(255,138,31,0.25)] bg-[rgba(255,138,31,0.07)] px-4 py-3"
+              className="flex items-start gap-3 rounded-lg border border-[rgba(139, 30, 45,0.25)] bg-[rgba(139, 30, 45,0.07)] px-4 py-3"
             >
               <Tag className="w-4 h-4 text-[var(--orange)] flex-shrink-0 mt-0.5" />
               <div>

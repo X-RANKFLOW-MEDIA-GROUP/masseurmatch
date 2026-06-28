@@ -44,6 +44,22 @@ function baseOptions() {
   };
 }
 
+// Scoped alias for webhook handlers — service-role but clearly labelled so it
+// is never accidentally used in user-facing request paths.
+export function createSupabaseWebhookClient() {
+  return createSupabaseAdminClient();
+}
+
+// Validates the incoming request has an active admin session, then returns both
+// the service-role client and the verified session together so callers cannot
+// accidentally skip the auth gate.
+export async function requireAdminClient(
+  request: Request | { headers: { get: (name: string) => string | null } },
+): Promise<{ client: ReturnType<typeof createSupabaseAdminClient>; session: RequestSession }> {
+  const session = await requireAdminSession(request);
+  return { client: createSupabaseAdminClient(), session };
+}
+
 export function createSupabasePublicClient() {
   const url = getSupabaseUrl();
   const anonKey = getAnonKey();
@@ -53,7 +69,7 @@ export function createSupabasePublicClient() {
   return createClient<Database>(url, anonKey, baseOptions());
 }
 
-export function createSupabaseAdminClient() {
+export function createSupabaseWebhookAdminClient() {
   const url = getSupabaseUrl();
   const serviceRoleKey = getServiceRoleKey();
   assertConfig(url, "SUPABASE_URL");
@@ -62,8 +78,36 @@ export function createSupabaseAdminClient() {
   return createClient<Database>(url, serviceRoleKey, baseOptions());
 }
 
+export function createSupabaseAdminDashboardClient(session: RequestSession) {
+  if (session.role !== "admin") {
+    throw new RouteError(403, "Admin access required.");
+  }
+
+  const url = getSupabaseUrl();
+  const serviceRoleKey = getServiceRoleKey();
+  assertConfig(url, "SUPABASE_URL");
+  assertConfig(serviceRoleKey, "SUPABASE_SERVICE_ROLE_KEY");
+
+  return createClient<Database>(url, serviceRoleKey, {
+    ...baseOptions(),
+    global: {
+      headers: {
+        "x-admin-user-id": session.userId,
+      },
+    },
+  });
+}
+
+/**
+ * @deprecated Prefer createSupabaseWebhookAdminClient for webhooks/background
+ * jobs and createSupabaseAdminDashboardClient(session) for admin routes.
+ */
+export function createSupabaseAdminClient() {
+  return createSupabaseWebhookAdminClient();
+}
+
 export async function getUserRole(userId: string): Promise<AppRole | null> {
-  const adminClient = createSupabaseAdminClient();
+  const adminClient = createSupabaseWebhookAdminClient();
   const { data, error } = await adminClient
     .from("user_roles")
     .select("role")
@@ -111,7 +155,7 @@ export async function recordAuditLog(
   details?: Json,
 ) {
   try {
-    const adminClient = createSupabaseAdminClient();
+    const adminClient = createSupabaseWebhookAdminClient();
     await adminClient.from("audit_log").insert({
       admin_user_id: adminUserId,
       action,
@@ -125,7 +169,7 @@ export async function recordAuditLog(
 }
 
 export async function getUserByEmail(email: string): Promise<User | null> {
-  const adminClient = createSupabaseAdminClient();
+  const adminClient = createSupabaseWebhookAdminClient();
   const normalizedEmail = email.trim().toLowerCase();
   let page = 1;
 
@@ -220,7 +264,7 @@ export async function ensureUserProfileAndRole(
     fallbackName?: string;
   } = {},
 ) {
-  const adminClient = createSupabaseAdminClient();
+  const adminClient = createSupabaseWebhookAdminClient();
   const defaultRole = options.defaultRole ?? "provider";
   const fullName = deriveUserDisplayName(user, options.fallbackName);
 

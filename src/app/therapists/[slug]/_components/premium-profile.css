@@ -1,10 +1,10 @@
-/* ══════════════════════════════════════════════════════════════════
+﻿/* ══════════════════════════════════════════════════════════════════
    PREMIUM THERAPIST PROFILE — WORLD-CLASS DESIGN SYSTEM
    ══════════════════════════════════════════════════════════════════ */
 
 .premium-profile {
   --navy: #111111;
-  --navy-light: #1F1F1F;
+  --navy-light: #2B2B2B;
   --navy-mid: #2B2B2B;
   --blue: #8B1E2D;
   --orange: #8B1E2D;
@@ -23,8 +23,8 @@
   --radius-sm: 8px;
   --radius-pill: 100px;
   --font-serif: var(--font-playfair), Georgia, serif;
-  --font-sans: var(--font-satoshi, 'Satoshi'), Arial, sans-serif;
-  --font-body: var(--font-satoshi, 'Satoshi'), Arial, sans-serif;
+  --font-sans: 'Satoshi', system-ui, sans-serif;
+  --font-body: 'Satoshi', system-ui, sans-serif;
   
   background: var(--navy);
   color: var(--cream);
@@ -95,7 +95,8 @@
   bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(17,17,17,0.85);
+  background: rgba(26,26,26,0.85);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-pill);
@@ -645,7 +646,7 @@
 
 /* ── CTA FINAL ── */
 .pp-cta-final {
-  background: linear-gradient(135deg, rgba(139,30,45,0.3) 0%, rgba(17,17,17,0) 100%);
+  background: linear-gradient(135deg, rgba(139,30,45,0.3) 0%, rgba(26,26,26,0) 100%);
   border: 1px solid rgba(139,30,45,0.3);
   border-radius: var(--radius);
   padding: 48px 40px;

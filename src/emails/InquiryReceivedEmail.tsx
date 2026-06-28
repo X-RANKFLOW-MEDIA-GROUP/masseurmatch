@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { Body, Button, Container, Head, Hr, Html, Preview, Section, Text } from '@react-email/components';
 
 interface InquiryReceivedEmailProps {

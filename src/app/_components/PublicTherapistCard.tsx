@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { ArrowUpRight, MapPin, Navigation, ShieldCheck, Sparkles, Star, Zap } from "lucide-react";
 import { useMemo } from "react";
 import type { PublicTherapist } from "@/app/_lib/directory";
@@ -86,10 +87,15 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
   );
 
   return (
-    <article
-      className="group relative isolate flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-black/[0.06] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_-12px_rgba(15,23,42,0.28)] hover:ring-black/10"
+    <motion.article
+      className="group relative isolate flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-black/[0.06] transition-[box-shadow,ring-color] duration-300 hover:shadow-[0_18px_40px_-12px_rgba(15,23,42,0.28)] hover:ring-black/10"
       itemScope
       itemType="https://schema.org/Person"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -4, transition: { type: "spring", stiffness: 320, damping: 22 } }}
+      viewport={{ once: true, margin: "-30px" }}
+      transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
     >
       <Link
         href={profilePath}
@@ -231,6 +237,6 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
           <span itemProp="addressCountry">US</span>
         </div>
       )}
-    </article>
+    </motion.article>
   );
 }

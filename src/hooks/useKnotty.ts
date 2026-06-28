@@ -8,6 +8,7 @@ import {
   getOrCreateKnottySessionId,
   sendKnottyEvent,
 } from "@/lib/knotty/client";
+import { KNOTTY_GREETING, KNOTTY_GREETING_ID } from "@/lib/knotty/intro";
 import type {
   KnottyMessage,
   KnottyQuickAction,
@@ -20,6 +21,15 @@ type ConversationMessage = {
   role: "user" | "assistant";
   content: string;
   response?: KnottyResponsePayload;
+  /** Seeded client-side (e.g. the opening greeting) — not part of LLM history. */
+  seeded?: boolean;
+};
+
+const GREETING_MESSAGE: ConversationMessage = {
+  id: KNOTTY_GREETING_ID,
+  role: "assistant",
+  content: KNOTTY_GREETING,
+  seeded: true,
 };
 
 type SendMessageOptions = {
@@ -33,23 +43,16 @@ function nextMessageId() {
     : `knotty-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-const INITIAL_ASSISTANT_MESSAGE: ConversationMessage = {
-  id: "knotty-intro",
-  role: "assistant",
-  content:
-    "Hey! I’m Knotty. Tell me what you’re looking for — availability, location, type of massage, whatever matters most — and I’ll find the right match for you.",
-};
-
 export function useKnotty() {
   const sessionIdRef = useRef(getOrCreateKnottySessionId());
-  const [messages, setMessages] = useState<ConversationMessage[]>([INITIAL_ASSISTANT_MESSAGE]);
+  const [messages, setMessages] = useState<ConversationMessage[]>([GREETING_MESSAGE]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
   const conversationHistory = useMemo<KnottyMessage[]>(
     () =>
       messages
-        .filter((message) => message.id !== INITIAL_ASSISTANT_MESSAGE.id)
+        .filter((message) => !message.seeded)
         .slice(-8)
         .map((message) => ({
           role: message.role,

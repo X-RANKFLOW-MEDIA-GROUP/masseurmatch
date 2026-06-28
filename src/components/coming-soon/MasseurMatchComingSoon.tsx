@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { FormEvent, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -7,7 +7,7 @@ import { motion, MotionConfig, useMotionValue, useSpring } from "framer-motion";
 const C = {
   serif: "'Georgia', 'Times New Roman', serif" as const,
   sans: "system-ui, -apple-system, sans-serif" as const,
-  dark: "#111111",
+  dark: "#1A1A1A",
   blue: "#8B1E2D",
   orange: "#8B1E2D",
   amber: "#FFB347",

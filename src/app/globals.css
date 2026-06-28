@@ -1,26 +1,20 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────
-   MasseurMatch Design System — Red/Black/White
+   MasseurMatch Design System — Sober Red/Black/White
    ──────────────────────────────────────────── */
 :root {
   --mm-bg:          #FFFFFF;
   --mm-dark:        #111111;
-  --mm-dark-strong: #1F1F1F;
-  --mm-dark-soft:   #2B2B2B;
   --mm-accent:      #8B1E2D;
   --mm-accent-hover:#6E1521;
+  --mm-accent-soft: #F8EDEE;
   --mm-gray:        #6F6F6F;
   --mm-muted:       #8E8E8E;
-  --mm-border:      #E8E8E8;
-  --mm-border-soft: #D9D9D9;
-  --mm-border-div:  #B5B5B5;
+  --mm-border:      rgba(0,0,0,0.08);
   --mm-white:       #FFFFFF;
   --mm-light:       #F7F7F7;
-  --mm-surface:     #FAFAFA;
-  --mm-badge-bg:    #F8EDEE;
-  --mm-verified-bg: #EEF8F1;
-  --mm-success:     #1E7A46;
+  --mm-med:         #E8E8E8;
 
   --mm-font-heading: var(--font-satoshi), 'Satoshi', Arial, sans-serif;
   --mm-font-body:    var(--font-satoshi), 'Satoshi', Arial, sans-serif;
@@ -69,11 +63,21 @@ h1, h2, h3, h4, h5, h6 {
   color: #FFFFFF;
   text-decoration: none;
   border: none;
+  border-radius: 999px;
   cursor: pointer;
-  transition: background 0.2s;
+  box-shadow: 0 10px 24px rgba(139,30,45,0.18);
+  transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
 }
 .mm-btn-primary:hover {
   background: var(--mm-accent-hover);
+  transform: translateY(-1px);
+}
+.mm-btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+.mm-btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(139, 30, 45, 0.18);
 }
 
 .mm-btn-outline {
@@ -89,12 +93,17 @@ h1, h2, h3, h4, h5, h6 {
   background: transparent;
   color: var(--mm-dark);
   text-decoration: none;
-  border: 1px solid rgba(0,0,0,0.2);
+  border: 1px solid var(--mm-med);
+  border-radius: 999px;
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
+  transition: border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
 }
 .mm-btn-outline:hover {
   border-color: var(--mm-dark);
+  transform: translateY(-1px);
+}
+.mm-btn-outline:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .mm-btn-outline-light {
@@ -132,7 +141,7 @@ h1, h2, h3, h4, h5, h6 {
 .mm-city-card {
   background: #ffffff;
   border-bottom: 3px solid transparent;
-  transition: border-bottom-color 0.2s ease, background 0.2s ease;
+  transition: border-bottom-color 0.18s ease, background 0.18s ease;
   display: block;
   text-decoration: none;
 }
@@ -149,7 +158,7 @@ h1, h2, h3, h4, h5, h6 {
   background: #FAFAFA;
   text-decoration: none;
   border-bottom: 2px solid transparent;
-  transition: border-bottom-color 0.2s ease, background 0.2s ease;
+  transition: border-bottom-color 0.18s ease, background 0.18s ease;
 }
 .mm-service-link:hover {
   border-bottom-color: #8B1E2D;
@@ -157,93 +166,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 .mm-service-link .mm-arrow {
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.18s ease;
 }
 .mm-service-link:hover .mm-arrow {
   opacity: 1;
-}
-
-/* ─────────────────────────────────────────────
-   Premium Motion System
-   ──────────────────────────────────────────── */
-
-/* Text shimmer — luxury highlight sweep */
-@keyframes mm-shimmer-sweep {
-  0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-.mm-text-shimmer {
-  background: linear-gradient(
-    120deg,
-    currentColor 0%,
-    currentColor 35%,
-    rgba(139, 30, 45, 0.65) 50%,
-    currentColor 65%,
-    currentColor 100%
-  );
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation:
-    mm-shimmer-sweep var(--shimmer-duration, 3s) ease-in-out var(--shimmer-delay, 0s) infinite;
-}
-
-/* Breathing glow — slow organic pulse */
-@keyframes mm-breathing {
-  0%, 100% { transform: scale(1);    opacity: 0.6; }
-  50%      { transform: scale(1.12); opacity: 1; }
-}
-.mm-breathing-glow {
-  animation: mm-breathing var(--glow-duration, 5s) ease-in-out infinite;
-}
-
-/* Film grain overlay via SVG filter */
-.mm-grain {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 128px 128px;
-  mix-blend-mode: overlay;
-}
-
-/* Underline sweep for nav links */
-.underline-sweep {
-  position: relative;
-}
-.underline-sweep::after {
-  content: "";
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 1.5px;
-  background: var(--mm-accent);
-  transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.underline-sweep:hover::after {
-  width: 100%;
-}
-
-/* Glass surface for dark backgrounds */
-.glass-dark {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .mm-text-shimmer {
-    animation: none;
-    background: none;
-    -webkit-text-fill-color: currentColor;
-  }
-  .mm-breathing-glow {
-    animation: none;
-  }
-  .mm-grain {
-    display: none;
-  }
 }
 
 @layer utilities {

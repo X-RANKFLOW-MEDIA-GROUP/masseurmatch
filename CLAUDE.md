@@ -18,19 +18,25 @@ The bar is **premium, hand-crafted, and trustworthy** — never cheap or
   units that match the adjacent text. (Literal `·` as a separator in copy
   is fine; it is punctuation, not an icon.)
 
-- **Brand palette**
-  - Deep navy (first fold + footer): `#060E1A`
-  - Primary orange: `#FF8A1F` (Tailwind `primary`)
-  - Trust accent: emerald (`emerald-400`)
-  - Hairlines/borders on dark: `white/[0.06]`; glass surfaces:
-    `bg-white/[0.04]`–`bg-white/5` with `border-white/10` + `backdrop-blur`.
-  - Micro-labels / eyebrows on dark: `font-mono text-[10px] uppercase
-    tracking-[0.18em]` (mirrors the footer).
-  - Headlines: `font-display` (Unbounded), extrabold, tight tracking.
+- **Brand palette** — sober red / black / white (this is what ships in
+  production; it replaced the earlier orange + navy scheme):
+  - Accent red: `#8B1E2D` (hover `#6E1521`, soft tint `#F8EDEE`) — Tailwind
+    `accent` / `primary`. (Replaces the old orange `#FF8A1F`.)
+  - Text: `#111111` primary, `#6F6F6F` secondary, `#8E8E8E` muted.
+  - Surfaces: `#FFFFFF` base, `#F7F7F7` soft, `#FAFAFA` card.
+  - Borders/hairlines: `#E8E8E8` subtle, `#D9D9D9` strong.
+  - Focus ring: `3px rgba(139,30,45,.18)`.
+  - Spacing scale: 4·8·12·16·24·32·40·48·64px.
+    Type scale: 12·14·16·18·24·32·40·56px.
+  - Micro-labels / eyebrows: `font-mono text-[10px] uppercase
+    tracking-[0.18em]`.
+  - All type (headings, display, body): the self-hosted **Satoshi** variable
+    font (`var(--font-satoshi)`; woff2/woff in `public/fonts/`). It replaced
+    Montserrat/Unbounded — do not reintroduce those.
 
-- **Homepage rhythm**: only the first fold (hero + city marquee) is the deep
-  navy `#060E1A`; the body alternates light, high-end sections, with the
-  cinematic dark "city diorama" band and the footer as dark bookends.
+- **Homepage rhythm**: predominantly light, high-end sections on white/soft-gray
+  surfaces with the red accent used sparingly for emphasis and CTAs; dark
+  bands (e.g. the cinematic "city diorama" and the footer) act as bookends.
 
 - **Effects = restrained, not garish**: fine radially-masked dot grids,
   slow-breathing single-color glows, thin gradient hairlines, vignettes.
@@ -47,8 +53,9 @@ The bar is **premium, hand-crafted, and trustworthy** — never cheap or
 
 The full stack already exists — do not rebuild it:
 - API: `src/app/api/knotty/route.ts` → `src/lib/knotty/service.ts`.
-  LLM reply provider order: **OpenAI `gpt-4o-mini` (`OPENAI_API_KEY`)** →
-  Gemini `gemini-1.5-flash` (`GEMINI_API_KEY`) → deterministic fallback.
+  LLM reply provider order: **DeepSeek `deepseek-chat` (`DEEPSEEK_API_KEY`)** →
+  OpenAI `gpt-4o-mini` (`OPENAI_API_KEY`) → Gemini `gemini-1.5-flash`
+  (`GEMINI_API_KEY`) → deterministic fallback.
   Plus guardrails, FAQ, intent, ranking, learning, attribution.
 - Client: `useKnotty` hook + `KnottyChat` (floating, mounted site-wide in
   `layout.tsx` via `ChatWidget`) + per-profile `ProfileAIChat`.

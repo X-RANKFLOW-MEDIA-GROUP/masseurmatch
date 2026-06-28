@@ -1,10 +1,8 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { MapPin, ArrowUpRight } from "lucide-react";
-import { StrokeReveal } from "@/components/motion/StrokeReveal";
-import { SplitTextReveal } from "@/components/motion/SplitTextReveal";
 
 type CityEntry = {
   name: string;
@@ -50,8 +48,8 @@ function CityLink({
         href={`/${city.slug}`}
         className={`group relative flex items-center justify-between overflow-hidden rounded-xl border px-5 py-4 transition-all duration-300 ${
           city.featured
-            ? "border-[#E8E8E8] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:border-[#8B1E2D]/40 hover:shadow-[0_8px_30px_rgba(139,30,45,0.08)]"
-            : "border-[#E8E8E8]/60 bg-[#FAFAFA] hover:border-[#8B1E2D]/30 hover:bg-white hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)]"
+            ? "border-[#E2E4E6] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:border-[#8B1E2D]/40 hover:shadow-[0_8px_30px_rgba(139,30,45,0.08)]"
+            : "border-[#E2E4E6]/60 bg-[#FAFAFA] hover:border-[#8B1E2D]/30 hover:bg-white hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)]"
         }`}
       >
         {/* Red accent bar on hover */}
@@ -62,7 +60,7 @@ function CityLink({
             className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-300 ${
               city.featured
                 ? "bg-[#8B1E2D]/8 group-hover:bg-[#8B1E2D]/12"
-                : "bg-[#F7F7F7] group-hover:bg-[#8B1E2D]/8"
+                : "bg-[#F4F5F6] group-hover:bg-[#8B1E2D]/8"
             }`}
           >
             <MapPin
@@ -71,15 +69,15 @@ function CityLink({
               className={`transition-colors duration-300 ${
                 city.featured
                   ? "text-[#8B1E2D]"
-                  : "text-[#8E8E8E] group-hover:text-[#8B1E2D]"
+                  : "text-[#6F6F6F] group-hover:text-[#8B1E2D]"
               }`}
             />
           </div>
           <div>
-            <p className="text-sm font-semibold text-[#111111]">
+            <p className="text-sm font-semibold text-[#1A1A1A]">
               {city.name}
             </p>
-            <p className="text-[11px] font-medium text-[#8E8E8E]">
+            <p className="text-[11px] font-medium text-[#6F6F6F]">
               {city.state}
             </p>
           </div>
@@ -112,24 +110,13 @@ export function CityCaseStudies() {
             <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.3em] text-[#8B1E2D]">
               BROWSE BY CITY
             </p>
-            <SplitTextReveal
-              text="YOUR CITY. YOUR THERAPIST."
-              tag="h2"
-              wordMode
-              charDelay={0.07}
-              className="font-display font-extrabold uppercase leading-[1.05] tracking-tight text-[#111111] text-[clamp(1.75rem,3.5vw,2.75rem)]"
-            />
-            <StrokeReveal
-              d="M0 30 Q50 0, 100 30 T200 30"
-              width={200}
-              height={40}
-              strokeColor="#8B1E2D"
-              strokeWidth={1.5}
-              duration={1}
-              delay={0.4}
-              className="mt-2 opacity-40"
-            />
-            <p className="mt-3 max-w-lg text-sm leading-relaxed text-[#6F6F6F] lg:text-base">
+            <h2
+              className="font-display font-extrabold uppercase leading-[1.05] tracking-tight text-[#1A1A1A]"
+              style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)" }}
+            >
+              YOUR CITY. YOUR THERAPIST.
+            </h2>
+            <p className="mt-3 max-w-lg text-sm leading-relaxed text-[#666666] lg:text-base">
               Explore verified massage professionals across the country.
               Every city page connects you with local, trusted therapists.
             </p>

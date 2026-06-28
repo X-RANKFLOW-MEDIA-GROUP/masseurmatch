@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion, useReducedMotion } from "framer-motion";
 import { ShieldCheck, Star, Lock, ArrowRight, Users, Globe, BadgeCheck } from "lucide-react";
@@ -31,7 +31,7 @@ export default function AboutContent() {
   const reduced = useReducedMotion();
 
   return (
-    <div className="bg-[#111111] text-white">
+    <div className="bg-[#060E1A] text-white">
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden px-4 pb-24 pt-28 sm:px-6 lg:pb-32 lg:pt-36">
@@ -51,13 +51,13 @@ export default function AboutContent() {
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="relative mx-auto max-w-[1100px] text-center"
         >
-          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#D4717E]">
             Our Manifesto
           </p>
           <h1 className="mt-5 font-display text-[clamp(2.5rem,6vw,5.5rem)] font-extrabold leading-[0.95] tracking-tight">
             Elevating the standard
             <br />
-            <span className="text-[#8B1E2D]">of wellness discovery.</span>
+            <span className="text-[#D4717E]">of wellness discovery.</span>
           </h1>
           <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-white/55 lg:text-lg">
             MasseurMatch is a premium US directory that connects clients with verified,
@@ -74,9 +74,9 @@ export default function AboutContent() {
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.18 }}
           className="relative mx-auto mt-16 grid max-w-3xl grid-cols-3 gap-8 border-t border-white/[0.08] pt-12"
         >
-          <Stat value="250+" label="US cities covered" />
-          <Stat value="48+" label="States with listings" />
-          <Stat value="6+" label="Massage specialties" />
+          <Stat value="Nationwide" label="City pages across the US" />
+          <Stat value="Specialized" label="Deep tissue, Swedish & more" />
+          <Stat value="Reviewed" label="Profiles before they go live" />
         </motion.div>
       </section>
 
@@ -86,7 +86,7 @@ export default function AboutContent() {
       {/* ── Core pillars ─────────────────────────────────────────────────── */}
       <section className="px-4 py-20 sm:px-6 lg:py-28">
         <div className="mx-auto max-w-[1100px]">
-          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#D4717E]">
             What we stand for
           </p>
           <h2 className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold tracking-tight text-white">
@@ -117,7 +117,7 @@ export default function AboutContent() {
       <section className="border-t border-white/[0.06] px-4 py-20 sm:px-6 lg:py-28">
         <div className="mx-auto grid max-w-[1100px] gap-16 lg:grid-cols-2 lg:items-center">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">
+            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#D4717E]">
               Why we exist
             </p>
             <h2 className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.5rem)] font-extrabold leading-tight tracking-tight text-white">
@@ -139,7 +139,7 @@ export default function AboutContent() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {[
               { icon: Users, label: "Independent therapists", text: "Profiles owned by the professional — not a platform." },
-              { icon: Globe, label: "250+ US cities", text: "National reach from Dallas to New York to LA and beyond." },
+              { icon: Globe, label: "Nationwide cities", text: "National reach from Dallas to New York to LA and beyond." },
               { icon: BadgeCheck, label: "Identity verified", text: "Each profile reviewed and approved before going live." },
               { icon: ShieldCheck, label: "LGBTQ+ affirming", text: "Inclusive by design — every profile clearly marked." },
             ].map(({ icon: Icon, label, text }) => (

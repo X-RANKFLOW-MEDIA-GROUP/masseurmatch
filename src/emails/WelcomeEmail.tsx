@@ -1,4 +1,4 @@
-// src/emails/WelcomeEmail.tsx
+﻿// src/emails/WelcomeEmail.tsx
 import * as React from 'react';
 import { Body, Button, Container, Head, Hr, Html, Preview, Section, Text } from '@react-email/components';
 

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { MessageCircle, Phone } from "lucide-react";
 
@@ -24,7 +24,7 @@ export function VoxStickyContact({
         {phoneHref && (
           <a
             href={phoneHref}
-            className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-[#8B1E2D] font-semibold text-[#FFFFFF] shadow-[0_0_20px_rgba(139,30,45,0.35)]"
+            className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-[#8B1E2D] font-semibold text-white shadow-[0_0_20px_rgba(139, 30, 45,0.35)]"
           >
             <Phone className="h-4 w-4" strokeWidth={2.5} />
             Text {name.split(" ")[0]}
@@ -33,7 +33,7 @@ export function VoxStickyContact({
         {whatsappHref && (
           <a
             href={whatsappHref}
-            className="flex h-12 items-center justify-center gap-2 rounded-full bg-[#111111] px-5 font-semibold text-white"
+            className="flex h-12 items-center justify-center gap-2 rounded-full bg-[#1A1A1A] px-5 font-semibold text-white"
             aria-label={`WhatsApp ${name}`}
           >
             <MessageCircle className="h-4 w-4" strokeWidth={2.5} />

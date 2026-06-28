@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Clock3, MapPinned, ArrowUp, ShieldCheck, Sparkles, X } from "lucide-react";
+import { ArrowUpRight, Clock3, MapPinned, Send, MessageCircle, ShieldCheck, X } from "lucide-react";
 import { useKnotty } from "@/hooks/useKnotty";
 import { cn } from "@/lib/utils";
 import type { KnottyRecommendation } from "@/lib/knotty/types";
@@ -73,39 +73,39 @@ function RecommendationCard({
   return (
     <div
       className={cn(
-        "rounded-[20px] border px-4 py-4 backdrop-blur-2xl",
+        "rounded-[18px] border px-4 py-4",
         featured
-          ? "border-[#8B1E2D]/20 bg-[#8B1E2D]/[0.08] text-white shadow-[0_22px_48px_rgba(0,0,0,0.18)]"
-          : "border-white/[0.08] bg-white/[0.04] text-white/88",
+          ? "border-[#8B1E2D]/25 bg-[#F8EDEE] text-[#151515]"
+          : "border-black/[0.08] bg-[#FAFAFA] text-[#2B3038]",
       )}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6F6F6F]">
             {featured ? "Top Match" : `Alternative ${recommendation.position}`}
           </p>
-          <h3 className="mt-1 text-lg font-semibold">{recommendation.name}</h3>
-          <p className="mt-1 text-sm text-white/72">
+          <h3 className="mt-1 text-lg font-semibold text-[#151515]">{recommendation.name}</h3>
+          <p className="mt-1 text-sm text-[#6F6F6F]">
             {recommendation.neighborhood || recommendation.city || "Local area"} · {recommendation.specialty}
           </p>
         </div>
         {recommendation.verified ? (
-          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/18 bg-white/12 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]">
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[#8B1E2D]/20 bg-[#8B1E2D]/[0.08] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8B1E2D]">
             <ShieldCheck className="h-3.5 w-3.5" />
             Active
           </span>
         ) : null}
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/72">
+      <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#6F6F6F]">
         {recommendation.availableNow ? (
-          <span className="rounded-full border border-white/14 bg-white/10 px-3 py-1">
+          <span className="rounded-full border border-black/[0.08] bg-white px-3 py-1">
             <Clock3 className="mr-1 inline h-3.5 w-3.5" />
             Available now
           </span>
         ) : null}
         {typeof recommendation.distanceMiles === "number" ? (
-          <span className="rounded-full border border-white/14 bg-white/10 px-3 py-1">
+          <span className="rounded-full border border-black/[0.08] bg-white px-3 py-1">
             <MapPinned className="mr-1 inline h-3.5 w-3.5" />
             {recommendation.distanceMiles < 10
               ? `${recommendation.distanceMiles.toFixed(1)} mi`
@@ -113,13 +113,13 @@ function RecommendationCard({
           </span>
         ) : null}
         {typeof recommendation.priceFrom === "number" ? (
-          <span className="rounded-full border border-white/14 bg-white/10 px-3 py-1">
+          <span className="rounded-full border border-black/[0.08] bg-white px-3 py-1">
             From ${recommendation.priceFrom}
           </span>
         ) : null}
       </div>
 
-      <ul className="mt-3 list-disc list-inside space-y-2 text-sm leading-6 text-white/78">
+      <ul className="mt-3 list-disc list-inside space-y-2 text-sm leading-6 text-[#5F6673]">
         {recommendation.why.map((reason) => (
           <li key={`${recommendation.therapistId}-${reason}`}>{reason}</li>
         ))}
@@ -132,8 +132,8 @@ function RecommendationCard({
           className={cn(
             "inline-flex min-h-11 items-center justify-center rounded-full px-4 text-sm font-semibold uppercase tracking-[0.12em] transition",
             featured
-              ? "bg-[#8B1E2D] text-white hover:bg-[#E87A15]"
-              : "border border-white/[0.1] bg-white/[0.06] text-white hover:bg-white/[0.12]",
+              ? "bg-[#8B1E2D] text-white hover:bg-[#6E1521]"
+              : "border border-black/[0.1] bg-white text-[#151515] hover:border-[#8B1E2D]/40 hover:text-[#8B1E2D]",
           )}
         >
           View profile
@@ -154,13 +154,14 @@ function ChatBubble({
   onRecommendationOpen: (recommendation: KnottyRecommendation) => void;
 }) {
   const isUser = message.role === "user";
-  const shouldAnimate = !isUser && isLatestAssistant;
+  // Don't typewriter the seeded greeting — it should read as already there.
+  const shouldAnimate = !isUser && isLatestAssistant && !message.seeded;
   const { displayed, isDone } = useTypewriter(message.content, shouldAnimate);
 
   if (isUser) {
     return (
       <div className="flex justify-end">
-        <div className="max-w-[82%] rounded-[20px] rounded-br-sm bg-gradient-to-br from-[#8B1E2D] to-[#E87A15] px-4 py-3 text-sm leading-relaxed text-white shadow-[0_12px_32px_rgba(139,30,45,0.18)]">
+        <div className="max-w-[82%] rounded-[20px] rounded-br-sm bg-[#8B1E2D] px-4 py-3 text-sm leading-relaxed text-white shadow-[0_10px_28px_rgba(139,30,45,0.18)]">
           {message.content}
         </div>
       </div>
@@ -173,7 +174,7 @@ function ChatBubble({
 
   return (
     <div className="flex justify-start">
-      <div className="w-full max-w-[88%] space-y-3 rounded-[24px] rounded-bl-sm border border-white/[0.08] bg-white/[0.05] px-4 py-4 text-sm leading-relaxed text-white/90 backdrop-blur-2xl">
+      <div className="w-full max-w-[88%] space-y-3 rounded-[22px] rounded-bl-sm border border-black/[0.06] bg-[#F5F5F5] px-4 py-3.5 text-sm leading-relaxed text-[#2B3038]">
         <p>
           {displayed}
           {!isDone && (
@@ -203,14 +204,26 @@ function ChatBubble({
   );
 }
 
-export const KnottyChat = ({
-  mode = "floating",
-  promptExamples,
-  className,
-}: KnottyChatProps) => {
+function KnottyDisclaimer() {
+  return (
+    <p className="px-5 pb-4 pt-1 text-[11px] leading-5 text-[#6F6F6F]">
+      Knotty is an AI assistant.{" "}
+      <Link href="/platform-disclaimer" className="text-[#8B1E2D] underline-offset-2 hover:underline">
+        Not medical or legal advice
+      </Link>
+      . MasseurMatch{" "}
+      <Link href="/platform-disclaimer" className="text-[#8B1E2D] underline-offset-2 hover:underline">
+        does not verify licenses or take bookings
+      </Link>
+      .
+    </p>
+  );
+}
+
+export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) => {
   const isEmbedded = mode === "embedded";
   const [isOpen, setIsOpen] = useState(isEmbedded);
-  const { input, isTyping, messages, quickActions, sendMessage, setInput, trackOpen, trackRecommendationClick } =
+  const { input, isTyping, messages, sendMessage, setInput, trackOpen, trackRecommendationClick } =
     useKnotty();
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -222,6 +235,16 @@ export const KnottyChat = ({
     if (isEmbedded) {
       trackOpen();
     }
+  }, [isEmbedded, trackOpen]);
+
+  // Auto-open floating chat after 3 seconds on page load.
+  useEffect(() => {
+    if (isEmbedded) return;
+    const timer = setTimeout(() => {
+      setIsOpen(true);
+      trackOpen();
+    }, 3000);
+    return () => clearTimeout(timer);
   }, [isEmbedded, trackOpen]);
 
   // Allow any part of the app to open the floating chat (optionally with a
@@ -247,44 +270,36 @@ export const KnottyChat = ({
     return null;
   }, [messages]);
 
-  const quickActionButtons = quickActions.map((action) => (
-    <button
-      key={action.key}
-      type="button"
-      onClick={() => void sendMessage({ quickAction: action.key })}
-      className="rounded-full border border-[#8B1E2D]/25 bg-[#8B1E2D]/[0.07] px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#FFB366] transition hover:border-[#8B1E2D]/50 hover:bg-[#8B1E2D]/15 hover:text-[#FFD199]"
-    >
-      {action.label}
-    </button>
-  ));
-
   const panel = (
     <div
       className={cn(
-        "relative flex flex-col overflow-hidden rounded-[28px] border border-white/[0.06] bg-[#111111] shadow-[0_32px_96px_rgba(1,10,28,0.6)] backdrop-blur-3xl",
+        "relative flex flex-col overflow-hidden rounded-[24px] border border-black/10 bg-white shadow-[0_32px_96px_rgba(15,23,42,0.22)]",
         isEmbedded
           ? "h-[620px] w-full"
-          : "w-[396px] max-w-[calc(100vw-2rem)] h-[min(620px,calc(100svh-5rem))]",
+          : "w-[380px] max-w-[calc(100vw-2rem)] h-[min(620px,calc(100svh-5rem))]",
         className,
       )}
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,30,45,0.06),transparent_50%),radial-gradient(circle_at_bottom_left,rgba(6,14,26,0.8),transparent_56%)]" />
-
-      <div className="relative flex items-center justify-between border-b border-white/[0.06] bg-white/[0.02] px-5 py-4">
+      {/* Header */}
+      <div className="flex items-center justify-between bg-[#0B0B0C] px-5 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#8B1E2D]/20 bg-[#8B1E2D]/10 text-[#8B1E2D]">
-            <Sparkles className="h-4 w-4" strokeWidth={2.25} />
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#8B1E2D] text-white">
+            <Send className="h-4 w-4" strokeWidth={2.25} />
           </div>
           <div>
-            <p className="text-sm font-semibold text-white/90">Knotty</p>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/40">AI concierge</p>
+            <p className="text-sm font-extrabold uppercase tracking-[0.04em] text-white">
+              Knotty <span className="text-[#E0566B]">AI</span>
+            </p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/60">
+              MasseurMatch concierge
+            </p>
           </div>
         </div>
         {!isEmbedded ? (
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.06] bg-white/[0.04] text-white/50 transition hover:bg-white/[0.08] hover:text-white/80"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-white/55 transition hover:bg-white/10 hover:text-white"
             aria-label="Close Knotty chat"
           >
             <X className="h-4 w-4" />
@@ -292,14 +307,8 @@ export const KnottyChat = ({
         ) : null}
       </div>
 
-      <div className="relative border-b border-white/[0.06] px-4 py-3">
-        <div className="flex flex-wrap gap-2">
-          {quickActionButtons}
-          {(promptExamples || []).slice(0, 0).map(() => null)}
-        </div>
-      </div>
-
-      <div className="relative flex-1 space-y-4 overflow-y-auto px-4 py-4">
+      {/* Conversation */}
+      <div className="relative flex-1 space-y-4 overflow-y-auto bg-white px-4 py-4">
         {messages.map((message) => (
           <ChatBubble
             key={message.id}
@@ -311,7 +320,7 @@ export const KnottyChat = ({
 
         {isTyping ? (
           <div className="flex justify-start">
-            <div className="rounded-[20px] rounded-bl-sm border border-white/[0.06] bg-white/[0.04] px-5 py-3.5 backdrop-blur-2xl">
+            <div className="rounded-[20px] rounded-bl-sm border border-black/[0.06] bg-[#F5F5F5] px-5 py-3.5">
               <TypingDots />
             </div>
           </div>
@@ -320,31 +329,34 @@ export const KnottyChat = ({
         <div ref={endRef} />
       </div>
 
+      {/* Composer */}
       <form
         onSubmit={(event) => {
           event.preventDefault();
           void sendMessage({ content: input });
         }}
-        className="relative border-t border-white/[0.06] px-4 py-4"
+        className="border-t border-black/[0.06] bg-white px-4 pb-2 pt-3"
       >
-        <div className="flex items-center gap-2 rounded-[22px] border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 backdrop-blur-2xl">
+        <div className="flex items-center gap-2 rounded-[20px] border border-black/[0.1] bg-white px-3 py-2">
           <input
             type="text"
             value={input}
             onChange={(event) => setInput(event.target.value)}
-            placeholder="Tell Knotty what matters most..."
-            className="flex-1 bg-transparent text-sm text-white/85 outline-none placeholder:text-white/35"
+            placeholder="Ask Knotty anything..."
+            className="flex-1 bg-transparent text-sm text-[#151515] outline-none placeholder:text-[#98A2B3]"
           />
           <button
             type="submit"
             disabled={!input.trim() || isTyping}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#8B1E2D] text-white transition hover:bg-[#E87A15] disabled:cursor-not-allowed disabled:opacity-35"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#8B1E2D] text-white transition hover:bg-[#6E1521] disabled:cursor-not-allowed disabled:opacity-35"
             aria-label="Send message"
           >
-            <ArrowUp className="h-4 w-4" strokeWidth={2.5} />
+            <Send className="h-4 w-4" strokeWidth={2.5} />
           </button>
         </div>
       </form>
+
+      <KnottyDisclaimer />
     </div>
   );
 
@@ -367,13 +379,12 @@ export const KnottyChat = ({
               setIsOpen(true);
               trackOpen();
             }}
-            className="group relative h-16 w-16 rounded-full border border-white/20 bg-[linear-gradient(180deg,#8B1E2D,#E06B00)] shadow-[0_20px_48px_rgba(139,30,45,0.3)]"
+            className="group relative h-16 w-16 rounded-full border border-white/20 bg-[#8B1E2D] shadow-[0_20px_48px_rgba(139,30,45,0.3)]"
             aria-label="Open Knotty chat"
           >
-            <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.3),transparent_58%)]" />
-            <div className="absolute -inset-2 rounded-full bg-[radial-gradient(circle,rgba(139,30,45,0.45),transparent_65%)] opacity-75 blur-2xl transition group-hover:opacity-100" />
+            <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.25),transparent_58%)]" />
             <div className="relative flex h-full w-full items-center justify-center text-white">
-              <Sparkles className="h-6 w-6" strokeWidth={2.25} />
+              <MessageCircle className="h-6 w-6" strokeWidth={2.25} />
             </div>
           </motion.button>
         ) : (

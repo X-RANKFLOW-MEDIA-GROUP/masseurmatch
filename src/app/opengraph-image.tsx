@@ -1,4 +1,4 @@
-import { ImageResponse } from "next/og";
+﻿import { ImageResponse } from "next/og";
 
 export const alt = "MasseurMatch – LGBTQ+-Inclusive Massage Therapist Directory";
 export const size = {

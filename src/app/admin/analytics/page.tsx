@@ -14,19 +14,36 @@ import { DashboardSkeleton } from "@/app/_components/DashboardSkeleton";
 export default function AdminAnalyticsPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const load = () => {
+    setLoading(true);
+    setError(null);
     fetch("/api/admin/analytics")
       .then(res => res.json())
       .then(json => {
-        if (json.ok) setData(json);
-        setLoading(false);
+        if (json.ok) {
+          setData(json);
+        } else {
+          setError(json.error ?? "The analytics API returned an error.");
+        }
       })
-      .catch(() => setLoading(false));
-  }, []);
+      .catch((err) => setError(err instanceof Error ? err.message : "Failed to reach the analytics API."))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(load, []);
 
   if (loading) return <div className="p-8"><DashboardSkeleton /></div>;
-  if (!data) return <div className="p-8">Failed to load analytics.</div>;
+  if (error) return (
+    <div className="flex flex-col items-center gap-4 p-12 text-center">
+      <p className="text-sm text-destructive">{error}</p>
+      <button onClick={load} className="rounded-md bg-primary px-4 py-2 text-xs font-semibold text-white">
+        Retry
+      </button>
+    </div>
+  );
+  if (!data) return null;
 
   const { stats, revenueByTier, topCities, signupsByDay } = data;
 

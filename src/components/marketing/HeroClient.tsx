@@ -1,8 +1,11 @@
-"use client";
+﻿"use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { useKnotty } from "@/hooks/useKnotty";
+import type { KnottyRecommendation } from "@/lib/knotty/types";
 import {
   Sparkles,
   MessageCircle,
@@ -13,10 +16,6 @@ import {
   Shield,
 } from "lucide-react";
 import { HeroMediaBanner } from "@/components/marketing/HeroMediaBanner";
-import { MagneticHover } from "@/components/motion/MagneticHover";
-import { TextShimmer } from "@/components/motion/TextShimmer";
-import { BreathingGlow } from "@/components/motion/BreathingGlow";
-import { GrainOverlay } from "@/components/motion/GrainOverlay";
 import type { PublicTherapist } from "@/app/_lib/directory";
 
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -37,14 +36,22 @@ const trustItems = [
 function TherapistCard({ profile, index }: { profile: PublicTherapist; index: number }) {
   const router = useRouter();
   const displayName = profile.display_name || profile.full_name || "Therapist";
+  const profilePath = profile.slug || profile.id;
+
+  const handleNavigate = () => {
+    if (profilePath) {
+      router.push(`/therapists/${profilePath}`);
+    }
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 36, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.65, ease: customEase, delay: 0.15 + index * 0.08 }}
-      className="relative flex min-w-[250px] flex-1 flex-col rounded-[1.75rem] border border-black/5 bg-white/95 p-4 pt-36 shadow-[0_28px_70px_rgba(15,23,42,0.13)] backdrop-blur"
-      onClick={() => router.push(`/therapists/${profile.slug || profile.id}`)}
+      className="relative flex min-w-[250px] flex-1 flex-col rounded-[1.75rem] border border-black/5 bg-white/95 p-4 pt-36 shadow-[0_28px_70px_rgba(15,23,42,0.13)] backdrop-blur cursor-pointer"
+      onClick={handleNavigate}
+      data-testid="therapist-card"
     >
       {profile.profile_photo && (
         <div className="absolute inset-x-3 -top-20 flex h-56 items-end justify-center overflow-hidden rounded-[1.5rem] bg-gradient-to-b from-slate-50 via-white to-white">
@@ -57,12 +64,12 @@ function TherapistCard({ profile, index }: { profile: PublicTherapist; index: nu
         </div>
       )}
       <div className="mt-3">
-        <h3 className="font-display text-lg font-black text-[#111111]">{displayName}</h3>
+        <h3 className="font-display text-lg font-black text-[#151515]">{displayName}</h3>
         <p className="text-sm text-[#5F6673]">{profile.city || "Location"}</p>
       </div>
       <button
         type="button"
-        onClick={() => router.push(`/therapists/${profile.slug || profile.id}`)}
+        onClick={handleNavigate}
         className="mt-5 w-full rounded-xl bg-[#8B1E2D] px-5 py-3 text-sm font-black uppercase tracking-wide text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
       >
         View Profile
@@ -93,7 +100,15 @@ interface HeroClientProps {
 export default function HeroClient({ featuredTherapists = [] }: HeroClientProps) {
   const reducedMotion = useReducedMotion();
   const router = useRouter();
-  const [assistantInput, setAssistantInput] = useState("");
+  const {
+    input: assistantInput,
+    setInput: setAssistantInput,
+    messages: knottyMessages,
+    isTyping,
+    sendMessage,
+    trackRecommendationClick,
+  } = useKnotty();
+  const conversationEndRef = useRef<HTMLDivElement>(null);
 
   const realProfiles = useMemo(
     () => featuredTherapists.filter(isRealProfile).slice(0, 3),
@@ -103,17 +118,22 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
   const dur = reducedMotion ? 0 : 0.7;
   const noDelay = reducedMotion ? 0 : undefined;
 
-  const submitAssistantPrompt = (prompt = assistantInput) => {
-    const q = prompt.trim();
-    router.push(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
+  // The hero card holds a real conversation inline (greeting + live replies).
+  const submitAssistantPrompt = (prompt?: string) => {
+    const q = (prompt ?? assistantInput).trim();
+    if (!q) return;
+    void sendMessage({ content: q });
   };
 
+  useEffect(() => {
+    conversationEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [knottyMessages, isTyping]);
+
   return (
-    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_24%_18%,rgba(139,30,45,0.08),transparent_28%),linear-gradient(180deg,#ffffff_0%,#fbfaf8_100%)] text-[#111111]">
-      <GrainOverlay opacity={0.02} />
+    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_24%_18%,rgba(139,30,45,0.08),transparent_28%),linear-gradient(180deg,#ffffff_0%,#fbfaf8_100%)] text-[#151515]">
       <div className="mx-auto grid min-h-[680px] max-w-[1500px] items-center gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1.03fr_0.97fr] lg:px-10 lg:py-16">
         <div className="relative order-2 lg:order-1">
-          <BreathingGlow color="rgba(139, 30, 45, 0.06)" size={350} duration={6} className="-left-10 top-12" />
+          <div className="pointer-events-none absolute -left-10 top-12 h-72 w-72 rounded-full bg-[#8B1E2D]/8 blur-3xl" />
 
           {realProfiles.length > 0 ? (
             <div className="relative flex snap-x gap-4 overflow-x-auto pb-6 pt-24 lg:overflow-visible lg:pb-0 lg:pt-28">
@@ -131,8 +151,8 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
               <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#8B1E2D]/10 text-[#8B1E2D]">
                 <Sparkles size={24} />
               </div>
-              <h2 className="font-display text-2xl font-black text-[#111111]">Live profile cards are ready.</h2>
-              <p className="mt-3 max-w-lg text-sm leading-6 text-[#6F6F6F]">
+              <h2 className="font-display text-2xl font-black text-[#151515]">Live profile cards are ready.</h2>
+              <p className="mt-3 max-w-lg text-sm leading-6 text-[#667085]">
                 The hero only shows approved public profiles from Supabase. No demo names are rendered in this first fold.
               </p>
             </motion.div>
@@ -146,9 +166,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.12 }}
             className="mb-4 font-mono text-[10px] uppercase tracking-[0.34em] text-[#8B1E2D] sm:text-xs"
           >
-            <TextShimmer duration={4} delay={1.5}>
-              PREMIUM.&nbsp;&nbsp;PROFESSIONAL.&nbsp;&nbsp;PERSONAL.
-            </TextShimmer>
+            PREMIUM.&nbsp;&nbsp;PROFESSIONAL.&nbsp;&nbsp;PERSONAL.
           </motion.p>
 
           <motion.h1
@@ -158,7 +176,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             className="mb-5 max-w-3xl font-display font-black leading-[0.96] tracking-tight"
             style={{ fontSize: "clamp(3rem, 6vw, 6.5rem)" }}
           >
-            <span className="block text-[#111111]">Find the Right</span>
+            <span className="block text-[#151515]">Find the Right</span>
             <span className="block"><span className="text-[#8B1E2D]">Masseur</span> Near You.</span>
           </motion.h1>
 
@@ -166,7 +184,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.28 }}
-            className="mb-7 max-w-2xl text-base leading-8 text-[#6F6F6F] lg:text-lg"
+            className="mb-7 max-w-2xl text-base leading-8 text-[#667085] lg:text-lg"
           >
             Browse professional massage providers by city, technique, availability, and style — with help from our AI assistant.
           </motion.p>
@@ -175,40 +193,84 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.36 }}
-            className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.10)]"
+            className="overflow-hidden rounded-[1.75rem] border border-black/10 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.10)]"
           >
-            <BreathingGlow
-              color="rgba(139, 30, 45, 0.04)"
-              size={300}
-              duration={7}
-              className="-right-20 -top-20"
-            />
             <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#8B1E2D]/10 text-[#8B1E2D]">
                   <MessageCircle size={23} strokeWidth={2.4} />
                 </div>
                 <div>
-                  <p className="font-display text-base font-black text-[#111111]">AI Match Assistant</p>
-                  <p className="text-xs font-semibold text-[#7B8190]">Ask Knotty AI</p>
+                  <p className="font-display text-base font-black text-[#151515]">AI Match Assistant</p>
+                  <p className="text-xs font-semibold text-[#656B78]">Ask Knotty AI</p>
                 </div>
               </div>
               <Sparkles size={20} className="text-[#8B1E2D]" />
             </div>
 
             <div className="space-y-4 px-5 py-5">
-              <div className="ml-auto max-w-[78%] rounded-2xl rounded-tr-md bg-slate-100 px-4 py-3 text-sm font-medium leading-6 text-[#2B3038]">
-                I need a deep tissue masseur in Dallas tonight.
-                <span className="mt-1 block text-right text-[11px] text-[#98A2B3]">10:24 AM</span>
-              </div>
-              <div className="flex max-w-[86%] items-start gap-3">
-                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#8B1E2D]/10 text-[#8B1E2D]">
-                  <Sparkles size={16} />
-                </div>
-                <div className="rounded-2xl rounded-tl-md bg-[#F7F7F8] px-4 py-3 text-sm font-medium leading-6 text-[#2B3038]">
-                  I can help with that. Do you prefer in-call or outcall, and what area of Dallas works best for you?
-                  <span className="mt-1 block text-[11px] text-[#98A2B3]">10:24 AM</span>
-                </div>
+              <div className="max-h-[224px] space-y-4 overflow-y-auto pr-1">
+                {knottyMessages.map((message) =>
+                  message.role === "user" ? (
+                    <div
+                      key={message.id}
+                      className="ml-auto max-w-[78%] rounded-2xl rounded-tr-md bg-[#8B1E2D] px-4 py-3 text-sm font-medium leading-6 text-white"
+                    >
+                      {message.content}
+                    </div>
+                  ) : (
+                    <div key={message.id} className="flex max-w-[90%] items-start gap-3">
+                      <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#8B1E2D]/10 text-[#8B1E2D]">
+                        <Sparkles size={16} />
+                      </div>
+                      <div className="min-w-0 rounded-2xl rounded-tl-md bg-[#F7F7F8] px-4 py-3 text-sm font-medium leading-6 text-[#2B3038]">
+                        {message.content}
+                        {(() => {
+                          const recs = [
+                            message.response?.primary,
+                            ...(message.response?.alternatives ?? []),
+                          ].filter((r): r is KnottyRecommendation => Boolean(r));
+                          if (recs.length === 0) return null;
+                          return (
+                            <div className="mt-2.5 space-y-1.5">
+                              {recs.map((rec) => (
+                                <Link
+                                  key={`${rec.therapistId}-${rec.position}`}
+                                  href={rec.profilePath}
+                                  onClick={() => trackRecommendationClick(rec)}
+                                  className="flex items-center justify-between gap-2 rounded-xl border border-[#8B1E2D]/20 bg-white px-3 py-2 text-xs font-bold text-[#8B1E2D] transition hover:bg-[#8B1E2D]/[0.06]"
+                                >
+                                  <span className="truncate">
+                                    {rec.name}
+                                    {rec.neighborhood || rec.city ? ` · ${rec.neighborhood || rec.city}` : ""}
+                                  </span>
+                                  <ArrowRight size={14} strokeWidth={2.5} className="shrink-0" />
+                                </Link>
+                              ))}
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    </div>
+                  ),
+                )}
+                {isTyping ? (
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#8B1E2D]/10 text-[#8B1E2D]">
+                      <Sparkles size={16} />
+                    </div>
+                    <div className="flex items-center gap-1.5 rounded-2xl rounded-tl-md bg-[#F7F7F8] px-4 py-3.5">
+                      {[0, 1, 2].map((dot) => (
+                        <span
+                          key={dot}
+                          className="h-[7px] w-[7px] animate-knotty-pulse rounded-full bg-[#8B1E2D]/60"
+                          style={{ animationDelay: `${dot * 180}ms` }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+                <div ref={conversationEndRef} />
               </div>
 
               <div className="flex flex-wrap gap-2 pt-1">
@@ -217,7 +279,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                     key={prompt}
                     type="button"
                     onClick={() => submitAssistantPrompt(prompt)}
-                    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-black text-[#111111] transition hover:border-[#8B1E2D] hover:text-[#8B1E2D]"
+                    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-black text-[#151515] transition hover:border-[#8B1E2D] hover:text-[#8B1E2D]"
                   >
                     {prompt}
                   </button>
@@ -231,9 +293,9 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                   onKeyDown={(event) => {
                     if (event.key === "Enter") submitAssistantPrompt();
                   }}
-                  placeholder="Describe what you need..."
+                  placeholder="Ask Knotty anything..."
                   aria-label="Ask Knotty AI what massage provider you need"
-                  className="min-w-0 flex-1 bg-transparent px-3 text-sm text-[#111111] outline-none placeholder:text-[#98A2B3]"
+                  className="min-w-0 flex-1 bg-transparent px-3 text-sm text-[#151515] outline-none placeholder:text-[#64748B]"
                 />
                 <button
                   type="button"
@@ -251,33 +313,27 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.46 }}
-            className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-semibold text-[#6F6F6F]"
+            className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-semibold text-[#667085]"
           >
             {trustItems.map(({ label, icon: Icon }) => (
               <span key={label} className="inline-flex items-center gap-2">
-                <Icon size={17} strokeWidth={2.25} className="text-[#111111]" />
+                <Icon size={17} strokeWidth={2.25} className="text-[#151515]" />
                 {label}
               </span>
             ))}
           </motion.div>
 
-          <motion.div
+          <motion.button
+            type="button"
+            onClick={() => router.push("/search")}
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.52 }}
-            className="mt-7 w-fit"
+            className="mt-7 inline-flex w-fit items-center gap-2 rounded-2xl bg-[#8B1E2D] px-6 py-4 text-sm font-black uppercase tracking-wide text-white shadow-xl shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
           >
-            <MagneticHover strength={0.25} radius={150}>
-              <button
-                type="button"
-                onClick={() => router.push("/search")}
-                className="inline-flex items-center gap-2 rounded-2xl bg-[#8B1E2D] px-6 py-4 text-sm font-black uppercase tracking-wide text-white shadow-xl shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
-              >
-                Find a Masseur
-                <ArrowRight size={18} strokeWidth={2.5} />
-              </button>
-            </MagneticHover>
-          </motion.div>
+            Find a Masseur
+            <ArrowRight size={18} strokeWidth={2.5} />
+          </motion.button>
         </div>
       </div>
 
