@@ -232,7 +232,7 @@ export function VoxProfile({
                 {phoneHref && (
                   <a
                     href={phoneHref}
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-[#1a0a00] shadow-[0_0_32px_rgba(139, 30, 45,0.4)] transition-transform hover:-translate-y-0.5"
+                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-white shadow-[0_0_32px_rgba(139, 30, 45,0.4)] transition-transform hover:-translate-y-0.5"
                   >
                     <Phone className="h-4 w-4" strokeWidth={2.5} />
                     Text {firstName}
@@ -256,7 +256,7 @@ export function VoxProfile({
                 {emailHref && !phoneHref && !whatsappHref && (
                   <a
                     href={emailHref}
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-[#1a0a00]"
+                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-white"
                   >
                     <Mail className="h-4 w-4" strokeWidth={2.5} />
                     Email {firstName}
@@ -321,7 +321,7 @@ export function VoxProfile({
                   </blockquote>
                   <figcaption className="mt-4 text-sm font-semibold text-[#1A1A1A]">
                     {review.author}
-                    {review.date ? <span className="ml-2 font-normal text-[#8a7d6f]">{review.date}</span> : null}
+                    {review.date ? <span className="ml-2 font-normal text-[#6F6050]">{review.date}</span> : null}
                   </figcaption>
                 </figure>
               ))}
@@ -397,7 +397,7 @@ export function VoxProfile({
                   >
                     <div>
                       <p className="font-semibold text-[#1a1a1a]">{row.name}</p>
-                      <p className="text-sm text-[#8a7d6f]">{row.duration}</p>
+                      <p className="text-sm text-[#6F6050]">{row.duration}</p>
                     </div>
                     <span className="text-right font-semibold text-[#1A1A1A]">{row.incall}</span>
                     <span className="text-right font-semibold text-[#1A1A1A]">{row.outcall}</span>
@@ -411,7 +411,7 @@ export function VoxProfile({
                 </div>
               )}
             </div>
-            <p className="mt-3 text-sm text-[#8a7d6f]">
+            <p className="mt-3 text-sm text-[#6F6050]">
               {hasRate(profile.startingPrice) ? `Sessions from ${profile.startingPrice}. ` : ""}
               Message {firstName} to confirm the right session length and location for you.
             </p>
@@ -557,7 +557,7 @@ export function VoxProfile({
                   </span>
                   <span>
                     <p className="font-semibold text-[#1a1a1a]">{related.name}</p>
-                    <p className="flex items-center gap-1 text-sm text-[#8a7d6f]">
+                    <p className="flex items-center gap-1 text-sm text-[#6F6050]">
                       <MapPin className="h-3 w-3" strokeWidth={2} />
                       {related.city}
                     </p>
@@ -591,7 +591,7 @@ export function VoxProfile({
             {(phoneHref || whatsappHref || emailHref) && (
               <a
                 href={phoneHref || whatsappHref || emailHref || "#contact"}
-                className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-[#1a0a00] shadow-[0_0_32px_rgba(139, 30, 45,0.35)] transition-transform hover:-translate-y-0.5"
+                className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-white shadow-[0_0_32px_rgba(139, 30, 45,0.35)] transition-transform hover:-translate-y-0.5"
               >
                 <Sparkles className="h-4 w-4" strokeWidth={2.5} />
                 Contact {firstName}
@@ -676,7 +676,7 @@ function DetailRow({ Icon, label, value }: { Icon: typeof MapPin; label: string;
         <Icon className="h-4 w-4" strokeWidth={2.25} />
       </span>
       <span>
-        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#a1927f]">{label}</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#6F6050]">{label}</p>
         <p className="text-sm font-semibold text-[#1a1a1a]">{value}</p>
       </span>
     </div>

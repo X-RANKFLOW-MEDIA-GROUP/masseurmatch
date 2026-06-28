@@ -204,7 +204,7 @@ export default function TherapistsPageClient({
           <button
             type="button"
             onClick={clearAll}
-            className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-5 py-2 text-sm font-semibold text-[#1a0a00]"
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-5 py-2 text-sm font-semibold text-white"
           >
             <X className="h-3.5 w-3.5" strokeWidth={2.5} />
             Clear filters
