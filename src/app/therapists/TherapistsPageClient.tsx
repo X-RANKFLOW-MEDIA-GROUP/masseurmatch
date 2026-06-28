@@ -131,14 +131,14 @@ export default function TherapistsPageClient({
       )}
 
       {/* ── Search & filter bar ──────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-[#e8e0d8] bg-white p-4 shadow-sm">
+      <div className="rounded-2xl border border-[#E8E8E8] bg-white p-4 shadow-sm">
         <div className="mb-3 flex items-center gap-2">
           <SlidersHorizontal className="h-4 w-4 text-[#8B1E2D]" strokeWidth={2.25} />
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a1927f]">Filter directory</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#8E8E8E]">Filter directory</span>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a1927f]" strokeWidth={2} />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8E8E8E]" strokeWidth={2} />
             <label htmlFor="therapists-filter-city" className="sr-only">Filter by city</label>
             <input
               id="therapists-filter-city"
@@ -148,11 +148,11 @@ export default function TherapistsPageClient({
                 setParam("city", e.target.value);
               }}
               placeholder="City or area…"
-              className="w-full rounded-xl border border-[#e8e0d8] bg-[#FAF8F5] py-2.5 pl-9 pr-3 text-sm text-[#1a1a1a] placeholder:text-[#a1927f] focus:border-[#8B1E2D]/50 focus:outline-none focus:ring-2 focus:ring-[#8B1E2D]/20"
+              className="w-full rounded-xl border border-[#E8E8E8] bg-[#FAFAFA] py-2.5 pl-9 pr-3 text-sm text-[#111111] placeholder:text-[#8E8E8E] focus:border-[#8B1E2D]/50 focus:outline-none focus:ring-2 focus:ring-[#8B1E2D]/20"
             />
           </div>
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#a1927f]" strokeWidth={2} />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8E8E8E]" strokeWidth={2} />
             <label htmlFor="therapists-filter-specialty" className="sr-only">Filter by specialty</label>
             <input
               id="therapists-filter-specialty"
@@ -162,7 +162,7 @@ export default function TherapistsPageClient({
                 setParam("modality", e.target.value);
               }}
               placeholder="Specialty or technique…"
-              className="w-full rounded-xl border border-[#e8e0d8] bg-[#FAF8F5] py-2.5 pl-9 pr-3 text-sm text-[#1a1a1a] placeholder:text-[#a1927f] focus:border-[#8B1E2D]/50 focus:outline-none focus:ring-2 focus:ring-[#8B1E2D]/20"
+              className="w-full rounded-xl border border-[#E8E8E8] bg-[#FAFAFA] py-2.5 pl-9 pr-3 text-sm text-[#111111] placeholder:text-[#8E8E8E] focus:border-[#8B1E2D]/50 focus:outline-none focus:ring-2 focus:ring-[#8B1E2D]/20"
             />
           </div>
         </div>
@@ -171,7 +171,7 @@ export default function TherapistsPageClient({
       {/* ── Result count + reset ─────────────────────────────────────────── */}
       <div className="mt-5 flex items-center justify-between gap-4">
         <p className="text-sm text-[#5a5147]" aria-live="polite">
-          <span className="font-semibold text-[#1a1a1a]">{total}</span>
+          <span className="font-semibold text-[#111111]">{total}</span>
           {" "}public {total === 1 ? "listing" : "listings"}
           {city ? <> near <span className="font-medium text-[#8B1E2D]">{city}</span></> : ""}
         </p>
@@ -195,9 +195,9 @@ export default function TherapistsPageClient({
           ))}
         </div>
       ) : (
-        <div className="mt-6 rounded-3xl border border-dashed border-[#e8e0d8] px-6 py-12 text-center">
+        <div className="mt-6 rounded-3xl border border-dashed border-[#E8E8E8] px-6 py-12 text-center">
           <MapPin className="mx-auto mb-3 h-8 w-8 text-[#8B1E2D]/40" strokeWidth={1.5} />
-          <h2 className="text-lg font-semibold text-[#1a1a1a]">No listings matched this view.</h2>
+          <h2 className="text-lg font-semibold text-[#111111]">No listings matched this view.</h2>
           <p className="mt-2 text-sm leading-6 text-[#5a5147]">
             Clear the filters to return to the full directory or try a broader city or specialty.
           </p>
@@ -220,7 +220,7 @@ export default function TherapistsPageClient({
             disabled={page <= 1}
             aria-label="Go to previous directory page"
             onClick={() => setParam("page", String(Math.max(1, page - 1)))}
-            className="rounded-xl border border-[#e8e0d8] bg-white px-4 py-2 text-sm font-semibold text-[#1a1a1a] shadow-sm disabled:opacity-40 hover:border-[#8B1E2D]/40"
+            className="rounded-xl border border-[#E8E8E8] bg-white px-4 py-2 text-sm font-semibold text-[#111111] shadow-sm disabled:opacity-40 hover:border-[#8B1E2D]/40"
           >
             Prev
           </button>
@@ -232,7 +232,7 @@ export default function TherapistsPageClient({
             disabled={page >= totalPages}
             aria-label="Go to next directory page"
             onClick={() => setParam("page", String(Math.min(totalPages, page + 1)))}
-            className="rounded-xl border border-[#e8e0d8] bg-white px-4 py-2 text-sm font-semibold text-[#1a1a1a] shadow-sm disabled:opacity-40 hover:border-[#8B1E2D]/40"
+            className="rounded-xl border border-[#E8E8E8] bg-white px-4 py-2 text-sm font-semibold text-[#111111] shadow-sm disabled:opacity-40 hover:border-[#8B1E2D]/40"
           >
             Next
           </button>

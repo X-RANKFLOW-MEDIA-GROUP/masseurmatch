@@ -93,7 +93,7 @@ export function IntroVideoSplash() {
     <div
       role="dialog"
       aria-label="Welcome to MasseurMatch"
-      className="fixed inset-0 z-[100000] flex items-center justify-center bg-[#1A1A1A]"
+      className="fixed inset-0 z-[100000] flex items-center justify-center bg-[#111111]"
     >
       <video
         ref={videoRef}

@@ -33,7 +33,7 @@ export function VoxStickyContact({
         {whatsappHref && (
           <a
             href={whatsappHref}
-            className="flex h-12 items-center justify-center gap-2 rounded-full bg-[#1A1A1A] px-5 font-semibold text-white"
+            className="flex h-12 items-center justify-center gap-2 rounded-full bg-[#111111] px-5 font-semibold text-white"
             aria-label={`WhatsApp ${name}`}
           >
             <MessageCircle className="h-4 w-4" strokeWidth={2.5} />

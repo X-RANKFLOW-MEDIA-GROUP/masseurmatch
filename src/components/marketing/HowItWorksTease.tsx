@@ -35,7 +35,7 @@ export function HowItWorksTease() {
               <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">
                 How it works
               </p>
-              <h2 className="mt-2 font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold leading-tight tracking-tight text-[#1A1A1A]">
+              <h2 className="mt-2 font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold leading-tight tracking-tight text-[#111111]">
                 Find your therapist in three steps.
               </h2>
             </div>
@@ -60,10 +60,10 @@ export function HowItWorksTease() {
                   </div>
                   <span className="font-display text-4xl font-extrabold text-[#E8E6E1]">{n}</span>
                 </div>
-                <h3 className="font-display text-[1.05rem] font-bold leading-snug text-[#1A1A1A]">
+                <h3 className="font-display text-[1.05rem] font-bold leading-snug text-[#111111]">
                   {title}
                 </h3>
-                <p className="mt-2 text-sm leading-6 text-[#666666]">{body}</p>
+                <p className="mt-2 text-sm leading-6 text-[#6F6F6F]">{body}</p>
               </div>
             </FadeUp>
           ))}

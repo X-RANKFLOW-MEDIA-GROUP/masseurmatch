@@ -248,7 +248,7 @@ export default function ModerationPolicyPage() {
             </h2>
             <div
               style={{
-                border: "1px solid rgba(26,26,26,0.1)",
+                border: "1px solid rgba(17,17,17,0.1)",
                 borderRadius: 14,
                 overflow: "hidden",
                 fontFamily: "system-ui, sans-serif",
@@ -261,8 +261,8 @@ export default function ModerationPolicyPage() {
                     display: "flex",
                     justifyContent: "space-between",
                     padding: "13px 20px",
-                    background: i % 2 === 0 ? "#fff" : "rgba(26,26,26,0.02)",
-                    borderBottom: i < slaRows.length - 1 ? "1px solid rgba(26,26,26,0.06)" : "none",
+                    background: i % 2 === 0 ? "#fff" : "rgba(17,17,17,0.02)",
+                    borderBottom: i < slaRows.length - 1 ? "1px solid rgba(17,17,17,0.06)" : "none",
                     fontSize: 14,
                   }}
                 >

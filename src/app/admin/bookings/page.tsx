@@ -110,7 +110,7 @@ export default function AdminBookingsPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#1A1A1A] p-6">
+    <div className="min-h-screen bg-[#111111] p-6">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#8B1E2D]">Admin</p>

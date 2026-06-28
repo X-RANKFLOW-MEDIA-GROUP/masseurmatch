@@ -81,7 +81,7 @@ export default function VerificationPage() {
       <main
         style={{
           background: "#FFFFFF",
-          color: "#1A1A1A",
+          color: "#111111",
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
@@ -89,7 +89,7 @@ export default function VerificationPage() {
         {/* Header */}
         <section
           style={{
-            background: "#1A1A1A",
+            background: "#111111",
             color: "#FFFFFF",
             padding: "clamp(56px, 8vw, 80px) 20px clamp(48px, 7vw, 72px)",
           }}
@@ -178,7 +178,7 @@ export default function VerificationPage() {
                     gap: 20,
                     marginBottom: 28,
                     paddingBottom: 28,
-                    borderBottom: i < steps.length - 1 ? "1px solid rgba(26,26,26,0.08)" : "none",
+                    borderBottom: i < steps.length - 1 ? "1px solid rgba(17,17,17,0.08)" : "none",
                   }}
                 >
                   <div
@@ -206,7 +206,7 @@ export default function VerificationPage() {
                         fontWeight: 600,
                         fontFamily: "system-ui, sans-serif",
                         marginBottom: 6,
-                        color: "#1A1A1A",
+                        color: "#111111",
                       }}
                     >
                       {i + 1}. {step.title}
@@ -293,7 +293,7 @@ export default function VerificationPage() {
               }}
             >
               We use{" "}
-              <span style={{ fontWeight: 600, color: "#1A1A1A" }}>Stripe Identity</span>{" "}
+              <span style={{ fontWeight: 600, color: "#111111" }}>Stripe Identity</span>{" "}
               for all document and biometric verification. Stripe is a PCI-certified
               payments infrastructure company trusted by millions of businesses.
               MasseurMatch does not store raw government ID images — they are processed
@@ -304,7 +304,7 @@ export default function VerificationPage() {
           {/* Report concern */}
           <section
             style={{
-              background: "#1A1A1A",
+              background: "#111111",
               color: "#FFFFFF",
               borderRadius: 16,
               padding: "28px 28px",

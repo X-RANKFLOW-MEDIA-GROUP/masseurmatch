@@ -31,7 +31,7 @@ export default function AboutContent() {
   const reduced = useReducedMotion();
 
   return (
-    <div className="bg-[#060E1A] text-white">
+    <div className="bg-[#111111] text-white">
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden px-4 pb-24 pt-28 sm:px-6 lg:pb-32 lg:pt-36">

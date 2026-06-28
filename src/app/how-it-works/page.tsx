@@ -171,10 +171,10 @@ export default function HowItWorksPage() {
       ])} />
       <JsonLd data={buildFaqJsonLd(FAQ_ITEMS)} />
 
-      <main className="bg-white text-[#1A1A1A]">
+      <main className="bg-white text-[#111111]">
 
         {/* ── Hero ─────────────────────────────────────────────────────────── */}
-        <section className="relative overflow-hidden bg-[#060E1A]">
+        <section className="relative overflow-hidden bg-[#111111]">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0"
@@ -229,7 +229,7 @@ export default function HowItWorksPage() {
         <section className="px-4 py-20 sm:px-6 lg:py-28">
           <div className="mx-auto max-w-[1100px]">
             <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">For clients</p>
-            <h2 className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold leading-tight tracking-tight text-[#1A1A1A]">
+            <h2 className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold leading-tight tracking-tight text-[#111111]">
               Connect directly in four steps.
             </h2>
 
@@ -242,8 +242,8 @@ export default function HowItWorksPage() {
                     </div>
                     <span className="font-display text-4xl font-extrabold text-[#F0F0F0]">{n}</span>
                   </div>
-                  <h3 className="font-display text-lg font-bold text-[#1A1A1A]">{title}</h3>
-                  <p className="mt-2 flex-1 text-sm leading-6 text-[#666666]">{body}</p>
+                  <h3 className="font-display text-lg font-bold text-[#111111]">{title}</h3>
+                  <p className="mt-2 flex-1 text-sm leading-6 text-[#6F6F6F]">{body}</p>
                   <span className="mt-5 inline-block rounded-full bg-[#8B1E2D]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#8B1E2D]">
                     {badge}
                   </span>
@@ -254,7 +254,7 @@ export default function HowItWorksPage() {
         </section>
 
         {/* ── Comparison table ─────────────────────────────────────────────── */}
-        <section className="bg-[#060E1A] px-4 py-20 sm:px-6 lg:py-28">
+        <section className="bg-[#111111] px-4 py-20 sm:px-6 lg:py-28">
           <div className="mx-auto max-w-[1000px]">
             <p className="text-center font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">
               The difference
@@ -304,7 +304,7 @@ export default function HowItWorksPage() {
         <section id="for-therapists" className="scroll-mt-20 px-4 py-20 sm:px-6 lg:py-28">
           <div className="mx-auto max-w-[1100px]">
             <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">For therapists</p>
-            <h2 className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold leading-tight tracking-tight text-[#1A1A1A]">
+            <h2 className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold leading-tight tracking-tight text-[#111111]">
               Get your practice listed.
             </h2>
 
@@ -313,8 +313,8 @@ export default function HowItWorksPage() {
                 <div key={n} className="flex gap-6 bg-white p-8">
                   <span className="font-display text-3xl font-extrabold text-[#EBEBEB]">{n}</span>
                   <div>
-                    <h3 className="font-display text-lg font-bold text-[#1A1A1A]">{title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-[#666666]">{body}</p>
+                    <h3 className="font-display text-lg font-bold text-[#111111]">{title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-[#6F6F6F]">{body}</p>
                   </div>
                 </div>
               ))}
@@ -335,18 +335,18 @@ export default function HowItWorksPage() {
         {/* ── FAQ ─────────────────────────────────────────────────────────── */}
         <section className="border-t border-[#F0F0F0] px-4 py-20 sm:px-6">
           <div className="mx-auto max-w-[720px]">
-            <h2 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-extrabold tracking-tight text-[#1A1A1A]">
+            <h2 className="font-display text-[clamp(1.5rem,2.5vw,2.25rem)] font-extrabold tracking-tight text-[#111111]">
               Quick answers.
             </h2>
             <dl className="mt-8 divide-y divide-[#F0F0F0]">
               {FAQ_ITEMS.map(({ question, answer }) => (
                 <div key={question} className="py-6">
-                  <dt className="font-display text-base font-bold text-[#1A1A1A]">{question}</dt>
-                  <dd className="mt-2 text-sm leading-6 text-[#666666]">{answer}</dd>
+                  <dt className="font-display text-base font-bold text-[#111111]">{question}</dt>
+                  <dd className="mt-2 text-sm leading-6 text-[#6F6F6F]">{answer}</dd>
                 </div>
               ))}
             </dl>
-            <p className="mt-8 text-sm text-[#999999]">
+            <p className="mt-8 text-sm text-[#8E8E8E]">
               More questions?{" "}
               <Link href="/contact" className="font-semibold text-[#8B1E2D] hover:underline">
                 Contact us
@@ -356,7 +356,7 @@ export default function HowItWorksPage() {
         </section>
 
         {/* ── CTA ─────────────────────────────────────────────────────────── */}
-        <section className="relative overflow-hidden bg-[#060E1A] px-4 py-20 text-center sm:px-6">
+        <section className="relative overflow-hidden bg-[#111111] px-4 py-20 text-center sm:px-6">
           <div aria-hidden="true" className="pointer-events-none absolute inset-0">
             <div className="absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 rounded-full bg-[#8B1E2D]/[0.08] blur-3xl" />
           </div>

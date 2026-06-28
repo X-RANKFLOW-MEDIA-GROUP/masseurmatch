@@ -119,7 +119,7 @@ export default function CookiePolicyPage() {
                 fontWeight: 400,
                 marginBottom: 12,
                 paddingBottom: 10,
-                borderBottom: "1px solid rgba(26,26,26,0.1)",
+                borderBottom: "1px solid rgba(17,17,17,0.1)",
                 fontFamily: "system-ui, sans-serif",
               }}
             >
@@ -147,7 +147,7 @@ export default function CookiePolicyPage() {
                 fontWeight: 400,
                 marginBottom: 20,
                 paddingBottom: 10,
-                borderBottom: "1px solid rgba(26,26,26,0.1)",
+                borderBottom: "1px solid rgba(17,17,17,0.1)",
                 fontFamily: "system-ui, sans-serif",
               }}
             >
@@ -161,7 +161,7 @@ export default function CookiePolicyPage() {
                   marginBottom: 28,
                   padding: 20,
                   background: "#fff",
-                  border: "1px solid rgba(26,26,26,0.08)",
+                  border: "1px solid rgba(17,17,17,0.08)",
                   borderRadius: 8,
                 }}
               >
@@ -185,7 +185,7 @@ export default function CookiePolicyPage() {
                       textTransform: "uppercase",
                       padding: "2px 8px",
                       borderRadius: 99,
-                      background: type.required ? "rgba(16,185,129,0.1)" : "rgba(26,26,26,0.07)",
+                      background: type.required ? "rgba(16,185,129,0.1)" : "rgba(17,17,17,0.07)",
                       color: type.required ? "#059669" : "#6B7280",
                     }}
                   >
@@ -224,7 +224,7 @@ export default function CookiePolicyPage() {
                 fontWeight: 400,
                 marginBottom: 12,
                 paddingBottom: 10,
-                borderBottom: "1px solid rgba(26,26,26,0.1)",
+                borderBottom: "1px solid rgba(17,17,17,0.1)",
                 fontFamily: "system-ui, sans-serif",
               }}
             >
@@ -252,7 +252,7 @@ export default function CookiePolicyPage() {
                 fontWeight: 400,
                 marginBottom: 12,
                 paddingBottom: 10,
-                borderBottom: "1px solid rgba(26,26,26,0.1)",
+                borderBottom: "1px solid rgba(17,17,17,0.1)",
                 fontFamily: "system-ui, sans-serif",
               }}
             >

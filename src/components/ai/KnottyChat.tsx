@@ -174,7 +174,7 @@ function ChatBubble({
 
   return (
     <div className="flex justify-start">
-      <div className="w-full max-w-[88%] space-y-3 rounded-[22px] rounded-bl-sm border border-black/[0.06] bg-[#F5F5F5] px-4 py-3.5 text-sm leading-relaxed text-[#2B3038]">
+      <div className="w-full max-w-[88%] space-y-3 rounded-[22px] rounded-bl-sm border border-black/[0.06] bg-[#F0F0F0] px-4 py-3.5 text-sm leading-relaxed text-[#2B3038]">
         <p>
           {displayed}
           {!isDone && (
@@ -320,7 +320,7 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
 
         {isTyping ? (
           <div className="flex justify-start">
-            <div className="rounded-[20px] rounded-bl-sm border border-black/[0.06] bg-[#F5F5F5] px-5 py-3.5">
+            <div className="rounded-[20px] rounded-bl-sm border border-black/[0.06] bg-[#F0F0F0] px-5 py-3.5">
               <TypingDots />
             </div>
           </div>

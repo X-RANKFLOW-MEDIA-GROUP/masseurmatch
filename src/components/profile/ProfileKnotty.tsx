@@ -149,7 +149,7 @@ export function ProfileKnotty({ facts }: { facts: KnottyProfileFacts }) {
       className="overflow-hidden rounded-[24px] border border-white/5 bg-[#101C2B]/90 shadow-2xl backdrop-blur-xl"
     >
       <div className="flex items-center gap-3 border-b border-white/5 bg-gradient-to-r from-[#8B1E2D]/10 to-transparent px-7 py-5">
-        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#8B1E2D] to-[#6E1521] text-[#1A1A1A]">
+        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#8B1E2D] to-[#6E1521] text-[#111111]">
           <Sparkles className="h-5 w-5" strokeWidth={2.25} />
         </span>
         <div>
@@ -219,7 +219,7 @@ export function ProfileKnotty({ facts }: { facts: KnottyProfileFacts }) {
             onClick={() => send(input)}
             disabled={!input.trim()}
             aria-label="Send question"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#8B1E2D] text-[#1A1A1A] transition hover:bg-[#6E1521] disabled:opacity-40"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#8B1E2D] text-[#111111] transition hover:bg-[#6E1521] disabled:opacity-40"
           >
             <Send className="h-4 w-4" strokeWidth={2.5} />
           </button>

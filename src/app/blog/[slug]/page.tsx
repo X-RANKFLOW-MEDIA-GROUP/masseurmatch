@@ -136,11 +136,11 @@ function Section({ section }: { section: BlogSection }) {
         style={{
           fontSize: "clamp(20px, 2.5vw, 26px)",
           fontWeight: 400,
-          color: "#1A1A1A",
+          color: "#111111",
           marginTop: 48,
           marginBottom: 18,
           paddingBottom: 12,
-          borderBottom: "1px solid rgba(26,26,26,0.08)",
+          borderBottom: "1px solid rgba(17,17,17,0.08)",
           fontFamily: serif,
         }}
       >
@@ -155,7 +155,7 @@ function Section({ section }: { section: BlogSection }) {
         style={{
           fontSize: 18,
           fontWeight: 400,
-          color: "#1A1A1A",
+          color: "#111111",
           marginTop: 32,
           marginBottom: 14,
           fontFamily: serif,
@@ -273,7 +273,7 @@ function Section({ section }: { section: BlogSection }) {
         style={{
           margin: "32px 0",
           padding: "24px 28px",
-          background: "#1A1A1A",
+          background: "#111111",
           color: "#FFFFFF",
           borderLeft: "3px solid #8B1E2D",
         }}
@@ -330,13 +330,13 @@ export default async function BlogPostPage({
       <main
         style={{
           background: "#FFFFFF",
-          color: "#1A1A1A",
+          color: "#111111",
           fontFamily: "'Georgia', serif",
         }}
       >
         <nav
           aria-label="Breadcrumb"
-          style={{ background: "#1A1A1A", padding: "14px 24px 0" }}
+          style={{ background: "#111111", padding: "14px 24px 0" }}
         >
           <div
             style={{
@@ -371,7 +371,7 @@ export default async function BlogPostPage({
           </div>
         </nav>
 
-        <header style={{ background: "#1A1A1A", color: "#FFFFFF", padding: "48px 24px 72px" }}>
+        <header style={{ background: "#111111", color: "#FFFFFF", padding: "48px 24px 72px" }}>
           <div style={{ maxWidth: 1060, margin: "0 auto" }}>
             <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 24 }}>
               <span
@@ -487,7 +487,7 @@ export default async function BlogPostPage({
               style={{
                 marginTop: 56,
                 paddingTop: 28,
-                borderTop: "1px solid rgba(26,26,26,0.1)",
+                borderTop: "1px solid rgba(17,17,17,0.1)",
                 display: "flex",
                 gap: 8,
                 flexWrap: "wrap",
@@ -539,7 +539,7 @@ export default async function BlogPostPage({
                   width: 44,
                   height: 44,
                   borderRadius: "50%",
-                  background: "#1A1A1A",
+                  background: "#111111",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -556,7 +556,7 @@ export default async function BlogPostPage({
                     fontSize: 14,
                     fontWeight: 600,
                     fontFamily: "system-ui, sans-serif",
-                    color: "#1A1A1A",
+                    color: "#111111",
                     marginBottom: 4,
                   }}
                 >
@@ -592,7 +592,7 @@ export default async function BlogPostPage({
           <aside style={{ position: "sticky", top: 100 }}>
             <div
               style={{
-                background: "#1A1A1A",
+                background: "#111111",
                 color: "#FFFFFF",
                 padding: "32px 28px",
                 marginBottom: 24,
@@ -632,7 +632,7 @@ export default async function BlogPostPage({
                   textTransform: "uppercase",
                   fontFamily: "system-ui, sans-serif",
                   background: "#8B1E2D",
-                  color: "#1A1A1A",
+                  color: "#111111",
                   textDecoration: "none",
                   fontWeight: 700,
                 }}
@@ -665,7 +665,7 @@ export default async function BlogPostPage({
                         background: "#fff",
                         padding: "20px",
                         textDecoration: "none",
-                        color: "#1A1A1A",
+                        color: "#111111",
                       }}
                     >
                       <span
@@ -753,7 +753,7 @@ export default async function BlogPostPage({
                   textTransform: "uppercase",
                   fontFamily: "system-ui, sans-serif",
                   background: "#8B1E2D",
-                  color: "#1A1A1A",
+                  color: "#111111",
                   border: "none",
                   cursor: "pointer",
                   fontWeight: 700,
@@ -767,7 +767,7 @@ export default async function BlogPostPage({
 
         <div
           style={{
-            borderTop: "1px solid rgba(26,26,26,0.08)",
+            borderTop: "1px solid rgba(17,17,17,0.08)",
             padding: "32px 24px",
             textAlign: "center",
           }}

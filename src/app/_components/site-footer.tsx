@@ -19,7 +19,7 @@ export function SiteFooter() {
   }
 
   return (
-    <footer className="bg-[#1A1A1A] text-gray-400 pt-16 pb-8">
+    <footer className="bg-[#111111] text-gray-400 pt-16 pb-8">
       <div className="container mx-auto px-4 md:px-6 max-w-7xl">
 
         <div className="flex flex-col md:flex-row items-start justify-between gap-10 mb-12">

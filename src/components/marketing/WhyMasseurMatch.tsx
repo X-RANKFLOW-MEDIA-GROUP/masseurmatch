@@ -26,7 +26,7 @@ const PLATFORM_FEATURES = [
 
 export function WhyMasseurMatch() {
   return (
-    <section className="bg-[#060E1A] py-16 lg:py-24">
+    <section className="bg-[#111111] py-16 lg:py-24">
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
 
         <FadeUp>

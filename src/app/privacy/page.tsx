@@ -162,14 +162,14 @@ export default function PrivacyPage() {
       <main
         style={{
           background: "#FFFFFF",
-          color: "#1A1A1A",
+          color: "#111111",
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
       >
         <section
           style={{
-            background: "#1A1A1A",
+            background: "#111111",
             color: "#FFFFFF",
             padding: "80px 24px 72px",
           }}
@@ -286,7 +286,7 @@ export default function PrivacyPage() {
                     fontWeight: 400,
                     marginBottom: 16,
                     paddingBottom: 12,
-                    borderBottom: "1px solid rgba(26,26,26,0.1)",
+                    borderBottom: "1px solid rgba(17,17,17,0.1)",
                   }}
                 >
                   {section.title}

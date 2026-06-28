@@ -129,7 +129,7 @@ export default function HomeTestPage() {
             <div className="lg:col-span-1">
               <div
                 className="w-full aspect-square rounded-2xl overflow-hidden shadow-lg flex items-center justify-center text-8xl"
-                style={{ backgroundColor: "#999999" }}
+                style={{ backgroundColor: "#8E8E8E" }}
               >
                 👨‍💼
               </div>
@@ -159,7 +159,7 @@ export default function HomeTestPage() {
                     borderColor: "#D0D0D0",
                   }}
                 >
-                  <Search className="w-5 h-5" strokeWidth={2.25} style={{ color: "#999999" }} />
+                  <Search className="w-5 h-5" strokeWidth={2.25} style={{ color: "#8E8E8E" }} />
                   <input
                     type="text"
                     placeholder="Search by string"
@@ -252,7 +252,7 @@ export default function HomeTestPage() {
                   />
                   <span
                     className="text-sm font-bold"
-                    style={{ color: "#333333" }}
+                    style={{ color: "#444444" }}
                   >
                     {stat.label}
                   </span>
@@ -277,7 +277,7 @@ export default function HomeTestPage() {
                     >
                       {stat.value}
                     </div>
-                    <div className="text-xs" style={{ color: "#999999" }}>
+                    <div className="text-xs" style={{ color: "#8E8E8E" }}>
                       {stat.label}
                     </div>
                   </div>
@@ -293,7 +293,7 @@ export default function HomeTestPage() {
         <div className="mx-auto max-w-7xl">
           <p
             className="font-mono text-[10px] uppercase tracking-[0.18em] text-center mb-4"
-            style={{ color: "#999999" }}
+            style={{ color: "#8E8E8E" }}
           >
             premium benefits
           </p>
@@ -349,7 +349,7 @@ export default function HomeTestPage() {
                 {/* Outer gray circle */}
                 <div
                   className="absolute inset-0 rounded-full border-8"
-                  style={{ borderColor: "#999999" }}
+                  style={{ borderColor: "#8E8E8E" }}
                 ></div>
 
                 {/* Burgundy accent arcs */}
@@ -439,7 +439,7 @@ export default function HomeTestPage() {
               >
                 Verified Therapists
               </h4>
-              <p className="text-xs text-center mt-2" style={{ color: "#999999" }}>
+              <p className="text-xs text-center mt-2" style={{ color: "#8E8E8E" }}>
                 All profiles reviewed and confirmed
               </p>
             </div>
@@ -467,7 +467,7 @@ export default function HomeTestPage() {
               >
                 Professional Care
               </h4>
-              <p className="text-xs text-center mt-2" style={{ color: "#999999" }}>
+              <p className="text-xs text-center mt-2" style={{ color: "#8E8E8E" }}>
                 Licensed and certified experts
               </p>
             </div>
@@ -495,7 +495,7 @@ export default function HomeTestPage() {
               >
                 LGBTQ+ Affirming
               </h4>
-              <p className="text-xs text-center mt-2" style={{ color: "#999999" }}>
+              <p className="text-xs text-center mt-2" style={{ color: "#8E8E8E" }}>
                 Safe, welcoming, and inclusive space
               </p>
             </div>
@@ -523,7 +523,7 @@ export default function HomeTestPage() {
               >
                 Top Rated
               </h4>
-              <p className="text-xs text-center mt-2" style={{ color: "#999999" }}>
+              <p className="text-xs text-center mt-2" style={{ color: "#8E8E8E" }}>
                 Premium therapists with high ratings
               </p>
             </div>
@@ -532,13 +532,13 @@ export default function HomeTestPage() {
       </section>
 
       {/* ─── DARK FOOTER SECTION ──────────────────────────────────────── */}
-      <section className="px-4 py-8 sm:px-6 lg:px-8 text-white text-center" style={{ backgroundColor: "#333333" }}>
+      <section className="px-4 py-8 sm:px-6 lg:px-8 text-white text-center" style={{ backgroundColor: "#111111" }}>
         <div className="mx-auto max-w-7xl">
           <h3 className="text-lg font-black mb-2 tracking-tight">MASSEURMATCH</h3>
           <p className="text-xs mb-4" style={{ color: "#CCCCCC" }}>
             © masseurmatch.com • masseurmatch@masseurmatch.com
           </p>
-          <p className="text-xs" style={{ color: "#999999" }}>
+          <p className="text-xs" style={{ color: "#8E8E8E" }}>
             ☎️ (000) 255-0775
           </p>
         </div>

@@ -159,7 +159,7 @@ export default async function TourPage({
                   display: "flex",
                   alignItems: "center",
                   gap: 12,
-                  border: "1px solid rgba(26,26,26,0.1)",
+                  border: "1px solid rgba(17,17,17,0.1)",
                   borderRadius: 12,
                   padding: "12px 16px",
                   background: "#fff",
@@ -213,7 +213,7 @@ export default async function TourPage({
                 <span
                   key={cat}
                   style={{
-                    border: "1px solid rgba(26,26,26,0.12)",
+                    border: "1px solid rgba(17,17,17,0.12)",
                     borderRadius: 99,
                     padding: "4px 12px",
                     fontSize: 13,
@@ -255,7 +255,7 @@ export default async function TourPage({
               gap: 6,
               background: "transparent",
               color: "#374151",
-              border: "1px solid rgba(26,26,26,0.15)",
+              border: "1px solid rgba(17,17,17,0.15)",
               borderRadius: 99,
               padding: "12px 22px",
               fontSize: 14,

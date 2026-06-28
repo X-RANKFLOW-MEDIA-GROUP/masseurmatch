@@ -2,7 +2,7 @@
 :root {
   --navy:   #111111;
   --navy2:  #1F1F1F;
-  --navy3:  #333333;
+  --navy3:  #2B2B2B;
   --orange: #8B1E2D;
   --orange2:#6E1521;
   --blue:   #8B1E2D;
@@ -135,7 +135,7 @@
     --color-action-primary-hover-rgb: 110 21 33;
     --color-action-secondary: #111111;
     --color-action-secondary-rgb: 17 17 17;
-    --color-action-secondary-hover: #333333;
+    --color-action-secondary-hover: #2B2B2B;
     --color-action-secondary-hover-rgb: 51 51 51;
 
     /* Feedback */
@@ -147,7 +147,7 @@
     --color-feedback-warning-rgb: 249 115 22;
 
     /* Gradients */
-    --gradient-brand: linear-gradient(135deg, #111111 0%, #333333 38%, #8B1E2D 100%);
+    --gradient-brand: linear-gradient(135deg, #111111 0%, #2B2B2B 38%, #8B1E2D 100%);
     --gradient-surface: linear-gradient(180deg, rgb(255 255 255 / 0.98), rgb(247 247 247 / 0.92));
     --gradient-warm: linear-gradient(135deg, #8B1E2D, #A52538);
 
@@ -317,7 +317,7 @@
 
 @layer utilities {
   .bg-grid-navy {
-    background-color: #1A1A1A;
+    background-color: #111111;
     background-image:
       linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
@@ -513,7 +513,7 @@
   .explore-map-cluster {
     width: 46px;
     height: 46px;
-    background: linear-gradient(180deg, #1A1A1A, #333333);
+    background: linear-gradient(180deg, #111111, #2B2B2B);
     color: white;
     font-size: 0.8rem;
     font-weight: 700;
@@ -807,7 +807,7 @@
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, #1A1A1A, #8B1E2D);
+    background: linear-gradient(135deg, #111111, #8B1E2D);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -1132,7 +1132,7 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #999999;
+  background: #8E8E8E;
 }
 
 .cursor-glow {

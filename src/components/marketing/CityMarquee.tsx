@@ -16,7 +16,7 @@ const TOP_CITIES = [
 
 export function CityMarquee() {
   return (
-    <div className="border-t border-white/[0.06] bg-[#060E1A] px-4 py-4 sm:px-8">
+    <div className="border-t border-white/[0.06] bg-[#111111] px-4 py-4 sm:px-8">
       <div className="mx-auto flex max-w-[1500px] flex-wrap items-center gap-x-1 gap-y-1">
         <span className="flex items-center gap-1.5 pr-3 font-mono text-[9px] uppercase tracking-[0.2em] text-white/60 sm:text-[10px]">
           <MapPin size={10} className="text-[#8B1E2D]" />

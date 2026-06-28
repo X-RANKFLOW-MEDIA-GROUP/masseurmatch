@@ -205,11 +205,11 @@ export function ProfileAIChat({ profile }: Props) {
               boxShadow: [
                 "0 0 0 1px rgba(139,30,45,0.12)",         /* brand ring */
                 "0 4px 0 -1px rgba(255,255,255,0.9)",      /* top-face highlight */
-                "0 8px 24px rgba(26,26,26,0.10)",          /* mid shadow */
-                "0 24px 56px rgba(26,26,26,0.16)",         /* depth shadow */
-                "0 48px 96px rgba(26,26,26,0.10)",         /* ambient */
+                "0 8px 24px rgba(17,17,17,0.10)",          /* mid shadow */
+                "0 24px 56px rgba(17,17,17,0.16)",         /* depth shadow */
+                "0 48px 96px rgba(17,17,17,0.10)",         /* ambient */
                 "inset 0 1px 0 rgba(255,255,255,1)",       /* inner top-edge */
-                "inset 0 -1px 0 rgba(26,26,26,0.06)",      /* inner bottom-edge */
+                "inset 0 -1px 0 rgba(17,17,17,0.06)",      /* inner bottom-edge */
               ].join(", "),
               /* subtle 3-D tilt — feels like a physical card */
               perspective: "1200px",
@@ -222,7 +222,7 @@ export function ProfileAIChat({ profile }: Props) {
               className="flex shrink-0 items-center justify-between px-5 py-4"
               style={{
                 background: "linear-gradient(135deg, rgba(139,30,45,0.12) 0%, rgba(255,100,0,0.06) 100%)",
-                borderBottom: "1px solid rgba(26,26,26,0.06)",
+                borderBottom: "1px solid rgba(17,17,17,0.06)",
               }}
             >
               <div className="flex items-center gap-3">
@@ -255,7 +255,7 @@ export function ProfileAIChat({ profile }: Props) {
                   setIsOpen(false);
                 }}
                 className="flex h-8 w-8 items-center justify-center rounded-full transition"
-                style={{ background: "rgba(26,26,26,0.06)" }}
+                style={{ background: "rgba(17,17,17,0.06)" }}
                 aria-label="Close chat"
               >
                 <X className="h-4 w-4 text-slate-500" strokeWidth={2} />
@@ -268,7 +268,7 @@ export function ProfileAIChat({ profile }: Props) {
               className="flex-1 space-y-3 overflow-y-auto px-4 py-4"
               style={{
                 scrollbarWidth: "thin",
-                scrollbarColor: "rgba(26,26,26,0.1) transparent",
+                scrollbarColor: "rgba(17,17,17,0.1) transparent",
               }}
             >
               {messages.map((msg) => (
@@ -286,9 +286,9 @@ export function ProfileAIChat({ profile }: Props) {
                     msg.role === "ai"
                       ? {
                           background: "rgba(255,255,255,0.9)",
-                          border: "1px solid rgba(26,26,26,0.07)",
+                          border: "1px solid rgba(17,17,17,0.07)",
                           color: "#1e293b",
-                          boxShadow: "0 2px 8px rgba(26,26,26,0.06), inset 0 1px 0 rgba(255,255,255,0.8)",
+                          boxShadow: "0 2px 8px rgba(17,17,17,0.06), inset 0 1px 0 rgba(255,255,255,0.8)",
                         }
                       : {
                           background: "linear-gradient(135deg, #8B1E2D 0%, #6E1521 100%)",
@@ -309,8 +309,8 @@ export function ProfileAIChat({ profile }: Props) {
                   className="mr-auto flex max-w-[85%] items-center gap-2.5 rounded-[18px] px-4 py-3"
                   style={{
                     background: "rgba(255,255,255,0.9)",
-                    border: "1px solid rgba(26,26,26,0.07)",
-                    boxShadow: "0 2px 8px rgba(26,26,26,0.06)",
+                    border: "1px solid rgba(17,17,17,0.07)",
+                    boxShadow: "0 2px 8px rgba(17,17,17,0.06)",
                   }}
                 >
                   <Sparkles
@@ -330,9 +330,9 @@ export function ProfileAIChat({ profile }: Props) {
                   className="mr-auto max-w-[85%] whitespace-pre-line rounded-[18px] px-4 py-3 text-sm leading-relaxed"
                   style={{
                     background: "rgba(255,255,255,0.9)",
-                    border: "1px solid rgba(26,26,26,0.07)",
+                    border: "1px solid rgba(17,17,17,0.07)",
                     color: "#1e293b",
-                    boxShadow: "0 2px 8px rgba(26,26,26,0.06), inset 0 1px 0 rgba(255,255,255,0.8)",
+                    boxShadow: "0 2px 8px rgba(17,17,17,0.06), inset 0 1px 0 rgba(255,255,255,0.8)",
                   }}
                 >
                   {streamText}
@@ -358,7 +358,7 @@ export function ProfileAIChat({ profile }: Props) {
                 >
                   <p
                     className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em]"
-                    style={{ color: "rgba(26,26,26,0.35)" }}
+                    style={{ color: "rgba(17,17,17,0.35)" }}
                   >
                     Quick questions
                   </p>
@@ -385,14 +385,14 @@ export function ProfileAIChat({ profile }: Props) {
             {/* ── Input bar ── */}
             <div
               className="shrink-0 px-4 py-3"
-              style={{ borderTop: "1px solid rgba(26,26,26,0.06)", background: "rgba(255,255,255,0.6)" }}
+              style={{ borderTop: "1px solid rgba(17,17,17,0.06)", background: "rgba(255,255,255,0.6)" }}
             >
               <div
                 className="flex items-center gap-2 rounded-full px-4 py-2"
                 style={{
                   background: "rgba(255,255,255,0.95)",
-                  border: "1px solid rgba(26,26,26,0.1)",
-                  boxShadow: "0 2px 8px rgba(26,26,26,0.06), inset 0 1px 0 rgba(255,255,255,0.9)",
+                  border: "1px solid rgba(17,17,17,0.1)",
+                  boxShadow: "0 2px 8px rgba(17,17,17,0.06), inset 0 1px 0 rgba(255,255,255,0.9)",
                 }}
               >
                 <input
@@ -417,7 +417,7 @@ export function ProfileAIChat({ profile }: Props) {
                   <Send className="h-3.5 w-3.5 text-white" strokeWidth={2.25} />
                 </button>
               </div>
-              <p className="mt-1.5 text-center text-[10px]" style={{ color: "rgba(26,26,26,0.25)" }}>
+              <p className="mt-1.5 text-center text-[10px]" style={{ color: "rgba(17,17,17,0.25)" }}>
                 Powered by Knotty AI · Elite feature
               </p>
             </div>

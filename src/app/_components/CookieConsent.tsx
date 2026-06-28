@@ -39,7 +39,7 @@ export function CookieConsent() {
             <p className="mt-1.5 text-sm leading-6 text-slate-600">
               We use essential cookies for site function and optional cookies to improve the
               experience. Review our{" "}
-              <Link href="/cookie-policy" className="font-semibold text-[#1A1A1A] underline underline-offset-2 hover:text-[#8B1E2D]">
+              <Link href="/cookie-policy" className="font-semibold text-[#111111] underline underline-offset-2 hover:text-[#8B1E2D]">
                 Cookie Policy
               </Link>
               .

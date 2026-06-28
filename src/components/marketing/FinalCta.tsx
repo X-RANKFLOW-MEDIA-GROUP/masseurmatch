@@ -15,7 +15,7 @@ export function FinalCta() {
           sizes="100vw"
           aria-hidden="true"
         />
-        <div className="absolute inset-0 bg-[#1A1A1A]/85" />
+        <div className="absolute inset-0 bg-[#111111]/85" />
       </div>
 
       {/* Orange glow */}
