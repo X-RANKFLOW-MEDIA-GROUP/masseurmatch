@@ -1,14 +1,21 @@
 "use client";
 
 import React, { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "@studio-freight/lenis";
+
+const SMOOTH_SCROLL_EXCLUDED = ["/waitlist"];
 
 type SmoothScrollProps = {
   children: React.ReactNode;
 };
 
 export default function SmoothScroll({ children }: SmoothScrollProps) {
+  const pathname = usePathname();
+  const excluded = SMOOTH_SCROLL_EXCLUDED.includes(pathname ?? "");
+
   useEffect(() => {
+    if (excluded) return;
     if (typeof window === "undefined") return;
     if (window.innerWidth < 768) return; // disable on mobile
 
@@ -31,7 +38,7 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
         // ignore
       }
     };
-  }, []);
+  }, [excluded]);
 
   return <>{children}</>;
 }

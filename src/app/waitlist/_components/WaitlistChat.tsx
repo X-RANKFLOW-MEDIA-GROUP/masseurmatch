@@ -130,15 +130,36 @@ function StepProgress({ current }: { current: Step }) {
 export function WaitlistChat() {
   const [step, setStep] = useState<Step>("name");
   const [collected, setCollected] = useState<Collected>({ name: "", email: "", city: "", role: "" });
-  const [messages, setMessages] = useState<Message[]>([
-    { id: uid(), role: "assistant", content: INITIAL_MESSAGE },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [startedAt] = useState(() => Date.now());
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Scroll page to top on mount
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, []);
+
+  // Auto-start greeting after a short delay (typing then reveal)
+  useEffect(() => {
+    const greetingId = uid();
+    const t1 = setTimeout(() => {
+      setIsTyping(true);
+      setMessages([{ id: greetingId, role: "assistant", content: "", typing: true }]);
+    }, 1200);
+    const t2 = setTimeout(() => {
+      setIsTyping(false);
+      setMessages([{ id: greetingId, role: "assistant", content: INITIAL_MESSAGE, typing: false }]);
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }, 2800);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });

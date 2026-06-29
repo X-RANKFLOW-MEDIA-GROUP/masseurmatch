@@ -466,7 +466,7 @@ export default function SiteHeader() {
     router.refresh();
   }
 
-  if (isAppSection) return null;
+  if (isAppSection || pathname === "/waitlist") return null;
 
   function isItemActive(item: NavItem): boolean {
     if (item.href) return pathname === item.href;

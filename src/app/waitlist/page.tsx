@@ -25,17 +25,38 @@ export const metadata: Metadata = {
   description:
     "MasseurMatch is the modern LGBTQ+-affirming alternative to MasseurFinder and RentMasseur. Identity-verified male massage therapists, AI-powered profiles, direct contact. Join the waitlist — launching in Dallas first.",
   keywords: [
+    // Brand & alternatives
     "MasseurFinder alternative",
     "RentMasseur alternative",
+    "masseurmatch waitlist",
+    // Generic
+    "gay massage",
+    "male massage",
+    "gay masseur",
+    "massage for men",
+    "male to male massage",
+    // Near me
+    "gay massage near me",
+    "male massage near me",
+    "gay masseur near me",
+    "gay massage therapist near me",
+    // Mobile/hotel
+    "mobile gay massage near me",
+    "hotel gay massage",
+    "gay massage for travelers",
+    "outcall gay massage",
+    // Cities
+    "dallas gay massage",
+    "gay massage dallas tx",
+    "houston gay massage",
+    "gay massage houston tx",
+    "austin gay massage",
+    "gay massage austin tx",
+    // Directory
     "LGBTQ male massage therapist directory",
     "verified male massage therapist",
-    "gay massage therapist near me",
-    "male massage directory",
-    "massage therapist waitlist",
-    "masseurmatch waitlist",
-    "male massage Dallas",
-    "gay massage directory US",
     "identity verified massage therapist",
+    "gay massage directory US",
   ],
   openGraph: {
     title: "Join the MasseurMatch Waitlist — Launching Soon",
@@ -256,18 +277,18 @@ export default function WaitlistPage() {
 
         {/* ── Hero ──────────────────────────────────────────────────────────────── */}
         <section className="relative overflow-hidden bg-[#080e18] pb-16 pt-24 sm:pb-20 sm:pt-32">
-          {/* Dot grid */}
+          {/* Static dot grid — CSS only, no JS repaint */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0"
+            className="pointer-events-none absolute inset-0 opacity-[0.03]"
             style={{
-              backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px)",
+              backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)",
               backgroundSize: "28px 28px",
             }}
           />
-          {/* Glow */}
-          <div aria-hidden="true" className="pointer-events-none absolute -right-40 top-0 h-[32rem] w-[32rem] rounded-full bg-[#8B1E2D]/8 blur-3xl" />
-          <div aria-hidden="true" className="pointer-events-none absolute -left-40 bottom-0 h-[28rem] w-[28rem] rounded-full bg-[#1d3461]/15 blur-3xl" />
+          {/* Subtle edge gradients (no blur filter — cheaper than blur-3xl) */}
+          <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 h-[28rem] w-[28rem] bg-[radial-gradient(ellipse_at_top_right,rgba(139,30,45,0.12),transparent_70%)]" />
+          <div aria-hidden="true" className="pointer-events-none absolute left-0 bottom-0 h-[24rem] w-[24rem] bg-[radial-gradient(ellipse_at_bottom_left,rgba(29,52,97,0.12),transparent_70%)]" />
 
           <div className="relative mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
             {/* Left copy */}

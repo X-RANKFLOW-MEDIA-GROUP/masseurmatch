@@ -14,8 +14,8 @@ export function SiteFooter() {
     return <SiteFooterTalk />;
   }
 
-  // Admin and Pro layouts have their own chrome — hide the marketing footer
-  if (pathname?.startsWith("/admin") || pathname?.startsWith("/pro")) {
+  // Admin, Pro, and waitlist layouts have their own chrome — hide the marketing footer
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/pro") || pathname === "/waitlist") {
     return null;
   }
 
