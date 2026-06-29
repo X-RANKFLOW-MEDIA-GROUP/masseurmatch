@@ -458,16 +458,12 @@ export default function WaitlistPage() {
                 </p>
               </div>
               <div className="shrink-0">
-                <a
-                  href="#top"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
+                <Link
+                  href="/waitlist"
                   className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-bold text-[#8B1E2D] shadow-lg transition hover:bg-white/90"
                 >
                   Join the waitlist
-                </a>
+                </Link>
               </div>
             </div>
           </div>
