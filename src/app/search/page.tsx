@@ -177,11 +177,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               so the site has meaningful internal links instead of one thin results screen.
             </p>
             <div className="mt-5 flex flex-wrap gap-3 text-sm font-semibold">
-              <Link href="/blog" className="text-primary hover:underline">
-                Visit the blog
+              <Link href="/how-it-works" className="text-primary hover:underline">
+                How it works
               </Link>
               <Link href="/safety" className="text-primary hover:underline">
-                Read trust and safety
+                Trust and safety
               </Link>
             </div>
           </div>

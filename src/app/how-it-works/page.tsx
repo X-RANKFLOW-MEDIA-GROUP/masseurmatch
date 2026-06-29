@@ -100,7 +100,7 @@ const clientSteps = [
     n: "02",
     icon: IconShield,
     title: "Compare verified profiles",
-    body: "Review photos, services, pricing, trust badges, availability, reviews, and years of experience before reaching out.",
+    body: "Review photos, services, pricing, trust badges, availability, and years of experience before reaching out.",
     badge: "Trust signals",
   },
   {

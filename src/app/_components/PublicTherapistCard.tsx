@@ -133,9 +133,12 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
           <div className="absolute inset-x-2.5 top-2.5 flex items-start justify-between gap-2">
             <div className="flex flex-col items-start gap-1">
               {isDirectoryListed && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/92 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 shadow-sm backdrop-blur-sm">
+                <span
+                  title="Identity reviewed before listing. Does not confirm professional licensure."
+                  className="inline-flex items-center gap-1 rounded-full bg-white/92 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 shadow-sm backdrop-blur-sm"
+                >
                   <IconShield size={12} className="text-emerald-500" />
-                  {isElite ? "Elite" : hasIdentityVerification ? "Verified" : "Listed"}
+                  {isElite ? "Elite" : hasIdentityVerification ? "ID Verified" : "Listed"}
                 </span>
               )}
               {isNewProfile && (
