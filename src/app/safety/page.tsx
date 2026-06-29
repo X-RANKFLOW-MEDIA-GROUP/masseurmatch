@@ -39,7 +39,7 @@ const safetyTips = [
     icon: UserCheck,
     title: "Review the profile before you reach out",
     description:
-      "Use the public listing to check specialties, rates, session format, reviews, and any visible verification signals before first contact.",
+      "Use the public listing to check specialties, rates, session format, and any visible verification signals before first contact.",
   },
   {
     icon: Phone,

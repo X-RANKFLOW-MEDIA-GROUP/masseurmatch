@@ -63,7 +63,7 @@ const caveats = [
   },
   {
     label: "Does NOT guarantee service quality",
-    detail: "Identity verification is not an endorsement or recommendation. Client reviews and direct communication remain the best way to assess fit.",
+    detail: "Identity verification is not an endorsement or recommendation. Direct communication with the therapist remains the best way to assess fit.",
   },
   {
     label: "Based on a point-in-time check",

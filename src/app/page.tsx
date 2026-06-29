@@ -81,7 +81,7 @@ const HOME_FAQ = [
   {
     question: "How do I know if a therapist is verified on MasseurMatch?",
     answer:
-      "Verified therapists display trust signals on their profiles: identity verification badges, review counts, availability status, years of experience, and professional credentials. Elite tier therapists have enhanced verification and premium features.",
+      "Verified therapists display trust signals on their profiles: identity verification badges, availability status, years of experience, and professional credentials. Elite tier therapists have enhanced verification and premium features.",
   },
   {
     question: "Can I find outcall and incall massage options on MasseurMatch?",
