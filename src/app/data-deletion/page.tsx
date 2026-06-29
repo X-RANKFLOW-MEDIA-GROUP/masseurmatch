@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { LegalPage } from "@/app/_components/legal-page";
 import { createPageMetadata } from "@/app/_lib/seo";
@@ -18,7 +19,7 @@ export default function DataDeletionPage() {
         This policy explains how users can request deletion of their personal data from MasseurMatch, what data
         may be deleted, what data may be retained, and how we handle deletion requests. This policy should be
         read alongside our{" "}
-        <a href="/privacy">Privacy Policy</a>.
+        <Link href="/privacy">Privacy Policy</Link>.
       </p>
 
       <h2>1. Your Right to Request Deletion</h2>

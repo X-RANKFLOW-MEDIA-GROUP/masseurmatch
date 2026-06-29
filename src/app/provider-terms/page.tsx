@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { LegalPage } from "@/app/_components/legal-page";
 import { createPageMetadata } from "@/app/_lib/seo";
@@ -18,8 +19,8 @@ export default function ProviderTermsPage() {
         These Provider Terms apply to independent massage therapists, bodywork practitioners, and wellness
         providers (&quot;Providers&quot;) who create, maintain, or pay for a listing on MasseurMatch. These
         terms supplement the general{" "}
-        <a href="/terms">Terms of Service</a> and, for paid listings, the{" "}
-        <a href="/subscriptions">Paid Subscription and Add-On Terms</a>.
+        <Link href="/terms">Terms of Service</Link> and, for paid listings, the{" "}
+        <Link href="/subscriptions">Paid Subscription and Add-On Terms</Link>.
       </p>
 
       <h2>1. Independent Provider Relationship</h2>
@@ -59,7 +60,7 @@ export default function ProviderTermsPage() {
         <li>Professional and non-sexual in nature.</li>
         <li>Free of explicit nudity, erotic content, or sexually suggestive material.</li>
         <li>Free of false credentials, stolen photos, or impersonation.</li>
-        <li>Compliant with the <a href="/photo-profile-policy">Photo and Profile Content Policy</a>.</li>
+        <li>Compliant with the <Link href="/photo-profile-policy">Photo and Profile Content Policy</Link>.</li>
         <li>Kept current — Providers are responsible for updating outdated information promptly.</li>
       </ul>
 
@@ -72,7 +73,7 @@ export default function ProviderTermsPage() {
       <p>
         Providers must treat all clients and users with respect, must not engage in harassment, discrimination,
         or coercive conduct, and must comply with the{" "}
-        <a href="/prohibited-conduct">Prohibited Conduct Policy</a>.
+        <Link href="/prohibited-conduct">Prohibited Conduct Policy</Link>.
       </p>
 
       <h2>6. Provider Responsibilities</h2>
@@ -91,8 +92,8 @@ export default function ProviderTermsPage() {
         Paid subscription plans, add-ons, boost credits, and featured placements may increase display
         opportunities but do not guarantee leads, clients, bookings, income, revenue, messages, views, or any
         specific search ranking. See the{" "}
-        <a href="/subscriptions">Paid Subscription and Add-On Terms</a> and{" "}
-        <a href="/advertising-terms">Advertising and Featured Placement Terms</a> for full details.
+        <Link href="/subscriptions">Paid Subscription and Add-On Terms</Link> and{" "}
+        <Link href="/advertising-terms">Advertising and Featured Placement Terms</Link> for full details.
       </p>
 
       <h2>8. Content License</h2>
@@ -107,14 +108,14 @@ export default function ProviderTermsPage() {
         MasseurMatch may review, edit, suspend, or remove any profile or listing at any time for policy
         violations, safety concerns, or quality issues. We may suspend paid listings without refund if the
         account is in violation of platform policies. See the{" "}
-        <a href="/moderation-policy">Moderation Policy</a> for details.
+        <Link href="/moderation-policy">Moderation Policy</Link> for details.
       </p>
 
       <h2>10. Billing</h2>
       <p>
         Paid listings renew automatically unless canceled before the renewal date. Failed payments may result
         in listing suspension. Refunds are governed by the{" "}
-        <a href="/refund-policy">Refund and Cancellation Policy</a>.
+        <Link href="/refund-policy">Refund and Cancellation Policy</Link>.
       </p>
 
       <h2>11. Changes to These Terms</h2>

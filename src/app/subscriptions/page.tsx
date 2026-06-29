@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { LegalPage } from "@/app/_components/legal-page";
 import { createPageMetadata } from "@/app/_lib/seo";
@@ -18,8 +19,8 @@ export default function SubscriptionsPage() {
         These Paid Subscription and Add-On Terms govern all paid products available through MasseurMatch,
         including provider subscription plans, profile add-ons, boost credits, and featured placement tools.
         These terms supplement the general{" "}
-        <a href="/terms">Terms of Service</a> and the{" "}
-        <a href="/provider-terms">Provider Terms</a>. By purchasing any paid product, you agree to these terms.
+        <Link href="/terms">Terms of Service</Link> and the{" "}
+        <Link href="/provider-terms">Provider Terms</Link>. By purchasing any paid product, you agree to these terms.
       </p>
 
       <h2>1. What Paid Products Cover</h2>
@@ -76,7 +77,7 @@ export default function SubscriptionsPage() {
         All payments are processed by Stripe. By purchasing a paid product, you agree to Stripe&apos;s terms of
         service and payment processing policies. MasseurMatch does not store full credit card numbers. Payment
         disputes must be submitted through the process described in our{" "}
-        <a href="/refund-policy">Refund and Cancellation Policy</a>.
+        <Link href="/refund-policy">Refund and Cancellation Policy</Link>.
       </p>
 
       <h2>7. Cancellation</h2>
@@ -90,7 +91,7 @@ export default function SubscriptionsPage() {
       <h2>8. Refunds</h2>
       <p>
         Refund eligibility is governed by our{" "}
-        <a href="/refund-policy">Refund and Cancellation Policy</a>. In general, subscription fees are
+        <Link href="/refund-policy">Refund and Cancellation Policy</Link>. In general, subscription fees are
         non-refundable except as required by law or in cases of billing error. We do not issue refunds based
         solely on dissatisfaction with visibility, leads, bookings, or profile performance.
       </p>

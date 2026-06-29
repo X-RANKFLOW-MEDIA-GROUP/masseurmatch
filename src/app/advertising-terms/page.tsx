@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { LegalPage } from "@/app/_components/legal-page";
 import { createPageMetadata } from "@/app/_lib/seo";
@@ -18,8 +19,8 @@ export default function AdvertisingTermsPage() {
         These Advertising and Featured Placement Terms apply to all paid visibility products on MasseurMatch,
         including featured placements, boost credits, sponsored positions, and any other promotional placement
         tools. These terms supplement the{" "}
-        <a href="/subscriptions">Paid Subscription and Add-On Terms</a> and the general{" "}
-        <a href="/terms">Terms of Service</a>.
+        <Link href="/subscriptions">Paid Subscription and Add-On Terms</Link> and the general{" "}
+        <Link href="/terms">Terms of Service</Link>.
       </p>
 
       <h2>1. What Advertising and Placement Tools Cover</h2>
@@ -90,8 +91,8 @@ export default function AdvertisingTermsPage() {
       <h2>6. Billing and Refunds</h2>
       <p>
         Advertising and placement fees are governed by the{" "}
-        <a href="/subscriptions">Paid Subscription and Add-On Terms</a> and the{" "}
-        <a href="/refund-policy">Refund and Cancellation Policy</a>. Placement fees are generally non-refundable
+        <Link href="/subscriptions">Paid Subscription and Add-On Terms</Link> and the{" "}
+        <Link href="/refund-policy">Refund and Cancellation Policy</Link>. Placement fees are generally non-refundable
         once a placement period has begun.
       </p>
 
