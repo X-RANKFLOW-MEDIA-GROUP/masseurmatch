@@ -76,7 +76,7 @@ export function SiteFooter() {
         {/* Policy link grid */}
         <div className="mb-12 grid grid-cols-2 gap-y-8 gap-x-6 sm:grid-cols-3 lg:grid-cols-5">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-500 mb-3">Legal</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-3">Legal</p>
             <ul className="space-y-2 text-xs text-gray-400">
               <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
               <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
@@ -86,7 +86,7 @@ export function SiteFooter() {
             </ul>
           </div>
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-500 mb-3">Safety</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-3">Safety</p>
             <ul className="space-y-2 text-xs text-gray-400">
               <li><Link href="/community-guidelines" className="hover:text-white transition-colors">Community Guidelines</Link></li>
               <li><Link href="/content-guidelines" className="hover:text-white transition-colors">Content Guidelines</Link></li>
@@ -96,7 +96,7 @@ export function SiteFooter() {
             </ul>
           </div>
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-500 mb-3">Providers</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-3">Providers</p>
             <ul className="space-y-2 text-xs text-gray-400">
               <li><Link href="/provider-terms" className="hover:text-white transition-colors">Provider Terms</Link></li>
               <li><Link href="/photo-profile-policy" className="hover:text-white transition-colors">Photo &amp; Profile Policy</Link></li>
@@ -106,7 +106,7 @@ export function SiteFooter() {
             </ul>
           </div>
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-500 mb-3">Users</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-3">Users</p>
             <ul className="space-y-2 text-xs text-gray-400">
               <li><Link href="/client-terms" className="hover:text-white transition-colors">Client Terms</Link></li>
               <li><Link href="/acceptable-use" className="hover:text-white transition-colors">Acceptable Use</Link></li>
@@ -116,7 +116,7 @@ export function SiteFooter() {
             </ul>
           </div>
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-500 mb-3">Communications</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-3">Communications</p>
             <ul className="space-y-2 text-xs text-gray-400">
               <li><Link href="/sms-terms" className="hover:text-white transition-colors">SMS Terms</Link></li>
               <li><Link href="/email-opt-out" className="hover:text-white transition-colors">Email Opt-Out</Link></li>
