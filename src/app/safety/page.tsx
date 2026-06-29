@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AlertTriangle, BadgeCheck, Camera, Phone, ShieldCheck, UserCheck } from "lucide-react";
+import { AlertTriangle, Camera, Phone, UserCheck } from "lucide-react";
+
+import { IconShield } from "@/components/icons";
 import { JsonLd } from "@/app/_components/JsonLd";
 import {
   buildBreadcrumbJsonLd,
@@ -46,7 +48,7 @@ const safetyTips = [
       "Use written communication when possible so pricing, timing, directions, and expectations are easy to reference later.",
   },
   {
-    icon: ShieldCheck,
+    icon: IconShield,
     title: "Use badges as signals, not guarantees",
     description:
       "MasseurMatch helps with discovery, but you should still verify the situation independently and leave if something feels wrong.",
@@ -61,7 +63,7 @@ const safetyTips = [
 
 const badgeMeanings = [
   {
-    icon: BadgeCheck,
+    icon: IconShield,
     title: "Profile reviewed",
     description: "The listing content was reviewed for presentation quality and trust and safety fit.",
   },

@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowRight } from "lucide-react";
+import { IconArrowRight } from "@/components/icons";
 
 type Variant = "primary" | "dark" | "glass";
 
@@ -55,9 +55,9 @@ export function Cta3DButton({
       >
         {children}
         {withIcon && (
-          <ArrowRight
-            className="h-[1.15rem] w-[1.15rem] transition-transform duration-200 group-hover:translate-x-0.5"
-            strokeWidth={2.5}
+          <IconArrowRight
+            size={18}
+            className="transition-transform duration-200 group-hover:translate-x-0.5"
           />
         )}
       </span>

@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
-import { ArrowRight, CheckCircle2, Lock, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
+import { CheckCircle2, TrendingUp } from "lucide-react";
 
 import { ProviderGrowthMarketplace } from "@/app/_components/provider-growth-marketplace";
+import { IconArrowRight, IconLock, IconShield, IconSpark } from "@/components/icons";
 import { SIGNUP_PLANS } from "@/app/signup/_lib/plans";
 import { PRICE_LOCK } from "@/lib/pricing";
 import { Badge } from "@/components/ui/badge";
@@ -46,12 +47,12 @@ const strategyCards = [
     body: "Low-ticket boosts make it easy to buy fast, while mid-ticket placements capture therapists ready for a bigger demand push.",
   },
   {
-    icon: ShieldCheck,
+    icon: IconShield,
     title: "Trust converts",
     body: "Verification, reviews, and proof badges improve first-contact conversion and support higher pricing confidence.",
   },
   {
-    icon: Sparkles,
+    icon: IconSpark,
     title: "Stack for margin",
     body: "Recurring analytics and geo tools create software-style revenue, while scarce premium slots protect higher-margin inventory.",
   },
@@ -104,7 +105,7 @@ export default function PricingPage() {
               <Button asChild size="lg" variant="hero">
                 <Link href="/signup/plan">
                   Choose a plan
-                  <ArrowRight className="h-4 w-4" />
+                  <IconArrowRight size={16} />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
@@ -114,7 +115,7 @@ export default function PricingPage() {
 
             {PRICE_LOCK && (
               <p className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-xs font-semibold text-emerald-700">
-                <Lock className="h-3.5 w-3.5" strokeWidth={2.5} />
+                <IconLock size={14} />
                 Founding-member price lock — your rate never increases while subscribed
               </p>
             )}
@@ -204,7 +205,7 @@ export default function PricingPage() {
                 <Button asChild className="mt-6 w-full" variant={plan.popular ? "hero" : "outline"}>
                   <Link href={`/signup/plan?selected=${plan.tier}`}>
                     {plan.tier === "free" ? "Start free" : "Start 14-day trial"}
-                    <ArrowRight className="h-4 w-4" />
+                    <IconArrowRight size={16} />
                   </Link>
                 </Button>
               </section>
@@ -269,7 +270,7 @@ export default function PricingPage() {
                 <Button asChild size="lg" variant="premium">
                   <Link href="/signup/plan">
                     Choose your plan
-                    <ArrowRight className="h-4 w-4" />
+                    <IconArrowRight size={16} />
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="glass">

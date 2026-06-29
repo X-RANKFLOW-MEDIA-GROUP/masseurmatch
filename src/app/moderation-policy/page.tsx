@@ -1,7 +1,9 @@
 ﻿import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
-import { AlertTriangle, ArrowRight, Ban, CheckCircle2, Clock, ShieldAlert } from "lucide-react";
+import { AlertTriangle, Ban, CheckCircle2, ShieldAlert } from "lucide-react";
+
+import { IconArrowRight, IconClock } from "@/components/icons";
 
 export const metadata: Metadata = {
   title: "Moderation Policy | MasseurMatch",
@@ -50,7 +52,7 @@ const actionTypes = [
     effect: "The violating content is removed. Profile remains active if no pattern exists.",
   },
   {
-    icon: Clock,
+    icon: IconClock,
     color: "#6366F1",
     bg: "rgba(99,102,241,0.08)",
     border: "rgba(99,102,241,0.2)",
@@ -380,7 +382,7 @@ export default function ModerationPolicyPage() {
                 }}
               >
                 Report to trust@masseurmatch.com
-                <ArrowRight style={{ width: 14, height: 14 }} strokeWidth={2.5} />
+                <IconArrowRight size={14} />
               </Link>
               <Link
                 href="/trust"

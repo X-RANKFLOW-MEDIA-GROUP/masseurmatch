@@ -1,6 +1,7 @@
 "use client";
 
-import { Diamond, CheckCircle, UserCheck, Smile, MapPin, Layers, ShieldCheck, Wallet } from "lucide-react";
+import { Diamond, CheckCircle, UserCheck, Smile, Layers, Wallet } from "lucide-react";
+import { IconMapPin, IconShield } from "@/components/icons";
 import FadeUp from "@/components/motion/FadeUp";
 
 const FEATURES = [
@@ -12,9 +13,9 @@ const FEATURES = [
 
 // Honest, non-numeric value statements — no fabricated counts pre-launch.
 const STATS = [
-  { icon: MapPin, headline: "Nationwide", label: "City pages across the US" },
+  { icon: IconMapPin, headline: "Nationwide", label: "City pages across the US" },
   { icon: Layers, headline: "Specialized", label: "Deep tissue, Swedish, sports & more" },
-  { icon: ShieldCheck, headline: "Reviewed", label: "Every profile before it goes live" },
+  { icon: IconShield, headline: "Reviewed", label: "Every profile before it goes live" },
   { icon: Wallet, headline: "Transparent", label: "Direct contact, no booking fees" },
 ] as const;
 

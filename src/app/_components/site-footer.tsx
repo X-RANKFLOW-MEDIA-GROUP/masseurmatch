@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShieldCheck, ArrowUpRight, Phone, Mail } from "lucide-react";
+import { ArrowUpRight, Phone, Mail } from "lucide-react";
+import { IconShield } from "@/components/icons";
 import { SiteFooterTalk } from "@/components/marketing/SiteFooterTalk";
 
 export function SiteFooter() {
@@ -47,7 +48,7 @@ export function SiteFooter() {
               </a>
             </div>
             <div className="flex items-center gap-2 mt-4">
-              <ShieldCheck className="w-[1.1rem] h-[1.1rem] text-emerald-400" strokeWidth={2.25} />
+              <IconShield size={18} className="text-emerald-400" />
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400">
                 Verified Secure Network
               </span>

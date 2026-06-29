@@ -76,7 +76,11 @@ function buildResponse(question: string, profile: PublicTherapist, name: string)
     return `For ${name}'s cancellation policy and scheduling details, please ask them directly when you reach out — it varies by provider.`;
   }
 
-  return `Great question! For specifics about ${name}'s services, reaching out directly via the contact buttons is your best bet — they're happy to answer. Anything else I can help clarify from their profile?`;
+  if (q.includes("hello") || q.includes("hi") || q.includes("hey") || q.includes("what's up") || q.includes("sup")) {
+    return `Hey! Good to meet you. What are you curious about — ${name}'s rates, availability, what kind of massage they do? I'm here to help.`;
+  }
+
+  return `Good question! I don't have that specific detail on file, but ${name} would be happy to answer — just hit the contact buttons above. Anything else about their profile I can help with?`;
 }
 
 /* ─── component ──────────────────────────────────────────────────────────── */
@@ -92,7 +96,7 @@ export function ProfileAIChat({ profile }: Props) {
 
   const name = getPublicProfileName(profile).split(" ")[0];
 
-  const INTRO = `Hi! I'm Knotty AI — ${name}'s profile assistant. Ask me about their rates, services, availability, or anything else. What can I help you with?`;
+  const INTRO = `Hey! I'm Knotty — ${name}'s profile assistant. What would you like to know? I can help with rates, availability, specialties, or how to book.`;
 
   const QUICK_QUESTIONS = [
     `What are ${name}'s rates?`,
@@ -237,13 +241,13 @@ export function ProfileAIChat({ profile }: Props) {
                   <Bot className="h-5 w-5 text-white" strokeWidth={2} />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-900">Knotty AI</p>
+                  <p className="text-sm font-bold text-[#111111]">Knotty AI</p>
                   <div className="flex items-center gap-1.5">
                     <span
                       className="h-2 w-2 rounded-full bg-emerald-400"
                       style={{ boxShadow: "0 0 6px rgba(52,211,153,0.7)", animation: "pulse 2s infinite" }}
                     />
-                    <p className="text-[11px] font-medium text-slate-500">Answers about {name}</p>
+                    <p className="text-[11px] font-medium text-[#6F6F6F]">Answers about {name}</p>
                   </div>
                 </div>
               </div>
@@ -258,7 +262,7 @@ export function ProfileAIChat({ profile }: Props) {
                 style={{ background: "rgba(17,17,17,0.06)" }}
                 aria-label="Close chat"
               >
-                <X className="h-4 w-4 text-slate-500" strokeWidth={2} />
+                <X className="h-4 w-4 text-[#6F6F6F]" strokeWidth={2} />
               </button>
             </div>
 
@@ -287,7 +291,7 @@ export function ProfileAIChat({ profile }: Props) {
                       ? {
                           background: "rgba(255,255,255,0.9)",
                           border: "1px solid rgba(17,17,17,0.07)",
-                          color: "#1e293b",
+                          color: "#111111",
                           boxShadow: "0 2px 8px rgba(17,17,17,0.06), inset 0 1px 0 rgba(255,255,255,0.8)",
                         }
                       : {
@@ -314,11 +318,11 @@ export function ProfileAIChat({ profile }: Props) {
                   }}
                 >
                   <Sparkles
-                    className="h-3.5 w-3.5 shrink-0 text-amber-500"
+                    className="h-3.5 w-3.5 shrink-0 text-[#8B1E2D]"
                     strokeWidth={2}
                     style={{ animation: "spin 1.6s linear infinite" }}
                   />
-                  <span className="text-xs font-medium text-slate-400">Analyzing your question…</span>
+                  <span className="text-xs font-medium text-[#8E8E8E]">Analyzing your question…</span>
                 </motion.div>
               )}
 
@@ -331,7 +335,7 @@ export function ProfileAIChat({ profile }: Props) {
                   style={{
                     background: "rgba(255,255,255,0.9)",
                     border: "1px solid rgba(17,17,17,0.07)",
-                    color: "#1e293b",
+                    color: "#111111",
                     boxShadow: "0 2px 8px rgba(17,17,17,0.06), inset 0 1px 0 rgba(255,255,255,0.8)",
                   }}
                 >
@@ -371,7 +375,7 @@ export function ProfileAIChat({ profile }: Props) {
                         style={{
                           background: "rgba(139,30,45,0.08)",
                           border: "1px solid rgba(139,30,45,0.2)",
-                          color: "#b45309",
+                          color: "#8B1E2D",
                         }}
                       >
                         {q}
@@ -402,7 +406,7 @@ export function ProfileAIChat({ profile }: Props) {
                   onKeyDown={(e) => e.key === "Enter" && send(input)}
                   placeholder={`Ask about ${name}…`}
                   disabled={phase !== "idle"}
-                  className="flex-1 bg-transparent text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none disabled:opacity-50"
+                  className="flex-1 bg-transparent text-sm text-[#111111] placeholder:text-[#8E8E8E] focus:outline-none disabled:opacity-50"
                 />
                 <button
                   onClick={() => send(input)}

@@ -1,25 +1,26 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowUp, MessageCircle, Search, Sparkles } from "lucide-react";
+import { ArrowUp } from "lucide-react";
+import { IconMessage, IconSearch, IconSpark } from "@/components/icons";
 
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const FEATURES = [
   {
-    icon: Search,
+    icon: IconSearch,
     title: "Ask in plain English",
     body: "“Deep tissue in Miami this weekend, outcall under $150” — Knotty understands and finds it.",
   },
   {
-    icon: MessageCircle,
+    icon: IconMessage,
     title: "On every profile",
     body: "Each therapist has their own Knotty chat to answer questions about services, rates, and availability.",
   },
   {
-    icon: Sparkles,
+    icon: IconSpark,
     title: "Always-on guidance",
     body: "Compare specialties, cities, and session types — 24/7, with instant answers.",
   },
@@ -34,7 +35,7 @@ const SCRIPT: { role: "user" | "bot"; text: string }[] = [
     role: "bot",
     text: "Found 7 therapists in Miami offering deep-tissue outcall this weekend under $150. Top match: Marcus R. — available Saturday evenings.",
   },
-  { role: "user", text: "Who's available Sunday morning?" },
+  { role: "user", text: "Who’s available Sunday morning?" },
   { role: "bot", text: "3 of them have Sunday-morning slots. Want me to sort by distance from South Beach?" },
 ];
 
@@ -46,10 +47,10 @@ const ANSWERS: Record<string, string> = {
   "LGBTQ+ friendly in NYC":
     "Every NYC therapist here is LGBTQ+-affirming — 24 are open this week. Want me to filter by neighborhood?",
   "Incall vs outcall?":
-    "Incall = you visit the therapist's studio. Outcall = they travel to your home or hotel. Many offer both.",
+    "Incall = you visit the therapist’s studio. Outcall = they travel to your home or hotel. Many offer both.",
 };
 const FALLBACK =
-  "Great question — in the live app I'll search that instantly. Open Knotty search to try it for real ↗";
+  "Great question — in the live app I’ll search that instantly. Open Knotty search to try it for real ↗";
 
 /**
  * "Meet Knotty" — introduces the site's AI assistant with a live, interactive
@@ -159,7 +160,7 @@ export function MeetKnotty() {
           {/* ── Left: copy ─────────────────────────────────────────────── */}
           <motion.div {...reveal(0.05)}>
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
+              <IconSpark size={14} className="text-primary" />
               <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
                 Meet Knotty
               </span>
@@ -178,7 +179,7 @@ export function MeetKnotty() {
               {FEATURES.map((f) => (
                 <li key={f.title} className="flex items-start gap-3.5">
                   <span className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <f.icon className="h-5 w-5" strokeWidth={2} />
+                    <f.icon size={20} />
                   </span>
                   <div>
                     <p className="text-sm font-semibold text-foreground">{f.title}</p>
@@ -192,7 +193,7 @@ export function MeetKnotty() {
               href="/search"
               className="mt-9 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-primary px-7 font-semibold text-primary-foreground transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-primary/25"
             >
-              <Search className="h-4 w-4" />
+              <IconSearch size={16} />
               Try Knotty search
             </Link>
           </motion.div>
@@ -210,7 +211,7 @@ export function MeetKnotty() {
                 {/* Chat header — vibrant gradient */}
                 <div className="flex items-center gap-3 bg-gradient-to-r from-primary via-red-600 to-red-500 px-5 py-4">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white ring-1 ring-white/30 backdrop-blur">
-                    <Sparkles className="h-5 w-5" />
+                    <IconSpark size={20} />
                   </span>
                   <div className="flex-1">
                     <p className="text-sm font-bold text-white">Knotty</p>

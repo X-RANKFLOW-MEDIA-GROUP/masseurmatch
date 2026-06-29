@@ -1,7 +1,8 @@
 ﻿"use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle2, Mail } from "lucide-react";
+import { CheckCircle2, Mail } from "lucide-react";
+import { IconArrowRight } from "@/components/icons";
 import { useState } from "react";
 
 export function NewsletterSignup() {
@@ -21,7 +22,7 @@ export function NewsletterSignup() {
   return (
     <section className="bg-slate-950 text-white py-20 relative overflow-hidden">
       {/* Subtle luxury glow effect */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 blur-[100px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-[#8B1E2D]/10 blur-[100px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-500/10 blur-[100px] pointer-events-none" />
 
       <div className="container mx-auto px-4 md:px-6 max-w-5xl relative z-10">
@@ -69,19 +70,19 @@ export function NewsletterSignup() {
                     placeholder="e.g. Dallas, TX"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="w-full bg-slate-900/50 border border-slate-700 text-white px-4 py-3 font-sans text-sm focus:border-indigo-500 focus:outline-none transition-colors placeholder:text-slate-600"
+                    className="w-full bg-slate-900/50 border border-slate-700 text-white px-4 py-3 font-sans text-sm focus:border-[#8B1E2D] focus:outline-none transition-colors placeholder:text-slate-600"
                   />
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="email" className="font-mono text-[10px] uppercase tracking-widest text-slate-400">Email Address</label>
-                  <input 
-                    type="email" 
+                  <input
+                    type="email"
                     id="email"
                     required
                     placeholder="hello@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-slate-900/50 border border-slate-700 text-white px-4 py-3 font-sans text-sm focus:border-indigo-500 focus:outline-none transition-colors placeholder:text-slate-600"
+                    className="w-full bg-slate-900/50 border border-slate-700 text-white px-4 py-3 font-sans text-sm focus:border-[#8B1E2D] focus:outline-none transition-colors placeholder:text-slate-600"
                   />
                 </div>
                 <button 
@@ -92,7 +93,7 @@ export function NewsletterSignup() {
                   {status === "loading" ? "Processing..." : (
                     <>
                       Request Access
-                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                      <IconArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
                     </>
                   )}
                 </button>

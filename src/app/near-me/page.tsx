@@ -4,7 +4,9 @@ import { JsonLd } from "@/app/_components/json-ld";
 import { getCities } from "@/app/_lib/directory";
 import { createPageMetadata } from "@/app/_lib/metadata";
 import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd } from "@/app/_lib/structured-data";
-import { MapPin, Smartphone, Zap } from "lucide-react";
+import { Smartphone } from "lucide-react";
+
+import { IconMapPin, IconSpark } from "@/components/icons";
 
 export const revalidate = 3600;
 
@@ -51,7 +53,7 @@ export default function NearMePage() {
           <header className="rounded-3xl border border-border bg-background p-6">
             <div className="flex items-start gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <MapPin className="h-6 w-6" />
+                <IconMapPin size={24} />
               </div>
               <div className="flex-1">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Location-Based Search</p>
@@ -71,12 +73,12 @@ export default function NearMePage() {
               <p className="mt-1 text-xs text-muted-foreground">Search and book on any device, anytime</p>
             </div>
             <div className="rounded-2xl border border-border bg-background p-4">
-              <MapPin className="h-6 w-6 text-primary" />
+              <IconMapPin size={24} className="text-primary" />
               <h3 className="mt-3 font-semibold text-foreground">Local Options</h3>
               <p className="mt-1 text-xs text-muted-foreground">Find therapists in your city or nearby areas</p>
             </div>
             <div className="rounded-2xl border border-border bg-background p-4">
-              <Zap className="h-6 w-6 text-primary" />
+              <IconSpark size={24} className="text-primary" />
               <h3 className="mt-3 font-semibold text-foreground">Quick Results</h3>
               <p className="mt-1 text-xs text-muted-foreground">Fast search and direct contact with therapists</p>
             </div>

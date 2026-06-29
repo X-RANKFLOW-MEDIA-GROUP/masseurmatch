@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
-import { Ban, HeartHandshake, Scale, ShieldCheck, UserCheck } from "lucide-react";
+import { Ban, HeartHandshake, Scale, UserCheck } from "lucide-react";
 
+import { IconShield } from "@/components/icons";
 import { JsonLd } from "@/app/_components/json-ld";
 import { buildBreadcrumbJsonLd, createPageMetadata } from "@/app/_lib/seo";
 
@@ -78,7 +79,7 @@ export default function CommunityGuidelinesPage() {
             transparent wellness connections and to keep the platform inclusive, lawful, and respectful.
           </p>
           <div className="mt-6 inline-flex items-start gap-3 rounded-[1.5rem] border border-brand-soft/40 bg-brand-soft/10 px-4 py-3 text-sm leading-6 text-text-secondary">
-            <ShieldCheck className="mt-0.5 h-5 w-5 flex-none text-brand-primary" />
+            <IconShield size={20} className="mt-0.5 flex-none text-brand-primary" />
             <span>Violations may result in content removal, account deletion, or escalation when legal or safety risks are involved.</span>
           </div>
         </section>
