@@ -100,7 +100,7 @@ const clientSteps = [
     n: "02",
     icon: IconShield,
     title: "Compare verified profiles",
-    body: "Review photos, services, pricing, trust badges, availability, reviews, and years of experience before reaching out.",
+    body: "Review photos, services, pricing, trust badges, availability, and years of experience before reaching out.",
     badge: "Trust signals",
   },
   {
@@ -114,7 +114,7 @@ const clientSteps = [
     n: "04",
     icon: IconStar,
     title: "Book & experience",
-    body: "Confirm details with the therapist and book the session. After, your review helps others in the community.",
+    body: "Confirm details with the therapist and book the session. Direct communication means no surprises — you set terms with the therapist.",
     badge: "Community",
   },
 ];
@@ -138,7 +138,7 @@ const therapistSteps = [
   {
     n: "04",
     title: "Build your reputation",
-    body: "A complete, accurate profile with clear pricing and great photos drives more inquiries. Reviews and trust badges help you stand out.",
+    body: "A complete, accurate profile with clear pricing and great photos drives more inquiries. Verification badges and trust signals help you stand out.",
   },
 ];
 

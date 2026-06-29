@@ -8,11 +8,11 @@ import { IconArrowRight, IconLock, IconShield } from "@/components/icons";
 export const metadata: Metadata = {
   title: "Trust & Safety | How MasseurMatch Protects You",
   description:
-    "Learn how MasseurMatch reviews profiles, protects your privacy, and promotes a safer environment with AI-driven moderation and identity verification.",
+    "Learn how MasseurMatch reviews profiles, protects your privacy, and maintains a safer environment for clients and therapists.",
   openGraph: {
     title: "Trust & Safety | MasseurMatch",
     description:
-      "AI-driven moderation, identity verification, and encrypted communications — our commitment to your safety.",
+      "Human-reviewed profiles, identity verification, and responsible data handling — our commitment to your safety.",
     url: "https://masseurmatch.com/trust",
     siteName: "MasseurMatch",
     type: "website",
@@ -26,7 +26,7 @@ const jsonLd = {
   name: "Trust & Safety - MasseurMatch",
   url: "https://masseurmatch.com/trust",
   description:
-    "MasseurMatch's commitment to AI-driven moderation, identity verification, data privacy, and secure communications.",
+    "MasseurMatch's commitment to human-reviewed profiles, identity verification, and responsible data handling.",
   publisher: {
     "@type": "Organization",
     name: "MasseurMatch",
@@ -60,8 +60,9 @@ export default function TrustPage() {
             <span className="text-slate-400">Uncompromising commitment.</span>
           </h1>
           <p className="mx-auto max-w-2xl font-sans text-lg leading-relaxed text-slate-600">
-            Your safety is the foundation of MasseurMatch. We built an AI-driven moderation
-            and identity verification infrastructure for peace of mind with every connection.
+            Your safety is the foundation of MasseurMatch. Every profile is reviewed before
+            going live, and identity verification adds an extra layer of confidence with every
+            connection.
           </p>
         </section>
 
@@ -82,11 +83,11 @@ export default function TrustPage() {
             <div className="group relative overflow-hidden bg-slate-950 p-8 text-white md:p-10">
               <div className="absolute right-0 top-0 h-32 w-32 bg-[#8B1E2D]/10 blur-[50px] transition-colors group-hover:bg-[#8B1E2D]/20" />
               <Bot className="mb-6 h-8 w-8 text-[#F8EDEE]" />
-              <h3 className="font-display mb-3 text-2xl font-medium">AI Singleton Moderation</h3>
+              <h3 className="font-display mb-3 text-2xl font-medium">Profile Moderation</h3>
               <p className="mb-6 font-sans text-sm leading-relaxed text-slate-400">
-                Our proprietary Artificial Intelligence system reads and verifies every word and
-                photo submitted to the platform in real-time. We automatically identify and block
-                fake profiles or inappropriate language before they ever go live.
+                Every new profile is reviewed by our team before it is published. Automated
+                screening assists our moderators in flagging content that may violate our
+                guidelines — but a human makes the final call.
               </p>
               <div className="flex items-center gap-2">
                 <span className="relative flex h-2 w-2">
@@ -94,7 +95,7 @@ export default function TrustPage() {
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
                 </span>
                 <span className="font-mono text-[10px] uppercase tracking-widest text-emerald-400">
-                  AI Engine Online
+                  Review Team Active
                 </span>
               </div>
             </div>
@@ -126,9 +127,9 @@ export default function TrustPage() {
               <EyeOff className="mb-6 h-8 w-8 text-slate-900" />
               <h3 className="font-display mb-3 text-2xl font-medium text-slate-900">Data Privacy</h3>
               <p className="font-sans text-sm leading-relaxed text-slate-600">
-                We do not sell your data. Your searches, message history, and location data are
-                end-to-end encrypted. We only share what is strictly necessary to connect you with
-                your chosen therapist.
+                We do not sell your data. We only collect what is necessary to operate the
+                platform and connect you with your chosen therapist. Your personal information
+                is never shared with third parties for advertising purposes.
               </p>
             </div>
 
@@ -153,15 +154,6 @@ export default function TrustPage() {
             <RuleRow text="Zero tolerance for solicitations of illegal or sexual services." />
             <RuleRow text="Profile photos must be strictly professional and free of watermarks." />
             <RuleRow text="Verbal aggression, discrimination, or harassment in chat results in an instant ban." />
-            <RuleRow text="Reviews require a documented contact event to earn a Verified Contact label." />
-          </div>
-
-          <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm leading-relaxed text-slate-600 font-sans">
-            <strong className="font-semibold text-slate-800">Verified reviews require proof of contact.</strong>{" "}
-            When a client clicks a contact button (call, SMS, or WhatsApp) on a profile, we record
-            that event. Only reviewers with a documented contact event receive a &ldquo;Verified
-            contact&rdquo; label on their review — making it easy to distinguish genuine first-hand
-            experiences from unverifiable submissions.
           </div>
 
           <div className="mt-8 text-center">

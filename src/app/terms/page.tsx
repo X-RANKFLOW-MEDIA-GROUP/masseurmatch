@@ -208,13 +208,11 @@ export default function TermsPage() {
 
         {/* ── Content ── */}
         <div
+          className="grid grid-cols-1 gap-7 md:grid-cols-[180px_1fr]"
           style={{
             maxWidth: 820,
             margin: "0 auto",
             padding: "clamp(32px, 6vw, 48px) 16px clamp(56px, 8vw, 84px)",
-            display: "grid",
-            gridTemplateColumns: "minmax(0, 1fr)",
-            gap: 28,
             alignItems: "start",
           }}
         >

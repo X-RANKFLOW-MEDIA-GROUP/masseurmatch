@@ -7,13 +7,16 @@ export type TherapistTier = "free" | "standard" | "pro" | "elite";
 
 const PUBLIC_PROFILE_SELECT = `
   id, slug, display_name, full_name, headline, bio, city, state, neighborhood,
+  neighborhood_name, primary_area,
   phone, whatsapp_number, email_address, show_email, website,
   service_categories, massage_techniques, specialties,
   incall_price, outcall_price, starting_price,
   offers_incall, offers_outcall, outcall_radius,
   height_inches, weight_lb, body_type,
-  years_experience, languages,
-  subscription_tier, verification_status, is_featured,
+  years_experience, start_year, languages,
+  subscription_tier, _tier, verification_status, is_featured,
+  is_verified_identity, is_verified_profile,
+  avatar_url, review_count,
   promotions, updated_at, status, profile_status, visibility_status,
   is_suspended, is_banned, available_now, available_now_expires,
   lgbtq_affirming, business_hours, custom_faq, pricing_sessions, areas_served,

@@ -66,6 +66,8 @@ export const legacyRedirects: LegacyRedirect[] = [
   // loop infinitely; capitalized variants are handled by case-sensitive guards
   // in src/middleware.ts instead.
   { source: "/massage-therapists", destination: "/therapists", permanent: true },
+  { source: "/home-1-search-form", destination: "/search", permanent: true },
+  { source: "/cookies", destination: "/cookie-policy", permanent: true },
 ];
 
 export const REDIRECTS_BY_SOURCE: ReadonlyMap<string, string> = new Map(

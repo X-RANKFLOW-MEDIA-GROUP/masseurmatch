@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { JsonLd } from "@/app/_components/json-ld";
 import { Hero } from "@/components/marketing/Hero";
@@ -81,7 +82,7 @@ const HOME_FAQ = [
   {
     question: "How do I know if a therapist is verified on MasseurMatch?",
     answer:
-      "Verified therapists display trust signals on their profiles: identity verification badges, review counts, availability status, years of experience, and professional credentials. Elite tier therapists have enhanced verification and premium features.",
+      "Verified therapists display trust signals on their profiles: identity verification badges, availability status, years of experience, and professional credentials. Elite tier therapists have enhanced verification and premium features.",
   },
   {
     question: "Can I find outcall and incall massage options on MasseurMatch?",
@@ -107,6 +108,9 @@ function isRealProfileId(id: string | null | undefined) {
 }
 
 export default async function HomePage() {
+  // Coming-soon mode — redirect to waitlist until launch (remove after May 7, 2026)
+  redirect("/waitlist");
+
   let featuredTherapists: Awaited<ReturnType<typeof getPublicTherapists>>["items"] = [];
   try {
     // Run both queries in parallel — lgbtq-affirming preferred, broad as fallback

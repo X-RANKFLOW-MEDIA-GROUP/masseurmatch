@@ -108,8 +108,8 @@ export default function AboutContent() {
             />
             <Pillar
               icon={IconLock}
-              title="Absolute privacy"
-              text="Your wellness journey is personal. Our platform is built with encrypted communications and no data selling — ever."
+              title="Data responsibility"
+              text="Your wellness journey is personal. We do not sell your data and only collect what is necessary to connect you with your chosen therapist."
             />
           </div>
         </div>

@@ -16,16 +16,16 @@ export const LEGAL_LAST_UPDATED = "March 10, 2026";
 
 export const LEGAL_QUICK_FACTS = [
   {
-    label: "Primary law",
+    label: "Governing law",
     value: "Delaware, USA",
   },
   {
-    label: "Core package",
-    value: "March 2026 legal package",
+    label: "Last updated",
+    value: "March 10, 2026",
   },
   {
-    label: "Merged extras",
-    value: "Legal Hub topics added",
+    label: "Covered topics",
+    value: "Terms, privacy, billing & more",
   },
   {
     label: "Platform model",
@@ -202,7 +202,7 @@ export const LEGAL_SUPPLEMENTAL_NOTICES = [
   },
   {
     title: "Health data disclaimer",
-    body: "The merged legal view does not treat the platform as a place for protected health information workflows.",
+    body: "MasseurMatch is not a healthcare provider and does not handle protected health information.",
   },
   {
     title: "Phishing and scam notice",

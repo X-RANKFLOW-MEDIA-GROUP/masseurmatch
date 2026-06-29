@@ -23,9 +23,9 @@ import {
 export const metadata: Metadata = createPageMetadata({
   title: "Legal Center",
   description:
-    "Updated legal overview for MasseurMatch, merging the March 2026 legal package with key Legal Hub topics in a clearer and easier-to-read format.",
+    "The MasseurMatch Legal Center — your reference for terms of service, privacy, cookies, billing, DMCA, content standards, and legal contact channels.",
   path: "/legal",
-  keywords: ["legal center", "legal hub", "privacy", "terms", "dmca", "billing", "compliance"],
+  keywords: ["legal center", "privacy", "terms", "dmca", "billing", "compliance"],
 });
 
 const breadcrumbJsonLd = buildBreadcrumbJsonLd([
@@ -56,9 +56,9 @@ export default function LegalPage() {
                   Updated legal guidance, organized to be easier to read.
                 </h1>
                 <p className="mt-4 max-w-3xl text-base leading-8 text-text-secondary">
-                  This page merges the stronger March 2026 legal package already present in this project with the
-                  useful supplemental topics from the separate Legal Hub repository. The goal is simple: one white,
-                  clear place to understand the rules, your rights, and the right way to contact the team.
+                  This Legal Center organizes MasseurMatch's current policies, user rights, platform boundaries, and
+                  contact channels in one place. Everything you need to understand the rules and how to reach the
+                  right team is here.
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <a
@@ -83,8 +83,8 @@ export default function LegalPage() {
                 </div>
                 <p className="mt-4 font-display text-3xl font-semibold text-foreground">{LEGAL_LAST_UPDATED}</p>
                 <p className="mt-3 text-sm leading-7 text-text-secondary">
-                  Base source: March 2026 legal package. Supplemental merge: advertiser policy, anti-trafficking,
-                  complaints, SMS terms, repeat infringer, subpoena, and related Legal Hub topics.
+                  Policies are reviewed and updated periodically to reflect platform changes and applicable legal
+                  requirements.
                 </p>
               </div>
             </div>
@@ -135,8 +135,8 @@ export default function LegalPage() {
               Updated legal topics, grouped by what people usually need.
             </h2>
             <p className="mt-4 text-sm leading-7 text-text-secondary">
-              Each topic below summarizes the current legal package and shows where the imported Legal Hub content was
-              folded in. When a standalone live page already exists, you can jump directly to it.
+              Each topic below summarizes the current MasseurMatch policy for that area. Where a standalone page
+              exists, you can jump directly to it.
             </p>
           </div>
 
@@ -148,7 +148,7 @@ export default function LegalPage() {
               >
                 <div className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.95fr)]">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-text-muted">Merged topic</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-text-muted">Policy topic</p>
                     <h3 className="mt-3 font-display text-3xl font-semibold tracking-tight text-foreground">
                       {topic.title}
                     </h3>
@@ -186,18 +186,6 @@ export default function LegalPage() {
                   </div>
                 </div>
 
-                {topic.mergedNotes?.length ? (
-                  <div className="mt-6 rounded-[1.6rem] border border-brand-soft/40 bg-brand-soft/10 px-5 py-5">
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-text-muted">What was merged in</p>
-                    <div className="mt-3 grid gap-3">
-                      {topic.mergedNotes.map((note) => (
-                        <p key={note} className="text-sm leading-7 text-text-secondary">
-                          {note}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
               </article>
             ))}
           </div>
@@ -208,7 +196,7 @@ export default function LegalPage() {
             <div className="max-w-3xl">
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-muted">Supplemental notices</p>
               <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-foreground">
-                Extra Legal Hub topics now folded into the overall legal view.
+                Additional notices covering platform-specific policies and user rights.
               </h2>
             </div>
 

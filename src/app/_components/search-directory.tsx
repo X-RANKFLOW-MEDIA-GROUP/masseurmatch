@@ -141,6 +141,7 @@ export function SearchDirectory({
         item.bio,
         item.modality,
         ...(item.specialties || []),
+        item.city,
         item.neighborhood_name,
         item.primary_area,
         ...buildPhysicalSearchTerms({

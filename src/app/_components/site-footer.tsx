@@ -25,18 +25,13 @@ export function SiteFooter() {
 
         <div className="flex flex-col md:flex-row items-start justify-between gap-10 mb-12">
 
-          {/* Left side: Logo text + email */}
-          <div className="space-y-3">
+          {/* Brand + contact */}
+          <div className="space-y-4">
             <Link href="/" className="inline-block">
               <span className="font-display text-2xl font-extrabold tracking-tight text-white">
-                MASSEUR MATCH
+                MASSEURMATCH
               </span>
             </Link>
-            <p className="text-sm text-gray-400">
-              <a href="mailto:support@masseurmatch.com" className="hover:text-white transition-colors">
-                support@masseurmatch.com
-              </a>
-            </p>
             <div className="space-y-2">
               <a href="tel:+19786277387" className="flex items-center gap-2 font-sans text-sm text-slate-400 hover:text-white transition-colors">
                 <Phone className="w-[0.9rem] h-[0.9rem] shrink-0" strokeWidth={2.25} />
@@ -47,27 +42,11 @@ export function SiteFooter() {
                 support@masseurmatch.com
               </a>
             </div>
-            <div className="flex items-center gap-2 mt-4">
+            <div className="flex items-center gap-2">
               <IconShield size={18} className="text-emerald-400" />
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400">
                 Verified Secure Network
               </span>
-            </div>
-          </div>
-
-          {/* Right side: Contact info */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-            <div className="flex items-center gap-3">
-              <Phone className="w-[1.1rem] h-[1.1rem] text-white" strokeWidth={2.25} />
-              <a href="tel:978-627-7387" className="text-sm text-white hover:text-red-400 transition-colors">
-                978-MASSEUR (627-7387)
-              </a>
-            </div>
-            <div className="flex items-center gap-3">
-              <Mail className="w-[1.1rem] h-[1.1rem] text-white" strokeWidth={2.25} />
-              <a href="mailto:support@masseurmatch.com" className="text-sm text-white hover:text-red-400 transition-colors">
-                support@masseurmatch.com
-              </a>
             </div>
           </div>
 

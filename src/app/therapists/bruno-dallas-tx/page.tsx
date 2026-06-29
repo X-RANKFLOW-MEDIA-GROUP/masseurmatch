@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function BrunoDallasTxPage() {
-  redirect("/therapists");
+  redirect("/therapists/bruno-santos");
 }

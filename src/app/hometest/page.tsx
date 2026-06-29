@@ -14,6 +14,7 @@ import {
 export const metadata: Metadata = {
   title: "Home Test - Premium Directory | MasseurMatch",
   description: "Premium male massage therapist directory showcase",
+  robots: { index: false, follow: false },
 };
 
 export default function HomeTestPage() {
