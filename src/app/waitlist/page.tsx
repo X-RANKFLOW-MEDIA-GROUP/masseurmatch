@@ -90,7 +90,7 @@ const faqJsonLd = {
       name: "When is MasseurMatch launching?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "MasseurMatch is launching in Dallas first, with rapid expansion to all major US cities. Join the waitlist to get early access.",
+        text: "MasseurMatch launches on May 7, 2026 — starting in Dallas, then expanding to all major US cities. Join the waitlist to get early access.",
       },
     },
     {
@@ -232,7 +232,7 @@ const faqs = [
   },
   {
     q: "When does MasseurMatch launch?",
-    a: "MasseurMatch is launching in Dallas first, with fast expansion to New York, Miami, Los Angeles, and every major US city. Join the waitlist to get first access.",
+    a: "MasseurMatch launches on May 7, 2026 — starting in Dallas, then expanding fast to New York, Miami, Los Angeles, and every major US city. Join the waitlist to get first access.",
   },
   {
     q: "Is MasseurMatch free for therapists?",
@@ -272,9 +272,14 @@ export default function WaitlistPage() {
           <div className="relative mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
             {/* Left copy */}
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">
-                Coming soon
-              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">
+                  Coming soon
+                </p>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#8B1E2D]/40 bg-[#8B1E2D]/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-[#8B1E2D]">
+                  🗓 Launching May 7, 2026
+                </span>
+              </div>
               <h1 className="mt-4 font-display text-[clamp(2.4rem,5.5vw,4.2rem)] font-extrabold leading-[0.95] tracking-tight text-white">
                 The verified male massage
                 <br />
