@@ -142,15 +142,29 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: dur, ease: customEase }}
-              className="rounded-[2rem] border border-dashed border-[#8B1E2D]/30 bg-white/80 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.09)]"
+              className="flex flex-col gap-4"
             >
-              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#8B1E2D]/10 text-[#8B1E2D]">
-                <IconSpark size={24} />
-              </div>
-              <h2 className="font-display text-2xl font-black text-[#151515]">Live profile cards are ready.</h2>
-              <p className="mt-3 max-w-lg text-sm leading-6 text-[#667085]">
-                The hero only shows approved public profiles from Supabase. No demo names are rendered in this first fold.
-              </p>
+              {[
+                { label: "Verified profiles", sub: "Identity-confirmed therapists" },
+                { label: "Direct contact", sub: "No booking middleman" },
+                { label: "Nationwide coverage", sub: "Dallas, Miami, NYC & more" },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: dur, ease: customEase, delay: 0.1 + i * 0.07 }}
+                  className="flex items-center gap-4 rounded-2xl border border-[#E8E8E8] bg-white/90 px-5 py-4 shadow-[0_4px_20px_rgba(15,23,42,0.06)]"
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#8B1E2D]/10 text-[#8B1E2D]">
+                    <IconSpark size={20} />
+                  </div>
+                  <div>
+                    <p className="font-display text-base font-black text-[#151515]">{item.label}</p>
+                    <p className="text-xs text-[#667085]">{item.sub}</p>
+                  </div>
+                </motion.div>
+              ))}
             </motion.div>
           )}
         </div>

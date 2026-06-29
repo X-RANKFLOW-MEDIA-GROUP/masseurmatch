@@ -67,9 +67,31 @@ function LoginPageContent() {
   );
 }
 
+function LoginFormSkeleton() {
+  return (
+    <div className="relative isolate overflow-hidden px-4 py-10 sm:py-14">
+      <div className="mx-auto max-w-5xl rounded-[32px] border border-border-subtle bg-white/85 p-4 shadow-[0_24px_60px_rgb(var(--color-brand-primary-rgb)/0.08)] backdrop-blur-xl sm:p-8">
+        <div className="mb-6 text-center sm:mb-8">
+          <div className="mx-auto h-3 w-28 animate-pulse rounded-full bg-muted" />
+          <div className="mx-auto mt-4 h-8 w-72 animate-pulse rounded-xl bg-muted" />
+          <div className="mx-auto mt-3 h-4 w-80 animate-pulse rounded-full bg-muted" />
+        </div>
+        <div className="mx-auto max-w-lg space-y-4">
+          <div className="h-11 w-full animate-pulse rounded-lg bg-muted" />
+          <div className="h-11 w-full animate-pulse rounded-lg bg-muted" />
+          <div className="relative my-5 h-px w-full bg-border" />
+          <div className="h-11 w-full animate-pulse rounded-lg bg-muted" />
+          <div className="h-11 w-full animate-pulse rounded-lg bg-muted" />
+          <div className="h-11 w-full animate-pulse rounded-full bg-muted" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function LoginPageClient() {
   return (
-    <Suspense fallback={<div className="container mx-auto px-4 py-10" />}>
+    <Suspense fallback={<LoginFormSkeleton />}>
       <LoginPageContent />
     </Suspense>
   );
