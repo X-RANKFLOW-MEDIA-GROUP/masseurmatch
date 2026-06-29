@@ -4,6 +4,8 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { IconMapPin } from "@/components/icons";
+import { InkReveal } from "@/components/motion/InkReveal";
+import { SplitTextReveal } from "@/components/motion/SplitTextReveal";
 
 type CityEntry = {
   name: string;
@@ -101,26 +103,30 @@ export function CityCaseStudies() {
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between lg:mb-14">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: reduced ? 0 : 0.6, ease }}
-          >
-            <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.3em] text-[#8B1E2D]">
-              BROWSE BY CITY
-            </p>
-            <h2
-              className="font-display font-extrabold uppercase leading-[1.05] tracking-tight text-[#111111]"
-              style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)" }}
+          <div>
+            <InkReveal origin="left" duration={0.7}>
+              <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.3em] text-[#8B1E2D]">
+                BROWSE BY CITY
+              </p>
+            </InkReveal>
+            <SplitTextReveal
+              text="YOUR CITY. YOUR THERAPIST."
+              tag="h2"
+              wordMode
+              charDelay={0.08}
+              className="font-display font-extrabold uppercase leading-[1.05] tracking-tight text-[#111111] text-[clamp(1.75rem,3.5vw,2.75rem)]"
+            />
+            <motion.p
+              className="mt-3 max-w-lg text-sm leading-relaxed text-[#6F6F6F] lg:text-base"
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: reduced ? 0 : 0.6, ease, delay: reduced ? 0 : 0.3 }}
             >
-              YOUR CITY. YOUR THERAPIST.
-            </h2>
-            <p className="mt-3 max-w-lg text-sm leading-relaxed text-[#6F6F6F] lg:text-base">
               Explore verified massage professionals across the country.
               Every city page connects you with local, trusted therapists.
-            </p>
-          </motion.div>
+            </motion.p>
+          </div>
 
           <motion.div
             initial={{ opacity: 0 }}

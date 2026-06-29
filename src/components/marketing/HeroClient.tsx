@@ -12,6 +12,9 @@ import {
 } from "lucide-react";
 import { IconSpark, IconMessage, IconArrowRight, IconLock, IconShield } from "@/components/icons";
 import { HeroMediaBanner } from "@/components/marketing/HeroMediaBanner";
+import { GrainOverlay } from "@/components/motion/GrainOverlay";
+import { BreathingGlow } from "@/components/motion/BreathingGlow";
+import { MagneticHover } from "@/components/motion/MagneticHover";
 import type { PublicTherapist } from "@/app/_lib/directory";
 
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -127,6 +130,13 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
 
   return (
     <section className="relative overflow-hidden bg-[radial-gradient(circle_at_24%_18%,rgba(139,30,45,0.08),transparent_28%),linear-gradient(180deg,#ffffff_0%,#fbfaf8_100%)] text-[#151515]">
+      <GrainOverlay opacity={0.02} className="z-[2]" />
+      <BreathingGlow
+        color="rgba(139, 30, 45, 0.06)"
+        size={500}
+        duration={7}
+        className="right-[10%] top-[20%] z-[1]"
+      />
       <div className="mx-auto grid min-h-[680px] max-w-[1500px] items-center gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1.03fr_0.97fr] lg:px-10 lg:py-16">
         <div className="relative order-2 lg:order-1">
           <div className="pointer-events-none absolute -left-10 top-12 h-72 w-72 rounded-full bg-[#8B1E2D]/8 blur-3xl" />
@@ -319,17 +329,23 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             ))}
           </motion.div>
 
-          <motion.button
-            type="button"
-            onClick={() => router.push("/search")}
+          <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.52 }}
-            className="mt-7 inline-flex w-fit items-center gap-2 rounded-2xl bg-[#8B1E2D] px-6 py-4 text-sm font-black uppercase tracking-wide text-white shadow-xl shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
+            className="mt-7 w-fit"
           >
-            Find a Masseur
-            <IconArrowRight size={18} />
-          </motion.button>
+            <MagneticHover strength={0.2} radius={140}>
+              <button
+                type="button"
+                onClick={() => router.push("/search")}
+                className="inline-flex items-center gap-2 rounded-2xl bg-[#8B1E2D] px-6 py-4 text-sm font-black uppercase tracking-wide text-white shadow-xl shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
+              >
+                Find a Masseur
+                <IconArrowRight size={18} />
+              </button>
+            </MagneticHover>
+          </motion.div>
         </div>
       </div>
 
