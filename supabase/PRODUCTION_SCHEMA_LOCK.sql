@@ -756,7 +756,6 @@ create index if not exists idx_text_verifications_reviewed_at on public.text_ver
 create index if not exists idx_admin_actions_admin on public.admin_actions(admin_id, created_at desc);
 create index if not exists idx_admin_actions_target_user on public.admin_actions(target_user_id, created_at desc);
 create index if not exists idx_admin_actions_type on public.admin_actions(action_type, created_at desc);
-create index if not exists idx_demand_scores_location on public.demand_scores(location);
 create index if not exists idx_appointments_user_id on public.appointments(user_id);
 
 create or replace function public.handle_new_user()
