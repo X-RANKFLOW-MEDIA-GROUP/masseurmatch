@@ -1,7 +1,8 @@
 ﻿'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Send, Calendar, CheckCircle2, Loader2, ArrowRight } from 'lucide-react'
+import { Send, CheckCircle2, Loader2 } from 'lucide-react'
+import { IconArrowRight, IconCalendar } from '@/components/icons'
 import { BookingCalendar } from './BookingCalendar'
 import type { AvailableSlot } from '@/lib/booking/types'
 
@@ -218,7 +219,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
           ) : (
             <>
               Send Inquiry
-              <ArrowRight className="h-4 w-4" strokeWidth={2.25} />
+              <IconArrowRight size={16} sketch="none" />
             </>
           )}
         </button>
@@ -281,7 +282,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
             onClick={() => setStep('slot_select')}
             className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-slate-300 transition-all hover:border-[#8B1E2D]/40 hover:text-white"
           >
-            <Calendar className="h-4 w-4" strokeWidth={2.25} />
+            <IconCalendar size={16} sketch="none" />
             Pick a date &amp; time
           </button>
         )}

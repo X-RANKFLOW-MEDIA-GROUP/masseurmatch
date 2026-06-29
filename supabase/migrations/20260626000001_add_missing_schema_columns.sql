@@ -47,18 +47,12 @@ ALTER TABLE public.therapist_photos ADD COLUMN IF NOT EXISTS approval_status tex
 ALTER TABLE public.admin_actions ADD COLUMN IF NOT EXISTS action text;
 ALTER TABLE public.admin_actions ADD COLUMN IF NOT EXISTS target_table text;
 
--- Create demand_scores table if it doesn't exist
-CREATE TABLE IF NOT EXISTS public.demand_scores (
-  id uuid primary key default gen_random_uuid(),
-  location text not null,
-  therapy_type text,
-  demand_level integer,
-  demand_score decimal(5, 2),
-  last_updated timestamptz default timezone('utc', now()),
-  created_at timestamptz default timezone('utc', now()),
-  updated_at timestamptz default timezone('utc', now())
-);
+-- Add missing columns to demand_scores (table already created in 20260611200001)
+ALTER TABLE public.demand_scores ADD COLUMN IF NOT EXISTS therapy_type text;
+ALTER TABLE public.demand_scores ADD COLUMN IF NOT EXISTS demand_level integer;
+ALTER TABLE public.demand_scores ADD COLUMN IF NOT EXISTS demand_score decimal(5, 2);
+ALTER TABLE public.demand_scores ADD COLUMN IF NOT EXISTS last_updated timestamptz default timezone('utc', now());
+ALTER TABLE public.demand_scores ADD COLUMN IF NOT EXISTS updated_at timestamptz default timezone('utc', now());
 
 -- Create indexes for new tables/columns
-CREATE INDEX IF NOT EXISTS idx_demand_scores_location ON public.demand_scores(location);
 CREATE INDEX IF NOT EXISTS idx_appointments_user_id ON public.appointments(user_id);

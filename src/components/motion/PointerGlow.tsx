@@ -1,22 +1,26 @@
 "use client";
 
 import { useEffect } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
 
 export function PointerGlow() {
+  const reduced = useReducedMotion();
   const x = useMotionValue(-240);
   const y = useMotionValue(-240);
   const springX = useSpring(x, { stiffness: 80, damping: 22 });
   const springY = useSpring(y, { stiffness: 80, damping: 22 });
 
   useEffect(() => {
+    if (reduced) return;
     const handleMove = (event: PointerEvent) => {
       x.set(event.clientX - 140);
       y.set(event.clientY - 140);
     };
     window.addEventListener("pointermove", handleMove);
     return () => window.removeEventListener("pointermove", handleMove);
-  }, [x, y]);
+  }, [x, y, reduced]);
+
+  if (reduced) return null;
 
   return (
     <motion.div

@@ -50,7 +50,7 @@ const ANSWERS: Record<string, string> = {
     "Incall = you visit the therapist’s studio. Outcall = they travel to your home or hotel. Many offer both.",
 };
 const FALLBACK =
-  "Great question — in the live app I’ll search that instantly. Open Knotty search to try it for real ↗";
+  "Great question — in the live app I’ll search that instantly. Open Knotty search to try it for real!";
 
 /**
  * "Meet Knotty" — introduces the site's AI assistant with a live, interactive

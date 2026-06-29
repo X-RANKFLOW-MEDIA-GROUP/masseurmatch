@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
 import {
   Accordion,
   AccordionContent,
@@ -14,7 +15,11 @@ type Props = {
   items: FaqItem[];
 };
 
+const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
 export function FaqAccordion({ items }: Props) {
+  const reduced = useReducedMotion();
+
   return (
     <section className="py-20 lg:py-32">
       <div className="mx-auto max-w-[1000px] px-4 sm:px-6 lg:px-8">
@@ -36,14 +41,26 @@ export function FaqAccordion({ items }: Props) {
 
         <Accordion type="single" collapsible className="w-full">
           {items.map((item, i) => (
-            <AccordionItem key={item.question} value={`item-${i}`}>
-              <AccordionTrigger className="py-6 text-left font-display text-xl font-bold hover:no-underline lg:text-2xl [&[data-state=open]>svg]:rotate-180">
-                {item.question}
-              </AccordionTrigger>
-              <AccordionContent className="pb-6 text-base leading-relaxed text-muted-foreground">
-                {item.answer}
-              </AccordionContent>
-            </AccordionItem>
+            <motion.div
+              key={item.question}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-30px" }}
+              transition={{
+                duration: reduced ? 0 : 0.45,
+                ease,
+                delay: reduced ? 0 : i * 0.04,
+              }}
+            >
+              <AccordionItem value={`item-${i}`}>
+                <AccordionTrigger className="py-6 text-left font-display text-xl font-bold hover:no-underline lg:text-2xl [&[data-state=open]>svg]:rotate-180">
+                  {item.question}
+                </AccordionTrigger>
+                <AccordionContent className="pb-6 text-base leading-relaxed text-muted-foreground">
+                  {item.answer}
+                </AccordionContent>
+              </AccordionItem>
+            </motion.div>
           ))}
         </Accordion>
       </div>

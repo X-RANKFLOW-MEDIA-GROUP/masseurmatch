@@ -1,6 +1,11 @@
-﻿import Link from "next/link";
+"use client";
+
+import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
 import { Check, X, ArrowRight } from "lucide-react";
-import FadeUp from "@/components/motion/FadeUp";
+import { InkReveal } from "@/components/motion/InkReveal";
+import { SplitTextReveal } from "@/components/motion/SplitTextReveal";
+import { MagneticHover } from "@/components/motion/MagneticHover";
 
 const OUR_FEATURES = [
   "Free to search & contact — no booking fees",
@@ -24,72 +29,128 @@ const PLATFORM_FEATURES = [
   "No guidance — you scroll and guess",
 ];
 
+const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
 export function WhyMasseurMatch() {
+  const reduced = useReducedMotion();
+
   return (
     <section className="bg-[#111111] py-16 lg:py-24">
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
 
-        <FadeUp>
-          <div className="text-center">
+        <div className="text-center">
+          <InkReveal origin="center" duration={0.7}>
             <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#D4717E]">
               Why MasseurMatch
             </p>
-            <h2 className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold tracking-tight text-white">
-              A directory, not a booking platform.
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-white/50">
-              Unlike on-demand massage apps that take commissions and control every booking,
-              MasseurMatch connects you directly with independent therapists — and steps aside.
+          </InkReveal>
+          <SplitTextReveal
+            text="A directory, not a booking platform."
+            tag="h2"
+            wordMode
+            charDelay={0.07}
+            className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold tracking-tight text-white"
+          />
+          <motion.p
+            className="mx-auto mt-4 max-w-xl text-sm leading-6 text-white/50"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: reduced ? 0 : 0.6, ease, delay: reduced ? 0 : 0.3 }}
+          >
+            Unlike on-demand massage apps that take commissions and control every booking,
+            MasseurMatch connects you directly with independent therapists — and steps aside.
+          </motion.p>
+        </div>
+
+        <motion.div
+          className="mt-12 grid grid-cols-1 gap-px bg-white/[0.06] sm:grid-cols-2"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: reduced ? 0 : 0.7, ease, delay: reduced ? 0 : 0.1 }}
+        >
+          {/* MasseurMatch column */}
+          <div className="bg-[#0B1829] p-8 lg:p-10">
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4717E]">
+              MasseurMatch
             </p>
-          </div>
-        </FadeUp>
-
-        <FadeUp delay={0.1}>
-          <div className="mt-12 grid grid-cols-1 gap-px bg-white/[0.06] sm:grid-cols-2">
-
-            {/* MasseurMatch column */}
-            <div className="bg-[#0B1829] p-8 lg:p-10">
-              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4717E]">
-                MasseurMatch
-              </p>
-              <p className="mt-1 text-xs text-white/60">Premium verified directory</p>
-              <div className="mt-7 space-y-0 divide-y divide-white/[0.05]">
-                {OUR_FEATURES.map((item) => (
-                  <div key={item} className="flex items-start gap-3 py-3">
-                    <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15">
-                      <Check size={11} className="text-emerald-400" strokeWidth={3} />
-                    </div>
-                    <span className="text-sm leading-5 text-white/80">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Generic platform column */}
-            <div className="bg-[#080F1A] p-8 lg:p-10">
-              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-white/55">
-                On-demand platforms
-              </p>
-              <p className="mt-1 text-xs text-white/55">Booking apps &amp; commission services</p>
-              <div className="mt-7 space-y-0 divide-y divide-white/[0.04]">
-                {PLATFORM_FEATURES.map((item, i) => (
-                  <div key={item} className="flex items-start gap-3 py-3">
-                    <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/[0.06]">
-                      {i === 0
-                        ? <Check size={11} className="text-white/55" strokeWidth={3} />
-                        : <X size={11} className="text-white/55" strokeWidth={3} />
-                      }
-                    </div>
-                    <span className="text-sm leading-5 text-white/55">{item}</span>
-                  </div>
-                ))}
-              </div>
+            <p className="mt-1 text-xs text-white/60">Premium verified directory</p>
+            <div className="mt-7 space-y-0 divide-y divide-white/[0.05]">
+              {OUR_FEATURES.map((item, i) => (
+                <motion.div
+                  key={item}
+                  className="flex items-start gap-3 py-3"
+                  initial={{ opacity: 0, x: -16 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-30px" }}
+                  transition={{
+                    duration: reduced ? 0 : 0.45,
+                    ease,
+                    delay: reduced ? 0 : 0.2 + i * 0.05,
+                  }}
+                >
+                  <motion.div
+                    className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15"
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={{ once: true, margin: "-30px" }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 15,
+                      delay: reduced ? 0 : 0.3 + i * 0.05,
+                    }}
+                  >
+                    <Check size={11} className="text-emerald-400" strokeWidth={3} />
+                  </motion.div>
+                  <span className="text-sm leading-5 text-white/80">{item}</span>
+                </motion.div>
+              ))}
             </div>
           </div>
-        </FadeUp>
 
-        <FadeUp delay={0.18}>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          {/* Generic platform column */}
+          <div className="bg-[#080F1A] p-8 lg:p-10">
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-white/55">
+              On-demand platforms
+            </p>
+            <p className="mt-1 text-xs text-white/55">Booking apps &amp; commission services</p>
+            <div className="mt-7 space-y-0 divide-y divide-white/[0.04]">
+              {PLATFORM_FEATURES.map((item, i) => (
+                <motion.div
+                  key={item}
+                  className="flex items-start gap-3 py-3"
+                  initial={{ opacity: 0, x: 16 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-30px" }}
+                  transition={{
+                    duration: reduced ? 0 : 0.45,
+                    ease,
+                    delay: reduced ? 0 : 0.2 + i * 0.05,
+                  }}
+                >
+                  <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/[0.06]">
+                    {i === 0
+                      ? <Check size={11} className="text-white/55" strokeWidth={3} />
+                      : <X size={11} className="text-white/55" strokeWidth={3} />
+                    }
+                  </div>
+                  <span className="text-sm leading-5 text-white/55">{item}</span>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="mt-10 flex flex-wrap items-center justify-center gap-4"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: reduced ? 0 : 0.6, ease, delay: reduced ? 0 : 0.2 }}
+        >
+          <MagneticHover strength={0.15} radius={120}>
             <Link
               href="/search"
               className="inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
@@ -97,14 +158,16 @@ export function WhyMasseurMatch() {
               Search therapists
               <ArrowRight size={15} strokeWidth={2.5} />
             </Link>
+          </MagneticHover>
+          <MagneticHover strength={0.15} radius={120}>
             <Link
               href="/how-it-works"
               className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-7 py-3.5 text-sm font-semibold text-white/80 transition hover:bg-white/[0.09]"
             >
               See how it works
             </Link>
-          </div>
-        </FadeUp>
+          </MagneticHover>
+        </motion.div>
 
       </div>
     </section>
