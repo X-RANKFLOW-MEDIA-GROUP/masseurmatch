@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { IconMapPin } from "@/components/icons";
 
 const TOP_CITIES = [
@@ -35,7 +36,7 @@ export function CityMarquee() {
           href="/cities"
           className="ml-1 rounded-full border border-[#D4717E]/30 bg-[#D4717E]/[0.06] px-3 py-1 text-[11px] font-semibold text-[#D4717E] transition hover:bg-[#D4717E]/[0.12]"
         >
-          All cities →
+          All cities <ArrowRight className="inline h-3 w-3" strokeWidth={2.5} />
         </Link>
       </div>
     </div>
