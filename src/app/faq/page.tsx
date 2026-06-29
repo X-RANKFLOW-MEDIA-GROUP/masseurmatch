@@ -31,7 +31,7 @@ const faqs = [
       },
       {
         q: "How do I find a massage therapist near me?",
-        a: "Use our search bar to enter your city or ZIP code. You can filter results by massage modality, pricing, availability, and LGBTQ+ certifications. Each profile includes the therapist's services, rates, and client reviews.",
+        a: "Use our search bar to enter your city or ZIP code. You can filter results by massage modality, pricing, availability, and LGBTQ+ certifications. Each profile includes the therapist's services, rates, and availability.",
       },
       {
         q: "How are therapists reviewed on MasseurMatch?",
@@ -43,7 +43,7 @@ const faqs = [
       },
       {
         q: "Does MasseurMatch charge clients to search or contact therapists?",
-        a: "Searching and browsing MasseurMatch is completely free for clients. You can view therapist profiles, read reviews, and contact therapists at no cost.",
+        a: "Searching and browsing MasseurMatch is completely free for clients. You can view therapist profiles and contact therapists at no cost.",
       },
       {
         q: "What types of massage are available?",
@@ -51,7 +51,7 @@ const faqs = [
       },
       {
         q: "How do I leave a review for my therapist?",
-        a: "After connecting with a therapist through MasseurMatch, you can log into your account and submit a review from your session history. Reviews help the community make informed decisions and reward excellent therapists.",
+        a: "After connecting with a therapist through MasseurMatch, you can reach out to our support team to share your experience. Your feedback helps us maintain quality standards across the directory.",
       },
     ],
   },
@@ -68,7 +68,7 @@ const faqs = [
       },
       {
         q: "Do I need to be LGBTQ+ to list on MasseurMatch?",
-        a: "No. Any licensed massage therapist who is committed to providing a respectful, inclusive experience for all clients is welcome to list on MasseurMatch. LGBTQ+ identity is not required — commitment to inclusivity is.",
+        a: "No. Any massage professional who is committed to providing a respectful, inclusive experience for all clients is welcome to list on MasseurMatch. LGBTQ+ identity is not required — commitment to inclusivity is.",
       },
       {
         q: "How long does profile review take?",
