@@ -58,7 +58,7 @@ export function HowItWorksTease() {
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#8B1E2D]/10">
                     <Icon size={20} className="text-[#8B1E2D]" />
                   </div>
-                  <span aria-hidden="true" className="font-display text-4xl font-extrabold text-[#E8E6E1]">{n}</span>
+                  <span aria-hidden="true" data-step={n} className="step-watermark font-display text-4xl font-extrabold" />
                 </div>
                 <h3 className="font-display text-[1.05rem] font-bold leading-snug text-[#111111]">
                   {title}
