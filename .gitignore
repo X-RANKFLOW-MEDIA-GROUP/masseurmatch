@@ -94,6 +94,9 @@ enterprise-audit-prompt.txt
 bug-audit-report/
 repo-audit-report/
 
+# Supabase CLI local state (machine-specific)
+supabase/.temp/
+
 # pnpm-only project: block stray npm/yarn lockfiles
 package-lock.json
 yarn.lock
