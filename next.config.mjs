@@ -71,6 +71,11 @@ const LEGACY_REDIRECTS = [
   // Client-side booking pages removed — clients browse without accounts
   { source: "/client", destination: "/search", permanent: false },
   { source: "/client/:path*", destination: "/search", permanent: false },
+  // Legacy test/variant pages → canonical
+  { source: "/home-1-search-form", destination: "/search", permanent: true },
+  { source: "/home-1-search-form/", destination: "/search", permanent: true },
+  // Cookie policy alias — /cookies → /cookie-policy
+  { source: "/cookies", destination: "/cookie-policy", permanent: true },
 ];
 
 const isDev = process.env.NODE_ENV !== "production";

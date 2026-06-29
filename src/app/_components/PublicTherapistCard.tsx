@@ -73,8 +73,8 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
   const startingPrice = getStartingPrice(therapist);
   const priceLabel = formatCurrency(startingPrice);
   const specialty = therapist.specialties?.[0] || therapist.modality || null;
-  const city = therapist.city || null;
-  const state = therapist.state || null;
+  const city = therapist.city?.trim() || null;
+  const state = therapist.state?.trim() || null;
   const locationLabel = [city, state].filter(Boolean).join(", ");
 
   const profileImage = therapist.profile_photo || therapist.avatar_url || null;
