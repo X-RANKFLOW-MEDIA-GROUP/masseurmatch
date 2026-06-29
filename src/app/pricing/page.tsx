@@ -49,7 +49,7 @@ const strategyCards = [
   {
     icon: IconShield,
     title: "Trust converts",
-    body: "Verification, reviews, and proof badges improve first-contact conversion and support higher pricing confidence.",
+    body: "Verification credentials and proof badges improve first-contact conversion and support higher pricing confidence.",
   },
   {
     icon: IconSpark,
