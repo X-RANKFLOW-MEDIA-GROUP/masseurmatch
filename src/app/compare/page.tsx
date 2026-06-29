@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, ChevronRight, Scale, Search, ShieldCheck } from "lucide-react";
+import { ChevronRight, Scale } from "lucide-react";
+
+import { IconArrowRight, IconSearch, IconShield } from "@/components/icons";
 import { JsonLd } from "@/app/_components/json-ld";
 import {
   buildBreadcrumbJsonLd,
@@ -86,7 +88,7 @@ export default function CompareHubPage() {
                 <Button asChild variant="hero" className="rounded-full px-6">
                   <Link href="/register">
                     Create free profile
-                    <ArrowRight className="h-4 w-4" />
+                    <IconArrowRight size={16} />
                   </Link>
                 </Button>
                 <Button asChild variant="glass" className="rounded-full px-6">
@@ -97,12 +99,12 @@ export default function CompareHubPage() {
               <div className="mt-10 grid gap-4 md:grid-cols-3">
                 {[
                   {
-                    icon: Search,
+                    icon: IconSearch,
                     title: "Search-first structure",
                     body: "Each comparison page targets high-intent alternative queries and stays linked back into the main directory.",
                   },
                   {
-                    icon: ShieldCheck,
+                    icon: IconShield,
                     title: "Cleaner positioning",
                     body: "The pages emphasize trust, premium presentation, and a more professional public profile strategy.",
                   },

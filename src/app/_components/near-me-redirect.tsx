@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowUpRight, MapPin } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { IconMapPin } from "@/components/icons";
 import { getCities } from "@/app/_lib/directory";
 import { requestJson } from "@/app/_lib/request";
 import { PRIORITY_CITY_SLUGS } from "@/lib/marketing/home-data";
@@ -91,7 +92,7 @@ export function NearMeRedirect() {
   return (
     <div className="mx-auto max-w-2xl">
       <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-        <MapPin className="h-4 w-4 text-primary" strokeWidth={2.25} aria-hidden />
+        <IconMapPin size={16} className="text-primary" aria-hidden />
         {message}
       </div>
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, LockKeyhole, ShieldCheck } from "lucide-react";
+import { IconArrowRight, IconShield, IconLock } from "@/components/icons";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import { buildFaqJsonLd } from "@/app/_lib/structured-data";
 import { JsonLd } from "@/app/_components/json-ld";
@@ -88,7 +88,7 @@ export function CityDirectoryPage({
                     }
                   >
                     {link.label}
-                    <ArrowRight className="h-4 w-4" />
+                    <IconArrowRight size={16} />
                   </Link>
                 ))}
               </div>
@@ -97,33 +97,29 @@ export function CityDirectoryPage({
             <div className="grid gap-px bg-border-subtle sm:grid-cols-3">
               {[
                 {
-                  icon: ShieldCheck,
+                  icon: <IconShield size={20} />,
                   title: "Trust-first discovery",
                   body: "Verification status is visible where available so users can shortlist faster.",
                 },
                 {
-                  icon: BadgeCheck,
+                  icon: <IconShield size={20} />,
                   title: "Premium local intent",
                   body: "City, segment, and service pages create cleaner long-tail search entry points.",
                 },
                 {
-                  icon: LockKeyhole,
+                  icon: <IconLock size={20} />,
                   title: "Direct connection",
                   body: "Profiles are built for immediate call or message without platform detours.",
                 },
-              ].map((item) => {
-                const Icon = item.icon;
-
-                return (
+              ].map((item) => (
                   <div key={item.title} className="bg-background px-6 py-6">
                     <div className="flex h-11 w-11 items-center justify-center rounded-[16px] bg-brand-primary text-white">
-                      <Icon className="h-5 w-5" />
+                      {item.icon}
                     </div>
                     <h2 className="mt-4 text-base font-semibold text-foreground">{item.title}</h2>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.body}</p>
                   </div>
-                );
-              })}
+                ))}
             </div>
           </Surface>
 
@@ -151,7 +147,7 @@ export function CityDirectoryPage({
               className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-secondary transition hover:gap-3"
             >
               Read the safety policy
-              <ArrowRight className="h-4 w-4" />
+              <IconArrowRight size={16} />
             </Link>
           </div>
         </div>

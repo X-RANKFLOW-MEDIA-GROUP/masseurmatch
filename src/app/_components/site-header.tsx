@@ -1,23 +1,32 @@
-﻿// src/app/_components/SiteHeader.tsx
+// src/app/_components/SiteHeader.tsx
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { BRAND_ASSETS } from "@/lib/brand";
 import {
-  Home,
   Users,
-  Heart,
+  Search,
+  MapPin,
+  Scale,
+  Compass,
+  Lightbulb,
+  ShieldCheck,
+  BadgeCheck,
+  BookOpen,
   Tag,
   Info,
   Phone,
+  FileText,
+  Newspaper,
   UserCircle,
   Menu,
   X,
   LogOut,
+  ChevronDown,
 } from "lucide-react";
 import {
   Sheet,
@@ -28,20 +37,196 @@ import {
 
 import type { LucideIcon } from "lucide-react";
 
-interface NavLink {
+interface NavChild {
   href: string;
   label: string;
   icon: LucideIcon;
+  description?: string;
 }
 
-const navLinks: NavLink[] = [
-  { href: "/", label: "Home", icon: Home },
-  { href: "/therapists", label: "Therapists", icon: Users },
-  { href: "/how-it-works", label: "How it Works", icon: Heart },
-  { href: "/pricing", label: "Pricing", icon: Tag },
-  { href: "/about", label: "About", icon: Info },
-  { href: "/contact", label: "Contact", icon: Phone },
+interface NavItem {
+  label: string;
+  icon: LucideIcon;
+  href?: string;
+  children?: NavChild[];
+}
+
+const navItems: NavItem[] = [
+  { label: "Therapists", icon: Users, href: "/therapists" },
+  {
+    label: "Explore",
+    icon: Compass,
+    children: [
+      { href: "/explore", label: "Browse & Map", icon: Compass, description: "Discover therapists visually" },
+      { href: "/search", label: "Search", icon: Search, description: "Filter by city, type, price" },
+      { href: "/near-me", label: "Near Me", icon: MapPin, description: "Find therapists nearby" },
+      { href: "/compare", label: "Compare", icon: Scale, description: "Side-by-side comparison" },
+    ],
+  },
+  { label: "How It Works", icon: Lightbulb, href: "/how-it-works" },
+  {
+    label: "Trust",
+    icon: ShieldCheck,
+    children: [
+      { href: "/trust", label: "Trust & Safety", icon: ShieldCheck, description: "Our safety commitment" },
+      { href: "/verification", label: "Verification", icon: BadgeCheck, description: "How we verify profiles" },
+      { href: "/community-guidelines", label: "Guidelines", icon: BookOpen, description: "Community standards" },
+    ],
+  },
+  { label: "Pricing", icon: Tag, href: "/pricing" },
+  {
+    label: "About",
+    icon: Info,
+    children: [
+      { href: "/about", label: "About Us", icon: Info, description: "Our story & mission" },
+      { href: "/contact", label: "Contact", icon: Phone, description: "Get in touch" },
+      { href: "/blog", label: "Blog", icon: Newspaper, description: "Articles & updates" },
+      { href: "/legal", label: "Legal", icon: FileText, description: "Terms & privacy" },
+    ],
+  },
 ];
+
+function DropdownMenu({
+  children,
+  isOpen,
+  onClose,
+}: {
+  children: NavChild[];
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  const shouldReduceMotion = useReducedMotion();
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 4 }}
+          transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute left-1/2 top-full pt-2 -translate-x-1/2"
+        >
+          <div
+            className="min-w-[240px] rounded-xl border border-[#E8E8E8] bg-white p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.1)]"
+            role="menu"
+          >
+            {children.map((child) => (
+              <Link
+                key={child.href}
+                href={child.href}
+                onClick={onClose}
+                role="menuitem"
+                className="group flex items-start gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-[#F7F7F7]"
+              >
+                <child.icon
+                  className="mt-0.5 w-4 h-4 text-[#8E8E8E] group-hover:text-[#8B1E2D] transition-colors shrink-0"
+                  strokeWidth={2.25}
+                />
+                <div>
+                  <p className="text-sm font-semibold text-[#111111]">
+                    {child.label}
+                  </p>
+                  {child.description && (
+                    <p className="text-[11px] text-[#8E8E8E] leading-snug mt-0.5">
+                      {child.description}
+                    </p>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function DesktopNavItem({
+  item,
+  active,
+}: {
+  item: NavItem;
+  active: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  const openMenu = useCallback(() => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    setIsOpen(true);
+  }, []);
+
+  const scheduleClose = useCallback(() => {
+    closeTimerRef.current = setTimeout(() => setIsOpen(false), 150);
+  }, []);
+
+  const closeMenu = useCallback(() => setIsOpen(false), []);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, []);
+
+  if (item.href) {
+    return (
+      <motion.div
+        whileHover={shouldReduceMotion ? undefined : { scale: 1.04 }}
+        whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
+        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      >
+        <Link
+          href={item.href}
+          className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md transition-colors ${
+            active
+              ? "bg-[#8B1E2D] text-white shadow-sm"
+              : "text-[#6F6F6F] hover:text-[#111111] hover:bg-[#F7F7F7]"
+          }`}
+        >
+          <item.icon className="w-[0.9rem] h-[0.9rem]" strokeWidth={2.35} />
+          {item.label}
+        </Link>
+      </motion.div>
+    );
+  }
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={openMenu}
+      onMouseLeave={scheduleClose}
+    >
+      <motion.button
+        type="button"
+        whileHover={shouldReduceMotion ? undefined : { scale: 1.04 }}
+        whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
+        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+        onClick={() => setIsOpen((prev) => !prev)}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+        className={`flex items-center gap-1 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md transition-colors ${
+          active
+            ? "bg-[#8B1E2D] text-white shadow-sm"
+            : "text-[#6F6F6F] hover:text-[#111111] hover:bg-[#F7F7F7]"
+        }`}
+      >
+        <item.icon className="w-[0.9rem] h-[0.9rem]" strokeWidth={2.35} />
+        {item.label}
+        <ChevronDown
+          className={`w-3 h-3 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          strokeWidth={2.5}
+        />
+      </motion.button>
+      {item.children && (
+        <DropdownMenu isOpen={isOpen} onClose={closeMenu}>
+          {item.children}
+        </DropdownMenu>
+      )}
+    </div>
+  );
+}
 
 function MobileNav({
   dashboardPath,
@@ -55,12 +240,27 @@ function MobileNav({
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
-  const allLinks: NavLink[] = [
-    ...navLinks,
-    authenticated
-      ? { href: dashboardPath, label: "Dashboard", icon: UserCircle }
-      : { href: "/login", label: "Login", icon: UserCircle },
-  ];
+  const flatLinks: { href: string; label: string; icon: LucideIcon; section?: string }[] = [];
+  for (const item of navItems) {
+    if (item.href) {
+      flatLinks.push({ href: item.href, label: item.label, icon: item.icon });
+    } else if (item.children) {
+      for (const child of item.children) {
+        flatLinks.push({ href: child.href, label: child.label, icon: child.icon, section: item.label });
+      }
+    }
+  }
+
+  const sections: { label: string | null; links: typeof flatLinks }[] = [];
+  let currentSection: string | null | undefined = undefined;
+  for (const link of flatLinks) {
+    const sec = link.section ?? null;
+    if (sec !== currentSection) {
+      currentSection = sec;
+      sections.push({ label: sec, links: [] });
+    }
+    sections[sections.length - 1].links.push(link);
+  }
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -76,11 +276,11 @@ function MobileNav({
 
       <SheetContent
         side="right"
-        className="w-[300px] bg-white border-l border-[#E5E5E5] p-0"
+        className="w-[300px] bg-white border-l border-[#E8E8E8] p-0"
       >
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#E5E5E5]">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#E8E8E8]">
           <Link
             href="/"
             onClick={() => setOpen(false)}
@@ -105,31 +305,66 @@ function MobileNav({
           </button>
         </div>
 
-        <nav className="flex flex-col px-3 py-4 gap-0.5">
-          {allLinks.map(({ href, label, icon: Icon }) => {
-            const active = pathname === href;
-            return (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  active
-                    ? "bg-[#8B1E2D] text-white"
-                    : "text-[#6F6F6F] hover:bg-[#F7F7F7] hover:text-[#111111]"
-                }`}
-              >
-                <Icon
-                  className="w-4 h-4"
-                  strokeWidth={2.25}
-                />
-                {label}
-              </Link>
-            );
-          })}
+        <nav className="flex flex-col px-3 py-3 gap-0.5 overflow-y-auto max-h-[calc(100vh-200px)]">
+          {sections.map((section, si) => (
+            <div key={si}>
+              {section.label && (
+                <p className="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8E8E8E]">
+                  {section.label}
+                </p>
+              )}
+              {section.links.map(({ href, label, icon: Icon }) => {
+                const active = pathname === href;
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                      active
+                        ? "bg-[#8B1E2D] text-white"
+                        : "text-[#6F6F6F] hover:bg-[#F7F7F7] hover:text-[#111111]"
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" strokeWidth={2.25} />
+                    {label}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
+
+          {authenticated !== null && authenticated && (
+            <Link
+              href={dashboardPath}
+              onClick={() => setOpen(false)}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                pathname === dashboardPath
+                  ? "bg-[#8B1E2D] text-white"
+                  : "text-[#6F6F6F] hover:bg-[#F7F7F7] hover:text-[#111111]"
+              }`}
+            >
+              <UserCircle className="w-4 h-4" strokeWidth={2.25} />
+              Dashboard
+            </Link>
+          )}
+          {authenticated !== null && !authenticated && (
+            <Link
+              href="/login"
+              onClick={() => setOpen(false)}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                pathname === "/login"
+                  ? "bg-[#8B1E2D] text-white"
+                  : "text-[#6F6F6F] hover:bg-[#F7F7F7] hover:text-[#111111]"
+              }`}
+            >
+              <UserCircle className="w-4 h-4" strokeWidth={2.25} />
+              Log In
+            </Link>
+          )}
         </nav>
 
-        <div className="mt-auto px-5 pb-6 pt-4 border-t border-[#E5E5E5] space-y-2">
+        <div className="mt-auto px-5 pb-6 pt-4 border-t border-[#E8E8E8] space-y-2">
           {authenticated === null ? (
             <div className="h-10 animate-pulse rounded-lg bg-[#F7F7F7]" />
           ) : authenticated ? (
@@ -137,7 +372,7 @@ function MobileNav({
               <Link
                 href={dashboardPath}
                 onClick={() => setOpen(false)}
-                className="block w-full text-center rounded-lg border border-[#E5E5E5] py-2.5 text-sm font-medium text-[#111111] hover:bg-[#F7F7F7] transition-colors"
+                className="block w-full text-center rounded-lg border border-[#E8E8E8] py-2.5 text-sm font-medium text-[#111111] hover:bg-[#F7F7F7] transition-colors"
               >
                 Dashboard
               </Link>
@@ -157,7 +392,7 @@ function MobileNav({
               <Link
                 href="/login"
                 onClick={() => setOpen(false)}
-                className="block w-full text-center rounded-lg border border-[#E5E5E5] py-2.5 text-sm font-medium text-[#111111] hover:bg-[#F7F7F7] transition-colors"
+                className="block w-full text-center rounded-lg border border-[#E8E8E8] py-2.5 text-sm font-medium text-[#111111] hover:bg-[#F7F7F7] transition-colors"
               >
                 Log In
               </Link>
@@ -231,8 +466,12 @@ export default function SiteHeader() {
     router.refresh();
   }
 
-  // Don't render public marketing header on admin/pro -- they have their own layout shells
   if (isAppSection) return null;
+
+  function isItemActive(item: NavItem): boolean {
+    if (item.href) return pathname === item.href;
+    return item.children?.some((c) => pathname === c.href) ?? false;
+  }
 
   return (
     <motion.header
@@ -241,7 +480,7 @@ export default function SiteHeader() {
       transition={{ duration: shouldReduceMotion ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 bg-white transition-shadow duration-300 ${
         isScrolled
-          ? "shadow-[0_2px_8px_rgba(0,0,0,0.08)] border-b border-[#E5E5E5]"
+          ? "shadow-[0_2px_8px_rgba(0,0,0,0.08)] border-b border-[#E8E8E8]"
           : "border-b border-transparent"
       }`}
     >
@@ -265,7 +504,6 @@ export default function SiteHeader() {
               Premium Sports Recovery &amp; Wellness
             </span>
           </div>
-          {/* Keep Image import used -- hidden fallback */}
           <Image
             src={BRAND_ASSETS.logo}
             alt="MasseurMatch"
@@ -278,34 +516,14 @@ export default function SiteHeader() {
 
         {/* Center: Navigation */}
         <nav className="hidden lg:flex items-center gap-0.5">
-          {navLinks.map(({ href, label, icon: Icon }) => {
-            const active = pathname === href;
-            return (
-              <motion.div
-                key={href}
-                whileHover={shouldReduceMotion ? undefined : { scale: 1.04 }}
-                whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
-              >
-                <Link
-                  href={href}
-                  className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md transition-colors ${
-                    active
-                      ? "bg-[#8B1E2D] text-white shadow-sm"
-                      : "text-[#6F6F6F] hover:text-[#111111] hover:bg-[#F7F7F7]"
-                  }`}
-                >
-                  <Icon
-                    className="w-[0.9rem] h-[0.9rem]"
-                    strokeWidth={2.35}
-                  />
-                  {label}
-                </Link>
-              </motion.div>
-            );
-          })}
+          {navItems.map((item) => (
+            <DesktopNavItem
+              key={item.label}
+              item={item}
+              active={isItemActive(item)}
+            />
+          ))}
 
-          {/* LOGIN nav item */}
           {authenticated === null ? (
             <div className="w-16 h-8 animate-pulse rounded-md bg-[#F7F7F7] ml-0.5" />
           ) : authenticated ? (
@@ -353,7 +571,7 @@ export default function SiteHeader() {
               onClick={handleLogout}
               whileHover={shouldReduceMotion ? undefined : { scale: 1.05 }}
               whileTap={shouldReduceMotion ? undefined : { scale: 0.95 }}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#6F6F6F] hover:text-[#8B1E2D] hover:bg-red-50 transition-colors"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#6F6F6F] hover:text-[#8B1E2D] hover:bg-[#F8EDEE] transition-colors"
             >
               <LogOut className="w-[0.9rem] h-[0.9rem]" strokeWidth={2.35} />
               Log out

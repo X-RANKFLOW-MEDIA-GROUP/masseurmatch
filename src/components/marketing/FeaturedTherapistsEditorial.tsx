@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BadgeCheck } from "lucide-react";
+import { IconArrowRight, IconShield } from "@/components/icons";
 import { InkReveal } from "@/components/motion/InkReveal";
 import { SplitTextReveal } from "@/components/motion/SplitTextReveal";
 import { StaggerReveal } from "@/components/motion/StaggerReveal";
@@ -50,7 +50,7 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
             className="hidden items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-primary transition hover:opacity-70 sm:inline-flex"
           >
             Browse all
-            <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.25} />
+            <IconArrowRight size={14} className="inline" />
           </Link>
         </div>
 
@@ -93,8 +93,8 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
                     </div>
                   )}
                   {isVerified && (
-                    <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full glass-dark px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">
-                      <BadgeCheck className="h-3 w-3 text-primary" />
+                    <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full glass-dark px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
+                      <IconShield size={12} className="text-primary" />
                       Pro
                     </div>
                   )}
@@ -126,7 +126,7 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
                     </p>
                     <span className="inline-flex items-center gap-1 text-xs font-bold text-primary">
                       View
-                      <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" strokeWidth={2.5} />
+                      <IconArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-0.5" />
                     </span>
                   </div>
                 </div>

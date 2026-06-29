@@ -1,8 +1,9 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowUpRight, ShieldCheck } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { IconShield } from "@/components/icons";
 
 type FormState = "idle" | "loading" | "success" | "error";
 
@@ -124,7 +125,7 @@ export function SiteFooterTalk() {
             </div>
 
             <div className="mt-12 flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-emerald-400" strokeWidth={2.25} />
+              <IconShield size={20} className="text-emerald-400" />
               <span className="font-mono text-[10px] uppercase tracking-widest text-slate-400">
                 Verified Secure Network
               </span>

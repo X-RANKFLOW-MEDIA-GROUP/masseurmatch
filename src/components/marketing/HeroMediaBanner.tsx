@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { IconMapPin } from "@/components/icons";
 import { Cta3DButton } from "@/components/marketing/Cta3DButton";
 import { BRAND_ASSETS } from "@/lib/brand";
 import type { PublicTherapist } from "@/app/_lib/directory";
@@ -122,7 +122,7 @@ function ProfileCard({ therapist }: { therapist: PublicTherapist }) {
           </p>
           {therapist.city && (
             <p className="mt-0.5 flex items-center gap-1 truncate text-[10px] text-white/55">
-              <MapPin className="h-2.5 w-2.5 flex-shrink-0" strokeWidth={2.25} />
+              <IconMapPin size={10} className="flex-shrink-0" />
               {therapist.city}
             </p>
           )}

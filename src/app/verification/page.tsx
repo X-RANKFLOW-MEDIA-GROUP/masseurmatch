@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
-import { ArrowRight, BadgeCheck, FileText, ShieldCheck, UserCheck } from "lucide-react";
+import { FileText, UserCheck } from "lucide-react";
+
+import { IconArrowRight, IconShield } from "@/components/icons";
 
 export const metadata: Metadata = {
   title: "Identity Verification | MasseurMatch",
@@ -43,12 +45,12 @@ const steps = [
     body: "Stripe Identity uses computer vision to confirm that the face on the ID matches the person holding it in real time. The check is automated and typically completes in under 60 seconds.",
   },
   {
-    icon: ShieldCheck,
+    icon: IconShield,
     title: "MasseurMatch receives a pass / fail result",
     body: "If the check passes, we mark the profile Verified and record the date. If it fails or cannot be confirmed, no badge is shown. We review disputed outcomes manually.",
   },
   {
-    icon: BadgeCheck,
+    icon: IconShield,
     title: "The badge appears on the profile with the verification date",
     body: "The Verified badge shows the month and year of the check so clients can see how recent it is. Therapists who let their subscription lapse and then re-subscribe must re-verify.",
   },
@@ -343,7 +345,7 @@ export default function VerificationPage() {
               }}
             >
               Report to trust@masseurmatch.com
-              <ArrowRight style={{ width: 14, height: 14 }} strokeWidth={2.5} />
+              <IconArrowRight size={14} />
             </Link>
           </section>
         </div>

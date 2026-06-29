@@ -1,14 +1,16 @@
-﻿"use client";
+"use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { ShieldCheck, Star, Lock, ArrowRight, Users, Globe, BadgeCheck } from "lucide-react";
+import { Users } from "lucide-react";
 import Link from "next/link";
 
-function Pillar({ icon: Icon, title, text }: { icon: typeof ShieldCheck; title: string; text: string }) {
+import { IconArrowRight, IconGlobe, IconLock, IconShield, IconStar } from "@/components/icons";
+
+function Pillar({ icon: Icon, title, text }: { icon: React.ComponentType<{ size?: number; className?: string }>; title: string; text: string }) {
   return (
     <div className="flex flex-col gap-4 border border-white/[0.08] bg-white/[0.03] p-8 backdrop-blur-sm">
       <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/[0.10] bg-[#8B1E2D]/10">
-        <Icon className="h-5 w-5 text-[#8B1E2D]" strokeWidth={2.25} />
+        <Icon size={20} className="text-[#8B1E2D]" />
       </div>
       <h3 className="font-display text-lg font-bold text-white">{title}</h3>
       <p className="text-sm leading-6 text-white/55">{text}</p>
@@ -95,17 +97,17 @@ export default function AboutContent() {
 
           <div className="mt-10 grid grid-cols-1 gap-px bg-white/[0.04] sm:grid-cols-3">
             <Pillar
-              icon={ShieldCheck}
+              icon={IconShield}
               title="Rigorous verification"
               text="Every profile is reviewed before going live. Identity checks, photo moderation, and profile approval ensure only legitimate, professional therapists are listed."
             />
             <Pillar
-              icon={Star}
+              icon={IconStar}
               title="Elite standards"
               text="We focus on quality over quantity. Only professionals dedicated to real results and a premium client experience appear in our directory."
             />
             <Pillar
-              icon={Lock}
+              icon={IconLock}
               title="Absolute privacy"
               text="Your wellness journey is personal. Our platform is built with encrypted communications and no data selling — ever."
             />
@@ -137,20 +139,34 @@ export default function AboutContent() {
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {[
-              { icon: Users, label: "Independent therapists", text: "Profiles owned by the professional — not a platform." },
-              { icon: Globe, label: "Nationwide cities", text: "National reach from Dallas to New York to LA and beyond." },
-              { icon: BadgeCheck, label: "Identity verified", text: "Each profile reviewed and approved before going live." },
-              { icon: ShieldCheck, label: "LGBTQ+ affirming", text: "Inclusive by design — every profile clearly marked." },
-            ].map(({ icon: Icon, label, text }) => (
-              <div key={label} className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#8B1E2D]/10">
-                  <Icon className="h-4 w-4 text-[#8B1E2D]" strokeWidth={2.25} />
-                </div>
-                <p className="mt-3 text-sm font-bold text-white">{label}</p>
-                <p className="mt-1 text-xs leading-5 text-white/50">{text}</p>
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#8B1E2D]/10">
+                <Users className="h-4 w-4 text-[#8B1E2D]" strokeWidth={2.25} />
               </div>
-            ))}
+              <p className="mt-3 text-sm font-bold text-white">Independent therapists</p>
+              <p className="mt-1 text-xs leading-5 text-white/50">Profiles owned by the professional — not a platform.</p>
+            </div>
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#8B1E2D]/10">
+                <IconGlobe size={16} className="text-[#8B1E2D]" />
+              </div>
+              <p className="mt-3 text-sm font-bold text-white">Nationwide cities</p>
+              <p className="mt-1 text-xs leading-5 text-white/50">National reach from Dallas to New York to LA and beyond.</p>
+            </div>
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#8B1E2D]/10">
+                <IconShield size={16} className="text-[#8B1E2D]" />
+              </div>
+              <p className="mt-3 text-sm font-bold text-white">Identity verified</p>
+              <p className="mt-1 text-xs leading-5 text-white/50">Each profile reviewed and approved before going live.</p>
+            </div>
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#8B1E2D]/10">
+                <IconShield size={16} className="text-[#8B1E2D]" />
+              </div>
+              <p className="mt-3 text-sm font-bold text-white">LGBTQ+ affirming</p>
+              <p className="mt-1 text-xs leading-5 text-white/50">Inclusive by design — every profile clearly marked.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -170,7 +186,7 @@ export default function AboutContent() {
               className="inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
             >
               Find a therapist
-              <ArrowRight size={15} strokeWidth={2.5} />
+              <IconArrowRight size={15} />
             </Link>
             <Link
               href="/for-therapists"

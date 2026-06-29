@@ -1,8 +1,9 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { MapPin, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { IconMapPin } from "@/components/icons";
 
 type CityEntry = {
   name: string;
@@ -63,9 +64,8 @@ function CityLink({
                 : "bg-[#F7F7F7] group-hover:bg-[#8B1E2D]/8"
             }`}
           >
-            <MapPin
+            <IconMapPin
               size={16}
-              strokeWidth={2.25}
               className={`transition-colors duration-300 ${
                 city.featured
                   ? "text-[#8B1E2D]"
@@ -86,7 +86,7 @@ function CityLink({
         <ArrowUpRight
           size={16}
           strokeWidth={2.25}
-          className="text-[#CCCCCC] transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#8B1E2D]"
+          className="text-[#E8E8E8] transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#8B1E2D]"
         />
       </Link>
     </motion.div>

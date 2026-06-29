@@ -1,6 +1,8 @@
 ﻿import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Check, ShieldCheck, Users, MessageCircle, Star, ArrowUpRight, X } from "lucide-react";
+import { ArrowUpRight, Check, Users, X } from "lucide-react";
+
+import { IconArrowRight, IconMessage, IconShield, IconStar } from "@/components/icons";
 import { JsonLd } from "@/app/_components/json-ld";
 import { buildBreadcrumbJsonLd, buildFaqJsonLd, createPageMetadata } from "@/app/_lib/seo";
 import { siteUrl } from "@/lib/site";
@@ -96,21 +98,21 @@ const clientSteps = [
   },
   {
     n: "02",
-    icon: ShieldCheck,
+    icon: IconShield,
     title: "Compare verified profiles",
     body: "Review photos, services, pricing, trust badges, availability, reviews, and years of experience before reaching out.",
     badge: "Trust signals",
   },
   {
     n: "03",
-    icon: MessageCircle,
+    icon: IconMessage,
     title: "Contact directly",
     body: "Use the phone, WhatsApp, or email buttons on each profile. No platform middleman — you communicate with the therapist directly.",
     badge: "Direct contact",
   },
   {
     n: "04",
-    icon: Star,
+    icon: IconStar,
     title: "Book & experience",
     body: "Confirm details with the therapist and book the session. After, your review helps others in the community.",
     badge: "Community",
@@ -204,7 +206,7 @@ export default function HowItWorksPage() {
                 className="inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
               >
                 Search therapists
-                <ArrowRight size={16} strokeWidth={2.5} />
+                <IconArrowRight size={16} />
               </Link>
               <Link
                 href="#for-therapists"
@@ -372,7 +374,7 @@ export default function HowItWorksPage() {
               className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-8 py-4 text-sm font-bold uppercase tracking-wide text-white shadow-xl shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
             >
               Search therapists now
-              <ArrowRight size={16} strokeWidth={2.5} />
+              <IconArrowRight size={16} />
             </Link>
           </div>
         </section>

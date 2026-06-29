@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { ArrowRight, ArrowUp, MapPin, MessageSquare, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowUp, MessageSquare } from "lucide-react";
+import { IconMapPin, IconSpark } from "@/components/icons";
 import { useState } from "react";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import { cn } from "@/lib/utils";
@@ -229,7 +230,7 @@ function SpotlightProfileCard({ therapist, index }: { therapist: ShowcaseCard; i
             <p className="mt-1 text-xs font-medium uppercase tracking-[0.18em] text-white/38">{therapist.byline}</p>
             <p className="mt-3 line-clamp-2 text-sm leading-5 text-white/58">{therapist.detailLabel}</p>
             <div className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-soft">
-              <MapPin className="h-3.5 w-3.5" />
+              <IconMapPin size={14} />
               <span>{therapist.cityLabel}</span>
             </div>
           </div>
@@ -415,7 +416,7 @@ export function KnottyHeroSpotlight({ therapists, therapistCount, cityCount }: K
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/45">
-                <Sparkles className="h-3.5 w-3.5" />
+                <IconSpark size={14} />
                 Spotlight
               </p>
               <h2 className="mt-3 max-w-[7ch] text-4xl font-black uppercase leading-[0.86] tracking-tight text-white sm:text-5xl">

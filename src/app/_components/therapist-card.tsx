@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { MapPin, Star } from "lucide-react";
+import { IconMapPin, IconStar } from "@/components/icons";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -37,7 +37,7 @@ export default function TechLuxuryTherapistCard({
           />
           {/* Floating Rating Badge */}
           <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-3 py-1.5 flex items-center gap-1.5 rounded-full shadow-md">
-            <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+            <IconStar size={16} className="text-amber-400" />
             <span className="font-semibold text-sm text-slate-900">{rating.toFixed(1)}</span>
           </div>
         </div>
@@ -62,7 +62,7 @@ export default function TechLuxuryTherapistCard({
           {/* Footer */}
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1.5 text-slate-500">
-              <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+              <IconMapPin size={14} className="flex-shrink-0" />
               <span className="truncate">{distance} mi</span>
             </div>
             <div className="text-right">
