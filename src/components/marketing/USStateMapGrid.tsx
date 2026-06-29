@@ -5,6 +5,8 @@ import Link from "next/link";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { MapPin, ChevronRight, X } from "lucide-react";
 import { US_CITIES } from "@/data/cities";
+import { InkReveal } from "@/components/motion/InkReveal";
+import { SplitTextReveal } from "@/components/motion/SplitTextReveal";
 
 type StateTile = {
   code: string;
@@ -107,16 +109,28 @@ export function USStateMapGrid() {
 
         {/* Header */}
         <div className="mb-12">
-          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-            City Coverage
-          </p>
-          <h2 className="mt-3 font-display text-[clamp(2rem,5vw,4rem)] font-extrabold leading-[0.95] tracking-tight">
-            Find a therapist in your city.
-          </h2>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
+          <InkReveal origin="left" duration={0.7}>
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+              City Coverage
+            </p>
+          </InkReveal>
+          <SplitTextReveal
+            text="Find a therapist in your city."
+            tag="h2"
+            wordMode
+            charDelay={0.07}
+            className="mt-3 font-display text-[clamp(2rem,5vw,4rem)] font-extrabold leading-[0.95] tracking-tight"
+          />
+          <motion.p
+            className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground"
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: reduced ? 0 : 0.6, ease: [0.22, 1, 0.36, 1], delay: reduced ? 0 : 0.3 }}
+          >
             MasseurMatch covers every major US market. Select a state to browse
             its cities.
-          </p>
+          </motion.p>
         </div>
 
         {/* Tile grid */}
