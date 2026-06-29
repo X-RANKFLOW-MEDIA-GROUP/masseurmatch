@@ -4,8 +4,13 @@ const LEGAL_LINKS = [
   { href: "/legal", label: "Legal Center" },
   { href: "/terms", label: "Terms" },
   { href: "/privacy", label: "Privacy" },
-  { href: "/therapist-agreement", label: "Therapist Agreement" },
   { href: "/cookie-policy", label: "Cookies" },
+  { href: "/provider-terms", label: "Provider Terms" },
+  { href: "/client-terms", label: "Client Terms" },
+  { href: "/acceptable-use", label: "Acceptable Use" },
+  { href: "/subscriptions", label: "Subscriptions" },
+  { href: "/refund-policy", label: "Refunds" },
+  { href: "/dmca", label: "DMCA" },
 ];
 
 type LegalPageProps = {

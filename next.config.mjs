@@ -71,6 +71,12 @@ const LEGACY_REDIRECTS = [
   // Client-side booking pages removed — clients browse without accounts
   { source: "/client", destination: "/search", permanent: false },
   { source: "/client/:path*", destination: "/search", permanent: false },
+  // Document catalog slug aliases — canonical slugs for existing pages at alternate URLs
+  { source: "/cookies", destination: "/cookie-policy", permanent: true },
+  { source: "/disclaimer", destination: "/platform-disclaimer", permanent: true },
+  { source: "/legal-notices", destination: "/legal", permanent: true },
+  { source: "/billing-policy", destination: "/refund-policy", permanent: true },
+  { source: "/legal-contact", destination: "/legal", permanent: true },
 ];
 
 const isDev = process.env.NODE_ENV !== "production";
