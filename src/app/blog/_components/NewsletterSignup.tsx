@@ -88,7 +88,7 @@ export function NewsletterSignup() {
               textTransform: "uppercase",
               fontFamily: "system-ui, sans-serif",
               background: "#8B1E2D",
-              color: "#1A1A1A",
+              color: "#111111",
               border: "none",
               cursor: status === "loading" ? "wait" : "pointer",
               fontWeight: 600,

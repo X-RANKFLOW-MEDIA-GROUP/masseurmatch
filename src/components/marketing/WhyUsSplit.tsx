@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { Check, ShieldCheck } from "lucide-react";
+import { Check } from "lucide-react";
+import { IconShield } from "@/components/icons";
 import FadeUp from "@/components/motion/FadeUp";
 
 const TRUST_POINTS = [
@@ -18,7 +19,7 @@ export function WhyUsSplit() {
 
           {/* Left — cinematic image with overlaid stat */}
           <FadeUp delay={0.05}>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-[#1A1A1A]">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-[#111111]">
               <Image
                 src="/marketing/hero/cover.jpg"
                 alt="Verified massage therapy session"
@@ -77,7 +78,7 @@ export function WhyUsSplit() {
               {/* Closing trust line */}
               <div className="mt-10 flex items-center gap-3 border-t border-border/40 pt-8">
                 <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                  <ShieldCheck className="h-6 w-6" />
+                  <IconShield size={24} />
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-foreground">Reviews from documented contacts</p>

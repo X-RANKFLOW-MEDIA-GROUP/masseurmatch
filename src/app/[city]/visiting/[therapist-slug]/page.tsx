@@ -93,7 +93,7 @@ export default async function TourPage({
       {/* Hero */}
       <section
         style={{
-          background: "#1A1A1A",
+          background: "#111111",
           color: "#FFFFFF",
           padding: "clamp(48px, 7vw, 72px) 20px",
         }}
@@ -159,7 +159,7 @@ export default async function TourPage({
                   display: "flex",
                   alignItems: "center",
                   gap: 12,
-                  border: "1px solid rgba(26,26,26,0.1)",
+                  border: "1px solid rgba(17,17,17,0.1)",
                   borderRadius: 12,
                   padding: "12px 16px",
                   background: "#fff",
@@ -169,7 +169,7 @@ export default async function TourPage({
                   style={{ width: 16, height: 16, color: "#8B1E2D", flexShrink: 0 }}
                   strokeWidth={2}
                 />
-                <span style={{ fontSize: 15, color: "#1A1A1A" }}>
+                <span style={{ fontSize: 15, color: "#111111" }}>
                   {formatDateRange(visit.start_date, visit.end_date)}
                 </span>
               </li>
@@ -213,7 +213,7 @@ export default async function TourPage({
                 <span
                   key={cat}
                   style={{
-                    border: "1px solid rgba(26,26,26,0.12)",
+                    border: "1px solid rgba(17,17,17,0.12)",
                     borderRadius: 99,
                     padding: "4px 12px",
                     fontSize: 13,
@@ -235,7 +235,7 @@ export default async function TourPage({
               display: "inline-flex",
               alignItems: "center",
               gap: 6,
-              background: "#1A1A1A",
+              background: "#111111",
               color: "#FFFFFF",
               borderRadius: 99,
               padding: "12px 22px",
@@ -255,7 +255,7 @@ export default async function TourPage({
               gap: 6,
               background: "transparent",
               color: "#374151",
-              border: "1px solid rgba(26,26,26,0.15)",
+              border: "1px solid rgba(17,17,17,0.15)",
               borderRadius: 99,
               padding: "12px 22px",
               fontSize: 14,

@@ -1,8 +1,9 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { MapPin, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { IconMapPin } from "@/components/icons";
 
 type CityEntry = {
   name: string;
@@ -48,8 +49,8 @@ function CityLink({
         href={`/${city.slug}`}
         className={`group relative flex items-center justify-between overflow-hidden rounded-xl border px-5 py-4 transition-all duration-300 ${
           city.featured
-            ? "border-[#E2E4E6] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:border-[#8B1E2D]/40 hover:shadow-[0_8px_30px_rgba(139,30,45,0.08)]"
-            : "border-[#E2E4E6]/60 bg-[#FAFAFA] hover:border-[#8B1E2D]/30 hover:bg-white hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)]"
+            ? "border-[#E8E8E8] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:border-[#8B1E2D]/40 hover:shadow-[0_8px_30px_rgba(139,30,45,0.08)]"
+            : "border-[#E8E8E8]/60 bg-[#FAFAFA] hover:border-[#8B1E2D]/30 hover:bg-white hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)]"
         }`}
       >
         {/* Red accent bar on hover */}
@@ -60,24 +61,23 @@ function CityLink({
             className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-300 ${
               city.featured
                 ? "bg-[#8B1E2D]/8 group-hover:bg-[#8B1E2D]/12"
-                : "bg-[#F4F5F6] group-hover:bg-[#8B1E2D]/8"
+                : "bg-[#F7F7F7] group-hover:bg-[#8B1E2D]/8"
             }`}
           >
-            <MapPin
+            <IconMapPin
               size={16}
-              strokeWidth={2.25}
               className={`transition-colors duration-300 ${
                 city.featured
                   ? "text-[#8B1E2D]"
-                  : "text-[#999999] group-hover:text-[#8B1E2D]"
+                  : "text-[#6F6F6F] group-hover:text-[#8B1E2D]"
               }`}
             />
           </div>
           <div>
-            <p className="text-sm font-semibold text-[#1A1A1A]">
+            <p className="text-sm font-semibold text-[#111111]">
               {city.name}
             </p>
-            <p className="text-[11px] font-medium text-[#999999]">
+            <p className="text-[11px] font-medium text-[#6F6F6F]">
               {city.state}
             </p>
           </div>
@@ -86,7 +86,7 @@ function CityLink({
         <ArrowUpRight
           size={16}
           strokeWidth={2.25}
-          className="text-[#CCCCCC] transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#8B1E2D]"
+          className="text-[#E8E8E8] transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#8B1E2D]"
         />
       </Link>
     </motion.div>
@@ -111,12 +111,12 @@ export function CityCaseStudies() {
               BROWSE BY CITY
             </p>
             <h2
-              className="font-display font-extrabold uppercase leading-[1.05] tracking-tight text-[#1A1A1A]"
+              className="font-display font-extrabold uppercase leading-[1.05] tracking-tight text-[#111111]"
               style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)" }}
             >
               YOUR CITY. YOUR THERAPIST.
             </h2>
-            <p className="mt-3 max-w-lg text-sm leading-relaxed text-[#666666] lg:text-base">
+            <p className="mt-3 max-w-lg text-sm leading-relaxed text-[#6F6F6F] lg:text-base">
               Explore verified massage professionals across the country.
               Every city page connects you with local, trusted therapists.
             </p>

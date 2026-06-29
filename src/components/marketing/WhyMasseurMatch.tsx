@@ -26,12 +26,12 @@ const PLATFORM_FEATURES = [
 
 export function WhyMasseurMatch() {
   return (
-    <section className="bg-[#060E1A] py-16 lg:py-24">
+    <section className="bg-[#111111] py-16 lg:py-24">
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
 
         <FadeUp>
           <div className="text-center">
-            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8B1E2D]">
+            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#D4717E]">
               Why MasseurMatch
             </p>
             <h2 className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold tracking-tight text-white">
@@ -49,10 +49,10 @@ export function WhyMasseurMatch() {
 
             {/* MasseurMatch column */}
             <div className="bg-[#0B1829] p-8 lg:p-10">
-              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-[#8B1E2D]">
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4717E]">
                 MasseurMatch
               </p>
-              <p className="mt-1 text-xs text-white/35">Premium verified directory</p>
+              <p className="mt-1 text-xs text-white/60">Premium verified directory</p>
               <div className="mt-7 space-y-0 divide-y divide-white/[0.05]">
                 {OUR_FEATURES.map((item) => (
                   <div key={item} className="flex items-start gap-3 py-3">
@@ -67,20 +67,20 @@ export function WhyMasseurMatch() {
 
             {/* Generic platform column */}
             <div className="bg-[#080F1A] p-8 lg:p-10">
-              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-white/30">
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-white/55">
                 On-demand platforms
               </p>
-              <p className="mt-1 text-xs text-white/20">Booking apps &amp; commission services</p>
+              <p className="mt-1 text-xs text-white/55">Booking apps &amp; commission services</p>
               <div className="mt-7 space-y-0 divide-y divide-white/[0.04]">
                 {PLATFORM_FEATURES.map((item, i) => (
-                  <div key={item} className="flex items-start gap-3 py-3 opacity-40">
+                  <div key={item} className="flex items-start gap-3 py-3">
                     <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/[0.06]">
                       {i === 0
-                        ? <Check size={11} className="text-white/40" strokeWidth={3} />
-                        : <X size={11} className="text-white/40" strokeWidth={3} />
+                        ? <Check size={11} className="text-white/55" strokeWidth={3} />
+                        : <X size={11} className="text-white/55" strokeWidth={3} />
                       }
                     </div>
-                    <span className="text-sm leading-5 text-white/60">{item}</span>
+                    <span className="text-sm leading-5 text-white/55">{item}</span>
                   </div>
                 ))}
               </div>

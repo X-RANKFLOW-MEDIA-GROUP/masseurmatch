@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
-import { ArrowRight, ShieldCheck, Bot, Lock, CheckCircle2, UserCheck, EyeOff, ShieldAlert } from "lucide-react";
+import { Bot, CheckCircle2, EyeOff, ShieldAlert, UserCheck } from "lucide-react";
+
+import { IconArrowRight, IconLock, IconShield } from "@/components/icons";
 
 export const metadata: Metadata = {
   title: "Trust & Safety | How MasseurMatch Protects You",
@@ -52,7 +54,7 @@ export default function TrustPage() {
 
       <div className="min-h-screen bg-slate-50 pb-32 pt-24">
         <section className="container mx-auto mb-20 max-w-4xl px-4 text-center md:px-6">
-          <ShieldCheck className="mx-auto mb-6 h-12 w-12 text-emerald-500" />
+          <IconShield size={48} sketch="medium" className="mx-auto mb-6 text-emerald-500" />
           <h1 className="font-display mb-6 text-4xl font-medium tracking-tight text-slate-900 md:text-6xl">
             Trust First. <br />
             <span className="text-slate-400">Uncompromising commitment.</span>
@@ -78,8 +80,8 @@ export default function TrustPage() {
         <section className="container mx-auto max-w-5xl px-4 md:px-6">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="group relative overflow-hidden bg-slate-950 p-8 text-white md:p-10">
-              <div className="absolute right-0 top-0 h-32 w-32 bg-indigo-500/10 blur-[50px] transition-colors group-hover:bg-indigo-500/20" />
-              <Bot className="mb-6 h-8 w-8 text-indigo-400" />
+              <div className="absolute right-0 top-0 h-32 w-32 bg-[#8B1E2D]/10 blur-[50px] transition-colors group-hover:bg-[#8B1E2D]/20" />
+              <Bot className="mb-6 h-8 w-8 text-[#F8EDEE]" />
               <h3 className="font-display mb-3 text-2xl font-medium">AI Singleton Moderation</h3>
               <p className="mb-6 font-sans text-sm leading-relaxed text-slate-400">
                 Our proprietary Artificial Intelligence system reads and verifies every word and
@@ -113,7 +115,7 @@ export default function TrustPage() {
                 </span>
               </p>
               <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5">
-                <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                <IconShield size={16} className="text-emerald-500" />
                 <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-600">
                   Verified Therapists
                 </span>
@@ -131,7 +133,7 @@ export default function TrustPage() {
             </div>
 
             <div className="border border-slate-200 bg-white p-8 shadow-sm md:p-10">
-              <Lock className="mb-6 h-8 w-8 text-slate-900" />
+              <IconLock size={32} sketch="medium" className="mb-6 text-slate-900" />
               <h3 className="font-display mb-3 text-2xl font-medium text-slate-900">Secure Contact</h3>
               <p className="font-sans text-sm leading-relaxed text-slate-600">
                 Our floating contact bar allows for quick initial communication (SMS/Call) without
@@ -168,7 +170,7 @@ export default function TrustPage() {
               className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 underline-offset-2 hover:text-slate-900 hover:underline"
             >
               Read our full Moderation Policy
-              <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.25} />
+              <IconArrowRight size={14} />
             </Link>
           </div>
         </section>

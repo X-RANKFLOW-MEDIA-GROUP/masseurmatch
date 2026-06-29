@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
+import { IconArrowRight, IconSpark } from "@/components/icons";
 
 import { Surface } from "@/app/_components/primitives";
 import {
@@ -46,10 +47,10 @@ const CATEGORY_STYLES: Record<
     border: "border-emerald-200/80",
   },
   analytics: {
-    glow: "from-indigo-100 via-slate-50 to-white",
-    accent: "bg-indigo-500/10 text-indigo-900",
-    softText: "text-indigo-700",
-    border: "border-indigo-200/80",
+    glow: "from-[#F8EDEE] via-slate-50 to-white",
+    accent: "bg-[#8B1E2D]/10 text-[#8B1E2D]",
+    softText: "text-[#8B1E2D]",
+    border: "border-[#8B1E2D]/20",
   },
   premium: {
     glow: "from-rose-100 via-pink-50 to-white",
@@ -171,12 +172,12 @@ function AddonCard({
           {action.href.startsWith("mailto:") ? (
             <a href={action.href}>
               {action.label}
-              <ArrowRight className="h-4 w-4" />
+              <IconArrowRight size={16} />
             </a>
           ) : (
             <Link href={action.href}>
               {action.label}
-              <ArrowRight className="h-4 w-4" />
+              <IconArrowRight size={16} />
             </Link>
           )}
         </Button>
@@ -258,7 +259,7 @@ export function ProviderGrowthMarketplace({
 
       <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <Sparkles className="h-5 w-5 text-brand-secondary" />
+          <IconSpark size={20} className="text-brand-secondary" />
           <h3 className="font-display text-2xl font-semibold tracking-tight text-foreground">Recommended bundles</h3>
         </div>
         <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
@@ -307,7 +308,7 @@ export function ProviderGrowthQuickPicks() {
             <Button asChild variant="premium">
               <Link href="/pro/billing#addons">
                 Explore add-ons
-                <ArrowRight className="h-4 w-4" />
+                <IconArrowRight size={16} />
               </Link>
             </Button>
             <Button asChild variant="glass">

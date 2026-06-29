@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Clock3, Mail, Scale, ShieldCheck } from "lucide-react";
+import { CheckCircle2, Mail, Scale } from "lucide-react";
+
+import { IconArrowRight, IconClock, IconShield } from "@/components/icons";
 
 import { JsonLd } from "@/app/_components/json-ld";
 import {
@@ -161,7 +163,7 @@ export default function LegalPage() {
                             className="inline-flex items-center gap-2 rounded-full border border-border-subtle px-4 py-2 text-sm font-semibold text-foreground transition hover:border-brand-secondary/30 hover:text-brand-secondary"
                           >
                             {link.label}
-                            <ArrowRight className="h-4 w-4" />
+                            <IconArrowRight size={16} />
                           </Link>
                         ))}
                       </div>
@@ -170,7 +172,7 @@ export default function LegalPage() {
 
                   <div className="rounded-[1.6rem] border border-border-subtle bg-[#fbfcfe] p-5">
                     <div className="flex items-center gap-2 text-brand-secondary">
-                      <ShieldCheck className="h-5 w-5" />
+                      <IconShield size={20} />
                       <p className="text-sm font-semibold uppercase tracking-[0.22em]">Key points</p>
                     </div>
                     <ul className="mt-4 space-y-3">
@@ -240,7 +242,7 @@ export default function LegalPage() {
 
               <div className="rounded-[1.6rem] border border-border-subtle bg-[#fbfcfe] px-5 py-5">
                 <div className="flex items-center gap-3 text-brand-secondary">
-                  <Clock3 className="h-5 w-5" />
+                  <IconClock size={20} />
                   <p className="text-sm font-semibold uppercase tracking-[0.22em]">Mailing location</p>
                 </div>
                 <p className="mt-4 text-sm leading-7 text-text-secondary">

@@ -1194,6 +1194,21 @@ alter table public.stripe_events
   add column if not exists processing_error text,
   add column if not exists failed_at timestamptz;
 
+create table if not exists public.analytics_events (
+  id uuid primary key default gen_random_uuid(),
+  event_name text not null,
+  user_id uuid null references auth.users(id) on delete set null,
+  profile_id uuid null,
+  session_id text null,
+  city text null,
+  state text null,
+  source_page text null,
+  metadata jsonb not null default '{}'::jsonb,
+  user_agent text null,
+  referrer text null,
+  created_at timestamptz not null default now()
+);
+
 create or replace view public.therapist_analytics_daily as
   select
     therapist_profile_id,

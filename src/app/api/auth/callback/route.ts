@@ -130,7 +130,7 @@ function buildWelcomeHtml(name: string): string {
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#FFFFFF;padding:28px 12px">
     <tr><td align="center">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;background:#FFFFFF;border:1px solid #ECE4E4;border-radius:14px;overflow:hidden">
-        <tr><td style="background:#1A1A1A;padding:22px 28px 24px">
+        <tr><td style="background:#111111;padding:22px 28px 24px">
           <h1 style="margin:0;font-size:28px;color:#FFFFFF">Welcome to MasseurMatch!</h1>
           <p style="margin:8px 0 0;font-size:15px;color:#DCE6FF">Hi ${name}, your account is ready.</p>
         </td></tr>

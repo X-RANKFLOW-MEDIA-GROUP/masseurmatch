@@ -162,14 +162,14 @@ export default function PrivacyPage() {
       <main
         style={{
           background: "#FFFFFF",
-          color: "#1A1A1A",
+          color: "#111111",
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
       >
         <section
           style={{
-            background: "#1A1A1A",
+            background: "#111111",
             color: "#FFFFFF",
             padding: "80px 24px 72px",
           }}
@@ -180,7 +180,7 @@ export default function PrivacyPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#8B1E2D",
+                color: "#D4717E",
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -193,6 +193,7 @@ export default function PrivacyPage() {
                 fontWeight: 400,
                 lineHeight: 1.1,
                 marginBottom: 20,
+                color: "#FFFFFF",
               }}
             >
               Privacy Policy
@@ -200,7 +201,7 @@ export default function PrivacyPage() {
             <p
               style={{
                 fontSize: 14,
-                opacity: 0.5,
+                color: "#9CA3AF",
                 fontFamily: "system-ui, sans-serif",
               }}
             >
@@ -209,7 +210,7 @@ export default function PrivacyPage() {
             <p
               style={{
                 fontSize: 16,
-                opacity: 0.65,
+                color: "#B0B8C4",
                 marginTop: 16,
                 fontFamily: "system-ui, sans-serif",
                 lineHeight: 1.7,
@@ -285,7 +286,7 @@ export default function PrivacyPage() {
                     fontWeight: 400,
                     marginBottom: 16,
                     paddingBottom: 12,
-                    borderBottom: "1px solid rgba(26,26,26,0.1)",
+                    borderBottom: "1px solid rgba(17,17,17,0.1)",
                   }}
                 >
                   {section.title}

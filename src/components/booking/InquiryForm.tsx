@@ -175,7 +175,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
             <select
               value={form.service_type}
               onChange={e => setForm(f => ({ ...f, service_type: e.target.value }))}
-              className="rounded-lg border border-white/10 bg-[#1A1A1A] px-3 py-2.5 text-sm text-white focus:border-[#8B1E2D]/50 focus:outline-none focus:ring-1 focus:ring-[#8B1E2D]/20"
+              className="rounded-lg border border-white/10 bg-[#111111] px-3 py-2.5 text-sm text-white focus:border-[#8B1E2D]/50 focus:outline-none focus:ring-1 focus:ring-[#8B1E2D]/20"
             >
               <option value="swedish">Swedish</option>
               <option value="deep_tissue">Deep Tissue</option>
@@ -190,7 +190,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
             <select
               value={form.duration_minutes}
               onChange={e => setForm(f => ({ ...f, duration_minutes: e.target.value }))}
-              className="rounded-lg border border-white/10 bg-[#1A1A1A] px-3 py-2.5 text-sm text-white focus:border-[#8B1E2D]/50 focus:outline-none focus:ring-1 focus:ring-[#8B1E2D]/20"
+              className="rounded-lg border border-white/10 bg-[#111111] px-3 py-2.5 text-sm text-white focus:border-[#8B1E2D]/50 focus:outline-none focus:ring-1 focus:ring-[#8B1E2D]/20"
             >
               <option value="60">60 min</option>
               <option value="90">90 min</option>

@@ -15,7 +15,7 @@ export function FinalCta() {
           sizes="100vw"
           aria-hidden="true"
         />
-        <div className="absolute inset-0 bg-[#1A1A1A]/85" />
+        <div className="absolute inset-0 bg-[#111111]/85" />
       </div>
 
       {/* Orange glow */}
@@ -26,13 +26,13 @@ export function FinalCta() {
 
       <FadeUp>
         <div className="relative mx-auto max-w-[900px] px-4 text-center sm:px-6 lg:px-8">
-          <p className="text-[11px] uppercase tracking-[0.25em] text-white/50">
+          <p className="text-[11px] uppercase tracking-[0.25em] text-white/60">
             For therapists
           </p>
           <h2 className="mt-4 font-display text-[clamp(2.75rem,7vw,6rem)] font-extrabold leading-[0.9] tracking-tight text-white">
             Get listed today.
           </h2>
-          <p className="mx-auto mt-5 max-w-md text-base text-white/60">
+          <p className="mx-auto mt-5 max-w-md text-base text-white/70">
             Join verified therapists growing their practice through MasseurMatch.
           </p>
 

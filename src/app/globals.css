@@ -16,8 +16,8 @@
   --mm-light:       #F7F7F7;
   --mm-med:         #E8E8E8;
 
-  --mm-font-heading: var(--font-satoshi), 'Satoshi', Arial, sans-serif;
-  --mm-font-body:    var(--font-satoshi), 'Satoshi', Arial, sans-serif;
+  --mm-font-heading: var(--font-satoshi), Arial, sans-serif;
+  --mm-font-body:    var(--font-satoshi), Arial, sans-serif;
 
   --mm-label-size:    11px;
   --mm-label-spacing: 0.22em;

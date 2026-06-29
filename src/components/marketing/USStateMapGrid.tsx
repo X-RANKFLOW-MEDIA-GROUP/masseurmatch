@@ -173,7 +173,7 @@ export function USStateMapGrid() {
                           rotateX: -4,
                           scale: 1.05,
                           filter:
-                            "drop-shadow(0 8px 18px rgba(26,26,26,0.22))",
+                            "drop-shadow(0 8px 18px rgba(17,17,17,0.22))",
                         }
                       : {}
                   }
@@ -223,7 +223,7 @@ export function USStateMapGrid() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-              className="relative mt-8 rounded-2xl border border-border bg-white p-6 shadow-[0_4px_32px_rgba(26,26,26,0.08)]"
+              className="relative mt-8 rounded-2xl border border-border bg-white p-6 shadow-[0_4px_32px_rgba(17,17,17,0.08)]"
             >
               {/* Close */}
               <button

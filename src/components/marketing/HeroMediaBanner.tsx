@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { IconMapPin } from "@/components/icons";
 import { Cta3DButton } from "@/components/marketing/Cta3DButton";
 import { BRAND_ASSETS } from "@/lib/brand";
 import type { PublicTherapist } from "@/app/_lib/directory";
@@ -72,10 +72,10 @@ function ProfilesBand({ therapists }: { therapists: PublicTherapist[] }) {
   const cards = therapists.slice(0, 6);
 
   return (
-    <div className="w-full bg-[#060E1A]">
+    <div className="w-full bg-[#111111]">
       <div className="h-px w-full bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
       <div className="px-4 pb-10 pt-8 sm:px-6 lg:px-8 lg:pb-14 lg:pt-10">
-        <p className="mb-6 text-center font-mono text-[10px] uppercase tracking-[0.18em] text-white/40">
+        <p className="mb-6 text-center font-mono text-[10px] uppercase tracking-[0.18em] text-white/60">
           Featured therapists
         </p>
 
@@ -115,14 +115,14 @@ function ProfileCard({ therapist }: { therapist: PublicTherapist }) {
         ) : (
           <div className="h-full w-full bg-gradient-to-br from-white/[0.08] to-white/[0.03]" />
         )}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#060E1A]/90 via-[#060E1A]/25 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#111111]/90 via-[#111111]/25 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 p-2.5 sm:p-3">
           <p className="truncate text-xs font-semibold leading-snug text-white sm:text-sm">
             {name}
           </p>
           {therapist.city && (
             <p className="mt-0.5 flex items-center gap-1 truncate text-[10px] text-white/55">
-              <MapPin className="h-2.5 w-2.5 flex-shrink-0" strokeWidth={2.25} />
+              <IconMapPin size={10} className="flex-shrink-0" />
               {therapist.city}
             </p>
           )}
@@ -135,7 +135,7 @@ function ProfileCard({ therapist }: { therapist: PublicTherapist }) {
 function Overlay() {
   return (
     <>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/85 via-[#1A1A1A]/20 to-transparent" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#111111]/85 via-[#111111]/20 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-4 px-6 pb-8 text-center sm:pb-12">
         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/70">
           Vetted · Discreet · Nationwide

@@ -16,20 +16,16 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   ArrowUpRight,
   CheckCircle2,
-  Clock3,
   Filter,
-  Heart,
   Layers3,
   LocateFixed,
-  MapPin,
   MapPinned,
   RefreshCw,
-  SlidersHorizontal,
   Sparkles,
-  Star,
   X,
   Grid2x2,
 } from "lucide-react";
+import { IconClock, IconHeart, IconMapPin, IconSliders, IconStar } from "@/components/icons";
 import type { CityData } from "@/data/cities";
 import {
   applyExploreFilters,
@@ -447,7 +443,7 @@ function ProviderCard({
                   <div className="rounded-full border border-white/16 bg-white/10 px-3 py-2 text-right shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]">
                     <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/72 sm:text-[10px]">Session</p>
                     <p className="mt-1 flex items-center justify-end gap-1.5 text-sm font-semibold text-white">
-                      <Clock3 className="h-3.5 w-3.5" />
+                      <IconClock size={14} />
                       {provider.sessionDurationMinutes} min
                     </p>
                   </div>
@@ -469,7 +465,7 @@ function ProviderCard({
               </h2>
               <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-text-secondary">
                 <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="h-3.5 w-3.5 text-brand-secondary" />
+                  <IconMapPin size={14} className="text-brand-secondary" />
                   {provider.neighborhood}
                 </span>
                 <span className="rounded-full border border-border-subtle bg-white/70 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-text-muted">
@@ -603,7 +599,7 @@ function SwipeDeck({
                           className="rounded-full border border-white/20 bg-white/10 p-3 backdrop-blur-xl transition hover:bg-white/18"
                           aria-label={`Save ${provider.name}`}
                         >
-                          <Star className="h-5 w-5" />
+                          <IconStar size={20} />
                         </button>
                       </div>
                       <p className="mt-2 text-base font-medium">{provider.specialty}</p>
@@ -622,7 +618,7 @@ function SwipeDeck({
                           onClick={() => onAction(provider, "like")}
                           className="inline-flex flex-1 items-center justify-center rounded-full bg-[rgb(var(--color-action-primary-rgb)/0.92)] px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] shadow-[0_20px_48px_rgb(var(--color-action-primary-rgb)/0.24)] transition hover:bg-[rgb(var(--color-action-primary-hover-rgb)/0.96)]"
                         >
-                          <Heart className="mr-2 h-4 w-4" />
+                          <IconHeart size={16} className="mr-2" />
                           Interested
                         </button>
                       </div>
@@ -1496,7 +1492,7 @@ export default function ExplorePageClient({
                 value={filters.sort}
                 onValueChange={(value) => handleSortChange(value as ExploreFilters["sort"])}
               >
-                <SelectTrigger className="h-12 rounded-full border-border-subtle bg-white/90 px-4">
+                <SelectTrigger className="h-12 rounded-full border-border-subtle bg-white/90 px-4" aria-label="Sort by">
                   <SelectValue placeholder="Sort" />
                 </SelectTrigger>
                 <SelectContent>
@@ -1538,7 +1534,7 @@ export default function ExplorePageClient({
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-text-muted">Filters</p>
                   <h2 className="mt-2 text-2xl font-semibold text-text-primary">Refine fast</h2>
                 </div>
-                <SlidersHorizontal className="h-5 w-5 text-brand-secondary" />
+                <IconSliders size={20} className="text-brand-secondary" />
               </div>
 
               <SidebarFilters

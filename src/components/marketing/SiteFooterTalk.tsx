@@ -1,8 +1,9 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowUpRight, ShieldCheck } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { IconShield } from "@/components/icons";
 
 type FormState = "idle" | "loading" | "success" | "error";
 
@@ -33,7 +34,7 @@ export function SiteFooterTalk() {
   }
 
   return (
-    <footer className="border-t border-white/[0.06] bg-[#1A1A1A] text-slate-400">
+    <footer className="border-t border-white/[0.06] bg-[#111111] text-slate-400">
       <div className="mx-auto max-w-[1200px] px-4 pb-12 pt-20 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
 
@@ -124,7 +125,7 @@ export function SiteFooterTalk() {
             </div>
 
             <div className="mt-12 flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-emerald-400" strokeWidth={2.25} />
+              <IconShield size={20} className="text-emerald-400" />
               <span className="font-mono text-[10px] uppercase tracking-widest text-slate-400">
                 Verified Secure Network
               </span>
@@ -134,10 +135,10 @@ export function SiteFooterTalk() {
 
         {/* Bottom bar */}
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/[0.06] pt-8 md:flex-row">
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-400">
             &copy; {currentYear} MasseurMatch. All rights reserved.
           </p>
-          <div className="flex items-center gap-6 font-mono text-[10px] uppercase tracking-widest text-slate-500">
+          <div className="flex items-center gap-6 font-mono text-[10px] uppercase tracking-widest text-slate-400">
             <Link href="/cookie-policy" className="transition-colors hover:text-white">Cookies</Link>
             <Link href="/accessibility" className="transition-colors hover:text-white">Accessibility</Link>
             <span className="flex items-center gap-1">

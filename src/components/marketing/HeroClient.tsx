@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -7,14 +7,10 @@ import { motion, useReducedMotion } from "framer-motion";
 import { useKnotty } from "@/hooks/useKnotty";
 import type { KnottyRecommendation } from "@/lib/knotty/types";
 import {
-  Sparkles,
-  MessageCircle,
   Send,
-  ArrowRight,
   Check,
-  Lock,
-  Shield,
 } from "lucide-react";
+import { IconSpark, IconMessage, IconArrowRight, IconLock, IconShield } from "@/components/icons";
 import { HeroMediaBanner } from "@/components/marketing/HeroMediaBanner";
 import type { PublicTherapist } from "@/app/_lib/directory";
 
@@ -29,8 +25,8 @@ const quickPrompts = [
 
 const trustItems = [
   { label: "Verified profiles", icon: Check },
-  { label: "Secure & private", icon: Lock },
-  { label: "Trusted reviews", icon: Shield },
+  { label: "Secure & private", icon: IconLock },
+  { label: "Trusted reviews", icon: IconShield },
 ];
 
 function TherapistCard({ profile, index }: { profile: PublicTherapist; index: number }) {
@@ -149,7 +145,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
               className="rounded-[2rem] border border-dashed border-[#8B1E2D]/30 bg-white/80 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.09)]"
             >
               <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#8B1E2D]/10 text-[#8B1E2D]">
-                <Sparkles size={24} />
+                <IconSpark size={24} />
               </div>
               <h2 className="font-display text-2xl font-black text-[#151515]">Live profile cards are ready.</h2>
               <p className="mt-3 max-w-lg text-sm leading-6 text-[#667085]">
@@ -198,14 +194,14 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#8B1E2D]/10 text-[#8B1E2D]">
-                  <MessageCircle size={23} strokeWidth={2.4} />
+                  <IconMessage size={23} />
                 </div>
                 <div>
                   <p className="font-display text-base font-black text-[#151515]">AI Match Assistant</p>
-                  <p className="text-xs font-semibold text-[#7B8190]">Ask Knotty AI</p>
+                  <p className="text-xs font-semibold text-[#656B78]">Ask Knotty AI</p>
                 </div>
               </div>
-              <Sparkles size={20} className="text-[#8B1E2D]" />
+              <IconSpark size={20} className="text-[#8B1E2D]" />
             </div>
 
             <div className="space-y-4 px-5 py-5">
@@ -221,7 +217,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                   ) : (
                     <div key={message.id} className="flex max-w-[90%] items-start gap-3">
                       <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#8B1E2D]/10 text-[#8B1E2D]">
-                        <Sparkles size={16} />
+                        <IconSpark size={16} />
                       </div>
                       <div className="min-w-0 rounded-2xl rounded-tl-md bg-[#F7F7F8] px-4 py-3 text-sm font-medium leading-6 text-[#2B3038]">
                         {message.content}
@@ -244,7 +240,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                                     {rec.name}
                                     {rec.neighborhood || rec.city ? ` · ${rec.neighborhood || rec.city}` : ""}
                                   </span>
-                                  <ArrowRight size={14} strokeWidth={2.5} className="shrink-0" />
+                                  <IconArrowRight size={14} className="shrink-0" />
                                 </Link>
                               ))}
                             </div>
@@ -257,7 +253,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                 {isTyping ? (
                   <div className="flex items-center gap-3">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#8B1E2D]/10 text-[#8B1E2D]">
-                      <Sparkles size={16} />
+                      <IconSpark size={16} />
                     </div>
                     <div className="flex items-center gap-1.5 rounded-2xl rounded-tl-md bg-[#F7F7F8] px-4 py-3.5">
                       {[0, 1, 2].map((dot) => (
@@ -295,7 +291,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                   }}
                   placeholder="Ask Knotty anything..."
                   aria-label="Ask Knotty AI what massage provider you need"
-                  className="min-w-0 flex-1 bg-transparent px-3 text-sm text-[#151515] outline-none placeholder:text-[#98A2B3]"
+                  className="min-w-0 flex-1 bg-transparent px-3 text-sm text-[#151515] outline-none placeholder:text-[#64748B]"
                 />
                 <button
                   type="button"
@@ -332,7 +328,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
             className="mt-7 inline-flex w-fit items-center gap-2 rounded-2xl bg-[#8B1E2D] px-6 py-4 text-sm font-black uppercase tracking-wide text-white shadow-xl shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
           >
             Find a Masseur
-            <ArrowRight size={18} strokeWidth={2.5} />
+            <IconArrowRight size={18} />
           </motion.button>
         </div>
       </div>

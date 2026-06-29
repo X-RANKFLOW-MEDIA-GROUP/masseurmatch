@@ -109,9 +109,9 @@ export default async function TherapistsPage({ searchParams }: TherapistsPagePro
         })}
       />
 
-      <div className="min-h-screen bg-[#FAF8F5]">
+      <div className="min-h-screen bg-[#FAFAFA]">
         {/* ── Hero / page header ──────────────────────────────────────────── */}
-        <div className="relative bg-[#060E1A] px-4 py-12 sm:px-6 sm:py-16">
+        <div className="relative bg-[#111111] px-4 py-12 sm:px-6 sm:py-16">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 overflow-hidden"

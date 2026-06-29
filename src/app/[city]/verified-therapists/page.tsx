@@ -11,7 +11,8 @@ import {
   buildFaqJsonLd,
   buildItemListJsonLd,
 } from "@/app/_lib/structured-data";
-import { ShieldCheck, Star, Users, Award } from "lucide-react";
+import { Users } from "lucide-react";
+import { IconAward, IconShield, IconStar } from "@/components/icons";
 
 type Params = { city: string };
 
@@ -101,7 +102,7 @@ export default async function VerifiedTherapistsPage({ params }: { params: Promi
           <header className="rounded-3xl border border-border bg-background p-6">
             <div className="flex items-start gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <ShieldCheck className="h-6 w-6" />
+                <IconShield size={24} />
               </div>
               <div className="flex-1">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Trust & Safety</p>
@@ -127,7 +128,7 @@ export default async function VerifiedTherapistsPage({ params }: { params: Promi
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               {config.trustSignals.map((signal) => (
                 <div key={signal} className="flex items-start gap-3">
-                  <Award className="h-5 w-5 shrink-0 text-primary" />
+                  <IconAward size={20} className="shrink-0 text-primary" />
                   <p className="text-sm text-muted-foreground">{signal}</p>
                 </div>
               ))}
@@ -149,7 +150,7 @@ export default async function VerifiedTherapistsPage({ params }: { params: Promi
                       {city.name} • {therapist.modality || "Massage services"}
                     </p>
                     <div className="mt-3 flex items-center gap-2">
-                      <Star className="h-4 w-4 fill-primary text-primary" />
+                      <IconStar size={16} className="text-primary" />
                       <span className="text-xs font-semibold text-foreground">Verified Professional</span>
                     </div>
                     <p className="mt-2 text-xs text-muted-foreground">

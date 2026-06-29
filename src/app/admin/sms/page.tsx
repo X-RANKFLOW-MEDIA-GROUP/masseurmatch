@@ -78,7 +78,7 @@ export default function SmsAdminPage() {
   ] as const
 
   return (
-    <div className="min-h-screen bg-[#1A1A1A]">
+    <div className="min-h-screen bg-[#111111]">
       {/* Header */}
       <div className="border-b border-white/[0.06] px-6 py-6">
         <div className="mx-auto max-w-6xl flex items-center justify-between">

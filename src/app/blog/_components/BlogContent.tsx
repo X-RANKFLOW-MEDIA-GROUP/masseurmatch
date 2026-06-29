@@ -83,7 +83,7 @@ const posts = [
 const categoryColors: Record<string, string> = {
   "LGBTQ+ Health": "#8B1E2D",
   "Wellness Tips": "#8B1E2D",
-  "For Therapists": "#1A1A1A",
+  "For Therapists": "#111111",
   "City Guides": "#6B7280",
   "Industry News": "#374151",
 };
@@ -101,7 +101,7 @@ export function BlogContent() {
       <nav
         aria-label="Blog categories"
         style={{
-          borderBottom: "1px solid rgba(26,26,26,0.1)",
+          borderBottom: "1px solid rgba(17,17,17,0.1)",
           padding: "0 24px",
           overflowX: "auto",
         }}
@@ -150,14 +150,14 @@ export function BlogContent() {
               gridTemplateColumns: "1fr 1fr",
               gap: 0,
               marginBottom: 80,
-              background: "#1A1A1A",
+              background: "#111111",
               color: "#FFFFFF",
             }}
           >
             <div
               style={{
                 background:
-                  "linear-gradient(135deg, #8B1E2D 0%, #1A1A1A 100%)",
+                  "linear-gradient(135deg, #8B1E2D 0%, #111111 100%)",
                 minHeight: 360,
                 display: "flex",
                 alignItems: "center",
@@ -363,7 +363,7 @@ export function BlogContent() {
                       fontWeight: 400,
                       lineHeight: 1.3,
                       marginBottom: 14,
-                      color: "#1A1A1A",
+                      color: "#111111",
                     }}
                   >
                     {post.title}
@@ -405,7 +405,7 @@ export function BlogContent() {
                       fontSize: 11,
                       letterSpacing: "0.14em",
                       textTransform: "uppercase",
-                      color: "#1A1A1A",
+                      color: "#111111",
                       textDecoration: "none",
                       fontFamily: "system-ui, sans-serif",
                     }}

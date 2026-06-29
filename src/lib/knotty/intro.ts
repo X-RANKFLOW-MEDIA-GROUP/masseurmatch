@@ -4,7 +4,7 @@
  * the moment it opens.
  */
 export const KNOTTY_GREETING =
-  "Hi! I'm Knotty 👋 — your MasseurMatch concierge. Ask me anything: finding a therapist, cities we cover, how it works, or what to expect.";
+  "Hey there! I'm Knotty — your MasseurMatch concierge. What brings you in today? Looking for a massage therapist, curious how the platform works, or just browsing?";
 
 /** Stable id for the seeded greeting message. */
 export const KNOTTY_GREETING_ID = "knotty-greeting";

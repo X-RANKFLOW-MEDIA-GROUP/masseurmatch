@@ -82,14 +82,14 @@ export default function ProBookingsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#1A1A1A]">
+      <div className="flex min-h-screen items-center justify-center bg-[#111111]">
         <Loader2 className="h-6 w-6 animate-spin text-slate-500" strokeWidth={2} />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#1A1A1A] p-6">
+    <div className="min-h-screen bg-[#111111] p-6">
       <div className="mx-auto max-w-4xl">
         <div className="mb-8">
           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#8B1E2D]">Your Dashboard</p>

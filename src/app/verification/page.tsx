@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
-import { ArrowRight, BadgeCheck, FileText, ShieldCheck, UserCheck } from "lucide-react";
+import { FileText, UserCheck } from "lucide-react";
+
+import { IconArrowRight, IconShield } from "@/components/icons";
 
 export const metadata: Metadata = {
   title: "Identity Verification | MasseurMatch",
@@ -43,12 +45,12 @@ const steps = [
     body: "Stripe Identity uses computer vision to confirm that the face on the ID matches the person holding it in real time. The check is automated and typically completes in under 60 seconds.",
   },
   {
-    icon: ShieldCheck,
+    icon: IconShield,
     title: "MasseurMatch receives a pass / fail result",
     body: "If the check passes, we mark the profile Verified and record the date. If it fails or cannot be confirmed, no badge is shown. We review disputed outcomes manually.",
   },
   {
-    icon: BadgeCheck,
+    icon: IconShield,
     title: "The badge appears on the profile with the verification date",
     body: "The Verified badge shows the month and year of the check so clients can see how recent it is. Therapists who let their subscription lapse and then re-subscribe must re-verify.",
   },
@@ -81,7 +83,7 @@ export default function VerificationPage() {
       <main
         style={{
           background: "#FFFFFF",
-          color: "#1A1A1A",
+          color: "#111111",
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
@@ -89,7 +91,7 @@ export default function VerificationPage() {
         {/* Header */}
         <section
           style={{
-            background: "#1A1A1A",
+            background: "#111111",
             color: "#FFFFFF",
             padding: "clamp(56px, 8vw, 80px) 20px clamp(48px, 7vw, 72px)",
           }}
@@ -178,7 +180,7 @@ export default function VerificationPage() {
                     gap: 20,
                     marginBottom: 28,
                     paddingBottom: 28,
-                    borderBottom: i < steps.length - 1 ? "1px solid rgba(26,26,26,0.08)" : "none",
+                    borderBottom: i < steps.length - 1 ? "1px solid rgba(17,17,17,0.08)" : "none",
                   }}
                 >
                   <div
@@ -206,7 +208,7 @@ export default function VerificationPage() {
                         fontWeight: 600,
                         fontFamily: "system-ui, sans-serif",
                         marginBottom: 6,
-                        color: "#1A1A1A",
+                        color: "#111111",
                       }}
                     >
                       {i + 1}. {step.title}
@@ -293,7 +295,7 @@ export default function VerificationPage() {
               }}
             >
               We use{" "}
-              <span style={{ fontWeight: 600, color: "#1A1A1A" }}>Stripe Identity</span>{" "}
+              <span style={{ fontWeight: 600, color: "#111111" }}>Stripe Identity</span>{" "}
               for all document and biometric verification. Stripe is a PCI-certified
               payments infrastructure company trusted by millions of businesses.
               MasseurMatch does not store raw government ID images — they are processed
@@ -304,7 +306,7 @@ export default function VerificationPage() {
           {/* Report concern */}
           <section
             style={{
-              background: "#1A1A1A",
+              background: "#111111",
               color: "#FFFFFF",
               borderRadius: 16,
               padding: "28px 28px",
@@ -343,7 +345,7 @@ export default function VerificationPage() {
               }}
             >
               Report to trust@masseurmatch.com
-              <ArrowRight style={{ width: 14, height: 14 }} strokeWidth={2.5} />
+              <IconArrowRight size={14} />
             </Link>
           </section>
         </div>

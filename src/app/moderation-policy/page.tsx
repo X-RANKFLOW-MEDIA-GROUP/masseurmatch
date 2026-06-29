@@ -1,7 +1,9 @@
 ﻿import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
-import { AlertTriangle, ArrowRight, Ban, CheckCircle2, Clock, ShieldAlert } from "lucide-react";
+import { AlertTriangle, Ban, CheckCircle2, ShieldAlert } from "lucide-react";
+
+import { IconArrowRight, IconClock } from "@/components/icons";
 
 export const metadata: Metadata = {
   title: "Moderation Policy | MasseurMatch",
@@ -50,7 +52,7 @@ const actionTypes = [
     effect: "The violating content is removed. Profile remains active if no pattern exists.",
   },
   {
-    icon: Clock,
+    icon: IconClock,
     color: "#6366F1",
     bg: "rgba(99,102,241,0.08)",
     border: "rgba(99,102,241,0.2)",
@@ -89,7 +91,7 @@ export default function ModerationPolicyPage() {
       <main
         style={{
           background: "#FFFFFF",
-          color: "#1A1A1A",
+          color: "#111111",
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
@@ -97,7 +99,7 @@ export default function ModerationPolicyPage() {
         {/* Header */}
         <section
           style={{
-            background: "#1A1A1A",
+            background: "#111111",
             color: "#FFFFFF",
             padding: "clamp(56px, 8vw, 80px) 20px clamp(48px, 7vw, 72px)",
           }}
@@ -162,7 +164,7 @@ export default function ModerationPolicyPage() {
           <section style={{ marginBottom: 56 }}>
             <div
               style={{
-                background: "#1A1A1A",
+                background: "#111111",
                 color: "#FFFFFF",
                 borderRadius: 14,
                 padding: "22px 24px",
@@ -219,7 +221,7 @@ export default function ModerationPolicyPage() {
                     <a.icon style={{ width: 18, height: 18, color: a.color }} strokeWidth={2} />
                   </div>
                   <div>
-                    <p style={{ fontSize: 15, fontWeight: 700, color: "#1A1A1A", marginBottom: 4 }}>
+                    <p style={{ fontSize: 15, fontWeight: 700, color: "#111111", marginBottom: 4 }}>
                       {a.action}
                     </p>
                     <p style={{ fontSize: 13, lineHeight: 1.65, color: "#374151", marginBottom: 6 }}>
@@ -248,7 +250,7 @@ export default function ModerationPolicyPage() {
             </h2>
             <div
               style={{
-                border: "1px solid rgba(26,26,26,0.1)",
+                border: "1px solid rgba(17,17,17,0.1)",
                 borderRadius: 14,
                 overflow: "hidden",
                 fontFamily: "system-ui, sans-serif",
@@ -261,13 +263,13 @@ export default function ModerationPolicyPage() {
                     display: "flex",
                     justifyContent: "space-between",
                     padding: "13px 20px",
-                    background: i % 2 === 0 ? "#fff" : "rgba(26,26,26,0.02)",
-                    borderBottom: i < slaRows.length - 1 ? "1px solid rgba(26,26,26,0.06)" : "none",
+                    background: i % 2 === 0 ? "#fff" : "rgba(17,17,17,0.02)",
+                    borderBottom: i < slaRows.length - 1 ? "1px solid rgba(17,17,17,0.06)" : "none",
                     fontSize: 14,
                   }}
                 >
                   <span style={{ color: "#374151" }}>{row.action}</span>
-                  <span style={{ fontWeight: 600, color: "#1A1A1A" }}>{row.response}</span>
+                  <span style={{ fontWeight: 600, color: "#111111" }}>{row.response}</span>
                 </div>
               ))}
             </div>
@@ -328,7 +330,7 @@ export default function ModerationPolicyPage() {
                 Send appeals to{" "}
                 <a
                   href="mailto:appeals@masseurmatch.com"
-                  style={{ color: "#1A1A1A", fontWeight: 600 }}
+                  style={{ color: "#111111", fontWeight: 600 }}
                 >
                   appeals@masseurmatch.com
                 </a>
@@ -340,7 +342,7 @@ export default function ModerationPolicyPage() {
           {/* Report & contact */}
           <section
             style={{
-              background: "#1A1A1A",
+              background: "#111111",
               color: "#FFFFFF",
               borderRadius: 16,
               padding: "28px 28px",
@@ -380,7 +382,7 @@ export default function ModerationPolicyPage() {
                 }}
               >
                 Report to trust@masseurmatch.com
-                <ArrowRight style={{ width: 14, height: 14 }} strokeWidth={2.5} />
+                <IconArrowRight size={14} />
               </Link>
               <Link
                 href="/trust"

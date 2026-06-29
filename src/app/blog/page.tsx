@@ -44,14 +44,14 @@ export default function BlogPage() {
       <main
         style={{
           background: "#FFFFFF",
-          color: "#1A1A1A",
+          color: "#111111",
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
       >
         <section
           style={{
-            background: "#1A1A1A",
+            background: "#111111",
             padding: "80px 24px 72px",
             textAlign: "center",
           }}

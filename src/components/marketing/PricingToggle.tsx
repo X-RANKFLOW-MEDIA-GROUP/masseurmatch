@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Check, Lock } from "lucide-react";
+import { Check } from "lucide-react";
+import { IconLock } from "@/components/icons";
 import { PLANS, PRICE_LOCK } from "@/lib/pricing";
 
 const springConfig = { type: "spring", stiffness: 400, damping: 30 } as const;
@@ -24,7 +25,7 @@ export function PricingToggle() {
           </p>
           {PRICE_LOCK && (
             <p className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-              <Lock className="h-3 w-3" strokeWidth={2.5} />
+              <IconLock size={12} />
               Founding member rates are price-locked — your rate never increases while subscribed
             </p>
           )}

@@ -1,4 +1,5 @@
-import { MapPin, Navigation, ShieldCheck } from "lucide-react";
+import { Navigation } from "lucide-react";
+import { IconMapPin, IconShield } from "@/components/icons";
 import type { ProfileViewModel } from "./profile-utils";
 
 /**
@@ -30,7 +31,7 @@ export function ProfileLocationMap({ profile }: { profile: ProfileViewModel }) {
       <div className="flex flex-wrap items-start justify-between gap-4 p-7 pb-5">
         <div className="flex items-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#3B82F6]/12 text-[#60A5FA]">
-            <MapPin className="h-5 w-5" strokeWidth={2.25} />
+            <IconMapPin size={20} />
           </span>
           <div>
             <h2 className="font-display text-[28px] font-bold tracking-[-0.03em] text-[#F8FAFC]">
@@ -42,7 +43,7 @@ export function ProfileLocationMap({ profile }: { profile: ProfileViewModel }) {
           </div>
         </div>
         <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300">
-          <ShieldCheck className="h-3.5 w-3.5" strokeWidth={2.5} />
+          <IconShield size={14} />
           Approximate area
         </span>
       </div>

@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight, MapPin, Navigation, ShieldCheck, Sparkles, Star, Zap } from "lucide-react";
+import { ArrowUpRight, Navigation } from "lucide-react";
+import { IconMapPin, IconShield, IconSpark, IconStar } from "@/components/icons";
 import { useMemo } from "react";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import {
@@ -133,13 +134,13 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
             <div className="flex flex-col items-start gap-1">
               {isDirectoryListed && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-white/92 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 shadow-sm backdrop-blur-sm">
-                  <ShieldCheck className="h-3 w-3 text-emerald-500" strokeWidth={2.5} />
+                  <IconShield size={12} className="text-emerald-500" />
                   {isElite ? "Elite" : hasIdentityVerification ? "Verified" : "Listed"}
                 </span>
               )}
               {isNewProfile && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-indigo-600/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur-sm">
-                  <Sparkles className="h-3 w-3" strokeWidth={2.5} />
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#8B1E2D]/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur-sm">
+                  <IconSpark size={12} />
                   New
                 </span>
               )}
@@ -151,14 +152,14 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
               )}
               {therapist.is_featured && !isElite && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur-sm">
-                  <Zap className="h-3 w-3" strokeWidth={2.5} />
+                  <IconSpark size={12} />
                   Featured
                 </span>
               )}
             </div>
             {therapist.review_count ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-black/45 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
-                <Star className="h-3 w-3 fill-primary text-primary" strokeWidth={2.5} />
+                <IconStar size={12} className="text-primary" />
                 {therapist.review_count}
               </span>
             ) : null}
@@ -190,7 +191,7 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
           <div className="min-w-0">
             {locationLabel ? (
               <p className="flex items-center gap-1 truncate text-[11px] font-medium text-neutral-500">
-                <MapPin className="h-3 w-3 shrink-0 text-neutral-400" strokeWidth={2.25} />
+                <IconMapPin size={12} className="shrink-0 text-neutral-400" />
                 <span className="truncate">{locationLabel}</span>
               </p>
             ) : (

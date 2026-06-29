@@ -128,7 +128,7 @@ export default function FAQPage() {
       <main
         style={{
           background: "#FFFFFF",
-          color: "#1A1A1A",
+          color: "#111111",
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
@@ -136,7 +136,7 @@ export default function FAQPage() {
         {/* ── Hero ── */}
         <section
           style={{
-            background: "#1A1A1A",
+            background: "#111111",
             color: "#FFFFFF",
             padding: "88px 24px 80px",
             textAlign: "center",
@@ -217,7 +217,7 @@ export default function FAQPage() {
                   <details
                     key={i}
                     style={{
-                      borderTop: "1px solid rgba(26,26,26,0.1)",
+                      borderTop: "1px solid rgba(17,17,17,0.1)",
                       padding: "24px 0",
                     }}
                   >
@@ -259,7 +259,7 @@ export default function FAQPage() {
                     </p>
                   </details>
                 ))}
-                <div style={{ borderTop: "1px solid rgba(26,26,26,0.1)" }} />
+                <div style={{ borderTop: "1px solid rgba(17,17,17,0.1)" }} />
               </div>
             </div>
           ))}
@@ -268,7 +268,7 @@ export default function FAQPage() {
         {/* ── Still Have Questions ── */}
         <section
           style={{
-            background: "#1A1A1A",
+            background: "#111111",
             color: "#FFFFFF",
             padding: "72px 24px",
             textAlign: "center",
@@ -303,7 +303,7 @@ export default function FAQPage() {
               textTransform: "uppercase",
               fontFamily: "system-ui, sans-serif",
               background: "#8B1E2D",
-              color: "#1A1A1A",
+              color: "#111111",
               textDecoration: "none",
               fontWeight: 700,
             }}

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShieldCheck, ArrowUpRight, Phone, Mail } from "lucide-react";
+import { ArrowUpRight, Phone, Mail } from "lucide-react";
+import { IconShield } from "@/components/icons";
 import { SiteFooterTalk } from "@/components/marketing/SiteFooterTalk";
 
 export function SiteFooter() {
@@ -19,7 +20,7 @@ export function SiteFooter() {
   }
 
   return (
-    <footer className="bg-[#1A1A1A] text-gray-400 pt-16 pb-8">
+    <footer className="bg-[#111111] text-gray-400 pt-16 pb-8">
       <div className="container mx-auto px-4 md:px-6 max-w-7xl">
 
         <div className="flex flex-col md:flex-row items-start justify-between gap-10 mb-12">
@@ -47,8 +48,8 @@ export function SiteFooter() {
               </a>
             </div>
             <div className="flex items-center gap-2 mt-4">
-              <ShieldCheck className="w-[1.1rem] h-[1.1rem] text-emerald-400" strokeWidth={2.25} />
-              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-500">
+              <IconShield size={18} className="text-emerald-400" />
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400">
                 Verified Secure Network
               </span>
             </div>
@@ -74,10 +75,10 @@ export function SiteFooter() {
 
         {/* Bottom Bar: Copyright & Links */}
         <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-white/[0.08] gap-4">
-          <p className="font-sans text-xs text-gray-500">
+          <p className="font-sans text-xs text-gray-400">
             &copy; {currentYear} MasseurMatch. All rights reserved.
           </p>
-          <div className="flex items-center gap-6 font-mono text-[10px] uppercase tracking-[0.18em] text-gray-500">
+          <div className="flex items-center gap-6 font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400">
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
             <Link href="/cookie-policy" className="hover:text-white transition-colors">Cookies</Link>

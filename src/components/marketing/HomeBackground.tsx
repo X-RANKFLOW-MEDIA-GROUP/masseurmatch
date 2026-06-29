@@ -23,7 +23,7 @@ export function HomeBackground() {
       <motion.div
         aria-hidden="true"
         className="pointer-events-none fixed bottom-[-12vh] left-[-8vw] z-0 h-[50vw] max-h-[600px] w-[50vw] max-w-[600px] rounded-full opacity-[0.14]"
-        style={{ background: "radial-gradient(circle, #1A1A1A 0%, transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, #111111 0%, transparent 70%)" }}
         animate={{ y: [16, -16, 16], scale: [1, 1.06, 1] }}
         transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 1.3 }}
       />

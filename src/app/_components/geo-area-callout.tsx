@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { LocateFixed, MapPin } from "lucide-react";
+import { LocateFixed } from "lucide-react";
+import { IconMapPin } from "@/components/icons";
 
 import { withSearchParams } from "@/app/_lib/request";
 import { Button } from "@/components/ui/button";
@@ -77,7 +78,7 @@ export function GeoAreaCallout({
               isInverse ? "border-white/12 bg-white/10 text-brand-soft" : "border-border bg-bg-subtle text-brand-secondary",
             )}
           >
-            {city ? <MapPin className="h-5 w-5" /> : <LocateFixed className="h-5 w-5" />}
+            {city ? <IconMapPin size={20} /> : <LocateFixed className="h-5 w-5" />}
           </div>
 
           <div>

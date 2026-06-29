@@ -20,7 +20,7 @@ export function VoxFaqAccordion({ items }: { items: ProfileFaqItem[] }) {
               aria-expanded={isOpen}
               className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left sm:px-7"
             >
-              <span itemProp="name" className="text-base font-semibold text-[#1a1a1a]">
+              <span itemProp="name" className="text-base font-semibold text-[#111111]">
                 {item.question}
               </span>
               <ChevronDown

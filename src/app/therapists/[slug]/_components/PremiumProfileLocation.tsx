@@ -25,7 +25,7 @@ export function PremiumProfileLocation({ profile }: Props) {
       {/* Map placeholder */}
       <div 
         className="h-[200px] rounded-[var(--radius)] border border-[var(--glass-border)] flex items-center justify-center relative overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #2A2A2A 0%, #1A1A1A 100%)" }}
+        style={{ background: "linear-gradient(135deg, #2A2A2A 0%, #111111 100%)" }}
       >
         <div className="flex flex-col items-center gap-3 text-[var(--text-muted)]">
           <div 

@@ -86,7 +86,7 @@ const heading = {
   fontWeight: '600',
   margin: '16px 0',
   padding: '0',
-  color: '#1A1A1A',
+  color: '#111111',
 };
 
 const paragraph = {

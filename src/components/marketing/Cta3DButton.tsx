@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowRight } from "lucide-react";
+import { IconArrowRight } from "@/components/icons";
 
 type Variant = "primary" | "dark" | "glass";
 
@@ -34,7 +34,7 @@ export function Cta3DButton({
     variant === "primary"
       ? "bg-gradient-to-b from-[#A5243A] to-[#8B1E2D] text-white"
       : variant === "dark"
-        ? "bg-gradient-to-b from-[#333333] to-[#1A1A1A] text-white ring-1 ring-white/10"
+        ? "bg-gradient-to-b from-[#2B2B2B] to-[#111111] text-white ring-1 ring-white/10"
         : "bg-white/10 text-white ring-1 ring-white/25 backdrop-blur-md";
 
   return (
@@ -55,9 +55,9 @@ export function Cta3DButton({
       >
         {children}
         {withIcon && (
-          <ArrowRight
-            className="h-[1.15rem] w-[1.15rem] transition-transform duration-200 group-hover:translate-x-0.5"
-            strokeWidth={2.5}
+          <IconArrowRight
+            size={18}
+            className="transition-transform duration-200 group-hover:translate-x-0.5"
           />
         )}
       </span>
