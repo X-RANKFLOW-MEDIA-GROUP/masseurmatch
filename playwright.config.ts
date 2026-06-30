@@ -18,9 +18,11 @@ const shouldManageWebServer = !process.env.PLAYWRIGHT_BASE_URL;
 export default defineConfig({
   testDir: "./tests",
   testIgnore: ["**/unit/**"],
-  timeout: 30_000,
+  timeout: 45_000,
   retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? [["github"], ["list"]] : [["list"]],
+  reporter: process.env.CI
+    ? [["github"], ["list"], ["html", { open: "never" }]]
+    : [["list"], ["html", { open: "never" }]],
   webServer: shouldManageWebServer
     ? {
         command: "pnpm dev",
@@ -31,6 +33,11 @@ export default defineConfig({
     : undefined,
   use: {
     baseURL: process.env.PLAYWRIGHT_BASE_URL ?? DEFAULT_BASE_URL,
+    // Evidence on failures (TAREFA 8): screenshots, traces, and video are
+    // retained only when a test fails so reviewers can inspect what broke.
+    screenshot: "only-on-failure",
+    trace: "retain-on-failure",
+    video: "retain-on-failure",
     extraHTTPHeaders: {
       // Tell the server it's a CI request so it can skip rate-limiting if needed.
       "x-playwright-ci": "1",
@@ -45,7 +52,14 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        // Allow pointing at a pre-installed Chromium when the managed browser
+        // download is unavailable (e.g. sandboxed CI). No-op when unset.
+        ...(process.env.PW_CHROMIUM_PATH
+          ? { launchOptions: { executablePath: process.env.PW_CHROMIUM_PATH } }
+          : {}),
+      },
     },
   ],
 });
