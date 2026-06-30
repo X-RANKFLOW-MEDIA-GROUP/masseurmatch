@@ -7,6 +7,8 @@ export const metadata: Metadata = createPageMetadata({
   description:
     "Create your professional profile on MasseurMatch, verify your identity, and start getting discovered by clients near you.",
   path: "/signup",
+  // Account-creation funnel — disallowed in robots.txt; keep it out of the index too.
+  noIndex: true,
   keywords: [
     "massage therapist sign up",
     "get listed as a massage therapist",

@@ -47,7 +47,7 @@ function SignupPlanPageContent() {
   }
 
   return (
-    <div className="space-y-8 py-8">
+    <div className="space-y-8 py-8 pb-28 sm:pb-12">
       <Suspense fallback={null}>
         <PreselectFromQuery />
       </Suspense>

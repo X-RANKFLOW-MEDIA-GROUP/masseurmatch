@@ -14,14 +14,26 @@ export function CookieConsent() {
       return;
     }
 
-    const consent = localStorage.getItem("mm_cookie_consent");
+    // localStorage access can throw (Safari private mode, blocked storage).
+    // Guard it so a thrown read never leaves the banner in an inconsistent
+    // state — default to showing it when we can't confirm a prior choice.
+    let consent: string | null = null;
+    try {
+      consent = localStorage.getItem("mm_cookie_consent");
+    } catch {
+      consent = null;
+    }
     if (!consent) {
       setShow(true);
     }
   }, [pathname]);
 
   const savePreference = (value: "accepted" | "rejected") => {
-    localStorage.setItem("mm_cookie_consent", value);
+    try {
+      localStorage.setItem("mm_cookie_consent", value);
+    } catch {
+      /* storage unavailable — still honor the choice for this session */
+    }
     setShow(false);
   };
 
@@ -29,7 +41,7 @@ export function CookieConsent() {
 
   return (
     <div
-      className="fixed bottom-3 left-3 right-3 z-50 sm:bottom-4 sm:left-4 sm:right-auto sm:max-w-sm"
+      className="fixed bottom-24 left-3 right-3 z-50 sm:bottom-4 sm:left-4 sm:right-auto sm:max-w-sm"
       aria-live="polite"
     >
       <div className="max-h-[46vh] overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 shadow-2xl shadow-slate-950/20">

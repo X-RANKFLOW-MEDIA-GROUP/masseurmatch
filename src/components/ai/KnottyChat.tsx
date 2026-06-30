@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Clock3, MapPinned, Send, MessageCircle, ShieldCheck, X } from "lucide-react";
 import { useKnotty } from "@/hooks/useKnotty";
@@ -220,12 +221,51 @@ function KnottyDisclaimer() {
   );
 }
 
+// Routes where the floating concierge should NOT render at all — focused app
+// surfaces (provider dashboard, admin) own their own chrome.
+const HIDDEN_ROUTE_PREFIXES = ["/pro", "/admin"];
+
+// Routes where the chat must never auto-open: it would cover primary form
+// fields, CTAs, or results. The user can still open it manually.
+const NO_AUTO_OPEN_PREFIXES = [
+  "/signup",
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+  "/pricing",
+  "/search",
+  "/checkout",
+  "/verification",
+];
+
+const DISMISS_STORAGE_KEY = "mm_knotty_dismissed";
+
+function matchesPrefix(pathname: string | null, prefixes: string[]): boolean {
+  if (!pathname) return false;
+  return prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+}
+
 export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) => {
   const isEmbedded = mode === "embedded";
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(isEmbedded);
   const { input, isTyping, messages, sendMessage, setInput, trackOpen, trackRecommendationClick } =
     useKnotty();
   const endRef = useRef<HTMLDivElement>(null);
+
+  const isHiddenRoute = !isEmbedded && matchesPrefix(pathname, HIDDEN_ROUTE_PREFIXES);
+
+  // Close = minimize and remember the choice for the rest of the session so the
+  // auto-open timer never re-covers content after the user dismissed it.
+  const handleClose = useCallback(() => {
+    setIsOpen(false);
+    try {
+      window.sessionStorage.setItem(DISMISS_STORAGE_KEY, "1");
+    } catch {
+      /* storage unavailable — best effort */
+    }
+  }, []);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -237,23 +277,40 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
     }
   }, [isEmbedded, trackOpen]);
 
-  // Auto-open floating chat after 3 seconds on page load.
+  // Auto-open floating chat after a short delay — but only when the user hasn't
+  // already dismissed it this session and the current route isn't one where the
+  // panel would obscure important content (signup, login, pricing, search, …).
   useEffect(() => {
-    if (isEmbedded) return;
+    if (isEmbedded || isHiddenRoute) return;
+    if (matchesPrefix(pathname, NO_AUTO_OPEN_PREFIXES)) return;
+    let dismissed = false;
+    try {
+      dismissed = window.sessionStorage.getItem(DISMISS_STORAGE_KEY) === "1";
+    } catch {
+      /* storage unavailable — proceed with default behavior */
+    }
+    if (dismissed) return;
+
     const timer = setTimeout(() => {
       setIsOpen(true);
       trackOpen();
-    }, 3000);
+    }, 4000);
     return () => clearTimeout(timer);
-  }, [isEmbedded, trackOpen]);
+  }, [isEmbedded, isHiddenRoute, pathname, trackOpen]);
 
   // Allow any part of the app to open the floating chat (optionally with a
-  // prefilled prompt) by dispatching a `knotty:open` window event.
+  // prefilled prompt) by dispatching a `knotty:open` window event. Explicit
+  // intent clears the dismissed flag.
   useEffect(() => {
     if (isEmbedded) return;
     const handler = (event: Event) => {
       setIsOpen(true);
       trackOpen();
+      try {
+        window.sessionStorage.removeItem(DISMISS_STORAGE_KEY);
+      } catch {
+        /* storage unavailable */
+      }
       const prompt = (event as CustomEvent<{ prompt?: string }>).detail?.prompt;
       if (prompt) {
         void sendMessage({ content: prompt });
@@ -298,9 +355,9 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
         {!isEmbedded ? (
           <button
             type="button"
-            onClick={() => setIsOpen(false)}
+            onClick={handleClose}
             className="flex h-8 w-8 items-center justify-center rounded-full text-white/55 transition hover:bg-white/10 hover:text-white"
-            aria-label="Close Knotty chat"
+            aria-label="Minimize Knotty chat"
           >
             <X className="h-4 w-4" />
           </button>
@@ -362,6 +419,11 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
 
   if (isEmbedded) {
     return panel;
+  }
+
+  // Don't render the floating concierge on focused app surfaces.
+  if (isHiddenRoute) {
+    return null;
   }
 
   return (

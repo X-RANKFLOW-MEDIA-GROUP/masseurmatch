@@ -108,7 +108,7 @@ function isRealProfileId(id: string | null | undefined) {
 }
 
 export default async function HomePage() {
-  // Coming-soon mode — redirect to waitlist until launch (remove after May 7, 2026)
+  // Coming-soon mode — redirect to waitlist until launch (remove this redirect to go live)
   redirect("/waitlist");
 
   let featuredTherapists: Awaited<ReturnType<typeof getPublicTherapists>>["items"] = [];
