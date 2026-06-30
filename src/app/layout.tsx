@@ -6,7 +6,6 @@ import { SiteFooter } from "@/app/_components/site-footer";
 import SiteHeader from "@/app/_components/site-header";
 import { CookieConsent } from "@/app/_components/CookieConsent";
 import { ChatWidget } from "@/app/_components/chat-widget";
-import { IntroVideoSplash } from "@/app/_components/IntroVideoSplash";
 import { SITE_DESCRIPTION, SITE_NAME, createPageMetadata } from "@/app/_lib/metadata";
 import { AppProviders } from "@/app/providers";
 import { SITE_URL } from "@/lib/site";
@@ -51,7 +50,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <GoogleAnalytics />
         <AppProviders>
           <SketchFilter />
-          <IntroVideoSplash />
           <div style={{ position: "relative", zIndex: 9999 }}>
             <SiteHeader />
           </div>

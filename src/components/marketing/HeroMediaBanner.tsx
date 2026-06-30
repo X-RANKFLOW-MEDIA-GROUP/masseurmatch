@@ -1,48 +1,29 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import { Cta3DButton } from "@/components/marketing/Cta3DButton";
 import { BRAND_ASSETS } from "@/lib/brand";
 import type { PublicTherapist } from "@/app/_lib/directory";
 
 export function HeroMediaBanner({
-  reducedMotion = false,
+  reducedMotion: _reducedMotion = false,
   therapists: _therapists = [],
 }: {
   reducedMotion?: boolean;
   therapists?: PublicTherapist[];
 }) {
-  const [videoFailed, setVideoFailed] = useState(false);
-  const showVideo = !reducedMotion && !videoFailed;
-
   return (
     <div className="relative w-full">
-      {/* Desktop / tablet — lazy-loaded, it's below the hero text fold */}
+      {/* Desktop / tablet — static hero still (no video) */}
       <div className="relative hidden aspect-video w-full overflow-hidden sm:block lg:aspect-[21/9]">
-        {showVideo ? (
-          <video
-            className="absolute inset-0 h-full w-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="none"
-            poster={BRAND_ASSETS.heroPoster}
-            onError={() => setVideoFailed(true)}
-          >
-            <source src={BRAND_ASSETS.heroVideo} type="video/mp4" />
-          </video>
-        ) : (
-          <Image
-            src={BRAND_ASSETS.heroPoster}
-            alt="Premium male massage therapy"
-            fill
-            loading="lazy"
-            className="object-cover"
-            sizes="100vw"
-          />
-        )}
+        <Image
+          src={BRAND_ASSETS.heroPoster}
+          alt="Premium male massage therapy"
+          fill
+          loading="lazy"
+          className="object-cover"
+          sizes="100vw"
+        />
         <Overlay />
       </div>
 
