@@ -456,7 +456,7 @@ export default function WaitlistPage() {
           <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col items-center gap-6 text-center lg:flex-row lg:justify-between lg:text-left">
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/50">Founding members</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/80">Founding members</p>
                 <h2 className="font-display mt-3 text-2xl font-bold text-white sm:text-3xl">
                   First 50 therapists get 50% off — forever locked in.
                 </h2>

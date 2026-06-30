@@ -111,7 +111,7 @@ function StepProgress({ current }: { current: Step }) {
                 ? "text-emerald-400"
                 : i === doneIdx
                   ? "text-white"
-                  : "text-white/55",
+                  : "text-white/60",
             ].join(" ")}
           >
             {STEP_LABELS[s]}
@@ -272,7 +272,7 @@ export function WaitlistChat() {
           </div>
           <div>
             <p className="text-sm font-semibold text-white">Knotty</p>
-            <p className="text-[10px] text-white/55 tracking-wide">MasseurMatch AI · Waitlist</p>
+            <p className="text-[10px] text-white/60 tracking-wide">MasseurMatch AI · Waitlist</p>
           </div>
           {isDone && (
             <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 px-2.5 py-1 text-[10px] font-semibold text-emerald-400">
