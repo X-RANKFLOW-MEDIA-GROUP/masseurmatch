@@ -233,6 +233,19 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
   const endRef = useRef<HTMLDivElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  // Holds the pending first-visit auto-open timer so an explicit open/close can
+  // cancel it — otherwise a late-firing timer could undo a user's close.
+  const autoOpenTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // True only when the panel was opened by an explicit user action, so we never
+  // pull focus on an automatic or persisted ("open") page-load open.
+  const userInitiatedOpenRef = useRef(false);
+
+  const clearAutoOpenTimer = useCallback(() => {
+    if (autoOpenTimerRef.current) {
+      clearTimeout(autoOpenTimerRef.current);
+      autoOpenTimerRef.current = null;
+    }
+  }, []);
 
   const persistState = useCallback(
     (value: "open" | "closed") => {
@@ -247,17 +260,21 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
   );
 
   const openChat = useCallback(() => {
+    clearAutoOpenTimer();
+    userInitiatedOpenRef.current = true;
     setIsOpen(true);
     persistState("open");
     trackOpen();
-  }, [persistState, trackOpen]);
+  }, [clearAutoOpenTimer, persistState, trackOpen]);
 
   const closeChat = useCallback(() => {
+    clearAutoOpenTimer();
+    userInitiatedOpenRef.current = false;
     setIsOpen(false);
     persistState("closed");
     // Return focus to the launcher so keyboard users aren't stranded.
     requestAnimationFrame(() => launcherRef.current?.focus());
-  }, [persistState]);
+  }, [clearAutoOpenTimer, persistState]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -282,17 +299,20 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
     }
     if (stored === "closed") return;
     if (stored === "open") {
+      // Persisted open: restore the panel but do NOT mark it user-initiated,
+      // so it won't steal focus on page load.
       setIsOpen(true);
       trackOpen();
       return;
     }
-    const timer = setTimeout(() => {
+    autoOpenTimerRef.current = setTimeout(() => {
+      autoOpenTimerRef.current = null;
       setIsOpen(true);
       persistState("open");
       trackOpen();
     }, 3000);
-    return () => clearTimeout(timer);
-  }, [isEmbedded, persistState, trackOpen]);
+    return () => clearAutoOpenTimer();
+  }, [isEmbedded, persistState, trackOpen, clearAutoOpenTimer]);
 
   // Allow any part of the app to open the floating chat (optionally with a
   // prefilled prompt) by dispatching a `knotty:open` window event.
@@ -309,8 +329,9 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
     return () => window.removeEventListener("knotty:open", handler as EventListener);
   }, [isEmbedded, openChat, sendMessage]);
 
-  // ESC closes the floating chat while it is open; move focus into the panel
-  // when it opens so keyboard/screen-reader users land inside it.
+  // ESC closes the floating chat while it is open. Focus only moves into the
+  // panel for explicit user-initiated opens — an automatic or persisted open
+  // must never steal focus from whatever the visitor is doing (e.g. a form).
   useEffect(() => {
     if (isEmbedded || !isOpen) return;
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -320,7 +341,9 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
       }
     };
     window.addEventListener("keydown", handleKeyDown);
-    requestAnimationFrame(() => closeButtonRef.current?.focus());
+    if (userInitiatedOpenRef.current) {
+      requestAnimationFrame(() => closeButtonRef.current?.focus());
+    }
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isEmbedded, isOpen, closeChat]);
 
