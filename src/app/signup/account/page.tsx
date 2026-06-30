@@ -289,6 +289,8 @@ export default function SignupAccountPage() {
                   <Checkbox
                     id="terms"
                     checked={termsChecked}
+                    aria-invalid={!!fieldErrors.terms}
+                    aria-describedby={fieldErrors.terms ? "terms-error" : undefined}
                     onCheckedChange={(v) => {
                       setTermsChecked(v === true);
                       setFieldErrors((prev) => {
@@ -320,6 +322,8 @@ export default function SignupAccountPage() {
                   <Checkbox
                     id="compliance"
                     checked={complianceChecked}
+                    aria-invalid={!!fieldErrors.compliance}
+                    aria-describedby={fieldErrors.compliance ? "compliance-error" : undefined}
                     onCheckedChange={(v) => {
                       setComplianceChecked(v === true);
                       setFieldErrors((prev) => {

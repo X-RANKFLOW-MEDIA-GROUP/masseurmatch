@@ -14,6 +14,9 @@ export const metadata: Metadata = createPageMetadata({
     "therapist listing signup",
     "get massage clients online",
   ],
+  // Onboarding funnel — keep out of the index alongside /login, /register, and
+  // /forgot-password (robots.txt also disallows /signup).
+  noIndex: true,
 });
 
 export default function SignupLayout({ children }: { children: React.ReactNode }) {

@@ -13,9 +13,11 @@ export function SiteFooterTalk() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setFormState("loading");
     const form = e.currentTarget;
     const data = Object.fromEntries(new FormData(form));
+    // Honeypot: bots fill hidden fields, humans don't
+    if (data.website) return;
+    setFormState("loading");
     try {
       const res = await fetch("/api/contact-footer", {
         method: "POST",
@@ -55,6 +57,15 @@ export function SiteFooterTalk() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+                {/* Honeypot — hidden from humans, filled by bots */}
+                <input
+                  name="website"
+                  type="text"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  style={{ display: "none" }}
+                  autoComplete="off"
+                />
                 <input
                   name="name"
                   type="text"

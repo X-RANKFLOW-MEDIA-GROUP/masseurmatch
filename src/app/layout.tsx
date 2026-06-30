@@ -50,7 +50,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <GoogleAnalytics />
         <AppProviders>
           <SketchFilter />
-          <IntroVideoSplash />
           <div style={{ position: "relative", zIndex: 9999 }}>
             <SiteHeader />
           </div>

@@ -47,7 +47,10 @@ function SignupPlanPageContent() {
   }
 
   return (
-    <div className="space-y-8 py-8">
+    // Extra bottom padding keeps the plan buttons clear of the page footer (and
+    // its tel: link) and reserves room for the sticky mobile bar so a tap on a
+    // "Continue" button can never land on the footer phone link below it.
+    <div className="space-y-8 py-8 pb-32 sm:pb-12">
       <Suspense fallback={null}>
         <PreselectFromQuery />
       </Suspense>
@@ -96,8 +99,9 @@ function SignupPlanPageContent() {
                 </ul>
                 <Button
                   variant={plan.popular ? "default" : "outline"}
-                  className="mt-auto"
+                  className="relative z-10 mt-auto min-h-11 w-full"
                   onClick={() => handleSelect(plan.tier)}
+                  aria-label={`Continue with the ${plan.name} plan`}
                 >
                   Continue with {plan.name}
                 </Button>
@@ -107,12 +111,13 @@ function SignupPlanPageContent() {
         })}
       </div>
 
-      {/* Sticky mobile bar */}
+      {/* Sticky mobile bar — sits above the floating chat launcher (z-40) and
+          footer so its CTA is never blocked or tapped through. */}
       {state.selectedPlanTier && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 p-4 backdrop-blur sm:hidden">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-semibold text-foreground">
+        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,0.06)] sm:hidden">
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-foreground">
                 {SIGNUP_PLANS.find((p) => p.tier === state.selectedPlanTier)?.name}
               </p>
               <p className="text-xs text-muted-foreground">
@@ -121,6 +126,7 @@ function SignupPlanPageContent() {
             </div>
             <Button
               size="sm"
+              className="min-h-11 shrink-0"
               onClick={() => handleSelect(state.selectedPlanTier!)}
             >
               Continue

@@ -29,7 +29,7 @@ const quickPrompts = [
 const trustItems = [
   { label: "Verified profiles", icon: Check },
   { label: "Secure & private", icon: IconLock },
-  { label: "Trusted reviews", icon: IconShield },
+  { label: "Reviewed before listing", icon: IconShield },
 ];
 
 function TherapistCard({ profile, index }: { profile: PublicTherapist; index: number }) {

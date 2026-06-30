@@ -63,7 +63,7 @@ function sanitize(text: string): string {
 
 function TypingDots() {
   return (
-    <span className="inline-flex items-center gap-1" aria-label="Knotty is typing">
+    <span className="inline-flex items-center gap-1" role="status" aria-label="Knotty is typing">
       {[0, 1, 2].map((i) => (
         <span
           key={i}
@@ -99,7 +99,7 @@ function StepProgress({ current }: { current: Step }) {
                 ? "bg-emerald-400 text-slate-950"
                 : i === doneIdx
                   ? "bg-[#8B1E2D] text-white"
-                  : "bg-white/10 text-white/40",
+                  : "bg-white/10 text-white/55",
             ].join(" ")}
           >
             {i < doneIdx ? "✓" : i + 1}
@@ -111,7 +111,7 @@ function StepProgress({ current }: { current: Step }) {
                 ? "text-emerald-400"
                 : i === doneIdx
                   ? "text-white"
-                  : "text-white/30",
+                  : "text-white/60",
             ].join(" ")}
           >
             {STEP_LABELS[s]}
@@ -272,7 +272,7 @@ export function WaitlistChat() {
           </div>
           <div>
             <p className="text-sm font-semibold text-white">Knotty</p>
-            <p className="text-[10px] text-white/40 tracking-wide">MasseurMatch AI · Waitlist</p>
+            <p className="text-[10px] text-white/60 tracking-wide">MasseurMatch AI · Waitlist</p>
           </div>
           {isDone && (
             <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 px-2.5 py-1 text-[10px] font-semibold text-emerald-400">
@@ -331,7 +331,7 @@ export function WaitlistChat() {
           <div className="flex items-center gap-2 rounded-[1.2rem] border border-white/10 bg-white/5 px-4 py-2.5 focus-within:border-[#8B1E2D]/60 transition-colors">
             <input
               ref={inputRef}
-              className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none"
+              className="flex-1 bg-transparent text-sm text-white placeholder:text-white/55 outline-none"
               placeholder={placeholder}
               value={input}
               onChange={(e) => setInput(e.target.value)}

@@ -1,16 +1,14 @@
-import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { JsonLd } from "@/app/_components/json-ld";
-import { Hero } from "@/components/marketing/Hero";
-import { CityMarquee } from "@/components/marketing/CityMarquee";
-import { StatsBand } from "@/components/marketing/StatsBand";
-import { CityCaseStudies } from "@/components/marketing/CityCaseStudies";
+import { HeroCinematic } from "@/components/marketing/HeroCinematic";
+import { AIDiscoverySection } from "@/components/marketing/AIDiscoverySection";
+import { CityDiscoveryShowcase } from "@/components/marketing/CityDiscoveryShowcase";
+import { HowItWorksPremium } from "@/components/marketing/HowItWorksPremium";
 import { FeaturedTherapistsEditorial } from "@/components/marketing/FeaturedTherapistsEditorial";
+import { TrustDashboardSection } from "@/components/marketing/TrustDashboardSection";
+import { ProviderGrowthCTA } from "@/components/marketing/ProviderGrowthCTA";
 import { FaqAccordion } from "@/components/marketing/FaqAccordion";
-import { USStateMapGrid } from "@/components/marketing/USStateMapGrid";
 import { FinalCta } from "@/components/marketing/FinalCta";
-import { HowItWorksTease } from "@/components/marketing/HowItWorksTease";
-import { WhyMasseurMatch } from "@/components/marketing/WhyMasseurMatch";
 import {
   createPageMetadata,
   buildFaqJsonLd,
@@ -108,9 +106,6 @@ function isRealProfileId(id: string | null | undefined) {
 }
 
 export default async function HomePage() {
-  // Coming-soon mode — redirect to waitlist until launch (remove after May 7, 2026)
-  redirect("/waitlist");
-
   let featuredTherapists: Awaited<ReturnType<typeof getPublicTherapists>>["items"] = [];
   try {
     // Run both queries in parallel — lgbtq-affirming preferred, broad as fallback
@@ -223,23 +218,31 @@ export default async function HomePage() {
       />
 
       <div className="relative min-h-screen overflow-x-hidden bg-background">
-        {/* ── FIRST FOLD — live profiles + AI assistant ─────────────────── */}
-        <div className="home-dark relative">
-          {/* 1. Editorial hero */}
-          <Hero therapists={featuredTherapists} />
+        {/* 1. Hero Cinematic — Large hero section with cinematic visual */}
+        <HeroCinematic />
 
-          {/* 2. Slim popular-cities marquee */}
-          <CityMarquee />
-        </div>
+        {/* 2. AI-Powered Discovery Section */}
+        <AIDiscoverySection />
 
-        {/* ── LIGHT BODY ─────────────────────────────────────────────── */}
-        <StatsBand />
-        <CityCaseStudies />
-        <HowItWorksTease />
+        {/* 3. Browse by Major Cities */}
+        <CityDiscoveryShowcase />
+
+        {/* 4. How It Works — 3-step premium layout */}
+        <HowItWorksPremium />
+
+        {/* 5. Featured Verified Profiles — Premium editorial cards */}
         <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
-        <WhyMasseurMatch />
-        <USStateMapGrid />
+
+        {/* 6. Trust / Verification Dashboard */}
+        <TrustDashboardSection />
+
+        {/* 7. Provider Growth CTA */}
+        <ProviderGrowthCTA />
+
+        {/* 8. FAQ Section */}
         <FaqAccordion items={LANDING_FAQ} />
+
+        {/* 9. Final CTA */}
         <FinalCta />
       </div>
     </>
