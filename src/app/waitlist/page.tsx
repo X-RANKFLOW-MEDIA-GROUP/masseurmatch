@@ -341,12 +341,12 @@ export default function WaitlistPage() {
               <table className="w-full min-w-[640px] border-collapse text-sm">
                 <thead>
                   <tr>
-                    <th className="w-[32%] pb-4 text-left text-xs font-semibold uppercase tracking-widest text-[#8E8E8E]">Feature</th>
+                    <th className="w-[32%] pb-4 text-left text-xs font-semibold uppercase tracking-widest text-[#6F6F6F]">Feature</th>
                     <th className="w-[23%] pb-4 text-center">
                       <span className="inline-block rounded-full bg-[#8B1E2D] px-3 py-1 text-xs font-bold text-white">MasseurMatch</span>
                     </th>
-                    <th className="w-[22%] pb-4 text-center text-xs font-semibold text-[#8E8E8E]">MasseurFinder</th>
-                    <th className="w-[23%] pb-4 text-center text-xs font-semibold text-[#8E8E8E]">RentMasseur</th>
+                    <th className="w-[22%] pb-4 text-center text-xs font-semibold text-[#6F6F6F]">MasseurFinder</th>
+                    <th className="w-[23%] pb-4 text-center text-xs font-semibold text-[#6F6F6F]">RentMasseur</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E8E8E8]">
@@ -361,7 +361,7 @@ export default function WaitlistPage() {
                       </td>
                       <td className="py-3.5 text-center text-sm text-[#6F6F6F]">
                         {row.mmBetter ? (
-                          <span className="inline-flex items-center gap-1 text-[#8E8E8E]">
+                          <span className="inline-flex items-center gap-1 text-[#6F6F6F]">
                             <X className="h-3.5 w-3.5 text-red-400" strokeWidth={2.5} />
                             {row.masseurfinder}
                           </span>
@@ -371,7 +371,7 @@ export default function WaitlistPage() {
                       </td>
                       <td className="py-3.5 text-center text-sm text-[#6F6F6F]">
                         {row.mmBetter ? (
-                          <span className="inline-flex items-center gap-1 text-[#8E8E8E]">
+                          <span className="inline-flex items-center gap-1 text-[#6F6F6F]">
                             <X className="h-3.5 w-3.5 text-red-400" strokeWidth={2.5} />
                             {row.rentmasseur}
                           </span>
@@ -385,7 +385,7 @@ export default function WaitlistPage() {
               </table>
             </div>
 
-            <p className="mt-6 text-center text-xs text-[#8E8E8E]">
+            <p className="mt-6 text-center text-xs text-[#6F6F6F]">
               Competitor pricing based on publicly available information as of 2026. Features subject to change.
             </p>
           </div>
@@ -505,10 +505,10 @@ export default function WaitlistPage() {
         <div className="border-t border-[#E8E8E8] bg-[#f7f7f7] py-8">
           <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-3 px-4 text-center sm:flex-row sm:justify-between">
             <p className="text-sm font-semibold text-[#111111]">MasseurMatch</p>
-            <p className="text-xs text-[#8E8E8E]">
+            <p className="text-xs text-[#6F6F6F]">
               Launching in Dallas first. More cities coming fast.
             </p>
-            <div className="flex gap-4 text-xs text-[#8E8E8E]">
+            <div className="flex gap-4 text-xs text-[#6F6F6F]">
               <Link href="/privacy" className="hover:text-[#111111] transition-colors">Privacy</Link>
               <Link href="/terms" className="hover:text-[#111111] transition-colors">Terms</Link>
               <Link href="/contact" className="hover:text-[#111111] transition-colors">Contact</Link>
