@@ -12,10 +12,11 @@ const schema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const body = await parseJsonBody(request, schema);
+    if (body.website) return json({ ok: true }); // silently discard bot submissions without consuming rate limit
+
     assertRateLimit(request, "contact-footer", { limit: 5, windowMs: 60_000 });
 
-    const body = await parseJsonBody(request, schema);
-    if (body.website) return json({ ok: true }); // silently discard bot submissions
     const delivery = await sendSupportEmail({
       name: sanitizeText(body.name),
       email: body.email.trim().toLowerCase(),
