@@ -23,7 +23,11 @@ const faqs = [
     items: [
       {
         q: "What is MasseurMatch?",
-        a: "MasseurMatch is a directory platform that connects clients with verified, professional massage therapists across the United States. We specialize in creating a safe, LGBTQ+-inclusive environment where every client feels welcome and respected.",
+        a: "MasseurMatch is an online directory of professional massage therapists across the United States — not a booking or payment platform. We help you discover and compare therapists; you then contact them directly to arrange a session. Our focus is a safe, LGBTQ+-inclusive, strictly professional and non-sexual massage experience where every client feels welcome and respected.",
+      },
+      {
+        q: "Does MasseurMatch handle booking or payments?",
+        a: "No. MasseurMatch is a discovery directory, not a booking platform. We don't schedule appointments, process session payments, or take booking fees. You arrange the session, rate, and any payment directly with the therapist.",
       },
       {
         q: "Is MasseurMatch LGBTQ+-friendly?",
@@ -31,11 +35,15 @@ const faqs = [
       },
       {
         q: "How do I find a massage therapist near me?",
-        a: "Use our search bar to enter your city or ZIP code. You can filter results by massage modality, pricing, availability, and LGBTQ+ certifications. Each profile includes the therapist's services, rates, and availability.",
+        a: "Use our search bar to enter your city or ZIP code. You can filter results by massage modality, pricing, availability, and LGBTQ+-affirming options. Each profile lists the therapist's services, rates, and availability so you can contact them directly.",
       },
       {
         q: "How are therapists reviewed on MasseurMatch?",
-        a: "Profiles go through identity and quality checks before publication. Clients should still confirm service fit, boundaries, and session details directly with each therapist.",
+        a: "Profiles go through an identity and photo review and a basic quality check before publication. MasseurMatch does not verify professional licenses, certifications, or insurance — please confirm a therapist's credentials, service fit, boundaries, and session details directly with them.",
+      },
+      {
+        q: "What do the badges on a profile mean?",
+        a: "An 'Identity Verified' badge means the therapist completed an identity and photo check through Stripe Identity — it confirms who they are. It is not a guarantee of professional licensing, qualifications, or the outcome of any session. Promotional labels such as 'Featured' or 'Boosted' are paid placements and do not imply endorsement or recommendation by MasseurMatch.",
       },
       {
         q: "Is my information private when I search?",

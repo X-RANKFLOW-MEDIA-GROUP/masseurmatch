@@ -63,7 +63,7 @@ function sanitize(text: string): string {
 
 function TypingDots() {
   return (
-    <span className="inline-flex items-center gap-1" aria-label="Knotty is typing">
+    <span className="inline-flex items-center gap-1" role="status" aria-label="Knotty is typing">
       {[0, 1, 2].map((i) => (
         <span
           key={i}
