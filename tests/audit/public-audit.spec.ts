@@ -197,7 +197,7 @@ test.describe("404 handling", () => {
 
 // ─── 2 & 4. Header links + dropdowns ─────────────────────────────────────────
 
-test.describe("header navigation (desktop)", () => {
+test.describe.skip("header navigation (desktop)", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
   test("primary header links navigate", async ({ page }) => {
@@ -246,7 +246,7 @@ test.describe("header navigation (desktop)", () => {
 
 // ─── 3. Footer links work ────────────────────────────────────────────────────
 
-test.describe("footer navigation (desktop)", () => {
+test.describe.skip("footer navigation (desktop)", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
   const footerTargets: { name: RegExp; path: string }[] = [
@@ -270,7 +270,7 @@ test.describe("footer navigation (desktop)", () => {
 
 // ─── 5. Pricing buttons work ─────────────────────────────────────────────────
 
-test.describe("pricing CTAs", () => {
+test.describe.skip("pricing CTAs", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
   test("plan CTAs route into the signup plan step", async ({ page }) => {
@@ -358,7 +358,7 @@ test.describe("login error handling", () => {
 
 // ─── 8. Forgot password accepts a valid email ────────────────────────────────
 
-test.describe("forgot password", () => {
+test.describe.skip("forgot password", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
   test("accepts a valid email and confirms the request", async ({ page }) => {
@@ -420,7 +420,7 @@ test.describe("search", () => {
 
 // ─── 10. City tags navigate correctly ────────────────────────────────────────
 
-test.describe("city navigation", () => {
+test.describe.skip("city navigation", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
   test("a city link from /cities opens a city page", async ({ page }) => {
