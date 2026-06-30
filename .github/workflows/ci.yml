@@ -165,11 +165,11 @@ jobs:
       options: --ipc=host
     needs: [build]
     env:
-      PLAYWRIGHT_BASE_URL: ${{ vars.PLAYWRIGHT_BASE_URL }}
-    # Only runs when a base URL is configured (production or preview deployment).
-    # Set PLAYWRIGHT_BASE_URL as a GitHub Actions repo variable (Settings → Variables).
-    # A base URL is not sensitive — use vars, not secrets.
-    if: ${{ vars.PLAYWRIGHT_BASE_URL != '' }}
+      PLAYWRIGHT_BASE_URL: ${{ github.event_name == 'pull_request' && format('https://{0}.masseurmatch.vercel.app', github.head_ref) || 'https://masseurmatch.com' }}
+    # On PRs, tests run against the Vercel preview deployment.
+    # On pushes to main, tests run against production.
+    # Tests only run if the deployment URL is available (always true now).
+    if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/main' }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -198,9 +198,10 @@ jobs:
       options: --ipc=host
     needs: [build]
     env:
-      PLAYWRIGHT_BASE_URL: ${{ vars.PLAYWRIGHT_BASE_URL }}
-    # Runs alongside the E2E suite whenever a deployed URL is available.
-    if: ${{ vars.PLAYWRIGHT_BASE_URL != '' }}
+      PLAYWRIGHT_BASE_URL: ${{ github.event_name == 'pull_request' && format('https://{0}.masseurmatch.vercel.app', github.head_ref) || 'https://masseurmatch.com' }}
+    # On PRs, tests run against the Vercel preview deployment.
+    # On pushes to main, tests run against production.
+    if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/main' }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
