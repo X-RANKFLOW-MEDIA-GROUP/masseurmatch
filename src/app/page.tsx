@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { JsonLd } from "@/app/_components/json-ld";
 import { Hero } from "@/components/marketing/Hero";
@@ -108,9 +107,6 @@ function isRealProfileId(id: string | null | undefined) {
 }
 
 export default async function HomePage() {
-  // Coming-soon mode — redirect to waitlist until public launch (remove when the directory goes live)
-  redirect("/waitlist");
-
   let featuredTherapists: Awaited<ReturnType<typeof getPublicTherapists>>["items"] = [];
   try {
     // Run both queries in parallel — lgbtq-affirming preferred, broad as fallback

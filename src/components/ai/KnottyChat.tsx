@@ -286,9 +286,8 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
     }
   }, [isEmbedded, trackOpen]);
 
-  // Decide the initial floating state from the persisted choice. A returning
-  // visitor who closed Knotty stays closed; first-time visitors get a gentle
-  // auto-open after a few seconds.
+  // Restore persisted open state for returning visitors who previously opened the chat.
+  // Do NOT auto-open for new visitors — the chat opens only on explicit user action.
   useEffect(() => {
     if (isEmbedded) return;
     let stored: string | null = null;
@@ -297,22 +296,12 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
     } catch {
       /* ignore */
     }
-    if (stored === "closed") return;
     if (stored === "open") {
-      // Persisted open: restore the panel but do NOT mark it user-initiated,
-      // so it won't steal focus on page load.
       setIsOpen(true);
       trackOpen();
-      return;
     }
-    autoOpenTimerRef.current = setTimeout(() => {
-      autoOpenTimerRef.current = null;
-      setIsOpen(true);
-      persistState("open");
-      trackOpen();
-    }, 3000);
-    return () => clearAutoOpenTimer();
-  }, [isEmbedded, persistState, trackOpen, clearAutoOpenTimer]);
+  }, [isEmbedded, trackOpen]);
+
 
   // Allow any part of the app to open the floating chat (optionally with a
   // prefilled prompt) by dispatching a `knotty:open` window event.
