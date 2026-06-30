@@ -4,6 +4,11 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+// In-memory fallback for environments where localStorage throws (Safari
+// private mode, blocked storage). Persists for the lifetime of the page so the
+// banner doesn't reappear on every client-side navigation for those users.
+let inMemoryConsent: string | null = null;
+
 export function CookieConsent() {
   const [show, setShow] = useState(false);
   const pathname = usePathname();
@@ -16,12 +21,12 @@ export function CookieConsent() {
 
     // localStorage access can throw (Safari private mode, blocked storage).
     // Guard it so a thrown read never leaves the banner in an inconsistent
-    // state — default to showing it when we can't confirm a prior choice.
-    let consent: string | null = null;
+    // state, and fall back to the in-memory choice when storage is unavailable.
+    let consent: string | null = inMemoryConsent;
     try {
-      consent = localStorage.getItem("mm_cookie_consent");
+      consent = localStorage.getItem("mm_cookie_consent") ?? inMemoryConsent;
     } catch {
-      consent = null;
+      consent = inMemoryConsent;
     }
     if (!consent) {
       setShow(true);
@@ -29,10 +34,13 @@ export function CookieConsent() {
   }, [pathname]);
 
   const savePreference = (value: "accepted" | "rejected") => {
+    // Always record the choice in memory so it survives client-side navigation
+    // even when the persistent write below fails.
+    inMemoryConsent = value;
     try {
       localStorage.setItem("mm_cookie_consent", value);
     } catch {
-      /* storage unavailable — still honor the choice for this session */
+      /* storage unavailable — honored via the in-memory fallback above */
     }
     setShow(false);
   };

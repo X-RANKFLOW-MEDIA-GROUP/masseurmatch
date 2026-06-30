@@ -231,6 +231,7 @@ const NO_AUTO_OPEN_PREFIXES = [
   "/signup",
   "/login",
   "/register",
+  "/auth",
   "/forgot-password",
   "/reset-password",
   "/pricing",
