@@ -2,26 +2,30 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 export function CookieConsent() {
   const [show, setShow] = useState(false);
-  const pathname = usePathname();
 
   useEffect(() => {
-    if (pathname === "/") {
-      setShow(false);
-      return;
-    }
-
-    const consent = localStorage.getItem("mm_cookie_consent");
-    if (!consent) {
+    // Show on every page until the visitor records a choice. localStorage is
+    // read on the client only, so the banner never causes an SSR mismatch.
+    try {
+      const consent = localStorage.getItem("mm_cookie_consent");
+      if (!consent) {
+        setShow(true);
+      }
+    } catch {
+      // Private-mode / storage-blocked browsers: surface the banner anyway.
       setShow(true);
     }
-  }, [pathname]);
+  }, []);
 
   const savePreference = (value: "accepted" | "rejected") => {
-    localStorage.setItem("mm_cookie_consent", value);
+    try {
+      localStorage.setItem("mm_cookie_consent", value);
+    } catch {
+      // Ignore storage failures — at minimum dismiss for this session.
+    }
     setShow(false);
   };
 
@@ -41,6 +45,10 @@ export function CookieConsent() {
               experience. Review our{" "}
               <Link href="/cookie-policy" className="font-semibold text-[#111111] underline underline-offset-2 hover:text-[#8B1E2D]">
                 Cookie Policy
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" className="font-semibold text-[#111111] underline underline-offset-2 hover:text-[#8B1E2D]">
+                Privacy Policy
               </Link>
               .
             </p>
