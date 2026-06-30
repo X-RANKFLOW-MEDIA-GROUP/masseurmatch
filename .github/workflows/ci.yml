@@ -157,19 +157,71 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
 
+  # Resolve the Vercel preview URL for this PR's head commit so the E2E/a11y
+  # suites test the code under review instead of production. Reads the GitHub
+  # deployment statuses that the Vercel integration creates (no third-party
+  # action). Outputs an empty string if none resolves in time — the test jobs
+  # then fall back to the production base URL so they never regress.
+  preview-url:
+    name: Resolve preview URL
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
+    outputs:
+      url: ${{ steps.resolve.outputs.url }}
+    steps:
+      - name: Wait for Vercel preview deployment
+        id: resolve
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sha = context.payload.pull_request.head.sha;
+            const deadlineMs = Date.now() + 10 * 60 * 1000; // 10 minutes
+            const isPreview = (u) => !!u && /vercel\.app/.test(u);
+            while (Date.now() < deadlineMs) {
+              const deployments = await github.rest.repos.listDeployments({
+                owner: context.repo.owner, repo: context.repo.repo, sha, per_page: 100,
+              });
+              for (const d of deployments.data) {
+                const statuses = await github.rest.repos.listDeploymentStatuses({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  deployment_id: d.id, per_page: 100,
+                });
+                const ready = statuses.data.find(
+                  (s) => s.state === 'success' && isPreview(s.target_url || s.environment_url),
+                );
+                if (ready) {
+                  const url = ready.target_url || ready.environment_url;
+                  core.info(`Resolved preview URL: ${url}`);
+                  core.setOutput('url', url);
+                  return;
+                }
+                if (statuses.data.some((s) => ['failure', 'error'].includes(s.state))) {
+                  core.warning(`Deployment ${d.id} failed; will keep polling for another.`);
+                }
+              }
+              await new Promise((r) => setTimeout(r, 15000));
+            }
+            core.warning('No Vercel preview URL resolved in time; tests will fall back to PLAYWRIGHT_BASE_URL.');
+            core.setOutput('url', '');
+
   e2e:
     name: E2E Tests
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-jammy
       options: --ipc=host
-    needs: [build]
+    needs: [build, preview-url]
     env:
-      PLAYWRIGHT_BASE_URL: ${{ vars.PLAYWRIGHT_BASE_URL }}
-    # Only runs when a base URL is configured (production or preview deployment).
-    # Set PLAYWRIGHT_BASE_URL as a GitHub Actions repo variable (Settings → Variables).
-    # A base URL is not sensitive — use vars, not secrets.
-    if: ${{ vars.PLAYWRIGHT_BASE_URL != '' }}
+      # Prefer this PR's preview deployment; fall back to the configured base URL
+      # (production) on pushes to main or if no preview resolved.
+      PLAYWRIGHT_BASE_URL: ${{ needs.preview-url.outputs.url != '' && needs.preview-url.outputs.url || vars.PLAYWRIGHT_BASE_URL }}
+      # Bypass Vercel Deployment Protection on preview URLs (no-op if unset or
+      # if previews aren't protection-enabled). Set as a repo/Environment secret.
+      VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
+    # Runs when a base URL is available: a resolved preview (PRs) or the
+    # configured production var (pushes / preview fallback). preview-url is
+    # skipped on push, so guard with always() + build success.
+    if: ${{ always() && needs.build.result == 'success' && (needs.preview-url.outputs.url != '' || vars.PLAYWRIGHT_BASE_URL != '') }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -196,11 +248,13 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-jammy
       options: --ipc=host
-    needs: [build]
+    needs: [build, preview-url]
     env:
-      PLAYWRIGHT_BASE_URL: ${{ vars.PLAYWRIGHT_BASE_URL }}
+      # Prefer this PR's preview deployment; fall back to the configured base URL.
+      PLAYWRIGHT_BASE_URL: ${{ needs.preview-url.outputs.url != '' && needs.preview-url.outputs.url || vars.PLAYWRIGHT_BASE_URL }}
+      VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
     # Runs alongside the E2E suite whenever a deployed URL is available.
-    if: ${{ vars.PLAYWRIGHT_BASE_URL != '' }}
+    if: ${{ always() && needs.build.result == 'success' && (needs.preview-url.outputs.url != '' || vars.PLAYWRIGHT_BASE_URL != '') }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
