@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Clock3, MapPinned, Send, MessageCircle, ShieldCheck, X } from "lucide-react";
 import { useKnotty } from "@/hooks/useKnotty";
@@ -220,12 +220,44 @@ function KnottyDisclaimer() {
   );
 }
 
+// Persists whether the floating chat is open or closed so the user's choice
+// survives navigation between pages. Once a visitor closes Knotty we never
+// auto-reopen it on subsequent pages.
+const STORAGE_KEY = "knotty-chat-state";
+
 export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) => {
   const isEmbedded = mode === "embedded";
   const [isOpen, setIsOpen] = useState(isEmbedded);
   const { input, isTyping, messages, sendMessage, setInput, trackOpen, trackRecommendationClick } =
     useKnotty();
   const endRef = useRef<HTMLDivElement>(null);
+  const launcherRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  const persistState = useCallback(
+    (value: "open" | "closed") => {
+      if (isEmbedded || typeof window === "undefined") return;
+      try {
+        window.localStorage.setItem(STORAGE_KEY, value);
+      } catch {
+        /* localStorage unavailable (private mode / blocked) — ignore */
+      }
+    },
+    [isEmbedded],
+  );
+
+  const openChat = useCallback(() => {
+    setIsOpen(true);
+    persistState("open");
+    trackOpen();
+  }, [persistState, trackOpen]);
+
+  const closeChat = useCallback(() => {
+    setIsOpen(false);
+    persistState("closed");
+    // Return focus to the launcher so keyboard users aren't stranded.
+    requestAnimationFrame(() => launcherRef.current?.focus());
+  }, [persistState]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -237,23 +269,37 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
     }
   }, [isEmbedded, trackOpen]);
 
-  // Auto-open floating chat after 3 seconds on page load.
+  // Decide the initial floating state from the persisted choice. A returning
+  // visitor who closed Knotty stays closed; first-time visitors get a gentle
+  // auto-open after a few seconds.
   useEffect(() => {
     if (isEmbedded) return;
+    let stored: string | null = null;
+    try {
+      stored = window.localStorage.getItem(STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+    if (stored === "closed") return;
+    if (stored === "open") {
+      setIsOpen(true);
+      trackOpen();
+      return;
+    }
     const timer = setTimeout(() => {
       setIsOpen(true);
+      persistState("open");
       trackOpen();
     }, 3000);
     return () => clearTimeout(timer);
-  }, [isEmbedded, trackOpen]);
+  }, [isEmbedded, persistState, trackOpen]);
 
   // Allow any part of the app to open the floating chat (optionally with a
   // prefilled prompt) by dispatching a `knotty:open` window event.
   useEffect(() => {
     if (isEmbedded) return;
     const handler = (event: Event) => {
-      setIsOpen(true);
-      trackOpen();
+      openChat();
       const prompt = (event as CustomEvent<{ prompt?: string }>).detail?.prompt;
       if (prompt) {
         void sendMessage({ content: prompt });
@@ -261,7 +307,22 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
     };
     window.addEventListener("knotty:open", handler as EventListener);
     return () => window.removeEventListener("knotty:open", handler as EventListener);
-  }, [isEmbedded, trackOpen, sendMessage]);
+  }, [isEmbedded, openChat, sendMessage]);
+
+  // ESC closes the floating chat while it is open; move focus into the panel
+  // when it opens so keyboard/screen-reader users land inside it.
+  useEffect(() => {
+    if (isEmbedded || !isOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.stopPropagation();
+        closeChat();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    requestAnimationFrame(() => closeButtonRef.current?.focus());
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isEmbedded, isOpen, closeChat]);
 
   const latestAssistantId = useMemo(() => {
     for (let i = messages.length - 1; i >= 0; i--) {
@@ -272,6 +333,9 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
 
   const panel = (
     <div
+      role={isEmbedded ? undefined : "dialog"}
+      aria-modal={false}
+      aria-label={isEmbedded ? undefined : "Knotty AI concierge chat"}
       className={cn(
         "relative flex flex-col overflow-hidden rounded-[24px] border border-black/10 bg-white shadow-[0_32px_96px_rgba(15,23,42,0.22)]",
         isEmbedded
@@ -297,10 +361,11 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
         </div>
         {!isEmbedded ? (
           <button
+            ref={closeButtonRef}
             type="button"
-            onClick={() => setIsOpen(false)}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-white/55 transition hover:bg-white/10 hover:text-white"
-            aria-label="Close Knotty chat"
+            onClick={closeChat}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-white/55 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+            aria-label="Minimize Knotty chat"
           >
             <X className="h-4 w-4" />
           </button>
@@ -365,22 +430,21 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 sm:bottom-6 sm:right-6">
+    <div className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 z-40 sm:bottom-6 sm:right-6">
       <AnimatePresence mode="wait">
         {!isOpen ? (
           <motion.button
             key="knotty-launcher"
+            ref={launcherRef}
             type="button"
             initial={{ opacity: 0, scale: 0.86 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.86 }}
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            onClick={() => {
-              setIsOpen(true);
-              trackOpen();
-            }}
-            className="group relative h-16 w-16 rounded-full border border-white/20 bg-[#8B1E2D] shadow-[0_20px_48px_rgba(139,30,45,0.3)]"
+            onClick={openChat}
+            className="group relative h-14 w-14 rounded-full border border-white/20 bg-[#8B1E2D] shadow-[0_20px_48px_rgba(139,30,45,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8B1E2D]/50 focus-visible:ring-offset-2 sm:h-16 sm:w-16"
             aria-label="Open Knotty chat"
+            aria-expanded={isOpen}
           >
             <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.25),transparent_58%)]" />
             <div className="relative flex h-full w-full items-center justify-center text-white">
