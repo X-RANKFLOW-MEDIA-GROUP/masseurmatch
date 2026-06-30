@@ -16,8 +16,8 @@ export function HeroCinematic() {
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-black">
-      {/* Video background with fallback */}
-      <div className="absolute inset-0 z-0">
+      {/* Desktop video background */}
+      <div className="absolute inset-0 z-0 hidden md:block">
         <video
           autoPlay
           muted
@@ -29,6 +29,27 @@ export function HeroCinematic() {
         >
           <source
             src="https://res.cloudinary.com/dyfxkq2nk/video/upload/v1782848462/Untitled_design_tx6pny.mp4"
+            type="video/mp4"
+          />
+        </video>
+
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/50" />
+      </div>
+
+      {/* Mobile video background */}
+      <div className="absolute inset-0 z-0 md:hidden">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="h-full w-full object-cover"
+          poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 960'%3E%3Crect fill='%230F1419' width='540' height='960'/%3E%3C/svg%3E"
+        >
+          <source
+            src="https://res.cloudinary.com/dyfxkq2nk/video/upload/v1782849866/Untitled_Mobile_Video_dkosuk.mp4"
             type="video/mp4"
           />
         </video>
