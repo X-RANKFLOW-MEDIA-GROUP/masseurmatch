@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
-import { BreathingGlow } from "@/components/motion/BreathingGlow";
 import { GrainOverlay } from "@/components/motion/GrainOverlay";
 
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -16,35 +15,38 @@ export function HeroCinematic() {
   const noDelay = reducedMotion ? 0 : undefined;
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-[#0F1419] via-[#1a1f2e] to-[#0F1419]">
-      <GrainOverlay opacity={0.03} className="z-[2]" />
-      <BreathingGlow
-        color="rgba(139, 30, 45, 0.08)"
-        size={600}
-        duration={8}
-        className="right-[5%] top-[10%] z-[1]"
-      />
+    <section className="relative min-h-screen overflow-hidden bg-black">
+      {/* Video background with fallback */}
+      <div className="absolute inset-0 z-0">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="h-full w-full object-cover"
+          poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1280 720'%3E%3Crect fill='%230F1419' width='1280' height='720'/%3E%3C/svg%3E"
+        >
+          <source
+            src="https://res.cloudinary.com/dyfxkq2nk/video/upload/v1782848462/Untitled_design_tx6pny.mp4"
+            type="video/mp4"
+          />
+        </video>
 
-      {/* Grid texture background */}
-      <div
-        className="absolute inset-0 z-0 opacity-[0.015]"
-        style={{
-          backgroundImage:
-            "linear-gradient(0deg, transparent 24%, rgba(139, 30, 45, 0.05) 25%, rgba(139, 30, 45, 0.05) 26%, transparent 27%, transparent 74%, rgba(139, 30, 45, 0.05) 75%, rgba(139, 30, 45, 0.05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(139, 30, 45, 0.05) 25%, rgba(139, 30, 45, 0.05) 26%, transparent 27%, transparent 74%, rgba(139, 30, 45, 0.05) 75%, rgba(139, 30, 45, 0.05) 76%, transparent 77%, transparent)",
-          backgroundSize: "60px 60px",
-        }}
-      />
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/50" />
+      </div>
+
+      <GrainOverlay opacity={0.05} className="z-[2]" />
 
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="mx-auto w-full max-w-7xl">
-          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-            {/* Left: Headline & CTA */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: dur, ease: customEase, delay: noDelay }}
-              className="flex flex-col justify-center"
-            >
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: dur, ease: customEase, delay: noDelay }}
+            className="flex max-w-3xl flex-col justify-center"
+          >
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -114,105 +116,7 @@ export function HeroCinematic() {
                   <p className="mt-1 text-sm text-gray-400">LGBTQ+ Affirming</p>
                 </div>
               </motion.div>
-            </motion.div>
-
-            {/* Right: Cinematic Visual (Premium interface mockup) */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 40 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: dur + 0.2, ease: customEase, delay: noDelay ?? 0.25 }}
-              className="relative"
-            >
-              {/* Glassmorphism card with interface mockup */}
-              <div className="relative h-[500px] overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-white/5 to-white/2 p-8 backdrop-blur-md sm:h-[600px]">
-                {/* Decorative glow circles */}
-                <div className="absolute -right-24 -top-24 h-48 w-48 rounded-full bg-[#8B1E2D]/20 blur-3xl" />
-                <div className="absolute -bottom-32 -left-32 h-64 w-64 rounded-full bg-[#8B1E2D]/10 blur-3xl" />
-
-                {/* Interface content */}
-                <div className="relative z-10 flex h-full flex-col">
-                  {/* Header */}
-                  <div className="mb-6 flex items-center justify-between border-b border-white/10 pb-6">
-                    <div>
-                      <p className="font-mono text-xs uppercase tracking-widest text-[#8B1E2D]">
-                        Knotty AI Discovery
-                      </p>
-                      <p className="mt-1 text-sm font-semibold text-white">
-                        Smart therapist matching
-                      </p>
-                    </div>
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#8B1E2D]/20 text-[#8B1E2D]">
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
-                        <path d="M12 11h-1v-1h1v1zm2 0h-1v-1h1v1z" />
-                      </svg>
-                    </div>
-                  </div>
-
-                  {/* Conversation preview */}
-                  <div className="flex-1 space-y-4 overflow-hidden">
-                    <div className="flex items-end gap-3">
-                      <div className="h-8 w-8 rounded-full bg-[#8B1E2D]/30" />
-                      <div className="rounded-2xl rounded-bl-none bg-[#8B1E2D]/15 px-4 py-3 text-sm text-gray-200">
-                        <p className="font-semibold">What's your ideal massage style?</p>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end">
-                      <div className="rounded-2xl rounded-br-none bg-[#8B1E2D] px-4 py-3 text-sm text-white">
-                        <p className="font-semibold">Deep tissue, preferably outcall</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-end gap-3">
-                      <div className="h-8 w-8 rounded-full bg-[#8B1E2D]/30" />
-                      <div className="rounded-2xl rounded-bl-none bg-[#8B1E2D]/15 px-4 py-3 text-sm text-gray-200">
-                        <p className="font-semibold">Found 3 perfect matches for you</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Input area */}
-                  <div className="mt-6 flex gap-2 border-t border-white/10 pt-6">
-                    <input
-                      type="text"
-                      placeholder="Ask anything..."
-                      disabled
-                      className="flex-1 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm text-gray-300 placeholder-gray-500 backdrop-blur-sm"
-                    />
-                    <button
-                      type="button"
-                      disabled
-                      className="flex h-11 w-11 items-center justify-center rounded-full bg-[#8B1E2D] text-white transition hover:bg-[#6E1521]"
-                    >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M16.6915026,12.4744748 L3.50612381,13.2599618 C3.19218622,13.2599618 3.03521743,13.4170592 3.03521743,13.5741566 L1.15159189,20.0151496 C0.8376543,20.8006365 0.99,21.89 1.77946707,22.52 C2.41,22.99 3.50612381,23.1 4.13399899,22.9429026 L21.714504,14.0454487 C22.6563168,13.5741566 23.1272231,12.6315722 22.9702544,11.6889879 L4.13399899,1.01449553 C3.34915502,0.9999968 2.40734225,1.00636533 1.77946707,1.4776575 C0.994623095,2.10604706 0.837654326,3.0486314 1.15159189,3.99047222 L3.03521743,10.4314652 C3.03521743,10.5885626 3.19218622,10.7456601 3.50612381,10.7456601 L16.6915026,11.5311469 C16.6915026,11.5311469 17.1624089,11.5311469 17.1624089,11.0598548 L17.1624089,12.0024392 C17.1624089,12.4744748 16.6915026,12.4744748 16.6915026,12.4744748 Z" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.5 }}
-                className="absolute -bottom-8 right-8 rounded-full border border-white/20 bg-[#0F1419]/80 px-6 py-3 backdrop-blur-md"
-              >
-                <p className="text-center text-xs font-semibold text-gray-300">
-                  Powered by <span className="text-[#8B1E2D]">Knotty AI</span>
-                </p>
-              </motion.div>
-            </motion.div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
