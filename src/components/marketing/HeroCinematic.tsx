@@ -15,50 +15,14 @@ export function HeroCinematic() {
   const noDelay = reducedMotion ? 0 : undefined;
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-black">
-      {/* Desktop video background */}
-      <div className="absolute inset-0 z-0 hidden md:block">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          className="h-full w-full object-cover"
-          poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1280 720'%3E%3Crect fill='%230F1419' width='1280' height='720'/%3E%3C/svg%3E"
-        >
-          <source
-            src="https://res.cloudinary.com/dyfxkq2nk/video/upload/v1782848462/Untitled_design_tx6pny.mp4"
-            type="video/mp4"
-          />
-        </video>
-
-        {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/50" />
+    <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-[#0F1419] via-[#1a1f2e] to-[#0F1419]">
+      {/* Gradient background (performance optimized - no video) */}
+      <div className="absolute inset-0 z-0 opacity-40">
+        <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-[#8B1E2D] blur-3xl" />
+        <div className="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-[#8B1E2D]/20 blur-2xl" />
       </div>
 
-      {/* Mobile video background */}
-      <div className="absolute inset-0 z-0 md:hidden">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          className="h-full w-full object-cover"
-          poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 960'%3E%3Crect fill='%230F1419' width='540' height='960'/%3E%3C/svg%3E"
-        >
-          <source
-            src="https://res.cloudinary.com/dyfxkq2nk/video/upload/v1782849866/Untitled_Mobile_Video_dkosuk.mp4"
-            type="video/mp4"
-          />
-        </video>
-
-        {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/50" />
-      </div>
-
-      <GrainOverlay opacity={0.05} className="z-[2]" />
+      <GrainOverlay opacity={0.03} className="z-[2]" />
 
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="mx-auto w-full max-w-7xl">
@@ -74,7 +38,7 @@ export function HeroCinematic() {
                 transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.1 }}
                 className="mb-6 font-mono text-xs uppercase tracking-[0.3em] text-[#8B1E2D]"
               >
-                Premium Directory
+                LGBTQ+ Affirming • AI-Powered Discovery
               </motion.p>
 
               <motion.h1
@@ -83,7 +47,7 @@ export function HeroCinematic() {
                 transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.15 }}
                 className="font-display text-5xl font-black leading-[1.1] tracking-tight text-white sm:text-6xl lg:text-7xl"
               >
-                Find Your <span className="text-[#8B1E2D]">Perfect Match</span>
+                Find Your <span className="text-[#8B1E2D]">Verified Therapist</span>
               </motion.h1>
 
               <motion.p
@@ -92,7 +56,7 @@ export function HeroCinematic() {
                 transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.2 }}
                 className="mt-8 max-w-lg text-lg leading-relaxed text-gray-300 sm:text-xl"
               >
-                Discover verified LGBTQ+-affirming male massage therapists across the US. Browse profiles by city, specialty, and availability. Direct contact, no middleman.
+                AI-powered discovery of verified, LGBTQ+-affirming male massage therapists across the US. Direct contact, transparent pricing, zero middleman.
               </motion.p>
 
               <motion.div

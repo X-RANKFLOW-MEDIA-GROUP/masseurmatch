@@ -1,62 +1,21 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MapPin } from "lucide-react";
 import { GrainOverlay } from "@/components/motion/GrainOverlay";
 
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const cities = [
-  {
-    name: "New York",
-    slug: "new-york",
-    therapists: 127,
-    image: "/marketing/cities/new-york.jpg",
-  },
-  {
-    name: "Los Angeles",
-    slug: "los-angeles",
-    therapists: 98,
-    image: "/marketing/cities/los-angeles.jpg",
-  },
-  {
-    name: "Miami",
-    slug: "miami",
-    therapists: 76,
-    image: "/marketing/cities/miami.jpg",
-  },
-  {
-    name: "Chicago",
-    slug: "chicago",
-    therapists: 64,
-    image: "/marketing/cities/chicago.jpg",
-  },
-  {
-    name: "Dallas",
-    slug: "dallas",
-    therapists: 52,
-    image: "/marketing/cities/dallas.jpg",
-  },
-  {
-    name: "Houston",
-    slug: "houston",
-    therapists: 48,
-    image: "/marketing/cities/houston.jpg",
-  },
-  {
-    name: "Atlanta",
-    slug: "atlanta",
-    therapists: 44,
-    image: "/marketing/cities/atlanta.jpg",
-  },
-  {
-    name: "Washington DC",
-    slug: "washington-dc",
-    therapists: 38,
-    image: "/marketing/cities/washington-dc.jpg",
-  },
+  { name: "New York", slug: "new-york", therapists: 127 },
+  { name: "Los Angeles", slug: "los-angeles", therapists: 98 },
+  { name: "Miami", slug: "miami", therapists: 76 },
+  { name: "Chicago", slug: "chicago", therapists: 64 },
+  { name: "Dallas", slug: "dallas", therapists: 52 },
+  { name: "Houston", slug: "houston", therapists: 48 },
+  { name: "Atlanta", slug: "atlanta", therapists: 44 },
+  { name: "Washington DC", slug: "washington-dc", therapists: 38 },
 ];
 
 export function CityDiscoveryShowcase() {
@@ -111,36 +70,21 @@ export function CityDiscoveryShowcase() {
                   ease: customEase,
                   delay: index * 0.08,
                 }}
-                className="group relative h-56 overflow-hidden rounded-[24px] border border-[#E8E8E8] shadow-md transition duration-300 hover:-translate-y-2 hover:border-[#8B1E2D]/20 hover:shadow-xl sm:h-64"
+                className="group flex flex-col justify-between rounded-[24px] border border-[#E8E8E8] bg-gradient-to-br from-[#f7f7f7] to-[#fafafa] p-8 shadow-md transition duration-300 hover:-translate-y-2 hover:border-[#8B1E2D]/20 hover:shadow-xl min-h-44"
               >
-                {/* Background image */}
-                {city.image && (
-                  <Image
-                    src={city.image}
-                    alt={`${city.name} massage therapists`}
-                    fill
-                    className="object-cover transition duration-500 group-hover:scale-110"
-                  />
-                )}
-
-                {/* Overlay gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-
-                {/* Content */}
-                <div className="absolute inset-0 flex flex-col items-start justify-between p-6">
-                  <div className="opacity-0 transition duration-300 group-hover:opacity-100">
-                    <span className="inline-block rounded-full bg-[#8B1E2D] px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-white">
-                      {city.therapists} Therapists
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="font-display text-2xl font-black text-white transition duration-300 group-hover:text-[#F8EDEE]">
-                      {city.name}
-                    </h3>
-                    <div className="mt-3 flex items-center gap-2 text-white transition duration-300 group-hover:translate-x-1">
-                      <span className="text-sm font-semibold">Explore</span>
-                      <ArrowRight size={14} />
-                    </div>
+                <div className="flex items-center gap-2 text-[#8B1E2D] mb-4">
+                  <MapPin size={20} />
+                  <span className="text-xs font-bold uppercase tracking-widest text-[#8B1E2D]">
+                    {city.therapists} Verified
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-display text-3xl font-black text-[#111111] transition duration-300 group-hover:text-[#8B1E2D]">
+                    {city.name}
+                  </h3>
+                  <div className="mt-4 flex items-center gap-2 text-[#8B1E2D] transition duration-300 group-hover:translate-x-1">
+                    <span className="text-sm font-semibold">Browse Therapists</span>
+                    <ArrowRight size={14} />
                   </div>
                 </div>
               </motion.div>
