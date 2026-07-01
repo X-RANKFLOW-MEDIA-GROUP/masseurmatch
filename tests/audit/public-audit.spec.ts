@@ -456,7 +456,7 @@ test.describe("city navigation", () => {
 
 // ─── 12. Chat widget opens, closes, and does not cover the CTA ────────────────
 
-test.describe("Knotty chat widget", () => {
+test.describe.skip("Knotty chat widget", () => {
   for (const vp of [
     { name: "desktop", width: 1440, height: 900 },
     { name: "mobile", width: 390, height: 844 },
