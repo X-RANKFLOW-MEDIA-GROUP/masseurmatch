@@ -1,0 +1,1460 @@
+[
+  {
+    "route": "/",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/",
+        "status": 200,
+        "ms": 1623,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "HIT",
+          "set-cookie": []
+        },
+        "bytes": 130567,
+        "bodySnippet": "<!DOCTYPE html><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/><link rel=\"preload\" as=\"ima"
+      }
+    ]
+  },
+  {
+    "route": "/therapists",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/therapists",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/therapists",
+        "status": 200,
+        "ms": 1161,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "MISS",
+          "set-cookie": []
+        },
+        "bytes": 64186,
+        "bodySnippet": "<!DOCTYPE html><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2Fbrand%2Fmm-logo.png&amp;w=16&amp;q=75 1x\"/><link rel=\"stylesheet\" href=\"/_next/st"
+      }
+    ]
+  },
+  {
+    "route": "/search",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/search",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/search",
+        "status": 200,
+        "ms": 377,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "MISS",
+          "set-cookie": []
+        },
+        "bytes": 140465,
+        "bodySnippet": "<!DOCTYPE html><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2Fbrand%2Fmm-logo.png&amp;w=16&amp;q=75 1x\"/><link rel=\"stylesheet\" href=\"/_next/st"
+      }
+    ]
+  },
+  {
+    "route": "/pricing",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/pricing",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/pricing",
+        "status": 200,
+        "ms": 288,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "HIT",
+          "set-cookie": []
+        },
+        "bytes": 349958,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/signup",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/signup",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/signup",
+        "status": 200,
+        "ms": 368,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "PRERENDER",
+          "set-cookie": []
+        },
+        "bytes": 72975,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/signup/plan",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/signup/plan",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/signup/plan",
+        "status": 200,
+        "ms": 520,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "PRERENDER",
+          "set-cookie": []
+        },
+        "bytes": 63375,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/signup/account",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/signup/account",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/signup/account",
+        "status": 200,
+        "ms": 410,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "PRERENDER",
+          "set-cookie": []
+        },
+        "bytes": 59216,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/login",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/login",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/login",
+        "status": 200,
+        "ms": 348,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "PRERENDER",
+          "set-cookie": []
+        },
+        "bytes": 41999,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/forgot-password",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/forgot-password",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/forgot-password",
+        "status": 200,
+        "ms": 364,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "PRERENDER",
+          "set-cookie": []
+        },
+        "bytes": 42412,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/about",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/about",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/about",
+        "status": 200,
+        "ms": 397,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "PRERENDER",
+          "set-cookie": []
+        },
+        "bytes": 56236,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/trust",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/trust",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/trust",
+        "status": 200,
+        "ms": 457,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "PRERENDER",
+          "set-cookie": []
+        },
+        "bytes": 65192,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/verification",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/verification",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/verification",
+        "status": 200,
+        "ms": 579,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "PRERENDER",
+          "set-cookie": []
+        },
+        "bytes": 65652,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/community-guidelines",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/community-guidelines",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/community-guidelines",
+        "status": 200,
+        "ms": 735,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "PRERENDER",
+          "set-cookie": []
+        },
+        "bytes": 61791,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/safety",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/safety",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/safety",
+        "status": 200,
+        "ms": 359,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "PRERENDER",
+          "set-cookie": []
+        },
+        "bytes": 67250,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/contact",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/contact",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/contact",
+        "status": 200,
+        "ms": 441,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "PRERENDER",
+          "set-cookie": []
+        },
+        "bytes": 75712,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/blog",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/blog",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/blog",
+        "status": 200,
+        "ms": 205,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "HIT",
+          "set-cookie": []
+        },
+        "bytes": 58021,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/legal",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/legal",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/legal",
+        "status": 200,
+        "ms": 374,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "PRERENDER",
+          "set-cookie": []
+        },
+        "bytes": 175218,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/terms",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/terms",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/terms",
+        "status": 200,
+        "ms": 276,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "HIT",
+          "set-cookie": []
+        },
+        "bytes": 69046,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/privacy",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/privacy",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/privacy",
+        "status": 200,
+        "ms": 408,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "PRERENDER",
+          "set-cookie": []
+        },
+        "bytes": 72419,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/cookie-policy",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/cookie-policy",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/cookie-policy",
+        "status": 200,
+        "ms": 335,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "PRERENDER",
+          "set-cookie": []
+        },
+        "bytes": 55571,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/cookies",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/cookie-policy",
+    "hops": 1,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/cookies",
+        "status": 308,
+        "ms": 51,
+        "location": "/cookie-policy"
+      },
+      {
+        "url": "https://www.masseurmatch.com/cookie-policy",
+        "status": 200,
+        "ms": 230,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "HIT",
+          "set-cookie": []
+        },
+        "bytes": 55571,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/accessibility",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/accessibility",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/accessibility",
+        "status": 200,
+        "ms": 263,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "HIT",
+          "set-cookie": []
+        },
+        "bytes": 50586,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/explore",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/explore",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/explore",
+        "status": 200,
+        "ms": 408,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": "noindex, follow",
+          "server": "Vercel",
+          "x-vercel-cache": "PRERENDER",
+          "set-cookie": []
+        },
+        "bytes": 71499,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/cities",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/cities",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/cities",
+        "status": 200,
+        "ms": 284,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "HIT",
+          "set-cookie": []
+        },
+        "bytes": 191483,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/dallas",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/dallas",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/dallas",
+        "status": 200,
+        "ms": 407,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "MISS",
+          "set-cookie": []
+        },
+        "bytes": 99705,
+        "bodySnippet": "<!DOCTYPE html><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2Fbrand%2Fmm-logo.png&amp;w=16&amp;q=75 1x\"/><link rel=\"stylesheet\" href=\"/_next/st"
+      }
+    ]
+  },
+  {
+    "route": "/austin",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/austin",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/austin",
+        "status": 200,
+        "ms": 235,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "MISS",
+          "set-cookie": []
+        },
+        "bytes": 85052,
+        "bodySnippet": "<!DOCTYPE html><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2Fbrand%2Fmm-logo.png&amp;w=16&amp;q=75 1x\"/><link rel=\"stylesheet\" href=\"/_next/st"
+      }
+    ]
+  },
+  {
+    "route": "/miami",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/miami",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/miami",
+        "status": 200,
+        "ms": 298,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "MISS",
+          "set-cookie": []
+        },
+        "bytes": 84484,
+        "bodySnippet": "<!DOCTYPE html><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2Fbrand%2Fmm-logo.png&amp;w=16&amp;q=75 1x\"/><link rel=\"stylesheet\" href=\"/_next/st"
+      }
+    ]
+  },
+  {
+    "route": "/new-york",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/new-york",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/new-york",
+        "status": 200,
+        "ms": 227,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "MISS",
+          "set-cookie": []
+        },
+        "bytes": 79036,
+        "bodySnippet": "<!DOCTYPE html><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2Fbrand%2Fmm-logo.png&amp;w=16&amp;q=75 1x\"/><link rel=\"stylesheet\" href=\"/_next/st"
+      }
+    ]
+  },
+  {
+    "route": "/los-angeles",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/los-angeles",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/los-angeles",
+        "status": 200,
+        "ms": 211,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "MISS",
+          "set-cookie": []
+        },
+        "bytes": 79384,
+        "bodySnippet": "<!DOCTYPE html><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2Fbrand%2Fmm-logo.png&amp;w=16&amp;q=75 1x\"/><link rel=\"stylesheet\" href=\"/_next/st"
+      }
+    ]
+  },
+  {
+    "route": "/chicago",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/chicago",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/chicago",
+        "status": 200,
+        "ms": 219,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "MISS",
+          "set-cookie": []
+        },
+        "bytes": 85204,
+        "bodySnippet": "<!DOCTYPE html><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2Fbrand%2Fmm-logo.png&amp;w=16&amp;q=75 1x\"/><link rel=\"stylesheet\" href=\"/_next/st"
+      }
+    ]
+  },
+  {
+    "route": "/houston",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/houston",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/houston",
+        "status": 200,
+        "ms": 254,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "MISS",
+          "set-cookie": []
+        },
+        "bytes": 86523,
+        "bodySnippet": "<!DOCTYPE html><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2Fbrand%2Fmm-logo.png&amp;w=16&amp;q=75 1x\"/><link rel=\"stylesheet\" href=\"/_next/st"
+      }
+    ]
+  },
+  {
+    "route": "/atlanta",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/atlanta",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/atlanta",
+        "status": 200,
+        "ms": 217,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "MISS",
+          "set-cookie": []
+        },
+        "bytes": 78933,
+        "bodySnippet": "<!DOCTYPE html><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2Fbrand%2Fmm-logo.png&amp;w=16&amp;q=75 1x\"/><link rel=\"stylesheet\" href=\"/_next/st"
+      }
+    ]
+  },
+  {
+    "route": "/las-vegas",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/las-vegas",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/las-vegas",
+        "status": 200,
+        "ms": 196,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "MISS",
+          "set-cookie": []
+        },
+        "bytes": 79127,
+        "bodySnippet": "<!DOCTYPE html><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2Fbrand%2Fmm-logo.png&amp;w=16&amp;q=75 1x\"/><link rel=\"stylesheet\" href=\"/_next/st"
+      }
+    ]
+  },
+  {
+    "route": "/orlando",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/orlando",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/orlando",
+        "status": 200,
+        "ms": 205,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "MISS",
+          "set-cookie": []
+        },
+        "bytes": 76874,
+        "bodySnippet": "<!DOCTYPE html><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2Fbrand%2Fmm-logo.png&amp;w=16&amp;q=75 1x\"/><link rel=\"stylesheet\" href=\"/_next/st"
+      }
+    ]
+  },
+  {
+    "route": "/therapists/kevin-os",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/therapists/kevin-os",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/therapists/kevin-os",
+        "status": 200,
+        "ms": 313,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "STALE",
+          "set-cookie": []
+        },
+        "bytes": 90230,
+        "bodySnippet": "<!DOCTYPE html><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/><link rel=\"preload\" as=\"ima"
+      }
+    ]
+  },
+  {
+    "route": "/therapists/bruno-dallas-tx",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/therapists",
+    "hops": 1,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/therapists/bruno-dallas-tx",
+        "status": 307,
+        "ms": 195,
+        "location": "/therapists"
+      },
+      {
+        "url": "https://www.masseurmatch.com/therapists",
+        "status": 200,
+        "ms": 256,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "MISS",
+          "set-cookie": []
+        },
+        "bytes": 64186,
+        "bodySnippet": "<!DOCTYPE html><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" imageSrcSet=\"/_next/image?url=%2Fbrand%2Fmm-logo.png&amp;w=16&amp;q=75 1x\"/><link rel=\"stylesheet\" href=\"/_next/st"
+      }
+    ]
+  },
+  {
+    "route": "/dashboard",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/login?redirect=/dashboard",
+    "hops": 1,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/dashboard",
+        "status": 307,
+        "ms": 203,
+        "location": "/login?redirect=/dashboard"
+      },
+      {
+        "url": "https://www.masseurmatch.com/login?redirect=/dashboard",
+        "status": 200,
+        "ms": 228,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "HIT",
+          "set-cookie": []
+        },
+        "bytes": 41999,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/pro/dashboard",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/login?redirect=%2Fpro%2Fdashboard",
+    "hops": 1,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/pro/dashboard",
+        "status": 307,
+        "ms": 69,
+        "location": "/login?redirect=%2Fpro%2Fdashboard"
+      },
+      {
+        "url": "https://www.masseurmatch.com/login?redirect=%2Fpro%2Fdashboard",
+        "status": 200,
+        "ms": 70,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "HIT",
+          "set-cookie": []
+        },
+        "bytes": 41999,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/pro/listing",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/login?redirect=%2Fpro%2Flisting",
+    "hops": 1,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/pro/listing",
+        "status": 307,
+        "ms": 98,
+        "location": "/login?redirect=%2Fpro%2Flisting"
+      },
+      {
+        "url": "https://www.masseurmatch.com/login?redirect=%2Fpro%2Flisting",
+        "status": 200,
+        "ms": 73,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "HIT",
+          "set-cookie": []
+        },
+        "bytes": 41999,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/pro/profile",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/login?redirect=%2Fpro%2Fprofile",
+    "hops": 1,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/pro/profile",
+        "status": 307,
+        "ms": 67,
+        "location": "/login?redirect=%2Fpro%2Fprofile"
+      },
+      {
+        "url": "https://www.masseurmatch.com/login?redirect=%2Fpro%2Fprofile",
+        "status": 200,
+        "ms": 77,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "HIT",
+          "set-cookie": []
+        },
+        "bytes": 41999,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/pro/settings",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/login?redirect=%2Fpro%2Fsettings",
+    "hops": 1,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/pro/settings",
+        "status": 307,
+        "ms": 69,
+        "location": "/login?redirect=%2Fpro%2Fsettings"
+      },
+      {
+        "url": "https://www.masseurmatch.com/login?redirect=%2Fpro%2Fsettings",
+        "status": 200,
+        "ms": 67,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "HIT",
+          "set-cookie": []
+        },
+        "bytes": 41999,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/pro/billing",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/login?redirect=%2Fpro%2Fbilling",
+    "hops": 1,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/pro/billing",
+        "status": 307,
+        "ms": 73,
+        "location": "/login?redirect=%2Fpro%2Fbilling"
+      },
+      {
+        "url": "https://www.masseurmatch.com/login?redirect=%2Fpro%2Fbilling",
+        "status": 200,
+        "ms": 68,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "HIT",
+          "set-cookie": []
+        },
+        "bytes": 41999,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/pro/photos",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/login?redirect=%2Fpro%2Fphotos",
+    "hops": 1,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/pro/photos",
+        "status": 307,
+        "ms": 75,
+        "location": "/login?redirect=%2Fpro%2Fphotos"
+      },
+      {
+        "url": "https://www.masseurmatch.com/login?redirect=%2Fpro%2Fphotos",
+        "status": 200,
+        "ms": 81,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "HIT",
+          "set-cookie": []
+        },
+        "bytes": 41999,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/pro/availability",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/login?redirect=%2Fpro%2Favailability",
+    "hops": 1,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/pro/availability",
+        "status": 307,
+        "ms": 67,
+        "location": "/login?redirect=%2Fpro%2Favailability"
+      },
+      {
+        "url": "https://www.masseurmatch.com/login?redirect=%2Fpro%2Favailability",
+        "status": 200,
+        "ms": 73,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "HIT",
+          "set-cookie": []
+        },
+        "bytes": 41999,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/admin",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/login?redirect=%2Fadmin",
+    "hops": 1,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/admin",
+        "status": 307,
+        "ms": 66,
+        "location": "/login?redirect=%2Fadmin"
+      },
+      {
+        "url": "https://www.masseurmatch.com/login?redirect=%2Fadmin",
+        "status": 200,
+        "ms": 69,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "HIT",
+          "set-cookie": []
+        },
+        "bytes": 41999,
+        "bodySnippet": "<!DOCTYPE html><!--bpHGAnTp3s58DbbgulnlN--><html lang=\"en\" class=\"__variable_7dbc08\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/d9396795aa5ec363-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/"
+      }
+    ]
+  },
+  {
+    "route": "/this-page-should-404",
+    "finalStatus": 404,
+    "finalUrl": "https://www.masseurmatch.com/this-page-should-404",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/this-page-should-404",
+        "status": 404,
+        "ms": 165,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "MISS",
+          "set-cookie": []
+        },
+        "bytes": 24101,
+        "bodySnippet": "<!DOCTYPE html><html id=\"__next_error__\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"script\" fetchPriority=\"low\" href=\"/_next/static/chunks/webpack-9e955994b6cfb735.js\"/><script src=\"/_next/static/chunks/5baa431c-6b33c6b10"
+      }
+    ]
+  },
+  {
+    "route": "/robots.txt",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/robots.txt",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/robots.txt",
+        "status": 200,
+        "ms": 206,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "HIT",
+          "set-cookie": []
+        },
+        "bytes": 2084,
+        "bodySnippet": "User-Agent: Googlebot\nUser-Agent: Bingbot\nUser-Agent: Yandex\nUser-Agent: Baiduspider\nAllow: /\nDisallow: /admin\nDisallow: /admin/\nDisallow: /api\nDisallow: /pro\nDisallow: /pro/\nDisallow: /login\nDisallow: /register\nDisallow: /signup\nDisallow: /forgot-password\nDisallow: /reset-password\nDisallow: /dashbo"
+      }
+    ]
+  },
+  {
+    "route": "/sitemap.xml",
+    "finalStatus": 200,
+    "finalUrl": "https://www.masseurmatch.com/sitemap.xml",
+    "hops": 0,
+    "chain": [
+      {
+        "url": "https://www.masseurmatch.com/sitemap.xml",
+        "status": 200,
+        "ms": 368,
+        "headers": {
+          "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+          "content-security-policy": "PRESENT",
+          "x-frame-options": "SAMEORIGIN",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "permissions-policy": "PRESENT",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-encoding": "br",
+          "x-robots-tag": null,
+          "server": "Vercel",
+          "x-vercel-cache": "PRERENDER",
+          "set-cookie": []
+        },
+        "bytes": 21636,
+        "bodySnippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n<url>\n<loc>https://masseurmatch.com/</loc>\n<lastmod>2026-07-01T16:42:13.248Z</lastmod>\n<changefreq>daily</changefreq>\n<priority>1</priority>\n</url>\n<url>\n<loc>https://masseurmatch.com/therapists</loc>"
+      }
+    ]
+  }
+]

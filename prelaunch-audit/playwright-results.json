@@ -1,0 +1,1064 @@
+{
+  "config": {
+    "argv": [
+      "/opt/node22/bin/node",
+      "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/node_modules/.bin/playwright",
+      "test",
+      "--config=playwright.config.mjs"
+    ],
+    "configFile": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/playwright.config.mjs",
+    "rootDir": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "./out/playwright-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "./out/playwright-results.json"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.61.1",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "audit.spec.mjs",
+      "file": "audit.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "navigation",
+          "file": "audit.spec.mjs",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "header links navigate correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "header-links",
+                      "description": "[{\"href\":\"/\",\"text\":\"MMMASSEURMATCHPremium Sports Recovery & \"},{\"href\":\"/therapists\",\"text\":\"Therapists\"},{\"href\":\"/how-it-works\",\"text\":\"How It Works\"},{\"href\":\"/pricing\",\"text\":\"Pricing\"},{\"href\":\"/login\",\"text\":\"Login\"},{\"href\":\"/signup\",\"text\":\"GET STARTED\"}]"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2301,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:28:34.731Z",
+                      "annotations": [
+                        {
+                          "type": "header-links",
+                          "description": "[{\"href\":\"/\",\"text\":\"MMMASSEURMATCHPremium Sports Recovery & \"},{\"href\":\"/therapists\",\"text\":\"Therapists\"},{\"href\":\"/how-it-works\",\"text\":\"How It Works\"},{\"href\":\"/pricing\",\"text\":\"Pricing\"},{\"href\":\"/login\",\"text\":\"Login\"},{\"href\":\"/signup\",\"text\":\"GET STARTED\"}]"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-db79a9f0bc2e907b9a5c",
+              "file": "audit.spec.mjs",
+              "line": 5,
+              "column": 3
+            },
+            {
+              "title": "therapists directory loads with cards or explicit empty state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "profile-card-links",
+                      "description": "2"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5975,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:28:37.193Z",
+                      "annotations": [
+                        {
+                          "type": "profile-card-links",
+                          "description": "2"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-10fdc16b02bdae7dd8ad",
+              "file": "audit.spec.mjs",
+              "line": 19,
+              "column": 3
+            },
+            {
+              "title": "clicking a therapist card opens the profile",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7188,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:28:43.194Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-cda76914d18dcb0e5263",
+              "file": "audit.spec.mjs",
+              "line": 28,
+              "column": 3
+            },
+            {
+              "title": "footer links are present and same-origin links respond",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 11520,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:28:50.401Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-197dde9bdcdd36145a43",
+              "file": "audit.spec.mjs",
+              "line": 40,
+              "column": 3
+            },
+            {
+              "title": "404 page is friendly and returns 404 status",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2275,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:29:01.938Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-16183457d2a73fa103f0",
+              "file": "audit.spec.mjs",
+              "line": 54,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "search & directory",
+          "file": "audit.spec.mjs",
+          "line": 63,
+          "column": 6,
+          "specs": [
+            {
+              "title": "search page accepts a city query",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "search-url",
+                      "description": "https://www.masseurmatch.com/search?keyword=Dallas"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7576,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:29:04.238Z",
+                      "annotations": [
+                        {
+                          "type": "search-url",
+                          "description": "https://www.masseurmatch.com/search?keyword=Dallas"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-3a928e6edaa974b7f1f3",
+              "file": "audit.spec.mjs",
+              "line": 64,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "pricing",
+          "file": "audit.spec.mjs",
+          "line": 78,
+          "column": 6,
+          "specs": [
+            {
+              "title": "pricing page shows plans and CTA destinations",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "plans-found",
+                      "description": "Free,Standard,Pro,Elite"
+                    },
+                    {
+                      "type": "pricing-ctas",
+                      "description": "[{\"tag\":\"A\",\"text\":\"Choose a plan\",\"href\":\"/signup/plan\"},{\"tag\":\"A\",\"text\":\"Start free\",\"href\":\"/signup/plan?selected=free\"},{\"tag\":\"A\",\"text\":\"Start 14-day trial\",\"href\":\"/signup/plan?selected=standard\"},{\"tag\":\"A\",\"text\":\"Start 14-day trial\",\"href\":\"/signup/plan?selected=pro\"},{\"tag\":\"A\",\"text\":\"Start 14-day trial\",\"href\":\"/signup/plan?selected=elite\"},{\"tag\":\"A\",\"text\":\"Upgrade to Pro\",\"href\":\"/signup/plan?selected=pro\"},{\"tag\":\"A\",\"text\":\"Choose your plan\",\"href\":\"/signup/plan\"}]"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3463,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:29:11.836Z",
+                      "annotations": [
+                        {
+                          "type": "plans-found",
+                          "description": "Free,Standard,Pro,Elite"
+                        },
+                        {
+                          "type": "pricing-ctas",
+                          "description": "[{\"tag\":\"A\",\"text\":\"Choose a plan\",\"href\":\"/signup/plan\"},{\"tag\":\"A\",\"text\":\"Start free\",\"href\":\"/signup/plan?selected=free\"},{\"tag\":\"A\",\"text\":\"Start 14-day trial\",\"href\":\"/signup/plan?selected=standard\"},{\"tag\":\"A\",\"text\":\"Start 14-day trial\",\"href\":\"/signup/plan?selected=pro\"},{\"tag\":\"A\",\"text\":\"Start 14-day trial\",\"href\":\"/signup/plan?selected=elite\"},{\"tag\":\"A\",\"text\":\"Upgrade to Pro\",\"href\":\"/signup/plan?selected=pro\"},{\"tag\":\"A\",\"text\":\"Choose your plan\",\"href\":\"/signup/plan\"}]"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-8a7612868817e97adcb0",
+              "file": "audit.spec.mjs",
+              "line": 79,
+              "column": 3
+            },
+            {
+              "title": "plan CTA navigates to signup (not checkout) for anonymous user",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "cta-destination",
+                      "description": "https://www.masseurmatch.com/signup/plan"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6706,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:29:15.312Z",
+                      "annotations": [
+                        {
+                          "type": "cta-destination",
+                          "description": "https://www.masseurmatch.com/signup/plan"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-d75b01e8c9ac920fa6e6",
+              "file": "audit.spec.mjs",
+              "line": 92,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "auth (negative paths only — no test credentials provided)",
+          "file": "audit.spec.mjs",
+          "line": 104,
+          "column": 6,
+          "specs": [
+            {
+              "title": "login rejects wrong credentials with visible error",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "login-error-shown",
+                      "description": "false"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 8311,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/tests/audit.spec.mjs:118:22",
+                        "location": {
+                          "file": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/tests/audit.spec.mjs",
+                          "column": 22,
+                          "line": 118
+                        },
+                        "snippet": "  116 |     const hasError = /invalid|incorrect|wrong|error|failed|not found|credentials/i.test(body);\n  117 |     test.info().annotations.push({ type: \"login-error-shown\", description: String(hasError) });\n> 118 |     expect(hasError).toBeTruthy();\n      |                      ^\n  119 |   });\n  120 |\n  121 |   test(\"login with empty fields shows validation\", async ({ page }) => {"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/tests/audit.spec.mjs",
+                            "column": 22,
+                            "line": 118
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  116 |     const hasError = /invalid|incorrect|wrong|error|failed|not found|credentials/i.test(body);\n  117 |     test.info().annotations.push({ type: \"login-error-shown\", description: String(hasError) });\n> 118 |     expect(hasError).toBeTruthy();\n      |                      ^\n  119 |   });\n  120 |\n  121 |   test(\"login with empty fields shows validation\", async ({ page }) => {\n    at /tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/tests/audit.spec.mjs:118:22"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:29:22.030Z",
+                      "annotations": [
+                        {
+                          "type": "login-error-shown",
+                          "description": "false"
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/test-results/audit-auth-negative-paths--e08e1-dentials-with-visible-error/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/test-results/audit-auth-negative-paths--e08e1-dentials-with-visible-error/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/test-results/audit-auth-negative-paths--e08e1-dentials-with-visible-error/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/tests/audit.spec.mjs",
+                        "column": 22,
+                        "line": 118
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-7a2ced0c5649f78fdb7d",
+              "file": "audit.spec.mjs",
+              "line": 105,
+              "column": 3
+            },
+            {
+              "title": "login with empty fields shows validation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4829,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:29:31.376Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-b2c4e620888d71ac8ed7",
+              "file": "audit.spec.mjs",
+              "line": 121,
+              "column": 3
+            },
+            {
+              "title": "anonymous /dashboard redirects to login",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3450,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:29:36.376Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-165199060be726b04886",
+              "file": "audit.spec.mjs",
+              "line": 128,
+              "column": 3
+            },
+            {
+              "title": "anonymous /admin redirects to login",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3410,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:29:39.840Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-e2f71a309af826ecedc0",
+              "file": "audit.spec.mjs",
+              "line": 134,
+              "column": 3
+            },
+            {
+              "title": "anonymous /pro/dashboard redirects to login",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3676,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:29:43.271Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-e10b5b70fdf13e52aaac",
+              "file": "audit.spec.mjs",
+              "line": 140,
+              "column": 3
+            },
+            {
+              "title": "forgot-password page renders a form",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3286,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:29:46.958Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-14e87cec4d0454875f97",
+              "file": "audit.spec.mjs",
+              "line": 146,
+              "column": 3
+            },
+            {
+              "title": "signup empty submit shows validation and does not advance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "no submit button on /signup",
+                      "location": {
+                        "file": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/tests/audit.spec.mjs",
+                        "line": 156,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 4604,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:29:50.274Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "no submit button on /signup",
+                          "location": {
+                            "file": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/tests/audit.spec.mjs",
+                            "line": 156,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-0b427c2c1792c988acce",
+              "file": "audit.spec.mjs",
+              "line": 152,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "forms (validation-only, no real submissions)",
+          "file": "audit.spec.mjs",
+          "line": 164,
+          "column": 6,
+          "specs": [
+            {
+              "title": "contact form blocks empty submit",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4836,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:29:54.890Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-b80de4845342ebdab7fa",
+              "file": "audit.spec.mjs",
+              "line": 165,
+              "column": 3
+            },
+            {
+              "title": "newsletter input exists on home and blocks empty submit",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "no newsletter button found",
+                      "location": {
+                        "file": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/tests/audit.spec.mjs",
+                        "line": 183,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 3797,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:29:59.740Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "no newsletter button found",
+                          "location": {
+                            "file": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/tests/audit.spec.mjs",
+                            "line": 183,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-ec8328053a6b1fcf8861",
+              "file": "audit.spec.mjs",
+              "line": 178,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "profile page",
+          "file": "audit.spec.mjs",
+          "line": 190,
+          "column": 6,
+          "specs": [
+            {
+              "title": "kevin-os profile renders key sections and contact CTA",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "profile-h1",
+                      "description": "KevinOS"
+                    },
+                    {
+                      "type": "contact-ctas",
+                      "description": "2"
+                    },
+                    {
+                      "type": "profile-images",
+                      "description": "3"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6185,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:30:03.550Z",
+                      "annotations": [
+                        {
+                          "type": "profile-h1",
+                          "description": "KevinOS"
+                        },
+                        {
+                          "type": "contact-ctas",
+                          "description": "2"
+                        },
+                        {
+                          "type": "profile-images",
+                          "description": "3"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-c8e2825a16320a6a44a7",
+              "file": "audit.spec.mjs",
+              "line": 191,
+              "column": 3
+            },
+            {
+              "title": "dead profile slug does not render a broken page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "dead-profile-behavior",
+                      "description": "200 -> https://www.masseurmatch.com/therapists"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2990,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:30:09.748Z",
+                      "annotations": [
+                        {
+                          "type": "dead-profile-behavior",
+                          "description": "200 -> https://www.masseurmatch.com/therapists"
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-a1b25e555e112581c4f1",
+              "file": "audit.spec.mjs",
+              "line": 205,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "knotty chat",
+          "file": "audit.spec.mjs",
+          "line": 215,
+          "column": 6,
+          "specs": [
+            {
+              "title": "floating chat opens via knotty:open event",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "chat-elements",
+                      "description": "0"
+                    }
+                  ],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 8864,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n    at /tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/tests/audit.spec.mjs:223:25",
+                        "location": {
+                          "file": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/tests/audit.spec.mjs",
+                          "column": 25,
+                          "line": 223
+                        },
+                        "snippet": "  221 |     const chatVisible = await page.locator('[class*=\"knotty\" i], [data-knotty], [class*=\"chat\" i]').filter({ hasNot: page.locator(\"footer\") }).count();\n  222 |     test.info().annotations.push({ type: \"chat-elements\", description: String(chatVisible) });\n> 223 |     expect(chatVisible).toBeGreaterThan(0);\n      |                         ^\n  224 |   });\n  225 | });\n  226 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/tests/audit.spec.mjs",
+                            "column": 25,
+                            "line": 223
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n\n  221 |     const chatVisible = await page.locator('[class*=\"knotty\" i], [data-knotty], [class*=\"chat\" i]').filter({ hasNot: page.locator(\"footer\") }).count();\n  222 |     test.info().annotations.push({ type: \"chat-elements\", description: String(chatVisible) });\n> 223 |     expect(chatVisible).toBeGreaterThan(0);\n      |                         ^\n  224 |   });\n  225 | });\n  226 |\n    at /tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/tests/audit.spec.mjs:223:25"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-07-02T04:30:12.750Z",
+                      "annotations": [
+                        {
+                          "type": "chat-elements",
+                          "description": "0"
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/test-results/audit-knotty-chat-floating-chat-opens-via-knotty-open-event/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/test-results/audit-knotty-chat-floating-chat-opens-via-knotty-open-event/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/test-results/audit-knotty-chat-floating-chat-opens-via-knotty-open-event/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/tmp/claude-0/-home-user-masseurmatch/52b90524-cfcd-501b-bb5f-4ea5c0f81512/scratchpad/audit-tools/tests/audit.spec.mjs",
+                        "column": 25,
+                        "line": 223
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "195cb0d734c7fb6d1c64-3989f85f3819686f01ee",
+              "file": "audit.spec.mjs",
+              "line": 216,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-07-02T04:28:33.955Z",
+    "duration": 108155.485,
+    "expected": 16,
+    "skipped": 2,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

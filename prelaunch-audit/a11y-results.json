@@ -1,0 +1,182 @@
+[
+ {
+  "page": "/",
+  "violations": [
+   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "nodes": 5,
+    "sample": ".relative:nth-child(1) > .lg\\:grid-cols-\\[120px_1fr\\].gap-8.grid > .items-start.gap-4.flex-col > .relative > .-right-2.-top-2.bg-\\[\\#111111\\]",
+    "sampleHtml": "<div class=\"absolute -right-2 -top-2 flex h-10 w-10 items-center justify-center rounded-full bg-[#111111] font-display text-lg font-black text-[#8B1E2D]\">01</di"
+   }
+  ]
+ },
+ {
+  "page": "/therapists",
+  "violations": [
+   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "nodes": 4,
+    "sample": ".text-\\[\\#8E8E8E\\].font-mono.tracking-\\[0\\.18em\\]",
+    "sampleHtml": "<span class=\"font-mono text-[10px] uppercase tracking-[0.18em] text-[#8E8E8E]\">Filter directory</span>"
+   }
+  ]
+ },
+ {
+  "page": "/pricing",
+  "violations": []
+ },
+ {
+  "page": "/login",
+  "violations": []
+ },
+ {
+  "page": "/signup",
+  "violations": []
+ },
+ {
+  "page": "/contact",
+  "violations": []
+ },
+ {
+  "page": "/therapists/kevin-os",
+  "violations": []
+ },
+ {
+  "page": "/dallas",
+  "violations": [
+   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "nodes": 3,
+    "sample": ".bg-brand-accent",
+    "sampleHtml": "<a class=\"inline-flex items-center gap-2 rounded-full bg-brand-accent px-5 py-2.5 text-sm font-semibold text-brand-primary transition hover:bg-brand-soft\" href="
+   }
+  ]
+ },
+ {
+  "page": "/blog",
+  "violations": [
+   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "nodes": 13,
+    "sample": "section:nth-child(1) > p:nth-child(1)",
+    "sampleHtml": "<p style=\"font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#8B1E2D;margin-bottom:20px;font-family:system-ui, sans-serif\">Editorial</p>"
+   }
+  ]
+ },
+ {
+  "page": "/search",
+  "violations": [
+   {
+    "id": "color-contrast",
+    "impact": "serious",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "nodes": 5,
+    "sample": ".min-w-\\[172px\\] > .gap-3.items-center.flex > div > .mt-1.font-sans.text-sm",
+    "sampleHtml": "<p class=\"mt-1 font-sans text-sm font-medium\">Open Filters</p>"
+   }
+  ]
+ },
+ {
+  "page": "keyboard-nav-home",
+  "focusTrail": [
+   {
+    "tag": "A",
+    "text": "MMMASSEURMATCHPremium Sports Recovery & ",
+    "href": "/",
+    "outline": true
+   },
+   {
+    "tag": "DIV",
+    "text": "Therapists",
+    "href": null,
+    "outline": true
+   },
+   {
+    "tag": "A",
+    "text": "Therapists",
+    "href": "/therapists",
+    "outline": true
+   },
+   {
+    "tag": "BUTTON",
+    "text": "Explore",
+    "href": null,
+    "outline": true
+   },
+   {
+    "tag": "DIV",
+    "text": "How It Works",
+    "href": null,
+    "outline": true
+   },
+   {
+    "tag": "A",
+    "text": "How It Works",
+    "href": "/how-it-works",
+    "outline": true
+   },
+   {
+    "tag": "BUTTON",
+    "text": "Trust",
+    "href": null,
+    "outline": true
+   },
+   {
+    "tag": "DIV",
+    "text": "Pricing",
+    "href": null,
+    "outline": true
+   },
+   {
+    "tag": "A",
+    "text": "Pricing",
+    "href": "/pricing",
+    "outline": true
+   },
+   {
+    "tag": "BUTTON",
+    "text": "About",
+    "href": null,
+    "outline": true
+   },
+   {
+    "tag": "DIV",
+    "text": "Login",
+    "href": null,
+    "outline": true
+   },
+   {
+    "tag": "A",
+    "text": "Login",
+    "href": "/login",
+    "outline": true
+   },
+   {
+    "tag": "DIV",
+    "text": "GET STARTED",
+    "href": null,
+    "outline": true
+   },
+   {
+    "tag": "A",
+    "text": "GET STARTED",
+    "href": "/signup",
+    "outline": true
+   },
+   {
+    "tag": "BUTTON",
+    "text": "Explore Therapists",
+    "href": null,
+    "outline": true
+   }
+  ]
+ }
+]

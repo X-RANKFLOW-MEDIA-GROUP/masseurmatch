@@ -1,0 +1,187 @@
+[
+ {
+  "page": "/",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/therapists",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/search",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/pricing",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/signup",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/login",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/forgot-password",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/about",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/trust",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/safety",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/contact",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/blog",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/legal",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/explore",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/cities",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/dallas",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/austin",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/miami",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/therapists/kevin-os",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/faq",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/how-it-works",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/near-me",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/verification",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/community-guidelines",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/this-page-should-404",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/ @laptop-1280",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/therapists @laptop-1280",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/therapists/kevin-os @laptop-1280",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/pricing @laptop-1280",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/ @tablet-768",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/therapists @tablet-768",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/therapists/kevin-os @tablet-768",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/pricing @tablet-768",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/ @mobile-390",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/therapists @mobile-390",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/therapists/kevin-os @mobile-390",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ },
+ {
+  "page": "/pricing @mobile-390",
+  "type": "warning",
+  "text": "[bugsnag] Bugsnag.start() was called more than once. Ignoring."
+ }
+]
