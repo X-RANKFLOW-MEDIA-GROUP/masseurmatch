@@ -1,0 +1,7 @@
+[
+ {
+  "page": "/this-page-should-404",
+  "url": "https://www.masseurmatch.com/this-page-should-404",
+  "status": 404
+ }
+]

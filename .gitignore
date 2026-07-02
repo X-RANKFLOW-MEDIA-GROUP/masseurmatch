@@ -73,6 +73,10 @@ repo_structure.txt
 !public/marketing/**/*.gif
 !public/marketing/**/*.webp
 !public/marketing/**/*.avif
+
+# Allow pre-launch audit evidence screenshots (deliverables referenced by final-audit-report.md)
+!prelaunch-audit/screenshots/**/*.png
+!prelaunch-audit/playwright-report/**/*.png
 !public/marketing/**/*.JPG
 !public/marketing/**/*.JPEG
 
