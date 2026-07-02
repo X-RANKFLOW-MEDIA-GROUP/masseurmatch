@@ -68,7 +68,7 @@ export async function GET(request: Request) {
     if (profileIds.length > 0) {
       const { data: profiles, error: profilesError } = await adminClient
         .from("profiles")
-        .select("id, display_name, full_name, city, state, status, is_active")
+        .select("id, display_name, full_name, city, state, profile_status, is_active")
         .in("id", profileIds);
 
       if (profilesError) {
@@ -129,7 +129,7 @@ export async function GET(request: Request) {
                 fullName: profile.full_name,
                 city: profile.city,
                 state: profile.state,
-                status: profile.status,
+                status: profile.profile_status,
                 isActive: profile.is_active,
               }
             : null,

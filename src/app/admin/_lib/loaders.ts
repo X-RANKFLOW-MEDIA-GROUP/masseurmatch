@@ -184,7 +184,7 @@ export async function loadUsers(): Promise<AdminLoadResult<AdminUser>> {
       await Promise.all([
         adminClient
           .from("profiles")
-          .select("id, user_id, display_name, full_name, city, status, updated_at")
+          .select("id, user_id, display_name, full_name, city, profile_status, updated_at")
           .order("updated_at", { ascending: false })
           .limit(50),
         adminClient.from("user_roles").select("user_id, role, created_at").order("created_at", { ascending: false }),
@@ -213,12 +213,12 @@ export async function loadUsers(): Promise<AdminLoadResult<AdminUser>> {
     }
 
     return {
-      items: ((profiles || []) as Array<{ id: string; user_id: string; display_name: string | null; full_name: string | null; city: string | null; status: string }>).map((profile) => ({
+      items: ((profiles || []) as Array<{ id: string; user_id: string; display_name: string | null; full_name: string | null; city: string | null; profile_status: string }>).map((profile) => ({
         profileId: profile.id,
         userId: profile.user_id,
         fullName: profile.display_name || profile.full_name || "Unknown User",
         city: profile.city,
-        status: profile.status,
+        status: profile.profile_status,
         role: roleMap.get(profile.user_id) || null,
         email: emailMap.get(profile.user_id) || null,
       })),
