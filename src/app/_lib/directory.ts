@@ -340,13 +340,37 @@ export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTher
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
     sanitizedSlug,
   );
-  const orFilter = isUuid
-    ? `slug.eq.${sanitizedSlug},id.eq.${sanitizedSlug}`
-    : `slug.eq.${sanitizedSlug}`;
 
-  const { data: profile, error } = await buildPublicTherapistsQuery()
-    .or(orFilter)
-    .maybeSingle();
+  // Build query with proper operator precedence: first filter by visibility/status,
+  // then apply slug/id match. Without .and() wrapping, the final .or() creates
+  // an unintended OR at the top level.
+  let query = supabase
+    .from("profiles")
+    .select(PUBLIC_PROFILE_SELECT)
+    .eq("visibility_status", "public")
+    .eq("profile_status", "approved")
+    .eq("is_suspended", false)
+    .eq("is_banned", false)
+    .or("email_address.is.null,not.email_address.ilike.%@example%")
+    .or("email_address.is.null,not.email_address.ilike.%admin.dev@%")
+    .not("display_name", "ilike", "%test%")
+    .not("display_name", "ilike", "%debug%")
+    .not("display_name", "ilike", "%admin%")
+    .not("display_name", "ilike", "%example%")
+    .not("display_name", "ilike", "%demo%")
+    .not("slug", "ilike", "%admin%")
+    .not("slug", "ilike", "%test%")
+    .not("slug", "ilike", "%example%")
+    .not("slug", "ilike", "%dev%")
+    .not("phone", "ilike", "%555%");
+
+  if (isUuid) {
+    query = query.or(`slug.eq.${sanitizedSlug},id.eq.${sanitizedSlug}`);
+  } else {
+    query = query.eq("slug", sanitizedSlug);
+  }
+
+  const { data: profile, error } = await query.maybeSingle();
 
   if (!error && profile) {
     // Photos live in `profile_photos` (the table the live Cloudinary upload
