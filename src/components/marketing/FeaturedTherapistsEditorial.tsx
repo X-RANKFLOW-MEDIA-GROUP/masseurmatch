@@ -106,8 +106,8 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
                       </div>
                     )}
                     {isVerified && (
-                      <div className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
-                        <BadgeCheck size={12} className="text-[#8B1E2D]" />
+                      <div className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-black/70 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
+                        <BadgeCheck size={12} className="text-white" />
                         Verified
                       </div>
                     )}

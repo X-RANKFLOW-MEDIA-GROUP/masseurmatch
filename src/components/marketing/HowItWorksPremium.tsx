@@ -97,7 +97,7 @@ export function HowItWorksPremium() {
                       <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-[#8B1E2D] text-white shadow-lg shadow-[#8B1E2D]/20">
                         <Icon size={40} strokeWidth={1.5} />
                       </div>
-                      <div className="absolute -right-2 -top-2 flex h-10 w-10 items-center justify-center rounded-full bg-[#111111] font-display text-lg font-black text-[#8B1E2D]">
+                      <div className="absolute -right-2 -top-2 flex h-10 w-10 items-center justify-center rounded-full bg-[#111111] font-display text-lg font-black text-white">
                         {step.number}
                       </div>
                     </div>

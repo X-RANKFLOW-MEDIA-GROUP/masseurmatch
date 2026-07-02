@@ -44,8 +44,17 @@ export default defineConfig({
       // Bypass Vercel Deployment Protection on preview deployments.
       // Set VERCEL_PROTECTION_BYPASS as a GitHub Actions secret when using a
       // protection-enabled preview URL as PLAYWRIGHT_BASE_URL.
+      // `x-vercel-set-bypass-cookie` makes Vercel set a session cookie so every
+      // navigation and sub-resource in the browsing context is bypassed — not
+      // only requests that carry the header. Without it, browser navigations
+      // get redirected to the Vercel SSO wall and axe/E2E scan that page
+      // instead of the app. Requires "Protection Bypass for Automation" enabled
+      // on the Vercel project (that is what mints the secret value).
       ...(process.env.VERCEL_PROTECTION_BYPASS
-        ? { "x-vercel-protection-bypass": process.env.VERCEL_PROTECTION_BYPASS }
+        ? {
+            "x-vercel-protection-bypass": process.env.VERCEL_PROTECTION_BYPASS,
+            "x-vercel-set-bypass-cookie": "true",
+          }
         : {}),
     },
   },
