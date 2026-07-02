@@ -5,7 +5,7 @@ import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist", ".next", "next-env.d.ts", "src/legacy-pages/**/*", "_old_app/**/*", "test-results", "playwright-report", ".claude/**/*"] },
+  { ignores: ["dist", ".next", "next-env.d.ts", "src/legacy-pages/**/*", "_old_app/**/*", "test-results", "playwright-report", ".claude/**/*", "prelaunch-audit/**/*"] },
   // Next.js flat config (recommended + core-web-vitals)
   nextPlugin.flatConfig.recommended,
   nextPlugin.flatConfig.coreWebVitals,
