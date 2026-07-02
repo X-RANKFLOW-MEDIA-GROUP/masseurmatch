@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getRequestSession } from '@/app/api/_lib/session';
 import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server';
+import { assertRateLimit } from '@/app/_lib/security';
+import { RouteError } from '@/app/api/_lib/http';
 
 export async function GET(request: NextRequest) {
   try {
+    assertRateLimit(request, 'search-therapists', { limit: 40, windowMs: 60_000 });
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get('q');
     const minPrice = searchParams.get('minPrice');
@@ -101,6 +104,9 @@ export async function GET(request: NextRequest) {
       limit,
     });
   } catch (error) {
+    if (error instanceof RouteError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
     console.error('Search error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

@@ -106,6 +106,13 @@ const IGNORED_CONSOLE = [
   "[Fast Refresh]",
   "preloaded using link preload",
   "was preloaded using link preload but not used",
+  // Google Maps fires an internal CSP self-probe XHR to
+  // maps.googleapis.com/.../gen_204?csp_test=true that is blocked by CORS by
+  // design. It is benign third-party noise (the map still works) and not an
+  // app defect, so it must not fail the smoke matrix on map-bearing pages.
+  "maps.googleapis.com",
+  "gen_204",
+  "csp_test",
 ];
 
 function collectConsoleErrors(page: Page): string[] {

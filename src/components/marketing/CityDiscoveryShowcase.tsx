@@ -8,14 +8,14 @@ import { GrainOverlay } from "@/components/motion/GrainOverlay";
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const cities = [
-  { name: "New York", slug: "new-york", therapists: 127 },
-  { name: "Los Angeles", slug: "los-angeles", therapists: 98 },
-  { name: "Miami", slug: "miami", therapists: 76 },
-  { name: "Chicago", slug: "chicago", therapists: 64 },
-  { name: "Dallas", slug: "dallas", therapists: 52 },
-  { name: "Houston", slug: "houston", therapists: 48 },
-  { name: "Atlanta", slug: "atlanta", therapists: 44 },
-  { name: "Washington DC", slug: "washington-dc", therapists: 38 },
+  { name: "New York", slug: "new-york" },
+  { name: "Los Angeles", slug: "los-angeles" },
+  { name: "Miami", slug: "miami" },
+  { name: "Chicago", slug: "chicago" },
+  { name: "Dallas", slug: "dallas" },
+  { name: "Houston", slug: "houston" },
+  { name: "Atlanta", slug: "atlanta" },
+  { name: "Washington DC", slug: "washington-dc" },
 ];
 
 export function CityDiscoveryShowcase() {
@@ -75,7 +75,7 @@ export function CityDiscoveryShowcase() {
                 <div className="flex items-center gap-2 text-[#8B1E2D] mb-4">
                   <MapPin size={20} />
                   <span className="text-xs font-bold uppercase tracking-widest text-[#8B1E2D]">
-                    {city.therapists} Verified
+                    LGBTQ+ affirming
                   </span>
                 </div>
                 <div>

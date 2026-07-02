@@ -1,5 +1,5 @@
 import { createSupabasePublicClient } from "@/app/api/_lib/supabase-server";
-import { getCities } from "@/app/_lib/directory";
+import { getCities, getSitemapProfileSlugs } from "@/app/_lib/directory";
 import { DIRECTORY_SEGMENTS, SPECIALTY_KEYWORDS } from "@/app/_lib/directory-taxonomy";
 import { siteUrl } from "@/lib/site";
 import type { Database } from "@/integrations/supabase/types";
@@ -124,56 +124,22 @@ export async function getSeoKeywords(): Promise<SeoKeyword[]> {
   }));
 }
 
-// Featured profiles that should always appear in sitemap (exported for priority boost)
+// Kept for the sitemap priority boost. Only slugs that are genuinely public
+// (i.e. returned by the public directory query) are ever emitted, so a slug
+// listed here that is not live will simply not appear.
 export const FEATURED_PROFILE_SLUGS = [
   "bruno-dallas-tx",
 ];
 
+// Source therapist sitemap entries from the exact same query that serves the
+// public profile route (`getPublicTherapistBySlug`). This guarantees the
+// sitemap and the live pages agree: every URL resolves (no 404s) and every
+// live profile is included. Previously this read a separate `therapists` table
+// whose approved rows had slugs the public route rejected — producing sitemap
+// 404s and omitting the profiles that actually resolve.
 export async function getSeoTherapists(): Promise<SeoTherapist[]> {
-  const therapistsTableRows = await tryFetchAllRows<SeoTherapist>(
-    "therapists",
-    "slug, updated_at",
-    (query) =>
-      query
-        .eq("status", "approved")
-        .not("slug", "is", null)
-        .order("slug"),
-  );
-
-  if (therapistsTableRows && therapistsTableRows.length > 0) {
-    const slugSet = new Set(therapistsTableRows.map((t) => t.slug));
-    // Ensure featured profiles are always included
-    const featuredToAdd = FEATURED_PROFILE_SLUGS
-      .filter((slug) => !slugSet.has(slug))
-      .map((slug) => ({ slug, updated_at: new Date().toISOString() }));
-    return [
-      ...therapistsTableRows.filter((therapist) => typeof therapist.slug === "string" && therapist.slug.length > 0),
-      ...featuredToAdd,
-    ];
-  }
-
-  const profileRows = await tryFetchAllRows<SeoTherapist>(
-    "profiles",
-    "slug, updated_at",
-    (query) =>
-      query
-        .eq("visibility_status", "public")
-        .eq("profile_status", "approved")
-        .eq("is_suspended", false)
-        .eq("is_banned", false)
-        .not("slug", "is", null)
-        .order("slug"),
-  );
-
-  const profiles = (profileRows ?? []).filter((therapist) => typeof therapist.slug === "string" && therapist.slug.length > 0);
-  
-  // Ensure featured profiles are always included
-  const slugSet = new Set(profiles.map((t) => t.slug));
-  const featuredToAdd = FEATURED_PROFILE_SLUGS
-    .filter((slug) => !slugSet.has(slug))
-    .map((slug) => ({ slug, updated_at: new Date().toISOString() }));
-  
-  return [...profiles, ...featuredToAdd];
+  const rows = await getSitemapProfileSlugs();
+  return rows.filter((row) => typeof row.slug === "string" && row.slug.length > 0);
 }
 
 export type SeoBlogPost = {

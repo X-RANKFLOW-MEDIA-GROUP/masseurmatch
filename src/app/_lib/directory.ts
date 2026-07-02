@@ -181,6 +181,41 @@ const buildPublicTherapistsQuery = () => {
   return q;
 };
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// A profile is linkable from the directory when it has a slug OR a real UUID id
+// (the profile route resolves both — `/therapists/<slug>` and `/therapists/<uuid>`).
+// Rows with neither (e.g. a malformed id and no slug) would render a card that
+// 404s, so they are dropped from listings. Slugless profiles with a valid UUID
+// stay routable via their id — we do NOT require a slug here.
+const isRoutableProfile = (p: PublicTherapist) =>
+  (typeof p.slug === "string" && p.slug.length > 0) || (typeof p.id === "string" && UUID_RE.test(p.id));
+
+// Slugs for the sitemap, sourced from the SAME query that serves the public
+// profile route (`getPublicTherapistBySlug`). This guarantees every profile URL
+// in the sitemap actually resolves (no 404s) and every resolvable profile is
+// included — the two must never disagree. Real DB rows only; no demo fallback.
+// Missing slugs are filtered here (the sitemap-specific path) rather than in the
+// shared query, so slugless-but-UUID-routable profiles still appear in the
+// directory. Pages through all results so completeness holds beyond one page.
+export const getSitemapProfileSlugs = async (): Promise<Array<{ slug: string; updated_at: string | null }>> => {
+  const PAGE = 1000;
+  const out: Array<{ slug: string; updated_at: string | null }> = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await buildPublicTherapistsQuery()
+      .order("updated_at", { ascending: false })
+      .range(from, from + PAGE - 1);
+    if (error || !data || data.length === 0) break;
+    for (const row of data as unknown as PublicTherapist[]) {
+      if (typeof row.slug === "string" && row.slug.length > 0) {
+        out.push({ slug: row.slug, updated_at: row.updated_at ?? null });
+      }
+    }
+    if (data.length < PAGE) break;
+  }
+  return out;
+};
+
 function isActivelyAvailable(profile: PublicTherapist) {
   return profile.available_now === true &&
     (profile.available_now_expires == null || new Date(profile.available_now_expires).getTime() > Date.now());
@@ -306,7 +341,8 @@ export const getPublicTherapists = async (filters?: {
   if (filters?.lgbtqAffirming) query = query.eq("lgbtq_affirming", true);
 
   const { data: rawData, error, count } = await query;
-  const data = rawData ? sortPublicTherapists(rawData as unknown as PublicTherapist[]) : [];
+  const routable = rawData ? (rawData as unknown as PublicTherapist[]).filter(isRoutableProfile) : [];
+  const data = sortPublicTherapists(routable);
 
   if (!error) {
     return { items: data, total: count ?? data.length, page, pageSize };
