@@ -41,20 +41,16 @@ export default defineConfig({
     extraHTTPHeaders: {
       // Tell the server it's a CI request so it can skip rate-limiting if needed.
       "x-playwright-ci": "1",
-      // Bypass Vercel Deployment Protection on preview deployments.
-      // Set VERCEL_PROTECTION_BYPASS as a GitHub Actions secret when using a
-      // protection-enabled preview URL as PLAYWRIGHT_BASE_URL.
-      // `x-vercel-set-bypass-cookie` makes Vercel set a session cookie so every
-      // navigation and sub-resource in the browsing context is bypassed — not
-      // only requests that carry the header. Without it, browser navigations
-      // get redirected to the Vercel SSO wall and axe/E2E scan that page
-      // instead of the app. Requires "Protection Bypass for Automation" enabled
-      // on the Vercel project (that is what mints the secret value).
+      // Bypass Vercel Deployment Protection on preview deployments. Requires
+      // "Protection Bypass for Automation" enabled on the Vercel project and its
+      // secret set as the VERCEL_PROTECTION_BYPASS GitHub Actions secret.
+      // Playwright sends this header on every request (extraHTTPHeaders), so the
+      // header alone bypasses the wall — we deliberately do NOT set
+      // `x-vercel-set-bypass-cookie`, because that makes Vercel insert a 307
+      // cookie-setting hop whose relative Location breaks the redirect-chain
+      // assertions in redirects.spec.ts / seo-normalization.spec.ts.
       ...(process.env.VERCEL_PROTECTION_BYPASS
-        ? {
-            "x-vercel-protection-bypass": process.env.VERCEL_PROTECTION_BYPASS,
-            "x-vercel-set-bypass-cookie": "true",
-          }
+        ? { "x-vercel-protection-bypass": process.env.VERCEL_PROTECTION_BYPASS }
         : {}),
     },
   },
