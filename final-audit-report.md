@@ -399,14 +399,23 @@ faulty assertions above, the suite was run three consecutive times with
 | 2 | 17 | 2 | 0 | 1 |
 | 3 | 17 | 2 | 0 | 1 |
 
-All three runs are green (Playwright exit 0). The single flaky test is the
-404-status check, which intermittently fails its first navigation with a
-transient connection reset **from the test environment's egress proxy** (not the
-site) and passes on retry. The 404 behavior itself is correct and was verified
-independently with `curl` (real `404` + `"Page not found | MasseurMatch"`), and
-across the HTTP sweep every non-existent route returns a true 404. This is a
-tooling-transport flake, documented here rather than hidden. Reproducible specs
-and config are in `prelaunch-audit/tools/`.
+All three runs are green (Playwright exit 0); the results were re-confirmed after
+a mid-run container restart (Run 1: 18 passed; Runs 2–3: 17 passed + the same 1
+flaky, each passing within `retries: 2`). The single flaky test is the
+404-status check, and the flake is in the **test assertion, not the site**: the
+test reads `body.innerText` immediately after navigation and asserts
+`length > 20`, but the `/404` page carries very little visible text (essentially
+"404 ERROR / Page not found / Sorry, we couldn't find the page you're looking
+for" plus two recovery links). When `innerText` is sampled a beat before the
+client finishes hydrating, it returns the near-empty pre-hydration body and the
+tight `> 20` threshold trips; it passes on retry. The 404 page itself is correct
+and friendly — verified by screenshot (`screenshots/desktop-this-page-should-404.png`
+and the failure capture in `playwright-report/`) and by `curl` (real HTTP `404`
++ `"Page not found | MasseurMatch"` title with a full page body); across the HTTP
+sweep every non-existent route returns a true 404. **Fix for the test** (not a
+launch item): loosen the threshold or wait for the heading, e.g.
+`await expect(page.getByRole("heading", { name: /page not found/i })).toBeVisible()`.
+Reproducible specs and config are in `prelaunch-audit/tools/`.
 
 ## 15. Lighthouse Results
 
