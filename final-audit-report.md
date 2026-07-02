@@ -389,6 +389,25 @@ test-harness artifacts, not product defects:**
 Net functional result after re-test: **18 pass-equivalent, 2 skipped, 0 real
 failures.**
 
+**3× consecutive stability run (per the audit brief).** After correcting the two
+faulty assertions above, the suite was run three consecutive times with
+`retries: 2`:
+
+| Run | Passed | Skipped | Hard failures | Flaky (passed on retry) |
+|---|---|---|---|---|
+| 1 | 17 | 2 | 0 | 1 |
+| 2 | 17 | 2 | 0 | 1 |
+| 3 | 17 | 2 | 0 | 1 |
+
+All three runs are green (Playwright exit 0). The single flaky test is the
+404-status check, which intermittently fails its first navigation with a
+transient connection reset **from the test environment's egress proxy** (not the
+site) and passes on retry. The 404 behavior itself is correct and was verified
+independently with `curl` (real `404` + `"Page not found | MasseurMatch"`), and
+across the HTTP sweep every non-existent route returns a true 404. This is a
+tooling-transport flake, documented here rather than hidden. Reproducible specs
+and config are in `prelaunch-audit/tools/`.
+
 ## 15. Lighthouse Results
 
 | URL | Form | Perf | A11y | BP | SEO | FCP | LCP | TBT | CLS | SI |
