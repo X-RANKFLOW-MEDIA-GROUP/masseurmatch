@@ -14,21 +14,21 @@ export async function GET(request: NextRequest) {
 
     const { data: profileStats } = await supabase
       .from("profiles")
-      .select("status, created_at", { count: "exact" });
+      .select("profile_status, created_at", { count: "exact" });
 
     const { data: complaintStats } = await supabase
       .from("complaints")
       .select("status, created_at", { count: "exact" });
 
     const total = profileStats?.length || 0;
-    const approved = profileStats?.filter((p) => p.status === "approved").length || 0;
-    const pending = profileStats?.filter((p) => p.status === "pending_approval").length || 0;
-    const rejected = profileStats?.filter((p) => p.status === "rejected").length || 0;
+    const approved = profileStats?.filter((p) => p.profile_status === "approved").length || 0;
+    const pending = profileStats?.filter((p) => p.profile_status === "pending_approval").length || 0;
+    const rejected = profileStats?.filter((p) => p.profile_status === "rejected").length || 0;
 
     const pendingComplaints = complaintStats?.filter((c) => c.status === "pending").length || 0;
 
     const approvedProfiles = profileStats?.filter(
-      (p) => p.status === "approved" && p.created_at
+      (p) => p.profile_status === "approved" && p.created_at
     ) || [];
     const avgApprovalHours =
       approvedProfiles.length > 0
