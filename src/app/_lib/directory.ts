@@ -177,8 +177,23 @@ const buildPublicTherapistsQuery = () => {
     .not("slug", "ilike", "%test%")
     .not("slug", "ilike", "%example%")
     .not("slug", "ilike", "%dev%")
+    .not("slug", "is", null)
     .not("phone", "ilike", "%555%");
   return q;
+};
+
+// Slugs for the sitemap, sourced from the SAME query that serves the public
+// profile route (`getPublicTherapistBySlug`). This guarantees every profile URL
+// in the sitemap actually resolves (no 404s) and every resolvable profile is
+// included — the two must never disagree. Real DB rows only; no demo fallback.
+export const getSitemapProfileSlugs = async (): Promise<Array<{ slug: string; updated_at: string | null }>> => {
+  const { data, error } = await buildPublicTherapistsQuery()
+    .order("updated_at", { ascending: false })
+    .limit(1000);
+  if (error || !data) return [];
+  return (data as unknown as PublicTherapist[])
+    .filter((row): row is PublicTherapist & { slug: string } => typeof row.slug === "string" && row.slug.length > 0)
+    .map((row) => ({ slug: row.slug, updated_at: row.updated_at ?? null }));
 };
 
 function isActivelyAvailable(profile: PublicTherapist) {

@@ -30,11 +30,11 @@ export function PremiumProfileHero({ profile, cityPath, reviews = [] }: Props) {
   const city = profile.city || "United States";
   const yearsExp = profile.years_experience;
   const ratedReviews = reviews.filter((r) => typeof r.rating === "number");
-  const avgRating = ratedReviews.length > 0 
+  // Only surface a rating when there are real rated reviews — never a fabricated default.
+  const avgRating = ratedReviews.length > 0
     ? (ratedReviews.reduce((sum, r) => sum + (r.rating as number), 0) / ratedReviews.length).toFixed(1)
-    : "5.0";
-  const sessionCount = 127; // Placeholder or derive from real analytics if available
-  
+    : null;
+
   const activePromo = profile.promotions?.[0];
 
   return (
@@ -93,21 +93,23 @@ export function PremiumProfileHero({ profile, cityPath, reviews = [] }: Props) {
           <span>{profile.headline || "Massage Therapist"}</span>
         </div>
 
-        {/* Meta Stats */}
-        <div className="pp-hero-meta">
-          <div className="pp-meta-item">
-            <div className="pp-meta-val">{yearsExp || 5}+</div>
-            <div className="pp-meta-label">Years exp.</div>
+        {/* Meta Stats — only real, substantiated values are shown */}
+        {(yearsExp || avgRating) && (
+          <div className="pp-hero-meta">
+            {yearsExp ? (
+              <div className="pp-meta-item">
+                <div className="pp-meta-val">{yearsExp}+</div>
+                <div className="pp-meta-label">Years exp.</div>
+              </div>
+            ) : null}
+            {avgRating ? (
+              <div className="pp-meta-item">
+                <div className="pp-meta-val">{avgRating}</div>
+                <div className="pp-meta-label">Rating ({ratedReviews.length})</div>
+              </div>
+            ) : null}
           </div>
-          <div className="pp-meta-item">
-            <div className="pp-meta-val">{avgRating}</div>
-            <div className="pp-meta-label">Rating</div>
-          </div>
-          <div className="pp-meta-item">
-            <div className="pp-meta-val">{sessionCount}</div>
-            <div className="pp-meta-label">Connections</div>
-          </div>
-        </div>
+        )}
 
         {/* CTAs */}
         <div className="pp-hero-cta">

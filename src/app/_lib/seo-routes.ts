@@ -172,6 +172,15 @@ function cityNameBySlug(slug: string): string | null {
   return city?.name ?? null;
 }
 
+// A city/service/neighborhood page is only indexable once its city has real
+// inventory (the city page itself sets `noIndex` when inventoryCount < 3). Gate
+// sitemap inclusion on the SAME threshold so the sitemap never advertises a
+// noindex page. NOTE: this uses the city-level count; per-segment precision
+// (e.g. a city with inventory but zero therapists for one modality) is a
+// follow-up — at launch scale no city clears the threshold, so no thin
+// service/area page is emitted.
+const CITY_INDEXABLE_MIN_INVENTORY = 3;
+
 async function pathHasInventory(path: string, inventoryMap?: Map<string, number>): Promise<boolean> {
   const [citySlug] = path.split("/").filter(Boolean);
   if (!citySlug) return false;
@@ -179,11 +188,11 @@ async function pathHasInventory(path: string, inventoryMap?: Map<string, number>
   if (!cityName) return false;
 
   if (inventoryMap) {
-    return (inventoryMap.get(cityName.toLowerCase()) ?? 0) > 0;
+    return (inventoryMap.get(cityName.toLowerCase()) ?? 0) >= CITY_INDEXABLE_MIN_INVENTORY;
   }
 
   const { total } = await getPublicTherapists({ city: cityName, page: 1, pageSize: 1 });
-  return total > 0;
+  return total >= CITY_INDEXABLE_MIN_INVENTORY;
 }
 
 export function buildRobotsRules(): MetadataRoute.Robots["rules"] {

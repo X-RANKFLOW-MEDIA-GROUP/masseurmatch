@@ -10,18 +10,18 @@ const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const trustPillars = [
   {
     icon: Shield,
-    title: "Verified Identity",
-    description: "Every therapist on MasseurMatch goes through identity verification before their profile goes live.",
+    title: "Reviewed Before Going Live",
+    description: "Every profile is reviewed before it appears. Pro and Elite therapists can add identity verification via Stripe Identity.",
   },
   {
     icon: Lock,
     title: "Direct Contact",
-    description: "No booking middleman. Direct communication and booking between you and the therapist.",
+    description: "No booking middleman. You contact and arrange sessions directly with the therapist.",
   },
   {
     icon: Heart,
     title: "LGBTQ+ Affirming",
-    description: "All therapists are screened for LGBTQ+ affirming experience and inclusive values.",
+    description: "Therapists self-identify as LGBTQ+ affirming, and we review profiles for inclusive, respectful presentation.",
   },
   {
     icon: Users,
@@ -124,10 +124,10 @@ export function TrustDashboardSection() {
           <div className="mb-8 flex items-center justify-between border-b border-white/10 pb-8">
             <div>
               <p className="font-mono text-xs uppercase tracking-widest text-[#8B1E2D]">
-                Verification System
+                How We Build Trust
               </p>
               <h3 className="mt-2 font-display text-2xl font-black text-white">
-                Every Profile Verified
+                Reviewed Before Going Live
               </h3>
             </div>
             <div className="hidden flex-col gap-2 sm:flex">
@@ -144,28 +144,28 @@ export function TrustDashboardSection() {
             </div>
           </div>
 
-          {/* Verification stats */}
+          {/* Trust process (qualitative — no unverifiable counts pre-launch) */}
           <div className="grid gap-6 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/5 bg-white/5 p-6">
               <p className="font-mono text-xs uppercase tracking-widest text-gray-400">
-                Total Verified
+                Profile Review
               </p>
-              <p className="mt-3 font-display text-3xl font-black text-white">500+</p>
-              <p className="mt-1 text-sm text-gray-400">Therapists verified</p>
+              <p className="mt-3 font-display text-xl font-black text-white">Reviewed before going live</p>
+              <p className="mt-1 text-sm text-gray-400">Every new profile is checked before it appears.</p>
+            </div>
+            <div className="rounded-2xl border border-white/5 bg-white/5 p-6">
+              <p className="font-mono text-xs uppercase tracking-widest text-gray-400">
+                Identity Verification
+              </p>
+              <p className="mt-3 font-display text-xl font-black text-[#8B1E2D]">Available to Pro &amp; Elite</p>
+              <p className="mt-1 text-sm text-gray-400">Optional Stripe Identity check with a public verification date.</p>
             </div>
             <div className="rounded-2xl border border-white/5 bg-white/5 p-6">
               <p className="font-mono text-xs uppercase tracking-widest text-gray-400">
                 LGBTQ+ Affirming
               </p>
-              <p className="mt-3 font-display text-3xl font-black text-[#8B1E2D]">100%</p>
-              <p className="mt-1 text-sm text-gray-400">Of all profiles</p>
-            </div>
-            <div className="rounded-2xl border border-white/5 bg-white/5 p-6">
-              <p className="font-mono text-xs uppercase tracking-widest text-gray-400">
-                Cities Covered
-              </p>
-              <p className="mt-3 font-display text-3xl font-black text-white">50+</p>
-              <p className="mt-1 text-sm text-gray-400">Across the US</p>
+              <p className="mt-3 font-display text-xl font-black text-white">Inclusive by design</p>
+              <p className="mt-1 text-sm text-gray-400">Profiles self-identify as affirming and welcoming.</p>
             </div>
           </div>
         </motion.div>

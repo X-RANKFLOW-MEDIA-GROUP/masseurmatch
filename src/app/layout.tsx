@@ -14,7 +14,6 @@ import "@/styles/mobile-responsive.css";
 import "@/styles/homepage-mobile-hotfix.css";
 import { satoshi } from "./fonts";
 import SmoothScroll from "@/components/motion/SmoothScroll";
-import { BugsnagInit } from "@/app/_components/bugsnag-init";
 
 const rootMetadata = createPageMetadata({
   title: "Premium verified male massage therapist directory",
@@ -44,7 +43,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={satoshi.variable}>
       <body className="theme-masseurmatch min-h-screen overflow-x-hidden font-sans text-foreground antialiased">
-        <BugsnagInit />
         <GoogleTagManager />
         <GoogleAnalytics />
         <AppProviders>

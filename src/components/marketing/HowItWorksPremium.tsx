@@ -21,8 +21,8 @@ const steps = [
     icon: MessageSquare,
     title: "Review & Connect",
     description:
-      "Read detailed profiles with photos, specialties, verified credentials, and direct contact information. Message therapists directly to confirm details.",
-    features: ["Verified profiles", "Direct messaging", "Transparent pricing", "Detailed specialties"],
+      "Read detailed profiles with photos, specialties, and direct contact information. Message therapists directly to confirm details.",
+    features: ["Reviewed profiles", "Direct messaging", "Transparent pricing", "Detailed specialties"],
   },
   {
     number: "03",

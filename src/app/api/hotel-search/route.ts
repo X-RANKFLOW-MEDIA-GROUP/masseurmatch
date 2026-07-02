@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { hotelSearchSchema } from "@/lib/hotel-search-schema";
 import type { HotelSearchResult } from "@/types/hotel-search";
+import { assertRateLimit } from "@/app/_lib/security";
+import { RouteError } from "@/app/api/_lib/http";
 
 export const runtime = "nodejs";
 
@@ -51,6 +53,16 @@ function extractJson(content: string): unknown {
 }
 
 export async function POST(request: Request) {
+  // This route proxies a paid LLM — rate-limit it tightly to prevent abuse/cost.
+  try {
+    assertRateLimit(request, "hotel-search", { limit: 8, windowMs: 60_000 });
+  } catch (error) {
+    if (error instanceof RouteError) {
+      return NextResponse.json({ error: error.message, success: false }, { status: error.status });
+    }
+    throw error;
+  }
+
   let payload: unknown;
   try {
     payload = await request.json();

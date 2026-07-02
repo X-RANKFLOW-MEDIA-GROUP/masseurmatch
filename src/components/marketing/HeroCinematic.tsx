@@ -89,16 +89,16 @@ export function HeroCinematic() {
                 className="mt-12 flex flex-wrap gap-8 border-t border-white/10 pt-8"
               >
                 <div>
-                  <p className="text-2xl font-black text-[#8B1E2D]">500+</p>
-                  <p className="mt-1 text-sm text-gray-400">Verified Therapists</p>
+                  <p className="text-lg font-black text-[#8B1E2D]">Reviewed</p>
+                  <p className="mt-1 text-sm text-gray-400">Before going live</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-black text-[#8B1E2D]">50+</p>
-                  <p className="mt-1 text-sm text-gray-400">US Cities</p>
+                  <p className="text-lg font-black text-[#8B1E2D]">Direct contact</p>
+                  <p className="mt-1 text-sm text-gray-400">No booking middleman</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-black text-[#8B1E2D]">100%</p>
-                  <p className="mt-1 text-sm text-gray-400">LGBTQ+ Affirming</p>
+                  <p className="text-lg font-black text-[#8B1E2D]">LGBTQ+ affirming</p>
+                  <p className="mt-1 text-sm text-gray-400">Inclusive by design</p>
                 </div>
               </motion.div>
           </motion.div>
