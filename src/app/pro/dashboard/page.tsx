@@ -25,6 +25,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { normalizePlanKey } from "@/hooks/usePlanLimits";
 import { requestJson, ApiError } from "@/app/_lib/request";
+import { NotificationsWidget } from "@/components/dashboard/NotificationsWidget";
 
 const statusOptions = [
   { key: "available", label: "Available Now", icon: Zap, color: "emerald" },
@@ -376,6 +377,8 @@ export default function DashboardHome() {
       </header>
 
       {!profileLoading && <ProfileStatusBanner status={profileStatus} />}
+
+      <NotificationsWidget />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
