@@ -14,6 +14,7 @@ export const AvailableNowBadge = ({ size = "md", className }: AvailableNowBadgeP
     <motion.div
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
       className={cn(
         "relative inline-flex items-center gap-1.5 rounded-full font-semibold select-none uppercase tracking-[0.18em]",
         isSmall ? "px-2.5 py-0.5 text-[10px]" : "px-3 py-1 text-[10px]",

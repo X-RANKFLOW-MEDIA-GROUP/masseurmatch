@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { Camera, Crown } from "lucide-react";
-import { IconShield, IconSpark } from "@/components/icons";
+import { Camera } from "lucide-react";
+import { StatusBadge } from "@/components/ui/status-badge";
 import type { ProfileViewModel } from "./profile-utils";
 import { ProfileHeader } from "./ProfileHeader";
 
@@ -20,9 +20,9 @@ export function ProfileHero({ profile }: { profile: ProfileViewModel }) {
                 </div>
                 <div className="hidden sm:block">
                   <div className="flex flex-wrap gap-2">
-                    {profile.isVerified && <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/15 px-3 py-1 text-sm text-emerald-200"><IconShield size={16} />Verified</span>}
-                    {profile.isFeatured && <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/15 px-3 py-1 text-sm text-amber-200"><IconSpark size={16} />Featured</span>}
-                    {profile.isPremium && <span className="inline-flex items-center gap-1 rounded-full bg-blue-400/15 px-3 py-1 text-sm text-blue-200"><Crown className="h-4 w-4" />Premium</span>}
+                    {profile.isVerified && <StatusBadge type="photo-reviewed" size="sm" />}
+                    {profile.isFeatured && <StatusBadge type="featured" size="sm" />}
+                    {profile.isPremium && <StatusBadge type="elite" size="sm" />}
                   </div>
                   <p className="mt-3 font-display text-2xl font-semibold tracking-[-0.03em] text-white">{profile.city}, {profile.state}</p>
                 </div>
