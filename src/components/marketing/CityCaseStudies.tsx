@@ -51,7 +51,7 @@ function CityLink({
         href={`/${city.slug}`}
         className={`group relative flex items-center justify-between overflow-hidden rounded-xl border px-5 py-4 transition-all duration-300 ${
           city.featured
-            ? "border-[#E8E8E8] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:border-[#8B1E2D]/40 hover:shadow-[0_8px_30px_rgba(139,30,45,0.08)]"
+            ? "border-[#E8E8E8] bg-white shadow-[var(--shadow-xs)] hover:border-[#8B1E2D]/40 hover:shadow-[var(--shadow-sm)]"
             : "border-[#E8E8E8]/60 bg-[#FAFAFA] hover:border-[#8B1E2D]/30 hover:bg-white hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)]"
         }`}
       >

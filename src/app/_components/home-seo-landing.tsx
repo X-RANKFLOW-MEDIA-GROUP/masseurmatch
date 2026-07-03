@@ -18,7 +18,7 @@ export function HomeSeoLanding({ comparisonLinks, guides }: HomeSeoLandingProps)
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,0.9fr)]">
 
         {/* Comparison hub */}
-        <div className="rounded-[2rem] border border-border bg-card p-7 shadow-[0_18px_42px_rgba(17,17,17,0.18)]">
+        <div className="rounded-3xl border border-border bg-card p-7 shadow-[var(--shadow-md)]">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-primary/10 text-primary">
               <Scale className="h-5 w-5" />
@@ -40,7 +40,7 @@ export function HomeSeoLanding({ comparisonLinks, guides }: HomeSeoLandingProps)
               <Link
                 key={competitor.slug}
                 href={`/compare/${competitor.slug}`}
-                className="group flex items-start justify-between gap-4 rounded-[1.4rem] border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
+                className="group flex items-start justify-between gap-4 rounded-2xl border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
               >
                 <div>
                   <p className="text-sm font-semibold text-foreground">
@@ -57,7 +57,7 @@ export function HomeSeoLanding({ comparisonLinks, guides }: HomeSeoLandingProps)
         </div>
 
         {/* Guides */}
-        <div className="rounded-[2rem] border border-border bg-card p-7 shadow-[0_18px_42px_rgba(17,17,17,0.18)]">
+        <div className="rounded-3xl border border-border bg-card p-7 shadow-[var(--shadow-md)]">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-primary/10 text-primary">
               <BookOpenText className="h-5 w-5" />
@@ -79,7 +79,7 @@ export function HomeSeoLanding({ comparisonLinks, guides }: HomeSeoLandingProps)
               <Link
                 key={guide.slug}
                 href={`/guides/${guide.slug}`}
-                className="group flex items-start justify-between gap-4 rounded-[1.4rem] border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
+                className="group flex items-start justify-between gap-4 rounded-2xl border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
               >
                 <div>
                   <p className="text-sm font-semibold text-foreground">{guide.h1}</p>
@@ -92,7 +92,7 @@ export function HomeSeoLanding({ comparisonLinks, guides }: HomeSeoLandingProps)
         </div>
 
         {/* Services */}
-        <div className="rounded-[2rem] border border-border bg-card p-7 shadow-[0_18px_42px_rgba(11,31,58,0.18)]">
+        <div className="rounded-3xl border border-border bg-card p-7 shadow-[var(--shadow-md)]">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-primary/10 text-primary">
               <Wand2 className="h-5 w-5" />
@@ -113,7 +113,7 @@ export function HomeSeoLanding({ comparisonLinks, guides }: HomeSeoLandingProps)
               <Link
                 key={service.slug}
                 href={`/services/${service.slug}`}
-                className="group flex items-start justify-between gap-4 rounded-[1.4rem] border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
+                className="group flex items-start justify-between gap-4 rounded-2xl border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
               >
                 <div>
                   <p className="text-sm font-semibold text-foreground">{service.label} Massage</p>
@@ -124,7 +124,7 @@ export function HomeSeoLanding({ comparisonLinks, guides }: HomeSeoLandingProps)
             ))}
             <Link
               href="/services"
-              className="group flex items-start justify-between gap-4 rounded-[1.4rem] border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
+              className="group flex items-start justify-between gap-4 rounded-2xl border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
             >
               <div>
                 <p className="text-sm font-semibold text-foreground">View All Services</p>

@@ -69,7 +69,7 @@ export default function CommunityGuidelinesPage() {
       <JsonLd data={communityGuidelinesJsonLd} />
 
       <main className="page-shell py-10">
-        <section className="rounded-[2rem] border border-border-subtle bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(244,246,250,0.96))] p-6 shadow-brand sm:p-8">
+        <section className="rounded-3xl border border-border-subtle bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(244,246,250,0.96))] p-6 shadow-brand sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-muted">Community Guidelines</p>
           <h1 className="mt-3 max-w-3xl font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
             Clear standards for a safer, more respectful directory.
@@ -78,7 +78,7 @@ export default function CommunityGuidelinesPage() {
             These guidelines apply to providers and clients using MasseurMatch. They exist to protect direct,
             transparent wellness connections and to keep the platform inclusive, lawful, and respectful.
           </p>
-          <div className="mt-6 inline-flex items-start gap-3 rounded-[1.5rem] border border-brand-soft/40 bg-brand-soft/10 px-4 py-3 text-sm leading-6 text-text-secondary">
+          <div className="mt-6 inline-flex items-start gap-3 rounded-3xl border border-brand-soft/40 bg-brand-soft/10 px-4 py-3 text-sm leading-6 text-text-secondary">
             <IconShield size={20} className="mt-0.5 flex-none text-brand-primary" />
             <span>Violations may result in content removal, account deletion, or escalation when legal or safety risks are involved.</span>
           </div>
@@ -88,7 +88,7 @@ export default function CommunityGuidelinesPage() {
           {coreGuidelines.map((item) => (
             <article
               key={item.title}
-              className="premium-surface rounded-[1.8rem] border border-border-subtle p-6 shadow-soft"
+              className="premium-surface rounded-3xl border border-border-subtle p-6 shadow-soft"
             >
               <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-secondary/10 text-brand-secondary">
                 <item.icon className="h-5 w-5" />
@@ -99,7 +99,7 @@ export default function CommunityGuidelinesPage() {
           ))}
         </section>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <div className="flex items-start gap-4">
             <div className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-brand-soft/12 text-brand-primary">
               <Ban className="h-5 w-5" />
@@ -123,7 +123,7 @@ export default function CommunityGuidelinesPage() {
           </div>
         </section>
 
-        <section className="mt-8 rounded-[2rem] border border-border-subtle bg-brand-primary px-6 py-7 text-white shadow-brand sm:px-8">
+        <section className="mt-8 rounded-3xl border border-border-subtle bg-brand-primary px-6 py-7 text-white shadow-brand sm:px-8">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-brand-soft">Related Policies</p>
           <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-white">
             Read the supporting legal and platform policies.

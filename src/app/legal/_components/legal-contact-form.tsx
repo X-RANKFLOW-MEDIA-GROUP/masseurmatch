@@ -173,7 +173,7 @@ export function LegalContactForm() {
           placeholder="Describe your request, include URLs, account email, listing slug, or any detail that will help the legal team respond faster."
           value={form.message}
           onChange={(event) => updateField("message", event.target.value)}
-          className="min-h-44 rounded-[1.5rem] border-border-subtle bg-white"
+          className="min-h-44 rounded-3xl border-border-subtle bg-white"
           required
         />
       </div>

@@ -92,7 +92,7 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
 
   return (
     <motion.article
-      className="group relative isolate flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-black/[0.06] transition-[box-shadow,ring-color] duration-300 hover:shadow-[0_18px_40px_-12px_rgba(15,23,42,0.28)] hover:ring-black/10"
+      className="group relative isolate flex flex-col overflow-hidden rounded-2xl bg-white shadow-[var(--shadow-xs)] ring-1 ring-black/[0.06] transition-[box-shadow,ring-color] duration-300 hover:shadow-[var(--shadow-md)] hover:ring-black/10"
       itemScope
       itemType="https://schema.org/Person"
       initial={{ opacity: 0, y: 20 }}

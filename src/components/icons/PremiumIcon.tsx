@@ -44,7 +44,7 @@ export function PremiumIcon({
   return (
     <span
       className={cn(
-        "motion-premium inline-flex items-center justify-center rounded-full border shadow-[0_18px_40px_rgb(var(--color-brand-primary-rgb)/0.14)]",
+        "motion-premium inline-flex items-center justify-center rounded-full border shadow-[var(--shadow-md)]",
         sizeMap[size],
         toneMap[tone],
         className,

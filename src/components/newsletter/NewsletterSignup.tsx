@@ -70,7 +70,7 @@ export function NewsletterSignup() {
                     placeholder="e.g. Dallas, TX"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="w-full bg-slate-900/50 border border-slate-700 text-white px-4 py-3 font-sans text-sm focus:border-[#8B1E2D] focus:outline-none transition-colors placeholder:text-slate-600"
+                    className="w-full bg-slate-900/50 border border-slate-700 text-white px-4 py-3 font-sans text-sm focus:border-[var(--color-primary)] focus:outline-none transition-colors placeholder:text-slate-600"
                   />
                 </div>
                 <div className="space-y-2">
@@ -82,7 +82,7 @@ export function NewsletterSignup() {
                     placeholder="hello@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-slate-900/50 border border-slate-700 text-white px-4 py-3 font-sans text-sm focus:border-[#8B1E2D] focus:outline-none transition-colors placeholder:text-slate-600"
+                    className="w-full bg-slate-900/50 border border-slate-700 text-white px-4 py-3 font-sans text-sm focus:border-[var(--color-primary)] focus:outline-none transition-colors placeholder:text-slate-600"
                   />
                 </div>
                 <button 

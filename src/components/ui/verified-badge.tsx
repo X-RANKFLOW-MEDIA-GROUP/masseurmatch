@@ -29,10 +29,11 @@ export const VerifiedBadge = ({ size = "md", className, verifiedAt, asLink }: Ve
     <motion.div
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
       className={cn(
-        "relative inline-flex items-center gap-1.5 rounded-full font-semibold select-none",
-        isSmall ? "px-2 py-0.5 text-[10px]" : "px-3 py-1 text-xs",
-        "bg-emerald-50 text-emerald-700 border border-emerald-200",
+        "relative inline-flex items-center gap-1.5 rounded-full font-semibold select-none uppercase tracking-[0.18em]",
+        isSmall ? "px-2 py-0.5 text-[10px]" : "px-3 py-1 text-[10px]",
+        "bg-badge-verified-light text-badge-verified border border-badge-verified-border",
         "backdrop-blur-sm",
         className,
       )}
@@ -40,7 +41,7 @@ export const VerifiedBadge = ({ size = "md", className, verifiedAt, asLink }: Ve
       <span
         className="absolute -inset-[2px] rounded-full pointer-events-none"
         style={{
-          boxShadow: "0 0 10px 2px rgba(16,185,129,0.15), 0 0 20px 4px rgba(16,185,129,0.08)",
+          boxShadow: "0 0 10px 2px hsl(var(--badge-verified) / 0.15), 0 0 20px 4px hsl(var(--badge-verified) / 0.08)",
         }}
       />
       <ShieldCheck className={cn("shrink-0", isSmall ? "w-2.5 h-2.5" : "w-3.5 h-3.5")} strokeWidth={2.25} />

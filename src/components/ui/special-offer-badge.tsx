@@ -14,9 +14,10 @@ export const SpecialOfferBadge = ({ size = "md", className }: SpecialOfferBadgeP
     <motion.div
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
       className={cn(
-        "relative inline-flex items-center gap-1.5 rounded-full font-semibold select-none",
-        isSmall ? "px-2 py-0.5 text-[10px]" : "px-3 py-1 text-xs",
+        "relative inline-flex items-center gap-1.5 rounded-full font-semibold select-none uppercase tracking-[0.18em]",
+        isSmall ? "px-2 py-0.5 text-[10px]" : "px-3 py-1 text-[10px]",
         "bg-accent/10 text-accent-foreground border border-accent/30",
         "backdrop-blur-sm",
         className,
@@ -31,7 +32,7 @@ export const SpecialOfferBadge = ({ size = "md", className }: SpecialOfferBadgeP
       />
 
       <Tag className={cn("shrink-0", isSmall ? "w-2.5 h-2.5" : "w-3.5 h-3.5")} />
-      <span className="relative z-10 tracking-wide uppercase">Special Offer</span>
+      <span className="relative z-10">Special Offer</span>
     </motion.div>
   );
 };

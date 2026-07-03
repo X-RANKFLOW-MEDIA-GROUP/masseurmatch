@@ -153,7 +153,7 @@ export default function CompareHubPage() {
                     <Link
                       key={competitor.slug}
                       href={`/compare/${competitor.slug}`}
-                      className="premium-surface group rounded-[28px] border border-border-subtle p-6 shadow-[0_16px_36px_rgb(var(--color-brand-primary-rgb)/0.04)] transition duration-300 hover:-translate-y-1 hover:border-brand-accent/35"
+                      className="premium-surface group rounded-[28px] border border-border-subtle p-6 shadow-[var(--shadow-md)] transition duration-300 hover:-translate-y-1 hover:border-brand-accent/35"
                     >
                       <div className="flex flex-wrap items-center gap-3">
                         <Badge variant={competitor.tier === 1 ? "premium" : "outline"} className="border-0">

@@ -1,215 +1,130 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import {
-  Check,
+  ArrowUpRight,
+  BadgeCheck,
+  Clock3,
   MapPin,
   MessageSquare,
   Phone,
+  Ruler,
+  ShieldCheck,
 } from "lucide-react";
 import type { PublicTherapist } from "@/app/_lib/directory";
-import { Pill } from "@/components/ui/pill";
 import {
   getPublicContactLinks,
   getPublicProfileName,
+  getPublicTrustHighlights,
   isVerifiedDirectoryProfile,
-  isIdentityVerified,
 } from "@/app/_lib/public-profile";
+import { buildPhysicalProfileSummary } from "@/lib/physical-profile";
 import { useKnottyProfileAttribution } from "./useKnottyProfileAttribution";
+
+function statusConfig(profile: PublicTherapist) {
+  if (profile.available_now) return { label: "Available now", dot: "bg-success" };
+  if (Array.isArray(profile.travel_schedule) && profile.travel_schedule.length > 0) {
+    const now = Date.now();
+    const upcoming = profile.travel_schedule.some((trip) => new Date(trip.start_date).getTime() > now);
+    if (upcoming) return { label: "Traveling soon", dot: "bg-brand-soft" };
+  }
+  return { label: "Limited availability", dot: "bg-white/60" };
+}
+
+function getSessionLabel(profile: PublicTherapist) {
+  if (profile.incall_price && profile.outcall_price) return "Incall + outcall";
+  if (profile.outcall_price) return "Outcall";
+  if (profile.incall_price) return "Incall";
+  return "Direct contact";
+}
 
 interface Props {
   profile: PublicTherapist;
+  cityPath: string;
 }
 
-export function ProfileHero({ profile }: Props) {
+export function ProfileHero({ profile, cityPath }: Props) {
   const name = getPublicProfileName(profile);
+  const status = statusConfig(profile);
   const { callHref, smsHref } = getPublicContactLinks(profile.phone, profile.whatsapp_number, profile.id);
   const neighborhood = profile.neighborhood_name || profile.primary_area || null;
   const { trackContact } = useKnottyProfileAttribution({ therapistId: profile.id, city: profile.city, neighborhood: neighborhood ?? null });
   const city = profile.city || "United States";
-  const state = profile.state || null;
-  const locationLabel = [neighborhood, city, state].filter(Boolean).join(", ");
-
   const yearsExp = profile.years_experience ?? (profile.start_year ? new Date().getFullYear() - profile.start_year : null);
-  const startingPrice = profile.incall_price ?? profile.outcall_price;
-  const services = (profile.massage_techniques || []).slice(0, 3);
-  const languages = (profile.languages || []).slice(0, 3);
-  const isDirectoryListed = isVerifiedDirectoryProfile(profile);
-  const lgbtqAffirming = profile.lgbtq_affirming === true;
+  const startingAt = profile.incall_price ?? profile.outcall_price;
+  const trustHighlights = getPublicTrustHighlights(profile).slice(0, 4);
+  const physicalProfile = buildPhysicalProfileSummary({ heightInches: profile.height_inches, weightLb: profile.weight_lb, bodyType: profile.body_type });
 
   return (
-    <section className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-brand-primary via-brand-deep to-brand-secondary shadow-brand">
-      <div className="grid gap-0 lg:grid-cols-[1fr_1.1fr]">
-        {/* Left: Profile photo */}
-        <div className="relative hidden overflow-hidden lg:block">
-          <div className="absolute inset-0 translate-y-8 bg-brand-soft/5 blur-3xl" />
-          <Image
-            src={profile.avatar_url || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=900&h=1120&fit=crop"}
-            alt={`${name} – massage therapist in ${city}`}
-            width={720}
-            height={900}
-            priority
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-brand-primary/80 via-brand-primary/40 to-transparent" />
+    <section className="overflow-hidden rounded-[2.25rem] border border-white/10 bg-gradient-to-br from-brand-primary via-brand-deep to-brand-secondary text-white shadow-brand">
+      <div className="grid gap-0 xl:grid-cols-[minmax(0,1.25fr)_24rem]">
+        <div className="space-y-6 p-7 md:p-10">
+          <div className="flex flex-wrap gap-2.5">
+            <Link href={cityPath} className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/8 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/84 backdrop-blur">
+              <ArrowUpRight className="h-4 w-4" />
+              Explore {city}
+            </Link>
+            {isVerifiedDirectoryProfile(profile) ? (
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/8 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/84 backdrop-blur">
+                <BadgeCheck className="h-4 w-4" />
+                Verified listing
+              </span>
+            ) : null}
+          </div>
+
+          <div className="space-y-3">
+            <h1 className="max-w-3xl font-display text-4xl font-semibold leading-[1.04] tracking-[-0.03em] text-white md:text-5xl xl:text-[3.5rem]">{name}</h1>
+            <div className="flex items-center gap-2 text-base text-white/80">
+              <MapPin className="h-4 w-4 text-brand-soft" />
+              <span className="font-medium">{neighborhood ? `${neighborhood}, ${city}` : city}</span>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/8 px-4 py-2 text-sm font-semibold text-white/90 backdrop-blur">
+              <span className={`inline-block h-2.5 w-2.5 rounded-full ${status.dot}`} />
+              {status.label}
+            </span>
+            {startingAt ? <span className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/8 px-4 py-2 text-sm font-semibold text-white/90 backdrop-blur">From ${startingAt}</span> : null}
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/8 px-4 py-2 text-sm font-medium text-white/80 backdrop-blur"><Clock3 className="h-4 w-4" />{getSessionLabel(profile)}</span>
+            {physicalProfile ? <span className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/8 px-4 py-2 text-sm font-medium text-white/80 backdrop-blur"><Ruler className="h-4 w-4" />{physicalProfile}</span> : null}
+          </div>
+
+          {trustHighlights.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {trustHighlights.map((highlight) => <span key={highlight} className="rounded-full border border-white/10 bg-white/6 px-3.5 py-1.5 text-xs font-medium text-white/78">{highlight}</span>)}
+            </div>
+          ) : null}
+
+          <div className="flex flex-wrap gap-3 pt-1">
+            {smsHref ? <a href={smsHref} onClick={() => trackContact("knotty_text_clicked")} className="profile-card-cta rounded-full px-7 py-3.5 text-sm font-semibold"><MessageSquare className="mr-2 h-4 w-4" />Text now</a> : null}
+            {callHref ? <a href={callHref} onClick={() => trackContact("knotty_call_clicked")} className="inline-flex items-center justify-center rounded-full border border-white/14 bg-white/8 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/14"><Phone className="mr-2 h-4 w-4" />Call</a> : null}
+            <a href="#contact" className="inline-flex items-center justify-center rounded-full border border-white/14 bg-white/8 px-7 py-3.5 text-sm font-semibold text-white/92 backdrop-blur transition hover:bg-white/14">Contact options</a>
+          </div>
         </div>
 
-        {/* Right: Info section */}
-        <div className="space-y-6 p-7 text-white md:p-10 lg:flex lg:flex-col lg:justify-between">
-          {/* Status badges */}
-          <div className="flex flex-wrap gap-2">
-            {profile.available_now && (
-              <Pill
-                variant="available"
-                size="sm"
-                icon={<span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />}
-                label="Available Now"
-                className="text-white"
-              />
-            )}
-            {isDirectoryListed && (
-              <Pill
-                variant="verified"
-                size="sm"
-                icon={<Check size={11} />}
-                label="Verified Photo"
-                className="text-white"
-              />
-            )}
-            {lgbtqAffirming && (
-              <Pill
-                variant="lgbtq"
-                size="sm"
-                label="LGBTQ+ Safe Space"
-                className="text-white"
-              />
-            )}
+        <div className="relative hidden xl:block">
+          <div className="absolute inset-0 translate-y-6 bg-brand-soft/10 blur-3xl" />
+          <div className="relative h-full overflow-hidden">
+            <Image src={profile.avatar_url || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=900&h=1120&fit=crop"} alt={`${name} profile photo`} width={720} height={900} priority className="h-full min-h-[28rem] w-full object-cover" />
+            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-brand-primary/60 to-transparent" />
           </div>
+        </div>
 
-          {/* Name and headline */}
-          <div className="space-y-2">
-            <h1 className="font-display text-4xl font-semibold leading-tight md:text-5xl">
-              {name}
-            </h1>
-            <div className="flex items-center gap-2 text-lg text-white/90">
-              <MapPin className="h-5 w-5 flex-shrink-0 text-brand-soft" />
-              <span>{locationLabel}</span>
-            </div>
-            {profile.headline && (
-              <p className="text-base text-white/80 md:text-lg">
-                {profile.headline}
-              </p>
-            )}
-          </div>
-
-          {/* Quick facts */}
-          <div className="space-y-3 border-t border-white/20 pt-4">
-            {/* Services */}
-            {services.length > 0 && (
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-white/60">Services</p>
-                <p className="mt-1 text-sm text-white/90">
-                  {services.join(" · ")}
-                </p>
-              </div>
-            )}
-
-            {/* Session types */}
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-white/60">Session Types</p>
-              <div className="mt-1 flex flex-wrap gap-2">
-                {profile.offers_incall && (
-                  <span className="text-sm text-white/90">Incall</span>
-                )}
-                {profile.offers_outcall && (
-                  <span className="text-sm text-white/90">Outcall</span>
-                )}
-                {!profile.offers_incall && !profile.offers_outcall && (
-                  <span className="text-sm text-white/90">Direct inquiry</span>
-                )}
-              </div>
-            </div>
-
-            {/* Price */}
-            {startingPrice && (
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-white/60">Starting Price</p>
-                <p className="mt-1 text-sm font-semibold text-white">
-                  ${startingPrice} per session
-                </p>
-              </div>
-            )}
-
-            {/* Experience */}
-            {yearsExp && (
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-white/60">Experience</p>
-                <p className="mt-1 text-sm text-white/90">
-                  {yearsExp}+ years
-                </p>
-              </div>
-            )}
-
-            {/* Languages */}
-            {languages.length > 0 && (
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-white/60">Languages</p>
-                <p className="mt-1 text-sm text-white/90">
-                  {languages.join(", ")}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* CTAs */}
-          <div className="flex flex-col gap-2 sm:flex-row">
-            {smsHref && (
-              <a
-                href={smsHref}
-                onClick={() => trackContact("knotty_text_clicked")}
-                className="profile-card-cta flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold"
-              >
-                <MessageSquare className="h-4 w-4" />
-                Ask Availability
-              </a>
-            )}
-            {callHref && (
-              <a
-                href={callHref}
-                onClick={() => trackContact("knotty_call_clicked")}
-                className="flex items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15"
-              >
-                <Phone className="h-4 w-4" />
-                Call
-              </a>
-            )}
-            {!smsHref && !callHref && (
-              <a
-                href="#contact"
-                className="flex items-center justify-center rounded-lg border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15"
-              >
-                View Contact Options
-              </a>
-            )}
-          </div>
-
-          {/* Directory disclaimer */}
-          <div className="border-t border-white/20 pt-4 text-xs text-white/60">
-            <p>MasseurMatch is a directory. Confirm availability, rates, location, and session details directly with the therapist.</p>
+        <div className="px-6 pb-6 xl:hidden">
+          <div className="overflow-hidden rounded-3xl border border-white/12">
+            <Image src={profile.avatar_url || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=900&h=1120&fit=crop"} alt={`${name} profile photo`} width={720} height={900} priority className="h-72 w-full object-cover sm:h-80" />
           </div>
         </div>
       </div>
 
-      {/* Mobile photo */}
-      <div className="overflow-hidden lg:hidden">
-        <Image
-          src={profile.avatar_url || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=900&h=1120&fit=crop"}
-          alt={`${name} – massage therapist`}
-          width={720}
-          height={600}
-          priority
-          className="h-64 w-full object-cover sm:h-80"
-        />
+      <div className="border-t border-white/8 bg-white/[0.04] px-7 py-5 md:px-10">
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="flex items-center gap-3"><MapPin className="h-5 w-5 text-brand-soft" /><div><p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/50">Location</p><p className="text-sm font-semibold text-white">{neighborhood || city}</p></div></div>
+          <div className="flex items-center gap-3"><ShieldCheck className="h-5 w-5 text-brand-soft" /><div><p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/50">Experience</p><p className="text-sm font-semibold text-white">{yearsExp ? `${yearsExp}+ years` : "Professional provider"}</p></div></div>
+          <div className="flex items-center gap-3"><Clock3 className="h-5 w-5 text-brand-soft" /><div><p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/50">Session style</p><p className="text-sm font-semibold text-white">{getSessionLabel(profile)}</p></div></div>
+        </div>
       </div>
     </section>
   );

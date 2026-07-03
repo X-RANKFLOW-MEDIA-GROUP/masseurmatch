@@ -122,7 +122,7 @@ function AddonCard({
   return (
     <div
       className={cn(
-        "rounded-[1.8rem] border bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.06)] backdrop-blur",
+        "rounded-3xl border bg-white/90 p-5 shadow-[var(--shadow-md)] backdrop-blur",
         styles.border,
       )}
     >
@@ -148,7 +148,7 @@ function AddonCard({
         <p className="mt-3 text-sm leading-6 text-muted-foreground">{addon.description}</p>
       </div>
 
-      <div className="mt-5 rounded-[1.5rem] border border-border/60 bg-slate-950/[0.03] p-4">
+      <div className="mt-5 rounded-3xl border border-border/60 bg-slate-950/[0.03] p-4">
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Impact Preview</p>
         <p className="mt-2 text-sm font-medium leading-6 text-foreground">{addon.impactPreview}</p>
       </div>
@@ -210,7 +210,7 @@ export function ProviderGrowthMarketplace({
           </p>
         </div>
 
-        <Surface className="max-w-md rounded-[1.7rem] border-brand-secondary/15 bg-[linear-gradient(180deg,rgba(244,180,0,0.08),rgba(255,255,255,0.96))] p-5">
+        <Surface className="max-w-md rounded-3xl border-brand-secondary/15 bg-[linear-gradient(180deg,rgba(244,180,0,0.08),rgba(255,255,255,0.96))] p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Pricing Strategy</p>
           <ul className="mt-3 space-y-2 text-sm leading-6 text-foreground">
             <li>Low ticket impulse buys from $6 to $22</li>
@@ -229,7 +229,7 @@ export function ProviderGrowthMarketplace({
             <Surface
               key={category.id}
               className={cn(
-                "overflow-hidden rounded-[2rem] border bg-gradient-to-br p-0",
+                "overflow-hidden rounded-3xl border bg-gradient-to-br p-0",
                 styles.border,
                 styles.glow,
               )}
@@ -266,7 +266,7 @@ export function ProviderGrowthMarketplace({
           {PROVIDER_GROWTH_BUNDLES.map((bundle) => (
             <div
               key={bundle.slug}
-              className="rounded-[1.8rem] border border-border bg-white/92 p-5 shadow-[0_18px_48px_rgba(15,23,42,0.05)]"
+              className="rounded-3xl border border-border bg-white/92 p-5 shadow-[var(--shadow-md)]"
             >
               <div className="flex items-center justify-between gap-3">
                 <Badge variant="outline">{bundle.audience}</Badge>
@@ -293,7 +293,7 @@ export function ProviderGrowthMarketplace({
 
 export function ProviderGrowthQuickPicks() {
   return (
-    <Surface className="overflow-hidden rounded-[2rem] border-brand-secondary/20 bg-[linear-gradient(135deg,rgba(12,28,51,0.96),rgba(21,73,122,0.92))] p-0 text-white">
+    <Surface className="overflow-hidden rounded-3xl border-brand-secondary/20 bg-[linear-gradient(135deg,rgba(12,28,51,0.96),rgba(21,73,122,0.92))] p-0 text-white">
       <div className="grid gap-0 lg:grid-cols-[minmax(0,0.9fr),minmax(0,1.1fr)]">
         <div className="border-b border-white/10 px-6 py-6 lg:border-b-0 lg:border-r">
           <Badge className="bg-white/12 text-white hover:bg-white/12">Boost Revenue</Badge>
@@ -319,7 +319,7 @@ export function ProviderGrowthQuickPicks() {
 
         <div className="grid gap-4 px-6 py-6 md:grid-cols-3">
           {PROVIDER_GROWTH_HERO_ADDONS.map((addon) => (
-            <div key={addon.slug} className="rounded-[1.6rem] border border-white/12 bg-white/8 p-4 backdrop-blur">
+            <div key={addon.slug} className="rounded-3xl border border-white/12 bg-white/8 p-4 backdrop-blur">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/58">{addon.priceLabel}</p>
               <h3 className="mt-3 text-lg font-semibold text-white">{addon.name}</h3>
               <p className="mt-3 text-sm leading-6 text-white/72">{addon.impactPreview}</p>

@@ -23,7 +23,7 @@ export function ProfileGallery({ profile, photos }: Props) {
       <h2 className="text-2xl font-semibold text-foreground">Gallery</h2>
       <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {images.map((src, i) => (
-          <div key={`gallery-${i}`} className="profile-panel-soft overflow-hidden rounded-[1.5rem]">
+          <div key={`gallery-${i}`} className="profile-panel-soft overflow-hidden rounded-3xl">
             <Image
               src={src}
               alt={`${name} — ${city} Massage Therapist photo ${i + 1}`}

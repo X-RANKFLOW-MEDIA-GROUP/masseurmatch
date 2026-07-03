@@ -71,7 +71,14 @@ export default function CityDigestEmail({
             </Text>
           </Column>
           <Column align="right">
-            <Text className="text-emerald-600 font-mono text-[10px] uppercase tracking-widest m-0 font-semibold bg-emerald-50 px-2 py-1 rounded-sm inline-block">
+            <Text
+              className="font-mono text-[10px] uppercase tracking-widest m-0 font-semibold rounded-sm inline-block"
+              style={{
+                color: "hsl(152, 60%, 30%)",
+                backgroundColor: "hsl(152, 45%, 93%)",
+                padding: "4px 8px",
+              }}
+            >
               City Exclusive
             </Text>
           </Column>
@@ -124,7 +131,11 @@ export default function CityDigestEmail({
               <Text className="text-slate-400 font-sans text-sm m-0">with {promo.therapistName}</Text>
             </Column>
             <Column align="right">
-              <Button href={promo.url} className="bg-emerald-500 text-white px-4 py-2 rounded-md text-xs font-bold tracking-wide">
+              <Button
+                href={promo.url}
+                className="text-white px-4 py-2 rounded-md text-xs font-bold tracking-wide"
+                style={{ backgroundColor: "hsl(152, 60%, 30%)" }}
+              >
                 {promo.discount}
               </Button>
             </Column>

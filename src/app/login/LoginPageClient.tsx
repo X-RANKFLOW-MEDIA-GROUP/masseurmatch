@@ -44,7 +44,7 @@ function LoginPageContent() {
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(139,30,45,0.14),transparent_40%),radial-gradient(circle_at_82%_18%,rgba(139,30,45,0.10),transparent_34%)]" />
       <div className="pointer-events-none absolute -top-16 left-1/2 -z-10 h-56 w-56 -translate-x-1/2 rounded-full bg-red-300/20 blur-3xl" />
 
-      <div className="mx-auto max-w-5xl rounded-[32px] border border-border-subtle bg-white/85 p-4 shadow-[0_24px_60px_rgb(var(--color-brand-primary-rgb)/0.08)] backdrop-blur-xl sm:p-8">
+      <div className="mx-auto max-w-5xl rounded-[32px] border border-border-subtle bg-white/85 p-4 shadow-[var(--shadow-lg)] backdrop-blur-xl sm:p-8">
         <div className="mb-6 text-center sm:mb-8">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-text-muted">Member access</p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
@@ -70,7 +70,7 @@ function LoginPageContent() {
 function LoginFormSkeleton() {
   return (
     <div className="relative isolate overflow-hidden px-4 py-10 sm:py-14">
-      <div className="mx-auto max-w-5xl rounded-[32px] border border-border-subtle bg-white/85 p-4 shadow-[0_24px_60px_rgb(var(--color-brand-primary-rgb)/0.08)] backdrop-blur-xl sm:p-8">
+      <div className="mx-auto max-w-5xl rounded-[32px] border border-border-subtle bg-white/85 p-4 shadow-[var(--shadow-lg)] backdrop-blur-xl sm:p-8">
         <div className="mb-6 text-center sm:mb-8">
           <div className="mx-auto h-3 w-28 animate-pulse rounded-full bg-muted" />
           <div className="mx-auto mt-4 h-8 w-72 animate-pulse rounded-xl bg-muted" />

@@ -62,7 +62,7 @@ export default function ReportBlockSafetyPage() {
       />
 
       <main className="page-shell py-10">
-        <section className="rounded-[2rem] border border-border-subtle bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(244,246,250,0.96))] p-6 shadow-brand sm:p-8">
+        <section className="rounded-3xl border border-border-subtle bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(244,246,250,0.96))] p-6 shadow-brand sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-muted">Trust and Safety</p>
           <h1 className="mt-3 max-w-3xl font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
             Report, Block, and Safety Policy
@@ -74,7 +74,7 @@ export default function ReportBlockSafetyPage() {
           <p className="mt-3 text-xs text-text-muted">Last updated: June 29, 2026</p>
         </section>
 
-        <section className="mt-8 rounded-[2rem] border border-red-200 bg-red-50 p-6 sm:p-8">
+        <section className="mt-8 rounded-3xl border border-red-200 bg-red-50 p-6 sm:p-8">
           <div className="flex items-start gap-4">
             <Phone className="mt-0.5 h-5 w-5 flex-none text-red-600" strokeWidth={2.25} />
             <div>
@@ -94,7 +94,7 @@ export default function ReportBlockSafetyPage() {
 
         <section className="mt-8 grid gap-4 md:grid-cols-2">
           {reportTypes.map((item) => (
-            <article key={item.title} className="premium-surface rounded-[1.8rem] border border-border-subtle p-6 shadow-soft">
+            <article key={item.title} className="premium-surface rounded-3xl border border-border-subtle p-6 shadow-soft">
               <div className="flex items-center gap-3">
                 <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-secondary/10 text-brand-secondary">
                   <item.icon className="h-5 w-5" strokeWidth={2.25} />
@@ -112,7 +112,7 @@ export default function ReportBlockSafetyPage() {
           ))}
         </section>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <div className="flex items-start gap-4">
             <Shield className="mt-0.5 h-5 w-5 flex-none text-brand-secondary" strokeWidth={2.25} />
             <div>
@@ -138,7 +138,7 @@ export default function ReportBlockSafetyPage() {
           </div>
         </section>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <h2 className="font-display text-2xl font-semibold tracking-tight text-foreground">Blocking</h2>
           <div className="mt-5 space-y-3 text-sm leading-7 text-text-secondary">
             <p>
@@ -154,7 +154,7 @@ export default function ReportBlockSafetyPage() {
           </div>
         </section>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <h2 className="mb-5 font-display text-2xl font-semibold tracking-tight text-foreground">Safety tips</h2>
           <ul className="space-y-3">
             {safetyTips.map((tip, i) => (
@@ -168,7 +168,7 @@ export default function ReportBlockSafetyPage() {
           </ul>
         </section>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <h2 className="font-display text-xl font-semibold tracking-tight text-foreground">Platform limits</h2>
           <p className="mt-4 text-sm leading-7 text-text-secondary">
             MasseurMatch is a directory platform. We do not accompany users to sessions, cannot verify what
@@ -182,7 +182,7 @@ export default function ReportBlockSafetyPage() {
           </p>
         </section>
 
-        <section className="mt-8 rounded-[2rem] border border-border-subtle bg-brand-primary px-6 py-7 text-white shadow-brand sm:px-8">
+        <section className="mt-8 rounded-3xl border border-border-subtle bg-brand-primary px-6 py-7 text-white shadow-brand sm:px-8">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-brand-soft">Related Policies</p>
           <div className="mt-5 flex flex-wrap gap-3 text-sm font-semibold">
             {[

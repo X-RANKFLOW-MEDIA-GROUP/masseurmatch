@@ -52,7 +52,7 @@ export function StaggerReveal({
             filter: "blur(0px)",
           }}
           viewport={{ once: true, margin: "-40px" }}
-          transition={{ duration: 0.55, ease, delay: i * stagger }}
+          transition={{ duration: 0.6, ease, delay: i * stagger }}
         >
           {child}
         </motion.div>

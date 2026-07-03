@@ -108,7 +108,7 @@ export default function SignupEntryPage() {
               key={plan.tier}
               className={
                 plan.popular
-                  ? "relative border-brand-secondary/40 shadow-[0_12px_32px_rgb(var(--color-brand-secondary-rgb)/0.12)]"
+                  ? "relative border-brand-secondary/40 shadow-[var(--shadow-sm)]"
                   : ""
               }
             >
