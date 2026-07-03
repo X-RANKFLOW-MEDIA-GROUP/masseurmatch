@@ -21,7 +21,7 @@ type Ticket = {
 export default function AdminTicketsPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "open" | "urgent">("all");
+  const [filter, setFilter] = useState<"all" | "open" | "in_progress">("all");
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -51,7 +51,6 @@ export default function AdminTicketsPage() {
 
   const filteredTickets = tickets.filter((ticket) => {
     if (filter !== "all" && ticket.status !== filter) return false;
-    if (filter === "urgent" && ticket.priority !== "urgent") return false;
     if (search && !ticket.title.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
@@ -80,12 +79,11 @@ export default function AdminTicketsPage() {
             Open
           </Button>
           <Button
-            variant={filter === "urgent" ? "default" : "outline"}
-            onClick={() => setFilter("urgent")}
+            variant={filter === "in_progress" ? "default" : "outline"}
+            onClick={() => setFilter("in_progress")}
             size="sm"
-            className="text-red-600"
           >
-            🔴 Urgent
+            In Progress
           </Button>
         </div>
         <Input

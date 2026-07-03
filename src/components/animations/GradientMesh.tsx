@@ -51,6 +51,7 @@ export const GradientMesh = () => (
           background: `radial-gradient(circle, rgb(${blob.color} / ${blob.opacity}) 0%, transparent 70%)`,
           top: `${20 + i * 15}%`,
           left: `${10 + i * 20}%`,
+          willChange: "transform",
         }}
         animate={{
           x: blob.x,
@@ -66,7 +67,6 @@ export const GradientMesh = () => (
           stiffness: 80,
           damping: 25,
         }}
-        style={{ willChange: "transform" }}
       />
     ))}
     <div className="absolute inset-0 noise-bg opacity-30" />
