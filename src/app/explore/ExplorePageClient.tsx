@@ -453,7 +453,7 @@ function ProviderCard({
           </div>
         </div>
 
-        <div className="profile-card-plane relative mx-2 -mt-8 rounded-[1.6rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,246,250,0.92))] p-5 shadow-[0_24px_48px_rgb(var(--color-brand-primary-rgb)/0.1)] backdrop-blur-2xl">
+        <div className="profile-card-plane relative mx-2 -mt-8 rounded-3xl border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,246,250,0.92))] p-5 shadow-[0_24px_48px_rgb(var(--color-brand-primary-rgb)/0.1)] backdrop-blur-2xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-secondary">
             {provider.specialty}
           </p>

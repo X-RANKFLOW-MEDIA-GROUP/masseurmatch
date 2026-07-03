@@ -122,7 +122,7 @@ function AddonCard({
   return (
     <div
       className={cn(
-        "rounded-[1.8rem] border bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.06)] backdrop-blur",
+        "rounded-3xl border bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.06)] backdrop-blur",
         styles.border,
       )}
     >
@@ -210,7 +210,7 @@ export function ProviderGrowthMarketplace({
           </p>
         </div>
 
-        <Surface className="max-w-md rounded-[1.7rem] border-brand-secondary/15 bg-[linear-gradient(180deg,rgba(244,180,0,0.08),rgba(255,255,255,0.96))] p-5">
+        <Surface className="max-w-md rounded-3xl border-brand-secondary/15 bg-[linear-gradient(180deg,rgba(244,180,0,0.08),rgba(255,255,255,0.96))] p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Pricing Strategy</p>
           <ul className="mt-3 space-y-2 text-sm leading-6 text-foreground">
             <li>Low ticket impulse buys from $6 to $22</li>
@@ -266,7 +266,7 @@ export function ProviderGrowthMarketplace({
           {PROVIDER_GROWTH_BUNDLES.map((bundle) => (
             <div
               key={bundle.slug}
-              className="rounded-[1.8rem] border border-border bg-white/92 p-5 shadow-[0_18px_48px_rgba(15,23,42,0.05)]"
+              className="rounded-3xl border border-border bg-white/92 p-5 shadow-[0_18px_48px_rgba(15,23,42,0.05)]"
             >
               <div className="flex items-center justify-between gap-3">
                 <Badge variant="outline">{bundle.audience}</Badge>
@@ -319,7 +319,7 @@ export function ProviderGrowthQuickPicks() {
 
         <div className="grid gap-4 px-6 py-6 md:grid-cols-3">
           {PROVIDER_GROWTH_HERO_ADDONS.map((addon) => (
-            <div key={addon.slug} className="rounded-[1.6rem] border border-white/12 bg-white/8 p-4 backdrop-blur">
+            <div key={addon.slug} className="rounded-3xl border border-white/12 bg-white/8 p-4 backdrop-blur">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/58">{addon.priceLabel}</p>
               <h3 className="mt-3 text-lg font-semibold text-white">{addon.name}</h3>
               <p className="mt-3 text-sm leading-6 text-white/72">{addon.impactPreview}</p>

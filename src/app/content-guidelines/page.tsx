@@ -87,7 +87,7 @@ export default function ContentGuidelinesPage() {
           {pillars.map((item) => (
             <article
               key={item.title}
-              className="premium-surface rounded-[1.8rem] border border-border-subtle p-6 shadow-soft"
+              className="premium-surface rounded-3xl border border-border-subtle p-6 shadow-soft"
             >
               <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-secondary/10 text-brand-secondary">
                 <item.icon className="h-5 w-5" strokeWidth={2.25} />

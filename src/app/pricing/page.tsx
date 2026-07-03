@@ -122,7 +122,7 @@ export default function PricingPage() {
           </div>
 
           {/* Market anchoring strip */}
-          <div className="mx-auto mt-8 max-w-3xl rounded-[1.6rem] border border-badge-promo-border/60 bg-badge-promo-light/70 px-6 py-4">
+          <div className="mx-auto mt-8 max-w-3xl rounded-3xl border border-badge-promo-border/60 bg-badge-promo-light/70 px-6 py-4">
             <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-badge-promo">How we compare</p>
             <div className="mt-3 grid grid-cols-3 gap-3 text-center">
               <div>
@@ -140,17 +140,17 @@ export default function PricingPage() {
           </div>
 
           <div className="mx-auto mt-10 grid max-w-5xl gap-4 md:grid-cols-3">
-            <div className="rounded-[1.8rem] border border-border bg-white/92 p-5 text-left shadow-[0_18px_48px_rgba(15,23,42,0.05)]">
+            <div className="rounded-3xl border border-border bg-white/92 p-5 text-left shadow-[0_18px_48px_rgba(15,23,42,0.05)]">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Trial</p>
               <p className="mt-3 text-2xl font-semibold text-foreground">14 days on paid tiers</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">Let therapists experience the visibility lift before the first paid cycle starts.</p>
             </div>
-            <div className="rounded-[1.8rem] border border-border bg-white/92 p-5 text-left shadow-[0_18px_48px_rgba(15,23,42,0.05)]">
+            <div className="rounded-3xl border border-border bg-white/92 p-5 text-left shadow-[0_18px_48px_rgba(15,23,42,0.05)]">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Founder offer</p>
               <p className="mt-3 text-2xl font-semibold text-foreground">50% off first 3 months</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">A strong pricing anchor that improves early conversion without discounting the full catalog long term.</p>
             </div>
-            <div className="rounded-[1.8rem] border border-border bg-white/92 p-5 text-left shadow-[0_18px_48px_rgba(15,23,42,0.05)]">
+            <div className="rounded-3xl border border-border bg-white/92 p-5 text-left shadow-[0_18px_48px_rgba(15,23,42,0.05)]">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Monetization mix</p>
               <p className="mt-3 text-2xl font-semibold text-foreground">$6 to $59 add-ons</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">Low-ticket impulse buys, recurring SaaS upgrades, and premium scarce inventory are all designed to stack.</p>
@@ -218,7 +218,7 @@ export default function PricingPage() {
             {strategyCards.map((card) => (
               <div
                 key={card.title}
-                className="rounded-[1.8rem] border border-border bg-white/92 p-6 shadow-[0_18px_48px_rgba(15,23,42,0.05)]"
+                className="rounded-3xl border border-border bg-white/92 p-6 shadow-[0_18px_48px_rgba(15,23,42,0.05)]"
               >
                 <card.icon className="h-5 w-5 text-brand-secondary" />
                 <h3 className="font-display mt-4 text-2xl font-semibold tracking-tight text-foreground">{card.title}</h3>

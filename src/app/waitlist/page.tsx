@@ -408,7 +408,7 @@ export default function WaitlistPage() {
               {therapistFeatures.map((f) => {
                 const Icon = f.icon;
                 return (
-                  <div key={f.title} className="rounded-[1.6rem] border border-[#E8E8E8] bg-white p-6 shadow-[0_4px_24px_rgba(15,23,42,0.04)]">
+                  <div key={f.title} className="rounded-3xl border border-[#E8E8E8] bg-white p-6 shadow-[0_4px_24px_rgba(15,23,42,0.04)]">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F8EDEE] text-[#8B1E2D]">
                       <Icon className="h-5 w-5" strokeWidth={2.25} />
                     </div>
@@ -438,7 +438,7 @@ export default function WaitlistPage() {
               {clientFeatures.map((f) => {
                 const Icon = f.icon;
                 return (
-                  <div key={f.title} className="rounded-[1.6rem] border border-[#E8E8E8] bg-white p-6 shadow-[0_4px_24px_rgba(15,23,42,0.04)]">
+                  <div key={f.title} className="rounded-3xl border border-[#E8E8E8] bg-white p-6 shadow-[0_4px_24px_rgba(15,23,42,0.04)]">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F8EDEE] text-[#8B1E2D]">
                       <Icon className="h-5 w-5" strokeWidth={2.25} />
                     </div>

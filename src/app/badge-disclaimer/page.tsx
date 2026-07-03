@@ -86,7 +86,7 @@ export default function BadgeDisclaimerPage() {
           <h2 className="font-display text-2xl font-semibold tracking-tight text-foreground">What each badge means</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {badgeTypes.map((badge) => (
-              <article key={badge.name} className="premium-surface rounded-[1.8rem] border border-border-subtle p-6 shadow-soft">
+              <article key={badge.name} className="premium-surface rounded-3xl border border-border-subtle p-6 shadow-soft">
                 <div className="flex items-center gap-3">
                   <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-secondary/10 text-brand-secondary">
                     <badge.icon className="h-5 w-5" strokeWidth={2.25} />

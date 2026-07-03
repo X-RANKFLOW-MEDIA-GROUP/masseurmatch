@@ -76,7 +76,7 @@ export default function LegalPage() {
                 </div>
               </div>
 
-              <div className="rounded-[1.8rem] border border-border-subtle bg-[#fbfcfe] p-5">
+              <div className="rounded-3xl border border-border-subtle bg-[#fbfcfe] p-5">
                 <div className="flex items-center gap-3 text-brand-secondary">
                   <Scale className="h-5 w-5" />
                   <p className="text-sm font-semibold uppercase tracking-[0.22em]">Last reviewed</p>
@@ -94,7 +94,7 @@ export default function LegalPage() {
             {LEGAL_QUICK_FACTS.map((fact) => (
               <article
                 key={fact.label}
-                className="rounded-[1.6rem] border border-border-subtle bg-white px-5 py-5 shadow-[0_16px_40px_rgba(11,31,58,0.05)]"
+                className="rounded-3xl border border-border-subtle bg-white px-5 py-5 shadow-[0_16px_40px_rgba(11,31,58,0.05)]"
               >
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-text-muted">{fact.label}</p>
                 <p className="mt-3 font-display text-2xl font-semibold tracking-tight text-foreground">{fact.value}</p>
@@ -170,7 +170,7 @@ export default function LegalPage() {
                     ) : null}
                   </div>
 
-                  <div className="rounded-[1.6rem] border border-border-subtle bg-[#fbfcfe] p-5">
+                  <div className="rounded-3xl border border-border-subtle bg-[#fbfcfe] p-5">
                     <div className="flex items-center gap-2 text-brand-secondary">
                       <IconShield size={20} />
                       <p className="text-sm font-semibold uppercase tracking-[0.22em]">Key points</p>
@@ -228,7 +228,7 @@ export default function LegalPage() {
                 </p>
               </div>
 
-              <div className="rounded-[1.6rem] border border-border-subtle bg-[#fbfcfe] px-5 py-5">
+              <div className="rounded-3xl border border-border-subtle bg-[#fbfcfe] px-5 py-5">
                 <div className="flex items-center gap-3 text-brand-secondary">
                   <IconClock size={20} />
                   <p className="text-sm font-semibold uppercase tracking-[0.22em]">Mailing location</p>
@@ -241,7 +241,7 @@ export default function LegalPage() {
               </div>
             </div>
 
-            <div className="mt-6 overflow-hidden rounded-[1.6rem] border border-border-subtle">
+            <div className="mt-6 overflow-hidden rounded-3xl border border-border-subtle">
               <div className="hidden grid-cols-[minmax(0,1.5fr)_minmax(220px,0.8fr)_minmax(180px,0.7fr)] bg-[#f7f9fc] px-5 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-text-muted md:grid">
                 <p>Matter</p>
                 <p>Email</p>
@@ -296,7 +296,7 @@ export default function LegalPage() {
                   below asks for your name, email, phone, subject, and message exactly so the request can be routed
                   correctly.
                 </p>
-                <div className="mt-6 rounded-[1.6rem] border border-brand-soft/40 bg-brand-soft/10 px-5 py-5">
+                <div className="mt-6 rounded-3xl border border-brand-soft/40 bg-brand-soft/10 px-5 py-5">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-text-muted">Helpful details to include</p>
                   <ul className="mt-3 space-y-2 text-sm leading-7 text-text-secondary">
                     <li>Account email or listing URL if the request is tied to a profile.</li>
@@ -306,7 +306,7 @@ export default function LegalPage() {
                 </div>
               </div>
 
-              <div className="rounded-[1.8rem] border border-border-subtle bg-[#fbfcfe] p-5 sm:p-6">
+              <div className="rounded-3xl border border-border-subtle bg-[#fbfcfe] p-5 sm:p-6">
                 <LegalContactForm />
               </div>
             </div>

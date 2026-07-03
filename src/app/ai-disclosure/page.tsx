@@ -94,7 +94,7 @@ export default function AiDisclosurePage() {
             {limitations.map((item) => (
               <div
                 key={item.heading}
-                className="premium-surface rounded-[1.8rem] border border-border-subtle p-5 shadow-soft"
+                className="premium-surface rounded-3xl border border-border-subtle p-5 shadow-soft"
               >
                 <div className="flex items-start gap-3">
                   <TriangleAlert className="mt-0.5 h-4 w-4 flex-none text-amber-500" strokeWidth={2.25} />

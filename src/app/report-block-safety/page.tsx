@@ -94,7 +94,7 @@ export default function ReportBlockSafetyPage() {
 
         <section className="mt-8 grid gap-4 md:grid-cols-2">
           {reportTypes.map((item) => (
-            <article key={item.title} className="premium-surface rounded-[1.8rem] border border-border-subtle p-6 shadow-soft">
+            <article key={item.title} className="premium-surface rounded-3xl border border-border-subtle p-6 shadow-soft">
               <div className="flex items-center gap-3">
                 <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-secondary/10 text-brand-secondary">
                   <item.icon className="h-5 w-5" strokeWidth={2.25} />
