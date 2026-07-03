@@ -20,7 +20,8 @@ export async function GET(request: Request) {
       .from("therapist_photos")
       .select("id, storage_path, public_url, photo_type, sort_order, status, rejection_reason, created_at")
       .eq("user_id", session.userId)
-      .order("sort_order", { ascending: true });
+      .order("sort_order", { ascending: true })
+      .limit(100); // Most therapists won't exceed 100 photos
 
     if (error) throw new RouteError(500, error.message);
 

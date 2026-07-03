@@ -95,7 +95,22 @@ function parseProfilePayload(raw: unknown) {
 export async function GET(request: Request) {
   try {
     const session = requireRequestSession(request);
-    const profile = await getProfileByUserId(session.userId);
+    const admin = createSupabaseAdminClient();
+
+    // Check if this is a dashboard request (minimal data needed)
+    const isDashboard = new URL(request.url).searchParams.get("dashboard") === "true";
+
+    const select = isDashboard
+      ? "id, display_name, full_name, bio, city, state, status, is_active, available_now, available_now_expires, specialties, incall_price, outcall_price, subscription_tier, is_featured"
+      : "*"; // Full select for other requests
+
+    const { data: profile, error } = await admin
+      .from("profiles")
+      .select(select)
+      .eq("user_id", session.userId)
+      .maybeSingle();
+
+    if (error) throw new RouteError(500, error.message);
 
     return json({ ok: true, profile });
   } catch (error) {

@@ -47,7 +47,8 @@ export async function GET(request: Request) {
       .eq("therapist_id", profile.id)
       .eq("event_name", "profile_viewed")
       .gte("created_at", since.toISOString())
-      .limit(10000); // Safety limit to prevent huge queries
+      .order("created_at", { ascending: false })
+      .limit(100); // 30 days of data; even heavily visited profiles stay under 100
 
     if (eventsError) throw new RouteError(500, eventsError.message);
 

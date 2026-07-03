@@ -9,6 +9,10 @@ export async function GET(request: NextRequest) {
     const session = requireRequestSession(request as unknown as Request);
     const supabase = createSupabaseAdminClient();
 
+    const { searchParams } = new URL(request.url);
+    const offset = Math.max(0, parseInt(searchParams.get('offset') || '0'));
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '50')));
+
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('id')
@@ -19,17 +23,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ ok: false, error: profileError.message }, { status: 500 });
     }
     if (!profile) {
-      return NextResponse.json({ ok: true, inquiries: [] });
+      return NextResponse.json({ ok: true, inquiries: [], total: 0 });
     }
+
+    // Get total count for pagination
+    const { count } = await supabase
+      .from('contact_inquiries')
+      .select('id', { count: 'exact', head: true })
+      .eq('profile_id', profile.id);
 
     const { data, error } = await supabase
       .from('contact_inquiries')
       .select('*')
       .eq('profile_id', profile.id)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
 
     if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
-    return NextResponse.json({ ok: true, inquiries: data ?? [] });
+    return NextResponse.json({ ok: true, inquiries: data ?? [], total: count ?? 0 });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     const status = (err as { status?: number }).status ?? 500;

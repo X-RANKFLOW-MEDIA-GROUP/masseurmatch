@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback, memo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -133,7 +133,123 @@ function computePlacement(profile: ProfileData | null, completion: number): Plac
   return { score, grade, factors };
 }
 
-function ProfileStatusBanner({ status }: { status: string }) {
+// Memoized profile completion card
+const ProfileCard = memo(function ProfileCard({
+  displayName,
+  completion,
+  profileLoading
+}: {
+  displayName: string;
+  completion: number;
+  profileLoading: boolean
+}) {
+  return (
+    <motion.div
+      variants={fadeUp}
+      initial="hidden"
+      animate="show"
+      className="relative overflow-hidden border border-slate-200/60 bg-white p-6 shadow-sm"
+    >
+      <div className="flex items-center gap-4">
+        <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-tr from-emerald-400 to-emerald-600">
+          <UserCircle className="relative h-10 w-10 text-white" />
+        </div>
+        <div>
+          <h2 className="font-display text-xl font-medium text-slate-900">
+            {displayName}
+          </h2>
+          <div className="mt-0.5 flex items-center gap-1">
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+            <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">
+              Pro Member
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6">
+        <div className="mb-2 flex justify-between text-xs">
+          <span className="font-mono uppercase tracking-wider text-slate-500">
+            Profile Completion
+          </span>
+          <span className="font-mono font-semibold text-slate-900">
+            {profileLoading ? "…" : `${completion}%`}
+          </span>
+        </div>
+        <div className="h-1.5 w-full overflow-hidden bg-slate-100">
+          {!profileLoading && (
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${completion}%` }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="h-full bg-slate-900"
+            />
+          )}
+        </div>
+        {!profileLoading && completion < 100 && (
+          <p className="mt-2 text-[11px] text-slate-500">
+            <Link href="/pro/listing" className="text-indigo-600 underline">
+              Complete your profile
+            </Link>{" "}
+            to appear in more searches.
+          </p>
+        )}
+      </div>
+    </motion.div>
+  );
+});
+
+// Memoized availability status card
+const AvailabilityCard = memo(function AvailabilityCard({
+  activeStatus,
+  statusSaving,
+  onStatusChange
+}: {
+  activeStatus: AvailabilityStatus;
+  statusSaving: boolean;
+  onStatusChange: (status: AvailabilityStatus) => void;
+}) {
+  return (
+    <motion.div
+      variants={fadeUp}
+      initial="hidden"
+      animate="show"
+      transition={{ delay: 0.1 }}
+      className="border border-slate-800 bg-slate-950 p-6 text-white shadow-xl"
+    >
+      <h3 className="mb-4 font-mono text-xs uppercase tracking-widest text-slate-400">
+        Availability
+      </h3>
+
+      <div className="grid grid-cols-2 gap-3">
+        {statusOptions.map((option) => {
+          const isActive = activeStatus === option.key;
+          const colors = colorMap[option.color];
+
+          return (
+            <button
+              key={option.key}
+              onClick={() => onStatusChange(option.key)}
+              disabled={statusSaving}
+              className={`flex flex-col items-center justify-center gap-2 border p-4 transition-all duration-300 disabled:opacity-60 ${
+                isActive ? colors.active : colors.idle
+              }`}
+            >
+              <option.icon className="h-6 w-6" />
+              <span className="font-sans text-xs font-medium">{option.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="mt-4 border border-white/10 bg-white/5 p-3 font-sans text-xs leading-relaxed text-slate-300">
+        {statusMessages[activeStatus]}
+      </div>
+    </motion.div>
+  );
+});
+
+const ProfileStatusBanner = memo(function ProfileStatusBanner({ status }: { status: string }) {
   if (status === "active") {
     return (
       <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
@@ -170,7 +286,7 @@ function ProfileStatusBanner({ status }: { status: string }) {
       </Link>
     </div>
   );
-}
+});
 
 export default function DashboardHome() {
   const router = useRouter();
@@ -181,16 +297,18 @@ export default function DashboardHome() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
 
-  const displayName = (() => {
+  // Memoize display name computation
+  const displayName = useMemo(() => {
     const meta = (
       user as { user_metadata?: { full_name?: string; name?: string } } | null
     )?.user_metadata;
     const name = meta?.full_name || meta?.name || user?.email?.split("@")[0] || "Pro";
     return name.split(" ")[0].slice(0, 20);
-  })();
+  }, [user]);
 
   useEffect(() => {
-    requestJson<{ ok: boolean; profile: ProfileData | null }>("/api/pro/profile")
+    // Fetch only dashboard-needed fields for better performance
+    requestJson<{ ok: boolean; profile: ProfileData | null }>("/api/pro/profile?dashboard=true")
       .then((data) => {
         setProfile(data.profile);
         if (data.profile?.available_now) {
@@ -209,7 +327,8 @@ export default function DashboardHome() {
       .finally(() => setProfileLoading(false));
   }, [router]);
 
-  async function handleStatusChange(status: AvailabilityStatus) {
+  // Memoize status change handler to prevent child re-renders
+  const handleStatusChange = useCallback(async (status: AvailabilityStatus) => {
     setActiveStatus(status);
     setStatusSaving(true);
     try {
@@ -222,10 +341,11 @@ export default function DashboardHome() {
     } finally {
       setStatusSaving(false);
     }
-  }
+  }, []);
 
-  const completion = computeCompletion(profile);
-  const placement = computePlacement(profile, completion);
+  // Memoize expensive computations
+  const completion = useMemo(() => computeCompletion(profile), [profile]);
+  const placement = useMemo(() => computePlacement(profile, completion), [profile, completion]);
   const profileStatus = profile?.status ?? "draft";
 
   return (
@@ -259,95 +379,16 @@ export default function DashboardHome() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            className="relative overflow-hidden border border-slate-200/60 bg-white p-6 shadow-sm"
-          >
-            <div className="flex items-center gap-4">
-              <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-tr from-emerald-400 to-emerald-600">
-                <UserCircle className="relative h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h2 className="font-display text-xl font-medium text-slate-900">
-                  {displayName}
-                </h2>
-                <div className="mt-0.5 flex items-center gap-1">
-                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">
-                    Pro Member
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <div className="mb-2 flex justify-between text-xs">
-                <span className="font-mono uppercase tracking-wider text-slate-500">
-                  Profile Completion
-                </span>
-                <span className="font-mono font-semibold text-slate-900">
-                  {profileLoading ? "…" : `${completion}%`}
-                </span>
-              </div>
-              <div className="h-1.5 w-full overflow-hidden bg-slate-100">
-                {!profileLoading && (
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${completion}%` }}
-                    transition={{ duration: 0.8, delay: 0.3 }}
-                    className="h-full bg-slate-900"
-                  />
-                )}
-              </div>
-              {!profileLoading && completion < 100 && (
-                <p className="mt-2 text-[11px] text-slate-500">
-                  <Link href="/pro/listing" className="text-indigo-600 underline">
-                    Complete your profile
-                  </Link>{" "}
-                  to appear in more searches.
-                </p>
-              )}
-            </div>
-          </motion.div>
-
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            transition={{ delay: 0.1 }}
-            className="border border-slate-800 bg-slate-950 p-6 text-white shadow-xl"
-          >
-            <h3 className="mb-4 font-mono text-xs uppercase tracking-widest text-slate-400">
-              Availability
-            </h3>
-
-            <div className="grid grid-cols-2 gap-3">
-              {statusOptions.map((option) => {
-                const isActive = activeStatus === option.key;
-                const colors = colorMap[option.color];
-
-                return (
-                  <button
-                    key={option.key}
-                    onClick={() => handleStatusChange(option.key)}
-                    disabled={statusSaving}
-                    className={`flex flex-col items-center justify-center gap-2 border p-4 transition-all duration-300 disabled:opacity-60 ${
-                      isActive ? colors.active : colors.idle
-                    }`}
-                  >
-                    <option.icon className="h-6 w-6" />
-                    <span className="font-sans text-xs font-medium">{option.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="mt-4 border border-white/10 bg-white/5 p-3 font-sans text-xs leading-relaxed text-slate-300">
-              {statusMessages[activeStatus]}
-            </div>
-          </motion.div>
+          <ProfileCard
+            displayName={displayName}
+            completion={completion}
+            profileLoading={profileLoading}
+          />
+          <AvailabilityCard
+            activeStatus={activeStatus}
+            statusSaving={statusSaving}
+            onStatusChange={handleStatusChange}
+          />
         </div>
 
         <div className="space-y-6 lg:col-span-2">
