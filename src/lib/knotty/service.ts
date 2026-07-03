@@ -42,6 +42,9 @@ const PROFILE_SELECT = [
   "years_experience",
   "start_year",
   "training",
+  "education",
+  "languages_spoken",
+  "business_hours",
   "latitude",
   "longitude",
   "boost_score",
@@ -87,6 +90,21 @@ function getLatestUserMessage(payload: KnottyRequestPayload) {
 }
 
 function toCandidate(item: Record<string, unknown>) {
+  const parseJsonArray = (value: unknown): string[] | null => {
+    if (Array.isArray(value)) {
+      return value.filter((v) => typeof v === "string");
+    }
+    if (typeof value === "string") {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed.filter((v) => typeof v === "string") : null;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
   return {
     id: String(item.id),
     slug: typeof item.slug === "string" ? item.slug : null,
@@ -136,6 +154,12 @@ function toCandidate(item: Record<string, unknown>) {
     years_experience: typeof item.years_experience === "number" ? item.years_experience : null,
     start_year: typeof item.start_year === "number" ? item.start_year : null,
     training: Array.isArray(item.training) ? (item.training as Array<Record<string, unknown>>) : null,
+    education: typeof item.education === "string" ? item.education : null,
+    languages_spoken: parseJsonArray(item.languages_spoken) || undefined,
+    business_hours:
+      typeof item.business_hours === "object" && item.business_hours !== null
+        ? (item.business_hours as Record<string, unknown>)
+        : undefined,
     latitude: typeof item.latitude === "number" ? item.latitude : null,
     longitude: typeof item.longitude === "number" ? item.longitude : null,
     boost_score: typeof item.boost_score === "number" ? item.boost_score : null,
@@ -339,8 +363,9 @@ function formatCandidateLine(c: KnottyCandidate, rank: number): string {
     c.years_experience ? `${c.years_experience} yrs exp` : null,
   ].filter(Boolean).join(", ");
   const specialties = c.specialties?.slice(0, 3).join(", ") || null;
+  const languages = c.languages_spoken?.slice(0, 2).join(", ") || null;
 
-  const meta = [loc, price, flags, specialties ? `specialties: ${specialties}` : null]
+  const meta = [loc, price, flags, specialties ? `specialties: ${specialties}` : null, languages ? `languages: ${languages}` : null]
     .filter(Boolean)
     .join(" · ");
 
@@ -409,6 +434,7 @@ function buildKnottySystemPrompt(input: {
     input.candidates.slice(0, 8).forEach((c, i) => {
       lines.push(formatCandidateLine(c, i + 1));
     });
+    lines.push("", "Note: Each therapist profile includes training, education, languages spoken, and business hours. Use this information to make personalized recommendations.");
   } else {
     lines.push("", "No therapist data is available for this location yet. Encourage the person to browse /explore or /search.");
   }
