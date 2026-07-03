@@ -21,7 +21,7 @@ function Pillar({ icon: Icon, title, text }: { icon: React.ComponentType<{ size?
 function Stat({ value, label }: { value: string; label: string }) {
   return (
     <div className="text-center">
-      <p className="font-display text-[clamp(2rem,4vw,3.5rem)] font-extrabold leading-none tracking-tight text-white">
+      <p className="font-display text-[clamp(1.75rem,3vw,2.5rem)] font-extrabold leading-tight tracking-tight text-white break-words">
         {value}
       </p>
       <p className="mt-2 text-sm font-medium text-white/50">{label}</p>
@@ -74,7 +74,7 @@ export default function AboutContent() {
           initial={reduced ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.18 }}
-          className="relative mx-auto mt-16 grid max-w-3xl grid-cols-3 gap-8 border-t border-white/[0.08] pt-12"
+          className="relative mx-auto mt-16 grid max-w-4xl grid-cols-1 gap-8 border-t border-white/[0.08] pt-12 sm:grid-cols-3"
         >
           <Stat value="Nationwide" label="City pages across the US" />
           <Stat value="Specialized" label="Deep tissue, Swedish & more" />
