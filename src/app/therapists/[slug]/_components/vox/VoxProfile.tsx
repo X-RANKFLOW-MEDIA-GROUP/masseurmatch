@@ -433,8 +433,9 @@ export function VoxProfile({
                   <h3 className="mb-3 text-sm font-semibold text-[#111111]">Training</h3>
                   <ul className="space-y-2">
                     {training.map((item, idx) => {
-                      const itemRecord = typeof item === "string" ? { label: item } : (item as Record<string, string | undefined>);
-                      const label = String(itemRecord?.label ?? item);
+                      const itemRecord = typeof item === "string" ? { label: item } : (item as Record<string, unknown>);
+                      const labelValue = itemRecord?.label || item;
+                      const label: string = typeof labelValue === "string" ? labelValue : String(labelValue);
                       const detail = itemRecord?.detail ?? null;
                       const institution = itemRecord?.institution ?? null;
                       return (
