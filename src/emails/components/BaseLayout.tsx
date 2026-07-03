@@ -15,7 +15,7 @@ export default function BaseLayout({ previewText, children }: BaseLayoutProps) {
       </Head>
       <Tailwind>
         <Body className="bg-slate-50 my-auto mx-auto font-sans px-2">
-          <Container className="border border-slate-200 border-solid mt-[40px] mb-[40px] mx-auto p-[0px] w-[600px] bg-white shadow-sm">
+          <Container className="border border-slate-200 border-solid mt-10 mb-10 mx-auto p-0 w-[600px] bg-white shadow-sm">
             
             {/* Luxury Dark Header */}
             <Section className="bg-slate-950 py-8 px-10 text-center">

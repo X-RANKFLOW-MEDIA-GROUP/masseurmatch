@@ -1528,7 +1528,7 @@ export default function ExplorePageClient({
 
         <section className="mt-6 grid gap-6 lg:grid-cols-[300px,minmax(0,1fr)]">
           <aside className="relative hidden lg:block">
-            <div className="sticky top-[98px] overflow-hidden rounded-[32px] border border-border-subtle bg-white/88 p-6 shadow-[0_28px_64px_rgb(var(--color-brand-primary-rgb)/0.07)] backdrop-blur-2xl">
+            <div className="sticky top-24 overflow-hidden rounded-[32px] border border-border-subtle bg-white/88 p-6 shadow-[0_28px_64px_rgb(var(--color-brand-primary-rgb)/0.07)] backdrop-blur-2xl">
               <div className="mb-6 flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-text-muted">Filters</p>
