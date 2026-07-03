@@ -100,7 +100,7 @@ export async function POST(
     if (action === "approve") {
       const { data: profile } = await supabase
         .from("profiles")
-        .select("email_address, slug, display_name")
+        .select("email_address, slug, display_name, user_id")
         .eq("id", id)
         .single();
 
@@ -113,6 +113,34 @@ export async function POST(
             profileUrl: `https://masseurmatch.com/therapists/${profileSlug}`,
             dashboardUrl: "https://masseurmatch.com/pro/dashboard",
           }),
+        });
+      }
+
+      // Create in-app notification
+      if (profile?.user_id) {
+        await supabase.from("notifications").insert({
+          user_id: profile.user_id,
+          type: "profile_approved",
+          title: "Profile Approved!",
+          body: "Your therapist profile has been reviewed and approved. It's now visible to clients.",
+          metadata: { profile_id: id, slug: profile.slug },
+        });
+      }
+    } else if (action === "reject") {
+      // Create rejection notification
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("user_id")
+        .eq("id", id)
+        .single();
+
+      if (profile?.user_id) {
+        await supabase.from("notifications").insert({
+          user_id: profile.user_id,
+          type: "profile_rejected",
+          title: "Profile Review Complete",
+          body: `Your profile needs adjustments before it can be approved. Reason: ${notes || "Please review your profile and try again."}`,
+          metadata: { profile_id: id, reason: notes },
         });
       }
     }
