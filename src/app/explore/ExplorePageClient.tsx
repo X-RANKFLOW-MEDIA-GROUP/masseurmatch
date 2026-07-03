@@ -453,7 +453,7 @@ function ProviderCard({
           </div>
         </div>
 
-        <div className="profile-card-plane relative mx-2 -mt-8 rounded-3xl border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,246,250,0.92))] p-5 shadow-[0_24px_48px_rgb(var(--color-brand-primary-rgb)/0.1)] backdrop-blur-2xl">
+        <div className="profile-card-plane relative mx-2 -mt-8 rounded-3xl border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,246,250,0.92))] p-5 shadow-[var(--shadow-lg)] backdrop-blur-2xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-secondary">
             {provider.specialty}
           </p>
@@ -1406,19 +1406,19 @@ export default function ExplorePageClient({
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-              <div className="rounded-[28px] border border-white/40 bg-white/78 p-5 shadow-[0_20px_40px_rgb(var(--color-brand-primary-rgb)/0.08)] backdrop-blur-2xl">
+              <div className="rounded-[28px] border border-white/40 bg-white/78 p-5 shadow-[var(--shadow-lg)] backdrop-blur-2xl">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-text-muted">Available Now</p>
                 <p className="mt-3 text-3xl font-semibold text-text-primary">{availableNowCount}</p>
                 <p className="mt-2 text-sm text-text-secondary">Profiles with live visibility right now.</p>
               </div>
-              <div className="rounded-[28px] border border-white/40 bg-white/78 p-5 shadow-[0_20px_40px_rgb(var(--color-brand-primary-rgb)/0.08)] backdrop-blur-2xl">
+              <div className="rounded-[28px] border border-white/40 bg-white/78 p-5 shadow-[var(--shadow-lg)] backdrop-blur-2xl">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-text-muted">Average Distance</p>
                 <p className="mt-3 text-3xl font-semibold text-text-primary">
                   {averageDistance ? `${averageDistance} mi` : "Near you"}
                 </p>
                 <p className="mt-2 text-sm text-text-secondary">Re-sorted when location is available.</p>
               </div>
-              <div className="rounded-[28px] border border-white/40 bg-white/78 p-5 shadow-[0_20px_40px_rgb(var(--color-brand-primary-rgb)/0.08)] backdrop-blur-2xl">
+              <div className="rounded-[28px] border border-white/40 bg-white/78 p-5 shadow-[var(--shadow-lg)] backdrop-blur-2xl">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-text-muted">Starting Price</p>
                 <p className="mt-3 text-3xl font-semibold text-text-primary">
                   {priceFloor ? formatCurrency(priceFloor) : "Request"}
@@ -1429,7 +1429,7 @@ export default function ExplorePageClient({
           </div>
         </section>
 
-        <section className="mt-6 rounded-[30px] border border-border-subtle/90 bg-white/88 p-4 shadow-[0_24px_60px_rgb(var(--color-brand-primary-rgb)/0.06)] backdrop-blur-2xl md:p-5">
+        <section className="mt-6 rounded-[30px] border border-border-subtle/90 bg-white/88 p-4 shadow-[var(--shadow-lg)] backdrop-blur-2xl md:p-5">
           <div className="grid gap-4 xl:grid-cols-[minmax(220px,320px),minmax(220px,280px),1fr,auto,auto]">
             <div className="rounded-[22px] border border-border-subtle bg-[rgb(var(--color-bg-body-rgb)/0.76)] px-4 py-3">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-text-muted">City or ZIP</p>
@@ -1693,7 +1693,7 @@ export default function ExplorePageClient({
             ) : null}
 
             {selectedProvider && filters.view === "grid" ? (
-              <div className="mt-8 rounded-[30px] border border-border-subtle bg-white/88 p-5 shadow-[0_24px_60px_rgb(var(--color-brand-primary-rgb)/0.06)] backdrop-blur-2xl md:hidden">
+              <div className="mt-8 rounded-[30px] border border-border-subtle bg-white/88 p-5 shadow-[var(--shadow-lg)] backdrop-blur-2xl md:hidden">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-text-muted">Current Highlight</p>
                 <h3 className="mt-3 text-xl font-semibold text-text-primary">{selectedProvider.name}</h3>
                 <p className="mt-2 text-sm text-text-secondary">{selectedProvider.overlaySummary}</p>

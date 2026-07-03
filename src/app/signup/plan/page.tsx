@@ -70,7 +70,7 @@ function SignupPlanPageContent() {
             <Card
               key={plan.tier}
               className={[
-                plan.popular ? "border-brand-secondary/40 shadow-[0_12px_32px_rgb(var(--color-brand-secondary-rgb)/0.12)]" : "",
+                plan.popular ? "border-brand-secondary/40 shadow-[var(--shadow-sm)]" : "",
                 isSelected ? "ring-2 ring-brand-secondary ring-offset-2 border-brand-secondary/50" : "",
                 "relative transition-shadow",
               ].filter(Boolean).join(" ")}

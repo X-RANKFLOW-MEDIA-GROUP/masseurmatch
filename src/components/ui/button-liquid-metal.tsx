@@ -62,7 +62,7 @@ export function ButtonLiquidMetal({
         "after:translate-x-[-150%] after:transition-transform after:duration-500 after:ease-smooth-out",
         "hover:after:translate-x-[150%]",
         // Lift
-        "hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(196,98,42,0.35)]",
+        "hover:-translate-y-[2px] hover:shadow-[var(--shadow-sm)]",
         "active:translate-y-0 active:shadow-none",
         className
       )}

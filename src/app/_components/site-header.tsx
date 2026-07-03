@@ -108,7 +108,7 @@ function DropdownMenu({
           className="absolute left-1/2 top-full pt-2 -translate-x-1/2"
         >
           <div
-            className="min-w-[240px] rounded-xl border border-[#E8E8E8] bg-white p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.1)]"
+            className="min-w-[240px] rounded-xl border border-[#E8E8E8] bg-white p-1.5 shadow-[var(--shadow-sm)]"
             role="menu"
           >
             {children.map((child) => (
@@ -480,7 +480,7 @@ export default function SiteHeader() {
       transition={{ duration: shouldReduceMotion ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 bg-white transition-shadow duration-300 ${
         isScrolled
-          ? "shadow-[0_2px_8px_rgba(0,0,0,0.08)] border-b border-[#E8E8E8]"
+          ? "shadow-[var(--shadow-xs)] border-b border-[#E8E8E8]"
           : "border-b border-transparent"
       }`}
     >

@@ -424,7 +424,7 @@ export function HomeSmartMatchCard({ cities, featuredModalities, therapistCount 
           <button
             type="button"
             onClick={handleStickyClick}
-            className="flex w-full items-center justify-center rounded-full bg-action-primary px-5 py-3.5 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(139,30,45,0.28)]"
+            className="flex w-full items-center justify-center rounded-full bg-action-primary px-5 py-3.5 text-sm font-semibold text-white shadow-[var(--shadow-md)]"
           >
             {hasSelections ? "Continue Smart Match" : "Start Smart Match"}
           </button>

@@ -220,7 +220,7 @@ export function ContactForm() {
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-emerald-500 px-7 text-base font-medium text-slate-950 shadow-[0_18px_42px_rgba(16,185,129,0.32)] transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-emerald-500 px-7 text-base font-medium text-slate-950 shadow-[var(--shadow-md)] transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? "Sending..." : "Send Message"}
           {!loading ? <ArrowRight className="h-4 w-4" /> : null}

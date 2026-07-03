@@ -122,7 +122,7 @@ function AddonCard({
   return (
     <div
       className={cn(
-        "rounded-3xl border bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.06)] backdrop-blur",
+        "rounded-3xl border bg-white/90 p-5 shadow-[var(--shadow-md)] backdrop-blur",
         styles.border,
       )}
     >
@@ -266,7 +266,7 @@ export function ProviderGrowthMarketplace({
           {PROVIDER_GROWTH_BUNDLES.map((bundle) => (
             <div
               key={bundle.slug}
-              className="rounded-3xl border border-border bg-white/92 p-5 shadow-[0_18px_48px_rgba(15,23,42,0.05)]"
+              className="rounded-3xl border border-border bg-white/92 p-5 shadow-[var(--shadow-md)]"
             >
               <div className="flex items-center justify-between gap-3">
                 <Badge variant="outline">{bundle.audience}</Badge>

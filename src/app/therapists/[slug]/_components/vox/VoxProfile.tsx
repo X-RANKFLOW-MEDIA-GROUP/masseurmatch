@@ -367,7 +367,7 @@ export function VoxProfile({
                 return (
                   <div
                     key={service}
-                    className="group flex items-start gap-3 rounded-2xl border border-[#E8E8E8] bg-white p-4 shadow-sm transition-all hover:border-[#8B1E2D]/30 hover:shadow-[0_4px_24px_rgba(139, 30, 45,0.1)]"
+                    className="group flex items-start gap-3 rounded-2xl border border-[#E8E8E8] bg-white p-4 shadow-sm transition-all hover:border-[#8B1E2D]/30 hover:shadow-[var(--shadow-xs)]"
                   >
                     <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#FFF4EA] to-[#FFECD4] text-[#8B1E2D] transition-transform group-hover:scale-105">
                       <Icon className="h-5 w-5" strokeWidth={2.25} />

@@ -124,7 +124,7 @@ function FilterMetric({
 }) {
   return (
     <div
-      className={`min-w-[158px] rounded-2xl border border-slate-200/80 bg-white/72 px-4 py-3 shadow-[0_16px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl ${
+      className={`min-w-[158px] rounded-2xl border border-slate-200/80 bg-white/72 px-4 py-3 shadow-[var(--shadow-md)] backdrop-blur-xl ${
         compact ? "min-w-[142px]" : ""
       }`}
     >
@@ -231,7 +231,7 @@ export function AdvancedDirectoryFilter({
                 </div>
               </div>
 
-              <div className="hidden min-w-[190px] items-center gap-3 rounded-[1.35rem] border border-slate-200/80 bg-white/72 px-4 py-3 shadow-[0_16px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl sm:flex">
+              <div className="hidden min-w-[190px] items-center gap-3 rounded-[1.35rem] border border-slate-200/80 bg-white/72 px-4 py-3 shadow-[var(--shadow-md)] backdrop-blur-xl sm:flex">
                 <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
                 <div className="min-w-0">
                   <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-slate-400">
@@ -384,7 +384,7 @@ export function AdvancedDirectoryFilter({
                 </div>
 
                 <div className="space-y-5">
-                  <div className="border border-slate-200 bg-white/82 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl">
+                  <div className="border border-slate-200 bg-white/82 p-5 shadow-[var(--shadow-md)] backdrop-blur-xl">
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-slate-400">

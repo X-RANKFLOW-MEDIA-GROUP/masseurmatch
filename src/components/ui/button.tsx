@@ -78,7 +78,7 @@ const buttonVariants = cva(
         ],
         glass: [
           "border border-white/16 bg-white/10 text-white",
-          "hover:bg-white/18 hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(255,255,255,0.16)]",
+          "hover:bg-white/18 hover:-translate-y-px hover:shadow-[var(--shadow-sm)]",
           "active:translate-y-0 active:bg-white/16",
         ],
         hero: [

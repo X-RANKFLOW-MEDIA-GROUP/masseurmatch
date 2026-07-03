@@ -140,17 +140,17 @@ export default function PricingPage() {
           </div>
 
           <div className="mx-auto mt-10 grid max-w-5xl gap-4 md:grid-cols-3">
-            <div className="rounded-3xl border border-border bg-white/92 p-5 text-left shadow-[0_18px_48px_rgba(15,23,42,0.05)]">
+            <div className="rounded-3xl border border-border bg-white/92 p-5 text-left shadow-[var(--shadow-md)]">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Trial</p>
               <p className="mt-3 text-2xl font-semibold text-foreground">14 days on paid tiers</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">Let therapists experience the visibility lift before the first paid cycle starts.</p>
             </div>
-            <div className="rounded-3xl border border-border bg-white/92 p-5 text-left shadow-[0_18px_48px_rgba(15,23,42,0.05)]">
+            <div className="rounded-3xl border border-border bg-white/92 p-5 text-left shadow-[var(--shadow-md)]">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Founder offer</p>
               <p className="mt-3 text-2xl font-semibold text-foreground">50% off first 3 months</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">A strong pricing anchor that improves early conversion without discounting the full catalog long term.</p>
             </div>
-            <div className="rounded-3xl border border-border bg-white/92 p-5 text-left shadow-[0_18px_48px_rgba(15,23,42,0.05)]">
+            <div className="rounded-3xl border border-border bg-white/92 p-5 text-left shadow-[var(--shadow-md)]">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Monetization mix</p>
               <p className="mt-3 text-2xl font-semibold text-foreground">$6 to $59 add-ons</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">Low-ticket impulse buys, recurring SaaS upgrades, and premium scarce inventory are all designed to stack.</p>
@@ -176,7 +176,7 @@ export default function PricingPage() {
             {SIGNUP_PLANS.map((plan) => (
               <section
                 key={plan.tier}
-                className={`rounded-[1.9rem] border p-5 text-left shadow-[0_18px_50px_rgba(15,23,42,0.05)] ${
+                className={`rounded-[1.9rem] border p-5 text-left shadow-[var(--shadow-md)] ${
                   plan.popular
                     ? "border-brand-secondary/25 bg-[linear-gradient(180deg,rgba(241,248,255,0.95),rgba(255,255,255,0.98))]"
                     : "border-border bg-white/92"
@@ -218,7 +218,7 @@ export default function PricingPage() {
             {strategyCards.map((card) => (
               <div
                 key={card.title}
-                className="rounded-3xl border border-border bg-white/92 p-6 shadow-[0_18px_48px_rgba(15,23,42,0.05)]"
+                className="rounded-3xl border border-border bg-white/92 p-6 shadow-[var(--shadow-md)]"
               >
                 <card.icon className="h-5 w-5 text-brand-secondary" />
                 <h3 className="font-display mt-4 text-2xl font-semibold tracking-tight text-foreground">{card.title}</h3>
@@ -233,7 +233,7 @@ export default function PricingPage() {
         </section>
 
         <section className="container mx-auto px-4 py-10">
-          <div className="mx-auto max-w-3xl rounded-3xl border border-border bg-white/92 p-8 shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
+          <div className="mx-auto max-w-3xl rounded-3xl border border-border bg-white/92 p-8 shadow-[var(--shadow-md)]">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">FAQ</p>
             <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight text-foreground">Pricing questions</h2>
             <div className="mt-6 space-y-4">
@@ -257,7 +257,7 @@ export default function PricingPage() {
         </section>
 
         <section className="container mx-auto px-4 pb-16 pt-4">
-          <div className="rounded-[2.4rem] border border-brand-secondary/15 bg-[linear-gradient(135deg,rgba(12,28,51,0.98),rgba(18,53,88,0.95))] px-8 py-12 text-white shadow-[0_28px_80px_rgba(15,23,42,0.22)]">
+          <div className="rounded-[2.4rem] border border-brand-secondary/15 bg-[linear-gradient(135deg,rgba(12,28,51,0.98),rgba(18,53,88,0.95))] px-8 py-12 text-white shadow-[var(--shadow-xl)]">
             <div className="mx-auto max-w-3xl text-center">
               <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
                 Start with the right plan and add only the upgrades that move revenue
