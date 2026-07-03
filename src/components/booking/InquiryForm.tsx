@@ -132,8 +132,9 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
       <form onSubmit={submitInquiry} className="flex flex-col gap-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
-            <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">Your Name</label>
+            <label htmlFor="inquiry-client-name" className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">Your Name</label>
             <input
+              id="inquiry-client-name"
               required
               value={form.client_name}
               onChange={e => setForm(f => ({ ...f, client_name: e.target.value }))}
@@ -142,8 +143,9 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">Phone</label>
+            <label htmlFor="inquiry-client-phone" className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">Phone</label>
             <input
+              id="inquiry-client-phone"
               required
               type="tel"
               value={form.client_phone}
@@ -153,8 +155,9 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">Email</label>
+            <label htmlFor="inquiry-client-email" className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">Email</label>
             <input
+              id="inquiry-client-email"
               type="email"
               value={form.client_email}
               onChange={e => setForm(f => ({ ...f, client_email: e.target.value }))}
@@ -163,8 +166,9 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">Hotel / Location</label>
+            <label htmlFor="inquiry-client-hotel" className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">Hotel / Location</label>
             <input
+              id="inquiry-client-hotel"
               value={form.client_hotel}
               onChange={e => setForm(f => ({ ...f, client_hotel: e.target.value }))}
               placeholder="Hotel name or address"
@@ -172,8 +176,9 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">Service</label>
+            <label htmlFor="inquiry-service-type" className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">Service</label>
             <select
+              id="inquiry-service-type"
               value={form.service_type}
               onChange={e => setForm(f => ({ ...f, service_type: e.target.value }))}
               className="rounded-lg border border-white/10 bg-[#111111] px-3 py-2.5 text-sm text-white focus:border-[var(--color-primary)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/20"
@@ -187,8 +192,9 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">Duration</label>
+            <label htmlFor="inquiry-duration-minutes" className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">Duration</label>
             <select
+              id="inquiry-duration-minutes"
               value={form.duration_minutes}
               onChange={e => setForm(f => ({ ...f, duration_minutes: e.target.value }))}
               className="rounded-lg border border-white/10 bg-[#111111] px-3 py-2.5 text-sm text-white focus:border-[var(--color-primary)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/20"
@@ -200,8 +206,9 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
           </div>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">Anything else? (optional)</label>
+          <label htmlFor="inquiry-message" className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">Anything else? (optional)</label>
           <textarea
+            id="inquiry-message"
             rows={3}
             value={form.message}
             onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
@@ -259,7 +266,9 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
 
         {/* Chat input */}
         <div className="flex gap-2">
+          <label htmlFor="inquiry-chat-input" className="sr-only">Send a message</label>
           <input
+            id="inquiry-chat-input"
             value={chatInput}
             onChange={e => setChatInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendChatMessage()}
@@ -268,8 +277,10 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
             className="flex-1 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#8B1E2D]/50 focus:outline-none disabled:opacity-60"
           />
           <button
+            type="button"
             onClick={sendChatMessage}
             disabled={loading || !chatInput.trim()}
+            aria-label="Send message"
             className="flex items-center justify-center rounded-lg bg-[var(--color-primary)] px-3 py-2.5 transition-all hover:bg-[var(--color-primary-hover)] disabled:opacity-60"
           >
             <Send className="h-4 w-4 text-white" strokeWidth={2.25} />
