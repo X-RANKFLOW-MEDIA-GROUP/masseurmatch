@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Sparkles } from "lucide-react";
 import { GrainOverlay } from "@/components/motion/GrainOverlay";
 
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -63,8 +63,18 @@ export function HeroCinematic() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.3 }}
-                className="mt-10 flex flex-wrap gap-4 sm:gap-6"
+                className="mt-10 flex flex-col gap-4 sm:gap-6"
               >
+                <motion.div
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  className="flex items-center gap-2"
+                >
+                  <Sparkles size={20} className="text-[#8B1E2D]" strokeWidth={2.5} />
+                  <span className="text-xs uppercase tracking-widest text-[#8B1E2D] font-semibold">AI-Powered Discovery</span>
+                </motion.div>
+
+                <div className="flex flex-wrap gap-4 sm:gap-6">
                 <button
                   type="button"
                   onClick={() => router.push("/search")}
@@ -79,6 +89,7 @@ export function HeroCinematic() {
                 >
                   Browse by City
                 </Link>
+                </div>
               </motion.div>
 
               {/* Trust indicators */}
