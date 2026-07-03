@@ -1,12 +1,29 @@
-import { Zap, TrendingUp } from "lucide-react";
+"use client";
+
+import { useEffect, useState } from "react";
+import { Zap } from "lucide-react";
+import { getCityDemandScores, type CityDemandData } from "@/app/_lib/analytics-aggregation";
 
 export function CityDemandScore() {
-  const cities = [
-    { name: "Dallas", score: 87, competition: "High", opportunity: "Strong" },
-    { name: "Houston", score: 72, competition: "Medium", opportunity: "Moderate" },
-    { name: "Austin", score: 65, competition: "Low", opportunity: "High" },
-    { name: "San Antonio", score: 58, competition: "Low", opportunity: "Very High" },
-  ];
+  const [cities, setCities] = useState<CityDemandData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getCityDemandScores().then((data) => {
+      setCities(data);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-border bg-card p-6">
+        <div className="h-24 bg-muted/30 animate-pulse rounded-lg" />
+      </div>
+    );
+  }
+
+  const bestOpportunity = cities.find((c) => c.opportunity.includes("High")) || cities[0];
 
   return (
     <div className="rounded-2xl border border-border bg-card p-6">
@@ -20,21 +37,21 @@ export function CityDemandScore() {
       <div className="space-y-3">
         {cities.map((city) => (
           <div
-            key={city.name}
+            key={city.city}
             className="p-3 rounded-lg border border-border/50 bg-muted/30"
           >
             <div className="flex items-center justify-between mb-2">
-              <h4 className="font-semibold">{city.name}</h4>
-              <span className="text-lg font-bold text-accent">{city.score}</span>
+              <h4 className="font-semibold">{city.city}</h4>
+              <span className="text-lg font-bold text-accent">{city.demandScore}</span>
             </div>
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Competition: <span className="font-medium">{city.competition}</span></span>
+              <span>Competition: <span className="font-medium">{Math.round(city.competitionLevel)}/10</span></span>
               <span>Opportunity: <span className="font-medium text-emerald-600">{city.opportunity}</span></span>
             </div>
             <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-accent to-accent/60"
-                style={{ width: `${city.score}%` }}
+                style={{ width: `${Math.min(city.demandScore * 2, 100)}%` }}
               />
             </div>
           </div>
@@ -43,7 +60,7 @@ export function CityDemandScore() {
 
       <div className="mt-4 pt-4 border-t border-border">
         <p className="text-xs text-muted-foreground">
-          💡 San Antonio shows highest opportunity with low competition. Consider expansion there.
+          💡 {bestOpportunity ? `${bestOpportunity.city} shows ${bestOpportunity.opportunity.toLowerCase()}.` : "No data yet."}
         </p>
       </div>
     </div>

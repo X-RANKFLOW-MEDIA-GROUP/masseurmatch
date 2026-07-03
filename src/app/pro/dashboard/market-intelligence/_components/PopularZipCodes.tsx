@@ -1,14 +1,27 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { MapPin } from "lucide-react";
+import { getPopularZipCodes, type ZipCodeData } from "@/app/_lib/analytics-aggregation";
 
 export function PopularZipCodes() {
-  const zipCodes = [
-    { zip: "75201", city: "Dallas", demand: 850, growth: 24 },
-    { zip: "75204", city: "Dallas", demand: 720, growth: 18 },
-    { zip: "75214", city: "Dallas", demand: 650, growth: 12 },
-    { zip: "75287", city: "Dallas", demand: 480, growth: 8 },
-  ];
+  const [zipCodes, setZipCodes] = useState<ZipCodeData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const maxDemand = Math.max(...zipCodes.map((z) => z.demand));
+  useEffect(() => {
+    getPopularZipCodes(4).then((data) => {
+      setZipCodes(data);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-border bg-card p-6">
+        <div className="h-24 bg-muted/30 animate-pulse rounded-lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-2xl border border-border bg-card p-6">
@@ -22,22 +35,21 @@ export function PopularZipCodes() {
       </div>
 
       <div className="space-y-2">
-        {zipCodes.map((zip, idx) => (
-          <div key={zip.zip} className="flex items-center justify-between">
+        {zipCodes.map((zip) => (
+          <div key={zip.zip_code} className="flex items-center justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold text-muted-foreground">
-                  #{idx + 1}
+                  #{zip.rank}
                 </span>
                 <div>
-                  <p className="text-sm font-medium">{zip.zip}</p>
+                  <p className="text-sm font-medium">{zip.zip_code}</p>
                   <p className="text-xs text-muted-foreground">{zip.city}</p>
                 </div>
               </div>
             </div>
             <div className="text-right shrink-0">
               <p className="text-xs font-semibold">{zip.demand} searches</p>
-              <p className="text-xs text-emerald-600">+{zip.growth}%</p>
             </div>
           </div>
         ))}
@@ -45,7 +57,7 @@ export function PopularZipCodes() {
 
       <div className="mt-4 pt-4 border-t border-border">
         <p className="text-xs text-muted-foreground">
-          🎯 Most searches in ZIP 75201. Consider expanding availability there.
+          🎯 {zipCodes.length > 0 ? `Most searches in ZIP ${zipCodes[0].zip_code} (${zipCodes[0].city}).` : "No data yet."}
         </p>
       </div>
     </div>

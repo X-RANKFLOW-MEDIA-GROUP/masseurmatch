@@ -1,36 +1,29 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { MapPin, AlertCircle } from "lucide-react";
+import { getHotelOpportunities, type HotelOpportunityData } from "@/app/_lib/analytics-aggregation";
 
 export function HotelOpportunities() {
-  const areas = [
-    {
-      area: "Downtown Dallas (75201)",
-      hotels: 28,
-      searches: 480,
-      demand: "High",
-      suggested: true,
-    },
-    {
-      area: "DFW Airport Area (75261)",
-      hotels: 42,
-      searches: 620,
-      demand: "Very High",
-      suggested: true,
-    },
-    {
-      area: "Uptown Dallas (75204)",
-      hotels: 15,
-      searches: 290,
-      demand: "Medium",
-      suggested: false,
-    },
-    {
-      area: "Las Colinas (75038)",
-      hotels: 22,
-      searches: 380,
-      demand: "High",
-      suggested: true,
-    },
-  ];
+  const [areas, setAreas] = useState<HotelOpportunityData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getHotelOpportunities().then((data) => {
+      setAreas(data);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-border bg-card p-6">
+        <div className="h-24 bg-muted/30 animate-pulse rounded-lg" />
+      </div>
+    );
+  }
+
+  const topArea = areas.find((a) => a.suggested) || areas[0];
 
   return (
     <div className="rounded-2xl border border-border bg-card p-6">
@@ -88,7 +81,7 @@ export function HotelOpportunities() {
         <p className="text-xs text-muted-foreground flex items-start gap-2">
           <AlertCircle className="h-3.5 w-3.5 text-orange-600 flex-shrink-0 mt-0.5" />
           <span>
-            DFW Airport area has highest hotel search volume. Enabling hotel visits
+            {topArea ? `${topArea.area} has highest hotel search volume.` : "No hotel data yet."} Enabling hotel visits
             could increase bookings by 40%.
           </span>
         </p>
