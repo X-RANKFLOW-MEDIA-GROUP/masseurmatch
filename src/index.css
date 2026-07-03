@@ -88,6 +88,23 @@
     --warning: 24 95% 53%;
     --warning-foreground: 0 0% 100%;
 
+    /* Badge/Status tokens – unified system */
+    --badge-verified: 152 60% 30%;
+    --badge-verified-light: 152 45% 93%;
+    --badge-verified-border: 152 60% 60%;
+
+    --badge-available: 152 60% 30%;
+    --badge-available-light: 152 45% 93%;
+    --badge-available-border: 152 60% 60%;
+
+    --badge-offer: 350 64% 33%;
+    --badge-offer-light: 350 60% 95%;
+    --badge-offer-border: 350 60% 65%;
+
+    --badge-promo: 24 95% 53%;
+    --badge-promo-light: 24 95% 93%;
+    --badge-promo-border: 24 95% 70%;
+
     /* Brand tokens */
     --color-brand-primary: #111111;
     --color-brand-primary-rgb: 17 17 17;
