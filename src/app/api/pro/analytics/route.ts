@@ -36,12 +36,18 @@ export async function GET(request: Request) {
     const since = new Date(Date.now() - (WINDOW_DAYS - 1) * 86_400_000);
     since.setUTCHours(0, 0, 0, 0);
 
+    // Safely query events - profile.id should always exist at this point due to line 26 check
+    if (!profile?.id) {
+      throw new RouteError(500, "Profile ID missing");
+    }
+
     const { data: events, error: eventsError } = await admin
       .from("ranking_events")
       .select("event_name, created_at")
       .eq("therapist_id", profile.id)
       .eq("event_name", "profile_viewed")
-      .gte("created_at", since.toISOString());
+      .gte("created_at", since.toISOString())
+      .limit(10000); // Safety limit to prevent huge queries
 
     if (eventsError) throw new RouteError(500, eventsError.message);
 
