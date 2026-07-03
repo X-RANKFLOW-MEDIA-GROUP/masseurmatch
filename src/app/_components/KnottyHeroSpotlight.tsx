@@ -20,7 +20,7 @@ const heroContainer = {
 
 const heroItem = {
   hidden: { opacity: 0, y: 22, filter: "blur(10px)" },
-  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.65, ease: EASE } },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6, ease: EASE } },
 };
 
 type KnottyHeroSpotlightProps = {
@@ -195,7 +195,7 @@ function SpotlightProfileCard({ therapist, index }: { therapist: ShowcaseCard; i
       whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, filter: "blur(0px)" }}
       whileHover={reduceMotion ? undefined : { y: -6, transition: SPRING }}
       viewport={{ once: true, margin: "-40px" }}
-      transition={{ delay: index * 0.07, duration: 0.55, ease: EASE }}
+      transition={{ delay: index * 0.07, duration: 0.6, ease: EASE }}
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,30,45,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(139,30,45,0.10),transparent_26%)]" />
       <div className="relative">

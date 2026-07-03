@@ -47,7 +47,7 @@ function TherapistCard({ profile, index }: { profile: PublicTherapist; index: nu
     <motion.div
       initial={{ opacity: 0, y: 36, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.65, ease: customEase, delay: 0.15 + index * 0.08 }}
+      transition={{ duration: 0.6, ease: customEase, delay: 0.15 + index * 0.08 }}
       className="relative flex min-w-[250px] flex-1 flex-col rounded-[1.75rem] border border-black/5 bg-white/95 p-4 pt-36 shadow-[0_28px_70px_rgba(15,23,42,0.13)] backdrop-blur cursor-pointer"
       onClick={handleNavigate}
       data-testid="therapist-card"

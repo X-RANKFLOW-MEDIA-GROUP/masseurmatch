@@ -146,7 +146,7 @@ export default function KnottyGlassChat({
             key={message.id}
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, ease: EASE }}
+            transition={{ duration: 0.4, ease: EASE }}
             className={`flex w-full ${
               message.role === "user" ? "justify-end" : "justify-start"
             }`}
