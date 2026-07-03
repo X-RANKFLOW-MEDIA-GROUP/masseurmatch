@@ -24,7 +24,7 @@ type Collected = {
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const INITIAL_MESSAGE =
-  "Hey there! 👋 I'm Knotty — MasseurMatch's AI assistant. We're putting the finishing touches on something way better than MasseurFinder or RentMasseur. Want early access? What's your name?";
+  "Hello! I'm Knotty — MasseurMatch's AI assistant. We're putting the finishing touches on something way better than MasseurFinder or RentMasseur. Want early access? What's your name?";
 
 const STEP_PLACEHOLDERS: Record<Step, string> = {
   name: "Type your name…",
