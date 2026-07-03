@@ -26,6 +26,18 @@ const TECHNIQUE_TERMS = [
   "relaxation",
   "mobility",
   "thai",
+  "shiatsu",
+  "acupressure",
+  "lymphatic",
+  "myofascial",
+  "trigger point",
+  "hot stone",
+  "couples",
+  "cupping",
+  "reflexology",
+  "prenatal",
+  "pregnancy",
+  "therapeutic",
 ];
 
 const INTENT_KEYWORDS: Array<{ intent: KnottyIntent; terms: string[] }> = [
