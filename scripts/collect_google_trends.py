@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
 Google Trends Keyword Collector
-Collects massage therapy keywords from Google Trends daily and stores in Supabase
+Collects gay massage therapy keywords from Google Trends daily
 Run daily via cron, Windows Task Scheduler, or Make.com webhook
+Sends data to MasseurMatch API endpoint
 """
 
 import os
@@ -34,75 +35,71 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Configuration
+API_URL = os.getenv("NEXT_PUBLIC_APP_URL", "http://localhost:3000")
+API_KEY = os.getenv("INTERNAL_API_KEY")
 SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
-# Keywords to track (50+ massage therapy keywords)
+# Top 50 Gay Massage Keywords - SEO focused, no city modifiers
 KEYWORDS = [
-    # Top level
-    "massage near me",
-    "massage therapist",
-    "massage therapist near me",
-    # Specific to gay massage
+    # Core brand
     "gay massage",
-    "gay massage therapist",
     "gay massage near me",
-    "LGBTQ massage",
-    "gay friendly massage",
-    "gay-friendly massage therapist",
-    # Session types
-    "outcall massage",
-    "incall massage",
-    "hotel massage",
-    "in-home massage",
-    "mobile massage",
-    # Techniques
-    "deep tissue massage",
-    "swedish massage",
-    "therapeutic massage",
-    "sports massage",
-    "relaxation massage",
-    "professional massage",
-    "full body massage",
-    "back massage",
-    # By gender preference
-    "massage for men",
+    "gay massage therapist",
+    "gay masseur",
+    "gay male massage",
+    # Male-specific
+    "male massage for men",
+    "massage for gay men",
     "male massage therapist",
     "male massage therapist near me",
-    "massage by men",
-    # Location modifiers
-    "massage Dallas",
-    "massage Houston",
-    "massage Austin",
-    "massage San Antonio",
-    "massage Fort Worth",
-    "massage DFW",
-    # Premium/niche
-    "premium massage",
-    "luxury massage",
-    "discreet massage",
-    "confidential massage",
-    # Booking/availability
-    "book massage online",
-    "schedule massage",
-    "massage appointment",
-    "same day massage",
-    # Specific services
-    "erotic massage",
-    "tantric massage",
-    "prostate massage",
-    "sensual massage",
-    # Certifications
-    "licensed massage therapist",
-    "certified massage therapist",
-    # Time-based
-    "evening massage",
-    "weekend massage",
-    "late night massage",
-    # Additional volume keywords
-    "massage services",
-    "massage therapy",
-    "body massage",
+    "male masseur",
+    "male massage near me",
+    "massage therapist for men",
+    "massage therapist for men near me",
+    # LGBTQ positioning
+    "LGBTQ massage therapist",
+    "LGBTQ friendly massage",
+    "LGBTQ affirming massage",
+    "LGBT massage therapist",
+    "gay friendly massage",
+    "gay friendly masseur",
+    "gay friendly massage therapist",
+    # Bodywork alternative
+    "gay bodywork",
+    "male bodywork",
+    "bodywork for men",
+    "gay massage therapy",
+    # Techniques + gay
+    "gay deep tissue massage",
+    "deep tissue massage for men",
+    "gay Swedish massage",
+    "Swedish massage for men",
+    "gay sports massage",
+    "sports massage for men",
+    "gay therapeutic massage",
+    "therapeutic massage for men",
+    "gay relaxation massage",
+    "relaxation massage for men",
+    # Session types + gay
+    "gay mobile massage",
+    "mobile massage for men",
+    "gay outcall massage",
+    "outcall massage for men",
+    "gay incall massage",
+    "incall massage for men",
+    # Premium/verified
+    "private gay massage",
+    "private male massage",
+    "professional gay massage",
+    "verified gay massage therapist",
+    "verified male massage therapist",
+    # Directory/discovery
+    "gay massage directory",
+    "male massage directory",
+    "gay massage reviews",
+    "gay massage rates",
+    "gay massage appointment",
 ]
 
 BATCH_SIZE = 5  # Google Trends rate limiting
@@ -131,9 +128,49 @@ def get_trends_data(keywords_batch: list[str]) -> Optional[dict]:
         return None
 
 
-def insert_into_supabase(trends_data: list[dict]) -> bool:
+def send_to_api(trends_data: list[dict]) -> bool:
     """
-    Insert keyword trends data into Supabase
+    Send keyword trends data to MasseurMatch API endpoint
+    Falls back to direct Supabase if API unavailable
+    """
+    if not API_URL or not API_KEY:
+        logger.warning("⚠️ API_URL or INTERNAL_API_KEY not set, falling back to direct Supabase")
+        return insert_into_supabase_direct(trends_data)
+
+    try:
+        headers = {
+            "Authorization": f"Bearer {API_KEY}",
+            "Content-Type": "application/json",
+        }
+
+        url = f"{API_URL}/api/trends/collect"
+        payload = {"trends_data": trends_data}
+
+        response = requests.post(url, json=payload, headers=headers, timeout=30)
+
+        if response.status_code in [200, 201]:
+            result = response.json()
+            logger.info(
+                f"✅ API received {result.get('inserted', 0)} records, "
+                f"{result.get('insights_created', 0)} insights created"
+            )
+            return True
+        else:
+            logger.warning(
+                f"⚠️ API error {response.status_code}, falling back to direct Supabase"
+            )
+            return insert_into_supabase_direct(trends_data)
+    except requests.exceptions.Timeout:
+        logger.warning("⚠️ API timeout, falling back to direct Supabase")
+        return insert_into_supabase_direct(trends_data)
+    except Exception as e:
+        logger.warning(f"⚠️ API error: {e}, falling back to direct Supabase")
+        return insert_into_supabase_direct(trends_data)
+
+
+def insert_into_supabase_direct(trends_data: list[dict]) -> bool:
+    """
+    Fallback: Insert keyword trends data directly into Supabase
     """
     if not SUPABASE_URL or not SUPABASE_KEY:
         logger.error("❌ SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not set")
@@ -151,7 +188,7 @@ def insert_into_supabase(trends_data: list[dict]) -> bool:
         response = requests.post(url, json=trends_data, headers=headers)
 
         if response.status_code in [200, 201]:
-            logger.info(f"✅ Inserted {len(trends_data)} records into Supabase")
+            logger.info(f"✅ Inserted {len(trends_data)} records directly into Supabase")
             return True
         else:
             logger.error(f"❌ Supabase error: {response.status_code} - {response.text}")
@@ -242,16 +279,16 @@ async def collect_keywords() -> bool:
     logger.info(f"   📦 Total records to insert: {len(all_records)}")
     logger.info("=" * 60)
 
-    # Insert into Supabase
+    # Send to API or Supabase
     if all_records:
-        logger.info("\n💾 Inserting into Supabase...")
-        success = insert_into_supabase(all_records)
+        logger.info("\n💾 Sending data to MasseurMatch...")
+        success = send_to_api(all_records)
 
         if success:
             logger.info("✅ All data successfully stored!")
             return True
         else:
-            logger.error("❌ Failed to insert data")
+            logger.error("❌ Failed to send data")
             return False
     else:
         logger.error("❌ No data to insert")

@@ -13,6 +13,7 @@ import { buildProfileFaq } from "@/components/profile/profile-faq";
 import { buildProfileViewModel } from "@/components/profile/profile-utils";
 import { VoxProfile } from "@/app/therapists/[slug]/_components/vox/VoxProfile";
 import { DemoProfileBanner } from "@/app/_components/demo-profile-banner";
+import { ProfileViewTracker } from "@/app/therapists/[slug]/_components/ProfileViewTracker";
 
 type Params = { slug: string };
 
@@ -110,6 +111,7 @@ export default async function TherapistPage({ params }: { params: Promise<Params
 
   return (
     <>
+      <ProfileViewTracker profileId={dbProfile.id} source="direct" />
       {dbProfile.is_demo && <DemoProfileBanner />}
       <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Therapists", path: "/therapists" }, ...(matchedCity ? [{ name: matchedCity.name, path: `/${matchedCity.slug}` }] : []), { name: profile.name, path: profilePath }])} />
       {faqItems.length > 0 ? <JsonLd data={buildFaqJsonLd(faqItems)} /> : null}
