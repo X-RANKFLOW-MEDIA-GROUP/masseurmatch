@@ -183,7 +183,7 @@ export default function AboutContent() {
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               href="/search"
-              className="inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
+              className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-[var(--color-primary)]/20 transition hover:bg-[var(--color-primary-hover)]"
             >
               Find a therapist
               <IconArrowRight size={15} />

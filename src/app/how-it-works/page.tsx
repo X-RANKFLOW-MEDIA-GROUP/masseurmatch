@@ -203,7 +203,7 @@ export default function HowItWorksPage() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/search"
-                className="inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
+                className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-[var(--color-primary)]/20 transition hover:bg-[var(--color-primary-hover)]"
               >
                 Search therapists
                 <IconArrowRight size={16} />
@@ -378,7 +378,7 @@ export default function HowItWorksPage() {
             </p>
             <Link
               href="/search"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-8 py-4 text-sm font-bold uppercase tracking-wide text-white shadow-xl shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521]"
+              className="mt-8 inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-8 py-4 text-sm font-bold uppercase tracking-wide text-white shadow-xl shadow-[var(--color-primary)]/20 transition hover:bg-[var(--color-primary-hover)]"
             >
               Search therapists now
               <IconArrowRight size={16} />

@@ -138,7 +138,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
               value={form.client_name}
               onChange={e => setForm(f => ({ ...f, client_name: e.target.value }))}
               placeholder="First name is fine"
-              className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#8B1E2D]/50 focus:outline-none focus:ring-1 focus:ring-[#8B1E2D]/20"
+              className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[var(--color-primary)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/20"
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -149,7 +149,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
               value={form.client_phone}
               onChange={e => setForm(f => ({ ...f, client_phone: e.target.value }))}
               placeholder="+1 (555) 000-0000"
-              className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#8B1E2D]/50 focus:outline-none focus:ring-1 focus:ring-[#8B1E2D]/20"
+              className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[var(--color-primary)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/20"
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -159,7 +159,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
               value={form.client_email}
               onChange={e => setForm(f => ({ ...f, client_email: e.target.value }))}
               placeholder="optional"
-              className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#8B1E2D]/50 focus:outline-none focus:ring-1 focus:ring-[#8B1E2D]/20"
+              className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[var(--color-primary)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/20"
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -168,7 +168,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
               value={form.client_hotel}
               onChange={e => setForm(f => ({ ...f, client_hotel: e.target.value }))}
               placeholder="Hotel name or address"
-              className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#8B1E2D]/50 focus:outline-none focus:ring-1 focus:ring-[#8B1E2D]/20"
+              className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[var(--color-primary)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/20"
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -176,7 +176,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
             <select
               value={form.service_type}
               onChange={e => setForm(f => ({ ...f, service_type: e.target.value }))}
-              className="rounded-lg border border-white/10 bg-[#111111] px-3 py-2.5 text-sm text-white focus:border-[#8B1E2D]/50 focus:outline-none focus:ring-1 focus:ring-[#8B1E2D]/20"
+              className="rounded-lg border border-white/10 bg-[#111111] px-3 py-2.5 text-sm text-white focus:border-[var(--color-primary)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/20"
             >
               <option value="swedish">Swedish</option>
               <option value="deep_tissue">Deep Tissue</option>
@@ -191,7 +191,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
             <select
               value={form.duration_minutes}
               onChange={e => setForm(f => ({ ...f, duration_minutes: e.target.value }))}
-              className="rounded-lg border border-white/10 bg-[#111111] px-3 py-2.5 text-sm text-white focus:border-[#8B1E2D]/50 focus:outline-none focus:ring-1 focus:ring-[#8B1E2D]/20"
+              className="rounded-lg border border-white/10 bg-[#111111] px-3 py-2.5 text-sm text-white focus:border-[var(--color-primary)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/20"
             >
               <option value="60">60 min</option>
               <option value="90">90 min</option>
@@ -206,13 +206,13 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
             value={form.message}
             onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
             placeholder="Preferred dates, special requests, questions…"
-            className="resize-none rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#8B1E2D]/50 focus:outline-none focus:ring-1 focus:ring-[#8B1E2D]/20"
+            className="resize-none rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[var(--color-primary)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/20"
           />
         </div>
         <button
           type="submit"
           disabled={loading}
-          className="flex items-center justify-center gap-2 rounded-lg bg-[#8B1E2D] px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-[#6E1521] disabled:opacity-60"
+          className="flex items-center justify-center gap-2 rounded-lg bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-[var(--color-primary-hover)] disabled:opacity-60"
         >
           {loading ? (
             <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2.25} />
@@ -237,7 +237,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
               <div
                 className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                   msg.role === 'user'
-                    ? 'bg-[#8B1E2D]/90 text-white'
+                    ? 'bg-[var(--color-primary)]/90 text-white'
                     : 'bg-white/[0.08] text-slate-200'
                 }`}
               >
@@ -270,7 +270,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
           <button
             onClick={sendChatMessage}
             disabled={loading || !chatInput.trim()}
-            className="flex items-center justify-center rounded-lg bg-[#8B1E2D] px-3 py-2.5 transition-all hover:bg-[#6E1521] disabled:opacity-60"
+            className="flex items-center justify-center rounded-lg bg-[var(--color-primary)] px-3 py-2.5 transition-all hover:bg-[var(--color-primary-hover)] disabled:opacity-60"
           >
             <Send className="h-4 w-4 text-white" strokeWidth={2.25} />
           </button>
@@ -280,7 +280,7 @@ export function InquiryForm({ therapistId, therapistName }: Props) {
         {step === 'chat' && (
           <button
             onClick={() => setStep('slot_select')}
-            className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-slate-300 transition-all hover:border-[#8B1E2D]/40 hover:text-white"
+            className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-slate-300 transition-all hover:border-[var(--color-primary)]/40 hover:text-white"
           >
             <IconCalendar size={16} sketch="none" />
             Pick a date &amp; time

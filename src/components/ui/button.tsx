@@ -47,22 +47,22 @@ const buttonVariants = cva(
         secondary: [
           "bg-[var(--color-surface-offset)] text-[var(--color-text)]",
           "border border-[var(--color-border)]",
-          "hover:bg-[var(--color-surface-dynamic)] hover:border-[var(--color-text-faint)]",
-          "active:bg-[var(--color-surface-dynamic)]",
+          "hover:bg-[var(--color-surface-dynamic)] hover:border-[var(--color-text-faint)] hover:-translate-y-px hover:shadow-[var(--shadow-subtle)]",
+          "active:translate-y-0 active:bg-[var(--color-surface-dynamic)]",
         ],
         outline: [
           "border border-[var(--color-border)] bg-transparent text-[var(--color-text)]",
-          "hover:border-[var(--color-text-muted)] hover:bg-[var(--color-surface-offset)]",
-          "active:bg-[var(--color-surface-dynamic)]",
+          "hover:border-[var(--color-text-muted)] hover:bg-[var(--color-surface-offset)] hover:-translate-y-px hover:shadow-[var(--shadow-subtle)]",
+          "active:translate-y-0 active:bg-[var(--color-surface-dynamic)]",
         ],
         ghost: [
           "bg-transparent text-[var(--color-text-muted)]",
-          "hover:bg-[var(--color-surface-offset)] hover:text-[var(--color-text)]",
-          "active:bg-[var(--color-surface-dynamic)]",
+          "hover:bg-[var(--color-surface-offset)] hover:text-[var(--color-text)] hover:-translate-y-px",
+          "active:translate-y-0 active:bg-[var(--color-surface-dynamic)]",
         ],
         danger: [
           "bg-[var(--color-error)] text-white",
-          "hover:opacity-90 hover:-translate-y-px",
+          "hover:opacity-90 hover:-translate-y-px hover:shadow-[var(--shadow-md)]",
           "active:translate-y-0 active:opacity-100",
         ],
         // ── Backward-compat aliases (prevent breakage in existing code) ──
@@ -73,17 +73,18 @@ const buttonVariants = cva(
         ],
         destructive: [
           "bg-[var(--color-error)] text-white",
-          "hover:opacity-90 hover:-translate-y-px",
+          "hover:opacity-90 hover:-translate-y-px hover:shadow-[var(--shadow-md)]",
           "active:translate-y-0 active:opacity-100",
         ],
         glass: [
           "border border-white/16 bg-white/10 text-white",
-          "hover:bg-white/18",
+          "hover:bg-white/18 hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(255,255,255,0.16)]",
+          "active:translate-y-0 active:bg-white/16",
         ],
         hero: [
           "bg-[var(--color-primary)] text-white font-bold",
-          "hover:bg-[var(--color-primary-hover)] hover:scale-[1.02]",
-          "active:scale-100",
+          "hover:bg-[var(--color-primary-hover)] hover:-translate-y-px hover:shadow-[var(--shadow-md)]",
+          "active:translate-y-0 active:bg-[var(--color-primary-active)]",
         ],
         link: [
           "bg-transparent text-[var(--color-primary)] underline-offset-4",
@@ -91,8 +92,8 @@ const buttonVariants = cva(
         ],
         premium: [
           "bg-[linear-gradient(180deg,hsl(var(--primary)),hsl(var(--primary)/0.85))] text-white",
-          "hover:brightness-[1.03] hover:-translate-y-0.5",
-          "active:translate-y-0",
+          "hover:brightness-[1.03] hover:-translate-y-px hover:shadow-[var(--shadow-md)]",
+          "active:translate-y-0 active:brightness-100",
         ],
       },
       size: {
