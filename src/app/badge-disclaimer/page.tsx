@@ -51,7 +51,7 @@ export default function BadgeDisclaimerPage() {
       />
 
       <main className="page-shell py-10">
-        <section className="rounded-[2rem] border border-border-subtle bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(244,246,250,0.96))] p-6 shadow-brand sm:p-8">
+        <section className="rounded-3xl border border-border-subtle bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(244,246,250,0.96))] p-6 shadow-brand sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-muted">Trust Signals</p>
           <h1 className="mt-3 max-w-3xl font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
             Badge and Verification Disclaimer
@@ -63,7 +63,7 @@ export default function BadgeDisclaimerPage() {
           <p className="mt-3 text-xs text-text-muted">Last updated: June 29, 2026</p>
         </section>
 
-        <section className="mt-8 rounded-[2rem] border border-amber-200 bg-amber-50 p-6 sm:p-8">
+        <section className="mt-8 rounded-3xl border border-amber-200 bg-amber-50 p-6 sm:p-8">
           <div className="flex items-start gap-4">
             <TriangleAlert className="mt-0.5 h-5 w-5 flex-none text-amber-600" strokeWidth={2.25} />
             <div>
@@ -108,7 +108,7 @@ export default function BadgeDisclaimerPage() {
           </div>
         </section>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <div className="flex items-start gap-4">
             <Info className="mt-0.5 h-5 w-5 flex-none text-brand-secondary" strokeWidth={2.25} />
             <div>
@@ -129,7 +129,7 @@ export default function BadgeDisclaimerPage() {
           </div>
         </section>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <div className="flex items-start gap-4">
             <ShieldOff className="mt-0.5 h-5 w-5 flex-none text-brand-secondary" strokeWidth={2.25} />
             <div>
@@ -144,7 +144,7 @@ export default function BadgeDisclaimerPage() {
           </div>
         </section>
 
-        <section className="mt-8 rounded-[2rem] border border-border-subtle bg-brand-primary px-6 py-7 text-white shadow-brand sm:px-8">
+        <section className="mt-8 rounded-3xl border border-border-subtle bg-brand-primary px-6 py-7 text-white shadow-brand sm:px-8">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-brand-soft">Related Policies</p>
           <div className="mt-5 flex flex-wrap gap-3 text-sm font-semibold">
             {[

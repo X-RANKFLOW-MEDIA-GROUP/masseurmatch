@@ -113,7 +113,7 @@ export function ProfileHero({ profile, cityPath }: Props) {
         </div>
 
         <div className="px-6 pb-6 xl:hidden">
-          <div className="overflow-hidden rounded-[2rem] border border-white/12">
+          <div className="overflow-hidden rounded-3xl border border-white/12">
             <Image src={profile.avatar_url || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=900&h=1120&fit=crop"} alt={`${name} profile photo`} width={720} height={900} priority className="h-72 w-full object-cover sm:h-80" />
           </div>
         </div>

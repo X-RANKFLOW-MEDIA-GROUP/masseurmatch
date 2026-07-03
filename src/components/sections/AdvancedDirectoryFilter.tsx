@@ -209,7 +209,7 @@ export function AdvancedDirectoryFilter({
 
   return (
     <div className="sticky top-[86px] z-40">
-      <div className="relative overflow-hidden rounded-[2rem] border border-slate-200/70 bg-[rgba(255,255,255,0.82)] shadow-[0_24px_64px_rgba(15,23,42,0.1)] backdrop-blur-2xl">
+      <div className="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-[rgba(255,255,255,0.82)] shadow-[0_24px_64px_rgba(15,23,42,0.1)] backdrop-blur-2xl">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(15,23,42,0.06),transparent_34%),radial-gradient(circle_at_top_right,rgba(148,163,184,0.14),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.94),rgba(248,250,252,0.86))]" />
 
         <div className="relative px-4 py-4 md:px-6 md:py-5">

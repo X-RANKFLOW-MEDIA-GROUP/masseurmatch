@@ -229,7 +229,7 @@ export function ProviderGrowthMarketplace({
             <Surface
               key={category.id}
               className={cn(
-                "overflow-hidden rounded-[2rem] border bg-gradient-to-br p-0",
+                "overflow-hidden rounded-3xl border bg-gradient-to-br p-0",
                 styles.border,
                 styles.glow,
               )}
@@ -293,7 +293,7 @@ export function ProviderGrowthMarketplace({
 
 export function ProviderGrowthQuickPicks() {
   return (
-    <Surface className="overflow-hidden rounded-[2rem] border-brand-secondary/20 bg-[linear-gradient(135deg,rgba(12,28,51,0.96),rgba(21,73,122,0.92))] p-0 text-white">
+    <Surface className="overflow-hidden rounded-3xl border-brand-secondary/20 bg-[linear-gradient(135deg,rgba(12,28,51,0.96),rgba(21,73,122,0.92))] p-0 text-white">
       <div className="grid gap-0 lg:grid-cols-[minmax(0,0.9fr),minmax(0,1.1fr)]">
         <div className="border-b border-white/10 px-6 py-6 lg:border-b-0 lg:border-r">
           <Badge className="bg-white/12 text-white hover:bg-white/12">Boost Revenue</Badge>

@@ -70,7 +70,7 @@ export default function ContentGuidelinesPage() {
       />
 
       <main className="page-shell py-10">
-        <section className="rounded-[2rem] border border-border-subtle bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(244,246,250,0.96))] p-6 shadow-brand sm:p-8">
+        <section className="rounded-3xl border border-border-subtle bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(244,246,250,0.96))] p-6 shadow-brand sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-muted">Platform Standards</p>
           <h1 className="mt-3 max-w-3xl font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
             Content Guidelines
@@ -98,7 +98,7 @@ export default function ContentGuidelinesPage() {
           ))}
         </section>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-muted">Prohibited Content</p>
           <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-foreground">
             The following content is not permitted on MasseurMatch.
@@ -115,7 +115,7 @@ export default function ContentGuidelinesPage() {
           </div>
         </section>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-muted">Photo Standards</p>
           <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight text-foreground">
             Photo and image requirements
@@ -138,7 +138,7 @@ export default function ContentGuidelinesPage() {
           </div>
         </section>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-muted">Moderation</p>
           <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight text-foreground">
             How we enforce content standards
@@ -160,7 +160,7 @@ export default function ContentGuidelinesPage() {
           </div>
         </section>
 
-        <section className="mt-8 rounded-[2rem] border border-border-subtle bg-brand-primary px-6 py-7 text-white shadow-brand sm:px-8">
+        <section className="mt-8 rounded-3xl border border-border-subtle bg-brand-primary px-6 py-7 text-white shadow-brand sm:px-8">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-brand-soft">Related Policies</p>
           <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight text-white">
             Supporting standards and policies.

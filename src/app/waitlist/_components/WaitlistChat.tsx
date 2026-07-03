@@ -264,7 +264,7 @@ export function WaitlistChat() {
         }
       `}</style>
 
-      <div className="flex h-[580px] flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-[#0a0f1a] shadow-[0_32px_80px_rgba(0,0,0,0.45)]">
+      <div className="flex h-[580px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0a0f1a] shadow-[0_32px_80px_rgba(0,0,0,0.45)]">
         {/* Header */}
         <div className="flex items-center gap-3 border-b border-white/10 px-5 py-4">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#8B1E2D]/20 text-[#8B1E2D]">

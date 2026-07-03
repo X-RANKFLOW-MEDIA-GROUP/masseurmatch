@@ -15,7 +15,7 @@ export function Surface({
   children: ReactNode;
 }) {
   return (
-    <div className={cn("premium-surface motion-premium rounded-[2rem] border border-border bg-background p-6 shadow-brand", className)}>
+    <div className={cn("premium-surface motion-premium rounded-3xl border border-border bg-background p-6 shadow-brand", className)}>
       {children}
     </div>
   );
@@ -76,7 +76,7 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-    <div className={cn("premium-surface rounded-[2rem] border border-dashed border-border px-6 py-10 text-center", className)}>
+    <div className={cn("premium-surface rounded-3xl border border-dashed border-border px-6 py-10 text-center", className)}>
       <h2 className="font-display text-xl font-semibold text-foreground">{title}</h2>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
     </div>

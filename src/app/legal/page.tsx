@@ -48,7 +48,7 @@ export default function LegalPage() {
 
       <main className="bg-white pb-16 pt-8 md:pb-20 md:pt-10">
         <section className="page-shell">
-          <div className="rounded-[2rem] border border-border-subtle bg-white px-6 py-8 shadow-soft sm:px-8 sm:py-10">
+          <div className="rounded-3xl border border-border-subtle bg-white px-6 py-8 shadow-soft sm:px-8 sm:py-10">
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(280px,0.9fr)] lg:items-start">
               <div className="max-w-4xl">
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-muted">Legal Center</p>
@@ -104,7 +104,7 @@ export default function LegalPage() {
         </section>
 
         <section className="page-shell mt-10">
-          <div className="rounded-[2rem] border border-border-subtle bg-[#fbfcfe] p-6 shadow-soft sm:p-8">
+          <div className="rounded-3xl border border-border-subtle bg-[#fbfcfe] p-6 shadow-soft sm:p-8">
             <div className="max-w-3xl">
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-muted">Quick answers</p>
               <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-foreground">
@@ -144,7 +144,7 @@ export default function LegalPage() {
             {LEGAL_TOPICS.map((topic) => (
               <article
                 key={topic.id}
-                className="rounded-[2rem] border border-border-subtle bg-white p-6 shadow-[0_18px_46px_rgba(11,31,58,0.06)] sm:p-8"
+                className="rounded-3xl border border-border-subtle bg-white p-6 shadow-[0_18px_46px_rgba(11,31,58,0.06)] sm:p-8"
               >
                 <div className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.95fr)]">
                   <div>
@@ -192,7 +192,7 @@ export default function LegalPage() {
         </section>
 
         <section className="page-shell mt-10">
-          <div className="rounded-[2rem] border border-border-subtle bg-[#fbfcfe] p-6 shadow-soft sm:p-8">
+          <div className="rounded-3xl border border-border-subtle bg-[#fbfcfe] p-6 shadow-soft sm:p-8">
             <div className="max-w-3xl">
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-muted">Supplemental notices</p>
               <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-foreground">
@@ -215,7 +215,7 @@ export default function LegalPage() {
         </section>
 
         <section className="page-shell mt-10">
-          <div className="rounded-[2rem] border border-border-subtle bg-white p-6 shadow-[0_18px_46px_rgba(11,31,58,0.06)] sm:p-8">
+          <div className="rounded-3xl border border-border-subtle bg-white p-6 shadow-[0_18px_46px_rgba(11,31,58,0.06)] sm:p-8">
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.8fr)]">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-muted">Contact matrix</p>
@@ -284,7 +284,7 @@ export default function LegalPage() {
         </section>
 
         <section id="legal-contact" className="page-shell mt-10 scroll-mt-28">
-          <div className="rounded-[2rem] border border-border-subtle bg-white p-6 shadow-[0_18px_46px_rgba(11,31,58,0.06)] sm:p-8">
+          <div className="rounded-3xl border border-border-subtle bg-white p-6 shadow-[0_18px_46px_rgba(11,31,58,0.06)] sm:p-8">
             <div className="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-muted">Contact the team</p>

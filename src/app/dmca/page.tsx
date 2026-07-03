@@ -42,7 +42,7 @@ export default function DmcaPage() {
       />
 
       <main className="page-shell py-10">
-        <section className="rounded-[2rem] border border-border-subtle bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(244,246,250,0.96))] p-6 shadow-brand sm:p-8">
+        <section className="rounded-3xl border border-border-subtle bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(244,246,250,0.96))] p-6 shadow-brand sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-muted">Intellectual Property</p>
           <h1 className="mt-3 max-w-3xl font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
             DMCA Copyright Policy
@@ -55,7 +55,7 @@ export default function DmcaPage() {
           <p className="mt-3 text-xs text-text-muted">Last updated: June 29, 2026</p>
         </section>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <div className="flex items-start gap-4">
             <div className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-brand-secondary/10 text-brand-secondary">
               <Copyright className="h-6 w-6" strokeWidth={2.25} />
@@ -86,7 +86,7 @@ export default function DmcaPage() {
           </div>
         </section>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <div className="flex items-start gap-4">
             <div className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-brand-secondary/10 text-brand-secondary">
               <FileText className="h-6 w-6" strokeWidth={2.25} />
@@ -116,7 +116,7 @@ export default function DmcaPage() {
           </div>
         </section>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <div className="flex items-start gap-4">
             <div className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-brand-secondary/10 text-brand-secondary">
               <RotateCcw className="h-6 w-6" strokeWidth={2.25} />
@@ -146,7 +146,7 @@ export default function DmcaPage() {
           </div>
         </section>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <h2 className="font-display text-xl font-semibold tracking-tight text-foreground">Repeat Infringer Policy</h2>
           <p className="mt-4 text-sm leading-7 text-text-secondary">
             MasseurMatch will terminate the accounts of users who are found to be repeat infringers of intellectual
@@ -156,7 +156,7 @@ export default function DmcaPage() {
           </p>
         </section>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <h2 className="font-display text-xl font-semibold tracking-tight text-foreground">Trademark and Other IP Complaints</h2>
           <p className="mt-4 text-sm leading-7 text-text-secondary">
             This policy covers copyright complaints under the DMCA. For trademark infringement complaints or other
@@ -167,7 +167,7 @@ export default function DmcaPage() {
           </p>
         </section>
 
-        <section className="mt-8 rounded-[2rem] border border-border-subtle bg-brand-primary px-6 py-7 text-white shadow-brand sm:px-8">
+        <section className="mt-8 rounded-3xl border border-border-subtle bg-brand-primary px-6 py-7 text-white shadow-brand sm:px-8">
           <div className="flex items-start gap-4">
             <Mail className="mt-0.5 h-5 w-5 flex-none text-brand-soft" strokeWidth={2.25} />
             <div>

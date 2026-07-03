@@ -233,7 +233,7 @@ export default function PricingPage() {
         </section>
 
         <section className="container mx-auto px-4 py-10">
-          <div className="mx-auto max-w-3xl rounded-[2rem] border border-border bg-white/92 p-8 shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
+          <div className="mx-auto max-w-3xl rounded-3xl border border-border bg-white/92 p-8 shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">FAQ</p>
             <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight text-foreground">Pricing questions</h2>
             <div className="mt-6 space-y-4">

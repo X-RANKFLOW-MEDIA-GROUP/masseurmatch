@@ -45,7 +45,7 @@ export default function PhotoProfilePolicyPage() {
       />
 
       <main className="page-shell py-10">
-        <section className="rounded-[2rem] border border-border-subtle bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(244,246,250,0.96))] p-6 shadow-brand sm:p-8">
+        <section className="rounded-3xl border border-border-subtle bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(244,246,250,0.96))] p-6 shadow-brand sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-muted">Content Standards</p>
           <h1 className="mt-3 max-w-3xl font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
             Photo and Profile Content Policy
@@ -59,7 +59,7 @@ export default function PhotoProfilePolicyPage() {
         </section>
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
-          <section className="premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-soft">
+          <section className="premium-surface rounded-3xl border border-border-subtle p-6 shadow-soft">
             <div className="mb-5 flex items-center gap-3">
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
                 <Camera className="h-5 w-5" strokeWidth={2.25} />
@@ -76,7 +76,7 @@ export default function PhotoProfilePolicyPage() {
             </ul>
           </section>
 
-          <section className="premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-soft">
+          <section className="premium-surface rounded-3xl border border-border-subtle p-6 shadow-soft">
             <div className="mb-5 flex items-center gap-3">
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-brand-secondary">
                 <ImageOff className="h-5 w-5" strokeWidth={2.25} />
@@ -94,7 +94,7 @@ export default function PhotoProfilePolicyPage() {
           </section>
         </div>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <h2 className="font-display text-2xl font-semibold tracking-tight text-foreground">Profile text and descriptions</h2>
           <div className="mt-5 space-y-4 text-sm leading-7 text-text-secondary">
             <p>
@@ -113,7 +113,7 @@ export default function PhotoProfilePolicyPage() {
           </div>
         </section>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <h2 className="font-display text-2xl font-semibold tracking-tight text-foreground">Copyright and image ownership</h2>
           <div className="mt-5 space-y-3 text-sm leading-7 text-text-secondary">
             <p>
@@ -128,7 +128,7 @@ export default function PhotoProfilePolicyPage() {
           </div>
         </section>
 
-        <section className="mt-8 premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+        <section className="mt-8 premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
           <h2 className="font-display text-2xl font-semibold tracking-tight text-foreground">Moderation and removal</h2>
           <div className="mt-5 space-y-3 text-sm leading-7 text-text-secondary">
             <p>
@@ -144,7 +144,7 @@ export default function PhotoProfilePolicyPage() {
           </div>
         </section>
 
-        <section className="mt-8 rounded-[2rem] border border-border-subtle bg-brand-primary px-6 py-7 text-white shadow-brand sm:px-8">
+        <section className="mt-8 rounded-3xl border border-border-subtle bg-brand-primary px-6 py-7 text-white shadow-brand sm:px-8">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-brand-soft">Related Policies</p>
           <div className="mt-5 flex flex-wrap gap-3 text-sm font-semibold">
             {[
