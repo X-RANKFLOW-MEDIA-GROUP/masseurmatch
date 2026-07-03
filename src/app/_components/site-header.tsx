@@ -515,7 +515,7 @@ export default function SiteHeader() {
         </Link>
 
         {/* Center: Navigation */}
-        <nav className="hidden lg:flex items-center gap-0.5">
+        <nav className="hidden lg:flex items-center gap-0.5" suppressHydrationWarning>
           {navItems.map((item) => (
             <DesktopNavItem
               key={item.label}
@@ -524,6 +524,7 @@ export default function SiteHeader() {
             />
           ))}
 
+          <div suppressHydrationWarning>
           {authenticated === null ? (
             <div className="w-16 h-8 animate-pulse rounded-md bg-[#F7F7F7] ml-0.5" />
           ) : authenticated ? (
@@ -561,10 +562,11 @@ export default function SiteHeader() {
               </Link>
             </motion.div>
           )}
+          </div>
         </nav>
 
         {/* Right: CTA + auth actions + mobile nav */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-3 shrink-0" suppressHydrationWarning>
           {authenticated !== null && authenticated && (
             <motion.button
               type="button"
