@@ -10,6 +10,7 @@ import { BoostRecommendations } from "./_components/BoostRecommendations";
 import { ProfileImprovements } from "./_components/ProfileImprovements";
 import { CityDemandScore } from "./_components/CityDemandScore";
 import { HotelOpportunities } from "./_components/HotelOpportunities";
+import KeywordTrendsDashboard from "@/components/dashboards/KeywordTrendsDashboard";
 
 export const metadata = {
   title: "Market Intelligence — MasseurMatch Pro",
@@ -72,6 +73,11 @@ export default async function MarketIntelligencePage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <CityDemandScore />
         <HotelOpportunities />
+      </div>
+
+      {/* Google Trends Keyword Monitor */}
+      <div className="border-t border-border pt-8">
+        <KeywordTrendsDashboard compact={false} />
       </div>
 
       {/* Recommendations */}
