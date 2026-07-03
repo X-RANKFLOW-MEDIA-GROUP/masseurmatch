@@ -425,7 +425,7 @@ export function VoxProfile({
         )}
 
         {/* ── Credentials & Training ───────────────────────────────────────── */}
-        {(training && training.length > 0) || (education && education.length > 0) ? (
+        {(training && training.length > 0) || (education && Array.isArray(education) && education.length > 0) ? (
           <Section id="credentials" eyebrow="Expertise" title="Credentials & training">
             <div className="space-y-4">
               {training && training.length > 0 && (
@@ -433,16 +433,17 @@ export function VoxProfile({
                   <h3 className="mb-3 text-sm font-semibold text-[#111111]">Training</h3>
                   <ul className="space-y-2">
                     {training.map((item, idx) => {
-                      const label = typeof item === "string" ? item : (item as Record<string, unknown>)?.label;
-                      const detail = typeof item === "string" ? null : (item as Record<string, unknown>)?.detail;
-                      const institution = typeof item === "string" ? null : (item as Record<string, unknown>)?.institution;
+                      const itemRecord = typeof item === "string" ? { label: item } : (item as Record<string, string | undefined>);
+                      const label = String(itemRecord?.label ?? item);
+                      const detail = itemRecord?.detail ?? null;
+                      const institution = itemRecord?.institution ?? null;
                       return (
                         <li key={idx} className="flex items-start gap-3">
                           <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600" strokeWidth={3} />
                           <div className="text-sm text-[#3f3a33]">
                             <div className="font-semibold">{label}</div>
-                            {institution && <div className="text-[#6F6050]">{institution}</div>}
-                            {detail && <div className="text-[#6F6050] text-xs mt-0.5">{detail}</div>}
+                            {institution && <div className="text-[#6F6050]">{String(institution)}</div>}
+                            {detail && <div className="text-[#6F6050] text-xs mt-0.5">{String(detail)}</div>}
                           </div>
                         </li>
                       );
@@ -450,40 +451,41 @@ export function VoxProfile({
                   </ul>
                 </div>
               )}
-              {education && education.length > 0 && !Array.isArray(education) && typeof education !== "string" ? (
+              {Array.isArray(education) && education.length > 0 && (
                 <div>
                   <h3 className="mb-3 text-sm font-semibold text-[#111111]">Education</h3>
                   <ul className="space-y-2">
-                    {(education as Array<Record<string, unknown> | string>).map((item, idx) => {
-                      const label = typeof item === "string" ? item : (item as Record<string, unknown>)?.label;
-                      const institution = typeof item === "string" ? null : (item as Record<string, unknown>)?.institution;
+                    {education.map((item, idx) => {
+                      const itemRecord = typeof item === "string" ? { label: item } : (item as Record<string, string | undefined>);
+                      const label = String(itemRecord?.label ?? item);
+                      const institution = itemRecord?.institution ?? null;
                       return (
                         <li key={idx} className="flex items-start gap-3">
                           <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600" strokeWidth={3} />
                           <div className="text-sm text-[#3f3a33]">
                             <div className="font-semibold">{label}</div>
-                            {institution && <div className="text-[#6F6050]">{institution}</div>}
+                            {institution && <div className="text-[#6F6050]">{String(institution)}</div>}
                           </div>
                         </li>
                       );
                     })}
                   </ul>
                 </div>
-              ) : null}
+              )}
             </div>
           </Section>
         ) : null}
 
         {/* ── Business Hours ───────────────────────────────────────────────── */}
-        {businessHours && typeof businessHours === "object" && Object.keys(businessHours).length > 0 && (
+        {businessHours && typeof businessHours === "object" && !Array.isArray(businessHours) && Object.keys(businessHours).length > 0 && (
           <Section id="business-hours" eyebrow="Hours" title="Business hours">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => {
                 const dayLower = day.toLowerCase();
-                const dayData = (businessHours as Record<string, unknown>)[dayLower] as Record<string, unknown> | undefined;
-                const isOpen = dayData?.enabled ?? dayData?.open ?? (dayData ? Boolean(Object.keys(dayData).length) : false);
-                const startTime = dayData?.start_time ?? dayData?.startTime ?? dayData?.open_time ?? "";
-                const endTime = dayData?.end_time ?? dayData?.endTime ?? dayData?.close_time ?? "";
+                const dayData = (businessHours as Record<string, Record<string, string | boolean>>)[dayLower];
+                const isOpen = dayData?.enabled ?? dayData?.open ?? Boolean(dayData);
+                const startTime = (dayData?.start_time ?? dayData?.startTime ?? dayData?.open_time ?? "") as string;
+                const endTime = (dayData?.end_time ?? dayData?.endTime ?? dayData?.close_time ?? "") as string;
 
                 return (
                   <div key={day} className="rounded-lg border border-[#E8E8E8] bg-white p-4 text-sm">
@@ -492,9 +494,9 @@ export function VoxProfile({
                       <div className="mt-1 text-[#5a5147]">
                         {startTime && endTime ? (
                           <>
-                            <div>{startTime}</div>
+                            <div>{String(startTime)}</div>
                             <div>–</div>
-                            <div>{endTime}</div>
+                            <div>{String(endTime)}</div>
                           </>
                         ) : (
                           <div className="text-emerald-600 font-medium">Open</div>
