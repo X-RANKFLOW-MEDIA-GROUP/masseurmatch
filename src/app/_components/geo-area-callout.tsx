@@ -65,8 +65,8 @@ export function GeoAreaCallout({
       className={cn(
         "rounded-[24px] border p-4 backdrop-blur-xl sm:p-5",
         isInverse
-          ? "border-white/12 bg-white/[0.06] text-white shadow-[0_24px_60px_rgba(0,0,0,0.16)]"
-          : "border-border-subtle bg-white/92 text-foreground shadow-[0_18px_40px_rgb(var(--color-brand-primary-rgb)/0.06)]",
+          ? "border-white/12 bg-white/[0.06] text-white shadow-[var(--shadow-lg)]"
+          : "border-border-subtle bg-white/92 text-foreground shadow-[var(--shadow-md)]",
         className,
       )}
     >

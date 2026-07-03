@@ -44,7 +44,7 @@ export function ProfileContact({ profile }: Props) {
       </p>
 
       {profile.phone ? (
-        <div className="profile-panel-soft mt-4 rounded-[1.5rem] px-4 py-3">
+        <div className="profile-panel-soft mt-4 rounded-3xl px-4 py-3">
           <div className="flex items-center gap-2">
             <Phone className="h-4 w-4 text-brand-secondary" strokeWidth={2.25} />
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
@@ -58,7 +58,7 @@ export function ProfileContact({ profile }: Props) {
       ) : null}
 
       {profile.show_email && profile.email_address ? (
-        <div className="profile-panel-soft mt-3 rounded-[1.5rem] px-4 py-3">
+        <div className="profile-panel-soft mt-3 rounded-3xl px-4 py-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             Email
           </p>

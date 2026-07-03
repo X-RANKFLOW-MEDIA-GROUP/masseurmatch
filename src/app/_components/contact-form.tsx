@@ -43,7 +43,7 @@ const FIELD_CLASSNAME =
   "!h-14 !rounded-[1.35rem] !border-white/10 !bg-slate-950/80 !px-4 !text-base !text-white !shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] !ring-offset-0 placeholder:!text-slate-500 focus-visible:!border-emerald-400/70 focus-visible:!ring-2 focus-visible:!ring-emerald-500/20";
 
 const TEXTAREA_CLASSNAME =
-  "!min-h-44 !rounded-[1.6rem] !border-white/10 !bg-slate-950/80 !px-4 !py-3 !text-base !text-white !shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] !ring-offset-0 placeholder:!text-slate-500 focus-visible:!border-emerald-400/70 focus-visible:!ring-2 focus-visible:!ring-emerald-500/20";
+  "!min-h-44 !rounded-3xl !border-white/10 !bg-slate-950/80 !px-4 !py-3 !text-base !text-white !shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] !ring-offset-0 placeholder:!text-slate-500 focus-visible:!border-emerald-400/70 focus-visible:!ring-2 focus-visible:!ring-emerald-500/20";
 
 const SELECT_TRIGGER_CLASSNAME =
   "!h-14 !rounded-[1.35rem] !border-white/10 !bg-slate-950/80 !px-4 !text-base !text-white !shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] !ring-offset-0 data-[placeholder]:!text-slate-500 [&>svg]:text-slate-500 focus:!border-emerald-400/70 focus:!ring-2 focus:!ring-emerald-500/20";
@@ -220,7 +220,7 @@ export function ContactForm() {
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-emerald-500 px-7 text-base font-medium text-slate-950 shadow-[0_18px_42px_rgba(16,185,129,0.32)] transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-emerald-500 px-7 text-base font-medium text-slate-950 shadow-[var(--shadow-md)] transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? "Sending..." : "Send Message"}
           {!loading ? <ArrowRight className="h-4 w-4" /> : null}

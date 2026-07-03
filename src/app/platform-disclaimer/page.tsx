@@ -92,7 +92,7 @@ export default function PlatformDisclaimerPage() {
             MasseurMatch exists to make provider visibility and direct connections clearer. It does not replace your
             own due diligence, legal compliance, or independent decision-making.
           </p>
-          <div className="mt-6 max-w-3xl rounded-[1.6rem] border border-white/14 bg-white/8 px-5 py-4 text-sm leading-7 text-white/76">
+          <div className="mt-6 max-w-3xl rounded-3xl border border-white/14 bg-white/8 px-5 py-4 text-sm leading-7 text-white/76">
             By using or listing on the platform, you acknowledge that providers operate independently and that any
             interaction or transaction is at your own risk and discretion.
           </div>
@@ -102,7 +102,7 @@ export default function PlatformDisclaimerPage() {
           {disclaimers.map((item) => (
             <article
               key={item.title}
-              className="premium-surface rounded-[1.8rem] border border-border-subtle p-6 shadow-soft"
+              className="premium-surface rounded-3xl border border-border-subtle p-6 shadow-soft"
             >
               <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-secondary/10 text-brand-secondary">
                 <item.icon className="h-5 w-5" />
@@ -114,7 +114,7 @@ export default function PlatformDisclaimerPage() {
         </section>
 
         <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-          <article className="premium-surface rounded-[2rem] border border-border-subtle p-6 shadow-brand sm:p-8">
+          <article className="premium-surface rounded-3xl border border-border-subtle p-6 shadow-brand sm:p-8">
             <div className="flex items-start gap-4">
               <div className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-brand-soft/12 text-brand-primary">
                 <ShieldAlert className="h-5 w-5" />
@@ -133,7 +133,7 @@ export default function PlatformDisclaimerPage() {
             </div>
           </article>
 
-          <article className="rounded-[2rem] border border-border-subtle bg-white/90 p-6 shadow-soft">
+          <article className="rounded-3xl border border-border-subtle bg-white/90 p-6 shadow-soft">
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-muted">Legal Contact</p>
             <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight text-foreground">
               Questions about platform liability or legal process?

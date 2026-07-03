@@ -95,7 +95,7 @@ export default function ComparisonPage({
       </section>
 
       <section className="page-shell py-12 sm:py-16">
-        <div className="premium-surface rounded-[32px] border border-border-subtle p-6 shadow-[0_16px_36px_rgb(var(--color-brand-primary-rgb)/0.05)] sm:p-8">
+        <div className="premium-surface rounded-[32px] border border-border-subtle p-6 shadow-[var(--shadow-md)] sm:p-8">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-action-secondary">
@@ -183,7 +183,7 @@ export default function ComparisonPage({
       </section>
 
       <section className="page-shell pb-12 sm:pb-16">
-        <div className="premium-surface rounded-[32px] border border-border-subtle p-6 shadow-[0_16px_36px_rgb(var(--color-brand-primary-rgb)/0.04)] sm:p-8">
+        <div className="premium-surface rounded-[32px] border border-border-subtle p-6 shadow-[var(--shadow-md)] sm:p-8">
           <h2 className="text-2xl font-semibold tracking-tight text-brand-primary">
             Frequently asked questions
           </h2>

@@ -1,14 +1,15 @@
 import { Crown } from "lucide-react";
-import { IconMapPin, IconShield, IconSpark } from "@/components/icons";
+import { IconMapPin } from "@/components/icons";
+import { StatusBadge } from "@/components/ui/status-badge";
 import type { ProfileViewModel } from "./profile-utils";
 
 export function ProfileHeader({ profile }: { profile: ProfileViewModel }) {
   return (
     <div className="rounded-[24px] border border-white/5 bg-[#101C2B]/90 p-6 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5">
-      <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-[#94A3B8]">
-        {profile.isVerified && <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-emerald-300"><IconShield size={16} />Verified</span>}
-        {profile.isFeatured && <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-amber-300"><IconSpark size={16} />Featured</span>}
-        {profile.isPremium && <span className="inline-flex items-center gap-1 rounded-full border border-blue-400/25 bg-blue-400/10 px-3 py-1 text-blue-200"><Crown className="h-4 w-4" />Premium</span>}
+      <div className="flex flex-wrap items-center gap-2">
+        {profile.isVerified && <StatusBadge type="photo-reviewed" size="sm" />}
+        {profile.isFeatured && <StatusBadge type="featured" size="sm" />}
+        {profile.isPremium && <StatusBadge type="elite" size="sm" />}
       </div>
       <h1 className="mt-5 font-display text-[clamp(34px,5vw,56px)] font-bold leading-[1.05] tracking-[-0.04em] text-[#F8FAFC]">
         {profile.name} Massage Therapist in {profile.city}, {profile.state}

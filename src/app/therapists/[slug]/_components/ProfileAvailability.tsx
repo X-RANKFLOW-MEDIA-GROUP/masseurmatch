@@ -30,7 +30,7 @@ export function ProfileAvailability({ profile }: Props) {
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         {/* Incall */}
-        <div className="profile-panel-soft rounded-[1.5rem] p-5">
+        <div className="profile-panel-soft rounded-3xl p-5">
           <h3 className="text-lg font-semibold text-foreground">Incall</h3>
           <div className="mt-3 space-y-2 text-sm text-muted-foreground">
             {hasIncall ? (
@@ -47,7 +47,7 @@ export function ProfileAvailability({ profile }: Props) {
         </div>
 
         {/* Outcall */}
-        <div className="profile-panel-soft rounded-[1.5rem] p-5">
+        <div className="profile-panel-soft rounded-3xl p-5">
           <h3 className="text-lg font-semibold text-foreground">Outcall</h3>
           <div className="mt-3 space-y-2 text-sm text-muted-foreground">
             {hasOutcall ? (

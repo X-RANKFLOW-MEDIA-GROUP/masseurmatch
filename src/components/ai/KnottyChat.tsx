@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, Clock3, MapPinned, Send, MessageCircle, ShieldCheck, X } from "lucide-react";
 import { useKnotty } from "@/hooks/useKnotty";
 import { cn } from "@/lib/utils";
@@ -148,10 +148,12 @@ function ChatBubble({
   message,
   isLatestAssistant,
   onRecommendationOpen,
+  reduced,
 }: {
   message: ReturnType<typeof useKnotty>["messages"][number];
   isLatestAssistant: boolean;
   onRecommendationOpen: (recommendation: KnottyRecommendation) => void;
+  reduced: boolean | null;
 }) {
   const isUser = message.role === "user";
   // Don't typewriter the seeded greeting — it should read as already there.
@@ -184,9 +186,9 @@ function ChatBubble({
 
         {isDone && recommendations.length > 0 ? (
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
+            initial={reduced ? undefined : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={reduced ? { duration: 0 } : { duration: 0.4 }}
             className="space-y-3"
           >
             {recommendations.map((recommendation, index) => (
@@ -227,6 +229,7 @@ const STORAGE_KEY = "knotty-chat-state";
 
 export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) => {
   const isEmbedded = mode === "embedded";
+  const reduced = useReducedMotion();
   const [isOpen, setIsOpen] = useState(isEmbedded);
   const { input, isTyping, messages, sendMessage, setInput, trackOpen, trackRecommendationClick } =
     useKnotty();
@@ -392,6 +395,7 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
             message={message}
             isLatestAssistant={message.id === latestAssistantId}
             onRecommendationOpen={(recommendation) => trackRecommendationClick(recommendation)}
+            reduced={reduced}
           />
         ))}
 
@@ -449,9 +453,9 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
             key="knotty-launcher"
             ref={launcherRef}
             type="button"
-            initial={{ opacity: 0, scale: 0.86 }}
+            initial={reduced ? undefined : { opacity: 0, scale: 0.86 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.86 }}
+            exit={reduced ? undefined : { opacity: 0, scale: 0.86 }}
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
             onClick={openChat}
             className="group relative h-14 w-14 rounded-full border border-white/20 bg-[#8B1E2D] shadow-[0_20px_48px_rgba(139,30,45,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8B1E2D]/50 focus-visible:ring-offset-2 sm:h-16 sm:w-16"
@@ -466,9 +470,9 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
         ) : (
           <motion.div
             key="knotty-panel"
-            initial={{ opacity: 0, y: 28, scale: 0.95 }}
+            initial={reduced ? undefined : { opacity: 0, y: 28, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 28, scale: 0.95 }}
+            exit={reduced ? undefined : { opacity: 0, y: 28, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 240, damping: 26 }}
             className="origin-bottom-right"
           >

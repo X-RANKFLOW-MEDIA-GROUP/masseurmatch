@@ -124,7 +124,7 @@ function FilterMetric({
 }) {
   return (
     <div
-      className={`min-w-[158px] rounded-[1.2rem] border border-slate-200/80 bg-white/72 px-4 py-3 shadow-[0_16px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl ${
+      className={`min-w-[158px] rounded-2xl border border-slate-200/80 bg-white/72 px-4 py-3 shadow-[var(--shadow-md)] backdrop-blur-xl ${
         compact ? "min-w-[142px]" : ""
       }`}
     >
@@ -209,7 +209,7 @@ export function AdvancedDirectoryFilter({
 
   return (
     <div className="sticky top-[86px] z-40">
-      <div className="relative overflow-hidden rounded-[2rem] border border-slate-200/70 bg-[rgba(255,255,255,0.82)] shadow-[0_24px_64px_rgba(15,23,42,0.1)] backdrop-blur-2xl">
+      <div className="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-[rgba(255,255,255,0.82)] shadow-[0_24px_64px_rgba(15,23,42,0.1)] backdrop-blur-2xl">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(15,23,42,0.06),transparent_34%),radial-gradient(circle_at_top_right,rgba(148,163,184,0.14),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.94),rgba(248,250,252,0.86))]" />
 
         <div className="relative px-4 py-4 md:px-6 md:py-5">
@@ -231,7 +231,7 @@ export function AdvancedDirectoryFilter({
                 </div>
               </div>
 
-              <div className="hidden min-w-[190px] items-center gap-3 rounded-[1.35rem] border border-slate-200/80 bg-white/72 px-4 py-3 shadow-[0_16px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl sm:flex">
+              <div className="hidden min-w-[190px] items-center gap-3 rounded-[1.35rem] border border-slate-200/80 bg-white/72 px-4 py-3 shadow-[var(--shadow-md)] backdrop-blur-xl sm:flex">
                 <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
                 <div className="min-w-0">
                   <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-slate-400">
@@ -384,7 +384,7 @@ export function AdvancedDirectoryFilter({
                 </div>
 
                 <div className="space-y-5">
-                  <div className="border border-slate-200 bg-white/82 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl">
+                  <div className="border border-slate-200 bg-white/82 p-5 shadow-[var(--shadow-md)] backdrop-blur-xl">
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-slate-400">

@@ -128,7 +128,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       <JsonLd data={buildFaqJsonLd(SEARCH_FAQS)} />
 
       <div className="page-shell py-10">
-        <div className="rounded-[2.2rem] border border-slate-800 bg-slate-950 px-6 py-8 shadow-[0_28px_80px_rgba(15,23,42,0.22)] sm:px-8 sm:py-10">
+        <div className="rounded-[2.2rem] border border-slate-800 bg-slate-950 px-6 py-8 shadow-[var(--shadow-xl)] sm:px-8 sm:py-10">
           <p className="font-mono text-[11px] font-medium uppercase tracking-[0.32em] text-slate-400">Explore and search</p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-medium tracking-tight text-white sm:text-6xl lg:text-7xl">
             <TextReveal text="Find trusted therapists fast." delay={0.05} />

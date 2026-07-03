@@ -53,7 +53,7 @@ function TherapistCard({ profile, index }: { profile: PublicTherapist; index: nu
       data-testid="therapist-card"
     >
       {profile.profile_photo && (
-        <div className="absolute inset-x-3 -top-20 flex h-56 items-end justify-center overflow-hidden rounded-[1.5rem] bg-gradient-to-b from-slate-50 via-white to-white">
+        <div className="absolute inset-x-3 -top-20 flex h-56 items-end justify-center overflow-hidden rounded-3xl bg-gradient-to-b from-slate-50 via-white to-white">
           <img
             src={profile.profile_photo}
             alt={`${displayName} profile photo`}
