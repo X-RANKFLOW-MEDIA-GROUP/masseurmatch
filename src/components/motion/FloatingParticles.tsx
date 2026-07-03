@@ -8,10 +8,11 @@ export function FloatingParticles() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const particles = Array.from({ length: reduced ? 22 : 64 }, () => ({
+    const lowPowerMode = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const particles = Array.from({ length: reduced ? 16 : lowPowerMode ? 32 : 48 }, () => ({
       x: Math.random(),
       y: Math.random(),
       r: Math.random() * 1.4 + 0.35,
