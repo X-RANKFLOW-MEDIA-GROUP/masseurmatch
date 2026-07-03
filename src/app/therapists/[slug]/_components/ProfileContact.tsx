@@ -3,6 +3,7 @@
 import { MessageCircleMore, MessageSquare, Phone } from "lucide-react";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import { getPublicContactLinks } from "@/app/_lib/public-profile";
+import { trackInquiry } from "@/app/_lib/analytics-events";
 import { useKnottyProfileAttribution } from "./useKnottyProfileAttribution";
 
 function formatPhoneDisplay(phone: string) {
@@ -70,7 +71,13 @@ export function ProfileContact({ profile }: Props) {
         {smsHref ? (
           <a
             href={smsHref}
-            onClick={() => trackContact("knotty_text_clicked")}
+            onClick={() => {
+              trackContact("knotty_text_clicked");
+              trackInquiry({
+                profile_id: profile.id,
+                inquiry_type: "text",
+              });
+            }}
             className="profile-card-cta w-full rounded-[1.25rem] px-5 py-3.5 text-sm font-semibold"
           >
             <MessageSquare className="mr-2 h-4 w-4" />
@@ -80,7 +87,13 @@ export function ProfileContact({ profile }: Props) {
         {callHref ? (
           <a
             href={callHref}
-            onClick={() => trackContact("knotty_call_clicked")}
+            onClick={() => {
+              trackContact("knotty_call_clicked");
+              trackInquiry({
+                profile_id: profile.id,
+                inquiry_type: "call",
+              });
+            }}
             className="profile-cta-secondary w-full rounded-[1.25rem] px-5 py-3.5 text-sm font-semibold"
           >
             <Phone className="mr-2 h-4 w-4" />
@@ -92,7 +105,13 @@ export function ProfileContact({ profile }: Props) {
             href={whatsappHref}
             target="_blank"
             rel="noreferrer"
-            onClick={() => trackContact("knotty_whatsapp_clicked")}
+            onClick={() => {
+              trackContact("knotty_whatsapp_clicked");
+              trackInquiry({
+                profile_id: profile.id,
+                inquiry_type: "text",
+              });
+            }}
             className="profile-cta-secondary w-full rounded-[1.25rem] px-5 py-3.5 text-sm font-semibold"
           >
             <MessageCircleMore className="mr-2 h-4 w-4" />

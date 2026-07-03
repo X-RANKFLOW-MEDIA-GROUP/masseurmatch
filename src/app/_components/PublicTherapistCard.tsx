@@ -3,10 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Navigation } from "lucide-react";
-import { IconMapPin, IconShield, IconSpark, IconStar } from "@/components/icons";
+import { ArrowUpRight, Navigation, MapPin, Check } from "lucide-react";
 import { useMemo } from "react";
 import type { PublicTherapist } from "@/app/_lib/directory";
+import { Pill } from "@/components/ui/pill";
 import {
   getPublicProfileName,
   isVerifiedDirectoryProfile,
@@ -87,6 +87,9 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
       .toUpperCase() || "MM"
   );
 
+  const services = (therapist.massage_techniques || []).slice(0, 3);
+  const lgbtqAffirming = therapist.lgbtq_affirming === true;
+
   return (
     <motion.article
       className="group relative isolate flex flex-col overflow-hidden rounded-2xl bg-white shadow-[var(--shadow-xs)] ring-1 ring-black/[0.06] transition-[box-shadow,ring-color] duration-300 hover:shadow-[var(--shadow-md)] hover:ring-black/10"
@@ -98,14 +101,9 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
       viewport={{ once: true, margin: "-30px" }}
       transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
     >
-      <Link
-        href={profilePath}
-        onClick={beginRouteTransition}
-        className="flex flex-1 flex-col"
-        aria-label={`${name} – massage therapist${locationLabel ? ` in ${locationLabel}` : ""}${priceLabel ? `, from ${priceLabel}` : ""}`}
-      >
-        {/* Photo */}
-        <div className="relative aspect-square overflow-hidden bg-neutral-100">
+      <div className="flex flex-1 flex-col">
+        {/* Photo with badges overlay */}
+        <div className="relative aspect-square overflow-hidden bg-neutral-50">
           {profileImage ? (
             <Image
               src={profileImage}
@@ -117,121 +115,139 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
               itemProp="image"
             />
           ) : (
-            <div
-              className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200"
-              aria-label={`${name} – no photo`}
-            >
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
               <span className="font-display text-4xl font-extrabold text-neutral-300">
                 {initials}
               </span>
             </div>
           )}
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
-
-          {/* Top badges */}
-          <div className="absolute inset-x-2.5 top-2.5 flex items-start justify-between gap-2">
-            <div className="flex flex-col items-start gap-1">
-              {isDirectoryListed && (
-                <span
-                  title="Identity reviewed before listing. Does not confirm professional licensure."
-                  className="inline-flex items-center gap-1 rounded-full bg-white/92 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 shadow-sm backdrop-blur-sm"
-                >
-                  <IconShield size={12} className="text-emerald-500" />
-                  {isElite ? "Elite" : hasIdentityVerification ? "ID Verified" : "Listed"}
-                </span>
-              )}
-              {isNewProfile && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#8B1E2D]/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur-sm">
-                  <IconSpark size={12} />
-                  New
-                </span>
-              )}
-              {travelBadge && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-sky-600/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur-sm">
-                  <Navigation className="h-3 w-3" strokeWidth={2.5} />
-                  {travelBadge.label}
-                </span>
-              )}
-              {therapist.is_featured && !isElite && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur-sm">
-                  <IconSpark size={12} />
-                  Featured
-                </span>
-              )}
-            </div>
-            {therapist.review_count ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-black/45 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
-                <IconStar size={12} className="text-primary" />
-                {therapist.review_count}
-              </span>
-            ) : null}
+          {/* Top badge row */}
+          <div className="absolute inset-x-2 top-2 flex gap-1.5">
+            {availableNow && (
+              <Pill
+                variant="available"
+                size="sm"
+                icon={<span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />}
+                label="Available Now"
+              />
+            )}
+            {isDirectoryListed && (
+              <Pill
+                variant="verified"
+                size="sm"
+                icon={<Check size={10} />}
+                label="Verified"
+              />
+            )}
           </div>
 
-          {/* Hover affordance */}
-          <span className="absolute right-2.5 top-1/2 flex h-8 w-8 -translate-y-1/2 translate-x-3 items-center justify-center rounded-full bg-white/95 text-neutral-900 opacity-0 shadow-md transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
-            <ArrowUpRight className="h-4 w-4" strokeWidth={2.5} />
-          </span>
+          {/* Hover link affordance */}
+          <Link
+            href={profilePath}
+            onClick={beginRouteTransition}
+            className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all duration-300 group-hover:bg-black/20 group-hover:opacity-100"
+            aria-label={`View ${name}'s full profile`}
+          >
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-neutral-900 shadow-md">
+              <ArrowUpRight className="h-5 w-5" strokeWidth={2.5} />
+            </span>
+          </Link>
+        </div>
 
-          {/* Name + specialty overlay */}
-          <div className="absolute inset-x-3 bottom-2.5">
+        {/* Content */}
+        <div className="flex flex-1 flex-col gap-3 p-3.5">
+          {/* Name and location */}
+          <div className="min-w-0">
             <h3
-              className="font-['Georgia',serif] text-[15px] font-normal leading-tight text-white drop-shadow-sm"
+              className="truncate font-display text-base font-semibold text-neutral-900"
               itemProp="name"
             >
               {name}
             </h3>
-            {specialty && (
-              <p className="mt-0.5 truncate text-[10px] uppercase tracking-[0.12em] text-white/70">
-                {specialty}
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Info row */}
-        <div className="flex items-center justify-between gap-2 px-2.5 py-2">
-          <div className="min-w-0">
-            {locationLabel ? (
-              <p className="flex items-center gap-1 truncate text-[11px] font-medium text-neutral-500">
-                <IconMapPin size={12} className="shrink-0 text-neutral-400" />
+            {locationLabel && (
+              <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-neutral-500">
+                <MapPin size={12} className="shrink-0" />
                 <span className="truncate">{locationLabel}</span>
               </p>
-            ) : (
-              <p className="text-[11px] font-medium text-neutral-400">Massage therapist</p>
-            )}
-            {availableNow && (
-              <p className="mt-0.5 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-600">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-                Available now
-              </p>
-            )}
-            {!availableNow && travelBadge && (
-              <p className="mt-0.5 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-sky-600">
-                <Navigation className="h-2.5 w-2.5" strokeWidth={2.5} />
-                {travelBadge.label} · {travelBadge.city}
-              </p>
             )}
           </div>
 
-          <div className="shrink-0 text-right">
-            {priceLabel ? (
-              <>
-                <p className="text-[9px] uppercase tracking-widest text-neutral-400">From</p>
-                <p className="text-sm font-semibold text-neutral-900" itemProp="priceRange">
-                  {priceLabel}
-                </p>
-              </>
-            ) : (
-              <p className="text-xs font-medium text-neutral-500" itemProp="priceRange">
-                Contact for rates
+          {/* Headline/specialty */}
+          {specialty && (
+            <p className="line-clamp-2 text-xs text-neutral-600">
+              {specialty}
+            </p>
+          )}
+
+          {/* Service pills */}
+          {services.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {services.map((service) => (
+                <Pill
+                  key={service}
+                  variant="service"
+                  size="sm"
+                  label={service}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Price */}
+          {priceLabel && (
+            <div className="pt-1">
+              <p className="text-[10px] uppercase tracking-widest text-neutral-400">
+                Starting at
               </p>
-            )}
-          </div>
+              <p
+                className="text-sm font-semibold text-neutral-900"
+                itemProp="priceRange"
+              >
+                {priceLabel}
+              </p>
+            </div>
+          )}
+
+          {/* Trust badge */}
+          {lgbtqAffirming && (
+            <div className="pt-1">
+              <Pill
+                variant="lgbtq"
+                size="sm"
+                label="LGBTQ+ Safe Space"
+              />
+            </div>
+          )}
         </div>
-      </Link>
 
-      {/* SEO microdata (visually hidden) */}
+        {/* CTA buttons */}
+        <div className="flex gap-2 border-t border-neutral-200 p-3">
+          <Link
+            href={profilePath}
+            onClick={beginRouteTransition}
+            className="flex-1 rounded-lg bg-neutral-100 px-3 py-2.5 text-center text-xs font-semibold text-neutral-900 transition hover:bg-neutral-200"
+          >
+            View Profile
+          </Link>
+          <button
+            onClick={() => {
+              const element = document.querySelector("#contact");
+              element?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="flex-1 rounded-lg bg-primary px-3 py-2.5 text-center text-xs font-semibold text-white transition hover:bg-primary/90"
+          >
+            Ask Availability
+          </button>
+        </div>
+
+        {/* Directory disclaimer */}
+        <div className="border-t border-neutral-100 px-3 py-2 text-[9px] text-neutral-500">
+          <p>Directory profile. Confirm rates & availability directly.</p>
+        </div>
+      </div>
+
+      {/* SEO microdata */}
       <meta itemProp="jobTitle" content="Massage Therapist" />
       <meta itemProp="url" content={profilePath} />
       {(city || state) && (
