@@ -66,8 +66,8 @@ export function HeroCinematic() {
                 className="mt-10 flex flex-col gap-4 sm:gap-6"
               >
                 <motion.div
-                  animate={{ y: [0, -4, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  animate={reducedMotion ? {} : { y: [0, -4, 0] }}
+                  transition={reducedMotion ? {} : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
                   className="flex items-center gap-2"
                 >
                   <Sparkles size={20} className="text-[#8B1E2D]" strokeWidth={2.5} />
