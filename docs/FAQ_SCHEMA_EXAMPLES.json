@@ -1,0 +1,177 @@
+{
+  "_comments": [
+    "FAQ JSON-LD Schema Examples for MasseurMatch",
+    "Copy these schemas directly into your app or use getCityFAQSchema() helper"
+  ],
+  "universal_schema_root_page": {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What makes a massage therapist LGBTQ+ affirming?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "LGBTQ+ affirming therapists actively welcome and support clients of all sexual orientations and gender identities. They use chosen names and pronouns, respect gender diversity, and create a judgment-free space. Every therapist on MasseurMatch has committed to these values, and we verify this during our review process. This means you can book with confidence, knowing your identity is respected."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does MasseurMatch verify therapists?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "All therapists complete our verification process before going live. We confirm identity, LGBTQ+ affirmation commitment, and contact information. Each profile is reviewed to ensure authenticity and safety. While we don't perform background checks ourselves, we encourage clients to research therapists thoroughly and trust their instincts. Our community ratings and reviews help build confidence over time."
+        }
+      }
+    ]
+  },
+  "dallas_city_page": {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What are the best neighborhoods for massage in Dallas?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oak Lawn and Uptown are Dallas's most vibrant LGBTQ+ neighborhoods with excellent therapist availability. Downtown and Deep Ellum also have strong communities. Many therapists service the entire Dallas area for out-call. Check individual profiles for their in-call location and service area. Proximity matters for in-call, so filter by neighborhood if location is important to you."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Are therapists available in Oak Lawn and Uptown?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, Oak Lawn and Uptown have multiple verified therapists on MasseurMatch. Many have studios in these neighborhoods and offer both in-call and out-call services. These areas are popular for bookings, so availability can fill quickly during peak times. Search by location or contact therapists directly to check their schedules."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What's the fastest way to book in Dallas?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Use the search filter to sort by availability or response time. Many Dallas therapists keep open slots and respond to texts or calls within hours. For same-day bookings, call or text directly—listed on each profile. Afternoon and evening slots often have better availability than morning. Weekday appointments may be easier to secure than weekends."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I book out-call sessions throughout Dallas?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, many Dallas therapists offer out-call throughout the city and surrounding areas. Service areas vary—some therapists cover the entire metroplex, others focus on specific neighborhoods. Check their profile for service radius or contact them directly. Out-call pricing may include a travel fee depending on distance."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I find therapists who specialize in a specific modality in Dallas?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Use the modality filter on the search page to narrow by specialty (deep tissue, sports massage, Thai, etc.). Dallas therapists cover the full range. Read profiles to confirm expertise and experience with your specific needs. You can also message therapists directly to ask about their training and approach."
+        }
+      }
+    ]
+  },
+  "houston_city_page": {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Where can I find LGBTQ+-affirming therapists in Montrose?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Montrose is Houston's primary LGBTQ+ neighborhood and has excellent therapist availability on MasseurMatch. Many therapists have studios or regularly service the Montrose area. Search by neighborhood or browse profiles to find therapists who list Montrose as their in-call location or service area. Montrose therapists are experienced with diverse clientele."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What modalities are most popular in Houston?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Deep tissue, Swedish, and sports massage are popular in Houston, reflecting the city's active lifestyle. Many therapists also specialize in prostate massage, tantric sessions, and myofascial release. Houston's heat and humidity make therapeutic massage especially popular. Search by modality to find specialists, or ask individual therapists about their most requested services."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does out-call work in Houston hotels?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Many Houston therapists offer hotel out-call services. When booking, confirm the therapist services hotels and your specific location. Provide the hotel name, room number, and check-in time. Most therapists bring a portable massage table. Some hotels have restrictions—check your hotel's guest policy. Therapists typically ask for discretion and appreciate clear directions to your room."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What's the typical massage cost in Houston?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Houston massage rates typically range from $70–200+ per hour, depending on modality, therapist experience, and location. In-call sessions in Montrose studios may differ from out-call hotel services. Many therapists offer first-time discounts or package rates for returning clients. Check individual profiles for exact pricing and any specials."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I contact a therapist in Houston?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Each therapist profile lists their preferred contact methods: phone, text, WhatsApp, or email. Most Houston therapists respond quickly to texts and calls. Include your name, desired service (in-call or out-call), date/time, and modality preference. Professional, clear communication helps secure your booking faster."
+        }
+      }
+    ]
+  },
+  "austin_city_page": {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What makes Austin's massage scene different?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Austin's culture emphasizes wellness, inclusivity, and authenticity—reflected in its thriving massage community. Austin therapists tend to blend modalities creatively and welcome conversations about holistic health. The city's laid-back vibe attracts therapists who prioritize personal connection and tailored sessions. Austin's outdoor lifestyle also drives demand for sports massage and recovery work."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Where are therapists located in East Austin and Downtown?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "East Austin and Downtown have growing massage communities. Many therapists have studios near Congress Avenue, East 6th Street, and surrounding neighborhoods. Some offer both in-call and out-call throughout Austin. Check profiles for exact locations. Austin's bikeable neighborhoods mean many therapists are accessible via public transit."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is same-day availability common in Austin?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Austin therapists vary in availability. Some keep slots open for last-minute bookings, while others book weeks ahead during peak seasons. Text or call directly—listed on profiles—for same-day inquiries. Early morning or late evening often has better availability. Weekday afternoons tend to be more flexible than weekends."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What payment methods do Austin therapists accept?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Most Austin therapists accept cash, Venmo, card payments, or digital wallets. Check individual profiles for their preferred methods. Some therapists require deposit or prepayment via Venmo or PayPal. Always confirm payment details when booking, especially for out-call sessions."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I book therapists outside Austin proper?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, some MasseurMatch therapists service greater Austin and surrounding areas like Round Rock, Cedar Park, and Pflugerville. Check profiles for their service radius. Out-call rates may include travel fees for farther distances. Contact therapists directly to confirm they service your location."
+        }
+      }
+    ]
+  },
+  "implementation_notes": {
+    "usage_in_next_js": "Paste schema into generateMetadata() > other > 'script:ld+json'",
+    "typescript_helper": "Use getCityFAQSchema(city, pageUrl) from src/lib/seo/faq-schema.ts",
+    "validation": "Test with https://search.google.com/test/rich-results",
+    "google_requirements": [
+      "Question text must be visible on page",
+      "Answer must be 60-120 words (optimal for snippets)",
+      "Schema must be valid JSON-LD",
+      "Use Question + Answer structure (not FAQPage alone)"
+    ]
+  }
+}
