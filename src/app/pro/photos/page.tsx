@@ -14,7 +14,7 @@ import {
   UploadCloud,
   XCircle,
 } from "lucide-react";
-import { type ChangeEvent, type ComponentType, useEffect, useRef, useState } from "react";
+import { type ChangeEvent, type ComponentType, useEffect, useRef, useState, useCallback, useMemo } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
@@ -74,7 +74,8 @@ export default function PhotoManagerPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [scanLabel, setScanLabel] = useState("file");
 
-  const fetchPhotos = async () => {
+  // Single source of truth for photo fetching
+  const fetchPhotos = useCallback(async () => {
     if (!profile?.id) {
       setPhotos([]);
       setPhotosLoading(false);
@@ -86,7 +87,8 @@ export default function PhotoManagerPage() {
       .from("profile_photos")
       .select("*")
       .eq("profile_id", profile.id)
-      .order("sort_order", { ascending: true });
+      .order("sort_order", { ascending: true })
+      .limit(100); // Limit to prevent loading too many photos
 
     if (error) {
       toast({
@@ -100,51 +102,31 @@ export default function PhotoManagerPage() {
     }
 
     setPhotosLoading(false);
-  };
-
-  useEffect(() => {
-    const loadPhotos = async () => {
-      if (!profile?.id) {
-        setPhotos([]);
-        setPhotosLoading(false);
-        return;
-      }
-
-      setPhotosLoading(true);
-      const { data, error } = await supabase
-        .from("profile_photos")
-        .select("*")
-        .eq("profile_id", profile.id)
-        .order("sort_order", { ascending: true });
-
-      if (error) {
-        toast({
-          title: "Could not load your photos",
-          description: error.message,
-          variant: "destructive",
-        });
-        setPhotos([]);
-      } else {
-        setPhotos((data ?? []) as PhotoRecord[]);
-      }
-
-      setPhotosLoading(false);
-    };
-
-    void loadPhotos();
   }, [profile?.id, toast]);
 
-  const approvedPhotos = photos.filter((photo) => photo.moderation_status === "approved");
-  const rejectedPhotos = photos.filter((photo) => photo.moderation_status === "rejected");
-  const pendingPhotos = photos.filter(
-    (photo) => !photo.moderation_status || photo.moderation_status === "pending",
+  useEffect(() => {
+    void fetchPhotos();
+  }, [fetchPhotos]);
+
+  // Memoize photo filtering to avoid recalculation on every render
+  const approvedPhotos = useMemo(
+    () => photos.filter((photo) => photo.moderation_status === "approved"),
+    [photos]
+  );
+  const rejectedPhotos = useMemo(
+    () => photos.filter((photo) => photo.moderation_status === "rejected"),
+    [photos]
+  );
+  const pendingPhotos = useMemo(
+    () => photos.filter((photo) => !photo.moderation_status || photo.moderation_status === "pending"),
+    [photos]
   );
 
-  const photosByTab: Record<TabKey, PhotoRecord[]> = {
+  const photosByTab: Record<TabKey, PhotoRecord[]> = useMemo(() => ({
     approved: approvedPhotos,
     pending: pendingPhotos,
     rejected: rejectedPhotos,
-  };
+  }), [approvedPhotos, pendingPhotos, rejectedPhotos]);
 
   const uploadToCloudinary = async (file: File): Promise<string> => {
     const { data: signData, error: signError } = await supabase.functions.invoke("cloudinary-sign");

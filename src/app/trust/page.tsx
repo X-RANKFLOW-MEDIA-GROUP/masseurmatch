@@ -66,17 +66,6 @@ export default function TrustPage() {
           </p>
         </section>
 
-        <section className="container mx-auto mb-16 max-w-3xl px-4 md:px-6">
-          <div className="flex items-start gap-4 rounded-2xl border border-red-200 bg-red-50 p-6 shadow-sm md:p-8">
-            <ShieldAlert className="mt-1 h-10 w-10 flex-shrink-0 text-red-600" />
-            <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Important Platform Disclaimer</h3>
-              <p className="text-gray-700 font-medium">
-                <strong>MasseurMatch verifies therapists&apos; identities but not their professional licenses.</strong> Users are solely responsible for verifying the credentials, legality, and safety of any professional they choose to contact or book outside of this platform.
-              </p>
-            </div>
-          </div>
-        </section>
 
         <section className="container mx-auto max-w-5xl px-4 md:px-6">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -105,15 +94,10 @@ export default function TrustPage() {
               <h3 className="font-display mb-3 text-2xl font-medium text-slate-900">
                 Identity Verification
               </h3>
-              <p className="mb-6 font-sans text-sm leading-relaxed text-slate-600">
+              <p className="mb-6 font-sans text-sm leading-relaxed text-slate-900">
                 Powered by Stripe Identity, we require therapists to provide valid
                 government-issued documents. Look for the blue &ldquo;Verified&rdquo; badge for
                 professionals who have passed our strictest audit.
-                <br />
-                <span className="mt-2 block font-semibold text-red-700">
-                  Note: Identity verification confirms a person&apos;s legal identity, <u>not</u>{" "}
-                  their professional licensure.
-                </span>
               </p>
               <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5">
                 <IconShield size={16} className="text-emerald-500" />

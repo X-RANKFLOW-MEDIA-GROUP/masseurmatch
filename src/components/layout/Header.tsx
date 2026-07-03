@@ -125,6 +125,7 @@ export const Header = () => {
                 className="w-3 h-3 rounded-full border-2 border-muted-foreground border-t-transparent"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+                style={{ willChange: "transform" }}
               />
               <span>Detecting...</span>
             </div>

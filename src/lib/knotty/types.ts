@@ -177,6 +177,9 @@ export type KnottyCandidate = {
   years_experience: number | null;
   start_year: number | null;
   training: Array<Record<string, unknown>> | null;
+  education?: string | null;
+  languages_spoken?: string[] | null;
+  business_hours?: Record<string, unknown> | null;
   latitude: number | null;
   longitude: number | null;
   boost_score: number | null;

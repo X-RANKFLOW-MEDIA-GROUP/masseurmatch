@@ -103,7 +103,14 @@ export async function GET(request: NextRequest) {
         }
       }
     } catch (error) {
-      console.error("[api/auth/callback] failed to ensure profile:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      const errorStack = error instanceof Error ? error.stack : "";
+      console.error("[api/auth/callback] failed to ensure profile:", {
+        userId: user.id,
+        email: user.email,
+        message: errorMessage,
+        stack: errorStack,
+      });
       return NextResponse.redirect(new URL("/login?error=profile_creation_failed", origin));
     }
   }

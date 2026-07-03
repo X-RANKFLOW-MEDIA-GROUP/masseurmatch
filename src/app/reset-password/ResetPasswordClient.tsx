@@ -18,12 +18,34 @@ export default function ResetPasswordClient() {
 
   // Supabase puts the recovery token in the URL hash; onAuthStateChange picks it up
   useEffect(() => {
+    // First, check if we have an active session with recovery access (token in URL hash)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user?.user_metadata?.email_verified || session?.access_token) {
+        setReady(true);
+        return;
+      }
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
         setReady(true);
       }
     });
-    return () => subscription.unsubscribe();
+
+    // Set a timeout - if PASSWORD_RECOVERY event doesn't fire within 2s, check again
+    const timeout = setTimeout(() => {
+      // Check one more time if session was established
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.access_token) {
+          setReady(true);
+        }
+      });
+    }, 2000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const onSubmit = async (event: React.FormEvent) => {

@@ -95,7 +95,22 @@ function parseProfilePayload(raw: unknown) {
 export async function GET(request: Request) {
   try {
     const session = requireRequestSession(request);
-    const profile = await getProfileByUserId(session.userId);
+    const admin = createSupabaseAdminClient();
+
+    // Check if this is a dashboard request (minimal data needed)
+    const isDashboard = new URL(request.url).searchParams.get("dashboard") === "true";
+
+    const select = isDashboard
+      ? "id, display_name, full_name, bio, city, state, status, is_active, available_now, available_now_expires, specialties, incall_price, outcall_price, subscription_tier, is_featured"
+      : "*"; // Full select for other requests
+
+    const { data: profile, error } = await admin
+      .from("profiles")
+      .select(select)
+      .eq("user_id", session.userId)
+      .maybeSingle();
+
+    if (error) throw new RouteError(500, error.message);
 
     return json({ ok: true, profile });
   } catch (error) {
@@ -122,22 +137,26 @@ export async function POST(request: Request) {
     const rulesAccepted = rawBody && typeof rawBody === "object" && (rawBody as Record<string, unknown>).rulesAccepted === true;
 
     // Auto-approve is never granted based on client-supplied flags.
-    // Profile edits always go through admin review (under_review → approved).
+    // Profile edits maintain current status; admin reviews via audit log.
     const canAutoApprove = false;
 
     const now = new Date().toISOString();
-    const nextStatus = canAutoApprove ? "approved" : (
-      profile.profile_status === "approved" ? "under_review" : profile.profile_status
-    );
+
+    // Keep profile visible during edits: don't change status to under_review
+    // Admin can review changes through audit log while profile stays public
+    const nextStatus = profile.profile_status;
 
     const statusUpdates: Record<string, unknown> = {
-      profile_status: nextStatus,
+      profile_status: nextStatus,  // Explicitly maintain current status
       updated_at: now,
     };
+
+    // Only update additional fields if auto-approve (which never happens in current logic)
     if (canAutoApprove) {
       statusUpdates.approved_at = now;
       statusUpdates.visibility_status = "public";
     }
+
     if (rulesAccepted) {
       statusUpdates.terms_accepted_at = now;
     }

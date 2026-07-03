@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -58,18 +58,21 @@ export default function InquiriesDashboard() {
     }
   }
 
-  const statusCounts = {
+  const statusCounts = useMemo(() => ({
     new: inquiries.filter((i) => i.status === 'new' || !i.status).length,
     viewed: inquiries.filter((i) => i.status === 'viewed').length,
     responded: inquiries.filter((i) => i.status === 'responded').length,
     archived: inquiries.filter((i) => i.status === 'archived').length,
-  };
+  }), [inquiries]);
 
-  const filteredInquiries = inquiries.filter((i) => {
-    if (selectedTab === 'all') return true;
-    if (selectedTab === 'new') return i.status === 'new' || !i.status;
-    return i.status === selectedTab;
-  });
+  const filteredInquiries = useMemo(() =>
+    inquiries.filter((i) => {
+      if (selectedTab === 'all') return true;
+      if (selectedTab === 'new') return i.status === 'new' || !i.status;
+      return i.status === selectedTab;
+    }),
+    [inquiries, selectedTab]
+  );
 
   const getStatusBadge = (status: string | null) => {
     const variants: Record<string, string> = {

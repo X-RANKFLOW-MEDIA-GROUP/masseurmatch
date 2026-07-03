@@ -51,18 +51,21 @@ export const GradientMesh = () => (
           background: `radial-gradient(circle, rgb(${blob.color} / ${blob.opacity}) 0%, transparent 70%)`,
           top: `${20 + i * 15}%`,
           left: `${10 + i * 20}%`,
+          willChange: "transform",
         }}
         animate={{
           x: blob.x,
           y: blob.y,
           scale: blob.scale,
-          rotate: [0, 180, 360],
         }}
         transition={{
           duration: blob.duration,
           repeat: Infinity,
           repeatType: "reverse",
           ease: "easeInOut",
+          type: "spring",
+          stiffness: 80,
+          damping: 25,
         }}
       />
     ))}
