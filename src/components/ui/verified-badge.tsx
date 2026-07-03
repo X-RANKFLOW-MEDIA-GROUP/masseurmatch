@@ -30,8 +30,8 @@ export const VerifiedBadge = ({ size = "md", className, verifiedAt, asLink }: Ve
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       className={cn(
-        "relative inline-flex items-center gap-1.5 rounded-full font-semibold select-none",
-        isSmall ? "px-2 py-0.5 text-[10px]" : "px-3 py-1 text-xs",
+        "relative inline-flex items-center gap-1.5 rounded-full font-semibold select-none uppercase tracking-[0.18em]",
+        isSmall ? "px-2 py-0.5 text-[10px]" : "px-3 py-1 text-[10px]",
         "bg-badge-verified-light text-badge-verified border border-badge-verified-border",
         "backdrop-blur-sm",
         className,
