@@ -103,7 +103,8 @@ AS $$
     p.latitude IS NOT NULL
     AND p.longitude IS NOT NULL
     AND (p.is_active = true OR p.is_active IS NULL)
-    AND p.status IN ('active', 'approved')
+    AND p.visibility_status = 'public'
+    AND p.profile_status = 'approved'
     AND 3958.8 * 2 * ASIN(SQRT(
       SIN(RADIANS(p.latitude - p_lat) / 2) ^ 2 +
       COS(RADIANS(p_lat)) * COS(RADIANS(p.latitude)) *

@@ -1,6 +1,9 @@
 export const dynamic = "force-dynamic";
+import React from "react";
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, recordAuditLog, requireAdminSession } from "@/app/api/_lib/supabase-server";
+import { sendEmail } from "@/app/api/_lib/email";
+import PhotoApprovedEmail from "@/emails/PhotoApprovedEmail";
 
 export async function POST(
   request: Request,
@@ -43,6 +46,27 @@ export async function POST(
     await recordAuditLog(admin.userId, "approve_photo", "profile_photo", photoId, {
       profileId: photo.profile_id,
     });
+
+    // Send approval notification email
+    if (photo.profile_id) {
+      const { data: profile } = await adminClient
+        .from("profiles")
+        .select("email_address")
+        .eq("id", photo.profile_id)
+        .maybeSingle();
+
+      if (profile?.email_address) {
+        sendEmail({
+          to: profile.email_address,
+          subject: "Your photo has been approved on MasseurMatch",
+          react: React.createElement(PhotoApprovedEmail, {
+            dashboardUrl: "https://masseurmatch.com/pro/dashboard",
+          }),
+        }).catch((err) => {
+          console.error("[api/admin/photo/approve] Email send failed:", err);
+        });
+      }
+    }
 
     return json({ ok: true, photoId, status: "approved" });
   } catch (error) {

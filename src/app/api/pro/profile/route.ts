@@ -122,22 +122,26 @@ export async function POST(request: Request) {
     const rulesAccepted = rawBody && typeof rawBody === "object" && (rawBody as Record<string, unknown>).rulesAccepted === true;
 
     // Auto-approve is never granted based on client-supplied flags.
-    // Profile edits always go through admin review (under_review → approved).
+    // Profile edits maintain current status; admin reviews via audit log.
     const canAutoApprove = false;
 
     const now = new Date().toISOString();
-    const nextStatus = canAutoApprove ? "approved" : (
-      profile.profile_status === "approved" ? "under_review" : profile.profile_status
-    );
+
+    // Keep profile visible during edits: don't change status to under_review
+    // Admin can review changes through audit log while profile stays public
+    const nextStatus = profile.profile_status;
 
     const statusUpdates: Record<string, unknown> = {
-      profile_status: nextStatus,
       updated_at: now,
     };
+
+    // Only update status if auto-approve (which never happens in current logic)
     if (canAutoApprove) {
+      statusUpdates.profile_status = "approved";
       statusUpdates.approved_at = now;
       statusUpdates.visibility_status = "public";
     }
+
     if (rulesAccepted) {
       statusUpdates.terms_accepted_at = now;
     }

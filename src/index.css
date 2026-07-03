@@ -1119,8 +1119,8 @@
 
 /* Webkit browsers (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 12px;
+  height: 12px;
 }
 
 ::-webkit-scrollbar-track {
@@ -1128,30 +1128,30 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #B3B3B3;
-  border-radius: 3px;
-  border: 1px solid #FFFFFF;
+  background: #8E8E8E;
+  border-radius: 6px;
+  border: 2px solid #FFFFFF;
   background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8E8E8E;
+  background: #6F6F6F;
   background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:active {
-  background: #6F6F6F;
+  background: #4A4A4A;
   background-clip: padding-box;
 }
 
 /* Firefox */
 * {
-  scrollbar-width: thin;
-  scrollbar-color: #B3B3B3 #FFFFFF;
+  scrollbar-width: auto;
+  scrollbar-color: #8E8E8E #FFFFFF;
 }
 
 *:hover {
-  scrollbar-color: #8E8E8E #FFFFFF;
+  scrollbar-color: #6F6F6F #FFFFFF;
 }
 
 .cursor-glow {
