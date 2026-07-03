@@ -24,7 +24,6 @@ export default function TherapistTicketsPage() {
   const [showNewTicket, setShowNewTicket] = useState(false);
 
   useEffect(() => {
-    // TODO: Fetch tickets from API
     setLoading(false);
   }, []);
 

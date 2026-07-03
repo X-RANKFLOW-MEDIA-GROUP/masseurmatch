@@ -25,7 +25,6 @@ export default function AdminTicketsPage() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    // TODO: Fetch tickets from API
     setLoading(false);
   }, []);
 
