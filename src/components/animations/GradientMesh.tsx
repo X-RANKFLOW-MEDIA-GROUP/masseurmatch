@@ -56,14 +56,17 @@ export const GradientMesh = () => (
           x: blob.x,
           y: blob.y,
           scale: blob.scale,
-          rotate: [0, 180, 360],
         }}
         transition={{
           duration: blob.duration,
           repeat: Infinity,
           repeatType: "reverse",
           ease: "easeInOut",
+          type: "spring",
+          stiffness: 80,
+          damping: 25,
         }}
+        style={{ willChange: "transform" }}
       />
     ))}
     <div className="absolute inset-0 noise-bg opacity-30" />
