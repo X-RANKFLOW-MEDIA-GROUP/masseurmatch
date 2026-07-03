@@ -148,7 +148,7 @@ function AddonCard({
         <p className="mt-3 text-sm leading-6 text-muted-foreground">{addon.description}</p>
       </div>
 
-      <div className="mt-5 rounded-[1.5rem] border border-border/60 bg-slate-950/[0.03] p-4">
+      <div className="mt-5 rounded-3xl border border-border/60 bg-slate-950/[0.03] p-4">
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Impact Preview</p>
         <p className="mt-2 text-sm font-medium leading-6 text-foreground">{addon.impactPreview}</p>
       </div>

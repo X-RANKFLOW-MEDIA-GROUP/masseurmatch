@@ -78,7 +78,7 @@ export default function CommunityGuidelinesPage() {
             These guidelines apply to providers and clients using MasseurMatch. They exist to protect direct,
             transparent wellness connections and to keep the platform inclusive, lawful, and respectful.
           </p>
-          <div className="mt-6 inline-flex items-start gap-3 rounded-[1.5rem] border border-brand-soft/40 bg-brand-soft/10 px-4 py-3 text-sm leading-6 text-text-secondary">
+          <div className="mt-6 inline-flex items-start gap-3 rounded-3xl border border-brand-soft/40 bg-brand-soft/10 px-4 py-3 text-sm leading-6 text-text-secondary">
             <IconShield size={20} className="mt-0.5 flex-none text-brand-primary" />
             <span>Violations may result in content removal, account deletion, or escalation when legal or safety risks are involved.</span>
           </div>

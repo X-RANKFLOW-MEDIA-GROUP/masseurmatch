@@ -419,7 +419,7 @@ function ProviderCard({
             </div>
 
             <div className="absolute inset-x-4 bottom-4 profile-card-plane-strong">
-              <div className="rounded-[1.5rem] border border-white/16 bg-[linear-gradient(135deg,rgba(9,24,45,0.88),rgba(20,59,108,0.68))] p-3.5 text-white shadow-[0_20px_48px_rgba(11,31,58,0.26)] backdrop-blur-2xl sm:p-4">
+              <div className="rounded-3xl border border-white/16 bg-[linear-gradient(135deg,rgba(9,24,45,0.88),rgba(20,59,108,0.68))] p-3.5 text-white shadow-[0_20px_48px_rgba(11,31,58,0.26)] backdrop-blur-2xl sm:p-4">
                 <div className="flex flex-wrap items-center gap-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/88 sm:text-[10px]">
                   <span className={provider.availableNow ? "live-dot" : "h-2.5 w-2.5 rounded-full bg-white/45"} />
                   <span>{provider.availableNow ? "Available now" : "Book today"}</span>

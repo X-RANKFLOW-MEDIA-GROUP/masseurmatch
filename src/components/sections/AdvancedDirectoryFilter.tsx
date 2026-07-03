@@ -124,7 +124,7 @@ function FilterMetric({
 }) {
   return (
     <div
-      className={`min-w-[158px] rounded-[1.2rem] border border-slate-200/80 bg-white/72 px-4 py-3 shadow-[0_16px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl ${
+      className={`min-w-[158px] rounded-2xl border border-slate-200/80 bg-white/72 px-4 py-3 shadow-[0_16px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl ${
         compact ? "min-w-[142px]" : ""
       }`}
     >

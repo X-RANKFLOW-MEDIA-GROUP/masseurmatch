@@ -247,7 +247,7 @@ export default function PricingPage() {
               ))}
             </div>
 
-            <div className="mt-6 rounded-[1.5rem] border border-dashed border-border/80 bg-white/70 px-5 py-4">
+            <div className="mt-6 rounded-3xl border border-dashed border-border/80 bg-white/70 px-5 py-4">
               <p className="text-sm leading-7 text-muted-foreground">
                 All plans and add-ons are advertising products. Featured placement, boosted visibility, verified labels,
                 and similar signals do not imply endorsement, qualification, or recommendation by MasseurMatch.

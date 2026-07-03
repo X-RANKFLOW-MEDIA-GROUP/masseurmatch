@@ -40,7 +40,7 @@ export function HomeSeoLanding({ comparisonLinks, guides }: HomeSeoLandingProps)
               <Link
                 key={competitor.slug}
                 href={`/compare/${competitor.slug}`}
-                className="group flex items-start justify-between gap-4 rounded-[1.4rem] border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
+                className="group flex items-start justify-between gap-4 rounded-2xl border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
               >
                 <div>
                   <p className="text-sm font-semibold text-foreground">
@@ -79,7 +79,7 @@ export function HomeSeoLanding({ comparisonLinks, guides }: HomeSeoLandingProps)
               <Link
                 key={guide.slug}
                 href={`/guides/${guide.slug}`}
-                className="group flex items-start justify-between gap-4 rounded-[1.4rem] border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
+                className="group flex items-start justify-between gap-4 rounded-2xl border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
               >
                 <div>
                   <p className="text-sm font-semibold text-foreground">{guide.h1}</p>
@@ -113,7 +113,7 @@ export function HomeSeoLanding({ comparisonLinks, guides }: HomeSeoLandingProps)
               <Link
                 key={service.slug}
                 href={`/services/${service.slug}`}
-                className="group flex items-start justify-between gap-4 rounded-[1.4rem] border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
+                className="group flex items-start justify-between gap-4 rounded-2xl border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
               >
                 <div>
                   <p className="text-sm font-semibold text-foreground">{service.label} Massage</p>
@@ -124,7 +124,7 @@ export function HomeSeoLanding({ comparisonLinks, guides }: HomeSeoLandingProps)
             ))}
             <Link
               href="/services"
-              className="group flex items-start justify-between gap-4 rounded-[1.4rem] border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
+              className="group flex items-start justify-between gap-4 rounded-2xl border border-border bg-white/5 px-4 py-4 transition hover:border-primary/40"
             >
               <div>
                 <p className="text-sm font-semibold text-foreground">View All Services</p>

@@ -34,7 +34,7 @@ export function ProfileQuickInfo({ profile }: Props) {
       <h2 className="sr-only">Quick Info</h2>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 xl:grid-cols-2">
         {items.map((item) => (
-          <div key={item.label} className="profile-panel-soft rounded-[1.5rem] p-4 text-center">
+          <div key={item.label} className="profile-panel-soft rounded-3xl p-4 text-center">
             <p className="text-2xl font-bold text-foreground">{item.value}</p>
             <p className="mt-1 text-xs font-medium text-muted-foreground">
               {item.label}

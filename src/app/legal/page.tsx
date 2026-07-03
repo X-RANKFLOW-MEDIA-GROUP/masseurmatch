@@ -116,7 +116,7 @@ export default function LegalPage() {
               {LEGAL_QUICK_ANSWERS.map((item) => (
                 <article
                   key={item.question}
-                  className="rounded-[1.5rem] border border-border-subtle bg-white px-5 py-5"
+                  className="rounded-3xl border border-border-subtle bg-white px-5 py-5"
                 >
                   <h3 className="font-display text-2xl font-semibold tracking-tight text-foreground">
                     {item.question}
@@ -204,7 +204,7 @@ export default function LegalPage() {
               {LEGAL_SUPPLEMENTAL_NOTICES.map((notice) => (
                 <article
                   key={notice.title}
-                  className="rounded-[1.5rem] border border-border-subtle bg-white px-5 py-5"
+                  className="rounded-3xl border border-border-subtle bg-white px-5 py-5"
                 >
                   <h3 className="font-display text-2xl font-semibold tracking-tight text-foreground">{notice.title}</h3>
                   <p className="mt-3 text-sm leading-7 text-text-secondary">{notice.body}</p>

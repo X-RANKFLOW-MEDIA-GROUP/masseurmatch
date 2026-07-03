@@ -56,7 +56,7 @@ export function StatGrid({
   return (
     <div className={cn("grid gap-3 md:grid-cols-2 xl:grid-cols-4", className)}>
       {items.map((item) => (
-        <div key={item.label} className="premium-surface motion-premium rounded-[1.4rem] border border-border bg-white/88 p-4">
+        <div key={item.label} className="premium-surface motion-premium rounded-2xl border border-border bg-white/88 p-4">
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{item.label}</p>
           <p className="font-display mt-2 text-2xl font-semibold text-foreground">{item.value}</p>
           {item.note ? <p className="mt-2 text-sm text-muted-foreground">{item.note}</p> : null}
