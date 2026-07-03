@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { BarChart3 } from "lucide-react";
-import { createServerClient } from "@/integrations/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 import KeywordTrendsDashboard from "@/components/dashboards/KeywordTrendsDashboard";
 
 export const metadata = {

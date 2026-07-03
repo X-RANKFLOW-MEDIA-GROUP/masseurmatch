@@ -324,7 +324,7 @@ export async function getHotelOpportunities(): Promise<HotelOpportunityData[]> {
 
     return Array.from(hotelZips.values())
       .map((item, idx) => {
-        const demand =
+        const demand: "Low" | "Medium" | "High" | "Very High" =
           item.searches > 600
             ? "Very High"
             : item.searches > 400

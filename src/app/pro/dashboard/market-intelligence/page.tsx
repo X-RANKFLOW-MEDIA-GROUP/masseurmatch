@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { Lock, TrendingUp, MapPin, Clock, BarChart3, AlertCircle, Zap } from "lucide-react";
-import { createServerClient } from "@/integrations/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 import { LockedPreview } from "./_components/LockedPreview";
 import { DemandSpikes } from "./_components/DemandSpikes";
 import { SearchTrends } from "./_components/SearchTrends";
