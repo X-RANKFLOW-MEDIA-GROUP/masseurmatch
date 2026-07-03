@@ -94,7 +94,7 @@ export default function TrustPage() {
               <h3 className="font-display mb-3 text-2xl font-medium text-slate-900">
                 Identity Verification
               </h3>
-              <p className="mb-6 font-sans text-sm leading-relaxed text-slate-600">
+              <p className="mb-6 font-sans text-sm leading-relaxed text-slate-900">
                 Powered by Stripe Identity, we require therapists to provide valid
                 government-issued documents. Look for the blue &ldquo;Verified&rdquo; badge for
                 professionals who have passed our strictest audit.
