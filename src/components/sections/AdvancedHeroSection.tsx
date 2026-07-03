@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { motion, type Variants } from "framer-motion";
+import { motion, type Variants, useReducedMotion } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { fadeInUp, staggerContainer } from "@/components/animations/MicroInteractions";
 
@@ -31,16 +31,30 @@ export function AdvancedHeroSection({
   const HERO_EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
   const ref = useRef<HTMLDivElement>(null);
   const [offset, setOffset] = useState(0);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     if (!parallax) return;
 
+    let rafId: number;
+    let lastOffset = 0;
+
     const handleScroll = () => {
-      setOffset(window.scrollY * 0.5);
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const newOffset = window.scrollY * 0.5;
+        if (Math.abs(newOffset - lastOffset) > 2) {
+          lastOffset = newOffset;
+          setOffset(newOffset);
+        }
+      });
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(rafId);
+    };
   }, [parallax]);
 
   const containerVariants = {
@@ -81,6 +95,7 @@ export function AdvancedHeroSection({
           backgroundSize: "cover",
           backgroundPosition: "center",
           transform: `translateY(${offset}px)`,
+          willChange: "transform",
         }}
       >
         {gradient && !backgroundImage && (
@@ -96,7 +111,7 @@ export function AdvancedHeroSection({
         <>
           <motion.div
             className="absolute top-20 -left-40 w-80 h-80 bg-brand-accent/20 rounded-full blur-3xl"
-            animate={{
+            animate={reducedMotion ? {} : {
               y: [0, -20, 0],
               x: [0, 20, 0],
             }}
@@ -104,11 +119,13 @@ export function AdvancedHeroSection({
               duration: 8,
               repeat: Infinity,
               repeatType: "mirror",
+              type: "tween",
             }}
+            style={{ willChange: reducedMotion ? "auto" : "transform" }}
           />
           <motion.div
             className="absolute bottom-20 -right-40 w-96 h-96 bg-brand-electric/20 rounded-full blur-3xl"
-            animate={{
+            animate={reducedMotion ? {} : {
               y: [0, 20, 0],
               x: [0, -20, 0],
             }}
@@ -116,7 +133,9 @@ export function AdvancedHeroSection({
               duration: 10,
               repeat: Infinity,
               repeatType: "mirror",
+              type: "tween",
             }}
+            style={{ willChange: reducedMotion ? "auto" : "transform" }}
           />
         </>
       )}
@@ -170,8 +189,9 @@ export function AdvancedHeroSection({
       {animated && (
         <motion.div
           className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
+          animate={reducedMotion ? {} : { y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Infinity, type: "tween" }}
+          style={{ willChange: reducedMotion ? "auto" : "transform" }}
         >
           <div className="w-6 h-10 border-2 border-white/40 rounded-full flex items-center justify-center">
             <div className="w-1 h-2 bg-white/40 rounded-full"></div>

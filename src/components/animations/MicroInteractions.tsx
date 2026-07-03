@@ -171,22 +171,29 @@ export function Parallax({ children, offset = 50, className = "" }: ParallaxProp
   const [y, setY] = useState(0);
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
     const handleMouseMove = (e: MouseEvent) => {
-      if (!ref.current) return;
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        if (!ref.current) return;
 
-      const rect = ref.current.getBoundingClientRect();
-      const centerY = rect.top + rect.height / 2;
-      const distY = e.clientY - centerY;
-      const offsetFactor = Math.max(0.05, Math.min(0.2, offset / 500));
-      setY(distY * offsetFactor);
+        const rect = ref.current.getBoundingClientRect();
+        const centerY = rect.top + rect.height / 2;
+        const distY = e.clientY - centerY;
+        const offsetFactor = Math.max(0.05, Math.min(0.2, offset / 500));
+        setY(distY * offsetFactor);
+      }, 16);
     };
 
     window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
   }, [offset]);
 
   return (
-    <motion.div ref={ref} className={className} style={{ y }} transition={{ type: "spring", stiffness: 100, damping: 10 }}>
+    <motion.div ref={ref} className={className} style={{ y, willChange: "transform" }} transition={{ type: "spring", stiffness: 100, damping: 10 }}>
       {children}
     </motion.div>
   );

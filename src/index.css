@@ -1117,8 +1117,10 @@
   animation: page-enter 0.6s ease-out;
 }
 
+/* Webkit browsers (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -1126,12 +1128,30 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CCCCCC;
-  border-radius: 2px;
+  background: #B3B3B3;
+  border-radius: 3px;
+  border: 1px solid #FFFFFF;
+  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #8E8E8E;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #6F6F6F;
+  background-clip: padding-box;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #B3B3B3 #FFFFFF;
+}
+
+*:hover {
+  scrollbar-color: #8E8E8E #FFFFFF;
 }
 
 .cursor-glow {
