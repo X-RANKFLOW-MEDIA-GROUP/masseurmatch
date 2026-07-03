@@ -272,8 +272,15 @@ export default function HowItWorksPage() {
                 <div className="mt-6 space-y-0 divide-y divide-white/[0.06]">
                   {comparison.us.map((item) => (
                     <div key={item} className="flex items-center gap-3 py-3">
-                      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15">
-                        <Check size={11} className="text-emerald-400" strokeWidth={3} />
+                      <div
+                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+                        style={{ backgroundColor: "hsl(var(--badge-verified) / 0.15)" }}
+                      >
+                        <Check
+                          size={11}
+                          style={{ color: "hsl(var(--badge-verified))" }}
+                          strokeWidth={3}
+                        />
                       </div>
                       <span className="text-sm text-white/80">{item}</span>
                     </div>

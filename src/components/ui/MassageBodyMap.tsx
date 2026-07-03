@@ -240,18 +240,18 @@ export function MassageBodyMap({
       {hasStats && (
         <div className="flex flex-wrap justify-center gap-2">
           {heightLabel && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/25 bg-sky-400/10 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-sky-300">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/25 bg-sky-400/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-sky-300">
               <Ruler className="h-3 w-3" strokeWidth={2.25} />
               {heightLabel}
             </span>
           )}
           {weightLabel && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/25 bg-sky-400/10 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-sky-300">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/25 bg-sky-400/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-sky-300">
               {weightLabel}
             </span>
           )}
           {buildLabel && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/25 bg-sky-400/10 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-sky-300">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/25 bg-sky-400/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-sky-300">
               {buildLabel}
             </span>
           )}

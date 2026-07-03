@@ -181,7 +181,7 @@ function Countdown() {
   const countdown = useCountdown();
   const items = useMemo(() => [["Days", countdown.days], ["Hours", countdown.hours], ["Minutes", countdown.minutes], ["Seconds", countdown.seconds]] as const, [countdown]);
   return (
-    <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.28 }} style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(68px, 1fr))", gap: 10, maxWidth: 460, margin: "30px auto 0" }}>
+    <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.28 }} style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(68px, 1fr))", gap: 10, maxWidth: 460, margin: "30px auto 0" }}>
       {items.map(([label, value]) => <div key={label} style={{ border: "1px solid rgba(255,255,255,.13)", background: "rgba(255,255,255,.06)", borderRadius: 0, padding: "16px 10px", textAlign: "center", backdropFilter: "blur(16px)" }}><p style={{ margin: 0, fontFamily: C.serif, fontSize: "clamp(28px, 4vw, 42px)", lineHeight: 1, fontWeight: 400, color: C.cream }}>{String(value).padStart(2, "0")}</p><p style={{ margin: "8px 0 0", fontFamily: C.sans, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(252,251,248,.42)" }}>{label}</p></div>)}
     </motion.div>
   );
@@ -190,7 +190,7 @@ function Countdown() {
 function KnottyConcierge() {
   const [answerKey, setAnswerKey] = useState("clients");
   return (
-    <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.72, delay: 0.55 }} style={{ margin: "32px auto 0", maxWidth: 760, border: "1px solid rgba(255,255,255,.12)", background: "rgba(255,255,255,.055)", padding: 18, backdropFilter: "blur(18px)" }}>
+    <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.55 }} style={{ margin: "32px auto 0", maxWidth: 760, border: "1px solid rgba(255,255,255,.12)", background: "rgba(255,255,255,.055)", padding: 18, backdropFilter: "blur(18px)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
         <div style={{ width: 42, height: 42, color: C.amber }}><LuxuryIcon type="knotty" /></div>
         <div style={{ textAlign: "left" }}>
@@ -248,7 +248,7 @@ export function MasseurMatchComingSoon() {
         <section style={{ position: "relative", zIndex: 1, maxWidth: 1180, margin: "0 auto", padding: "clamp(64px, 10vw, 104px) 20px 34px", minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", textAlign: "center" }}>
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} style={{ margin: "0 auto 26px", width: 74, height: 74, color: C.amber }}><LuxuryIcon type="diamond" /></motion.div>
           <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.58, delay: 0.05 }} style={{ margin: "0 auto 22px", fontFamily: C.sans, fontSize: 11, letterSpacing: "0.26em", textTransform: "uppercase", color: C.orange }}>MasseurMatch · Private launch</motion.p>
-          <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.72, delay: 0.1 }} style={{ margin: "0 auto", maxWidth: 900, fontFamily: C.serif, fontSize: "clamp(48px, 9vw, 94px)", lineHeight: 1.02, letterSpacing: "-0.045em", fontWeight: 400, color: C.cream }}>
+          <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} style={{ margin: "0 auto", maxWidth: 900, fontFamily: C.serif, fontSize: "clamp(48px, 9vw, 94px)", lineHeight: 1.02, letterSpacing: "-0.045em", fontWeight: 400, color: C.cream }}>
             Find the right massage therapist,<br /><em style={{ color: C.orange, fontStyle: "italic" }}>beautifully.</em>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.66, delay: 0.18 }} style={{ margin: "28px auto 0", maxWidth: 660, fontFamily: C.sans, fontSize: "clamp(15px, 2vw, 18px)", lineHeight: 1.8, color: "rgba(252,251,248,.65)", fontWeight: 300 }}>

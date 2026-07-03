@@ -128,7 +128,7 @@ function FilterMetric({
         compact ? "min-w-[142px]" : ""
       }`}
     >
-      <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">{label}</p>
+      <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-slate-400">{label}</p>
       <p className="mt-1.5 font-sans text-sm font-medium text-slate-900">{value}</p>
     </div>
   );
@@ -218,7 +218,7 @@ export function AdvancedDirectoryFilter({
               <div className="flex min-w-[300px] flex-1 items-center gap-3 rounded-[1.35rem] border border-slate-200/80 bg-white/76 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.86)] backdrop-blur-xl md:min-w-[440px]">
                 <Search className="h-4 w-4 shrink-0 text-slate-400" />
                 <div className="min-w-0 flex-1">
-                  <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                  <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-slate-400">
                     Search
                   </p>
                   <input
@@ -234,7 +234,7 @@ export function AdvancedDirectoryFilter({
               <div className="hidden min-w-[190px] items-center gap-3 rounded-[1.35rem] border border-slate-200/80 bg-white/72 px-4 py-3 shadow-[0_16px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl sm:flex">
                 <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
                 <div className="min-w-0">
-                  <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                  <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-slate-400">
                     Location
                   </p>
                   <p className="mt-1 truncate font-sans text-sm font-medium text-slate-900">{cityLabel}</p>
@@ -249,7 +249,7 @@ export function AdvancedDirectoryFilter({
                 <div className="flex items-center gap-3">
                   <SlidersHorizontal className="h-4 w-4" />
                   <div>
-                    <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                    <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-slate-400">
                       Filters
                     </p>
                     <p className="mt-1 font-sans text-sm font-medium">
@@ -290,7 +290,7 @@ export function AdvancedDirectoryFilter({
               <div className="relative grid gap-8 px-4 py-6 md:grid-cols-[minmax(0,1.65fr)_minmax(280px,1fr)] md:px-6 md:py-7">
                 <div className="space-y-7">
                   <div>
-                    <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                    <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-slate-400">
                       Looking for
                     </p>
                     <div className="mt-4 flex flex-wrap gap-2">
@@ -321,7 +321,7 @@ export function AdvancedDirectoryFilter({
 
                   <div className="grid gap-5 md:grid-cols-3">
                     <label className="space-y-2">
-                      <span className="block font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                      <span className="block font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-slate-400">
                         City
                       </span>
                       <select
@@ -339,7 +339,7 @@ export function AdvancedDirectoryFilter({
                     </label>
 
                     <div className="space-y-2">
-                      <span className="block font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                      <span className="block font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-slate-400">
                         Session type
                       </span>
                       <div className="grid min-h-12 grid-cols-3 overflow-hidden border border-slate-200 bg-white">
@@ -365,7 +365,7 @@ export function AdvancedDirectoryFilter({
                     </div>
 
                     <label className="space-y-2">
-                      <span className="block font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                      <span className="block font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-slate-400">
                         Therapist tier
                       </span>
                       <select
@@ -387,7 +387,7 @@ export function AdvancedDirectoryFilter({
                   <div className="border border-slate-200 bg-white/82 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl">
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-slate-400">
                           Availability & Tier
                         </p>
                         <p className="mt-2 max-w-xs font-sans text-sm font-light leading-6 text-slate-600">
@@ -432,7 +432,7 @@ export function AdvancedDirectoryFilter({
                   </div>
 
                   <div className="border border-slate-200 bg-slate-950 p-5 text-white shadow-[0_24px_54px_rgba(15,23,42,0.18)]">
-                    <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-slate-400">
+                    <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-slate-400">
                       Match State
                     </p>
                     <p className="mt-4 font-display text-4xl font-medium tracking-[-0.04em] text-white">
@@ -442,10 +442,10 @@ export function AdvancedDirectoryFilter({
                       {resultCount === 1 ? "listing" : "listings"} matching now.
                     </p>
                     <div className="mt-5 flex flex-wrap gap-2">
-                      <span className="rounded-full border border-white/14 bg-white/10 px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-white">
+                      <span className="rounded-full border border-white/14 bg-white/10 px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-white">
                         {isPending ? "Refreshing query" : "URL synced"}
                       </span>
-                      <span className="rounded-full border border-white/14 bg-white/10 px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-white">
+                      <span className="rounded-full border border-white/14 bg-white/10 px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-white">
                         {totalCount} indexed
                       </span>
                     </div>

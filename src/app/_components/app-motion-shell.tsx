@@ -62,7 +62,7 @@ export function AppMotionShell({ children }: { children: React.ReactNode }) {
           initial={reduceMotion ? undefined : { opacity: 0, y: 24, filter: "blur(12px)" }}
           animate={reduceMotion ? undefined : { opacity: 1, y: 0, filter: "blur(0px)" }}
           exit={reduceMotion ? undefined : { opacity: 0, y: -12, filter: "blur(8px)" }}
-          transition={{ duration: 0.72, ease: EASE }}
+          transition={{ duration: 0.6, ease: EASE }}
         >
           {children}
         </motion.main>

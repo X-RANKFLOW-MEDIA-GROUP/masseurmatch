@@ -114,7 +114,7 @@ export default function PricingPage() {
             </div>
 
             {PRICE_LOCK && (
-              <p className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-xs font-semibold text-emerald-700">
+              <p className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-badge-verified-border bg-badge-verified-light px-3.5 py-1.5 text-xs font-semibold text-badge-verified">
                 <IconLock size={14} />
                 Founding-member price lock — your rate never increases while subscribed
               </p>
@@ -122,8 +122,8 @@ export default function PricingPage() {
           </div>
 
           {/* Market anchoring strip */}
-          <div className="mx-auto mt-8 max-w-3xl rounded-[1.6rem] border border-amber-200/60 bg-amber-50/70 px-6 py-4">
-            <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">How we compare</p>
+          <div className="mx-auto mt-8 max-w-3xl rounded-[1.6rem] border border-badge-promo-border/60 bg-badge-promo-light/70 px-6 py-4">
+            <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-badge-promo">How we compare</p>
             <div className="mt-3 grid grid-cols-3 gap-3 text-center">
               <div>
                 <p className="text-xl font-bold text-foreground">$300–$375</p>
@@ -196,7 +196,7 @@ export default function PricingPage() {
                 <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-badge-verified" />
                       <span>{feature}</span>
                     </li>
                   ))}
