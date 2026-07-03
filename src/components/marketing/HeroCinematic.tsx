@@ -125,8 +125,12 @@ export function HeroCinematic() {
           delay: noDelay ?? 1,
           repeat: Infinity,
           repeatType: "reverse",
+          type: "spring",
+          stiffness: 100,
+          damping: 20,
         }}
         className="absolute bottom-8 left-1/2 z-20 -translate-x-1/2 text-center"
+        style={{ willChange: "transform" }}
       >
         <p className="text-xs uppercase tracking-widest text-gray-500">Scroll to explore</p>
         <svg
