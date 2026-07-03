@@ -121,6 +121,9 @@ export default async function TherapistPage({ params }: { params: Promise<Params
         availableNow={Boolean(dbProfile.available_now)}
         lgbtqAffirming={Boolean(dbProfile.lgbtq_affirming)}
         knottyPrompt={knottyPrompt}
+        businessHours={dbProfile.business_hours}
+        training={Array.isArray(dbProfile.training) ? dbProfile.training : []}
+        education={Array.isArray(dbProfile.education) ? dbProfile.education : []}
       />
     </>
   );
