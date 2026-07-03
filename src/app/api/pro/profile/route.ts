@@ -132,12 +132,12 @@ export async function POST(request: Request) {
     const nextStatus = profile.profile_status;
 
     const statusUpdates: Record<string, unknown> = {
+      profile_status: nextStatus,  // Explicitly maintain current status
       updated_at: now,
     };
 
-    // Only update status if auto-approve (which never happens in current logic)
+    // Only update additional fields if auto-approve (which never happens in current logic)
     if (canAutoApprove) {
-      statusUpdates.profile_status = "approved";
       statusUpdates.approved_at = now;
       statusUpdates.visibility_status = "public";
     }
