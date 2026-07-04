@@ -157,7 +157,7 @@ export function TrustDashboardSection() {
               <p className="font-mono text-xs uppercase tracking-widest text-gray-400">
                 Identity Verification
               </p>
-              <p className="mt-3 font-display text-xl font-black text-[#8B1E2D]">Available to Pro &amp; Elite</p>
+              <p className="mt-3 font-display text-xl font-black text-white">Available to Pro &amp; Elite</p>
               <p className="mt-1 text-sm text-gray-400">Optional Stripe Identity check with a public verification date.</p>
             </div>
             <div className="rounded-2xl border border-white/5 bg-white/5 p-6">
