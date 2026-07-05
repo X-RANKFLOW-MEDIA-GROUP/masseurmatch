@@ -27,10 +27,10 @@ const steps = [
   {
     number: "03",
     icon: CheckCircle,
-    title: "Book & Enjoy",
+    title: "Connect & Schedule",
     description:
       "Coordinate session details directly with your chosen therapist. No middleman, no booking fees, just a professional and trustworthy experience.",
-    features: ["Direct booking", "No hidden fees", "Flexible scheduling", "Professional service"],
+    features: ["Direct contact", "No hidden fees", "Flexible scheduling", "Professional service"],
   },
 ];
 

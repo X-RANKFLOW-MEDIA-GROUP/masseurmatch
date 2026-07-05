@@ -178,7 +178,7 @@ export default async function VerifiedTherapistsPage({ params }: { params: Promi
                 <strong className="text-foreground">Check the profile</strong> — Review experience, specialties, pricing, and session formats
               </li>
               <li>
-                <strong className="text-foreground">Look for trust signals</strong> — Verified credentials, years of experience, client feedback
+                <strong className="text-foreground">Look for trust signals</strong> — verified identity, years of experience, client feedback
               </li>
               <li>
                 <strong className="text-foreground">Contact directly</strong> — Ask about certifications, specialties, availability, boundaries
