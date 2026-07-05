@@ -273,11 +273,11 @@ export const StatusBadge = ({
       )}
 
       {/* Soft glow shadow */}
-      {config.colors.glow && (
+      {'glow' in config.colors && config.colors.glow && (
         <span
           className="absolute -inset-[2px] rounded-full pointer-events-none"
           style={{
-            boxShadow: `0 0 12px 2px ${config.colors.glow}33, 0 0 24px 4px ${config.colors.glow}18`,
+            boxShadow: `0 0 12px 2px ${(config.colors as any).glow}33, 0 0 24px 4px ${(config.colors as any).glow}18`,
           }}
         />
       )}

@@ -92,6 +92,12 @@ export const Footer = () => {
             {t("footer.ageNotice")}
           </p>
         </div>
+
+        <div className="border-t border-border mt-8 pt-8">
+          <p className="text-xs text-muted-foreground text-center">
+            Professional massage therapy only. Sexual services are strictly prohibited.
+          </p>
+        </div>
       </div>
     </footer>
   );

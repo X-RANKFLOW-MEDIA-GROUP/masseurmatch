@@ -1,0 +1,62 @@
+/* FAQ Accordion Animations
+   Add to your global CSS or import in layout.tsx
+   If using Tailwind @apply, paste these into globals.css instead.
+*/
+
+@keyframes accordion-down {
+  from {
+    opacity: 0;
+    height: 0;
+  }
+  to {
+    opacity: 1;
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    opacity: 1;
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    opacity: 0;
+    height: 0;
+  }
+}
+
+.animate-accordion-down {
+  animation: accordion-down 200ms ease-out;
+}
+
+.animate-accordion-up {
+  animation: accordion-up 200ms ease-out;
+}
+
+/* Smooth transitions for trigger rotate */
+[data-state="open"] {
+  transition: all 200ms ease-out;
+}
+
+[data-state="closed"] {
+  transition: all 200ms ease-out;
+}
+
+/* Optional: Focus ring for accessibility */
+[role="button"]:focus-visible {
+  outline: 3px solid rgba(139, 30, 45, 0.18);
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-accordion-down,
+  .animate-accordion-up {
+    animation: none;
+  }
+
+  [data-state="open"],
+  [data-state="closed"] {
+    transition: none;
+  }
+}
