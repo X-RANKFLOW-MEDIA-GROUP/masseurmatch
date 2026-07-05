@@ -36,7 +36,7 @@ export function HeroCinematic() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.1 }}
-                className="mb-6 font-mono text-xs uppercase tracking-[0.3em] text-[#8B1E2D]"
+                className="mb-6 font-mono text-xs uppercase tracking-[0.3em] text-white/70"
               >
                 LGBTQ+ Affirming • AI-Powered Discovery
               </motion.p>
@@ -47,7 +47,7 @@ export function HeroCinematic() {
                 transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.15 }}
                 className="font-display text-5xl font-black leading-[1.1] tracking-tight text-white sm:text-6xl lg:text-7xl"
               >
-                Find Your <span className="text-[#8B1E2D]">Verified Therapist</span>
+                Find Your <span className="text-white">Verified Therapist</span>
               </motion.h1>
 
               <motion.p
@@ -70,8 +70,8 @@ export function HeroCinematic() {
                   transition={reducedMotion ? {} : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
                   className="flex items-center gap-2"
                 >
-                  <Sparkles size={20} className="text-[#8B1E2D]" strokeWidth={2.5} />
-                  <span className="text-xs uppercase tracking-widest text-[#8B1E2D] font-semibold">AI-Powered Discovery</span>
+                  <Sparkles size={20} className="text-white/70" strokeWidth={2.5} />
+                  <span className="text-xs uppercase tracking-widest text-white/70 font-semibold">AI-Powered Discovery</span>
                 </motion.div>
 
                 <div className="flex flex-wrap gap-4 sm:gap-6">
@@ -100,15 +100,15 @@ export function HeroCinematic() {
                 className="mt-12 flex flex-wrap gap-8 border-t border-white/10 pt-8"
               >
                 <div>
-                  <p className="text-lg font-black text-[#8B1E2D]">Reviewed</p>
+                  <p className="text-lg font-black text-white">Reviewed</p>
                   <p className="mt-1 text-sm text-gray-400">Before going live</p>
                 </div>
                 <div>
-                  <p className="text-lg font-black text-[#8B1E2D]">Direct contact</p>
+                  <p className="text-lg font-black text-white">Direct contact</p>
                   <p className="mt-1 text-sm text-gray-400">No booking middleman</p>
                 </div>
                 <div>
-                  <p className="text-lg font-black text-[#8B1E2D]">LGBTQ+ affirming</p>
+                  <p className="text-lg font-black text-white">LGBTQ+ affirming</p>
                   <p className="mt-1 text-sm text-gray-400">Inclusive by design</p>
                 </div>
               </motion.div>

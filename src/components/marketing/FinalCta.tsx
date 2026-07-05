@@ -21,7 +21,7 @@ export function FinalCta() {
         <div className="absolute inset-[-10%]">
           <Image
             src="/marketing/hero/cover.jpg"
-            alt=""
+            alt="Professional male massage therapist providing therapeutic massage services"
             fill
             className="object-cover object-center"
             sizes="100vw"
