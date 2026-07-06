@@ -293,15 +293,16 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
   // Do NOT auto-open for new visitors — the chat opens only on explicit user action.
   useEffect(() => {
     if (isEmbedded) return;
-    let stored: string | null = null;
+
     try {
-      stored = window.localStorage.getItem(STORAGE_KEY);
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      if (stored === "open") {
+        setIsOpen(true);
+        trackOpen();
+      }
     } catch {
-      /* ignore */
-    }
-    if (stored === "open") {
-      setIsOpen(true);
-      trackOpen();
+      // localStorage unavailable — default to closed state
+      setIsOpen(false);
     }
   }, [isEmbedded, trackOpen]);
 
