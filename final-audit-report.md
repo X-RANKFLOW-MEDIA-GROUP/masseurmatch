@@ -10,22 +10,23 @@
 
 ```json
 {
-  "verdict": "GO",
-  "blocking_failures": 0,
-  "critical": 0,
-  "high": 0,
+  "verdict": "NO-GO",
+  "blocking_failures": 3,
+  "critical": 1,
+  "high": 2,
   "medium": 0,
   "low": 0,
   "pages_crawled": 27,
   "links_tested": 11,
-  "not_tested": ["lighthouse_full_suite", "axe_accessibility_full_run"],
+  "not_tested": [],
   "known_issues": {
-    "establishClientSession": "appears_working",
-    "cloudinary_6313": "not_found",
-    "compliance_copy": "verified_correct"
+    "broken_links_in_sitemap": "CRITICAL",
+    "color_contrast_violations": "HIGH",
+    "mobile_performance_critical": "HIGH"
   },
-  "timestamp": "2026-07-08T20:30:00Z",
-  "session_duration_minutes": 45
+  "timestamp": "2026-07-08T23:15:00Z",
+  "session_duration_minutes": 65,
+  "note": "Initial audit report omitted pre-existing audit artifacts (prelaunch-audit/). Corrected based on actual Lighthouse, axe, and crawl data."
 }
 ```
 
@@ -33,17 +34,31 @@
 
 ## 🎯 EXECUTIVE SUMMARY
 
-MasseurMatch está **pronto para lançamento** (GO verdict). Toda a infraestrutura crítica foi validada:
+**⚠️ CORRIGIDO: Auditoria inicial omitiu dados de auditoria pré-existentes em `prelaunch-audit/`.**
 
-### ✅ Verificado & Conformado
+MasseurMatch tem **3 bloqueadores críticos** que impedem o lançamento (NO-GO verdict):
+
+### 🚨 Bloqueadores Críticos Encontrados
+
+1. **CRITICAL: Broken Links in Sitemap** — 5 therapist profiles return 404 but indexed
+   - `/therapists/bruno-3890ba48`, `/therapists/carlos-luis-pena-fd794a8e`, `/therapists/david-213c8e32`, etc.
+   - SEO death: indexed pages returning 404
+
+2. **HIGH: Color Contrast Violations (WCAG AA Failure)** — Serious accessibility issues
+   - `/`: 5 nodes | `/therapists`: 4 nodes | `/dallas`: 3 nodes | `/blog`: 13 nodes | `/search`: 5 nodes
+   - All marked "serious" impact per axe-core
+
+3. **HIGH: Abysmal Mobile Performance** — Performance scores critically low
+   - `/therapists`: Lighthouse mobile **44** (critical), FCP 3.2s, LCP 11.1s, TBT 860ms
+   - `/login`: Performance 47, FCP 4.0s, LCP 10.8s  
+   - Average mobile performance: 50–57 (should be 80+), LCP 10+ seconds (should be <2.5s)
+
+### ✅ Verificado OK
 
 1. **Segurança**: Headers HSTS/CSP/X-Content-Type-Options presentes; source maps bloqueados
 2. **Compliance QA**: Copy é conforme — categorizado como "diretório", não "plataforma de booking"
-3. **Fluxos Críticos**: Signup (200), Login (200), Dashboard (307 redirect), 404 page (working)
-4. **Acesso**: Rotas privadas bloqueadas corretamente (/dashboard, /pro/*, /admin retornam 307 redirect)
-5. **Performance**: Sem erros de console críticos; renderização rápida
-6. **SEO**: Robots.txt correto; sitemap presente; tags canônicas validadas
-7. **Bugs Conhecidos**: `establishClientSession` está operacional; API key 6313 não encontrada (já resolvida)
+3. **Acesso**: Rotas privadas bloqueadas corretamente (307 redirects funcionam)
+4. **Bugs Conhecidos**: `establishClientSession` operacional; Cloudinary 6313 não reproduced
 
 ### 📊 Cobertura
 
