@@ -1217,3 +1217,101 @@ create or replace view public.therapist_analytics_daily as
   from public.analytics_events
   where therapist_profile_id is not null
   group by therapist_profile_id, date_trunc('day', created_at)::date, event_name;
+
+-- Analytics tables for Market Intelligence
+create table if not exists public.search_analytics (
+  id uuid default gen_random_uuid() primary key,
+  query text not null,
+  city text,
+  state text,
+  zip_code text,
+  filters jsonb,
+  user_ip text,
+  created_at timestamptz default now()
+);
+
+create table if not exists public.profile_view_analytics (
+  id uuid default gen_random_uuid() primary key,
+  profile_id uuid references public.profiles(id) on delete cascade,
+  viewer_city text,
+  viewer_state text,
+  viewer_zip text,
+  source text,
+  referrer text,
+  user_ip text,
+  session_id text,
+  created_at timestamptz default now()
+);
+
+create table if not exists public.inquiry_analytics (
+  id uuid default gen_random_uuid() primary key,
+  profile_id uuid references public.profiles(id) on delete cascade,
+  inquiry_type text,
+  technique_requested text,
+  session_type text,
+  user_city text,
+  user_state text,
+  user_zip text,
+  user_ip text,
+  session_id text,
+  created_at timestamptz default now()
+);
+
+create table if not exists public.booking_analytics (
+  id uuid default gen_random_uuid() primary key,
+  profile_id uuid references public.profiles(id) on delete cascade,
+  technique text,
+  session_type text,
+  session_duration_minutes int,
+  location_city text,
+  location_state text,
+  location_zip text,
+  price decimal(10, 2),
+  user_ip text,
+  created_at timestamptz default now()
+);
+
+create index if not exists idx_search_analytics_city on public.search_analytics(city, created_at);
+create index if not exists idx_search_analytics_zip on public.search_analytics(zip_code, created_at);
+create index if not exists idx_search_analytics_query on public.search_analytics(query, created_at);
+create index if not exists idx_profile_views_profile on public.profile_view_analytics(profile_id, created_at);
+create index if not exists idx_profile_views_city on public.profile_view_analytics(viewer_city, created_at);
+create index if not exists idx_inquiry_profile on public.inquiry_analytics(profile_id, created_at);
+create index if not exists idx_inquiry_city on public.inquiry_analytics(user_city, created_at);
+create index if not exists idx_booking_profile on public.booking_analytics(profile_id, created_at);
+create index if not exists idx_booking_city on public.booking_analytics(location_city, created_at);
+
+-- Keyword trends tables for Market Intelligence
+create table if not exists public.keyword_trends (
+  id uuid default gen_random_uuid() primary key,
+  keyword text not null,
+  search_volume int,
+  competition_level text,
+  city text,
+  state text,
+  trend_direction text,
+  week int,
+  year int,
+  date date,
+  score int,
+  week_over_week_change decimal(5, 2),
+  peak_detected boolean default false,
+  created_at timestamptz default now(),
+  unique(keyword, city, state, week, year)
+);
+
+create table if not exists public.keyword_insights (
+  id uuid default gen_random_uuid() primary key,
+  keyword text not null,
+  total_searches int,
+  avg_competition decimal(5, 2),
+  top_cities text[],
+  recommendation text,
+  status text,
+  created_at timestamptz default now(),
+  last_updated timestamptz default now()
+);
+
+create index if not exists idx_keyword_trends_keyword on public.keyword_trends(keyword, created_at);
+create index if not exists idx_keyword_trends_city on public.keyword_trends(city, state, created_at);
+create index if not exists idx_keyword_insights_keyword on public.keyword_insights(keyword);
