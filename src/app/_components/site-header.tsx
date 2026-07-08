@@ -120,7 +120,7 @@ function DropdownMenu({
                 className="group flex items-start gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-[#F7F7F7]"
               >
                 <child.icon
-                  className="mt-0.5 w-4 h-4 text-[#8E8E8E] group-hover:text-[#8B1E2D] transition-colors shrink-0"
+                  className="mt-0.5 w-4 h-4 text-[#6F6F6F] group-hover:text-[#8B1E2D] transition-colors shrink-0"
                   strokeWidth={2.25}
                 />
                 <div>
@@ -128,7 +128,7 @@ function DropdownMenu({
                     {child.label}
                   </p>
                   {child.description && (
-                    <p className="text-[11px] text-[#8E8E8E] leading-snug mt-0.5">
+                    <p className="text-[11px] text-[#6F6F6F] leading-snug mt-0.5">
                       {child.description}
                     </p>
                   )}
@@ -309,7 +309,7 @@ function MobileNav({
           {sections.map((section, si) => (
             <div key={si}>
               {section.label && (
-                <p className="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8E8E8E]">
+                <p className="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#6F6F6F]">
                   {section.label}
                 </p>
               )}
