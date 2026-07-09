@@ -348,19 +348,131 @@ export default function SignupMigrationPage() {
         </div>
       </motion.form>
 
-      {/* Trust Section */}
+      {/* Comprehensive Disclaimers Section */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
-        className="rounded-lg border border-[#E8E8E8] bg-[#FAFAFA] p-6 text-center"
+        className="space-y-4"
       >
-        <p className="text-sm text-[#6F6F6F]">
-          Your profile URLs are used only for migration. We never share your profiles or contact information with other platforms.{" "}
-          <Link href="/privacy" className="text-[#8B1E2D] hover:underline">
-            Read our privacy policy
-          </Link>
-        </p>
+        <h3 className="font-display text-lg font-semibold text-[#111111]">Important Information About Profile Migration</h3>
+
+        <div className="space-y-3">
+          {/* Data Transfer Disclaimer */}
+          <div className="rounded-lg border border-[#E8E8E8] bg-[#FAFAFA] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8B1E2D] mb-2">Data Transfer</p>
+            <p className="text-sm text-[#6F6F6F]">
+              You're transferring profile data from third-party directories to MasseurMatch. This process involves:
+            </p>
+            <ul className="mt-2 space-y-1.5 text-sm text-[#6F6F6F] list-disc list-inside">
+              <li>Extracting your profile, reviews, and ratings from the source platform</li>
+              <li>Importing this data into your MasseurMatch profile</li>
+              <li>Storing imported reviews securely in our database</li>
+            </ul>
+          </div>
+
+          {/* Source Platform & Authenticity */}
+          <div className="rounded-lg border border-[#E8E8E8] bg-[#FAFAFA] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8B1E2D] mb-2">Review Authenticity & Source</p>
+            <p className="text-sm text-[#6F6F6F]">
+              Imported reviews originate from third-party platforms and retain their source attribution. MasseurMatch does not verify or validate the authenticity of migrated reviews. You remain responsible for the accuracy of any profile information imported from other directories.
+            </p>
+          </div>
+
+          {/* Data Ownership & Control */}
+          <div className="rounded-lg border border-[#E8E8E8] bg-[#FAFAFA] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8B1E2D] mb-2">Ownership & Control</p>
+            <p className="text-sm text-[#6F6F6F]">
+              While your profile information is yours, the reviews and ratings come from clients on other platforms. You may edit or remove any imported profile information from MasseurMatch at any time, but you cannot remove reviews posted by clients on their original platforms. Removing imported reviews from MasseurMatch does not delete them from the source platform.
+            </p>
+          </div>
+
+          {/* Verification & Publishing Timeline */}
+          <div className="rounded-lg border border-[#E8E8E8] bg-[#FAFAFA] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8B1E2D] mb-2">Verification & Publishing</p>
+            <p className="text-sm text-[#6F6F6F]">
+              After you submit your profile URLs:
+            </p>
+            <ol className="mt-2 space-y-1.5 text-sm text-[#6F6F6F] list-decimal list-inside">
+              <li><strong>We extract your data</strong> from the source platform (typically 24–48 hours)</li>
+              <li><strong>Our team reviews</strong> imported reviews and ratings for appropriateness</li>
+              <li><strong>You see a preview</strong> of imported data in your dashboard before it's published</li>
+              <li><strong>You approve or edit</strong> any information before it appears publicly</li>
+              <li><strong>Reviews go live</strong> on your public MasseurMatch profile</li>
+            </ol>
+          </div>
+
+          {/* Privacy & Data Usage */}
+          <div className="rounded-lg border border-[#E8E8E8] bg-[#FAFAFA] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8B1E2D] mb-2">Privacy & Data Usage</p>
+            <p className="text-sm text-[#6F6F6F]">
+              Your profile URLs are used only for one-time migration. We:
+            </p>
+            <ul className="mt-2 space-y-1.5 text-sm text-[#6F6F6F] list-disc list-inside">
+              <li>Never contact third-party platforms on your behalf</li>
+              <li>Never share your account information with other directories</li>
+              <li>Never sell or trade your profile data</li>
+              <li>Store profile URLs securely and delete them after successful migration</li>
+            </ul>
+          </div>
+
+          {/* Account Deletion */}
+          <div className="rounded-lg border border-[#E8E8E8] bg-[#FAFAFA] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8B1E2D] mb-2">Account Deletion</p>
+            <p className="text-sm text-[#6F6F6F]">
+              If you delete your MasseurMatch account, all imported reviews and profile data will be removed from our platform. However, reviews you received on other platforms will remain there. Your deletion does not affect other directories' records.
+            </p>
+          </div>
+
+          {/* Third-Party Terms */}
+          <div className="rounded-lg border border-[#E8E8E8] bg-[#FAFAFA] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8B1E2D] mb-2">Third-Party Platform Terms</p>
+            <p className="text-sm text-[#6F6F6F]">
+              By proceeding with migration, you represent that:
+            </p>
+            <ul className="mt-2 space-y-1.5 text-sm text-[#6F6F6F] list-disc list-inside">
+              <li>You own or manage the profiles at the URLs you're submitting</li>
+              <li>You have permission to import profile data from these platforms</li>
+              <li>The information is accurate and you're responsible for its accuracy</li>
+              <li>You acknowledge the terms of both the source platform and MasseurMatch</li>
+            </ul>
+          </div>
+
+          {/* GDPR & Legal */}
+          <div className="rounded-lg border border-[#E8E8E8] bg-[#FAFAFA] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8B1E2D] mb-2">Privacy & Compliance</p>
+            <p className="text-sm text-[#6F6F6F]">
+              MasseurMatch complies with GDPR, CCPA, and other privacy regulations. Imported reviews may contain personal information (reviewer names, dates, etc.). By importing reviews, you consent to storing and displaying this information in accordance with our{" "}
+              <Link href="/privacy" className="text-[#8B1E2D] hover:underline font-semibold">
+                Privacy Policy
+              </Link>
+              {" "}and{" "}
+              <Link href="/terms" className="text-[#8B1E2D] hover:underline font-semibold">
+                Terms of Service
+              </Link>.
+            </p>
+          </div>
+
+          {/* Liability */}
+          <div className="rounded-lg border border-[#E8E8E8] bg-[#FAFAFA] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8B1E2D] mb-2">Limitations of Liability</p>
+            <p className="text-sm text-[#6F6F6F]">
+              MasseurMatch provides migration as a service but is not responsible for:
+            </p>
+            <ul className="mt-2 space-y-1.5 text-sm text-[#6F6F6F] list-disc list-inside">
+              <li>Incomplete or inaccurate data extraction from source platforms</li>
+              <li>Changes or deletions on source platforms after migration begins</li>
+              <li>Disputes regarding ownership of reviews or ratings</li>
+              <li>Violations of third-party platform terms by user</li>
+            </ul>
+            <p className="mt-3 text-sm text-[#6F6F6F]">
+              For questions, contact{" "}
+              <Link href="mailto:concierge@masseurmatch.com" className="text-[#8B1E2D] hover:underline font-semibold">
+                concierge@masseurmatch.com
+              </Link>.
+            </p>
+          </div>
+        </div>
       </motion.div>
     </div>
   );
