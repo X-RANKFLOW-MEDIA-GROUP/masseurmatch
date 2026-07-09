@@ -132,6 +132,7 @@ alter table public.profiles
   add column if not exists stripe_verification_session_id text,
   add column if not exists current_period_end timestamptz,
   add column if not exists _tier text,
+  add column if not exists tier text default 'free',
   add column if not exists photo_limit integer default 2,
   add column if not exists visibility_level integer default 1,
   add column if not exists featured_until timestamptz,
@@ -753,20 +754,60 @@ create index if not exists idx_admin_actions_target_user on public.admin_actions
 create index if not exists idx_admin_actions_type on public.admin_actions(action_type, created_at desc);
 create index if not exists idx_appointments_user_id on public.appointments(user_id);
 
+-- Signup trigger. profiles.id is NOT NULL with no default (and on databases
+-- provisioned from the legacy shape it references auth.users), so the insert
+-- MUST set id = new.id explicitly; inserting without id breaks every signup
+-- with "Database error creating new user". Role must map to 'provider'
+-- ('therapist' is not allowed by users_role_check / profiles_role_check).
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path=public as $$
+declare
+  app_role text;
+  display_name text;
 begin
-  insert into public.users(id, email, full_name)
-  values (new.id, new.email, coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email,'@',1)))
-  on conflict (id) do nothing;
+  app_role := coalesce(new.raw_user_meta_data ->> 'role', 'provider');
 
-  insert into public.user_roles(user_id, role)
-  values (new.id, 'provider')
+  if app_role = 'therapist' then
+    app_role := 'provider';
+  end if;
+
+  if app_role not in ('admin', 'provider', 'client') then
+    app_role := 'provider';
+  end if;
+
+  display_name := coalesce(
+    new.raw_user_meta_data ->> 'full_name',
+    new.raw_user_meta_data ->> 'name',
+    split_part(coalesce(new.email, ''), '@', 1),
+    'User'
+  );
+
+  insert into public.users (id, email, full_name, role)
+  values (new.id, new.email, display_name, app_role)
+  on conflict (id) do update set
+    email = excluded.email,
+    full_name = excluded.full_name,
+    role = excluded.role,
+    updated_at = timezone('utc', now());
+
+  insert into public.profiles (
+    id, user_id, email, email_address, full_name, display_name, role,
+    status, profile_status, visibility_status, subscription_tier, _tier, tier
+  )
+  values (
+    new.id, new.id, new.email, new.email, display_name, display_name, app_role,
+    'pending', 'draft', 'hidden', 'free', 'free', 'free'
+  )
+  on conflict (id) do update set
+    user_id = excluded.user_id,
+    email = coalesce(public.profiles.email, excluded.email),
+    email_address = coalesce(public.profiles.email_address, excluded.email_address),
+    role = excluded.role,
+    updated_at = timezone('utc', now());
+
+  insert into public.user_roles (user_id, role)
+  values (new.id, app_role)
   on conflict do nothing;
-
-  insert into public.profiles(user_id, email, full_name, status, profile_status)
-  values (new.id, new.email, coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email,'@',1)), 'draft', 'draft')
-  on conflict (user_id) do nothing;
 
   return new;
 end;
