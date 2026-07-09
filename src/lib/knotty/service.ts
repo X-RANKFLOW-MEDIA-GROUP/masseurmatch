@@ -309,12 +309,49 @@ function selectCandidatePool(candidates: KnottyCandidate[], intent: KnottyIntent
   return pool.slice(0, 30);
 }
 
+const THERAPIST_NOUN_RE =
+  /\b(massage|masseurs?|therapists?|bodywork(?:er)?|providers?|professionals?|someone|somebody|anyone|any one|guys?)\b/;
+const SEEKING_VERB_RE =
+  /\b(find|looking for|look for|search(?:ing)?|need|want|show me|recommend(?:ation)?s?|suggest(?:ion)?s?|book|browse|match(?: me)?|hire|who(?:'s| is)?|get me|available)\b/;
+
+/**
+ * Profile cards must never appear before the person asks for a therapist.
+ * Quick-action buttons are explicit asks; otherwise the message itself has to
+ * read as a request for a person, not a general or platform question.
+ */
+export function wantsTherapistProfiles(input: {
+  intent: KnottyIntent;
+  normalizedMessage: string;
+  quickAction: KnottyQuickAction | null;
+}): boolean {
+  if (input.quickAction) return true;
+  if (input.intent === "help_choose") return true;
+
+  const noun = THERAPIST_NOUN_RE.test(input.normalizedMessage);
+  const seeking = SEEKING_VERB_RE.test(input.normalizedMessage);
+
+  // "what is deep tissue massage?" stays informational; "find me a deep
+  // tissue massage" is an ask.
+  if (input.intent === "general" || input.intent === "technique") {
+    return noun && seeking;
+  }
+
+  // Keyword intents (available_now, mobile, verified, budget, premium,
+  // nearby, travel) still need the message to be about finding a person.
+  return noun || seeking;
+}
+
 function buildDeterministicReply(input: {
   intent: KnottyIntent;
   primary: KnottyResponsePayload["primary"];
   alternatives: KnottyResponsePayload["alternatives"];
   city: string | null;
+  profilesRequested: boolean;
 }) {
+  if (!input.profilesRequested) {
+    return "Happy to help! Ask me anything about massage styles or how MasseurMatch works — and when you're ready, tell me your city and what you're looking for and I'll find a great therapist near you.";
+  }
+
   if (!input.primary) {
     return "I couldn’t find a strong match from the current public profiles, so I’d broaden the filters and keep the focus on verified listings, pricing, and direct contact options.";
   }
@@ -346,6 +383,7 @@ type ReplyInput = {
   alternatives: KnottyResponsePayload["alternatives"];
   candidates: KnottyCandidate[];
   city: string | null;
+  profilesRequested: boolean;
 };
 
 function formatCandidateLine(c: KnottyCandidate, rank: number): string {
@@ -377,6 +415,7 @@ function buildKnottySystemPrompt(input: {
   candidates: KnottyCandidate[];
   ranked: KnottyResponsePayload["primary"] | null;
   alternatives: KnottyResponsePayload["alternatives"];
+  profilesRequested: boolean;
 }): string {
   const lines: string[] = [
     "You are Knotty — the friendly, knowledgeable concierge at MasseurMatch, a premium US directory of LGBTQ+-affirming male massage therapists.",
@@ -429,7 +468,12 @@ function buildKnottySystemPrompt(input: {
     lines.push("", "Ranked matches for this request:", ...rankedNames);
   }
 
-  if (input.candidates.length > 0) {
+  if (!input.profilesRequested) {
+    lines.push(
+      "",
+      "IMPORTANT: The person has NOT asked for a therapist yet. Do not name, list, or recommend any specific therapist in this reply. Answer their question conversationally, and if it feels natural, offer to help find a therapist when they're ready (ask for their city or what they're looking for).",
+    );
+  } else if (input.candidates.length > 0) {
     lines.push("", "Full available roster:");
     input.candidates.slice(0, 8).forEach((c, i) => {
       lines.push(formatCandidateLine(c, i + 1));
@@ -449,12 +493,14 @@ function buildConversationMessages(input: {
   alternatives: KnottyResponsePayload["alternatives"];
   city: string | null;
   intent: KnottyIntent;
+  profilesRequested: boolean;
 }): ChatMessage[] {
   const system = buildKnottySystemPrompt({
     city: input.city,
     candidates: input.candidates,
     ranked: input.primary,
     alternatives: input.alternatives,
+    profilesRequested: input.profilesRequested,
   });
 
   return [
@@ -476,6 +522,7 @@ async function composeReply(input: ReplyInput) {
     alternatives: input.alternatives,
     city: input.city,
     intent: input.intent,
+    profilesRequested: input.profilesRequested,
   });
 
   const result = await chatMessages(messages, {
@@ -538,32 +585,39 @@ export async function handleKnottyRequest(
   }
 
   const resolvedCity = intentMatch.cityHint || context.city || null;
+  const profilesRequested = wantsTherapistProfiles({
+    intent: intentMatch.intent,
+    normalizedMessage: intentMatch.normalizedMessage,
+    quickAction: payload.quickAction || null,
+  });
 
   let adminClient: any = null;
   let candidates: KnottyCandidate[] = [];
 
-  try {
-    adminClient = createSupabaseAdminClient();
-    candidates = await fetchCandidatesFromRpc(adminClient, context);
+  if (profilesRequested) {
+    try {
+      adminClient = createSupabaseAdminClient();
+      candidates = await fetchCandidatesFromRpc(adminClient, context);
 
-    if (!candidates.length) {
-      candidates = await fetchCandidatesDirect(adminClient, context, resolvedCity);
+      if (!candidates.length) {
+        candidates = await fetchCandidatesDirect(adminClient, context, resolvedCity);
+      }
+    } catch {
+      candidates = await getPublicTherapists({
+        city: resolvedCity || undefined,
+        page: 1,
+        pageSize: 30,
+      }).then((result) =>
+        result.items.map((item) =>
+          toCandidate({
+            ...item,
+            boost_score: 0,
+            latitude: item.latitude ?? null,
+            longitude: item.longitude ?? null,
+          }),
+        ),
+      );
     }
-  } catch {
-    candidates = await getPublicTherapists({
-      city: resolvedCity || undefined,
-      page: 1,
-      pageSize: 30,
-    }).then((result) =>
-      result.items.map((item) =>
-        toCandidate({
-          ...item,
-          boost_score: 0,
-          latitude: item.latitude ?? null,
-          longitude: item.longitude ?? null,
-        }),
-      ),
-    );
   }
 
   const candidatePool = selectCandidatePool(candidates, intentMatch.intent);
@@ -612,6 +666,7 @@ export async function handleKnottyRequest(
     alternatives,
     candidates: candidatePool,
     city: resolvedCity,
+    profilesRequested,
   });
 
   if (adminClient && recommendations.length > 0) {
