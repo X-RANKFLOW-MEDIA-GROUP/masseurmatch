@@ -218,7 +218,7 @@ export const FALLBACK_PUBLIC_THERAPISTS: FallbackTherapist[] = [
     full_name: "Bruno Santos",
     headline: "14 Years Experience in Deep Tissue & Recovery",
     bio: "Brazilian-trained therapist with 14 years of experience in Oak Lawn, Dallas. Specializes in Deep Tissue, Swedish, Hot Stone, Shiatsu, AMMA Therapy, Lymphatic Drainage, Myofascial Release, and Zero Balancing.",
-    avatar_url: null,
+    avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&q=80",
     phone: "+17623345300",
     whatsapp_number: null,
     email_address: null,
