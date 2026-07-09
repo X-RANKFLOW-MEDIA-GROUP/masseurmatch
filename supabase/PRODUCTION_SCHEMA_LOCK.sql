@@ -132,6 +132,7 @@ alter table public.profiles
   add column if not exists stripe_verification_session_id text,
   add column if not exists current_period_end timestamptz,
   add column if not exists _tier text,
+  add column if not exists tier text default 'free',
   add column if not exists photo_limit integer default 2,
   add column if not exists visibility_level integer default 1,
   add column if not exists featured_until timestamptz,
@@ -229,7 +230,6 @@ create table if not exists public.profile_reviews (
   moderation_notes text,
   admin_notes text,
   submitted_at timestamptz,
-  admin_notes text,
   reviewed_at timestamptz,
   reviewed_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default timezone('utc', now()),
@@ -265,8 +265,6 @@ create table if not exists public.text_verifications (
   verified_at timestamptz,
   reviewed_at timestamptz,
   expires_at timestamptz,
-  submitted_text text,
-  code text,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
@@ -276,7 +274,6 @@ create table if not exists public.admin_actions (
   admin_id uuid not null references auth.users(id) on delete cascade,
   action text,
   action_type text not null,
-  action text,
   target_user_id uuid references auth.users(id) on delete set null,
   target_profile_id uuid,
   target_table text,
@@ -578,7 +575,6 @@ create table if not exists public.moderation_queue (
   payload jsonb,
   resolved_by uuid,
   resolved_at timestamptz,
-  content_type text,
   created_at timestamptz default timezone('utc', now()),
   updated_at timestamptz default timezone('utc', now())
 );
@@ -758,20 +754,60 @@ create index if not exists idx_admin_actions_target_user on public.admin_actions
 create index if not exists idx_admin_actions_type on public.admin_actions(action_type, created_at desc);
 create index if not exists idx_appointments_user_id on public.appointments(user_id);
 
+-- Signup trigger. profiles.id is NOT NULL with no default (and on databases
+-- provisioned from the legacy shape it references auth.users), so the insert
+-- MUST set id = new.id explicitly; inserting without id breaks every signup
+-- with "Database error creating new user". Role must map to 'provider'
+-- ('therapist' is not allowed by users_role_check / profiles_role_check).
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path=public as $$
+declare
+  app_role text;
+  display_name text;
 begin
-  insert into public.users(id, email, full_name)
-  values (new.id, new.email, coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email,'@',1)))
-  on conflict (id) do nothing;
+  app_role := coalesce(new.raw_user_meta_data ->> 'role', 'provider');
 
-  insert into public.user_roles(user_id, role)
-  values (new.id, 'provider')
+  if app_role = 'therapist' then
+    app_role := 'provider';
+  end if;
+
+  if app_role not in ('admin', 'provider', 'client') then
+    app_role := 'provider';
+  end if;
+
+  display_name := coalesce(
+    new.raw_user_meta_data ->> 'full_name',
+    new.raw_user_meta_data ->> 'name',
+    split_part(coalesce(new.email, ''), '@', 1),
+    'User'
+  );
+
+  insert into public.users (id, email, full_name, role)
+  values (new.id, new.email, display_name, app_role)
+  on conflict (id) do update set
+    email = excluded.email,
+    full_name = excluded.full_name,
+    role = excluded.role,
+    updated_at = timezone('utc', now());
+
+  insert into public.profiles (
+    id, user_id, email, email_address, full_name, display_name, role,
+    status, profile_status, visibility_status, subscription_tier, _tier, tier
+  )
+  values (
+    new.id, new.id, new.email, new.email, display_name, display_name, app_role,
+    'pending', 'draft', 'hidden', 'free', 'free', 'free'
+  )
+  on conflict (id) do update set
+    user_id = excluded.user_id,
+    email = coalesce(public.profiles.email, excluded.email),
+    email_address = coalesce(public.profiles.email_address, excluded.email_address),
+    role = excluded.role,
+    updated_at = timezone('utc', now());
+
+  insert into public.user_roles (user_id, role)
+  values (new.id, app_role)
   on conflict do nothing;
-
-  insert into public.profiles(user_id, email, full_name, status, profile_status)
-  values (new.id, new.email, coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email,'@',1)), 'draft', 'draft')
-  on conflict (user_id) do nothing;
 
   return new;
 end;
@@ -835,7 +871,6 @@ create table if not exists public.favorites (
 
 create table if not exists public.appointments (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid references auth.users(id) on delete set null,
   client_id uuid not null references auth.users(id) on delete cascade,
   therapist_id uuid not null references auth.users(id) on delete cascade,
   user_id uuid references auth.users(id) on delete cascade,
@@ -860,8 +895,6 @@ create table if not exists public.payment_transactions (
   amount integer,
   currency text,
   status text not null default 'pending',
-  provider_transaction_id text,
-  provider text,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
@@ -1315,3 +1348,113 @@ create table if not exists public.keyword_insights (
 create index if not exists idx_keyword_trends_keyword on public.keyword_trends(keyword, created_at);
 create index if not exists idx_keyword_trends_city on public.keyword_trends(city, state, created_at);
 create index if not exists idx_keyword_insights_keyword on public.keyword_insights(keyword);
+
+-- ---------------------------------------------------------------------------
+-- Convergence section (2026-07-09)
+-- The CREATE TABLE statements above are skipped for tables that already exist,
+-- so databases provisioned from older shapes never receive columns that only
+-- appear inside those blocks. The statements below converge existing databases
+-- to the full contract. NOT NULL is kept only where a DEFAULT exists (safe on
+-- populated tables); PRIMARY KEY clauses are not repeated for existing tables.
+-- ---------------------------------------------------------------------------
+
+alter table public.analytics_events
+  add column if not exists city text null,
+  add column if not exists profile_id uuid null,
+  add column if not exists referrer text null,
+  add column if not exists session_id text null,
+  add column if not exists source_page text null,
+  add column if not exists state text null,
+  add column if not exists user_id uuid null references auth.users(id) on delete set null;
+
+alter table public.appointments
+  add column if not exists client_id uuid references auth.users(id) on delete cascade,
+  add column if not exists end_time timestamptz,
+  add column if not exists location_type text,
+  add column if not exists service_type text,
+  add column if not exists start_time timestamptz;
+
+alter table public.audit_log
+  add column if not exists action_type text,
+  add column if not exists metadata jsonb,
+  add column if not exists reason text,
+  add column if not exists target_profile_id uuid,
+  add column if not exists target_user_id uuid;
+
+alter table public.blog_posts
+  add column if not exists body text;
+
+alter table public.conversations
+  add column if not exists participant_a_id uuid references auth.users(id) on delete cascade,
+  add column if not exists participant_b_id uuid references auth.users(id) on delete cascade;
+
+alter table public.identity_verifications
+  add column if not exists stripe_verification_session_id text;
+
+alter table public.keyword_insights
+  add column if not exists avg_competition decimal(5, 2),
+  add column if not exists last_updated timestamptz default now(),
+  add column if not exists recommendation text,
+  add column if not exists top_cities text[],
+  add column if not exists total_searches int;
+
+alter table public.keyword_trends
+  add column if not exists competition_level text,
+  add column if not exists search_volume int,
+  add column if not exists trend_direction text,
+  add column if not exists week int,
+  add column if not exists year int;
+
+alter table public.messages
+  add column if not exists content text,
+  add column if not exists sender_id uuid references auth.users(id) on delete cascade;
+
+alter table public.newsletter_subscribers
+  add column if not exists city text,
+  add column if not exists is_active boolean not null default true,
+  add column if not exists name text;
+
+alter table public.notifications
+  add column if not exists message text;
+
+alter table public.payment_transactions
+  add column if not exists amount integer,
+  add column if not exists stripe_payment_intent_id text unique,
+  add column if not exists updated_at timestamptz not null default timezone('utc', now());
+
+alter table public.profile_reviews
+  add column if not exists moderation_notes text;
+
+alter table public.ranking_events
+  add column if not exists city text null,
+  add column if not exists device_type text null,
+  add column if not exists intent text not null default 'general',
+  add column if not exists neighborhood text null,
+  add column if not exists position_in_results integer null,
+  add column if not exists recommendation_source text null,
+  add column if not exists session_id text,
+  add column if not exists therapist_id uuid null references public.profiles (id) on delete cascade,
+  add column if not exists user_id uuid null references auth.users (id) on delete set null;
+
+alter table public.subscriptions
+  add column if not exists profile_id uuid;
+
+alter table public.text_verifications
+  add column if not exists attempt_count integer not null default 0,
+  add column if not exists expires_at timestamptz,
+  add column if not exists phone text,
+  add column if not exists provider text,
+  add column if not exists sent_at timestamptz,
+  add column if not exists verification_code text,
+  add column if not exists verified_at timestamptz;
+
+alter table public.therapist_photos
+  add column if not exists height integer,
+  add column if not exists width integer;
+
+alter table public.user_roles
+  add column if not exists id uuid default gen_random_uuid();
+
+alter table public.waitlist_rate_limits
+  add column if not exists created_at timestamptz not null default now(),
+  add column if not exists id uuid default gen_random_uuid();

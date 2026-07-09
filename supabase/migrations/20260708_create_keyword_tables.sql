@@ -39,10 +39,13 @@ alter table public.keyword_trends enable row level security;
 alter table public.keyword_insights enable row level security;
 
 -- RLS Policies: Only allow reads from authenticated users
-create policy if not exists "allow_read_keyword_trends" on public.keyword_trends
+-- ("create policy if not exists" is not valid PostgreSQL; drop first instead)
+drop policy if exists "allow_read_keyword_trends" on public.keyword_trends;
+create policy "allow_read_keyword_trends" on public.keyword_trends
   for select using (auth.role() = 'authenticated');
 
-create policy if not exists "allow_read_keyword_insights" on public.keyword_insights
+drop policy if exists "allow_read_keyword_insights" on public.keyword_insights;
+create policy "allow_read_keyword_insights" on public.keyword_insights
   for select using (auth.role() = 'authenticated');
 
 -- Allow inserts from service role

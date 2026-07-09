@@ -184,7 +184,7 @@ const seedUsers = [
     email: process.env.SEED_THERAPIST_EMAIL || "therapist@masseurmatch.com",
     password: process.env.SEED_THERAPIST_PASSWORD,
     fullName: "Leo Martinez",
-    role: "therapist",
+    role: "provider",
   },
 ];
 
@@ -622,9 +622,9 @@ async function main() {
     reviews.map((review) => ({
       id: review.id,
       therapist_id: therapistIdBySlug.get(review.therapistSlug),
-      author_name: review.author_name,
+      reviewer_name: review.author_name,
       rating: review.rating,
-      body: review.body,
+      review_text: review.body,
       status: review.status,
       created_at: timestamp,
       updated_at: timestamp,

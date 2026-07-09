@@ -2,6 +2,32 @@
 
 This checklist defines the minimum release gates required before sending MasseurMatch to production.
 
+> **Launch-day closure pass (2026-07-09):** full repository gate (section 1) passes end to end.
+>
+> Changes in this pass (2026-07-09):
+> - `supabase/PRODUCTION_SCHEMA_LOCK.sql`: removed duplicate column definitions that
+>   would make the file fail with `column specified more than once` on a fresh database:
+>   `profile_reviews.admin_notes`, `text_verifications.submitted_text`,
+>   `text_verifications.code`, `admin_actions.action`, `moderation_queue.content_type`,
+>   `appointments.user_id` (kept the `on delete cascade` variant matching migration
+>   `20260626000001_add_missing_schema_columns.sql`), and
+>   `payment_transactions.provider_transaction_id` / `payment_transactions.provider`.
+> - Verified: homepage and search render only `profile_status = 'approved'` profiles via
+>   `getPublicTherapists`; OAuth callback syncs `mm_session` and routes new profiles to
+>   `/pro/onboard`; Stripe checkout/webhook metadata and downgrade paths intact;
+>   no public phone OTP UI; no Portuguese comments in source.
+> - `supabase/PRODUCTION_SCHEMA_LOCK.sql`: added a convergence section at the end of the
+>   file. A live-schema diff (PostgREST OpenAPI vs. the lock) found 63 columns across 19
+>   tables that exist only inside `create table if not exists` blocks — those blocks are
+>   skipped on databases where the tables already exist, so production never received the
+>   columns. The new section adds each one via `alter table ... add column if not exists`
+>   (NOT NULL kept only where a DEFAULT exists; PRIMARY KEY not repeated). Re-apply the
+>   lock in the Supabase SQL editor to converge production.
+> - Validation results (2026-07-09): `pnpm install --frozen-lockfile`, lockfile diff clean,
+>   `pnpm lint` (0 errors), `pnpm typecheck`, `pnpm test` (117 unit + 8 API smoke),
+>   `pnpm validate:sitemap`, `pnpm validate:db-contract`, `pnpm release:audit`, and
+>   `pnpm build` all pass.
+>
 > **Final closure pass (2026-06-26 — pass 2):** full repository gate (section 1) passes end to end.
 >
 > Changes in this pass (2026-06-26):
