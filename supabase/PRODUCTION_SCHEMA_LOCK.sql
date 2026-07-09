@@ -229,7 +229,6 @@ create table if not exists public.profile_reviews (
   moderation_notes text,
   admin_notes text,
   submitted_at timestamptz,
-  admin_notes text,
   reviewed_at timestamptz,
   reviewed_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default timezone('utc', now()),
@@ -265,8 +264,6 @@ create table if not exists public.text_verifications (
   verified_at timestamptz,
   reviewed_at timestamptz,
   expires_at timestamptz,
-  submitted_text text,
-  code text,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
@@ -276,7 +273,6 @@ create table if not exists public.admin_actions (
   admin_id uuid not null references auth.users(id) on delete cascade,
   action text,
   action_type text not null,
-  action text,
   target_user_id uuid references auth.users(id) on delete set null,
   target_profile_id uuid,
   target_table text,
@@ -578,7 +574,6 @@ create table if not exists public.moderation_queue (
   payload jsonb,
   resolved_by uuid,
   resolved_at timestamptz,
-  content_type text,
   created_at timestamptz default timezone('utc', now()),
   updated_at timestamptz default timezone('utc', now())
 );
@@ -835,7 +830,6 @@ create table if not exists public.favorites (
 
 create table if not exists public.appointments (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid references auth.users(id) on delete set null,
   client_id uuid not null references auth.users(id) on delete cascade,
   therapist_id uuid not null references auth.users(id) on delete cascade,
   user_id uuid references auth.users(id) on delete cascade,
@@ -860,8 +854,6 @@ create table if not exists public.payment_transactions (
   amount integer,
   currency text,
   status text not null default 'pending',
-  provider_transaction_id text,
-  provider text,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
