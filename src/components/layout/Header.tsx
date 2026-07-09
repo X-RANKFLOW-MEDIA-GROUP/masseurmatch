@@ -91,7 +91,7 @@ export const Header = () => {
                     value={citySearch}
                     onChange={(e) => setCitySearch(e.target.value)}
                     placeholder="Search cities..."
-                    className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                    className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-[#8B1E2D]/50 focus:ring-offset-0 rounded px-1"
                     autoFocus
                   />
                 </div>
@@ -208,7 +208,7 @@ export const Header = () => {
                 value={citySearch}
                 onChange={(e) => setCitySearch(e.target.value)}
                 placeholder="Search cities..."
-                className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-[#8B1E2D]/50 focus:ring-offset-0 rounded px-1"
               />
             </div>
             <div className="max-h-48 overflow-y-auto">

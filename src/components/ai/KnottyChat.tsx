@@ -425,7 +425,7 @@ export const KnottyChat = ({ mode = "floating", className }: KnottyChatProps) =>
             value={input}
             onChange={(event) => setInput(event.target.value)}
             placeholder="Ask Knotty anything..."
-            className="flex-1 bg-transparent text-sm text-[#151515] outline-none placeholder:text-[#98A2B3]"
+            className="flex-1 bg-transparent text-sm text-[#151515] outline-none placeholder:text-[#98A2B3] focus:ring-2 focus:ring-[#8B1E2D]/50 focus:ring-offset-0 rounded"
           />
           <button
             type="submit"
