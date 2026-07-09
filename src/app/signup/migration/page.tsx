@@ -102,19 +102,24 @@ export default function SignupMigrationPage() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch("/api/migrate/initiate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          profileUrls: urls.map((u) => ({ platform: u.platform, url: u.url })),
-          email: state.email,
-        }),
-      });
+      if (urls.length > 0) {
+        const res = await fetch("/api/migrate/initiate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            profileUrls: urls.map((u) => ({ platform: u.platform, url: u.url })),
+            email: state.email,
+          }),
+        });
 
-      if (!res.ok) {
-        setValidationError("Failed to initiate migration. Please try again.");
-        setIsSubmitting(false);
-        return;
+        if (!res.ok) {
+          setValidationError("Failed to initiate migration. Please try again.");
+          setIsSubmitting(false);
+          return;
+        }
+
+        // Store URLs in signup context for record-keeping
+        updateProfile({ migrationUrls: urls.map((u) => ({ platform: u.platform, url: u.url })) });
       }
 
       router.push("/signup/review");
