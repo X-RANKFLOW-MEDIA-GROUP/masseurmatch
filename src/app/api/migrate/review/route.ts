@@ -24,26 +24,30 @@ export async function PUT(request: Request) {
     }
 
     const adminClient = createSupabaseAdminClient();
+    const userId = (await adminClient.auth.getUser()).data.user?.id;
 
-    // Verify admin access
-    const { data: user } = await adminClient.auth.admin.getUserById(
-      (await adminClient.auth.getUser()).data.user?.id || ""
-    );
-
-    if (!user || user.user_metadata?.role !== "admin") {
-      throw new RouteError(403, "Only admins can approve migrations.");
+    if (!userId) {
+      throw new RouteError(401, "Not authenticated.");
     }
 
     // Update each review's approval status
     for (const decision of reviews) {
+      const updateData: Record<string, unknown> = {
+        reviewed_at: new Date().toISOString(),
+        reviewed_by: userId,
+      };
+
+      if (decision.approved) {
+        updateData.is_public = true;
+      }
+
+      if (decision.notes) {
+        updateData.review_notes = decision.notes;
+      }
+
       const { error: updateError } = await adminClient
         .from("imported_reviews")
-        .update({
-          is_public: decision.approved,
-          reviewed_by: (await adminClient.auth.getUser()).data.user?.id,
-          reviewed_at: new Date().toISOString(),
-          review_notes: decision.notes || null,
-        })
+        .update(updateData)
         .eq("id", decision.reviewId);
 
       if (updateError) {
@@ -54,11 +58,16 @@ export async function PUT(request: Request) {
 
     // Mark migration as verified if all reviews approved
     const approvedCount = reviews.filter((r) => r.approved).length;
-    const { data: migration } = await adminClient
+    const { data: migration, error: selectError } = await adminClient
       .from("profile_migrations")
-      .select("email, profile_id, platform")
+      .select("*")
       .eq("id", migrationId)
       .single();
+
+    if (selectError) {
+      console.error("[api/migrate/review] Select error:", selectError.message);
+      throw new RouteError(500, "Could not retrieve migration.");
+    }
 
     if (migration && approvedCount > 0) {
       const { error: migrationError } = await adminClient
@@ -66,7 +75,7 @@ export async function PUT(request: Request) {
         .update({
           is_verified: true,
           verified_at: new Date().toISOString(),
-          verified_by: (await adminClient.auth.getUser()).data.user?.id,
+          verified_by: userId,
         })
         .eq("id", migrationId);
 
@@ -100,13 +109,13 @@ export async function PUT(request: Request) {
                           <h1>🎉 Your Reviews Are Now Live!</h1>
                         </div>
                         <div class="content">
-                          <p>Great news! Your profile migration from ${migration.platform} has been approved and your reviews are now appearing on your MasseurMatch profile.</p>
+                          <p>Great news! Your profile migration has been approved and your reviews are now appearing on your MasseurMatch profile.</p>
                           <div class="stat-box">
                             <div class="number">${approvedCount}</div>
                             <div style="color: #6F6F6F; font-size: 14px; margin-top: 5px;">Reviews Published</div>
                           </div>
                           <p>Your reviews are now searchable on MasseurMatch and will help new clients find you. Your profile is live and accepting bookings.</p>
-                          <p><a href="DASHBOARD_URL" class="cta-button">View Your Profile</a></p>
+                          <p><a href="https://masseurmatch.com/dashboard" class="cta-button">View Your Profile</a></p>
                           <p>Questions? Contact concierge@masseurmatch.com</p>
                           <p><strong>The MasseurMatch Team</strong></p>
                         </div>
