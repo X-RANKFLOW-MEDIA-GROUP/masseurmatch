@@ -63,12 +63,30 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("[apply-schema-lock] Schema lock applied. Verifying live schema...");
-
-  const verify = spawnSync(process.execPath, [path.join(ROOT, "scripts/verify-live-schema.mjs")], {
-    stdio: "inherit",
+  // PostgREST caches the schema; without a reload the verifier reads stale
+  // column lists and reports gaps that no longer exist.
+  console.log("[apply-schema-lock] Schema lock applied. Reloading PostgREST schema cache...");
+  await fetch(`https://api.supabase.com/v1/projects/${ref}/database/query`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query: "NOTIFY pgrst, 'reload schema';" }),
   });
-  process.exit(verify.status ?? 1);
+
+  console.log("[apply-schema-lock] Verifying live schema...");
+  let status = 1;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    const verify = spawnSync(process.execPath, [path.join(ROOT, "scripts/verify-live-schema.mjs")], {
+      stdio: "inherit",
+    });
+    status = verify.status ?? 1;
+    if (status === 0) break;
+    if (attempt < 3) console.log(`[apply-schema-lock] Schema cache may still be stale, retrying (${attempt}/3)...`);
+  }
+  process.exit(status);
 }
 
 main().catch((error) => {
