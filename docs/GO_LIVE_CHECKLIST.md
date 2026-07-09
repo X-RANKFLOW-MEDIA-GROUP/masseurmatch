@@ -16,6 +16,13 @@ This checklist defines the minimum release gates required before sending Masseur
 >   `getPublicTherapists`; OAuth callback syncs `mm_session` and routes new profiles to
 >   `/pro/onboard`; Stripe checkout/webhook metadata and downgrade paths intact;
 >   no public phone OTP UI; no Portuguese comments in source.
+> - `supabase/PRODUCTION_SCHEMA_LOCK.sql`: added a convergence section at the end of the
+>   file. A live-schema diff (PostgREST OpenAPI vs. the lock) found 63 columns across 19
+>   tables that exist only inside `create table if not exists` blocks — those blocks are
+>   skipped on databases where the tables already exist, so production never received the
+>   columns. The new section adds each one via `alter table ... add column if not exists`
+>   (NOT NULL kept only where a DEFAULT exists; PRIMARY KEY not repeated). Re-apply the
+>   lock in the Supabase SQL editor to converge production.
 > - Validation results (2026-07-09): `pnpm install --frozen-lockfile`, lockfile diff clean,
 >   `pnpm lint` (0 errors), `pnpm typecheck`, `pnpm test` (117 unit + 8 API smoke),
 >   `pnpm validate:sitemap`, `pnpm validate:db-contract`, `pnpm release:audit`, and

@@ -1307,3 +1307,113 @@ create table if not exists public.keyword_insights (
 create index if not exists idx_keyword_trends_keyword on public.keyword_trends(keyword, created_at);
 create index if not exists idx_keyword_trends_city on public.keyword_trends(city, state, created_at);
 create index if not exists idx_keyword_insights_keyword on public.keyword_insights(keyword);
+
+-- ---------------------------------------------------------------------------
+-- Convergence section (2026-07-09)
+-- The CREATE TABLE statements above are skipped for tables that already exist,
+-- so databases provisioned from older shapes never receive columns that only
+-- appear inside those blocks. The statements below converge existing databases
+-- to the full contract. NOT NULL is kept only where a DEFAULT exists (safe on
+-- populated tables); PRIMARY KEY clauses are not repeated for existing tables.
+-- ---------------------------------------------------------------------------
+
+alter table public.analytics_events
+  add column if not exists city text null,
+  add column if not exists profile_id uuid null,
+  add column if not exists referrer text null,
+  add column if not exists session_id text null,
+  add column if not exists source_page text null,
+  add column if not exists state text null,
+  add column if not exists user_id uuid null references auth.users(id) on delete set null;
+
+alter table public.appointments
+  add column if not exists client_id uuid references auth.users(id) on delete cascade,
+  add column if not exists end_time timestamptz,
+  add column if not exists location_type text,
+  add column if not exists service_type text,
+  add column if not exists start_time timestamptz;
+
+alter table public.audit_log
+  add column if not exists action_type text,
+  add column if not exists metadata jsonb,
+  add column if not exists reason text,
+  add column if not exists target_profile_id uuid,
+  add column if not exists target_user_id uuid;
+
+alter table public.blog_posts
+  add column if not exists body text;
+
+alter table public.conversations
+  add column if not exists participant_a_id uuid references auth.users(id) on delete cascade,
+  add column if not exists participant_b_id uuid references auth.users(id) on delete cascade;
+
+alter table public.identity_verifications
+  add column if not exists stripe_verification_session_id text;
+
+alter table public.keyword_insights
+  add column if not exists avg_competition decimal(5, 2),
+  add column if not exists last_updated timestamptz default now(),
+  add column if not exists recommendation text,
+  add column if not exists top_cities text[],
+  add column if not exists total_searches int;
+
+alter table public.keyword_trends
+  add column if not exists competition_level text,
+  add column if not exists search_volume int,
+  add column if not exists trend_direction text,
+  add column if not exists week int,
+  add column if not exists year int;
+
+alter table public.messages
+  add column if not exists content text,
+  add column if not exists sender_id uuid references auth.users(id) on delete cascade;
+
+alter table public.newsletter_subscribers
+  add column if not exists city text,
+  add column if not exists is_active boolean not null default true,
+  add column if not exists name text;
+
+alter table public.notifications
+  add column if not exists message text;
+
+alter table public.payment_transactions
+  add column if not exists amount integer,
+  add column if not exists stripe_payment_intent_id text unique,
+  add column if not exists updated_at timestamptz not null default timezone('utc', now());
+
+alter table public.profile_reviews
+  add column if not exists moderation_notes text;
+
+alter table public.ranking_events
+  add column if not exists city text null,
+  add column if not exists device_type text null,
+  add column if not exists intent text not null default 'general',
+  add column if not exists neighborhood text null,
+  add column if not exists position_in_results integer null,
+  add column if not exists recommendation_source text null,
+  add column if not exists session_id text,
+  add column if not exists therapist_id uuid null references public.profiles (id) on delete cascade,
+  add column if not exists user_id uuid null references auth.users (id) on delete set null;
+
+alter table public.subscriptions
+  add column if not exists profile_id uuid;
+
+alter table public.text_verifications
+  add column if not exists attempt_count integer not null default 0,
+  add column if not exists expires_at timestamptz,
+  add column if not exists phone text,
+  add column if not exists provider text,
+  add column if not exists sent_at timestamptz,
+  add column if not exists verification_code text,
+  add column if not exists verified_at timestamptz;
+
+alter table public.therapist_photos
+  add column if not exists height integer,
+  add column if not exists width integer;
+
+alter table public.user_roles
+  add column if not exists id uuid default gen_random_uuid();
+
+alter table public.waitlist_rate_limits
+  add column if not exists created_at timestamptz not null default now(),
+  add column if not exists id uuid default gen_random_uuid();
