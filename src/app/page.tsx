@@ -221,17 +221,17 @@ export default async function HomePage() {
         {/* 1. Hero Cinematic — Large hero section with cinematic visual */}
         <HeroCinematic />
 
-        {/* 2. AI-Powered Discovery Section */}
+        {/* 2. Featured Verified Profiles — Premium editorial cards (moved after hero) */}
+        <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
+
+        {/* 3. AI-Powered Discovery Section */}
         <AIDiscoverySection />
 
-        {/* 3. Browse by Major Cities */}
+        {/* 4. Browse by Major Cities */}
         <CityDiscoveryShowcase />
 
-        {/* 4. How It Works — 3-step premium layout */}
+        {/* 5. How It Works — 3-step premium layout */}
         <HowItWorksPremium />
-
-        {/* 5. Featured Verified Profiles — Premium editorial cards */}
-        <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
 
         {/* 6. Trust / Verification Dashboard */}
         <TrustDashboardSection />
