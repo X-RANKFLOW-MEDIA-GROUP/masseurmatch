@@ -1,7 +1,6 @@
 'use client';
 
-import { TrendingUp } from 'lucide-react';
-import { IconStar, IconAward } from '@/components/icons';
+import { TrendingUp, Star, Award } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface SocialProofBadgesProps {
@@ -28,7 +27,7 @@ export function SocialProofBadges({
         <Card className="border-yellow-200 bg-yellow-50">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="p-2 bg-yellow-100 rounded-lg">
-              <IconStar size={20} sketch="subtle" className="text-yellow-600" />
+              <Star size={20} strokeWidth={2.25} className="text-yellow-600" />
             </div>
             <div>
               <p className="text-xs font-semibold text-yellow-900 uppercase">Top Rated</p>
@@ -43,7 +42,7 @@ export function SocialProofBadges({
         <Card className="border-emerald-200 bg-emerald-50">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="p-2 bg-emerald-100 rounded-lg">
-              <IconAward size={20} sketch="subtle" className="text-emerald-600" />
+              <Award size={20} strokeWidth={2.25} className="text-emerald-600" />
             </div>
             <div>
               <p className="text-xs font-semibold text-emerald-900 uppercase">Most Reviewed</p>

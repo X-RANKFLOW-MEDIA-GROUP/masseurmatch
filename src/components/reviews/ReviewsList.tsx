@@ -112,7 +112,7 @@ export function ReviewsList({ therapistId, averageRating = 0, totalReviews = 0 }
                   key={star}
                   className={`h-4 w-4 ${
                     star <= Math.round(averageRating)
-                      ? "fill-amber-400 text-amber-400"
+                      ? "fill-[#8B1E2D] text-[#8B1E2D]"
                       : "text-slate-300"
                   }`}
                 />
@@ -159,7 +159,7 @@ export function ReviewsList({ therapistId, averageRating = 0, totalReviews = 0 }
                             key={star}
                             className={`h-4 w-4 ${
                               star <= review.rating
-                                ? "fill-amber-400 text-amber-400"
+                                ? "fill-[#8B1E2D] text-[#8B1E2D]"
                                 : "text-slate-300"
                             }`}
                           />

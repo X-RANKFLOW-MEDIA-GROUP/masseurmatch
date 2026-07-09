@@ -118,7 +118,7 @@ export function ReviewForm({ therapistId, therapistName, onSuccess }: ReviewForm
                     className={cn(
                       "h-8 w-8 transition-colors",
                       star <= (hoverRating || rating)
-                        ? "fill-amber-400 text-amber-400"
+                        ? "fill-[#8B1E2D] text-[#8B1E2D]"
                         : "text-slate-300"
                     )}
                   />

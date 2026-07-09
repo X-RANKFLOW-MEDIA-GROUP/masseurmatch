@@ -52,7 +52,7 @@ export function AuroraBackground({
       <div className="absolute inset-0 overflow-hidden">
         {/* Primary blob - top left */}
         <div
-          className="absolute -top-1/4 -left-1/4 w-[60%] h-[60%] rounded-full blur-3xl animate-aurora-1"
+          className="absolute -top-1/4 -left-1/4 w-[60%] h-[60%] rounded-full blur-3xl motion-reduce:animate-none animate-aurora-1"
           style={{
             background: `radial-gradient(circle, ${colors.primary} 0%, transparent 70%)`,
           }}
@@ -60,7 +60,7 @@ export function AuroraBackground({
 
         {/* Secondary blob - top right */}
         <div
-          className="absolute -top-1/4 -right-1/4 w-[50%] h-[50%] rounded-full blur-3xl animate-aurora-2"
+          className="absolute -top-1/4 -right-1/4 w-[50%] h-[50%] rounded-full blur-3xl motion-reduce:animate-none animate-aurora-2"
           style={{
             background: `radial-gradient(circle, ${colors.secondary} 0%, transparent 70%)`,
           }}
@@ -68,7 +68,7 @@ export function AuroraBackground({
 
         {/* Tertiary blob - bottom left */}
         <div
-          className="absolute -bottom-1/4 -left-1/4 w-[55%] h-[55%] rounded-full blur-3xl animate-aurora-3"
+          className="absolute -bottom-1/4 -left-1/4 w-[55%] h-[55%] rounded-full blur-3xl motion-reduce:animate-none animate-aurora-3"
           style={{
             background: `radial-gradient(circle, ${colors.tertiary} 0%, transparent 70%)`,
           }}
@@ -76,7 +76,7 @@ export function AuroraBackground({
 
         {/* Accent blob - bottom right */}
         <div
-          className="absolute -bottom-1/4 -right-1/4 w-[45%] h-[45%] rounded-full blur-3xl animate-aurora-4"
+          className="absolute -bottom-1/4 -right-1/4 w-[45%] h-[45%] rounded-full blur-3xl motion-reduce:animate-none animate-aurora-4"
           style={{
             background: `radial-gradient(circle, ${colors.accent} 0%, transparent 70%)`,
           }}
@@ -84,7 +84,7 @@ export function AuroraBackground({
 
         {/* Center floating blob */}
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] h-[40%] rounded-full blur-3xl animate-aurora-5"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] h-[40%] rounded-full blur-3xl motion-reduce:animate-none animate-aurora-5"
           style={{
             background: `radial-gradient(circle, ${colors.primary} 0%, transparent 60%)`,
           }}
@@ -137,25 +137,25 @@ export function AuroraBackgroundLight({
       {/* Aurora blobs - light version */}
       <div className="absolute inset-0 overflow-hidden">
         <div
-          className="absolute -top-1/4 -left-1/4 w-[60%] h-[60%] rounded-full blur-3xl animate-aurora-1"
+          className="absolute -top-1/4 -left-1/4 w-[60%] h-[60%] rounded-full blur-3xl motion-reduce:animate-none animate-aurora-1"
           style={{
             background: "radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%)",
           }}
         />
         <div
-          className="absolute -top-1/4 -right-1/4 w-[50%] h-[50%] rounded-full blur-3xl animate-aurora-2"
+          className="absolute -top-1/4 -right-1/4 w-[50%] h-[50%] rounded-full blur-3xl motion-reduce:animate-none animate-aurora-2"
           style={{
             background: "radial-gradient(circle, rgba(167, 139, 250, 0.15) 0%, transparent 70%)",
           }}
         />
         <div
-          className="absolute -bottom-1/4 -left-1/4 w-[55%] h-[55%] rounded-full blur-3xl animate-aurora-3"
+          className="absolute -bottom-1/4 -left-1/4 w-[55%] h-[55%] rounded-full blur-3xl motion-reduce:animate-none animate-aurora-3"
           style={{
             background: "radial-gradient(circle, rgba(139, 30, 45, 0.1) 0%, transparent 70%)",
           }}
         />
         <div
-          className="absolute -bottom-1/4 -right-1/4 w-[45%] h-[45%] rounded-full blur-3xl animate-aurora-4"
+          className="absolute -bottom-1/4 -right-1/4 w-[45%] h-[45%] rounded-full blur-3xl motion-reduce:animate-none animate-aurora-4"
           style={{
             background: "radial-gradient(circle, rgba(52, 211, 153, 0.12) 0%, transparent 70%)",
           }}
