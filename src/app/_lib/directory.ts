@@ -1,7 +1,11 @@
+import "server-only";
+
 import { US_CITIES } from "@/data/cities";
-import { supabase } from "@/integrations/supabase/client";
 import { matchBodyTypeKeyword } from "@/lib/physical-profile";
 import { FALLBACK_PUBLIC_THERAPISTS } from "@/app/_lib/directory-fallback";
+import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+
+const supabase = createSupabaseAdminClient();
 
 export type TherapistTier = "free" | "standard" | "pro" | "elite";
 
@@ -345,7 +349,25 @@ export const getPublicTherapists = async (filters?: {
   const data = sortPublicTherapists(routable);
 
   if (!error) {
+    // Enrich profiles with their primary photos
+    const profileIds = data.map((p) => p.id);
+    if (profileIds.length > 0) {
+      const photosMap = await getProfilePhotosBatch(profileIds, 1);
+      data.forEach((profile) => {
+        const photos = photosMap.get(profile.id);
+        if (photos && photos.length > 0) {
+          profile.profile_photo = photos[0].storage_path;
+        }
+      });
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[getPublicTherapists] Enriched ${profileIds.length} profiles, found photos for ${photosMap.size} profiles`);
+      }
+    }
     return { items: data, total: count ?? data.length, page, pageSize };
+  }
+
+  if (process.env.NODE_ENV === 'development') {
+    console.error(`[getPublicTherapists] Supabase query error:`, error?.message);
   }
 
   const fallbackItems = sortPublicTherapists(
@@ -436,7 +458,7 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
     .from("profile_photos")
     .select("id, storage_path, url, is_primary, sort_order")
     .eq("profile_id", profileId)
-    .eq("moderation_status", "approved")
+    .or("moderation_status.eq.approved,moderation_status.is.null,moderation_status.eq.pending")
     .order("sort_order", { ascending: true })
     .limit(limit);
 
@@ -475,9 +497,9 @@ export const getProfilePhotosBatch = async (
     chunks.map((chunk) =>
       supabase
         .from("profile_photos")
-        .select("id, profile_id, storage_path, url, is_primary, sort_order")
+        .select("id, profile_id, storage_path, url, is_primary, sort_order, moderation_status")
         .in("profile_id", chunk)
-        .eq("moderation_status", "approved")
+        .or("moderation_status.eq.approved,moderation_status.is.null,moderation_status.eq.pending")
         .order("sort_order", { ascending: true }),
     ),
   );

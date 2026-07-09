@@ -53,28 +53,26 @@ export async function POST(request: Request) {
 
     // Count existing photos to determine sort_order
     const { count } = await adminClient
-      .from("therapist_photos")
+      .from("profile_photos")
       .select("id", { count: "exact", head: true })
-      .eq("user_id", session.userId);
+      .eq("profile_id", profile.id);
 
     const sortOrder = count ?? 0;
-    const photoType = sortOrder === 0 ? "profile" : "gallery";
+    const isPrimary = sortOrder === 0;
 
     const { data: photoRow, error: insertError } = await adminClient
-      .from("therapist_photos")
+      .from("profile_photos")
       .insert({
-        therapist_profile_id: profile.id,
-        user_id: session.userId,
         profile_id: profile.id,
         storage_path: fileName,
-        public_url: publicUrl,
-        photo_type: photoType,
+        url: publicUrl,
+        is_primary: isPrimary,
         sort_order: sortOrder,
-        status: "pending_review",
+        moderation_status: "pending",
         mime_type: file.type,
         file_size: file.size,
       })
-      .select("id, public_url, storage_path, photo_type, sort_order, status")
+      .select("id, url, storage_path, is_primary, sort_order, moderation_status")
       .single();
 
     if (insertError) throw new RouteError(500, insertError.message);
@@ -83,10 +81,10 @@ export async function POST(request: Request) {
       ok: true,
       photo: {
         id: photoRow.id,
-        url: photoRow.public_url || photoRow.storage_path || "",
-        isPrimary: photoRow.photo_type === "profile",
+        url: photoRow.url || photoRow.storage_path || "",
+        isPrimary: photoRow.is_primary ?? false,
         sortOrder: photoRow.sort_order ?? 0,
-        status: photoRow.status ?? "pending_review",
+        status: photoRow.moderation_status ?? "pending",
       },
     });
   } catch (error) {
