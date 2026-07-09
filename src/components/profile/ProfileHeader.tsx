@@ -1,5 +1,4 @@
-import { Crown } from "lucide-react";
-import { IconMapPin } from "@/components/icons";
+import { Crown, MapPin } from "lucide-react";
 import { StatusBadge } from "@/components/ui/status-badge";
 import type { ProfileViewModel } from "./profile-utils";
 
@@ -16,7 +15,7 @@ export function ProfileHeader({ profile }: { profile: ProfileViewModel }) {
       </h1>
       <p className="mt-4 max-w-3xl font-sans text-lg leading-8 text-[#94A3B8]">{profile.headline}</p>
       <div className="mt-6 flex flex-wrap gap-3 text-sm text-[#94A3B8]">
-        <span className="inline-flex items-center gap-2"><IconMapPin size={16} className="text-[#3B82F6]" />{profile.neighborhood}, {profile.city}, {profile.state}, {profile.country}</span>
+        <span className="inline-flex items-center gap-2"><MapPin size={16} strokeWidth={2.25} className="text-[#3B82F6]" />{profile.neighborhood}, {profile.city}, {profile.state}, {profile.country}</span>
         <span>Last active: {profile.lastActiveAt}</span>
         <span>Response: {profile.responseTime}</span>
         <span>Member since: {profile.memberSince}</span>
