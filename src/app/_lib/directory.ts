@@ -345,6 +345,17 @@ export const getPublicTherapists = async (filters?: {
   const data = sortPublicTherapists(routable);
 
   if (!error) {
+    // Enrich profiles with their primary photos
+    const profileIds = data.map((p) => p.id);
+    if (profileIds.length > 0) {
+      const photosMap = await getProfilePhotosBatch(profileIds, 1);
+      data.forEach((profile) => {
+        const photos = photosMap.get(profile.id);
+        if (photos && photos.length > 0) {
+          profile.profile_photo = photos[0].storage_path;
+        }
+      });
+    }
     return { items: data, total: count ?? data.length, page, pageSize };
   }
 
