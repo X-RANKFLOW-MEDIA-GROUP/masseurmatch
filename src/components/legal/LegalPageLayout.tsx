@@ -62,13 +62,13 @@ export default function LegalPageLayout({ title, lastUpdated = "March 10, 2026",
         </aside>
 
         {/* Legal Content */}
-        <main className="flex-1 bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-gray-100">
+        <div className="flex-1 bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-gray-100">
           <h1 className="text-3xl font-extrabold text-gray-900 mb-2">{title}</h1>
           <p className="text-sm text-gray-500 mb-8 border-b pb-4">Last Updated: {lastUpdated}</p>
           <div className="prose prose-gray max-w-none">
             {children}
           </div>
-        </main>
+        </div>
       </div>
     </div>
   );

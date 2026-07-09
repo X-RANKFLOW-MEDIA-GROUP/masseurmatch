@@ -41,7 +41,7 @@ export default function BlogPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <main
+      <div
         style={{
           background: "#FFFFFF",
           color: "#111111",
@@ -61,7 +61,7 @@ export default function BlogPage() {
               fontSize: 11,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "#8B1E2D",
+              color: "#FFFFFF",
               marginBottom: 20,
               fontFamily: "system-ui, sans-serif",
             }}
@@ -98,7 +98,7 @@ export default function BlogPage() {
         <BlogContent />
 
         <NewsletterSignup />
-      </main>
+      </div>
     </>
   );
 }

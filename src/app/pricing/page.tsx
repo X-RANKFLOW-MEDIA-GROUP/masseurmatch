@@ -90,7 +90,7 @@ export default function PricingPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingSchema) }}
       />
 
-      <main className="bg-[radial-gradient(circle_at_top,rgba(139,30,45,0.05),transparent_35%),linear-gradient(180deg,#ffffff_0%,#f7f7f7_100%)]">
+      <div className="bg-[radial-gradient(circle_at_top,rgba(139,30,45,0.05),transparent_35%),linear-gradient(180deg,#ffffff_0%,#f7f7f7_100%)]">
         <section className="container mx-auto px-4 pb-10 pt-14 sm:pt-20">
           <div className="mx-auto max-w-4xl text-center">
             <Badge variant="premium">Pricing</Badge>
@@ -280,7 +280,7 @@ export default function PricingPage() {
             </div>
           </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }

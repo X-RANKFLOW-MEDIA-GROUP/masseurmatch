@@ -315,7 +315,7 @@ export default function HeroClient({ featuredTherapists = [] }: HeroClientProps)
                   }}
                   placeholder="Ask Knotty anything..."
                   aria-label="Ask Knotty AI what massage provider you need"
-                  className="min-w-0 flex-1 bg-transparent px-3 text-sm text-[#151515] outline-none placeholder:text-[#64748B]"
+                  className="min-w-0 flex-1 bg-transparent px-3 text-sm text-[#151515] outline-none placeholder:text-[#64748B] focus:ring-2 focus:ring-[#8B1E2D]/50 focus:ring-offset-0 rounded"
                 />
                 <button
                   type="button"

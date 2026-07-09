@@ -149,7 +149,7 @@ export function CityGlobe() {
           aria-label="Globe highlighting MasseurMatch cities across the United States"
           className="absolute inset-0 grid place-items-center overflow-hidden rounded-full bg-[radial-gradient(circle_at_35%_30%,#16365c,#0a1a2e_55%,#060d1b)] shadow-[0_0_80px_rgba(139, 30, 45,0.18)] ring-1 ring-white/10"
         >
-          <div className="absolute inset-0 animate-spin rounded-full border border-dashed border-white/10 [animation-duration:40s]" />
+          <div className="absolute inset-0 animate-spin rounded-full border border-dashed border-white/10 [animation-duration:4s]" />
           <div className="absolute inset-6 rounded-full border border-white/10" />
           <div className="absolute inset-16 rounded-full border border-white/5" />
           <span className="absolute h-2.5 w-2.5 animate-ping rounded-full bg-primary [animation-duration:2s]" style={{ top: "32%", left: "40%" }} />

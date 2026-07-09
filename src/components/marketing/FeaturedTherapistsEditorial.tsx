@@ -88,7 +88,7 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
               >
                 <Link
                   href={profileHref}
-                  className="group block overflow-hidden rounded-[24px] border border-[#E8E8E8] bg-white shadow-md transition-all duration-300 hover:-translate-y-2 hover:border-[#8B1E2D]/20 hover:shadow-xl"
+                  className="group relative block overflow-hidden rounded-[24px] border border-[#E8E8E8] bg-gradient-to-b from-white to-[#FAFAFA] shadow-[0_4px_24px_rgba(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-3 hover:border-[#8B1E2D]/30 hover:shadow-[0_16px_48px_rgba(139,30,45,0.12)]"
                 >
                   {/* Portrait image */}
                   <div className="relative aspect-[3/4] overflow-hidden bg-[#F7F7F7]">
@@ -111,14 +111,17 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
                         Verified
                       </div>
                     )}
+                    <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-gradient-to-r from-[#8B1E2D] to-[#A82E3D] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg">
+                      ★ Featured
+                    </div>
                   </div>
 
                   {/* Card body */}
-                  <div className="p-6">
-                    <h3 className="font-display text-lg font-bold leading-tight text-[#111111]">
+                  <div className="flex flex-col p-6">
+                    <h3 className="font-display text-lg font-black leading-tight text-[#111111]">
                       {therapist.display_name || therapist.full_name || "Therapist"}
                     </h3>
-                    <p className="mt-1 text-sm text-[#6F6F6F]">
+                    <p className="mt-1.5 text-sm font-medium text-[#8B1E2D]">
                       {buildLocationLabel(therapist)}
                     </p>
                     {specialties.length > 0 && (
@@ -126,20 +129,20 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
                         {specialties.map((s) => (
                           <span
                             key={s}
-                            className="rounded-full border border-[#D9D9D9] bg-[#fafafa] px-3 py-1 text-xs font-medium text-[#6F6F6F]"
+                            className="rounded-full border border-[#8B1E2D]/20 bg-gradient-to-r from-[#F8EDEE] to-[#FCF4F6] px-3 py-1.5 text-xs font-semibold text-[#8B1E2D]"
                           >
                             {s}
                           </span>
                         ))}
                       </div>
                     )}
-                    <div className="mt-6 flex items-center justify-between border-t border-[#E8E8E8] pt-4">
-                      <p className="text-xs font-semibold text-[#6F6F6F]">
+                    <div className="mt-auto flex items-center justify-between border-t border-[#E8E8E8] pt-4">
+                      <p className="text-xs font-bold uppercase tracking-wide text-[#8B1E2D]">
                         {formatPrice(therapist.incall_price || therapist.outcall_price)}
                       </p>
-                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#8B1E2D] transition-transform group-hover:translate-x-1">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#8B1E2D] transition-all group-hover:gap-2 group-hover:translate-x-0.5">
                         View Profile
-                        <ArrowRight size={14} />
+                        <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
                       </span>
                     </div>
                   </div>

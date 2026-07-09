@@ -1379,7 +1379,7 @@ export default function ExplorePageClient({
     providers.find((provider) => provider.id === selectedProviderId) || providers[0] || null;
 
   return (
-    <main className="explore-shell relative overflow-hidden pb-20">
+    <div className="explore-shell relative overflow-hidden pb-20">
       <div className="site-ambient-glow site-ambient-glow-left" />
       <div className="site-ambient-glow site-ambient-glow-right" />
 
@@ -1754,6 +1754,6 @@ export default function ExplorePageClient({
           </div>
         </SheetContent>
       </Sheet>
-    </main>
+    </div>
   );
 }

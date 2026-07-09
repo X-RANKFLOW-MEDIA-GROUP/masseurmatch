@@ -41,7 +41,7 @@ export default function DmcaPage() {
         ])}
       />
 
-      <main className="page-shell py-10">
+      <div className="page-shell py-10">
         <section className="rounded-3xl border border-border-subtle bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(244,246,250,0.96))] p-6 shadow-brand sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-muted">Intellectual Property</p>
           <h1 className="mt-3 max-w-3xl font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
@@ -184,7 +184,7 @@ export default function DmcaPage() {
             </div>
           </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }

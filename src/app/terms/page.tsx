@@ -140,7 +140,7 @@ export default function TermsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <main
+      <div
         style={{
           background: "#FFFFFF",
           color: "#111111",
@@ -303,7 +303,7 @@ export default function TermsPage() {
             ))}
           </div>
         </div>
-      </main>
+      </div>
     </>
   );
 }

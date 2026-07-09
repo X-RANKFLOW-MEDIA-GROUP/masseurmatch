@@ -173,7 +173,7 @@ export default function HowItWorksPage() {
       ])} />
       <JsonLd data={buildFaqJsonLd(FAQ_ITEMS)} />
 
-      <main className="bg-white text-[#111111]">
+      <div className="bg-white text-[#111111]">
 
         {/* ── Hero ─────────────────────────────────────────────────────────── */}
         <section className="relative overflow-hidden bg-[#111111]">
@@ -386,7 +386,7 @@ export default function HowItWorksPage() {
           </div>
         </section>
 
-      </main>
+      </div>
     </>
   );
 }

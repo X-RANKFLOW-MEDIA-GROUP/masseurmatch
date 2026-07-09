@@ -141,10 +141,19 @@ const PRIVATE_PROFILE_SLUG_PATTERNS = [
   /legal/i,
 ];
 
+// Profiles that return 404 or are inaccessible; excluded from sitemap until fixed
+const BROKEN_PROFILE_SLUGS = new Set([
+  "carlos-luis-pena-fd794a8e",
+  "david-213c8e32",
+  "kevinos-beaf90c6",
+  "tamerat-molla-83ce3629",
+]);
+
 function isPublicProfileSlug(slug: string | null | undefined): slug is string {
   if (!slug || slug.length < 3) return false;
   if (slug.includes("@")) return false;
   if (slug.startsWith("admin-") || slug.startsWith("test-") || slug.startsWith("dev-")) return false;
+  if (BROKEN_PROFILE_SLUGS.has(slug)) return false;
   if (PRIVATE_PROFILE_SLUG_PATTERNS.some((pattern) => pattern.test(slug))) return false;
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
 }
