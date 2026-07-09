@@ -143,7 +143,6 @@ const PRIVATE_PROFILE_SLUG_PATTERNS = [
 
 // Profiles that return 404 or are inaccessible; excluded from sitemap until fixed
 const BROKEN_PROFILE_SLUGS = new Set([
-  "bruno-3890ba48",
   "carlos-luis-pena-fd794a8e",
   "david-213c8e32",
   "kevinos-beaf90c6",
