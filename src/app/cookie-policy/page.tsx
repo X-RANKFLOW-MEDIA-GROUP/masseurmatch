@@ -54,7 +54,7 @@ export default function CookiePolicyPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <main
+      <div
         style={{
           background: "#FFFFFF",
           color: "#111111",
@@ -281,7 +281,7 @@ export default function CookiePolicyPage() {
             </p>
           </section>
         </div>
-      </main>
+      </div>
     </>
   );
 }

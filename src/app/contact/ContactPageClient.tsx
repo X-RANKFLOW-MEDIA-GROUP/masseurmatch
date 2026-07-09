@@ -53,7 +53,7 @@ const contactCards: Array<{
 
 export default function ContactPageClient() {
   return (
-    <main className="relative isolate overflow-hidden bg-[#040b16] text-white">
+    <div className="relative isolate overflow-hidden bg-[#040b16] text-white">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(56,189,248,0.16),transparent_26%),radial-gradient(circle_at_82%_14%,rgba(14,165,233,0.12),transparent_22%),linear-gradient(180deg,#020617_0%,#05101d_42%,#030712_100%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/25 to-transparent" />
       <div className="pointer-events-none absolute inset-x-0 top-24 h-72 bg-[radial-gradient(circle,rgba(56,189,248,0.12),transparent_62%)] blur-3xl" />
@@ -174,6 +174,6 @@ export default function ContactPageClient() {
           </div>
         </section>
       </section>
-    </main>
+    </div>
   );
 }

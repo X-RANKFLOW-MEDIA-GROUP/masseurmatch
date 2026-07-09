@@ -89,9 +89,9 @@ export default function AdminLayoutShell({ children }: { children: React.ReactNo
           <span className="text-sm font-semibold text-muted-foreground">Admin Panel</span>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 pt-[72px] md:p-6 md:pt-6">
+        <div className="flex-1 overflow-y-auto p-4 pt-[72px] md:p-6 md:pt-6">
           {children}
-        </main>
+        </div>
       </div>
     </div>
   );

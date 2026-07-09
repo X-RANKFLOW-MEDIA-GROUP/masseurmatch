@@ -253,7 +253,7 @@ export default function WaitlistPage() {
       <Script id="waitlist-page-ld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageJsonLd) }} />
       <Script id="waitlist-faq-ld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
-      <main className="bg-white text-[#111111]">
+      <div className="bg-white text-[#111111]">
 
         {/* ── Hero ──────────────────────────────────────────────────────────────── */}
         <section className="relative overflow-hidden bg-[#080e18] pb-16 pt-24 sm:pb-20 sm:pt-32">
@@ -516,7 +516,7 @@ export default function WaitlistPage() {
           </div>
         </div>
 
-      </main>
+      </div>
     </>
   );
 }

@@ -82,7 +82,7 @@ export default function PlatformDisclaimerPage() {
       />
       <JsonLd data={platformDisclaimerJsonLd} />
 
-      <main className="page-shell py-10">
+      <div className="page-shell py-10">
         <section className="hero-panel px-6 py-8 sm:px-8 sm:py-10">
           <span className="eyebrow-chip eyebrow-chip-inverse">Platform Disclaimer</span>
           <h1 className="mt-6 max-w-3xl font-display text-4xl font-semibold tracking-tight text-white sm:text-5xl">
@@ -158,7 +158,7 @@ export default function PlatformDisclaimerPage() {
             </div>
           </article>
         </section>
-      </main>
+      </div>
     </>
   );
 }

@@ -46,7 +46,7 @@ export default function LegalPage() {
       <JsonLd data={breadcrumbJsonLd} />
       <JsonLd data={collectionJsonLd} />
 
-      <main className="bg-white pb-16 pt-8 md:pb-20 md:pt-10">
+      <div className="bg-white pb-16 pt-8 md:pb-20 md:pt-10">
         <section className="page-shell">
           <div className="rounded-3xl border border-border-subtle bg-white px-6 py-8 shadow-soft sm:px-8 sm:py-10">
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(280px,0.9fr)] lg:items-start">
@@ -312,7 +312,7 @@ export default function LegalPage() {
             </div>
           </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }
