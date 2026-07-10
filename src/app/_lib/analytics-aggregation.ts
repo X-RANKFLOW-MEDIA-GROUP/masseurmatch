@@ -1,9 +1,22 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { supabase as sharedBrowserClient } from "@/integrations/supabase/client";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Creating the client at module scope with raw env crashed every client
+// bundle that imported this file ("supabaseKey is required"): the service
+// role key is never available in the browser. Resolve lazily instead —
+// server code gets the service-role client, browser code degrades to the
+// shared anon client (writes remain subject to Row Level Security).
+let cachedClient: SupabaseClient | null = null;
+function getSupabase(): SupabaseClient {
+  if (cachedClient) return cachedClient;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  cachedClient =
+    url && serviceKey
+      ? createClient(url, serviceKey)
+      : (sharedBrowserClient as unknown as SupabaseClient);
+  return cachedClient;
+}
 
 export interface DemandSpikeData {
   day: string;
@@ -53,11 +66,11 @@ export async function getDemandSpikes(): Promise<DemandSpikeData[]> {
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
     const [searchesResult, viewsResult] = await Promise.all([
-      supabase
+      getSupabase()
         .from("search_analytics")
         .select("created_at")
         .gte("created_at", sevenDaysAgo.toISOString()),
-      supabase
+      getSupabase()
         .from("profile_view_analytics")
         .select("created_at")
         .gte("created_at", sevenDaysAgo.toISOString()),
@@ -107,7 +120,7 @@ export async function getSearchTrends(
   limit: number = 10
 ): Promise<SearchTrendData[]> {
   try {
-    const result = await supabase.from("search_analytics").select("query");
+    const result = await getSupabase().from("search_analytics").select("query");
 
     if (!result.data) return [];
 
@@ -137,7 +150,7 @@ export async function getPopularZipCodes(
   limit: number = 10
 ): Promise<ZipCodeData[]> {
   try {
-    const result = await supabase
+    const result = await getSupabase()
       .from("search_analytics")
       .select("zip_code, city");
 
@@ -178,7 +191,7 @@ export async function getPopularZipCodes(
 // Get peak times by hour
 export async function getPeakTimes(): Promise<PeakTimeData[]> {
   try {
-    const result = await supabase
+    const result = await getSupabase()
       .from("profile_view_analytics")
       .select("created_at");
 
@@ -221,9 +234,9 @@ export async function getPeakTimes(): Promise<PeakTimeData[]> {
 export async function getCityDemandScores(): Promise<CityDemandData[]> {
   try {
     const [searchResult, viewResult, inquiryResult] = await Promise.all([
-      supabase.from("search_analytics").select("city"),
-      supabase.from("profile_view_analytics").select("viewer_city"),
-      supabase.from("inquiry_analytics").select("user_city"),
+      getSupabase().from("search_analytics").select("city"),
+      getSupabase().from("profile_view_analytics").select("viewer_city"),
+      getSupabase().from("inquiry_analytics").select("user_city"),
     ]);
 
     const cityMap = new Map<
@@ -296,7 +309,7 @@ export async function getCityDemandScores(): Promise<CityDemandData[]> {
 // Get hotel search opportunities
 export async function getHotelOpportunities(): Promise<HotelOpportunityData[]> {
   try {
-    const result = await supabase
+    const result = await getSupabase()
       .from("search_analytics")
       .select("zip_code, city, filters");
 

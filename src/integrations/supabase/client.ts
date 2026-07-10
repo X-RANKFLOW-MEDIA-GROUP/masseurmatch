@@ -6,24 +6,30 @@
 import { createBrowserClient } from "@supabase/ssr";
 import type { Database } from "./types";
 
+// Production fallbacks: NEXT_PUBLIC_* vars are inlined at build time, and a
+// build made without them ships a client that cannot reach Supabase at all
+// (profile pages and search die on hydration). The anon key is Supabase's
+// publishable key — it is designed to ship in the browser bundle, and
+// everything it can read or write is enforced by Row Level Security.
+const FALLBACK_SUPABASE_URL = "https://ijsdpozjfjjufjsoexod.supabase.co";
+const FALLBACK_SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlqc2Rwb3pqZmpqdWZqc29leG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwMDcxNTYsImV4cCI6MjA3NzU4MzE1Nn0.S6fGMlOp8KLHwPGL9ebOQvDUqY3C79bw3SH9IOsCi2M";
+
 const SUPABASE_URL =
   process.env.NEXT_PUBLIC_SUPABASE_URL ||
   process.env.NEXT_PUBLIC_STORAGE_SUPABASE_URL ||
   process.env.VITE_SUPABASE_URL ||
-  "";
+  FALLBACK_SUPABASE_URL;
 
 const SUPABASE_ANON_KEY =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
   process.env.NEXT_PUBLIC_STORAGE_SUPABASE_ANON_KEY ||
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-  "";
+  FALLBACK_SUPABASE_ANON_KEY;
 
 export function createClient() {
-  return createBrowserClient<Database>(
-    SUPABASE_URL || "http://placeholder.supabase.invalid",
-    SUPABASE_ANON_KEY || "placeholder-key",
-  );
+  return createBrowserClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
 // Singleton for the many existing `import { supabase } from "..."` callsites.

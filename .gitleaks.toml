@@ -1,5 +1,8 @@
 [allowlist]
-  description = "Historical commits where a Gemini example key was present; key has been removed from HEAD and should be rotated."
+  description = "Historical commits with a removed Gemini example key, plus the Supabase anon key: it is the publishable browser key, shipped in every client bundle by design and constrained by Row Level Security."
+  paths = [
+    '''src/integrations/supabase/client\.ts''',
+  ]
   commits = [
     "dccff74f4c5cef27c513c73053d014bf0c142b75",
     "993d065254f5ac1fb5cddda1e2c2da48fa13acaf",

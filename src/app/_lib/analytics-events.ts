@@ -1,9 +1,22 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { supabase as sharedBrowserClient } from "@/integrations/supabase/client";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Creating the client at module scope with raw env crashed every client
+// bundle that imported this file ("supabaseKey is required"): the service
+// role key is never available in the browser. Resolve lazily instead —
+// server code gets the service-role client, browser code degrades to the
+// shared anon client (writes remain subject to Row Level Security).
+let cachedClient: SupabaseClient | null = null;
+function getSupabase(): SupabaseClient {
+  if (cachedClient) return cachedClient;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  cachedClient =
+    url && serviceKey
+      ? createClient(url, serviceKey)
+      : (sharedBrowserClient as unknown as SupabaseClient);
+  return cachedClient;
+}
 
 interface SearchEventData {
   query: string;
@@ -51,7 +64,7 @@ interface BookingEventData {
 
 export async function trackSearch(data: SearchEventData) {
   try {
-    const { error } = await supabase.from("search_analytics").insert([
+    const { error } = await getSupabase().from("search_analytics").insert([
       {
         query: data.query,
         city: data.city,
@@ -72,7 +85,7 @@ export async function trackSearch(data: SearchEventData) {
 
 export async function trackProfileView(data: ProfileViewEventData) {
   try {
-    const { error } = await supabase.from("profile_view_analytics").insert([
+    const { error } = await getSupabase().from("profile_view_analytics").insert([
       {
         profile_id: data.profile_id,
         viewer_city: data.viewer_city,
@@ -95,7 +108,7 @@ export async function trackProfileView(data: ProfileViewEventData) {
 
 export async function trackInquiry(data: InquiryEventData) {
   try {
-    const { error } = await supabase.from("inquiry_analytics").insert([
+    const { error } = await getSupabase().from("inquiry_analytics").insert([
       {
         profile_id: data.profile_id,
         inquiry_type: data.inquiry_type,
@@ -119,7 +132,7 @@ export async function trackInquiry(data: InquiryEventData) {
 
 export async function trackBooking(data: BookingEventData) {
   try {
-    const { error } = await supabase.from("booking_analytics").insert([
+    const { error } = await getSupabase().from("booking_analytics").insert([
       {
         profile_id: data.profile_id,
         technique: data.technique,

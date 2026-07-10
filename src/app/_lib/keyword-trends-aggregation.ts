@@ -1,9 +1,22 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { supabase as sharedBrowserClient } from "@/integrations/supabase/client";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Creating the client at module scope with raw env crashed every client
+// bundle that imported this file ("supabaseKey is required"): the service
+// role key is never available in the browser. Resolve lazily instead —
+// server code gets the service-role client, browser code degrades to the
+// shared anon client (writes remain subject to Row Level Security).
+let cachedClient: SupabaseClient | null = null;
+function getSupabase(): SupabaseClient {
+  if (cachedClient) return cachedClient;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  cachedClient =
+    url && serviceKey
+      ? createClient(url, serviceKey)
+      : (sharedBrowserClient as unknown as SupabaseClient);
+  return cachedClient;
+}
 
 export interface KeywordTrendRecord {
   keyword: string;
@@ -26,7 +39,7 @@ export interface KeywordInsight {
 // Calculate aggregates for a keyword over time
 export async function calculateKeywordAggregates(keyword: string) {
   try {
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from("keyword_trends")
       .select("score, date")
       .eq("keyword", keyword)
@@ -91,7 +104,7 @@ export async function generateKeywordInsights(): Promise<KeywordInsight[]> {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const { data: recentTrends } = await supabase
+    const { data: recentTrends } = await getSupabase()
       .from("keyword_trends")
       .select("keyword, score, date, week_over_week_change")
       .gte("date", sevenDaysAgo.toISOString().split("T")[0])
@@ -128,7 +141,7 @@ export async function generateKeywordInsights(): Promise<KeywordInsight[]> {
       }
       // Check for new trending keywords (first time > 70)
       else if (trend.score > 70) {
-        const allTimeData = await supabase
+        const allTimeData = await getSupabase()
           .from("keyword_trends")
           .select("score")
           .eq("keyword", trend.keyword)
@@ -163,7 +176,7 @@ export async function storeInsights(insights: KeywordInsight[]) {
   if (insights.length === 0) return;
 
   try {
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from("keyword_insights")
       .insert(
         insights.map((insight) => ({
@@ -186,7 +199,7 @@ export async function storeInsights(insights: KeywordInsight[]) {
 // Get top trending keywords
 export async function getTopTrendingKeywords(limit = 10) {
   try {
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from("keyword_trends")
       .select("keyword, score, date")
       .order("score", { ascending: false })
@@ -217,7 +230,7 @@ export async function getTopTrendingKeywords(limit = 10) {
 // Get keywords with peaks
 export async function getKeywordsWithPeaks() {
   try {
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from("keyword_trends")
       .select("keyword, score, date, peak_detected")
       .eq("peak_detected", true)
