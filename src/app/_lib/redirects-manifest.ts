@@ -66,6 +66,8 @@ export const legacyRedirects: LegacyRedirect[] = [
   // loop infinitely; capitalized variants are handled by case-sensitive guards
   // in src/middleware.ts instead.
   { source: "/massage-therapists", destination: "/therapists", permanent: true },
+  // Profile slug renamed from the account name to the display name.
+  { source: "/therapists/gleicimar-hall-3890ba48", destination: "/therapists/bruno-3890ba48", permanent: true },
   { source: "/home-1-search-form", destination: "/search", permanent: true },
   { source: "/cookies", destination: "/cookie-policy", permanent: true },
 ];
