@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
 import {
   LineChart,
   Line,
@@ -15,11 +14,15 @@ import {
   Bar,
 } from "recharts";
 import { TrendingUp, AlertCircle, Zap, Calendar } from "lucide-react";
+// The shared client guards against missing env; instantiating
+// @supabase/supabase-js directly here threw "supabaseKey is required" at
+// module scope and crashed every route whose bundle included this file.
+// keyword_trends/keyword_insights are not in the generated Database types,
+// so the queries below use the untyped client surface.
+import { supabase as sharedSupabase } from "@/integrations/supabase/client";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabase = sharedSupabase as unknown as SupabaseClient;
 
 interface KeywordTrend {
   keyword: string;
