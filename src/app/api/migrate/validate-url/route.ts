@@ -60,18 +60,24 @@ export async function POST(request: Request) {
 
     // Optional: Make a HEAD request to verify the URL is reachable
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
       const headRes = await fetch(url, {
         method: "HEAD",
         redirect: "follow",
-        timeout: 5000,
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!headRes.ok && headRes.status !== 404) {
         throw new RouteError(400, "Could not reach the URL. Please check it and try again.");
       }
-    } catch {
+    } catch (fetchErr) {
       // If HEAD fails, that's okay — the URL might have CORS restrictions
       // but we still accept it for backend validation
+      if (fetchErr instanceof RouteError) throw fetchErr;
     }
 
     return json({ ok: true, valid: true });
