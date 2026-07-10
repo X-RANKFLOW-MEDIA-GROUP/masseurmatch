@@ -45,10 +45,10 @@ export async function PUT(request: Request) {
         updateData.review_notes = decision.notes;
       }
 
-      const { error: updateError } = await adminClient
+      const { error: updateError } = await ((adminClient as any)
         .from("imported_reviews")
         .update(updateData)
-        .eq("id", decision.reviewId);
+        .eq("id", decision.reviewId));
 
       if (updateError) {
         console.error("[api/migrate/review] Update error:", updateError.message);
@@ -58,11 +58,11 @@ export async function PUT(request: Request) {
 
     // Mark migration as verified if all reviews approved
     const approvedCount = reviews.filter((r) => r.approved).length;
-    const { data: migration, error: selectError } = await adminClient
+    const { data: migration, error: selectError } = await ((adminClient as any)
       .from("profile_migrations")
       .select("*")
       .eq("id", migrationId)
-      .single();
+      .single());
 
     if (selectError) {
       console.error("[api/migrate/review] Select error:", selectError.message);
@@ -70,14 +70,14 @@ export async function PUT(request: Request) {
     }
 
     if (migration && approvedCount > 0) {
-      const { error: migrationError } = await adminClient
+      const { error: migrationError } = await ((adminClient as any)
         .from("profile_migrations")
         .update({
           is_verified: true,
           verified_at: new Date().toISOString(),
           verified_by: userId,
         })
-        .eq("id", migrationId);
+        .eq("id", migrationId));
 
       if (!migrationError && migration.email) {
         // Send notification to therapist

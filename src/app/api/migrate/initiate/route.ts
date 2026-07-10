@@ -33,9 +33,9 @@ export async function POST(request: Request) {
       created_at: new Date().toISOString(),
     }));
 
-    const { error: insertError } = await adminClient
+    const { error: insertError } = await ((adminClient as any)
       .from("profile_migrations")
-      .insert(migrationData);
+      .insert(migrationData));
 
     if (insertError) {
       console.error("[api/migrate/initiate] Insert error:", insertError.message);
