@@ -64,6 +64,8 @@ const LEGACY_REDIRECTS = [
   // infinite 308 loop. Capitalized variants are handled safely by the
   // case-sensitive (===) guards in src/middleware.ts instead.
   { source: "/massage-therapists", destination: "/therapists", permanent: true },
+  // Profile slug renamed from the account name to the display name.
+  { source: "/therapists/gleicimar-hall-3890ba48", destination: "/therapists/bruno-3890ba48", permanent: true },
   // Privacy policy alias — some external links use the longer form
   { source: "/privacy-policy", destination: "/privacy", permanent: true },
   // Legacy therapist profile URL — canonical is /therapists/:slug
