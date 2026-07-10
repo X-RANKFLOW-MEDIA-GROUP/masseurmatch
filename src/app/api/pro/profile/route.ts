@@ -10,6 +10,8 @@ import { proProfileSchema } from "@/app/_lib/validation";
 import { massageTherapistProfileSchema } from "@/app/_lib/validation.massagist";
 import ProfileApprovedEmail from "@/emails/ProfileApprovedEmail";
 import type { TablesUpdate } from "@/integrations/supabase/types";
+import { slugify } from "@/components/profile/profile-utils";
+import { buildProfileSlug } from "@/app/_lib/profile-slug";
 
 function parseProfilePayload(raw: unknown) {
   const modern = massageTherapistProfileSchema.safeParse(raw);
@@ -161,8 +163,26 @@ export async function POST(request: Request) {
       statusUpdates.terms_accepted_at = now;
     }
 
+    // Slug rules: a client-supplied slug wins, an existing slug is never
+    // regenerated (published URLs stay stable), and a profile that still has
+    // no slug gets one derived from its display name.
+    const updates = { ...parsed.updates } as Record<string, unknown>;
+    const clientSlug = typeof updates.slug === "string" ? slugify(updates.slug) : "";
+    if (clientSlug) {
+      updates.slug = clientSlug;
+    } else {
+      delete updates.slug;
+      if (!profile.slug) {
+        const displayName =
+          (typeof updates.display_name === "string" && updates.display_name) ||
+          profile.display_name ||
+          profile.full_name;
+        updates.slug = buildProfileSlug(displayName, profile.id);
+      }
+    }
+
     const nextProfile = await updateProfileByUserId(session.userId, {
-      ...parsed.updates,
+      ...updates,
       ...statusUpdates,
     });
 
