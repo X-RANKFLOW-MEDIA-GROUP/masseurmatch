@@ -365,6 +365,13 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   }
 
   // ── 9. Auth guards ────────────────────────────────────────────────────────
+  // /pro/join is the therapist entry point: signed-out visitors go to the
+  // public recruitment page instead of hitting a login wall, while providers
+  // who are already signed in fall through to the portal hub below.
+  if (pathname === "/pro/join" && !session) {
+    return NextResponse.redirect(new URL("/for-therapists", request.url));
+  }
+
   if (pathname === "/pro" || pathname.startsWith("/pro/")) {
     if (!session) {
       const loginUrl = new URL("/login", request.url);
