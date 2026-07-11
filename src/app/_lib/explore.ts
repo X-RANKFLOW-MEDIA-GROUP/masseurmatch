@@ -534,6 +534,16 @@ export function recalculateExploreDistances(providers: ExploreProvider[], origin
   return providers.map((provider) => withProviderDistance(provider, origin));
 }
 
+// Only a missing service area makes a card unrenderable (no city page to
+// link, no distance to compute). Missing experience or pricing degrades
+// gracefully on the card ("Price on request"), so those profiles stay
+// listed instead of silently emptying the directory.
+const HARD_MISSING_FIELDS = new Set(["neighborhood"]);
+
+export function isHiddenExploreProvider(provider: ExploreProvider) {
+  return provider.missingFields.some((field) => HARD_MISSING_FIELDS.has(field));
+}
+
 export function applyExploreFilters(
   providers: ExploreProvider[],
   filters: ExploreFilters,
@@ -541,7 +551,7 @@ export function applyExploreFilters(
 ) {
   const nextProviders = origin ? recalculateExploreDistances(providers, origin) : providers;
   return sortProviders(
-    nextProviders.filter((provider) => provider.missingFields.length === 0 && filterProvider(provider, filters)),
+    nextProviders.filter((provider) => !isHiddenExploreProvider(provider) && filterProvider(provider, filters)),
     filters.sort,
   );
 }
@@ -615,7 +625,7 @@ export async function loadExploreProviders(filters: ExploreFilters) {
 
   const normalized = withPhotos.map((profile) => normalizeProvider(profile, origin));
   const sorted = applyExploreFilters(normalized, { ...filters, city: resolvedCity });
-  const invalidProviderCount = normalized.filter((provider) => provider.missingFields.length > 0).length;
+  const invalidProviderCount = normalized.filter(isHiddenExploreProvider).length;
 
   return {
     filters: { ...filters, city: resolvedCity },

@@ -166,18 +166,19 @@ const buildPublicTherapistsQuery = () => {
     .eq("profile_status", "approved")
     .eq("is_suspended", false)
     .eq("is_banned", false)
-    .not("email_address", "ilike", "%@example%")
-    .not("email_address", "ilike", "%admin.dev@%")
+    // Test/debug exclusions. `NOT (col ILIKE ...)` evaluates to NULL (not
+    // TRUE) when the column is NULL, which silently drops legitimate rows
+    // that simply lack a phone/slug/email — so every nullable column gets an
+    // explicit `is.null` escape hatch. display_name is required for a card,
+    // so plain .not() is fine there.
     .not("display_name", "ilike", "%test%")
     .not("display_name", "ilike", "%debug%")
     .not("display_name", "ilike", "%admin%")
     .not("display_name", "ilike", "%example%")
     .not("display_name", "ilike", "%demo%")
-    .not("slug", "ilike", "%admin%")
-    .not("slug", "ilike", "%test%")
-    .not("slug", "ilike", "%example%")
-    .not("slug", "ilike", "%dev%")
-    .not("phone", "ilike", "%555%");
+    .or("email_address.is.null,and(email_address.not.ilike.%@example%,email_address.not.ilike.%admin.dev@%)")
+    .or("slug.is.null,and(slug.not.ilike.%admin%,slug.not.ilike.%test%,slug.not.ilike.%example%,slug.not.ilike.%dev%)")
+    .or("phone.is.null,phone.not.ilike.%555%");
   return q;
 };
 
