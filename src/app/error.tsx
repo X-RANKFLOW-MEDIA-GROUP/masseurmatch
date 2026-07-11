@@ -36,9 +36,9 @@ export default function Error({
         Something went wrong
       </h1>
       <p className="mt-4 text-lg text-muted-foreground">
-        We encountered an unexpected error. Our team has been notified.
+        We encountered an unexpected error. Please try again or return to the home page.
       </p>
-      <div className="mt-10 flex items-center justify-center gap-x-6">
+      <div className="mt-10 flex flex-col gap-4 sm:flex-row items-center justify-center gap-x-6">
         <button
           onClick={() => reset()}
           className="rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
@@ -46,7 +46,10 @@ export default function Error({
           Try again
         </button>
         <Link href="/" className="text-sm font-semibold text-foreground hover:text-accent">
-          Go back home <span aria-hidden="true">&rarr;</span>
+          Go back home <span aria-hidden="true">→</span>
+        </Link>
+        <Link href="/therapists" className="text-sm font-semibold text-foreground hover:text-accent">
+          Browse therapists <span aria-hidden="true">→</span>
         </Link>
       </div>
     </div>
