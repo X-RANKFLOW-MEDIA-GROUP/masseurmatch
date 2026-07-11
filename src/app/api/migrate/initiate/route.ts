@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { after } from "next/server";
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import { processPendingMigrations } from "@/app/api/migrate/_lib/processor";
 import { sendEmail } from "@/app/api/_lib/email";
 import React from "react";
 
@@ -117,6 +118,16 @@ export async function POST(request: Request) {
     } catch (emailErr) {
       console.error("[api/migrate/initiate] Email error:", emailErr);
     }
+
+    // Kick off scraping as soon as the response is sent instead of waiting
+    // for the next cron sweep. The cron route remains the retry safety net.
+    after(async () => {
+      try {
+        await processPendingMigrations();
+      } catch (err) {
+        console.error("[api/migrate/initiate] Background processing failed:", err);
+      }
+    });
 
     return json({
       ok: true,
