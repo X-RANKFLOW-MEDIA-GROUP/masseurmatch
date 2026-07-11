@@ -22,6 +22,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Neighborhood is required." }, { status: 400 });
     }
 
+    const phone = typeof profile.phone === "string" ? profile.phone.trim() : "";
+    if (phone.replace(/\D/g, "").length < 10) {
+      return NextResponse.json({ error: "A valid phone number is required." }, { status: 400 });
+    }
+
     if (!profile.yearsExperience?.trim()) {
       return NextResponse.json({ error: "Years of experience is required." }, { status: 400 });
     }
@@ -39,6 +44,11 @@ export async function POST(request: NextRequest) {
     const { data: authUser, error: authError } = await adminClient.auth.admin.getUserById(session.userId);
     if (authError || !authUser.user?.email_confirmed_at) {
       return NextResponse.json({ error: "Email must be verified." }, { status: 400 });
+    }
+
+    const email = authUser.user.email?.trim();
+    if (!email) {
+      return NextResponse.json({ error: "An email address is required." }, { status: 400 });
     }
 
     const { data: identityVerification, error: verificationError } = await adminClient
@@ -61,6 +71,9 @@ export async function POST(request: NextRequest) {
       .from("profiles")
       .update({
         bio: profile.bio || null,
+        phone,
+        email: email,
+        email_address: email,
         city: profile.city || null,
         neighborhood_name: profile.neighborhood?.trim() || null,
         state: profile.state || null,
