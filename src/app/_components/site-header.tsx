@@ -287,14 +287,13 @@ function MobileNav({
             className="flex items-center gap-2"
             aria-label="MasseurMatch home"
           >
-            <div className="w-8 h-8 rounded-md bg-[#8B1E2D] flex items-center justify-center">
-              <span className="text-white font-extrabold text-sm leading-none">
-                MM
-              </span>
-            </div>
-            <span className="font-bold text-[#111111] text-sm tracking-tight">
-              MASSEURMATCH
-            </span>
+            <Image
+              src={BRAND_ASSETS.logo}
+              alt="MasseurMatch"
+              width={100}
+              height={40}
+              className="h-8 w-auto object-contain"
+            />
           </Link>
           <button
             type="button"
@@ -488,30 +487,22 @@ export default function SiteHeader() {
         {/* Left: Logo area */}
         <Link
           href="/"
-          className="group flex items-center gap-3 shrink-0"
+          className="group flex items-center gap-2.5 shrink-0"
           aria-label="MasseurMatch home"
         >
-          <div className="relative w-10 h-10 rounded-lg bg-[#8B1E2D] flex items-center justify-center shadow-sm">
-            <span className="text-white font-extrabold text-base leading-none tracking-tight">
-              MM
-            </span>
-          </div>
-          <div className="hidden sm:flex flex-col">
-            <span className="font-extrabold text-[#111111] text-[15px] tracking-tight leading-tight">
-              MASSEURMATCH
-            </span>
+          <Image
+            src={BRAND_ASSETS.logo}
+            alt="MasseurMatch"
+            width={120}
+            height={48}
+            priority
+            className="h-10 w-auto object-contain"
+          />
+          <div className="hidden lg:flex flex-col">
             <span className="text-[9px] font-semibold text-[#6F6F6F] tracking-[0.12em] uppercase leading-tight">
               Premium Sports Recovery &amp; Wellness
             </span>
           </div>
-          <Image
-            src={BRAND_ASSETS.logo}
-            alt="MasseurMatch"
-            width={1}
-            height={1}
-            priority
-            className="sr-only"
-          />
         </Link>
 
         {/* Center: Navigation */}
