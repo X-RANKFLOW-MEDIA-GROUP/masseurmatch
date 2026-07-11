@@ -107,6 +107,7 @@
     "react-router-dom": "^7.18.0",
     "recharts": "^3.8.1",
     "resend": "^6.9.4",
+    "server-only": "0.0.1",
     "sonner": "^1.7.4",
     "stripe": "^18.3.0",
     "tailwind-merge": "^2.6.0",

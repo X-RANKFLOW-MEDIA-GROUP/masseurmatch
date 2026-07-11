@@ -555,6 +555,37 @@ create table if not exists public.imported_reviews (
   created_at timestamptz default timezone('utc', now())
 );
 
+alter table public.imported_reviews
+  add column if not exists migration_id uuid,
+  add column if not exists reviewer_anonymized boolean default false,
+  add column if not exists is_public boolean default false,
+  add column if not exists reviewed_by uuid,
+  add column if not exists reviewed_at timestamp,
+  add column if not exists review_notes text,
+  add column if not exists updated_at timestamp default now();
+
+-- Profile migration pipeline (/api/migrate): one row per requested import of
+-- an external profile into MasseurMatch. Mirrors the table already live in
+-- production.
+create table if not exists public.profile_migrations (
+  id uuid primary key default gen_random_uuid(),
+  email text,
+  profile_id uuid,
+  platform text,
+  source_url text,
+  status text default 'pending',
+  imported_reviews integer default 0,
+  imported_rating numeric,
+  migration_notes text,
+  completed_at timestamp,
+  created_at timestamp default now(),
+  updated_at timestamp default now(),
+  imported_review_count integer default 0,
+  is_verified boolean default false,
+  verified_at timestamp,
+  verified_by uuid
+);
+
 create table if not exists public.moderation_queue (
   id uuid primary key default gen_random_uuid(),
   user_id uuid,
