@@ -13,6 +13,14 @@ ALTER TABLE imported_reviews
   ADD COLUMN IF NOT EXISTS review_notes TEXT,
   ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW();
 
+-- 1b. The legacy table stored rating as INTEGER; reviews use half-star
+-- precision (e.g. 4.5), matching the intended NUMERIC(2,1) definition
+ALTER TABLE imported_reviews ALTER COLUMN rating TYPE NUMERIC(2,1);
+
+ALTER TABLE imported_reviews DROP CONSTRAINT IF EXISTS imported_reviews_rating_check;
+ALTER TABLE imported_reviews ADD CONSTRAINT imported_reviews_rating_check
+  CHECK (rating >= 1 AND rating <= 5);
+
 -- 2. Verification tracking columns on profile_migrations
 ALTER TABLE profile_migrations
   ADD COLUMN IF NOT EXISTS imported_review_count INTEGER DEFAULT 0,
