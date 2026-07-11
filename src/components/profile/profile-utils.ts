@@ -1,5 +1,5 @@
 import type { PublicTherapist, ProfilePhoto } from "@/app/_lib/directory";
-import { getCities } from "@/app/_lib/directory";
+import { getCities } from "@/data/cities";
 import { SITE_URL } from "@/lib/site";
 
 export type ProfileViewModel = {

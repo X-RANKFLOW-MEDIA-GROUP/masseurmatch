@@ -348,3 +348,7 @@ export function getCityBySlug(slug: string): CityData | undefined {
 export function isValidCitySlug(slug: string): boolean {
   return Boolean(getCityBySlug(slug));
 }
+
+export function getCities(): CityData[] {
+  return US_CITIES;
+}
