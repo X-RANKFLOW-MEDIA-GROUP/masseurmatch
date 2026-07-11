@@ -30,14 +30,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // High-priority hub pages
   const hubs: MetadataRoute.Sitemap = [
-    { url: siteUrl("/states"), lastModified: now, changeFrequency: "weekly", priority: 0.84 },
-    { url: siteUrl("/near-me"), lastModified: now, changeFrequency: "daily", priority: 0.87 },
-    { url: siteUrl("/therapists"), lastModified: now, changeFrequency: "daily", priority: 0.92 },
+    { url: siteUrl("/"), lastModified: now, changeFrequency: "weekly", priority: 1.0 },
+    { url: siteUrl("/therapists"), lastModified: now, changeFrequency: "daily", priority: 0.95 },
+    { url: siteUrl("/explore"), lastModified: now, changeFrequency: "daily", priority: 0.93 },
+    { url: siteUrl("/near-me"), lastModified: now, changeFrequency: "daily", priority: 0.90 },
+    { url: siteUrl("/states"), lastModified: now, changeFrequency: "weekly", priority: 0.88 },
+    { url: siteUrl("/how-it-works"), lastModified: now, changeFrequency: "monthly", priority: 0.80 },
+    { url: siteUrl("/trust"), lastModified: now, changeFrequency: "monthly", priority: 0.75 },
+    { url: siteUrl("/verification"), lastModified: now, changeFrequency: "monthly", priority: 0.75 },
+    { url: siteUrl("/about"), lastModified: now, changeFrequency: "monthly", priority: 0.70 },
+    { url: siteUrl("/pricing"), lastModified: now, changeFrequency: "monthly", priority: 0.70 },
+    { url: siteUrl("/blog"), lastModified: now, changeFrequency: "weekly", priority: 0.80 },
+    { url: siteUrl("/contact"), lastModified: now, changeFrequency: "monthly", priority: 0.60 },
   ];
 
   return [
-    ...core,
     ...hubs,
+    ...core,
     ...cities,
     ...services,
     ...neighborhoods,
