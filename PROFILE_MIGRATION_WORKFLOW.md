@@ -111,19 +111,28 @@ is_verified: FALSE,  -- Still waiting for admin review
 
 ### Phase 3: Background Processing (24-48 hours)
 
-**Supabase Edge Function** (`supabase/functions/process-migrations/index.ts`):
+**Processing pipeline** (`src/app/api/migrate/_lib/processor.ts`, exposed at
+`/api/migrate/process`):
 
 ```typescript
-// Runs on schedule (every 30 minutes) or triggered manually
-// 1. Query pending migrations
+// Runs immediately after submission (via next/server `after()` in the
+// initiate route) and daily via Vercel Cron (see vercel.json) as a
+// retry sweeper. Secured with the CRON_SECRET env var.
+// 1. Query pending migrations (oldest first, batch of 10)
 // 2. For each migration:
-//    a. Scrape/fetch profile data from source_url
-//    b. Parse reviews, ratings, service history
+//    a. Fetch the source_url HTML (10s timeout, 3MB cap)
+//    b. Extract schema.org JSON-LD Review objects (generic scraper);
+//       per-platform DOM scrapers can be added in PLATFORM_SCRAPERS
 //    c. Create imported_reviews entries (is_public: FALSE initially)
 //    d. Update profile_migrations.imported_review_count
 //    e. Set status: "completed"
-//    f. Trigger admin review email
-// 3. Handle errors: Set status: "failed", log error message
+// 3. No machine-readable reviews found → status: "manual_review"
+//    (concierge team imports by hand; never silently completed empty)
+// 4. Handle errors: Set status: "failed", log error message
+
+// Note: supabase/functions/process-migrations/index.ts contains an
+// equivalent Supabase Edge Function variant, kept as an alternative
+// deployment path. The Next.js route above is the one that ships.
 ```
 
 **Key Implementation Details**:
