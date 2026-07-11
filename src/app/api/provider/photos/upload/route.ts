@@ -69,8 +69,6 @@ export async function POST(request: Request) {
         is_primary: isPrimary,
         sort_order: sortOrder,
         moderation_status: "pending",
-        mime_type: file.type,
-        file_size: file.size,
       })
       .select("id, url, storage_path, is_primary, sort_order, moderation_status")
       .single();
