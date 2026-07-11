@@ -1,9 +1,28 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// This module is imported by client components (e.g. SearchPageClient), so it
+// must never reference the service-role key: it is absent in the browser
+// (crashing the page at module load) and must not ship in the bundle anyway.
+// The client is created lazily with whatever key the current runtime has, and
+// tracking becomes a no-op when none is available.
+let client: SupabaseClient | null = null;
+
+function getAnalyticsClient(): SupabaseClient | null {
+  if (client) return client;
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key =
+    typeof window === "undefined"
+      ? process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      : process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !key) return null;
+
+  client = createClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+  return client;
+}
 
 interface SearchEventData {
   query: string;
@@ -51,6 +70,9 @@ interface BookingEventData {
 
 export async function trackSearch(data: SearchEventData) {
   try {
+    const supabase = getAnalyticsClient();
+    if (!supabase) return;
+
     const { error } = await supabase.from("search_analytics").insert([
       {
         query: data.query,
@@ -72,6 +94,9 @@ export async function trackSearch(data: SearchEventData) {
 
 export async function trackProfileView(data: ProfileViewEventData) {
   try {
+    const supabase = getAnalyticsClient();
+    if (!supabase) return;
+
     const { error } = await supabase.from("profile_view_analytics").insert([
       {
         profile_id: data.profile_id,
@@ -95,6 +120,9 @@ export async function trackProfileView(data: ProfileViewEventData) {
 
 export async function trackInquiry(data: InquiryEventData) {
   try {
+    const supabase = getAnalyticsClient();
+    if (!supabase) return;
+
     const { error } = await supabase.from("inquiry_analytics").insert([
       {
         profile_id: data.profile_id,
@@ -119,6 +147,9 @@ export async function trackInquiry(data: InquiryEventData) {
 
 export async function trackBooking(data: BookingEventData) {
   try {
+    const supabase = getAnalyticsClient();
+    if (!supabase) return;
+
     const { error } = await supabase.from("booking_analytics").insert([
       {
         profile_id: data.profile_id,

@@ -170,18 +170,20 @@ const buildPublicTherapistsQuery = () => {
     .eq("profile_status", "approved")
     .eq("is_suspended", false)
     .eq("is_banned", false)
-    .not("email_address", "ilike", "%@example%")
-    .not("email_address", "ilike", "%admin.dev@%")
-    .not("display_name", "ilike", "%test%")
-    .not("display_name", "ilike", "%debug%")
-    .not("display_name", "ilike", "%admin%")
-    .not("display_name", "ilike", "%example%")
-    .not("display_name", "ilike", "%demo%")
-    .not("slug", "ilike", "%admin%")
-    .not("slug", "ilike", "%test%")
-    .not("slug", "ilike", "%example%")
-    .not("slug", "ilike", "%dev%")
-    .not("phone", "ilike", "%555%");
+    // NULL-safe test-data filters: `NOT ILIKE` evaluates to NULL for NULL
+    // values, so a plain .not() filter silently drops every profile with a
+    // missing phone/email/slug — which hid real therapists from the
+    // directory and homepage.
+    .or(
+      "display_name.is.null,and(display_name.not.ilike.*test*,display_name.not.ilike.*debug*,display_name.not.ilike.*admin*,display_name.not.ilike.*example*,display_name.not.ilike.*demo*)",
+    )
+    .or(
+      "slug.is.null,and(slug.not.ilike.*admin*,slug.not.ilike.*test*,slug.not.ilike.*example*,slug.not.ilike.*dev*)",
+    )
+    .or("phone.is.null,phone.not.ilike.*555*")
+    .or(
+      "email_address.is.null,and(email_address.not.ilike.*@example*,email_address.not.ilike.*admin.dev@*)",
+    );
   return q;
 };
 
