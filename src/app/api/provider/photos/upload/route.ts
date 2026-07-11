@@ -60,10 +60,14 @@ export async function POST(request: Request) {
     const sortOrder = count ?? 0;
     const isPrimary = sortOrder === 0;
 
-    const { data: photoRow, error: insertError } = await adminClient
+    // Cast: the generated Database types predate the profile_id column on
+    // profile_photos. (mime_type/file_size were dropped from the payload —
+    // the live table doesn't have them and the insert would 42703.)
+    const { data: photoRow, error: insertError } = await (adminClient as any)
       .from("profile_photos")
       .insert({
         profile_id: profile.id,
+        user_id: session.userId,
         storage_path: fileName,
         url: publicUrl,
         is_primary: isPrimary,

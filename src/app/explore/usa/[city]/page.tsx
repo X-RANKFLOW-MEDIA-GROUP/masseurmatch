@@ -7,8 +7,8 @@ import {
   buildExploreItemListJsonLd,
   getBaseExploreFilters,
   getExploreDefaults,
-  loadExploreProviders,
 } from "@/app/_lib/explore";
+import { loadExploreProviders } from "@/app/_lib/explore-server";
 import { buildBreadcrumbJsonLd, createPageMetadata } from "@/app/_lib/seo";
 import ExplorePageClient from "../../ExplorePageClient";
 

@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import {
   EXPLORE_PAGE_SIZE,
   exploreFiltersToUrl,
-  loadExploreProviders,
   parseExploreSearchParams,
   serializeExploreProvider,
 } from "@/app/_lib/explore";
+import { loadExploreProviders } from "@/app/_lib/explore-server";
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
