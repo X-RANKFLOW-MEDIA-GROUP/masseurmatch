@@ -480,10 +480,13 @@ function filterProvider(provider: ExploreProvider, filters: ExploreFilters) {
     return false;
   }
 
-  if (
-    typeof provider.priceFrom === "number" &&
-    (provider.priceFrom < filters.priceMin || provider.priceFrom > filters.priceMax)
-  ) {
+  if (typeof provider.priceFrom === "number") {
+    if (provider.priceFrom < filters.priceMin || provider.priceFrom > filters.priceMax) {
+      return false;
+    }
+  } else if (filters.priceMin > 0 || filters.priceMax < EXPLORE_DEFAULT_PRICE_MAX) {
+    // "Price on request" providers stay listed under the default range, but a
+    // user-narrowed price filter can't be satisfied by an unknown price.
     return false;
   }
 
