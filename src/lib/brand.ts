@@ -7,5 +7,5 @@ export const BRAND_ASSETS = {
   // Local, next/image-optimized stills (the homepage no longer uses video).
   heroPoster: "/brand/hero-desktop.png", // desktop hero still
   heroMobile: "/brand/hero-mobile.png", // mobile hero still
-  logo: "/brand/mm-logo.png",
+  logo: "https://res.cloudinary.com/dyfxkq2nk/image/upload/v1783717666/ChatGPT_Image_Jul_10_2026_04_07_35_PM_vxqgdv.png",
 } as const;
