@@ -41,66 +41,114 @@ function confirmUrl(type: string, tokenHash: string, redirectTo: string): string
   return `${SUPABASE_URL}/auth/v1/verify?token=${tokenHash}&type=${type}&redirect_to=${encodeURIComponent(redirectTo)}`;
 }
 
-function buildEmail(
+interface OutgoingEmail {
+  to: string;
+  subject: string;
+  html: string;
+}
+
+// Returns the list of emails to send for a given auth action. Most actions
+// produce a single message to the user's current address; email_change is the
+// exception — see below.
+function buildMessages(
   actionType: string,
   emailData: Record<string, string>,
-  userEmail: string,
-): { subject: string; html: string } | null {
+  user: Record<string, string>,
+): OutgoingEmail[] {
   const redirectTo = emailData.redirect_to || SITE_URL;
+  const userEmail = user.email ?? "";
+  const newEmail = user.new_email ?? emailData.new_email ?? "";
 
   switch (actionType) {
     case "signup":
-      return {
+      return [{
+        to: userEmail,
         subject: "Confirm your MasseurMatch email",
         html: shell("Confirm Your Email", `
           <p style="font-size:16px;line-height:1.6;margin:0 0 20px">Thanks for signing up! Click below to confirm your email address and activate your account.</p>
           ${btn("Confirm Email", confirmUrl("signup", emailData.token_hash, redirectTo))}
           <p style="font-size:13px;color:#8E8E8E;margin-top:20px">This link expires in 24 hours.</p>
         `),
-      };
+      }];
 
     case "recovery":
-      return {
+      return [{
+        to: userEmail,
         subject: "Reset your MasseurMatch password",
         html: shell("Reset Your Password", `
           <p style="font-size:16px;line-height:1.6;margin:0 0 20px">We received a request to reset the password for <strong>${userEmail}</strong>. Click below to choose a new password.</p>
           ${btn("Reset Password", confirmUrl("recovery", emailData.token_hash, redirectTo))}
           <p style="font-size:13px;color:#8E8E8E;margin-top:20px">This link expires in 1 hour. If you didn't request this, you can ignore this email.</p>
         `, "Security"),
-      };
+      }];
 
     case "magiclink":
-      return {
+      return [{
+        to: userEmail,
         subject: "Your MasseurMatch login link",
         html: shell("Your Login Link", `
           <p style="font-size:16px;line-height:1.6;margin:0 0 20px">Click below to sign in to your MasseurMatch account. This link can only be used once.</p>
           ${btn("Sign In", confirmUrl("magiclink", emailData.token_hash, redirectTo))}
           <p style="font-size:13px;color:#8E8E8E;margin-top:20px">This link expires in 1 hour.</p>
         `),
-      };
+      }];
 
     case "invite":
-      return {
+      return [{
+        to: userEmail,
         subject: "You've been invited to MasseurMatch",
         html: shell("You've Been Invited", `
           <p style="font-size:16px;line-height:1.6;margin:0 0 20px">You've been invited to join MasseurMatch. Click below to accept your invitation and set up your account.</p>
           ${btn("Accept Invitation", confirmUrl("invite", emailData.token_hash, redirectTo))}
           <p style="font-size:13px;color:#8E8E8E;margin-top:20px">This link expires in 24 hours.</p>
         `, "Invitation"),
-      };
+      }];
 
-    case "email_change":
-      return {
-        subject: "Confirm your new MasseurMatch email",
-        html: shell("Confirm Your New Email", `
-          <p style="font-size:16px;line-height:1.6;margin:0 0 20px">Click below to confirm your new email address.</p>
-          ${btn("Confirm New Email", confirmUrl("email_change", emailData.token_hash_new || emailData.token_hash, redirectTo))}
-          <p style="font-size:13px;color:#8E8E8E;margin-top:20px">If you didn't request an email change, contact support immediately.</p>
-        `, "Security"),
-      };
+    case "email_change": {
+      // The confirmation that proves control of the NEW inbox must be delivered
+      // to new_email using token_hash_new. With Secure Email Change enabled,
+      // GoTrue also issues token_hash for the CURRENT address, which must be
+      // confirmed from that inbox — so up to two distinct messages are sent.
+      const messages: OutgoingEmail[] = [];
+      const newTokenHash = emailData.token_hash_new || emailData.token_hash;
+      const newRecipient = newEmail || userEmail;
+
+      if (newRecipient && newTokenHash) {
+        messages.push({
+          to: newRecipient,
+          subject: "Confirm your new MasseurMatch email",
+          html: shell("Confirm Your New Email", `
+            <p style="font-size:16px;line-height:1.6;margin:0 0 20px">Click below to confirm this as the new email address for your MasseurMatch account.</p>
+            ${btn("Confirm New Email", confirmUrl("email_change", newTokenHash, redirectTo))}
+            <p style="font-size:13px;color:#8E8E8E;margin-top:20px">If you didn't request an email change, contact support immediately.</p>
+          `, "Security"),
+        });
+      }
+
+      // Secure Email Change: a second, distinct token for the current address.
+      if (
+        userEmail &&
+        emailData.token_hash &&
+        emailData.token_hash_new &&
+        emailData.token_hash !== emailData.token_hash_new
+      ) {
+        messages.push({
+          to: userEmail,
+          subject: "Confirm the email change on your MasseurMatch account",
+          html: shell("Confirm This Change", `
+            <p style="font-size:16px;line-height:1.6;margin:0 0 20px">A request was made to change the email on your account${newEmail ? ` to <strong>${newEmail}</strong>` : ""}. Click below to confirm from your current address.</p>
+            ${btn("Confirm Change", confirmUrl("email_change", emailData.token_hash, redirectTo))}
+            <p style="font-size:13px;color:#8E8E8E;margin-top:20px">If you didn't request an email change, contact support immediately.</p>
+          `, "Security"),
+        });
+      }
+
+      return messages;
+    }
 
     case "reauthentication":
-      return {
+      return [{
+        to: userEmail,
         subject: "Your MasseurMatch verification code",
         html: shell("Your Verification Code", `
           <p style="font-size:16px;line-height:1.6;margin:0 0 20px">Enter this code to verify your identity:</p>
@@ -109,10 +157,10 @@ function buildEmail(
           </div>
           <p style="font-size:13px;color:#8E8E8E">This code expires in 10 minutes. Do not share it with anyone.</p>
         `, "Security"),
-      };
+      }];
 
     default:
-      return null;
+      return [];
   }
 }
 
@@ -160,9 +208,9 @@ serve(async (req) => {
       });
     }
 
-    const email = buildEmail(actionType, emailData, userEmail);
-    if (!email) {
-      console.warn(`[AUTH-EMAIL] Unknown action type: ${actionType}`);
+    const messages = buildMessages(actionType, emailData, user);
+    if (messages.length === 0) {
+      console.warn(`[AUTH-EMAIL] No deliverable message for action type: ${actionType}`);
       return new Response(JSON.stringify({}), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -171,27 +219,29 @@ serve(async (req) => {
     const resendKey = Deno.env.get("RESEND_API_KEY");
     if (!resendKey) throw new Error("RESEND_API_KEY not configured");
 
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${resendKey}`,
-      },
-      body: JSON.stringify({
-        from: FROM_ADDRESS,
-        to: [userEmail],
-        subject: email.subject,
-        html: email.html,
-      }),
-    });
+    for (const message of messages) {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${resendKey}`,
+        },
+        body: JSON.stringify({
+          from: FROM_ADDRESS,
+          to: [message.to],
+          subject: message.subject,
+          html: message.html,
+        }),
+      });
 
-    if (!res.ok) {
-      const errBody = await res.text();
-      throw new Error(`Resend error: ${res.status} ${errBody}`);
+      if (!res.ok) {
+        const errBody = await res.text();
+        throw new Error(`Resend error: ${res.status} ${errBody}`);
+      }
+
+      const result = await res.json();
+      console.log(`[AUTH-EMAIL] Sent ${actionType} to ${message.to}`, { id: result.id });
     }
-
-    const result = await res.json();
-    console.log(`[AUTH-EMAIL] Sent ${actionType} to ${userEmail}`, { id: result.id });
 
     return new Response(JSON.stringify({}), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
