@@ -25,6 +25,7 @@ type ChangeFrequency = NonNullable<SitemapEntry["changeFrequency"]>;
 export const SEO_CITY_MIN_PUBLIC_PROFILES = 3;
 
 const PROFILE_LOOKUP_CHUNK_SIZE = 100;
+const INVENTORY_DEPENDENT_HUB_PATHS = new Set(["/cities", "/explore", "/near-me"]);
 const BLOCKED_PROFILE_SLUGS = new Set([
   "carlos-luis-pena-fd794a8e",
   "david-213c8e32",
@@ -203,7 +204,10 @@ export async function buildReleaseSitemapEntries(now = new Date()): Promise<Meta
   const hasEligibleCities = local.eligibleCities.length > 0;
 
   const core = buildCoreSitemapEntries(now)
-    .filter((entry) => hasEligibleCities || new URL(entry.url).pathname !== "/cities")
+    .filter((entry) => {
+      const pathname = new URL(entry.url).pathname;
+      return hasEligibleCities || !INVENTORY_DEPENDENT_HUB_PATHS.has(pathname);
+    })
     .map(stripSyntheticLastModified);
 
   const conditionalHubs: MetadataRoute.Sitemap = [
