@@ -65,6 +65,7 @@ const navSections = [
   {
     title: "Ops",
     items: [
+      { href: "/admin/tickets", label: "Tickets", icon: MessageSquare },
       { href: "/admin/support", label: "Support", icon: LifeBuoy },
       { href: "/admin/verification", label: "Verification", icon: ShieldCheck },
       { href: "/admin/legal", label: "Legal", icon: FileText },

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getRequestSession } from "@/app/api/_lib/session";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
-import { sendEmail } from "@/app/api/_lib/email";
-import React from "react";
+import { notifyAdmin } from "@/app/api/_lib/admin-notify";
 
 export async function POST(request: NextRequest) {
   try {
@@ -88,22 +87,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to save profile." }, { status: 500 });
     }
 
-    await sendEmail({
-      to: process.env.ADMIN_EMAIL || "admin@masseurmatch.com",
-      subject: "New Provider Signup Pending Review",
-      react: React.createElement("div", {}, [
-        React.createElement("h1", { key: "title" }, "New Signup"),
-        React.createElement(
-          "p",
-          { key: "body" },
-          `A new provider (${profile.full_name || session.userId}) has submitted their profile for review.`,
-        ),
-        React.createElement(
-          "a",
-          { key: "link", href: "https://masseurmatch.com/admin/therapists" },
-          "Review in Admin Dashboard",
-        ),
-      ]),
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://masseurmatch.com";
+    await notifyAdmin({
+      subject: "New provider profile submitted for review",
+      heading: "Profile submitted for review",
+      intro: `${profile.full_name || "A provider"} submitted their profile and is awaiting approval.`,
+      fields: [
+        { label: "Name", value: profile.full_name || null },
+        { label: "City", value: profile.city || null },
+        { label: "State", value: profile.state || null },
+        { label: "Plan", value: planTier || null },
+        { label: "User ID", value: session.userId },
+      ],
+      action: { label: "Review in admin", url: `${appUrl}/admin/therapists` },
     });
 
     return NextResponse.json({ success: true });
