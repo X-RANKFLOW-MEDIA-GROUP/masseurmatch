@@ -1,10 +1,13 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 import { setSessionCookie } from "@/app/api/_lib/session";
-import { ensureUserProfileAndRole, type AppRole } from "@/app/api/_lib/supabase-server";
+import {
+  createSupabaseAdminClient,
+  ensureUserProfileAndRole,
+  type AppRole,
+} from "@/app/api/_lib/supabase-server";
 import { assertRateLimit } from "@/app/_lib/security";
 
 type SessionRole = AppRole | null;
@@ -65,16 +68,15 @@ export async function GET(request: NextRequest) {
         ? user.user_metadata.name
         : user.email.split("@")[0] || "there";
 
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (serviceKey) {
-    const adminClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      serviceKey,
-      { auth: { autoRefreshToken: false, persistSession: false } }
-    );
-
+  // Profile creation must never be skipped: this guard used to be
+  // `if (SUPABASE_SERVICE_ROLE_KEY)`, and with the env var absent OAuth
+  // logins silently minted sessions with no profiles row and a null role —
+  // those accounts then 404'd across every /pro surface. A missing key now
+  // fails the login visibly instead of creating a broken account.
+  {
     const defaultRole: AppRole = "provider";
     try {
+      const adminClient = createSupabaseAdminClient();
       const ensured = await ensureUserProfileAndRole(user, { defaultRole });
       role = ensured.role as SessionRole;
       profileCreated = ensured.profileCreated;
