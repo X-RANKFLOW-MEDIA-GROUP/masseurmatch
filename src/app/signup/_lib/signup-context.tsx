@@ -33,6 +33,11 @@ export type BillingStatus =
   | "active"
   | "failed";
 
+export interface ProfileMigrationUrl {
+  platform: string;
+  url: string;
+}
+
 export interface SignupProfile {
   tagline: string;
   bio: string;
@@ -60,6 +65,7 @@ export interface SignupProfile {
   profilePhoto: File | null;
   galleryPhotos: File[];
   mediaCompliance: boolean;
+  migrationUrls: ProfileMigrationUrl[];
 }
 
 export interface SignupState {
@@ -110,6 +116,7 @@ const emptyProfile: SignupProfile = {
   profilePhoto: null,
   galleryPhotos: [],
   mediaCompliance: false,
+  migrationUrls: [],
 };
 
 const initialState: SignupState = {

@@ -26,19 +26,19 @@ import {
   Grid2x2,
 } from "lucide-react";
 import { IconClock, IconHeart, IconMapPin, IconSliders, IconStar } from "@/components/icons";
-import type { CityData } from "@/data/cities";
 import {
   applyExploreFilters,
   EXPLORE_DEFAULT_CITY,
   EXPLORE_DEFAULT_PRICE_MAX,
   exploreFiltersToUrl,
   getBaseExploreFilters,
-  getCityCoordinates,
-  resolveExploreCity,
+  getCityCoordinatesFromSlug,
+  resolveExploreCityWithData,
+  type CityData,
   type ExploreFilters,
   type ExplorePoint,
   type ExploreProvider,
-} from "@/app/_lib/explore";
+} from "@/app/_lib/explore-client";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -851,8 +851,8 @@ function MapCanvas({
         const bounds = L.latLngBounds(providers.map((provider) => [provider.latitude, provider.longitude]));
         map.fitBounds(bounds.pad(0.18), { animate: false, maxZoom: providers.length === 1 ? 13 : 11 });
       } else {
-        const dallas = getCityCoordinates(EXPLORE_DEFAULT_CITY);
-        map.setView([dallas.latitude, dallas.longitude], 10);
+        const center = getCityCoordinatesFromSlug("");
+        map.setView([center.latitude, center.longitude], 10);
       }
     };
 
@@ -1101,13 +1101,13 @@ export default function ExplorePageClient({
     }
 
     const nextZip = isZip(trimmed) ? trimmed : "";
-    const nextCity = resolveExploreCity(nextZip ? filters.city : trimmed, nextZip);
+    const nextCity = resolveExploreCityWithData(nextZip ? filters.city : trimmed, cities, nextZip);
     if (nextCity === filters.city && nextZip === filters.zip) {
       return;
     }
 
     applyFilters({ ...filters, city: nextCity, zip: nextZip });
-  }, [applyFilters, deferredLocationInput, filters, usingDetectedLocation]);
+  }, [applyFilters, cities, deferredLocationInput, filters, usingDetectedLocation]);
 
   useEffect(() => {
     if (hasExplicitLocation || typeof window === "undefined") {
@@ -1128,14 +1128,14 @@ export default function ExplorePageClient({
       return;
     }
 
-    const nextCity = resolveExploreCity(geoCity.name, "");
+    const nextCity = resolveExploreCityWithData(geoCity.name, cities, "");
     if (nextCity === filters.city) {
       return;
     }
 
     applyFilters({ ...filters, city: nextCity, zip: "" });
     setLocationInput(nextCity);
-  }, [applyFilters, filters, geoCity, hasExplicitLocation, usingDetectedLocation]);
+  }, [applyFilters, cities, filters, geoCity, hasExplicitLocation, usingDetectedLocation]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1559,7 +1559,7 @@ export default function ExplorePageClient({
                 </p>
                 {invalidProviderCount > 0 ? (
                   <p className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
-                    {invalidProviderCount} incomplete {invalidProviderCount === 1 ? "profile" : "profiles"} hidden until neighborhood, experience, and starting price are complete.
+                    {invalidProviderCount} incomplete {invalidProviderCount === 1 ? "profile" : "profiles"} hidden until a service area is added.
                   </p>
                 ) : null}
                 {geoDenied ? (

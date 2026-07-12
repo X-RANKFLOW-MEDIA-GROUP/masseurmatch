@@ -1,5 +1,7 @@
+// Type-only import from directory.ts (server-only module) — this file is
+// bundled into client profile components, so it must not import its runtime.
 import type { PublicTherapist, ProfilePhoto } from "@/app/_lib/directory";
-import { getCities } from "@/app/_lib/directory";
+import { US_CITIES } from "@/data/cities";
 import { SITE_URL } from "@/lib/site";
 
 export type ProfileViewModel = {
@@ -141,7 +143,7 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
   const city = profile.city || "Your city";
   const state = profile.state || String(p.state_code || "US");
   const country = String(p.country || "United States");
-  const matchedCity = getCities().find((item) => item.name.toLowerCase() === city.toLowerCase());
+  const matchedCity = US_CITIES.find((item) => item.name.toLowerCase() === city.toLowerCase());
   const citySlug = String(p.city_slug || matchedCity?.slug || slugify(`${city}-${state}`) || "search");
   const stateSlug = String(p.state_slug || slugify(state) || "states");
   const services = asStringArray(p.services).concat(asStringArray(profile.service_categories));
@@ -157,7 +159,7 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
   const galleryImages = Array.from(new Set([profilePhotoUrl, coverPhotoUrl, ...galleryFromProfile, ...galleryFromPhotos])).filter(Boolean).slice(0, 12);
   const pricingSessions = Array.isArray(profile.pricing_sessions) ? profile.pricing_sessions : [];
   const serviceAreas = Array.from(new Set([...asStringArray(p.service_areas), ...(profile.areas_served || [])])).filter(Boolean);
-  const nearbyCities = getCities()
+  const nearbyCities = US_CITIES
     .filter((item) => item.name.toLowerCase() !== city.toLowerCase() && (!matchedCity || item.stateCode === matchedCity.stateCode))
     .slice(0, 5)
     .map((item) => ({ name: item.name, slug: item.slug }));

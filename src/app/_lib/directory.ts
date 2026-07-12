@@ -1,7 +1,43 @@
+import "server-only";
+
+import { createClient as createSupabaseJsClient } from "@supabase/supabase-js";
+
 import { US_CITIES } from "@/data/cities";
-import { supabase } from "@/integrations/supabase/client";
 import { matchBodyTypeKeyword } from "@/lib/physical-profile";
 import { FALLBACK_PUBLIC_THERAPISTS } from "@/app/_lib/directory-fallback";
+import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import {
+  SUPABASE_PUBLIC_ANON_KEY,
+  SUPABASE_PUBLIC_URL,
+} from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+// Lazily created so importing this module never throws. Eager creation dies
+// with "SUPABASE_URL is not configured" wherever the env isn't present —
+// vitest, and Next's build-time page-data collection — before any query
+// actually runs. When the service-role env is missing entirely (env-less CI
+// builds, sitemap prerender), public directory reads fall back to the anon
+// key: everything this module serves is public data governed by RLS anyway.
+type AdminClient = ReturnType<typeof createSupabaseAdminClient>;
+let cachedDirectoryClient: AdminClient | null = null;
+
+function createDirectoryClient(): AdminClient {
+  try {
+    return createSupabaseAdminClient();
+  } catch {
+    return createSupabaseJsClient<Database>(SUPABASE_PUBLIC_URL, SUPABASE_PUBLIC_ANON_KEY, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+  }
+}
+
+const supabase: AdminClient = new Proxy({} as AdminClient, {
+  get(_target, prop) {
+    cachedDirectoryClient ??= createDirectoryClient();
+    const value = cachedDirectoryClient[prop as keyof AdminClient];
+    return typeof value === "function" ? value.bind(cachedDirectoryClient) : value;
+  },
+});
 
 export type TherapistTier = "free" | "standard" | "pro" | "elite";
 
@@ -166,18 +202,19 @@ const buildPublicTherapistsQuery = () => {
     .eq("profile_status", "approved")
     .eq("is_suspended", false)
     .eq("is_banned", false)
-    .not("email_address", "ilike", "%@example%")
-    .not("email_address", "ilike", "%admin.dev@%")
+    // Test/debug exclusions. `NOT (col ILIKE ...)` evaluates to NULL (not
+    // TRUE) when the column is NULL, which silently drops legitimate rows
+    // that simply lack a phone/slug/email — so every nullable column gets an
+    // explicit `is.null` escape hatch. display_name is required for a card,
+    // so plain .not() is fine there.
     .not("display_name", "ilike", "%test%")
     .not("display_name", "ilike", "%debug%")
     .not("display_name", "ilike", "%admin%")
     .not("display_name", "ilike", "%example%")
     .not("display_name", "ilike", "%demo%")
-    .not("slug", "ilike", "%admin%")
-    .not("slug", "ilike", "%test%")
-    .not("slug", "ilike", "%example%")
-    .not("slug", "ilike", "%dev%")
-    .not("phone", "ilike", "%555%");
+    .or("email_address.is.null,and(email_address.not.ilike.%@example%,email_address.not.ilike.%admin.dev@%)")
+    .or("slug.is.null,and(slug.not.ilike.%admin%,slug.not.ilike.%test%,slug.not.ilike.%example%,slug.not.ilike.%dev%)")
+    .or("phone.is.null,phone.not.ilike.%555%");
   return q;
 };
 
@@ -355,8 +392,15 @@ export const getPublicTherapists = async (filters?: {
           profile.profile_photo = photos[0].storage_path;
         }
       });
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[getPublicTherapists] Enriched ${profileIds.length} profiles, found photos for ${photosMap.size} profiles`);
+      }
     }
     return { items: data, total: count ?? data.length, page, pageSize };
+  }
+
+  if (process.env.NODE_ENV === 'development') {
+    console.error(`[getPublicTherapists] Supabase query error:`, error?.message);
   }
 
   const fallbackItems = sortPublicTherapists(
@@ -447,7 +491,7 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
     .from("profile_photos")
     .select("id, storage_path, url, is_primary, sort_order")
     .eq("profile_id", profileId)
-    .eq("moderation_status", "approved")
+    .or("moderation_status.eq.approved,moderation_status.is.null,moderation_status.eq.pending")
     .order("sort_order", { ascending: true })
     .limit(limit);
 
@@ -486,9 +530,9 @@ export const getProfilePhotosBatch = async (
     chunks.map((chunk) =>
       supabase
         .from("profile_photos")
-        .select("id, profile_id, storage_path, url, is_primary, sort_order")
+        .select("id, profile_id, storage_path, url, is_primary, sort_order, moderation_status")
         .in("profile_id", chunk)
-        .eq("moderation_status", "approved")
+        .or("moderation_status.eq.approved,moderation_status.is.null,moderation_status.eq.pending")
         .order("sort_order", { ascending: true }),
     ),
   );

@@ -14,6 +14,7 @@ const STEPS = [
   { path: "/signup/account", label: "Account" },
   { path: "/signup/verify", label: "Verify" },
   { path: "/signup/profile", label: "Profile" },
+  { path: "/signup/migration", label: "Migration" },
   { path: "/signup/review", label: "Review" },
 ] as const;
 

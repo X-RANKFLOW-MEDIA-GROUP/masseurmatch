@@ -13,13 +13,50 @@ import type { TablesUpdate } from "@/integrations/supabase/types";
 import { slugify } from "@/components/profile/profile-utils";
 import { buildProfileSlug } from "@/app/_lib/profile-slug";
 
+// Fields that must never be blanked by a profile save. A payload with an
+// empty/null value for one of these (typically an unhydrated client form)
+// keeps the existing database value instead of wiping it. Clearing these
+// intentionally goes through admin tooling, not the self-serve editor.
+const PROTECTED_TEXT_FIELDS = [
+  "display_name",
+  "full_name",
+  "bio",
+  "city",
+  "state",
+  "phone",
+  "email_address",
+] as const;
+
+const PROTECTED_ARRAY_FIELDS = [
+  "specialties",
+  "massage_techniques",
+  "service_categories",
+  "languages",
+] as const;
+
+function stripDestructiveEmptyFields(updates: Record<string, unknown>) {
+  for (const field of PROTECTED_TEXT_FIELDS) {
+    const value = updates[field];
+    if (value === null || (typeof value === "string" && !value.trim())) {
+      delete updates[field];
+    }
+  }
+  for (const field of PROTECTED_ARRAY_FIELDS) {
+    const value = updates[field];
+    if (Array.isArray(value) && value.length === 0) {
+      delete updates[field];
+    }
+  }
+  return updates;
+}
+
 function parseProfilePayload(raw: unknown) {
   const modern = massageTherapistProfileSchema.safeParse(raw);
   if (modern.success) {
     const body = modern.data;
     return {
       fields: Object.keys(body),
-      updates: {
+      updates: stripDestructiveEmptyFields({
         display_name: sanitizeText(body.display_name),
         full_name: sanitizeText(body.full_name),
         headline: sanitizeOptionalText(body.headline),
@@ -49,7 +86,7 @@ function parseProfilePayload(raw: unknown) {
         seo_description: sanitizeOptionalText(body.seo_description),
         seo_keywords: sanitizeStringArray(body.seo_keywords || []),
         slug: sanitizeText(body.slug),
-      },
+      }),
     };
   }
 
@@ -58,7 +95,7 @@ function parseProfilePayload(raw: unknown) {
     const body = legacy.data;
     return {
       fields: Object.keys(body),
-      updates: {
+      updates: stripDestructiveEmptyFields({
         display_name: sanitizeText(body.displayName),
         full_name: sanitizeText(body.displayName),
         bio: sanitizeText(body.bio),
@@ -87,7 +124,7 @@ function parseProfilePayload(raw: unknown) {
             end_date: t.end_date,
           })),
         }),
-      },
+      }),
     };
   }
 
@@ -359,11 +396,14 @@ export async function PATCH(request: Request) {
       updates.full_name = body.displayName.trim();
     }
     if (body.headline !== undefined) updates.headline = text(body.headline);
-    if (body.bio !== undefined) updates.bio = text(body.bio);
+    // bio/city/state are load-bearing (routing, SEO, listing eligibility) —
+    // a blank value in the payload means "unset field in the form", never
+    // "erase what's in the database", so only non-empty values are applied.
+    if (text(body.bio)) updates.bio = text(body.bio);
     if (body.tagline !== undefined) updates.tagline = text(body.tagline);
 
-    if (body.city !== undefined) updates.city = text(body.city);
-    if (body.state !== undefined) updates.state = text(body.state);
+    if (text(body.city)) updates.city = text(body.city);
+    if (text(body.state)) updates.state = text(body.state);
     if (body.neighborhood !== undefined) updates.neighborhood = text(body.neighborhood);
     if (body.zipCode !== undefined) updates.zip_code = text(body.zipCode);
 

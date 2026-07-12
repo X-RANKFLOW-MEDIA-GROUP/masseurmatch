@@ -1,10 +1,11 @@
-import {
-  getCities,
-  getProfilePhotosBatch,
-  getPublicTherapists,
-  type PricingSessionItem,
-  type PublicTherapist,
+// Type-only import: this module is shared with client components, so it must
+// not pull in the server-only runtime from directory.ts. Server data loading
+// lives in explore-server.ts.
+import type {
+  PricingSessionItem,
+  PublicTherapist,
 } from "@/app/_lib/directory";
+import { US_CITIES } from "@/data/cities";
 import { isVerifiedDirectoryProfile } from "@/app/_lib/public-profile";
 
 export const EXPLORE_DEFAULT_CITY = "";
@@ -195,7 +196,7 @@ export function resolveExploreCity(inputCity: string, inputZip = "") {
     return "";
   }
 
-  const matched = getCities().find((city) => {
+  const matched = US_CITIES.find((city) => {
     const normalizedInput = normalize(raw);
     return normalize(city.name) === normalizedInput || city.slug === toSlug(raw);
   });
@@ -207,7 +208,7 @@ export function resolveExploreCity(inputCity: string, inputZip = "") {
 const US_CENTER: ExplorePoint = { latitude: 39.8283, longitude: -98.5795 };
 
 export function getCityCoordinates(cityName: string) {
-  const city = getCities().find((entry) => normalize(entry.name) === normalize(cityName));
+  const city = US_CITIES.find((entry) => normalize(entry.name) === normalize(cityName));
   const slug = city?.slug || toSlug(cityName);
   return CITY_COORDINATES[slug] || US_CENTER;
 }
@@ -395,7 +396,7 @@ function withProviderDistance(provider: ExploreProvider, origin: ExplorePoint) {
   };
 }
 
-function normalizeProvider(profile: PublicTherapist, origin: ExplorePoint): ExploreProvider {
+export function normalizeProvider(profile: PublicTherapist, origin: ExplorePoint): ExploreProvider {
   const location = getProfileCoordinates(profile);
   const yearsExperience = deriveYearsExperience(profile);
   const priceFrom = deriveStartingPrice(profile);
@@ -479,10 +480,13 @@ function filterProvider(provider: ExploreProvider, filters: ExploreFilters) {
     return false;
   }
 
-  if (
-    typeof provider.priceFrom === "number" &&
-    (provider.priceFrom < filters.priceMin || provider.priceFrom > filters.priceMax)
-  ) {
+  if (typeof provider.priceFrom === "number") {
+    if (provider.priceFrom < filters.priceMin || provider.priceFrom > filters.priceMax) {
+      return false;
+    }
+  } else if (filters.priceMin > 0 || filters.priceMax < EXPLORE_DEFAULT_PRICE_MAX) {
+    // "Price on request" providers stay listed under the default range, but a
+    // user-narrowed price filter can't be satisfied by an unknown price.
     return false;
   }
 
@@ -534,6 +538,16 @@ export function recalculateExploreDistances(providers: ExploreProvider[], origin
   return providers.map((provider) => withProviderDistance(provider, origin));
 }
 
+// Only a missing service area makes a card unrenderable (no city page to
+// link, no distance to compute). Missing experience or pricing degrades
+// gracefully on the card ("Price on request"), so those profiles stay
+// listed instead of silently emptying the directory.
+const HARD_MISSING_FIELDS = new Set(["neighborhood"]);
+
+export function isHiddenExploreProvider(provider: ExploreProvider) {
+  return provider.missingFields.some((field) => HARD_MISSING_FIELDS.has(field));
+}
+
 export function applyExploreFilters(
   providers: ExploreProvider[],
   filters: ExploreFilters,
@@ -541,7 +555,7 @@ export function applyExploreFilters(
 ) {
   const nextProviders = origin ? recalculateExploreDistances(providers, origin) : providers;
   return sortProviders(
-    nextProviders.filter((provider) => provider.missingFields.length === 0 && filterProvider(provider, filters)),
+    nextProviders.filter((provider) => !isHiddenExploreProvider(provider) && filterProvider(provider, filters)),
     filters.sort,
   );
 }
@@ -595,35 +609,6 @@ export function exploreFiltersToUrl(filters: ExploreFilters) {
   if (filters.priceMax < EXPLORE_DEFAULT_PRICE_MAX) params.set("price_max", String(filters.priceMax));
 
   return params.toString();
-}
-
-export async function loadExploreProviders(filters: ExploreFilters) {
-  const resolvedCity = resolveExploreCity(filters.city, filters.zip);
-  const origin = getCityCoordinates(resolvedCity);
-  const response = await getPublicTherapists({ page: 1, pageSize: 200 });
-
-  // Attach each provider's approved primary photo so explore cards show the
-  // uploaded image rather than a generic stock fallback.
-  const photoIds = response.items
-    .map((item) => item.id)
-    .filter((id): id is string => Boolean(id) && !id.toLowerCase().startsWith("fallback-"));
-  const photoMap = await getProfilePhotosBatch(photoIds, 1);
-  const withPhotos = response.items.map((profile) => {
-    const primary = photoMap.get(profile.id)?.[0];
-    return primary ? { ...profile, profile_photo: primary.storage_path } : profile;
-  });
-
-  const normalized = withPhotos.map((profile) => normalizeProvider(profile, origin));
-  const sorted = applyExploreFilters(normalized, { ...filters, city: resolvedCity });
-  const invalidProviderCount = normalized.filter((provider) => provider.missingFields.length > 0).length;
-
-  return {
-    filters: { ...filters, city: resolvedCity },
-    origin,
-    total: sorted.length,
-    items: sorted,
-    invalidProviderCount,
-  };
 }
 
 export function serializeExploreProvider(provider: ExploreProvider): ExploreApiProvider {
