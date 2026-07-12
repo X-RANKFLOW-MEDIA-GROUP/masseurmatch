@@ -108,7 +108,21 @@ jobs:
           SITEMAP_VALIDATION_BASE_URL: ${{ steps.preview.outputs.url }}
           SITEMAP_CANONICAL_ORIGIN: https://masseurmatch.com
           SITEMAP_VALIDATION_CONCURRENCY: "6"
-        run: node scripts/validate-sitemap.mjs > sitemap-preview-audit.log 2>&1
+          VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
+        run: |
+          cat > /tmp/vercel-bypass-fetch.mjs <<'EOF'
+          const token = process.env.VERCEL_PROTECTION_BYPASS?.trim();
+          if (token) {
+            const originalFetch = globalThis.fetch;
+            globalThis.fetch = (input, init = {}) => {
+              const headers = new Headers(init.headers || {});
+              headers.set("x-vercel-protection-bypass", token);
+              headers.set("x-vercel-set-bypass-cookie", "true");
+              return originalFetch(input, { ...init, headers });
+            };
+          }
+          EOF
+          node --import /tmp/vercel-bypass-fetch.mjs scripts/validate-sitemap.mjs > sitemap-preview-audit.log 2>&1
 
       - name: Upload sitemap audit report
         if: always()
