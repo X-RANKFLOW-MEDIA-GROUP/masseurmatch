@@ -100,7 +100,7 @@ export function ReportProfileDialog({ profileId, profileName, profileSlug }: Rep
       <DialogTrigger asChild>
         <button
           type="button"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#8E8E8E] transition-colors hover:text-[#8B1E2D]"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#6F6F6F] transition-colors hover:text-[#8B1E2D]"
         >
           <Flag className="h-[0.85rem] w-[0.85rem]" strokeWidth={2.25} />
           Report this profile

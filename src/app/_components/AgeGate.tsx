@@ -80,7 +80,7 @@ export function AgeGate() {
             Leave this site
           </a>
         </div>
-        <p className="mt-5 text-xs leading-5 text-[#8E8E8E]">
+        <p className="mt-5 text-xs leading-5 text-[#6F6F6F]">
           By entering you agree to our{" "}
           <Link href="/terms" className="underline underline-offset-2 hover:text-[#8B1E2D]">Terms</Link> and{" "}
           <Link href="/privacy" className="underline underline-offset-2 hover:text-[#8B1E2D]">Privacy Policy</Link>.

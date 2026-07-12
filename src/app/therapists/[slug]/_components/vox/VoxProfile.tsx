@@ -666,7 +666,7 @@ export function VoxProfile({
 
         {/* ── Safety / report ─────────────────────────────────────────────── */}
         <div className="mt-12 flex flex-col items-center gap-2 border-t border-[#E8E8E8] pt-6 text-center sm:mt-16">
-          <p className="max-w-md text-xs leading-5 text-[#8E8E8E]">
+          <p className="max-w-md text-xs leading-5 text-[#6F6F6F]">
             MasseurMatch is a professional massage directory. Sexual services are strictly prohibited. See
             something that violates our{" "}
             <Link href="/prohibited-conduct" className="underline underline-offset-2 hover:text-[#8B1E2D]">
