@@ -49,6 +49,12 @@ const reportTypes: { icon: React.ElementType; title: string; body: string; actio
     body: "Report any user who is harassing, threatening, or discriminating against you through the platform.",
     action: "trust@masseurmatch.com",
   },
+  {
+    icon: ShieldAlert,
+    title: "Report child exploitation",
+    body: "Any content that sexualizes or involves a minor is reported to NCMEC and law enforcement. Report it to us and to the NCMEC CyberTipline at 1-800-843-5678.",
+    action: "trust@masseurmatch.com",
+  },
 ];
 
 export default function ReportBlockSafetyPage() {
@@ -85,6 +91,10 @@ export default function ReportBlockSafetyPage() {
               </p>
               <div className="mt-3 space-y-2 text-sm text-red-800">
                 <p><strong>National Human Trafficking Hotline:</strong> 1-888-373-7888 or text &quot;HELP&quot; to 233733</p>
+                <p>
+                  <strong>NCMEC CyberTipline (child exploitation):</strong> 1-800-843-5678 or{" "}
+                  <a href="https://report.cybertip.org" target="_blank" rel="noopener noreferrer" className="underline">report.cybertip.org</a>
+                </p>
                 <p><strong>National Sexual Assault Hotline:</strong> 1-800-656-4673</p>
                 <p><strong>Crisis Text Line:</strong> Text HOME to 741741</p>
               </div>
@@ -118,7 +128,10 @@ export default function ReportBlockSafetyPage() {
             <div>
               <h2 className="font-display text-2xl font-semibold tracking-tight text-foreground">How to report</h2>
               <div className="mt-5 space-y-3 text-sm leading-7 text-text-secondary">
-                <p>To report a profile, content, or conduct violation, email{" "}
+                <p>
+                  The fastest way to flag a listing is the{" "}
+                  <strong>&ldquo;Report this profile&rdquo;</strong> link at the bottom of any therapist
+                  profile — no account required. You can also email{" "}
                   <a href="mailto:trust@masseurmatch.com" className="text-brand-secondary underline">trust@masseurmatch.com</a>{" "}
                   with:
                 </p>
@@ -179,6 +192,14 @@ export default function ReportBlockSafetyPage() {
           <p className="mt-3 text-sm leading-7 text-text-secondary">
             Submitting a report does not guarantee removal, suspension, or any specific enforcement outcome.
             We review every report but we do not share details of enforcement decisions with reporters.
+          </p>
+          <p className="mt-3 text-sm leading-7 text-text-secondary">
+            In line with FOSTA-SESTA (18 U.S.C. &sect;&nbsp;2421A) and our obligations under 18 U.S.C.
+            &sect;&nbsp;2258A, MasseurMatch prohibits any use of the platform to facilitate prostitution or sex
+            trafficking, preserves relevant records, cooperates with valid legal process, and reports apparent
+            child sexual abuse material to NCMEC. See our{" "}
+            <Link href="/prohibited-conduct" className="text-brand-secondary underline">Prohibited Conduct</Link>{" "}
+            policy for details.
           </p>
         </section>
 
