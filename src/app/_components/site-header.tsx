@@ -290,9 +290,9 @@ function MobileNav({
             <Image
               src={BRAND_ASSETS.logo}
               alt="MasseurMatch"
-              width={100}
-              height={40}
-              className="h-9 w-auto object-contain"
+              width={110}
+              height={44}
+              className="h-11 w-auto object-contain"
             />
           </Link>
           <button
@@ -493,14 +493,14 @@ export default function SiteHeader() {
           <Image
             src={BRAND_ASSETS.logo}
             alt="MasseurMatch"
-            width={120}
-            height={48}
+            width={140}
+            height={56}
             priority
-            className="h-9 w-auto object-contain md:h-12"
+            className="h-11 w-auto object-contain md:h-14"
           />
           <div className="hidden lg:flex flex-col">
             <span className="text-[9px] font-semibold text-[#6F6F6F] tracking-[0.12em] uppercase leading-tight">
-              Premium Sports Recovery &amp; Wellness
+              LGBTQ+-Affirming Male Massage
             </span>
           </div>
         </Link>
