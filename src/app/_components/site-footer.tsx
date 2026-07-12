@@ -62,6 +62,7 @@ export function SiteFooter() {
               <li><Link href="/cookie-policy" className="hover:text-white transition-colors">Cookie Policy</Link></li>
               <li><Link href="/platform-disclaimer" className="hover:text-white transition-colors">Disclaimer</Link></li>
               <li><Link href="/2257" className="hover:text-white transition-colors">2257 Notice</Link></li>
+              <li><Link href="/law-enforcement" className="hover:text-white transition-colors">Law Enforcement</Link></li>
               <li><Link href="/legal" className="hover:text-white transition-colors">Legal Notices</Link></li>
             </ul>
           </div>

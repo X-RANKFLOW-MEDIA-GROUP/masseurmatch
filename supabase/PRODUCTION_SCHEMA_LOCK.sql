@@ -47,6 +47,7 @@ create table if not exists public.profiles (
 );
 
 alter table public.profiles
+  add column if not exists age_conduct_attested_at timestamptz,
   add column if not exists slug text,
   add column if not exists email text,
   add column if not exists full_name text,
@@ -1489,3 +1490,21 @@ alter table public.user_roles
 alter table public.waitlist_rate_limits
   add column if not exists created_at timestamptz not null default now(),
   add column if not exists id uuid default gen_random_uuid();
+
+create table if not exists public.profile_reports (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid not null references public.profiles (id) on delete cascade,
+  profile_slug text,
+  profile_name text,
+  category text not null default 'other',
+  reason text not null,
+  reporter_email text,
+  reporter_user_id uuid,
+  ip_hash text,
+  status text not null default 'open',
+  admin_notes text,
+  resolved_by uuid,
+  resolved_at timestamptz,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);

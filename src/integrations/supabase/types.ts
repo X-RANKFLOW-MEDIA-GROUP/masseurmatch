@@ -1960,6 +1960,7 @@ export type Database = {
           additional_services: string[] | null
           admin_notes: string | null
           affiliations: string[] | null
+          age_conduct_attested_at: string | null
           approved_at: string | null
           approved_by: string | null
           areas_served: string[] | null
@@ -2135,6 +2136,7 @@ export type Database = {
           additional_services?: string[] | null
           admin_notes?: string | null
           affiliations?: string[] | null
+          age_conduct_attested_at?: string | null
           approved_at?: string | null
           approved_by?: string | null
           areas_served?: string[] | null
@@ -2310,6 +2312,7 @@ export type Database = {
           additional_services?: string[] | null
           admin_notes?: string | null
           affiliations?: string[] | null
+          age_conduct_attested_at?: string | null
           approved_at?: string | null
           approved_by?: string | null
           areas_served?: string[] | null
