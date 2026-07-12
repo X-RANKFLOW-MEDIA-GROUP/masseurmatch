@@ -480,10 +480,13 @@ function filterProvider(provider: ExploreProvider, filters: ExploreFilters) {
     return false;
   }
 
-  if (
-    typeof provider.priceFrom === "number" &&
-    (provider.priceFrom < filters.priceMin || provider.priceFrom > filters.priceMax)
-  ) {
+  if (typeof provider.priceFrom === "number") {
+    if (provider.priceFrom < filters.priceMin || provider.priceFrom > filters.priceMax) {
+      return false;
+    }
+  } else if (filters.priceMin > 0 || filters.priceMax < EXPLORE_DEFAULT_PRICE_MAX) {
+    // "Price on request" providers stay listed under the default range, but a
+    // user-narrowed price filter can't be satisfied by an unknown price.
     return false;
   }
 
@@ -535,6 +538,16 @@ export function recalculateExploreDistances(providers: ExploreProvider[], origin
   return providers.map((provider) => withProviderDistance(provider, origin));
 }
 
+// Only a missing service area makes a card unrenderable (no city page to
+// link, no distance to compute). Missing experience or pricing degrades
+// gracefully on the card ("Price on request"), so those profiles stay
+// listed instead of silently emptying the directory.
+const HARD_MISSING_FIELDS = new Set(["neighborhood"]);
+
+export function isHiddenExploreProvider(provider: ExploreProvider) {
+  return provider.missingFields.some((field) => HARD_MISSING_FIELDS.has(field));
+}
+
 export function applyExploreFilters(
   providers: ExploreProvider[],
   filters: ExploreFilters,
@@ -542,7 +555,7 @@ export function applyExploreFilters(
 ) {
   const nextProviders = origin ? recalculateExploreDistances(providers, origin) : providers;
   return sortProviders(
-    nextProviders.filter((provider) => provider.missingFields.length === 0 && filterProvider(provider, filters)),
+    nextProviders.filter((provider) => !isHiddenExploreProvider(provider) && filterProvider(provider, filters)),
     filters.sort,
   );
 }

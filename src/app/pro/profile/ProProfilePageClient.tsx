@@ -134,6 +134,15 @@ export default function ProProfilePageClient() {
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (loading || loadError) return;
+    if (!form.displayName.trim() || !form.city.trim()) {
+      toast({
+        title: "Missing required fields",
+        description: "Display name and city are required before saving.",
+        variant: "destructive",
+      });
+      return;
+    }
     setSaving(true);
 
     try {

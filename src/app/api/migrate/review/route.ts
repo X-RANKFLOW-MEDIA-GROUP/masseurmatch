@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
-import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import { createSupabaseAdminClient, requireAdminSession } from "@/app/api/_lib/supabase-server";
 import { sendEmail } from "@/app/api/_lib/email";
 import React from "react";
 
@@ -10,8 +10,54 @@ interface ReviewDecision {
   notes?: string;
 }
 
+// Admin listing for /admin/migrations: pending/processed migrations with
+// their imported reviews attached.
+export async function GET(request: Request) {
+  try {
+    await requireAdminSession(request);
+    const adminClient = createSupabaseAdminClient();
+
+    // Cast: profile_migrations/imported_reviews aren't in the generated
+    // Supabase types yet (see processor.ts).
+    const { data: migrations, error } = await (adminClient as any)
+      .from("profile_migrations")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(100);
+
+    if (error) {
+      throw new RouteError(500, error.message);
+    }
+
+    const migrationIds = (migrations ?? []).map((m: { id: string }) => m.id);
+    let reviews: Array<{ migration_id: string }> = [];
+    if (migrationIds.length > 0) {
+      const { data: reviewRows, error: reviewsError } = await (adminClient as any)
+        .from("imported_reviews")
+        .select("*")
+        .in("migration_id", migrationIds);
+      if (reviewsError) {
+        throw new RouteError(500, reviewsError.message);
+      }
+      reviews = reviewRows ?? [];
+    }
+
+    const items = (migrations ?? []).map((migration: { id: string }) => ({
+      ...migration,
+      reviews: reviews.filter((review) => review.migration_id === migration.id),
+    }));
+
+    return json({ ok: true, migrations: items });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
+
 export async function PUT(request: Request) {
   try {
+    const session = await requireAdminSession(request);
+    const userId = session.userId;
+
     const body = await request.json();
     const { migrationId, reviews, notes } = body as {
       migrationId: string;
@@ -24,11 +70,6 @@ export async function PUT(request: Request) {
     }
 
     const adminClient = createSupabaseAdminClient();
-    const userId = (await adminClient.auth.getUser()).data.user?.id;
-
-    if (!userId) {
-      throw new RouteError(401, "Not authenticated.");
-    }
 
     // Update each review's approval status
     for (const decision of reviews) {

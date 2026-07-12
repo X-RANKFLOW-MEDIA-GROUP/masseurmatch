@@ -40,14 +40,15 @@ export default function AdminMigrationsPage() {
 
   const fetchMigrations = async () => {
     try {
-      // TODO: Replace with actual API call
-      // const res = await fetch("/api/admin/migrations");
-      // const data = await res.json();
-      // setMigrations(data);
-      console.log("Fetching migrations...");
-      setIsLoading(false);
+      const res = await fetch("/api/migrate/review");
+      if (!res.ok) {
+        throw new Error(`Failed to load migrations (${res.status})`);
+      }
+      const data = (await res.json()) as { migrations?: Migration[] };
+      setMigrations(data.migrations ?? []);
     } catch (error) {
       console.error("Error fetching migrations:", error);
+    } finally {
       setIsLoading(false);
     }
   };
