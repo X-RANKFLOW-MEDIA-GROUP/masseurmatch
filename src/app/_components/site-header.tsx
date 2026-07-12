@@ -288,11 +288,11 @@ function MobileNav({
             aria-label="MasseurMatch home"
           >
             <Image
-              src={BRAND_ASSETS.logo}
+              src={BRAND_ASSETS.logoLockup}
               alt="MasseurMatch"
-              width={110}
-              height={44}
-              className="h-11 w-auto object-contain"
+              width={247}
+              height={40}
+              className="h-10 w-auto object-contain"
             />
           </Link>
           <button
@@ -491,9 +491,9 @@ export default function SiteHeader() {
           aria-label="MasseurMatch home"
         >
           <Image
-            src={BRAND_ASSETS.logo}
+            src={BRAND_ASSETS.logoLockup}
             alt="MasseurMatch"
-            width={140}
+            width={345}
             height={56}
             priority
             className="h-11 w-auto object-contain md:h-14"
