@@ -6,6 +6,7 @@ import {
 import { envAny } from "@/app/api/_lib/env";
 import { RouteError } from "@/app/api/_lib/http";
 import { getRequestSession, type RequestSession } from "@/app/api/_lib/session";
+import { notifyAdmin } from "@/app/api/_lib/admin-notify";
 import type { Database, Json } from "@/integrations/supabase/types";
 
 export type AppRole = "admin" | "provider" | "client";
@@ -330,6 +331,26 @@ export async function ensureUserProfileAndRole(
     } catch {
       // Legacy public.users sync is best-effort only.
     }
+  }
+
+  // Notify the admin team the first time a profile is created for a user, so a
+  // brand-new signup (email/password, social login, or admin-created) surfaces
+  // in the admin inbox. Best-effort — never blocks account creation.
+  if (profileCreated) {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://masseurmatch.com";
+    await notifyAdmin({
+      subject: `New ${role} account: ${fullName}`,
+      heading: "New account created",
+      intro: `A new ${role} account was just created on MasseurMatch.`,
+      fields: [
+        { label: "Name", value: fullName },
+        { label: "Email", value: user.email },
+        { label: "Role", value: role },
+        { label: "User ID", value: user.id },
+      ],
+      action: { label: "View in admin", url: `${appUrl}/admin/users` },
+      replyTo: user.email ?? null,
+    });
   }
 
   return {

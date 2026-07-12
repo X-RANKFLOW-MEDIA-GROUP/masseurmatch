@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { createPageMetadata } from "@/app/_lib/seo";
-import ResetPasswordClient from "./ResetPasswordClient";
+import ResetPasswordPageClient from "./ResetPasswordPageClient";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Reset password",
@@ -10,5 +10,5 @@ export const metadata: Metadata = createPageMetadata({
 });
 
 export default function ResetPasswordPage() {
-  return <ResetPasswordClient />;
+  return <ResetPasswordPageClient />;
 }

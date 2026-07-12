@@ -10,6 +10,7 @@ import {
   CreditCard,
   Image as ImageIcon,
   LayoutDashboard,
+  LifeBuoy,
   Loader2,
   Mail,
   Menu,
@@ -29,6 +30,7 @@ const navItems = [
   { name: "Inquiries", href: "/pro/inquiries", icon: Mail },
   { name: "Analytics", href: "/pro/analytics", icon: BarChart },
   { name: "Subscription", href: "/pro/subscription", icon: CreditCard },
+  { name: "Support", href: "/pro/tickets", icon: LifeBuoy },
   { name: "Settings", href: "/pro/settings", icon: Settings },
 ];
 
