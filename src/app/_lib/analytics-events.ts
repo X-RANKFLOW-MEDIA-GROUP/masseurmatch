@@ -62,6 +62,16 @@ interface BookingEventData {
   user_ip?: string;
 }
 
+// Demo/fallback profiles carry synthetic ids like "fallback-bruno-santos".
+// Their page views must never reach the analytics tables, whose profile_id
+// columns are uuid — the insert fails with 22P02 and logs a console error on
+// every fallback profile view.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isTrackableProfileId(profileId: string) {
+  return UUID_RE.test(profileId);
+}
+
 export async function trackSearch(data: SearchEventData) {
   try {
     const { error } = await getSupabase().from("search_analytics").insert([
@@ -84,6 +94,7 @@ export async function trackSearch(data: SearchEventData) {
 }
 
 export async function trackProfileView(data: ProfileViewEventData) {
+  if (!isTrackableProfileId(data.profile_id)) return;
   try {
     const { error } = await getSupabase().from("profile_view_analytics").insert([
       {
@@ -107,6 +118,7 @@ export async function trackProfileView(data: ProfileViewEventData) {
 }
 
 export async function trackInquiry(data: InquiryEventData) {
+  if (!isTrackableProfileId(data.profile_id)) return;
   try {
     const { error } = await getSupabase().from("inquiry_analytics").insert([
       {
@@ -131,6 +143,7 @@ export async function trackInquiry(data: InquiryEventData) {
 }
 
 export async function trackBooking(data: BookingEventData) {
+  if (!isTrackableProfileId(data.profile_id)) return;
   try {
     const { error } = await getSupabase().from("booking_analytics").insert([
       {
