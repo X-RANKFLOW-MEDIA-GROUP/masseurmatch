@@ -292,7 +292,7 @@ function MobileNav({
               alt="MasseurMatch"
               width={100}
               height={40}
-              className="h-8 w-auto object-contain"
+              className="h-9 w-auto object-contain"
             />
           </Link>
           <button
@@ -496,7 +496,7 @@ export default function SiteHeader() {
             width={120}
             height={48}
             priority
-            className="h-10 w-auto object-contain"
+            className="h-9 w-auto object-contain md:h-12"
           />
           <div className="hidden lg:flex flex-col">
             <span className="text-[9px] font-semibold text-[#6F6F6F] tracking-[0.12em] uppercase leading-tight">
