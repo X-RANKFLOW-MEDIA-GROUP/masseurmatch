@@ -110,18 +110,39 @@ jobs:
           SITEMAP_VALIDATION_CONCURRENCY: "6"
           VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
         run: |
-          cat > /tmp/vercel-bypass-fetch.mjs <<'EOF'
+          cat > /tmp/vercel-preview-fetch.mjs <<'EOF'
           const token = process.env.VERCEL_PROTECTION_BYPASS?.trim();
-          if (token) {
-            const originalFetch = globalThis.fetch;
-            globalThis.fetch = (input, init = {}) => {
-              const headers = new Headers(init.headers || {});
-              headers.set("x-vercel-protection-bypass", token);
-              return originalFetch(input, { ...init, headers });
-            };
-          }
+          const originalFetch = globalThis.fetch;
+
+          globalThis.fetch = async (input, init = {}) => {
+            const headers = new Headers(init.headers || {});
+            if (token) headers.set("x-vercel-protection-bypass", token);
+
+            const response = await originalFetch(input, { ...init, headers });
+            const requestUrl = new URL(
+              typeof input === "string" || input instanceof URL ? input : input.url,
+            );
+
+            // Vercel intentionally noindexes every preview deployment. Strip only
+            // that platform header so the audit can still enforce page-level meta
+            // robots, canonicals, redirects, HTTP status, and production robots.txt.
+            if (
+              requestUrl.hostname.endsWith(".vercel.app") &&
+              response.headers.get("x-robots-tag")?.toLowerCase().includes("noindex")
+            ) {
+              const responseHeaders = new Headers(response.headers);
+              responseHeaders.delete("x-robots-tag");
+              return new Response(response.body, {
+                status: response.status,
+                statusText: response.statusText,
+                headers: responseHeaders,
+              });
+            }
+
+            return response;
+          };
           EOF
-          node --import /tmp/vercel-bypass-fetch.mjs scripts/validate-sitemap.mjs > sitemap-preview-audit.log 2>&1
+          node --import /tmp/vercel-preview-fetch.mjs scripts/validate-sitemap.mjs > sitemap-preview-audit.log 2>&1
 
       - name: Upload sitemap audit report
         if: always()
