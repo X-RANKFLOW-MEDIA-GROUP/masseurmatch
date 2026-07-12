@@ -7,6 +7,7 @@ import {
 import {
   applyExploreFilters,
   getCityCoordinates,
+  isHiddenExploreProvider,
   normalizeProvider,
   resolveExploreCity,
   type ExploreFilters,
@@ -33,7 +34,7 @@ export async function loadExploreProviders(filters: ExploreFilters) {
 
   const normalized = withPhotos.map((profile) => normalizeProvider(profile, origin));
   const sorted = applyExploreFilters(normalized, { ...filters, city: resolvedCity });
-  const invalidProviderCount = normalized.filter((provider) => provider.missingFields.length > 0).length;
+  const invalidProviderCount = normalized.filter(isHiddenExploreProvider).length;
 
   return {
     filters: { ...filters, city: resolvedCity },

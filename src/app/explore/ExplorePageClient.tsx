@@ -1559,7 +1559,7 @@ export default function ExplorePageClient({
                 </p>
                 {invalidProviderCount > 0 ? (
                   <p className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
-                    {invalidProviderCount} incomplete {invalidProviderCount === 1 ? "profile" : "profiles"} hidden until neighborhood, experience, and starting price are complete.
+                    {invalidProviderCount} incomplete {invalidProviderCount === 1 ? "profile" : "profiles"} hidden until a service area is added.
                   </p>
                 ) : null}
                 {geoDenied ? (
