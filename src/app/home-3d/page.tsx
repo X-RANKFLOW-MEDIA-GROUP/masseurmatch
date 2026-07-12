@@ -137,16 +137,27 @@ function Monogram3D({
 
 /* ── Small flat monogram for the header ────────────────────────────── */
 
-function MonogramMark({ size = 34 }: { size?: number }) {
+function MonogramMark({
+  size = 34,
+  idPrefix = "mk",
+  className,
+}: {
+  size?: number;
+  idPrefix?: string;
+  className?: string;
+}) {
+  // SVG gradient ids are document-global: every instance needs its own prefix,
+  // or a hidden copy earlier in the DOM hijacks url(#...) and renders blank.
+  const dims = className ? { className } : { width: size, height: (size * 224) / 306 };
   return (
-    <svg viewBox="0 0 306 224" width={size} height={(size * 224) / 306} aria-hidden="true">
+    <svg viewBox="0 0 306 224" {...dims} aria-hidden="true">
       <defs>
-        <linearGradient id="mk-ti" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id={`${idPrefix}-ti`} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#D9D9DB" />
           <stop offset="0.5" stopColor="#8F8F94" />
           <stop offset="1" stopColor="#C4C4C7" />
         </linearGradient>
-        <linearGradient id="mk-wine" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id={`${idPrefix}-wine`} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#A83848" />
           <stop offset="0.55" stopColor="#8B1E2D" />
           <stop offset="1" stopColor="#5E121E" />
@@ -155,12 +166,12 @@ function MonogramMark({ size = 34 }: { size?: number }) {
       <path
         d="M0 150 V10 H42 L85 78 L128 10 H170 V150 H136 V68 L97 130 H73 L34 68 V150 Z"
         transform="translate(8, 8)"
-        fill="url(#mk-ti)"
+        fill={`url(#${idPrefix}-ti)`}
       />
       <path
         d="M0 150 V10 H42 L85 78 L128 10 H170 V150 H136 V68 L97 130 H73 L34 68 V150 Z"
         transform="translate(122, 66) scale(0.88)"
-        fill="url(#mk-wine)"
+        fill={`url(#${idPrefix}-wine)`}
       />
     </svg>
   );
@@ -295,7 +306,8 @@ export default function Home3DTestPage() {
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <MonogramMark size={36} />
+            {/* logo: 36px tall on mobile, 48px from md up */}
+            <MonogramMark idPrefix="mkh" className="h-9 w-auto md:h-12" />
             <span className="text-[1.05rem] font-black tracking-tight">
               <span style={{ color: "#111111" }}>Masseur</span>
               <span style={{ color: WINE }}>Match</span>

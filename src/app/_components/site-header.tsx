@@ -287,7 +287,7 @@ function MobileNav({
             className="flex items-center gap-2"
             aria-label="MasseurMatch home"
           >
-            <div className="w-8 h-8 rounded-md bg-[#8B1E2D] flex items-center justify-center">
+            <div className="w-9 h-9 rounded-md bg-[#8B1E2D] flex items-center justify-center">
               <span className="text-white font-extrabold text-sm leading-none">
                 MM
               </span>
@@ -491,8 +491,8 @@ export default function SiteHeader() {
           className="group flex items-center gap-3 shrink-0"
           aria-label="MasseurMatch home"
         >
-          <div className="relative w-10 h-10 rounded-lg bg-[#8B1E2D] flex items-center justify-center shadow-sm">
-            <span className="text-white font-extrabold text-base leading-none tracking-tight">
+          <div className="relative w-9 h-9 md:w-12 md:h-12 rounded-lg bg-[#8B1E2D] flex items-center justify-center shadow-sm">
+            <span className="text-white font-extrabold text-sm md:text-lg leading-none tracking-tight">
               MM
             </span>
           </div>
