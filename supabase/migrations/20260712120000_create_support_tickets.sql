@@ -59,8 +59,11 @@ as $$
 begin
   update public.support_tickets
      set updated_at = new.created_at,
+         -- Any provider reply hands the ticket back to the admins: reopen it
+         -- from a resolved/closed state, and clear a "waiting on user" flag so
+         -- the status no longer implies the provider still owes a response.
          status = case
-           when new.sender_role = 'provider' and status in ('resolved', 'closed')
+           when new.sender_role = 'provider' and status in ('resolved', 'closed', 'waiting_on_user')
              then 'open'
            else status
          end,
