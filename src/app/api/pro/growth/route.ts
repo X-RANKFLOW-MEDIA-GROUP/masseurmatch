@@ -49,6 +49,13 @@ async function loadOrCreateGrowthProfile(
   if (error) throw new RouteError(500, error.message);
   if (data) return data;
 
+  // Only sessions that already carry provider/admin standing may trigger the
+  // repair — otherwise an authenticated client-role user could turn this
+  // endpoint into a provider-role grant.
+  if (session.role !== "provider" && session.role !== "admin") {
+    throw new RouteError(404, "Profile not found.");
+  }
+
   const { data: authUser, error: userError } = await admin.auth.admin.getUserById(session.userId);
   if (userError || !authUser?.user) {
     throw new RouteError(404, "Profile not found.");
