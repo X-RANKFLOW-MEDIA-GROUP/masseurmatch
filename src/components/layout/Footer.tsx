@@ -24,6 +24,7 @@ export const Footer = () => {
       links: [
         { to: "/register", label: t("footer.listYourPractice") },
         { to: "/pricing", label: t("footer.advertisingPlans") },
+        { to: "/how-ranking-works", label: "How Ranking Works" },
         { to: "/dashboard", label: t("footer.providerDashboard") },
         { to: "/about", label: t("footer.aboutUs") },
       ],
