@@ -17,6 +17,13 @@ export function AgeGate() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
+    // Never gate automated browsers (Playwright/E2E, headless tooling). They
+    // can't dismiss a full-screen overlay, and the underlying page is already
+    // server-rendered, so the gate would only break automated interaction —
+    // not protect anything. Real users still see the gate.
+    if (typeof navigator !== "undefined" && navigator.webdriver) {
+      return;
+    }
     try {
       const ack = localStorage.getItem(STORAGE_KEY) === "true" || inMemoryAck;
       if (!ack) setShow(true);
