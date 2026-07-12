@@ -29,34 +29,48 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.32.1
-
       - name: Install Node.js 24
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
 
       - name: Resolve Vercel preview URL
         id: preview
         uses: actions/github-script@v7
         with:
           script: |
-            const sha = context.payload.pull_request.head.sha;
-            const deadlineMs = Date.now() + 10 * 60 * 1000;
+            const headSha = context.payload.pull_request.head.sha;
+            let deploySha = headSha;
+
+            // Vercel can skip deployments for workflow-only commits. Walk back
+            // through those commits so the audit still targets the exact latest
+            // deployable application commit rather than production.
+            for (let depth = 0; depth < 10; depth += 1) {
+              const commit = await github.rest.repos.getCommit({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: deploySha,
+              });
+              const files = commit.data.files || [];
+              const workflowOnly = files.length > 0 && files.every(
+                (file) => file.filename.startsWith(".github/"),
+              );
+              if (!workflowOnly) break;
+
+              const parentSha = commit.data.parents[0]?.sha;
+              if (!parentSha) break;
+              core.info(`Vercel may skip workflow-only commit ${deploySha}; checking parent ${parentSha}.`);
+              deploySha = parentSha;
+            }
+
+            const deadlineMs = Date.now() + 5 * 60 * 1000;
             const isPreview = (url) => Boolean(url && /\.vercel\.app(?:\/|$)/.test(url));
 
             while (Date.now() < deadlineMs) {
               const deployments = await github.rest.repos.listDeployments({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                sha,
+                sha: deploySha,
                 per_page: 100,
               });
 
@@ -75,7 +89,7 @@ jobs:
 
                 if (ready) {
                   const url = ready.target_url || ready.environment_url;
-                  core.info(`Resolved Vercel preview: ${url}`);
+                  core.info(`Resolved Vercel preview for ${deploySha}: ${url}`);
                   core.setOutput("url", url.replace(/\/$/, ""));
                   return;
                 }
@@ -84,12 +98,33 @@ jobs:
               await new Promise((resolve) => setTimeout(resolve, 15000));
             }
 
-            core.setFailed(`No successful Vercel preview was found for ${sha}.`);
+            core.setFailed(`No successful Vercel preview was found for deployable commit ${deploySha}.`);
 
       - name: Validate deployed sitemap, robots, canonicals, and indexability
+        id: audit
+        continue-on-error: true
         env:
           SITEMAP_STRICT: "1"
           SITEMAP_VALIDATION_BASE_URL: ${{ steps.preview.outputs.url }}
           SITEMAP_CANONICAL_ORIGIN: https://masseurmatch.com
           SITEMAP_VALIDATION_CONCURRENCY: "6"
-        run: pnpm validate:sitemap
+        run: node scripts/validate-sitemap.mjs > sitemap-preview-audit.log 2>&1
+
+      - name: Upload sitemap audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sitemap-preview-audit
+          path: sitemap-preview-audit.log
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Publish successful audit summary
+        if: steps.audit.outcome == 'success'
+        run: cat sitemap-preview-audit.log
+
+      - name: Enforce clean sitemap gate
+        if: steps.audit.outcome == 'failure'
+        run: |
+          cat sitemap-preview-audit.log
+          exit 1
