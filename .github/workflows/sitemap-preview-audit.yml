@@ -83,12 +83,12 @@ jobs:
                 });
 
                 const ready = statuses.data.find((status) => {
-                  const url = status.target_url || status.environment_url;
+                  const url = status.environment_url || status.target_url;
                   return status.state === "success" && isPreview(url);
                 });
 
                 if (ready) {
-                  const url = ready.target_url || ready.environment_url;
+                  const url = ready.environment_url || ready.target_url;
                   core.info(`Resolved Vercel preview for ${deploySha}: ${url}`);
                   core.setOutput("url", url.replace(/\/$/, ""));
                   return;
