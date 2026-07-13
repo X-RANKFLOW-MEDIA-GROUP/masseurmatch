@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { planTier, profile, termsAccepted } = body;
+    const { planTier, profile, termsAccepted, ageAndConductAttested } = body;
 
     if (!profile) {
       return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
@@ -31,6 +31,13 @@ export async function POST(request: NextRequest) {
 
     if (!termsAccepted) {
       return NextResponse.json({ error: "Terms must be accepted." }, { status: 400 });
+    }
+
+    if (!ageAndConductAttested) {
+      return NextResponse.json(
+        { error: "You must confirm you are 18+ and provide non-sexual massage therapy only." },
+        { status: 400 },
+      );
     }
 
     const adminClient = createSupabaseAdminClient();
@@ -70,6 +77,7 @@ export async function POST(request: NextRequest) {
         status: "pending_approval",
         profile_status: "pending_approval",
         is_active: false,
+        age_conduct_attested_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
       .eq("user_id", session.userId);

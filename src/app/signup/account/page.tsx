@@ -25,6 +25,7 @@ export default function SignupAccountPage() {
     markAccountCreated,
     setTermsAccepted,
     setComplianceAcknowledged,
+    setAgeAndConductAttested,
   } = useSignup();
   const { signUp } = useAuth();
 
@@ -38,6 +39,7 @@ export default function SignupAccountPage() {
   });
   const [termsChecked, setTermsChecked] = useState(state.termsAccepted);
   const [complianceChecked, setComplianceChecked] = useState(state.complianceAcknowledged);
+  const [ageChecked, setAgeChecked] = useState(state.ageAndConductAttested);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [loading, setLoading] = useState(false);
@@ -82,11 +84,15 @@ export default function SignupAccountPage() {
           return complianceChecked
             ? null
             : "You must acknowledge the Therapist Agreement and platform policies.";
+        case "age":
+          return ageChecked
+            ? null
+            : "You must confirm you are 18+ and will not offer sexual services.";
         default:
           return null;
       }
     },
-    [form, termsChecked, complianceChecked],
+    [form, termsChecked, complianceChecked, ageChecked],
   );
 
   function handleBlur(field: string) {
@@ -100,7 +106,7 @@ export default function SignupAccountPage() {
   }
 
   function validateAll(): FieldErrors {
-    const fields = ["fullName", "email", "phone", "password", "confirmPassword", "terms", "compliance"];
+    const fields = ["fullName", "email", "phone", "password", "confirmPassword", "terms", "compliance", "age"];
     const errors: FieldErrors = {};
     for (const f of fields) {
       const msg = validateField(f);
@@ -110,7 +116,7 @@ export default function SignupAccountPage() {
   }
 
   function focusFirstInvalid(errors: FieldErrors) {
-    const order = ["fullName", "email", "phone", "password", "confirmPassword", "terms", "compliance"];
+    const order = ["fullName", "email", "phone", "password", "confirmPassword", "terms", "compliance", "age"];
     for (const f of order) {
       if (errors[f]) {
         const el = formRef.current?.querySelector<HTMLElement>(`#${f}`);
@@ -149,6 +155,7 @@ export default function SignupAccountPage() {
       markAccountCreated();
       setTermsAccepted(termsChecked);
       setComplianceAcknowledged(complianceChecked);
+      setAgeAndConductAttested(ageChecked);
 
       router.push("/signup/verify");
     } catch {
@@ -344,6 +351,33 @@ export default function SignupAccountPage() {
                 {fieldErrors.compliance && (
                   <p id="compliance-error" role="alert" className="pl-7 text-xs text-destructive">
                     {fieldErrors.compliance}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    id="age"
+                    checked={ageChecked}
+                    aria-invalid={!!fieldErrors.age}
+                    aria-describedby={fieldErrors.age ? "age-error" : undefined}
+                    onCheckedChange={(v) => {
+                      setAgeChecked(v === true);
+                      setFieldErrors((prev) => {
+                        const next = { ...prev };
+                        delete next.age;
+                        return next;
+                      });
+                    }}
+                  />
+                  <Label htmlFor="age" className="text-sm leading-snug">
+                    I confirm I am at least 18 years old and that I provide professional, non-sexual massage
+                    therapy only. I will not use MasseurMatch to offer, solicit, or arrange sexual services.
+                  </Label>
+                </div>
+                {fieldErrors.age && (
+                  <p id="age-error" role="alert" className="pl-7 text-xs text-destructive">
+                    {fieldErrors.age}
                   </p>
                 )}
               </div>

@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
 
-export default function AuthConfirmPage() {
+function AuthConfirmInner() {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -46,5 +46,21 @@ export default function AuthConfirmPage() {
         .
       </div>
     </div>
+  );
+}
+
+export default function AuthConfirmPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container mx-auto max-w-lg px-4 py-10">
+          <div className="rounded-lg border border-border p-6 text-center text-sm text-muted-foreground">
+            Validating your reset link…
+          </div>
+        </div>
+      }
+    >
+      <AuthConfirmInner />
+    </Suspense>
   );
 }
