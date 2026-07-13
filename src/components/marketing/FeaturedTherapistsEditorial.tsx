@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, BadgeCheck } from "lucide-react";
+import { ArrowRight, BadgeCheck, Star } from "lucide-react";
 import { GrainOverlay } from "@/components/motion/GrainOverlay";
 import type { PublicTherapist } from "@/app/_lib/directory";
 
@@ -112,7 +112,8 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
                       </div>
                     )}
                     <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-gradient-to-r from-[#8B1E2D] to-[#A82E3D] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg">
-                      ★ Featured
+                      <Star size={11} className="fill-white" strokeWidth={2.5} />
+                      Featured
                     </div>
                   </div>
 
