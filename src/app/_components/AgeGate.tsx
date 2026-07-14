@@ -5,26 +5,17 @@ import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 
 export function AgeGate() {
-  // Rendered as a client-only overlay: the underlying page is still present in
-  // the DOM (so crawlers and assistive tech see full content), we simply gate
-  // interaction until the visitor confirms they are 18+.
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    // Never gate automated browsers (Playwright/E2E, headless tooling). They
-    // cannot dismiss a full-screen overlay, and the underlying page is already
-    // server-rendered, so the gate would only break automated interaction.
-    if (typeof navigator !== "undefined" && navigator.webdriver) {
-      return;
-    }
+    // Automated browsers must be able to run CI/E2E without a blocking overlay.
+    if (typeof navigator !== "undefined" && navigator.webdriver) return;
 
-    // Do not persist the acknowledgement in cookies, localStorage, or
-    // sessionStorage. The gate appears again after a fresh page visit/reload.
+    // No cookie, localStorage, or sessionStorage persistence.
     setShow(true);
   }, []);
 
   useEffect(() => {
-    // Prevent the page behind the gate from scrolling while it is visible.
     if (!show) return;
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -32,10 +23,6 @@ export function AgeGate() {
       document.body.style.overflow = previous;
     };
   }, [show]);
-
-  const confirm = () => {
-    setShow(false);
-  };
 
   if (!show) return null;
 
@@ -54,16 +41,18 @@ export function AgeGate() {
           Are you 18 or older?
         </h2>
         <p className="mt-3 text-sm leading-6 text-[#6F6F6F]">
-          MasseurMatch is a professional massage directory intended for adults. You must be at least 18 years
-          old to enter. This site does not offer or facilitate sexual services.
+          MasseurMatch is a professional, non-sexual directory for massage and bodywork services. You must be at least 18 years old to enter.
+        </p>
+        <p className="mt-2 text-sm leading-6 text-[#6F6F6F]">
+          Sexual services, erotic content, escorting, and solicitation are strictly prohibited.
         </p>
         <div className="mt-6 flex flex-col gap-2.5">
           <button
             type="button"
-            onClick={confirm}
+            onClick={() => setShow(false)}
             className="min-h-11 rounded-lg bg-[#8B1E2D] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#6E1521] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B1E2D]"
           >
-            I am 18 or older — enter
+            I am 18 or older — Enter
           </button>
           <a
             href="https://www.google.com"
@@ -73,11 +62,10 @@ export function AgeGate() {
           </a>
         </div>
         <p className="mt-5 text-xs leading-5 text-[#6F6F6F]">
-          By entering you agree to our{" "}
-          <Link href="/terms" className="underline underline-offset-2 hover:text-[#8B1E2D]">Terms</Link> and{" "}
+          By entering, you confirm that you are at least 18 years old and agree to our{" "}
+          <Link href="/terms" className="underline underline-offset-2 hover:text-[#8B1E2D]">Terms of Use</Link>{" "}
+          and{" "}
           <Link href="/privacy" className="underline underline-offset-2 hover:text-[#8B1E2D]">Privacy Policy</Link>.
-          See our{" "}
-          <Link href="/2257" className="underline underline-offset-2 hover:text-[#8B1E2D]">18 U.S.C. § 2257 notice</Link>.
         </p>
       </div>
     </div>
