@@ -4,12 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 
-// In-memory fallback for browsers where localStorage throws (Safari private
-// mode, blocked storage). Keeps the acknowledgement for the page's lifetime.
-let inMemoryAck = false;
-
-const STORAGE_KEY = "mm_age_ack";
-
 export function AgeGate() {
   // Rendered as a client-only overlay: the underlying page is still present in
   // the DOM (so crawlers and assistive tech see full content), we simply gate
@@ -18,18 +12,15 @@ export function AgeGate() {
 
   useEffect(() => {
     // Never gate automated browsers (Playwright/E2E, headless tooling). They
-    // can't dismiss a full-screen overlay, and the underlying page is already
-    // server-rendered, so the gate would only break automated interaction —
-    // not protect anything. Real users still see the gate.
+    // cannot dismiss a full-screen overlay, and the underlying page is already
+    // server-rendered, so the gate would only break automated interaction.
     if (typeof navigator !== "undefined" && navigator.webdriver) {
       return;
     }
-    try {
-      const ack = localStorage.getItem(STORAGE_KEY) === "true" || inMemoryAck;
-      if (!ack) setShow(true);
-    } catch {
-      if (!inMemoryAck) setShow(true);
-    }
+
+    // Do not persist the acknowledgement in cookies, localStorage, or
+    // sessionStorage. The gate appears again after a fresh page visit/reload.
+    setShow(true);
   }, []);
 
   useEffect(() => {
@@ -43,12 +34,6 @@ export function AgeGate() {
   }, [show]);
 
   const confirm = () => {
-    inMemoryAck = true;
-    try {
-      localStorage.setItem(STORAGE_KEY, "true");
-    } catch {
-      // In-memory fallback above still applies.
-    }
     setShow(false);
   };
 
