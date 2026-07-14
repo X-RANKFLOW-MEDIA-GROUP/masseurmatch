@@ -8,10 +8,7 @@ export function AgeGate() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    // Automated browsers must be able to run CI/E2E without a blocking overlay.
     if (typeof navigator !== "undefined" && navigator.webdriver) return;
-
-    // No cookie, localStorage, or sessionStorage persistence.
     setShow(true);
   }, []);
 
