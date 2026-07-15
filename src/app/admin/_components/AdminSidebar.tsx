@@ -23,6 +23,7 @@ import {
   BarChart3,
   CalendarCheck,
   MessageSquare,
+  Flag,
 } from "lucide-react";
 
 const navSections = [
@@ -34,6 +35,7 @@ const navSections = [
       { href: "/admin/therapists", label: "Therapists", icon: HeartHandshake },
       { href: "/admin/photos", label: "Photos", icon: ImageIcon },
       { href: "/admin/moderation", label: "Moderation", icon: ShieldAlert },
+      { href: "/admin/profile-reports", label: "Profile Reports", icon: Flag },
     ],
   },
   {
@@ -63,6 +65,7 @@ const navSections = [
   {
     title: "Ops",
     items: [
+      { href: "/admin/tickets", label: "Tickets", icon: MessageSquare },
       { href: "/admin/support", label: "Support", icon: LifeBuoy },
       { href: "/admin/verification", label: "Verification", icon: ShieldCheck },
       { href: "/admin/legal", label: "Legal", icon: FileText },

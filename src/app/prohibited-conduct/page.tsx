@@ -36,6 +36,10 @@ export default function ProhibitedConductPage() {
         <li>Using the platform to facilitate human trafficking, sex trafficking, or coercion of any kind.</li>
         <li>Prostitution or any arrangement where sexual services are exchanged for money, gifts, or benefits.</li>
         <li>Posting explicit nudity, pornographic content, or sexually explicit images or text.</li>
+        <li>
+          Any content that sexualizes, depicts, or involves a minor. Child sexual abuse material (CSAM) is
+          reported to the National Center for Missing &amp; Exploited Children (NCMEC) and law enforcement.
+        </li>
       </ul>
 
       <h2>2. Harassment, Threats, and Intimidation</h2>
@@ -99,15 +103,42 @@ export default function ProhibitedConductPage() {
         take action without prior notice when safety or legal urgency requires it.
       </p>
 
-      <h2>8. Reporting</h2>
+      <h2>8. Legal Compliance and Law Enforcement (FOSTA-SESTA)</h2>
       <p>
-        Report prohibited conduct to{" "}
-        <a href="mailto:trust@masseurmatch.com">trust@masseurmatch.com</a>. For emergencies or suspected
-        trafficking, contact local law enforcement or the National Human Trafficking Hotline at{" "}
-        <strong>1-888-373-7888</strong>.
+        MasseurMatch is a professional wellness directory. It is not an escort or adult-services platform, and
+        it does not permit, host, or facilitate commercial sexual activity. We do not tolerate any use of the
+        platform to promote or facilitate prostitution or sex trafficking, and we design our policies,
+        moderation, and reporting tools to prevent it.
+      </p>
+      <p>
+        Consistent with the Allow States and Victims to Fight Online Sex Trafficking Act and the Stop Enabling
+        Sex Traffickers Act (together, &ldquo;FOSTA-SESTA,&rdquo; including 18 U.S.C. &sect;&nbsp;2421A) and
+        our obligations under 18 U.S.C. &sect;&nbsp;2258A, MasseurMatch:
+      </p>
+      <ul>
+        <li>Prohibits any content or conduct that owns, manages, or operates the platform with intent to promote or facilitate the prostitution of another person.</li>
+        <li>Removes offending content and terminates the accounts responsible when we become aware of a violation.</li>
+        <li>Preserves relevant records and cooperates with valid legal process and law enforcement investigations into trafficking, exploitation, or other criminal activity.</li>
+        <li>Reports apparent child sexual abuse material (CSAM) to the National Center for Missing &amp; Exploited Children (NCMEC) CyberTipline as required by law.</li>
+      </ul>
+      <p>
+        Nothing on this platform is intended to facilitate any transaction that is unlawful in the applicable
+        jurisdiction. This policy does not create any obligation, warranty, or liability beyond what applicable
+        law requires, and MasseurMatch is a neutral intermediary that does not create user content.
       </p>
 
-      <h2>9. Contact</h2>
+      <h2>9. Reporting</h2>
+      <p>
+        Report prohibited conduct to{" "}
+        <a href="mailto:trust@masseurmatch.com">trust@masseurmatch.com</a>, or use the{" "}
+        <strong>&ldquo;Report this profile&rdquo;</strong> link on any therapist profile. For emergencies or
+        suspected trafficking, contact local law enforcement or the National Human Trafficking Hotline at{" "}
+        <strong>1-888-373-7888</strong>. To report child sexual exploitation, contact the NCMEC CyberTipline at{" "}
+        <strong>1-800-843-5678</strong> or{" "}
+        <a href="https://report.cybertip.org" target="_blank" rel="noopener noreferrer">report.cybertip.org</a>.
+      </p>
+
+      <h2>10. Contact</h2>
       <p>
         Policy questions: <a href="mailto:legal@masseurmatch.com">legal@masseurmatch.com</a>.<br />
         Operator: XRankFlow Media Group LLC — Dover, Delaware, USA.

@@ -92,8 +92,17 @@ Clients who violate these terms may have their accounts suspended or permanently
 Violations may result in immediate and permanent account termination and, where appropriate, reporting to law enforcement.`,
   },
   {
+    id: "anti-trafficking",
+    title: "7. Legal Compliance & Anti-Trafficking (FOSTA-SESTA)",
+    content: `MasseurMatch is a professional massage directory. It is not an escort or adult-services platform and does not permit, host, or facilitate commercial sexual activity, prostitution, or sex trafficking.
+
+Consistent with the Allow States and Victims to Fight Online Sex Trafficking Act and the Stop Enabling Sex Traffickers Act ("FOSTA-SESTA," including 18 U.S.C. § 2421A) and our reporting obligations under 18 U.S.C. § 2258A, we prohibit any use of the Platform to promote or facilitate prostitution, remove offending content, terminate the responsible accounts, preserve relevant records, cooperate with valid legal process, and report apparent child sexual abuse material to the National Center for Missing & Exploited Children (NCMEC).
+
+Every visitor can report a profile using the "Report this profile" link on any listing, or by emailing trust@masseurmatch.com. Suspected trafficking can also be reported to the National Human Trafficking Hotline at 1-888-373-7888. MasseurMatch acts as a neutral intermediary and does not create user content.`,
+  },
+  {
     id: "disclaimer",
-    title: "7. Disclaimer of Warranties",
+    title: "8. Disclaimer of Warranties",
     content: `The Platform is provided "as is" and "as available" without warranties of any kind, express or implied. We do not guarantee:
 
 • The accuracy of therapist profiles, profile claims, or reviews
@@ -105,24 +114,24 @@ You use the Platform and engage with therapists at your own risk.`,
   },
   {
     id: "liability",
-    title: "8. Limitation of Liability",
+    title: "9. Limitation of Liability",
     content: `To the maximum extent permitted by law, XRankFlow Media Group LLC shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the Platform or services obtained through the Platform.
 
 Our total liability for any claim arising from use of the Platform shall not exceed the amount you paid to us in the 12 months preceding the claim, or $100, whichever is greater.`,
   },
   {
     id: "governing-law",
-    title: "9. Governing Law",
+    title: "10. Governing Law",
     content: `These Terms are governed by the laws of the State of Delaware, where XRankFlow Media Group LLC is incorporated. Any disputes shall be resolved in the courts of Delaware, and you consent to personal jurisdiction in that venue.`,
   },
   {
     id: "changes",
-    title: "10. Changes to Terms",
+    title: "11. Changes to Terms",
     content: `We may update these Terms from time to time. We will notify registered users of material changes via email and update the "Last Updated" date. Continued use of the Platform after changes constitutes acceptance of the updated Terms.`,
   },
   {
     id: "contact-terms",
-    title: "11. Contact",
+    title: "12. Contact",
     content: `Questions about these Terms:
 
 Email: legal@masseurmatch.com

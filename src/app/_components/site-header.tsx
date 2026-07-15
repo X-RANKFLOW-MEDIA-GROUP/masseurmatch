@@ -288,11 +288,11 @@ function MobileNav({
             aria-label="MasseurMatch home"
           >
             <Image
-              src={BRAND_ASSETS.logo}
+              src={BRAND_ASSETS.logoLockup}
               alt="MasseurMatch"
-              width={100}
+              width={247}
               height={40}
-              className="h-8 w-auto object-contain"
+              className="h-10 w-auto object-contain"
             />
           </Link>
           <button
@@ -491,16 +491,16 @@ export default function SiteHeader() {
           aria-label="MasseurMatch home"
         >
           <Image
-            src={BRAND_ASSETS.logo}
+            src={BRAND_ASSETS.logoLockup}
             alt="MasseurMatch"
-            width={120}
-            height={48}
+            width={345}
+            height={56}
             priority
-            className="h-10 w-auto object-contain"
+            className="h-11 w-auto object-contain md:h-14"
           />
           <div className="hidden lg:flex flex-col">
             <span className="text-[9px] font-semibold text-[#6F6F6F] tracking-[0.12em] uppercase leading-tight">
-              Premium Sports Recovery &amp; Wellness
+              LGBTQ+-Affirming Male Massage
             </span>
           </div>
         </Link>

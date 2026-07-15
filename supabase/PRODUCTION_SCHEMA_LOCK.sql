@@ -47,6 +47,7 @@ create table if not exists public.profiles (
 );
 
 alter table public.profiles
+  add column if not exists age_conduct_attested_at timestamptz,
   add column if not exists slug text,
   add column if not exists email text,
   add column if not exists full_name text,
@@ -1489,3 +1490,46 @@ alter table public.user_roles
 alter table public.waitlist_rate_limits
   add column if not exists created_at timestamptz not null default now(),
   add column if not exists id uuid default gen_random_uuid();
+
+create table if not exists public.profile_reports (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid not null references public.profiles (id) on delete cascade,
+  profile_slug text,
+  profile_name text,
+  category text not null default 'other',
+  reason text not null,
+  reporter_email text,
+  reporter_user_id uuid,
+  ip_hash text,
+  status text not null default 'open',
+  admin_notes text,
+  resolved_by uuid,
+  resolved_at timestamptz,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
+-- Support ticket desk (providers <-> admins). See migration
+-- 20260712120000_create_support_tickets.sql for triggers and RLS policies.
+create table if not exists public.support_tickets (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  profile_id uuid references public.profiles(id) on delete set null,
+  subject text not null,
+  category text not null default 'other',
+  priority text not null default 'medium',
+  status text not null default 'open',
+  assigned_to uuid,
+  resolved_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.support_ticket_messages (
+  id uuid primary key default gen_random_uuid(),
+  ticket_id uuid not null references public.support_tickets(id) on delete cascade,
+  sender_id uuid not null,
+  sender_role text not null default 'provider',
+  body text not null,
+  created_at timestamptz not null default now()
+);

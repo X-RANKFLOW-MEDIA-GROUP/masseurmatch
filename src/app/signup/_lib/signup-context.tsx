@@ -87,6 +87,7 @@ export interface SignupState {
   stripeCustomerId: string | null;
   termsAccepted: boolean;
   complianceAcknowledged: boolean;
+  ageAndConductAttested: boolean;
 }
 
 const emptyProfile: SignupProfile = {
@@ -138,6 +139,7 @@ const initialState: SignupState = {
   stripeCustomerId: null,
   termsAccepted: false,
   complianceAcknowledged: false,
+  ageAndConductAttested: false,
 };
 
 export const SIGNUP_BOOTSTRAP_STORAGE_KEY = "mm_signup_bootstrap";
@@ -172,6 +174,7 @@ interface SignupContextType {
   markProfileCompleted: () => void;
   setTermsAccepted: (v: boolean) => void;
   setComplianceAcknowledged: (v: boolean) => void;
+  setAgeAndConductAttested: (v: boolean) => void;
   setSubmissionStatus: (status: SubmissionStatus) => void;
   setModerationNotes: (notes: string[]) => void;
   setBillingStatus: (status: BillingStatus) => void;
@@ -269,6 +272,7 @@ export function SignupProvider({ children }: { children: ReactNode }) {
   const markProfileCompleted = useCallback(() => setState((s) => ({ ...s, profileCompleted: true })), []);
   const setTermsAccepted = useCallback((v: boolean) => setState((s) => ({ ...s, termsAccepted: v })), []);
   const setComplianceAcknowledged = useCallback((v: boolean) => setState((s) => ({ ...s, complianceAcknowledged: v })), []);
+  const setAgeAndConductAttested = useCallback((v: boolean) => setState((s) => ({ ...s, ageAndConductAttested: v })), []);
   const setSubmissionStatus = useCallback((status: SubmissionStatus) => setState((s) => ({ ...s, submissionStatus: status })), []);
   const setModerationNotes = useCallback((notes: string[]) => setState((s) => ({ ...s, moderationNotes: notes })), []);
   const setBillingStatus = useCallback((status: BillingStatus) => setState((s) => ({ ...s, billingStatus: status })), []);
@@ -297,6 +301,7 @@ export function SignupProvider({ children }: { children: ReactNode }) {
         markProfileCompleted,
         setTermsAccepted,
         setComplianceAcknowledged,
+        setAgeAndConductAttested,
         setSubmissionStatus,
         setModerationNotes,
         setBillingStatus,
