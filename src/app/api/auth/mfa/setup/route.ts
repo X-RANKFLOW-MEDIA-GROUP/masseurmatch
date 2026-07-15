@@ -15,12 +15,12 @@ export async function POST(request: Request) {
     const backupCodes = generateBackupCodes();
 
     // Store MFA setup in progress (expires in 15 minutes)
-    await adminClient.from("mfa_pending").insert({
+    await adminClient.from("mfa_pending" as any).insert({
       user_id: session.userId,
       totp_secret: secret,
       backup_codes: backupCodes,
       expires_at: new Date(Date.now() + 15 * 60_000).toISOString(),
-    });
+    } as any);
 
     return json({
       ok: true,

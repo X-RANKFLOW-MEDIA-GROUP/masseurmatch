@@ -21,13 +21,13 @@ export async function POST(request: Request) {
     const adminClient = createSupabaseWebhookAdminClient();
 
     // Retrieve pending MFA setup
-    const { data: pending, error: pendingError } = await adminClient
-      .from("mfa_pending")
+    const { data: pending, error: pendingError } = await (adminClient
+      .from("mfa_pending" as any)
       .select("totp_secret, backup_codes")
       .eq("user_id", session.userId)
       .order("created_at", { ascending: false })
       .limit(1)
-      .maybeSingle();
+      .maybeSingle() as any);
 
     if (pendingError || !pending) {
       throw new RouteError(400, "No pending MFA setup found. Start setup first.");
@@ -39,15 +39,15 @@ export async function POST(request: Request) {
     }
 
     // Enable MFA for user
-    await adminClient.from("user_mfa").upsert({
+    await (adminClient.from("user_mfa" as any).upsert({
       user_id: session.userId,
       totp_secret: pending.totp_secret,
       backup_codes: pending.backup_codes,
       enabled_at: new Date().toISOString(),
-    });
+    } as any) as any);
 
     // Remove pending setup
-    await adminClient.from("mfa_pending").delete().eq("user_id", session.userId);
+    await (adminClient.from("mfa_pending" as any).delete().eq("user_id", session.userId) as any);
 
     return json({
       ok: true,
