@@ -8,7 +8,7 @@
     "node": "24.x"
   },
   "scripts": {
-    "dev": "next dev -p 5000 -H 0.0.0.0",
+    "dev": "next dev --webpack -p 5000 -H 0.0.0.0",
     "clean:next": "node scripts/clean-next.mjs",
     "seed:supabase": "node scripts/seed-supabase.mjs",
     "check-all": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run validate:sitemap && pnpm run release:audit",
