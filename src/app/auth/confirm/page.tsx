@@ -36,16 +36,16 @@ function AuthConfirmInner() {
       });
   }, []);
 
+  return <ConfirmShell />;
+}
+
+// `useSearchParams()` requires a Suspense boundary so the page can be
+// statically prerendered without bailing the whole build.
+export default function AuthConfirmPage() {
   return (
-    <div className="container mx-auto max-w-lg px-4 py-10">
-      <div className="rounded-lg border border-border p-6 text-center text-sm text-muted-foreground">
-        Validating your reset link… If nothing happens, please{" "}
-        <Link href="/forgot-password" className="underline">
-          request a new link
-        </Link>
-        .
-      </div>
-    </div>
+    <Suspense fallback={<ConfirmShell />}>
+      <AuthConfirm />
+    </Suspense>
   );
 }
 
