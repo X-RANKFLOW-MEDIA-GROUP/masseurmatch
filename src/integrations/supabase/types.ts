@@ -1888,6 +1888,68 @@ export type Database = {
           },
         ]
       }
+      profile_reports: {
+        Row: {
+          admin_notes: string | null
+          category: string
+          created_at: string
+          id: string
+          ip_hash: string | null
+          profile_id: string
+          profile_name: string | null
+          profile_slug: string | null
+          reason: string
+          reporter_email: string | null
+          reporter_user_id: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          profile_id: string
+          profile_name?: string | null
+          profile_slug?: string | null
+          reason: string
+          reporter_email?: string | null
+          reporter_user_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          profile_id?: string
+          profile_name?: string | null
+          profile_slug?: string | null
+          reason?: string
+          reporter_email?: string | null
+          reporter_user_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_reports_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           _tier: string | null
@@ -1898,6 +1960,7 @@ export type Database = {
           additional_services: string[] | null
           admin_notes: string | null
           affiliations: string[] | null
+          age_conduct_attested_at: string | null
           approved_at: string | null
           approved_by: string | null
           areas_served: string[] | null
@@ -2073,6 +2136,7 @@ export type Database = {
           additional_services?: string[] | null
           admin_notes?: string | null
           affiliations?: string[] | null
+          age_conduct_attested_at?: string | null
           approved_at?: string | null
           approved_by?: string | null
           areas_served?: string[] | null
@@ -2248,6 +2312,7 @@ export type Database = {
           additional_services?: string[] | null
           admin_notes?: string | null
           affiliations?: string[] | null
+          age_conduct_attested_at?: string | null
           approved_at?: string | null
           approved_by?: string | null
           areas_served?: string[] | null

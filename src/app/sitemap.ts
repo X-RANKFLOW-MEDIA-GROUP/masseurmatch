@@ -9,6 +9,7 @@ import {
   buildBlogPostsSitemapEntries,
   buildTourPagesSitemapEntries,
 } from "@/app/_lib/seo-routes";
+import { getAllCities } from "@/lib/get-city";
 import { siteUrl } from "@/lib/site";
 
 // Regenerate sitemap every hour so new profiles and city pages appear promptly
@@ -27,6 +28,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]);
 
   const core = buildCoreSitemapEntries(now);
+
+  // Provider signup landing pages (/providers/[citySlug]) — surfaced so the
+  // pre-rendered per-city SEO pages are discoverable by crawlers.
+  const providerLandingPages: MetadataRoute.Sitemap = getAllCities().map((city) => ({
+    url: siteUrl(`/providers/${city.slug}`),
+    lastModified: now,
+    changeFrequency: "weekly",
+    priority: 0.75,
+  }));
 
   // High-priority hub pages
   const hubs: MetadataRoute.Sitemap = [
@@ -48,6 +58,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...hubs,
     ...core,
+    ...providerLandingPages,
     ...cities,
     ...services,
     ...neighborhoods,

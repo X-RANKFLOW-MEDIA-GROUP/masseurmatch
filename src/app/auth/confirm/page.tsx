@@ -5,6 +5,20 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
 
+function ConfirmShell() {
+  return (
+    <div className="container mx-auto max-w-lg px-4 py-10">
+      <div className="rounded-lg border border-border p-6 text-center text-sm text-muted-foreground">
+        Validating your reset link… If nothing happens, please{" "}
+        <Link href="/forgot-password" className="underline">
+          request a new link
+        </Link>
+        .
+      </div>
+    </div>
+  );
+}
+
 function AuthConfirmInner() {
   const router = useRouter();
   const params = useSearchParams();
@@ -36,30 +50,14 @@ function AuthConfirmInner() {
       });
   }, []);
 
-  return (
-    <div className="container mx-auto max-w-lg px-4 py-10">
-      <div className="rounded-lg border border-border p-6 text-center text-sm text-muted-foreground">
-        Validating your reset link… If nothing happens, please{" "}
-        <Link href="/forgot-password" className="underline">
-          request a new link
-        </Link>
-        .
-      </div>
-    </div>
-  );
+  return <ConfirmShell />;
 }
 
+// `useSearchParams()` requires a Suspense boundary so the page can be
+// statically prerendered without bailing the whole build.
 export default function AuthConfirmPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="container mx-auto max-w-lg px-4 py-10">
-          <div className="rounded-lg border border-border p-6 text-center text-sm text-muted-foreground">
-            Validating your reset link…
-          </div>
-        </div>
-      }
-    >
+    <Suspense fallback={<ConfirmShell />}>
       <AuthConfirmInner />
     </Suspense>
   );

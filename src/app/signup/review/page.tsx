@@ -42,6 +42,10 @@ export default function SignupReviewPage() {
         throw new Error("You must acknowledge the Therapist Agreement and platform policies.");
       }
 
+      if (!state.ageAndConductAttested) {
+        throw new Error("You must confirm you are 18+ and provide non-sexual massage therapy only.");
+      }
+
       if (!state.selectedPlanTier) {
         throw new Error("Please select a subscription plan before submitting.");
       }
@@ -81,6 +85,7 @@ export default function SignupReviewPage() {
           },
           termsAccepted: state.termsAccepted,
           complianceAcknowledged: state.complianceAcknowledged,
+          ageAndConductAttested: state.ageAndConductAttested,
         }),
       });
 
@@ -249,6 +254,12 @@ export default function SignupReviewPage() {
             </li>
             <li className="flex items-center gap-2">
               <CheckCircle2
+                className={`h-4 w-4 ${state.ageAndConductAttested ? "text-green-500" : "text-muted-foreground"}`}
+              />
+              18+ and non-sexual services attested
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2
                 className={`h-4 w-4 ${
                   state.identityVerificationStatus === "verified"
                     ? "text-green-500"
@@ -301,7 +312,8 @@ export default function SignupReviewPage() {
             !state.emailVerified ||
             state.identityVerificationStatus !== "verified" ||
             !state.termsAccepted ||
-            !state.complianceAcknowledged
+            !state.complianceAcknowledged ||
+            !state.ageAndConductAttested
           }
         >
           {loading ? "Submitting…" : "Submit for Review"}

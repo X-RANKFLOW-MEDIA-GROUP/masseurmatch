@@ -15,7 +15,18 @@ const IMAGE_MODELS = [
   "gore-2.0",
   "offensive",
   "text-content-2.0",
+  // Returns a per-face "minor" probability, used to keep any image that may
+  // depict a minor out of auto-approval and escalate it to human review.
+  "face-attributes",
 ] as const;
+
+// A face scoring at or above this is treated as possibly a minor and forces
+// human review. Kept conservative because youthful-looking adults false-positive;
+// a false flag only means a reviewer approves it manually.
+const MINOR_REVIEW_THRESHOLD = 0.5;
+// Any hint of a minor combined with a sexual/suggestive signal is escalated as a
+// potential CSAM case, at a lower threshold given the severity.
+const MINOR_CSAM_THRESHOLD = 0.3;
 
 const IMAGE_TEXT_CATEGORIES = [
   "sexual",
@@ -40,6 +51,8 @@ type ModerationDecision = {
   approved: boolean;
   reason: string;
   flags: string[];
+  priority: "normal" | "high";
+  csamSuspected: boolean;
 };
 
 type PhotoQueueContext = {
@@ -66,6 +79,7 @@ type SightengineImageResponse = {
     detected_categories?: string[];
     detections?: Record<string, { details?: Array<{ match?: string; severity?: string; category?: string }> }>;
   };
+  faces?: Array<{ attributes?: { minor?: number } }>;
 };
 
 function getCredentials() {
@@ -169,10 +183,37 @@ function decideModeration(data: SightengineImageResponse): ModerationDecision {
     flags.push(`embedded_text:${textCategories.slice(0, 4).join(",")}`);
   }
 
+  // Minor / CSAM screening. Take the highest per-face minor probability.
+  const minorScore = (data.faces ?? []).reduce(
+    (max, face) => Math.max(max, face.attributes?.minor ?? 0),
+    0,
+  );
+  const hasSexualSignal =
+    (nudity.sexual_activity ?? 0) >= 0.12 ||
+    (nudity.sexual_display ?? 0) >= 0.12 ||
+    (nudity.erotica ?? 0) >= 0.2 ||
+    (nudity.very_suggestive ?? 0) >= 0.6;
+
+  let priority: "normal" | "high" = "normal";
+  let csamSuspected = false;
+
+  if (minorScore >= MINOR_CSAM_THRESHOLD && hasSexualSignal) {
+    // Potential child sexual abuse material — highest severity, never auto-approve.
+    csamSuspected = true;
+    priority = "high";
+    flags.push(`CSAM_SUSPECTED:minor:${toPercent(minorScore)}%`);
+  } else if (minorScore >= MINOR_REVIEW_THRESHOLD) {
+    // Possible minor with no sexual signal — still requires human confirmation.
+    priority = "high";
+    flags.push(`possible_minor:${toPercent(minorScore)}%`);
+  }
+
   return {
     approved: flags.length === 0,
     reason: flags.length === 0 ? "safe" : flags.join("; "),
     flags,
+    priority,
+    csamSuspected,
   };
 }
 
@@ -278,7 +319,7 @@ async function syncModerationQueue(
     source: "pro_photos",
     field_name: null,
     status: pendingStatus,
-    priority: "normal",
+    priority: decision.priority,
     moderation_provider: provider,
     moderation_reason: decision.reason,
     snapshot,
@@ -287,6 +328,8 @@ async function syncModerationQueue(
       flags: decision.flags,
       approved: decision.approved,
       reason: decision.reason,
+      priority: decision.priority,
+      csam_suspected: decision.csamSuspected,
     },
     admin_reason: null,
     resolved_by: null,
@@ -336,6 +379,8 @@ serve(async (request) => {
         reason: decision.reason,
         provider: "sightengine",
         flags: decision.flags,
+        priority: decision.priority,
+        csam_suspected: decision.csamSuspected,
         photo_id: payload.photo_id ?? null,
       }),
       {
