@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   LineChart,
   Line,
@@ -57,11 +57,7 @@ export default function KeywordTrendsDashboard({
   const [allKeywords, setAllKeywords] = useState<string[]>([]);
   const [chartData, setChartData] = useState<Record<string, unknown>[]>([]);
 
-  useEffect(() => {
-    fetchData();
-  }, [dateRange]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
 
     try {
@@ -114,7 +110,11 @@ export default function KeywordTrendsDashboard({
     } finally {
       setLoading(false);
     }
-  };
+  }, [dateRange, compact]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const toggleKeyword = (keyword: string) => {
     setSelectedKeywords((prev) =>
