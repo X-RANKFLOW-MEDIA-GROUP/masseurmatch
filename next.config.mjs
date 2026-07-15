@@ -111,6 +111,10 @@ const nextConfig = {
       { protocol: "https", hostname: "res.cloudinary.com" },
     ],
   },
+  // Next 16 defaults to Turbopack, which ignores this webpack() config and
+  // errors on the mismatch. We keep webpack for now (see the `--webpack` flag
+  // on the dev/build scripts) so the lucide-react alias and prod cache tweak
+  // below still apply. Migrate to a `turbopack` config when we're ready.
   webpack(config, { dev }) {
     if (config.cache && !dev) {
       config.cache = Object.freeze({ type: "memory" });
