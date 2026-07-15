@@ -8,14 +8,14 @@
     "node": "24.x"
   },
   "scripts": {
-    "dev": "next dev -p 5000 -H 0.0.0.0",
+    "dev": "next dev --webpack -p 5000 -H 0.0.0.0",
     "clean:next": "node scripts/clean-next.mjs",
     "seed:supabase": "node scripts/seed-supabase.mjs",
     "check-all": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run validate:sitemap && pnpm run release:audit",
     "release:audit": "node scripts/release-audit.mjs",
     "release:check": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run validate:sitemap && pnpm run validate:db-contract && pnpm run release:audit && pnpm run build",
-    "build": "pnpm run clean:next && next build",
-    "build:dev": "pnpm run clean:next && next build",
+    "build": "pnpm run clean:next && next build --webpack",
+    "build:dev": "pnpm run clean:next && next build --webpack",
     "start": "next start -p 5000 -H 0.0.0.0",
     "lint": "eslint .",
     "test": "pnpm run test:unit && pnpm run test:api",

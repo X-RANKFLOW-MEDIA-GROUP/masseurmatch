@@ -11,7 +11,11 @@ const nextCommand =
   process.platform === "win32"
     ? path.join(process.cwd(), "node_modules", ".bin", "next.cmd")
     : path.join(process.cwd(), "node_modules", ".bin", "next");
-const nextArgs = ["dev", "-p", port, "--hostname", "127.0.0.1"];
+// Force the webpack bundler: this project ships a custom `webpack` config
+// (see next.config.mjs) with no Turbopack equivalent, and Next 16 makes
+// Turbopack the default — which fatally errors on that config and kills the
+// dev server before it becomes ready. Match the `dev`/`build` scripts.
+const nextArgs = ["dev", "--webpack", "-p", port, "--hostname", "127.0.0.1"];
 const serverCommand =
   process.platform === "win32" ? "powershell.exe" : nextCommand;
 const serverArgs =
