@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={satoshi.variable}>
+    <html lang="en-US" className={satoshi.variable} suppressHydrationWarning>
       <body className="theme-masseurmatch min-h-screen overflow-x-hidden font-sans text-foreground antialiased">
         <GoogleTagManager />
         <GoogleAnalytics />
