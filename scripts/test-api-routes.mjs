@@ -11,7 +11,10 @@ const nextCommand =
   process.platform === "win32"
     ? path.join(process.cwd(), "node_modules", ".bin", "next.cmd")
     : path.join(process.cwd(), "node_modules", ".bin", "next");
-const nextArgs = ["dev", "-p", port, "--hostname", "127.0.0.1"];
+// `--webpack` keeps the dev server on webpack to match next.config.mjs, which
+// has a webpack() config. Next 16 defaults to Turbopack and errors on that
+// mismatch, which would prevent the dev server from becoming ready here.
+const nextArgs = ["dev", "--webpack", "-p", port, "--hostname", "127.0.0.1"];
 const serverCommand =
   process.platform === "win32" ? "powershell.exe" : nextCommand;
 const serverArgs =
