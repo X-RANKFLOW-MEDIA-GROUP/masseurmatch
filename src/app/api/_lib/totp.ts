@@ -16,6 +16,7 @@ function generateTotp(secret: string, timestamp: number = Date.now()): string {
   const counterBuffer = Buffer.alloc(8);
 
   for (let i = 7; i >= 0; i--) {
+    // eslint-disable-next-line no-bitwise
     counterBuffer[i] = timeCounter & 0xff;
     // eslint-disable-next-line no-bitwise
     timeCounter = timeCounter >> 8;
@@ -44,6 +45,7 @@ export function generateTotpSecret(): string {
   let value = 0;
 
   for (const byte of randomBytes32) {
+    // eslint-disable-next-line no-bitwise
     value = (value << 8) | byte;
     bits += 8;
 
