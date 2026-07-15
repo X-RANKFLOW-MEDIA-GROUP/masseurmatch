@@ -1,18 +1,23 @@
-import { errorResponse, json, parseJsonBody } from "@/app/api/_lib/http";
+import { errorResponse, json } from "@/app/api/_lib/http";
 import { requireSession } from "@/app/api/_lib/supabase-server";
 import { createSupabaseWebhookAdminClient } from "@/app/api/_lib/supabase-server";
 import { verifyTotp } from "@/app/api/_lib/totp";
 import { RouteError } from "@/app/api/_lib/http";
-import { z } from "zod";
-
-const mfaVerifySchema = z.object({
-  code: z.string().length(6, "Code must be 6 digits").regex(/^\d+$/, "Code must contain only digits"),
-});
 
 export async function POST(request: Request) {
   try {
     const session = await requireSession(request);
-    const body = await parseJsonBody(request, mfaVerifySchema);
+    let code: string;
+    try {
+      const body = await request.json() as Record<string, unknown>;
+      code = body.code as string;
+    } catch {
+      throw new RouteError(400, "Invalid request body.");
+    }
+
+    if (!code || typeof code !== "string" || code.length !== 6 || !/^\d+$/.test(code)) {
+      throw new RouteError(400, "Code must be 6 digits.");
+    }
     const adminClient = createSupabaseWebhookAdminClient();
 
     // Retrieve pending MFA setup
@@ -29,7 +34,7 @@ export async function POST(request: Request) {
     }
 
     // Verify TOTP code
-    if (!verifyTotp(pending.totp_secret, body.code)) {
+    if (!verifyTotp(pending.totp_secret, code)) {
       throw new RouteError(401, "Invalid verification code.");
     }
 

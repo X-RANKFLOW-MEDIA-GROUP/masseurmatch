@@ -12,7 +12,7 @@ function hmacSha1(key: Buffer, counter: Buffer): Buffer {
 // Time-based One-Time Password algorithm (RFC 6238)
 function generateTotp(secret: string, timestamp: number = Date.now()): string {
   const secretBuffer = Buffer.from(secret, "base64");
-  const timeCounter = Math.floor(timestamp / 1000 / TIME_STEP);
+  let timeCounter = Math.floor(timestamp / 1000 / TIME_STEP);
   const counterBuffer = Buffer.alloc(8);
 
   for (let i = 7; i >= 0; i--) {
