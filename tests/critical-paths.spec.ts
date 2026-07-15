@@ -25,9 +25,9 @@ test.describe("Critical user paths", () => {
 
     await page.goto("/", { waitUntil: "networkidle" });
 
-    // Homepage should render without 4xx/5xx
-    expect(page.url()).not.toContain("404");
-    expect(page.url()).not.toContain("500");
+    // Homepage should render without 4xx/5xx status codes
+    const response = await page.goto("/", { waitUntil: "networkidle" });
+    expect(response?.status()).toBeLessThan(400);
 
     // Should have main title
     await expect(page.locator("h1").first()).toBeVisible();
