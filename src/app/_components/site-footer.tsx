@@ -14,8 +14,13 @@ export function SiteFooter() {
     return <SiteFooterTalk />;
   }
 
-  // Admin and Pro layouts have their own chrome — hide the marketing footer
-  if (pathname?.startsWith("/admin") || pathname?.startsWith("/pro")) {
+  // Admin, Pro, and the provider landing pages have their own chrome —
+  // hide the marketing footer
+  if (
+    pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/pro") ||
+    pathname?.startsWith("/providers")
+  ) {
     return null;
   }
 
@@ -61,7 +66,6 @@ export function SiteFooter() {
               <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
               <li><Link href="/cookie-policy" className="hover:text-white transition-colors">Cookie Policy</Link></li>
               <li><Link href="/platform-disclaimer" className="hover:text-white transition-colors">Disclaimer</Link></li>
-              <li><Link href="/2257" className="hover:text-white transition-colors">2257 Notice</Link></li>
               <li><Link href="/law-enforcement" className="hover:text-white transition-colors">Law Enforcement</Link></li>
               <li><Link href="/legal" className="hover:text-white transition-colors">Legal Notices</Link></li>
             </ul>
@@ -79,6 +83,7 @@ export function SiteFooter() {
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-3">Providers</p>
             <ul className="space-y-2 text-xs text-gray-400">
+              <li><Link href="/how-ranking-works" className="hover:text-white transition-colors">How Ranking Works</Link></li>
               <li><Link href="/provider-terms" className="hover:text-white transition-colors">Provider Terms</Link></li>
               <li><Link href="/photo-profile-policy" className="hover:text-white transition-colors">Photo &amp; Profile Policy</Link></li>
               <li><Link href="/badge-disclaimer" className="hover:text-white transition-colors">Badge Disclaimer</Link></li>

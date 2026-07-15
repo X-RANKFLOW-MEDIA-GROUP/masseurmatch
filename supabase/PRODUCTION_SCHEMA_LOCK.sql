@@ -1533,3 +1533,22 @@ create table if not exists public.support_ticket_messages (
   body text not null,
   created_at timestamptz not null default now()
 );
+
+-- MFA (Multi-Factor Authentication) tables for TOTP-based 2FA
+create table if not exists public.mfa_pending (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null unique references auth.users(id) on delete cascade,
+  totp_secret text not null,
+  backup_codes text[] not null,
+  expires_at timestamptz not null,
+  created_at timestamptz default timezone('utc', now())
+);
+
+create table if not exists public.user_mfa (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null unique references auth.users(id) on delete cascade,
+  totp_secret text not null,
+  backup_codes text[] not null,
+  enabled_at timestamptz not null,
+  updated_at timestamptz default timezone('utc', now())
+);

@@ -418,7 +418,9 @@ export default function SiteHeader() {
   const router = useRouter();
   const shouldReduceMotion = useReducedMotion();
   const isAppSection =
-    pathname?.startsWith("/admin") || pathname?.startsWith("/pro");
+    pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/pro") ||
+    pathname?.startsWith("/providers");
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
