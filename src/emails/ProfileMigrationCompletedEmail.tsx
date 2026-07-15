@@ -15,99 +15,88 @@ export default function ProfileMigrationCompletedEmail({
   profileUrl,
   dashboardUrl,
 }: ProfileMigrationCompletedEmailProps) {
+  const containerStyle = { maxWidth: 600, margin: "0 auto", padding: 20, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", lineHeight: 1.6, color: "#333" };
+  const headerStyle = { borderBottom: "3px solid #8B1E2D", paddingBottom: 20, marginBottom: 30 };
+  const h1Style = { margin: 0, color: "#111111", fontSize: 24, fontWeight: "bold" };
+  const contentStyle = { marginBottom: 30 };
+  const pStyle = { margin: "15px 0" };
+  const statBoxStyle = { background: "#F8EDEE", borderLeft: "4px solid #8B1E2D", padding: 20, margin: "20px 0", textAlign: "center" as const };
+  const numberStyle = { color: "#8B1E2D", fontSize: 32, fontWeight: "bold" };
+  const labelStyle = { color: "#6F6F6F", fontSize: 14, marginTop: 5 };
+  const ctaButtonStyle = { display: "inline-block", backgroundColor: "#8B1E2D", color: "white", padding: "12px 24px", textDecoration: "none", borderRadius: 6, fontWeight: "bold", margin: "20px 0" };
+  const nextStepsStyle = { background: "#FAFAFA", border: "1px solid #E8E8E8", borderRadius: 6, padding: 20, margin: "20px 0" };
+  const nextStepsH3Style = { marginTop: 0, color: "#8B1E2D" };
+  const nextStepsOlStyle = { paddingLeft: 20 };
+  const nextStepsLiStyle = { margin: "10px 0" };
+  const footerStyle = { borderTop: "1px solid #E8E8E8", paddingTop: 20, fontSize: 12, color: "#8E8E8E" };
+  const socialProofStyle = { background: "#FAFAFA", border: "1px solid #E8E8E8", padding: 15, borderRadius: 6, margin: "15px 0" };
+  const socialProofPStyle = { margin: "5px 0", fontSize: 14 };
+
   return (
-    <html>
-      <head>
-        <style>
-          {`
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { border-bottom: 3px solid #8B1E2D; padding-bottom: 20px; margin-bottom: 30px; }
-            .header h1 { margin: 0; color: #111111; font-size: 24px; font-weight: bold; }
-            .content { margin-bottom: 30px; }
-            .content p { margin: 15px 0; }
-            .stat-box { background: #F8EDEE; border-left: 4px solid #8B1E2D; padding: 20px; margin: 20px 0; text-align: center; }
-            .stat-box .number { color: #8B1E2D; font-size: 32px; font-weight: bold; }
-            .stat-box .label { color: #6F6F6F; font-size: 14px; margin-top: 5px; }
-            .cta-button { display: inline-block; background-color: #8B1E2D; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
-            .cta-button:hover { background-color: #6E1521; }
-            .next-steps { background: #FAFAFA; border: 1px solid #E8E8E8; border-radius: 6px; padding: 20px; margin: 20px 0; }
-            .next-steps h3 { margin-top: 0; color: #8B1E2D; }
-            .next-steps ol { padding-left: 20px; }
-            .next-steps li { margin: 10px 0; }
-            .footer { border-top: 1px solid #E8E8E8; padding-top: 20px; font-size: 12px; color: #8E8E8E; }
-            .social-proof { background: #FAFAFA; border: 1px solid #E8E8E8; padding: 15px; border-radius: 6px; margin: 15px 0; }
-            .social-proof p { margin: 5px 0; font-size: 14px; }
-          `}
-        </style>
-      </head>
-      <body>
-        <div className="container">
-          <div className="header">
-            <h1>🎉 Your Profile Is Live!</h1>
-          </div>
+    <div style={containerStyle as React.CSSProperties}>
+      <div style={headerStyle}>
+        <h1 style={h1Style}>🎉 Your Profile Is Live!</h1>
+      </div>
 
-          <div className="content">
-            <p>Hi {therapistName},</p>
-            <p>Excellent news! Your profile migration from {platform} is complete, and your profile is now live on MasseurMatch.</p>
+      <div style={contentStyle}>
+        <p style={pStyle}>Hi {therapistName},</p>
+        <p style={pStyle}>Excellent news! Your profile migration from {platform} is complete, and your profile is now live on MasseurMatch.</p>
 
-            <div className="stat-box">
-              <div className="number">{importedReviews}</div>
-              <div className="label">Reviews & Ratings Migrated</div>
-            </div>
-
-            <p>
-              Your reviews, ratings, and service history have been imported, so clients can already see your track record on MasseurMatch.
-              Your profile is fully searchable and ready to accept bookings.
-            </p>
-
-            <div className="next-steps">
-              <h3>What's Next?</h3>
-              <ol>
-                <li>
-                  <strong>Review Your Profile:</strong> Log in to your dashboard to verify everything looks right.
-                </li>
-                <li>
-                  <strong>Add Photos:</strong> Upload professional photos to showcase your space and services.
-                </li>
-                <li>
-                  <strong>Customize Availability:</strong> Set your hours and manage your booking calendar.
-                </li>
-                <li>
-                  <strong>Start Accepting Bookings:</strong> Clients can book you directly from your profile.
-                </li>
-              </ol>
-            </div>
-
-            <p style={{ textAlign: "center" }}>
-              <a href={dashboardUrl} className="cta-button">View Your Profile</a>
-            </p>
-
-            <div className="social-proof">
-              <p>
-                <strong>Did you know?</strong> Therapists on MasseurMatch with complete profiles receive 3x more booking requests.
-                The more detail you add, the more clients find you.
-              </p>
-            </div>
-
-            <p>
-              If you'd like to add more profiles from other directories or need help with anything, just reply to this email or
-              reach out to <strong>concierge@masseurmatch.com</strong>.
-            </p>
-
-            <p>Welcome to MasseurMatch!</p>
-            <p><strong>The MasseurMatch Team</strong></p>
-          </div>
-
-          <div className="footer">
-            <p>© 2025 MasseurMatch. All rights reserved.</p>
-            <p>
-              You're receiving this email because your profile migration from {platform} has been completed.
-              Questions? Contact concierge@masseurmatch.com
-            </p>
-          </div>
+        <div style={statBoxStyle}>
+          <div style={numberStyle}>{importedReviews}</div>
+          <div style={labelStyle}>Reviews & Ratings Migrated</div>
         </div>
-      </body>
-    </html>
+
+        <p style={pStyle}>
+          Your reviews, ratings, and service history have been imported, so clients can already see your track record on MasseurMatch.
+          Your profile is fully searchable and ready to accept bookings.
+        </p>
+
+        <div style={nextStepsStyle}>
+          <h3 style={nextStepsH3Style}>What's Next?</h3>
+          <ol style={nextStepsOlStyle}>
+            <li style={nextStepsLiStyle}>
+              <strong>Review Your Profile:</strong> Log in to your dashboard to verify everything looks right.
+            </li>
+            <li style={nextStepsLiStyle}>
+              <strong>Add Photos:</strong> Upload professional photos to showcase your space and services.
+            </li>
+            <li style={nextStepsLiStyle}>
+              <strong>Customize Availability:</strong> Set your hours and manage your booking calendar.
+            </li>
+            <li style={nextStepsLiStyle}>
+              <strong>Start Accepting Bookings:</strong> Clients can book you directly from your profile.
+            </li>
+          </ol>
+        </div>
+
+        <p style={{ textAlign: "center" }}>
+          <a href={dashboardUrl} style={ctaButtonStyle as React.CSSProperties}>View Your Profile</a>
+        </p>
+
+        <div style={socialProofStyle}>
+          <p style={socialProofPStyle}>
+            <strong>Did you know?</strong> Therapists on MasseurMatch with complete profiles receive 3x more booking requests.
+            The more detail you add, the more clients find you.
+          </p>
+        </div>
+
+        <p style={pStyle}>
+          If you'd like to add more profiles from other directories or need help with anything, just reply to this email or
+          reach out to <strong>concierge@masseurmatch.com</strong>.
+        </p>
+
+        <p style={pStyle}>Welcome to MasseurMatch!</p>
+        <p style={pStyle}><strong>The MasseurMatch Team</strong></p>
+      </div>
+
+      <div style={footerStyle}>
+        <p>© 2025 MasseurMatch. All rights reserved.</p>
+        <p>
+          You're receiving this email because your profile migration from {platform} has been completed.
+          Questions? Contact concierge@masseurmatch.com
+        </p>
+      </div>
+    </div>
   );
 }

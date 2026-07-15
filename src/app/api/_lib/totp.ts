@@ -16,16 +16,12 @@ function generateTotp(secret: string, timestamp: number = Date.now()): string {
   const counterBuffer = Buffer.alloc(8);
 
   for (let i = 7; i >= 0; i--) {
-    // eslint-disable-next-line no-bitwise
     counterBuffer[i] = timeCounter & 0xff;
-    // eslint-disable-next-line no-bitwise
     timeCounter = timeCounter >> 8;
   }
 
   const hmac = hmacSha1(secretBuffer, counterBuffer);
-  // eslint-disable-next-line no-bitwise
   const offset = hmac[hmac.length - 1] & 0xf;
-  // eslint-disable-next-line no-bitwise
   const code =
     ((hmac[offset] & 0x7f) << 24) |
     ((hmac[offset + 1] & 0xff) << 16) |
@@ -45,19 +41,16 @@ export function generateTotpSecret(): string {
   let value = 0;
 
   for (const byte of randomBytes32) {
-    // eslint-disable-next-line no-bitwise
     value = (value << 8) | byte;
     bits += 8;
 
     while (bits >= 5) {
       bits -= 5;
-      // eslint-disable-next-line no-bitwise
       base32 += base32Alphabet[(value >> bits) & 31];
     }
   }
 
   if (bits > 0) {
-    // eslint-disable-next-line no-bitwise
     base32 += base32Alphabet[(value << (5 - bits)) & 31];
   }
 
