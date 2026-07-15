@@ -83,6 +83,7 @@ export function SiteFooter() {
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-3">Providers</p>
             <ul className="space-y-2 text-xs text-gray-400">
+              <li><Link href="/how-ranking-works" className="hover:text-white transition-colors">How Ranking Works</Link></li>
               <li><Link href="/provider-terms" className="hover:text-white transition-colors">Provider Terms</Link></li>
               <li><Link href="/photo-profile-policy" className="hover:text-white transition-colors">Photo &amp; Profile Policy</Link></li>
               <li><Link href="/badge-disclaimer" className="hover:text-white transition-colors">Badge Disclaimer</Link></li>
