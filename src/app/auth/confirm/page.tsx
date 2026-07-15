@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
 import Link from "next/link";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -48,13 +48,11 @@ function AuthConfirmInner() {
           router.replace("/dashboard");
         }
       });
-  }, []);
+  }, [router, params]);
 
   return <ConfirmShell />;
 }
 
-// `useSearchParams()` requires a Suspense boundary so the page can be
-// statically prerendered without bailing the whole build.
 export default function AuthConfirmPage() {
   return (
     <Suspense fallback={<ConfirmShell />}>
