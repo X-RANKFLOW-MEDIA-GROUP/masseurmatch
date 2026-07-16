@@ -16,8 +16,9 @@ import { satoshi } from "./fonts";
 import SmoothScroll from "@/components/motion/SmoothScroll";
 
 const rootMetadata = createPageMetadata({
-  title: "Premium verified male massage therapist directory",
-  description: SITE_DESCRIPTION,
+  title: "MasseurMatch — Coming Soon",
+  description:
+    "AI-powered verified therapist discovery — a premium directory of male massage therapists you can trust.",
   path: "/",
 });
 
