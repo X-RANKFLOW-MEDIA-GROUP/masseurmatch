@@ -84,10 +84,10 @@ export default function DemandRadarTab() {
         <div className="text-center">
           <div className="text-2xl mb-4 flex items-center justify-center gap-2">
             <TrendingUp className="h-8 w-8 text-accent" />
-            Cargando Demand Radar...
+            Loading Demand Radar...
           </div>
           <div className="text-muted-foreground text-sm">
-            Conectando a Supabase
+            Connecting to Supabase
           </div>
         </div>
       </div>
@@ -113,18 +113,18 @@ export default function DemandRadarTab() {
           Demand Radar
         </h2>
         <p className="text-muted-foreground text-sm mt-2">
-          Monitor de demanda en tiempo real • {data.length} registros
+          Real-time demand monitor • {data.length} records
         </p>
       </div>
 
       <div className="max-w-xs">
-        <label className="block text-sm font-medium mb-2">Ciudad</label>
+        <label className="block text-sm font-medium mb-2">City</label>
         <select
           value={selectedCity}
           onChange={(e) => setSelectedCity(e.target.value)}
           className="w-full px-4 py-2 bg-background border border-border rounded-lg text-foreground"
         >
-          <option value="all">Todas las ciudades ({cities.length})</option>
+          <option value="all">All cities ({cities.length})</option>
           {cities.map((city) => (
             <option key={city} value={city}>
               {city}
@@ -158,7 +158,7 @@ export default function DemandRadarTab() {
                   <div className="flex-1 min-w-0">
                     <p className="text-foreground truncate">{item.keyword}</p>
                     <p className="text-muted-foreground text-xs">
-                      {new Date(item.date).toLocaleDateString("es-ES")}
+                      {new Date(item.date).toLocaleDateString("en-US")}
                     </p>
                   </div>
                   <div className="bg-accent/10 text-accent px-3 py-1 rounded text-sm font-bold ml-2 flex-shrink-0">
@@ -172,7 +172,7 @@ export default function DemandRadarTab() {
       </div>
 
       <div className="text-center text-muted-foreground text-xs pt-4 border-t border-border">
-        <p>Actualizado: {new Date().toLocaleString("es-ES")}</p>
+        <p>Updated: {new Date().toLocaleString("en-US")}</p>
       </div>
     </div>
   );
