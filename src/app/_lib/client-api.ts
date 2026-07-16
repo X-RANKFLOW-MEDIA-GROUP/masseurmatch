@@ -25,6 +25,32 @@ async function parsePayload(response: Response) {
   }
 }
 
+let cachedCsrfToken: string | null = null;
+
+async function getCsrfToken(): Promise<string | null> {
+  if (cachedCsrfToken) return cachedCsrfToken;
+
+  try {
+    const response = await fetch("/api/auth/login", {
+      method: "GET",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (response.ok) {
+      const data = (await response.json()) as { csrfToken?: string };
+      if (data.csrfToken) {
+        cachedCsrfToken = data.csrfToken;
+        return cachedCsrfToken;
+      }
+    }
+  } catch {
+    // Silently fail - CSRF might not be needed for all requests
+  }
+
+  return null;
+}
+
 export async function requestJson<T>(
   input: RequestInfo | URL,
   init: RequestInit = {},
@@ -33,6 +59,14 @@ export async function requestJson<T>(
 
   if (init.body && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
+  }
+
+  // Add CSRF token for state-changing requests
+  if ((init.method === "POST" || init.method === "DELETE") && !headers.has("x-csrf-token")) {
+    const csrfToken = await getCsrfToken();
+    if (csrfToken) {
+      headers.set("x-csrf-token", csrfToken);
+    }
   }
 
   const response = await fetch(input, {
