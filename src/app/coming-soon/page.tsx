@@ -215,7 +215,7 @@ export default function ComingSoonPage() {
       </div>
 
       {/* Mobile Hero (shown only on mobile) */}
-      <div className="lg:hidden flex flex-col min-h-screen p-8 pt-12">
+      <div className="lg:hidden flex flex-col min-h-screen p-4 pt-8">
         {/* Background with gradients */}
         <div className="absolute inset-0 bg-[#1A1F2E] z-0">
           <div
@@ -233,17 +233,18 @@ export default function ComingSoonPage() {
 
           {/* Animated ripples with mark */}
           <div
-            className="absolute left-1/2 transform -translate-x-1/2 w-full max-w-xs flex items-center justify-center"
+            className="absolute left-1/2 transform -translate-x-1/2 w-full flex items-center justify-center"
             style={{
-              top: "120px",
+              top: "60px",
+              maxWidth: "280px",
               animation: "mmpulse 7s ease-in-out infinite",
             }}
           >
-            <div className="relative w-72 h-72 flex items-center justify-center">
-              <div className="absolute w-72 h-72 border border-white/[0.045] rounded-full"></div>
-              <div className="absolute w-52 h-52 border border-white/6 rounded-full"></div>
-              <div className="absolute w-36 h-36 border border-white/[0.085] rounded-full"></div>
-              <div className="absolute w-20 h-20 border border-[#FFE0E7]/14 rounded-full"></div>
+            <div className="relative w-64 h-64 flex items-center justify-center">
+              <div className="absolute w-64 h-64 border border-white/[0.045] rounded-full"></div>
+              <div className="absolute w-48 h-48 border border-white/6 rounded-full"></div>
+              <div className="absolute w-32 h-32 border border-white/[0.085] rounded-full"></div>
+              <div className="absolute w-16 h-16 border border-[#FFE0E7]/14 rounded-full"></div>
               <div
                 className="absolute w-20 h-20 rounded-full blur-sm"
                 style={{
@@ -255,16 +256,16 @@ export default function ComingSoonPage() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-center text-center h-full py-16">
+        <div className="relative z-10 flex flex-col items-center text-center h-full py-8 sm:py-16">
           {/* Logo */}
           <div
-            className="mb-12"
+            className="mb-6 sm:mb-12"
             style={{
               animation: "mmfadein 0.9s ease 0.05s both",
               filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.55))",
             }}
           >
-            <div className="h-20 w-auto">
+            <div className="h-12 sm:h-20 w-auto">
               <svg viewBox="0 0 200 100" className="h-full w-auto fill-white" xmlns="http://www.w3.org/2000/svg">
                 <text x="10" y="80" fontSize="60" fontWeight="bold" fontFamily="Space Grotesk, monospace">MM</text>
               </svg>
@@ -272,7 +273,7 @@ export default function ComingSoonPage() {
           </div>
 
           {/* Main content */}
-          <div className="flex flex-col items-center gap-8 flex-1 justify-center">
+          <div className="flex flex-col items-center gap-4 sm:gap-8 flex-1 justify-center">
             {/* Badge */}
             <div
               className="inline-flex items-center gap-3 px-6 py-3 border border-white/16 rounded-full bg-white/3"
@@ -326,23 +327,23 @@ export default function ComingSoonPage() {
 
           {/* Email Form */}
           <div
-            className="w-full"
+            className="w-full px-2"
             style={{ animation: "mmfadeup 0.9s ease 0.52s both" }}
           >
-            <form onSubmit={handleSubmit} className="flex flex-col gap-6 w-full">
-              <div className="flex items-center h-20 border border-white/16 rounded-full bg-white/4 px-8 overflow-hidden">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
+              <div className="flex items-center h-16 sm:h-20 border border-white/16 rounded-full bg-white/4 px-4 sm:px-8 overflow-hidden">
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="flex-1 bg-transparent text-2xl text-gray-400 placeholder-gray-500 outline-none"
+                  className="flex-1 bg-transparent text-lg sm:text-2xl text-gray-400 placeholder-gray-500 outline-none min-w-0"
                   required
                 />
                 <button
                   type="submit"
                   disabled={loading}
-                  className="ml-2 h-20 px-12 border-2 border-white/50 rounded-full font-bold text-2xl tracking-wide text-white cursor-pointer transition-all"
+                  className="ml-1 sm:ml-2 h-16 sm:h-20 px-6 sm:px-12 border-2 border-white/50 rounded-full font-bold text-lg sm:text-2xl tracking-wide text-white cursor-pointer transition-all whitespace-nowrap"
                   style={{
                     background: "repeating-linear-gradient(90deg, rgba(255,255,255,.10) 0px, rgba(255,255,255,.10) 1px, rgba(0,0,0,.08) 2px, rgba(0,0,0,.08) 3px), linear-gradient(180deg, #d76b83 0%, #b23a54 28%, #8a2338 52%, #a83048 74%, #661726 100%)",
                     borderTopColor: "#e58197",
@@ -354,16 +355,16 @@ export default function ComingSoonPage() {
                 </button>
               </div>
 
-              <span className="text-2xl text-gray-400 tracking-wider">masseurmatch.com</span>
+              <span className="text-sm sm:text-2xl text-gray-400 tracking-wider">masseurmatch.com</span>
 
               {/* Status messages */}
               {submitted && (
-                <p className="text-lg text-green-400" style={{ animation: "mmfadeup 0.5s ease" }}>
+                <p className="text-sm sm:text-lg text-green-400" style={{ animation: "mmfadeup 0.5s ease" }}>
                   Thanks! Check your email for updates.
                 </p>
               )}
               {error && (
-                <p className="text-lg text-red-400" style={{ animation: "mmfadeup 0.5s ease" }}>
+                <p className="text-sm sm:text-lg text-red-400" style={{ animation: "mmfadeup 0.5s ease" }}>
                   {error}
                 </p>
               )}
