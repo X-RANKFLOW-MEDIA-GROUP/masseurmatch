@@ -5,6 +5,8 @@ import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
 
+export const dynamic = "force-dynamic";
+
 function ConfirmShell() {
   return (
     <div className="container mx-auto max-w-lg px-4 py-10">
