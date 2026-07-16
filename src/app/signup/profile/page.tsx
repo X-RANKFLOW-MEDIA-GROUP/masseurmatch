@@ -102,14 +102,18 @@ export default function SignupProfilePage() {
 
     // Fall back to free API for any US ZIP
     setZipMessage("Looking up ZIP code…");
-    fetchZipByCode(cleanedZip).then((result) => {
-      if (result) {
-        updateProfile({ city: result.city, state: result.stateAbbr });
-        setZipMessage(`Auto filled: ${result.city}, ${result.stateAbbr}`);
-      } else {
-        setZipMessage("ZIP not found — enter city and state manually.");
-      }
-    });
+    fetchZipByCode(cleanedZip)
+      .then((result) => {
+        if (result) {
+          updateProfile({ city: result.city, state: result.stateAbbr });
+          setZipMessage(`Auto filled: ${result.city}, ${result.stateAbbr}`);
+        } else {
+          setZipMessage("ZIP not found — enter city and state manually.");
+        }
+      })
+      .catch(() => {
+        setZipMessage("Could not look up ZIP code. Please enter city and state manually.");
+      });
   }
 
   function applyBioSuggestion() {
