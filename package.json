@@ -35,7 +35,8 @@
     "install:gitleaks": "curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/main/install.sh | sh -s -- -b ./bin",
     "scan:secrets": "./bin/gitleaks detect --source . --verbose",
     "audit": "pnpm audit",
-    "audit:fix": "pnpm audit --fix"
+    "audit:fix": "pnpm audit --fix",
+    "test:hourly": "node scripts/hourly-website-tests.mjs"
   },
   "dependencies": {
     "@bugsnag/browser-performance": "^2.15.0",
