@@ -16,8 +16,9 @@ import { satoshi } from "./fonts";
 import SmoothScroll from "@/components/motion/SmoothScroll";
 
 const rootMetadata = createPageMetadata({
-  title: "Premium verified male massage therapist directory",
-  description: SITE_DESCRIPTION,
+  title: "MasseurMatch — Premium Directory of LGBTQ+-Affirming Male Massage Therapists",
+  description:
+    "AI-powered verified therapist discovery — a premium directory of male massage therapists you can trust.",
   path: "/",
 });
 
@@ -42,6 +43,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={satoshi.variable}>
+      <head></head>
       <body className="theme-masseurmatch min-h-screen overflow-x-hidden font-sans text-foreground antialiased">
         <GoogleTagManager />
         <GoogleAnalytics />
