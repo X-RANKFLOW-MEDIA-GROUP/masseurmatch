@@ -27,6 +27,49 @@ async function parsePayload(response: Response) {
   }
 }
 
+type CsrfTokenResponse = {
+  ok: boolean;
+  csrfToken?: string;
+};
+
+let cachedCsrfToken: string | null = null;
+let csrfFetchPromise: Promise<string> | null = null;
+
+async function fetchCsrfToken(): Promise<string> {
+  if (cachedCsrfToken) {
+    return cachedCsrfToken;
+  }
+
+  if (csrfFetchPromise) {
+    return csrfFetchPromise;
+  }
+
+  csrfFetchPromise = (async () => {
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch CSRF token");
+      }
+
+      const data = (await response.json()) as CsrfTokenResponse;
+
+      if (!data.csrfToken) {
+        throw new Error("CSRF token not in response");
+      }
+
+      cachedCsrfToken = data.csrfToken as string;
+      return cachedCsrfToken;
+    } finally {
+      csrfFetchPromise = null;
+    }
+  })();
+
+  return csrfFetchPromise;
+}
 export async function requestJson<T>(
   input: RequestInfo | URL,
   init: RequestInit = {},
