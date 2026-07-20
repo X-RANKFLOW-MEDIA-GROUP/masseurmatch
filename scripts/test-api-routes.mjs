@@ -71,8 +71,13 @@ async function request(path, init = {}) {
     headers.set("Content-Type", "application/json");
   }
 
+  if (testCookie && !headers.has("cookie")) {
+    headers.set("cookie", testCookie);
+  }
+
   const response = await fetch(`${baseUrl}${path}`, {
     redirect: "manual",
+    credentials: "include",
     ...init,
     headers,
   });
@@ -85,14 +90,33 @@ async function request(path, init = {}) {
   };
 }
 
+let testCookie = "";
+
 async function getCsrfToken() {
-  const { response, json } = await request("/api/auth/login", {
+  const headers = new Headers();
+  if (testCookie) {
+    headers.set("cookie", testCookie);
+  }
+
+  const response = await fetch(`${baseUrl}/api/auth/login`, {
     method: "GET",
     credentials: "include",
+    headers,
   });
+
+  const text = await response.text();
+  const json = parseJson(text);
 
   if (!response.ok || !json?.csrfToken) {
     throw new Error("Failed to fetch CSRF token for test");
+  }
+
+  const setCookie = response.headers.get("set-cookie");
+  if (setCookie) {
+    const match = setCookie.match(/mm_csrf_token=([^;]+)/);
+    if (match?.[1]) {
+      testCookie = `mm_csrf_token=${match[1]}`;
+    }
   }
 
   return {
