@@ -25,6 +25,50 @@ async function parsePayload(response: Response) {
   }
 }
 
+type CsrfTokenResponse = {
+  ok: boolean;
+  csrfToken?: string;
+};
+
+let cachedCsrfToken: string | null = null;
+let csrfFetchPromise: Promise<string> | null = null;
+
+async function fetchCsrfToken(): Promise<string> {
+  if (cachedCsrfToken) {
+    return cachedCsrfToken;
+  }
+
+  if (csrfFetchPromise) {
+    return csrfFetchPromise;
+  }
+
+  csrfFetchPromise = (async () => {
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch CSRF token");
+      }
+
+      const data = (await response.json()) as CsrfTokenResponse;
+
+      if (!data.csrfToken) {
+        throw new Error("CSRF token not in response");
+      }
+
+      cachedCsrfToken = data.csrfToken;
+      return data.csrfToken;
+    } finally {
+      csrfFetchPromise = null;
+    }
+  })();
+
+  return csrfFetchPromise;
+}
+
 export async function requestJson<T>(
   input: RequestInfo | URL,
   init: RequestInit = {},
@@ -33,6 +77,17 @@ export async function requestJson<T>(
 
   if (init.body && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
+  }
+
+  const method = (init.method || "GET").toUpperCase();
+  if ((method === "POST" || method === "DELETE" || method === "PUT" || method === "PATCH") && !headers.has("x-csrf-token")) {
+    try {
+      const csrfToken = await fetchCsrfToken();
+      headers.set("x-csrf-token", csrfToken);
+    } catch (error) {
+      console.error("Failed to fetch CSRF token:", error);
+      throw new ApiError("Failed to fetch CSRF token", 403);
+    }
   }
 
   const response = await fetch(input, {
