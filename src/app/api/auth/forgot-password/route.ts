@@ -1,7 +1,8 @@
-import { errorResponse, json, parseJsonBody } from "@/app/api/_lib/http";
+import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { assertRateLimit } from "@/app/_lib/security";
 import { forgotPasswordSchema } from "@/app/_lib/validation";
+import { verifyCsrfToken, extractCsrfToken } from "@/app/api/_lib/csrf";
 
 const DEFAULT_RESET_PATH = "/reset-password";
 
@@ -9,6 +10,13 @@ export async function POST(request: Request) {
   try {
     // Prevent password-reset email bombing per IP.
     assertRateLimit(request, "auth-forgot-password", { limit: 5, windowMs: 60_000 });
+
+    // Validate CSRF token
+    const csrfData = extractCsrfToken(request.headers);
+    if (!csrfData || !verifyCsrfToken(csrfData.token, csrfData.cookieValue)) {
+      throw new RouteError(403, "Invalid security token. Please try again.", "CSRF_INVALID");
+    }
+
     const body = await parseJsonBody(request, forgotPasswordSchema);
     try {
       const supabase = createSupabaseAdminClient();

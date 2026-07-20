@@ -3,6 +3,7 @@ import { setSessionCookie } from "@/app/api/_lib/session";
 import { RouteError } from "@/app/api/_lib/http";
 import { assertRateLimit } from "@/app/_lib/security";
 import { authRegisterSchema } from "@/app/_lib/validation";
+import { verifyCsrfToken, extractCsrfToken } from "@/app/api/_lib/csrf";
 import {
   createTherapistUser,
   ensureUserProfileAndRole,
@@ -12,6 +13,13 @@ export async function POST(request: Request) {
   try {
     // Limit automated account creation per IP.
     assertRateLimit(request, "auth-register", { limit: 5, windowMs: 60_000 });
+
+    // Validate CSRF token for account creation
+    const csrfData = extractCsrfToken(request.headers);
+    if (!csrfData || !verifyCsrfToken(csrfData.token, csrfData.cookieValue)) {
+      throw new RouteError(403, "Invalid security token. Please try again.", "CSRF_INVALID");
+    }
+
     const body = await parseJsonBody(request, authRegisterSchema);
     const { origin } = new URL(request.url);
     const result = await createTherapistUser({
