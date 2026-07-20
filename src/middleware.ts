@@ -195,10 +195,13 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // ── 0a. Admin subdomain routing ──────────────────────────────────────────
   // Rewrite admin.masseurmatch.com/* → /admin/* (requires domain alias in Vercel)
   const host = request.headers.get("host") ?? "";
-  if (host === "admin.masseurmatch.com") {
+  const isAdminSubdomain = host.startsWith("admin.masseurmatch.com") || host.startsWith("admin.masseurmatch.local");
+
+  if (isAdminSubdomain) {
     const adminPathname = pathname === "/" ? "/admin" : pathname.startsWith("/admin") ? pathname : `/admin${pathname}`;
     if (!session) {
-      const loginUrl = new URL("https://masseurmatch.com/login");
+      const loginUrl = new URL(request.url);
+      loginUrl.pathname = "/login";
       loginUrl.searchParams.set("redirect", adminPathname);
       return NextResponse.redirect(loginUrl);
     }
