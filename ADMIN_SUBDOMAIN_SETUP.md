@@ -45,6 +45,12 @@ if (host === "admin.masseurmatch.com") {
 
 **Base:** `src/app/admin/`
 
+**Authentication:** `src/app/admin/login/page.tsx`
+- Dedicated login page for admin subdomain
+- Keeps users on `admin.masseurmatch.com` throughout authentication
+- Reuses main `LoginPageClient` component
+- Automatically redirects authenticated users back to `/admin` dashboard
+
 The admin portal includes the following modules:
 
 - **Dashboard** — `dashboard/` — Overview and key metrics
@@ -77,11 +83,15 @@ The session system uses HMAC-signed cookies (`mm_session`) containing:
 
 1. User visits `admin.masseurmatch.com` (or any subpath)
 2. Middleware checks for valid admin session
-3. If no session → redirect to `https://masseurmatch.com/login?redirect=/admin` (or the specific subpath)
-4. User logs in with admin credentials
-5. Session is created and returned to browser
-6. On next request to `admin.masseurmatch.com`, middleware validates session and allows access
-7. Request is rewritten to `/admin/*` and the admin dashboard loads
+3. If no session → redirect to `admin.masseurmatch.com/login?redirect=/admin`
+4. User sees login page on admin subdomain
+5. User logs in with admin credentials
+6. Session is created and returned to browser
+7. User is redirected to `/admin` dashboard
+8. On next request to `admin.masseurmatch.com`, middleware validates session and allows access
+9. Request is rewritten to `/admin/*` and the admin dashboard loads
+
+**Key difference:** Users now stay on the admin subdomain throughout the entire authentication flow, rather than being redirected to the main domain.
 
 ## Vercel Configuration Required
 
@@ -204,9 +214,11 @@ NEXT_PUBLIC_SUPABASE_URL=https://<your-project>.supabase.co
 
 | File | Purpose |
 |------|---------|
-| `src/middleware.ts` | Subdomain routing logic (lines 195–211) |
+| `src/middleware.ts` | Subdomain routing logic and unauthenticated redirect |
 | `src/app/admin/layout.tsx` | Admin layout with access guards |
 | `src/app/admin/page.tsx` | Admin dashboard homepage |
+| `src/app/admin/login/page.tsx` | Admin subdomain login page |
+| `src/app/login/LoginPageClient.tsx` | Reusable login form component |
 | `src/app/admin/_components/AdminLayoutShell.tsx` | Admin UI wrapper |
 | `src/app/_lib/auth/` | Session utilities |
 | `vercel.json` | Vercel deployment config |
