@@ -128,11 +128,20 @@ export function AuthForms({
         errorMsg.includes("USER_EXISTS") ||
         ((typeof (result.error as any)?.code === "string" && (result.error as any).code) === "USER_EXISTS");
 
+      const isNetworkError = result.error.message?.includes("Failed to fetch") ||
+        (result.error instanceof Error && !('status' in result.error));
+
+      const displayMessage = isUserExists
+        ? "An account with this email already exists. Please sign in instead."
+        : isNetworkError
+          ? isLogin
+            ? "Unable to connect. Please check your internet and try again."
+            : "Connection error. Please try again in a moment."
+          : errorMsg || (isLogin ? "Invalid email or password." : "Unable to create account. Please try again.");
+
       toast({
         title: isLogin ? "Login failed" : "Could not register",
-        description: isUserExists
-          ? "An account with this email already exists. Please sign in instead."
-          : errorMsg,
+        description: displayMessage,
         variant: "destructive",
       });
 
@@ -228,6 +237,7 @@ export function AuthForms({
               placeholder="Full name"
               value={fullName}
               onChange={(event) => setFullName(event.target.value)}
+              autoComplete="name"
               minLength={2}
               maxLength={120}
               required
