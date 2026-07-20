@@ -32,13 +32,9 @@ test.describe("Critical user paths", () => {
     // Should have main title
     await expect(page.locator("h1").first()).toBeVisible();
 
-    // Should have hero text mentioning massage/therapists
+    // Should have hero text mentioning massage/therapists (coming-soon page does)
     const bodyText = await page.locator("body").textContent();
     expect(bodyText?.toLowerCase()).toContain("therapist");
-
-    // Critical sections should be present
-    await expect(page.locator("header")).toBeVisible();
-    await expect(page.locator("footer")).toBeVisible();
 
     // No JavaScript errors (ignore external services that fail in CI environment)
     expect(
@@ -174,7 +170,7 @@ test.describe("Critical user paths", () => {
   });
 
   test("site header and footer persist across pages", async ({ page }) => {
-    const routes = ["/", "/blog", "/search", "/privacy"];
+    const routes = ["/blog", "/search", "/privacy"];
 
     for (const route of routes) {
       await page.goto(route, { waitUntil: "networkidle" });
@@ -266,7 +262,7 @@ test.describe("SEO and metadata", () => {
 
   test("page titles are descriptive", async ({ page }) => {
     const pages = [
-      { url: "/", shouldContain: "massage" },
+      { url: "/", shouldContain: "coming" },
       { url: "/blog", shouldContain: "blog" },
       { url: "/privacy", shouldContain: "privacy" },
     ];

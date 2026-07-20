@@ -16,8 +16,9 @@ import { satoshi } from "./fonts";
 import SmoothScroll from "@/components/motion/SmoothScroll";
 
 const rootMetadata = createPageMetadata({
-  title: "Premium verified male massage therapist directory",
-  description: SITE_DESCRIPTION,
+  title: "MasseurMatch — Coming Soon",
+  description:
+    "AI-powered verified therapist discovery — a premium directory of male massage therapists you can trust.",
   path: "/",
 });
 
@@ -42,6 +43,20 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={satoshi.variable}>
+      <head>
+        <style>{`
+          /* Coming-soon page: hide header/footer and reset layout wrappers */
+          :root.coming-soon header,
+          :root.coming-soon footer {
+            display: none !important;
+          }
+          :root.coming-soon [data-motion-shell],
+          :root.coming-soon div[style*="position: relative"] > div:last-of-type {
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+        `}</style>
+      </head>
       <body className="theme-masseurmatch min-h-screen overflow-x-hidden font-sans text-foreground antialiased">
         <GoogleTagManager />
         <GoogleAnalytics />
@@ -57,6 +72,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CookieConsent />
           {/* Knotty floating chat is mounted once inside AppProviders
               (dynamic, ssr:false, wrapped in an error boundary). */}
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                if (window.location.pathname === '/') {
+                  document.documentElement.classList.add('coming-soon');
+                }
+              `,
+            }}
+          />
         </AppProviders>
       </body>
     </html>
