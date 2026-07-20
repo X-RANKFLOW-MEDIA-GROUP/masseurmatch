@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "MasseurMatch — Premium Directory of LGBTQ+-Affirming Male Massage Therapists",
@@ -22,18 +23,18 @@ export default function HomePage() {
             <p className="text-muted-foreground mb-6">
               Browse and book appointments with verified male massage therapists who are LGBTQ+-affirming and trustworthy.
             </p>
-            <a href="/explore" className="text-primary font-semibold hover:underline">
+            <Link href="/explore" className="text-primary font-semibold hover:underline">
               Browse Therapists →
-            </a>
+            </Link>
           </div>
           <div className="border border-border rounded-lg p-8">
             <h2 className="text-2xl font-semibold mb-4">For Therapists</h2>
             <p className="text-muted-foreground mb-6">
               Grow your practice and connect with clients who value trust and quality.
             </p>
-            <a href="/for-therapists" className="text-primary font-semibold hover:underline">
+            <Link href="/for-therapists" className="text-primary font-semibold hover:underline">
               List Your Practice →
-            </a>
+            </Link>
           </div>
         </div>
       </div>
