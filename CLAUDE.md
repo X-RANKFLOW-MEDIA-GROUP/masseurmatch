@@ -62,9 +62,30 @@ The full stack already exists — do not rebuild it:
 - Open the floating chat from anywhere by dispatching
   `window.dispatchEvent(new CustomEvent("knotty:open", { detail: { prompt } }))`.
 
+## Dependency Management
+
+**pnpm is the single source of truth** for this project (`pnpm@10.32.1` locked in `package.json`).
+
+- **Always use pnpm** — never `npm install` or `yarn add`. Use:
+  - `pnpm add <package>` (production)
+  - `pnpm add -D <package>` (dev)
+  - `pnpm remove <package>`
+- **Every commit touching package.json must update pnpm-lock.yaml.** If it's out
+  of sync, CI will fail with `pnpm install --frozen-lockfile`.
+- **Never commit package-lock.json, yarn.lock, or shrinkwrap.yaml.**
+  Use only `pnpm-lock.yaml`.
+- **Setup the pre-commit hook** (automatic lockfile sync when package.json changes):
+  ```bash
+  git config core.hooksPath .githooks
+  ```
+  This runs `pnpm install --lockfile-only` before each commit if `package.json` changed,
+  ensuring `pnpm-lock.yaml` is always in sync.
+- **CI enforces lockfile consistency** — each job runs `pnpm install --frozen-lockfile`,
+  so lockfile mismatches are caught immediately in the PR.
+
 ## Workflow
 
 - Dev branch for this work: `claude/repo-launch-readiness-KqLDX`.
 - Before pushing, run: `npx tsc --noEmit`, `npx eslint <changed files>`,
-  and `npm run build`.
+  `pnpm run build`, and verify `pnpm-lock.yaml` is updated.
 - Do not open PRs unless explicitly asked.

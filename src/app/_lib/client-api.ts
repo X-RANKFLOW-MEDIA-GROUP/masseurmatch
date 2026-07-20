@@ -25,48 +25,30 @@ async function parsePayload(response: Response) {
   }
 }
 
-type CsrfTokenResponse = {
-  ok: boolean;
-  csrfToken?: string;
-};
-
 let cachedCsrfToken: string | null = null;
-let csrfFetchPromise: Promise<string> | null = null;
 
-async function fetchCsrfToken(): Promise<string> {
-  if (cachedCsrfToken) {
-    return cachedCsrfToken;
-  }
+async function getCsrfToken(): Promise<string | null> {
+  if (cachedCsrfToken) return cachedCsrfToken;
 
-  if (csrfFetchPromise) {
-    return csrfFetchPromise;
-  }
+  try {
+    const response = await fetch("/api/auth/login", {
+      method: "GET",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
 
-  csrfFetchPromise = (async () => {
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch CSRF token");
+    if (response.ok) {
+      const data = (await response.json()) as { csrfToken?: string };
+      if (data.csrfToken) {
+        cachedCsrfToken = data.csrfToken;
+        return cachedCsrfToken;
       }
-
-      const data = (await response.json()) as CsrfTokenResponse;
-
-      if (!data.csrfToken) {
-        throw new Error("CSRF token not in response");
-      }
-
-      cachedCsrfToken = data.csrfToken;
-      return data.csrfToken;
-    } finally {
-      csrfFetchPromise = null;
     }
-  })();
+  } catch {
+    // Silently fail - CSRF might not be needed for all requests
+  }
 
-  return csrfFetchPromise;
+  return null;
 }
 
 export async function requestJson<T>(
@@ -79,14 +61,11 @@ export async function requestJson<T>(
     headers.set("Content-Type", "application/json");
   }
 
-  const method = (init.method || "GET").toUpperCase();
-  if ((method === "POST" || method === "DELETE" || method === "PUT" || method === "PATCH") && !headers.has("x-csrf-token")) {
-    try {
-      const csrfToken = await fetchCsrfToken();
+  // Add CSRF token for state-changing requests
+  if ((init.method === "POST" || init.method === "DELETE") && !headers.has("x-csrf-token")) {
+    const csrfToken = await getCsrfToken();
+    if (csrfToken) {
       headers.set("x-csrf-token", csrfToken);
-    } catch (error) {
-      console.error("Failed to fetch CSRF token:", error);
-      throw new ApiError("Failed to fetch CSRF token", 403);
     }
   }
 
