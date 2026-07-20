@@ -1,5 +1,7 @@
 "use client";
 
+import { getCsrfToken } from "./csrf-client";
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -33,6 +35,19 @@ export async function requestJson<T>(
 
   if (init.body && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
+  }
+
+  // Add CSRF token for auth endpoints
+  const url = input instanceof Request ? input.url : String(input);
+  const isAuthRoute = url.includes("/api/auth/");
+  if (isAuthRoute && init.method?.toUpperCase() === "POST") {
+    try {
+      const csrfToken = await getCsrfToken();
+      headers.set("x-csrf-token", csrfToken);
+    } catch (error) {
+      console.error("Failed to get CSRF token:", error);
+      throw new ApiError("Security token fetch failed. Please refresh and try again.", 403);
+    }
   }
 
   const response = await fetch(input, {
