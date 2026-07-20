@@ -43,9 +43,18 @@ async function getCsrfToken(): Promise<string | null> {
         cachedCsrfToken = data.csrfToken;
         return cachedCsrfToken;
       }
+    } else {
+      // Log non-OK response so we can debug auth infrastructure issues
+      console.warn(
+        `[CSRF] Failed to fetch token: ${response.status} ${response.statusText}`,
+        {
+          url: response.url,
+          timestamp: new Date().toISOString(),
+        }
+      );
     }
-  } catch {
-    // Silently fail - CSRF might not be needed for all requests
+  } catch (error) {
+    console.error("[CSRF] Failed to fetch token:", error);
   }
 
   return null;
