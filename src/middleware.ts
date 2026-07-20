@@ -200,7 +200,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   if (isAdminSubdomain) {
     const adminPathname = pathname === "/" ? "/admin" : pathname.startsWith("/admin") ? pathname : `/admin${pathname}`;
     if (!session) {
-      const loginUrl = new URL("https://masseurmatch.com/login");
+      const loginUrl = new URL(request.url);
+      loginUrl.pathname = "/login";
       loginUrl.searchParams.set("redirect", adminPathname);
       return NextResponse.redirect(loginUrl);
     }
