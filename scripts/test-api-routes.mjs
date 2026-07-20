@@ -85,6 +85,22 @@ async function request(path, init = {}) {
   };
 }
 
+async function getCsrfToken() {
+  const { response, json } = await request("/api/auth/login", {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (!response.ok || !json?.csrfToken) {
+    throw new Error("Failed to fetch CSRF token for test");
+  }
+
+  return {
+    token: json.csrfToken,
+    response,
+  };
+}
+
 function ensure(condition, message) {
   if (!condition) {
     throw new Error(message);
@@ -140,8 +156,12 @@ try {
   await waitForServer();
 
   {
+    const { token } = await getCsrfToken();
     const { response, json } = await request("/api/auth/forgot-password", {
       method: "POST",
+      headers: {
+        "x-csrf-token": token,
+      },
       body: JSON.stringify({
         email: "therapist@example.com",
         redirectTo: `${baseUrl}/reset-password`,
@@ -211,8 +231,12 @@ try {
   }
 
   {
+    const { token } = await getCsrfToken();
     const { response, json } = await request("/api/auth/login", {
       method: "POST",
+      headers: {
+        "x-csrf-token": token,
+      },
       body: JSON.stringify({
         email: "not-an-email",
         password: "short",
@@ -225,8 +249,12 @@ try {
   }
 
   {
+    const { token } = await getCsrfToken();
     const { response, json } = await request("/api/auth/register", {
       method: "POST",
+      headers: {
+        "x-csrf-token": token,
+      },
       body: JSON.stringify({
         fullName: "A",
         email: "bad",

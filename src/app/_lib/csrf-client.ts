@@ -1,11 +1,27 @@
 "use client";
 
 let cachedCsrfToken: string | null = null;
+const CSRF_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+function isTokenExpired(token: string): boolean {
+  const parts = token.split(".");
+  if (parts.length !== 3) return true;
+
+  try {
+    const timestamp = parseInt(parts[1], 10);
+    const now = Date.now();
+    return now - timestamp > CSRF_TTL_MS;
+  } catch {
+    return true;
+  }
+}
 
 export async function getCsrfToken(): Promise<string> {
-  if (cachedCsrfToken) {
+  if (cachedCsrfToken && !isTokenExpired(cachedCsrfToken)) {
     return cachedCsrfToken;
   }
+
+  cachedCsrfToken = null;
 
   const response = await fetch("/api/auth/login", {
     method: "GET",
@@ -17,8 +33,11 @@ export async function getCsrfToken(): Promise<string> {
   }
 
   const data = await response.json();
-  cachedCsrfToken = data.csrfToken;
-  return cachedCsrfToken;
+  if (typeof data.csrfToken !== "string") {
+    throw new Error("Server did not return CSRF token");
+  }
+  cachedCsrfToken = data.csrfToken as string;
+  return data.csrfToken;
 }
 
 export function clearCsrfToken() {
