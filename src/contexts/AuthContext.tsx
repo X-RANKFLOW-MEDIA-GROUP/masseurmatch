@@ -237,8 +237,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    await logoutMutation().catch(() => null);
-    await supabase.auth.signOut();
+    try {
+      // Clear server-side session cookie
+      await logoutMutation().catch(() => null);
+
+      // Clear Supabase client session (local scope = current browser only)
+      await supabase.auth.signOut({ scope: "local" });
+
+      // Clear local state
+      setSession(null);
+      setUser(null);
+      setSubscription({ ...defaultSubscription, loading: false });
+    } catch (error) {
+      console.error("Error during sign out:", error);
+      // Still clear local state even if server call fails
+      setSession(null);
+      setUser(null);
+      setSubscription({ ...defaultSubscription, loading: false });
+    }
   };
 
   return (
