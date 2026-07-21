@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const results = [];
+    const results: Record<string, any>[] = [];
 
     for (const post of postsToPublish) {
       const publishResult = await publishBlogPost(post);
