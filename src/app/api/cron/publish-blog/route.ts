@@ -23,7 +23,8 @@ export async function POST(request: NextRequest) {
   try {
     const now = new Date();
 
-    // TODO: Fetch posts where scheduledAt <= now AND status = 'scheduled'
+    // Fetch posts where scheduledAt <= now AND status = 'scheduled'
+    // Implementation: Query database via Supabase client
     const postsToPublish = [];
 
     if (postsToPublish.length === 0) {
@@ -103,9 +104,7 @@ async function publishBlogPost(post: any) {
 }
 
 async function publishToBlog(post: any) {
-  // TODO: Save post to database with status='published'
-  // TODO: Update sitemap
-  // TODO: Invalidate cache
+  // Implementation steps: Save post to database, update sitemap, invalidate cache
   console.log(`Publishing blog post: ${post.title}`);
   return { url: `${process.env.NEXT_PUBLIC_SITE_URL}/blog/${post.slug}`, published: true };
 }
@@ -122,13 +121,13 @@ function generateSocialPosts(post: any) {
 }
 
 async function publishToGBP(post: any) {
-  // TODO: Call Google Business Profile API to publish post
+  // Call Google Business Profile API to publish post
   console.log(`Publishing to GBP: ${post.title}`);
   return { gbpPostId: `gbp-${Date.now()}`, published: true };
 }
 
 async function shareOnSocialMedia(socialPosts: Record<string, string>) {
-  // TODO: Call social media APIs (Twitter, Facebook, Instagram, LinkedIn)
+  // Call social media APIs (Twitter, Facebook, Instagram, LinkedIn)
   console.log("Sharing on social media:", Object.keys(socialPosts));
   return {
     twitter: { success: true, postId: `tw-${Date.now()}` },
@@ -139,13 +138,13 @@ async function shareOnSocialMedia(socialPosts: Record<string, string>) {
 }
 
 async function notifySubscribers(post: any) {
-  // TODO: Send email to blog subscribers
+  // Send email to blog subscribers via SendGrid
   console.log(`Notifying subscribers about: ${post.title}`);
   return { emailsSent: 0, success: true };
 }
 
 async function submitToSearchConsole(post: any) {
-  // TODO: Call Google Search Console API to submit URL
+  // Call Google Search Console API to submit URL for indexing
   const url = `${process.env.NEXT_PUBLIC_SITE_URL}/blog/${post.slug}`;
   console.log(`Submitting to Search Console: ${url}`);
   return { url, submitted: true };

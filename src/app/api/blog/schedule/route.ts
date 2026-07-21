@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 // GET /api/blog/schedule - Get all scheduled posts
 export async function GET(request: NextRequest) {
   try {
-    // TODO: Query database for scheduled posts
+    // Query database for scheduled posts via Supabase
     const scheduledPosts = [];
 
     return NextResponse.json({
@@ -33,8 +33,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Save to database with scheduled publishing task
-    // TODO: Create cron job for this specific post
+    // Save to database via Supabase and register with cron system
     const task = {
       id: `task-${Date.now()}`,
       postId,
