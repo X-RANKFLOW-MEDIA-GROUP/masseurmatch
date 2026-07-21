@@ -48,6 +48,18 @@ function SignupVerifyPageInner() {
   const [idLoading, setIdLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const autoCheckedRef = useRef(false);
+  const statusCheckAttemptsRef = useRef(0);
+  const MAX_STATUS_CHECK_ATTEMPTS = 30; // Prevent infinite polling
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Cleanup: abort pending requests on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (authLoading) return;
@@ -90,7 +102,12 @@ function SignupVerifyPageInner() {
 
   const checkIdentityStatus = useCallback(async () => {
     if (!state.stripeIdentitySessionId) return;
+    if (statusCheckAttemptsRef.current >= MAX_STATUS_CHECK_ATTEMPTS) {
+      setError("Verification check timed out. Please click 'Resume Verification' to try again.");
+      return;
+    }
 
+    statusCheckAttemptsRef.current += 1;
     setIdLoading(true);
     setError(null);
 
@@ -108,6 +125,7 @@ function SignupVerifyPageInner() {
 
       if (status === "verified") {
         setIdentityStatus("verified");
+        statusCheckAttemptsRef.current = 0; // Reset on success
       } else if (status === "requires_input") {
         setIdentityStatus("requires_input");
       } else if (status === "canceled") {
@@ -116,7 +134,7 @@ function SignupVerifyPageInner() {
         setIdentityStatus("processing");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to check verification status.");
+      setError(err instanceof Error ? err.message : "Failed to check verification status. Please try again.");
     } finally {
       setIdLoading(false);
     }
@@ -192,10 +210,17 @@ function SignupVerifyPageInner() {
     setError(null);
 
     try {
+      // Abort any previous requests
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      abortControllerRef.current = new AbortController();
+
       const response = await fetch("/api/stripe/identity/create-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
+        signal: abortControllerRef.current.signal,
       });
 
       if (!response.ok) {
@@ -206,11 +231,15 @@ function SignupVerifyPageInner() {
       const { sessionId, url } = await response.json();
       setStripeIdentitySessionId(sessionId);
       setIdentityStatus("processing");
+      statusCheckAttemptsRef.current = 0; // Reset attempts counter
 
       if (url) {
         window.location.href = url;
       }
     } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") {
+        return; // Request was cancelled, don't show error
+      }
       setError(err instanceof Error ? err.message : "Identity verification failed to start.");
       setIdentityStatus("failed");
     } finally {

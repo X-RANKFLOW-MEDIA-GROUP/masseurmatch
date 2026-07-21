@@ -65,12 +65,16 @@ function ProgressStepper() {
 export function SignupShell({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (!loading && user) {
+    // Don't redirect authenticated users who are in the signup flow
+    // (after account creation, they need to complete verification, profile, etc.)
+    // Only redirect if they're on the entry page (/signup) and already authenticated
+    if (!loading && user && pathname === "/signup") {
       router.replace("/pro/dashboard");
     }
-  }, [loading, user, router]);
+  }, [loading, user, pathname, router]);
 
   return (
     <SignupProvider>

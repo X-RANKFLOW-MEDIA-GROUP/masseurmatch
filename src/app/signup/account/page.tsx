@@ -14,6 +14,7 @@ import { useSignup } from "../_lib/signup-context";
 import { useAuth } from "@/contexts/AuthContext";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_RE = /^\d{10,}$/; // At least 10 digits, allows +1-234-567-8900 format after cleanup
 
 type FieldErrors = Record<string, string>;
 
@@ -66,10 +67,12 @@ export default function SignupAccountPage() {
           if (!form.email.trim()) return "Email is required.";
           if (!EMAIL_RE.test(form.email.trim())) return "Enter a valid email address.";
           return null;
-        case "phone":
-          return !form.phone.trim() || form.phone.length < 10
-            ? "A valid phone number is required."
+        case "phone": {
+          const cleaned = form.phone.replace(/\D/g, "");
+          return !cleaned || cleaned.length < 10
+            ? "A valid phone number is required (at least 10 digits)."
             : null;
+        }
         case "password":
           return form.password.length < 8
             ? "Password must be at least 8 characters."
