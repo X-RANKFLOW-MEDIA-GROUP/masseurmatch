@@ -6,12 +6,12 @@ import { slugify, uniqueStrings } from "@/app/_lib/utils";
 const GLOBAL_REVALIDATE_PATHS = ["/", "/explore", "/search", "/therapists"];
 const SITEMAP_REVALIDATE_PATHS = [
   "/sitemap.xml",
-  "/sitemap/0.xml",
-  "/sitemap/1.xml",
-  "/sitemap/2.xml",
-  "/sitemap/3.xml",
-  "/sitemap/4.xml",
-  "/sitemap/5.xml",
+  "/sitemaps/0.xml",
+  "/sitemaps/1.xml",
+  "/sitemaps/2.xml",
+  "/sitemaps/3.xml",
+  "/sitemaps/4.xml",
+  "/sitemaps/5.xml",
 ];
 
 type TriggerRevalidateOptions = {

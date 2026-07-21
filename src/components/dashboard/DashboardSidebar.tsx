@@ -1,4 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
+import React from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -61,9 +62,23 @@ const accountItems = [
 
 export const DashboardSidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { signOut } = useAuth();
   const { profile } = useProfile();
   const { planLabel, planKey } = usePlanLimits();
+  const [isLoggingOut, setIsLoggingOut] = React.useState(false);
+
+  const handleSignOut = async () => {
+    setIsLoggingOut(true);
+    try {
+      await signOut();
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Still navigate even if logout fails
+      navigate("/login");
+    }
+  };
 
   const planColorMap: Record<string, string> = {
     free: "border-muted-foreground/40 text-muted-foreground",
@@ -170,9 +185,13 @@ export const DashboardSidebar = () => {
         </div>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Sign Out" onClick={signOut}>
+            <SidebarMenuButton
+              tooltip="Sign Out"
+              onClick={handleSignOut}
+              disabled={isLoggingOut}
+            >
               <LogOut className="shrink-0" />
-              <span>Sign Out</span>
+              <span>{isLoggingOut ? "Signing out..." : "Sign Out"}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

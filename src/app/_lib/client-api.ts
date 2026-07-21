@@ -1,6 +1,6 @@
 "use client";
 
-let cachedCsrfToken: string | null = null;
+import { getCsrfToken, clearCsrfToken } from "@/app/_lib/csrf-client";
 
 export class ApiError extends Error {
   constructor(
@@ -27,27 +27,13 @@ async function parsePayload(response: Response) {
   }
 }
 
-async function fetchCsrfToken(): Promise<string> {
-  if (cachedCsrfToken) {
-    return cachedCsrfToken;
-  }
-
-  const response = await fetch("/api/auth/login", {
-    method: "GET",
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch CSRF token");
-  }
-
-  const payload = await parsePayload(response);
-  if (typeof payload === "object" && payload && "csrfToken" in payload) {
-    cachedCsrfToken = String(payload.csrfToken);
-    return cachedCsrfToken;
-  }
-
-  throw new Error("No CSRF token in response");
+function needsCsrfToken(url: string, method?: string): boolean {
+  return (
+    method === "POST" &&
+    (url.includes("/api/auth/login") ||
+      url.includes("/api/auth/register") ||
+      url.includes("/api/auth/forgot-password"))
+  );
 }
 
 export async function requestJson<T>(
@@ -61,18 +47,29 @@ export async function requestJson<T>(
   }
 
   const url = typeof input === "string" ? input : input.toString();
-  const isAuthLoginPost = url.includes("/api/auth/login") && init.method === "POST";
+  const csrfProtected = needsCsrfToken(url, init.method) && !headers.has("x-csrf-token");
 
-  if (isAuthLoginPost && !headers.has("x-csrf-token")) {
-    const csrfToken = await fetchCsrfToken();
-    headers.set("x-csrf-token", csrfToken);
+  if (csrfProtected) {
+    headers.set("x-csrf-token", await getCsrfToken());
   }
 
-  const response = await fetch(input, {
+  let response = await fetch(input, {
     credentials: "include",
     ...init,
     headers,
   });
+
+  // The cached CSRF token can outlive the server-side one (1h TTL). On a
+  // CSRF rejection, refetch a fresh token and retry once.
+  if (response.status === 403 && csrfProtected) {
+    clearCsrfToken();
+    headers.set("x-csrf-token", await getCsrfToken());
+    response = await fetch(input, {
+      credentials: "include",
+      ...init,
+      headers,
+    });
+  }
 
   const payload = await parsePayload(response);
 
