@@ -65,6 +65,7 @@ const REQUIRED_PROFILE_COLUMNS = [
   "is_featured",
   "is_suspended",
   "is_banned",
+  "is_demo",
   "subscription_tier",
   "subscription_status",
   "stripe_customer_id",
