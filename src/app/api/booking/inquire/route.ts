@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseAdminClient, requireAdminSession } from '@/app/api/_lib/supabase-server'
-import { getRequestSession } from '@/app/api/_lib/session'
 import { createInquiryAndRespond, continueConversation, runBackgroundIntelligence } from '@/lib/booking/ai-responder'
 import type { NewInquiryInput } from '@/lib/booking/types'
 
-// POST /api/booking/inquire — submit a new inquiry or reply to an existing one (admin only)
+// This route is internal-only. Public visitors contact providers directly; they do
+// not receive or submit another user's booking/contact data through the Data API.
 export async function POST(request: NextRequest) {
   try {
     await requireAdminSession(request)
@@ -13,13 +13,11 @@ export async function POST(request: NextRequest) {
       client_message?: string
     }
 
-    // Existing conversation: client replied
     if (body.inquiry_id && body.client_message) {
       const reply = await continueConversation(body.inquiry_id, body.client_message)
       return NextResponse.json({ ok: true, aiMessage: reply })
     }
 
-    // New inquiry
     const input: NewInquiryInput = {
       client_name: body.client_name,
       client_phone: body.client_phone,
@@ -35,10 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await createInquiryAndRespond(input)
-
-    // If we sent a hold message, kick off background intelligence (fire and forget)
     if (!result.immediate) {
-      // Use waitUntil equivalent: trigger async without blocking response
       Promise.resolve().then(() => runBackgroundIntelligence(result.inquiry.id)).catch(() => undefined)
     }
 
@@ -54,27 +49,29 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET /api/booking/inquire — list inquiries (admin or provider)
 export async function GET(request: NextRequest) {
-  const session = getRequestSession(request)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  try {
+    await requireAdminSession(request)
 
-  const supabase = createSupabaseAdminClient()
-  const { searchParams } = new URL(request.url)
-  const status = searchParams.get('status')
-  const therapistId = searchParams.get('therapist_id')
+    const supabase = createSupabaseAdminClient()
+    const { searchParams } = new URL(request.url)
+    const status = searchParams.get('status')
+    const therapistId = searchParams.get('therapist_id')
 
-  let query = supabase
-    .from('booking_inquiries')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(100)
+    let query = supabase
+      .from('booking_inquiries')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(100)
 
-  if (status) query = query.eq('status', status)
-  if (therapistId) query = query.eq('therapist_id', therapistId)
+    if (status) query = query.eq('status', status)
+    if (therapistId) query = query.eq('therapist_id', therapistId)
 
-  const { data, error } = await query
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    const { data, error } = await query
+    if (error) return NextResponse.json({ error: 'Inquiries unavailable' }, { status: 500 })
 
-  return NextResponse.json({ ok: true, inquiries: data ?? [] })
+    return NextResponse.json({ ok: true, inquiries: data ?? [] })
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 }
