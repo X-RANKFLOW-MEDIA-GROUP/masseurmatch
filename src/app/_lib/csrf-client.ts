@@ -36,8 +36,9 @@ export async function getCsrfToken(): Promise<string> {
   if (typeof data.csrfToken !== "string") {
     throw new Error("Server did not return CSRF token");
   }
-  cachedCsrfToken = data.csrfToken as string;
-  return data.csrfToken;
+  cachedCsrfToken = data.csrfToken ?? null;
+  if (!cachedCsrfToken) throw new Error('CSRF token missing');
+  return cachedCsrfToken;
 }
 
 export function clearCsrfToken() {

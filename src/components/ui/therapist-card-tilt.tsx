@@ -103,7 +103,7 @@ export function TherapistCardTilt({
         transform: transform || undefined,
         transition: transform
           ? "transform 80ms ease-out, box-shadow 200ms ease"
-          : "transform 400ms cubic-bezier(0.16,1,0.3,1), box-shadow 200ms ease",
+          : "transform 400ms cubic-bezier(0.16_1_0.3_1), box-shadow 200ms ease",
       }}
       {...props}
     >
