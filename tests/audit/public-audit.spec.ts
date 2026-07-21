@@ -102,6 +102,12 @@ const IGNORED_CONSOLE = [
   "stripe",
   "Failed to fetch",
   "hydrat", // hydration warnings from 3rd-party-injected markup
+  // Production builds minify the same hydration warnings to error codes, so
+  // the "hydrat" needle above misses them: #418/#425 = hydration mismatch,
+  // #423 = render error recovered during hydration.
+  "Minified React error #418",
+  "Minified React error #423",
+  "Minified React error #425",
   "Download the React DevTools",
   "[Fast Refresh]",
   "preloaded using link preload",
