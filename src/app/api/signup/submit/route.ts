@@ -88,18 +88,22 @@ export async function POST(request: NextRequest) {
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://masseurmatch.com";
-    await notifyAdmin({
+    // Notify admin but don't block on failure (email system is separate from profile submission)
+    notifyAdmin({
       subject: "New provider profile submitted for review",
       heading: "Profile submitted for review",
-      intro: `${profile.full_name || "A provider"} submitted their profile and is awaiting approval.`,
+      intro: `${profile.fullName || "A provider"} submitted their profile and is awaiting approval.`,
       fields: [
-        { label: "Name", value: profile.full_name || null },
+        { label: "Name", value: profile.fullName || null },
         { label: "City", value: profile.city || null },
         { label: "State", value: profile.state || null },
         { label: "Plan", value: planTier || null },
         { label: "User ID", value: session.userId },
       ],
       action: { label: "Review in admin", url: `${appUrl}/admin/therapists` },
+    }).catch((err) => {
+      console.error("[signup/submit] admin notification failed:", err);
+      // Don't throw - email failure shouldn't block signup
     });
 
     return NextResponse.json({ success: true });

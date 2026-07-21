@@ -50,7 +50,12 @@ export async function POST(request: Request) {
         if (error.code === "EMAIL_NOT_CONFIRMED") {
           throw error;
         }
+        // Return specific error code for invalid credentials/token
         throw new RouteError(401, "Invalid email or password.", "AUTH_INVALID");
+      }
+      // Handle token-related errors
+      if (error instanceof RouteError && error.message?.includes("token")) {
+        throw new RouteError(401, "Invalid token please try again", "INVALID_TOKEN");
       }
       throw error;
     }
