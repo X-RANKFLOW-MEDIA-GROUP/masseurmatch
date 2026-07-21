@@ -1,5 +1,7 @@
 "use client";
 
+import { getCsrfToken } from "./csrf-client";
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -25,41 +27,6 @@ async function parsePayload(response: Response) {
   }
 }
 
-let cachedCsrfToken: string | null = null;
-
-async function getCsrfToken(): Promise<string | null> {
-  if (cachedCsrfToken) return cachedCsrfToken;
-
-  try {
-    const response = await fetch("/api/auth/login", {
-      method: "GET",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (response.ok) {
-      const data = (await response.json()) as { csrfToken?: string };
-      if (data.csrfToken) {
-        cachedCsrfToken = data.csrfToken;
-        return cachedCsrfToken;
-      }
-    } else {
-      // Log non-OK response so we can debug auth infrastructure issues
-      console.warn(
-        `[CSRF] Failed to fetch token: ${response.status} ${response.statusText}`,
-        {
-          url: response.url,
-          timestamp: new Date().toISOString(),
-        }
-      );
-    }
-  } catch (error) {
-    console.error("[CSRF] Failed to fetch token:", error);
-  }
-
-  return null;
-}
-
 export async function requestJson<T>(
   input: RequestInfo | URL,
   init: RequestInit = {},
@@ -70,11 +37,16 @@ export async function requestJson<T>(
     headers.set("Content-Type", "application/json");
   }
 
-  // Add CSRF token for state-changing requests
-  if ((init.method === "POST" || init.method === "DELETE") && !headers.has("x-csrf-token")) {
-    const csrfToken = await getCsrfToken();
-    if (csrfToken) {
+  // Add CSRF token for auth endpoints
+  const url = input instanceof Request ? input.url : String(input);
+  const isAuthRoute = url.includes("/api/auth/");
+  if (isAuthRoute && init.method?.toUpperCase() === "POST") {
+    try {
+      const csrfToken = await getCsrfToken();
       headers.set("x-csrf-token", csrfToken);
+    } catch (error) {
+      console.error("Failed to get CSRF token:", error);
+      throw new ApiError("Security token fetch failed. Please refresh and try again.", 403);
     }
   }
 

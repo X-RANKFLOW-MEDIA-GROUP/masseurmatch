@@ -102,7 +102,7 @@ export function VoxProfile({
   const stats = [
     { label: "Experience", value: profile.yearsExperience.replace(/\s*years?/i, "").trim() || "—", suffix: /year/i.test(profile.yearsExperience) ? "yrs" : "" },
     { label: "Response", value: profile.responseTime.length > 18 ? "Fast" : profile.responseTime, suffix: "" },
-    { label: "Languages", value: `${profile.languages.length} language${profile.languages.length === 1 ? "" : "s"}`, suffix: "" },
+    { label: "Languages", value: String(profile.languages.length), suffix: profile.languages.length === 1 ? "language" : "languages" },
   ];
 
   const quickNavItems = [

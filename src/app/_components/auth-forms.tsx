@@ -78,6 +78,7 @@ export function AuthForms({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(true);
   const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
 
@@ -103,6 +104,7 @@ export function AuthForms({
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setError(null);
     setLoading(true);
 
     if (isLogin) {
@@ -128,25 +130,22 @@ export function AuthForms({
         errorMsg.includes("USER_EXISTS") ||
         ((typeof (result.error as any)?.code === "string" && (result.error as any).code) === "USER_EXISTS");
 
-      const isNetworkError = result.error.message?.includes("Failed to fetch") ||
-        (result.error instanceof Error && !('status' in result.error));
-
-      const displayMessage = isUserExists
+      const displayError = isUserExists
         ? "An account with this email already exists. Please sign in instead."
-        : isNetworkError
-          ? isLogin
-            ? "Unable to connect. Please check your internet and try again."
-            : "Connection error. Please try again in a moment."
-          : errorMsg || (isLogin ? "Invalid email or password." : "Unable to create account. Please try again.");
+        : errorMsg || (isLogin ? "Login failed. Please try again." : "Could not register. Please try again.");
 
-      toast({
-        title: isLogin ? "Login failed" : "Could not register",
-        description: displayMessage,
-        variant: "destructive",
-      });
+      setError(displayError);
+
+      // Log to Bugsnag if available
+      if (typeof window !== "undefined" && (window as any).Bugsnag) {
+        (window as any).Bugsnag.notify(result.error, {
+          context: isLogin ? "login" : "register",
+          severity: "warning",
+        });
+      }
 
       if (isUserExists) {
-        router.push("/login");
+        setTimeout(() => router.push("/login"), 1000);
       }
       return;
     }
@@ -230,6 +229,14 @@ export function AuthForms({
       <OrDivider />
 
       <div className="mt-4">
+        {error && (
+          <div
+            role="alert"
+            className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
+          >
+            {error}
+          </div>
+        )}
         <form onSubmit={onSubmit} className="space-y-3">
           {!isLogin ? (
             <AppInput
@@ -237,10 +244,10 @@ export function AuthForms({
               placeholder="Full name"
               value={fullName}
               onChange={(event) => setFullName(event.target.value)}
-              autoComplete="name"
               minLength={2}
               maxLength={120}
               required
+              disabled={loading}
             />
           ) : null}
           <AppInput
@@ -251,6 +258,7 @@ export function AuthForms({
             onChange={(event) => setEmail(event.target.value)}
             autoComplete="email"
             required
+            disabled={loading}
           />
           <PasswordInput
             aria-label="Password"
@@ -261,6 +269,7 @@ export function AuthForms({
             minLength={8}
             showStrength={!isLogin}
             required
+            disabled={loading}
           />
 
           {isLogin ? (
@@ -271,6 +280,7 @@ export function AuthForms({
                   checked={rememberMe}
                   onChange={(event) => setRememberMe(event.target.checked)}
                   className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                  disabled={loading}
                 />
                 Remember me
               </label>

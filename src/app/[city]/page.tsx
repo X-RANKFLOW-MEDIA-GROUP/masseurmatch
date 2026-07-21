@@ -51,8 +51,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   const cityLabel = `${city.name}, ${city.stateCode}`;
 
-  const title = inventoryCount < 10 && inventoryCount > 0
-    ? `${inventoryCount} Verified Male Massage Therapist${inventoryCount === 1 ? "" : "s"} in ${cityLabel}`
+  // Format count for title: use exact number for small counts, add + for larger numbers
+  const countLabel = inventoryCount === 0
+    ? ""
+    : inventoryCount < 10
+      ? String(inventoryCount)
+      : `${inventoryCount}+`;
+
+  const title = countLabel
+    ? `${countLabel} Verified Male Massage Therapists in ${cityLabel}`
     : `Verified Male Massage Therapists in ${cityLabel} | MasseurMatch`;
 
   const description = `Find trusted male massage therapists in ${cityLabel}. LGBTQ+-friendly directory with identity-verified professionals, transparent rates, and direct contact. Compare specialties & availability.`;
