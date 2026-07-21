@@ -41,7 +41,7 @@ import { VoxAiButton } from "./VoxAiButton";
 import { ReportProfileDialog } from "@/components/profile/ReportProfileDialog";
 
 type RelatedProfile = { name: string; slug: string; city: string; profilePhotoUrl?: string };
-type Review = { quote: string; author: string; date?: string };
+type Review = { quote: string; author: string; date?: string; rating?: number; source?: string };
 
 const SERVICE_ICONS: Array<{ test: RegExp; Icon: typeof Sparkles }> = [
   { test: /deep|sport|recovery|trigger|therap/i, Icon: Activity },
@@ -81,7 +81,8 @@ export function VoxProfile({
   availableNow: boolean;
   lgbtqAffirming: boolean;
   knottyPrompt: string;
-  // Optional showcase-only social proof. Real directory profiles never pass these.
+  // Social proof. Directory profiles pass reviews imported (with approval)
+  // from the therapist's profiles on other platforms; each carries its source.
   reviews?: Review[];
   rating?: number;
   reviewCount?: number;
@@ -107,6 +108,7 @@ export function VoxProfile({
 
   const quickNavItems = [
     profile.galleryImages.length > 1 && { label: "Gallery", href: "#gallery" },
+    reviews.length > 0 && { label: "Reviews", href: "#reviews" },
     allServices.length > 0 && { label: "Services", href: "#services" },
     (profile.pricing.length > 0 || hasRate(profile.incallPrice)) && { label: "Rates", href: "#rates" },
     { label: "Availability", href: "#availability" },
@@ -206,7 +208,11 @@ export function VoxProfile({
                 <div className="mt-4 flex items-center gap-2">
                   <span className="flex items-center gap-0.5 text-[#8B1E2D]">
                     {[0, 1, 2, 3, 4].map((i) => (
-                      <Star key={i} className="h-4 w-4 fill-current" strokeWidth={0} />
+                      <Star
+                        key={i}
+                        className={`h-4 w-4 ${i < Math.round(rating) ? "fill-current" : "fill-white/15 text-white/15"}`}
+                        strokeWidth={0}
+                      />
                     ))}
                   </span>
                   <span className="text-sm font-semibold text-white">{rating.toFixed(1)}</span>
@@ -309,7 +315,7 @@ export function VoxProfile({
           </Section>
         )}
 
-        {/* ── Reviews (showcase only — never shown for real directory profiles) */}
+        {/* ── Reviews imported from the therapist's profiles on other platforms */}
         {reviews.length > 0 && (
           <Section id="reviews" eyebrow="Testimonials" title="Client reviews">
             <div className="grid gap-4 md:grid-cols-3">
@@ -318,11 +324,26 @@ export function VoxProfile({
                   key={index}
                   className="flex h-full flex-col rounded-2xl border border-[#E8E8E8] bg-white p-6 shadow-sm"
                 >
-                  <span className="mb-3 flex items-center gap-0.5 text-[#8B1E2D]">
-                    {[0, 1, 2, 3, 4].map((i) => (
-                      <Star key={i} className="h-4 w-4 fill-current" strokeWidth={0} />
-                    ))}
-                  </span>
+                  <div className="mb-3 flex items-center justify-between gap-2">
+                    {typeof review.rating === "number" ? (
+                      <span className="flex items-center gap-0.5 text-[#8B1E2D]">
+                        {[0, 1, 2, 3, 4].map((i) => (
+                          <Star
+                            key={i}
+                            className={`h-4 w-4 ${i < Math.round(review.rating ?? 0) ? "fill-current" : "fill-[#E8E8E8] text-[#E8E8E8]"}`}
+                            strokeWidth={0}
+                          />
+                        ))}
+                      </span>
+                    ) : (
+                      <span aria-hidden="true" />
+                    )}
+                    {review.source && (
+                      <span className="rounded-full border border-[#E8E8E8] bg-[#F7F7F7] px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.14em] text-[#6F6F6F]">
+                        via {review.source}
+                      </span>
+                    )}
+                  </div>
                   <blockquote className="flex-1 text-[15px] leading-7 text-[#3f3a33]">
                     &ldquo;{review.quote}&rdquo;
                   </blockquote>
@@ -333,6 +354,11 @@ export function VoxProfile({
                 </figure>
               ))}
             </div>
+            <p className="mt-4 flex items-center gap-1.5 text-xs text-[#8E8E8E]">
+              <ShieldCheck className="h-3.5 w-3.5 text-[#8B1E2D]" strokeWidth={2.25} />
+              Imported from the therapist&rsquo;s profiles on other platforms and reviewed by
+              MasseurMatch before going live.
+            </p>
           </Section>
         )}
 

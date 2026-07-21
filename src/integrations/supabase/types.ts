@@ -1077,37 +1077,58 @@ export type Database = {
           created_at: string | null
           id: string
           imported_at: string | null
+          is_public: boolean | null
+          migration_id: string | null
           profile_id: string | null
           rating: number | null
           review_date: string | null
+          review_notes: string | null
           review_text: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewer_anonymized: boolean | null
           reviewer_name: string | null
           source_platform: string | null
           source_url: string | null
+          updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           id?: string
           imported_at?: string | null
+          is_public?: boolean | null
+          migration_id?: string | null
           profile_id?: string | null
           rating?: number | null
           review_date?: string | null
+          review_notes?: string | null
           review_text?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_anonymized?: boolean | null
           reviewer_name?: string | null
           source_platform?: string | null
           source_url?: string | null
+          updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           id?: string
           imported_at?: string | null
+          is_public?: boolean | null
+          migration_id?: string | null
           profile_id?: string | null
           rating?: number | null
           review_date?: string | null
+          review_notes?: string | null
           review_text?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_anonymized?: boolean | null
           reviewer_name?: string | null
           source_platform?: string | null
           source_url?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }

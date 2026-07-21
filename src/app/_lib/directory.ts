@@ -188,6 +188,7 @@ export interface ImportedReview {
   rating: number | null;
   reviewer_name: string | null;
   review_date: string | null;
+  source_platform: string | null;
 }
 
 export const getCities = () => US_CITIES;
@@ -467,11 +468,14 @@ export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTher
   ) ?? null;
 };
 
-export const getImportedReviews = async (profileId: string, limit = 5) => {
+export const getImportedReviews = async (profileId: string, limit = 6) => {
+  // RLS already restricts the anon key to approved rows, but filter explicitly
+  // so a policy change can never leak unmoderated reviews.
   const { data } = await supabase
     .from("imported_reviews")
-    .select("id, review_text, rating, reviewer_name, review_date")
+    .select("id, review_text, rating, reviewer_name, review_date, source_platform")
     .eq("profile_id", profileId)
+    .eq("is_public", true)
     .order("review_date", { ascending: false, nullsFirst: false })
     .limit(limit);
 
