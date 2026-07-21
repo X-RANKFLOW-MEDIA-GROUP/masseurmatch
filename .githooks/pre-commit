@@ -1,0 +1,18 @@
+#!/bin/bash
+# Pre-commit hook: Ensure pnpm-lock.yaml is in sync when package.json changes
+
+if git diff --cached --name-only | grep -q "^package.json$"; then
+  echo "📦 package.json changed, updating pnpm-lock.yaml..."
+  pnpm install --lockfile-only --silent
+  
+  if [ $? -ne 0 ]; then
+    echo "❌ Failed to update pnpm-lock.yaml"
+    exit 1
+  fi
+  
+  # Add the updated lockfile to the commit
+  git add pnpm-lock.yaml
+  echo "✓ pnpm-lock.yaml updated and staged"
+fi
+
+exit 0

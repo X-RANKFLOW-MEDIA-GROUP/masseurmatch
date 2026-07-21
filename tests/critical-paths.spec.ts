@@ -262,7 +262,7 @@ test.describe("SEO and metadata", () => {
 
   test("page titles are descriptive", async ({ page }) => {
     const pages = [
-      { url: "/", shouldContain: "coming" },
+      { url: "/", shouldContain: "masseurmatch" },
       { url: "/blog", shouldContain: "blog" },
       { url: "/privacy", shouldContain: "privacy" },
     ];
