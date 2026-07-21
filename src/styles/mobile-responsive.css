@@ -148,12 +148,3 @@ input, textarea, select {
   .modal, [role="dialog"] { z-index: 999; }
   .dropdown { z-index: 100; }
 }
-
-/* COMING SOON MODE - Hide layout components */
-html.coming-soon-mode > body > div[style*="position: relative"] {
-  display: none !important;
-}
-
-html.coming-soon-mode > body footer {
-  display: none !important;
-}
