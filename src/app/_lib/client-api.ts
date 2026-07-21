@@ -61,9 +61,13 @@ export async function requestJson<T>(
   }
 
   const url = typeof input === "string" ? input : input.toString();
-  const isAuthLoginPost = url.includes("/api/auth/login") && init.method === "POST";
+  const needsCsrf =
+    init.method === "POST" &&
+    (url.includes("/api/auth/login") ||
+      url.includes("/api/auth/register") ||
+      url.includes("/api/auth/forgot-password"));
 
-  if (isAuthLoginPost && !headers.has("x-csrf-token")) {
+  if (needsCsrf && !headers.has("x-csrf-token")) {
     const csrfToken = await fetchCsrfToken();
     headers.set("x-csrf-token", csrfToken);
   }
