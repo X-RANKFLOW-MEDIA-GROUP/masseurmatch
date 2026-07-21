@@ -215,7 +215,7 @@ export function buildRobotsRules(): MetadataRoute.Robots["rules"] {
 }
 
 export function buildSitemapSegmentUrls(): string[] {
-  return SITEMAP_SEGMENT_IDS.map((id) => absoluteUrl(`/sitemap/${id}.xml`));
+  return SITEMAP_SEGMENT_IDS.map((id) => absoluteUrl(`/sitemaps/${id}.xml`));
 }
 
 export function buildCoreSitemapEntries(now = new Date()): MetadataRoute.Sitemap {
