@@ -42,7 +42,7 @@ function buildSyncArgs(tier: string, sub: Stripe.Subscription, subscriptionStatu
       : (sub.customer as Stripe.Customer | null)?.id ?? null
 
   return {
-    p_user_id:                sub.metadata?.user_id ?? null,
+    p_user_id:                sub.metadata?.user_id ?? sub.metadata?.userId ?? null,
     p_stripe_customer_id:     customerId,
     p_stripe_subscription_id: sub.id,
     p_tier:                   tier,
@@ -59,12 +59,20 @@ async function recordStripeEvent(
 ): Promise<boolean> {
   const { data: existingEvent, error: lookupError } = await supabase
     .from('stripe_events')
-    .select('stripe_event_id')
+    .select('stripe_event_id, processing_error')
     .eq('stripe_event_id', event.id)
     .maybeSingle()
 
   if (lookupError) throw lookupError
-  if (existingEvent) return false
+  if (existingEvent && !existingEvent.processing_error) return false
+  if (existingEvent) {
+    const { error: retryError } = await supabase
+      .from('stripe_events')
+      .update({ payload: event as unknown as Json, processing_error: null, failed_at: null })
+      .eq('stripe_event_id', event.id)
+    if (retryError) throw retryError
+    return true
+  }
 
   const { error: insertError } = await supabase.from('stripe_events').insert({
     stripe_event_id: event.id,
@@ -125,8 +133,8 @@ export async function POST(request: NextRequest) {
         const session = event.data.object as Stripe.Checkout.Session
         const subscriptionId =
           typeof session.subscription === 'string' ? session.subscription : session.subscription?.id
-        const userId = session.metadata?.user_id
-        const planKey = session.metadata?.plan_key
+        const userId = session.metadata?.user_id ?? session.metadata?.userId
+        const planKey = session.metadata?.plan_key ?? session.metadata?.planKey
 
         if (!subscriptionId || !userId) break
 
@@ -144,7 +152,7 @@ export async function POST(request: NextRequest) {
 
       case 'customer.subscription.created': {
         const sub = event.data.object as Stripe.Subscription
-        const tier = planKeyToTier(sub.metadata?.plan_key ?? sub.metadata?.masseurmatch_plan)
+        const tier = planKeyToTier(sub.metadata?.plan_key ?? sub.metadata?.planKey ?? sub.metadata?.masseurmatch_plan)
         const { error } = await supabase.rpc('sync_stripe_subscription', buildSyncArgs(tier, sub))
         if (error) throw error
         break
@@ -205,6 +213,12 @@ export async function POST(request: NextRequest) {
 
     throw error
   }
+
+  const { error: completionError } = await supabase
+    .from('stripe_events')
+    .update({ processing_error: null, failed_at: null, processed_at: new Date().toISOString() })
+    .eq('stripe_event_id', event.id)
+  if (completionError) throw completionError
 
   return NextResponse.json({ received: true })
 }
