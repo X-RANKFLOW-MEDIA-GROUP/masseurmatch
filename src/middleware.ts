@@ -180,8 +180,9 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return permanentRedirect("/pro/dashboard", request);
   }
 
-  if (pathname === "/Auth") {
-    return permanentRedirect("/auth", request);
+  // The standalone /auth page was removed; /login is the canonical entry.
+  if (pathname === "/Auth" || pathname === "/auth") {
+    return permanentRedirect("/login", request);
   }
 
   if (pathname === "/Privacy") {

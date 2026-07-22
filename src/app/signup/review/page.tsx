@@ -20,14 +20,29 @@ import { Badge } from "@/components/ui/badge";
 import { useSignup } from "../_lib/signup-context";
 import { getPlanByTier } from "../_lib/plans";
 
+async function uploadPhoto(file: File): Promise<void> {
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await fetch("/api/provider/photos/upload", {
+    method: "POST",
+    body: formData,
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error ?? `Failed to upload ${file.name}.`);
+  }
+}
+
 export default function SignupReviewPage() {
   const router = useRouter();
   const { state, setSubmissionStatus } = useSignup();
   const [loading, setLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const plan = state.selectedPlanTier ? getPlanByTier(state.selectedPlanTier) : null;
   const p = state.profile;
+  const photoCount = (p.profilePhoto ? 1 : 0) + p.galleryPhotos.length;
 
   async function handleSubmit() {
     setError(null);
@@ -49,6 +64,18 @@ export default function SignupReviewPage() {
       if (!state.selectedPlanTier) {
         throw new Error("Please select a subscription plan before submitting.");
       }
+
+      // Upload photos first so they actually reach moderation with the
+      // profile — they were previously collected and silently discarded.
+      const photos: File[] = [
+        ...(p.profilePhoto ? [p.profilePhoto] : []),
+        ...p.galleryPhotos,
+      ];
+      for (let i = 0; i < photos.length; i += 1) {
+        setUploadProgress(`Uploading photo ${i + 1} of ${photos.length}…`);
+        await uploadPhoto(photos[i]);
+      }
+      setUploadProgress(null);
 
       // Submit the profile for moderation
       const res = await fetch("/api/signup/submit", {
@@ -96,8 +123,9 @@ export default function SignupReviewPage() {
 
       setSubmissionStatus("pending_approval");
       router.push("/signup/pending");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Submission failed. Please try again.");
+      setUploadProgress(null);
     } finally {
       setLoading(false);
     }
@@ -219,7 +247,9 @@ export default function SignupReviewPage() {
             <div className="flex items-center gap-1">
               <Camera className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="font-medium">
-                {(p.profilePhoto ? 1 : 0) + p.galleryPhotos.length} photo(s)
+                {photoCount > 0
+                  ? `${photoCount} photo(s) — uploaded on submit`
+                  : "No photos — you can add them from your dashboard"}
               </span>
             </div>
             <div className="flex items-center gap-1">
@@ -316,7 +346,7 @@ export default function SignupReviewPage() {
             !state.ageAndConductAttested
           }
         >
-          {loading ? "Submitting…" : "Submit for Review"}
+          {loading ? uploadProgress ?? "Submitting…" : "Submit for Review"}
         </Button>
       </div>
     </div>
