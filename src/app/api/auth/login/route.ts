@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     }
 
     // Sign in through the cookie-bound server client. Supabase writes the
-    // (HttpOnly) auth cookies onto the response automatically — the session is
+    // auth cookies onto the response automatically — the session is
     // never handed back in the JSON body.
     const supabase = await createServerSupabase();
     const { data, error } = await supabase.auth.signInWithPassword({

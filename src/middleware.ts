@@ -11,6 +11,18 @@ function permanentRedirect(path: string, request: NextRequest): NextResponse {
   return NextResponse.redirect(new URL(path, request.url), { status: 301 });
 }
 
+// Carry any auth cookies that updateSession rotated (a refreshed access/refresh
+// token pair) onto a redirect response. Without this, redirecting after a
+// silent token refresh discards the new cookies and the browser keeps the old,
+// now-revoked refresh token — silently logging the user out.
+function withSessionCookies(
+  response: NextResponse,
+  sessionResponse: NextResponse | null,
+): NextResponse {
+  sessionResponse?.cookies.getAll().forEach((cookie) => response.cookies.set(cookie));
+  return response;
+}
+
 const PUBLIC_RATE_LIMIT = { windowMs: 60_000, max: 240 };
 const publicHits = new Map<string, { count: number; resetAt: number }>();
 
@@ -144,7 +156,10 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
     if (session.role !== "admin") {
       const baseHost = host.replace(/^admin\./, "");
-      return NextResponse.redirect(new URL(`${request.nextUrl.protocol}//${baseHost}/`));
+      return withSessionCookies(
+        NextResponse.redirect(new URL(`${request.nextUrl.protocol}//${baseHost}/`)),
+        sessionResponse,
+      );
     }
     const rewriteUrl = request.nextUrl.clone();
     rewriteUrl.pathname = adminPathname;
@@ -323,7 +338,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       return NextResponse.redirect(loginUrl);
     }
     if (session.role !== "provider" && session.role !== "admin") {
-      return NextResponse.redirect(new URL("/", request.url));
+      return withSessionCookies(NextResponse.redirect(new URL("/", request.url)), sessionResponse);
     }
   }
 
@@ -334,7 +349,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       return NextResponse.redirect(loginUrl);
     }
     if (session.role !== "client") {
-      return NextResponse.redirect(new URL("/", request.url));
+      return withSessionCookies(NextResponse.redirect(new URL("/", request.url)), sessionResponse);
     }
   }
 
@@ -345,7 +360,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       return NextResponse.redirect(loginUrl);
     }
     if (session.role !== "admin") {
-      return NextResponse.redirect(new URL("/", request.url));
+      return withSessionCookies(NextResponse.redirect(new URL("/", request.url)), sessionResponse);
     }
   }
 

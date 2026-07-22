@@ -65,7 +65,7 @@ export async function POST(request: Request) {
 
     // When email confirmation is enabled, `session` is null and the auth
     // cookies are NOT set — the user must confirm first. When it is disabled,
-    // signUp already wrote the (HttpOnly) session cookies onto the response.
+    // signUp already wrote the session cookies onto the response.
     return json({
       ok: true,
       user: { id: data.user.id, email: data.user.email },
