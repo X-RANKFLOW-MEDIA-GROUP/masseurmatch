@@ -112,7 +112,7 @@ function validateTravelSchedule(
 
 export async function GET(request: Request) {
   try {
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const admin = createSupabaseAdminClient();
     const data = await loadOrCreateGrowthProfile(admin, session);
     const tier = normalizeProviderTier(data.subscription_tier);
@@ -133,7 +133,7 @@ export async function POST(request: Request) {
   try {
     assertRateLimit(request, "pro-growth", { limit: 30, windowMs: 60_000 });
 
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const body = await parseJsonBody(request, growthSchema);
     const admin = createSupabaseAdminClient();
     const profile = await loadOrCreateGrowthProfile(admin, session);
