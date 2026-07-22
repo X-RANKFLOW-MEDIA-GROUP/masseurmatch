@@ -82,14 +82,7 @@ const webSiteSchema = {
 
 function RootPageContent() {
   if (SHOW_COMING_SOON) {
-    if (typeof document !== "undefined") {
-      document.documentElement.classList.add("coming-soon-mode");
-    }
     return <ComingSoonPage />;
-  }
-
-  if (typeof document !== "undefined") {
-    document.documentElement.classList.remove("coming-soon-mode");
   }
 
   const faqSchema = generateFAQSchema(DIRECTORY_FAQ_SCHEMA);
