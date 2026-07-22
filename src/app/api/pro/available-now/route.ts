@@ -4,20 +4,11 @@ import { requireRequestSession } from "@/app/_lib/session";
 import { getAvailableNowProfile, recordAuditLog, setAvailableNow } from "@/app/_lib/store";
 import { z } from "zod";
 
-const activateSchema = z.object({
-  activate: z.boolean(),
-});
+const activateSchema = z.object({ activate: z.boolean() });
 
 type SubscriptionTier = "free" | "standard" | "pro" | "elite";
+type TierRule = { durationMinutes: number; label: string };
 
-type TierRule = {
-  durationMinutes: number;
-  label: string;
-};
-
-// Product rule: Free = 30 minutes, Standard = 60 minutes,
-// Pro and Elite = 120 minutes. A provider who turns the badge off early must
-// wait until the original window expires before starting another window.
 const TIER_RULES: Record<SubscriptionTier, TierRule> = {
   free: { durationMinutes: 30, label: "30 minutes" },
   standard: { durationMinutes: 60, label: "1 hour" },
@@ -28,9 +19,7 @@ const TIER_RULES: Record<SubscriptionTier, TierRule> = {
 const VALID_TIERS = new Set<SubscriptionTier>(["free", "standard", "pro", "elite"]);
 
 function toTier(value: string | null | undefined): SubscriptionTier {
-  if (value !== null && value !== undefined && VALID_TIERS.has(value as SubscriptionTier)) {
-    return value as SubscriptionTier;
-  }
+  if (value && VALID_TIERS.has(value as SubscriptionTier)) return value as SubscriptionTier;
   return "free";
 }
 
@@ -45,57 +34,45 @@ export async function POST(request: Request) {
     const session = requireRequestSession(request);
     const body = await parseJsonBody(request, activateSchema);
     const profile = await getAvailableNowProfile(session.userId);
-
     if (!profile) throw new RouteError(404, "Profile not found.");
 
     const tier = toTier(profile.subscription_tier);
     const rules = TIER_RULES[tier];
     const now = new Date();
     const currentExpiry = profile.available_now_expires ? new Date(profile.available_now_expires) : null;
-    const hasValidFutureExpiry =
-      currentExpiry !== null &&
-      !Number.isNaN(currentExpiry.getTime()) &&
-      currentExpiry > now;
+    const hasValidFutureExpiry = Boolean(
+      currentExpiry && !Number.isNaN(currentExpiry.getTime()) && currentExpiry > now,
+    );
 
     if (!body.activate) {
-      // Preserve the original expiry as a cooldown. Clearing it allowed users to
-      // repeatedly turn the badge off and immediately restart a fresh window.
       await setAvailableNow(session.userId, {
         available_now: false,
-        available_now_expires: hasValidFutureExpiry ? currentExpiry.toISOString() : null,
+        available_now_expires: hasValidFutureExpiry && currentExpiry ? currentExpiry.toISOString() : null,
       });
 
       await recordAuditLog(session.userId, "provider.available_now.deactivate", "profile", profile.id, {
         tier,
-        cooldownUntil: hasValidFutureExpiry ? currentExpiry.toISOString() : null,
+        cooldownUntil: hasValidFutureExpiry && currentExpiry ? currentExpiry.toISOString() : null,
       });
 
       return json({
         ok: true,
         available_now: false,
-        cooldown_until: hasValidFutureExpiry ? currentExpiry.toISOString() : null,
-        remaining_seconds: hasValidFutureExpiry ? remainingSeconds(currentExpiry, now) : 0,
+        cooldown_until: hasValidFutureExpiry && currentExpiry ? currentExpiry.toISOString() : null,
+        remaining_seconds: hasValidFutureExpiry && currentExpiry ? remainingSeconds(currentExpiry, now) : 0,
       });
     }
 
-    if (hasValidFutureExpiry) {
-      const seconds = remainingSeconds(currentExpiry, now);
+    if (hasValidFutureExpiry && currentExpiry) {
       throw new RouteError(
         409,
         `Your previous Available Now window is still running. You can activate it again after ${currentExpiry.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}.`,
         "AVAILABLE_NOW_COOLDOWN",
-        {
-          cooldown_until: currentExpiry.toISOString(),
-          remaining_seconds: seconds,
-        },
       );
     }
 
     if (profile.available_now) {
-      await setAvailableNow(session.userId, {
-        available_now: false,
-        available_now_expires: null,
-      });
+      await setAvailableNow(session.userId, { available_now: false, available_now_expires: null });
     }
 
     const expiresAt = new Date(now.getTime() + rules.durationMinutes * 60_000);
