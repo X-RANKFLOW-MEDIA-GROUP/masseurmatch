@@ -19,12 +19,10 @@ export async function POST(request: Request) {
   try {
     assertRateLimit(request, "pro-moderate-content", { limit: 10, windowMs: 60_000 });
 
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const profile = await getProfileByUserId(session.userId);
 
-    if (!profile) {
-      return errorResponse(new Error("Profile not found."));
-    }
+    if (!profile) return errorResponse(new Error("Profile not found."));
 
     const body = await parseJsonBody(request, moderateContentSchema);
 
@@ -32,12 +30,7 @@ export async function POST(request: Request) {
       await recordAuditLog(session.userId, "provider.content.flagged", "profile", profile.id, {
         reason: "AI moderation unavailable — queued for manual review",
       });
-
-      return json({
-        ok: true,
-        state: "pending" as const,
-        message: "Content queued for manual review.",
-      });
+      return json({ ok: true, state: "pending" as const, message: "Content queued for manual review." });
     }
 
     const system = [
@@ -62,21 +55,11 @@ export async function POST(request: Request) {
     let aiDecision: AiDecision;
     try {
       if (!result) throw new Error("No AI response");
-      const cleaned = result.text
-        .replace(/^```(?:json)?/i, "")
-        .replace(/```$/, "")
-        .trim();
+      const cleaned = result.text.replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
       aiDecision = JSON.parse(cleaned) as AiDecision;
-
-      if (!["SAFE", "UNSAFE"].includes(aiDecision.status)) {
-        throw new Error("Invalid AI response status");
-      }
+      if (!["SAFE", "UNSAFE"].includes(aiDecision.status)) throw new Error("Invalid AI response status");
     } catch {
-      aiDecision = {
-        status: "UNSAFE",
-        confidence: 0,
-        reason: "Automated analysis failed — queued for manual review.",
-      };
+      aiDecision = { status: "UNSAFE", confidence: 0, reason: "Automated analysis failed — queued for manual review." };
     }
 
     await recordAuditLog(session.userId, "provider.content.moderated", "profile", profile.id, {
@@ -86,11 +69,7 @@ export async function POST(request: Request) {
     });
 
     if (aiDecision.status === "SAFE") {
-      return json({
-        ok: true,
-        state: "approved" as const,
-        message: "Content approved by AI moderation.",
-      });
+      return json({ ok: true, state: "approved" as const, message: "Content approved by AI moderation." });
     }
 
     return json({
