@@ -1,0 +1,33 @@
+/* Contrast repair for the legacy inline-styled process section on /for-therapists. */
+section[style*="padding: 100px 24px"][style*="background: rgb(17, 17, 17)"] h2,
+section[style*="padding: 100px 24px"][style*="background: rgb(17, 17, 17)"] h3 {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+section[style*="padding: 100px 24px"][style*="background: rgb(17, 17, 17)"] p {
+  color: rgba(255, 255, 255, 0.82) !important;
+  opacity: 1 !important;
+}
+
+section[style*="padding: 100px 24px"][style*="background: rgb(17, 17, 17)"] div[style*="font-size: 32px"] {
+  color: #d4717e !important;
+  opacity: 1 !important;
+}
+
+@media (max-width: 640px) {
+  section[style*="padding: 100px 24px"][style*="background: rgb(17, 17, 17)"] {
+    padding: 64px 20px !important;
+  }
+
+  section[style*="padding: 100px 24px"][style*="background: rgb(17, 17, 17)"] > div > div:last-child {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  section[style*="padding: 100px 24px"][style*="background: rgb(17, 17, 17)"] > div > div:last-child > div {
+    border-left: 0 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+    padding: 24px 8px !important;
+  }
+}
