@@ -10,7 +10,7 @@ function dayKey(iso: string) {
 
 export async function GET(request: Request) {
   try {
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const admin = createSupabaseAdminClient();
 
     const { data: profile, error: profileError } = await admin
@@ -21,8 +21,6 @@ export async function GET(request: Request) {
 
     if (profileError) throw new RouteError(500, profileError.message);
 
-    // No profile yet (e.g. setup incomplete) — return zeros so the page
-    // renders the "No visits yet" empty state instead of an error.
     if (!profile) {
       const since = new Date(Date.now() - (WINDOW_DAYS - 1) * 86_400_000);
       since.setUTCHours(0, 0, 0, 0);
@@ -36,10 +34,7 @@ export async function GET(request: Request) {
     const since = new Date(Date.now() - (WINDOW_DAYS - 1) * 86_400_000);
     since.setUTCHours(0, 0, 0, 0);
 
-    // Safely query events - profile.id should always exist at this point due to line 26 check
-    if (!profile?.id) {
-      throw new RouteError(500, "Profile ID missing");
-    }
+    if (!profile?.id) throw new RouteError(500, "Profile ID missing");
 
     const { data: events, error: eventsError } = await admin
       .from("ranking_events")
@@ -48,11 +43,10 @@ export async function GET(request: Request) {
       .eq("event_name", "profile_viewed")
       .gte("created_at", since.toISOString())
       .order("created_at", { ascending: false })
-      .limit(100); // 30 days of data; even heavily visited profiles stay under 100
+      .limit(100);
 
     if (eventsError) throw new RouteError(500, eventsError.message);
 
-    // Build a continuous 30-day series of daily visitors.
     const buckets = new Map<string, number>();
     for (let i = 0; i < WINDOW_DAYS; i += 1) {
       const d = new Date(since.getTime() + i * 86_400_000);
