@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { createServerClient as createSsrServerClient } from "@supabase/ssr";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import {
   SUPABASE_PUBLIC_URL,
@@ -34,3 +35,10 @@ export async function createServerSupabase() {
 
 /** Compatibility alias for existing server components. */
 export const createServerClient = createServerSupabase;
+
+/** Public anon server client for non-user-scoped legacy endpoints. */
+export function createClient() {
+  return createSupabaseClient<Database>(SUPABASE_PUBLIC_URL, SUPABASE_PUBLIC_ANON_KEY, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
