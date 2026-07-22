@@ -8,7 +8,7 @@ import {
   getSegmentSearchFilters,
   getSegmentBySlug,
 } from "@/app/_lib/directory-taxonomy";
-import { getLaunchKeywordPaths, getLaunchSegmentPaths, isLaunchUrl } from "@/app/_lib/launch-urls";
+import { getLaunchKeywordPaths } from "@/app/_lib/launch-urls";
 import { createPageMetadata } from "@/app/_lib/metadata";
 import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd } from "@/app/_lib/structured-data";
 
@@ -36,7 +36,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const segment = getSegmentBySlug(resolvedParams.segment);
   const routePath = `/${resolvedParams.city}/${resolvedParams.segment}`;
 
-  if (!city || !segment || !isLaunchUrl(routePath)) {
+  // FIRST_30_URLS_IN_ORDER controls launch discovery/sitemap exposure only.
+  // Any city and segment that exist in the canonical data/taxonomy must remain
+  // routable so legacy redirects never terminate at a 404.
+  if (!city || !segment) {
     return createPageMetadata({
       title: "Directory",
       description: "City segment directory page.",
@@ -86,9 +89,8 @@ export default async function CitySegmentPage({ params }: { params: Promise<Para
   const resolvedParams = await params;
   const city = getCities().find((entry) => entry.slug === resolvedParams.city);
   const segment = getSegmentBySlug(resolvedParams.segment);
-  const routePath = `/${resolvedParams.city}/${resolvedParams.segment}`;
 
-  if (!city || !segment || !isLaunchUrl(routePath)) {
+  if (!city || !segment) {
     notFound();
   }
 
