@@ -3,7 +3,7 @@ import { getRequestSession } from '@/app/api/_lib/session'
 import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
 
 export async function GET(request: NextRequest) {
-  const session = getRequestSession(request)
+  const session = await getRequestSession(request)
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const supabase = createSupabaseAdminClient()
@@ -16,7 +16,6 @@ export async function GET(request: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Fetch referenced appointments separately
   const appointmentIds = [...new Set(
     (txns ?? []).map(t => t.appointment_id as string).filter(Boolean)
   )]
@@ -30,7 +29,6 @@ export async function GET(request: NextRequest) {
     appts?.forEach(a => { appointmentsById[a.id] = a })
   }
 
-  // Collect therapist IDs from appointments and fetch profiles separately
   const therapistIds = [...new Set(
     Object.values(appointmentsById).map(a => a.therapist_id).filter((id): id is string => Boolean(id))
   )]
