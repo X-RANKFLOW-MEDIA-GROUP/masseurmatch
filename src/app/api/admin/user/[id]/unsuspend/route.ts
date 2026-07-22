@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, recordAuditLog, requireAdminSession } from "@/app/api/_lib/supabase-server";
+import { revalidatePublicDirectory } from "@/app/_lib/directory-cache";
 
 export async function POST(
   request: Request,
@@ -18,6 +19,8 @@ export async function POST(
       .eq("user_id", userId);
 
     if (error) throw new RouteError(500, error.message);
+
+    revalidatePublicDirectory();
 
     await adminClient.from("admin_actions").insert({
       action: "unsuspend_user",

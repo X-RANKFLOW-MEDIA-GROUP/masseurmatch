@@ -78,6 +78,7 @@ export function AuthForms({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(true);
   const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
 
@@ -103,15 +104,18 @@ export function AuthForms({
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setError(null);
     setLoading(true);
 
     if (isLogin) {
+      // This toggle only controls whether we prefill the email next time — it
+      // does NOT affect session lifetime. Supabase SSR sessions are persistent
+      // with explicit sign-out; there is no session-only mode here.
       localStorage.setItem("mm_remember_me", String(rememberMe));
       if (rememberMe) {
         localStorage.setItem("mm_saved_email", email);
       } else {
         localStorage.removeItem("mm_saved_email");
-        sessionStorage.setItem("mm_session_only", "true");
       }
     }
 
@@ -145,7 +149,7 @@ export function AuthForms({
       });
 
       if (isUserExists) {
-        router.push("/login");
+        setTimeout(() => router.push("/login"), 1000);
       }
       return;
     }
@@ -229,6 +233,14 @@ export function AuthForms({
       <OrDivider />
 
       <div className="mt-4">
+        {error && (
+          <div
+            role="alert"
+            className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
+          >
+            {error}
+          </div>
+        )}
         <form onSubmit={onSubmit} className="space-y-3">
           {!isLogin ? (
             <AppInput
@@ -239,6 +251,7 @@ export function AuthForms({
               minLength={2}
               maxLength={120}
               required
+              disabled={loading}
             />
           ) : null}
           <AppInput
@@ -249,6 +262,7 @@ export function AuthForms({
             onChange={(event) => setEmail(event.target.value)}
             autoComplete="email"
             required
+            disabled={loading}
           />
           <PasswordInput
             aria-label="Password"
@@ -259,6 +273,7 @@ export function AuthForms({
             minLength={8}
             showStrength={!isLogin}
             required
+            disabled={loading}
           />
 
           {isLogin ? (
@@ -269,8 +284,9 @@ export function AuthForms({
                   checked={rememberMe}
                   onChange={(event) => setRememberMe(event.target.checked)}
                   className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                  disabled={loading}
                 />
-                Remember me
+                Remember my email
               </label>
               <Link href={forgotPasswordHref} className="text-sm font-semibold text-primary hover:underline">
                 Forgot password?

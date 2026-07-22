@@ -10,7 +10,7 @@ function dayKey(iso: string) {
 
 export async function GET(request: Request) {
   try {
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const admin = createSupabaseAdminClient();
 
     const { data: profile, error: profileError } = await admin

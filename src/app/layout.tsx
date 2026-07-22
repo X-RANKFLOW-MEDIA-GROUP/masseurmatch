@@ -5,7 +5,6 @@ import { GoogleTagManager } from "@/app/_components/google-tag-manager";
 import { SiteFooter } from "@/app/_components/site-footer";
 import SiteHeader from "@/app/_components/site-header";
 import { CookieConsent } from "@/app/_components/CookieConsent";
-import { AgeGate } from "@/app/_components/AgeGate";
 import { SITE_DESCRIPTION, SITE_NAME, createPageMetadata } from "@/app/_lib/metadata";
 import { AppProviders } from "@/app/providers";
 import { SITE_URL } from "@/lib/site";
@@ -17,8 +16,9 @@ import { satoshi } from "./fonts";
 import SmoothScroll from "@/components/motion/SmoothScroll";
 
 const rootMetadata = createPageMetadata({
-  title: "Premium verified male massage therapist directory",
-  description: SITE_DESCRIPTION,
+  title: "MasseurMatch — Premium Directory of LGBTQ+-Affirming Male Massage Therapists",
+  description:
+    "AI-powered verified therapist discovery — a premium directory of male massage therapists you can trust.",
   path: "/",
 });
 
@@ -43,6 +43,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={satoshi.variable}>
+      <head></head>
       <body className="theme-masseurmatch min-h-screen overflow-x-hidden font-sans text-foreground antialiased">
         <GoogleTagManager />
         <GoogleAnalytics />
@@ -56,7 +57,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </AppMotionShell>
           <SiteFooter />
           <CookieConsent />
-          <AgeGate />
           {/* Knotty floating chat is mounted once inside AppProviders
               (dynamic, ssr:false, wrapped in an error boundary). */}
         </AppProviders>

@@ -1,24 +1,41 @@
 import { createHmac, randomBytes } from "node:crypto";
 import { envOptional } from "@/app/api/_lib/env";
+import { RouteError } from "@/app/api/_lib/http";
 
 const CSRF_COOKIE_NAME = "mm_csrf_token";
 const CSRF_HEADER_NAME = "x-csrf-token";
 const CSRF_TTL_MS = 60 * 60 * 1000; // 1 hour
 
-function getCsrfSecret(): string {
+function getCsrfSecret(): string | null {
   const secret = envOptional(["MM_CSRF_SECRET", "CSRF_SECRET"]);
   if (secret) return secret;
   if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
     return "dev-only-csrf-secret";
   }
-  throw new Error("MM_CSRF_SECRET is required in production");
+  return null;
 }
 
 export function generateCsrfToken(): { token: string; cookie: string } {
+  const secret = getCsrfSecret();
+  if (!secret) {
+    console.error(
+      "[CSRF] MM_CSRF_SECRET is required in production. This will cause authentication to fail.",
+      {
+        env: process.env.NODE_ENV,
+        timestamp: new Date().toISOString(),
+      }
+    );
+    throw new RouteError(
+      503,
+      "Authentication service temporarily unavailable. Please try again in a few moments.",
+      "CSRF_SECRET_MISSING"
+    );
+  }
+
   const randomPart = randomBytes(32).toString("hex");
   const timestamp = Date.now().toString();
   const payload = `${randomPart}.${timestamp}`;
-  const signature = createHmac("sha256", getCsrfSecret()).update(payload).digest("hex");
+  const signature = createHmac("sha256", secret).update(payload).digest("hex");
   const token = `${payload}.${signature}`;
 
   const secure = process.env.NODE_ENV === "production";
@@ -44,6 +61,11 @@ export function generateCsrfToken(): { token: string; cookie: string } {
 
 export function verifyCsrfToken(token: string, cookieValue: string): boolean {
   try {
+    const secret = getCsrfSecret();
+    if (!secret) {
+      return false;
+    }
+
     const [randomPart, timestamp, signature] = token.split(".");
 
     if (!randomPart || !timestamp || !signature) {
@@ -58,7 +80,7 @@ export function verifyCsrfToken(token: string, cookieValue: string): boolean {
 
     // Verify signature
     const payload = `${randomPart}.${timestamp}`;
-    const expectedSignature = createHmac("sha256", getCsrfSecret())
+    const expectedSignature = createHmac("sha256", secret)
       .update(payload)
       .digest("hex");
 

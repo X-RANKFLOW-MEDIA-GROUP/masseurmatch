@@ -18,6 +18,16 @@ export async function GET(request: NextRequest) {
       | "changes_requested"
       | "all";
 
+    // The submission flow writes status = "pending_approval"; the UI filter
+    // says "pending". Map the filter to the real column values so submitted
+    // profiles actually appear in the queue.
+    const STATUS_FILTER: Record<string, string> = {
+      pending: "pending_approval",
+      approved: "approved",
+      rejected: "rejected",
+      changes_requested: "changes_requested",
+    };
+
     let query = supabase
       .from("profiles")
       .select(
@@ -42,7 +52,7 @@ export async function GET(request: NextRequest) {
       .order("submitted_at", { ascending: false });
 
     if (status !== "all") {
-      query = query.eq("status", status);
+      query = query.eq("status", STATUS_FILTER[status] ?? status);
     }
 
     const { data: profiles, error } = await query.limit(50);

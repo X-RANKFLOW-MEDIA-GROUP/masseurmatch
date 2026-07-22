@@ -78,31 +78,31 @@ export default function SmsAdminPage() {
   ] as const
 
   return (
-    <div className="min-h-screen bg-[#111111]">
+    <div className="min-h-full bg-bg-subtle">
       {/* Header */}
-      <div className="border-b border-white/[0.06] px-6 py-6">
+      <div className="border-b border-slate-200 px-6 py-6">
         <div className="mx-auto max-w-6xl flex items-center justify-between">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#8B1E2D]">Admin</p>
-            <h1 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-white">SMS Center</h1>
-            <p className="mt-1 text-sm text-slate-400">Automated SMS responses, logs, and follow-up alerts.</p>
+            <h1 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-slate-900">SMS Center</h1>
+            <p className="mt-1 text-sm text-slate-500">Automated SMS responses, logs, and follow-up alerts.</p>
           </div>
           {/* Twilio status pill */}
           <div className="flex items-center gap-3">
             {twilioLoading ? (
               <Loader2 className="h-4 w-4 animate-spin text-slate-500" strokeWidth={2} />
             ) : twilio?.connected ? (
-              <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs text-emerald-400">
+              <span className="flex items-center gap-1.5 rounded-full border border-[#1E7A46]/30 bg-[#EFF6F1] px-3 py-1.5 text-xs text-[#1E7A46]">
                 <Wifi className="h-3.5 w-3.5" strokeWidth={2.25} /> Connected
               </span>
             ) : (
-              <span className="flex items-center gap-1.5 rounded-full border border-slate-500/20 bg-slate-500/10 px-3 py-1.5 text-xs text-slate-400">
+              <span className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs text-slate-500">
                 <WifiOff className="h-3.5 w-3.5" strokeWidth={2.25} /> Not configured
               </span>
             )}
             <button
               onClick={loadStatus}
-              className="rounded-lg border border-white/10 bg-white/[0.04] p-2 text-slate-400 hover:text-white transition-colors"
+              className="rounded-lg border border-slate-200 bg-white p-2 text-slate-500 hover:text-slate-900 transition-colors"
             >
               <RefreshCw className="h-4 w-4" strokeWidth={2.25} />
             </button>
@@ -111,7 +111,7 @@ export default function SmsAdminPage() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-white/[0.06] px-6">
+      <div className="border-b border-slate-200 px-6">
         <div className="mx-auto max-w-6xl flex gap-1">
           {tabs.map(t => {
             const Icon = t.icon
@@ -122,11 +122,11 @@ export default function SmsAdminPage() {
                 onClick={() => setTab(t.id)}
                 className={`flex items-center gap-2 border-b-2 px-4 py-4 text-sm font-medium transition-colors ${
                   tab === t.id
-                    ? 'border-[#8B1E2D] text-white'
-                    : 'border-transparent text-slate-500 hover:text-slate-300'
+                    ? 'border-[#8B1E2D] text-brand-secondary'
+                    : 'border-transparent text-slate-500 hover:text-slate-900'
                 }`}
               >
-                <Icon className={`h-4 w-4 ${isAlerts && alertCount > 0 ? 'text-amber-400' : ''}`} strokeWidth={2.25} />
+                <Icon className={`h-4 w-4 ${isAlerts && alertCount > 0 ? 'text-amber-700' : ''}`} strokeWidth={2.25} />
                 {t.label}
                 {isAlerts && alertCount > 0 && (
                   <span className="rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-black">
@@ -171,13 +171,13 @@ function ConversationsTab({ twilioReady, twilioLoading }: { twilioReady: boolean
 
   if (!twilioLoading && !twilioReady) {
     return (
-      <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] py-20 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-500/10">
-          <MessageSquare className="h-8 w-8 text-slate-400" strokeWidth={2} />
+      <div className="flex flex-col items-center gap-4 rounded-2xl border border-slate-200 bg-white py-20 text-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+          <MessageSquare className="h-8 w-8 text-slate-500" strokeWidth={2} />
         </div>
         <div>
-          <p className="font-semibold text-white">SMS auto-reply is not yet configured</p>
-          <p className="mx-auto mt-2 max-w-md text-sm text-slate-400">
+          <p className="font-semibold text-slate-900">SMS auto-reply is not yet configured</p>
+          <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
             Connect a Twilio account to enable automated SMS responses. Once configured,
             you can manage conversations, set up auto-replies, and receive follow-up alerts here.
           </p>
@@ -227,16 +227,16 @@ function ConversationsTab({ twilioReady, twilioLoading }: { twilioReady: boolean
             onClick={() => setSelectedConv(conv)}
             className={`w-full rounded-xl border p-3 text-left transition-all ${
               selectedConv?.client_phone === conv.client_phone && selectedConv?.our_phone === conv.our_phone
-                ? 'border-red-500/40 bg-red-500/5'
+                ? 'border-brand-secondary/40 bg-brand-secondary/[0.06]'
                 : conv.unresolved_alert
-                ? 'border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50'
-                : 'border-white/[0.06] bg-white/[0.02] hover:border-white/10'
+                ? 'border-amber-300 bg-amber-50 hover:border-amber-400'
+                : 'border-slate-200 bg-white hover:border-slate-300'
             }`}
           >
             <div className="flex items-center justify-between gap-2">
-              <span className="truncate text-sm font-medium text-white">{conv.client_phone}</span>
+              <span className="truncate text-sm font-medium text-slate-900">{conv.client_phone}</span>
               {conv.unresolved_alert && (
-                <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-400" strokeWidth={2.25} />
+                <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-700" strokeWidth={2.25} />
               )}
             </div>
             <p className="mt-1 truncate text-xs text-slate-500">
@@ -246,7 +246,7 @@ function ConversationsTab({ twilioReady, twilioLoading }: { twilioReady: boolean
               <Clock className="h-3 w-3" strokeWidth={2.25} />
               {formatDistanceToNow(parseISO(conv.last_message_at), { addSuffix: true })}
               {conv.unresolved_alert && conv.minutes_since_reply !== null && (
-                <span className="text-amber-500">{conv.minutes_since_reply}m no reply</span>
+                <span className="text-amber-700">{conv.minutes_since_reply}m no reply</span>
               )}
             </div>
           </button>
@@ -254,17 +254,17 @@ function ConversationsTab({ twilioReady, twilioLoading }: { twilioReady: boolean
       </div>
 
       {/* Conversation detail */}
-      <div className="flex-1 flex flex-col rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
+      <div className="flex-1 flex flex-col rounded-2xl border border-slate-200 bg-white overflow-hidden">
         {selectedConv ? (
           <>
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-white/[0.06] px-4 py-3">
+            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
               <div>
-                <p className="text-sm font-medium text-white">{selectedConv.client_phone}</p>
+                <p className="text-sm font-medium text-slate-900">{selectedConv.client_phone}</p>
                 <p className="text-xs text-slate-500">via {selectedConv.our_phone}</p>
               </div>
               {selectedConv.unresolved_alert && (
-                <span className="flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-xs text-amber-400">
+                <span className="flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs text-amber-700">
                   <AlertTriangle className="h-3 w-3" strokeWidth={2.25} />
                   {selectedConv.minutes_since_reply}m no reply
                 </span>
@@ -280,10 +280,10 @@ function ConversationsTab({ twilioReady, twilioLoading }: { twilioReady: boolean
                 >
                   <div className={`max-w-[75%] rounded-2xl px-3.5 py-2.5 ${
                     msg.direction === 'inbound'
-                      ? 'bg-white/[0.08] text-slate-200'
+                      ? 'bg-slate-100 text-slate-700'
                       : msg.is_manual
-                      ? 'bg-sky-500/20 text-sky-200'
-                      : 'bg-[#8B1E2D]/20 text-red-100'
+                      ? 'bg-slate-100 text-slate-700'
+                      : 'bg-brand-secondary/10 text-brand-secondary'
                   }`}>
                     <p className="text-sm leading-relaxed">{msg.body}</p>
                     <p className="mt-1 text-[10px] opacity-50">
@@ -297,18 +297,18 @@ function ConversationsTab({ twilioReady, twilioLoading }: { twilioReady: boolean
             </div>
 
             {/* Reply box */}
-            <div className="border-t border-white/[0.06] p-3 flex gap-2">
+            <div className="border-t border-slate-200 p-3 flex gap-2">
               <input
                 value={replyText}
                 onChange={e => setReplyText(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendReply()}
                 placeholder="Manual reply…"
-                className="flex-1 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-red-500/50 focus:outline-none"
+                className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-500 focus:border-brand-secondary/50 focus:outline-none"
               />
               <button
                 onClick={sendReply}
                 disabled={replySending || !replyText.trim()}
-                className="flex items-center justify-center rounded-lg bg-[#8B1E2D] px-3 py-2 transition-all hover:bg-red-400 disabled:opacity-60"
+                className="flex items-center justify-center rounded-lg bg-[#8B1E2D] px-3 py-2 transition-all hover:bg-[#6E1521] disabled:opacity-60"
               >
                 {replySending ? (
                   <Loader2 className="h-4 w-4 animate-spin text-white" strokeWidth={2.25} />
@@ -366,12 +366,12 @@ function AlertsTab({ onResolved }: { onResolved: () => void }) {
   if (!alerts.length) {
     return (
       <div className="flex flex-col items-center gap-4 py-20 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10">
-          <CheckCircle2 className="h-8 w-8 text-emerald-400" strokeWidth={2} />
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#EFF6F1]">
+          <CheckCircle2 className="h-8 w-8 text-[#1E7A46]" strokeWidth={2} />
         </div>
         <div>
-          <p className="font-semibold text-white">All caught up!</p>
-          <p className="mt-1 text-sm text-slate-400">No follow-up alerts right now.</p>
+          <p className="font-semibold text-slate-900">All caught up!</p>
+          <p className="mt-1 text-sm text-slate-500">No follow-up alerts right now.</p>
         </div>
       </div>
     )
@@ -379,25 +379,25 @@ function AlertsTab({ onResolved }: { onResolved: () => void }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm text-slate-400">
+      <p className="text-sm text-slate-500">
         {alerts.length} conversation{alerts.length !== 1 ? 's' : ''} waiting 90+ minutes for a reply.
       </p>
       {alerts.map(alert => (
         <div
           key={alert.id}
-          className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 flex items-start gap-4"
+          className="rounded-2xl border border-amber-200 bg-amber-50 p-5 flex items-start gap-4"
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/10">
-            <AlertTriangle className="h-5 w-5 text-amber-400" strokeWidth={2.25} />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-50">
+            <AlertTriangle className="h-5 w-5 text-amber-700" strokeWidth={2.25} />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-semibold text-white">{alert.client_phone}</span>
-              <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-amber-400">
+              <span className="font-semibold text-slate-900">{alert.client_phone}</span>
+              <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-amber-700">
                 {alert.minutes_waiting}m waiting
               </span>
             </div>
-            <p className="mt-1 text-xs text-slate-400">
+            <p className="mt-1 text-xs text-slate-500">
               Last outbound: {format(parseISO(alert.last_outbound_at), 'MMM d, h:mm a')}
               {alert.last_inbound_at && ` · Last reply: ${format(parseISO(alert.last_inbound_at), 'MMM d, h:mm a')}`}
             </p>
@@ -408,7 +408,7 @@ function AlertsTab({ onResolved }: { onResolved: () => void }) {
           <button
             onClick={() => resolve(alert.id)}
             disabled={resolving === alert.id}
-            className="flex shrink-0 items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs font-medium text-emerald-400 transition-all hover:bg-emerald-500/20 disabled:opacity-60"
+            className="flex shrink-0 items-center gap-1.5 rounded-lg border border-[#1E7A46]/30 bg-[#EFF6F1] px-3 py-2 text-xs font-medium text-[#1E7A46] transition-all hover:bg-emerald-500/20 disabled:opacity-60"
           >
             {resolving === alert.id ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={2.25} />
@@ -496,20 +496,20 @@ function ProfilesTab() {
         const hasDraft = Object.keys(draft).length > 0
 
         return (
-          <div key={profile.id} className="rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
+          <div key={profile.id} className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
             {/* Profile header row */}
             <div className="flex items-center gap-4 p-5">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-semibold text-white">
+                  <span className="font-semibold text-slate-900">
                     {(profile.profiles as { display_name?: string } | undefined)?.display_name ?? 'Profile'}
                   </span>
                   <span className={`rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest ${
                     merged.availability_mode === 'in_city'
-                      ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
+                      ? 'border-[#1E7A46]/30 bg-[#EFF6F1] text-[#1E7A46]'
                       : merged.availability_mode === 'unavailable'
-                      ? 'border-rose-500/20 bg-rose-500/10 text-rose-400'
-                      : 'border-amber-500/20 bg-amber-500/10 text-amber-400'
+                      ? 'border-red-200 bg-red-50 text-red-700'
+                      : 'border-amber-200 bg-amber-50 text-amber-700'
                   }`}>
                     {merged.availability_mode.replace('_', ' ')}
                   </span>
@@ -542,7 +542,7 @@ function ProfilesTab() {
 
               <button
                 onClick={() => setExpandedId(isExpanded ? null : profile.id)}
-                className="rounded-lg border border-white/10 bg-white/[0.04] p-2 text-slate-400 hover:text-white transition-colors"
+                className="rounded-lg border border-slate-200 bg-white p-2 text-slate-500 hover:text-slate-900 transition-colors"
               >
                 {isExpanded ? (
                   <ChevronUp className="h-4 w-4" strokeWidth={2.25} />
@@ -554,7 +554,7 @@ function ProfilesTab() {
 
             {/* Expanded settings */}
             {isExpanded && (
-              <div className="border-t border-white/[0.06] p-5 flex flex-col gap-5">
+              <div className="border-t border-slate-200 p-5 flex flex-col gap-5">
                 {/* Availability mode */}
                 <div>
                   <Label>Availability Mode</Label>
@@ -566,7 +566,7 @@ function ProfilesTab() {
                         className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all capitalize ${
                           merged.availability_mode === mode
                             ? 'border-red-500/40 bg-red-500/10 text-red-400'
-                            : 'border-white/10 bg-white/[0.04] text-slate-400 hover:text-white'
+                            : 'border-slate-200 bg-white text-slate-500 hover:text-slate-900'
                         }`}
                       >
                         {mode.replace('_', ' ')}
@@ -693,7 +693,7 @@ function ProfilesTab() {
                   <button
                     onClick={() => saveProfile(profile)}
                     disabled={saving === profile.id}
-                    className="flex items-center justify-center gap-2 rounded-lg bg-[#8B1E2D] px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-red-400 disabled:opacity-60"
+                    className="flex items-center justify-center gap-2 rounded-lg bg-[#8B1E2D] px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-[#6E1521] disabled:opacity-60"
                   >
                     {saving === profile.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2.25} />
@@ -711,11 +711,11 @@ function ProfilesTab() {
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
-const inputCls = "mt-1 w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-red-500/50 focus:outline-none"
+const inputCls = "mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-500 focus:border-brand-secondary/50 focus:outline-none"
 
 function Label({ children, muted }: { children: React.ReactNode; muted?: boolean }) {
   return (
-    <span className={`font-mono text-[10px] uppercase tracking-[0.18em] ${muted ? 'text-slate-600' : 'text-slate-400'}`}>
+    <span className={`font-mono text-[10px] uppercase tracking-[0.18em] ${muted ? 'text-slate-600' : 'text-slate-500'}`}>
       {children}
     </span>
   )
@@ -724,13 +724,13 @@ function Label({ children, muted }: { children: React.ReactNode; muted?: boolean
 function ToggleRow({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-sm text-slate-300">{label}</span>
+      <span className="text-sm text-slate-700">{label}</span>
       <button
         onClick={() => onChange(!value)}
         className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all ${
           value
-            ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
-            : 'border-white/10 bg-white/[0.04] text-slate-500'
+            ? 'border-[#1E7A46]/30 bg-[#EFF6F1] text-[#1E7A46]'
+            : 'border-slate-200 bg-white text-slate-500'
         }`}
       >
         {value ? <ToggleRight className="h-3.5 w-3.5" strokeWidth={2.25} /> : <ToggleLeft className="h-3.5 w-3.5" strokeWidth={2.25} />}
@@ -750,7 +750,7 @@ function Spinner() {
 
 function Empty({ label }: { label: string }) {
   return (
-    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] py-16 text-center text-sm text-slate-500">
+    <div className="rounded-2xl border border-slate-200 bg-white py-16 text-center text-sm text-slate-500">
       {label}
     </div>
   )

@@ -5,7 +5,7 @@ import { notifyAdmin } from "@/app/api/_lib/admin-notify";
 
 export async function POST(request: NextRequest) {
   try {
-    const session = getRequestSession(request);
+    const session = await getRequestSession(request);
     if (!session) {
       return NextResponse.json({ error: "Authentication required." }, { status: 401 });
     }
@@ -17,14 +17,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
     }
 
-    if (!profile.neighborhood?.trim()) {
-      return NextResponse.json({ error: "Neighborhood is required." }, { status: 400 });
-    }
-
-    if (!profile.yearsExperience?.trim()) {
-      return NextResponse.json({ error: "Years of experience is required." }, { status: 400 });
-    }
-
+    // Neighborhood and years of experience are optional in the profile step, so
+    // they must not be hard-required here — the previous mismatch 400'd users
+    // who followed the UI. Starting price stays required for a usable listing.
     if (!profile.startingPrice?.trim()) {
       return NextResponse.json({ error: "Starting price is required." }, { status: 400 });
     }

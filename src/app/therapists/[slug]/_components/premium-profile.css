@@ -865,11 +865,28 @@
 
 /* ── FADE IN ANIMATION ── */
 .pp-fade-in {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
-.pp-fade-in.visible { 
-  opacity: 1; 
-  transform: none; 
+.pp-fade-in:not(.visible) {
+  opacity: 0;
+  transform: translateY(12px);
+}
+.pp-fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Respect user's motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .pp-fade-in {
+    opacity: 1;
+    transform: translateY(0);
+    transition: none;
+  }
+  .pp-fade-in:not(.visible) {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

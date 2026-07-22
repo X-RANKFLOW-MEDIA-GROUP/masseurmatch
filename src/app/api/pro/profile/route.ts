@@ -133,14 +133,14 @@ function parseProfilePayload(raw: unknown) {
 
 export async function GET(request: Request) {
   try {
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const admin = createSupabaseAdminClient();
 
     // Check if this is a dashboard request (minimal data needed)
     const isDashboard = new URL(request.url).searchParams.get("dashboard") === "true";
 
     const select = isDashboard
-      ? "id, display_name, full_name, bio, city, state, status, is_active, available_now, available_now_expires, specialties, incall_price, outcall_price, subscription_tier, is_featured"
+      ? "id, display_name, full_name, bio, city, state, status, is_active, current_status, available_now, available_now_expires, specialties, incall_price, outcall_price, subscription_tier, is_featured"
       : "*"; // Full select for other requests
 
     const { data: profile, error } = await admin
@@ -161,7 +161,7 @@ export async function POST(request: Request) {
   try {
     assertRateLimit(request, "pro-profile", { limit: 20, windowMs: 60_000 });
 
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const profile = await getProfileByUserId(session.userId);
 
     if (!profile) {
@@ -380,7 +380,7 @@ export async function PATCH(request: Request) {
   try {
     assertRateLimit(request, "pro-profile", { limit: 30, windowMs: 60_000 });
 
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const profile = await getProfileByUserId(session.userId);
     if (!profile) {
       throw new RouteError(404, "Profile not found.");
@@ -452,8 +452,10 @@ export async function PATCH(request: Request) {
     if (body.weightLb !== undefined) updates.weight_lb = body.weightLb;
     if (body.bodyType !== undefined) updates.body_type = text(body.bodyType);
 
-    if (body.availableNow !== undefined) updates.available_now = body.availableNow;
-    if (body.availableNowExpires !== undefined) updates.available_now_expires = body.availableNowExpires;
+    // available_now / available_now_expires are intentionally NOT writable here.
+    // The paid "Available Now" badge is gated by tier + TTL in
+    // /api/pro/available-now; accepting it on the general profile PATCH let any
+    // user (including Free) grant themselves the badge with no expiry.
     if (body.currentStatus !== undefined) updates.current_status = text(body.currentStatus);
     if (body.lgbtqAffirming !== undefined) updates.lgbtq_affirming = body.lgbtqAffirming;
 

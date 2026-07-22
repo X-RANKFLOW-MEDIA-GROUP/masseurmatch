@@ -6,7 +6,7 @@ import { requireRequestSession } from '@/app/_lib/session';
 // GET /api/contact/inquiries — fetch inquiries for the authenticated therapist
 export async function GET(request: NextRequest) {
   try {
-    const session = requireRequestSession(request as unknown as Request);
+    const session = await requireRequestSession(request as unknown as Request);
     const supabase = createSupabaseAdminClient();
 
     const { searchParams } = new URL(request.url);
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
 // PATCH /api/contact/inquiries?id=xxx — update inquiry status
 export async function PATCH(request: NextRequest) {
   try {
-    const session = requireRequestSession(request as unknown as Request);
+    const session = await requireRequestSession(request as unknown as Request);
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ ok: false, error: 'id required' }, { status: 400 });

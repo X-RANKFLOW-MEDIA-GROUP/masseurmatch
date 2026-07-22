@@ -64,8 +64,13 @@ function SignupVerifyPageInner() {
   useEffect(() => {
     if (authLoading) return;
 
+    // A just-signed-up user awaiting email confirmation has no session yet. Let
+    // them stay on this step and confirm by email, as long as we know their
+    // address from the signup context. Only bounce genuinely cold visits.
     if (!user) {
-      router.replace("/login?redirect=%2Fsignup%2Fverify");
+      if (!state.email) {
+        router.replace("/login?redirect=%2Fsignup%2Fverify");
+      }
       return;
     }
 
@@ -172,6 +177,9 @@ function SignupVerifyPageInner() {
       const { error: resendError } = await supabase.auth.resend({
         type: "signup",
         email: state.email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/signup/profile`,
+        },
       });
 
       if (resendError) throw resendError;
@@ -191,7 +199,7 @@ function SignupVerifyPageInner() {
       const { data, error: verifyError } = await supabase.auth.verifyOtp({
         email: state.email,
         token: emailOtp,
-        type: "email",
+        type: "signup",
       });
 
       if (verifyError) throw verifyError;
@@ -252,7 +260,9 @@ function SignupVerifyPageInner() {
 
   function handleContinue() {
     if (!canContinue) return;
-    router.push(idVerified ? "/pro/listing" : "/signup/profile");
+    // Always continue through the wizard (profile → review → submit); jumping to
+    // the listing editor here skipped submission entirely.
+    router.push("/signup/profile");
   }
 
   function renderIdButton() {
@@ -306,7 +316,7 @@ function SignupVerifyPageInner() {
     );
   }
 
-  if (!authLoading && !user) {
+  if (!authLoading && !user && !state.email) {
     return null;
   }
 
@@ -321,6 +331,17 @@ function SignupVerifyPageInner() {
           before your profile can be reviewed.
         </p>
       </div>
+
+      {!user && (
+        <div className="rounded-lg border border-border bg-bg-subtle/40 px-4 py-3 text-sm">
+          <p className="font-medium text-foreground">Confirm your email to continue</p>
+          <p className="mt-1 text-muted-foreground">
+            We sent a confirmation link to{" "}
+            <span className="font-medium text-foreground">{state.email || "your email"}</span>. Click
+            it to finish, or enter the 6-digit code from that email below.
+          </p>
+        </div>
+      )}
 
       {error && (
         <p className="rounded-lg bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
@@ -388,11 +409,12 @@ function SignupVerifyPageInner() {
               <ShieldCheck className="h-5 w-5 text-brand-secondary" />
               <h2 className="font-display text-lg font-semibold">Secure ID Check</h2>
             </div>
-            <Badge variant="outline" className="text-xs text-muted-foreground">Optional now</Badge>
+            <Badge variant="outline" className="text-xs text-muted-foreground">Required to publish</Badge>
           </div>
           <p className="text-sm text-muted-foreground">
-            Verify your identity with a government-issued ID via Stripe. Verified profiles get a
-            trust badge and are approved faster. You can complete this later from your dashboard.
+            Verify your identity with a government-issued ID via Stripe. This is required before your
+            profile can be submitted for review — you can complete it now or at the review step.
+            Verified profiles get a trust badge.
           </p>
           <p className="text-xs text-muted-foreground">
             Verification is handled securely by Stripe Identity. MasseurMatch does not store your ID documents.
@@ -402,7 +424,7 @@ function SignupVerifyPageInner() {
       </Card>
 
       <Button size="lg" className="w-full gap-2" disabled={!canContinue} onClick={handleContinue}>
-        {idVerified ? "Go to Profile Editor" : "Continue to Profile"}
+        Continue to Profile
         <ArrowRight className="h-4 w-4" strokeWidth={2.25} />
       </Button>
 
@@ -413,7 +435,8 @@ function SignupVerifyPageInner() {
       )}
       {state.emailVerified && !idVerified && (
         <p className="text-center text-xs text-muted-foreground">
-          ID verification is optional — you can complete it later from your dashboard.
+          ID verification is required before your profile can be submitted — you can complete it now
+          or at the review step.
         </p>
       )}
     </div>

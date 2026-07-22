@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     // Twilio senders, so it must never be reachable anonymously. Require an
     // authenticated session and restrict non-admins to their own account to
     // prevent notification spoofing, email bombing, and SMS toll fraud.
-    const session = getRequestSession(request);
+    const session = await getRequestSession(request);
     if (!session) {
       return NextResponse.json({ error: "Authentication required." }, { status: 401 });
     }

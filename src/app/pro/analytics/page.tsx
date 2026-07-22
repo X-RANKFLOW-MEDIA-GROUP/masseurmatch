@@ -10,7 +10,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { BarChart2, Eye, Loader2, MousePointerClick, Users } from "lucide-react";
+import { BarChart2, Eye, Loader2, MousePointerClick } from "lucide-react";
 
 import { requestJson } from "@/app/_lib/request";
 
@@ -53,17 +53,11 @@ export default function AnalyticsPage() {
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
           <h1 className="font-display text-3xl font-medium tracking-tight text-slate-900">Analytics</h1>
-          <p className="mt-2 font-sans text-slate-500">Unique daily visitors over the last 30 days.</p>
+          <p className="mt-2 font-sans text-slate-500">Profile views over the last 30 days.</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <StatCard
-          title="Visitors (30d)"
-          icon={Users}
-          value={data ? data.totals.windowUniqueVisitors.toLocaleString() : null}
-          loading={loading}
-        />
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <StatCard
           title="Profile Views (30d)"
           icon={Eye}
@@ -81,7 +75,7 @@ export default function AnalyticsPage() {
 
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="font-display text-lg font-medium text-slate-900">Daily unique visitors</h2>
+          <h2 className="font-display text-lg font-medium text-slate-900">Daily profile views</h2>
           <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">Last 30 days</span>
         </div>
 
@@ -132,7 +126,7 @@ export default function AnalyticsPage() {
                 <Tooltip
                   cursor={{ stroke: "#8B1E2D", strokeWidth: 1, strokeDasharray: "4 4" }}
                   labelFormatter={(label) => formatTick(String(label))}
-                  formatter={(value: number) => [`${value} visitor${value === 1 ? "" : "s"}`, "Unique"]}
+                  formatter={(value: number) => [`${value} view${value === 1 ? "" : "s"}`, "Views"]}
                   contentStyle={{
                     borderRadius: 12,
                     border: "1px solid #e2e8f0",

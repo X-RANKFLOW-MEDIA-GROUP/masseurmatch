@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { JsonLd } from "@/app/_components/json-ld";
 import { HeroCinematic } from "@/components/marketing/HeroCinematic";
 import { AIDiscoverySection } from "@/components/marketing/AIDiscoverySection";
@@ -21,6 +20,7 @@ import {
 import { siteUrl } from "@/lib/site";
 import { getProfilePhotosBatch, getPublicTherapists } from "@/app/_lib/directory";
 import { LANDING_FAQ } from "@/lib/marketing/home-data";
+import type { Metadata } from "next";
 
 export const revalidate = 3600;
 

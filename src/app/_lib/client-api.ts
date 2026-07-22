@@ -1,5 +1,7 @@
 "use client";
 
+import { getCsrfToken, clearCsrfToken } from "@/app/_lib/csrf-client";
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -25,6 +27,15 @@ async function parsePayload(response: Response) {
   }
 }
 
+function needsCsrfToken(url: string, method?: string): boolean {
+  return (
+    method === "POST" &&
+    (url.includes("/api/auth/login") ||
+      url.includes("/api/auth/register") ||
+      url.includes("/api/auth/forgot-password"))
+  );
+}
+
 export async function requestJson<T>(
   input: RequestInfo | URL,
   init: RequestInit = {},
@@ -35,11 +46,30 @@ export async function requestJson<T>(
     headers.set("Content-Type", "application/json");
   }
 
-  const response = await fetch(input, {
+  const url = typeof input === "string" ? input : input.toString();
+  const csrfProtected = needsCsrfToken(url, init.method) && !headers.has("x-csrf-token");
+
+  if (csrfProtected) {
+    headers.set("x-csrf-token", await getCsrfToken());
+  }
+
+  let response = await fetch(input, {
     credentials: "include",
     ...init,
     headers,
   });
+
+  // The cached CSRF token can outlive the server-side one (1h TTL). On a
+  // CSRF rejection, refetch a fresh token and retry once.
+  if (response.status === 403 && csrfProtected) {
+    clearCsrfToken();
+    headers.set("x-csrf-token", await getCsrfToken());
+    response = await fetch(input, {
+      credentials: "include",
+      ...init,
+      headers,
+    });
+  }
 
   const payload = await parsePayload(response);
 

@@ -115,8 +115,8 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
               itemProp="image"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
-              <span className="font-display text-4xl font-extrabold text-neutral-300">
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#F8EDEE] to-[#E8D4D8]">
+              <span className="font-display text-4xl font-extrabold text-[#8B1E2D]">
                 {initials}
               </span>
             </div>

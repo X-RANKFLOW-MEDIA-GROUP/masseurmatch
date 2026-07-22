@@ -126,6 +126,7 @@ alter table public.profiles
   add column if not exists is_featured boolean default false,
   add column if not exists is_suspended boolean default false,
   add column if not exists is_banned boolean default false,
+  add column if not exists is_demo boolean not null default false,
   add column if not exists subscription_tier text default 'free',
   add column if not exists subscription_status text,
   add column if not exists stripe_customer_id text,
@@ -1551,4 +1552,14 @@ create table if not exists public.user_mfa (
   backup_codes text[] not null,
   enabled_at timestamptz not null,
   updated_at timestamptz default timezone('utc', now())
+);
+
+-- Durable storage for admin-editable content (blog posts, city intros,
+-- keywords). Singleton row keyed by 'singleton'; service-role only.
+create table if not exists public.admin_content (
+  id text primary key default 'singleton',
+  blog_posts jsonb not null default '[]'::jsonb,
+  cities jsonb not null default '[]'::jsonb,
+  keywords jsonb not null default '[]'::jsonb,
+  updated_at timestamptz not null default now()
 );

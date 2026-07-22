@@ -2,6 +2,17 @@ export const dynamic = "force-dynamic";
 import { z } from "zod";
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, recordAuditLog, requireAdminSession } from "@/app/api/_lib/supabase-server";
+import { SUPABASE_PUBLIC_URL } from "@/integrations/supabase/client";
+
+// Prefer the stored public URL; otherwise derive one from the storage path.
+// Rendering the raw storage_path in <img src> produced broken images.
+function photoUrl(url: unknown, storagePath: unknown): string {
+  if (typeof url === "string" && url) return url;
+  if (typeof storagePath === "string" && storagePath) {
+    return `${SUPABASE_PUBLIC_URL}/storage/v1/object/public/therapist-photos/${storagePath}`;
+  }
+  return "";
+}
 
 const moderatePhotoSchema = z.object({
   photoId: z.string().min(1),
@@ -16,7 +27,7 @@ export async function GET(request: Request) {
 
     const { data: photos, error } = await adminClient
       .from("profile_photos")
-      .select("id, profile_id, storage_path, is_primary, sort_order, moderation_status, moderation_reason, created_at, profiles!profile_photos_profile_id_fkey(id, display_name, full_name, city)")
+      .select("id, profile_id, url, storage_path, is_primary, sort_order, moderation_status, moderation_reason, created_at, profiles!profile_photos_profile_id_fkey(id, display_name, full_name, city)")
       .order("created_at", { ascending: false })
       .limit(100);
 
@@ -24,7 +35,7 @@ export async function GET(request: Request) {
       // If foreign key join fails, fall back to photos only
       const { data: fallbackPhotos, error: fallbackError } = await adminClient
         .from("profile_photos")
-        .select("id, profile_id, storage_path, is_primary, sort_order, moderation_status, moderation_reason, created_at")
+        .select("id, profile_id, url, storage_path, is_primary, sort_order, moderation_status, moderation_reason, created_at")
         .order("created_at", { ascending: false })
         .limit(100);
 
@@ -35,7 +46,7 @@ export async function GET(request: Request) {
         photos: (fallbackPhotos ?? []).map((p: any) => ({
           id: p.id,
           profileId: p.profile_id,
-          url: p.storage_path || "",
+          url: photoUrl(p.url, p.storage_path),
           position: p.sort_order ?? 0,
           moderationStatus: p.moderation_status,
           moderationReason: p.moderation_reason,
@@ -50,7 +61,7 @@ export async function GET(request: Request) {
       photos: (photos ?? []).map((p: any) => ({
         id: p.id,
         profileId: p.profile_id,
-        url: p.storage_path || "",
+        url: photoUrl(p.url, p.storage_path),
         position: p.sort_order ?? 0,
         moderationStatus: p.moderation_status,
         moderationReason: p.moderation_reason,

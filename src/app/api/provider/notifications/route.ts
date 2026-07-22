@@ -4,7 +4,7 @@ import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 
 export async function GET(request: Request) {
   try {
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const supabase = createSupabaseAdminClient();
 
     const { searchParams } = new URL(request.url);
@@ -37,7 +37,7 @@ export async function GET(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const { searchParams } = new URL(request.url);
     const notificationId = searchParams.get("id");
 

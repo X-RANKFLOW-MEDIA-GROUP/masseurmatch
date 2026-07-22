@@ -11,11 +11,10 @@ const nextCommand =
   process.platform === "win32"
     ? path.join(process.cwd(), "node_modules", ".bin", "next.cmd")
     : path.join(process.cwd(), "node_modules", ".bin", "next");
-// Force the webpack bundler: this project ships a custom `webpack` config
-// (see next.config.mjs) with no Turbopack equivalent, and Next 16 makes
-// Turbopack the default — which fatally errors on that config and kills the
-// dev server before it becomes ready. Match the `dev`/`build` scripts.
-const nextArgs = ["dev", "--webpack", "-p", port, "--hostname", "127.0.0.1"];
+// This project ships a custom `webpack` config (see next.config.mjs).
+// Next.js 15+ no longer supports the --webpack CLI flag; the webpack function
+// in the config is used automatically by default.
+const nextArgs = ["dev", "-p", port, "--hostname", "127.0.0.1"];
 const serverCommand =
   process.platform === "win32" ? "powershell.exe" : nextCommand;
 const serverArgs =
@@ -72,8 +71,13 @@ async function request(path, init = {}) {
     headers.set("Content-Type", "application/json");
   }
 
+  if (testCookie && !headers.has("cookie")) {
+    headers.set("cookie", testCookie);
+  }
+
   const response = await fetch(`${baseUrl}${path}`, {
     redirect: "manual",
+    credentials: "include",
     ...init,
     headers,
   });
@@ -83,6 +87,41 @@ async function request(path, init = {}) {
     response,
     text,
     json: parseJson(text),
+  };
+}
+
+let testCookie = "";
+
+async function getCsrfToken() {
+  const headers = new Headers();
+  if (testCookie) {
+    headers.set("cookie", testCookie);
+  }
+
+  const response = await fetch(`${baseUrl}/api/auth/login`, {
+    method: "GET",
+    credentials: "include",
+    headers,
+  });
+
+  const text = await response.text();
+  const json = parseJson(text);
+
+  if (!response.ok || !json?.csrfToken) {
+    throw new Error("Failed to fetch CSRF token for test");
+  }
+
+  const setCookie = response.headers.get("set-cookie");
+  if (setCookie) {
+    const match = setCookie.match(/mm_csrf_token=([^;]+)/);
+    if (match?.[1]) {
+      testCookie = `mm_csrf_token=${match[1]}`;
+    }
+  }
+
+  return {
+    token: json.csrfToken,
+    response,
   };
 }
 
@@ -141,8 +180,12 @@ try {
   await waitForServer();
 
   {
+    const { token } = await getCsrfToken();
     const { response, json } = await request("/api/auth/forgot-password", {
       method: "POST",
+      headers: {
+        "x-csrf-token": token,
+      },
       body: JSON.stringify({
         email: "therapist@example.com",
         redirectTo: `${baseUrl}/reset-password`,
@@ -212,8 +255,12 @@ try {
   }
 
   {
+    const { token } = await getCsrfToken();
     const { response, json } = await request("/api/auth/login", {
       method: "POST",
+      headers: {
+        "x-csrf-token": token,
+      },
       body: JSON.stringify({
         email: "not-an-email",
         password: "short",
@@ -226,8 +273,12 @@ try {
   }
 
   {
+    const { token } = await getCsrfToken();
     const { response, json } = await request("/api/auth/register", {
       method: "POST",
+      headers: {
+        "x-csrf-token": token,
+      },
       body: JSON.stringify({
         fullName: "A",
         email: "bad",

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { JsonLd } from "@/app/_components/json-ld";
 import { getCanonicalCitySlug, resolveCitySlug } from "@/app/_lib/city-routing";
 import {
@@ -90,6 +90,11 @@ export default async function CanonicalCityCategoryPage({ params }: { params: Pr
 
   if (!category) {
     notFound();
+  }
+
+  // Redirect legacy /cities/{slug}/{category} routes to canonical paths
+  if (resolved.city !== citySlug) {
+    redirect(`/${citySlug}/${category.slug}`);
   }
 
   const cityPath = `/cities/${canonicalCity}`;

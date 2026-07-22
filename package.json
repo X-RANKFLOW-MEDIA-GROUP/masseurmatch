@@ -35,7 +35,8 @@
     "install:gitleaks": "curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/main/install.sh | sh -s -- -b ./bin",
     "scan:secrets": "./bin/gitleaks detect --source . --verbose",
     "audit": "pnpm audit",
-    "audit:fix": "pnpm audit --fix"
+    "audit:fix": "pnpm audit --fix",
+    "test:hourly": "node scripts/hourly-website-tests.mjs"
   },
   "dependencies": {
     "@bugsnag/browser-performance": "^2.15.0",
@@ -114,6 +115,7 @@
     "tailwindcss-animate": "^1.0.7",
     "twilio": "^5.13.1",
     "vaul": "^0.9.9",
+    "web-vitals": "^5.3.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {

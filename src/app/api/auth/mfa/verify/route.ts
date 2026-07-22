@@ -3,9 +3,12 @@ import { requireSession } from "@/app/api/_lib/supabase-server";
 import { createSupabaseWebhookAdminClient } from "@/app/api/_lib/supabase-server";
 import { verifyTotp } from "@/app/api/_lib/totp";
 import { RouteError } from "@/app/api/_lib/http";
+import { assertRateLimit } from "@/app/_lib/security";
 
 export async function POST(request: Request) {
   try {
+    // Throttle code guessing: a 6-digit TOTP is brute-forceable otherwise.
+    assertRateLimit(request, "auth-mfa-verify", { limit: 5, windowMs: 60_000 });
     const session = await requireSession(request);
     let code: string;
     try {

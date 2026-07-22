@@ -137,11 +137,13 @@ export default function KeywordTrendsDashboard({
     );
   }
 
+  // Brand-aligned chart palette (sober red / ink / warm neutrals) — the old
+  // orange (#FF8A1F) and navy (#1E4B8F) were leftovers from the retired scheme.
   const colors = [
     "#8B1E2D",
-    "#FF8A1F",
-    "#1E4B8F",
-    "#6F8B7A",
+    "#111111",
+    "#6E1521",
+    "#8E8E8E",
     "#C47B5E",
   ];
 

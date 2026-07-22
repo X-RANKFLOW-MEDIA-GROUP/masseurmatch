@@ -16,10 +16,7 @@ export type AuthMutationResponse = {
     email: string;
   };
   role: "admin" | "provider" | "client" | null;
-  session?: {
-    access_token: string;
-    refresh_token: string;
-  } | null;
+  redirect?: string;
   requiresEmailConfirmation?: boolean;
   message?: string;
 };

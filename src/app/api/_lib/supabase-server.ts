@@ -125,7 +125,7 @@ export async function getUserRole(userId: string): Promise<AppRole | null> {
 }
 
 export async function requireSession(request: Request | { headers: { get: (name: string) => string | null } }): Promise<RequestSession> {
-  const session = getRequestSession(request as Request);
+  const session = await getRequestSession(request as Request);
 
   if (!session) {
     throw new RouteError(401, "Authentication required.");
@@ -315,6 +315,19 @@ export async function ensureUserProfileAndRole(
     }
 
     role = defaultRole;
+  }
+
+  // Mirror the role into app_metadata (server-writable only) so the middleware
+  // and route handlers can trust it for authorization without a DB round-trip.
+  const currentMetaRole = (user.app_metadata as Record<string, unknown> | undefined)?.role;
+  if (currentMetaRole !== role) {
+    try {
+      await adminClient.auth.admin.updateUserById(user.id, {
+        app_metadata: { ...(user.app_metadata ?? {}), role },
+      });
+    } catch {
+      // Best-effort — user_roles remains the source of truth.
+    }
   }
 
   if (user.email) {

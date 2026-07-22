@@ -1,4 +1,4 @@
-import { createServerClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -34,7 +34,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const supabase = await createServerClient();
+    // keyword_trends / keyword_insights are not in the generated Supabase
+    // types, so use a loosely-typed handle for these inserts.
+    const supabase = createAdminClient() as unknown as { from: (table: string) => any };
 
     // Insert trends data
     const { data: insertedData, error: insertError } = await supabase

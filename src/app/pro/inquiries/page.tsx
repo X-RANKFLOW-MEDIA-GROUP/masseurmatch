@@ -76,7 +76,7 @@ export default function InquiriesDashboard() {
 
   const getStatusBadge = (status: string | null) => {
     const variants: Record<string, string> = {
-      new: 'bg-blue-100 text-blue-800',
+      new: 'bg-brand-secondary/10 text-brand-secondary',
       viewed: 'bg-purple-100 text-purple-800',
       responded: 'bg-emerald-100 text-emerald-800',
       archived: 'bg-gray-100 text-gray-800',
@@ -121,7 +121,7 @@ export default function InquiriesDashboard() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'New', count: statusCounts.new, color: 'bg-blue-50 border-blue-200' },
+            { label: 'New', count: statusCounts.new, color: 'bg-brand-secondary/[0.06] border-brand-secondary/25' },
             { label: 'Viewed', count: statusCounts.viewed, color: 'bg-purple-50 border-purple-200' },
             { label: 'Responded', count: statusCounts.responded, color: 'bg-emerald-50 border-emerald-200' },
             { label: 'Archived', count: statusCounts.archived, color: 'bg-gray-50 border-gray-200' },
@@ -182,14 +182,14 @@ export default function InquiriesDashboard() {
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
                           <label className="text-sm font-medium">Email</label>
-                          <a href={`mailto:${inquiry.client_email}`} className="mt-1 text-sm text-blue-600 hover:underline block">
+                          <a href={`mailto:${inquiry.client_email}`} className="mt-1 text-sm text-brand-secondary hover:underline block">
                             {inquiry.client_email}
                           </a>
                         </div>
                         {inquiry.client_phone && (
                           <div>
                             <label className="text-sm font-medium">Phone</label>
-                            <a href={`tel:${inquiry.client_phone}`} className="mt-1 text-sm text-blue-600 hover:underline block">
+                            <a href={`tel:${inquiry.client_phone}`} className="mt-1 text-sm text-brand-secondary hover:underline block">
                               {inquiry.client_phone}
                             </a>
                           </div>
