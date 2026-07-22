@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Users, HeartHandshake, ShieldCheck, ShieldAlert, CreditCard,
   FileClock, FileText, BarChart, LifeBuoy, Settings, LogOut, MapPin, Tag,
@@ -43,7 +44,14 @@ const navSections = [
 
 export default function AdminSidebarNav() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { signOut } = useAuth();
   const isActive = (href: string, exact?: boolean) => exact ? pathname === href : pathname?.startsWith(href) ?? false;
+
+  async function handleLogout() {
+    await signOut();
+    router.replace("/login");
+  }
 
   return (
     <nav className="flex flex-1 flex-col overflow-y-auto py-2">
@@ -52,14 +60,14 @@ export default function AdminSidebarNav() {
           <p className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400">{section.title}</p>
           <ul>{section.items.map((item) => {
             const active = isActive(item.href, item.exact);
-            return <li key={item.href}><Link href={item.href} className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${active ? "bg-slate-100 font-medium text-slate-900" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"}`}><item.icon className="h-4 w-4 shrink-0" />{item.label}</Link></li>;
+            return <li key={item.href}><Link href={item.href} className={`flex items-center gap-3 border-l-2 px-4 py-2.5 text-sm transition-colors ${active ? "border-brand-secondary bg-brand-secondary/[0.06] font-medium text-brand-secondary" : "border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900"}`}><item.icon className="h-4 w-4 shrink-0" />{item.label}</Link></li>;
           })}</ul>
         </div>
       ))}
       <div className="mt-auto border-t border-slate-100 pt-2">
         <Link href="/" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50"><Home className="h-4 w-4" />Back to Site</Link>
         <Link href="/pro/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50"><LayoutDashboard className="h-4 w-4" />Pro Dashboard</Link>
-        <Link href="/login" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50"><LogOut className="h-4 w-4" />Logout</Link>
+        <button type="button" onClick={handleLogout} className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-600 hover:bg-slate-50"><LogOut className="h-4 w-4" />Logout</button>
       </div>
     </nav>
   );
