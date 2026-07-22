@@ -43,13 +43,11 @@ function hashIp(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    // Reporting must stay frictionless (FOSTA-SESTA), but abuse-proof.
     assertRateLimit(request, "report-profile", { limit: 6, windowMs: 60_000 });
 
     const body = await parseJsonBody(request, reportSchema);
     const adminClient = createSupabaseAdminClient();
 
-    // Confirm the reported profile exists before recording a report.
     const { data: profile, error: profileError } = await adminClient
       .from("profiles")
       .select("id")
@@ -63,8 +61,7 @@ export async function POST(request: Request) {
       throw new RouteError(404, "Profile not found.");
     }
 
-    // Attribute to a logged-in reporter when we have one; anonymous is allowed.
-    const session = getRequestSession(request);
+    const session = await getRequestSession(request);
     const reporterEmail = body.reporterEmail ? sanitizeOptionalText(body.reporterEmail) : null;
 
     const payload: TablesInsert<"profile_reports"> = {
@@ -80,7 +77,6 @@ export async function POST(request: Request) {
     };
 
     const { error: insertError } = await adminClient.from("profile_reports").insert(payload);
-
     if (insertError) {
       throw new RouteError(500, insertError.message);
     }
