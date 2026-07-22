@@ -2,26 +2,10 @@ import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/h
 import { assertRateLimit } from "@/app/_lib/security";
 import { requireRequestSession } from "@/app/_lib/session";
 import { getAvailableNowProfile, recordAuditLog, setAvailableNow } from "@/app/_lib/store";
+import { AVAILABLE_NOW_RULES, formatDuration, normalizeProviderTier } from "@/lib/provider-product-rules";
 import { z } from "zod";
 
 const activateSchema = z.object({ activate: z.boolean() });
-
-type SubscriptionTier = "free" | "standard" | "pro" | "elite";
-type TierRule = { durationMinutes: number; label: string };
-
-const TIER_RULES: Record<SubscriptionTier, TierRule> = {
-  free: { durationMinutes: 30, label: "30 minutes" },
-  standard: { durationMinutes: 60, label: "1 hour" },
-  pro: { durationMinutes: 120, label: "2 hours" },
-  elite: { durationMinutes: 120, label: "2 hours" },
-};
-
-const VALID_TIERS = new Set<SubscriptionTier>(["free", "standard", "pro", "elite"]);
-
-function toTier(value: string | null | undefined): SubscriptionTier {
-  if (value && VALID_TIERS.has(value as SubscriptionTier)) return value as SubscriptionTier;
-  return "free";
-}
 
 function remainingSeconds(expiresAt: Date, now: Date) {
   return Math.max(0, Math.ceil((expiresAt.getTime() - now.getTime()) / 1000));
@@ -36,8 +20,8 @@ export async function POST(request: Request) {
     const profile = await getAvailableNowProfile(session.userId);
     if (!profile) throw new RouteError(404, "Profile not found.");
 
-    const tier = toTier(profile.subscription_tier);
-    const rules = TIER_RULES[tier];
+    const tier = normalizeProviderTier(profile.subscription_tier);
+    const rules = AVAILABLE_NOW_RULES[tier];
     const now = new Date();
     const currentExpiry = profile.available_now_expires ? new Date(profile.available_now_expires) : null;
     const hasValidFutureExpiry = Boolean(
@@ -93,7 +77,7 @@ export async function POST(request: Request) {
       available_now: true,
       expires_at: expiresAt.toISOString(),
       duration_minutes: rules.durationMinutes,
-      duration_label: rules.label,
+      duration_label: formatDuration(rules.durationMinutes),
     });
   } catch (error) {
     return errorResponse(error);
