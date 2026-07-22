@@ -1,20 +1,7 @@
-import { RouteError } from "@/app/api/_lib/http";
-import {
-  clearSessionCookie,
+export {
   getRequestSession,
-  parseSessionCookieValue,
-  setSessionCookie,
+  requireRequestSession,
+  supabaseFromRequest,
+  normalizeSessionRole,
   type RequestSession,
 } from "@/app/api/_lib/session";
-
-export { clearSessionCookie, getRequestSession, parseSessionCookieValue, setSessionCookie, type RequestSession };
-
-export function requireRequestSession(request: Request): RequestSession {
-  const session = getRequestSession(request);
-
-  if (!session) {
-    throw new RouteError(401, "Authentication required.");
-  }
-
-  return session;
-}
