@@ -95,8 +95,10 @@ export async function uploadSignupProfilePhotos({
       throw new Error(insertError?.message || "Could not save the uploaded photo.");
     }
 
+    // Moderate the original asset so the first asynchronous background-removal
+    // render cannot delay or block safety review.
     await supabase.functions.invoke("moderate-photo", {
-      body: { photo_id: photo.id, image_url: displayUrl },
+      body: { photo_id: photo.id, image_url: originalUrl },
     }).catch(() => null);
 
     uploaded += 1;
