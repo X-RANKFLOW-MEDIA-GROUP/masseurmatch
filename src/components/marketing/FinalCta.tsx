@@ -15,8 +15,7 @@ export function FinalCta() {
   const reduced = useReducedMotion();
 
   return (
-    <section className="relative overflow-hidden py-24 lg:py-36">
-      {/* Background image with parallax */}
+    <section className="relative overflow-hidden py-20 sm:py-24 lg:py-36">
       <ParallaxLayer speed={0.08} className="absolute inset-0">
         <div className="absolute inset-[-10%]">
           <Image
@@ -29,21 +28,12 @@ export function FinalCta() {
           />
         </div>
       </ParallaxLayer>
-      <div className="absolute inset-0 bg-[#111111]/85" />
-
-      {/* Breathing glow accent */}
-      <BreathingGlow
-        color="rgba(139, 30, 45, 0.18)"
-        size={600}
-        duration={6}
-        className="left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-      />
+      <div className="absolute inset-0 bg-[#111111]/88" />
+      <BreathingGlow color="rgba(139, 30, 45, 0.18)" size={600} duration={6} className="left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
 
       <div className="relative mx-auto max-w-[900px] px-4 text-center sm:px-6 lg:px-8">
         <InkReveal origin="center" duration={0.7}>
-          <p className="text-[11px] uppercase tracking-[0.25em] text-white/60">
-            For therapists
-          </p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/70">For therapists</p>
         </InkReveal>
 
         <SplitTextReveal
@@ -55,7 +45,7 @@ export function FinalCta() {
         />
 
         <motion.p
-          className="mx-auto mt-5 max-w-md text-base text-white/70"
+          className="mx-auto mt-5 max-w-md text-base leading-7 text-white/80"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-40px" }}
@@ -65,7 +55,7 @@ export function FinalCta() {
         </motion.p>
 
         <motion.div
-          className="mt-10 flex flex-wrap items-center justify-center gap-3"
+          className="mt-9 flex flex-col items-stretch justify-center gap-3 sm:mt-10 sm:flex-row sm:items-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-40px" }}
@@ -73,8 +63,8 @@ export function FinalCta() {
         >
           <MagneticHover strength={0.15} radius={120}>
             <Link
-              href="/for-therapists"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-primary px-8 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 hover:shadow-[0_0_40px_rgba(139,30,45,0.35)]"
+              href="/signup/account"
+              className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#A91E38] px-8 text-sm font-bold text-white transition-all hover:bg-[#8B1E2D] hover:shadow-[0_0_40px_rgba(139,30,45,0.35)] sm:w-auto"
             >
               List your practice
             </Link>
@@ -82,7 +72,7 @@ export function FinalCta() {
           <MagneticHover strength={0.15} radius={120}>
             <Link
               href="/pricing"
-              className="inline-flex h-12 items-center justify-center rounded-full border border-white/20 px-8 text-sm font-semibold text-white transition-all hover:border-white/40 hover:bg-white/5"
+              className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-white/35 bg-black/10 px-8 text-sm font-bold text-white transition-all hover:border-white/60 hover:bg-white/10 sm:w-auto"
             >
               View pricing
             </Link>
