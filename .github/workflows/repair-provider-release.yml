@@ -1,0 +1,191 @@
+name: Repair provider release
+
+on:
+  push:
+    branches:
+      - release/provider-ready-20260722
+    paths:
+      - .github/workflows/repair-provider-release.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out release branch
+        uses: actions/checkout@v4
+        with:
+          ref: release/provider-ready-20260722
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge current main and resolve ownership boundaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git merge --no-commit --no-ff origin/main || true
+
+          prefer_main() {
+            case "$1" in
+              .github/workflows/* |
+              docs/AUTH_SECURITY.md |
+              package.json |
+              pnpm-lock.yaml |
+              tailwind.config.ts |
+              src/app/_components/auth-forms.tsx |
+              src/app/_lib/client-api.ts |
+              src/app/_lib/session.ts |
+              src/app/_lib/seo-routes.ts |
+              src/app/_lib/revalidate.ts |
+              src/app/admin/layout.tsx |
+              src/app/api/_lib/session.ts |
+              src/app/api/_lib/supabase-server.ts |
+              src/app/api/auth/* |
+              src/app/api/booking/inquire/route.ts |
+              src/app/api/pro/profiles/route.ts |
+              src/app/auth/callback/route.ts |
+              src/components/motion/BreathingGlow.tsx |
+              src/components/motion/GrainOverlay.tsx |
+              src/contexts/AuthContext.tsx |
+              src/lib/supabase/* |
+              src/middleware.ts |
+              supabase/PRODUCTION_SCHEMA_LOCK.sql |
+              supabase/functions/auth-email-hook/* |
+              supabase/migrations/* |
+              tests/unit/auth-email-hook-messages.test.ts)
+                return 0
+                ;;
+              *)
+                return 1
+                ;;
+            esac
+          }
+
+          mapfile -t conflicts < <(git diff --name-only --diff-filter=U)
+          for file in "${conflicts[@]}"; do
+            if prefer_main "$file"; then
+              side="theirs"
+              stage="3"
+            else
+              side="ours"
+              stage="2"
+            fi
+
+            if git ls-files -u -- "$file" | awk -v wanted="$stage" '$3 == wanted { found=1 } END { exit(found ? 0 : 1) }'; then
+              git checkout --"$side" -- "$file"
+              git add -- "$file"
+            else
+              git rm -f --ignore-unmatch -- "$file"
+            fi
+          done
+
+          # Canonical authentication, security and migration history always come
+          # from main. Provider-facing feature files remain from this release.
+          git checkout origin/main -- \
+            .github/workflows \
+            docs/AUTH_SECURITY.md \
+            package.json \
+            pnpm-lock.yaml \
+            tailwind.config.ts \
+            src/app/_components/auth-forms.tsx \
+            src/app/_lib/client-api.ts \
+            src/app/_lib/session.ts \
+            src/app/_lib/seo-routes.ts \
+            src/app/_lib/revalidate.ts \
+            src/app/admin/layout.tsx \
+            src/app/api/_lib/session.ts \
+            src/app/api/_lib/supabase-server.ts \
+            src/app/api/auth \
+            src/app/api/booking/inquire/route.ts \
+            src/app/api/pro/profiles/route.ts \
+            src/app/auth/callback/route.ts \
+            src/components/motion/BreathingGlow.tsx \
+            src/components/motion/GrainOverlay.tsx \
+            src/contexts/AuthContext.tsx \
+            src/lib/supabase \
+            src/middleware.ts \
+            supabase/PRODUCTION_SCHEMA_LOCK.sql \
+            supabase/functions/auth-email-hook \
+            supabase/migrations \
+            tests/unit/auth-email-hook-messages.test.ts
+
+          # Remove legacy files deleted by the Supabase SSR consolidation.
+          git rm -f --ignore-unmatch \
+            src/app/api/_lib/oauth-security.ts \
+            src/app/api/_lib/password-policy.ts \
+            src/app/api/admin/run-migrations/route.ts \
+            src/app/api/auth/signup/route.ts \
+            src/app/auth/AuthPageClient.tsx \
+            src/app/auth/page.tsx \
+            src/app/register/RegisterPageClient.tsx
+
+          if git diff --name-only --diff-filter=U | grep -q .; then
+            echo "Unresolved merge conflicts remain:"
+            git diff --name-only --diff-filter=U
+            exit 1
+          fi
+
+          git add -A
+          git diff --check --cached
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.32.1
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Normalize async session calls
+        run: node scripts/normalize-async-session-calls.mjs
+
+      - name: Validate release
+        env:
+          NEXT_PUBLIC_APP_URL: https://masseurmatch.com
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+        run: |
+          pnpm typecheck
+          pnpm lint
+          pnpm test:unit
+          pnpm validate:db-contract
+          pnpm build
+
+      - name: Commit repaired release branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/repair-provider-release.yml
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "fix(release): reconcile provider features with current main"
+          git push origin HEAD:release/provider-ready-20260722
