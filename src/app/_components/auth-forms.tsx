@@ -127,24 +127,26 @@ export function AuthForms({
 
     if (result.error) {
       const errorMsg = result.error.message || "";
+      const errorCode = (result.error as any)?.code || "";
       const isUserExists =
         errorMsg.includes("already exists") ||
         errorMsg.includes("USER_EXISTS") ||
-        ((typeof (result.error as any)?.code === "string" && (result.error as any).code) === "USER_EXISTS");
+        (typeof errorCode === "string" && errorCode === "USER_EXISTS");
 
-      const displayError = isUserExists
-        ? "An account with this email already exists. Please sign in instead."
-        : errorMsg || (isLogin ? "Login failed. Please try again." : "Could not register. Please try again.");
+      const isInvalidToken =
+        errorCode === "AUTH_INVALID" ||
+        errorMsg.includes("Invalid email or password") ||
+        errorMsg.includes("Invalid token");
 
-      setError(displayError);
-
-      // Log to Bugsnag if available
-      if (typeof window !== "undefined" && (window as any).Bugsnag) {
-        (window as any).Bugsnag.notify(result.error, {
-          context: isLogin ? "login" : "register",
-          severity: "warning",
-        });
-      }
+      toast({
+        title: isLogin ? "Login failed" : "Could not register",
+        description: isUserExists
+          ? "An account with this email already exists. Please sign in instead."
+          : isInvalidToken && isLogin
+            ? "Invalid token please try again"
+            : errorMsg,
+        variant: "destructive",
+      });
 
       if (isUserExists) {
         setTimeout(() => router.push("/login"), 1000);
