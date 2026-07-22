@@ -22,82 +22,54 @@ export function ProviderGrowthCTA() {
   const dur = reducedMotion ? 0 : 0.7;
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-[#ffffff] to-[#f7f7f7] py-24 lg:py-32">
+    <section className="relative overflow-hidden bg-gradient-to-b from-white to-[#f7f7f7] py-16 sm:py-24 lg:py-32">
       <GrainOverlay opacity={0.02} className="z-0" />
-      <BreathingGlow
-        color="rgba(139, 30, 45, 0.06)"
-        size={500}
-        duration={12}
-        className="left-[-10%] top-[50%] z-0"
-      />
+      <BreathingGlow color="rgba(139, 30, 45, 0.06)" size={500} duration={12} className="left-[-10%] top-[50%] z-0" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-          {/* Left: Content */}
+        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: dur, ease: customEase }}
           >
-            <p className="font-mono text-xs uppercase tracking-[0.3em] text-[#8B1E2D]">
-              For Massage Therapists
-            </p>
-
-            <h2 className="mt-6 font-display text-4xl font-black tracking-tight text-[#111111] sm:text-5xl">
+            <p className="font-mono text-xs uppercase tracking-[0.3em] text-[#8B1E2D]">For Massage Therapists</p>
+            <h2 className="mt-5 font-display text-3xl font-black tracking-tight text-[#111111] sm:mt-6 sm:text-5xl">
               Grow Your Practice <span className="text-[#8B1E2D]">With MasseurMatch</span>
             </h2>
-
-            <p className="mt-8 text-lg leading-relaxed text-[#6F6F6F]">
-              Join a curated directory built for serious massage therapists who want to reach clients
-              in a professional, LGBTQ+-affirming environment. No booking platform. No booking fees.
-              Just direct connections with clients who value your expertise.
+            <p className="mt-6 text-base leading-7 text-[#5E5E5E] sm:mt-8 sm:text-lg sm:leading-relaxed">
+              Join a curated directory built for serious massage therapists who want direct connections with clients in a professional, LGBTQ+-affirming environment.
             </p>
 
-            {/* Benefits list */}
-            <div className="mt-12 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="mt-8 grid grid-cols-1 gap-3 sm:mt-10 sm:grid-cols-2">
               {benefits.map((benefit) => (
-                <div
-                  key={benefit}
-                  className="flex items-center gap-3 text-sm font-semibold text-[#111111]"
-                >
-                  <svg
-                    className="h-5 w-5 shrink-0 text-[#8B1E2D]"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2.5}
-                      d="M5 13l4 4L19 7"
-                    />
+                <div key={benefit} className="flex items-center gap-3 text-sm font-semibold text-[#111111]">
+                  <svg className="h-5 w-5 shrink-0 text-[#8B1E2D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                   </svg>
                   {benefit}
                 </div>
               ))}
             </div>
 
-            {/* CTA Buttons */}
-            <div className="mt-12 flex flex-wrap gap-4 sm:gap-6">
+            <div className="mt-10 flex flex-col gap-3 sm:mt-12 sm:flex-row sm:flex-wrap sm:gap-4">
               <Link
-                href="/therapist-agreement"
-                className="inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-8 py-4 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521] hover:shadow-[#8B1E2D]/40"
+                href="/signup/account"
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#8B1E2D] px-8 py-4 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521] sm:w-auto"
               >
                 Join MasseurMatch
                 <ArrowRight size={18} />
               </Link>
               <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 rounded-full border border-[#D9D9D9] bg-white px-8 py-4 text-sm font-black uppercase tracking-wider text-[#111111] transition hover:border-[#8B1E2D]/50 hover:bg-[#F8EDEE]"
+                href="/for-therapists"
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-[#D0D0D0] bg-white px-8 py-4 text-sm font-black uppercase tracking-wider text-[#111111] transition hover:border-[#8B1E2D]/50 hover:bg-[#F8EDEE] sm:w-auto"
               >
                 Learn More
               </Link>
             </div>
           </motion.div>
 
-          {/* Right: Visual showcase */}
           <motion.div
             initial={{ opacity: 0, x: 40, scale: 0.95 }}
             whileInView={{ opacity: 1, x: 0, scale: 1 }}
@@ -105,72 +77,21 @@ export function ProviderGrowthCTA() {
             transition={{ duration: dur + 0.1, ease: customEase }}
             className="relative"
           >
-            {/* Card container */}
             <div className="relative space-y-4">
-              {/* Card 1: Profile Setup */}
-              <div className="rounded-[24px] border border-[#E8E8E8] bg-white p-8 shadow-md transition hover:shadow-lg">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#8B1E2D]/10 text-[#8B1E2D]">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 6v6l4 2" />
-                  </svg>
+              {[
+                ["Premium Profile Setup", "Create a professional profile showcasing your expertise, specialties, and approach."],
+                ["Direct Client Connections", "Clients contact you directly. MasseurMatch does not take bookings or commissions."],
+                ["Zero Booking Fees", "Keep 100% of your service rates with no platform booking fee."],
+              ].map(([title, text]) => (
+                <div key={title} className="rounded-[24px] border border-[#E3E3E3] bg-white p-6 shadow-md transition hover:shadow-lg sm:p-8">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#8B1E2D]/10 text-[#8B1E2D]">
+                    <Sparkles size={22} />
+                  </div>
+                  <h3 className="font-display text-lg font-bold text-[#111111]">{title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-[#5E5E5E]">{text}</p>
                 </div>
-                <h3 className="font-display text-lg font-bold text-[#111111]">
-                  Premium Profile Setup
-                </h3>
-                <p className="mt-2 text-sm text-[#6F6F6F]">
-                  Create a professional profile showcasing your expertise, specialties, and approach.
-                </p>
-              </div>
-
-              {/* Card 2: Direct Clients */}
-              <div className="rounded-[24px] border border-[#E8E8E8] bg-white p-8 shadow-md transition hover:shadow-lg">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#8B1E2D]/10 text-[#8B1E2D]">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                  </svg>
-                </div>
-                <h3 className="font-display text-lg font-bold text-[#111111]">
-                  Direct Client Connections
-                </h3>
-                <p className="mt-2 text-sm text-[#6F6F6F]">
-                  Connect directly with verified clients seeking your specific services.
-                </p>
-              </div>
-
-              {/* Card 3: Zero Fees */}
-              <div className="rounded-[24px] border border-[#E8E8E8] bg-white p-8 shadow-md transition hover:shadow-lg">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#8B1E2D]/10 text-[#8B1E2D]">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M8 12h8M12 8v8" />
-                  </svg>
-                </div>
-                <h3 className="font-display text-lg font-bold text-[#111111]">
-                  Zero Booking Fees
-                </h3>
-                <p className="mt-2 text-sm text-[#6F6F6F]">
-                  Keep 100% of your rates. No commissions, no hidden fees, just direct bookings.
-                </p>
-              </div>
+              ))}
             </div>
-
-            {/* Floating badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: dur, ease: customEase, delay: 0.5 }}
-              className="absolute -right-6 bottom-4 rounded-full border border-[#8B1E2D]/30 bg-white px-5 py-3 shadow-lg"
-            >
-              <div className="flex items-center gap-2">
-                <Sparkles size={18} className="text-[#8B1E2D]" />
-                <span className="text-sm font-bold text-[#111111]">Premium Opportunity</span>
-              </div>
-            </motion.div>
           </motion.div>
         </div>
       </div>
