@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState } from 'react'
 import type { LucideIcon } from 'lucide-react'
@@ -21,22 +21,24 @@ import {
 import { format, parseISO } from 'date-fns'
 import type { BookingInquiry } from '@/lib/booking/types'
 
+// Light-surface, sober status palette (brand red for "needs approval",
+// success green for approved/clean, red for denied/flagged, neutral otherwise).
 const STATUS_CONFIG = {
-  new:              { label: 'New',             icon: Clock,        iconBg: 'bg-amber-500/10',   iconText: 'text-amber-400',   badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
-  checking:         { label: 'Reviewing',       icon: AlertCircle,  iconBg: 'bg-sky-500/10',     iconText: 'text-sky-400',     badge: 'bg-sky-500/10 text-sky-400 border-sky-500/20' },
-  pending_approval: { label: 'Needs Approval',  icon: AlertCircle,  iconBg: 'bg-red-500/10',  iconText: 'text-red-400',  badge: 'bg-red-500/10 text-red-400 border-red-500/20' },
-  approved:         { label: 'Approved',         icon: CheckCircle2, iconBg: 'bg-emerald-500/10', iconText: 'text-emerald-400', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
-  denied:           { label: 'Denied',           icon: XCircle,      iconBg: 'bg-rose-500/10',    iconText: 'text-rose-400',    badge: 'bg-rose-500/10 text-rose-400 border-rose-500/20' },
-  completed:        { label: 'Completed',        icon: CheckCircle2, iconBg: 'bg-slate-500/10',   iconText: 'text-slate-400',   badge: 'bg-slate-500/10 text-slate-400 border-slate-500/20' },
-  cancelled:        { label: 'Cancelled',        icon: XCircle,      iconBg: 'bg-slate-500/10',   iconText: 'text-slate-400',   badge: 'bg-slate-500/10 text-slate-400 border-slate-500/20' },
+  new:              { label: 'New',            icon: Clock,        iconBg: 'bg-slate-100',            iconText: 'text-slate-600',      badge: 'bg-slate-100 text-slate-700 border-slate-200' },
+  checking:         { label: 'Reviewing',      icon: AlertCircle,  iconBg: 'bg-slate-100',            iconText: 'text-slate-600',      badge: 'bg-slate-100 text-slate-700 border-slate-200' },
+  pending_approval: { label: 'Needs Approval', icon: AlertCircle,  iconBg: 'bg-brand-secondary/10',   iconText: 'text-brand-secondary', badge: 'bg-brand-secondary/10 text-brand-secondary border-brand-secondary/25' },
+  approved:         { label: 'Approved',       icon: CheckCircle2, iconBg: 'bg-[#EFF6F1]',            iconText: 'text-[#1E7A46]',      badge: 'bg-[#EFF6F1] text-[#1E7A46] border-[#1E7A46]/30' },
+  denied:           { label: 'Denied',         icon: XCircle,      iconBg: 'bg-red-50',              iconText: 'text-red-700',        badge: 'bg-red-50 text-red-700 border-red-200' },
+  completed:        { label: 'Completed',      icon: CheckCircle2, iconBg: 'bg-slate-50',            iconText: 'text-slate-500',      badge: 'bg-slate-50 text-slate-600 border-slate-200' },
+  cancelled:        { label: 'Cancelled',      icon: XCircle,      iconBg: 'bg-slate-50',            iconText: 'text-slate-500',      badge: 'bg-slate-50 text-slate-600 border-slate-200' },
 } as const
 
 const INTEL_CONFIG = {
-  pending:      { label: 'Pending',      icon: Clock,        iconBg: 'bg-slate-500/10',   iconText: 'text-slate-400',   badge: 'bg-slate-500/10 text-slate-400 border-slate-500/20' },
-  running:      { label: 'Checking',     icon: Loader2,      iconBg: 'bg-sky-500/10',     iconText: 'text-sky-400',     badge: 'bg-sky-500/10 text-sky-400 border-sky-500/20' },
-  clean:        { label: 'Clean',        icon: ShieldCheck,  iconBg: 'bg-emerald-500/10', iconText: 'text-emerald-400', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
-  flagged:      { label: 'Flagged',      icon: ShieldAlert,  iconBg: 'bg-rose-500/10',    iconText: 'text-rose-400',    badge: 'bg-rose-500/10 text-rose-400 border-rose-500/20' },
-  inconclusive: { label: 'Inconclusive', icon: AlertCircle,  iconBg: 'bg-amber-500/10',   iconText: 'text-amber-400',   badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+  pending:      { label: 'Pending',      icon: Clock,        iconBg: 'bg-slate-100', iconText: 'text-slate-600', badge: 'bg-slate-100 text-slate-700 border-slate-200' },
+  running:      { label: 'Checking',     icon: Loader2,      iconBg: 'bg-slate-100', iconText: 'text-slate-600', badge: 'bg-slate-100 text-slate-700 border-slate-200' },
+  clean:        { label: 'Clean',        icon: ShieldCheck,  iconBg: 'bg-[#EFF6F1]', iconText: 'text-[#1E7A46]', badge: 'bg-[#EFF6F1] text-[#1E7A46] border-[#1E7A46]/30' },
+  flagged:      { label: 'Flagged',      icon: ShieldAlert,  iconBg: 'bg-red-50',   iconText: 'text-red-700',   badge: 'bg-red-50 text-red-700 border-red-200' },
+  inconclusive: { label: 'Inconclusive', icon: AlertCircle,  iconBg: 'bg-slate-100', iconText: 'text-slate-600', badge: 'bg-slate-100 text-slate-700 border-slate-200' },
 } as const
 
 type FilterType = 'all' | BookingInquiry['status']
@@ -44,10 +46,10 @@ type FilterType = 'all' | BookingInquiry['status']
 function riskBadge(riskLevel?: string) {
   if (!riskLevel) return null
   const colors: Record<string, string> = {
-    low: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    medium: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-    high: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
-    unknown: 'bg-slate-500/10 text-slate-400 border-slate-500/20',
+    low: 'bg-[#EFF6F1] text-[#1E7A46] border-[#1E7A46]/30',
+    medium: 'bg-slate-100 text-slate-700 border-slate-200',
+    high: 'bg-red-50 text-red-700 border-red-200',
+    unknown: 'bg-slate-50 text-slate-600 border-slate-200',
   }
   return (
     <span className={`rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest ${colors[riskLevel] ?? colors.unknown}`}>
@@ -110,14 +112,14 @@ export default function AdminBookingsPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#111111] p-6">
+    <div className="min-h-full bg-bg-subtle p-6">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8">
           <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#8B1E2D]">Admin</p>
-          <h1 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-white">
+          <h1 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-slate-900">
             Booking Inquiries
           </h1>
-          <p className="mt-1 text-sm text-slate-400">Review and approve massage booking requests.</p>
+          <p className="mt-1 text-sm text-slate-500">Review and approve massage booking requests.</p>
         </div>
 
         {/* Filters */}
@@ -129,7 +131,7 @@ export default function AdminBookingsPage() {
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
                 filter === f.value
                   ? 'bg-[#8B1E2D] text-white'
-                  : 'border border-white/10 bg-white/[0.04] text-slate-400 hover:text-white'
+                  : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >
               {f.label}
@@ -139,11 +141,11 @@ export default function AdminBookingsPage() {
 
         {/* List */}
         {loading ? (
-          <div className="flex items-center justify-center py-20 text-slate-500">
+          <div className="flex items-center justify-center py-20 text-slate-400">
             <Loader2 className="h-6 w-6 animate-spin" strokeWidth={2} />
           </div>
         ) : inquiries.length === 0 ? (
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] py-16 text-center text-sm text-slate-500">
+          <div className="rounded-2xl border border-slate-200 bg-white py-16 text-center text-sm text-slate-500">
             No inquiries match this filter.
           </div>
         ) : (
@@ -152,18 +154,17 @@ export default function AdminBookingsPage() {
               const statusCfg = STATUS_CONFIG[inq.status] ?? STATUS_CONFIG.new
               const intelCfg = INTEL_CONFIG[inq.intelligence_status] ?? INTEL_CONFIG.pending
               const StatusIcon = statusCfg.icon
-              const IntelIcon = intelCfg.icon
               const isExpanded = expandedId === inq.id
 
               return (
                 <div
                   key={inq.id}
-                  className="rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden"
+                  className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden"
                 >
                   {/* Header row */}
                   <button
                     onClick={() => setExpandedId(isExpanded ? null : inq.id)}
-                    className="flex w-full items-start gap-4 p-5 text-left hover:bg-white/[0.02] transition-colors"
+                    className="flex w-full items-start gap-4 p-5 text-left transition-colors hover:bg-slate-50"
                   >
                     {/* Status indicator */}
                     <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${statusCfg.iconBg}`}>
@@ -173,7 +174,7 @@ export default function AdminBookingsPage() {
                     {/* Main info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-semibold text-white">{inq.client_name ?? 'Unknown Client'}</span>
+                        <span className="font-semibold text-slate-900">{inq.client_name ?? 'Unknown Client'}</span>
                         <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest border ${statusCfg.badge}`}>
                           {statusCfg.label}
                         </span>
@@ -182,7 +183,7 @@ export default function AdminBookingsPage() {
                         </span>
                         {riskBadge(inq.intelligence_report?.riskLevel)}
                       </div>
-                      <div className="mt-1.5 flex flex-wrap gap-3 text-xs text-slate-400">
+                      <div className="mt-1.5 flex flex-wrap gap-3 text-xs text-slate-500">
                         {inq.client_phone && (
                           <span className="flex items-center gap-1">
                             <Phone className="h-3 w-3" strokeWidth={2.25} />
@@ -196,30 +197,30 @@ export default function AdminBookingsPage() {
                           </span>
                         )}
                         {inq.confirmed_date && (
-                          <span className="flex items-center gap-1 text-emerald-400">
+                          <span className="flex items-center gap-1 text-[#1E7A46]">
                             <CalendarCheck className="h-3 w-3" strokeWidth={2.25} />
                             {inq.confirmed_date} @ {inq.confirmed_time}
                           </span>
                         )}
-                        <span className="text-slate-500">
+                        <span className="text-slate-400">
                           {format(parseISO(inq.created_at), 'MMM d, h:mm a')}
                         </span>
                       </div>
                       {inq.message && (
-                        <p className="mt-1 text-xs text-slate-500 line-clamp-1">"{inq.message}"</p>
+                        <p className="mt-1 text-xs text-slate-400 line-clamp-1">"{inq.message}"</p>
                       )}
                     </div>
 
                     {isExpanded ? (
-                      <ChevronUp className="h-4 w-4 shrink-0 text-slate-500" strokeWidth={2.25} />
+                      <ChevronUp className="h-4 w-4 shrink-0 text-slate-400" strokeWidth={2.25} />
                     ) : (
-                      <ChevronDown className="h-4 w-4 shrink-0 text-slate-500" strokeWidth={2.25} />
+                      <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" strokeWidth={2.25} />
                     )}
                   </button>
 
                   {/* Expanded details */}
                   {isExpanded && (
-                    <div className="border-t border-white/[0.06] px-5 pb-5 pt-4 flex flex-col gap-5">
+                    <div className="border-t border-slate-200 px-5 pb-5 pt-4 flex flex-col gap-5">
                       {/* Client details */}
                       <div className="grid gap-3 sm:grid-cols-2">
                         <Detail icon={User} label="Name" value={inq.client_name} />
@@ -233,18 +234,18 @@ export default function AdminBookingsPage() {
 
                       {/* Intelligence report */}
                       {inq.intelligence_report && Object.keys(inq.intelligence_report).length > 0 && (
-                        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                           <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Intelligence Report</p>
-                          <div className="flex flex-wrap gap-3 text-xs text-slate-400">
+                          <div className="flex flex-wrap gap-3 text-xs text-slate-600">
                             {inq.intelligence_report.carrier && <span>Carrier: {inq.intelligence_report.carrier}</span>}
                             {inq.intelligence_report.lineType && <span>Line: {inq.intelligence_report.lineType}</span>}
-                            <span className={inq.intelligence_report.riskLevel === 'low' ? 'text-emerald-400' : inq.intelligence_report.riskLevel === 'high' ? 'text-rose-400' : 'text-amber-400'}>
+                            <span className={inq.intelligence_report.riskLevel === 'low' ? 'text-[#1E7A46]' : inq.intelligence_report.riskLevel === 'high' ? 'text-red-600' : 'text-slate-600'}>
                               Risk: {inq.intelligence_report.riskLevel}
                             </span>
                           </div>
                           {inq.intelligence_report.spamReports?.length > 0 && (
                             <div className="mt-3">
-                              <p className="mb-1 text-[11px] text-rose-400">Spam indicators found:</p>
+                              <p className="mb-1 text-[11px] text-red-600">Spam indicators found:</p>
                               <ul className="space-y-1">
                                 {inq.intelligence_report.spamReports.slice(0, 3).map((r, i) => (
                                   <li key={i} className="text-[11px] text-slate-500 line-clamp-2">• {r}</li>
@@ -257,12 +258,12 @@ export default function AdminBookingsPage() {
 
                       {/* AI Conversation */}
                       {inq.ai_conversation?.length > 0 && (
-                        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                           <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">AI Conversation</p>
                           <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
                             {inq.ai_conversation.map((msg, i) => (
                               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-[85%] rounded-xl px-3 py-2 text-xs ${msg.role === 'user' ? 'bg-[#8B1E2D]/20 text-red-100' : 'bg-white/[0.06] text-slate-300'}`}>
+                                <div className={`max-w-[85%] rounded-xl px-3 py-2 text-xs ${msg.role === 'user' ? 'bg-brand-secondary/10 text-brand-secondary' : 'bg-white text-slate-700 border border-slate-200'}`}>
                                   {msg.content}
                                 </div>
                               </div>
@@ -279,13 +280,13 @@ export default function AdminBookingsPage() {
                             placeholder="Admin notes (optional)…"
                             value={adminNotes[inq.id] ?? ''}
                             onChange={e => setAdminNotes(prev => ({ ...prev, [inq.id]: e.target.value }))}
-                            className="resize-none rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-red-500/50 focus:outline-none"
+                            className="resize-none rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-secondary/50 focus:outline-none"
                           />
                           <div className="flex gap-3">
                             <button
                               onClick={() => handleAction(inq.id, 'approve')}
                               disabled={!!actionLoading}
-                              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-emerald-400 disabled:opacity-60"
+                              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-emerald-700 disabled:opacity-60"
                             >
                               {actionLoading === inq.id + 'approve' ? (
                                 <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2.25} />
@@ -297,7 +298,7 @@ export default function AdminBookingsPage() {
                             <button
                               onClick={() => handleAction(inq.id, 'deny')}
                               disabled={!!actionLoading}
-                              className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2.5 text-sm font-semibold text-rose-400 transition-all hover:bg-rose-500/20 disabled:opacity-60"
+                              className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 transition-all hover:bg-red-100 disabled:opacity-60"
                             >
                               {actionLoading === inq.id + 'deny' ? (
                                 <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2.25} />
@@ -328,7 +329,7 @@ function Detail({ icon: Icon, label, value }: { icon: LucideIcon; label: string;
       <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-500" strokeWidth={2.25} />
       <div>
         <p className="font-mono text-[9px] uppercase tracking-widest text-slate-500">{label}</p>
-        <p className="text-xs text-slate-300">{value}</p>
+        <p className="text-xs text-slate-700">{value}</p>
       </div>
     </div>
   )

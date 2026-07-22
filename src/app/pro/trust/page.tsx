@@ -58,7 +58,7 @@ export default function TrustAndVerificationPage() {
           Trust &amp; Verification
         </h1>
         <p className="mt-2 font-sans text-slate-500">
-          Verified profiles receive up to 70% more bookings from premium clients.
+          Complete verification to earn a trust badge and reassure clients before they reach out.
         </p>
       </div>
 

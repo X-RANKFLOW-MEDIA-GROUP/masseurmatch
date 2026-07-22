@@ -847,7 +847,7 @@ export default function MyListingPage() {
   const handleSave = async () => {
     if (!form.displayName.trim()) {
       toast({ title: "Display name required", description: "Add your professional name before saving.", variant: "destructive" });
-      setOpen((o) => ({ ...o, appointment: true }));
+      setOpen((o) => ({ ...o, about: true }));
       return;
     }
     setSaveState("saving");

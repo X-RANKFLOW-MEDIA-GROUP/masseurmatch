@@ -64,7 +64,7 @@ export async function POST(request: Request) {
     }
 
     // Attribute to a logged-in reporter when we have one; anonymous is allowed.
-    const session = getRequestSession(request);
+    const session = await getRequestSession(request);
     const reporterEmail = body.reporterEmail ? sanitizeOptionalText(body.reporterEmail) : null;
 
     const payload: TablesInsert<"profile_reports"> = {

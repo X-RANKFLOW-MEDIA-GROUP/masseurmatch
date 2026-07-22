@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import { z } from "zod";
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, recordAuditLog, requireAdminSession } from "@/app/api/_lib/supabase-server";
+import { revalidatePublicDirectory } from "@/app/_lib/directory-cache";
 
 const schema = z.object({ reason: z.string().min(1) });
 
@@ -36,6 +37,8 @@ export async function POST(
       .eq("id", profileId);
 
     if (updateError) throw new RouteError(500, updateError.message);
+
+    revalidatePublicDirectory();
 
     await adminClient
       .from("profile_reviews")

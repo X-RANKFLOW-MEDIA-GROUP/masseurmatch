@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import { z } from "zod";
 
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
+import { assertRateLimit } from "@/app/_lib/security";
 import {
   createSupabaseAdminClient,
   recordAuditLog,
@@ -37,6 +38,17 @@ async function updateUserRole(
     throw new RouteError(500, error.message);
   }
 
+  // Mirror the change into app_metadata — the source the middleware and route
+  // handlers read for authorization. Without this the new role wouldn't take
+  // effect until the user's next login.
+  try {
+    await adminClient.auth.admin.updateUserById(input.userId, {
+      app_metadata: { role: input.role },
+    });
+  } catch {
+    // Best-effort; user_roles remains the source of truth for the API layer.
+  }
+
   await recordAuditLog(adminUserId, "update_user_role", "user", input.userId, {
     role: input.role,
   });
@@ -47,6 +59,7 @@ async function updateUserRole(
 export async function POST(request: Request) {
   try {
     const admin = await requireAdminSession(request);
+    assertRateLimit(request, "admin-user-role", { limit: 20, windowMs: 60_000 });
     const body = await parseJsonBody(request, adminUserActionSchema);
     const result = await updateUserRole(admin.userId, body);
 

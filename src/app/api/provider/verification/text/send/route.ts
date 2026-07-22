@@ -3,6 +3,7 @@ import twilio from "twilio";
 import { z } from "zod";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { getRequestSession } from "@/app/api/_lib/session";
+import { assertRateLimit } from "@/app/_lib/security";
 
 const sendSchema = z.object({
   phone: z.string().min(7).max(20),
@@ -15,7 +16,10 @@ const CODE_TTL_MINUTES = 10;
 
 export async function POST(request: Request) {
   try {
-    const session = getRequestSession(request);
+    // Cap outbound SMS per caller to prevent Twilio-pumping cost abuse.
+    assertRateLimit(request, "provider-sms-send", { limit: 3, windowMs: 60_000 });
+
+    const session = await getRequestSession(request);
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -42,10 +46,8 @@ export async function POST(request: Request) {
     const supabase = createSupabaseAdminClient();
     const expiresAt = new Date(Date.now() + CODE_TTL_MINUTES * 60 * 1000).toISOString();
 
-    await supabase
-      .from("profiles")
-      .update({ phone_number: phone })
-      .eq("user_id", session.userId);
+    // Do NOT write the phone onto the profile here — it is unverified until the
+    // code is confirmed. The check endpoint persists the number once verified.
 
     const { error: verificationError } = await supabase
       .from("text_verifications")

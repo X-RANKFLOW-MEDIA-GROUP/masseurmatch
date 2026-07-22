@@ -43,7 +43,7 @@ export default function SubscriptionPage() {
           <p className="mt-2 text-sm text-slate-500">
             You are currently on the{" "}
             <strong className="text-slate-800">{subscription.plan_name}</strong> plan.{" "}
-            <Link href="/pro/billing" className="text-indigo-600 underline">
+            <Link href="/pro/billing" className="text-brand-secondary underline">
               Manage billing
             </Link>
           </p>
@@ -60,7 +60,7 @@ export default function SubscriptionPage() {
                 tier.highlighted
                   ? "ring-2 ring-red-600 shadow-lg lg:scale-105"
                   : "border-slate-200"
-              } ${isCurrent ? "ring-2 ring-indigo-500" : ""}`}
+              } ${isCurrent ? "ring-2 ring-brand-secondary" : ""}`}
             >
               <CardHeader>
                 <CardTitle className="text-xl">{tier.name}</CardTitle>
@@ -138,7 +138,7 @@ export default function SubscriptionPage() {
             <h3 className="mb-1 font-semibold text-slate-900">Need help choosing?</h3>
             <p className="text-sm text-slate-600">
               Email us at{" "}
-              <a href="mailto:support@masseurmatch.com" className="text-indigo-600 underline">
+              <a href="mailto:support@masseurmatch.com" className="text-brand-secondary underline">
                 support@masseurmatch.com
               </a>{" "}
               and we&apos;ll help you pick the right plan.

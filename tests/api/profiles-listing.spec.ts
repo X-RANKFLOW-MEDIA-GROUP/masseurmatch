@@ -1,53 +1,37 @@
 import { expect, test } from '@playwright/test';
 
+// /api/pro/profiles is a provider-scoped endpoint: it returns only the
+// authenticated provider's own profile and rejects anonymous requests
+// (see src/app/api/pro/profiles/route.ts). These tests pin that contract —
+// the endpoint must never leak profile data without a session.
 test.describe('GET /api/pro/profiles', () => {
-  test('should return a list of profiles', async ({ request }) => {
+  test('rejects anonymous requests with 401', async ({ request }) => {
     const res = await request.get('/api/pro/profiles');
-    expect(res.ok()).toBeTruthy();
+    expect(res.status()).toBe(401);
     const data = await res.json();
-    expect(data.ok).toBe(true);
-    expect(Array.isArray(data.profiles)).toBe(true);
+    expect(data.error).toBeTruthy();
+    expect(data.profiles).toBeUndefined();
   });
 
-  test('should filter by city', async ({ request }) => {
+  test('rejects anonymous requests with query params (city)', async ({ request }) => {
     const res = await request.get('/api/pro/profiles?city=São Paulo');
-    expect(res.ok()).toBeTruthy();
+    expect(res.status()).toBe(401);
     const data = await res.json();
-    expect(data.ok).toBe(true);
-    data.profiles.forEach((p: any) => expect(p.city).toBe('São Paulo'));
+    expect(data.profiles).toBeUndefined();
   });
 
-  test('should filter by technique', async ({ request }) => {
+  test('rejects anonymous requests with query params (technique)', async ({ request }) => {
     const res = await request.get('/api/pro/profiles?technique=Deep Tissue');
-    expect(res.ok()).toBeTruthy();
+    expect(res.status()).toBe(401);
     const data = await res.json();
-    expect(data.ok).toBe(true);
-    data.profiles.forEach((p: any) => expect((p.massage_techniques||[]).includes('Deep Tissue')).toBe(true));
+    expect(data.profiles).toBeUndefined();
   });
 
-  test('should successfully filter profiles by technique without throwing a 500 error', async ({ request }) => {
-    // Testing the specific P0 fix: requesting a technique (case-insensitive in-memory filter)
-    const testTechnique = 'Deep Tissue';
-    const response = await request.get(`/api/pro/profiles?technique=${encodeURIComponent(testTechnique)}`);
-    
-    // 1. Ensure the endpoint does not break (resilience test)
-    expect(response.status()).toBe(200);
-
-    const data = await response.json();
-    const profiles = data.profiles || [];
-    
-    // 2. Validate the in-memory filter contract
-    if (profiles.length > 0) {
-      for (const profile of profiles) {
-        expect(profile).toHaveProperty('massage_techniques');
-        
-        // Normalize everything to lowercase to validate the case-insensitive fix
-        const hasTechnique = (profile.massage_techniques || []).some(
-          (t: string) => t.toLowerCase() === testTechnique.toLowerCase()
-        );
-        
-        expect(hasTechnique).toBeTruthy();
-      }
-    }
+  test('does not throw a 500 for filtered anonymous requests', async ({ request }) => {
+    const response = await request.get(
+      `/api/pro/profiles?technique=${encodeURIComponent('Deep Tissue')}`,
+    );
+    expect(response.status()).toBeLessThan(500);
+    expect(response.status()).toBe(401);
   });
 });

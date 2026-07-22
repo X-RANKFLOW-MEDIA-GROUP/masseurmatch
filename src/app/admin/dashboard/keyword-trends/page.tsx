@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { BarChart3 } from "lucide-react";
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerSupabase } from "@/lib/supabase/server";
 import KeywordTrendsDashboard from "@/components/dashboards/KeywordTrendsDashboard";
 
 export const metadata = {
@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 async function checkAdminAccess() {
-  const supabase = await createServerClient();
+  const supabase = await createServerSupabase();
   const {
     data: { user },
   } = await supabase.auth.getUser();

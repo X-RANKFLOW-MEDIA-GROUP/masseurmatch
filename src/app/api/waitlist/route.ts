@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ALLOWED_ROLES = new Set(["visitor", "therapist", "partner", "press"]);
@@ -48,7 +48,11 @@ function getRequestKey(request: Request, email: string) {
   return `${forwardedFor.split(",")[0]}:${userAgent.slice(0, 140)}:${email || "anonymous"}`.slice(0, 500);
 }
 
-async function enforceRateLimit(supabase: ReturnType<typeof createClient>, fingerprint: string) {
+// The waitlist_* tables are not present in the generated Supabase types, so the
+// strongly-typed admin client rejects them. Use a loosely-typed handle here.
+type LooseClient = { from: (table: string) => any };
+
+async function enforceRateLimit(supabase: LooseClient, fingerprint: string) {
   const now = new Date();
   const existing = await supabase
     .from("waitlist_rate_limits")
@@ -88,7 +92,7 @@ async function enforceRateLimit(supabase: ReturnType<typeof createClient>, finge
 
 export async function POST(request: Request) {
   const payload = await parsePayload(request);
-  const supabase = createClient();
+  const supabase = createAdminClient() as unknown as LooseClient;
   const email = sanitizeText(payload.email).toLowerCase();
   const role = ALLOWED_ROLES.has(payload.role || "") ? payload.role || "visitor" : "visitor";
   const eventName = sanitizeText(payload.eventName, email ? "waitlist_signup" : "coming_soon_event");

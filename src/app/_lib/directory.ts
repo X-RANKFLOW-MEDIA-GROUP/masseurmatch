@@ -1,10 +1,12 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
 import { createClient as createSupabaseJsClient } from "@supabase/supabase-js";
 
 import { US_CITIES } from "@/data/cities";
 import { matchBodyTypeKeyword } from "@/lib/physical-profile";
 import { FALLBACK_PUBLIC_THERAPISTS } from "@/app/_lib/directory-fallback";
+import { PUBLIC_THERAPISTS_TAG } from "@/app/_lib/directory-cache";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import {
   SUPABASE_PUBLIC_ANON_KEY,
@@ -315,7 +317,7 @@ function applyFallbackFilters(items: PublicTherapist[], filters?: Parameters<typ
   });
 }
 
-export const getPublicTherapists = async (filters?: {
+export type PublicTherapistFilters = {
   city?: string;
   modality?: string;
   keyword?: string;
@@ -326,7 +328,9 @@ export const getPublicTherapists = async (filters?: {
   lgbtqAffirming?: boolean;
   page?: number;
   pageSize?: number;
-}) => {
+};
+
+const fetchPublicTherapistsUncached = async (filters?: PublicTherapistFilters) => {
   const page = Math.max(1, filters?.page ?? 1);
   const pageSize = Math.max(1, Math.min(500, filters?.pageSize ?? 12));
   const from = (page - 1) * pageSize;
@@ -413,6 +417,28 @@ export const getPublicTherapists = async (filters?: {
     pageSize,
   };
 };
+
+/**
+ * Cached public-directory read. This is the hot path — homepage, city pages,
+ * search, sitemap all call it, and every call otherwise sequential-scans the
+ * profiles table (P75 ~720ms, thousands of calls/day). We wrap the pure fetch
+ * in `unstable_cache` (anon/admin client, no cookies → cacheable) with a short
+ * 60s revalidate window so newly-published profiles still surface quickly, and
+ * a shared tag so the admin approve/reject routes can invalidate on demand
+ * (revalidateTag(PUBLIC_THERAPISTS_TAG)) for instant appearance.
+ *
+ * The cache key is derived from the serialized filters, so each distinct
+ * (city, modality, keyword, page, …) combination is memoized independently.
+ * High-cardinality keyword searches naturally get low hit rates but still pay
+ * nothing extra; the high-volume home/city/sitemap reads share a handful of
+ * keys and cache almost perfectly.
+ */
+export const getPublicTherapists = (filters?: PublicTherapistFilters) =>
+  unstable_cache(
+    () => fetchPublicTherapistsUncached(filters),
+    ["public-therapists", JSON.stringify(filters ?? {})],
+    { revalidate: 60, tags: [PUBLIC_THERAPISTS_TAG] },
+  )();
 
 export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTherapist | null> => {
   const sanitizedSlug = slug.trim();

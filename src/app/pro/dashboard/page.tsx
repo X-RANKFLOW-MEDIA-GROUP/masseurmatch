@@ -43,23 +43,14 @@ const statusMessages: Record<AvailabilityStatus, string> = {
   hidden: "Invisible mode — your profile has been temporarily removed from search results.",
 };
 
+// Sober, light-surface status palette: success green = available, brand red =
+// mobile, ink = traveling, muted = hidden. No indigo/amber/rose.
+const IDLE_STYLE = "bg-white border-[#E8E8E8] text-[#6F6F6F] hover:bg-[#F7F7F7]";
 const colorMap: Record<string, { active: string; idle: string }> = {
-  emerald: {
-    active: "bg-emerald-500/10 border-emerald-500/50 text-emerald-400",
-    idle: "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10",
-  },
-  indigo: {
-    active: "bg-indigo-500/10 border-indigo-500/50 text-indigo-400",
-    idle: "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10",
-  },
-  amber: {
-    active: "bg-amber-500/10 border-amber-500/50 text-amber-400",
-    idle: "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10",
-  },
-  rose: {
-    active: "bg-rose-500/10 border-rose-500/50 text-rose-400",
-    idle: "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10",
-  },
+  emerald: { active: "bg-[#EFF6F1] border-[#1E7A46]/40 text-[#1E7A46]", idle: IDLE_STYLE },
+  indigo: { active: "bg-brand-secondary/[0.08] border-brand-secondary/40 text-brand-secondary", idle: IDLE_STYLE },
+  amber: { active: "bg-[#F5F5F5] border-[#111111]/25 text-[#111111]", idle: IDLE_STYLE },
+  rose: { active: "bg-[#F7F7F7] border-[#D9D9D9] text-[#8E8E8E]", idle: IDLE_STYLE },
 };
 
 const fadeUp = {
@@ -152,7 +143,7 @@ const ProfileCard = memo(function ProfileCard({
       className="relative overflow-hidden border border-slate-200/60 bg-white p-6 shadow-sm"
     >
       <div className="flex items-center gap-4">
-        <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-tr from-emerald-400 to-emerald-600">
+        <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-tr from-brand-secondary to-[#6E1521]">
           <UserCircle className="relative h-10 w-10 text-white" />
         </div>
         <div>
@@ -160,7 +151,7 @@ const ProfileCard = memo(function ProfileCard({
             {displayName}
           </h2>
           <div className="mt-0.5 flex items-center gap-1">
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+            <ShieldCheck className="h-3.5 w-3.5 text-[#1E7A46]" />
             <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">
               Pro Member
             </span>
@@ -189,7 +180,7 @@ const ProfileCard = memo(function ProfileCard({
         </div>
         {!profileLoading && completion < 100 && (
           <p className="mt-2 text-[11px] text-slate-500">
-            <Link href="/pro/listing" className="text-indigo-600 underline">
+            <Link href="/pro/listing" className="text-brand-secondary underline">
               Complete your profile
             </Link>{" "}
             to appear in more searches.
@@ -216,9 +207,9 @@ const AvailabilityCard = memo(function AvailabilityCard({
       initial="hidden"
       animate="show"
       transition={{ delay: 0.1 }}
-      className="border border-slate-800 bg-slate-950 p-6 text-white shadow-xl"
+      className="border border-slate-200/60 bg-white p-6 text-slate-900 shadow-sm"
     >
-      <h3 className="mb-4 font-mono text-xs uppercase tracking-widest text-slate-400">
+      <h3 className="mb-4 font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">
         Availability
       </h3>
 
@@ -243,7 +234,7 @@ const AvailabilityCard = memo(function AvailabilityCard({
         })}
       </div>
 
-      <div className="mt-4 border border-white/10 bg-white/5 p-3 font-sans text-xs leading-relaxed text-slate-300">
+      <div className="mt-4 border border-[#E8E8E8] bg-[#F7F7F7] p-3 font-sans text-xs leading-relaxed text-[#6F6F6F]">
         {statusMessages[activeStatus]}
       </div>
     </motion.div>
@@ -261,8 +252,8 @@ const ProfileStatusBanner = memo(function ProfileStatusBanner({ status }: { stat
   }
   if (status === "pending_approval") {
     return (
-      <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-        <Clock className="h-4 w-4 shrink-0 text-amber-600" />
+      <div className="flex items-center gap-2 rounded-lg border border-[#E8E8E8] bg-[#F7F7F7] px-4 py-3 text-sm text-[#6F6F6F]">
+        <Clock className="h-4 w-4 shrink-0 text-brand-secondary" />
         Your profile is <strong>pending review</strong>. We'll notify you once it's approved.
       </div>
     );
@@ -312,8 +303,11 @@ export default function DashboardHome() {
     requestJson<{ ok: boolean; profile: ProfileData | null }>("/api/pro/profile?dashboard=true")
       .then((data) => {
         setProfile(data.profile);
-        if (data.profile?.available_now) {
-          setActiveStatus("available");
+        // Reflect the general presence status (current_status / is_active), not
+        // the paid "Available Now" badge, which is managed separately.
+        const currentStatus = (data.profile as { current_status?: string } | null)?.current_status;
+        if (currentStatus === "available" || currentStatus === "mobile" || currentStatus === "traveling") {
+          setActiveStatus(currentStatus as AvailabilityStatus);
         } else if (data.profile?.is_active === false) {
           setActiveStatus("hidden");
         }
@@ -411,7 +405,7 @@ export default function DashboardHome() {
               </span>
             </div>
             <div className="grid gap-5 p-5 sm:grid-cols-[140px_1fr] sm:items-center">
-              <div className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-slate-950 p-5 text-white">
+              <div className="flex flex-col items-center justify-center rounded-xl border border-[#111111] bg-[#111111] p-5 text-white">
                 <span className="font-display text-4xl font-semibold">
                   {profileLoading ? "…" : placement.grade}
                 </span>
@@ -424,7 +418,7 @@ export default function DashboardHome() {
                   <li key={factor.label} className="flex items-center justify-between gap-3 text-sm">
                     <span className="flex items-center gap-2 text-slate-600">
                       {factor.met ? (
-                        <Check className="h-4 w-4 text-emerald-500" strokeWidth={2.5} />
+                        <Check className="h-4 w-4 text-[#1E7A46]" strokeWidth={2.5} />
                       ) : (
                         <X className="h-4 w-4 text-slate-300" strokeWidth={2.5} />
                       )}
@@ -438,15 +432,15 @@ export default function DashboardHome() {
             <div className="border-t border-slate-100 bg-slate-50/60 px-5 py-3">
               <p className="text-xs text-slate-500">
                 Raise your placement:{" "}
-                <Link href="/pro/listing" className="font-medium text-indigo-600 underline">
+                <Link href="/pro/listing" className="font-medium text-brand-secondary underline">
                   complete your profile
                 </Link>
                 ,{" "}
-                <Link href="/pro/growth" className="font-medium text-indigo-600 underline">
+                <Link href="/pro/growth" className="font-medium text-brand-secondary underline">
                   go live with Available Now
                 </Link>
                 , or{" "}
-                <Link href="/pro/subscription" className="font-medium text-indigo-600 underline">
+                <Link href="/pro/subscription" className="font-medium text-brand-secondary underline">
                   upgrade your plan
                 </Link>
                 .
@@ -506,10 +500,10 @@ export default function DashboardHome() {
 
           {/* Knotty AI teaser — only shown for non-Elite plans */}
           {currentTier !== "elite" && (
-            <div className="rounded-xl border border-slate-800 bg-slate-950 p-5 text-white">
+            <div className="rounded-xl border border-white/10 bg-[#111111] p-5 text-white">
               <div className="flex items-start gap-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-400/15">
-                  <Sparkles className="h-4 w-4 text-amber-400" strokeWidth={2.25} />
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#C4344A]/15">
+                  <Sparkles className="h-4 w-4 text-[#C4344A]" strokeWidth={2.25} />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-semibold">Knotty AI — available on Elite</p>
@@ -520,7 +514,7 @@ export default function DashboardHome() {
                   </p>
                   <Link
                     href="/pro/billing?upgrade=elite"
-                    className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-amber-400 hover:text-amber-300"
+                    className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#C4344A] hover:text-white"
                   >
                     Upgrade to Elite
                     <ArrowRight className="h-3 w-3" strokeWidth={2.5} />

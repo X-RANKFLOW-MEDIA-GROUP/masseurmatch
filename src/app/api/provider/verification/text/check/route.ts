@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, requireSession } from "@/app/api/_lib/supabase-server";
+import { assertRateLimit } from "@/app/_lib/security";
 
 const checkSchema = z.object({
   phone: z.string().min(7).max(20),
@@ -9,6 +10,9 @@ const checkSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    // Throttle guessing: a 6-digit code is trivially brute-forceable otherwise.
+    assertRateLimit(request, "provider-sms-check", { limit: 5, windowMs: 60_000 });
+
     const session = await requireSession(request);
     const body = await parseJsonBody(request, checkSchema);
     const adminClient = createSupabaseAdminClient();
@@ -16,7 +20,7 @@ export async function POST(request: Request) {
     // Get the latest pending verification for this user
     const { data: verification, error: fetchError } = await adminClient
       .from("text_verifications")
-      .select("id, code")
+      .select("id, code, expires_at")
       .eq("user_id", session.userId)
       .eq("status", "pending")
       .order("created_at", { ascending: false })
@@ -25,6 +29,16 @@ export async function POST(request: Request) {
 
     if (fetchError || !verification) {
       throw new RouteError(400, "No pending verification found for this phone number.");
+    }
+
+    // Reject expired codes instead of accepting them indefinitely.
+    const expiresAt = verification.expires_at ? new Date(verification.expires_at).getTime() : null;
+    if (expiresAt !== null && !Number.isNaN(expiresAt) && expiresAt <= Date.now()) {
+      await adminClient
+        .from("text_verifications")
+        .update({ status: "expired", updated_at: new Date().toISOString() })
+        .eq("id", verification.id);
+      throw new RouteError(400, "This verification code has expired. Request a new one.");
     }
 
     // Check code

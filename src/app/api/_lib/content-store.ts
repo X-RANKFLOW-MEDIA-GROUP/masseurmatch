@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 
 import seedContent from "../_data/admin-content.json";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { BlogPost } from "@/app/blog/posts";
 
 export interface StoredBlogPost extends BlogPost {
@@ -33,14 +34,25 @@ interface ContentStore {
   keywords: StoredKeyword[];
 }
 
-// The original implementation wrote into the project tree under
-// `process.cwd()`, which is read-only on serverless platforms (Vercel) and
-// threw on the first admin write. Persist into the OS temp dir instead and keep
-// an in-memory cache so reads/writes never crash a request even when the
-// filesystem is fully read-only.
+// Durable persistence lives in the `admin_content` singleton row (see
+// migration 20260713000000_admin_content_store.sql). The temp-dir file below is
+// only a fallback for environments where the table isn't available yet, so a
+// missing migration degrades gracefully instead of losing every write.
 const storePath = path.join(os.tmpdir(), "masseurmatch", "admin-content.json");
+const SINGLETON_ID = "singleton";
 
 let memoryStore: ContentStore | null = null;
+
+// admin_content is not in the generated Supabase types.
+type LooseAdmin = { from: (table: string) => any } | null;
+
+function looseAdminClient(): LooseAdmin {
+  try {
+    return createAdminClient() as unknown as { from: (table: string) => any };
+  } catch {
+    return null;
+  }
+}
 
 function normalizeStore(raw: Partial<ContentStore> | null | undefined): ContentStore {
   return {
@@ -50,38 +62,99 @@ function normalizeStore(raw: Partial<ContentStore> | null | undefined): ContentS
   };
 }
 
-// Best-effort persistence: swallow read-only filesystem errors so admin writes
-// still succeed (the in-memory cache keeps them live for the instance's life).
-async function persist(store: ContentStore): Promise<void> {
+// ── Supabase (durable) ──────────────────────────────────────────────────────
+
+async function readFromSupabase(): Promise<ContentStore | null> {
+  const admin = looseAdminClient();
+  if (!admin) return null;
+  try {
+    const { data, error } = await admin
+      .from("admin_content")
+      .select("blog_posts, cities, keywords")
+      .eq("id", SINGLETON_ID)
+      .maybeSingle();
+    if (error || !data) return null;
+    return normalizeStore({
+      blogPosts: data.blog_posts,
+      cities: data.cities,
+      keywords: data.keywords,
+    });
+  } catch {
+    return null;
+  }
+}
+
+async function writeToSupabase(store: ContentStore): Promise<boolean> {
+  const admin = looseAdminClient();
+  if (!admin) return false;
+  try {
+    const { error } = await admin.from("admin_content").upsert(
+      {
+        id: SINGLETON_ID,
+        blog_posts: store.blogPosts,
+        cities: store.cities,
+        keywords: store.keywords,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "id" },
+    );
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+// ── Temp-dir fallback ───────────────────────────────────────────────────────
+
+async function persistToDisk(store: ContentStore): Promise<void> {
   try {
     await mkdir(path.dirname(storePath), { recursive: true });
     await writeFile(storePath, `${JSON.stringify(store, null, 2)}\n`, "utf8");
   } catch {
-    // Ignore — serverless filesystems are read-only outside the temp dir.
+    // Serverless filesystems are read-only outside the temp dir.
   }
 }
+
+async function readFromDisk(): Promise<ContentStore | null> {
+  try {
+    const contents = await readFile(storePath, "utf8");
+    return normalizeStore(JSON.parse(contents) as Partial<ContentStore>);
+  } catch {
+    return null;
+  }
+}
+
+// ── Public API ──────────────────────────────────────────────────────────────
 
 export async function readContentStore(): Promise<ContentStore> {
   if (memoryStore) {
     return memoryStore;
   }
 
-  // Prefer the runtime-persisted copy in the writable temp dir.
-  try {
-    const contents = await readFile(storePath, "utf8");
-    memoryStore = normalizeStore(JSON.parse(contents) as Partial<ContentStore>);
+  // Prefer the durable Supabase copy, then the runtime temp-dir copy, then the
+  // seed bundled with the app.
+  const fromDb = await readFromSupabase();
+  if (fromDb) {
+    memoryStore = fromDb;
     return memoryStore;
-  } catch {
-    // No runtime copy yet — fall back to the seed bundled with the app.
+  }
+
+  const fromDisk = await readFromDisk();
+  if (fromDisk) {
+    memoryStore = fromDisk;
+    return memoryStore;
   }
 
   memoryStore = normalizeStore(seedContent as unknown as Partial<ContentStore>);
-  await persist(memoryStore);
+  // Seed the durable store on first run so subsequent instances share it.
+  await writeToSupabase(memoryStore);
+  await persistToDisk(memoryStore);
   return memoryStore;
 }
 
 export async function writeContentStore(store: ContentStore) {
   const normalized = normalizeStore(store);
   memoryStore = normalized;
-  await persist(normalized);
+  await writeToSupabase(normalized);
+  await persistToDisk(normalized);
 }
