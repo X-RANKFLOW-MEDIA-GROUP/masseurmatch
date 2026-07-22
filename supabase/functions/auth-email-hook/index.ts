@@ -38,7 +38,9 @@ function btn(text: string, url: string): string {
 }
 
 function confirmUrl(type: string, tokenHash: string, redirectTo: string): string {
-  return `${SUPABASE_URL}/auth/v1/verify?token=${tokenHash}&type=${type}&redirect_to=${encodeURIComponent(redirectTo)}`;
+  // redirectTo is already a fully-formed URL — do NOT encodeURIComponent() it here.
+  // Double-encoding produces %252F instead of %2F, which breaks the callback route.
+  return `${SUPABASE_URL}/auth/v1/verify?token=${tokenHash}&type=${type}&redirect_to=${redirectTo}`;
 }
 
 interface OutgoingEmail {
