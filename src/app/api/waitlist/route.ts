@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import type { Json } from "@/integrations/supabase/types";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ALLOWED_ROLES = new Set(["visitor", "therapist", "partner", "press"]);
@@ -58,7 +59,7 @@ async function enforceRateLimit(supabase: ReturnType<typeof createClient>, finge
 
   if (existing.error) {
     console.error("[waitlist] rate-limit check failed:", existing.error.message);
-    return { allowed: true }; // fail open — don't block signups on DB errors
+    return { allowed: true };
   }
   if (!existing.data) {
     await supabase.from("waitlist_rate_limits").insert({ fingerprint, window_start: now.toISOString(), request_count: 1 });
@@ -97,7 +98,7 @@ export async function POST(request: Request) {
   const referrer = sanitizeText(payload.referrer || request.headers.get("referer") || "");
   const campaign = sanitizeText(payload.campaign, "prelaunch");
   const userAgent = sanitizeText(request.headers.get("user-agent") || "");
-  const metadata = typeof payload.metadata === "object" && payload.metadata ? payload.metadata : {};
+  const metadata = (typeof payload.metadata === "object" && payload.metadata ? payload.metadata : {}) as Json;
   const company = sanitizeText(payload.company);
   const startedAt = typeof payload.startedAt === "number" ? payload.startedAt : 0;
   const timeToSubmitMs = startedAt > 0 ? Date.now() - startedAt : null;
@@ -121,11 +122,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Valid email is required." }, { status: 400 });
   }
 
-  const eventInsert = await supabase.from("waitlist_events").insert({ event_name: eventName, email: email || null, source, page_path: pagePath, referrer, user_agent: userAgent, metadata: { ...metadata, campaign, timeToSubmitMs } });
+  const eventInsert = await supabase.from("waitlist_events").insert({ event_name: eventName, email: email || null, source, page_path: pagePath, referrer, user_agent: userAgent, metadata: { ...(metadata as Record<string, Json | undefined>), campaign, timeToSubmitMs } });
   if (eventInsert.error) return NextResponse.json({ ok: false, error: "Unable to track event." }, { status: 500 });
   if (!email) return NextResponse.json({ ok: true, tracked: true });
 
-  // normalized_email is the unique conflict target — strip dots/plus-tricks
   const normalizedEmail = email.toLowerCase().replace(/\+[^@]*(?=@)/, "").replace(/\.(?=[^@]*@)/g, "");
 
   const signupInsert = await supabase
