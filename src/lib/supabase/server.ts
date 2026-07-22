@@ -1,21 +1,16 @@
 import { cookies } from "next/headers";
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient as createSsrServerClient } from "@supabase/ssr";
 import type { Database } from "@/integrations/supabase/types";
 import {
   SUPABASE_PUBLIC_URL,
   SUPABASE_PUBLIC_ANON_KEY,
 } from "@/integrations/supabase/client";
 
-/**
- * Cookie-bound Supabase server client for the current request.
- *
- * Uses the anon key so every query is enforced by Row Level Security and runs
- * as the signed-in user from Supabase auth cookies.
- */
+/** Cookie-bound Supabase server client scoped by the signed-in user's RLS. */
 export async function createServerSupabase() {
   const cookieStore = await cookies();
 
-  return createServerClient<Database>(
+  return createSsrServerClient<Database>(
     SUPABASE_PUBLIC_URL,
     SUPABASE_PUBLIC_ANON_KEY,
     {
@@ -36,3 +31,6 @@ export async function createServerSupabase() {
     },
   );
 }
+
+/** Compatibility alias for existing server components. */
+export const createServerClient = createServerSupabase;
