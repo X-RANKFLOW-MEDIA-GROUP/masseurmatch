@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { JsonLd } from "@/app/_components/json-ld";
 import { getCanonicalCitySlug, resolveCitySlug } from "@/app/_lib/city-routing";
 import {
@@ -92,6 +92,11 @@ export default async function CanonicalCityPage({ params }: { params: Promise<Pa
   }
 
   const canonicalCity = getCanonicalCitySlug(city.slug);
+
+  // Redirect legacy /cities/{slug} routes to canonical /{city} paths
+  if (resolved.city !== citySlug) {
+    redirect(`/${citySlug}`);
+  }
   const canonicalCityPath = `/cities/${canonicalCity}`;
   const cityName = city.name;
   const therapists = await getPublicTherapists({ city: cityName, page: 1, pageSize: 10 });
