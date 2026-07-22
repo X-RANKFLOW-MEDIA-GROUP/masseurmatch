@@ -87,7 +87,7 @@ function validatePricingSessions(value: unknown): NormalizedPricingSession[] {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = getRequestSession(request);
+    const session = await getRequestSession(request);
     if (!session) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
 
     const body = await request.json();
@@ -122,9 +122,6 @@ export async function POST(request: NextRequest) {
     const outcallRates = pricingSessions.map((item) => item.outcall_rate).filter((value): value is number => typeof value === "number");
     const allRates = [...incallRates, ...outcallRates];
 
-    // Only provider-editable profile data is updated here. Publication,
-    // verification, visibility, activation, and subscription tier are protected
-    // moderation fields and must be changed through their trusted workflows.
     const editableProfileUpdate = {
       display_name: profile.displayName || profile.fullName || null,
       full_name: profile.fullName || profile.displayName || null,
