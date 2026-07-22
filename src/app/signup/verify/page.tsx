@@ -1,28 +1,36 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   AlertCircle,
   ArrowRight,
   CheckCircle2,
+  Clock,
   Loader2,
   Mail,
   ShieldCheck,
 } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { useSignup } from "../_lib/signup-context";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useSignup } from "../_lib/signup-context";
+
+type IdentityStatusResponse = {
+  status: "verified" | "processing" | "requires_input" | "canceled" | string;
+  publicationStatus?: "not_ready" | "published" | "pending";
+  next?: string | null;
+  error?: string;
+};
 
 async function syncServerSession(accessToken: string | undefined) {
   if (!accessToken) return;
-
   await fetch("/api/auth/sync-session", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -47,137 +55,91 @@ function SignupVerifyPageInner() {
   const [emailLoading, setEmailLoading] = useState(false);
   const [idLoading, setIdLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [verifiedNext, setVerifiedNext] = useState<string | null>(null);
   const autoCheckedRef = useRef(false);
-  const statusCheckAttemptsRef = useRef(0);
-  const MAX_STATUS_CHECK_ATTEMPTS = 30; // Prevent infinite polling
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Cleanup: abort pending requests on unmount
-  useEffect(() => {
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
-  }, []);
+  useEffect(() => () => abortControllerRef.current?.abort(), []);
 
   useEffect(() => {
     if (authLoading) return;
-
     if (!user) {
       router.replace("/login?redirect=%2Fsignup%2Fverify");
       return;
     }
 
     const metadata = user.user_metadata as Record<string, unknown> | undefined;
-    const derivedFullName =
-      state.fullName ||
-      (typeof metadata?.full_name === "string"
-        ? metadata.full_name.trim()
-        : typeof metadata?.name === "string"
-          ? metadata.name.trim()
-          : user.email?.split("@")[0] || "User");
+    const fullName = state.fullName ||
+      (typeof metadata?.full_name === "string" ? metadata.full_name.trim() : "") ||
+      (typeof metadata?.name === "string" ? metadata.name.trim() : "") ||
+      user.email?.split("@")[0] || "User";
 
     setAccountInfo({
-      fullName: derivedFullName,
-      displayName: state.displayName || derivedFullName,
+      fullName,
+      displayName: state.displayName || fullName,
       email: state.email || user.email?.trim() || "",
       phone: state.phone || user.phone?.trim() || "",
     });
 
-    if (user.email_confirmed_at) {
-      markEmailVerified();
-    }
-  }, [
-    authLoading,
-    markEmailVerified,
-    router,
-    setAccountInfo,
-    state.displayName,
-    state.email,
-    state.fullName,
-    state.phone,
-    user,
-  ]);
+    if (user.email_confirmed_at) markEmailVerified();
+  }, [authLoading, markEmailVerified, router, setAccountInfo, state.displayName, state.email, state.fullName, state.phone, user]);
 
   const checkIdentityStatus = useCallback(async () => {
     if (!state.stripeIdentitySessionId) return;
-    if (statusCheckAttemptsRef.current >= MAX_STATUS_CHECK_ATTEMPTS) {
-      setError("Verification check timed out. Please click 'Resume Verification' to try again.");
-      return;
-    }
-
-    statusCheckAttemptsRef.current += 1;
     setIdLoading(true);
     setError(null);
+    setNotice(null);
 
     try {
-      const response = await fetch(
-        `/api/stripe/identity/check-status?sessionId=${encodeURIComponent(state.stripeIdentitySessionId)}`,
-      );
+      const response = await fetch(`/api/stripe/identity/check-status?sessionId=${encodeURIComponent(state.stripeIdentitySessionId)}`, {
+        cache: "no-store",
+      });
+      const body = await response.json().catch(() => ({})) as IdentityStatusResponse;
+      if (!response.ok) throw new Error(body.error || "Verification status could not be checked.");
 
-      if (!response.ok) {
-        const body = await response.json().catch(() => ({}));
-        throw new Error(body.error ?? "Failed to check verification status.");
-      }
-
-      const { status } = await response.json();
-
-      if (status === "verified") {
+      if (body.status === "verified") {
         setIdentityStatus("verified");
-        statusCheckAttemptsRef.current = 0; // Reset on success
-      } else if (status === "requires_input") {
+        setVerifiedNext(body.next || "/pro/subscription?identity=verified");
+        setNotice(body.publicationStatus === "published"
+          ? "Identity approved. Your profile publication status was updated successfully."
+          : "Identity approved. Your dashboard is available while publication finishes syncing.");
+      } else if (body.status === "requires_input") {
         setIdentityStatus("requires_input");
-      } else if (status === "canceled") {
+        setNotice("Stripe needs additional information. Resume verification to continue.");
+      } else if (body.status === "canceled") {
         setIdentityStatus("failed");
       } else {
         setIdentityStatus("processing");
+        setNotice("Stripe is still processing your verification. You may continue building your profile now.");
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to check verification status. Please try again.");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Verification status could not be checked.");
     } finally {
       setIdLoading(false);
     }
   }, [setIdentityStatus, state.stripeIdentitySessionId]);
 
   useEffect(() => {
-    if (state.identityVerificationStatus !== "processing" || !state.stripeIdentitySessionId) {
-      return;
-    }
-
-    void checkIdentityStatus();
-  }, [checkIdentityStatus, state.identityVerificationStatus, state.stripeIdentitySessionId]);
-
-  // When Stripe redirects back with ?identity_return=1, auto-check status once
-  useEffect(() => {
-    if (autoCheckedRef.current) return;
-    if (!searchParams?.get("identity_return")) return;
-    if (!state.stripeIdentitySessionId) return;
-    if (state.identityVerificationStatus === "verified") return;
-
+    if (autoCheckedRef.current || !searchParams?.get("identity_return") || !state.stripeIdentitySessionId) return;
     autoCheckedRef.current = true;
     void checkIdentityStatus();
-  }, [checkIdentityStatus, searchParams, state.stripeIdentitySessionId, state.identityVerificationStatus]);
+  }, [checkIdentityStatus, searchParams, state.stripeIdentitySessionId]);
 
   async function sendEmailCode() {
     if (!state.email) {
-      setError("An email address is required to verify your account.");
+      setError("An email address is required.");
       return;
     }
-
     setEmailLoading(true);
     setError(null);
-
     try {
-      const { error: resendError } = await supabase.auth.resend({
-        type: "signup",
-        email: state.email,
-      });
-
+      const { error: resendError } = await supabase.auth.resend({ type: "signup", email: state.email });
       if (resendError) throw resendError;
       setEmailSent(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send email verification code.");
+      setNotice(`A verification code was sent to ${state.email}.`);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Failed to send email verification.");
     } finally {
       setEmailLoading(false);
     }
@@ -186,20 +148,18 @@ function SignupVerifyPageInner() {
   async function verifyEmailCode() {
     setEmailLoading(true);
     setError(null);
-
     try {
       const { data, error: verifyError } = await supabase.auth.verifyOtp({
         email: state.email,
         token: emailOtp,
         type: "email",
       });
-
       if (verifyError) throw verifyError;
-
       await syncServerSession(data.session?.access_token);
       markEmailVerified();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid email verification code.");
+      setNotice("Email verified successfully.");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Invalid email verification code.");
     } finally {
       setEmailLoading(false);
     }
@@ -208,222 +168,131 @@ function SignupVerifyPageInner() {
   const startIdentityVerification = useCallback(async () => {
     setIdLoading(true);
     setError(null);
+    setNotice(null);
 
     try {
-      // Abort any previous requests
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
+      abortControllerRef.current?.abort();
       abortControllerRef.current = new AbortController();
-
       const response = await fetch("/api/stripe/identity/create-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
         signal: abortControllerRef.current.signal,
       });
+      const body = await response.json().catch(() => ({})) as { sessionId?: string; url?: string; error?: string };
+      if (!response.ok || !body.sessionId) throw new Error(body.error || "Could not start ID verification.");
 
-      if (!response.ok) {
-        const body = await response.json().catch(() => ({}));
-        throw new Error(body.error ?? "Failed to create verification session.");
-      }
-
-      const { sessionId, url } = await response.json();
-      setStripeIdentitySessionId(sessionId);
+      setStripeIdentitySessionId(body.sessionId);
       setIdentityStatus("processing");
-      statusCheckAttemptsRef.current = 0; // Reset attempts counter
-
-      if (url) {
-        window.location.href = url;
-      }
-    } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") {
-        return; // Request was cancelled, don't show error
-      }
-      setError(err instanceof Error ? err.message : "Identity verification failed to start.");
+      if (body.url) window.location.href = body.url;
+    } catch (caught) {
+      if (caught instanceof Error && caught.name === "AbortError") return;
       setIdentityStatus("failed");
+      setError(caught instanceof Error ? caught.message : "Identity verification could not start.");
     } finally {
       setIdLoading(false);
     }
   }, [setIdentityStatus, setStripeIdentitySessionId]);
 
-  const idVerified = state.identityVerificationStatus === "verified";
+  if (!authLoading && !user) return null;
+
+  const idStatus = state.identityVerificationStatus;
+  const idVerified = idStatus === "verified";
   const canContinue = state.emailVerified;
-
-  function handleContinue() {
-    if (!canContinue) return;
-    router.push(idVerified ? "/pro/listing" : "/signup/profile");
-  }
-
-  function renderIdButton() {
-    const status = state.identityVerificationStatus;
-
-    if (status === "verified") {
-      return (
-        <Badge
-          variant="secondary"
-          className="gap-1.5 border-green-200 bg-green-50 py-1.5 text-green-700"
-        >
-          <CheckCircle2 className="h-3.5 w-3.5" /> Verification Complete
-        </Badge>
-      );
-    }
-
-    if (status === "processing") {
-      return (
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={checkIdentityStatus} disabled={idLoading}>
-            {idLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Check Status
-          </Button>
-          <Button variant="outline" onClick={startIdentityVerification} disabled={idLoading}>
-            Resume Verification
-          </Button>
-        </div>
-      );
-    }
-
-    if (status === "requires_input" || status === "failed") {
-      return (
-        <div className="space-y-2">
-          <Badge variant="destructive" className="gap-1.5">
-            <AlertCircle className="h-3.5 w-3.5" />
-            {status === "failed" ? "Verification Failed" : "Additional Input Required"}
-          </Badge>
-          <Button onClick={startIdentityVerification} disabled={idLoading}>
-            {idLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Retry Verification
-          </Button>
-        </div>
-      );
-    }
-
-    return (
-      <Button onClick={startIdentityVerification} disabled={idLoading}>
-        {idLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-        Start ID Verification
-      </Button>
-    );
-  }
-
-  if (!authLoading && !user) {
-    return null;
-  }
+  const continueDestination = idVerified && state.profileCompleted
+    ? verifiedNext || "/pro/subscription?identity=verified"
+    : state.profileCompleted
+      ? "/pro/dashboard?identity=pending"
+      : "/signup/profile";
 
   return (
-    <div className="mx-auto max-w-lg space-y-8 py-8">
+    <div className="mx-auto max-w-2xl space-y-7 py-8">
       <div className="text-center">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-foreground">
-          Verify Your Identity
-        </h1>
-        <p className="mt-3 text-muted-foreground">
-          To help maintain trust and safety on MasseurMatch, identity verification is required
-          before your profile can be reviewed.
+        <h1 className="font-display text-3xl font-bold tracking-tight text-foreground">Verification</h1>
+        <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+          Verify your email to continue. Stripe Identity can be completed now or later; you can still access the dashboard and finish your profile while it is pending.
         </p>
       </div>
 
-      {error && (
-        <p className="rounded-lg bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
-          {error}
-        </p>
-      )}
+      {error && <p className="flex items-start gap-2 rounded-xl bg-destructive/10 px-4 py-3 text-sm leading-6 text-destructive"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />{error}</p>}
+      {notice && <p className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-900">{notice}</p>}
 
       <Card>
         <CardContent className="space-y-4 p-6">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Mail className="h-5 w-5 text-brand-secondary" />
             <h2 className="font-display text-lg font-semibold">Email Verification</h2>
-            {state.emailVerified && (
-              <Badge
-                variant="secondary"
-                className="ml-auto gap-1 border-green-200 bg-green-50 text-green-700"
-              >
-                <CheckCircle2 className="h-3 w-3" /> Verified
-              </Badge>
-            )}
+            {state.emailVerified && <Badge className="ml-auto gap-1 border-green-200 bg-green-50 text-green-700" variant="outline"><CheckCircle2 className="h-3 w-3" /> Verified</Badge>}
           </div>
 
-          {!state.emailVerified && (
-            <>
-              {!emailSent ? (
-                <Button onClick={sendEmailCode} disabled={emailLoading} variant="outline">
-                  {emailLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  Send Verification Code
+          {!state.emailVerified && !emailSent && (
+            <Button type="button" variant="outline" onClick={sendEmailCode} disabled={emailLoading}>
+              {emailLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Send Verification Code
+            </Button>
+          )}
+
+          {!state.emailVerified && emailSent && (
+            <div className="space-y-3">
+              <Label htmlFor="emailOtp">Enter the 6-digit code sent to {state.email}</Label>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Input id="emailOtp" inputMode="numeric" value={emailOtp} onChange={(event) => setEmailOtp(event.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="000000" maxLength={6} />
+                <Button type="button" onClick={verifyEmailCode} disabled={emailLoading || emailOtp.length !== 6}>
+                  {emailLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Verify Email
                 </Button>
-              ) : (
-                <div className="space-y-3">
-                  <Label htmlFor="emailOtp">Enter the code sent to {state.email}</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="emailOtp"
-                      value={emailOtp}
-                      onChange={(event) => setEmailOtp(event.target.value)}
-                      placeholder="000000"
-                      maxLength={6}
-                    />
-                    <Button onClick={verifyEmailCode} disabled={emailLoading || emailOtp.length !== 6}>
-                      {emailLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                      Verify
-                    </Button>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={sendEmailCode}
-                    className="text-xs text-brand-secondary underline"
-                    disabled={emailLoading}
-                  >
-                    Resend code
-                  </button>
-                </div>
-              )}
-            </>
+              </div>
+              <button type="button" onClick={sendEmailCode} disabled={emailLoading} className="text-sm font-semibold text-brand-secondary underline">Resend code</button>
+            </div>
           )}
         </CardContent>
       </Card>
 
       <Card>
-        <CardContent className="space-y-4 p-6">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
+        <CardContent className="space-y-5 p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
               <ShieldCheck className="h-5 w-5 text-brand-secondary" />
-              <h2 className="font-display text-lg font-semibold">Secure ID Check</h2>
+              <div><h2 className="font-display text-lg font-semibold">Secure ID Check</h2><p className="text-xs text-muted-foreground">Handled by Stripe Identity</p></div>
             </div>
-            <Badge variant="outline" className="text-xs text-muted-foreground">Optional now</Badge>
+            <Badge variant="outline" className={idVerified ? "border-green-200 bg-green-50 text-green-700" : "text-muted-foreground"}>
+              {idVerified ? "Verified" : idStatus === "processing" ? "Processing" : idStatus === "requires_input" ? "Input Required" : "Required for Public Profile"}
+            </Badge>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Verify your identity with a government-issued ID via Stripe. Verified profiles get a
-            trust badge and are approved faster. You can complete this later from your dashboard.
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Verification is handled securely by Stripe Identity. MasseurMatch does not store your ID documents.
-          </p>
-          {renderIdButton()}
+
+          <div className="rounded-xl border border-border bg-muted/30 p-4 text-sm leading-6 text-muted-foreground">
+            <p>MasseurMatch does not store your ID documents. Stripe confirms the verification result.</p>
+            <p className="mt-2"><strong className="text-foreground">While pending:</strong> you can use the dashboard, edit rates, upload photos, add travel dates, and finish your profile.</p>
+            <p className="mt-2"><strong className="text-foreground">When approved:</strong> the profile becomes eligible for public visibility and you continue to plan/payment setup.</p>
+          </div>
+
+          {idVerified ? (
+            <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 p-4 text-sm font-semibold text-green-800"><CheckCircle2 className="h-5 w-5" /> Identity verification complete</div>
+          ) : idStatus === "processing" ? (
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button type="button" onClick={checkIdentityStatus} disabled={idLoading}>{idLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Check Status</Button>
+              <Button type="button" variant="outline" onClick={startIdentityVerification} disabled={idLoading}>Resume Verification</Button>
+            </div>
+          ) : (
+            <Button type="button" onClick={startIdentityVerification} disabled={idLoading}>
+              {idLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {idStatus === "requires_input" || idStatus === "failed" ? "Retry ID Verification" : "Start ID Verification"}
+            </Button>
+          )}
         </CardContent>
       </Card>
 
-      <Button size="lg" className="w-full gap-2" disabled={!canContinue} onClick={handleContinue}>
-        {idVerified ? "Go to Profile Editor" : "Continue to Profile"}
-        <ArrowRight className="h-4 w-4" strokeWidth={2.25} />
-      </Button>
-
-      {!state.emailVerified && (
-        <p className="text-center text-xs text-muted-foreground">
-          Verify your email above to continue.
-        </p>
-      )}
-      {state.emailVerified && !idVerified && (
-        <p className="text-center text-xs text-muted-foreground">
-          ID verification is optional — you can complete it later from your dashboard.
-        </p>
-      )}
+      <div className="space-y-3">
+        <Button type="button" size="lg" className="w-full gap-2" disabled={!canContinue} onClick={() => router.push(continueDestination)}>
+          {idVerified && state.profileCompleted ? "Continue to Plan & Payment" : state.profileCompleted ? "Open Dashboard" : "Continue to Profile"}
+          <ArrowRight className="h-4 w-4" />
+        </Button>
+        {!state.emailVerified && <p className="text-center text-xs text-muted-foreground">Verify your email above to continue.</p>}
+        {state.emailVerified && !idVerified && <p className="text-center text-xs text-muted-foreground">You may continue now and return to ID verification from the dashboard.</p>}
+        {state.emailVerified && <div className="text-center"><Link href="/pro/dashboard" className="text-sm font-semibold text-brand-secondary underline">Go directly to dashboard</Link></div>}
+      </div>
     </div>
   );
 }
 
 export default function SignupVerifyPage() {
-  return (
-    <Suspense>
-      <SignupVerifyPageInner />
-    </Suspense>
-  );
+  return <Suspense><SignupVerifyPageInner /></Suspense>;
 }
