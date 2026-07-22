@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { setSessionCookie } from "@/app/api/_lib/session";
-import { withSetCookie } from "@/app/api/_lib/http";
-import { ensureUserProfileAndRole, createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import { ensureUserProfileAndRole } from "@/app/api/_lib/supabase-server";
+import { createServerSupabase } from "@/lib/supabase/server";
 import { isRateLimited } from "@/app/api/_lib/rate-limit";
 
 function secureJson(body: unknown, status = 200) {
@@ -13,51 +12,25 @@ function secureJson(body: unknown, status = 200) {
   return response;
 }
 
+/**
+ * Compatibility endpoint. Supabase SSR stores the browser session in auth
+ * cookies, so this only confirms the current cookie session and ensures the
+ * profile and role rows exist.
+ */
 export async function POST(request: NextRequest) {
-  if (
-    isRateLimited(request, {
-      keyPrefix: "auth-sync",
-      windowMs: 60000,
-      max: 15,
-    })
-  ) {
+  if (isRateLimited(request, { keyPrefix: "auth-sync", windowMs: 60000, max: 15 })) {
     return secureJson({ error: "Too many requests" }, 429);
   }
 
-  let body: { access_token?: string };
-
-  try {
-    body = await request.json();
-  } catch {
-    return secureJson({ error: "Invalid body" }, 400);
-  }
-
-  const accessToken = body.access_token;
-
-  if (!accessToken || typeof accessToken !== "string") {
-    return secureJson({ error: "Missing access_token" }, 400);
-  }
-
-  const supabase = createSupabaseAdminClient();
-
+  const supabase = await createServerSupabase();
   const {
     data: { user },
-    error,
-  } = await supabase.auth.getUser(accessToken);
+  } = await supabase.auth.getUser();
 
-  if (error || !user) {
-    return secureJson({ error: "Invalid token" }, 401);
+  if (!user) {
+    return secureJson({ ok: false, error: "Not authenticated" }, 401);
   }
 
-  const { role } = await ensureUserProfileAndRole(user, {
-    defaultRole: "provider",
-  });
-
-  const cookie = setSessionCookie({
-    userId: user.id,
-    email: user.email || user.phone || "",
-    role,
-  });
-
-  return withSetCookie(secureJson({ ok: true }), cookie);
+  const { role } = await ensureUserProfileAndRole(user, { defaultRole: "provider" });
+  return secureJson({ ok: true, role });
 }
