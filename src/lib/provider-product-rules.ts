@@ -2,20 +2,19 @@ export type ProviderTier = "free" | "standard" | "pro" | "elite";
 
 export const MAX_RATE_PER_MINUTE = 3.33;
 
-export const AVAILABLE_NOW_RULES: Record<ProviderTier, { durationMinutes: number; activationsPerDay: number }> = {
+export const AVAILABLE_NOW_RULES: Record<ProviderTier, { durationMinutes: number; activationsPerDay: number | null }> = {
   free: { durationMinutes: 30, activationsPerDay: 3 },
-  standard: { durationMinutes: 60, activationsPerDay: 3 },
-  pro: { durationMinutes: 120, activationsPerDay: 3 },
-  elite: { durationMinutes: 120, activationsPerDay: 3 },
+  standard: { durationMinutes: 60, activationsPerDay: null },
+  pro: { durationMinutes: 120, activationsPerDay: null },
+  elite: { durationMinutes: 120, activationsPerDay: null },
 };
 
-// Monthly destination limits. Travel Boost remains available as an add-on for
-// additional trips after the included allowance is used.
-export const TRAVEL_DESTINATION_LIMITS: Record<ProviderTier, number> = {
-  free: 0,
-  standard: 1,
-  pro: 3,
-  elite: 6,
+// Included travel destinations per calendar month. null means unlimited.
+export const TRAVEL_DESTINATION_LIMITS: Record<ProviderTier, number | null> = {
+  free: 1,
+  standard: 3,
+  pro: null,
+  elite: null,
 };
 
 export function normalizeProviderTier(value: string | null | undefined): ProviderTier {
