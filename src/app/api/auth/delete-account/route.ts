@@ -4,7 +4,7 @@ import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 
 export async function DELETE(request: Request) {
   try {
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
 
     const adminClient = createSupabaseAdminClient();
     const { error } = await adminClient.auth.admin.deleteUser(session.userId);
