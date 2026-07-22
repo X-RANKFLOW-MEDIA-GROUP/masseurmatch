@@ -95,7 +95,7 @@ function deriveLegacyPrices(sessions: ReturnType<typeof normalizeSessions>) {
 
 export async function GET(request: Request) {
   try {
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const admin = createSupabaseAdminClient();
     const { data, error } = await admin
       .from("profiles")
@@ -114,7 +114,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const body = await parseJsonBody(request, ratesSchema);
     const normalized = normalizeSessions(body.mode, body.sessions);
     const legacyPrices = deriveLegacyPrices(normalized);
