@@ -133,7 +133,7 @@ function parseProfilePayload(raw: unknown) {
 
 export async function GET(request: Request) {
   try {
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const admin = createSupabaseAdminClient();
 
     // Check if this is a dashboard request (minimal data needed)
@@ -161,7 +161,7 @@ export async function POST(request: Request) {
   try {
     assertRateLimit(request, "pro-profile", { limit: 20, windowMs: 60_000 });
 
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const profile = await getProfileByUserId(session.userId);
 
     if (!profile) {
@@ -380,7 +380,7 @@ export async function PATCH(request: Request) {
   try {
     assertRateLimit(request, "pro-profile", { limit: 30, windowMs: 60_000 });
 
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const profile = await getProfileByUserId(session.userId);
     if (!profile) {
       throw new RouteError(404, "Profile not found.");

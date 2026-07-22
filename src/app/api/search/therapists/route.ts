@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '20', 10) || 20));
 
     const supabase = createSupabaseAdminClient();
-    const session = getRequestSession(request);
+    const session = await getRequestSession(request);
 
     let queryBuilder = supabase
       .from('profiles')

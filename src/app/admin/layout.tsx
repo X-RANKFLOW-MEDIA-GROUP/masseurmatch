@@ -22,10 +22,6 @@ async function ensureAdminAccess() {
   const cookieStore = await cookies();
   const cookieHeader = cookieStore.toString();
 
-  if (!cookieHeader.includes("mm_session=")) {
-    redirect("/login?redirect=%2Fadmin");
-  }
-
   try {
     await requireAdminSession(
       new Request("http://localhost/admin", {

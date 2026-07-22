@@ -72,7 +72,7 @@ export async function GET(
   }
 
   // Fire-and-forget: analytics + contact event logging
-  const session = getRequestSession(request as unknown as Request);
+  const session = await getRequestSession(request as unknown as Request);
   const ipRaw =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
     request.headers.get("x-real-ip") ??

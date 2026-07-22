@@ -113,7 +113,6 @@ export function AuthForms({
         localStorage.setItem("mm_saved_email", email);
       } else {
         localStorage.removeItem("mm_saved_email");
-        sessionStorage.setItem("mm_session_only", "true");
       }
     }
 

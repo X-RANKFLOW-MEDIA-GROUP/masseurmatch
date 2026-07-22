@@ -15,7 +15,7 @@ const CODE_TTL_MINUTES = 10;
 
 export async function POST(request: Request) {
   try {
-    const session = getRequestSession(request);
+    const session = await getRequestSession(request);
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

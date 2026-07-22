@@ -671,7 +671,7 @@ export async function handleKnottyRequest(
 
   if (adminClient && recommendations.length > 0) {
     try {
-      const session = request ? getRequestSession(request) : null;
+      const session = request ? await getRequestSession(request) : null;
       await persistRankingEvents(
         adminClient,
         recommendations.map((recommendation) => ({

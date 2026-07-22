@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 
     try {
       const adminClient = createSupabaseAdminClient();
-      const session = getRequestSession(request);
+      const session = await getRequestSession(request);
       await persistRankingEvents(adminClient, [parsed], session?.userId || null);
       persisted = true;
     } catch {

@@ -63,14 +63,15 @@ export async function GET(request: NextRequest) {
     }
 
     if (stripeSession.status === "verified") {
+      // Identity verification records the ID check ONLY. It must never publish
+      // a profile or mark it approved — going public still requires human
+      // moderation via the admin approval queue. Auto-approving here previously
+      // let anyone whose ID verified bypass review entirely.
       const { error: profileUpdateError } = await adminClient
         .from("profiles")
         .update({
           is_verified_identity: true,
           verification_status: "verified",
-          status: "approved",
-          profile_status: "approved",
-          visibility_status: "public",
           updated_at: new Date().toISOString(),
         })
         .eq("user_id", userId)

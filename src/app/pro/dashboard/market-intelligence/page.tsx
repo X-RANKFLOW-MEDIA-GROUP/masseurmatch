@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { Lock, TrendingUp, MapPin, Clock, BarChart3, AlertCircle, Zap } from "lucide-react";
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerSupabase } from "@/lib/supabase/server";
 import { LockedPreview } from "./_components/LockedPreview";
 import { DemandSpikes } from "./_components/DemandSpikes";
 import { SearchTrends } from "./_components/SearchTrends";
@@ -18,7 +18,7 @@ export const metadata = {
 };
 
 async function getUserSubscription() {
-  const supabase = await createServerClient();
+  const supabase = await createServerSupabase();
   const {
     data: { user },
   } = await supabase.auth.getUser();

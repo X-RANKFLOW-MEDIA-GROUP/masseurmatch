@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   try {
     assertRateLimit(request, "pro-moderate-content", { limit: 10, windowMs: 60_000 });
 
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const profile = await getProfileByUserId(session.userId);
 
     if (!profile) {

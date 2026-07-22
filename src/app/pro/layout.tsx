@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createPageMetadata } from "@/app/_lib/metadata";
-import { parseSessionCookieValue } from "@/app/_lib/session";
+import { createServerSupabase } from "@/lib/supabase/server";
+import { normalizeSessionRole } from "@/app/api/_lib/session";
 import ProLayoutClient from "./ProLayoutClient";
 
 export const metadata: Metadata = createPageMetadata({
@@ -13,12 +13,21 @@ export const metadata: Metadata = createPageMetadata({
 });
 
 async function ensureProAccess() {
-  const cookieStore = await cookies();
-  const rawValue = cookieStore.get("mm_session")?.value;
-  const session = parseSessionCookieValue(rawValue);
+  const supabase = await createServerSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user) {
     redirect("/login?redirect=%2Fpro%2Fdashboard");
+  }
+
+  const role =
+    normalizeSessionRole((user.app_metadata as Record<string, unknown> | undefined)?.role) ??
+    normalizeSessionRole((user.user_metadata as Record<string, unknown> | undefined)?.role);
+
+  if (role !== "provider" && role !== "admin") {
+    redirect("/");
   }
 }
 

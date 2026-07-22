@@ -5,94 +5,10 @@ import {
   resolveCitySlug,
 } from "@/app/_lib/city-routing";
 import { containsLangParam, removeLangSearchParam } from "@/app/_lib/route-normalization";
-
-const SESSION_COOKIE_NAME = "mm_session";
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
-
-type MiddlewareSession = {
-  userId: string;
-  email: string;
-  role: "admin" | "provider" | "client" | null;
-  expiresAt: string;
-};
+import { updateSession, type EdgeSession } from "@/lib/supabase/middleware";
 
 function permanentRedirect(path: string, request: NextRequest): NextResponse {
   return NextResponse.redirect(new URL(path, request.url), { status: 301 });
-}
-
-function getSessionSecret(): string {
-  const secret =
-    process.env.MM_SESSION_SECRET ??
-    process.env.SESSION_SECRET ??
-    process.env.MM_JWT_SECRET ??
-    process.env.JWT_SECRET;
-  if (secret) return secret;
-  // Only fall back to a constant for genuine local development/testing. Any
-  // deployed environment (production, preview, staging) must provide a real
-  // secret so an attacker cannot forge a signed admin cookie.
-  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
-    const devSecret = 'dev-only-masseurmatch-session-secret';
-    console.warn('Using hardcoded development session secret. This is only safe in local development.');
-    return devSecret;
-  }
-  throw new Error('MM_SESSION_SECRET is required for session validation. Check your environment variables.');
-}
-
-function toBase64Url(bytes: Uint8Array): string {
-  let binary = "";
-  for (const byte of bytes) {
-    binary += String.fromCharCode(byte);
-  }
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
-}
-
-function fromBase64Url(value: string): Uint8Array {
-  const padded = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(value.length / 4) * 4, "=");
-  const binary = atob(padded);
-  return Uint8Array.from(binary, (char) => char.charCodeAt(0));
-}
-
-function constantTimeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let mismatch = 0;
-  for (let index = 0; index < a.length; index += 1) {
-    mismatch |= a.charCodeAt(index) ^ b.charCodeAt(index);
-  }
-  return mismatch === 0;
-}
-
-async function signPayload(payload: string): Promise<string> {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(getSessionSecret()),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(payload));
-  return toBase64Url(new Uint8Array(signature));
-}
-
-async function readSessionCookie(request: NextRequest): Promise<MiddlewareSession | null> {
-  const rawValue = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  if (!rawValue) return null;
-
-  const [payload, signature] = rawValue.split(".");
-  if (!payload || !signature) return null;
-
-  const expectedSignature = await signPayload(payload);
-  if (!constantTimeEqual(signature, expectedSignature)) return null;
-
-  try {
-    const parsed = JSON.parse(decoder.decode(fromBase64Url(payload))) as MiddlewareSession;
-    if (!parsed.userId || !parsed.email || !parsed.expiresAt) return null;
-    const expiryMs = new Date(parsed.expiresAt).getTime();
-    if (Number.isNaN(expiryMs) || expiryMs <= Date.now()) return null;
-    return parsed;
-  } catch {
-    return null;
-  }
 }
 
 const PUBLIC_RATE_LIMIT = { windowMs: 60_000, max: 240 };
@@ -186,31 +102,55 @@ function exploreCityToSlug(rawCity: string): string {
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname, searchParams } = request.nextUrl;
-  const session = await readSessionCookie(request);
 
   if (isPublicRateLimited(request)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
+  const host = request.headers.get("host") ?? "";
+  const isAdminSubdomain =
+    host.startsWith("admin.masseurmatch.com") || host.startsWith("admin.masseurmatch.local");
+
+  // Only touch Supabase Auth on routes that actually gate on identity. Public
+  // pages (the bulk of traffic) skip the network round-trip entirely.
+  const needsSession =
+    isAdminSubdomain ||
+    pathname === "/pro" ||
+    pathname.startsWith("/pro/") ||
+    pathname === "/client" ||
+    pathname.startsWith("/client/") ||
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/");
+
+  let session: EdgeSession | null = null;
+  let sessionResponse: NextResponse | null = null;
+  if (needsSession) {
+    const result = await updateSession(request);
+    session = result.session;
+    sessionResponse = result.response;
+  }
+
   // ── 0a. Admin subdomain routing ──────────────────────────────────────────
   // Rewrite admin.masseurmatch.com/* → /admin/* (requires domain alias in Vercel)
-  const host = request.headers.get("host") ?? "";
-  const isAdminSubdomain = host.startsWith("admin.masseurmatch.com") || host.startsWith("admin.masseurmatch.local");
-
   if (isAdminSubdomain) {
     const adminPathname = pathname === "/" ? "/admin" : pathname.startsWith("/admin") ? pathname : `/admin${pathname}`;
     if (!session) {
-      const loginUrl = new URL(request.url);
-      loginUrl.pathname = "/login";
+      // Redirect to the login page on the *apex* host, not this admin host —
+      // otherwise the login page itself is caught by this branch and loops.
+      const baseHost = host.replace(/^admin\./, "");
+      const loginUrl = new URL(`${request.nextUrl.protocol}//${baseHost}/login`);
       loginUrl.searchParams.set("redirect", adminPathname);
       return NextResponse.redirect(loginUrl);
     }
     if (session.role !== "admin") {
-      return NextResponse.redirect(new URL("https://masseurmatch.com/"));
+      const baseHost = host.replace(/^admin\./, "");
+      return NextResponse.redirect(new URL(`${request.nextUrl.protocol}//${baseHost}/`));
     }
     const rewriteUrl = request.nextUrl.clone();
     rewriteUrl.pathname = adminPathname;
-    return NextResponse.rewrite(rewriteUrl);
+    const rewrite = NextResponse.rewrite(rewriteUrl);
+    sessionResponse?.cookies.getAll().forEach((cookie) => rewrite.cookies.set(cookie));
+    return rewrite;
   }
 
   // ── 0. Supabase auth callback guard ─────────────────────────────────────
@@ -408,7 +348,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
   }
 
-  return NextResponse.next();
+  return sessionResponse ?? NextResponse.next();
 }
 
 export const config = {

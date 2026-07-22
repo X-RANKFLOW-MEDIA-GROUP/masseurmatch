@@ -4,6 +4,32 @@ const TOTP_WINDOW = 1; // Allow 1 time window in each direction for clock skew
 const TIME_STEP = 30; // 30 seconds per time window
 const DIGITS = 6;
 
+const BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+// Decode an RFC 4648 base32 secret (the encoding authenticator apps use) into
+// its raw bytes. The secret is produced by generateTotpSecret below, so the two
+// MUST agree on the encoding — decoding base32 as base64 (the previous bug)
+// yields different bytes and every code fails to verify.
+function base32Decode(input: string): Buffer {
+  const clean = input.toUpperCase().replace(/=+$/g, "").replace(/\s+/g, "");
+  let bits = 0;
+  let value = 0;
+  const bytes: number[] = [];
+
+  for (const char of clean) {
+    const idx = BASE32_ALPHABET.indexOf(char);
+    if (idx === -1) continue;
+    value = (value << 5) | idx;
+    bits += 5;
+    if (bits >= 8) {
+      bits -= 8;
+      bytes.push((value >> bits) & 0xff);
+    }
+  }
+
+  return Buffer.from(bytes);
+}
+
 // HMAC-based One-Time Password algorithm (RFC 4226)
 function hmacSha1(key: Buffer, counter: Buffer): Buffer {
   return createHmac("sha1", key).update(counter).digest();
@@ -11,7 +37,7 @@ function hmacSha1(key: Buffer, counter: Buffer): Buffer {
 
 // Time-based One-Time Password algorithm (RFC 6238)
 function generateTotp(secret: string, timestamp: number = Date.now()): string {
-  const secretBuffer = Buffer.from(secret, "base64");
+  const secretBuffer = base32Decode(secret);
   let timeCounter = Math.floor(timestamp / 1000 / TIME_STEP);
   const counterBuffer = Buffer.alloc(8);
 
@@ -32,31 +58,25 @@ function generateTotp(secret: string, timestamp: number = Date.now()): string {
 }
 
 export function generateTotpSecret(): string {
-  // Generate 32 random bytes and encode as base32 (RFC 4648)
-  const randomBytes32 = randomBytes(32);
-  const base32Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+  // Generate 20 random bytes and encode as unpadded base32 (RFC 4648). No `=`
+  // padding: authenticator apps expect the bare base32 secret in otpauth URIs.
+  const raw = randomBytes(20);
   let base32 = "";
-
   let bits = 0;
   let value = 0;
 
-  for (const byte of randomBytes32) {
+  for (const byte of raw) {
     value = (value << 8) | byte;
     bits += 8;
 
     while (bits >= 5) {
       bits -= 5;
-      base32 += base32Alphabet[(value >> bits) & 31];
+      base32 += BASE32_ALPHABET[(value >> bits) & 31];
     }
   }
 
   if (bits > 0) {
-    base32 += base32Alphabet[(value << (5 - bits)) & 31];
-  }
-
-  // Pad to multiple of 8
-  while (base32.length % 8 !== 0) {
-    base32 += "=";
+    base32 += BASE32_ALPHABET[(value << (5 - bits)) & 31];
   }
 
   return base32;
