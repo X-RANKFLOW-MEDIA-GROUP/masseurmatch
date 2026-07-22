@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   try {
     assertRateLimit(request, "pro-availability", { limit: 30, windowMs: 60_000 });
 
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const profile = await getProfileByUserId(session.userId);
 
     if (!profile) {
@@ -25,7 +25,6 @@ export async function POST(request: Request) {
 
     const nextProfile = await updateProfileByUserId(session.userId, {
       current_status: body.status,
-      available_now: body.status === "available",
       is_active: body.status !== "hidden",
       service_radius_km: body.radius ?? 15,
       travel_destination: body.travelDestination ?? null,
