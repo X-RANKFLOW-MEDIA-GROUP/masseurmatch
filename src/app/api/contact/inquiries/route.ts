@@ -6,7 +6,7 @@ import { requireRequestSession } from '@/app/_lib/session';
 // GET /api/contact/inquiries — fetch inquiries for the authenticated therapist
 export async function GET(request: NextRequest) {
   try {
-    const session = requireRequestSession(request as unknown as Request);
+    const session = await requireRequestSession(request as unknown as Request);
     const supabase = createSupabaseAdminClient();
 
     const { searchParams } = new URL(request.url);
@@ -26,7 +26,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ ok: true, inquiries: [], total: 0 });
     }
 
-    // Get total count for pagination
     const { count } = await supabase
       .from('contact_inquiries')
       .select('id', { count: 'exact', head: true })
@@ -51,7 +50,7 @@ export async function GET(request: NextRequest) {
 // PATCH /api/contact/inquiries?id=xxx — update inquiry status
 export async function PATCH(request: NextRequest) {
   try {
-    const session = requireRequestSession(request as unknown as Request);
+    const session = await requireRequestSession(request as unknown as Request);
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ ok: false, error: 'id required' }, { status: 400 });
@@ -179,7 +178,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send email notification directly using Resend (avoid calling admin-gated email API)
     const therapistEmail = profile.email_address || profile.email;
     const resendApiKey = process.env.RESEND_API_KEY;
     if (therapistEmail && resendApiKey) {
