@@ -9,7 +9,6 @@ import {
   resolveDirectoryFilters,
   getSegmentBySlug,
 } from "@/app/_lib/directory-taxonomy";
-import { isLaunchUrl } from "@/app/_lib/launch-urls";
 import { createPageMetadata } from "@/app/_lib/metadata";
 import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd } from "@/app/_lib/structured-data";
 
@@ -41,7 +40,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const keyword = getKeywordBySlug(resolvedParams.keyword);
   const routePath = `/${resolvedParams.city}/${resolvedParams.segment}/${resolvedParams.keyword}`;
 
-  if (!city || !segment || !keyword || !isLaunchUrl(routePath)) {
+  // Launch URL lists control sitemap/discovery exposure, not whether an otherwise
+  // valid canonical city + taxonomy route can render. Legacy redirects depend on
+  // these valid combinations returning a real page instead of a 404.
+  if (!city || !segment || !keyword) {
     return createPageMetadata({
       title: "Specialty page",
       description: "Keyword directory page.",
@@ -71,9 +73,8 @@ export default async function CityKeywordPage({ params }: { params: Promise<Para
   const city = getCities().find((entry) => entry.slug === resolvedParams.city);
   const segment = getSegmentBySlug(resolvedParams.segment);
   const keyword = getKeywordBySlug(resolvedParams.keyword);
-  const routePath = `/${resolvedParams.city}/${resolvedParams.segment}/${resolvedParams.keyword}`;
 
-  if (!city || !segment || !keyword || !isLaunchUrl(routePath)) {
+  if (!city || !segment || !keyword) {
     notFound();
   }
 
