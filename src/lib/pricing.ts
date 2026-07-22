@@ -41,6 +41,7 @@ export const PLANS: Plan[] = [
       "1 city listing",
       "Direct contact buttons",
       "Bottom search placement",
+      "Available Now (30 min, up to 3 times/day)",
       "1 travel schedule/month",
     ],
   },
