@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
-import { setSessionCookie } from "@/app/api/_lib/session";
+import { createServerSupabase } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { ensureUserProfileAndRole } from "@/app/api/_lib/supabase-server";
 import { assertRateLimit } from "@/app/_lib/security";
 
@@ -24,64 +23,83 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
   }
 
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return cookieStore.getAll(); },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
+  const supabase = await createServerSupabase();
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+  const user = data?.user;
 
-  const { data: sessionData, error: sessionError } =
-    await supabase.auth.exchangeCodeForSession(code);
-
-  if (sessionError || !sessionData?.user) {
-    console.error("[auth/callback] error:", sessionError?.message);
+  if (error || !user?.email) {
+    console.error("[auth/callback] error:", error?.message);
     return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
   }
 
-  const user = sessionData.user;
-
-  if (!user.email) {
-    console.error("[auth/callback] user missing email");
-    return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
-  }
-
-  let role: "admin" | "provider" | "client" | null = null;
-  let isNewProfile = false;
-
+  let profileCreated = false;
+  let fullName = user.email.split("@")[0] || "there";
   try {
     const ensured = await ensureUserProfileAndRole(user, { defaultRole: "provider" });
-    role = ensured.role as "admin" | "provider" | "client" | null;
-    isNewProfile = ensured.profileCreated;
-  } catch (error) {
-    console.error("[auth/callback] failed to ensure profile:", error);
+    profileCreated = ensured.profileCreated;
+    fullName = ensured.fullName;
+  } catch (caught) {
+    console.error("[auth/callback] failed to ensure profile:", caught);
     return NextResponse.redirect(`${origin}/login?error=profile_creation_failed`);
   }
 
-  const sessionCookieHeader = setSessionCookie({
-    userId: user.id,
-    email: user.email,
-    role,
-  });
+  if (profileCreated) {
+    try {
+      const admin = createAdminClient();
+      await admin.from("lifecycle_email_queue").insert({
+        user_id: user.id,
+        recipient_email: user.email,
+        recipient_name: fullName,
+        segment: "new_signup",
+        campaign_key: "welcome_post_signup",
+        flow_key: "post_signup",
+        template_key: "welcome_v1",
+        send_category: "transactional",
+        subject: "Welcome to MasseurMatch!",
+        body_html: buildWelcomeHtml(fullName),
+        body_text: "Welcome to MasseurMatch! Complete your profile to start getting discovered.",
+        scheduled_for: new Date().toISOString(),
+        status: "pending",
+        idempotency_key: `welcome:${user.id}:${new Date().toISOString().slice(0, 10)}`,
+      });
+    } catch {
+      // Email queue issues must never block authentication.
+    }
+  }
 
-  // Redirect new OAuth users (new profile created) to onboarding,
-  // unless they explicitly requested a different destination via the `next` param.
-  const requestedOnboard = next === "/pro/onboard";
-  const destination =
-    isNewProfile && !requestedOnboard && (next === "/pro/dashboard" || next === "/dashboard")
-      ? "/pro/onboard"
-      : next;
+  const destination = profileCreated ? "/signup/plan" : next;
+  return NextResponse.redirect(`${origin}${destination}`);
+}
 
-  const redirectResponse = NextResponse.redirect(`${origin}${destination}`);
-  redirectResponse.headers.append("Set-Cookie", sessionCookieHeader);
-  return redirectResponse;
+function buildWelcomeHtml(name: string): string {
+  return `<!doctype html>
+<html lang="en">
+<body style="margin:0;padding:0;background:#FFFFFF;font-family:Arial,sans-serif;color:#4A4F5C">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#FFFFFF;padding:28px 12px">
+    <tr><td align="center">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;background:#FFFFFF;border:1px solid #ECE4E4;border-radius:14px;overflow:hidden">
+        <tr><td style="background:#111111;padding:22px 28px 24px">
+          <h1 style="margin:0;font-size:28px;color:#FFFFFF">Welcome to MasseurMatch!</h1>
+          <p style="margin:8px 0 0;font-size:15px;color:#DCE6FF">Hi ${name}, your account is ready.</p>
+        </td></tr>
+        <tr><td style="padding:24px 28px">
+          <p style="font-size:15px;line-height:1.6">Here's how to get started:</p>
+          <ol style="padding-left:20px;font-size:14px;line-height:1.8">
+            <li><strong>Complete your profile</strong> - Add photos, bio, and services</li>
+            <li><strong>Set your availability</strong> - Let clients know when you're available</li>
+            <li><strong>Get verified</strong> - Build trust with identity verification</li>
+            <li><strong>Choose a plan</strong> - Boost visibility with a paid plan</li>
+          </ol>
+        </td></tr>
+        <tr><td align="center" style="padding:0 28px 24px">
+          <a href="https://masseurmatch.com/signup/plan" style="display:inline-block;background:#8B1E2D;color:#FFFFFF;text-decoration:none;font-size:15px;font-weight:700;padding:12px 24px;border-radius:8px">Complete Your Profile</a>
+        </td></tr>
+        <tr><td style="padding:0 28px 20px;font-size:12px;color:#71717a;line-height:1.5">
+          You received this because you created a MasseurMatch account. <a href="{{unsubscribe_url}}" style="color:#8B1E2D">Unsubscribe</a>.
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
 }
