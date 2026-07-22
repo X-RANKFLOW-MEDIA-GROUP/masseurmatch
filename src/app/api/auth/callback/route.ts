@@ -1,5 +1,6 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import type { EmailOtpType } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 import { setSessionCookie } from "@/app/api/_lib/session";
@@ -24,9 +25,16 @@ export async function GET(request: NextRequest) {
 
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
+  const tokenHash = searchParams.get("token_hash");
+  const type = searchParams.get("type") as EmailOtpType | null;
   const next = sanitizeRedirect(searchParams.get("next"));
 
-  if (!code) {
+  // Two ways in: OAuth/PKCE arrives with ?code (exchanged with the stored
+  // code_verifier); email-link confirmations (signup, invite, email_change,
+  // resend) arrive with ?token_hash&type and are verified with verifyOtp(),
+  // which needs no verifier — so server-initiated signups and cross-device
+  // clicks work.
+  if (!code && !(tokenHash && type)) {
     return NextResponse.redirect(new URL("/login?error=no_code", origin));
   }
 
@@ -46,7 +54,9 @@ export async function GET(request: NextRequest) {
     }
   );
 
-  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+  const { data, error } = code
+    ? await supabase.auth.exchangeCodeForSession(code)
+    : await supabase.auth.verifyOtp({ type: type!, token_hash: tokenHash! });
 
   if (error || !data.session?.user) {
     return NextResponse.redirect(new URL("/login?error=auth_failed", origin));

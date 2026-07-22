@@ -10,18 +10,19 @@ const CONFIG: EmailUrlConfig = {
   siteUrl: "https://masseurmatch.com",
 };
 
-const REDIRECT = "https://www.masseurmatch.com/api/auth/callback?next=/pro/onboard";
+// The redirect_to the app sets for account-confirmation flows: our own server
+// callback route, which verifies token_hash itself.
+const CALLBACK = "https://www.masseurmatch.com/api/auth/callback?next=/pro/onboard";
+// A non-callback redirect (e.g. recovery → client /reset-password page), which
+// still goes through GoTrue's /auth/v1/verify.
+const RESET = "https://www.masseurmatch.com/reset-password";
 
-// Pull hrefs out of generated HTML, then the /auth/v1/verify link specifically.
-function hrefs(html: string): string[] {
-  return [...html.matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
+// Every shell email has exactly one <a> (the button); reauthentication has none.
+function confirmLink(html: string): string | undefined {
+  return [...html.matchAll(/href="([^"]+)"/g)].map((m) => m[1])[0];
 }
-function verifyLink(html: string): string | undefined {
-  return hrefs(html).find((h) => h.includes("/auth/v1/verify"));
-}
-
-// GoTrue reads redirect_to with Go's url.Query().Get() — one decode.
-// URL().searchParams.get() does the identical thing.
+// GoTrue reads redirect_to with Go's url.Query().Get() — one decode. URL()
+// searchParams.get() does the identical thing.
 function redirectSeenByGoTrue(link: string): string | null {
   return new URL(link).searchParams.get("redirect_to");
 }
@@ -31,64 +32,81 @@ function emailData(over: Record<string, string>): Record<string, string> {
     email_action_type: over.type,
     token_hash: "hash_current",
     token: "123456",
-    redirect_to: REDIRECT,
+    redirect_to: CALLBACK,
     ...over,
   };
 }
 
 describe("auth-email-hook buildMessages", () => {
-  for (const type of ["signup", "recovery", "magiclink", "invite"] as const) {
-    describe(type, () => {
-      const msgs = buildMessages(type, emailData({ type }), { email: "user@example.com" }, CONFIG);
+  describe("confirmation flows that target our own callback route", () => {
+    for (const type of ["signup", "invite", "magiclink"] as const) {
+      describe(type, () => {
+        const msgs = buildMessages(type, emailData({ type }), { email: "user@example.com" }, CONFIG);
 
-      it("produces exactly one message to the user's address", () => {
-        expect(msgs).toHaveLength(1);
-        expect(msgs[0].to).toBe("user@example.com");
-      });
+        it("produces one message to the user's address", () => {
+          expect(msgs).toHaveLength(1);
+          expect(msgs[0].to).toBe("user@example.com");
+        });
 
-      it("contains a verify link carrying the correct type", () => {
-        const link = verifyLink(msgs[0].html);
-        expect(link).toBeTruthy();
-        expect(link).toContain(`type=${type}`);
+        it("links straight to the callback with token_hash + type + next (no GoTrue verify hop)", () => {
+          const link = confirmLink(msgs[0].html)!;
+          const u = new URL(link);
+          expect(u.pathname).toBe("/api/auth/callback");
+          expect(u.searchParams.get("token_hash")).toBe("hash_current");
+          expect(u.searchParams.get("type")).toBe(type);
+          expect(u.searchParams.get("next")).toBe("/pro/onboard");
+          expect(link).not.toContain("/auth/v1/verify");
+        });
       });
+    }
+  });
 
-      it("percent-encodes redirect_to exactly once (round-trips, no %252F)", () => {
-        const link = verifyLink(msgs[0].html)!;
-        expect(redirectSeenByGoTrue(link)).toBe(REDIRECT);
-        expect(link).toContain("%2F");
-        expect(link).not.toContain("%252F");
-      });
+  describe("flows that keep the GoTrue verify hop (non-callback redirect)", () => {
+    it("recovery → /reset-password uses /auth/v1/verify with a single-encoded redirect_to", () => {
+      const msgs = buildMessages(
+        "recovery",
+        emailData({ type: "recovery", redirect_to: RESET }),
+        { email: "user@example.com" },
+        CONFIG,
+      );
+      const link = confirmLink(msgs[0].html)!;
+      expect(link).toContain("/auth/v1/verify");
+      expect(link).toContain("type=recovery");
+      // percent-encoded exactly once — round-trips, and never %252F.
+      expect(redirectSeenByGoTrue(link)).toBe(RESET);
+      expect(link).not.toContain("%252F");
     });
-  }
 
-  it("keeps a redirect_to with a second &-param intact (the encode's whole point)", () => {
-    const multi = "https://www.masseurmatch.com/api/auth/callback?next=/pro/onboard&plan=pro";
-    const msgs = buildMessages(
-      "signup",
-      emailData({ type: "signup", redirect_to: multi }),
-      { email: "user@example.com" },
-      CONFIG,
-    );
-    const link = verifyLink(msgs[0].html)!;
-    // redirect_to survives whole; nothing leaks as a stray top-level param.
-    expect(redirectSeenByGoTrue(link)).toBe(multi);
-    const stray = [...new URL(link).searchParams.keys()].filter(
-      (k) => !["token", "type", "redirect_to"].includes(k),
-    );
-    expect(stray).toEqual([]);
+    it("keeps a redirect_to carrying a second &-param intact (the encode's whole point)", () => {
+      const multi = "https://www.masseurmatch.com/reset-password?flow=a&stage=b";
+      const msgs = buildMessages(
+        "recovery",
+        emailData({ type: "recovery", redirect_to: multi }),
+        { email: "user@example.com" },
+        CONFIG,
+      );
+      const link = confirmLink(msgs[0].html)!;
+      expect(redirectSeenByGoTrue(link)).toBe(multi);
+      const stray = [...new URL(link).searchParams.keys()].filter(
+        (k) => !["token", "type", "redirect_to"].includes(k),
+      );
+      expect(stray).toEqual([]);
+    });
+
+    it("falls back to siteUrl (a non-callback target) when redirect_to is absent", () => {
+      const msgs = buildMessages(
+        "signup",
+        { email_action_type: "signup", token_hash: "h" },
+        { email: "user@example.com" },
+        CONFIG,
+      );
+      const link = confirmLink(msgs[0].html)!;
+      expect(link).toContain("/auth/v1/verify");
+      expect(redirectSeenByGoTrue(link)).toBe(CONFIG.siteUrl);
+    });
   });
 
-  it("falls back to siteUrl when redirect_to is absent", () => {
-    const msgs = buildMessages(
-      "signup",
-      { email_action_type: "signup", token_hash: "h" },
-      { email: "user@example.com" },
-      CONFIG,
-    );
-    expect(redirectSeenByGoTrue(verifyLink(msgs[0].html)!)).toBe(CONFIG.siteUrl);
-  });
-
-  it("reauthentication shows the OTP code and has no verify link", () => {
+  it("reauthentication shows the OTP code and has no link", () => {
     const msgs = buildMessages(
       "reauthentication",
       emailData({ type: "reauthentication", token: "918273" }),
@@ -97,10 +115,10 @@ describe("auth-email-hook buildMessages", () => {
     );
     expect(msgs).toHaveLength(1);
     expect(msgs[0].html).toContain("918273");
-    expect(verifyLink(msgs[0].html)).toBeUndefined();
+    expect(confirmLink(msgs[0].html)).toBeUndefined();
   });
 
-  describe("email_change (Secure Email Change)", () => {
+  describe("email_change (Secure Email Change) → callback route", () => {
     const msgs = buildMessages(
       "email_change",
       emailData({ type: "email_change", token_hash: "hash_old", token_hash_new: "hash_new" }),
@@ -113,17 +131,11 @@ describe("auth-email-hook buildMessages", () => {
       expect(msgs.map((m) => m.to).sort()).toEqual(["new@example.com", "old@example.com"]);
     });
 
-    it("uses token_hash_new for the new inbox and token_hash for the current inbox", () => {
+    it("carries token_hash_new for the new inbox and token_hash for the current inbox", () => {
       const newMsg = msgs.find((m) => m.to === "new@example.com")!;
       const oldMsg = msgs.find((m) => m.to === "old@example.com")!;
-      expect(verifyLink(newMsg.html)).toContain("token=hash_new");
-      expect(verifyLink(oldMsg.html)).toContain("token=hash_old");
-    });
-
-    it("round-trips redirect_to for both messages", () => {
-      for (const m of msgs) {
-        expect(redirectSeenByGoTrue(verifyLink(m.html)!)).toBe(REDIRECT);
-      }
+      expect(new URL(confirmLink(newMsg.html)!).searchParams.get("token_hash")).toBe("hash_new");
+      expect(new URL(confirmLink(oldMsg.html)!).searchParams.get("token_hash")).toBe("hash_old");
     });
   });
 

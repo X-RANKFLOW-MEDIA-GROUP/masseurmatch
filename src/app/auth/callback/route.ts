@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import type { EmailOtpType } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { setSessionCookie } from "@/app/api/_lib/session";
 import { ensureUserProfileAndRole } from "@/app/api/_lib/supabase-server";
@@ -18,9 +19,13 @@ export async function GET(request: NextRequest) {
 
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
+  const tokenHash = searchParams.get("token_hash");
+  const type = searchParams.get("type") as EmailOtpType | null;
   const next = sanitizeRedirect(searchParams.get("next"));
 
-  if (!code) {
+  // OAuth/PKCE comes in with ?code; email-link confirmations come in with
+  // ?token_hash&type and are verified via verifyOtp() (no PKCE verifier needed).
+  if (!code && !(tokenHash && type)) {
     return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
   }
 
@@ -40,8 +45,9 @@ export async function GET(request: NextRequest) {
     }
   );
 
-  const { data: sessionData, error: sessionError } =
-    await supabase.auth.exchangeCodeForSession(code);
+  const { data: sessionData, error: sessionError } = code
+    ? await supabase.auth.exchangeCodeForSession(code)
+    : await supabase.auth.verifyOtp({ type: type!, token_hash: tokenHash! });
 
   if (sessionError || !sessionData?.user) {
     console.error("[auth/callback] error:", sessionError?.message);

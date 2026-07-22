@@ -43,18 +43,41 @@ function btn(text: string, url: string): string {
   return `<a href="${url}" style="display:inline-block;background:#8B1E2D;color:#FFFFFF;text-decoration:none;font-size:15px;font-weight:700;padding:12px 24px;border-radius:8px;margin-top:8px">${text}</a>`;
 }
 
+// Server routes that verify the token_hash themselves via verifyOtp(). When a
+// redirect targets one of these, we hand it the raw token_hash directly instead
+// of routing through GoTrue's /auth/v1/verify.
+const APP_CALLBACK_PATHS = new Set(["/api/auth/callback", "/auth/callback"]);
+
 function confirmUrl(
   config: EmailUrlConfig,
   type: string,
   tokenHash: string,
   redirectTo: string,
 ): string {
-  // redirectTo (from emailData.redirect_to) is a raw URL, e.g.
-  // https://www.masseurmatch.com/api/auth/callback?next=/pro/onboard
-  // It is a query-parameter value here, so it must be percent-encoded exactly
-  // once — matching what Supabase's official token_hash template does (Go's
-  // html/template urlquery-escapes {{ .RedirectTo }} in this position). Leaving
-  // it raw lets any '&' in the redirect leak into GoTrue's own query string.
+  // When the redirect targets one of our own server callback routes, deliver
+  // the raw token_hash straight to it (as ?token_hash & ?type) so the route can
+  // establish the session with verifyOtp(). That path needs NO PKCE
+  // code_verifier, so it works for server-initiated signups and across devices
+  // — unlike routing through GoTrue's /auth/v1/verify, which consumes the token
+  // and hands back only a ?code the server has no verifier to exchange (the
+  // cause of the "Sign-in failed" bounce to /login after confirming an account).
+  try {
+    const target = new URL(redirectTo);
+    if (APP_CALLBACK_PATHS.has(target.pathname)) {
+      target.searchParams.set("token_hash", tokenHash);
+      target.searchParams.set("type", type);
+      return target.toString();
+    }
+  } catch {
+    // Unparseable redirectTo — fall through to the standard verify link.
+  }
+
+  // Standard flow (e.g. recovery → the client /reset-password page): route
+  // through GoTrue's verify endpoint. redirectTo is a query-parameter value
+  // here, so it must be percent-encoded exactly once — matching what Supabase's
+  // official token_hash template does (Go's html/template urlquery-escapes
+  // {{ .RedirectTo }} in this position). Leaving it raw would let any '&' in the
+  // redirect leak into GoTrue's own query string.
   return `${config.supabaseUrl}/auth/v1/verify?token=${tokenHash}&type=${type}&redirect_to=${encodeURIComponent(redirectTo)}`;
 }
 
