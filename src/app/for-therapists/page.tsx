@@ -1,15 +1,26 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
+import {
+  ArrowRight,
+  BadgeCheck,
+  BarChart3,
+  CheckCircle2,
+  MapPin,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  UserRoundCheck,
+  Zap,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "List Your Massage Practice | For Therapists - MasseurMatch",
   description:
-    "Grow your massage therapy practice with MasseurMatch. Get discovered by LGBTQ+-affirming clients, manage your profile, and build a sustainable independent business.",
+    "Build a professional MasseurMatch profile, reach LGBTQ+-affirming clients, and manage your visibility without booking commissions.",
   openGraph: {
     title: "List Your Massage Practice on MasseurMatch",
-    description:
-      "Join verified massage therapists on the leading LGBTQ+-inclusive directory.",
+    description: "Join a professional LGBTQ+-affirming massage directory.",
     url: "https://masseurmatch.com/for-therapists",
     siteName: "MasseurMatch",
     type: "website",
@@ -22,8 +33,7 @@ const jsonLd = {
   "@type": "WebPage",
   name: "List Your Massage Practice - MasseurMatch",
   url: "https://masseurmatch.com/for-therapists",
-  description:
-    "MasseurMatch helps independent massage therapists grow their practices by connecting them with LGBTQ+-affirming clients across the United States.",
+  description: "MasseurMatch helps independent massage therapists create professional listings and connect directly with clients.",
   publisher: {
     "@type": "Organization",
     name: "MasseurMatch",
@@ -31,756 +41,220 @@ const jsonLd = {
   },
   potentialAction: {
     "@type": "RegisterAction",
-    target: "https://masseurmatch.com/register",
+    target: "https://masseurmatch.com/signup/account",
     name: "List Your Practice",
   },
 };
 
 const benefits = [
   {
-    icon: "01",
-    title: "Reach clients who value you",
-    body: "Our community actively seeks inclusive, affirming therapists. Every client browsing MasseurMatch is already aligned with your values.",
+    icon: Search,
+    title: "Be discovered locally",
+    body: "Appear in city, neighborhood, technique, and nearby searches built around real client intent.",
   },
   {
-    icon: "02",
-    title: "Own your professional identity",
-    body: "Build a profile that represents your full practice - modalities, training, rates, availability, and photos. No generic templates.",
+    icon: UserRoundCheck,
+    title: "Own your professional profile",
+    body: "Present your training, services, rates, languages, travel dates, and photos in one clear profile.",
   },
   {
-    icon: "03",
-    title: "No bookings taken from you",
-    body: "Clients contact you directly. We do not insert ourselves into the transaction or take a booking fee. Your business stays your business.",
+    icon: ShieldCheck,
+    title: "Build trust",
+    body: "Identity, photo, and profile status help clients understand which information has been reviewed.",
   },
   {
-    icon: "04",
-    title: "Verified badge builds trust",
-    body: "Our verification process signals to clients that you are committed to professional standards before they even read your bio.",
+    icon: Zap,
+    title: "Control your visibility",
+    body: "Use Available Now, travel schedules, specials, and plan-based growth tools without giving up your independence.",
   },
   {
-    icon: "05",
-    title: "Built for independent therapists",
-    body: "No employer. No franchise. No commission. Just a high-quality directory that sends you clients and gets out of the way.",
+    icon: BarChart3,
+    title: "Understand demand",
+    body: "Use analytics and Market Intelligence to see where clients search and how to strengthen your listing.",
   },
   {
-    icon: "06",
-    title: "SEO-powered visibility",
-    body: "Your profile is indexed by Google and optimized for local searches like 'LGBTQ+ massage therapist Dallas.' We do the SEO work so you do not have to.",
+    icon: BadgeCheck,
+    title: "Direct client connection",
+    body: "MasseurMatch is a directory. Clients contact you directly; we do not take booking commissions from sessions.",
   },
 ];
 
 const steps = [
   {
-    n: "01",
-    title: "Create your profile",
-    body: "Add your credentials, services, photos, and rates. Takes about 15 minutes.",
+    number: "01",
+    title: "Create your account",
+    body: "Verify your email, confirm you are at least 18, and accept the professional provider terms.",
   },
   {
-    n: "02",
-    title: "Submit your profile details",
-    body: "Our team reviews profile quality and safety details within 1-2 business days.",
+    number: "02",
+    title: "Build your profile",
+    body: "Add services, languages, free-form session times, Incall and Outcall rates, photos, and location details.",
   },
   {
-    n: "03",
-    title: "Go live",
-    body: "Your profile goes live and starts appearing in searches. Clients reach out directly to you.",
+    number: "03",
+    title: "Complete identity verification",
+    body: "You can use the dashboard while Stripe Identity is pending. Verification is required for public visibility.",
   },
   {
-    n: "04",
-    title: "Grow at your pace",
-    body: "Upgrade your plan anytime to unlock priority placement and enhanced visibility.",
+    number: "04",
+    title: "Choose your plan and go public",
+    body: "After approval, confirm your plan and payment settings. Your profile can then appear in public discovery.",
   },
 ];
 
-const testimonials = [
+const faqs = [
   {
-    quote:
-      "Since listing on MasseurMatch, about 40% of my new clients mention they found me there specifically because they wanted a safe space. That alignment matters for both of us.",
-    name: "Jordan T.",
-    location: "Austin, TX",
-    years: "8 years",
+    question: "Does MasseurMatch take bookings or session payments?",
+    answer: "No. MasseurMatch is a directory. Clients contact providers directly, and providers manage their own schedules and payments.",
   },
   {
-    quote:
-      "I tried other directories but the client base here is completely different - more intentional, more respectful. My cancellation rate dropped significantly.",
-    name: "Marcus R.",
-    location: "Chicago, IL",
-    years: "5 years",
+    question: "Can I finish my profile while ID verification is pending?",
+    answer: "Yes. You can access the provider dashboard, edit your profile, set rates, upload photos, and prepare travel dates while verification is pending.",
   },
   {
-    quote:
-      "Setting up was fast and the verification gave me credibility I could not build on my own website alone. Clients trust the badge.",
-    name: "Elena V.",
-    location: "Miami, FL",
-    years: "11 years",
+    question: "Can I enter my own session lengths and prices?",
+    answer: "Yes. Session minutes and prices are flexible. Numeric prices must remain at or below US$3.33 per minute; otherwise select Ask Me.",
+  },
+  {
+    question: "Is there a Free plan?",
+    answer: "Yes. The Free plan provides a basic listing and selected visibility tools. Paid plans add photos, travel capacity, analytics, placement, and advanced tools.",
   },
 ];
 
 export default function ForTherapistsPage() {
   return (
     <>
-      <Script
-        id="therapists-jsonld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <Script id="therapists-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <div
-        style={{
-          background: "#FFFFFF",
-          color: "#111111",
-          fontFamily: "'Georgia', 'Times New Roman', serif",
-        }}
-      >
-        {/* Hero */}
-        <section
-          style={{
-            background: "#111111",
-            color: "#FFFFFF",
-            padding: "110px 24px 100px",
-            textAlign: "center",
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
-          {[420, 580, 740].map((size) => (
-            <div
-              key={size}
-              aria-hidden
-              style={{
-                position: "absolute",
-                width: size,
-                height: size,
-                borderRadius: "50%",
-                border: "1px solid rgba(139,30,45,0.07)",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%,-50%)",
-                pointerEvents: "none",
-              }}
-            />
-          ))}
-
-          <p
-            style={{
-              fontSize: 11,
-              letterSpacing: "0.22em",
-              textTransform: "uppercase",
-              color: "#8B1E2D",
-              marginBottom: 24,
-              fontFamily: "system-ui, sans-serif",
-              position: "relative",
-            }}
-          >
-            For Therapists
-          </p>
-          <h1
-            style={{
-              fontSize: "clamp(38px, 7vw, 72px)",
-              fontWeight: 400,
-              lineHeight: 1.05,
-              maxWidth: 780,
-              margin: "0 auto 28px",
-              position: "relative",
-            }}
-          >
-            Your practice deserves{" "}
-            <em style={{ color: "#8B1E2D", fontStyle: "italic" }}>
-              the right clients.
-            </em>
-          </h1>
-          <p
-            style={{
-              fontSize: 18,
-              lineHeight: 1.7,
-              maxWidth: 540,
-              margin: "0 auto 44px",
-              opacity: 0.7,
-              fontFamily: "system-ui, sans-serif",
-              fontWeight: 300,
-              position: "relative",
-            }}
-          >
-            MasseurMatch connects you with LGBTQ+-affirming clients who
-            specifically seek inclusive, professional care. No middleman. No
-            commission. Just the right connections.
-          </p>
-          <div
-            style={{
-              display: "flex",
-              gap: 12,
-              justifyContent: "center",
-              flexWrap: "wrap",
-              position: "relative",
-            }}
-          >
-            <Link
-              href="/register"
-              style={{
-                display: "inline-block",
-                padding: "16px 40px",
-                fontSize: 12,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                fontFamily: "system-ui, sans-serif",
-                background: "#8B1E2D",
-                color: "#111111",
-                textDecoration: "none",
-                fontWeight: 700,
-              }}
-            >
-              List Your Practice - Free
-            </Link>
-            <Link
-              href="/pricing"
-              style={{
-                display: "inline-block",
-                padding: "16px 32px",
-                fontSize: 12,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                fontFamily: "system-ui, sans-serif",
-                background: "transparent",
-                color: "#FFFFFF",
-                textDecoration: "none",
-                border: "1px solid rgba(252,251,248,0.25)",
-              }}
-            >
-              See Pricing
-            </Link>
-          </div>
-        </section>
-
-        {/* Social Proof Bar */}
-        <section
-          style={{
-            background: "#8B1E2D",
-            color: "#FFFFFF",
-            padding: "32px 24px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
-              gap: 48,
-              maxWidth: 900,
-              margin: "0 auto",
-            }}
-          >
-            {[
-              { value: "Join Early", label: "Be Among the First Listed" },
-              { value: "80+", label: "US Cities Covered" },
-              { value: "$0", label: "Booking Commission" },
-              { value: "48h", label: "Average Verification Time" },
-            ].map((stat) => (
-              <div key={stat.label} style={{ textAlign: "center" }}>
-                <div
-                  style={{
-                    fontSize: 28,
-                    fontWeight: 700,
-                    color: "#8B1E2D",
-                    fontFamily: "system-ui, sans-serif",
-                  }}
-                >
-                  {stat.value}
-                </div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    opacity: 0.65,
-                    marginTop: 4,
-                    fontFamily: "system-ui, sans-serif",
-                  }}
-                >
-                  {stat.label}
-                </div>
+      <main className="bg-white pt-16 text-[#111111] md:pt-0">
+        <section className="relative overflow-hidden bg-[#111111] px-5 py-24 text-white sm:px-8 sm:py-32 lg:px-12">
+          <div className="absolute inset-0 opacity-80 [background:radial-gradient(circle_at_75%_20%,rgba(139,30,45,0.38),transparent_34%),radial-gradient(circle_at_15%_85%,rgba(139,30,45,0.2),transparent_30%)]" />
+          <div className="relative mx-auto max-w-6xl">
+            <div className="max-w-3xl">
+              <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#E18A96]">For Massage Therapists</p>
+              <h1 className="mt-6 font-display text-5xl font-extrabold leading-[0.96] tracking-tight sm:text-6xl lg:text-7xl">
+                Build a profile that works as professionally as you do.
+              </h1>
+              <p className="mt-7 max-w-2xl text-lg leading-8 text-white/78 sm:text-xl">
+                Reach clients searching for professional, LGBTQ+-affirming massage while keeping direct control of your rates, schedule, and client relationships.
+              </p>
+              <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+                <Link href="/signup/account" className="inline-flex min-h-13 items-center justify-center gap-2 rounded-full bg-[#9D2335] px-8 py-4 text-sm font-bold uppercase tracking-[0.1em] text-white shadow-xl shadow-[#8B1E2D]/30 transition hover:bg-[#B62B40]">
+                  Create Your Profile <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link href="/pricing" className="inline-flex min-h-13 items-center justify-center rounded-full border border-white/30 bg-white/5 px-8 py-4 text-sm font-bold uppercase tracking-[0.1em] text-white transition hover:bg-white/10">
+                  View Plans
+                </Link>
               </div>
-            ))}
+            </div>
+
+            <div className="mt-16 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                ["Direct", "Client contact"],
+                ["$0", "Booking commission"],
+                ["Flexible", "Minutes and rates"],
+                ["80+", "US markets planned"],
+              ].map(([value, label]) => (
+                <div key={label} className="rounded-2xl border border-white/12 bg-white/[0.06] p-5 backdrop-blur">
+                  <p className="text-2xl font-extrabold text-white">{value}</p>
+                  <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-white/65">{label}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
-        {/* Benefits */}
-        <section style={{ padding: "100px 24px" }}>
-          <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-            <p
-              style={{
-                fontSize: 11,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                color: "#8B1E2D",
-                marginBottom: 20,
-                fontFamily: "system-ui, sans-serif",
-              }}
-            >
-              Why MasseurMatch
-            </p>
-            <h2
-              style={{
-                fontSize: "clamp(26px, 4vw, 42px)",
-                fontWeight: 400,
-                marginBottom: 64,
-                maxWidth: 540,
-                lineHeight: 1.25,
-              }}
-            >
-              Everything you need. Nothing you do not.
-            </h2>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-                gap: 2,
-              }}
-            >
+        <section className="px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
+          <div className="mx-auto max-w-6xl">
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#8B1E2D]">Why MasseurMatch</p>
+            <div className="mt-4 grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+              <h2 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">A professional home for your independent practice.</h2>
+              <p className="text-lg leading-8 text-[#555B64]">Create a clear listing, improve discovery, and use data-backed growth tools without turning your practice over to a booking marketplace.</p>
+            </div>
+
+            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {benefits.map((benefit) => (
-                <div
-                  key={benefit.title}
-                  style={{ background: "#fff", padding: "40px 36px" }}
-                >
-                  <div
-                    style={{ fontSize: 26, color: "#8B1E2D", marginBottom: 18 }}
-                  >
-                    {benefit.icon}
-                  </div>
-                  <h3
-                    style={{
-                      fontSize: 17,
-                      fontWeight: 400,
-                      marginBottom: 12,
-                      lineHeight: 1.3,
-                    }}
-                  >
-                    {benefit.title}
-                  </h3>
-                  <p
-                    style={{
-                      fontSize: 14,
-                      lineHeight: 1.75,
-                      color: "#6B7280",
-                      fontFamily: "system-ui, sans-serif",
-                    }}
-                  >
-                    {benefit.body}
-                  </p>
-                </div>
+                <article key={benefit.title} className="rounded-3xl border border-[#E4E4E4] bg-white p-6 shadow-sm">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#8B1E2D]/10 text-[#8B1E2D]"><benefit.icon className="h-5 w-5" /></div>
+                  <h3 className="mt-5 text-xl font-bold">{benefit.title}</h3>
+                  <p className="mt-2 text-sm leading-7 text-[#5E626A]">{benefit.body}</p>
+                </article>
               ))}
             </div>
           </div>
         </section>
 
-        {/* How It Works */}
-        <section
-          style={{
-            background: "#111111",
-            color: "#FFFFFF",
-            padding: "100px 24px",
-          }}
-        >
-          <div style={{ maxWidth: 960, margin: "0 auto" }}>
-            <p
-              style={{
-                fontSize: 11,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                color: "#8B1E2D",
-                marginBottom: 20,
-                fontFamily: "system-ui, sans-serif",
-                textAlign: "center",
-              }}
-            >
-              The Process
-            </p>
-            <h2
-              style={{
-                fontSize: "clamp(26px, 4vw, 40px)",
-                fontWeight: 400,
-                textAlign: "center",
-                marginBottom: 64,
-              }}
-            >
-              Live in 4 steps
-            </h2>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: 0,
-              }}
-            >
-              {steps.map((step, index) => (
-                <div
-                  key={step.n}
-                  style={{
-                    padding: "36px 28px",
-                    borderLeft:
-                      index > 0 ? "1px solid rgba(252,251,248,0.1)" : "none",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 32,
-                      fontWeight: 700,
-                      color: "rgba(139,30,45,0.25)",
-                      fontFamily: "system-ui, sans-serif",
-                      marginBottom: 16,
-                      lineHeight: 1,
-                    }}
-                  >
-                    {step.n}
-                  </div>
-                  <h3
-                    style={{
-                      fontSize: 16,
-                      fontWeight: 400,
-                      marginBottom: 12,
-                    }}
-                  >
-                    {step.title}
-                  </h3>
-                  <p
-                    style={{
-                      fontSize: 13,
-                      lineHeight: 1.7,
-                      opacity: 0.55,
-                      fontFamily: "system-ui, sans-serif",
-                    }}
-                  >
-                    {step.body}
-                  </p>
-                </div>
+        <section className="bg-[#101010] px-5 py-20 text-white sm:px-8 sm:py-28 lg:px-12">
+          <div className="mx-auto max-w-6xl">
+            <div className="text-center">
+              <p className="text-xs font-bold uppercase tracking-[0.26em] text-[#E18A96]">The Process</p>
+              <h2 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">From account to public profile.</h2>
+              <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/75">Every step remains visible, readable, and manageable from mobile or desktop.</p>
+            </div>
+
+            <div className="mt-12 grid gap-4 lg:grid-cols-4">
+              {steps.map((step) => (
+                <article key={step.number} className="relative rounded-3xl border border-white/14 bg-white/[0.065] p-6 shadow-lg shadow-black/20">
+                  <p className="text-4xl font-black text-[#E18A96]">{step.number}</p>
+                  <h3 className="mt-8 text-xl font-bold leading-7 text-white">{step.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-white/78">{step.body}</p>
+                </article>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Testimonials */}
-        <section style={{ padding: "100px 24px" }}>
-          <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-            <p
-              style={{
-                fontSize: 11,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                color: "#8B1E2D",
-                marginBottom: 20,
-                fontFamily: "system-ui, sans-serif",
-              }}
-            >
-              Therapist Voices
-            </p>
-            <h2
-              style={{
-                fontSize: "clamp(24px, 3.5vw, 38px)",
-                fontWeight: 400,
-                marginBottom: 56,
-              }}
-            >
-              From the community, for the community
-            </h2>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-                gap: 2,
-              }}
-            >
-              {testimonials.map((testimonial) => (
-                <blockquote
-                  key={testimonial.name}
-                  style={{
-                    background: "#fff",
-                    padding: "40px 36px",
-                    margin: 0,
-                    borderTop: "3px solid #8B1E2D",
-                  }}
-                >
-                  <p
-                    style={{
-                      fontSize: 15,
-                      lineHeight: 1.8,
-                      color: "#374151",
-                      fontStyle: "italic",
-                      marginBottom: 24,
-                      fontFamily: "system-ui, sans-serif",
-                    }}
-                  >
-                    &ldquo;{testimonial.quote}&rdquo;
-                  </p>
-                  <footer>
-                    <div
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 600,
-                        color: "#111111",
-                        fontFamily: "system-ui, sans-serif",
-                      }}
-                    >
-                      {testimonial.name}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        color: "#9CA3AF",
-                        fontFamily: "system-ui, sans-serif",
-                        marginTop: 2,
-                      }}
-                    >
-                      {testimonial.location} | {testimonial.years}
-                    </div>
-                  </footer>
-                </blockquote>
-              ))}
+        <section className="px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
+          <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#8B1E2D]">Your Dashboard</p>
+              <h2 className="mt-5 font-display text-4xl font-extrabold tracking-tight sm:text-5xl">Manage visibility without losing control.</h2>
+              <p className="mt-5 text-base leading-8 text-[#555B64]">Pending providers can finish their profile before ID approval. Verified providers continue to plan/payment setup and public discovery.</p>
             </div>
-          </div>
-        </section>
-
-        {/* Requirements */}
-        <section
-          style={{
-            background: "#FFFFFF",
-            borderTop: "1px solid rgba(17,17,17,0.08)",
-            padding: "80px 24px",
-          }}
-        >
-          <div
-            style={{
-              maxWidth: 720,
-              margin: "0 auto",
-              textAlign: "center",
-            }}
-          >
-            <h2
-              style={{
-                fontSize: "clamp(22px, 3vw, 32px)",
-                fontWeight: 400,
-                marginBottom: 40,
-              }}
-            >
-              Requirements to list
-            </h2>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 20,
-                textAlign: "left",
-              }}
-            >
+            <div className="grid gap-4 sm:grid-cols-2">
               {[
-                "Accurate service profile details",
-                "License in good standing",
-                "Commitment to LGBTQ+-inclusive practice",
-                "Accurate, truthful profile information",
-                "Professional profile photo",
-                "Legally operating independent practice",
-              ].map((requirement) => (
-                <div
-                  key={requirement}
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    alignItems: "flex-start",
-                    padding: "16px 20px",
-                    background: "#fff",
-                  }}
-                >
-                  <span style={{ color: "#8B1E2D", marginTop: 2, flexShrink: 0 }}>
-                    +
-                  </span>
-                  <span
-                    style={{
-                      fontSize: 14,
-                      fontFamily: "system-ui, sans-serif",
-                      color: "#374151",
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {requirement}
-                  </span>
-                </div>
+                [Zap, "Available Now", "Tier-based live windows with cooldown protection."],
+                [MapPin, "Travel Schedule", "Clear destination and date fields with monthly plan limits."],
+                [DollarSign, "Flexible Rates", "One Simple Rate, Rates by Technique, or Ask Me."],
+                [Sparkles, "Market Intelligence", "Search trends, keywords, locations, and demand timing."],
+              ].map(([Icon, title, body]) => {
+                const FeatureIcon = Icon as typeof Zap;
+                return (
+                  <div key={title as string} className="rounded-3xl border border-[#E4E4E4] bg-[#FAFAFA] p-6">
+                    <FeatureIcon className="h-5 w-5 text-[#8B1E2D]" />
+                    <h3 className="mt-4 font-bold">{title as string}</h3>
+                    <p className="mt-2 text-sm leading-6 text-[#60646B]">{body as string}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-[#F6F3F3] px-5 py-20 sm:px-8 sm:py-24 lg:px-12">
+          <div className="mx-auto max-w-4xl">
+            <div className="text-center"><p className="text-xs font-bold uppercase tracking-[0.24em] text-[#8B1E2D]">Questions</p><h2 className="mt-4 font-display text-4xl font-extrabold">Before you join.</h2></div>
+            <div className="mt-10 space-y-3">
+              {faqs.map((faq) => (
+                <details key={faq.question} className="group rounded-2xl border border-[#DEDEDE] bg-white p-5 open:shadow-sm">
+                  <summary className="cursor-pointer list-none font-bold text-[#171717]">{faq.question}</summary>
+                  <p className="mt-3 text-sm leading-7 text-[#5C6169]">{faq.answer}</p>
+                </details>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Knotty AI — Elite differentiator */}
-        <section
-          style={{
-            background: "#111111",
-            padding: "80px 24px",
-            color: "#FFFFFF",
-          }}
-        >
-          <div style={{ maxWidth: 760, margin: "0 auto" }}>
-            <p
-              style={{
-                fontSize: 11,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                color: "#F59E0B",
-                marginBottom: 20,
-                fontFamily: "system-ui, sans-serif",
-              }}
-            >
-              Elite · AI Answering
-            </p>
-            <h2
-              style={{
-                fontSize: "clamp(26px, 4vw, 42px)",
-                fontWeight: 400,
-                lineHeight: 1.15,
-                marginBottom: 20,
-              }}
-            >
-              Knotty AI answers for you —
-              <br />
-              24 hours a day, 7 days a week.
-            </h2>
-            <p
-              style={{
-                fontSize: "clamp(14px, 2.5vw, 16px)",
-                opacity: 0.65,
-                fontFamily: "system-ui, sans-serif",
-                lineHeight: 1.7,
-                marginBottom: 36,
-                maxWidth: 540,
-              }}
-            >
-              Elite profiles get a Knotty AI chat widget embedded directly on their listing.
-              It answers client questions about rates, availability, specialties, and LGBTQ+
-              affirmation — without you needing to be online. First impressions happen at all
-              hours; Knotty makes sure yours is always ready.
-            </p>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: 16,
-                marginBottom: 36,
-              }}
-            >
-              {[
-                { label: "Answers rate & availability questions", detail: "Without interrupting your schedule" },
-                { label: "Explains your services clearly", detail: "Using your own profile data" },
-                { label: "Available on every Elite listing", detail: "Not a third-party chatbot — fully integrated" },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  style={{
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    borderRadius: 12,
-                    padding: "16px 18px",
-                    fontFamily: "system-ui, sans-serif",
-                  }}
-                >
-                  <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{item.label}</p>
-                  <p style={{ fontSize: 12, opacity: 0.5, lineHeight: 1.5 }}>{item.detail}</p>
-                </div>
-              ))}
-            </div>
-            <Link
-              href="/pricing"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                background: "#F59E0B",
-                color: "#111111",
-                borderRadius: 99,
-                padding: "12px 24px",
-                fontSize: 13,
-                fontWeight: 700,
-                fontFamily: "system-ui, sans-serif",
-                textDecoration: "none",
-                letterSpacing: "0.03em",
-              }}
-            >
-              See Elite pricing
+        <section className="bg-[#8B1E2D] px-5 py-20 text-white sm:px-8 lg:px-12">
+          <div className="mx-auto max-w-4xl text-center">
+            <h2 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">Ready to build your profile?</h2>
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/80">Create your account, complete the profile at your pace, and finish identity verification when ready for public visibility.</p>
+            <Link href="/signup/account" className="mt-8 inline-flex min-h-13 items-center justify-center gap-2 rounded-full bg-white px-8 py-4 text-sm font-bold uppercase tracking-[0.1em] text-[#8B1E2D] shadow-xl transition hover:bg-[#F8EDEE]">
+              Join MasseurMatch <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </section>
-
-        {/* CTA */}
-        <section
-          style={{
-            background: "#8B1E2D",
-            padding: "88px 24px",
-            textAlign: "center",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "clamp(28px, 4.5vw, 48px)",
-              fontWeight: 400,
-              color: "#111111",
-              marginBottom: 16,
-              lineHeight: 1.15,
-            }}
-          >
-            Ready to reach clients who
-            <br />
-            are looking for exactly you?
-          </h2>
-          <p
-            style={{
-              fontSize: 16,
-              color: "rgba(17,17,17,0.7)",
-              marginBottom: 40,
-              fontFamily: "system-ui, sans-serif",
-            }}
-          >
-            Free listing. No commitment. Live within 48 hours.
-          </p>
-          <div
-            style={{
-              display: "flex",
-              gap: 12,
-              justifyContent: "center",
-              flexWrap: "wrap",
-            }}
-          >
-            <Link
-              href="/register"
-              style={{
-                display: "inline-block",
-                padding: "16px 44px",
-                fontSize: 12,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                fontFamily: "system-ui, sans-serif",
-                background: "#111111",
-                color: "#FFFFFF",
-                textDecoration: "none",
-                fontWeight: 700,
-              }}
-            >
-              Create Free Listing
-            </Link>
-            <Link
-              href="/pricing"
-              style={{
-                display: "inline-block",
-                padding: "16px 32px",
-                fontSize: 12,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                fontFamily: "system-ui, sans-serif",
-                background: "transparent",
-                color: "#111111",
-                textDecoration: "none",
-                border: "1px solid rgba(17,17,17,0.35)",
-              }}
-            >
-              View Plans
-            </Link>
-          </div>
-        </section>
-      </div>
+      </main>
     </>
   );
 }
