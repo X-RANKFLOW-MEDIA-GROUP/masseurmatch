@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducedMotion } from "framer-motion";
+import { useHydratedReducedMotion } from "@/hooks/useHydratedReducedMotion";
 
 type GrainOverlayProps = {
   opacity?: number;
@@ -8,7 +8,7 @@ type GrainOverlayProps = {
 };
 
 export function GrainOverlay({ opacity = 0.035, className = "" }: GrainOverlayProps) {
-  const reduced = useReducedMotion();
+  const reduced = useHydratedReducedMotion();
 
   if (reduced) return null;
 
