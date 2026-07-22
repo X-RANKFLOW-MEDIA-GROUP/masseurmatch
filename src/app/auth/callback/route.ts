@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import type { EmailOtpType } from "@supabase/supabase-js";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ensureUserProfileAndRole } from "@/app/api/_lib/supabase-server";
@@ -17,14 +18,18 @@ export async function GET(request: NextRequest) {
 
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
+  const tokenHash = searchParams.get("token_hash");
+  const type = searchParams.get("type") as EmailOtpType | null;
   const next = sanitizeRedirect(searchParams.get("next"));
 
-  if (!code) {
+  if (!code && !(tokenHash && type)) {
     return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
   }
 
   const supabase = await createServerSupabase();
-  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+  const { data, error } = code
+    ? await supabase.auth.exchangeCodeForSession(code)
+    : await supabase.auth.verifyOtp({ type: type!, token_hash: tokenHash! });
   const user = data?.user;
 
   if (error || !user?.email) {
