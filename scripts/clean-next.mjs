@@ -130,4 +130,9 @@ if (process.env[OVERRIDE_ENV] !== "1") {
 }
 
 rmSync(nextDir, { recursive: true, force: true });
+
+// Also remove TypeScript incremental build cache to prevent stale type
+// resolutions (e.g. requireRequestSession resolving as Promise<T> instead of T)
+rmSync(path.join(rootDir, "tsconfig.tsbuildinfo"), { force: true });
+
 ensureChunkDirectories();
