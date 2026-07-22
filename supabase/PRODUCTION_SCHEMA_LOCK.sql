@@ -1553,3 +1553,13 @@ create table if not exists public.user_mfa (
   enabled_at timestamptz not null,
   updated_at timestamptz default timezone('utc', now())
 );
+
+-- Durable storage for admin-editable content (blog posts, city intros,
+-- keywords). Singleton row keyed by 'singleton'; service-role only.
+create table if not exists public.admin_content (
+  id text primary key default 'singleton',
+  blog_posts jsonb not null default '[]'::jsonb,
+  cities jsonb not null default '[]'::jsonb,
+  keywords jsonb not null default '[]'::jsonb,
+  updated_at timestamptz not null default now()
+);
