@@ -1,100 +1,126 @@
 import type { PublicTherapist, PricingSessionItem } from "@/app/_lib/directory";
 
-function normalizePricingSessions(value: unknown): PricingSessionItem[] {
+type FlexiblePricingSession = PricingSessionItem & {
+  id?: string | null;
+  mode?: "simple" | "technique" | "ask_me" | null;
+  technique?: string | null;
+  minutes?: number | null;
+  incall_rate?: number | null;
+  outcall_rate?: number | null;
+  incall_ask_me?: boolean | null;
+  outcall_ask_me?: boolean | null;
+};
+
+function normalizePricingSessions(value: unknown): FlexiblePricingSession[] {
   if (!Array.isArray(value)) return [];
-  return value.filter((item): item is PricingSessionItem => typeof item === "object" && item !== null);
+  return value
+    .filter((item): item is Record<string, unknown> => typeof item === "object" && item !== null)
+    .map((item) => ({
+      ...item,
+      mode: item.mode === "technique" || item.mode === "ask_me" ? item.mode : "simple",
+      technique: typeof item.technique === "string" ? item.technique : typeof item.name === "string" ? item.name : null,
+      minutes: typeof item.minutes === "number" ? item.minutes : typeof item.duration === "number" ? item.duration : 60,
+      incall_rate: typeof item.incall_rate === "number" ? item.incall_rate : typeof item.incall === "number" ? item.incall : null,
+      outcall_rate: typeof item.outcall_rate === "number" ? item.outcall_rate : typeof item.outcall === "number" ? item.outcall : null,
+      incall_ask_me: item.incall_ask_me === true,
+      outcall_ask_me: item.outcall_ask_me === true,
+    }));
 }
 
 interface Props {
   profile: PublicTherapist;
 }
 
+function rateLabel(rate: number | null | undefined, askMe: boolean | null | undefined) {
+  if (askMe || rate === null || rate === undefined) return "Ask Me";
+  return `$${rate}`;
+}
+
 export function ProfilePricing({ profile }: Props) {
   const city = profile.city || "your area";
   const sessions = normalizePricingSessions(profile.pricing_sessions);
+  const mode = sessions[0]?.mode || "simple";
   const hasAny = sessions.length > 0 || profile.incall_price || profile.outcall_price;
 
   if (!hasAny) return null;
 
-  // Build structured rows: group by duration
-  const hasStructuredSessions = sessions.length > 0 && sessions.some((s) => s.duration);
-  const hasIncall = sessions.some((s) => s.incall) || !!profile.incall_price;
-  const hasOutcall = sessions.some((s) => s.outcall) || !!profile.outcall_price;
-
-  // Check if a value is more than +33.33% above the base price
-  function isOverLimit(base: number | null | undefined, value: number | null | undefined) {
-    if (!base || !value) return false;
-    return value > base * 1.3333;
+  if (mode === "ask_me") {
+    return (
+      <section id="pricing" className="profile-panel scroll-mt-24 p-6 md:p-7">
+        <h2 className="text-2xl font-semibold text-foreground">Massage Rates in {city}</h2>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="profile-panel-soft rounded-2xl px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Incall</p>
+            <p className="mt-1 text-lg font-semibold text-foreground">Ask Me</p>
+          </div>
+          <div className="profile-panel-soft rounded-2xl px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Outcall</p>
+            <p className="mt-1 text-lg font-semibold text-foreground">Ask Me</p>
+          </div>
+        </div>
+        <p className="mt-4 text-sm text-muted-foreground">Contact the therapist directly for current pricing and session details.</p>
+      </section>
+    );
   }
 
-  // Find the base reference price (60min in-call, if it exists)
-  const baseIncall = sessions.find((s) => s.duration === 60 && s.incall) ? sessions.find((s) => s.duration === 60)?.incall : undefined;
-  const baseOutcall = sessions.find((s) => s.duration === 60 && s.outcall) ? sessions.find((s) => s.duration === 60)?.outcall : undefined;
+  if (sessions.length > 0) {
+    return (
+      <section id="pricing" className="profile-panel scroll-mt-24 p-6 md:p-7">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold text-foreground">Massage Rates in {city}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {mode === "technique" ? "Rates are organized by massage technique." : "Flexible session pricing based on total time."}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 space-y-3">
+          {sessions.map((session, index) => {
+            const minutes = session.minutes || 60;
+            return (
+              <div key={session.id || `price-${index}`} className="overflow-hidden rounded-2xl border border-border bg-background">
+                <div className="border-b border-border bg-secondary/50 px-4 py-3">
+                  <p className="font-semibold text-foreground">
+                    {mode === "technique" && session.technique ? session.technique : `${minutes} minutes`}
+                  </p>
+                  {mode === "technique" && <p className="mt-0.5 text-xs text-muted-foreground">{minutes}-minute session</p>}
+                </div>
+                <div className="grid grid-cols-2 divide-x divide-border">
+                  <div className="px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Incall</p>
+                    <p className="mt-1 font-semibold text-foreground">{rateLabel(session.incall_rate, session.incall_ask_me)}</p>
+                  </div>
+                  <div className="px-4 py-3 text-right">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Outcall</p>
+                    <p className="mt-1 font-semibold text-foreground">{rateLabel(session.outcall_rate, session.outcall_ask_me)}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <p className="mt-4 text-xs leading-5 text-muted-foreground">
+          Contact the therapist directly to confirm current rates, travel details, and availability. MasseurMatch does not process appointments or session payments.
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section id="pricing" className="profile-panel scroll-mt-24 p-6 md:p-7">
       <h2 className="text-2xl font-semibold text-foreground">Massage Rates in {city}</h2>
-
-      {hasStructuredSessions ? (
-        <div className="mt-4 overflow-hidden rounded-2xl border border-border">
-          {/* Table header */}
-          <div className="grid grid-cols-3 gap-px bg-secondary/60 px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            <span>Duration</span>
-            {hasIncall && <span className="text-right">In-call</span>}
-            {hasOutcall && <span className="text-right">Out-call</span>}
-            {!hasIncall && !hasOutcall && <span />}
-          </div>
-          {/* Rows */}
-          {sessions.map((s, i) => (
-            <div
-              key={`price-${i}`}
-              className="grid grid-cols-3 gap-px border-t border-border px-4 py-3 text-sm"
-            >
-              <span className="font-medium text-foreground">
-                {s.name || `${s.duration || 60} min`}
-              </span>
-              {hasIncall && (
-                <span
-                  className={`text-right text-foreground ${isOverLimit(baseIncall, s.incall) ? 'bg-yellow-100 text-red-700 font-bold px-1 rounded' : ''}`}
-                  title={isOverLimit(baseIncall, s.incall) ? 'Exceeds +33.33% of base price' : ''}
-                >
-                  {s.incall ? `$${s.incall}` : "Ask me"}
-                </span>
-              )}
-              {hasOutcall && (
-                <span
-                  className={`text-right text-foreground ${isOverLimit(baseOutcall, s.outcall) ? 'bg-yellow-100 text-red-700 font-bold px-1 rounded' : ''}`}
-                  title={isOverLimit(baseOutcall, s.outcall) ? 'Exceeds +33.33% of base price' : ''}
-                >
-                  {s.outcall ? `$${s.outcall}` : "Ask me"}
-                </span>
-              )}
-            </div>
-          ))}
-          <div className="text-xs text-red-700 mt-2 px-4">
-            * Valores destacados excedem +33.33% do valor base de 60min.
-          </div>
+      <div className="mt-4 space-y-3">
+        <div className="profile-panel-soft flex items-center justify-between rounded-2xl px-4 py-3 text-sm">
+          <span className="font-medium text-foreground">Incall</span>
+          <span className="font-semibold text-foreground">{profile.incall_price ? `$${profile.incall_price}` : "Ask Me"}</span>
         </div>
-      ) : (
-        <div className="mt-4 space-y-3">
-          {profile.incall_price ? (
-            <div className="profile-panel-soft flex items-center justify-between rounded-2xl px-4 py-3 text-sm">
-              <span className="font-medium text-foreground">In-call</span>
-              <span className="text-foreground font-semibold">${profile.incall_price}</span>
-            </div>
-          ) : null}
-          {profile.outcall_price ? (
-            <div className="profile-panel-soft flex items-center justify-between rounded-2xl px-4 py-3 text-sm">
-              <span className="font-medium text-foreground">Out-call</span>
-              <span className="text-foreground font-semibold">${profile.outcall_price}</span>
-            </div>
-          ) : null}
+        <div className="profile-panel-soft flex items-center justify-between rounded-2xl px-4 py-3 text-sm">
+          <span className="font-medium text-foreground">Outcall</span>
+          <span className="font-semibold text-foreground">{profile.outcall_price ? `$${profile.outcall_price}` : "Ask Me"}</span>
         </div>
-      )}
-
-      <p className="mt-4 text-xs text-muted-foreground">
-        Pricing may vary based on location and service type. Contact the therapist directly to confirm rates.
-      </p>
+      </div>
     </section>
   );
 }
