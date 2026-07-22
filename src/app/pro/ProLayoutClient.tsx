@@ -6,7 +6,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  Banknote,
   BarChart,
+  Bell,
   CreditCard,
   Image as ImageIcon,
   LayoutDashboard,
@@ -17,6 +19,7 @@ import {
   Settings,
   TrendingUp,
   UserCircle,
+  WalletCards,
   X,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -25,11 +28,14 @@ import { BRAND_ASSETS } from "@/lib/brand";
 const navItems = [
   { name: "Dashboard", href: "/pro/dashboard", icon: LayoutDashboard },
   { name: "My Profile", href: "/pro/listing", icon: UserCircle },
+  { name: "Rates", href: "/pro/rates", icon: Banknote },
   { name: "Photos", href: "/pro/photos", icon: ImageIcon },
   { name: "Growth Tools", href: "/pro/growth", icon: TrendingUp },
   { name: "Inquiries", href: "/pro/inquiries", icon: Mail },
   { name: "Analytics", href: "/pro/analytics", icon: BarChart },
+  { name: "Notifications", href: "/pro/notifications", icon: Bell },
   { name: "Subscription", href: "/pro/subscription", icon: CreditCard },
+  { name: "Payment History", href: "/pro/payment-history", icon: WalletCards },
   { name: "Support", href: "/pro/tickets", icon: LifeBuoy },
   { name: "Settings", href: "/pro/settings", icon: Settings },
 ];
@@ -76,9 +82,9 @@ export default function ProLayoutClient({
         </Link>
       </div>
 
-      <nav className="flex-1 space-y-1 px-4 py-6">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-4 py-6">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
           return (
             <Link key={item.name} href={item.href} className="relative block">
@@ -132,6 +138,7 @@ export default function ProLayoutClient({
           </span>
         </Link>
         <button
+          type="button"
           onClick={() => setMobileOpen((prev) => !prev)}
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
           className="rounded-md p-1.5 text-white/80 transition-colors hover:bg-white/10"
