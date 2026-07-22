@@ -1,171 +1,123 @@
-import { Buffer } from "node:buffer";
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createServerClient } from "@supabase/ssr";
 
-import { envAny, envOptional } from "@/app/api/_lib/env";
-import { parseCookieHeader } from "@/app/api/_lib/http";
+import { RouteError } from "@/app/api/_lib/http";
+import {
+  SUPABASE_PUBLIC_URL,
+  SUPABASE_PUBLIC_ANON_KEY,
+} from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 
 export interface RequestSession {
   userId: string;
   email: string;
   role: "admin" | "provider" | "client" | null;
+  /**
+   * ISO timestamp of the access token expiry. Retained for backward
+   * compatibility with callers that surface it; identity is always
+   * re-verified against Supabase, never trusted from this value.
+   */
   expiresAt: string;
 }
 
-const COOKIE_NAME = "mm_session";
-const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
-
-function sessionSecret(): string {
-  const secret = envOptional([
-    "MM_SESSION_SECRET",
-    "SESSION_SECRET",
-    "MM_JWT_SECRET",
-    "JWT_SECRET",
-  ]);
-  if (secret) return secret;
-  // Only fall back to a constant for genuine local development/testing. Any
-  // deployed environment (production, preview, staging) must provide a real
-  // secret so an attacker cannot forge a signed admin cookie.
-  if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
-    return "dev-only-masseurmatch-session-secret";
+export function normalizeSessionRole(value: unknown): RequestSession["role"] {
+  if (value === "admin") return "admin";
+  if (value === "provider" || value === "therapist" || value === "masseur") {
+    return "provider";
   }
-  throw new Error(
-    "MM_SESSION_SECRET is required outside local development. Set it in your environment variables.",
+  if (value === "client") return "client";
+  return null;
+}
+
+interface ParsedCookie {
+  name: string;
+  value: string;
+}
+
+function parseRequestCookies(request: Request): ParsedCookie[] {
+  const header = request.headers.get("cookie");
+  if (!header) return [];
+
+  return header
+    .split(";")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((part) => {
+      const eq = part.indexOf("=");
+      if (eq === -1) return { name: part, value: "" };
+      return {
+        name: part.slice(0, eq).trim(),
+        value: decodeURIComponent(part.slice(eq + 1).trim()),
+      };
+    });
+}
+
+/**
+ * Builds a read-only, cookie-bound Supabase client from an incoming request.
+ * Used to verify the caller's identity inside route handlers, where the
+ * response object is not available for cookie rotation (the middleware keeps
+ * the session fresh on document navigations).
+ */
+export function supabaseFromRequest(request: Request) {
+  const cookies = parseRequestCookies(request);
+  return createServerClient<Database>(
+    SUPABASE_PUBLIC_URL,
+    SUPABASE_PUBLIC_ANON_KEY,
+    {
+      cookies: {
+        getAll() {
+          return cookies;
+        },
+        setAll() {
+          // No mutable response in a bare route-handler context.
+        },
+      },
+    },
   );
 }
 
-function encodeBase64Url(value: string): string {
-  return Buffer.from(value, "utf8").toString("base64url");
-}
+/**
+ * Returns the verified session for the request, or null when the caller is not
+ * authenticated. The identity is validated by Supabase Auth (`getUser`), so the
+ * result can be trusted for authorization.
+ */
+export async function getRequestSession(
+  request: Request,
+): Promise<RequestSession | null> {
+  const supabase = supabaseFromRequest(request);
 
-function decodeBase64Url(value: string): string {
-  return Buffer.from(value, "base64url").toString("utf8");
-}
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
-function signPayload(value: string): string {
-  return createHmac("sha256", sessionSecret()).update(value).digest("base64url");
-}
-
-function serializeCookie(
-  name: string,
-  value: string,
-  options: {
-    httpOnly?: boolean;
-    maxAge?: number;
-    path?: string;
-    sameSite?: "Lax" | "Strict" | "None";
-    secure?: boolean;
-    domain?: string;
-  } = {},
-) {
-  const parts = [`${name}=${encodeURIComponent(value)}`];
-
-  if (options.maxAge !== undefined) {
-    parts.push(`Max-Age=${options.maxAge}`);
-  }
-
-  parts.push(`Path=${options.path ?? "/"}`);
-  parts.push(`SameSite=${options.sameSite ?? "Lax"}`);
-
-  if (options.domain) {
-    parts.push(`Domain=${options.domain}`);
-  }
-
-  if (options.httpOnly !== false) {
-    parts.push("HttpOnly");
-  }
-
-  if (options.secure) {
-    parts.push("Secure");
-  }
-
-  return parts.join("; ");
-}
-
-function parseSessionValue(value: string): RequestSession | null {
-  const [payload, signature] = value.split(".");
-
-  if (!payload || !signature) {
+  if (error || !user) {
     return null;
   }
 
-  const expectedSignature = signPayload(payload);
-  const providedBuffer = Buffer.from(signature);
-  const expectedBuffer = Buffer.from(expectedSignature);
+  const role =
+    normalizeSessionRole(
+      (user.app_metadata as Record<string, unknown> | undefined)?.role,
+    ) ??
+    normalizeSessionRole(
+      (user.user_metadata as Record<string, unknown> | undefined)?.role,
+    );
 
-  if (providedBuffer.length !== expectedBuffer.length) {
-    return null;
-  }
-
-  if (!timingSafeEqual(providedBuffer, expectedBuffer)) {
-    return null;
-  }
-
-  try {
-    const parsed = JSON.parse(decodeBase64Url(payload)) as RequestSession;
-    if (!parsed?.userId || !parsed?.email || !parsed?.expiresAt) {
-      return null;
-    }
-
-    const expiryMs = new Date(parsed.expiresAt).getTime();
-    if (Number.isNaN(expiryMs) || expiryMs <= Date.now()) {
-      return null;
-    }
-
-    return parsed;
-  } catch {
-    return null;
-  }
+  return {
+    userId: user.id,
+    email: user.email ?? "",
+    role,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+  };
 }
 
-export function setSessionCookie(session: Omit<RequestSession, "expiresAt"> & { expiresAt?: string }): string {
-  const expiresAt =
-    session.expiresAt ?? new Date(Date.now() + SESSION_TTL_SECONDS * 1000).toISOString();
+export async function requireRequestSession(
+  request: Request,
+): Promise<RequestSession> {
+  const session = await getRequestSession(request);
 
-  const payload = encodeBase64Url(
-    JSON.stringify({
-      ...session,
-      expiresAt,
-    } satisfies RequestSession),
-  );
-
-  const secure = envAny(["NODE_ENV"], "development") === "production";
-  const signedValue = `${payload}.${signPayload(payload)}`;
-
-  return serializeCookie(COOKIE_NAME, signedValue, {
-    httpOnly: true,
-    maxAge: SESSION_TTL_SECONDS,
-    path: "/",
-    sameSite: "Lax",
-    secure,
-    domain: secure ? ".masseurmatch.com" : undefined,
-  });
-}
-
-export function clearSessionCookie(): string {
-  const secure = envAny(["NODE_ENV"], "development") === "production";
-
-  return serializeCookie(COOKIE_NAME, "", {
-    httpOnly: true,
-    maxAge: 0,
-    path: "/",
-    sameSite: "Lax",
-    secure,
-    domain: secure ? ".masseurmatch.com" : undefined,
-  });
-}
-
-export function getRequestSession(request: Request): RequestSession | null {
-  const cookies = parseCookieHeader(request.headers.get("cookie"));
-  const raw = cookies[COOKIE_NAME];
-
-  if (!raw) {
-    return null;
+  if (!session) {
+    throw new RouteError(401, "Authentication required.");
   }
 
-  return parseSessionValue(raw);
-}
-
-export function parseSessionCookieValue(rawValue: string | undefined): RequestSession | null {
-  if (!rawValue) return null;
-  return parseSessionValue(rawValue);
+  return session;
 }

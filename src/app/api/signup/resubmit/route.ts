@@ -4,7 +4,7 @@ import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 
 export async function POST(request: NextRequest) {
   try {
-    const session = getRequestSession(request as unknown as Request);
+    const session = await getRequestSession(request as unknown as Request);
     if (!session) {
       return NextResponse.json({ error: "Authentication required." }, { status: 401 });
     }

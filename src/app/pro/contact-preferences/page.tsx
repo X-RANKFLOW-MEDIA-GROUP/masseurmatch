@@ -286,7 +286,7 @@ export default function ContactPreferencesPage() {
         </div>
 
         {/* Help Text */}
-        <Card className="bg-blue-50 border-blue-200">
+        <Card className="bg-[#F7F7F7] border-[#E8E8E8]">
           <CardContent className="pt-6">
             <h3 className="font-semibold text-sm mb-2">How this works</h3>
             <ul className="text-sm space-y-1 text-muted-foreground list-disc list-inside">

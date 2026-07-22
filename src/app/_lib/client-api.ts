@@ -1,6 +1,6 @@
 "use client";
 
-import { getCsrfToken } from "./csrf-client";
+import { getCsrfToken, clearCsrfToken } from "@/app/_lib/csrf-client";
 
 export class ApiError extends Error {
   constructor(
@@ -27,49 +27,15 @@ async function parsePayload(response: Response) {
   }
 }
 
-type CsrfTokenResponse = {
-  ok: boolean;
-  csrfToken?: string;
-};
-
-let cachedCsrfToken: string | null = null;
-let csrfFetchPromise: Promise<string> | null = null;
-
-async function fetchCsrfToken(): Promise<string> {
-  if (cachedCsrfToken) {
-    return cachedCsrfToken;
-  }
-
-  if (csrfFetchPromise) {
-    return csrfFetchPromise;
-  }
-
-  csrfFetchPromise = (async () => {
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch CSRF token");
-      }
-
-      const data = (await response.json()) as CsrfTokenResponse;
-
-      if (!data.csrfToken) {
-        throw new Error("CSRF token not in response");
-      }
-
-      cachedCsrfToken = data.csrfToken as string;
-      return cachedCsrfToken;
-    } finally {
-      csrfFetchPromise = null;
-    }
-  })();
-
-  return csrfFetchPromise;
+function needsCsrfToken(url: string, method?: string): boolean {
+  return (
+    method === "POST" &&
+    (url.includes("/api/auth/login") ||
+      url.includes("/api/auth/register") ||
+      url.includes("/api/auth/forgot-password"))
+  );
 }
+
 export async function requestJson<T>(
   input: RequestInfo | URL,
   init: RequestInit = {},
@@ -80,24 +46,30 @@ export async function requestJson<T>(
     headers.set("Content-Type", "application/json");
   }
 
-  // Add CSRF token for auth endpoints
-  const url = input instanceof Request ? input.url : String(input);
-  const isAuthRoute = url.includes("/api/auth/");
-  if (isAuthRoute && init.method?.toUpperCase() === "POST") {
-    try {
-      const csrfToken = await getCsrfToken();
-      headers.set("x-csrf-token", csrfToken);
-    } catch (error) {
-      console.error("Failed to get CSRF token:", error);
-      throw new ApiError("Security token fetch failed. Please refresh and try again.", 403);
-    }
+  const url = typeof input === "string" ? input : input.toString();
+  const csrfProtected = needsCsrfToken(url, init.method) && !headers.has("x-csrf-token");
+
+  if (csrfProtected) {
+    headers.set("x-csrf-token", await getCsrfToken());
   }
 
-  const response = await fetch(input, {
+  let response = await fetch(input, {
     credentials: "include",
     ...init,
     headers,
   });
+
+  // The cached CSRF token can outlive the server-side one (1h TTL). On a
+  // CSRF rejection, refetch a fresh token and retry once.
+  if (response.status === 403 && csrfProtected) {
+    clearCsrfToken();
+    headers.set("x-csrf-token", await getCsrfToken());
+    response = await fetch(input, {
+      credentials: "include",
+      ...init,
+      headers,
+    });
+  }
 
   const payload = await parsePayload(response);
 

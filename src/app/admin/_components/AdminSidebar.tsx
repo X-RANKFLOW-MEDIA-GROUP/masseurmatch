@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard,
   Users,
@@ -76,6 +77,13 @@ const navSections = [
 
 export default function AdminSidebarNav() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    router.replace("/login");
+  };
 
   const isActive = (href: string, exact?: boolean) => {
     if (exact) return pathname === href;
@@ -96,13 +104,13 @@ export default function AdminSidebarNav() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                    className={`flex items-center gap-3 border-l-2 px-4 py-2.5 text-sm transition-colors ${
                       active
-                        ? "bg-slate-100 font-medium text-slate-900"
-                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                        ? "border-brand-secondary bg-brand-secondary/[0.06] font-medium text-brand-secondary"
+                        : "border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                     }`}
                   >
-                    <item.icon className="h-4 w-4 shrink-0" />
+                    <item.icon className="h-4 w-4 shrink-0" strokeWidth={2.25} />
                     {item.label}
                   </Link>
                 </li>
@@ -127,13 +135,14 @@ export default function AdminSidebarNav() {
           <LayoutDashboard className="h-4 w-4 shrink-0" />
           Pro Dashboard
         </Link>
-        <Link
-          href="/login"
-          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
         >
           <LogOut className="h-4 w-4 shrink-0" />
           Logout
-        </Link>
+        </button>
       </div>
     </nav>
   );

@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import {
   AlertTriangle,
   Clock,
   CheckCircle2,
   MessageSquare,
-  ChevronRight,
   Flag,
 } from "lucide-react";
 import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";
@@ -32,12 +30,14 @@ type Complaint = {
 
 type ComplaintFilter = "pending" | "resolved" | "dismissed" | "all";
 
-const categoryColors: Record<string, string> = {
-  inappropriate_photos: "rose",
-  fake_profile: "red",
-  harassment: "orange",
-  scam: "amber",
-  other: "slate",
+// Full static class strings — Tailwind's JIT cannot generate classes built by
+// string interpolation (`bg-${x}-50`), so those badges rendered unstyled.
+const categoryBadgeClass: Record<string, string> = {
+  inappropriate_photos: "bg-brand-secondary/[0.06] text-brand-secondary",
+  fake_profile: "bg-red-50 text-red-700",
+  harassment: "bg-[#F5F5F5] text-[#111111]",
+  scam: "bg-[#F7F7F7] text-[#6F6F6F]",
+  other: "bg-slate-50 text-slate-700",
 };
 
 export default function ComplaintsPage() {
@@ -106,18 +106,17 @@ export default function ComplaintsPage() {
           </div>
         ) : (
           complaints.map((complaint) => {
-            const categoryColor = categoryColors[complaint.category] || "slate";
+            const categoryClass = categoryBadgeClass[complaint.category] || categoryBadgeClass.other;
 
             return (
-              <Link
+              <div
                 key={complaint.id}
-                href={`/admin/complaints/${complaint.id}`}
                 className="block border border-border bg-white p-5 rounded-lg transition-all hover:shadow-md hover:border-primary/50"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-${categoryColor}-50 text-${categoryColor}-700`}>
+                      <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${categoryClass}`}>
                         <Flag className="h-3 w-3" />
                         {complaint.category.replace(/_/g, " ")}
                       </div>
@@ -147,10 +146,9 @@ export default function ComplaintsPage() {
                     <div className="text-xs text-muted-foreground text-right">
                       {getDaysAgo(complaint.created_at)}
                     </div>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
                   </div>
                 </div>
-              </Link>
+              </div>
             );
           })
         )}

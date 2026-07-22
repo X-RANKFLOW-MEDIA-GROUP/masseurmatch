@@ -18,6 +18,8 @@ interface SubscriptionState {
   config_error: string | null;
 }
 
+type AppRole = "admin" | "provider" | "client" | null;
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
@@ -25,7 +27,7 @@ interface AuthContextType {
   subscription: SubscriptionState;
   refreshSubscription: () => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null; requiresEmailConfirmation?: boolean; message?: string }>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null; role?: "admin" | "provider" | "client" | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null; role?: AppRole; redirect?: string }>;
   signOut: () => Promise<void>;
 }
 
@@ -41,7 +43,6 @@ const defaultSubscription: SubscriptionState = {
   loading: true,
   config_error: null,
 };
-const CLIENT_SESSION_SYNC_TIMEOUT_MS = 8000;
 
 type SubscriptionResponse = {
   ok: boolean;
@@ -56,60 +57,21 @@ type SubscriptionResponse = {
   config_error?: string | null;
 };
 
-async function wait(ms: number) {
-  await new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function signInWithRetry(email: string, password: string, attempts = 5) {
-  let lastError: Error | null = null;
-
-  for (let attempt = 0; attempt < attempts; attempt += 1) {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-    if (!error) {
-      return null;
-    }
-
-    lastError = error;
-
-    if (attempt < attempts - 1) {
-      await wait(750 * (attempt + 1));
-    }
-  }
-
-  return lastError;
-}
-
-async function establishClientSession(
+/**
+ * After the server auth routes write the Supabase cookies, make sure the
+ * browser client's in-memory session reflects them. getSession() reads the
+ * freshly-set cookies; if the adapter hasn't picked them up yet we sign in
+ * directly once as a fallback (no retry storms).
+ */
+async function hydrateBrowserSession(
   email: string,
   password: string,
-  sessionTokens?: {
-    access_token: string;
-    refresh_token: string;
-  } | null,
-) {
-  const accessToken = sessionTokens?.access_token;
-  const refreshToken = sessionTokens?.refresh_token;
+): Promise<Session | null> {
+  const { data } = await supabase.auth.getSession();
+  if (data.session) return data.session;
 
-  if (accessToken && refreshToken) {
-    try {
-      const result = await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
-
-      if (!result.error) {
-        return;
-      }
-    } catch {
-      // Fall back to a direct browser sign-in below.
-    }
-  }
-
-  const signInError = await signInWithRetry(email, password);
-  if (signInError) {
-    throw signInError;
-  }
+  const { data: signInData } = await supabase.auth.signInWithPassword({ email, password });
+  return signInData.session ?? null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -122,18 +84,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshSubscription = useCallback(async () => {
     try {
-      const response = await fetch("/api/pro/subscription", {
-        method: "GET",
-        cache: "no-store",
-      });
-
+      const response = await fetch("/api/pro/subscription", { method: "GET", cache: "no-store" });
       if (!response.ok) {
         setSubscription((prev) => ({ ...prev, loading: false }));
         return;
       }
-
       const data = (await response.json()) as SubscriptionResponse;
-
       setSubscription({
         subscribed: data.subscribed ?? false,
         plan_key: data.plan_key ?? null,
@@ -169,15 +125,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      // Only clear loading after the initial getSession() has resolved.
-      // If INITIAL_SESSION fires before getSession() completes and returns null,
-      // this prevents prematurely setting loading=false with user=null which
-      // would trigger a redirect-to-login loop on the pro dashboard.
       if (initialLoadDone) {
         setLoading(false);
       }
       if (event === "SIGNED_IN" && initialLoadDone) {
-        // Only refresh on explicit sign-in events, not on initial session restore
         setTimeout(() => refreshSubscription(), 0);
       } else if (!session) {
         setSubscription({ ...defaultSubscription, loading: false });
@@ -187,23 +138,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => authSub.unsubscribe();
   }, [refreshSubscription]);
 
-  // Clear session on browser close if "remember me" was not checked
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (sessionStorage.getItem("mm_session_only") === "true") {
-        supabase.auth.signOut();
-        sessionStorage.removeItem("mm_session_only");
-      }
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, []);
-
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
       const result = await registerMutation({ email, password, fullName });
+      // Only hydrate a live session when email confirmation is NOT required.
+      // When it is, there is no session yet — the user must confirm by email.
       if (!result.requiresEmailConfirmation) {
-        await establishClientSession(email, password, result.session);
+        const hydrated = await hydrateBrowserSession(email, password);
+        setSession(hydrated);
+        setUser(hydrated?.user ?? null);
       }
       return {
         error: null,
@@ -217,28 +160,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
+      // Server route enforces CSRF, rate limiting and brute-force lockout, then
+      // writes the auth cookies. We only mirror them into the browser client.
       const result = await loginMutation({ email, password });
-
-      // Login API already sets the server session cookie.
-      // Mirror the Supabase browser session so client auth state hydrates immediately,
-      // but don't block login when this sync fails (server cookie is already valid).
-      const sessionSyncPromise = establishClientSession(email, password, result.session).catch((sessionError) => {
-        console.warn("Client session sync failed after login.", sessionError);
-      });
-      await Promise.race([
-        sessionSyncPromise,
-        wait(CLIENT_SESSION_SYNC_TIMEOUT_MS),
-      ]);
-
-      return { error: null, role: result.role };
+      const hydrated = await hydrateBrowserSession(email, password);
+      setSession(hydrated);
+      setUser(hydrated?.user ?? null);
+      if (hydrated?.user) {
+        setTimeout(() => refreshSubscription(), 0);
+      }
+      return { error: null, role: result.role, redirect: result.redirect };
     } catch (error) {
       return { error: error as Error };
     }
   };
 
   const signOut = async () => {
-    await logoutMutation().catch(() => null);
-    await supabase.auth.signOut();
+    try {
+      await logoutMutation().catch(() => null);
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error("Error during sign out:", error);
+    } finally {
+      setSession(null);
+      setUser(null);
+      setSubscription({ ...defaultSubscription, loading: false });
+    }
   };
 
   return (

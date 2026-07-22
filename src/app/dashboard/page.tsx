@@ -1,31 +1,27 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { createServerSupabase } from "@/lib/supabase/server";
+import { normalizeSessionRole } from "@/app/api/_lib/session";
 
-function parseSessionRole(raw: string): string | null {
-  try {
-    const [payload] = decodeURIComponent(raw).split(".");
-    if (!payload) return null;
-    const session = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as {
-      role?: string;
-    };
-    return session?.role ?? null;
-  } catch {
-    return null;
-  }
-}
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const cookieStore = await cookies();
-  const raw = cookieStore.get("mm_session")?.value;
-  const role = raw ? parseSessionRole(raw) : null;
+  const supabase = await createServerSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login?redirect=/dashboard");
+  }
+
+  const role =
+    normalizeSessionRole((user.app_metadata as Record<string, unknown> | undefined)?.role) ??
+    normalizeSessionRole((user.user_metadata as Record<string, unknown> | undefined)?.role);
 
   if (role === "provider" || role === "admin") {
     redirect("/pro/dashboard");
   }
 
-  if (role === "client") {
-    redirect("/");
-  }
-
-  redirect("/login?redirect=/dashboard");
+  // Clients and not-yet-roled accounts land on the public site.
+  redirect("/");
 }

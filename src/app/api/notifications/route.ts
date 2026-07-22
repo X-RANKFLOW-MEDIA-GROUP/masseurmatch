@@ -3,7 +3,7 @@ import { getRequestSession } from '@/app/api/_lib/session'
 import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server'
 
 export async function GET(request: NextRequest) {
-  const session = getRequestSession(request)
+  const session = await getRequestSession(request)
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const supabase = createSupabaseAdminClient()
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const session = getRequestSession(request)
+  const session = await getRequestSession(request)
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const supabase = createSupabaseAdminClient()

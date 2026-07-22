@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
 
 // PUT /api/availability - therapist sets their weekly availability
 export async function PUT(request: NextRequest) {
-  const session = getRequestSession(request)
+  const session = await getRequestSession(request)
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const supabase = createSupabaseAdminClient()

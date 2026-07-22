@@ -45,15 +45,13 @@ tests/auth/
 // Payload contains: userId, email, role, expiresAt
 ```
 
-**Usage:**
+**Usage:** (sessions are managed by Supabase SSR — cookies are written by the
+Supabase client on sign-in, not minted manually.)
 ```typescript
-import { setSessionCookie, getRequestSession } from "@/app/api/_lib/session";
+import { getRequestSession } from "@/app/api/_lib/session";
 
-// Set session
-const cookie = setSessionCookie({ userId, email, role });
-
-// Retrieve session
-const session = getRequestSession(request);
+// Retrieve the verified session (validated against Supabase Auth).
+const session = await getRequestSession(request);
 ```
 
 ### 2. CSRF Protection

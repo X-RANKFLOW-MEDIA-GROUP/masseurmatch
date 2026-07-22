@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import React from "react";
 import { requireAdminSession, createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { sendEmail } from "@/app/api/_lib/email";
+import { revalidatePublicDirectory } from "@/app/_lib/directory-cache";
 import ProfileApprovedEmail from "@/emails/ProfileApprovedEmail";
 
 export async function GET(
@@ -85,17 +86,34 @@ export async function POST(
     };
 
     const now = new Date().toISOString();
+
+    // Approval must also flip the fields the public directory reads
+    // (profile_status = "approved" AND visibility_status = "public"); setting
+    // only `status` left approved therapists invisible. Reject / changes hide
+    // the profile again.
+    const visibility =
+      action === "approve"
+        ? { profile_status: "approved", visibility_status: "public", is_active: true, approved_at: now, approved_by: adminSession.userId }
+        : action === "reject"
+          ? { profile_status: "rejected", visibility_status: "hidden", is_active: false, rejected_at: now, rejected_by: adminSession.userId, rejection_reason: notes || null }
+          : { profile_status: "changes_requested", visibility_status: "hidden", is_active: false };
+
     const { error } = await supabase
       .from("profiles")
       .update({
         status: statusMap[action],
         moderation_notes: notes || null,
-        ...(action === "approve" ? { approved_at: now, approved_by: adminSession.userId } : {}),
-        ...(action === "reject" ? { rejected_at: now, rejected_by: adminSession.userId, rejection_reason: notes || null } : {}),
+        ...visibility,
       })
       .eq("id", id);
 
     if (error) throw error;
+
+    // A moderation decision changes the listable set the public directory
+    // caches (getPublicTherapists). Invalidate it so the newly approved (or
+    // newly hidden) profile appears/disappears immediately instead of waiting
+    // out the 60s revalidate window.
+    revalidatePublicDirectory();
 
     if (action === "approve") {
       const { data: profile } = await supabase

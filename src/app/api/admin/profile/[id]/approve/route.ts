@@ -3,6 +3,7 @@ import { z } from "zod";
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, recordAuditLog, requireAdminSession } from "@/app/api/_lib/supabase-server";
 import { sendEmail } from "@/app/api/_lib/email";
+import { revalidatePublicDirectory } from "@/app/_lib/directory-cache";
 import ProfileApprovedEmail from "@/emails/ProfileApprovedEmail";
 import React from "react";
 
@@ -42,6 +43,8 @@ export async function POST(
       .eq("id", profileId);
 
     if (updateError) throw new RouteError(500, updateError.message);
+
+    revalidatePublicDirectory();
 
     // Update profile_reviews
     await adminClient

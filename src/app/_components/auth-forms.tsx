@@ -108,12 +108,14 @@ export function AuthForms({
     setLoading(true);
 
     if (isLogin) {
+      // This toggle only controls whether we prefill the email next time — it
+      // does NOT affect session lifetime. Supabase SSR sessions are persistent
+      // with explicit sign-out; there is no session-only mode here.
       localStorage.setItem("mm_remember_me", String(rememberMe));
       if (rememberMe) {
         localStorage.setItem("mm_saved_email", email);
       } else {
         localStorage.removeItem("mm_saved_email");
-        sessionStorage.setItem("mm_session_only", "true");
       }
     }
 
@@ -282,7 +284,7 @@ export function AuthForms({
                   className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
                   disabled={loading}
                 />
-                Remember me
+                Remember my email
               </label>
               <Link href={forgotPasswordHref} className="text-sm font-semibold text-primary hover:underline">
                 Forgot password?

@@ -32,6 +32,20 @@ export function HeroCinematic() {
             transition={{ duration: dur, ease: customEase, delay: noDelay }}
             className="flex max-w-3xl flex-col justify-center"
           >
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.05 }}
+                className="mb-8 flex items-center gap-3"
+              >
+                <span className="font-display text-3xl font-black tracking-tight text-white sm:text-4xl">
+                  M<span className="text-[#8B1E2D]">M</span>
+                </span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50">
+                  MasseurMatch
+                </span>
+              </motion.div>
+
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
