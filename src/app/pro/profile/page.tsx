@@ -1,14 +1,8 @@
-import type { Metadata } from "next";
-import { createPageMetadata } from "@/app/_lib/metadata";
-import ProProfilePageClient from "./ProProfilePageClient";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = createPageMetadata({
-  title: "Edit pro profile",
-  description: "Private therapist profile editor.",
-  path: "/pro/profile",
-  noIndex: true,
-});
-
+// The profile editor lives at /pro/listing. This route was a second, partial
+// editor writing the same table with divergent field names; it now redirects
+// so there is a single source of truth for editing a profile.
 export default function ProProfilePage() {
-  return <ProProfilePageClient />;
+  redirect("/pro/listing");
 }

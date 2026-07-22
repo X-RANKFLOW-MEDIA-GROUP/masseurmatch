@@ -40,7 +40,10 @@ export default function ProBookingsPage() {
   useEffect(() => {
     async function init() {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      if (!user) {
+        setLoading(false)
+        return
+      }
 
       // Get therapist profile id
       const { data: profile } = await supabase
@@ -49,7 +52,10 @@ export default function ProBookingsPage() {
         .eq('user_id', user.id)
         .maybeSingle()
 
-      if (!profile) return
+      if (!profile) {
+        setLoading(false)
+        return
+      }
       setTherapistId(profile.id)
 
       // Load inquiries for this therapist
