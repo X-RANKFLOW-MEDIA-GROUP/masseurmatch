@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import React from "react";
 import { requireAdminSession, createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { sendEmail } from "@/app/api/_lib/email";
+import { revalidatePublicDirectory } from "@/app/_lib/directory-cache";
 import ProfileApprovedEmail from "@/emails/ProfileApprovedEmail";
 
 export async function GET(
@@ -107,6 +108,12 @@ export async function POST(
       .eq("id", id);
 
     if (error) throw error;
+
+    // A moderation decision changes the listable set the public directory
+    // caches (getPublicTherapists). Invalidate it so the newly approved (or
+    // newly hidden) profile appears/disappears immediately instead of waiting
+    // out the 60s revalidate window.
+    revalidatePublicDirectory();
 
     if (action === "approve") {
       const { data: profile } = await supabase
