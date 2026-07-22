@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { JsonLd } from "@/app/_components/JsonLd";
 import {
   getCities,
+  getImportedReviews,
   getProfilePhotos,
   getPublicTherapistBySlug,
   getPublicTherapists,
@@ -79,9 +80,10 @@ export default async function TherapistPage({ params }: { params: Promise<Params
 
   if (!dbProfile) notFound();
 
-  const [photos, relatedResult] = await Promise.all([
+  const [photos, relatedResult, importedReviews] = await Promise.all([
     getProfilePhotos(dbProfile.id),
     getPublicTherapists({ city: dbProfile.city || undefined, page: 1, pageSize: 6 }),
+    getImportedReviews(dbProfile.id),
   ]);
   const profile = buildProfileViewModel(dbProfile, photos);
   const matchedCity = getCities().find((city) => city.name.toLowerCase() === profile.city.toLowerCase());
@@ -109,6 +111,30 @@ export default async function TherapistPage({ params }: { params: Promise<Params
 
   const knottyPrompt = `Tell me about ${profile.name}, a massage therapist in ${profile.city}. What services and availability do they offer?`;
 
+  // Reviews imported (with approval) from the therapist's profiles on other
+  // platforms — each card is labeled with its source.
+  const reviews = importedReviews
+    .filter((review) => review.review_text)
+    .map((review) => ({
+      quote: review.review_text,
+      author: review.reviewer_name || "Verified client",
+      date: review.review_date
+        ? new Date(`${review.review_date}T00:00:00Z`).toLocaleDateString("en-US", {
+            month: "short",
+            year: "numeric",
+            timeZone: "UTC",
+          })
+        : undefined,
+      rating: review.rating ?? undefined,
+      source: review.source_platform ?? undefined,
+    }));
+  const ratedReviews = importedReviews.filter(
+    (review): review is typeof review & { rating: number } => typeof review.rating === "number",
+  );
+  const averageRating = ratedReviews.length
+    ? ratedReviews.reduce((sum, review) => sum + review.rating, 0) / ratedReviews.length
+    : undefined;
+
   return (
     <>
       <ProfileViewTracker profileId={dbProfile.id} source="direct" />
@@ -123,6 +149,9 @@ export default async function TherapistPage({ params }: { params: Promise<Params
         availableNow={Boolean(dbProfile.available_now)}
         lgbtqAffirming={Boolean(dbProfile.lgbtq_affirming)}
         knottyPrompt={knottyPrompt}
+        reviews={reviews}
+        rating={averageRating}
+        reviewCount={reviews.length || undefined}
         businessHours={dbProfile.business_hours}
         training={Array.isArray(dbProfile.training) ? dbProfile.training : []}
         education={Array.isArray(dbProfile.education) ? dbProfile.education : []}

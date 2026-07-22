@@ -9,21 +9,27 @@ import { expect, test, type APIRequestContext } from "@playwright/test";
  */
 
 /**
- * Follow Vercel's infrastructure-level domain redirect (apex → www, 307)
+ * Follow Vercel's infrastructure-level domain redirect (apex → www)
  * transparently so the test sees the application-level redirect (301/308).
  * The apex domain `masseurmatch.com` redirects to `www.masseurmatch.com`
- * with a 307 before Next.js runs; we skip over that hop here.
+ * before Next.js runs. Its status code has changed over time (307, then 308),
+ * so identify the hop by shape — same path, different host — rather than by
+ * status: application redirects always rewrite the path, the domain hop never
+ * does.
  */
 async function fetchCanonical(
   request: APIRequestContext,
   url: string,
 ): Promise<Awaited<ReturnType<APIRequestContext["get"]>>> {
   const res = await request.get(url, { maxRedirects: 0 });
-  if (res.status() === 307 || res.status() === 302) {
+  if (res.status() >= 300 && res.status() < 400) {
     const loc = res.headers()["location"];
     if (loc) {
-      const locUrl = new URL(loc);
       const srcUrl = new URL(url);
+      // Resolve against the request URL: app-level redirects may send a
+      // relative Location, which resolves to the same host and is never
+      // treated as the domain hop.
+      const locUrl = new URL(loc, srcUrl);
       // Same path, different host → domain-level redirect; follow it once.
       if (locUrl.pathname === srcUrl.pathname && locUrl.hostname !== srcUrl.hostname) {
         return request.get(locUrl.origin + locUrl.pathname, { maxRedirects: 0 });

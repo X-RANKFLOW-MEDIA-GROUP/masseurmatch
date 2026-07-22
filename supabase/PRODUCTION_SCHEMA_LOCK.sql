@@ -126,6 +126,7 @@ alter table public.profiles
   add column if not exists is_featured boolean default false,
   add column if not exists is_suspended boolean default false,
   add column if not exists is_banned boolean default false,
+  add column if not exists is_demo boolean not null default false,
   add column if not exists subscription_tier text default 'free',
   add column if not exists subscription_status text,
   add column if not exists stripe_customer_id text,
