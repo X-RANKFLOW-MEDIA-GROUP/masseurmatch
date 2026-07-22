@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { STRIPE_API_VERSION } from "@/app/api/_lib/stripe-config";
 
+import { STRIPE_API_VERSION } from "@/app/api/_lib/stripe-config";
 import {
   createSupabaseAdminClient,
   getUserRole,
@@ -10,9 +10,7 @@ import {
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) {
-    throw new Error("STRIPE_SECRET_KEY is not configured. Please ensure the Stripe connector is enabled.");
-  }
+  if (!key) throw new Error("STRIPE_SECRET_KEY is not configured.");
   return new Stripe(key, { apiVersion: STRIPE_API_VERSION });
 }
 
@@ -30,17 +28,13 @@ function isSchemaDriftError(message = "") {
 
 export async function GET(request: NextRequest) {
   const sessionId = request.nextUrl.searchParams.get("sessionId");
-
-  if (!sessionId) {
-    return NextResponse.json({ error: "sessionId is required." }, { status: 400 });
-  }
+  if (!sessionId) return NextResponse.json({ error: "sessionId is required." }, { status: 400 });
 
   try {
     const requester = await requireSession(request);
     const requesterRole = await getUserRole(requester.userId);
     const stripe = getStripe();
     const adminClient = createSupabaseAdminClient();
-
     const stripeSession = await stripe.identity.verificationSessions.retrieve(sessionId);
     const userId = stripeSession.metadata?.userId ?? requester.userId;
 
@@ -49,7 +43,6 @@ export async function GET(request: NextRequest) {
     }
 
     const dbStatus = mapVerificationStatus(stripeSession.status);
-
     const { error: verificationUpdateError } = await adminClient
       .from("identity_verifications")
       .update({
@@ -59,25 +52,25 @@ export async function GET(request: NextRequest) {
       .eq("stripe_session_id", sessionId);
 
     if (verificationUpdateError && !isSchemaDriftError(verificationUpdateError.message)) {
-      return NextResponse.json({ error: verificationUpdateError.message }, { status: 500 });
+      console.error("[identity/check-status] verification update failed", verificationUpdateError.message);
+      return NextResponse.json({ error: "Identity status could not be saved. Please try again." }, { status: 500 });
     }
 
-    if (stripeSession.status === "verified") {
-      const { error: profileUpdateError } = await adminClient
-        .from("profiles")
-        .update({
-          is_verified_identity: true,
-          verification_status: "verified",
-          status: "approved",
-          profile_status: "approved",
-          visibility_status: "public",
-          updated_at: new Date().toISOString(),
-        })
-        .eq("user_id", userId)
-        .not("profile_status", "in", '("rejected","banned","suspended")');
+    let publicationStatus: "not_ready" | "published" | "pending" = "not_ready";
 
-      if (profileUpdateError && !isSchemaDriftError(profileUpdateError.message)) {
-        return NextResponse.json({ error: profileUpdateError.message }, { status: 500 });
+    if (stripeSession.status === "verified") {
+      const rpcClient = adminClient as unknown as {
+        rpc: (name: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message?: string; code?: string } | null }>;
+      };
+      const { error: publishError } = await rpcClient.rpc("publish_verified_identity_profile", {
+        p_user_id: userId,
+      });
+
+      if (publishError) {
+        publicationStatus = "pending";
+        console.error("[identity/check-status] verified identity could not publish profile", publishError.message);
+      } else {
+        publicationStatus = "published";
       }
     }
 
@@ -86,9 +79,16 @@ export async function GET(request: NextRequest) {
       dbStatus,
       lastError: stripeSession.last_error,
       userId,
+      publicationStatus,
+      next: stripeSession.status === "verified"
+        ? publicationStatus === "published"
+          ? "/pro/subscription?identity=verified&profile=published"
+          : "/pro/dashboard?identity=verified&publication=pending"
+        : null,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to check verification status.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("[identity/check-status]", message);
+    return NextResponse.json({ error: "Verification status could not be checked. Please try again." }, { status: 500 });
   }
 }
