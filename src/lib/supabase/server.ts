@@ -1,19 +1,38 @@
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { cookies } from "next/headers";
+import { createServerClient } from "@supabase/ssr";
+import type { Database } from "@/integrations/supabase/types";
+import {
+  SUPABASE_PUBLIC_URL,
+  SUPABASE_PUBLIC_ANON_KEY,
+} from "@/integrations/supabase/client";
 
-export function createClient() {
-  const supabaseUrl =
-    process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    process.env.SUPABASE_URL ||
-    "http://placeholder.supabase.invalid";
+/**
+ * Cookie-bound Supabase server client for the current request.
+ *
+ * Uses the anon key so every query is enforced by Row Level Security and runs
+ * as the signed-in user from Supabase auth cookies.
+ */
+export async function createServerSupabase() {
+  const cookieStore = await cookies();
 
-  // Server-side: prefer service role key (bypasses RLS, always works for server routes)
-  const supabaseKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-    process.env.SUPABASE_ANON_KEY ||
-    "placeholder-key";
-
-  return createSupabaseClient(supabaseUrl, supabaseKey);
+  return createServerClient<Database>(
+    SUPABASE_PUBLIC_URL,
+    SUPABASE_PUBLIC_ANON_KEY,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options),
+            );
+          } catch {
+            // Server Components cannot always write cookies; middleware refreshes them.
+          }
+        },
+      },
+    },
+  );
 }
-
-export const createServerClient = createClient;
