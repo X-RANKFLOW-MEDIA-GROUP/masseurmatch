@@ -477,7 +477,7 @@ export default function Home3DTestPage() {
                 <p className="text-sm font-semibold" style={{ color: "#111111" }}>
                   {f.name}
                 </p>
-                <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em]" style={{ color: "#8E8E8E" }}>
+                <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em]" style={{ color: "#6F6F6F" }}>
                   {f.hex}
                 </p>
               </div>
@@ -511,7 +511,7 @@ export default function Home3DTestPage() {
                   <p className="text-sm font-semibold" style={{ color: "#111111" }}>
                     {s.name}
                   </p>
-                  <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em]" style={{ color: "#8E8E8E" }}>
+                  <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em]" style={{ color: "#6F6F6F" }}>
                     {s.hex}
                   </p>
                 </div>
