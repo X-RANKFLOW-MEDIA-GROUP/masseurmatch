@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducedMotion } from "framer-motion";
+import { useHydratedReducedMotion } from "@/hooks/useHydratedReducedMotion";
 
 type BreathingGlowProps = {
   color?: string;
@@ -15,7 +15,7 @@ export function BreathingGlow({
   duration = 5,
   className = "",
 }: BreathingGlowProps) {
-  const reduced = useReducedMotion();
+  const reduced = useHydratedReducedMotion();
 
   if (reduced) return null;
 
