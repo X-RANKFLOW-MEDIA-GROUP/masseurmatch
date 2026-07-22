@@ -97,7 +97,7 @@ export function FeaturedTherapistsEditorial({ featuredTherapists }: Props) {
                         src={(therapist.profile_photo || therapist.avatar_url) as string}
                         alt={therapist.display_name || therapist.full_name || "Therapist"}
                         fill
-                        className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.08]"
+                        className="object-cover transition-transform duration-700 ease-editorial group-hover:scale-[1.08]"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       />
                     ) : (
