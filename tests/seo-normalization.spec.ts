@@ -44,7 +44,7 @@ const CASES: Array<{ source: string; destination: string }> = [
   { source: "/cities/miami-fl", destination: "/miami" },
 
   // Case-insensitive page redirects
-  { source: "/Auth", destination: "/auth" },
+  { source: "/Auth", destination: "/login" },
   { source: "/Privacy", destination: "/privacy" },
 
   // Global legacy aliases
