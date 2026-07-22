@@ -18,171 +18,93 @@ type SendPayload = {
   emailTo?: string;
   smsTo?: string;
   channels?: Array<"in_app" | "email" | "sms" | "push">;
-  data?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
 };
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as SendPayload;
-
-    if (!body.userId || !body.type || !body.title) {
-      return NextResponse.json({ error: "userId, type and title are required" }, { status: 400 });
-    }
-
-    // This route uses the Supabase service-role client plus the Resend and
-    // Twilio senders, so it must never be reachable anonymously. Require an
-    // authenticated session and restrict non-admins to their own account to
-    // prevent notification spoofing, email bombing, and SMS toll fraud.
-    const session = getRequestSession(request);
+    const session = await getRequestSession(request);
     if (!session) {
-      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    let isAdmin = session.role === "admin";
-    try {
-      isAdmin = (await getUserRole(session.userId)) === "admin";
-    } catch {
-      // Fall back to the signed cookie role if the authoritative lookup fails.
+    const role = await getUserRole(session.userId);
+    if (role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    if (!isAdmin && body.userId !== session.userId) {
-      return NextResponse.json(
-        { error: "You can only send notifications to your own account." },
-        { status: 403 },
-      );
+    const body = (await request.json()) as SendPayload;
+    if (!body.userId || !body.type || !body.title) {
+      return NextResponse.json({ error: "userId, type, and title are required" }, { status: 400 });
     }
 
     const supabase = createSupabaseAdminClient();
-
-    const { data: prefs } = await supabase
-      .from("user_notification_preferences")
-      .select("email_enabled,sms_enabled,push_enabled,phone_e164")
-      .eq("user_id", body.userId)
-      .maybeSingle();
-
-    const channels = body.channels && body.channels.length > 0
-      ? body.channels
-      : (["in_app", "email", "sms", "push"] as const);
-
-    let notificationId: string | null = null;
+    const channels = body.channels?.length ? body.channels : ["in_app"];
+    const delivery: Record<string, unknown> = {};
 
     if (channels.includes("in_app")) {
-      const { data: notification, error } = await supabase
-        .from("notifications")
-        .insert({
-          user_id: body.userId,
-          type: body.type,
-          title: body.title,
-          body: body.message ?? null,
-          data: (body.data ?? {}) as Json,
-        })
-        .select("id")
-        .single();
-
-      if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-      }
-
-      notificationId = notification.id;
-
-      await supabase.from("notification_deliveries").insert({
-        notification_id: notificationId,
+      const { error } = await supabase.from("notifications").insert({
         user_id: body.userId,
-        channel: "in_app",
-        provider: "supabase",
-        status: "sent",
-        payload: (body.data ?? {}) as Json,
+        type: body.type,
+        title: body.title,
+        message: body.message ?? null,
+        metadata: (body.metadata ?? {}) as Json,
       });
+      if (error) throw error;
+      delivery.in_app = { success: true };
     }
 
-    if (channels.includes("email") && prefs?.email_enabled !== false && body.emailTo) {
-      const from = process.env.RESEND_FROM_EMAIL || "MasseurMatch <onboarding@resend.dev>";
-      if (!resendApiKey) {
-        await logDelivery({
-          notificationId,
-          userId: body.userId,
-          channel: "email",
-          provider: "resend",
-          destination: body.emailTo,
-          status: "failed",
-          errorMessage: "RESEND_API_KEY missing",
-          payload: body.data,
-        });
+    if (channels.includes("email")) {
+      if (!body.emailTo) {
+        delivery.email = { success: false, error: "Missing emailTo" };
+      } else if (!resendApiKey) {
+        delivery.email = { success: false, error: "RESEND_API_KEY not configured" };
       } else {
-        const resend = new Resend(resendApiKey);
-        const result = await resend.emails.send({
-          from,
-          to: body.emailTo,
-          subject: body.title,
-          text: body.message || body.title,
-        });
-
-        await logDelivery({
-          notificationId,
-          userId: body.userId,
-          channel: "email",
-          provider: "resend",
-          providerMessageId: result.data?.id,
-          destination: body.emailTo,
-          status: result.error ? "failed" : "sent",
-          errorMessage: result.error?.message,
-          payload: body.data,
-        });
+        try {
+          const resend = new Resend(resendApiKey);
+          const { data, error } = await resend.emails.send({
+            from: "MasseurMatch <notifications@masseurmatch.com>",
+            to: body.emailTo,
+            subject: body.title,
+            html: `<div style="font-family:Arial,sans-serif;color:#111827"><h2>${escapeHtml(body.title)}</h2><p>${escapeHtml(body.message ?? "")}</p></div>`,
+            text: `${body.title}\n\n${body.message ?? ""}`,
+          });
+          delivery.email = error
+            ? { success: false, error: error.message }
+            : { success: true, id: data?.id };
+        } catch (error) {
+          delivery.email = { success: false, error: error instanceof Error ? error.message : "Unknown email error" };
+        }
       }
     }
 
-    if (channels.includes("sms") && prefs?.sms_enabled === true) {
-      const smsTo = body.smsTo || prefs.phone_e164 || undefined;
-      if (twilioAccountSid && twilioAuthToken && twilioPhone && smsTo) {
-        const client = twilio(twilioAccountSid, twilioAuthToken);
-        const sms = await client.messages.create({
-          body: body.message || body.title,
-          from: twilioPhone,
-          to: smsTo,
-        });
-
-        await logDelivery({
-          notificationId,
-          userId: body.userId,
-          channel: "sms",
-          provider: "twilio",
-          providerMessageId: sms.sid,
-          destination: smsTo,
-          status: "sent",
-          payload: body.data,
-        });
+    if (channels.includes("sms")) {
+      if (!body.smsTo) {
+        delivery.sms = { success: false, error: "Missing smsTo" };
+      } else if (!twilioAccountSid || !twilioAuthToken || !twilioPhone) {
+        delivery.sms = { success: false, error: "Twilio not configured" };
       } else {
-        await logDelivery({
-          notificationId,
-          userId: body.userId,
-          channel: "sms",
-          provider: "twilio",
-          destination: smsTo,
-          status: "failed",
-          errorMessage: "Twilio not configured or smsTo missing",
-          payload: body.data,
-        });
+        try {
+          const client = twilio(twilioAccountSid, twilioAuthToken);
+          const message = await client.messages.create({
+            from: twilioPhone,
+            to: body.smsTo,
+            body: `${body.title}${body.message ? `: ${body.message}` : ""}`,
+          });
+          delivery.sms = { success: true, sid: message.sid };
+        } catch (error) {
+          delivery.sms = { success: false, error: error instanceof Error ? error.message : "Unknown SMS error" };
+        }
       }
     }
 
-    if (channels.includes("push") && prefs?.push_enabled === true) {
-      // Push is queued/logged now; delivery can be performed by an Edge Function worker.
-      await logDelivery({
-        notificationId,
-        userId: body.userId,
-        channel: "push",
-        provider: "queue",
-        status: "queued",
-        payload: {
-          ...(body.data ?? {}),
-          title: body.title,
-          message: body.message ?? null,
-        },
-      });
+    if (channels.includes("push")) {
+      delivery.push = { success: false, error: "Push provider not configured" };
     }
 
-    return NextResponse.json({ success: true, notificationId });
+    return NextResponse.json({ ok: true, delivery });
   } catch (error) {
+    console.error("Failed to send notification", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to send notification" },
       { status: 500 },
@@ -190,27 +112,11 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function logDelivery(input: {
-  notificationId: string | null;
-  userId: string;
-  channel: "email" | "sms" | "push";
-  provider: string;
-  status: "queued" | "sent" | "failed";
-  providerMessageId?: string;
-  destination?: string;
-  errorMessage?: string;
-  payload?: Record<string, unknown>;
-}) {
-  const supabase = createSupabaseAdminClient();
-  await supabase.from("notification_deliveries").insert({
-    notification_id: input.notificationId,
-    user_id: input.userId,
-    channel: input.channel,
-    provider: input.provider,
-    provider_message_id: input.providerMessageId ?? null,
-    destination: input.destination ?? null,
-    status: input.status,
-    error_message: input.errorMessage ?? null,
-    payload: (input.payload ?? {}) as Json,
-  });
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
