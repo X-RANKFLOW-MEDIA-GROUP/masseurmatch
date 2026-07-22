@@ -24,6 +24,10 @@ export function withCloudinaryBackgroundRemoval(url: string) {
   return url.replace("/image/upload/", "/image/upload/e_background_removal/");
 }
 
+export function withoutCloudinaryBackgroundRemoval(url: string) {
+  return url.replace("/image/upload/e_background_removal/", "/image/upload/");
+}
+
 async function uploadToCloudinary(file: File) {
   const { data, error } = await supabase.functions.invoke<CloudinarySignature>("cloudinary-sign");
   if (error || !data) throw new Error(error?.message || "Could not prepare the photo upload.");
@@ -67,6 +71,8 @@ export async function uploadSignupProfilePhotos({
   for (const [index, file] of files.entries()) {
     const originalUrl = await uploadToCloudinary(file);
     const isPrimary = Boolean(primary) && index === 0;
+    // The transformed URL keeps the original Cloudinary asset intact. Removing
+    // e_background_removal from the URL restores the original at any time.
     const displayUrl = isPrimary && removePrimaryBackground
       ? withCloudinaryBackgroundRemoval(originalUrl)
       : originalUrl;
@@ -77,7 +83,6 @@ export async function uploadSignupProfilePhotos({
         profile_id: profileId,
         user_id: userId,
         storage_path: displayUrl,
-        original_url: originalUrl,
         is_primary: isPrimary,
         sort_order: index,
         moderation_status: "pending",
@@ -87,34 +92,12 @@ export async function uploadSignupProfilePhotos({
       .single();
 
     if (insertError || !photo) {
-      // Some production schemas may not yet include original_url. Preserve the
-      // feature by retrying with the established columns only.
-      const { data: fallbackPhoto, error: fallbackError } = await supabase
-        .from("profile_photos")
-        .insert({
-          profile_id: profileId,
-          user_id: userId,
-          storage_path: displayUrl,
-          is_primary: isPrimary,
-          sort_order: index,
-          moderation_status: "pending",
-          moderation_reason: "queued_for_ai_review",
-        })
-        .select("id")
-        .single();
-
-      if (fallbackError || !fallbackPhoto) {
-        throw new Error(fallbackError?.message || insertError?.message || "Could not save the uploaded photo.");
-      }
-
-      await supabase.functions.invoke("moderate-photo", {
-        body: { photo_id: fallbackPhoto.id, image_url: displayUrl },
-      }).catch(() => null);
-    } else {
-      await supabase.functions.invoke("moderate-photo", {
-        body: { photo_id: photo.id, image_url: displayUrl },
-      }).catch(() => null);
+      throw new Error(insertError?.message || "Could not save the uploaded photo.");
     }
+
+    await supabase.functions.invoke("moderate-photo", {
+      body: { photo_id: photo.id, image_url: displayUrl },
+    }).catch(() => null);
 
     uploaded += 1;
   }
