@@ -43,13 +43,14 @@ export async function POST(request: NextRequest) {
     const delivery: Record<string, unknown> = {};
 
     if (channels.includes("in_app")) {
-      const { error } = await supabase.from("notifications").insert({
+      const notificationPayload = {
         user_id: body.userId,
         type: body.type,
         title: body.title,
         message: body.message ?? null,
         metadata: (body.metadata ?? {}) as Json,
-      });
+      };
+      const { error } = await supabase.from("notifications").insert(notificationPayload as never);
       if (error) throw error;
       delivery.in_app = { success: true };
     }
