@@ -38,9 +38,13 @@ function btn(text: string, url: string): string {
 }
 
 function confirmUrl(type: string, tokenHash: string, redirectTo: string): string {
-  // redirectTo is already a fully-formed URL — do NOT encodeURIComponent() it here.
-  // Double-encoding produces %252F instead of %2F, which breaks the callback route.
-  return `${SUPABASE_URL}/auth/v1/verify?token=${tokenHash}&type=${type}&redirect_to=${redirectTo}`;
+  // redirectTo (from emailData.redirect_to) is a raw URL, e.g.
+  // https://www.masseurmatch.com/api/auth/callback?next=/pro/onboard
+  // It is a query-parameter value here, so it must be percent-encoded exactly
+  // once — matching what Supabase's official token_hash template does (Go's
+  // html/template urlquery-escapes {{ .RedirectTo }} in this position). Leaving
+  // it raw lets any '&' in the redirect leak into GoTrue's own query string.
+  return `${SUPABASE_URL}/auth/v1/verify?token=${tokenHash}&type=${type}&redirect_to=${encodeURIComponent(redirectTo)}`;
 }
 
 interface OutgoingEmail {
