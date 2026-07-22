@@ -23,9 +23,12 @@ export async function POST(request: Request) {
 
     const body = await parseJsonBody(request, availabilitySchema);
 
+    // NOTE: this endpoint controls the general presence status only. The paid
+    // "Available Now" badge (available_now) is deliberately NOT set here — it is
+    // gated by subscription tier and TTL in /api/pro/available-now. Coupling it
+    // to this status let free users grant themselves the paid badge for free.
     const nextProfile = await updateProfileByUserId(session.userId, {
       current_status: body.status,
-      available_now: body.status === "available",
       is_active: body.status !== "hidden",
       service_radius_km: body.radius ?? 15,
       travel_destination: body.travelDestination ?? null,
