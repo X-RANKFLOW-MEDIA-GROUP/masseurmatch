@@ -15,52 +15,31 @@ export async function GET(request: NextRequest) {
     .from('therapist_availability')
     .select('*')
     .eq('therapist_id', therapistId)
+    .eq('is_available', true)
 
-  if (date) {
-    const dayOfWeek = new Date(date).getDay()
-    const daySlots = availability?.filter(a => a.day_of_week === dayOfWeek) ?? []
+  const { data: appointments } = await supabase
+    .from('appointments')
+    .select('scheduled_at, duration_minutes')
+    .eq('therapist_id', therapistId)
+    .in('status', ['pending', 'confirmed'])
+    .gte('scheduled_at', date ? `${date}T00:00:00Z` : new Date().toISOString())
 
-    const start = new Date(date)
-    start.setHours(0, 0, 0, 0)
-    const end = new Date(date)
-    end.setHours(23, 59, 59, 999)
-
-    const { data: booked } = await supabase
-      .from('appointments')
-      .select('start_time, end_time')
-      .eq('therapist_id', therapistId)
-      .eq('status', 'confirmed')
-      .gte('start_time', start.toISOString())
-      .lte('start_time', end.toISOString())
-
-    return NextResponse.json({ slots: daySlots, booked: booked ?? [] })
-  }
-
-  return NextResponse.json({ availability: availability ?? [] })
+  return NextResponse.json({ availability: availability ?? [], booked_slots: appointments ?? [] })
 }
 
-// PUT /api/availability - therapist sets their weekly availability
-export async function PUT(request: NextRequest) {
-  const session = getRequestSession(request)
+// POST /api/availability — therapist sets schedule
+export async function POST(request: NextRequest) {
+  const session = await getRequestSession(request)
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const supabase = createSupabaseAdminClient()
-  const body = await request.json()
-  const { slots } = body
-
-  if (!Array.isArray(slots)) return NextResponse.json({ error: 'slots must be an array' }, { status: 400 })
+  const { slots } = await request.json()
 
   await supabase.from('therapist_availability').delete().eq('therapist_id', session.userId)
 
-  if (slots.length > 0) {
-    const { error } = await supabase.from('therapist_availability').insert(
-      slots.map((s: { day_of_week: number; start_time: string; end_time: string }) => ({
-        therapist_id: session.userId,
-        day_of_week: s.day_of_week,
-        start_time: s.start_time,
-        end_time: s.end_time,
-      }))
-    )
+  if (slots?.length) {
+    const rows = slots.map((slot: Record<string, unknown>) => ({ ...slot, therapist_id: session.userId }))
+    const { error } = await supabase.from('therapist_availability').insert(rows)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
