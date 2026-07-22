@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   try {
     assertRateLimit(request, "pro-profile-flag", { limit: 10, windowMs: 60_000 });
 
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const profile = await getProfileByUserId(session.userId);
 
     if (!profile) {
@@ -76,9 +76,7 @@ export async function POST(request: Request) {
       .eq("status", "pending")
       .maybeSingle();
 
-    if (queueLookupError) {
-      throw new RouteError(500, queueLookupError.message);
-    }
+    if (queueLookupError) throw new RouteError(500, queueLookupError.message);
 
     let queueId = existingQueueItem?.id ?? null;
 
@@ -87,21 +85,14 @@ export async function POST(request: Request) {
         .from("moderation_queue")
         .update(queuePayload)
         .eq("id", queueId);
-
-      if (queueUpdateError) {
-        throw new RouteError(500, queueUpdateError.message);
-      }
+      if (queueUpdateError) throw new RouteError(500, queueUpdateError.message);
     } else {
       const { data: insertedQueueItem, error: queueInsertError } = await adminClient
         .from("moderation_queue")
         .insert(queuePayload)
         .select("id")
         .single();
-
-      if (queueInsertError) {
-        throw new RouteError(500, queueInsertError.message);
-      }
-
+      if (queueInsertError) throw new RouteError(500, queueInsertError.message);
       queueId = insertedQueueItem?.id ?? null;
     }
 
@@ -112,11 +103,7 @@ export async function POST(request: Request) {
       snapshot,
     });
 
-    return json({
-      ok: true,
-      queued: true,
-      queueId,
-    });
+    return json({ ok: true, queued: true, queueId });
   } catch (error) {
     return errorResponse(error);
   }
