@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { clearSessionCookie, getRequestSession } from "@/app/api/_lib/session";
+import { createServerSupabase } from "@/lib/supabase/server";
 import { getUserRole } from "@/app/api/_lib/supabase-server";
+import { normalizeSessionRole } from "@/app/api/_lib/session";
 
 function dashboardPathForRole(role: string | null | undefined) {
   if (role === "client") return "/search";
-  if (role === "admin" || role === "provider" || role === "therapist") return "/pro/dashboard";
+  if (role === "admin" || role === "provider") return "/pro/dashboard";
   return "/login";
 }
 
@@ -17,31 +18,29 @@ function noStoreJson(body: unknown, init?: ResponseInit) {
   return response;
 }
 
-export async function GET(request: Request) {
-  const session = getRequestSession(request);
+export async function GET() {
+  const supabase = await createServerSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!session) {
-    const response = noStoreJson({ authenticated: false, dashboardPath: "/login" });
-    response.headers.append("Set-Cookie", clearSessionCookie());
-    return response;
+  if (!user) {
+    return noStoreJson({ authenticated: false, dashboardPath: "/login" });
   }
 
-  // Always re-validate role from DB — cookie role can be stale after manual role changes
-  let role = session.role;
+  let role =
+    normalizeSessionRole((user.app_metadata as Record<string, unknown> | undefined)?.role) ??
+    null;
   try {
-    const freshRole = await getUserRole(session.userId);
+    const freshRole = await getUserRole(user.id);
     if (freshRole) role = freshRole;
   } catch {
-    // Fall back to cookie role if DB lookup fails
+    // Fall back to the verified metadata role.
   }
 
   return noStoreJson({
     authenticated: true,
-    user: {
-      id: session.userId,
-      email: session.email,
-      role,
-    },
+    user: { id: user.id, email: user.email, role },
     dashboardPath: dashboardPathForRole(role),
   });
 }
