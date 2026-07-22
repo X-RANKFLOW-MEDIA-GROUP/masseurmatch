@@ -1,6 +1,6 @@
 "use client";
 
-import { ApiError, requestJson, postJson } from "@/app/_lib/request";
+import { requestJson, postJson } from "@/app/_lib/request";
 import type {
   AuthLoginInput,
   AuthRegisterInput,
@@ -16,10 +16,7 @@ export type AuthMutationResponse = {
     email: string;
   };
   role: "admin" | "provider" | "client" | null;
-  session?: {
-    access_token: string;
-    refresh_token: string;
-  } | null;
+  redirect?: string;
   requiresEmailConfirmation?: boolean;
   message?: string;
 };
@@ -65,19 +62,8 @@ export function loginMutation(input: AuthLoginInput) {
   return postJson<AuthMutationResponse>("/api/auth/login", input);
 }
 
-export async function registerMutation(input: AuthRegisterInput) {
-  try {
-    return await postJson<AuthMutationResponse>("/api/auth/register", input);
-  } catch (error) {
-    if (error instanceof ApiError && error.status === 409 && typeof window !== "undefined") {
-      const payload = error.payload as { loginPath?: string; resetPath?: string } | undefined;
-      const loginPath = payload?.loginPath || `/login?email=${encodeURIComponent(input.email)}`;
-      const separator = loginPath.includes("?") ? "&" : "?";
-      window.location.assign(`${loginPath}${separator}reason=account-exists&reset=${encodeURIComponent(payload?.resetPath || "/forgot-password")}`);
-      return await new Promise<AuthMutationResponse>(() => undefined);
-    }
-    throw error;
-  }
+export function registerMutation(input: AuthRegisterInput) {
+  return postJson<AuthMutationResponse>("/api/auth/register", input);
 }
 
 export function logoutMutation() {
