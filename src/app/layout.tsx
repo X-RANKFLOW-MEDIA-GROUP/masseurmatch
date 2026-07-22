@@ -12,7 +12,6 @@ import { SketchFilter } from "@/components/icons";
 import "@/index.css";
 import "@/styles/mobile-responsive.css";
 import "@/styles/homepage-mobile-hotfix.css";
-import "@/styles/for-therapists-contrast.css";
 import { satoshi } from "./fonts";
 import SmoothScroll from "@/components/motion/SmoothScroll";
 
