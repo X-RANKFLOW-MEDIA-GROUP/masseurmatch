@@ -4,7 +4,7 @@ import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 
 export async function GET(request: Request) {
   try {
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const supabase = createSupabaseAdminClient();
 
     const { searchParams } = new URL(request.url);
@@ -18,18 +18,12 @@ export async function GET(request: Request) {
       .order("created_at", { ascending: false })
       .limit(limit);
 
-    if (unreadOnly) {
-      query = query.is("read_at", null);
-    }
+    if (unreadOnly) query = query.is("read_at", null);
 
     const { data: notifications, error } = await query;
-
     if (error) throw new RouteError(500, error.message);
 
-    return json({
-      ok: true,
-      notifications: notifications ?? [],
-    });
+    return json({ ok: true, notifications: notifications ?? [] });
   } catch (error) {
     return errorResponse(error);
   }
@@ -37,7 +31,7 @@ export async function GET(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    const session = requireRequestSession(request);
+    const session = await requireRequestSession(request);
     const { searchParams } = new URL(request.url);
     const notificationId = searchParams.get("id");
 
@@ -46,8 +40,6 @@ export async function PATCH(request: Request) {
     }
 
     const supabase = createSupabaseAdminClient();
-
-    // Verify the notification belongs to the user
     const { data: notification, error: fetchError } = await supabase
       .from("notifications")
       .select("user_id")
@@ -58,14 +50,12 @@ export async function PATCH(request: Request) {
       return json({ ok: false, error: "Notification not found" }, { status: 404 });
     }
 
-    // Mark as read
     const { error } = await supabase
       .from("notifications")
       .update({ read_at: new Date().toISOString() })
       .eq("id", notificationId);
 
     if (error) throw new RouteError(500, error.message);
-
     return json({ ok: true });
   } catch (error) {
     return errorResponse(error);
