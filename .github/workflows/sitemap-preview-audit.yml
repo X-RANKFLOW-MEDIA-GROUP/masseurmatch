@@ -83,7 +83,7 @@ jobs:
         env:
           SITEMAP_STRICT: "1"
           SITEMAP_VALIDATION_BASE_URL: ${{ steps.preview.outputs.url }}
-          SITEMAP_CANONICAL_ORIGIN: https://masseurmatch.com
+          SITEMAP_CANONICAL_ORIGIN: https://www.masseurmatch.com
           SITEMAP_VALIDATION_CONCURRENCY: "6"
           VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
         run: |
