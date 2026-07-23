@@ -67,6 +67,8 @@ const TABLE_BY_TYPE = {
 } as const;
 
 function getSupabaseAdminClient() {
+  // Prefer the client-visible production URL so a stale private SUPABASE_URL
+  // cannot route server analytics to a retired project.
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!supabaseUrl || !serviceRoleKey) return null;
