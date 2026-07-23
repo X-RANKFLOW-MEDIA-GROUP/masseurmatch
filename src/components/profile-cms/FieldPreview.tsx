@@ -6,27 +6,11 @@ import { cn } from "@/lib/utils";
 import type { FieldPreviewProps } from "@/types/profile-fields";
 import { FieldType } from "@/types/profile-fields";
 
-function displayValue(value: unknown): string {
-  if (value === null || value === undefined || value === "") return "—";
-  if (
-    typeof value === "string" ||
-    typeof value === "number" ||
-    typeof value === "boolean"
-  ) {
-    return String(value);
-  }
-  try {
-    return JSON.stringify(value);
-  } catch {
-    return String(value);
-  }
-}
-
 export const FieldPreview = React.forwardRef<
   HTMLDivElement,
   FieldPreviewProps
 >(({ config, value, className }, ref) => {
-  const renderValue = () => {
+  const renderValue = (): React.ReactNode => {
     switch (config.type) {
       case FieldType.BOOLEAN:
         return (
@@ -53,10 +37,10 @@ export const FieldPreview = React.forwardRef<
           <div className="flex flex-wrap gap-2">
             {value.map((item, idx) => (
               <div
-                key={`${displayValue(item)}-${idx}`}
+                key={`${item}-${idx}`}
                 className="inline-flex items-center px-3 py-1 bg-accent/10 text-accent rounded-lg border border-accent/20 text-sm font-medium"
               >
-                {displayValue(item)}
+                {item}
               </div>
             ))}
           </div>
@@ -82,7 +66,7 @@ export const FieldPreview = React.forwardRef<
       case FieldType.INTEGER:
         return (
           <span className="font-mono text-sm font-bold text-accent">
-            {typeof value === "number" ? value : Number(value) || 0}
+            {value ?? 0}
           </span>
         );
 
@@ -90,19 +74,19 @@ export const FieldPreview = React.forwardRef<
         const option = config.options?.find((opt) => opt.value === value);
         return (
           <span className="inline-flex items-center px-3 py-1 bg-secondary/10 text-secondary rounded-lg border border-secondary/20 text-sm font-medium">
-            {option?.label ?? displayValue(value)}
+            {option?.label ? String(option.label) : (value ? String(value) : "—")}
           </span>
         );
       }
 
       case FieldType.TEXT:
       default:
-        if (value === null || value === undefined || value === "") {
+        if (!value) {
           return <span className="text-muted-foreground italic">Empty</span>;
         }
         return (
           <p className="text-sm text-foreground whitespace-pre-wrap break-words">
-            {displayValue(value)}
+            {String(value)}
           </p>
         );
     }
@@ -113,7 +97,7 @@ export const FieldPreview = React.forwardRef<
       ref={ref}
       className={cn(
         "space-y-2 p-4 rounded-xl border border-border/90 bg-white/92",
-        className,
+        className
       )}
     >
       <div className="flex items-center justify-between">

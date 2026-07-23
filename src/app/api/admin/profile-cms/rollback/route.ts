@@ -4,8 +4,6 @@ import {
   requireAdminSession,
   recordAuditLog,
 } from "@/app/api/_lib/supabase-server";
-import { getFieldByKey } from "@/lib/profile-fields-config";
-import type { Database, Json } from "@/integrations/supabase/types";
 
 export const dynamic = "force-dynamic";
 
@@ -20,22 +18,18 @@ type AuditDetails = {
   new_value?: unknown;
 };
 
-type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
-
-function toJson(value: unknown): Json {
+/**
+ * Convert unknown values to JSON-serializable format
+ */
+function toJsonValue(value: unknown): any {
   if (value === null || value === undefined) return null;
   if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
     return value;
   }
-  if (Array.isArray(value)) {
-    return value.map((item) => toJson(item));
+  if (Array.isArray(value) || (typeof value === "object" && value !== null)) {
+    return value;
   }
-  if (typeof value === "object") {
-    return Object.fromEntries(
-      Object.entries(value).map(([key, item]) => [key, toJson(item)]),
-    );
-  }
-  return String(value);
+  return null;
 }
 
 export async function POST(request: Request) {
@@ -63,47 +57,35 @@ export async function POST(request: Request) {
         : {};
     const fieldName = typeof details.field_name === "string" ? details.field_name : null;
 
-    if (!fieldName || !getFieldByKey(fieldName)) {
-      return Response.json({ error: "Audit log entry has an invalid field name" }, { status: 400 });
+    if (!fieldName) {
+      return Response.json({ error: "Audit log entry has no field name" }, { status: 400 });
     }
-
-    const oldValue = toJson(details.old_value);
-    const newValue = toJson(details.new_value);
-    const updatePayload = {
-      [fieldName]: oldValue,
-      updated_at: new Date().toISOString(),
-    } as unknown as ProfileUpdate;
 
     const { error: updateError } = await supabase
       .from("profiles")
-      .update(updatePayload)
+      .update({
+        [fieldName]: toJsonValue(details.old_value) ?? null,
+        updated_at: new Date().toISOString(),
+      })
       .eq("id", profile_id);
 
     if (updateError) {
       return Response.json({ error: "Failed to rollback" }, { status: 500 });
     }
 
-    const auditDetails: Json = {
+    await recordAuditLog(admin.userId, "provider.profile.field_rollback", "profile", profile_id, {
       field_name: fieldName,
-      old_value: newValue,
-      new_value: oldValue,
+      old_value: toJsonValue(details.new_value) ?? null,
+      new_value: toJsonValue(details.old_value) ?? null,
       source_audit_log_id: audit_log_id,
       rolled_back_at: new Date().toISOString(),
-    };
-
-    await recordAuditLog(
-      admin.userId,
-      "provider.profile.field_rollback",
-      "profile",
-      profile_id,
-      auditDetails,
-    );
+    });
 
     return Response.json({
       ok: true,
       profile_id,
       field_name: fieldName,
-      rolled_back_value: oldValue,
+      rolled_back_value: toJsonValue(details.old_value) ?? null,
     });
   } catch (error) {
     console.error("Rollback error:", error);

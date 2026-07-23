@@ -5,16 +5,20 @@ import { assertRateLimit } from "@/app/_lib/security";
 import { requireRequestSession } from "@/app/_lib/session";
 import { getProfileByUserId } from "@/app/_lib/store";
 import { getFieldByKey } from "@/lib/profile-fields-config";
-import type { Database, Json } from "@/integrations/supabase/types";
+import type { Database } from "@/integrations/supabase/types";
 
+// Request body schema for single field update
 const fieldUpdateSchema = z.object({
   field_name: z.string().min(1).max(100),
   value: z.unknown(),
   reason: z.string().min(1).max(500).optional(),
 });
 
-type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
+type FieldUpdateRequest = z.infer<typeof fieldUpdateSchema>;
 
+/**
+ * Extract client IP address from request headers
+ */
 function getClientIpAddress(request: Request): string {
   const forwardedFor = request.headers.get("x-forwarded-for");
   if (forwardedFor) {
@@ -27,26 +31,30 @@ function getClientIpAddress(request: Request): string {
   return "unknown";
 }
 
+/**
+ * Get old value from profile, safely handling undefined
+ */
 function getOldValue(profile: Record<string, unknown>, fieldName: string): unknown {
   return profile[fieldName] ?? null;
 }
 
-function toJson(value: unknown): Json {
+/**
+ * Convert unknown values to JSON-serializable format
+ */
+function toJsonValue(value: unknown): any {
   if (value === null || value === undefined) return null;
   if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
     return value;
   }
-  if (Array.isArray(value)) {
-    return value.map((item) => toJson(item));
+  if (Array.isArray(value) || (typeof value === "object" && value !== null)) {
+    return value;
   }
-  if (typeof value === "object") {
-    return Object.fromEntries(
-      Object.entries(value).map(([key, item]) => [key, toJson(item)]),
-    );
-  }
-  return String(value);
+  return null;
 }
 
+/**
+ * Validate and prepare the update value using the field's validation schema
+ */
 async function validateAndPrepareValue(
   fieldName: string,
   value: unknown,
@@ -65,14 +73,19 @@ async function validateAndPrepareValue(
     throw new RouteError(403, `Field "${fieldName}" can only be edited by administrators.`);
   }
 
+  // Validate using the field's validation schema
   try {
-    return fieldDef.validationSchema.parse(value);
+    const validated = fieldDef.validationSchema.parse(value);
+    return validated;
   } catch (error) {
     const message = error instanceof Error ? error.message : "Validation failed";
     throw new RouteError(400, `Invalid value for field "${fieldName}": ${message}`);
   }
 }
 
+/**
+ * Record audit log entry for the field update
+ */
 async function recordFieldAuditLog(
   userId: string,
   profileId: string,
@@ -85,10 +98,10 @@ async function recordFieldAuditLog(
   const adminClient = createSupabaseAdminClient();
 
   try {
-    const details: Json = {
+    const details = {
       field_name: fieldName,
-      old_value: toJson(oldValue),
-      new_value: toJson(newValue),
+      old_value: toJsonValue(oldValue),
+      new_value: toJsonValue(newValue),
       reason: reason || null,
       ip_address: ipAddress,
       updated_at: new Date().toISOString(),
@@ -103,22 +116,29 @@ async function recordFieldAuditLog(
     });
   } catch (error) {
     console.error("[api/pro/profile/cms-update] Audit log recording failed:", error);
+    // Continue even if audit log fails - don't break the update
   }
 }
 
 export async function POST(request: Request) {
   try {
+    // Rate limit: max 20 requests per minute
     assertRateLimit(request, "pro-profile-cms-field", { limit: 20, windowMs: 60_000 });
-    const session = await requireRequestSession(request);
-    const profile = await getProfileByUserId(session.userId);
 
+    // Require authenticated session
+    const session = await requireRequestSession(request);
+
+    // Get user's profile
+    const profile = await getProfileByUserId(session.userId);
     if (!profile) {
       throw new RouteError(404, "Profile not found.");
     }
 
+    // Parse and validate request body
     const body = await parseJsonBody(request, fieldUpdateSchema);
-    const fieldDef = getFieldByKey(body.field_name);
 
+    // Validate field exists and is editable
+    const fieldDef = getFieldByKey(body.field_name);
     if (!fieldDef) {
       throw new RouteError(400, `Field "${body.field_name}" does not exist in profile schema.`);
     }
@@ -131,26 +151,33 @@ export async function POST(request: Request) {
       throw new RouteError(403, `Field "${body.field_name}" can only be edited by administrators.`);
     }
 
+    // Validate and prepare the new value
     const newValue = await validateAndPrepareValue(body.field_name, body.value);
+
+    // Get the old value from the profile
     const profileData = profile as Record<string, unknown>;
     const oldValue = getOldValue(profileData, body.field_name);
+
+    // If no change, return without updating
     const hasChanged = JSON.stringify(oldValue) !== JSON.stringify(newValue);
 
     const adminClient = createSupabaseAdminClient();
     let updatedProfile = profile;
 
     if (hasChanged) {
-      const updates = {
+      // Prepare the update object with dynamic field name
+      const updates: Record<string, any> = {
         [body.field_name]: newValue,
         updated_at: new Date().toISOString(),
-        ...(profile.profile_status === "approved"
-          ? {
-              profile_status: "under_review",
-              visibility_status: "public",
-            }
-          : {}),
-      } as unknown as ProfileUpdate;
+      };
 
+      // If profile was approved, mark as under_review for changes
+      if (profile.profile_status === "approved") {
+        updates.profile_status = "under_review";
+        updates.visibility_status = "public"; // Keep visible while under review
+      }
+
+      // Update the profile
       const { data: nextProfile, error } = await adminClient
         .from("profiles")
         .update(updates)
@@ -169,8 +196,10 @@ export async function POST(request: Request) {
       updatedProfile = nextProfile;
     }
 
+    // Get client IP address
     const ipAddress = getClientIpAddress(request);
 
+    // Record audit log
     await recordFieldAuditLog(
       session.userId,
       profile.id,
@@ -181,6 +210,7 @@ export async function POST(request: Request) {
       ipAddress,
     );
 
+    // Trigger revalidation if slug exists
     if (updatedProfile.slug || profile.slug) {
       await import("@/app/_lib/revalidate")
         .then(({ buildTherapistRevalidatePaths, triggerRevalidate }) =>
