@@ -14,6 +14,12 @@
 
 BEGIN;
 
+-- Step 0: Ensure canonical_city_slug exists. It is in the generated profiles
+-- types (src/integrations/supabase/types.ts) and is selected by the view below,
+-- but no committed migration ever added it to public.profiles — so the view
+-- creation failed with `42703 column "canonical_city_slug" does not exist`.
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS canonical_city_slug text;
+
 -- Step 1: BACKUP - Copy any unique data from therapist_profiles to profiles
 -- (In this case, therapist_profiles has NO unique data we need to preserve)
 -- But just in case, log it:
@@ -28,7 +34,12 @@ DROP VIEW IF EXISTS public.public_therapist_profiles;
 DROP TABLE IF EXISTS public.therapist_profiles;
 
 -- Step 4: RECREATE PUBLIC_PROFILES VIEW (single, clean view)
--- This replaces the old dual views with one unified view
+-- This replaces the old dual views with one unified view.
+-- Guarded: canonical_city_slug is added above, but if any other selected column
+-- is absent on a fresh/branch DB the view is skipped (nothing else in the
+-- migration history depends on it) rather than aborting. On production, where
+-- every column exists, the view is created in full.
+DO $view$ BEGIN
 CREATE OR REPLACE VIEW public.public_profiles AS
 SELECT
   -- Identity
@@ -118,6 +129,9 @@ WHERE visibility_status = 'public'
   AND status = 'approved'
   AND is_suspended = false
   AND is_banned = false;
+EXCEPTION WHEN undefined_column OR undefined_table THEN
+  RAISE NOTICE 'consolidate_profile_schema: skipped public_profiles view (a selected column is absent on this DB): %', SQLERRM;
+END $view$;
 
 -- Step 5: UPDATE RLS POLICIES (keep existing ones, they already protect)
 -- Note: profiles table RLS is already configured correctly
