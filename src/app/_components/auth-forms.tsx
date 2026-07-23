@@ -8,20 +8,16 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { useAuth } from "@/contexts/AuthContext";
 import { resendConfirmationMutation } from "@/app/_lib/mutations";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 function SocialButtons({ label, redirectTo = "/pro/dashboard" }: { label: string; redirectTo?: string }) {
   const [loading, setLoading] = useState<string | null>(null);
 
-  const handleOAuth = async (provider: "google" | "apple") => {
+  const startOAuth = (provider: "google" | "apple") => {
     setLoading(provider);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
-      },
-    });
-    if (error) setLoading(null);
+    const startUrl = new URL("/auth/oauth", window.location.origin);
+    startUrl.searchParams.set("provider", provider);
+    startUrl.searchParams.set("next", redirectTo);
+    window.location.assign(startUrl.toString());
   };
 
   return (
@@ -29,7 +25,7 @@ function SocialButtons({ label, redirectTo = "/pro/dashboard" }: { label: string
       <button
         type="button"
         disabled={!!loading}
-        onClick={() => handleOAuth("google")}
+        onClick={() => startOAuth("google")}
         className="flex w-full items-center justify-center gap-2.5 rounded-lg border border-border bg-white px-4 py-2.5 text-sm font-medium text-foreground shadow-sm transition hover:bg-secondary/40 disabled:opacity-60"
       >
         <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -43,7 +39,7 @@ function SocialButtons({ label, redirectTo = "/pro/dashboard" }: { label: string
       <button
         type="button"
         disabled={!!loading}
-        onClick={() => handleOAuth("apple")}
+        onClick={() => startOAuth("apple")}
         className="flex w-full items-center justify-center gap-2.5 rounded-lg border border-border bg-black px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-black/80 disabled:opacity-60"
       >
         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="white">
