@@ -1,11 +1,21 @@
 const EXPECTED_PROJECT_REF = "ijsdpozjfjjufjsoexod";
 const EXPECTED_HOSTNAME = `${EXPECTED_PROJECT_REF}.supabase.co`;
 
-const requiredVariables = [
+const urlVariableNames = [
   "SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_URL",
+  "NEXT_PUBLIC_STORAGE_SUPABASE_URL",
+  "VITE_SUPABASE_URL",
+];
+
+const keyVariableNames = [
   "SUPABASE_ANON_KEY",
   "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+  "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+  "NEXT_PUBLIC_STORAGE_SUPABASE_ANON_KEY",
+  "VITE_SUPABASE_PUBLISHABLE_KEY",
+  "SUPABASE_SERVICE_ROLE_KEY",
+  "SITEMAP_SUPABASE_KEY",
 ];
 
 function fail(message) {
@@ -13,7 +23,12 @@ function fail(message) {
   process.exit(1);
 }
 
-function parseSupabaseUrl(name, value) {
+function configuredValue(name) {
+  const value = process.env[name]?.trim();
+  return value ? value : null;
+}
+
+function validateSupabaseUrl(name, value) {
   let parsed;
 
   try {
@@ -29,54 +44,58 @@ function parseSupabaseUrl(name, value) {
   if (parsed.hostname !== EXPECTED_HOSTNAME) {
     fail(
       `${name} points to ${parsed.hostname}, but MasseurMatch must use ${EXPECTED_HOSTNAME}. ` +
-        "This usually means a deleted Supabase preview branch was injected into the deployment.",
+        "A stale or deleted Supabase preview branch may have overridden this deployment.",
     );
   }
-
-  return parsed.origin;
 }
 
-function getJwtProjectRef(name, token) {
-  const parts = token.split(".");
-  if (parts.length !== 3) {
-    fail(`${name} is not a valid Supabase JWT.`);
+function validateJwtProjectRef(name, token) {
+  // New Supabase publishable keys can use the sb_publishable_ format and are
+  // validated indirectly through the project URL. Legacy anon/service keys are JWTs.
+  if (token.startsWith("sb_publishable_") || token.startsWith("sb_secret_")) {
+    return;
   }
 
+  const parts = token.split(".");
+  if (parts.length !== 3) {
+    fail(`${name} is neither a recognized Supabase key nor a valid JWT.`);
+  }
+
+  let payload;
   try {
-    const payload = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8"));
-    return typeof payload.ref === "string" ? payload.ref : null;
+    payload = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8"));
   } catch {
     fail(`${name} has an unreadable JWT payload.`);
   }
-}
 
-for (const name of requiredVariables) {
-  if (!process.env[name]?.trim()) {
-    fail(`${name} is missing.`);
-  }
-}
-
-const serverOrigin = parseSupabaseUrl("SUPABASE_URL", process.env.SUPABASE_URL.trim());
-const publicOrigin = parseSupabaseUrl(
-  "NEXT_PUBLIC_SUPABASE_URL",
-  process.env.NEXT_PUBLIC_SUPABASE_URL.trim(),
-);
-
-if (serverOrigin !== publicOrigin) {
-  fail("SUPABASE_URL and NEXT_PUBLIC_SUPABASE_URL must be identical.");
-}
-
-if (process.env.SUPABASE_ANON_KEY.trim() !== process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.trim()) {
-  fail("SUPABASE_ANON_KEY and NEXT_PUBLIC_SUPABASE_ANON_KEY must be identical.");
-}
-
-for (const name of ["SUPABASE_ANON_KEY", "NEXT_PUBLIC_SUPABASE_ANON_KEY"]) {
-  const projectRef = getJwtProjectRef(name, process.env[name].trim());
-  if (projectRef !== EXPECTED_PROJECT_REF) {
+  if (typeof payload.ref === "string" && payload.ref !== EXPECTED_PROJECT_REF) {
     fail(
-      `${name} belongs to project ${projectRef || "unknown"}, but MasseurMatch must use ${EXPECTED_PROJECT_REF}.`,
+      `${name} belongs to project ${payload.ref}, but MasseurMatch must use ${EXPECTED_PROJECT_REF}.`,
     );
   }
 }
 
-console.log(`Supabase environment verified: ${EXPECTED_HOSTNAME}`);
+const configuredUrls = urlVariableNames
+  .map((name) => [name, configuredValue(name)])
+  .filter((entry) => entry[1]);
+
+for (const [name, value] of configuredUrls) {
+  validateSupabaseUrl(name, value);
+}
+
+for (const name of keyVariableNames) {
+  const value = configuredValue(name);
+  if (value) {
+    validateJwtProjectRef(name, value);
+  }
+}
+
+if (configuredUrls.length === 0) {
+  console.log(
+    `No Supabase URL environment override is configured; the application fallback will use ${EXPECTED_HOSTNAME}.`,
+  );
+} else {
+  console.log(
+    `Supabase environment verified for ${configuredUrls.length} configured URL variable(s): ${EXPECTED_HOSTNAME}`,
+  );
+}
