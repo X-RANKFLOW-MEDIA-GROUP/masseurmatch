@@ -1,9 +1,9 @@
 name: AI Coach Diagnostics
 
 on:
-  push:
+  pull_request:
     branches:
-      - feature/ai-profile-coach-dashboard
+      - main
 
 permissions:
   contents: read
