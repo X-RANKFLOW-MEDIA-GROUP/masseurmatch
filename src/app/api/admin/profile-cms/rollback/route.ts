@@ -1,69 +1,80 @@
-import { z } from 'zod';
-import { createClient } from '@supabase/supabase-js';
-import { requireAdminSession } from '@/app/api/_lib/supabase-server';
+import { z } from "zod";
+import {
+  createSupabaseAdminClient,
+  requireAdminSession,
+  recordAuditLog,
+} from "@/app/api/_lib/supabase-server";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 const RollbackSchema = z.object({
   audit_log_id: z.string().uuid(),
   profile_id: z.string().uuid(),
 });
 
+type AuditDetails = {
+  field_name?: unknown;
+  old_value?: unknown;
+  new_value?: unknown;
+};
+
 export async function POST(request: Request) {
   try {
     const admin = await requireAdminSession(request);
     const body = await request.json();
     const { audit_log_id, profile_id } = RollbackSchema.parse(body);
-
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-      process.env.SUPABASE_SERVICE_ROLE_KEY || '',
-      { auth: { persistSession: false } }
-    );
+    const supabase = createSupabaseAdminClient();
 
     const { data: auditEntry, error: auditError } = await supabase
-      .from('profile_audit_log')
-      .select('*')
-      .eq('id', audit_log_id)
-      .eq('profile_id', profile_id)
+      .from("audit_log")
+      .select("id, target_id, details")
+      .eq("id", audit_log_id)
+      .eq("target_type", "profile")
+      .eq("target_id", profile_id)
       .single();
 
     if (auditError || !auditEntry) {
-      return Response.json({ error: 'Audit log entry not found' }, { status: 404 });
+      return Response.json({ error: "Audit log entry not found" }, { status: 404 });
     }
 
-    const updateObj: Record<string, any> = {
-      [(auditEntry as any).field_name]: (auditEntry as any).old_value,
-      updated_at: new Date().toISOString(),
-    };
+    const details =
+      auditEntry.details && typeof auditEntry.details === "object" && !Array.isArray(auditEntry.details)
+        ? (auditEntry.details as AuditDetails)
+        : {};
+    const fieldName = typeof details.field_name === "string" ? details.field_name : null;
+
+    if (!fieldName) {
+      return Response.json({ error: "Audit log entry has no field name" }, { status: 400 });
+    }
 
     const { error: updateError } = await supabase
-      .from('profiles')
-      .update(updateObj)
-      .eq('id', profile_id);
+      .from("profiles")
+      .update({
+        [fieldName]: details.old_value ?? null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", profile_id);
 
     if (updateError) {
-      return Response.json({ error: 'Failed to rollback' }, { status: 500 });
+      return Response.json({ error: "Failed to rollback" }, { status: 500 });
     }
 
-    await supabase.from('profile_audit_log').insert({
-      profile_id,
-      edited_by: admin.userId,
-      field_name: `ROLLBACK: ${(auditEntry as any).field_name}`,
-      old_value: (auditEntry as any).new_value,
-      new_value: (auditEntry as any).old_value,
-      reason: `Rollback from audit entry ${audit_log_id}`,
-      ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+    await recordAuditLog(admin.userId, "provider.profile.field_rollback", "profile", profile_id, {
+      field_name: fieldName,
+      old_value: details.new_value ?? null,
+      new_value: details.old_value ?? null,
+      source_audit_log_id: audit_log_id,
+      rolled_back_at: new Date().toISOString(),
     });
 
     return Response.json({
       ok: true,
       profile_id,
-      field_name: (auditEntry as any).field_name,
-      rolled_back_value: (auditEntry as any).old_value,
+      field_name: fieldName,
+      rolled_back_value: details.old_value ?? null,
     });
   } catch (error) {
-    console.error('Rollback error:', error);
-    return Response.json({ error: 'Rollback failed' }, { status: 500 });
+    console.error("Rollback error:", error);
+    return Response.json({ error: "Rollback failed" }, { status: 500 });
   }
 }
