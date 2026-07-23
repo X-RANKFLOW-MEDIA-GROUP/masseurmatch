@@ -1,4 +1,18 @@
 -- ============================================================
+-- STEP 0: Ensure profiles has the columns STEP 3 copies from therapists.
+-- `keyword_slugs` and `segments` exist on public.therapists and in the
+-- generated Supabase types for public.profiles, but no migration ever added
+-- them to public.profiles — so STEP 3's upsert failed with
+--   42703 column "keyword_slugs" of relation "profiles" does not exist
+-- which blocked this migration (and every migration after it) from applying.
+-- Adding them here keeps the migration self-sufficient; IF NOT EXISTS makes it
+-- safe to run on databases that already have the columns.
+-- ============================================================
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS keyword_slugs text[] NOT NULL DEFAULT '{}'::text[],
+  ADD COLUMN IF NOT EXISTS segments text[] NOT NULL DEFAULT '{}'::text[];
+
+-- ============================================================
 -- STEP 1: DELETE test/debug therapists
 -- ============================================================
 DELETE FROM public.therapists
