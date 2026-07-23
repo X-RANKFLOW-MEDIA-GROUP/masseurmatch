@@ -6,6 +6,8 @@ on:
     paths:
       - ".github/workflows/sitemap-preview-audit.yml"
       - "scripts/validate-sitemap.mjs"
+      - "src/lib/site.ts"
+      - "src/app/[city]/page.tsx"
       - "src/app/robots.ts"
       - "src/app/sitemap.ts"
       - "src/app/sitemap/**"
@@ -83,7 +85,7 @@ jobs:
         env:
           SITEMAP_STRICT: "1"
           SITEMAP_VALIDATION_BASE_URL: ${{ steps.preview.outputs.url }}
-          SITEMAP_CANONICAL_ORIGIN: https://masseurmatch.com
+          SITEMAP_CANONICAL_ORIGIN: https://www.masseurmatch.com
           SITEMAP_VALIDATION_CONCURRENCY: "6"
           VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
         run: |

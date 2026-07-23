@@ -11,24 +11,24 @@ export const metadata: Metadata = {
     title: "Blog | MasseurMatch",
     description:
       "Expert massage therapy advice, wellness guides, and LGBTQ+ health resources.",
-    url: "https://masseurmatch.com/blog",
+    url: "https://www.masseurmatch.com/blog",
     siteName: "MasseurMatch",
     type: "website",
   },
-  alternates: { canonical: "https://masseurmatch.com/blog" },
+  alternates: { canonical: "https://www.masseurmatch.com/blog" },
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Blog",
   name: "MasseurMatch Blog",
-  url: "https://masseurmatch.com/blog",
+  url: "https://www.masseurmatch.com/blog",
   description:
     "Expert massage therapy advice, wellness guides, and LGBTQ+ inclusive health resources.",
   publisher: {
     "@type": "Organization",
     name: "MasseurMatch",
-    url: "https://masseurmatch.com",
+    url: "https://www.masseurmatch.com",
   },
 };
 

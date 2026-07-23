@@ -10,28 +10,28 @@ export const metadata: Metadata = {
     title: "List Your Massage Practice on MasseurMatch",
     description:
       "Join verified massage therapists on the leading LGBTQ+-inclusive directory.",
-    url: "https://masseurmatch.com/for-therapists",
+    url: "https://www.masseurmatch.com/for-therapists",
     siteName: "MasseurMatch",
     type: "website",
   },
-  alternates: { canonical: "https://masseurmatch.com/for-therapists" },
+  alternates: { canonical: "https://www.masseurmatch.com/for-therapists" },
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
   name: "List Your Massage Practice - MasseurMatch",
-  url: "https://masseurmatch.com/for-therapists",
+  url: "https://www.masseurmatch.com/for-therapists",
   description:
     "MasseurMatch helps independent massage therapists grow their practices by connecting them with LGBTQ+-affirming clients across the United States.",
   publisher: {
     "@type": "Organization",
     name: "MasseurMatch",
-    url: "https://masseurmatch.com",
+    url: "https://www.masseurmatch.com",
   },
   potentialAction: {
     "@type": "RegisterAction",
-    target: "https://masseurmatch.com/register",
+    target: "https://www.masseurmatch.com/register",
     name: "List Your Practice",
   },
 };

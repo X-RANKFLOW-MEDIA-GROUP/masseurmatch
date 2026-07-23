@@ -3,8 +3,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const BASE_URL = (process.env.SITEMAP_VALIDATION_BASE_URL || "https://masseurmatch.com").replace(/\/$/, "");
-const CANONICAL_ORIGIN = (process.env.SITEMAP_CANONICAL_ORIGIN || "https://masseurmatch.com").replace(/\/$/, "");
+const BASE_URL = (process.env.SITEMAP_VALIDATION_BASE_URL || "https://www.masseurmatch.com").replace(/\/$/, "");
+const CANONICAL_ORIGIN = (process.env.SITEMAP_CANONICAL_ORIGIN || "https://www.masseurmatch.com").replace(/\/$/, "");
 const SITEMAP_URL = `${BASE_URL}/sitemap.xml`;
 const STRICT = /^(1|true)$/i.test(process.env.SITEMAP_STRICT || "");
 const CONCURRENCY = Math.max(1, Number(process.env.SITEMAP_VALIDATION_CONCURRENCY || 6));
@@ -342,7 +342,7 @@ function validateViaSourceFiles() {
   for (const marker of [
     "dedupeSitemapEntries",
     "getSitemapProfileSlugs",
-    "SEO_CITY_MIN_PUBLIC_PROFILES = 3",
+    "SEO_CITY_MIN_PUBLIC_PROFILES = 1",
     "buildPublishedBlogEntries",
   ]) {
     if (!releaseSource.includes(marker)) throw new Error(`Release sitemap builder is missing safeguard: ${marker}`);

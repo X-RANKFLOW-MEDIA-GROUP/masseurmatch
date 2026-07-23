@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "Cookie Policy | MasseurMatch",
   description:
     "MasseurMatch cookie policy: how we use essential, preference, and analytics cookies to operate the platform securely and improve your experience.",
-  alternates: { canonical: "https://masseurmatch.com/cookie-policy" },
+  alternates: { canonical: "https://www.masseurmatch.com/cookie-policy" },
   robots: { index: true, follow: true },
 };
 
@@ -14,8 +14,8 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
   name: "Cookie Policy - MasseurMatch",
-  url: "https://masseurmatch.com/cookie-policy",
-  publisher: { "@type": "Organization", name: "MasseurMatch", url: "https://masseurmatch.com" },
+  url: "https://www.masseurmatch.com/cookie-policy",
+  publisher: { "@type": "Organization", name: "MasseurMatch", url: "https://www.masseurmatch.com" },
 };
 
 const COOKIE_TYPES = [
