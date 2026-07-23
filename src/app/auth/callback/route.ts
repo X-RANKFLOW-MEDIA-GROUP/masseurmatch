@@ -15,6 +15,18 @@ function sanitizeRedirect(next: string | null): string {
   return next;
 }
 
+// Build the /login redirect for a failed callback. When the provider (or
+// Supabase) handed us an explicit reason, forward that real error so the user —
+// and our logs — see what actually happened instead of a blanket failure. The
+// login page renders `error_description` verbatim and maps `auth_callback_failed`
+// to the friendly "clear your cookies and retry" copy.
+function failureRedirect(origin: string, providerError: string | null): string {
+  const query = providerError
+    ? `error_description=${encodeURIComponent(providerError)}`
+    : "error=auth_callback_failed";
+  return `${origin}/login?${query}`;
+}
+
 export async function GET(request: NextRequest) {
   assertRateLimit(request, "auth-callback", { limit: 30, windowMs: 60_000 });
 
@@ -23,26 +35,63 @@ export async function GET(request: NextRequest) {
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
   const next = sanitizeRedirect(searchParams.get("next"));
+  // Present when the provider/Supabase rejected the sign-in outright
+  // (access_denied, misconfigured provider, expired link, …).
+  const providerError =
+    searchParams.get("error_description") ?? searchParams.get("error");
+
+  // Cookie-bound client: exchangeCodeForSession / verifyOtp write the Supabase
+  // auth cookies onto the response automatically.
+  const supabase = await createServerSupabase();
 
   // OAuth/PKCE arrives with ?code; email-link confirmations (signup, invite,
   // email_change, resend) arrive with ?token_hash&type and are verified with
   // verifyOtp(), which needs no PKCE code_verifier — so server-initiated
   // signups and cross-device clicks work.
   if (!code && !(tokenHash && type)) {
-    return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+    // A duplicate callback hit (browser prefetch, double navigation) can arrive
+    // after the first request already consumed the single-use code and
+    // established the session. If we're already signed in, send the user on
+    // instead of showing a spurious "sign-in failed".
+    const {
+      data: { user: existing },
+    } = await supabase.auth.getUser();
+    if (existing?.email) {
+      return NextResponse.redirect(`${origin}${next}`);
+    }
+    if (providerError) {
+      console.error("[auth/callback] provider error:", providerError);
+    }
+    return NextResponse.redirect(failureRedirect(origin, providerError));
   }
 
-  // Cookie-bound client: exchangeCodeForSession / verifyOtp write the Supabase
-  // auth cookies onto the response automatically.
-  const supabase = await createServerSupabase();
   const { data, error } = code
     ? await supabase.auth.exchangeCodeForSession(code)
     : await supabase.auth.verifyOtp({ type: type!, token_hash: tokenHash! });
 
-  const user = data?.user;
+  let user = data?.user ?? null;
   if (error || !user?.email) {
-    console.error("[auth/callback] error:", error?.message);
-    return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+    // The single-use code may already have been redeemed by a duplicate
+    // request (prefetch, double navigation, an impatient retry). If valid
+    // session cookies are already present, treat this as a success rather than
+    // punishing a user who is, in fact, signed in.
+    const {
+      data: { user: existing },
+    } = await supabase.auth.getUser();
+    if (existing?.email) {
+      user = existing;
+    } else {
+      console.error("[auth/callback] exchange failed:", {
+        message: error?.message ?? null,
+        hasCode: Boolean(code),
+        providerError: providerError ?? null,
+      });
+      return NextResponse.redirect(failureRedirect(origin, providerError));
+    }
+  }
+
+  if (!user?.email) {
+    return NextResponse.redirect(failureRedirect(origin, providerError));
   }
 
   let profileCreated = false;
