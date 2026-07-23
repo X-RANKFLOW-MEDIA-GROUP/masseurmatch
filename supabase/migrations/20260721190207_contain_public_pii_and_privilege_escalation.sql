@@ -1,26 +1,40 @@
 begin;
 
--- Stop exposing complete records through the Data API. Public directory access will
--- move to a deliberately scoped view/API in the application migration.
+-- Stop exposing complete records through the Data API.
 drop policy if exists "profiles_public_read_approved" on public.profiles;
-drop policy if exists "Public can read approved therapist profiles" on public.therapist_profiles;
 
--- Do not expose verification documents to other users or anonymous callers.
-drop policy if exists "Users can view own documents" on public.profile_documents;
-create policy "profile_documents_owner_read"
-on public.profile_documents
-for select
-to authenticated
-using (
-  exists (
-    select 1
-    from public.profiles p
-    where p.id = profile_documents.profile_id
-      and p.user_id = (select auth.uid())
-  )
-);
+DO $$
+BEGIN
+  IF to_regclass('public.therapist_profiles') IS NOT NULL THEN
+    DROP POLICY IF EXISTS "Public can read approved therapist profiles" ON public.therapist_profiles;
+  END IF;
+END
+$$;
 
--- A profile owner may edit normal profile content, but never their authorization,
+-- Verification documents are optional on clean branches.
+DO $$
+BEGIN
+  IF to_regclass('public.profile_documents') IS NOT NULL
+     AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='profile_documents' AND column_name='profile_id') THEN
+    DROP POLICY IF EXISTS "Users can view own documents" ON public.profile_documents;
+    DROP POLICY IF EXISTS "profile_documents_owner_read" ON public.profile_documents;
+    CREATE POLICY "profile_documents_owner_read"
+      ON public.profile_documents
+      FOR SELECT
+      TO authenticated
+      USING (
+        EXISTS (
+          SELECT 1
+          FROM public.profiles p
+          WHERE p.id = profile_documents.profile_id
+            AND p.user_id = (select auth.uid())
+        )
+      );
+  END IF;
+END
+$$;
+
+-- A profile owner may edit normal profile content, but never authorization,
 -- moderation, lifecycle, or billing state.
 create or replace function public.prevent_sensitive_profile_mutation()
 returns trigger
@@ -65,7 +79,7 @@ create trigger prevent_sensitive_profile_mutation
 before update on public.profiles
 for each row execute function public.prevent_sensitive_profile_mutation();
 
--- A provider cannot self-publish or self-approve the secondary profile record.
+-- The secondary therapist profile is optional on some clean branches.
 create or replace function public.prevent_sensitive_therapist_profile_mutation()
 returns trigger
 language plpgsql
@@ -93,10 +107,16 @@ begin
 end;
 $$;
 
-drop trigger if exists prevent_sensitive_therapist_profile_mutation on public.therapist_profiles;
-create trigger prevent_sensitive_therapist_profile_mutation
-before update on public.therapist_profiles
-for each row execute function public.prevent_sensitive_therapist_profile_mutation();
+DO $$
+BEGIN
+  IF to_regclass('public.therapist_profiles') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS prevent_sensitive_therapist_profile_mutation ON public.therapist_profiles;
+    CREATE TRIGGER prevent_sensitive_therapist_profile_mutation
+      BEFORE UPDATE ON public.therapist_profiles
+      FOR EACH ROW EXECUTE FUNCTION public.prevent_sensitive_therapist_profile_mutation();
+  END IF;
+END
+$$;
 
 revoke all on function public.prevent_sensitive_profile_mutation() from public;
 revoke all on function public.prevent_sensitive_therapist_profile_mutation() from public;
