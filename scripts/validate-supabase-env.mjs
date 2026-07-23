@@ -1,11 +1,19 @@
-const EXPECTED_PROJECT_REF = "ijsdpozjfjjufjsoexod";
-const EXPECTED_HOSTNAME = `${EXPECTED_PROJECT_REF}.supabase.co`;
+const PRODUCTION_PROJECT_REF = "ijsdpozjfjjufjsoexod";
+const PRODUCTION_HOSTNAME = `${PRODUCTION_PROJECT_REF}.supabase.co`;
+const FALLBACK_URL = `https://${PRODUCTION_HOSTNAME}`;
 
 const urlVariableNames = [
   "SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_URL",
   "NEXT_PUBLIC_STORAGE_SUPABASE_URL",
   "VITE_SUPABASE_URL",
+];
+
+const publicUrlPriority = [
+  "NEXT_PUBLIC_SUPABASE_URL",
+  "NEXT_PUBLIC_STORAGE_SUPABASE_URL",
+  "VITE_SUPABASE_URL",
+  "SUPABASE_URL",
 ];
 
 const keyVariableNames = [
@@ -28,7 +36,7 @@ function configuredValue(name) {
   return value ? value : null;
 }
 
-function validateSupabaseUrl(name, value) {
+function parseSupabaseUrl(name, value) {
   let parsed;
 
   try {
@@ -41,19 +49,23 @@ function validateSupabaseUrl(name, value) {
     fail(`${name} must use https.`);
   }
 
-  if (parsed.hostname !== EXPECTED_HOSTNAME) {
-    fail(
-      `${name} points to ${parsed.hostname}, but MasseurMatch must use ${EXPECTED_HOSTNAME}. ` +
-        "A stale or deleted Supabase preview branch may have overridden this deployment.",
-    );
+  const match = /^([a-z0-9]{20})\.supabase\.co$/.exec(parsed.hostname);
+  if (!match) {
+    fail(`${name} does not point to a valid Supabase project hostname: ${parsed.hostname}.`);
   }
+
+  return {
+    origin: parsed.origin,
+    hostname: parsed.hostname,
+    projectRef: match[1],
+  };
 }
 
-function validateJwtProjectRef(name, token) {
-  // New Supabase publishable keys can use the sb_publishable_ format and are
-  // validated indirectly through the project URL. Legacy anon/service keys are JWTs.
+function readJwtProjectRef(name, token) {
+  // New Supabase publishable keys are opaque. Their project is validated by
+  // the URL health check. Legacy anon and service-role keys are JWTs.
   if (token.startsWith("sb_publishable_") || token.startsWith("sb_secret_")) {
-    return;
+    return null;
   }
 
   const parts = token.split(".");
@@ -61,41 +73,87 @@ function validateJwtProjectRef(name, token) {
     fail(`${name} is neither a recognized Supabase key nor a valid JWT.`);
   }
 
-  let payload;
   try {
-    payload = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8"));
+    const payload = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8"));
+    return typeof payload.ref === "string" ? payload.ref : null;
   } catch {
     fail(`${name} has an unreadable JWT payload.`);
   }
+}
 
-  if (typeof payload.ref === "string" && payload.ref !== EXPECTED_PROJECT_REF) {
+async function verifyReachable(origin) {
+  if (process.env.VERCEL !== "1") {
+    return;
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10_000);
+
+  try {
+    const response = await fetch(`${origin}/auth/v1/health`, {
+      method: "GET",
+      cache: "no-store",
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      fail(`Supabase health check returned HTTP ${response.status} for ${origin}.`);
+    }
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
     fail(
-      `${name} belongs to project ${payload.ref}, but MasseurMatch must use ${EXPECTED_PROJECT_REF}.`,
+      `Supabase project ${origin} is unreachable (${detail}). ` +
+        "The deployment may reference a deleted or stale preview branch.",
     );
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
 const configuredUrls = urlVariableNames
-  .map((name) => [name, configuredValue(name)])
-  .filter((entry) => entry[1]);
+  .map((name) => {
+    const value = configuredValue(name);
+    return value ? [name, parseSupabaseUrl(name, value)] : null;
+  })
+  .filter(Boolean);
 
-for (const [name, value] of configuredUrls) {
-  validateSupabaseUrl(name, value);
+const selectedUrlName = publicUrlPriority.find((name) => configuredValue(name));
+const selectedUrl = parseSupabaseUrl(
+  selectedUrlName || "application fallback",
+  selectedUrlName ? configuredValue(selectedUrlName) : FALLBACK_URL,
+);
+
+for (const [name, parsed] of configuredUrls) {
+  if (parsed.origin !== selectedUrl.origin) {
+    fail(
+      `${name} points to ${parsed.hostname}, while the browser client points to ${selectedUrl.hostname}. ` +
+        "All Supabase URL variables in one deployment must use the same project.",
+    );
+  }
+}
+
+if (process.env.VERCEL_ENV === "production" && selectedUrl.projectRef !== PRODUCTION_PROJECT_REF) {
+  fail(
+    `Production points to project ${selectedUrl.projectRef}, but MasseurMatch production must use ${PRODUCTION_PROJECT_REF}.`,
+  );
 }
 
 for (const name of keyVariableNames) {
   const value = configuredValue(name);
-  if (value) {
-    validateJwtProjectRef(name, value);
+  if (!value) continue;
+
+  const keyProjectRef = readJwtProjectRef(name, value);
+  if (keyProjectRef && keyProjectRef !== selectedUrl.projectRef) {
+    fail(
+      `${name} belongs to project ${keyProjectRef}, but the deployment URL uses ${selectedUrl.projectRef}.`,
+    );
   }
 }
 
-if (configuredUrls.length === 0) {
-  console.log(
-    `No Supabase URL environment override is configured; the application fallback will use ${EXPECTED_HOSTNAME}.`,
-  );
-} else {
-  console.log(
-    `Supabase environment verified for ${configuredUrls.length} configured URL variable(s): ${EXPECTED_HOSTNAME}`,
-  );
-}
+await verifyReachable(selectedUrl.origin);
+
+const environment = process.env.VERCEL_ENV || "local/ci";
+console.log(
+  `Supabase environment verified for ${environment}: ${selectedUrl.hostname} ` +
+    `(${configuredUrls.length} configured URL variable(s)).`,
+);
