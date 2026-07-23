@@ -11,6 +11,7 @@ import {
 } from "@/app/_lib/directory-taxonomy";
 import { getLaunchAreaPaths, getLaunchKeywordPaths, getLaunchSegmentPaths } from "@/app/_lib/launch-urls";
 import { createPageMetadata } from "@/app/_lib/metadata";
+import { SEO_CITY_MIN_PUBLIC_PROFILES } from "@/app/_lib/sitemap-release";
 import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd, buildLocalBusinessJsonLd } from "@/app/_lib/structured-data";
 import { TherapistComparison, type ComparisonTherapistProfile } from "@/components";
 
@@ -35,8 +36,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   if (!city) {
     return createPageMetadata({
-      title: "City",
-      description: "City directory page.",
+      title: "Page not found",
+      description: "The requested city directory page could not be found.",
       path: `/${resolvedParams.city}`,
       noIndex: true,
     });
@@ -60,9 +61,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   const title = countLabel
     ? `${countLabel} Verified Male Massage Therapists in ${cityLabel}`
-    : `Verified Male Massage Therapists in ${cityLabel} | MasseurMatch`;
+    : `Male Massage Therapists in ${cityLabel} — Coming Soon`;
 
-  const description = `Find trusted male massage therapists in ${cityLabel}. LGBTQ+-friendly directory with identity-verified professionals, transparent rates, and direct contact. Compare specialties & availability.`;
+  const description = inventoryCount > 0
+    ? `Find trusted male massage therapists in ${cityLabel}. LGBTQ+-friendly directory with identity-verified professionals, transparent rates, and direct contact. Compare specialties & availability.`
+    : `MasseurMatch is preparing its male massage therapist directory for ${cityLabel}. Explore other active markets while local listings are added.`;
 
   return createPageMetadata({
     title,
@@ -78,7 +81,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       `${city.name} sports massage`,
       `mobile massage ${city.name}`,
     ],
-    noIndex: inventoryCount < 3,
+    noIndex: inventoryCount < SEO_CITY_MIN_PUBLIC_PROFILES,
   });
 }
 
@@ -132,7 +135,6 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
   const cityIntro = DFW_SUBURB_SLUGS.has(city.slug)
     ? buildSuburbIntro(buildAreaCopyInput({ area: city.name, city: "DFW", therapists: therapists.items }))
     : `Search-first city page for trusted male massage discovery in ${city.name}. Compare verified profiles, outcall and incall options, specialties, and direct contact in one cleaner flow.`;
-
   const comparisonProfiles: ComparisonTherapistProfile[] = therapists.items.slice(0, 3).map((item, idx) => ({
     id: item.id,
     name: item.display_name || item.full_name || `Therapist ${idx + 1}`,
