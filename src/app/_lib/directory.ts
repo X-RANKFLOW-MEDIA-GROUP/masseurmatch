@@ -565,8 +565,8 @@ export const getProfilePhotosBatch = async (
   // merge the rows.
   const CHUNK_SIZE = 100;
   const chunks: string[][] = [];
-  for (let i = 0; i < profileIds.length; i += CHUNK_SIZE) {
-    chunks.push(profileIds.slice(i, i + CHUNK_SIZE));
+  for (let i = 0; i < uuidIds.length; i += CHUNK_SIZE) {
+    chunks.push(uuidIds.slice(i, i + CHUNK_SIZE));
   }
 
   const responses = await Promise.all(
