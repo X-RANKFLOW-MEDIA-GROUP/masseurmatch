@@ -49,18 +49,22 @@ export async function GET(request: NextRequest) {
   // verifyOtp(), which needs no PKCE code_verifier — so server-initiated
   // signups and cross-device clicks work.
   if (!code && !(tokenHash && type)) {
-    // A duplicate callback hit (browser prefetch, double navigation) can arrive
-    // after the first request already consumed the single-use code and
-    // established the session. If we're already signed in, send the user on
-    // instead of showing a spurious "sign-in failed".
-    const {
-      data: { user: existing },
-    } = await supabase.auth.getUser();
-    if (existing?.email) {
-      return NextResponse.redirect(`${origin}${next}`);
-    }
+    // A provider-supplied error (access_denied, expired link, …) must always
+    // surface — even for an already-logged-in user who just started a fresh
+    // OAuth flow — otherwise a denied attempt is mistaken for a successful
+    // sign-in to the pre-existing account. Only fall back to the existing
+    // session for the benign duplicate-callback case (browser prefetch, double
+    // navigation) where the first request already consumed the single-use code
+    // and established the session, and no provider error was returned.
     if (providerError) {
       console.error("[auth/callback] provider error:", providerError);
+    } else {
+      const {
+        data: { user: existing },
+      } = await supabase.auth.getUser();
+      if (existing?.email) {
+        return NextResponse.redirect(`${origin}${next}`);
+      }
     }
     return NextResponse.redirect(failureRedirect(origin, providerError));
   }

@@ -82,13 +82,17 @@ async function tryFetchAllRows<T>(
 }
 
 export async function getSeoCities(): Promise<SeoCity[]> {
+  // NB: no `is_active` filter — that column does not exist on public.cities, and
+  // querying it made every sitemap build log `42703 column cities.is_active does
+  // not exist`. Use DB rows only when the table actually returns some; otherwise
+  // fall back to the static city taxonomy.
   const dbCities = await tryFetchAllRows<SeoCity>(
     "cities",
     "slug, updated_at",
-    (query) => query.eq("is_active", true).not("slug", "is", null).order("slug"),
+    (query) => query.not("slug", "is", null).order("slug"),
   );
 
-  if (dbCities) {
+  if (dbCities && dbCities.length > 0) {
     return dbCities.filter((city) => typeof city.slug === "string" && city.slug.length > 0);
   }
 
@@ -108,13 +112,15 @@ export async function getSeoSegments(): Promise<SeoSegment[]> {
 }
 
 export async function getSeoKeywords(): Promise<SeoKeyword[]> {
+  // No `is_active` filter — the column does not exist on public.keywords (same
+  // 42703 as cities). Use DB rows only when present, else the static taxonomy.
   const dbKeywords = await tryFetchAllRows<SeoKeyword>(
     "keywords",
     "slug, updated_at",
-    (query) => query.eq("is_active", true).not("slug", "is", null).order("slug"),
+    (query) => query.not("slug", "is", null).order("slug"),
   );
 
-  if (dbKeywords) {
+  if (dbKeywords && dbKeywords.length > 0) {
     return dbKeywords.filter((keyword) => typeof keyword.slug === "string" && keyword.slug.length > 0);
   }
 
