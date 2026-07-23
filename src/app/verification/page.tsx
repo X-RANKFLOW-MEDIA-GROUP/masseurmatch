@@ -71,6 +71,20 @@ const caveats = [
   },
 ];
 
+const COLORS = {
+  accent: "#8B1E2D",
+  accentHover: "#6E1521",
+  accentTint: "#F8EDEE",
+  textPrimary: "#111111",
+  textSecondary: "#6F6F6F",
+  textMuted: "#8E8E8E",
+  surfaceBase: "#FFFFFF",
+  surfaceSoft: "#F7F7F7",
+  surfaceCard: "#FAFAFA",
+  borderSubtle: "#E8E8E8",
+  borderStrong: "#D9D9D9",
+};
+
 export default function VerificationPage() {
   return (
     <>
@@ -82,8 +96,8 @@ export default function VerificationPage() {
 
       <div
         style={{
-          background: "#FFFFFF",
-          color: "#111111",
+          background: COLORS.surfaceBase,
+          color: COLORS.textPrimary,
           fontFamily: "'Georgia', 'Times New Roman', serif",
           minHeight: "100vh",
         }}
@@ -91,8 +105,8 @@ export default function VerificationPage() {
         {/* Header */}
         <section
           style={{
-            background: "#111111",
-            color: "#FFFFFF",
+            background: COLORS.textPrimary,
+            color: COLORS.surfaceBase,
             padding: "clamp(56px, 8vw, 80px) 20px clamp(48px, 7vw, 72px)",
           }}
         >
@@ -102,7 +116,7 @@ export default function VerificationPage() {
                 fontSize: 11,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                color: "#10B981",
+                color: COLORS.accent,
                 marginBottom: 20,
                 fontFamily: "system-ui, sans-serif",
               }}
@@ -122,7 +136,7 @@ export default function VerificationPage() {
             <p
               style={{
                 fontSize: "clamp(14px, 2.8vw, 16px)",
-                opacity: 0.65,
+                opacity: 0.7,
                 fontFamily: "system-ui, sans-serif",
                 lineHeight: 1.7,
                 maxWidth: 540,
@@ -134,13 +148,14 @@ export default function VerificationPage() {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 4,
-                  background: "rgba(16,185,129,0.15)",
-                  border: "1px solid rgba(16,185,129,0.4)",
+                  background: "rgba(139,30,45,0.12)",
+                  border: `1px solid ${COLORS.accent}`,
                   borderRadius: 99,
-                  padding: "1px 8px",
+                  padding: "2px 10px",
                   fontSize: 12,
                   fontFamily: "system-ui, sans-serif",
-                  color: "#34D399",
+                  color: COLORS.accent,
+                  fontWeight: 600,
                 }}
               >
                 Verified
@@ -164,9 +179,10 @@ export default function VerificationPage() {
             <h2
               style={{
                 fontSize: "clamp(20px, 3.5vw, 26px)",
-                fontWeight: 400,
+                fontWeight: 500,
                 marginBottom: 32,
                 fontFamily: "system-ui, sans-serif",
+                color: COLORS.textPrimary,
               }}
             >
               How the verification works
@@ -189,16 +205,16 @@ export default function VerificationPage() {
                       width: 40,
                       height: 40,
                       borderRadius: 12,
-                      background: "rgba(16,185,129,0.1)",
-                      border: "1px solid rgba(16,185,129,0.2)",
+                      background: "rgba(139,30,45,0.08)",
+                      border: `1px solid ${COLORS.borderSubtle}`,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                     }}
                   >
                     <step.icon
-                      style={{ width: 18, height: 18, color: "#10B981" }}
-                      strokeWidth={2}
+                      style={{ width: 18, height: 18, color: COLORS.accent }}
+                      strokeWidth={2.25}
                     />
                   </div>
                   <div>
@@ -208,7 +224,7 @@ export default function VerificationPage() {
                         fontWeight: 600,
                         fontFamily: "system-ui, sans-serif",
                         marginBottom: 6,
-                        color: "#111111",
+                        color: COLORS.textPrimary,
                       }}
                     >
                       {i + 1}. {step.title}
@@ -217,7 +233,7 @@ export default function VerificationPage() {
                       style={{
                         fontSize: 14,
                         lineHeight: 1.75,
-                        color: "#4B5563",
+                        color: COLORS.textSecondary,
                         fontFamily: "system-ui, sans-serif",
                       }}
                     >
@@ -234,9 +250,10 @@ export default function VerificationPage() {
             <h2
               style={{
                 fontSize: "clamp(20px, 3.5vw, 26px)",
-                fontWeight: 400,
+                fontWeight: 500,
                 marginBottom: 8,
                 fontFamily: "system-ui, sans-serif",
+                color: COLORS.textPrimary,
               }}
             >
               What the badge does not mean
@@ -244,7 +261,7 @@ export default function VerificationPage() {
             <p
               style={{
                 fontSize: 14,
-                color: "#6B7280",
+                color: COLORS.textSecondary,
                 fontFamily: "system-ui, sans-serif",
                 marginBottom: 24,
                 lineHeight: 1.6,
@@ -257,17 +274,17 @@ export default function VerificationPage() {
                 <li
                   key={c.label}
                   style={{
-                    background: "#F8EDEE",
-                    border: "1px solid rgba(249,115,22,0.2)",
+                    background: COLORS.accentTint,
+                    border: `1px solid rgba(139,30,45,0.15)`,
                     borderRadius: 12,
-                    padding: "14px 18px",
+                    padding: "16px 20px",
                     fontFamily: "system-ui, sans-serif",
                   }}
                 >
-                  <p style={{ fontSize: 14, fontWeight: 600, color: "#C2410C", marginBottom: 4 }}>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: COLORS.accent, marginBottom: 6 }}>
                     {c.label}
                   </p>
-                  <p style={{ fontSize: 13, lineHeight: 1.65, color: "#6B7280" }}>{c.detail}</p>
+                  <p style={{ fontSize: 13, lineHeight: 1.65, color: COLORS.textSecondary }}>{c.detail}</p>
                 </li>
               ))}
             </ul>
@@ -278,9 +295,10 @@ export default function VerificationPage() {
             <h2
               style={{
                 fontSize: "clamp(20px, 3.5vw, 26px)",
-                fontWeight: 400,
+                fontWeight: 500,
                 marginBottom: 16,
                 fontFamily: "system-ui, sans-serif",
+                color: COLORS.textPrimary,
               }}
             >
               Powered by Stripe Identity
@@ -289,13 +307,13 @@ export default function VerificationPage() {
               style={{
                 fontSize: 14,
                 lineHeight: 1.75,
-                color: "#4B5563",
+                color: COLORS.textSecondary,
                 fontFamily: "system-ui, sans-serif",
                 maxWidth: 580,
               }}
             >
               We use{" "}
-              <span style={{ fontWeight: 600, color: "#111111" }}>Stripe Identity</span>{" "}
+              <span style={{ fontWeight: 600, color: COLORS.textPrimary }}>Stripe Identity</span>{" "}
               for all document and biometric verification. Stripe is a PCI-certified
               payments infrastructure company trusted by millions of businesses.
               MasseurMatch does not store raw government ID images — they are processed
@@ -306,10 +324,10 @@ export default function VerificationPage() {
           {/* Report concern */}
           <section
             style={{
-              background: "#111111",
-              color: "#FFFFFF",
+              background: COLORS.textPrimary,
+              color: COLORS.surfaceBase,
               borderRadius: 16,
-              padding: "28px 28px",
+              padding: "28px 32px",
               fontFamily: "system-ui, sans-serif",
             }}
           >
@@ -318,13 +336,14 @@ export default function VerificationPage() {
                 fontSize: 11,
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
-                color: "#10B981",
-                marginBottom: 10,
+                color: COLORS.accent,
+                marginBottom: 12,
+                fontWeight: 600,
               }}
             >
               Report a concern
             </p>
-            <p style={{ fontSize: 15, lineHeight: 1.65, opacity: 0.75, marginBottom: 16 }}>
+            <p style={{ fontSize: 15, lineHeight: 1.7, opacity: 0.8, marginBottom: 20 }}>
               If you believe a verified profile is misrepresenting itself or violating our
               policies, please report it. We investigate every report and will revoke the
               badge if fraud or misrepresentation is confirmed.
@@ -335,13 +354,14 @@ export default function VerificationPage() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 6,
-                background: "#10B981",
-                color: "#fff",
+                background: COLORS.accent,
+                color: COLORS.surfaceBase,
                 borderRadius: 99,
-                padding: "10px 20px",
+                padding: "11px 22px",
                 fontSize: 13,
                 fontWeight: 600,
                 textDecoration: "none",
+                transition: "background-color 0.2s",
               }}
             >
               Report to trust@masseurmatch.com
