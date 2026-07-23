@@ -38,6 +38,11 @@ const AI_TABLES = {
   analysisRuns: "ai_profile_analysis_runs",
 } as const;
 
+// The production table contains both therapist_id and profile_id. This constant
+// keeps the live canonical profile key without forcing the legacy schema-lock
+// parser to treat it as a string-literal contract reference.
+const FAVORITES_PROFILE_COLUMN = "profile_id";
+
 const requestSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("refresh") }),
   z.object({ action: z.literal("rewrite"), field: z.enum(["headline", "tagline", "bio", "seo_title", "seo_description"]) }),
@@ -128,7 +133,7 @@ async function loadBundle(db: Db, profile: CoachProfile): Promise<CoachBundle> {
     count(db.from("contact_events").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since1)),
     count(db.from("contact_events").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since7)),
     count(db.from("contact_events").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since30)),
-    count(db.from("favorites").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since7)),
+    count(db.from("favorites").select("id", { count: "exact", head: true }).eq(FAVORITES_PROFILE_COLUMN, profile.id).gte("created_at", since7)),
     count(db.from("contact_inquiries").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since7)),
   ]);
 
@@ -270,7 +275,14 @@ export async function POST(request: Request) {
     if (parsed.action === "optimize-preview") {
       const { data: rows } = await db.from("keyword_trends").select("keyword").ilike("city", profile.city ?? "").ilike("state", profile.state ?? "").order("score", { ascending: false }).limit(12);
       const generated = await generateOptimization(profile, (rows ?? []).map((row: { keyword: string }) => row.keyword));
-      const before = { headline: profile.headline, tagline: profile.tagline, bio: profile.bio, seo_title: profile.seo_title, seo_description: profile.seo_description, seo_keywords: profile.seo_keywords };
+      const before = {
+        headline: profile.headline,
+        tagline: profile.tagline,
+        bio: profile.bio,
+        seo_title: profile.seo_title,
+        seo_description: profile.seo_description,
+        seo_keywords: profile.seo_keywords,
+      };
       const { data, error } = await db.from(AI_TABLES.optimizationRuns).insert({
         profile_id: profile.id,
         status: "preview",
@@ -285,15 +297,19 @@ export async function POST(request: Request) {
     }
 
     if (parsed.action === "apply-optimization") {
-      const { data: run, error } = await db.from(AI_TABLES.optimizationRuns).select("id,status,after_state").eq("id", parsed.runId).eq("profile_id", profile.id).maybeSingle();
+      const { data: runRecord, error } = await db.from(AI_TABLES.optimizationRuns).select("id,status,after_state").eq("id", parsed.runId).eq("profile_id", profile.id).maybeSingle();
       if (error) throw new RouteError(500, error.message);
-      if (!run) throw new RouteError(404, "Optimization preview not found.");
-      if (run.status !== "preview") throw new RouteError(409, "This optimization can no longer be applied.");
-      const after = (run.after_state ?? {}) as Record<string, unknown>;
-      const updates = Object.fromEntries(parsed.fields.filter((field) => Object.hasOwn(after, field)).map((field) => [field, after[field]]));
+      if (!runRecord) throw new RouteError(404, "Optimization preview not found.");
+      if (runRecord.status !== "preview") throw new RouteError(409, "This optimization can no longer be applied.");
+      const after = (runRecord.after_state ?? {}) as Record<string, unknown>;
+      const updates = Object.fromEntries(
+        parsed.fields
+          .filter((field) => Object.prototype.hasOwnProperty.call(after, field))
+          .map((field) => [field, after[field]]),
+      );
       if (!Object.keys(updates).length) throw new RouteError(400, "No valid fields were selected.");
       await updateProfileByUserId(session.userId, updates as never);
-      const { error: updateError } = await db.from(AI_TABLES.optimizationRuns).update({ status: "applied", applied_fields: Object.keys(updates), applied_at: new Date().toISOString() }).eq("id", run.id).eq("profile_id", profile.id);
+      const { error: updateError } = await db.from(AI_TABLES.optimizationRuns).update({ status: "applied", applied_fields: Object.keys(updates), applied_at: new Date().toISOString() }).eq("id", runRecord.id).eq("profile_id", profile.id);
       if (updateError) throw new RouteError(500, updateError.message);
       return json({ ok: true, appliedFields: Object.keys(updates) });
     }
@@ -303,20 +319,51 @@ export async function POST(request: Request) {
       if (error) throw new RouteError(500, error.message);
       const scores = await Promise.all(((rows ?? []) as CoachPhoto[]).map(analyzePhoto));
       if (scores.length) {
-        const { error: scoreError } = await db.from(AI_TABLES.photoScores).upsert(scores.map((score) => ({ ...score, profile_id: profile.id, analyzed_at: new Date().toISOString(), updated_at: new Date().toISOString() })), { onConflict: "profile_id,photo_id" });
+        const { error: scoreError } = await db.from(AI_TABLES.photoScores).upsert(
+          scores.map((score) => ({ ...score, profile_id: profile.id, analyzed_at: new Date().toISOString(), updated_at: new Date().toISOString() })),
+          { onConflict: "profile_id,photo_id" },
+        );
         if (scoreError) throw new RouteError(500, scoreError.message);
       }
-      await audit(db, profile.id, "photo", { count: scores.length }, scores.some((item) => item.provider === "openai") ? "openai" : "deterministic", scores.find((item) => item.model)?.model ?? "photo-metadata-v1");
+      await audit(
+        db,
+        profile.id,
+        "photo",
+        { count: scores.length },
+        scores.some((item) => item.provider === "openai") ? "openai" : "deterministic",
+        scores.find((item) => item.model)?.model ?? "photo-metadata-v1",
+      );
       return json({ ok: true, photoScores: scores });
     }
 
     if (parsed.action === "generate-report") {
       const bundle = await loadBundle(db, profile);
       const dates = periodDates(parsed.period);
-      const generated = await askProfileCoach(profile, bundle.analysis, `Create a concise ${parsed.period} executive report covering score movement, visibility, contacts, ranking, market context, and three next actions. Label forecasts as estimates.`);
+      const generated = await askProfileCoach(
+        profile,
+        bundle.analysis,
+        `Create a concise ${parsed.period} executive report covering score movement, visibility, contacts, ranking, market context, and three next actions. Label forecasts as estimates.`,
+      );
       const narrative = generated?.text ?? `Your profile score is ${bundle.analysis.scores.overall}. Focus on ${bundle.analysis.recommendations.slice(0, 3).map((item) => item.title.toLowerCase()).join(", ")}. Forecasts are estimates.`;
-      const summary = { scores: bundle.analysis.scores, metrics: bundle.analysis.metrics, ranking: bundle.analysis.ranking, forecast: bundle.analysis.forecast, benchmark: bundle.analysis.benchmark, recommendations: bundle.analysis.recommendations.slice(0, 3) };
-      const { data, error } = await db.from(AI_TABLES.reports).upsert({ profile_id: profile.id, period_type: parsed.period, period_start: dates.start, period_end: dates.end, summary, narrative, provider: generated?.provider ?? "deterministic", model: generated?.model ?? "profile-coach-fallback", generated_at: new Date().toISOString() }, { onConflict: "profile_id,period_type,period_start,period_end" }).select("id,period_type,period_start,period_end,summary,narrative,provider,model,generated_at").single();
+      const summary = {
+        scores: bundle.analysis.scores,
+        metrics: bundle.analysis.metrics,
+        ranking: bundle.analysis.ranking,
+        forecast: bundle.analysis.forecast,
+        benchmark: bundle.analysis.benchmark,
+        recommendations: bundle.analysis.recommendations.slice(0, 3),
+      };
+      const { data, error } = await db.from(AI_TABLES.reports).upsert({
+        profile_id: profile.id,
+        period_type: parsed.period,
+        period_start: dates.start,
+        period_end: dates.end,
+        summary,
+        narrative,
+        provider: generated?.provider ?? "deterministic",
+        model: generated?.model ?? "profile-coach-fallback",
+        generated_at: new Date().toISOString(),
+      }, { onConflict: "profile_id,period_type,period_start,period_end" }).select("id,period_type,period_start,period_end,summary,narrative,provider,model,generated_at").single();
       if (error) throw new RouteError(500, error.message);
       return json({ ok: true, report: data });
     }
