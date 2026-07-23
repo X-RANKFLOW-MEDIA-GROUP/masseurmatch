@@ -222,6 +222,12 @@ const buildPublicTherapistsQuery = () => {
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// Demo/fallback profiles (directory-fallback.ts) carry synthetic ids like
+// "fallback-bruno-santos". Any query that filters a uuid column by such an id
+// fails with `invalid input syntax for type uuid` (22P02), logging a DB error
+// on every fallback profile view. Guard ids before they reach a uuid column.
+const isUuid = (value: string): boolean => UUID_RE.test(value);
+
 // A profile is linkable from the directory when it has a slug OR a real UUID id
 // (the profile route resolves both — `/therapists/<slug>` and `/therapists/<uuid>`).
 // Rows with neither (e.g. a malformed id and no slug) would render a card that
@@ -494,6 +500,8 @@ export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTher
 };
 
 export const getImportedReviews = async (profileId: string, limit = 5) => {
+  // Fallback/demo profiles have non-uuid ids and no imported reviews.
+  if (!isUuid(profileId)) return [] as ImportedReview[];
   const { data } = await supabase
     .from("imported_reviews")
     .select("id, review_text, rating, reviewer_name, review_date")
@@ -513,6 +521,12 @@ const resolvePhotoUrl = (
 
 export const getProfilePhotos = async (profileId: string, limit = 6) => {
   const fallback = (FALLBACK_PUBLIC_THERAPISTS as PublicTherapist[]).find((profile) => profile.id === profileId);
+  // A fallback profile's id is not a uuid: skip the query (it would raise
+  // 22P02) and serve its avatar directly.
+  if (!isUuid(profileId)) {
+    if (!fallback?.avatar_url) return [];
+    return [{ id: `${fallback.id}-avatar`, storage_path: fallback.avatar_url, is_primary: true }];
+  }
   const { data, error } = await supabase
     .from("profile_photos")
     .select("id, storage_path, url, is_primary, sort_order")
@@ -540,7 +554,10 @@ export const getProfilePhotosBatch = async (
   limitPerProfile = 1,
 ): Promise<Map<string, ProfilePhoto[]>> => {
   const result = new Map<string, ProfilePhoto[]>();
-  if (!profileIds.length) return result;
+  // Drop any non-uuid (fallback/demo) ids so a single bad id can't fail the
+  // whole `.in()` query with 22P02.
+  const uuidIds = profileIds.filter(isUuid);
+  if (!uuidIds.length) return result;
 
   // Chunk the id list before querying: Supabase encodes `.in()` arrays into
   // the request URL, so a large directory (e.g. 200 UUIDs from /explore) can
