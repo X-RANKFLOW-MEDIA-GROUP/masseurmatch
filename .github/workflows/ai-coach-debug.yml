@@ -1,0 +1,43 @@
+name: AI Coach Diagnostics
+
+on:
+  push:
+    branches:
+      - feature/ai-profile-coach-dashboard
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.32.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Capture database contract and migration diagnostics
+        shell: bash
+        run: |
+          set +e
+          pnpm validate:db-contract > db-contract.txt 2>&1
+          echo "$?" > db-contract-exit-code.txt
+          grep -R -n "keyword_slugs" supabase > keyword-slugs.txt 2>&1 || true
+          find supabase/migrations -maxdepth 1 -type f -printf "%f\n" | sort > migration-files.txt
+          set -e
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ai-coach-diagnostics
+          path: |
+            db-contract.txt
+            db-contract-exit-code.txt
+            keyword-slugs.txt
+            migration-files.txt
+          if-no-files-found: error
+          retention-days: 1
