@@ -2,6 +2,20 @@
 -- MIGRATION: fix_rls_policies_launch_v3
 -- RLS policies with correct column names + performance indexes
 -- ============================================================
+--
+-- Several tables below (appointments, favorites, conversations, messages,
+-- payment_transactions, user_mfa, mfa_pending, user_suspensions, …) and a few
+-- profiles columns used by the indexes (boost_score, canonical_city_slug,
+-- is_demo) are production-only objects that no committed migration creates. On
+-- production they exist and every statement applies; on a fresh database (the
+-- Supabase branch preview, local `db reset`) they don't, which made this whole
+-- migration abort with 42703/42P01 and blocked every migration after it.
+--
+-- Each section is wrapped so a missing table/column is skipped with a NOTICE
+-- instead of aborting. Where the schema is correct nothing changes; where an
+-- object is absent that section is simply not applied. `undefined_object`
+-- covers a missing policy target; all handlers also catch `undefined_column`
+-- and `undefined_table`.
 
 DO $$ BEGIN
 
@@ -104,6 +118,9 @@ IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename
     USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
 END IF;
 
+EXCEPTION
+  WHEN undefined_column OR undefined_table OR undefined_object THEN
+    RAISE NOTICE 'fix_rls_policies_launch_v3: skipped RLS policies for an absent production-only table/column (fresh/branch DB): %', SQLERRM;
 END $$;
 
 -- ============================================================
@@ -111,51 +128,81 @@ END $$;
 -- ============================================================
 
 -- KEYWORD_TRENDS
-DROP POLICY IF EXISTS "Anyone can read and write keyword_trends" ON public.keyword_trends;
 DO $$ BEGIN
+  DROP POLICY IF EXISTS "Anyone can read and write keyword_trends" ON public.keyword_trends;
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='keyword_trends' AND policyname='Public read keyword_trends') THEN
     CREATE POLICY "Public read keyword_trends" ON public.keyword_trends FOR SELECT USING (true);
   END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='keyword_trends' AND policyname='Service role write keyword_trends') THEN
     CREATE POLICY "Service role write keyword_trends" ON public.keyword_trends FOR INSERT WITH CHECK (auth.role() = 'service_role');
   END IF;
+EXCEPTION
+  WHEN undefined_column OR undefined_table OR undefined_object THEN
+    RAISE NOTICE 'fix_rls_policies_launch_v3: skipped keyword_trends policies (absent on this DB): %', SQLERRM;
 END $$;
 
 -- PROFILE_DOCUMENTS (has: profile_id — use that)
-DROP POLICY IF EXISTS "Users can delete their own documents" ON public.profile_documents;
-DROP POLICY IF EXISTS "Users can insert their own documents" ON public.profile_documents;
-DROP POLICY IF EXISTS "Users can update their own documents" ON public.profile_documents;
-CREATE POLICY "Users can delete their own documents" ON public.profile_documents FOR DELETE
-  USING (auth.uid() = (SELECT user_id FROM profiles WHERE id = profile_id));
-CREATE POLICY "Users can insert their own documents" ON public.profile_documents FOR INSERT
-  WITH CHECK (auth.uid() = (SELECT user_id FROM profiles WHERE id = profile_id));
-CREATE POLICY "Users can update their own documents" ON public.profile_documents FOR UPDATE
-  USING (auth.uid() = (SELECT user_id FROM profiles WHERE id = profile_id));
+DO $$ BEGIN
+  DROP POLICY IF EXISTS "Users can delete their own documents" ON public.profile_documents;
+  DROP POLICY IF EXISTS "Users can insert their own documents" ON public.profile_documents;
+  DROP POLICY IF EXISTS "Users can update their own documents" ON public.profile_documents;
+  CREATE POLICY "Users can delete their own documents" ON public.profile_documents FOR DELETE
+    USING (auth.uid() = (SELECT user_id FROM profiles WHERE id = profile_id));
+  CREATE POLICY "Users can insert their own documents" ON public.profile_documents FOR INSERT
+    WITH CHECK (auth.uid() = (SELECT user_id FROM profiles WHERE id = profile_id));
+  CREATE POLICY "Users can update their own documents" ON public.profile_documents FOR UPDATE
+    USING (auth.uid() = (SELECT user_id FROM profiles WHERE id = profile_id));
+EXCEPTION
+  WHEN undefined_column OR undefined_table OR undefined_object THEN
+    RAISE NOTICE 'fix_rls_policies_launch_v3: skipped profile_documents policies (absent on this DB): %', SQLERRM;
+END $$;
 
 -- REVIEWS
-DROP POLICY IF EXISTS "reviews_insert_authenticated" ON public.reviews;
 DO $$ BEGIN
+  DROP POLICY IF EXISTS "reviews_insert_authenticated" ON public.reviews;
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='reviews' AND policyname='Authenticated users insert own reviews') THEN
     CREATE POLICY "Authenticated users insert own reviews" ON public.reviews FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
   END IF;
+EXCEPTION
+  WHEN undefined_column OR undefined_table OR undefined_object THEN
+    RAISE NOTICE 'fix_rls_policies_launch_v3: skipped reviews policies (absent on this DB): %', SQLERRM;
 END $$;
 
 -- ============================================================
 -- PERFORMANCE INDEXES
+-- Wrapped so an index on a profiles column that is absent on a fresh DB
+-- (boost_score / canonical_city_slug / is_demo are production-only) is skipped
+-- rather than aborting the migration.
 -- ============================================================
 
-CREATE INDEX IF NOT EXISTS idx_profiles_directory
-  ON profiles(city, visibility_status, profile_status)
-  WHERE visibility_status = 'public' AND profile_status = 'approved';
+DO $$ BEGIN
+  CREATE INDEX IF NOT EXISTS idx_profiles_directory
+    ON profiles(city, visibility_status, profile_status)
+    WHERE visibility_status = 'public' AND profile_status = 'approved';
+EXCEPTION WHEN undefined_column OR undefined_table THEN
+  RAISE NOTICE 'fix_rls_policies_launch_v3: skipped idx_profiles_directory: %', SQLERRM;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_profiles_ranking
-  ON profiles(is_featured DESC, boost_score DESC)
-  WHERE visibility_status = 'public' AND is_demo = false;
+DO $$ BEGIN
+  CREATE INDEX IF NOT EXISTS idx_profiles_ranking
+    ON profiles(is_featured DESC, boost_score DESC)
+    WHERE visibility_status = 'public' AND is_demo = false;
+EXCEPTION WHEN undefined_column OR undefined_table THEN
+  RAISE NOTICE 'fix_rls_policies_launch_v3: skipped idx_profiles_ranking: %', SQLERRM;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_profiles_slug
-  ON profiles(slug)
-  WHERE slug IS NOT NULL;
+DO $$ BEGIN
+  CREATE INDEX IF NOT EXISTS idx_profiles_slug
+    ON profiles(slug)
+    WHERE slug IS NOT NULL;
+EXCEPTION WHEN undefined_column OR undefined_table THEN
+  RAISE NOTICE 'fix_rls_policies_launch_v3: skipped idx_profiles_slug: %', SQLERRM;
+END $$;
 
-CREATE INDEX IF NOT EXISTS idx_profiles_canonical_city
-  ON profiles(canonical_city_slug)
-  WHERE canonical_city_slug IS NOT NULL AND visibility_status = 'public';
+DO $$ BEGIN
+  CREATE INDEX IF NOT EXISTS idx_profiles_canonical_city
+    ON profiles(canonical_city_slug)
+    WHERE canonical_city_slug IS NOT NULL AND visibility_status = 'public';
+EXCEPTION WHEN undefined_column OR undefined_table THEN
+  RAISE NOTICE 'fix_rls_policies_launch_v3: skipped idx_profiles_canonical_city: %', SQLERRM;
+END $$;
