@@ -19,7 +19,7 @@ function normalizeAppRole(role: unknown): AppRole | null {
 }
 
 function getSupabaseUrl() {
-  return envAny(["SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL", "VITE_SUPABASE_URL"]);
+  return envAny(["NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_URL", "VITE_SUPABASE_URL"]);
 }
 
 function getAnonKey() {
