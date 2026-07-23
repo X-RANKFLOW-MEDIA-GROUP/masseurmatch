@@ -81,36 +81,56 @@ function readJwtProjectRef(name, token) {
   }
 }
 
+function delay(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
 async function verifyReachable(origin) {
   if (process.env.VERCEL !== "1") {
     return;
   }
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10_000);
+  const attempts = 3;
+  const timeoutMs = 12_000;
+  let lastDetail = "unknown network error";
 
-  try {
-    const response = await fetch(`${origin}/auth/v1/health`, {
-      method: "GET",
-      cache: "no-store",
-      signal: controller.signal,
-    });
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
-    // Supabase's gateway may return 401 without an apikey. That still proves
-    // the project hostname resolves and accepts TLS/HTTP. Deleted preview
-    // branches fail before an HTTP response is received.
-    if (response.status >= 500) {
-      fail(`Supabase health check returned HTTP ${response.status} for ${origin}.`);
+    try {
+      const response = await fetch(`${origin}/auth/v1/health`, {
+        method: "GET",
+        cache: "no-store",
+        signal: controller.signal,
+      });
+
+      // Supabase's gateway may return 401 without an apikey. That still proves
+      // the project hostname resolves and accepts TLS/HTTP. Deleted preview
+      // branches fail before an HTTP response is received.
+      if (response.status >= 500) {
+        lastDetail = `HTTP ${response.status}`;
+      } else {
+        return;
+      }
+    } catch (error) {
+      lastDetail = error instanceof Error ? error.message : String(error);
+    } finally {
+      clearTimeout(timeout);
     }
-  } catch (error) {
-    const detail = error instanceof Error ? error.message : String(error);
-    fail(
-      `Supabase project ${origin} is unreachable (${detail}). ` +
-        "The deployment may reference a deleted or stale preview branch.",
-    );
-  } finally {
-    clearTimeout(timeout);
+
+    if (attempt < attempts) {
+      console.warn(
+        `Supabase health check attempt ${attempt}/${attempts} failed for ${origin} (${lastDetail}); retrying...`,
+      );
+      await delay(1_500 * attempt);
+    }
   }
+
+  fail(
+    `Supabase project ${origin} is unreachable after ${attempts} attempts (${lastDetail}). ` +
+      "The deployment may reference a deleted or stale preview branch.",
+  );
 }
 
 const configuredUrls = urlVariableNames
