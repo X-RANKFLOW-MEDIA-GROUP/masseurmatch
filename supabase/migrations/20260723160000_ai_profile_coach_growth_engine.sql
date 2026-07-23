@@ -170,12 +170,3 @@ create policy providers_manage_own_ai_coach_preferences
 alter view public.ai_profile_coach_source set (security_invoker = true);
 revoke all on public.ai_profile_coach_source from public, anon, authenticated;
 grant select on public.ai_profile_coach_source to service_role;
-
--- SECURITY DEFINER functions must never be callable through the public REST API.
-revoke all on function public.ai_profile_coach_build_snapshot(uuid, date) from public, anon, authenticated;
-revoke all on function public.ai_profile_coach_render_email(uuid) from public, anon, authenticated;
-revoke all on function public.ai_profile_coach_queue_due_emails() from public, anon, authenticated;
-
-grant execute on function public.ai_profile_coach_build_snapshot(uuid, date) to service_role;
-grant execute on function public.ai_profile_coach_render_email(uuid) to service_role;
-grant execute on function public.ai_profile_coach_queue_due_emails() to service_role;
