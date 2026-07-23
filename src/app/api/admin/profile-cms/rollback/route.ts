@@ -5,7 +5,7 @@ import {
   recordAuditLog,
 } from "@/app/api/_lib/supabase-server";
 import { getFieldByKey } from "@/lib/profile-fields-config";
-import type { Database } from "@/integrations/supabase/types";
+import type { Database, Json } from "@/integrations/supabase/types";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +21,22 @@ type AuditDetails = {
 };
 
 type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
+
+function toJson(value: unknown): Json {
+  if (value === null || value === undefined) return null;
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => toJson(item));
+  }
+  if (typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [key, toJson(item)]),
+    );
+  }
+  return String(value);
+}
 
 export async function POST(request: Request) {
   try {
@@ -51,10 +67,12 @@ export async function POST(request: Request) {
       return Response.json({ error: "Audit log entry has an invalid field name" }, { status: 400 });
     }
 
+    const oldValue = toJson(details.old_value);
+    const newValue = toJson(details.new_value);
     const updatePayload = {
-      [fieldName]: details.old_value ?? null,
+      [fieldName]: oldValue,
       updated_at: new Date().toISOString(),
-    } as ProfileUpdate;
+    } as unknown as ProfileUpdate;
 
     const { error: updateError } = await supabase
       .from("profiles")
@@ -65,19 +83,27 @@ export async function POST(request: Request) {
       return Response.json({ error: "Failed to rollback" }, { status: 500 });
     }
 
-    await recordAuditLog(admin.userId, "provider.profile.field_rollback", "profile", profile_id, {
+    const auditDetails: Json = {
       field_name: fieldName,
-      old_value: details.new_value ?? null,
-      new_value: details.old_value ?? null,
+      old_value: newValue,
+      new_value: oldValue,
       source_audit_log_id: audit_log_id,
       rolled_back_at: new Date().toISOString(),
-    });
+    };
+
+    await recordAuditLog(
+      admin.userId,
+      "provider.profile.field_rollback",
+      "profile",
+      profile_id,
+      auditDetails,
+    );
 
     return Response.json({
       ok: true,
       profile_id,
       field_name: fieldName,
-      rolled_back_value: details.old_value ?? null,
+      rolled_back_value: oldValue,
     });
   } catch (error) {
     console.error("Rollback error:", error);
