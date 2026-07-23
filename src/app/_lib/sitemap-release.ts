@@ -22,7 +22,9 @@ import { siteUrl } from "@/lib/site";
 type SitemapEntry = MetadataRoute.Sitemap[number];
 type ChangeFrequency = NonNullable<SitemapEntry["changeFrequency"]>;
 
-export const SEO_CITY_MIN_PUBLIC_PROFILES = 3;
+// Publish a city as soon as it has one real, public profile. Empty markets stay
+// excluded, while launch inventory can be discovered and indexed immediately.
+export const SEO_CITY_MIN_PUBLIC_PROFILES = 1;
 
 const PROFILE_LOOKUP_CHUNK_SIZE = 100;
 const INVENTORY_DEPENDENT_HUB_PATHS = new Set(["/cities", "/explore", "/near-me"]);
@@ -177,55 +179,4 @@ function buildEligibleLocalEntries(inventory: Map<string, number>) {
     .map((path) => buildEntry(path, "weekly", 0.6));
 
   return { eligibleCities, cities, services, neighborhoods };
-}
-
-async function buildPublishedBlogEntries(now: Date): Promise<MetadataRoute.Sitemap> {
-  const posts = await getSeoBlogPosts();
-
-  return posts.flatMap((post) => {
-    const publishedAt = validDate(post.published_at);
-    if (!publishedAt || publishedAt.getTime() > now.getTime()) return [];
-
-    const updatedAt = validDate(post.updated_at);
-    const lastModified = updatedAt && updatedAt.getTime() <= now.getTime() ? updatedAt : publishedAt;
-
-    return [buildEntry(`/blog/${post.slug}`, "weekly", 0.65, lastModified)];
-  });
-}
-
-export async function buildReleaseSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
-  const [inventory, profiles, blogPosts, tourPages] = await Promise.all([
-    getSeoEligibleCityInventoryMap(),
-    buildProfilesSitemapEntries(now),
-    buildPublishedBlogEntries(now),
-    buildTourPagesSitemapEntries(now),
-  ]);
-
-  const local = buildEligibleLocalEntries(inventory);
-  const hasEligibleCities = local.eligibleCities.length > 0;
-
-  const core = buildCoreSitemapEntries(now)
-    .filter((entry) => {
-      const pathname = new URL(entry.url).pathname;
-      if (INTENTIONALLY_NOINDEX_PATHS.has(pathname)) return false;
-      return hasEligibleCities || !INVENTORY_DEPENDENT_HUB_PATHS.has(pathname);
-    })
-    .map(stripSyntheticLastModified);
-
-  const conditionalHubs: MetadataRoute.Sitemap = [
-    buildEntry("/verification", "monthly", 0.75),
-    ...(hasEligibleCities ? [buildEntry("/states", "weekly", 0.78)] : []),
-  ];
-
-  return dedupeSitemapEntries([
-    ...core,
-    ...conditionalHubs,
-    ...local.cities,
-    ...local.services,
-    ...local.neighborhoods,
-    ...profiles,
-    ...buildGuidesSitemapEntries(now),
-    ...blogPosts,
-    ...tourPages,
-  ]);
 }
