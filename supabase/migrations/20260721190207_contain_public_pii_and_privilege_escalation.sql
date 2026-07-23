@@ -6,19 +6,26 @@ drop policy if exists "profiles_public_read_approved" on public.profiles;
 drop policy if exists "Public can read approved therapist profiles" on public.therapist_profiles;
 
 -- Do not expose verification documents to other users or anonymous callers.
-drop policy if exists "Users can view own documents" on public.profile_documents;
-create policy "profile_documents_owner_read"
-on public.profile_documents
-for select
-to authenticated
-using (
-  exists (
-    select 1
-    from public.profiles p
-    where p.id = profile_documents.profile_id
-      and p.user_id = (select auth.uid())
-  )
-);
+-- profile_documents is a production-only table no committed migration creates,
+-- so guard it: on production the policy is (re)created; on a fresh/branch DB its
+-- absence is skipped instead of aborting the migration.
+do $$ begin
+  drop policy if exists "Users can view own documents" on public.profile_documents;
+  create policy "profile_documents_owner_read"
+  on public.profile_documents
+  for select
+  to authenticated
+  using (
+    exists (
+      select 1
+      from public.profiles p
+      where p.id = profile_documents.profile_id
+        and p.user_id = (select auth.uid())
+    )
+  );
+exception when undefined_table or undefined_column or undefined_object then
+  raise notice 'contain_public_pii: skipped profile_documents policy (absent on this DB): %', sqlerrm;
+end $$;
 
 -- A profile owner may edit normal profile content, but never their authorization,
 -- moderation, lifecycle, or billing state.
