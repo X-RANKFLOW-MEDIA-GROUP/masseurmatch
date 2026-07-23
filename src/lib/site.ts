@@ -1,3 +1,4 @@
+// Production has one canonical origin so sitemap, metadata, robots, and previews agree.
 const DEFAULT_APP_URL = "https://www.masseurmatch.com";
 
 const isVercelProduction = process.env.VERCEL_ENV === "production";
