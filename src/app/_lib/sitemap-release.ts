@@ -165,7 +165,8 @@ function buildEligibleLocalEntries(inventory: Map<string, number>) {
   const servicePaths = FIRST_30_URLS_IN_ORDER.filter((path) => {
     const citySlug = citySlugFromPath(path);
     return Boolean(
-      citySlug &&
+      INCLUDE_LOCAL_LONG_TAIL_PATHS &&
+        citySlug &&
         eligibleCitySlugs.has(citySlug) &&
         isLaunchUrl(path) &&
         (launchSegmentPaths.has(path) || launchKeywordPaths.has(path)),
