@@ -52,19 +52,24 @@ CREATE POLICY contact_inquiries_update_own ON public.contact_inquiries
   FOR UPDATE USING (EXISTS ( SELECT 1 FROM profiles WHERE profiles.id = contact_inquiries.profile_id AND profiles.user_id = (select auth.uid())));
 
 -- ranking_events
+-- public.ranking_events has a `therapist_id` column (FK to profiles.id), not
+-- `profile_id` (see 20260321143000_knotty_learning_engine.sql). The original
+-- policies referenced a non-existent `profile_id`, so they failed with
+-- `42703 column "profile_id" does not exist` on every database — production
+-- included. Use the correct column name.
 DROP POLICY IF EXISTS ranking_events_owner_select ON public.ranking_events;
 CREATE POLICY ranking_events_owner_select ON public.ranking_events
-  FOR SELECT USING (profile_id IN ( SELECT p.id FROM profiles p WHERE p.user_id = (select auth.uid())));
+  FOR SELECT USING (therapist_id IN ( SELECT p.id FROM profiles p WHERE p.user_id = (select auth.uid())));
 
 DROP POLICY IF EXISTS ranking_events_owner_insert ON public.ranking_events;
 CREATE POLICY ranking_events_owner_insert ON public.ranking_events
-  FOR INSERT WITH CHECK (profile_id IN ( SELECT p.id FROM profiles p WHERE p.user_id = (select auth.uid())));
+  FOR INSERT WITH CHECK (therapist_id IN ( SELECT p.id FROM profiles p WHERE p.user_id = (select auth.uid())));
 
 DROP POLICY IF EXISTS ranking_events_owner_update ON public.ranking_events;
 CREATE POLICY ranking_events_owner_update ON public.ranking_events
-  FOR UPDATE USING (profile_id IN ( SELECT p.id FROM profiles p WHERE p.user_id = (select auth.uid())))
-  WITH CHECK (profile_id IN ( SELECT p.id FROM profiles p WHERE p.user_id = (select auth.uid())));
+  FOR UPDATE USING (therapist_id IN ( SELECT p.id FROM profiles p WHERE p.user_id = (select auth.uid())))
+  WITH CHECK (therapist_id IN ( SELECT p.id FROM profiles p WHERE p.user_id = (select auth.uid())));
 
 DROP POLICY IF EXISTS ranking_events_owner_delete ON public.ranking_events;
 CREATE POLICY ranking_events_owner_delete ON public.ranking_events
-  FOR DELETE USING (profile_id IN ( SELECT p.id FROM profiles p WHERE p.user_id = (select auth.uid())));
+  FOR DELETE USING (therapist_id IN ( SELECT p.id FROM profiles p WHERE p.user_id = (select auth.uid())));
