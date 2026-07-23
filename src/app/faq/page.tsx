@@ -10,11 +10,11 @@ export const metadata: Metadata = {
     title: "FAQ – MasseurMatch",
     description:
       "Common questions about MasseurMatch: how to find a therapist, list your practice, pricing, and privacy.",
-    url: "https://masseurmatch.com/faq",
+    url: "https://www.masseurmatch.com/faq",
     siteName: "MasseurMatch",
     type: "website",
   },
-  alternates: { canonical: "https://masseurmatch.com/faq" },
+  alternates: { canonical: "https://www.masseurmatch.com/faq" },
 };
 
 const faqs = [

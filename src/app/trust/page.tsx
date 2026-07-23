@@ -13,24 +13,24 @@ export const metadata: Metadata = {
     title: "Trust & Safety | MasseurMatch",
     description:
       "Human-reviewed profiles, identity verification, and responsible data handling — our commitment to your safety.",
-    url: "https://masseurmatch.com/trust",
+    url: "https://www.masseurmatch.com/trust",
     siteName: "MasseurMatch",
     type: "website",
   },
-  alternates: { canonical: "https://masseurmatch.com/trust" },
+  alternates: { canonical: "https://www.masseurmatch.com/trust" },
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
   name: "Trust & Safety - MasseurMatch",
-  url: "https://masseurmatch.com/trust",
+  url: "https://www.masseurmatch.com/trust",
   description:
     "MasseurMatch's commitment to human-reviewed profiles, identity verification, and responsible data handling.",
   publisher: {
     "@type": "Organization",
     name: "MasseurMatch",
-    url: "https://masseurmatch.com",
+    url: "https://www.masseurmatch.com",
   },
 };
 
