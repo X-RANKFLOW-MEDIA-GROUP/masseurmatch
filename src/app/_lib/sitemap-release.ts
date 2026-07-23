@@ -180,3 +180,54 @@ function buildEligibleLocalEntries(inventory: Map<string, number>) {
 
   return { eligibleCities, cities, services, neighborhoods };
 }
+
+async function buildPublishedBlogEntries(now: Date): Promise<MetadataRoute.Sitemap> {
+  const posts = await getSeoBlogPosts();
+
+  return posts.flatMap((post) => {
+    const publishedAt = validDate(post.published_at);
+    if (!publishedAt || publishedAt.getTime() > now.getTime()) return [];
+
+    const updatedAt = validDate(post.updated_at);
+    const lastModified = updatedAt && updatedAt.getTime() <= now.getTime() ? updatedAt : publishedAt;
+
+    return [buildEntry(`/blog/${post.slug}`, "weekly", 0.65, lastModified)];
+  });
+}
+
+export async function buildReleaseSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
+  const [inventory, profiles, blogPosts, tourPages] = await Promise.all([
+    getSeoEligibleCityInventoryMap(),
+    buildProfilesSitemapEntries(now),
+    buildPublishedBlogEntries(now),
+    buildTourPagesSitemapEntries(now),
+  ]);
+
+  const local = buildEligibleLocalEntries(inventory);
+  const hasEligibleCities = local.eligibleCities.length > 0;
+
+  const core = buildCoreSitemapEntries(now)
+    .filter((entry) => {
+      const pathname = new URL(entry.url).pathname;
+      if (INTENTIONALLY_NOINDEX_PATHS.has(pathname)) return false;
+      return hasEligibleCities || !INVENTORY_DEPENDENT_HUB_PATHS.has(pathname);
+    })
+    .map(stripSyntheticLastModified);
+
+  const conditionalHubs: MetadataRoute.Sitemap = [
+    buildEntry("/verification", "monthly", 0.75),
+    ...(hasEligibleCities ? [buildEntry("/states", "weekly", 0.78)] : []),
+  ];
+
+  return dedupeSitemapEntries([
+    ...core,
+    ...conditionalHubs,
+    ...local.cities,
+    ...local.services,
+    ...local.neighborhoods,
+    ...profiles,
+    ...buildGuidesSitemapEntries(now),
+    ...blogPosts,
+    ...tourPages,
+  ]);
+}
