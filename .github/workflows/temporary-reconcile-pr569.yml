@@ -1,0 +1,111 @@
+name: Temporary Reconcile PR 569
+
+on:
+  push:
+    branches:
+      - fix/prelaunch-blockers-20260722
+    paths:
+      - ".github/workflows/temporary-reconcile-pr569.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/prelaunch-blockers-20260722
+          fetch-depth: 0
+
+      - name: Merge latest main and preserve verified fixes
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+
+          set +e
+          git merge --no-ff --no-commit origin/main
+          merge_status=$?
+          set -e
+
+          if [ "$merge_status" -ne 0 ]; then
+            mapfile -t conflicts < <(git diff --name-only --diff-filter=U)
+            printf 'Resolving conflicts:\n%s\n' "${conflicts[*]}"
+
+            for file in "${conflicts[@]}"; do
+              case "$file" in
+                ".github/workflows/sitemap-preview-audit.yml"|"scripts/validate-sitemap.mjs"|"src/app/_lib/sitemap-release.ts"|"src/app/[city]/page.tsx")
+                  git checkout --ours -- "$file"
+                  ;;
+                *)
+                  git checkout --theirs -- "$file"
+                  ;;
+              esac
+              git add -- "$file"
+            done
+          fi
+
+          python - <<'PY'
+          from pathlib import Path
+
+          old = "https://masseurmatch.com"
+          new = "https://www.masseurmatch.com"
+          roots = [Path("src"), Path("scripts"), Path("supabase/functions"), Path(".github/workflows")]
+
+          for root in roots:
+              if not root.exists():
+                  continue
+              for path in root.rglob("*"):
+                  if not path.is_file() or path.suffix not in {".ts", ".tsx", ".js", ".mjs", ".yml", ".yaml"}:
+                      continue
+                  text = path.read_text(encoding="utf-8-sig")
+                  updated = text.replace(old, new)
+                  if updated != text:
+                      path.write_text(updated, encoding="utf-8")
+
+          checkout = Path("supabase/functions/create-checkout/index.ts")
+          if checkout.exists():
+              text = checkout.read_text(encoding="utf-8")
+              text = text.replace('name: "Elite",\n    amount: 9900,', 'name: "Elite",\n    amount: 14900,')
+              checkout.write_text(text, encoding="utf-8")
+
+          sitemap = Path("src/app/_lib/sitemap-release.ts")
+          text = sitemap.read_text(encoding="utf-8")
+          if "const INCLUDE_LOCAL_LONG_TAIL_PATHS = false;" not in text:
+              marker = "export const SEO_CITY_MIN_PUBLIC_PROFILES = 1;\n"
+              text = text.replace(
+                  marker,
+                  marker
+                  + "\n// Long-tail city/service/area routes remain routable, but only city roots\n"
+                  + "// enter the sitemap until route-specific inventory can prove each page\n"
+                  + "// indexable. This prevents sitemap URLs from contradicting page noindex.\n"
+                  + "const INCLUDE_LOCAL_LONG_TAIL_PATHS = false;\n",
+                  1,
+              )
+          text = text.replace(
+              """    return Boolean(\n      citySlug &&\n        eligibleCitySlugs.has(citySlug) &&\n        isLaunchUrl(path) &&\n        (launchSegmentPaths.has(path) || launchKeywordPaths.has(path)),\n    );""",
+              """    return Boolean(\n      INCLUDE_LOCAL_LONG_TAIL_PATHS &&\n        citySlug &&\n        eligibleCitySlugs.has(citySlug) &&\n        isLaunchUrl(path) &&\n        (launchSegmentPaths.has(path) || launchKeywordPaths.has(path)),\n    );""",
+              1,
+          )
+          text = text.replace(
+              "return Boolean(citySlug && eligibleCitySlugs.has(citySlug) && isLaunchUrl(path));",
+              "return Boolean(INCLUDE_LOCAL_LONG_TAIL_PATHS && citySlug && eligibleCitySlugs.has(citySlug) && isLaunchUrl(path));",
+              1,
+          )
+          sitemap.write_text(text, encoding="utf-8")
+          PY
+
+          rm .github/workflows/temporary-reconcile-pr569.yml
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No reconciliation changes were required."
+            exit 0
+          fi
+
+          git commit -m "merge: reconcile SEO fixes with latest main"
+          git push origin HEAD:fix/prelaunch-blockers-20260722
