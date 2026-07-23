@@ -1,0 +1,48 @@
+name: Temporary Supabase URL Reconcile
+
+on:
+  push:
+    branches:
+      - claude/new-session-ye8vwd
+    paths:
+      - ".github/workflows/temporary-supabase-url-reconcile.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/new-session-ye8vwd
+      - name: Prefer the active public Supabase project URL
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          helper = Path("src/app/api/_lib/supabase-server.ts")
+          text = helper.read_text(encoding="utf-8-sig")
+          old = 'return envAny(["SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL", "VITE_SUPABASE_URL"]);'
+          new = 'return envAny(["NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_URL", "VITE_SUPABASE_URL"]);'
+          if old not in text:
+              raise SystemExit("server Supabase URL priority line not found")
+          helper.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+          route = Path("src/app/api/analytics/legacy/route.ts")
+          text = route.read_text(encoding="utf-8-sig")
+          old = 'const supabaseUrl = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;'
+          new = 'const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;'
+          if old not in text:
+              raise SystemExit("legacy analytics Supabase URL line not found")
+          route.write_text(text.replace(old, new, 1), encoding="utf-8")
+          PY
+          rm .github/workflows/temporary-supabase-url-reconcile.yml
+      - name: Commit reconciliation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/app/api/_lib/supabase-server.ts src/app/api/analytics/legacy/route.ts .github/workflows/temporary-supabase-url-reconcile.yml
+          git commit -m "fix(runtime): prefer active Supabase project URL"
+          git push origin HEAD:claude/new-session-ye8vwd
