@@ -45,12 +45,8 @@ alter table public.support_ticket_messages
 alter table public.support_ticket_messages
   alter column sender_role set default 'provider';
 
--- Production uses normal while an older migration/UI used medium. Normalize the
--- stored values and enforce one canonical set going forward.
-update public.support_tickets
-   set priority = 'normal'
- where priority = 'medium';
-
+-- Keep both normal (current API) and medium (older admin UI) compatible until
+-- the UI is fully normalized.
 alter table public.support_tickets
   alter column priority set default 'normal';
 
@@ -59,7 +55,7 @@ alter table public.support_tickets
 
 alter table public.support_tickets
   add constraint support_tickets_priority_check
-  check (priority in ('low', 'normal', 'high', 'urgent'));
+  check (priority in ('low', 'normal', 'medium', 'high', 'urgent'));
 
 -- Keep ticket activity current. Provider/user replies reopen a ticket; system
 -- call reports update activity without changing an administrator's resolution.
