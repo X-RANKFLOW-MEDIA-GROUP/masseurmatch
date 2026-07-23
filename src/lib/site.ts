@@ -1,4 +1,4 @@
-const DEFAULT_APP_URL = "https://masseurmatch.com";
+const DEFAULT_APP_URL = "https://www.masseurmatch.com";
 
 const isVercelProduction = process.env.VERCEL_ENV === "production";
 
