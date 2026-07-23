@@ -29,12 +29,18 @@ const PROFILE_SELECT = `
   subscription_tier,visibility_status,profile_status
 `;
 
+const AI_TABLES = {
+  snapshots: "ai_profile_coach_daily_snapshots",
+  photoScores: "ai_profile_photo_scores",
+  drafts: "ai_profile_content_drafts",
+  optimizationRuns: "ai_profile_optimization_runs",
+  reports: "ai_profile_reports",
+  analysisRuns: "ai_profile_analysis_runs",
+} as const;
+
 const requestSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("refresh") }),
-  z.object({
-    action: z.literal("rewrite"),
-    field: z.enum(["headline", "tagline", "bio", "seo_title", "seo_description"]),
-  }),
+  z.object({ action: z.literal("rewrite"), field: z.enum(["headline", "tagline", "bio", "seo_title", "seo_description"]) }),
   z.object({ action: z.literal("optimize-preview") }),
   z.object({
     action: z.literal("apply-optimization"),
@@ -46,11 +52,8 @@ const requestSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("chat"), message: z.string().trim().min(2).max(1000) }),
 ]);
 
-type UntypedSupabase = ReturnType<typeof createSupabaseAdminClient> & {
-  from: (table: string) => any;
-  rpc: (name: string, params?: Record<string, unknown>) => any;
-};
-
+type QueryResult<T = unknown> = { data: T; error: { message: string } | null; count?: number | null };
+type Db = { from: (table: string) => any };
 type CoachBundle = {
   profile: CoachProfile;
   photos: CoachPhoto[];
@@ -60,38 +63,28 @@ type CoachBundle = {
   latestOptimization: unknown | null;
 };
 
-function asDb() {
-  return createSupabaseAdminClient() as unknown as UntypedSupabase;
-}
+const dbClient = () => createSupabaseAdminClient() as unknown as Db;
+const daysAgo = (days: number) => new Date(Date.now() - days * 86_400_000).toISOString();
+const today = () => new Date().toISOString().slice(0, 10);
 
-function isoDaysAgo(days: number) {
-  const date = new Date();
-  date.setUTCDate(date.getUTCDate() - days);
-  return date.toISOString();
-}
-
-function todayUtc() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-async function countRows(query: PromiseLike<{ count: number | null; error: { message: string } | null }>) {
+async function count(query: PromiseLike<QueryResult>) {
   const result = await query;
   return result.error ? 0 : result.count ?? 0;
 }
 
-async function requireProfile(db: UntypedSupabase, userId: string): Promise<CoachProfile> {
+async function getProfile(db: Db, userId: string): Promise<CoachProfile> {
   const { data, error } = await db.from("profiles").select(PROFILE_SELECT).eq("user_id", userId).maybeSingle();
   if (error) throw new RouteError(500, error.message);
   if (!data) throw new RouteError(404, "Provider profile not found.");
   return data as CoachProfile;
 }
 
-async function loadCoachBundle(db: UntypedSupabase, profile: CoachProfile): Promise<CoachBundle> {
+async function loadBundle(db: Db, profile: CoachProfile): Promise<CoachBundle> {
   const city = profile.city?.trim() ?? "";
   const state = profile.state?.trim() ?? "";
-  const since30 = isoDaysAgo(30);
-  const since7 = isoDaysAgo(7);
-  const since1 = isoDaysAgo(1);
+  const since1 = daysAgo(1);
+  const since7 = daysAgo(7);
+  const since30 = daysAgo(30);
 
   const [
     photosResult,
@@ -114,9 +107,9 @@ async function loadCoachBundle(db: UntypedSupabase, profile: CoachProfile): Prom
     inquiries7d,
   ] = await Promise.all([
     db.from("profile_photos").select("id,url,storage_path,is_primary,moderation_status,sort_order").eq("profile_id", profile.id).order("sort_order", { ascending: true }),
-    db.from("ai_profile_photo_scores").select("*").eq("profile_id", profile.id).order("overall_score", { ascending: false }),
-    db.from("ai_profile_coach_daily_snapshots").select("snapshot_date,profile_score,visibility_score,trust_score,content_score,conversion_score").eq("profile_id", profile.id).order("snapshot_date", { ascending: false }).limit(90),
-    db.from("ranking_events").select("position_in_results,created_at").eq("profile_id", profile.id).not("position_in_results", "is", null).gte("created_at", since30).order("created_at", { ascending: false }).limit(400),
+    db.from(AI_TABLES.photoScores).select("*").eq("profile_id", profile.id).order("overall_score", { ascending: false }),
+    db.from(AI_TABLES.snapshots).select("snapshot_date,profile_score,visibility_score,trust_score,content_score,conversion_score").eq("profile_id", profile.id).order("snapshot_date", { ascending: false }).limit(90),
+    db.from("ranking_events").select("position_in_results,created_at").eq("therapist_id", profile.id).not("position_in_results", "is", null).gte("created_at", since30).order("created_at", { ascending: false }).limit(400),
     city && state
       ? db.from("demand_scores").select("score,trend,competition_index,search_volume_index").ilike("city", city).ilike("state", state).order("week_start", { ascending: false }).limit(1).maybeSingle()
       : Promise.resolve({ data: null, error: null }),
@@ -124,19 +117,19 @@ async function loadCoachBundle(db: UntypedSupabase, profile: CoachProfile): Prom
       ? db.from("keyword_trends").select("keyword,score,trend_direction,week_over_week_change").ilike("city", city).ilike("state", state).order("date", { ascending: false }).order("score", { ascending: false }).limit(40)
       : Promise.resolve({ data: [], error: null }),
     city && state
-      ? db.from("profiles").select("headline,tagline,bio,city,state,massage_techniques,modalities,specialties,languages,languages_spoken,years_experience,areas_served,starting_price,starting_rate,incall_price,is_verified_identity,is_verified_phone,is_verified_email,available_now").ilike("city", city).ilike("state", state).neq("id", profile.id).eq("is_demo", false).eq("is_banned", false).eq("is_suspended", false).limit(100)
+      ? db.from("profiles").select("*").ilike("city", city).ilike("state", state).neq("id", profile.id).eq("is_demo", false).eq("is_banned", false).eq("is_suspended", false).limit(100)
       : Promise.resolve({ data: [], error: null }),
-    db.from("ai_profile_content_drafts").select("id,field,suggested_text,rationale,provider,model,status,created_at").eq("profile_id", profile.id).order("created_at", { ascending: false }).limit(12),
-    db.from("ai_profile_reports").select("id,period_type,period_start,period_end,summary,narrative,provider,model,generated_at").eq("profile_id", profile.id).order("generated_at", { ascending: false }).limit(6),
-    db.from("ai_profile_optimization_runs").select("id,status,before_state,after_state,applied_fields,estimated_impact,provider,model,created_at,applied_at").eq("profile_id", profile.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-    countRows(db.from("profile_view_analytics").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since1)),
-    countRows(db.from("profile_view_analytics").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since7)),
-    countRows(db.from("profile_view_analytics").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since30)),
-    countRows(db.from("contact_events").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since1)),
-    countRows(db.from("contact_events").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since7)),
-    countRows(db.from("contact_events").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since30)),
-    countRows(db.from("favorites").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since7)),
-    countRows(db.from("contact_inquiries").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since7)),
+    db.from(AI_TABLES.drafts).select("id,field,suggested_text,rationale,provider,model,status,created_at").eq("profile_id", profile.id).order("created_at", { ascending: false }).limit(12),
+    db.from(AI_TABLES.reports).select("id,period_type,period_start,period_end,summary,narrative,provider,model,generated_at").eq("profile_id", profile.id).order("generated_at", { ascending: false }).limit(6),
+    db.from(AI_TABLES.optimizationRuns).select("id,status,before_state,after_state,applied_fields,estimated_impact,provider,model,created_at,applied_at").eq("profile_id", profile.id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+    count(db.from("profile_view_analytics").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since1)),
+    count(db.from("profile_view_analytics").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since7)),
+    count(db.from("profile_view_analytics").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since30)),
+    count(db.from("contact_events").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since1)),
+    count(db.from("contact_events").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since7)),
+    count(db.from("contact_events").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since30)),
+    count(db.from("favorites").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since7)),
+    count(db.from("contact_inquiries").select("id", { count: "exact", head: true }).eq("profile_id", profile.id).gte("created_at", since7)),
   ]);
 
   const photos = (photosResult.data ?? []) as CoachPhoto[];
@@ -154,8 +147,7 @@ async function loadCoachBundle(db: UntypedSupabase, profile: CoachProfile): Prom
     metrics: { views1d, views7d, views30d, contacts1d, contacts7d, contacts30d, favorites7d, inquiries7d },
   });
 
-  await persistSnapshot(db, profile, analysis);
-
+  await saveSnapshot(db, profile, analysis);
   return {
     profile,
     photos,
@@ -166,11 +158,20 @@ async function loadCoachBundle(db: UntypedSupabase, profile: CoachProfile): Prom
   };
 }
 
-async function persistSnapshot(db: UntypedSupabase, profile: CoachProfile, analysis: CoachAnalysis) {
+async function saveSnapshot(db: Db, profile: CoachProfile, analysis: CoachAnalysis) {
   const top = analysis.recommendations[0];
-  const payload = {
+  const sectionScores = {
+    content: analysis.scores.content,
+    trust: analysis.scores.trust,
+    visibility: analysis.scores.visibility,
+    conversion: analysis.scores.conversion,
+    seo: analysis.scores.seo,
+    photos: analysis.scores.photos,
+  };
+  const weakest = Object.entries(sectionScores).sort((a, b) => a[1] - b[1])[0]?.[0] ?? null;
+  const { error } = await db.from(AI_TABLES.snapshots).upsert({
     profile_id: profile.id,
-    snapshot_date: todayUtc(),
+    snapshot_date: today(),
     profile_score: analysis.scores.overall,
     visibility_score: analysis.scores.visibility,
     trust_score: analysis.scores.trust,
@@ -189,7 +190,7 @@ async function persistSnapshot(db: UntypedSupabase, profile: CoachProfile, analy
     local_demand_score: analysis.market.demandScore,
     local_demand_trend: analysis.market.demandTrend,
     strongest_keyword: analysis.strongestKeyword,
-    weakest_section: Object.entries({ content: analysis.scores.content, trust: analysis.scores.trust, visibility: analysis.scores.visibility, conversion: analysis.scores.conversion, seo: analysis.scores.seo, photos: analysis.scores.photos }).sort((a, b) => a[1] - b[1])[0]?.[0] ?? null,
+    weakest_section: weakest,
     top_recommendation_key: top?.key ?? null,
     top_recommendation_title: top?.title ?? null,
     top_recommendation_reason: top?.reason ?? null,
@@ -203,13 +204,12 @@ async function persistSnapshot(db: UntypedSupabase, profile: CoachProfile, analy
     recommendation_list: analysis.recommendations,
     subscription_tier: profile.subscription_tier,
     generated_at: new Date().toISOString(),
-  };
-  const { error } = await db.from("ai_profile_coach_daily_snapshots").upsert(payload, { onConflict: "profile_id,snapshot_date" });
+  }, { onConflict: "profile_id,snapshot_date" });
   if (error) console.error("[ai-coach] snapshot upsert failed", error.message);
 }
 
-async function recordAnalysis(db: UntypedSupabase, profileId: string, type: string, result: unknown, provider?: string | null, model?: string | null) {
-  const { error } = await db.from("ai_profile_analysis_runs").insert({
+async function audit(db: Db, profileId: string, type: string, result: unknown, provider?: string | null, model?: string | null) {
+  const { error } = await db.from(AI_TABLES.analysisRuns).insert({
     profile_id: profileId,
     analysis_type: type,
     status: "completed",
@@ -218,10 +218,10 @@ async function recordAnalysis(db: UntypedSupabase, profileId: string, type: stri
     model: model ?? null,
     completed_at: new Date().toISOString(),
   });
-  if (error) console.error("[ai-coach] analysis audit failed", error.message);
+  if (error) console.error("[ai-coach] audit insert failed", error.message);
 }
 
-function reportDates(period: "weekly" | "monthly") {
+function periodDates(period: "weekly" | "monthly") {
   const end = new Date();
   const start = new Date(end);
   start.setUTCDate(start.getUTCDate() - (period === "weekly" ? 6 : 29));
@@ -231,10 +231,8 @@ function reportDates(period: "weekly" | "monthly") {
 export async function GET(request: Request) {
   try {
     const session = await requireRequestSession(request);
-    const db = asDb();
-    const profile = await requireProfile(db, session.userId);
-    const bundle = await loadCoachBundle(db, profile);
-    return json({ ok: true, ...bundle });
+    const db = dbClient();
+    return json({ ok: true, ...(await loadBundle(db, await getProfile(db, session.userId))) });
   } catch (error) {
     return errorResponse(error);
   }
@@ -244,110 +242,90 @@ export async function POST(request: Request) {
   try {
     const session = await requireRequestSession(request);
     const parsed = requestSchema.parse(await request.json());
-    const db = asDb();
-    const profile = await requireProfile(db, session.userId);
+    const db = dbClient();
+    const profile = await getProfile(db, session.userId);
 
     if (parsed.action === "refresh") {
-      const bundle = await loadCoachBundle(db, profile);
-      await recordAnalysis(db, profile.id, "profile", bundle.analysis, "deterministic", "profile-coach-v1");
+      const bundle = await loadBundle(db, profile);
+      await audit(db, profile.id, "profile", bundle.analysis, "deterministic", "profile-coach-v1");
       return json({ ok: true, ...bundle });
     }
 
     if (parsed.action === "rewrite") {
       const rewrite = await rewriteProfileField(profile, parsed.field);
-      const currentValue = profile[parsed.field];
-      const { data, error } = await db.from("ai_profile_content_drafts").insert({
+      const { data, error } = await db.from(AI_TABLES.drafts).insert({
         profile_id: profile.id,
         field: parsed.field,
-        source_text: typeof currentValue === "string" ? currentValue : null,
+        source_text: typeof profile[parsed.field] === "string" ? profile[parsed.field] : null,
         suggested_text: rewrite.suggestedText,
         rationale: rewrite.rationale,
         provider: rewrite.provider,
         model: rewrite.model,
       }).select("id,field,suggested_text,rationale,provider,model,status,created_at").single();
       if (error) throw new RouteError(500, error.message);
-      await recordAnalysis(db, profile.id, "seo", { field: parsed.field, draftId: data.id }, rewrite.provider, rewrite.model);
+      await audit(db, profile.id, "seo", { field: parsed.field, draftId: data.id }, rewrite.provider, rewrite.model);
       return json({ ok: true, draft: data });
     }
 
     if (parsed.action === "optimize-preview") {
-      const { data: keywordRows } = await db.from("keyword_trends").select("keyword").ilike("city", profile.city ?? "").ilike("state", profile.state ?? "").order("score", { ascending: false }).limit(12);
-      const optimization = await generateOptimization(profile, (keywordRows ?? []).map((row: { keyword: string }) => row.keyword));
-      const beforeState = {
-        headline: profile.headline,
-        tagline: profile.tagline,
-        bio: profile.bio,
-        seo_title: profile.seo_title,
-        seo_description: profile.seo_description,
-        seo_keywords: profile.seo_keywords,
-      };
-      const estimatedImpact = { visibility: 14, conversion: 11, seo: 19, disclaimer: "Directional estimate based on profile completeness and keyword coverage; not a guarantee." };
-      const { data, error } = await db.from("ai_profile_optimization_runs").insert({
+      const { data: rows } = await db.from("keyword_trends").select("keyword").ilike("city", profile.city ?? "").ilike("state", profile.state ?? "").order("score", { ascending: false }).limit(12);
+      const generated = await generateOptimization(profile, (rows ?? []).map((row: { keyword: string }) => row.keyword));
+      const before = { headline: profile.headline, tagline: profile.tagline, bio: profile.bio, seo_title: profile.seo_title, seo_description: profile.seo_description, seo_keywords: profile.seo_keywords };
+      const { data, error } = await db.from(AI_TABLES.optimizationRuns).insert({
         profile_id: profile.id,
         status: "preview",
-        before_state: beforeState,
-        after_state: optimization.after,
-        estimated_impact: estimatedImpact,
-        provider: optimization.provider,
-        model: optimization.model,
+        before_state: before,
+        after_state: generated.after,
+        estimated_impact: { visibility: 14, conversion: 11, seo: 19, disclaimer: "Directional estimate; not a guarantee." },
+        provider: generated.provider,
+        model: generated.model,
       }).select("id,status,before_state,after_state,estimated_impact,provider,model,created_at").single();
       if (error) throw new RouteError(500, error.message);
-      return json({ ok: true, optimization: { ...data, rationale: optimization.rationale } });
+      return json({ ok: true, optimization: { ...data, rationale: generated.rationale } });
     }
 
     if (parsed.action === "apply-optimization") {
-      const { data: run, error } = await db.from("ai_profile_optimization_runs").select("id,status,after_state").eq("id", parsed.runId).eq("profile_id", profile.id).maybeSingle();
+      const { data: run, error } = await db.from(AI_TABLES.optimizationRuns).select("id,status,after_state").eq("id", parsed.runId).eq("profile_id", profile.id).maybeSingle();
       if (error) throw new RouteError(500, error.message);
       if (!run) throw new RouteError(404, "Optimization preview not found.");
-      if (run.status !== "preview") throw new RouteError(409, "This optimization is no longer available to apply.");
+      if (run.status !== "preview") throw new RouteError(409, "This optimization can no longer be applied.");
       const after = (run.after_state ?? {}) as Record<string, unknown>;
-      const updates = Object.fromEntries(parsed.fields.filter((field) => Object.prototype.hasOwnProperty.call(after, field)).map((field) => [field, after[field]]));
-      if (!Object.keys(updates).length) throw new RouteError(400, "No valid optimization fields were selected.");
+      const updates = Object.fromEntries(parsed.fields.filter((field) => Object.hasOwn(after, field)).map((field) => [field, after[field]]));
+      if (!Object.keys(updates).length) throw new RouteError(400, "No valid fields were selected.");
       await updateProfileByUserId(session.userId, updates as never);
-      const { error: updateError } = await db.from("ai_profile_optimization_runs").update({ status: "applied", applied_fields: Object.keys(updates), applied_at: new Date().toISOString() }).eq("id", run.id).eq("profile_id", profile.id);
+      const { error: updateError } = await db.from(AI_TABLES.optimizationRuns).update({ status: "applied", applied_fields: Object.keys(updates), applied_at: new Date().toISOString() }).eq("id", run.id).eq("profile_id", profile.id);
       if (updateError) throw new RouteError(500, updateError.message);
       return json({ ok: true, appliedFields: Object.keys(updates) });
     }
 
     if (parsed.action === "analyze-photos") {
-      const { data: photoRows, error } = await db.from("profile_photos").select("id,url,storage_path,is_primary,moderation_status,sort_order").eq("profile_id", profile.id).order("sort_order", { ascending: true }).limit(12);
+      const { data: rows, error } = await db.from("profile_photos").select("id,url,storage_path,is_primary,moderation_status,sort_order").eq("profile_id", profile.id).order("sort_order", { ascending: true }).limit(12);
       if (error) throw new RouteError(500, error.message);
-      const photos = (photoRows ?? []) as CoachPhoto[];
-      const scores = await Promise.all(photos.map((photo, index) => analyzePhoto(photo, index)));
+      const scores = await Promise.all(((rows ?? []) as CoachPhoto[]).map(analyzePhoto));
       if (scores.length) {
-        const { error: scoreError } = await db.from("ai_profile_photo_scores").upsert(scores.map((score) => ({ ...score, profile_id: profile.id, strengths: score.strengths, improvements: score.improvements, analyzed_at: new Date().toISOString(), updated_at: new Date().toISOString() })), { onConflict: "profile_id,photo_id" });
+        const { error: scoreError } = await db.from(AI_TABLES.photoScores).upsert(scores.map((score) => ({ ...score, profile_id: profile.id, analyzed_at: new Date().toISOString(), updated_at: new Date().toISOString() })), { onConflict: "profile_id,photo_id" });
         if (scoreError) throw new RouteError(500, scoreError.message);
       }
-      await recordAnalysis(db, profile.id, "photo", { count: scores.length, average: scores.length ? Math.round(scores.reduce((sum, item) => sum + item.overall_score, 0) / scores.length) : 0 }, scores.some((item) => item.provider === "openai") ? "openai" : "deterministic", scores.some((item) => item.model) ? scores.find((item) => item.model)?.model : "photo-metadata-v1");
+      await audit(db, profile.id, "photo", { count: scores.length }, scores.some((item) => item.provider === "openai") ? "openai" : "deterministic", scores.find((item) => item.model)?.model ?? "photo-metadata-v1");
       return json({ ok: true, photoScores: scores });
     }
 
     if (parsed.action === "generate-report") {
-      const bundle = await loadCoachBundle(db, profile);
-      const dates = reportDates(parsed.period);
-      const coachResult = await askProfileCoach(profile, bundle.analysis, `Create a concise ${parsed.period} executive profile performance report. Summarize score movement, visibility, contacts, ranking, market context, and the three best next actions. Clearly label forecasts as estimates.`);
-      const narrative = coachResult?.text ?? `Your profile score is ${bundle.analysis.scores.overall}. Focus first on ${bundle.analysis.recommendations.slice(0, 3).map((item) => item.title.toLowerCase()).join(", ")}. Predicted contacts are estimates based on recent activity.`;
+      const bundle = await loadBundle(db, profile);
+      const dates = periodDates(parsed.period);
+      const generated = await askProfileCoach(profile, bundle.analysis, `Create a concise ${parsed.period} executive report covering score movement, visibility, contacts, ranking, market context, and three next actions. Label forecasts as estimates.`);
+      const narrative = generated?.text ?? `Your profile score is ${bundle.analysis.scores.overall}. Focus on ${bundle.analysis.recommendations.slice(0, 3).map((item) => item.title.toLowerCase()).join(", ")}. Forecasts are estimates.`;
       const summary = { scores: bundle.analysis.scores, metrics: bundle.analysis.metrics, ranking: bundle.analysis.ranking, forecast: bundle.analysis.forecast, benchmark: bundle.analysis.benchmark, recommendations: bundle.analysis.recommendations.slice(0, 3) };
-      const { data, error } = await db.from("ai_profile_reports").upsert({
-        profile_id: profile.id,
-        period_type: parsed.period,
-        period_start: dates.start,
-        period_end: dates.end,
-        summary,
-        narrative,
-        provider: coachResult?.provider ?? "deterministic",
-        model: coachResult?.model ?? "profile-coach-fallback",
-        generated_at: new Date().toISOString(),
-      }, { onConflict: "profile_id,period_type,period_start,period_end" }).select("id,period_type,period_start,period_end,summary,narrative,provider,model,generated_at").single();
+      const { data, error } = await db.from(AI_TABLES.reports).upsert({ profile_id: profile.id, period_type: parsed.period, period_start: dates.start, period_end: dates.end, summary, narrative, provider: generated?.provider ?? "deterministic", model: generated?.model ?? "profile-coach-fallback", generated_at: new Date().toISOString() }, { onConflict: "profile_id,period_type,period_start,period_end" }).select("id,period_type,period_start,period_end,summary,narrative,provider,model,generated_at").single();
       if (error) throw new RouteError(500, error.message);
       return json({ ok: true, report: data });
     }
 
-    const bundle = await loadCoachBundle(db, profile);
-    const result = await askProfileCoach(profile, bundle.analysis, parsed.message);
-    const answer = result?.text ?? `Your strongest next action is “${bundle.analysis.recommendations[0]?.title ?? "keep your profile current"}.” ${bundle.analysis.recommendations[0]?.action ?? "Review your profile details and availability."}`;
-    await recordAnalysis(db, profile.id, "profile", { question: parsed.message, answer }, result?.provider ?? "deterministic", result?.model ?? "profile-coach-fallback");
-    return json({ ok: true, answer, provider: result?.provider ?? "deterministic", model: result?.model ?? "profile-coach-fallback" });
+    const bundle = await loadBundle(db, profile);
+    const generated = await askProfileCoach(profile, bundle.analysis, parsed.message);
+    const answer = generated?.text ?? `Your strongest next action is “${bundle.analysis.recommendations[0]?.title ?? "keep your profile current"}.” ${bundle.analysis.recommendations[0]?.action ?? "Review your profile details."}`;
+    await audit(db, profile.id, "profile", { question: parsed.message, answer }, generated?.provider ?? "deterministic", generated?.model ?? "profile-coach-fallback");
+    return json({ ok: true, answer, provider: generated?.provider ?? "deterministic", model: generated?.model ?? "profile-coach-fallback" });
   } catch (error) {
     return errorResponse(error);
   }
