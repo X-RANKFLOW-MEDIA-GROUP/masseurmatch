@@ -14,7 +14,7 @@ export default function SubscriptionCancelledEmail({
   therapistName = "Alex",
   planName = "Elite PRO",
   endDate = "November 15, 2026",
-  reactivateUrl = "https://masseurmatch.com/pro/billing"
+  reactivateUrl = "https://www.masseurmatch.com/pro/billing"
 }: SubscriptionCancelledEmailProps) {
   return (
     <BaseLayout previewText="Your subscription has been cancelled">

@@ -60,7 +60,7 @@ export async function POST(
           to: profile.email_address,
           subject: "Your photo has been approved on MasseurMatch",
           react: React.createElement(PhotoApprovedEmail, {
-            dashboardUrl: "https://masseurmatch.com/pro/dashboard",
+            dashboardUrl: "https://www.masseurmatch.com/pro/dashboard",
           }),
         }).catch((err) => {
           console.error("[api/admin/photo/approve] Email send failed:", err);

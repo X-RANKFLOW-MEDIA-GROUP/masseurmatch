@@ -9,11 +9,11 @@ export const metadata: Metadata = {
   title: "Identity Verification | MasseurMatch",
   description:
     "How MasseurMatch verifies the identity of massage therapists using Stripe Identity. What the verified badge means — and what it does not mean.",
-  alternates: { canonical: "https://masseurmatch.com/verification" },
+  alternates: { canonical: "https://www.masseurmatch.com/verification" },
   openGraph: {
     title: "Identity Verification | MasseurMatch",
     description: "What the Verified badge on MasseurMatch profiles means — and what it does not mean.",
-    url: "https://masseurmatch.com/verification",
+    url: "https://www.masseurmatch.com/verification",
     siteName: "MasseurMatch",
     type: "website",
   },
@@ -24,12 +24,12 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
   name: "Identity Verification – MasseurMatch",
-  url: "https://masseurmatch.com/verification",
+  url: "https://www.masseurmatch.com/verification",
   description: "Explains the Stripe Identity verification process used by MasseurMatch to verify therapist identities.",
   publisher: {
     "@type": "Organization",
     name: "MasseurMatch",
-    url: "https://masseurmatch.com",
+    url: "https://www.masseurmatch.com",
   },
 };
 

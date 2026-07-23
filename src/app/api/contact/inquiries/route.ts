@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server';
 import { requireRequestSession } from '@/app/_lib/session';
@@ -185,7 +185,7 @@ export async function POST(request: NextRequest) {
     if (therapistEmail && resendApiKey) {
       try {
         const resend = new Resend(resendApiKey);
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://masseurmatch.com';
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.masseurmatch.com';
         const therapistName = escapeHtml(profile.display_name || profile.full_name || 'Therapist');
         const safeClientName = escapeHtml(clientName);
         const safeClientEmail = escapeHtml(clientEmail);

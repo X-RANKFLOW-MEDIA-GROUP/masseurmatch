@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to save profile." }, { status: 500 });
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://masseurmatch.com";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://www.masseurmatch.com";
     // Notify admin but don't block on failure (email system is separate from profile submission)
     notifyAdmin({
       subject: "New provider profile submitted for review",

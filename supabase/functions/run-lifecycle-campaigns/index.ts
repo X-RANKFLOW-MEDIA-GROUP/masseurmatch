@@ -30,7 +30,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const SITE_URL = Deno.env.get("SITE_URL") ?? "https://masseurmatch.com";
+const SITE_URL = Deno.env.get("SITE_URL") ?? "https://www.masseurmatch.com";
 
 function logStep(step: string, details?: Record<string, unknown>) {
   console.log(`[LIFECYCLE-CAMPAIGNS] ${step}${details ? ` ${JSON.stringify(details)}` : ""}`);

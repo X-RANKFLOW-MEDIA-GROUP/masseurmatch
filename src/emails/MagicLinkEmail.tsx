@@ -7,7 +7,7 @@ interface MagicLinkEmailProps {
   loginUrl: string;
 }
 
-export default function MagicLinkEmail({ loginUrl = "https://masseurmatch.com/auth/callback" }: MagicLinkEmailProps) {
+export default function MagicLinkEmail({ loginUrl = "https://www.masseurmatch.com/auth/callback" }: MagicLinkEmailProps) {
   return (
     <BaseLayout previewText="Your secure access link to MasseurMatch">
       <Text className="text-slate-900 text-xl font-medium mb-4">

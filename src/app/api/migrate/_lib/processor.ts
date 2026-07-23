@@ -29,7 +29,7 @@ async function fetchHtml(url: string): Promise<string | null> {
       signal: controller.signal,
       headers: {
         "User-Agent":
-          "Mozilla/5.0 (compatible; MasseurMatchImporter/1.0; +https://masseurmatch.com)",
+          "Mozilla/5.0 (compatible; MasseurMatchImporter/1.0; +https://www.masseurmatch.com)",
         Accept: "text/html,application/xhtml+xml",
       },
     });

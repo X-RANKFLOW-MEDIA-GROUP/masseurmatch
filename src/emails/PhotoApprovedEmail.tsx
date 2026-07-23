@@ -7,12 +7,12 @@ interface PhotoApprovedEmailProps {
   dashboardUrl?: string;
 }
 
-const SITE_URL = 'https://masseurmatch.com';
+const SITE_URL = 'https://www.masseurmatch.com';
 const DASHBOARD_PATH = '/pro/dashboard';
 
 function safeUrl(value: string | undefined, fallbackPath: string) {
   if (!value) return `${SITE_URL}${fallbackPath}`;
-  if (value.startsWith('https://masseurmatch.com/')) return value;
+  if (value.startsWith('https://www.masseurmatch.com/')) return value;
   if (value.startsWith('/')) return `${SITE_URL}${value}`;
   return `${SITE_URL}${fallbackPath}`;
 }

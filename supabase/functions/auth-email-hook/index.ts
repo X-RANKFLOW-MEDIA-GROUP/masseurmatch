@@ -8,7 +8,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const SITE_URL = Deno.env.get("SITE_URL") ?? "https://masseurmatch.com";
+const SITE_URL = Deno.env.get("SITE_URL") ?? "https://www.masseurmatch.com";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const FROM_ADDRESS = "MasseurMatch <noreply@masseurmatch.com>";
 

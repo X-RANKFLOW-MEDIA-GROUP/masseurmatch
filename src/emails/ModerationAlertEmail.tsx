@@ -10,7 +10,7 @@ interface ModerationAlertEmailProps {
 
 export default function ModerationAlertEmail({
   reason = "Suggestive or unprofessional language detected.",
-  editUrl = "https://masseurmatch.com/pro/listing"
+  editUrl = "https://www.masseurmatch.com/pro/listing"
 }: ModerationAlertEmailProps) {
   return (
     <BaseLayout previewText="Action Required: Profile update on hold">

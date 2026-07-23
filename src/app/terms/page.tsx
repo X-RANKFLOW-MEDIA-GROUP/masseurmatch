@@ -1,15 +1,15 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Terms of Service | MasseurMatch",
   description:
     "MasseurMatch terms of service: rules for clients and therapists using the directory platform operated by XRankFlow Media Group LLC.",
-  alternates: { canonical: "https://masseurmatch.com/terms" },
+  alternates: { canonical: "https://www.masseurmatch.com/terms" },
   openGraph: {
     title: "Terms of Service | MasseurMatch",
     description: "Rules for clients and therapists using the MasseurMatch directory platform.",
-    url: "https://masseurmatch.com/terms",
+    url: "https://www.masseurmatch.com/terms",
     siteName: "MasseurMatch",
     type: "website",
   },
@@ -20,11 +20,11 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
   name: "Terms of Service – MasseurMatch",
-  url: "https://masseurmatch.com/terms",
+  url: "https://www.masseurmatch.com/terms",
   publisher: {
     "@type": "Organization",
     name: "MasseurMatch",
-    url: "https://masseurmatch.com",
+    url: "https://www.masseurmatch.com",
   },
 };
 

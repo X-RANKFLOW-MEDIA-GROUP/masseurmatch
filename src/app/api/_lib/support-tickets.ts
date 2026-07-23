@@ -104,7 +104,7 @@ export async function resolveRequesterInfo(userId: string): Promise<RequesterInf
 
 export function ticketAppUrl(path: string): string {
   const base =
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://masseurmatch.com";
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://www.masseurmatch.com";
   return `${base}${path}`;
 }
 

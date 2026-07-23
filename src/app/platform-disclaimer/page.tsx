@@ -66,7 +66,7 @@ const platformDisclaimerJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
   name: "Platform Disclaimer",
-  url: "https://masseurmatch.com/platform-disclaimer",
+  url: "https://www.masseurmatch.com/platform-disclaimer",
   description:
     "MasseurMatch platform disclaimer covering the independent-provider model, listing responsibility, and direct-contact terms.",
 };

@@ -237,7 +237,7 @@ export async function POST(request: Request) {
           to: emailAddress,
           subject: "Your MasseurMatch Profile is Approved!",
           react: React.createElement(ProfileApprovedEmail, {
-            profileUrl: `https://masseurmatch.com/therapists/${slug || profile.id}`,
+            profileUrl: `https://www.masseurmatch.com/therapists/${slug || profile.id}`,
           }),
         }).catch((err) => {
           console.error("[api/pro/profile] Approval email failed:", err);

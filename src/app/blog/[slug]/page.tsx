@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import { notFound } from "next/navigation";
@@ -37,7 +37,7 @@ export async function generateMetadata({
     openGraph: {
       title: post.title,
       description: post.excerpt,
-      url: `https://masseurmatch.com/blog/${post.slug}`,
+      url: `https://www.masseurmatch.com/blog/${post.slug}`,
       siteName: "MasseurMatch",
       type: "article",
       publishedTime: post.publishedAt,
@@ -50,7 +50,7 @@ export async function generateMetadata({
       title: post.title,
       description: post.excerpt,
     },
-    alternates: { canonical: `https://masseurmatch.com/blog/${post.slug}` },
+    alternates: { canonical: `https://www.masseurmatch.com/blog/${post.slug}` },
   };
 }
 
@@ -60,26 +60,26 @@ function articleSchema(post: BlogPost) {
     "@type": "Article",
     headline: post.title,
     description: post.excerpt,
-    url: `https://masseurmatch.com/blog/${post.slug}`,
+    url: `https://www.masseurmatch.com/blog/${post.slug}`,
     datePublished: post.publishedAt,
     dateModified: post.updatedAt,
     author: {
       "@type": "Organization",
       name: post.author.name,
-      url: "https://masseurmatch.com",
+      url: "https://www.masseurmatch.com",
     },
     publisher: {
       "@type": "Organization",
       name: "MasseurMatch",
-      url: "https://masseurmatch.com",
+      url: "https://www.masseurmatch.com",
       logo: {
         "@type": "ImageObject",
-        url: "https://masseurmatch.com/og-default.png",
+        url: "https://www.masseurmatch.com/og-default.png",
       },
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://masseurmatch.com/blog/${post.slug}`,
+      "@id": `https://www.masseurmatch.com/blog/${post.slug}`,
     },
     keywords: post.tags.join(", "),
     articleSection: post.category,
@@ -98,13 +98,13 @@ function breadcrumbSchema(post: BlogPost) {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://masseurmatch.com" },
-      { "@type": "ListItem", position: 2, name: "Blog", item: "https://masseurmatch.com/blog" },
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.masseurmatch.com" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "https://www.masseurmatch.com/blog" },
       {
         "@type": "ListItem",
         position: 3,
         name: post.title,
-        item: `https://masseurmatch.com/blog/${post.slug}`,
+        item: `https://www.masseurmatch.com/blog/${post.slug}`,
       },
     ],
   };

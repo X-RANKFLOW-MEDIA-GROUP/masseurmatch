@@ -73,7 +73,7 @@ export async function POST(
         to: profile.email_address,
         subject: "Your MasseurMatch Profile is Approved!",
         react: React.createElement(ProfileApprovedEmail, {
-          profileUrl: `https://masseurmatch.com/therapists/${profile.slug || profile.id}`,
+          profileUrl: `https://www.masseurmatch.com/therapists/${profile.slug || profile.id}`,
         }),
       });
     }

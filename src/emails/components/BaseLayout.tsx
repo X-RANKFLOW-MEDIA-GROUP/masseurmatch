@@ -34,7 +34,7 @@ export default function BaseLayout({ previewText, children }: BaseLayoutProps) {
               <Text className="text-slate-400 text-xs leading-relaxed">
                 MasseurMatch Elite Directory <br />
                 Dallas, TX, United States <br />
-                <Link href="https://masseurmatch.com/privacy" className="text-slate-500 underline">Privacy Policy</Link> • <Link href="https://masseurmatch.com/terms" className="text-slate-500 underline">Terms of Service</Link>
+                <Link href="https://www.masseurmatch.com/privacy" className="text-slate-500 underline">Privacy Policy</Link> • <Link href="https://www.masseurmatch.com/terms" className="text-slate-500 underline">Terms of Service</Link>
               </Text>
             </Section>
 

@@ -7,7 +7,7 @@ interface ResetPasswordEmailProps {
   resetUrl: string;
 }
 
-export default function ResetPasswordEmail({ resetUrl = "https://masseurmatch.com/reset" }: ResetPasswordEmailProps) {
+export default function ResetPasswordEmail({ resetUrl = "https://www.masseurmatch.com/reset" }: ResetPasswordEmailProps) {
   return (
     <BaseLayout previewText="Instructions to reset your password">
       <Text className="text-slate-900 text-xl font-medium mb-4">

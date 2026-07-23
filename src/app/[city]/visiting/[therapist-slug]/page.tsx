@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
@@ -70,7 +70,7 @@ export async function generateMetadata({
   return {
     title: `${name} Visiting ${cityMeta.name} | MasseurMatch`,
     description: `${name} is visiting ${cityMeta.name} ${dateLabel}. Book a session with this LGBTQ+-affirming massage therapist during their travel stay.`,
-    alternates: { canonical: `https://masseurmatch.com/${city}/visiting/${slug}` },
+    alternates: { canonical: `https://www.masseurmatch.com/${city}/visiting/${slug}` },
     robots: { index: true, follow: true },
   };
 }

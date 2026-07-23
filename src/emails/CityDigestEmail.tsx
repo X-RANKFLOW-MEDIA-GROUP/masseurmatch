@@ -45,18 +45,18 @@ export default function CityDigestEmail({
   cityName = "Dallas",
   // Mock Data for perfect preview testing
   newTherapists = [
-    { name: "Julian K.", specialty: "Sports Recovery & Deep Tissue", image: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?q=80&w=200&auto=format&fit=crop", url: "https://masseurmatch.com/therapists/julian-k" },
-    { name: "Marcus V.", specialty: "Holistic Relaxation", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=200&auto=format&fit=crop", url: "https://masseurmatch.com/therapists/marcus-v" }
+    { name: "Julian K.", specialty: "Sports Recovery & Deep Tissue", image: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?q=80&w=200&auto=format&fit=crop", url: "https://www.masseurmatch.com/therapists/julian-k" },
+    { name: "Marcus V.", specialty: "Holistic Relaxation", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=200&auto=format&fit=crop", url: "https://www.masseurmatch.com/therapists/marcus-v" }
   ],
   promotions = [
-    { title: "Double Recovery Session", discount: "20% OFF", therapistName: "Julian K.", url: "https://masseurmatch.com/promotions/julian-k" }
+    { title: "Double Recovery Session", discount: "20% OFF", therapistName: "Julian K.", url: "https://www.masseurmatch.com/promotions/julian-k" }
   ],
   localEvents = [
     { day: "12", month: "OCT", title: "Oak Lawn Wellness Mixer", location: "Turtle Creek Park", url: "#" },
     { day: "15", month: "OCT", title: "LGBTQ+ Health Panel", location: "Dallas Community Center", url: "#" }
   ],
   articles = [
-    { title: "How to Choose the Right Massage Therapist", readTime: "5 min", url: "https://masseurmatch.com/blog/how-to-choose-a-massage-therapist" }
+    { title: "How to Choose the Right Massage Therapist", readTime: "5 min", url: "https://www.masseurmatch.com/blog/how-to-choose-a-massage-therapist" }
   ]
 }: CityDigestEmailProps) {
   return (
@@ -112,7 +112,7 @@ export default function CityDigestEmail({
           </Section>
         ))}
         <Section className="text-center mt-4">
-          <Button href={`https://masseurmatch.com/cities/${cityName.toLowerCase()}`} className="bg-white text-slate-900 border border-slate-300 px-6 py-2 rounded-md text-xs font-semibold tracking-wide hover:bg-slate-50">
+          <Button href={`https://www.masseurmatch.com/cities/${cityName.toLowerCase()}`} className="bg-white text-slate-900 border border-slate-300 px-6 py-2 rounded-md text-xs font-semibold tracking-wide hover:bg-slate-50">
             View all in {cityName}
           </Button>
         </Section>

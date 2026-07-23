@@ -1,11 +1,11 @@
 export const seoConfig = {
   siteName: 'MasseurMatch',
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://masseurmatch.com',
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.masseurmatch.com',
   description: 'Find verified massage therapists and wellness professionals in your area. Browse profiles, read reviews, and connect with certified therapists.',
   twitterHandle: '@masseurmatch',
   fbAppId: process.env.NEXT_PUBLIC_FB_APP_ID || '',
-  logoUrl: 'https://masseurmatch.com/logo.png',
-  socialImage: 'https://masseurmatch.com/og-image.jpg',
+  logoUrl: 'https://www.masseurmatch.com/logo.png',
+  socialImage: 'https://www.masseurmatch.com/og-image.jpg',
 };
 
 export function generateTherapistMetadata(therapist: any) {

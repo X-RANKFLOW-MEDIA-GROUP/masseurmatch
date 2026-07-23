@@ -37,7 +37,7 @@ const DEFAULT_FROM = {
   transactional: "noreply@mail.masseurmatch.com",
 };
 
-const SITE_URL = Deno.env.get("SITE_URL") ?? "https://masseurmatch.com";
+const SITE_URL = Deno.env.get("SITE_URL") ?? "https://www.masseurmatch.com";
 
 function logStep(step: string, details?: Record<string, unknown>) {
   console.log(`[LIFECYCLE-WORKER] ${step}${details ? ` ${JSON.stringify(details)}` : ""}`);

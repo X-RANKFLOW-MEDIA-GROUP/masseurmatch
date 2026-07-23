@@ -52,7 +52,7 @@ const communityGuidelinesJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
   name: "Community Guidelines",
-  url: "https://masseurmatch.com/community-guidelines",
+  url: "https://www.masseurmatch.com/community-guidelines",
   description:
     "Community standards for providers and clients using MasseurMatch, including inclusion requirements and prohibited conduct.",
 };

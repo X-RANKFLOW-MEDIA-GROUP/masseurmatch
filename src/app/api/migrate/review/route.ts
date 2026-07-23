@@ -156,7 +156,7 @@ export async function PUT(request: Request) {
                             <div style="color: #6F6F6F; font-size: 14px; margin-top: 5px;">Reviews Published</div>
                           </div>
                           <p>Your reviews are now searchable on MasseurMatch and will help new clients find you. Your profile is live and accepting bookings.</p>
-                          <p><a href="https://masseurmatch.com/dashboard" class="cta-button">View Your Profile</a></p>
+                          <p><a href="https://www.masseurmatch.com/dashboard" class="cta-button">View Your Profile</a></p>
                           <p>Questions? Contact concierge@masseurmatch.com</p>
                           <p><strong>The MasseurMatch Team</strong></p>
                         </div>

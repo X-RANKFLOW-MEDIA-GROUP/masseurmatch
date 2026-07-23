@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const CANONICAL_SITEMAP_URL = "https://masseurmatch.com/sitemap.xml";
+const CANONICAL_SITEMAP_URL = "https://www.masseurmatch.com/sitemap.xml";
 
 /**
  * Legacy Supabase sitemap endpoint.

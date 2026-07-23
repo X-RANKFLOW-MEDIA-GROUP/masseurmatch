@@ -14,7 +14,7 @@ export default function SubscriptionSuccessEmail({
   therapistName = "Alex", 
   planName = "Elite PRO", 
   amount = "$99.00",
-  dashboardLink = "https://masseurmatch.com/pro/dashboard" 
+  dashboardLink = "https://www.masseurmatch.com/pro/dashboard" 
 }: SubscriptionEmailProps) {
   return (
     <BaseLayout previewText={`Your ${planName} subscription is active`}>

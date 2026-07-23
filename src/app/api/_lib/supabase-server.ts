@@ -350,7 +350,7 @@ export async function ensureUserProfileAndRole(
   // brand-new signup (email/password, social login, or admin-created) surfaces
   // in the admin inbox. Best-effort — never blocks account creation.
   if (profileCreated) {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://masseurmatch.com";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://www.masseurmatch.com";
     await notifyAdmin({
       subject: `New ${role} account: ${fullName}`,
       heading: "New account created",

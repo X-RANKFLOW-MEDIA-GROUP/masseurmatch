@@ -12,7 +12,7 @@ interface NewClientMessageEmailProps {
 export default function NewClientMessageEmail({
   therapistName = "Alex",
   clientCity = "Dallas",
-  inboxUrl = "https://masseurmatch.com/pro/messages"
+  inboxUrl = "https://www.masseurmatch.com/pro/messages"
 }: NewClientMessageEmailProps) {
   return (
     <BaseLayout previewText={`New massage request in ${clientCity}`}>

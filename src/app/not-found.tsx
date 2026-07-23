@@ -27,7 +27,7 @@ export default function NotFoundPage() {
           isPartOf: {
             "@type": "WebSite",
             name: "MasseurMatch",
-            url: "https://masseurmatch.com",
+            url: "https://www.masseurmatch.com",
           },
         }}
       />

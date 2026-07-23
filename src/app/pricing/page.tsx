@@ -18,18 +18,18 @@ export const metadata: Metadata = {
     title: "MasseurMatch Pricing for Massage Therapists",
     description:
       "Base listing plans plus market-aligned add-ons for visibility, trust, geo discovery, and premium exposure.",
-    url: "https://masseurmatch.com/pricing",
+    url: "https://www.masseurmatch.com/pricing",
     siteName: "MasseurMatch",
     type: "website",
   },
-  alternates: { canonical: "https://masseurmatch.com/pricing" },
+  alternates: { canonical: "https://www.masseurmatch.com/pricing" },
 };
 
 const pricingSchema = {
   "@context": "https://schema.org",
   "@type": "WebPage",
   name: "MasseurMatch Pricing",
-  url: "https://masseurmatch.com/pricing",
+  url: "https://www.masseurmatch.com/pricing",
   mainEntity: SIGNUP_PLANS.map((plan) => ({
     "@type": "Offer",
     name: `${plan.name} Listing`,

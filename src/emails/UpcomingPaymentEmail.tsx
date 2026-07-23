@@ -16,7 +16,7 @@ export default function UpcomingPaymentEmail({
   planName = "Elite PRO",
   amount = "$99.00",
   renewalDate = "October 15, 2026",
-  billingUrl = "https://masseurmatch.com/pro/billing"
+  billingUrl = "https://www.masseurmatch.com/pro/billing"
 }: UpcomingPaymentEmailProps) {
   return (
     <BaseLayout previewText={`Reminder: Your subscription renews on ${renewalDate}`}>

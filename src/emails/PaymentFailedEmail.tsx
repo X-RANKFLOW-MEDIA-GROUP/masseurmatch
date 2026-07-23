@@ -7,7 +7,7 @@ interface PaymentFailedEmailProps {
   billingUrl: string;
 }
 
-export default function PaymentFailedEmail({ billingUrl = "https://masseurmatch.com/pro/billing" }: PaymentFailedEmailProps) {
+export default function PaymentFailedEmail({ billingUrl = "https://www.masseurmatch.com/pro/billing" }: PaymentFailedEmailProps) {
   return (
     <BaseLayout previewText="Action Required: Update your payment method">
       <Text className="text-amber-600 text-xl font-medium mb-4">

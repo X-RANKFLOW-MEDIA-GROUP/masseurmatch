@@ -1,15 +1,15 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | MasseurMatch",
   description:
     "MasseurMatch's privacy policy: how we collect, use, and protect your personal information. We never sell your data. CCPA and GDPR rights included.",
-  alternates: { canonical: "https://masseurmatch.com/privacy" },
+  alternates: { canonical: "https://www.masseurmatch.com/privacy" },
   openGraph: {
     title: "Privacy Policy | MasseurMatch",
     description: "How MasseurMatch collects, uses, and protects your data. We never sell your information.",
-    url: "https://masseurmatch.com/privacy",
+    url: "https://www.masseurmatch.com/privacy",
     siteName: "MasseurMatch",
     type: "website",
   },
@@ -20,12 +20,12 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
   name: "Privacy Policy - MasseurMatch",
-  url: "https://masseurmatch.com/privacy",
+  url: "https://www.masseurmatch.com/privacy",
   description: "MasseurMatch privacy policy: data collection, use, and your rights.",
   publisher: {
     "@type": "Organization",
     name: "MasseurMatch",
-    url: "https://masseurmatch.com",
+    url: "https://www.masseurmatch.com",
   },
 };
 

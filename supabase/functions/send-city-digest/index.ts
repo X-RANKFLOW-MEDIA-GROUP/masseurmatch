@@ -57,8 +57,8 @@ serve(async (_req) => {
           therapistList
             ? `<h2>New Additions</h2><pre>${therapistList}</pre>`
             : "",
-          `<p><a href="https://masseurmatch.com/cities/${encodeURIComponent(city.toLowerCase())}">View all in ${city} &rarr;</a></p>`,
-          `<hr/><p style="font-size:12px;color:#888;">You received this because you subscribed to the ${city} City Digest. <a href="https://masseurmatch.com/unsubscribe">Unsubscribe</a></p>`,
+          `<p><a href="https://www.masseurmatch.com/cities/${encodeURIComponent(city.toLowerCase())}">View all in ${city} &rarr;</a></p>`,
+          `<hr/><p style="font-size:12px;color:#888;">You received this because you subscribed to the ${city} City Digest. <a href="https://www.masseurmatch.com/unsubscribe">Unsubscribe</a></p>`,
         ].join(""),
       }));
 

@@ -26,6 +26,11 @@ type ChangeFrequency = NonNullable<SitemapEntry["changeFrequency"]>;
 // This keeps empty markets out while allowing launch inventory to be discovered.
 export const SEO_CITY_MIN_PUBLIC_PROFILES = 1;
 
+// Long-tail city/service/area routes remain routable, but only city roots
+// enter the sitemap until route-specific inventory can prove each page
+// indexable. This prevents sitemap URLs from contradicting page noindex.
+const INCLUDE_LOCAL_LONG_TAIL_PATHS = false;
+
 const PROFILE_LOOKUP_CHUNK_SIZE = 100;
 const INVENTORY_DEPENDENT_HUB_PATHS = new Set(["/cities", "/explore", "/near-me"]);
 const INTENTIONALLY_NOINDEX_PATHS = new Set(["/therapist-agreement"]);
@@ -174,7 +179,7 @@ function buildEligibleLocalEntries(inventory: Map<string, number>) {
   const neighborhoods: MetadataRoute.Sitemap = getLaunchAreaPaths()
     .filter((path) => {
       const citySlug = citySlugFromPath(path);
-      return Boolean(citySlug && eligibleCitySlugs.has(citySlug) && isLaunchUrl(path));
+      return Boolean(INCLUDE_LOCAL_LONG_TAIL_PATHS && citySlug && eligibleCitySlugs.has(citySlug) && isLaunchUrl(path));
     })
     .map((path) => buildEntry(path, "weekly", 0.6));
 

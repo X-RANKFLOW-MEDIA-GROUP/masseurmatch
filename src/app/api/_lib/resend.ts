@@ -20,7 +20,7 @@ export async function sendWelcomeEmail(email: string, name: string, token: strin
     react: WelcomeEmail({
       name,
       isTherapist: true,
-      onboardingLink: `https://masseurmatch.com/verify?token=${token}`,
+      onboardingLink: `https://www.masseurmatch.com/verify?token=${token}`,
     }),
   });
 }
