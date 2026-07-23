@@ -8,12 +8,17 @@ FOR INSERT WITH CHECK (
 );
 
 -- 2. newsletter_subscribers: restrict INSERT with email validation
-DROP POLICY IF EXISTS "newsletter_insert_anon" ON public.newsletter_subscribers;
-CREATE POLICY "newsletter_insert_anon" ON public.newsletter_subscribers
-FOR INSERT WITH CHECK (
-  email IS NOT NULL
-  AND email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
-);
+-- (production-only table; guard so its absence on a fresh/branch DB is skipped)
+DO $$ BEGIN
+  DROP POLICY IF EXISTS "newsletter_insert_anon" ON public.newsletter_subscribers;
+  CREATE POLICY "newsletter_insert_anon" ON public.newsletter_subscribers
+  FOR INSERT WITH CHECK (
+    email IS NOT NULL
+    AND email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+  );
+EXCEPTION WHEN undefined_table OR undefined_column OR undefined_object THEN
+  RAISE NOTICE 'fix_rls_security_and_storage: skipped newsletter_subscribers policy (absent on this DB): %', SQLERRM;
+END $$;
 
 -- 3. support_tickets: restrict ALL to service_role only
 DROP POLICY IF EXISTS "service_role_tickets_all" ON public.support_tickets;
