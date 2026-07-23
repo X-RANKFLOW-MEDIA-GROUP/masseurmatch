@@ -1,0 +1,86 @@
+name: Temporary SEO Normalize
+
+on:
+  push:
+    branches:
+      - fix/prelaunch-blockers-20260722
+    paths:
+      - ".github/workflows/temporary-seo-normalize.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/prelaunch-blockers-20260722
+          fetch-depth: 0
+
+      - name: Normalize production origin and sitemap eligibility
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          roots = [Path("src"), Path("supabase/functions")]
+          old = "https://masseurmatch.com"
+          new = "https://www.masseurmatch.com"
+
+          for root in roots:
+              if not root.exists():
+                  continue
+              for path in root.rglob("*"):
+                  if not path.is_file() or path.suffix not in {".ts", ".tsx", ".js", ".mjs"}:
+                      continue
+                  text = path.read_text(encoding="utf-8-sig")
+                  updated = text.replace(old, new)
+                  if updated != text:
+                      path.write_text(updated, encoding="utf-8")
+
+          sitemap = Path("src/app/_lib/sitemap-release.ts")
+          text = sitemap.read_text(encoding="utf-8")
+          marker = "export const SEO_CITY_MIN_PUBLIC_PROFILES = 1;\n"
+          flag = (
+              marker
+              + "\n"
+              + "// Long-tail city/service/area routes remain routable, but only city roots\n"
+              + "// enter the sitemap until route-specific inventory can prove each page\n"
+              + "// indexable. This prevents sitemap URLs from contradicting page noindex.\n"
+              + "const INCLUDE_LOCAL_LONG_TAIL_PATHS = false;\n"
+          )
+          if "const INCLUDE_LOCAL_LONG_TAIL_PATHS" not in text:
+              if marker not in text:
+                  raise SystemExit("SEO city threshold marker not found")
+              text = text.replace(marker, flag, 1)
+
+          service_old = """      citySlug &&
+          eligibleCitySlugs.has(citySlug) &&
+          isLaunchUrl(path) &&
+          (launchSegmentPaths.has(path) || launchKeywordPaths.has(path)),"""
+          service_new = """      INCLUDE_LOCAL_LONG_TAIL_PATHS &&
+          citySlug &&
+          eligibleCitySlugs.has(citySlug) &&
+          isLaunchUrl(path) &&
+          (launchSegmentPaths.has(path) || launchKeywordPaths.has(path)),"""
+          if service_old in text:
+              text = text.replace(service_old, service_new, 1)
+
+          area_old = "return Boolean(citySlug && eligibleCitySlugs.has(citySlug) && isLaunchUrl(path));"
+          area_new = "return Boolean(INCLUDE_LOCAL_LONG_TAIL_PATHS && citySlug && eligibleCitySlugs.has(citySlug) && isLaunchUrl(path));"
+          if area_old in text:
+              text = text.replace(area_old, area_new, 1)
+
+          sitemap.write_text(text, encoding="utf-8")
+          PY
+
+          rm .github/workflows/temporary-seo-normalize.yml
+
+      - name: Commit normalized SEO sources
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src supabase/functions .github/workflows/temporary-seo-normalize.yml
+          git commit -m "fix(seo): normalize canonical origin and sitemap eligibility"
+          git push origin HEAD:fix/prelaunch-blockers-20260722
