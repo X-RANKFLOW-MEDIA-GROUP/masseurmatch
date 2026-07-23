@@ -22,7 +22,9 @@ import { siteUrl } from "@/lib/site";
 type SitemapEntry = MetadataRoute.Sitemap[number];
 type ChangeFrequency = NonNullable<SitemapEntry["changeFrequency"]>;
 
-export const SEO_CITY_MIN_PUBLIC_PROFILES = 3;
+// City pages become indexable as soon as they have one real public profile.
+// This keeps empty markets out while allowing launch inventory to be discovered.
+export const SEO_CITY_MIN_PUBLIC_PROFILES = 1;
 
 const PROFILE_LOOKUP_CHUNK_SIZE = 100;
 const INVENTORY_DEPENDENT_HUB_PATHS = new Set(["/cities", "/explore", "/near-me"]);
