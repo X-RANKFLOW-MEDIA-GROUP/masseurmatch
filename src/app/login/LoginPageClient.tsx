@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { Suspense, useEffect, type MouseEvent } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthForms } from "@/app/_components/auth-forms";
 import { useAuth } from "@/contexts/AuthContext";
@@ -39,30 +39,8 @@ function LoginPageContent() {
     router.replace(redirectTo);
   }, [loading, redirectTo, router, user]);
 
-  const startOAuth = (event: MouseEvent<HTMLDivElement>) => {
-    const target = event.target as HTMLElement;
-    const button = target.closest("button");
-    const label = button?.textContent ?? "";
-    const provider = label.includes("Google") ? "google" : label.includes("Apple") ? "apple" : null;
-
-    if (!provider) {
-      return;
-    }
-
-    // Capture the social-button click before the legacy browser OAuth handler.
-    // The server route owns PKCE cookie creation, redirects preview/apex hosts to
-    // the canonical www host, and guarantees the callback consumes the verifier
-    // from the same cookie jar.
-    event.preventDefault();
-    event.stopPropagation();
-    const startUrl = new URL("/auth/oauth", window.location.origin);
-    startUrl.searchParams.set("provider", provider);
-    startUrl.searchParams.set("next", redirectTo);
-    window.location.assign(startUrl.toString());
-  };
-
   return (
-    <div className="relative isolate overflow-hidden px-4 py-10 sm:py-14" onClickCapture={startOAuth}>
+    <div className="relative isolate overflow-hidden px-4 py-10 sm:py-14">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(139,30,45,0.14),transparent_40%),radial-gradient(circle_at_82%_18%,rgba(139,30,45,0.10),transparent_34%)]" />
       <div className="pointer-events-none absolute -top-16 left-1/2 -z-10 h-56 w-56 -translate-x-1/2 rounded-full bg-red-300/20 blur-3xl" />
 
