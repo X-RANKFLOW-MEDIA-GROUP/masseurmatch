@@ -18,29 +18,25 @@ jobs:
       KNOTTY_LEARNING_ENABLED: "false"
       KNOTTY_DEBUG_RANKING: "false"
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
+      - name: Checkout exact event revision
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ github.head_ref || github.ref }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 1
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@v4
         with:
           version: 10.32.1
       - name: Install Node.js 24
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: git diff --exit-code package.json pnpm-lock.yaml
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm test
-      - run: pnpm validate:sitemap
-      - run: pnpm validate:db-contract
-      - run: pnpm release:audit
-      - run: pnpm release:check
-      - run: pnpm build
+      - name: Install dependencies from lockfile
+        run: pnpm install --frozen-lockfile
+      - name: Verify dependency manifests are unchanged
+        run: git diff --exit-code package.json pnpm-lock.yaml
+      - name: Run complete release validation
+        run: pnpm release:check
