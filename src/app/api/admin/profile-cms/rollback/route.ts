@@ -4,6 +4,8 @@ import {
   requireAdminSession,
   recordAuditLog,
 } from "@/app/api/_lib/supabase-server";
+import { getFieldByKey } from "@/lib/profile-fields-config";
+import type { Database } from "@/integrations/supabase/types";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +19,8 @@ type AuditDetails = {
   old_value?: unknown;
   new_value?: unknown;
 };
+
+type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 
 export async function POST(request: Request) {
   try {
@@ -43,16 +47,18 @@ export async function POST(request: Request) {
         : {};
     const fieldName = typeof details.field_name === "string" ? details.field_name : null;
 
-    if (!fieldName) {
-      return Response.json({ error: "Audit log entry has no field name" }, { status: 400 });
+    if (!fieldName || !getFieldByKey(fieldName)) {
+      return Response.json({ error: "Audit log entry has an invalid field name" }, { status: 400 });
     }
+
+    const updatePayload = {
+      [fieldName]: details.old_value ?? null,
+      updated_at: new Date().toISOString(),
+    } as ProfileUpdate;
 
     const { error: updateError } = await supabase
       .from("profiles")
-      .update({
-        [fieldName]: details.old_value ?? null,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updatePayload)
       .eq("id", profile_id);
 
     if (updateError) {
