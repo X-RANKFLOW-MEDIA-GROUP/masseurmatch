@@ -23,10 +23,15 @@ DROP POLICY IF EXISTS user_notification_prefs_own ON public.user_notification_pr
 CREATE POLICY user_notification_prefs_own ON public.user_notification_preferences
   USING ((select auth.uid()) = user_id);
 
--- provider_travel
-DROP POLICY IF EXISTS provider_travel_own ON public.provider_travel;
-CREATE POLICY provider_travel_own ON public.provider_travel
-  USING ((select auth.uid()) = ( SELECT profiles.user_id FROM profiles WHERE profiles.id = provider_travel.profile_id LIMIT 1));
+-- provider_travel (production-only table; absent on a fresh/branch DB, so guard
+-- so its absence skips rather than aborts the migration chain)
+DO $$ BEGIN
+  DROP POLICY IF EXISTS provider_travel_own ON public.provider_travel;
+  CREATE POLICY provider_travel_own ON public.provider_travel
+    USING ((select auth.uid()) = ( SELECT profiles.user_id FROM profiles WHERE profiles.id = provider_travel.profile_id LIMIT 1));
+EXCEPTION WHEN undefined_table OR undefined_column OR undefined_object THEN
+  RAISE NOTICE 'fix_rls_auth_initplan: skipped provider_travel policy (absent on this DB): %', SQLERRM;
+END $$;
 
 -- contact_inquiries
 DROP POLICY IF EXISTS "providers can view own inquiries" ON public.contact_inquiries;
