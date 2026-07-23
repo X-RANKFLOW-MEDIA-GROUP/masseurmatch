@@ -6,6 +6,18 @@ import { cn } from "@/lib/utils";
 import type { FieldPreviewProps } from "@/types/profile-fields";
 import { FieldType } from "@/types/profile-fields";
 
+function displayValue(value: unknown): string {
+  if (value === null || value === undefined || value === "") return "—";
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
 export const FieldPreview = React.forwardRef<
   HTMLDivElement,
   FieldPreviewProps
@@ -15,7 +27,7 @@ export const FieldPreview = React.forwardRef<
       case FieldType.BOOLEAN:
         return (
           <div className="flex items-center gap-2">
-            {value ? (
+            {Boolean(value) ? (
               <>
                 <Check className="h-4 w-4 text-success" />
                 <span className="text-success font-medium">Yes</span>
@@ -37,10 +49,10 @@ export const FieldPreview = React.forwardRef<
           <div className="flex flex-wrap gap-2">
             {value.map((item, idx) => (
               <div
-                key={`${item}-${idx}`}
+                key={`${displayValue(item)}-${idx}`}
                 className="inline-flex items-center px-3 py-1 bg-accent/10 text-accent rounded-lg border border-accent/20 text-sm font-medium"
               >
-                {item}
+                {displayValue(item)}
               </div>
             ))}
           </div>
@@ -66,7 +78,7 @@ export const FieldPreview = React.forwardRef<
       case FieldType.INTEGER:
         return (
           <span className="font-mono text-sm font-bold text-accent">
-            {value ?? 0}
+            {typeof value === "number" ? value : Number(value) || 0}
           </span>
         );
 
@@ -74,19 +86,19 @@ export const FieldPreview = React.forwardRef<
         const option = config.options?.find((opt) => opt.value === value);
         return (
           <span className="inline-flex items-center px-3 py-1 bg-secondary/10 text-secondary rounded-lg border border-secondary/20 text-sm font-medium">
-            {option?.label || value || "—"}
+            {option?.label ?? displayValue(value)}
           </span>
         );
       }
 
       case FieldType.TEXT:
       default:
-        if (!value) {
+        if (value === null || value === undefined || value === "") {
           return <span className="text-muted-foreground italic">Empty</span>;
         }
         return (
           <p className="text-sm text-foreground whitespace-pre-wrap break-words">
-            {String(value)}
+            {displayValue(value)}
           </p>
         );
     }
