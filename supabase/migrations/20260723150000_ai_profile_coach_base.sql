@@ -77,24 +77,48 @@ alter table public.ai_profile_coach_email_preferences enable row level security;
 drop policy if exists providers_read_own_ai_coach_snapshots on public.ai_profile_coach_daily_snapshots;
 create policy providers_read_own_ai_coach_snapshots
   on public.ai_profile_coach_daily_snapshots for select to authenticated
-  using (profile_id = (select auth.uid()));
+  using (
+    exists (
+      select 1
+      from public.profiles p
+      where p.id = ai_profile_coach_daily_snapshots.profile_id
+        and p.user_id = (select auth.uid())
+    )
+  );
 
 drop policy if exists providers_manage_own_ai_coach_preferences on public.ai_profile_coach_email_preferences;
 create policy providers_manage_own_ai_coach_preferences
   on public.ai_profile_coach_email_preferences for all to authenticated
-  using (profile_id = (select auth.uid()))
-  with check (profile_id = (select auth.uid()));
+  using (
+    exists (
+      select 1
+      from public.profiles p
+      where p.id = ai_profile_coach_email_preferences.profile_id
+        and p.user_id = (select auth.uid())
+    )
+  )
+  with check (
+    exists (
+      select 1
+      from public.profiles p
+      where p.id = ai_profile_coach_email_preferences.profile_id
+        and p.user_id = (select auth.uid())
+    )
+  );
 
 grant select on public.ai_profile_coach_daily_snapshots to authenticated;
 grant select, insert, update, delete on public.ai_profile_coach_email_preferences to authenticated;
 grant all on public.ai_profile_coach_daily_snapshots to service_role;
 grant all on public.ai_profile_coach_email_preferences to service_role;
 
+-- Server-only normalized source. Legacy column names are exposed as aliases so
+-- reporting jobs remain compatible with the consolidated profiles schema.
 create or replace view public.ai_profile_coach_source
 with (security_invoker = true)
 as
 select
   p.id as profile_id,
+  p.user_id,
   coalesce(p.display_name, p.full_name, 'Provider') as display_name,
   coalesce(p.email_address, p.email) as recipient_email,
   p.slug,
@@ -107,7 +131,7 @@ select
   p.country,
   p.photo_url,
   p.avatar_url,
-  p.profile_completion_score,
+  coalesce(p.profile_completeness, p.completion_score, p.completion_percentage, 0) as profile_completion_score,
   p.profile_completeness,
   p.completion_score,
   p.completion_percentage,
@@ -141,19 +165,19 @@ select
   p.languages,
   p.languages_spoken,
   p.years_experience,
-  p.education_entries,
+  '[]'::jsonb as education_entries,
   p.certifications,
   p.training,
-  p.affiliations,
-  p.massage_setup,
-  p.incall_amenities,
-  p.studio_amenities,
-  p.mobile_extras,
-  p.products_used,
-  p.payment_methods,
+  '{}'::text[] as affiliations,
+  null::text as massage_setup,
+  '{}'::text[] as incall_amenities,
+  '{}'::text[] as studio_amenities,
+  '{}'::text[] as mobile_extras,
+  '{}'::text[] as products_used,
+  '{}'::text[] as payment_methods,
   p.areas_served,
   p.travel_schedule,
-  p.business_trips,
+  '[]'::jsonb as business_trips,
   p.is_verified_phone,
   p.is_verified_email,
   p.is_verified_identity,
@@ -167,7 +191,7 @@ select
   p.inquiry_count,
   p.review_count,
   p.average_rating,
-  p.last_seen_at,
+  p.last_active_at as last_seen_at,
   p.updated_at,
   (select count(*) from public.profile_photos pp where pp.profile_id = p.id and pp.moderation_status = 'approved') as approved_photo_count,
   (select count(*) from public.profile_view_analytics pva where pva.profile_id = p.id and pva.created_at >= now() - interval '1 day') as profile_views_1d,
@@ -178,7 +202,7 @@ select
   (select count(*) from public.contact_events ce where ce.profile_id = p.id and ce.created_at >= now() - interval '30 days') as contact_clicks_30d,
   (select count(*) from public.favorites f where f.profile_id = p.id and f.created_at >= now() - interval '7 days') as favorites_7d,
   (select count(*) from public.contact_inquiries ci where ci.profile_id = p.id and ci.created_at >= now() - interval '7 days') as inquiries_7d,
-  (select avg(re.position_in_results)::numeric(8,2) from public.ranking_events re where re.profile_id = p.id and re.created_at >= now() - interval '7 days' and re.position_in_results is not null) as average_search_position,
+  (select avg(re.position_in_results)::numeric(8,2) from public.ranking_events re where re.therapist_id = p.id and re.created_at >= now() - interval '7 days' and re.position_in_results is not null) as average_search_position,
   (select ds.score from public.demand_scores ds where lower(ds.city) = lower(p.city) and lower(ds.state) = lower(p.state) order by ds.week_start desc limit 1) as local_demand_score,
   (select ds.trend from public.demand_scores ds where lower(ds.city) = lower(p.city) and lower(ds.state) = lower(p.state) order by ds.week_start desc limit 1) as local_demand_trend
 from public.profiles p
