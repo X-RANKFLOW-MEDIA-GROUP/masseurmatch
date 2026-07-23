@@ -33,7 +33,7 @@ const PLANS: Record<string, { name: string; amount: number; features: string; is
   },
   elite: {
     name: "Elite",
-    amount: 9900,
+    amount: 14900,
     features: "Everything in Pro, 3 active cities, Knotty AI answering on your profile 24/7, Demand Radar, auto tour pages for travel schedules, priority support",
   },
 };
