@@ -11,17 +11,12 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # ── Public (safe to hardcode or keep as defaults) ──
   NEXT_PUBLIC_APP_URL: https://masseurmatch.com
-
-  # ── Public keys (from secrets) ──
   NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
   NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
   NEXT_PUBLIC_GOOGLE_MAPS_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_KEY }}
-
-  # ── Server-side secrets ──
   SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
   SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
   STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
@@ -39,9 +34,8 @@ env:
   SITEMAP_SUPABASE_KEY: ${{ secrets.SITEMAP_SUPABASE_KEY }}
 
 jobs:
-
-  vercel-lockfile-guard:
-    name: Vercel lockfile guard
+  lockfile-guard:
+    name: Lockfile guard
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -53,8 +47,8 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
-      - run: pnpm build
+      - name: Verify install did not modify dependency manifests
+        run: git diff --exit-code package.json pnpm-lock.yaml
 
   secret-scan:
     name: Secret Scan
@@ -137,7 +131,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [typecheck, lint, unit-tests, db-contract]
+    needs: [lockfile-guard, typecheck, lint, unit-tests, db-contract]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -157,11 +151,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
 
-  # Resolve the Vercel preview URL for this PR's head commit so the E2E/a11y
-  # suites test the code under review instead of production. Reads the GitHub
-  # deployment statuses that the Vercel integration creates (no third-party
-  # action). Outputs an empty string if none resolves in time — the test jobs
-  # then fall back to the production base URL so they never regress.
   preview-url:
     name: Resolve preview URL
     runs-on: ubuntu-latest
@@ -175,7 +164,7 @@ jobs:
         with:
           script: |
             const sha = context.payload.pull_request.head.sha;
-            const deadlineMs = Date.now() + 10 * 60 * 1000; // 10 minutes
+            const deadlineMs = Date.now() + 10 * 60 * 1000;
             const isPreview = (u) => !!u && /vercel\.app/.test(u);
             while (Date.now() < deadlineMs) {
               const deployments = await github.rest.repos.listDeployments({
@@ -212,15 +201,8 @@ jobs:
       options: --ipc=host
     needs: [build, preview-url]
     env:
-      # Prefer this PR's preview deployment; fall back to the configured base URL
-      # (production) on pushes to main or if no preview resolved.
       PLAYWRIGHT_BASE_URL: ${{ needs.preview-url.outputs.url != '' && needs.preview-url.outputs.url || vars.PLAYWRIGHT_BASE_URL }}
-      # Bypass Vercel Deployment Protection on preview URLs (no-op if unset or
-      # if previews aren't protection-enabled). Set as a repo/Environment secret.
       VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
-    # Runs when a base URL is available: a resolved preview (PRs) or the
-    # configured production var (pushes / preview fallback). preview-url is
-    # skipped on push, so guard with always() + build success.
     if: ${{ always() && needs.build.result == 'success' && (needs.preview-url.outputs.url != '' || vars.PLAYWRIGHT_BASE_URL != '') }}
     steps:
       - uses: actions/checkout@v4
@@ -250,10 +232,8 @@ jobs:
       options: --ipc=host
     needs: [build, preview-url]
     env:
-      # Prefer this PR's preview deployment; fall back to the configured base URL.
       PLAYWRIGHT_BASE_URL: ${{ needs.preview-url.outputs.url != '' && needs.preview-url.outputs.url || vars.PLAYWRIGHT_BASE_URL }}
       VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
-    # Runs alongside the E2E suite whenever a deployed URL is available.
     if: ${{ always() && needs.build.result == 'success' && (needs.preview-url.outputs.url != '' || vars.PLAYWRIGHT_BASE_URL != '') }}
     steps:
       - uses: actions/checkout@v4
