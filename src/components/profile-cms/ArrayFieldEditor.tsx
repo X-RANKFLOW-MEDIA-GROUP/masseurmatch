@@ -87,13 +87,16 @@ export const ArrayFieldEditor = React.forwardRef<
             )}
           />
           <button
+            type="button"
             onClick={handleAddItem}
-        disabled={!!isLoading}
+            disabled={
               isSaving ||
               config.readOnly ||
               !inputValue.trim() ||
-              (config.validation?.maxLength &&
-                arrayValue.length >= config.validation.maxLength)
+              Boolean(
+                config.validation?.maxLength &&
+                  arrayValue.length >= config.validation.maxLength
+              )
             }
             className="flex items-center justify-center gap-2 px-4 py-2 bg-accent text-accent-foreground rounded-xl hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors motion-premium font-medium text-sm"
           >
@@ -112,6 +115,7 @@ export const ArrayFieldEditor = React.forwardRef<
               >
                 <span className="text-sm font-medium">{item}</span>
                 <button
+                  type="button"
                   onClick={() => handleRemoveItem(index)}
                   disabled={isSaving || config.readOnly}
                   className="p-0.5 hover:bg-accent/20 rounded transition-colors disabled:cursor-not-allowed"
