@@ -8,7 +8,6 @@ import { createServerSupabase } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   try {
-    // Limit automated account creation per IP.
     assertRateLimit(request, "auth-register", { limit: 5, windowMs: 60_000 });
 
     const csrfData = extractCsrfToken(request.headers);
@@ -19,13 +18,14 @@ export async function POST(request: Request) {
     const body = await parseJsonBody(request, authRegisterSchema);
     const email = body.email.trim().toLowerCase();
     const { origin } = new URL(request.url);
+    const verificationPath = "/signup/verify?autostart=1";
 
     const supabase = await createServerSupabase();
     const { data, error } = await supabase.auth.signUp({
       email,
       password: body.password,
       options: {
-        emailRedirectTo: `${origin}/auth/callback?next=/signup/plan`,
+        emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(verificationPath)}`,
         data: { full_name: body.fullName, role: "provider" },
       },
     });
@@ -45,8 +45,6 @@ export async function POST(request: Request) {
       throw new RouteError(400, error?.message || "Could not create account.");
     }
 
-    // Supabase obfuscates a re-signup of an existing confirmed email by
-    // returning a user with an empty identities array and no session.
     if (Array.isArray(data.user.identities) && data.user.identities.length === 0) {
       return json(
         {
@@ -63,9 +61,6 @@ export async function POST(request: Request) {
       fallbackName: body.fullName,
     });
 
-    // When email confirmation is enabled, `session` is null and the auth
-    // cookies are NOT set — the user must confirm first. When it is disabled,
-    // signUp already wrote the session cookies onto the response.
     return json({
       ok: true,
       user: { id: data.user.id, email: data.user.email },
