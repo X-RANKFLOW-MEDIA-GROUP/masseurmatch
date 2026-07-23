@@ -33,7 +33,7 @@ const PLANS: Record<string, { name: string; amount: number; features: string; is
   },
   elite: {
     name: "Elite",
-    amount: 14900,
+    amount: 9900,
     features: "Everything in Pro, 3 active cities, Knotty AI answering on your profile 24/7, Demand Radar, auto tour pages for travel schedules, priority support",
   },
 };
@@ -119,7 +119,6 @@ async function getOrCreatePrice(stripe: Stripe, planKey: string): Promise<string
   logStep("Created price", { priceId: price.id });
   return price.id;
 }
-
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
