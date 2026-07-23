@@ -27,7 +27,7 @@ export const FieldPreview = React.forwardRef<
       case FieldType.BOOLEAN:
         return (
           <div className="flex items-center gap-2">
-            {Boolean(value) ? (
+            {value ? (
               <>
                 <Check className="h-4 w-4 text-success" />
                 <span className="text-success font-medium">Yes</span>
