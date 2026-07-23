@@ -58,20 +58,14 @@ type SubscriptionResponse = {
 };
 
 /**
- * After the server auth routes write the Supabase cookies, make sure the
- * browser client's in-memory session reflects them. getSession() reads the
- * freshly-set cookies; if the adapter hasn't picked them up yet we sign in
- * directly once as a fallback (no retry storms).
+ * The server auth routes already perform the password exchange and write the
+ * Supabase SSR cookies. Reading those cookies is enough to mirror the session
+ * into the browser client; signing in with the password a second time adds an
+ * unnecessary network round-trip and can rotate the session again.
  */
-async function hydrateBrowserSession(
-  email: string,
-  password: string,
-): Promise<Session | null> {
+async function readBrowserSession(): Promise<Session | null> {
   const { data } = await supabase.auth.getSession();
-  if (data.session) return data.session;
-
-  const { data: signInData } = await supabase.auth.signInWithPassword({ email, password });
-  return signInData.session ?? null;
+  return data.session ?? null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -141,10 +135,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
       const result = await registerMutation({ email, password, fullName });
-      // Only hydrate a live session when email confirmation is NOT required.
+      // Only read a live session when email confirmation is NOT required.
       // When it is, there is no session yet — the user must confirm by email.
       if (!result.requiresEmailConfirmation) {
-        const hydrated = await hydrateBrowserSession(email, password);
+        const hydrated = await readBrowserSession();
         setSession(hydrated);
         setUser(hydrated?.user ?? null);
       }
@@ -160,10 +154,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      // Server route enforces CSRF, rate limiting and brute-force lockout, then
-      // writes the auth cookies. We only mirror them into the browser client.
+      // The server route enforces CSRF, rate limiting and brute-force lockout,
+      // performs the only password exchange, and writes the auth cookies.
       const result = await loginMutation({ email, password });
-      const hydrated = await hydrateBrowserSession(email, password);
+      const hydrated = await readBrowserSession();
       setSession(hydrated);
       setUser(hydrated?.user ?? null);
       if (hydrated?.user) {
