@@ -63,7 +63,7 @@ function parseSupabaseUrl(name, value) {
 
 function readJwtProjectRef(name, token) {
   // New Supabase publishable keys are opaque. Their project is validated by
-  // the URL health check. Legacy anon and service-role keys are JWTs.
+  // the URL reachability check. Legacy anon and service-role keys are JWTs.
   if (token.startsWith("sb_publishable_") || token.startsWith("sb_secret_")) {
     return null;
   }
@@ -96,7 +96,10 @@ async function verifyReachable(origin) {
       signal: controller.signal,
     });
 
-    if (!response.ok) {
+    // Supabase's gateway may return 401 without an apikey. That still proves
+    // the project hostname resolves and accepts TLS/HTTP. Deleted preview
+    // branches fail before an HTTP response is received.
+    if (response.status >= 500) {
       fail(`Supabase health check returned HTTP ${response.status} for ${origin}.`);
     }
   } catch (error) {
