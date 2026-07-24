@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowUpRight, Sparkles } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { GrainOverlay } from "@/components/motion/GrainOverlay";
 
 const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -32,20 +32,6 @@ export function HeroCinematic() {
             transition={{ duration: dur, ease: customEase, delay: noDelay }}
             className="flex max-w-3xl flex-col justify-center"
           >
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.05 }}
-                className="mb-8 flex items-center gap-3"
-              >
-                <span className="font-display text-3xl font-black tracking-tight text-white sm:text-4xl">
-                  M<span className="text-[#8B1E2D]">M</span>
-                </span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50">
-                  MasseurMatch
-                </span>
-              </motion.div>
-
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -61,7 +47,7 @@ export function HeroCinematic() {
                 transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.15 }}
                 className="font-display text-5xl font-black leading-[1.1] tracking-tight text-white sm:text-6xl lg:text-7xl"
               >
-                Find Your <span className="text-white">Verified Therapist</span>
+                Find Your <span className="text-[#C8434F]">Verified</span> Therapist
               </motion.h1>
 
               <motion.p
@@ -79,15 +65,6 @@ export function HeroCinematic() {
                 transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.3 }}
                 className="mt-10 flex flex-col gap-4 sm:gap-6"
               >
-                <motion.div
-                  animate={reducedMotion ? {} : { y: [0, -4, 0] }}
-                  transition={reducedMotion ? {} : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  className="flex items-center gap-2"
-                >
-                  <Sparkles size={20} className="text-white/70" strokeWidth={2.5} />
-                  <span className="text-xs uppercase tracking-widest text-white/70 font-semibold">AI-Powered Discovery</span>
-                </motion.div>
-
                 <div className="flex flex-wrap gap-4 sm:gap-6">
                 <button
                   type="button"

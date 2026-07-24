@@ -290,7 +290,7 @@ function MobileNav({
             <Image
               src={BRAND_ASSETS.logoLockup}
               alt="MasseurMatch"
-              width={247}
+              width={168}
               height={40}
               className="h-10 w-auto object-contain"
             />
@@ -495,7 +495,7 @@ export default function SiteHeader() {
           <Image
             src={BRAND_ASSETS.logoLockup}
             alt="MasseurMatch"
-            width={345}
+            width={236}
             height={56}
             priority
             className="h-11 w-auto object-contain md:h-14"

@@ -82,7 +82,7 @@ export default function ProLayoutClient({
           <Image
             src={BRAND_ASSETS.logoLockup}
             alt="MasseurMatch"
-            width={175}
+            width={143}
             height={34}
             className="h-8 w-auto object-contain"
             priority
@@ -157,7 +157,7 @@ export default function ProLayoutClient({
 
       <div className="fixed inset-x-0 top-0 z-30 flex items-center justify-between border-b border-[#E9E2DC] bg-white/95 px-4 py-3 shadow-sm backdrop-blur md:hidden">
         <Link href="/" className="inline-flex items-center gap-2">
-          <Image src={BRAND_ASSETS.logoLockup} alt="MasseurMatch" width={140} height={28} className="h-7 w-auto object-contain" priority />
+          <Image src={BRAND_ASSETS.logoLockup} alt="MasseurMatch" width={118} height={28} className="h-7 w-auto object-contain" priority />
           <span className="rounded-full bg-[#F9EDEE] px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-[0.16em] text-[#8B1E2D]">
             Pro
           </span>
