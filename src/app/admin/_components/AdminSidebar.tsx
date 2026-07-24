@@ -25,6 +25,7 @@ import {
   CalendarCheck,
   MessageSquare,
   Flag,
+  FlaskConical,
 } from "lucide-react";
 
 const navSections = [
@@ -61,6 +62,7 @@ const navSections = [
       { href: "/admin/cities", label: "Cities", icon: MapPin },
       { href: "/admin/keywords", label: "Keywords", icon: Tag },
       { href: "/admin/seo", label: "SEO", icon: BarChart },
+      { href: "/admin/spikes", label: "Design Spikes", icon: FlaskConical },
     ],
   },
   {
