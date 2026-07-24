@@ -42,7 +42,23 @@ export async function GET(request: NextRequest) {
   const user = data?.user;
   if (error || !user?.email) {
     console.error("[auth/callback] error:", error?.message);
+    // Recovery links that fail here are almost always a single-use token that
+    // was already consumed (commonly by an email link-scanner pre-fetch). Send
+    // the user to the reset page with a clear, actionable error instead of the
+    // generic login failure.
+    if (type === "recovery") {
+      return NextResponse.redirect(
+        `${origin}/reset-password?error=access_denied&error_code=otp_expired`,
+      );
+    }
     return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+  }
+
+  // Password recovery: the OTP is now verified and a recovery session cookie is
+  // set on this response, so hand off to the reset form to collect the new
+  // password. (Never route recovery to the dashboard.)
+  if (type === "recovery") {
+    return NextResponse.redirect(`${origin}/reset-password`);
   }
 
   let profileCreated = false;

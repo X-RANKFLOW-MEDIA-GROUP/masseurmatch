@@ -528,7 +528,7 @@ function PromotionalBanner() {
   return (
     <aside className="relative hidden overflow-hidden bg-gradient-to-b from-[#FFFDFC] via-[#FFF9F5] to-[#FDF2F1] px-7 py-8 2xl:flex 2xl:flex-col">
       <div className="absolute -bottom-24 -right-20 h-72 w-72 rounded-full border border-[#C89555]/25" />
-      <Image src={BRAND_ASSETS.logoLockup} alt="MasseurMatch" width={235} height={44} className="h-auto w-[220px] object-contain" priority />
+      <Image src={BRAND_ASSETS.logoLockup} alt="MasseurMatch" width={220} height={52} className="h-auto w-[220px] object-contain" priority />
       <span className="mt-8 inline-flex w-fit items-center gap-2 rounded-full border border-[#C98E45]/35 bg-white/80 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8B1E2D]">
         <Sparkles className="h-3.5 w-3.5" /> AI-powered
       </span>
