@@ -53,12 +53,9 @@ export async function POST(request: Request) {
       return Response.json({ error: "Audit log entry has an invalid field name" }, { status: 400 });
     }
 
-    let payload;
-    let rolledBackValue;
+    let update: ReturnType<typeof createProfileCmsUpdate>;
     try {
-      const update = createProfileCmsUpdate(fieldName, details.old_value);
-      payload = update.payload;
-      rolledBackValue = update.normalizedValue;
+      update = createProfileCmsUpdate(fieldName, details.old_value);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Invalid rollback value";
       return Response.json({ error: message }, { status: 400 });
@@ -66,7 +63,7 @@ export async function POST(request: Request) {
 
     const { error: updateError } = await supabase
       .from("profiles")
-      .update(payload)
+      .update(update.payload)
       .eq("id", profile_id);
 
     if (updateError) {
@@ -76,7 +73,7 @@ export async function POST(request: Request) {
     const auditDetails: Json = {
       field_name: fieldName,
       old_value: toProfileCmsJson(details.new_value),
-      new_value: toProfileCmsJson(rolledBackValue),
+      new_value: toProfileCmsJson(update.normalizedValue),
       source_audit_log_id: audit_log_id,
       rolled_back_at: new Date().toISOString(),
     };
@@ -93,7 +90,7 @@ export async function POST(request: Request) {
       ok: true,
       profile_id,
       field_name: fieldName,
-      rolled_back_value: rolledBackValue,
+      rolled_back_value: update.normalizedValue,
     });
   } catch (error) {
     console.error("Rollback error:", error);
