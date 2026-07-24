@@ -13,9 +13,13 @@ const CONFIG: EmailUrlConfig = {
 // The redirect_to the app sets for account-confirmation flows: our own server
 // callback route, which verifies token_hash itself.
 const CALLBACK = "https://www.masseurmatch.com/api/auth/callback?next=/pro/onboard";
-// A non-callback redirect (e.g. recovery → client /reset-password page), which
-// still goes through GoTrue's /auth/v1/verify.
+// Recovery redirect → the client /reset-password page, which verifies the
+// token_hash itself (client-side verifyOtp), so it receives the raw token_hash
+// directly — no GoTrue /auth/v1/verify hop.
 const RESET = "https://www.masseurmatch.com/reset-password";
+// A genuinely external / non-app redirect that must still route through
+// GoTrue's /auth/v1/verify (used to assert redirect_to encoding).
+const EXTERNAL = "https://partner.example.com/back";
 
 // Every shell email has exactly one <a> (the button); reauthentication has none.
 function confirmLink(html: string): string | undefined {
@@ -61,8 +65,8 @@ describe("auth-email-hook buildMessages", () => {
     }
   });
 
-  describe("flows that keep the GoTrue verify hop (non-callback redirect)", () => {
-    it("recovery → /reset-password uses /auth/v1/verify with a single-encoded redirect_to", () => {
+  describe("recovery → /reset-password links straight with token_hash (no GoTrue verify hop)", () => {
+    it("delivers the raw token_hash + type to /reset-password (scanner-safe)", () => {
       const msgs = buildMessages(
         "recovery",
         emailData({ type: "recovery", redirect_to: RESET }),
@@ -70,14 +74,14 @@ describe("auth-email-hook buildMessages", () => {
         CONFIG,
       );
       const link = confirmLink(msgs[0].html)!;
-      expect(link).toContain("/auth/v1/verify");
-      expect(link).toContain("type=recovery");
-      // percent-encoded exactly once — round-trips, and never %252F.
-      expect(redirectSeenByGoTrue(link)).toBe(RESET);
-      expect(link).not.toContain("%252F");
+      const u = new URL(link);
+      expect(u.pathname).toBe("/reset-password");
+      expect(u.searchParams.get("token_hash")).toBe("hash_current");
+      expect(u.searchParams.get("type")).toBe("recovery");
+      expect(link).not.toContain("/auth/v1/verify");
     });
 
-    it("keeps a redirect_to carrying a second &-param intact (the encode's whole point)", () => {
+    it("preserves existing query params on the reset URL", () => {
       const multi = "https://www.masseurmatch.com/reset-password?flow=a&stage=b";
       const msgs = buildMessages(
         "recovery",
@@ -85,8 +89,28 @@ describe("auth-email-hook buildMessages", () => {
         { email: "user@example.com" },
         CONFIG,
       );
+      const u = new URL(confirmLink(msgs[0].html)!);
+      expect(u.searchParams.get("flow")).toBe("a");
+      expect(u.searchParams.get("stage")).toBe("b");
+      expect(u.searchParams.get("token_hash")).toBe("hash_current");
+      expect(u.searchParams.get("type")).toBe("recovery");
+    });
+  });
+
+  describe("flows that keep the GoTrue verify hop (non-app redirect)", () => {
+    it("keeps a redirect_to carrying a second &-param intact (single-encoded, the encode's whole point)", () => {
+      const multi = `${EXTERNAL}?flow=a&stage=b`;
+      const msgs = buildMessages(
+        "recovery",
+        emailData({ type: "recovery", redirect_to: multi }),
+        { email: "user@example.com" },
+        CONFIG,
+      );
       const link = confirmLink(msgs[0].html)!;
+      expect(link).toContain("/auth/v1/verify");
+      // percent-encoded exactly once — round-trips, and never %252F.
       expect(redirectSeenByGoTrue(link)).toBe(multi);
+      expect(link).not.toContain("%252F");
       const stray = [...new URL(link).searchParams.keys()].filter(
         (k) => !["token", "type", "redirect_to"].includes(k),
       );
