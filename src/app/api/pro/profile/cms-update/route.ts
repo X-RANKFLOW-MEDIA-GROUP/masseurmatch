@@ -5,7 +5,14 @@ import { assertRateLimit } from "@/app/_lib/security";
 import { requireRequestSession } from "@/app/_lib/session";
 import { getProfileByUserId } from "@/app/_lib/store";
 import { getFieldByKey } from "@/lib/profile-fields-config";
-import type { Database } from "@/integrations/supabase/types";
+import {
+  createProfileCmsUpdate,
+  isProfileCmsUpdateField,
+  toProfileCmsJson,
+  type ProfileCmsUpdateField,
+  type ProfileRow,
+} from "@/lib/profile-cms-update";
+import type { Json } from "@/integrations/supabase/types";
 
 // Request body schema for single field update
 const fieldUpdateSchema = z.object({
@@ -13,8 +20,6 @@ const fieldUpdateSchema = z.object({
   value: z.unknown(),
   reason: z.string().min(1).max(500).optional(),
 });
-
-type FieldUpdateRequest = z.infer<typeof fieldUpdateSchema>;
 
 /**
  * Extract client IP address from request headers
@@ -32,33 +37,16 @@ function getClientIpAddress(request: Request): string {
 }
 
 /**
- * Get old value from profile, safely handling undefined
+ * Get old value from profile using the validated database column name.
  */
-function getOldValue(profile: Record<string, unknown>, fieldName: string): unknown {
+function getOldValue(profile: ProfileRow, fieldName: ProfileCmsUpdateField): unknown {
   return profile[fieldName] ?? null;
 }
 
 /**
- * Convert unknown values to JSON-serializable format
+ * Validate and prepare the update value using the field's validation schema.
  */
-function toJsonValue(value: unknown): any {
-  if (value === null || value === undefined) return null;
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-    return value;
-  }
-  if (Array.isArray(value) || (typeof value === "object" && value !== null)) {
-    return value;
-  }
-  return null;
-}
-
-/**
- * Validate and prepare the update value using the field's validation schema
- */
-async function validateAndPrepareValue(
-  fieldName: string,
-  value: unknown,
-): Promise<unknown> {
+function validateAndPrepareValue(fieldName: ProfileCmsUpdateField, value: unknown): unknown {
   const fieldDef = getFieldByKey(fieldName);
 
   if (!fieldDef) {
@@ -73,10 +61,8 @@ async function validateAndPrepareValue(
     throw new RouteError(403, `Field "${fieldName}" can only be edited by administrators.`);
   }
 
-  // Validate using the field's validation schema
   try {
-    const validated = fieldDef.validationSchema.parse(value);
-    return validated;
+    return fieldDef.validationSchema.parse(value);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Validation failed";
     throw new RouteError(400, `Invalid value for field "${fieldName}": ${message}`);
@@ -84,12 +70,12 @@ async function validateAndPrepareValue(
 }
 
 /**
- * Record audit log entry for the field update
+ * Record audit log entry for the field update.
  */
 async function recordFieldAuditLog(
   userId: string,
   profileId: string,
-  fieldName: string,
+  fieldName: ProfileCmsUpdateField,
   oldValue: unknown,
   newValue: unknown,
   reason: string | undefined,
@@ -98,10 +84,10 @@ async function recordFieldAuditLog(
   const adminClient = createSupabaseAdminClient();
 
   try {
-    const details = {
+    const details: Json = {
       field_name: fieldName,
-      old_value: toJsonValue(oldValue),
-      new_value: toJsonValue(newValue),
+      old_value: toProfileCmsJson(oldValue),
+      new_value: toProfileCmsJson(newValue),
       reason: reason || null,
       ip_address: ipAddress,
       updated_at: new Date().toISOString(),
@@ -137,26 +123,38 @@ export async function POST(request: Request) {
     // Parse and validate request body
     const body = await parseJsonBody(request, fieldUpdateSchema);
 
+    if (!isProfileCmsUpdateField(body.field_name)) {
+      throw new RouteError(400, `Field "${body.field_name}" is not an allowed profile column.`);
+    }
+    const fieldName = body.field_name;
+
     // Validate field exists and is editable
-    const fieldDef = getFieldByKey(body.field_name);
+    const fieldDef = getFieldByKey(fieldName);
     if (!fieldDef) {
-      throw new RouteError(400, `Field "${body.field_name}" does not exist in profile schema.`);
+      throw new RouteError(400, `Field "${fieldName}" does not exist in profile schema.`);
     }
 
     if (!fieldDef.editable) {
-      throw new RouteError(403, `Field "${body.field_name}" is not editable.`);
+      throw new RouteError(403, `Field "${fieldName}" is not editable.`);
     }
 
     if (fieldDef.adminOnly) {
-      throw new RouteError(403, `Field "${body.field_name}" can only be edited by administrators.`);
+      throw new RouteError(403, `Field "${fieldName}" can only be edited by administrators.`);
     }
 
-    // Validate and prepare the new value
-    const newValue = await validateAndPrepareValue(body.field_name, body.value);
+    // Validate and normalize the new value against the generated column type
+    const validatedValue = validateAndPrepareValue(fieldName, body.value);
+    let update;
+    try {
+      update = createProfileCmsUpdate(fieldName, validatedValue);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Invalid profile value";
+      throw new RouteError(400, message);
+    }
+    const newValue = update.normalizedValue;
 
     // Get the old value from the profile
-    const profileData = profile as Record<string, unknown>;
-    const oldValue = getOldValue(profileData, body.field_name);
+    const oldValue = getOldValue(profile, fieldName);
 
     // If no change, return without updating
     const hasChanged = JSON.stringify(oldValue) !== JSON.stringify(newValue);
@@ -165,11 +163,7 @@ export async function POST(request: Request) {
     let updatedProfile = profile;
 
     if (hasChanged) {
-      // Prepare the update object with dynamic field name
-      const updates: Record<string, any> = {
-        [body.field_name]: newValue,
-        updated_at: new Date().toISOString(),
-      };
+      const updates = update.payload;
 
       // If profile was approved, mark as under_review for changes
       if (profile.profile_status === "approved") {
@@ -203,7 +197,7 @@ export async function POST(request: Request) {
     await recordFieldAuditLog(
       session.userId,
       profile.id,
-      body.field_name,
+      fieldName,
       oldValue,
       newValue,
       body.reason,
@@ -227,7 +221,7 @@ export async function POST(request: Request) {
 
     return json({
       success: true,
-      field_name: body.field_name,
+      field_name: fieldName,
       old_value: oldValue,
       new_value: newValue,
       changed: hasChanged,
