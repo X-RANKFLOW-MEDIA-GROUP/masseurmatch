@@ -21,6 +21,32 @@ function dashboardPathForRole(role: string | null | undefined) {
   return "/pro/dashboard";
 }
 
+function mapSupabaseAuthError(error: unknown): RouteError {
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+
+  if (message.includes("email not confirmed")) {
+    return new RouteError(
+      401,
+      "Check your email to confirm your account before continuing.",
+      "EMAIL_NOT_CONFIRMED",
+    );
+  }
+
+  if (
+    message.includes("invalid login credentials") ||
+    message.includes("invalid email or password") ||
+    message.includes("user not found")
+  ) {
+    return new RouteError(401, "Invalid email or password.", "AUTH_INVALID");
+  }
+
+  if (message.includes("rate limit") || message.includes("too many requests")) {
+    return new RouteError(429, "Too many login attempts. Please try again shortly.", "AUTH_RATE_LIMITED");
+  }
+
+  return new RouteError(503, "Sign in is temporarily unavailable. Please try again.", "AUTH_UNAVAILABLE");
+}
+
 export async function GET() {
   try {
     const { token, cookie } = generateCsrfToken();
@@ -50,9 +76,6 @@ export async function POST(request: Request) {
       throw new RouteError(403, "Invalid security token. Please try again.", "CSRF_INVALID");
     }
 
-    // Sign in through the cookie-bound server client. Supabase writes the
-    // auth cookies onto the response automatically — the session is
-    // never handed back in the JSON body.
     const supabase = await createServerSupabase();
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -61,18 +84,7 @@ export async function POST(request: Request) {
 
     if (error || !data.user) {
       recordFailedAttempt(email, request);
-      if (error instanceof RouteError && error.status === 401) {
-        if (error.code === "EMAIL_NOT_CONFIRMED") {
-          throw error;
-        }
-        // Return specific error code for invalid credentials/token
-        throw new RouteError(401, "Invalid email or password.", "AUTH_INVALID");
-      }
-      // Handle token-related errors
-      if (error instanceof RouteError && error.message?.includes("token")) {
-        throw new RouteError(401, "Invalid token please try again", "INVALID_TOKEN");
-      }
-      throw error;
+      throw mapSupabaseAuthError(error);
     }
 
     clearFailedAttempts(email, request);
@@ -88,17 +100,11 @@ export async function POST(request: Request) {
       redirect: dashboardPathForRole(role),
     });
   } catch (error) {
-    if (error instanceof RouteError && error.status === 401) {
+    if (error instanceof RouteError && [401, 403, 429, 503].includes(error.status)) {
       return json(
         { ok: false, error: error.message, code: error.code || "AUTH_FAILED" },
-        { status: 401 },
+        { status: error.status },
       );
-    }
-    if (error instanceof RouteError && error.status === 429) {
-      return json({ ok: false, error: error.message, code: error.code }, { status: 429 });
-    }
-    if (error instanceof RouteError && error.status === 403) {
-      return json({ ok: false, error: error.message, code: error.code }, { status: 403 });
     }
     return errorResponse(error);
   }
