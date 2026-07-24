@@ -3,10 +3,29 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import type { EmailOtpType } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useToast } from "@/hooks/use-toast";
+
+// Human-friendly copy for the Supabase error codes a recovery link can carry.
+// `otp_expired` is overwhelmingly caused by email link scanners (Outlook Safe
+// Links, antivirus, corporate proxies) pre-fetching the single-use verify URL
+// and consuming the token before the person clicks — so the link looks
+// "expired" on the very first real click.
+function friendlyLinkError(code: string | null, description: string | null): string {
+  if (code === "otp_expired") {
+    return "This password reset link has expired or was already used. Request a new one below — it stays valid for 60 minutes.";
+  }
+  if (code === "access_denied") {
+    return "This password reset link is no longer valid. Please request a new one below.";
+  }
+  return (
+    description ||
+    "We couldn't validate this reset link. Please request a new one below."
+  );
+}
 
 export default function ResetPasswordPageClient() {
   const router = useRouter();
@@ -15,33 +34,69 @@ export default function ResetPasswordPageClient() {
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [sessionReady, setSessionReady] = useState(false);
+  const [linkError, setLinkError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Supabase sends the user to this page with either:
-  // - A PKCE code in the query string (?code=…)   — must be exchanged explicitly
-  // - A token_hash in the URL fragment (#…)        — handled by the Supabase client automatically
-  //
-  // We first register the auth-state listener (so we never miss the event),
-  // then exchange the PKCE code when present, and finally fall back to checking
-  // for an already-active recovery session (handles page reloads).
+  // Supabase can hand this page a recovery grant in several shapes depending on
+  // the email-template and project flow settings. We handle all of them so the
+  // link works regardless of device, browser, or scanner behaviour:
+  //   1. ?token_hash=…&type=recovery  → verifyOtp (no PKCE verifier needed, so
+  //      it works cross-device and is safe against link pre-fetch scanners).
+  //   2. ?code=…                      → PKCE exchangeCodeForSession.
+  //   3. #access_token=…              → implicit tokens (auto-detected by the client).
+  //   4. ?error=…/#error=…            → a failed/expired grant; show clear copy.
   useEffect(() => {
-    // 1. Register listener before any async work so PASSWORD_RECOVERY is not missed.
+    // Register the listener before any async work so PASSWORD_RECOVERY (fired by
+    // implicit-flow hash detection) is never missed.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
         setSessionReady(true);
       }
     });
 
     const init = async () => {
+      const query = new URLSearchParams(window.location.search);
+      // Supabase puts errors (and implicit tokens) in the hash fragment.
+      const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+
+      // 0. Surface an explicit error carried by the link before anything else.
+      const errorCode = query.get("error_code") || hash.get("error_code");
+      const errorParam = query.get("error") || hash.get("error");
+      const errorDesc = query.get("error_description") || hash.get("error_description");
+      if (errorCode || errorParam) {
+        setLinkError(friendlyLinkError(errorCode, errorDesc));
+        window.history.replaceState({}, "", window.location.pathname);
+        return;
+      }
+
+      // 1. token_hash flow — verify client-side (scanner-safe, cross-device).
+      const tokenHash = query.get("token_hash");
+      const type = query.get("type") as EmailOtpType | null;
+      if (tokenHash && type) {
+        const { error: verifyError } = await supabase.auth.verifyOtp({
+          type,
+          token_hash: tokenHash,
+        });
+        window.history.replaceState({}, "", window.location.pathname);
+        if (verifyError) {
+          setLinkError(friendlyLinkError("otp_expired", verifyError.message));
+        } else {
+          setSessionReady(true);
+        }
+        return;
+      }
+
       // 2. PKCE flow: exchange the code from the URL for a recovery session.
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get("code");
+      const code = query.get("code");
       if (code) {
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-        if (!exchangeError) {
-          // Remove the one-time code from the URL so a refresh doesn't fail.
-          window.history.replaceState({}, "", window.location.pathname);
+        window.history.replaceState({}, "", window.location.pathname);
+        if (exchangeError) {
+          setLinkError(friendlyLinkError("otp_expired", exchangeError.message));
+        } else {
+          setSessionReady(true);
         }
+        return;
       }
 
       // 3. Implicit / already-exchanged flow: check for an active session.
@@ -49,7 +104,7 @@ export default function ResetPasswordPageClient() {
       if (session) setSessionReady(true);
     };
 
-    init();
+    void init();
 
     return () => subscription.unsubscribe();
   }, []);
@@ -86,6 +141,20 @@ export default function ResetPasswordPageClient() {
     await supabase.auth.signOut();
     router.replace("/login");
   };
+
+  if (linkError) {
+    return (
+      <div className="container mx-auto max-w-lg px-4 py-10">
+        <div className="rounded-lg border border-border p-6">
+          <h1 className="text-2xl font-bold">Reset link expired</h1>
+          <p className="mt-2 text-sm text-muted-foreground">{linkError}</p>
+          <Button asChild className="mt-5 w-full">
+            <Link href="/forgot-password">Request a new reset link</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (!sessionReady) {
     return (
