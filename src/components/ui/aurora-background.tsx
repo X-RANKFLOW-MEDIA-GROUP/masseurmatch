@@ -9,7 +9,7 @@ interface AuroraBackgroundProps {
   showRadialGradient?: boolean;
 }
 
-export function AuroraBackground({
+function AuroraBackground({
   children,
   className,
   variant = "default",

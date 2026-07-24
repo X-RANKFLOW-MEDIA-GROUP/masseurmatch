@@ -16,7 +16,7 @@ export type GeoLocation = {
 type GeoCacheEntry = GeoLocation & { ts: number };
 
 /** Normalize a city name for comparison: lowercase, trim, strip accents. */
-export function normalizeCity(raw: string): string {
+function normalizeCity(raw: string): string {
   return raw
     .trim()
     .toLowerCase()
@@ -44,7 +44,7 @@ export function readGeoCache(): GeoLocation | null {
 }
 
 /** Persist a geo result to localStorage. */
-export function writeGeoCache(location: GeoLocation): void {
+function writeGeoCache(location: GeoLocation): void {
   if (typeof window === "undefined") return;
   try {
     const entry: GeoCacheEntry = { ...location, ts: Date.now() };
@@ -55,7 +55,7 @@ export function writeGeoCache(location: GeoLocation): void {
 }
 
 /** Call the /api/reverse-geocode endpoint to resolve lat/lng → city + neighborhood. */
-export async function reverseGeocode(
+async function reverseGeocode(
   lat: number,
   lng: number,
 ): Promise<{ city: string | null; neighborhood: string | null; stateCode: string | null }> {

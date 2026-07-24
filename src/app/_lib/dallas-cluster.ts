@@ -1,7 +1,5 @@
 import { getCanonicalCitySlug, resolveCitySlug } from "@/app/_lib/city-routing";
-
-export type CanonicalPageKind = "service" | "session" | "neighborhood";
-
+type CanonicalPageKind = "service" | "session" | "neighborhood";
 export type CanonicalCategory = {
   slug: string;
   label: string;
@@ -11,7 +9,6 @@ export type CanonicalCategory = {
   h1: string;
   intro: string;
 };
-
 export const DALLAS_SERVICE_SLUGS = [
   "gay-massage",
   "male-massage",
@@ -19,14 +16,12 @@ export const DALLAS_SERVICE_SLUGS = [
   "swedish",
   "sports-massage",
 ] as const;
-
 export const DALLAS_SESSION_SLUGS = [
   "incall",
   "outcall",
   "mobile",
   "hotel",
 ] as const;
-
 export const DALLAS_NEIGHBORHOOD_SLUGS = [
   "oak-lawn",
   "turtle-creek",
@@ -37,8 +32,7 @@ export const DALLAS_NEIGHBORHOOD_SLUGS = [
   "dfw-airport",
   "love-field",
 ] as const;
-
-export const DFW_SUBURB_GAY_CITY_SLUGS = [
+const DFW_SUBURB_GAY_CITY_SLUGS = [
   "plano",
   "richardson",
   "carrollton",
@@ -50,7 +44,6 @@ export const DFW_SUBURB_GAY_CITY_SLUGS = [
   "grand-prairie",
   "farmers-branch",
 ] as const;
-
 const DALLAS_CATEGORY_COPY: Record<string, Omit<CanonicalCategory, "slug">> = {
   "gay-massage": {
     label: "Gay Massage",
@@ -206,7 +199,6 @@ const DALLAS_CATEGORY_COPY: Record<string, Omit<CanonicalCategory, "slug">> = {
       "Love Field search intent is handled here through a focused Dallas micro-area page optimized for direct contact and local relevance. Listings show trust context, session format, and pricing cues that help users decide fast. This route complements DFW Airport and hotel pages as part of the Dallas-first proving model. Internal links connect travel-adjacent users to service and city pages without diluting intent. Use Love Field as your entry point when proximity to airport corridors is a strong part of your therapist selection criteria.",
   },
 };
-
 export const DALLAS_ORDERED_CATEGORY_SLUGS = [
   "gay-massage",
   "male-massage",
@@ -226,26 +218,21 @@ export const DALLAS_ORDERED_CATEGORY_SLUGS = [
   "dfw-airport",
   "love-field",
 ] as const;
-
-export function getDallasCategory(slug: string): CanonicalCategory | null {
+function getDallasCategory(slug: string): CanonicalCategory | null {
   const category = DALLAS_CATEGORY_COPY[slug];
   if (!category) {
     return null;
   }
-
   return { slug, ...category };
 }
-
 export function getCanonicalCategoryForCity(cityCanonicalSlug: string, categorySlug: string): CanonicalCategory | null {
   const citySlug = resolveCitySlug(cityCanonicalSlug);
   if (!citySlug) {
     return null;
   }
-
   if (citySlug === "dallas") {
     return getDallasCategory(categorySlug);
   }
-
   const dfwSuburbMatch = DFW_SUBURB_GAY_CITY_SLUGS.includes(citySlug as (typeof DFW_SUBURB_GAY_CITY_SLUGS)[number]);
   if (dfwSuburbMatch && categorySlug === "gay-massage") {
     return {
@@ -259,33 +246,26 @@ export function getCanonicalCategoryForCity(cityCanonicalSlug: string, categoryS
         "This DFW support page captures nearby gay massage intent and reinforces Dallas cluster authority. It provides a focused local entry point with direct profile contact, visible session format, and stronger trust context than generic listing pages.",
     };
   }
-
   return null;
 }
-
-export function isDallasBeachheadCity(cityCanonicalSlug: string): boolean {
+function isDallasBeachheadCity(cityCanonicalSlug: string): boolean {
   const citySlug = resolveCitySlug(cityCanonicalSlug);
   return citySlug === "dallas";
 }
-
 export function getCityCanonicalCategorySlugs(cityCanonicalSlug: string): string[] {
   const citySlug = resolveCitySlug(cityCanonicalSlug);
   if (!citySlug) {
     return [];
   }
-
   if (citySlug === "dallas") {
     return [...DALLAS_ORDERED_CATEGORY_SLUGS];
   }
-
   const dfwSuburbMatch = DFW_SUBURB_GAY_CITY_SLUGS.includes(citySlug as (typeof DFW_SUBURB_GAY_CITY_SLUGS)[number]);
   if (dfwSuburbMatch) {
     return ["gay-massage"];
   }
-
   return [];
 }
-
-export function getDfwSupportCanonicalCitySlugs(): string[] {
+function getDfwSupportCanonicalCitySlugs(): string[] {
   return DFW_SUBURB_GAY_CITY_SLUGS.map((slug) => getCanonicalCitySlug(slug));
 }

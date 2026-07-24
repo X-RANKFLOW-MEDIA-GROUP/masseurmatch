@@ -11,7 +11,7 @@ const TRACKING_PARAMS = new Set([
   "msclkid",
 ]);
 
-export function normalizePathname(pathname: string): string {
+function normalizePathname(pathname: string): string {
   if (!pathname) return "/";
   const normalized = pathname.startsWith("/") ? pathname : `/${pathname}`;
   return normalized !== "/" ? normalized.replace(/\/+$/, "") : normalized;
@@ -23,7 +23,7 @@ export function removeLangSearchParam(searchParams: URLSearchParams): URLSearchP
   return normalized;
 }
 
-export function sanitizeCanonicalSearchParams(searchParams: URLSearchParams): URLSearchParams {
+function sanitizeCanonicalSearchParams(searchParams: URLSearchParams): URLSearchParams {
   const normalized = removeLangSearchParam(searchParams);
   const keysToDelete = Array.from(normalized.keys()).filter((key) =>
     TRACKING_PARAMS.has(key.toLowerCase()),
@@ -38,7 +38,7 @@ export function buildCanonicalPath(pathname: string): string {
   return normalizePathname(pathname);
 }
 
-export function buildCanonicalPathWithSearch(pathname: string, searchParams?: URLSearchParams): string {
+function buildCanonicalPathWithSearch(pathname: string, searchParams?: URLSearchParams): string {
   const cleanPath = buildCanonicalPath(pathname);
   if (!searchParams) return cleanPath;
 
@@ -51,6 +51,6 @@ export function containsLangParam(searchParams: URLSearchParams): boolean {
   return searchParams.has(LANG_PARAM);
 }
 
-export const ROUTE_NORMALIZATION = {
+const ROUTE_NORMALIZATION = {
   LANG_PARAM,
 };

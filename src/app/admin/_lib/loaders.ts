@@ -9,7 +9,7 @@ type UserRoleRow = {
   created_at?: string | null;
 };
 
-export type AdminImportedReview = Pick<
+type AdminImportedReview = Pick<
   ImportedReviewRow,
   | "id"
   | "profile_id"
@@ -57,7 +57,7 @@ function toErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Unknown error.";
 }
 
-export async function loadImportedReviews(): Promise<AdminLoadResult<AdminImportedReview>> {
+async function loadImportedReviews(): Promise<AdminLoadResult<AdminImportedReview>> {
   try {
     const adminClient = createSupabaseAdminClient();
     const { data, error } = await adminClient

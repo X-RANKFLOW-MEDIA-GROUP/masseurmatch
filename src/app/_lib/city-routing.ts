@@ -81,7 +81,7 @@ export function canonicalCategoryToLegacyParts(category: string): string[] | nul
   return legacyPair[category] || null;
 }
 
-export function normalizeCanonicalCategory(category: string): string {
+function normalizeCanonicalCategory(category: string): string {
   if (!category) {
     return category;
   }
@@ -93,7 +93,7 @@ export function normalizeCanonicalCategory(category: string): string {
   return category;
 }
 
-export function buildCanonicalCityPath(citySlug: string, canonicalParts: string[] = []): string {
+function buildCanonicalCityPath(citySlug: string, canonicalParts: string[] = []): string {
   const canonicalCity = getCanonicalCitySlug(citySlug);
   if (!canonicalParts.length) {
     return `/cities/${canonicalCity}`;
@@ -102,7 +102,7 @@ export function buildCanonicalCityPath(citySlug: string, canonicalParts: string[
   return `/cities/${canonicalCity}/${canonicalParts.join("/")}`;
 }
 
-export function legacyPartsToCanonical(legacyParts: string[]): string[] {
+function legacyPartsToCanonical(legacyParts: string[]): string[] {
   if (!legacyParts.length) {
     return [];
   }

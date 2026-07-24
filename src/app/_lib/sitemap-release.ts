@@ -90,7 +90,7 @@ function stripSyntheticLastModified(entry: SitemapEntry): SitemapEntry {
   };
 }
 
-export function dedupeSitemapEntries(entries: MetadataRoute.Sitemap): MetadataRoute.Sitemap {
+function dedupeSitemapEntries(entries: MetadataRoute.Sitemap): MetadataRoute.Sitemap {
   const unique = new Map<string, SitemapEntry>();
 
   for (const entry of entries) {
@@ -111,7 +111,7 @@ export function dedupeSitemapEntries(entries: MetadataRoute.Sitemap): MetadataRo
  * query used by the profile route. Demo and fallback records never participate.
  * A database failure intentionally produces no local SEO entries.
  */
-export async function getSeoEligibleCityInventoryMap(): Promise<Map<string, number>> {
+async function getSeoEligibleCityInventoryMap(): Promise<Map<string, number>> {
   try {
     const sitemapProfiles = await getSitemapProfileSlugs();
     const slugs = [...new Set(sitemapProfiles.map((row) => row.slug).filter(isSafeProfileSlug))];

@@ -460,7 +460,7 @@ export const PROVIDER_GROWTH_HERO_ADDONS = [
   "travel-boost",
 ].map((slug) => allAddons.find((addon) => addon.slug === slug)).filter(Boolean) as GrowthAddon[];
 
-export function findGrowthAddon(slug: string) {
+function findGrowthAddon(slug: string) {
   return allAddons.find((addon) => addon.slug === slug) || null;
 }
 

@@ -35,7 +35,7 @@ export const SUPABASE_PUBLIC_ANON_KEY =
 const SUPABASE_URL = SUPABASE_PUBLIC_URL;
 const SUPABASE_ANON_KEY = SUPABASE_PUBLIC_ANON_KEY;
 
-export function createClient() {
+function createClient() {
   return createBrowserClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 

@@ -4,4 +4,3 @@ export function createClient() {
   return supabase;
 }
 
-export { supabase };

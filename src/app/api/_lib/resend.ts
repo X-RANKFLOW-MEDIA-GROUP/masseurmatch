@@ -12,7 +12,7 @@ function getResend() {
   return _resend;
 }
 
-export async function sendWelcomeEmail(email: string, name: string, token: string) {
+async function sendWelcomeEmail(email: string, name: string, token: string) {
   await getResend().emails.send({
     from: 'MasseurMatch Concierge <concierge@masseurmatch.com>',
     to: email,

@@ -54,7 +54,7 @@ export function createSupabaseWebhookClient() {
 // Validates the incoming request has an active admin session, then returns both
 // the service-role client and the verified session together so callers cannot
 // accidentally skip the auth gate.
-export async function requireAdminClient(
+async function requireAdminClient(
   request: Request | { headers: { get: (name: string) => string | null } },
 ): Promise<{ client: ReturnType<typeof createSupabaseAdminClient>; session: RequestSession }> {
   const session = await requireAdminSession(request);
@@ -79,7 +79,7 @@ export function createSupabaseWebhookAdminClient() {
   return createClient<Database>(url, serviceRoleKey, baseOptions());
 }
 
-export function createSupabaseAdminDashboardClient(session: RequestSession) {
+function createSupabaseAdminDashboardClient(session: RequestSession) {
   if (session.role !== "admin") {
     throw new RouteError(403, "Admin access required.");
   }
@@ -197,7 +197,7 @@ export async function getUserByEmail(email: string): Promise<User | null> {
   return null;
 }
 
-export async function verifyPassword(email: string, password: string) {
+async function verifyPassword(email: string, password: string) {
   const publicClient = createSupabasePublicClient();
   const { data, error } = await publicClient.auth.signInWithPassword({
     email,
@@ -219,7 +219,7 @@ async function wait(ms: number) {
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function verifyPasswordWithRetry(email: string, password: string, attempts = 1) {
+async function verifyPasswordWithRetry(email: string, password: string, attempts = 1) {
   let lastError: unknown;
 
   for (let attempt = 0; attempt < attempts; attempt += 1) {
@@ -373,7 +373,7 @@ export async function ensureUserProfileAndRole(
   };
 }
 
-export async function createTherapistUser(input: {
+async function createTherapistUser(input: {
   fullName: string;
   email: string;
   password: string;

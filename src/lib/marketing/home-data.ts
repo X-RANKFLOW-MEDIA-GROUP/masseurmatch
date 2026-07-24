@@ -39,7 +39,7 @@ export const LANDING_FAQ: FaqItem[] = [
   },
 ];
 
-export type LaunchCityCard = {
+type LaunchCityCard = {
   href: string;
   city: CityData;
   listingCount: number;
@@ -47,7 +47,7 @@ export type LaunchCityCard = {
   highlights: string[];
 };
 
-export const PRIORITY_CITY_SLUGS = [
+const PRIORITY_CITY_SLUGS = [
   "dallas",
   "miami",
   "new-york",
@@ -58,7 +58,7 @@ export const PRIORITY_CITY_SLUGS = [
   "washington-dc",
 ] as const;
 
-export const CITY_HIGHLIGHTS: Record<string, string[]> = {
+const CITY_HIGHLIGHTS: Record<string, string[]> = {
   dallas: ["Deep Tissue", "Outcall", "Hotel Massage", "Verified Profiles"],
   miami: ["Outcall", "LGBTQ+ Friendly", "Beach Area", "Verified Profiles"],
   "new-york": ["Manhattan", "Brooklyn", "Incall & Outcall", "Verified"],
@@ -69,7 +69,7 @@ export const CITY_HIGHLIGHTS: Record<string, string[]> = {
   "washington-dc": ["Incall & Outcall", "Deep Tissue", "Verified", "LGBTQ+"],
 };
 
-export const CITY_ROUTE_COUNTS: Record<string, number> = {
+const CITY_ROUTE_COUNTS: Record<string, number> = {
   dallas: 42,
   miami: 28,
   "new-york": 36,

@@ -27,7 +27,7 @@ export function isIdentityVerified(
   return profile.verification_status === "verified";
 }
 
-export function getDirectoryTierLabel(profile: Pick<PublicTherapist, "subscription_tier">) {
+function getDirectoryTierLabel(profile: Pick<PublicTherapist, "subscription_tier">) {
   const tier = profile.subscription_tier;
   if (tier === "pro" || tier === "elite") {
     return "Premium";
@@ -43,14 +43,14 @@ export function normalizePhoneNumber(phone: string | null) {
   return phone.replace(/[^\d+]/g, "");
 }
 
-export function getMaskedPhoneLabel(phone: string | null) {
+function getMaskedPhoneLabel(phone: string | null) {
   const digits = normalizePhoneNumber(phone).replace(/[^\d]/g, "");
   if (!digits) return "Contact provider";
   const last4 = digits.slice(-4);
   return last4 ? `Contact ending in ${last4}` : "Contact provider";
 }
 
-export function getPublicContactLinks(
+function getPublicContactLinks(
   phone: string | null,
   whatsapp_number?: string | null,
   profileId?: string | null,
@@ -67,7 +67,7 @@ export function getPublicContactLinks(
   };
 }
 
-export function getPublicTrustHighlights(profile: PublicTherapist) {
+function getPublicTrustHighlights(profile: PublicTherapist) {
   const highlights = [
     profile.available_now ? "Available now" : null,
     profile.verification_status === "verified" ? "Identity reviewed" : null,

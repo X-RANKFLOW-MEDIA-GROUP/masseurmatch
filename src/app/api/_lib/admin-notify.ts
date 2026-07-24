@@ -15,13 +15,13 @@ import { envAny, envOptional } from "@/app/api/_lib/env";
 const DEFAULT_ADMIN_RECIPIENT = "admin@xrankflow.com";
 const DEFAULT_FROM = "MasseurMatch <notifications@masseurmatch.com>";
 
-export function getAdminNotificationRecipient(): string {
+function getAdminNotificationRecipient(): string {
   return (
     envOptional(["ADMIN_NOTIFICATION_EMAIL", "ADMIN_EMAIL"]) ?? DEFAULT_ADMIN_RECIPIENT
   );
 }
 
-export interface AdminNotificationField {
+interface AdminNotificationField {
   label: string;
   value: string | null | undefined;
 }

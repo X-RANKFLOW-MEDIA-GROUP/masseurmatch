@@ -15,7 +15,7 @@ function clamp(value: number, min = 0, max = 1) {
   return Math.min(max, Math.max(min, value));
 }
 
-export function hashSessionToPercent(sessionId: string) {
+function hashSessionToPercent(sessionId: string) {
   let hash = 0;
 
   for (let index = 0; index < sessionId.length; index += 1) {
@@ -25,7 +25,7 @@ export function hashSessionToPercent(sessionId: string) {
   return hash % 100;
 }
 
-export function isExplorationSession(sessionId: string) {
+function isExplorationSession(sessionId: string) {
   return hashSessionToPercent(sessionId) < 10;
 }
 

@@ -86,7 +86,7 @@ export function clearFailedAttempts(email: string, request: Request): void {
   MEMORY_STORE.delete(key);
 }
 
-export function assertNotBruteForceLocked(email: string, request: Request): void {
+function assertNotBruteForceLocked(email: string, request: Request): void {
   const { isLocked, remainingTime } = checkBruteForce(email, request);
 
   if (isLocked) {

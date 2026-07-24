@@ -12,7 +12,7 @@ export interface BlogPost {
   blocks: BlogBlock[];
 }
 
-export const BLOG_POSTS: BlogPost[] = [
+const BLOG_POSTS: BlogPost[] = [
   {
     slug: "benefits-of-booking-local-massage-therapists",
     title: "Top 7 Benefits of Booking Local Massage Therapists Near You",

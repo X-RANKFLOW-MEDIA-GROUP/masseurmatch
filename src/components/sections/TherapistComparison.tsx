@@ -246,7 +246,7 @@ interface CompareButtonProps {
   isSelected?: boolean;
 }
 
-export function CompareButton({
+function CompareButton({
   profileId,
   onCompare,
   isSelected = false,

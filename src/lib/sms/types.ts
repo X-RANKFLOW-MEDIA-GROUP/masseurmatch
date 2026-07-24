@@ -1,4 +1,4 @@
-export type AvailabilityMode = 'in_city' | 'traveling' | 'arrival_window' | 'unavailable'
+type AvailabilityMode = 'in_city' | 'traveling' | 'arrival_window' | 'unavailable'
 
 export type SmsIntent =
   | 'pricing'

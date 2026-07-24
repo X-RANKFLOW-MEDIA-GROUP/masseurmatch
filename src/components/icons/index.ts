@@ -24,16 +24,11 @@
 export { SketchFilter }    from './SketchFilter';
 export { IconShield }      from './IconShield';
 export { IconStar }        from './IconStar';
-export { IconHand }        from './IconHand';
 export { IconSpark }       from './IconSpark';
 export { IconMapPin }      from './IconMapPin';
-export { IconCalendar }    from './IconCalendar';
-export { IconUser }        from './IconUser';
 export { IconAward }       from './IconAward';
 export { IconMessage }     from './IconMessage';
-export { IconCreditCard }  from './IconCreditCard';
 export { IconSearch }      from './IconSearch';
-export { IconLeaf }        from './IconLeaf';
 export { IconLock }        from './IconLock';
 export { IconArrowRight }  from './IconArrowRight';
 export { IconHeart }       from './IconHeart';

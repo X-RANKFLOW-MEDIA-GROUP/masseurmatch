@@ -85,7 +85,7 @@ export function formatWeightLb(weightLb: number | null | undefined) {
   return `${Math.round(weightLb)} lb`;
 }
 
-export function buildPhysicalProfileSummary(input: {
+function buildPhysicalProfileSummary(input: {
   heightInches?: number | null;
   weightLb?: number | null;
   bodyType?: string | null;

@@ -57,7 +57,7 @@ function parseRequestCookies(request: Request): ParsedCookie[] {
  * response object is not available for cookie rotation (the middleware keeps
  * the session fresh on document navigations).
  */
-export function supabaseFromRequest(request: Request) {
+function supabaseFromRequest(request: Request) {
   const cookies = parseRequestCookies(request);
   return createServerClient<Database>(
     SUPABASE_PUBLIC_URL,

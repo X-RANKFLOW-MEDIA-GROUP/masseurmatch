@@ -1,9 +1,9 @@
 import { envAny as baseEnvAny, envOptional as baseEnvOptional } from "@/app/api/_lib/env";
 
-export const envAny = baseEnvAny;
+const envAny = baseEnvAny;
 export const envOptional = baseEnvOptional;
 
-export function envRequired(names: string[], label?: string) {
+function envRequired(names: string[], label?: string) {
   const value = baseEnvOptional(names);
 
   if (!value) {
@@ -13,4 +13,4 @@ export function envRequired(names: string[], label?: string) {
   return value;
 }
 
-export const isProduction = envAny(["NODE_ENV"], "development") === "production";
+const isProduction = envAny(["NODE_ENV"], "development") === "production";

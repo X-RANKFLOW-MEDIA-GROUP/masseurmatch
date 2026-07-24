@@ -13,7 +13,10 @@ import { getLaunchAreaPaths, getLaunchKeywordPaths, getLaunchSegmentPaths } from
 import { createPageMetadata } from "@/app/_lib/metadata";
 import { SEO_CITY_MIN_PUBLIC_PROFILES } from "@/app/_lib/sitemap-release";
 import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd, buildLocalBusinessJsonLd } from "@/app/_lib/structured-data";
-import { TherapistComparison, type ComparisonTherapistProfile } from "@/components";
+import {
+  TherapistComparison,
+  type TherapistProfile as ComparisonTherapistProfile,
+} from "@/components/sections/TherapistComparison";
 
 type Params = { city: string };
 

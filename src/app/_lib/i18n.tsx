@@ -11,7 +11,7 @@ import pt from "@/i18n/locales/pt.json";
 const LOCALE_STORAGE_KEY = "mm-locale";
 const LOCALE_COOKIE_KEY = "mm-locale";
 
-export const supportedLocales = ["en", "es", "fr", "pt", "de", "it", "nl", "ja", "zh"] as const;
+const supportedLocales = ["en", "es", "fr", "pt", "de", "it", "nl", "ja", "zh"] as const;
 
 export type Locale = (typeof supportedLocales)[number];
 
@@ -134,7 +134,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
-export function useI18n() {
+function useI18n() {
   const context = useContext(I18nContext);
 
   if (!context) {

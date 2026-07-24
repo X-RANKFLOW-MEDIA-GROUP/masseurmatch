@@ -1,4 +1,4 @@
-export interface Hotel {
+interface Hotel {
   name: string;
   address: string;
   distanceToGayArea: string;
@@ -11,7 +11,7 @@ export interface Hotel {
   whyRecommended: string;
 }
 
-export interface StreetMeterInfo {
+interface StreetMeterInfo {
   location: string;
   rate: string;
   hours: string;
