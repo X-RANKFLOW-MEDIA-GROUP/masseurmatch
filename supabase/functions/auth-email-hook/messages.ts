@@ -43,10 +43,20 @@ function btn(text: string, url: string): string {
   return `<a href="${url}" style="display:inline-block;background:#8B1E2D;color:#FFFFFF;text-decoration:none;font-size:15px;font-weight:700;padding:12px 24px;border-radius:8px;margin-top:8px">${text}</a>`;
 }
 
-// Server routes that verify the token_hash themselves via verifyOtp(). When a
-// redirect targets one of these, we hand it the raw token_hash directly instead
-// of routing through GoTrue's /auth/v1/verify.
-const APP_CALLBACK_PATHS = new Set(["/api/auth/callback", "/auth/callback"]);
+// App routes that verify the token_hash themselves via verifyOtp() — the two
+// server callback routes and the client /reset-password page. When a redirect
+// targets one of these, we hand it the raw token_hash directly instead of
+// routing through GoTrue's /auth/v1/verify. That verify endpoint is a plain
+// server GET, so email link-scanners (Outlook Safe Links, antivirus) pre-fetch
+// and consume the single-use token before the person clicks — the classic
+// "token expired" on a fresh recovery link. Delivering token_hash straight to
+// /reset-password (which runs verifyOtp in the browser) is scanner-safe and
+// needs no PKCE code_verifier, so it also works cross-device.
+const APP_CALLBACK_PATHS = new Set([
+  "/api/auth/callback",
+  "/auth/callback",
+  "/reset-password",
+]);
 
 function confirmUrl(
   config: EmailUrlConfig,

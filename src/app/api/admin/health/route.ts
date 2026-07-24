@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
-import { errorResponse, json } from "@/app/api/_lib/http";
-import { requireAdminSession } from "@/app/api/_lib/supabase-server";
+import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
+import { supabaseFromRequest } from "@/app/api/_lib/session";
 
 // Admin-only environment diagnostic. Reports whether required integration
 // secrets are configured as booleans ONLY — it never returns, logs, or hints
@@ -13,9 +13,33 @@ function isSet(...names: string[]): boolean {
   });
 }
 
+// Authorize WITHOUT the service-role admin client. Identity is verified by the
+// cookie-bound anon client (getUser), and the role is read from app_metadata —
+// which is server-writable only (mirrored by the role-assignment path), so it
+// is safe to trust and is the same source the middleware authorizes from. This
+// deliberately avoids getUserRole()/the service-role client so the endpoint can
+// still report SUPABASE_SERVICE_ROLE_KEY: false when that key is the very thing
+// that is missing (otherwise the auth check itself would 500 first).
+async function requireAdminFromCookie(request: Request): Promise<void> {
+  const supabase = supabaseFromRequest(request);
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    throw new RouteError(401, "Authentication required.");
+  }
+
+  const role = (user.app_metadata as Record<string, unknown> | undefined)?.role;
+  if (role !== "admin") {
+    throw new RouteError(403, "Admin access required.");
+  }
+}
+
 export async function GET(request: Request) {
   try {
-    await requireAdminSession(request);
+    await requireAdminFromCookie(request);
 
     const env = {
       // Password reset (token_hash email) depends on both of these.
