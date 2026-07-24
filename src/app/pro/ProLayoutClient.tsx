@@ -6,49 +6,45 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Banknote,
-  BarChart,
+  BarChart3,
   Bell,
   CreditCard,
-  Image as ImageIcon,
   LayoutDashboard,
-  LifeBuoy,
   Loader2,
   Mail,
   Menu,
   Settings,
-  ShieldCheck,
-  Sparkles,
-  TrendingUp,
   UserCircle,
-  WalletCards,
   X,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { BRAND_ASSETS } from "@/lib/brand";
 
 const navItems = [
-  { name: "Dashboard", href: "/pro/dashboard", icon: LayoutDashboard },
+  { name: "Home", href: "/pro/dashboard", icon: LayoutDashboard },
   { name: "My Profile", href: "/pro/listing", icon: UserCircle },
-  { name: "AI Profile Coach", href: "/pro/ai-coach", icon: Sparkles, badge: "New" },
-  { name: "Trust & Verification", href: "/pro/trust", icon: ShieldCheck },
-  { name: "Rates", href: "/pro/rates", icon: Banknote },
-  { name: "Photos", href: "/pro/photos", icon: ImageIcon },
-  { name: "Growth Tools", href: "/pro/growth", icon: TrendingUp },
-  { name: "Inquiries", href: "/pro/inquiries", icon: Mail },
-  { name: "Analytics", href: "/pro/analytics", icon: BarChart },
-  { name: "Notifications", href: "/pro/notifications", icon: Bell },
-  { name: "Subscription", href: "/pro/subscription", icon: CreditCard },
-  { name: "Payment History", href: "/pro/payment-history", icon: WalletCards },
-  { name: "Support", href: "/pro/tickets", icon: LifeBuoy },
-  { name: "Settings", href: "/pro/settings", icon: Settings },
+  { name: "Leads", href: "/pro/inquiries", icon: Mail },
+  { name: "Performance", href: "/pro/analytics", icon: BarChart3 },
+  { name: "Plan & Billing", href: "/pro/subscription", icon: CreditCard },
+  { name: "Settings & Help", href: "/pro/settings", icon: Settings },
 ] as const;
 
-export default function ProLayoutClient({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+const routeGroups: Record<string, string[]> = {
+  "/pro/listing": ["/pro/profile", "/pro/listing", "/pro/rates", "/pro/photos", "/pro/trust"],
+  "/pro/analytics": ["/pro/analytics", "/pro/growth", "/pro/ai-coach"],
+  "/pro/subscription": ["/pro/subscription", "/pro/billing", "/pro/payment-history"],
+  "/pro/settings": ["/pro/settings", "/pro/tickets", "/pro/notifications"],
+};
+
+function itemIsActive(pathname: string, href: string) {
+  const groupedRoutes = routeGroups[href];
+  if (groupedRoutes) {
+    return groupedRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+export default function ProLayoutClient({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -71,9 +67,7 @@ export default function ProLayoutClient({
     };
   }, []);
 
-  if (!loading && !user) {
-    return null;
-  }
+  if (!loading && !user) return null;
 
   const sidebarContent = (
     <>
@@ -95,8 +89,7 @@ export default function ProLayoutClient({
 
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-5" aria-label="Provider dashboard">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-
+          const isActive = itemIsActive(pathname, item.href);
           return (
             <Link key={item.name} href={item.href} className="relative block rounded-xl">
               {isActive ? (
@@ -107,7 +100,7 @@ export default function ProLayoutClient({
                 />
               ) : null}
               <span
-                className={`relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 font-sans text-sm transition-colors ${
+                className={`relative flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm transition-colors ${
                   isActive
                     ? "font-semibold text-[#8B1E2D]"
                     : "text-[#6D655F] hover:bg-[#F7F3F0] hover:text-[#25211E]"
@@ -118,33 +111,20 @@ export default function ProLayoutClient({
                 ) : null}
                 <item.icon className="h-4 w-4 shrink-0" strokeWidth={2.15} />
                 <span className="min-w-0 flex-1 truncate">{item.name}</span>
-                {"badge" in item ? (
-                  <span className="rounded-full bg-[#8B1E2D] px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.08em] text-white">
-                    {item.badge}
-                  </span>
-                ) : null}
               </span>
             </Link>
           );
         })}
       </nav>
 
-      <div className="m-3 rounded-2xl border border-[#E9E1DA] bg-[#FCF9F6] p-4">
-        <div className="flex items-center gap-2 text-[#8B1E2D]">
-          <Sparkles className="h-4 w-4" />
-          <p className="text-xs font-semibold">Need guidance?</p>
-        </div>
-        <p className="mt-2 text-xs leading-5 text-[#756D67]">
-          Ask the AI Profile Coach or contact our team.
-        </p>
-        <div className="mt-3 flex gap-3 text-xs font-semibold">
-          <Link href="/pro/ai-coach" className="text-[#8B1E2D] hover:underline">
-            Open coach
-          </Link>
-          <a href="mailto:support@masseurmatch.com" className="text-[#655E59] hover:underline">
-            Support
-          </a>
-        </div>
+      <div className="border-t border-[#ECE5DF] p-3">
+        <Link
+          href="/pro/notifications"
+          className="flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm text-[#6D655F] transition-colors hover:bg-[#F7F3F0] hover:text-[#25211E]"
+        >
+          <Bell className="h-4 w-4" />
+          Notifications
+        </Link>
       </div>
     </>
   );
@@ -162,14 +142,23 @@ export default function ProLayoutClient({
             Pro
           </span>
         </Link>
-        <button
-          type="button"
-          onClick={() => setMobileOpen((previous) => !previous)}
-          aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          className="rounded-lg border border-[#E5DDD6] p-1.5 text-[#5E5752] transition-colors hover:bg-[#F7F3F0]"
-        >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/pro/notifications"
+            aria-label="Notifications"
+            className="rounded-lg border border-[#E5DDD6] p-1.5 text-[#5E5752] transition-colors hover:bg-[#F7F3F0]"
+          >
+            <Bell className="h-5 w-5" />
+          </Link>
+          <button
+            type="button"
+            onClick={() => setMobileOpen((previous) => !previous)}
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            className="rounded-lg border border-[#E5DDD6] p-1.5 text-[#5E5752] transition-colors hover:bg-[#F7F3F0]"
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
