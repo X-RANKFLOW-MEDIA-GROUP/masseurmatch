@@ -173,7 +173,11 @@ export function AuthForms({
       : role === "client"
         ? "/dashboard"
         : sanitizedRedirectTo;
-    router.push(destination);
+
+    // Authentication writes SSR cookies on the server. A document-level
+    // navigation reloads the auth provider from those cookies and guarantees
+    // the dashboard uses assets from the current production deployment.
+    window.location.replace(destination);
   };
 
   const resendConfirmation = async () => {
