@@ -8,7 +8,6 @@ import {
   buildItemListJsonLd,
   createPageMetadata,
 } from "@/app/_lib/seo";
-import { siteUrl } from "@/lib/site";
 
 export const revalidate = 3600; // 1 hour
 

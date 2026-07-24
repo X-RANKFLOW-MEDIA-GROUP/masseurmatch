@@ -1,5 +1,5 @@
 import { createHmac } from "node:crypto";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 
 // ─── Mirrors of production logic from src/app/api/webhooks/stripe/route.ts ───
 // These are copied verbatim so the tests remain pure and dependency-free.

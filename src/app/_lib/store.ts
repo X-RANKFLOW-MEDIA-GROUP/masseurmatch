@@ -1,8 +1,6 @@
 import { RouteError } from "@/app/api/_lib/http";
 import {
   createSupabaseAdminClient,
-  createSupabasePublicClient,
-  getUserRole,
   recordAuditLog,
 } from "@/app/api/_lib/supabase-server";
 import type { Database } from "@/integrations/supabase/types";

@@ -11,7 +11,6 @@ import {
   buildItemListJsonLd,
   createPageMetadata,
 } from "@/app/_lib/seo";
-import { siteUrl } from "@/lib/site";
 
 type Params = { city: string; service: string };
 

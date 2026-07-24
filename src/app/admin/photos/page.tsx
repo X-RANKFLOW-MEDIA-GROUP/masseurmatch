@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw, CheckCircle2, XCircle, ImageIcon } from "lucide-react";

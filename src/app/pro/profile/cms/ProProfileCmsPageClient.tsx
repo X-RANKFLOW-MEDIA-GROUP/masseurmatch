@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { AppButton, AppInput, AppTextarea, PageSection, Surface } from "@/app/_components/primitives";
+import { AppButton, AppTextarea, PageSection, Surface } from "@/app/_components/primitives";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, RefreshCw, AlertCircle, Eye, Save, X } from "lucide-react";
+import { Loader2, RefreshCw, AlertCircle, Eye, X } from "lucide-react";
 import { requestJson, postJson } from "@/app/_lib/request";
 
 type ProfileResponse = {

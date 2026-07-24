@@ -11,7 +11,6 @@ import {
   buildItemListJsonLd,
   createPageMetadata,
 } from "@/app/_lib/seo";
-import { Users } from "lucide-react";
 import { IconAward, IconShield, IconStar } from "@/components/icons";
 
 type Params = { city: string };

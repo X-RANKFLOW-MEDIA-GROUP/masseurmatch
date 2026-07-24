@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, Phone, Mail } from "lucide-react";
+import { Phone, Mail } from "lucide-react";
 import { IconShield } from "@/components/icons";
 import { SiteFooterTalk } from "@/components/marketing/SiteFooterTalk";
 

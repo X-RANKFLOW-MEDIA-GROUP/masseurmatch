@@ -5,7 +5,6 @@ import { JsonLd } from "@/app/_components/json-ld";
 import { getModalityGuide } from "@/app/_lib/modality-guides";
 import { getServiceMetadata } from "@/app/_lib/service-data";
 import { buildArticleJsonLd, buildBreadcrumbJsonLd, createPageMetadata } from "@/app/_lib/seo";
-import { siteUrl } from "@/lib/site";
 import { ArrowRight } from "lucide-react";
 
 type Params = { slug: string };

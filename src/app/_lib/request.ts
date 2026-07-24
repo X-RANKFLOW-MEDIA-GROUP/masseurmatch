@@ -2,7 +2,6 @@
 
 import {
   ApiError,
-  deleteJson,
   postJson,
   requestJson as baseRequestJson,
 } from "@/app/_lib/client-api";

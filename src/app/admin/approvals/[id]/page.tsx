@@ -7,13 +7,7 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
-  MessageSquare,
   Loader2,
-  FileText,
-  MapPin,
-  DollarSign,
-  Star,
-  Upload,
 } from "lucide-react";
 import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";
 import { requestJson } from "@/app/_lib/request";
