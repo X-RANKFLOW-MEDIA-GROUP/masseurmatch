@@ -4,8 +4,12 @@ import {
   requireAdminSession,
   recordAuditLog,
 } from "@/app/api/_lib/supabase-server";
-import { getFieldByKey } from "@/lib/profile-fields-config";
-import type { Database, Json } from "@/integrations/supabase/types";
+import {
+  createProfileCmsUpdate,
+  isProfileCmsUpdateField,
+  toProfileCmsJson,
+} from "@/lib/profile-cms-update";
+import type { Json } from "@/integrations/supabase/types";
 
 export const dynamic = "force-dynamic";
 
@@ -19,24 +23,6 @@ type AuditDetails = {
   old_value?: unknown;
   new_value?: unknown;
 };
-
-type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
-
-function toJson(value: unknown): Json {
-  if (value === null || value === undefined) return null;
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-    return value;
-  }
-  if (Array.isArray(value)) {
-    return value.map((item) => toJson(item));
-  }
-  if (typeof value === "object") {
-    return Object.fromEntries(
-      Object.entries(value).map(([key, item]) => [key, toJson(item)]),
-    );
-  }
-  return String(value);
-}
 
 export async function POST(request: Request) {
   try {
@@ -63,20 +49,24 @@ export async function POST(request: Request) {
         : {};
     const fieldName = typeof details.field_name === "string" ? details.field_name : null;
 
-    if (!fieldName || !getFieldByKey(fieldName)) {
+    if (!fieldName || !isProfileCmsUpdateField(fieldName)) {
       return Response.json({ error: "Audit log entry has an invalid field name" }, { status: 400 });
     }
 
-    const oldValue = toJson(details.old_value);
-    const newValue = toJson(details.new_value);
-    const updatePayload = {
-      [fieldName]: oldValue,
-      updated_at: new Date().toISOString(),
-    } as unknown as ProfileUpdate;
+    let payload;
+    let rolledBackValue;
+    try {
+      const update = createProfileCmsUpdate(fieldName, details.old_value);
+      payload = update.payload;
+      rolledBackValue = update.normalizedValue;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Invalid rollback value";
+      return Response.json({ error: message }, { status: 400 });
+    }
 
     const { error: updateError } = await supabase
       .from("profiles")
-      .update(updatePayload)
+      .update(payload)
       .eq("id", profile_id);
 
     if (updateError) {
@@ -85,8 +75,8 @@ export async function POST(request: Request) {
 
     const auditDetails: Json = {
       field_name: fieldName,
-      old_value: newValue,
-      new_value: oldValue,
+      old_value: toProfileCmsJson(details.new_value),
+      new_value: toProfileCmsJson(rolledBackValue),
       source_audit_log_id: audit_log_id,
       rolled_back_at: new Date().toISOString(),
     };
@@ -103,7 +93,7 @@ export async function POST(request: Request) {
       ok: true,
       profile_id,
       field_name: fieldName,
-      rolled_back_value: oldValue,
+      rolled_back_value: rolledBackValue,
     });
   } catch (error) {
     console.error("Rollback error:", error);
