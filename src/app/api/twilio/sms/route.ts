@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { buildTwimlEmpty, buildTwimlReply, getConversationHistory, logSms, validateTwilioSignature } from "@/lib/sms/twilio-utils";
+import { buildTwimlEmpty, buildTwimlReply, logSms, validateTwilioSignature } from "@/lib/sms/twilio-utils";
 import { generateVapiSmsReply } from "@/lib/knotty/vapi-chat";
 
 export const dynamic = "force-dynamic";
@@ -70,8 +70,7 @@ export async function POST(request: NextRequest) {
   });
 
   try {
-    const history = await getConversationHistory(from, to, 14);
-    const reply = await generateVapiSmsReply({ from, to, history });
+    const { reply } = await generateVapiSmsReply({ from, to, message: body });
 
     await logSms({
       profile_id: null,
