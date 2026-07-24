@@ -1,11 +1,11 @@
 /**
- * /design-system/buttons
- * ──────────────────────
+ * /admin/spike/design-system/buttons
+ * ──────────────────────────────────
  * Interactive showcase of all button variants for team approval.
+ * Experimental page — lives behind the admin spike area so it is only
+ * reachable with an admin session.
  * Server Component — no client JS needed for the demo layout.
  * The ButtonLiquidMetal hover effect is client-only CSS (no JS).
- *
- * Route: /design-system/buttons
  */
 
 import { Button } from "@/components/ui/button";
