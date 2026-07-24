@@ -15,6 +15,7 @@ const fieldUpdateSchema = z.object({
 });
 
 type FieldUpdateRequest = z.infer<typeof fieldUpdateSchema>;
+type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 
 /**
  * Extract client IP address from request headers
@@ -135,7 +136,7 @@ export async function POST(request: Request) {
     }
 
     // Parse and validate request body
-    const body = await parseJsonBody(request, fieldUpdateSchema);
+    const body: FieldUpdateRequest = await parseJsonBody(request, fieldUpdateSchema);
 
     // Validate field exists and is editable
     const fieldDef = getFieldByKey(body.field_name);
@@ -165,11 +166,13 @@ export async function POST(request: Request) {
     let updatedProfile = profile;
 
     if (hasChanged) {
-      // Prepare the update object with dynamic field name
-      const updates: Record<string, any> = {
+      // The key is dynamic but has already been validated against the profile
+      // field registry. Cast only at this boundary to satisfy strict generated
+      // Supabase update types while retaining runtime field validation.
+      const updates = {
         [body.field_name]: newValue,
         updated_at: new Date().toISOString(),
-      };
+      } as unknown as ProfileUpdate;
 
       // If profile was approved, mark as under_review for changes
       if (profile.profile_status === "approved") {
