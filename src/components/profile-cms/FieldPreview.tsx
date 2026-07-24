@@ -35,14 +35,18 @@ export const FieldPreview = React.forwardRef<
         }
         return (
           <div className="flex flex-wrap gap-2">
-            {value.map((item, idx) => (
-              <div
-                key={`${item}-${idx}`}
-                className="inline-flex items-center px-3 py-1 bg-accent/10 text-accent rounded-lg border border-accent/20 text-sm font-medium"
-              >
-                {item}
-              </div>
-            ))}
+            {value.map((item, idx) => {
+              const displayValue =
+                typeof item === "string" ? item : JSON.stringify(item) ?? String(item);
+              return (
+                <div
+                  key={`${displayValue}-${idx}`}
+                  className="inline-flex items-center px-3 py-1 bg-accent/10 text-accent rounded-lg border border-accent/20 text-sm font-medium"
+                >
+                  {displayValue}
+                </div>
+              );
+            })}
           </div>
         );
 
@@ -63,12 +67,15 @@ export const FieldPreview = React.forwardRef<
           );
         }
 
-      case FieldType.INTEGER:
+      case FieldType.INTEGER: {
+        const displayValue =
+          typeof value === "number" || typeof value === "string" ? value : 0;
         return (
           <span className="font-mono text-sm font-bold text-accent">
-            {value ?? 0}
+            {displayValue}
           </span>
         );
+      }
 
       case FieldType.SELECT: {
         const option = config.options?.find((opt) => opt.value === value);
