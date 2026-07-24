@@ -124,11 +124,30 @@ export default function ResetPasswordPageClient() {
     }
 
     setLoading(true);
+
+    // Guard against a dropped recovery session: without one, updateUser() throws
+    // the raw "Auth session missing!" error. Surface the actionable expired
+    // screen instead so the person can request a fresh link.
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      setLoading(false);
+      setLinkError(
+        "Your reset session has expired. Request a new link below — it stays valid for 60 minutes.",
+      );
+      return;
+    }
+
     const { error: updateError } = await supabase.auth.updateUser({ password });
     setLoading(false);
 
     if (updateError) {
-      setError(updateError.message);
+      if (/session|missing|jwt|token/i.test(updateError.message)) {
+        setLinkError(
+          "Your reset session has expired. Request a new link below — it stays valid for 60 minutes.",
+        );
+      } else {
+        setError(updateError.message);
+      }
       return;
     }
 
