@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/app/_components/json-ld";
 import { getCities } from "@/app/_lib/directory";
-import { createPageMetadata } from "@/app/_lib/metadata";
-import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd } from "@/app/_lib/structured-data";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  createPageMetadata,
+} from "@/app/_lib/seo";
 import { Smartphone } from "lucide-react";
 
 import { IconMapPin, IconSpark } from "@/components/icons";

@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-import { appUrl } from "@/app/_lib/metadata";
+import { appUrl } from "@/app/_lib/seo";
 import { buildRobotsRules } from "@/app/_lib/seo-routes";
 import { siteUrl } from "@/lib/site";
 

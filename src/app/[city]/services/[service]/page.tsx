@@ -4,13 +4,13 @@ import { notFound } from "next/navigation";
 import { JsonLd } from "@/app/_components/json-ld";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
 import { getServiceMetadata } from "@/app/_lib/service-data";
-import { createPageMetadata } from "@/app/_lib/metadata";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
   buildFaqJsonLd,
   buildItemListJsonLd,
-} from "@/app/_lib/structured-data";
+  createPageMetadata,
+} from "@/app/_lib/seo";
 import { siteUrl } from "@/lib/site";
 
 type Params = { city: string; service: string };

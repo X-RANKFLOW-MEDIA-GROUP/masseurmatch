@@ -8,7 +8,7 @@ import {
   sanitizeOptionalText,
   sanitizeText,
 } from "@/app/_lib/security";
-import { getRequestSession } from "@/app/_lib/session";
+import { getRequestSession } from "@/app/api/_lib/session";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import type { TablesInsert } from "@/integrations/supabase/types";
 

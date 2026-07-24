@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getCanonicalCitySlug } from "@/app/_lib/city-routing";
 import { getCities } from "@/app/_lib/directory";
-import { createPageMetadata } from "@/app/_lib/metadata";
+import { createPageMetadata } from "@/app/_lib/seo";
 
 export const metadata = createPageMetadata({
   title: "Find massage therapists by city across the United States",

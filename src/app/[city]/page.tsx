@@ -10,9 +10,14 @@ import {
   getSegmentBySlug,
 } from "@/app/_lib/directory-taxonomy";
 import { getLaunchAreaPaths, getLaunchKeywordPaths, getLaunchSegmentPaths } from "@/app/_lib/launch-urls";
-import { createPageMetadata } from "@/app/_lib/metadata";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildItemListJsonLd,
+  buildLocalBusinessJsonLd,
+  createPageMetadata,
+} from "@/app/_lib/seo";
 import { SEO_CITY_MIN_PUBLIC_PROFILES } from "@/app/_lib/sitemap-release";
-import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd, buildLocalBusinessJsonLd } from "@/app/_lib/structured-data";
 import {
   TherapistComparison,
   type TherapistProfile as ComparisonTherapistProfile,

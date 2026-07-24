@@ -1,6 +1,6 @@
 import { errorResponse, json, parseJsonBody } from "@/app/api/_lib/http";
 import { assertRateLimit } from "@/app/_lib/security";
-import { requireRequestSession } from "@/app/_lib/session";
+import { requireRequestSession } from "@/app/api/_lib/session";
 import { getProfileByUserId, recordAuditLog } from "@/app/_lib/store";
 import { completeText, hasAnyLlmKey } from "@/lib/ai/llm";
 import { z } from "zod";

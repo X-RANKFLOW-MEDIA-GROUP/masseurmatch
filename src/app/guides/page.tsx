@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/app/_components/json-ld";
-import { buildCollectionPageJsonLd, buildItemListJsonLd } from "@/app/_lib/seo";
-import { createPageMetadata } from "@/app/_lib/metadata";
+import {
+  buildCollectionPageJsonLd,
+  buildItemListJsonLd,
+  createPageMetadata,
+} from "@/app/_lib/seo";
 import { GUIDES } from "@/app/guides/data";
 
 export const metadata: Metadata = createPageMetadata({

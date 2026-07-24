@@ -1,6 +1,6 @@
 import { errorResponse, json } from "@/app/api/_lib/http";
 import { getAvailableNowProfile } from "@/app/_lib/store";
-import { requireRequestSession } from "@/app/_lib/session";
+import { requireRequestSession } from "@/app/api/_lib/session";
 
 function normalizePlanKey(value: string | null | undefined) {
   if (value === "free" || value === "standard" || value === "pro" || value === "elite") {

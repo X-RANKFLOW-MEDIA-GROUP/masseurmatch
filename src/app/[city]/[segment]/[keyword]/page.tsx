@@ -9,8 +9,12 @@ import {
   resolveDirectoryFilters,
   getSegmentBySlug,
 } from "@/app/_lib/directory-taxonomy";
-import { createPageMetadata } from "@/app/_lib/metadata";
-import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd } from "@/app/_lib/structured-data";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildItemListJsonLd,
+  createPageMetadata,
+} from "@/app/_lib/seo";
 
 type Params = { city: string; segment: string; keyword: string };
 

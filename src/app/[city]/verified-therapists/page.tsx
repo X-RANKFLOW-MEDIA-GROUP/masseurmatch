@@ -4,13 +4,13 @@ import { notFound } from "next/navigation";
 import { JsonLd } from "@/app/_components/json-ld";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
 import { getVerifiedTherapistPageConfig } from "@/app/_lib/verified-therapist-pages";
-import { createPageMetadata } from "@/app/_lib/metadata";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
   buildFaqJsonLd,
   buildItemListJsonLd,
-} from "@/app/_lib/structured-data";
+  createPageMetadata,
+} from "@/app/_lib/seo";
 import { Users } from "lucide-react";
 import { IconAward, IconShield, IconStar } from "@/components/icons";
 

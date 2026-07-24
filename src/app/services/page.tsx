@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/app/_components/json-ld";
 import { getAllServices } from "@/app/_lib/service-data";
-import { createPageMetadata } from "@/app/_lib/metadata";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
   buildItemListJsonLd,
-} from "@/app/_lib/structured-data";
+  createPageMetadata,
+} from "@/app/_lib/seo";
 import { siteUrl } from "@/lib/site";
 
 export const revalidate = 3600; // 1 hour

@@ -7,7 +7,7 @@ import {
   sanitizeStringArray,
   sanitizeText,
 } from "@/app/_lib/security";
-import { requireRequestSession } from "@/app/_lib/session";
+import { requireRequestSession } from "@/app/api/_lib/session";
 import { createSupabaseAdminClient, recordAuditLog } from "@/app/api/_lib/supabase-server";
 import { getProfileByUserId } from "@/app/_lib/store";
 import { proProfileSchema } from "@/app/_lib/validation";

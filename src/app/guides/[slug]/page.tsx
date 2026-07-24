@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { JsonLd } from "@/app/_components/json-ld";
-import { createPageMetadata } from "@/app/_lib/metadata";
+import { buildArticleJsonLd, buildBreadcrumbJsonLd, createPageMetadata } from "@/app/_lib/seo";
 import { formatSlugLabel } from "@/app/_lib/directory-taxonomy";
-import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "@/app/_lib/seo";
 import { GUIDES, getGuideBySlug } from "@/app/guides/data";
 
 type Params = { slug: string };

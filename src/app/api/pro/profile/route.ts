@@ -4,7 +4,7 @@ import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { sendEmail } from "@/app/api/_lib/email";
 import { assertRateLimit, sanitizeOptionalText, sanitizeStringArray, sanitizeText } from "@/app/_lib/security";
-import { requireRequestSession } from "@/app/_lib/session";
+import { requireRequestSession } from "@/app/api/_lib/session";
 import { getProfileByUserId, recordAuditLog, updateProfileByUserId } from "@/app/_lib/store";
 import { proProfileSchema } from "@/app/_lib/validation";
 import { massageTherapistProfileSchema } from "@/app/_lib/validation.massagist";
