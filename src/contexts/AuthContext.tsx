@@ -170,15 +170,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
+    setLoading(true);
+
     try {
+      // Revoke the refresh token while the server can still read the auth
+      // cookies. The route also explicitly expires every auth cookie.
       await logoutMutation().catch(() => null);
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error("Error during sign out:", error);
     } finally {
+      // The server has already attempted the global revocation. Use local scope
+      // here so an already-revoked token cannot prevent browser cookie cleanup.
+      await supabase.auth.signOut({ scope: "local" }).catch(() => null);
+
       setSession(null);
       setUser(null);
       setSubscription({ ...defaultSubscription, loading: false });
+      setLoading(false);
+
+      // A document navigation prevents cached protected layouts or stale React
+      // state from making the user appear signed in after logout.
+      window.location.replace("/login");
     }
   };
 
