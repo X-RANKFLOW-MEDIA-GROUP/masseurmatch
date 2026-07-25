@@ -174,14 +174,20 @@ const AVAILABLE_NOW_TIER_PRIORITY: Record<SupportedPlanKey, number> = {
   free: 99,
 };
 
-export const usePlanLimits = (): PlanLimits & { planKey: PlanKey; isLoading: boolean } => {
+/** Photo cap during the 14-day free trial; the full plan allowance unlocks once the trial converts. */
+export const TRIAL_MAX_PHOTOS = 4;
+
+export const usePlanLimits = (): PlanLimits & { planKey: PlanKey; isTrial: boolean; isLoading: boolean } => {
   const { subscription } = useAuth();
   const planKey = normalizePlanKey(subscription?.plan_key) || (subscription?.subscribed ? "standard" : null);
   const limits = PLAN_LIMITS[planKey || "free"] || FREE_LIMITS;
+  const isTrial = (subscription?.is_trial ?? false) && planKey !== null && planKey !== "free";
 
   return {
     ...limits,
+    maxPhotos: isTrial ? Math.min(limits.maxPhotos, TRIAL_MAX_PHOTOS) : limits.maxPhotos,
     planKey,
+    isTrial,
     isLoading: subscription?.loading ?? false,
   };
 };

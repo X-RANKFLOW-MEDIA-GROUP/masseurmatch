@@ -23,6 +23,10 @@ const PHOTO_LIMITS: Record<string, number> = {
   elite: 20,
 }
 
+// During the 14-day free trial paid tiers are capped at 4 photos;
+// the full plan allowance unlocks when the trial converts to active.
+const TRIAL_PHOTO_LIMIT = 4
+
 const VISIBILITY_LEVELS: Record<string, number> = {
   free: 1,
   standard: 2,
@@ -41,15 +45,20 @@ function buildSyncArgs(tier: string, sub: Stripe.Subscription, subscriptionStatu
       ? sub.customer
       : (sub.customer as Stripe.Customer | null)?.id ?? null
 
+  const status = subscriptionStatus ?? sub.status ?? null
+  const tierPhotoLimit = PHOTO_LIMITS[tier] ?? 2
+  const photoLimit =
+    status === 'trialing' && tier !== 'free' ? Math.min(tierPhotoLimit, TRIAL_PHOTO_LIMIT) : tierPhotoLimit
+
   return {
     p_user_id:                sub.metadata?.user_id ?? sub.metadata?.userId ?? null,
     p_stripe_customer_id:     customerId,
     p_stripe_subscription_id: sub.id,
     p_tier:                   tier,
-    p_photo_limit:            PHOTO_LIMITS[tier] ?? 2,
+    p_photo_limit:            photoLimit,
     p_visibility_level:       VISIBILITY_LEVELS[tier] ?? 1,
     p_current_period_end:     getCurrentPeriodEnd(sub),
-    p_subscription_status:    subscriptionStatus ?? null,
+    p_subscription_status:    status,
   }
 }
 
@@ -143,8 +152,7 @@ export async function POST(request: NextRequest) {
 
         const { error } = await supabase.rpc('sync_stripe_subscription', {
           ...buildSyncArgs(tier, sub),
-          p_user_id:             userId,
-          p_subscription_status: null,
+          p_user_id: userId,
         })
         if (error) throw error
         break
