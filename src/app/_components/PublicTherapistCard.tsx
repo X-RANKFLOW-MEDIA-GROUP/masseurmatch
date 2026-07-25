@@ -3,9 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight, MapPin, Check } from "lucide-react";
+import { ArrowUpRight, MapPin, Check, Plane } from "lucide-react";
 import { useMemo } from "react";
 import type { PublicTherapist } from "@/app/_lib/directory";
+import { getTravelVisit } from "@/app/_lib/travel-status";
 import { Pill } from "@/components/ui/pill";
 import {
   getPublicProfileName,
@@ -57,17 +58,12 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
   }, [therapist.created_at]);
 
   const travelBadge = useMemo(() => {
-    const schedule = therapist.travel_schedule;
-    if (!Array.isArray(schedule) || schedule.length === 0) return null;
-    const now = Date.now();
-    for (const entry of schedule) {
-      const start = new Date(entry.start_date).getTime();
-      const end = new Date(entry.end_date).getTime();
-      if (now >= start && now <= end) return { label: "Traveling", city: entry.city };
-      const daysUntil = (start - now) / (1000 * 60 * 60 * 24);
-      if (daysUntil > 0 && daysUntil <= 14) return { label: "Arriving soon", city: entry.city };
-    }
-    return null;
+    const visit = getTravelVisit(therapist.travel_schedule);
+    if (!visit) return null;
+    return {
+      label: visit.status === "now" ? "Visiting Now" : "Visiting Soon",
+      city: visit.entry.city,
+    };
   }, [therapist.travel_schedule]);
 
   const startingPrice = getStartingPrice(therapist);
@@ -123,13 +119,22 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
           )}
 
           {/* Top badge row */}
-          <div className="absolute inset-x-2 top-2 flex gap-1.5">
+          <div className="absolute inset-x-2 top-2 flex flex-wrap gap-1.5">
             {availableNow && (
               <Pill
                 variant="available"
                 size="sm"
                 icon={<span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />}
                 label="Available Now"
+              />
+            )}
+            {travelBadge && (
+              <Pill
+                variant="visiting"
+                size="sm"
+                icon={<Plane size={10} strokeWidth={2.5} />}
+                label={travelBadge.label}
+                title={`${travelBadge.label} · ${travelBadge.city}`}
               />
             )}
             {isDirectoryListed && (
