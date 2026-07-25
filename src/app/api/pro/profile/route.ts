@@ -364,7 +364,11 @@ const fullProfileSchema = z.object({
   studioHours: z.array(hoursEntrySchema).max(20).optional(),
   mobileHours: mobileHoursSchema.optional(),
 
-  startDate: z.string().max(7).optional().nullable(),
+  startDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}(-\d{2})?$/, "Expected YYYY-MM or YYYY-MM-DD")
+    .optional()
+    .nullable(),
   yearsExperience: z.number().int().min(0).max(80).optional().nullable(),
   heightInches: z.number().int().min(36).max(96).optional().nullable(),
   weightLb: z.number().int().min(60).max(600).optional().nullable(),
@@ -446,7 +450,12 @@ export async function PATCH(request: Request) {
     if (body.studioHours !== undefined) updates.studio_hours = body.studioHours;
     if (body.mobileHours !== undefined) updates.mobile_hours = body.mobileHours;
 
-    if (body.startDate !== undefined) updates.start_date = text(body.startDate);
+    if (body.startDate !== undefined) {
+      // start_date is timestamptz; pad month-only values so Postgres accepts them
+      const startDate = text(body.startDate);
+      updates.start_date =
+        startDate && /^\d{4}-\d{2}$/.test(startDate) ? `${startDate}-01` : startDate;
+    }
     if (body.yearsExperience !== undefined) updates.years_experience = body.yearsExperience;
     if (body.heightInches !== undefined) updates.height_inches = body.heightInches;
     if (body.weightLb !== undefined) updates.weight_lb = body.weightLb;
