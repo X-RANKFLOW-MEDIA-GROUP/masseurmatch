@@ -15,6 +15,14 @@ function getCsrfSecret(): string | null {
   return null;
 }
 
+function getCookieDomain(): string | null {
+  // Optional env to override cookie domain in production. If unset, do not set Domain header
+  // which is safer for preview/staging domains.
+  const domain = envOptional(["COOKIE_DOMAIN", "MM_COOKIE_DOMAIN"]);
+  if (domain) return domain;
+  return null;
+}
+
 export function generateCsrfToken(): { token: string; cookie: string } {
   const secret = getCsrfSecret();
   if (!secret) {
@@ -50,7 +58,10 @@ export function generateCsrfToken(): { token: string; cookie: string } {
 
   if (secure) {
     cookieParts.push("Secure");
-    cookieParts.push("Domain=.masseurmatch.com");
+    const domain = getCookieDomain();
+    if (domain) {
+      cookieParts.push(`Domain=${domain}`);
+    }
   }
 
   return {
@@ -131,7 +142,10 @@ function clearCsrfCookie(): string {
 
   if (secure) {
     parts.push("Secure");
-    parts.push("Domain=.masseurmatch.com");
+    const domain = getCookieDomain();
+    if (domain) {
+      parts.push(`Domain=${domain}`);
+    }
   }
 
   return parts.join("; ");

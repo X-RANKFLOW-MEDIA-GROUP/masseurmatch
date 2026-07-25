@@ -7,8 +7,43 @@ import {
 import { containsLangParam, removeLangSearchParam } from "@/app/_lib/route-normalization";
 import { updateSession, type EdgeSession } from "@/lib/supabase/middleware";
 
+const VALID_HOST_PATTERN = /^[a-z0-9.-]+(?::\d{1,5})?$/i;
+
+function firstForwardedValue(value: string | null): string | null {
+  const first = value?.split(",")[0]?.trim();
+  return first || null;
+}
+
+function getRequestProtocol(request: NextRequest): "http:" | "https:" {
+  const forwardedProtocol = firstForwardedValue(request.headers.get("x-forwarded-proto"))
+    ?.toLowerCase()
+    .replace(/:$/, "");
+
+  return forwardedProtocol === "http" ? "http:" : "https:";
+}
+
+function getRequestHost(request: NextRequest): string {
+  const forwardedHost = firstForwardedValue(request.headers.get("x-forwarded-host"));
+  const host = forwardedHost ?? firstForwardedValue(request.headers.get("host"));
+
+  if (host && VALID_HOST_PATTERN.test(host)) {
+    return host;
+  }
+
+  return request.nextUrl.host;
+}
+
+function absoluteRequestUrl(
+  path: string,
+  request: NextRequest,
+  host = getRequestHost(request),
+): URL {
+  const protocol = getRequestProtocol(request);
+  return new URL(path, `${protocol}//${host}`);
+}
+
 function permanentRedirect(path: string, request: NextRequest): NextResponse {
-  return NextResponse.redirect(new URL(path, request.url), { status: 301 });
+  return NextResponse.redirect(absoluteRequestUrl(path, request), { status: 301 });
 }
 
 // Carry any auth cookies that updateSession rotated (a refreshed access/refresh
@@ -23,8 +58,41 @@ function withSessionCookies(
   return response;
 }
 
-const PUBLIC_RATE_LIMIT = { windowMs: 60_000, max: 240 };
+const PUBLIC_RATE_LIMIT = {
+  windowMs: 60_000,
+  max: 240,
+  maxEntries: 10_000,
+  pruneIntervalMs: 60_000,
+};
+
+// Best-effort process-local protection only. Use Upstash/Redis (or another
+// shared store) for production rate limiting across serverless instances.
 const publicHits = new Map<string, { count: number; resetAt: number }>();
+let nextPublicHitsPruneAt = 0;
+
+function prunePublicHits(now: number): void {
+  if (now < nextPublicHitsPruneAt && publicHits.size <= PUBLIC_RATE_LIMIT.maxEntries) {
+    return;
+  }
+
+  for (const [ip, hit] of publicHits) {
+    if (now >= hit.resetAt) {
+      publicHits.delete(ip);
+    }
+  }
+
+  const overflow = publicHits.size - PUBLIC_RATE_LIMIT.maxEntries;
+  if (overflow > 0) {
+    let removed = 0;
+    for (const ip of publicHits.keys()) {
+      publicHits.delete(ip);
+      removed += 1;
+      if (removed >= overflow) break;
+    }
+  }
+
+  nextPublicHitsPruneAt = now + PUBLIC_RATE_LIMIT.pruneIntervalMs;
+}
 
 function getRequestIp(request: NextRequest): string {
   return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? request.headers.get("x-real-ip") ?? "unknown";
@@ -37,6 +105,8 @@ function isPublicRateLimited(request: NextRequest): boolean {
 
   const ip = getRequestIp(request);
   const now = Date.now();
+  prunePublicHits(now);
+
   const current = publicHits.get(ip);
   if (!current || now >= current.resetAt) {
     publicHits.set(ip, { count: 1, resetAt: now + PUBLIC_RATE_LIMIT.windowMs });
@@ -119,7 +189,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
-  const host = request.headers.get("host") ?? "";
+  const host = getRequestHost(request);
   const isAdminSubdomain =
     host.startsWith("admin.masseurmatch.com") || host.startsWith("admin.masseurmatch.local");
 
@@ -150,14 +220,14 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       // Redirect to the login page on the *apex* host, not this admin host —
       // otherwise the login page itself is caught by this branch and loops.
       const baseHost = host.replace(/^admin\./, "");
-      const loginUrl = new URL(`${request.nextUrl.protocol}//${baseHost}/login`);
+      const loginUrl = absoluteRequestUrl("/login", request, baseHost);
       loginUrl.searchParams.set("redirect", adminPathname);
       return NextResponse.redirect(loginUrl);
     }
     if (session.role !== "admin") {
       const baseHost = host.replace(/^admin\./, "");
       return withSessionCookies(
-        NextResponse.redirect(new URL(`${request.nextUrl.protocol}//${baseHost}/`)),
+        NextResponse.redirect(absoluteRequestUrl("/", request, baseHost)),
         sessionResponse,
       );
     }
@@ -174,7 +244,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // to https://www.masseurmatch.com instead of https://www.masseurmatch.com/auth/callback).
   // Forward it to the real handler so the session exchange can complete.
   if (pathname === "/" && searchParams.has("code")) {
-    const callbackUrl = new URL("/auth/callback", request.url);
+    const callbackUrl = absoluteRequestUrl("/auth/callback", request);
     // Preserve all query params (code, next, error, etc.)
     searchParams.forEach((value, key) => {
       callbackUrl.searchParams.set(key, value);
@@ -207,7 +277,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   if (pathname === "/admin/reviews" || pathname.startsWith("/admin/reviews/")) {
     return permanentRedirect("/admin/moderation", request);
   }
-
 
   if (pathname === "/register") {
     return permanentRedirect("/signup/account", request);
@@ -328,39 +397,48 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // public recruitment page instead of hitting a login wall, while providers
   // who are already signed in fall through to the portal hub below.
   if (pathname === "/pro/join" && !session) {
-    return NextResponse.redirect(new URL("/for-therapists", request.url));
+    return NextResponse.redirect(absoluteRequestUrl("/for-therapists", request));
   }
 
   if (pathname === "/pro" || pathname.startsWith("/pro/")) {
     if (!session) {
-      const loginUrl = new URL("/login", request.url);
+      const loginUrl = absoluteRequestUrl("/login", request);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
     if (session.role !== "provider" && session.role !== "admin") {
-      return withSessionCookies(NextResponse.redirect(new URL("/", request.url)), sessionResponse);
+      return withSessionCookies(
+        NextResponse.redirect(absoluteRequestUrl("/", request)),
+        sessionResponse,
+      );
     }
   }
 
   if (pathname === "/client" || pathname.startsWith("/client/")) {
     if (!session) {
-      const loginUrl = new URL("/login", request.url);
+      const loginUrl = absoluteRequestUrl("/login", request);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
     if (session.role !== "client") {
-      return withSessionCookies(NextResponse.redirect(new URL("/", request.url)), sessionResponse);
+      return withSessionCookies(
+        NextResponse.redirect(absoluteRequestUrl("/", request)),
+        sessionResponse,
+      );
     }
   }
 
   if (pathname === "/admin" || pathname.startsWith("/admin/")) {
     if (!session) {
-      const loginUrl = new URL("/login", request.url);
+      const loginUrl = absoluteRequestUrl("/login", request);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
     if (session.role !== "admin") {
-      return withSessionCookies(NextResponse.redirect(new URL("/", request.url)), sessionResponse);
+      return withSessionCookies(
+        NextResponse.redirect(absoluteRequestUrl("/", request)),
+        sessionResponse,
+      );
     }
   }
 
