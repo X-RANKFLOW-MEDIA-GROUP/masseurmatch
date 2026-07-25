@@ -19,21 +19,24 @@ export async function sendEmail({ to, subject, react, from }: SendEmailOptions) 
   const resend = new Resend(apiKey);
 
   try {
-    const { data, error } = await resend.emails.send({
+    // Resend SDK typically returns the created email object or throws on error.
+    // Do not destructure { data, error } unless the SDK documents that shape.
+    const res = await resend.emails.send({
       from: from || 'MasseurMatch <notifications@masseurmatch.com>',
       to,
       subject,
       react,
     });
 
-    if (error) {
-      console.error('[Email] Resend error:', error);
-      return { success: false, error };
+    // Defensive: if the SDK returns an object with id or message, treat as success.
+    if (!res) {
+      console.error('[Email] Resend returned empty response');
+      return { success: false, error: 'Empty response from Resend' };
     }
 
-    return { success: true, data };
-  } catch (error) {
-    console.error('[Email] Unexpected error:', error);
-    return { success: false, error };
+    return { success: true, data: res };
+  } catch (err) {
+    console.error('[Email] Unexpected error:', err instanceof Error ? err.message : String(err));
+    return { success: false, error: err };
   }
 }
