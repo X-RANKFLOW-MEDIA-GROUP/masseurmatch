@@ -15,7 +15,6 @@ import {
   competitorsByTier,
   getCompetitorBySlug,
   getCompetitorKeywords,
-  getCompetitorTierLabel,
 } from "@/lib/competitors";
 import { siteUrl } from "@/lib/site";
 
