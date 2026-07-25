@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
-import { getCities, getSitemapProfileSlugs } from "@/app/_lib/directory";
+import { getCities, getPublicTherapists, getSitemapProfileSlugs } from "@/app/_lib/directory";
 import {
   FIRST_30_URLS_IN_ORDER,
   getLaunchAreaPaths,
@@ -171,14 +171,49 @@ function buildEligibleLocalEntries(inventory: Map<string, number>) {
     buildEntry(path, "weekly", 0.66),
   );
 
-  const neighborhoods: MetadataRoute.Sitemap = getLaunchAreaPaths()
-    .filter((path) => {
-      const citySlug = citySlugFromPath(path);
-      return Boolean(citySlug && eligibleCitySlugs.has(citySlug) && isLaunchUrl(path));
-    })
-    .map((path) => buildEntry(path, "weekly", 0.6));
+  const neighborhoodPaths = getLaunchAreaPaths().filter((path) => {
+    const citySlug = citySlugFromPath(path);
+    return Boolean(citySlug && eligibleCitySlugs.has(citySlug) && isLaunchUrl(path));
+  });
 
-  return { eligibleCities, cities, services, neighborhoods };
+  return { eligibleCities, cities, services, neighborhoodPaths };
+}
+
+function formatAreaLabel(areaSlug: string) {
+  return areaSlug
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+// Area pages render meta robots noindex when the neighborhood itself has no
+// matching public profiles (see src/app/[city]/areas/[area]/page.tsx). Mirror
+// that exact rule here so the sitemap never lists a URL that serves noindex.
+async function buildIndexableNeighborhoodEntries(paths: string[]): Promise<MetadataRoute.Sitemap> {
+  const cityBySlug = new Map(getCities().map((city) => [city.slug, city]));
+
+  const checked = await Promise.all(
+    paths.map(async (path) => {
+      const [citySlug, , areaSlug] = path.split("/").filter(Boolean);
+      const city = citySlug ? cityBySlug.get(citySlug) : undefined;
+      if (!city || !areaSlug) return null;
+
+      try {
+        const { total } = await getPublicTherapists({
+          city: city.name,
+          keyword: formatAreaLabel(areaSlug),
+          page: 1,
+          pageSize: 1,
+        });
+        return total > 0 ? buildEntry(path, "weekly", 0.6) : null;
+      } catch {
+        // Supabase unavailable — the page would render noindex, so stay out.
+        return null;
+      }
+    }),
+  );
+
+  return checked.filter((entry): entry is SitemapEntry => entry !== null);
 }
 
 async function buildPublishedBlogEntries(now: Date): Promise<MetadataRoute.Sitemap> {
@@ -204,6 +239,7 @@ export async function buildReleaseSitemapEntries(now = new Date()): Promise<Meta
   ]);
 
   const local = buildEligibleLocalEntries(inventory);
+  const neighborhoods = await buildIndexableNeighborhoodEntries(local.neighborhoodPaths);
   const hasEligibleCities = local.eligibleCities.length > 0;
 
   const core = buildCoreSitemapEntries(now)
@@ -224,7 +260,7 @@ export async function buildReleaseSitemapEntries(now = new Date()): Promise<Meta
     ...conditionalHubs,
     ...local.cities,
     ...local.services,
-    ...local.neighborhoods,
+    ...neighborhoods,
     ...profiles,
     ...buildGuidesSitemapEntries(now),
     ...blogPosts,
