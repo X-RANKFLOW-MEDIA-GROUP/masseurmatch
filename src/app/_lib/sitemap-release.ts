@@ -32,8 +32,11 @@ type ChangeFrequency = NonNullable<SitemapEntry["changeFrequency"]>;
 export const SEO_CITY_MIN_PUBLIC_PROFILES = 1;
 
 const PROFILE_LOOKUP_CHUNK_SIZE = 100;
-const INVENTORY_DEPENDENT_HUB_PATHS = new Set(["/cities", "/explore", "/near-me"]);
-const INTENTIONALLY_NOINDEX_PATHS = new Set(["/therapist-agreement"]);
+const INVENTORY_DEPENDENT_HUB_PATHS = new Set(["/cities", "/near-me"]);
+// /explore is served with X-Robots-Tag: noindex by middleware (all /explore/*
+// filter pages are), so it must never appear in the sitemap even when city
+// inventory exists — a sitemapped noindex URL fails live sitemap validation.
+const INTENTIONALLY_NOINDEX_PATHS = new Set(["/therapist-agreement", "/explore"]);
 const BLOCKED_PROFILE_SLUGS = new Set([
   "carlos-luis-pena-fd794a8e",
   "david-213c8e32",

@@ -176,3 +176,61 @@ Vercel preview. Not verifiable from static analysis in this run.
   `pnpm validate:db-contract` passes; apply the lock before deployment and
   keep `validate:db-contract` as a release blocker (already wired into
   `release:check`).
+
+---
+
+## Appendix: live-service verification (later on 2026-07-25)
+
+After the initial run, live credentials were provided and the external
+services were verified directly.
+
+### Stripe (live account MASSEURMATCH) — ✅ verified
+
+- ✅ Live, enabled webhook endpoint at `https://masseurmatch.com/api/webhooks/stripe`
+  with all events the app handles (§4.1). ⏭ Still confirm in the dashboard
+  that the `whsec_…` in Vercel came from this endpoint (§4.2) — signing
+  secrets are not readable via API.
+- ✅ Live price IDs exist matching the app's $39/$79/$99 catalog:
+  Standard `price_1TkvMcLUTr1XrJODF8TSpohr`, Pro `price_1T7lDBLUTr1XrJODA1xj0i2d`,
+  Elite `price_1TwTCmLUTr1XrJODrKz1F8Zo`. These must be set both in Vercel
+  (release audit) and as Supabase Edge Function secrets (`create-checkout`
+  consumes them).
+- 🚩 A stray v2 event destination ("engaging-excellence-thin") points at a
+  `stripe-identity-webhook` function on Supabase project `cnycelkfbtzfnphbeurd`
+  — not the production project, and no such function exists in the repo.
+  Recommend deleting it.
+- ⚠️ Catalog clutter: a duplicate active Elite price ($149) and old BRL/test
+  products with active prices. Not purchasable via checkout (fixed IDs), but
+  worth archiving.
+
+### Vercel (project masseurmatch-3l) — ✅ verified
+
+- ✅ 15 of 16 required production vars set. `SUPABASE_ANON_KEY` is absent but
+  every server reader falls back to `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+  (`getAnonKey` in `supabase-server.ts`), so this is cosmetic — add it for
+  completeness.
+- ✅ Production deploys from `main`; commit `9cc1524` is live and READY.
+
+### Supabase (project ijsdpozjfjjufjsoexod) — verified, one fix shipped
+
+- ✅ `pnpm validate:supabase-env` passes against the production project.
+- ✅ `pnpm verify:live-schema` passes — 69 contract tables satisfied.
+- ✅ RLS is enabled and fails closed: anon inserts are rejected (401) and
+  anon reads leak nothing.
+- 🚩 **Policy drift (fixed in this branch):** the public-read policy gated on
+  legacy `status IN ('active','approved')`, but live rows all carry
+  `status='pending'` — approval sets `profile_status`/`visibility_status`
+  instead. Anon could read **zero** profiles; production only works because
+  the directory reads through the service-role client. Migration
+  `20260725190000_fix_profiles_public_read_policy.sql` realigns the policy
+  with the app's filters (`profile_status='approved' AND
+  visibility_status='public' AND NOT suspended/banned`, plus self/admin).
+- ⏭ `app.settings.*` for cron Edge Functions still needs a dashboard check.
+
+### Production site smoke test — ✅ pass
+
+All public routes on `https://masseurmatch.com` return 200 with real
+therapist profiles rendering. One finding: the live sitemap listed
+`/explore`, which middleware deliberately serves with
+`X-Robots-Tag: noindex` — fixed in this branch by excluding `/explore`
+from the sitemap (`INTENTIONALLY_NOINDEX_PATHS`).
