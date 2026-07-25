@@ -2,7 +2,32 @@
 
 This checklist defines the minimum release gates required before sending MasseurMatch to production.
 
-> **Launch-day closure pass (2026-07-09):** full repository gate (section 1) passes end to end.
+> **Final go-live closure pass (2026-07-25):** full repository gate (section 1) passes end to end.
+>
+> Changes in this pass (2026-07-25):
+> - `.github/workflows/release-checks.yml`: the single `pnpm release:check` step was split
+>   into discrete steps (lint → typecheck → test → validate:sitemap → validate:db-contract →
+>   release:audit → build) so CI failures point at the exact failing gate.
+> - `src/lib/profile-fields-config.ts`: the admin-only `profile_status` field choices now
+>   match the `profiles_profile_status_check` constraint in `PRODUCTION_SCHEMA_LOCK.sql`
+>   (removed stale `submitted`/`active`/`archived`; added `pending`, `pending_approval`,
+>   `under_review`, `changes_requested`, `rejected`).
+> - Re-verified: no legacy artifacts (`vite.config.ts`, `index.html`, `package-lock.json`,
+>   `public/robots.txt` absent); `packageManager` is `pnpm@10.32.1`; `.gitattributes` and
+>   `.vscode/extensions.json` match spec; Tailwind content paths contain no legacy
+>   `src/mm` / `src/pages` globs; no public phone OTP UI; Stripe checkout sends
+>   `metadata.user_id` on session and subscription; webhook syncs all tier fields and
+>   downgrades to free on deletion; release audit enforces `STRIPE_PRICE_*` IDs; no
+>   Portuguese comments in source.
+> - Known live-only observation: the deployed sitemap still lists `/explore` (served
+>   `noindex` by middleware). Source is already consistent (#593 removed it); the next
+>   production deploy resolves the mismatch.
+> - Validation results (2026-07-25): `pnpm install --frozen-lockfile`, lockfile diff clean,
+>   `pnpm lint` (0 errors), `pnpm typecheck`, `pnpm test` (142 unit + 8 API smoke),
+>   `pnpm validate:sitemap`, `pnpm validate:db-contract`, `pnpm release:audit`, and
+>   `pnpm build` all pass.
+>
+> Previous closure (2026-07-09): full repository gate (section 1) passes end to end.
 >
 > Changes in this pass (2026-07-09):
 > - `supabase/PRODUCTION_SCHEMA_LOCK.sql`: removed duplicate column definitions that

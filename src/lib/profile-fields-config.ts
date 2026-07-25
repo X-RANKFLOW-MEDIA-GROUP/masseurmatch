@@ -1007,11 +1007,13 @@ export const PROFILE_FIELDS_CONFIG: ProfileFieldDefinition[] = [
     order: 6,
     choices: [
       { value: 'draft', label: 'Draft' },
-      { value: 'submitted', label: 'Submitted for Review' },
+      { value: 'pending', label: 'Pending' },
+      { value: 'pending_approval', label: 'Pending Approval' },
+      { value: 'under_review', label: 'Under Review' },
       { value: 'approved', label: 'Approved' },
-      { value: 'active', label: 'Active' },
+      { value: 'changes_requested', label: 'Changes Requested' },
+      { value: 'rejected', label: 'Rejected' },
       { value: 'suspended', label: 'Suspended' },
-      { value: 'archived', label: 'Archived' },
     ],
   },
 
