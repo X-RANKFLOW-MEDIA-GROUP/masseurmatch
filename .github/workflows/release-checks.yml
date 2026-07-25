@@ -38,5 +38,17 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Verify dependency manifests are unchanged
         run: git diff --exit-code package.json pnpm-lock.yaml
-      - name: Run complete release validation
-        run: pnpm release:check
+      - name: Lint
+        run: pnpm lint
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Unit and API tests
+        run: pnpm test
+      - name: Validate sitemap
+        run: pnpm validate:sitemap
+      - name: Validate database contract
+        run: pnpm validate:db-contract
+      - name: Release audit
+        run: pnpm release:audit
+      - name: Production build
+        run: pnpm build
