@@ -211,7 +211,7 @@ async function resolveProvider(body: unknown): Promise<Profile> {
   if (data.length > 1) {
     throw new RouteError(409, "Multiple provider accounts match this phone number. Human verification is required.");
   }
-  return data[0] as Profile;
+  return data[0] as unknown as Profile;
 }
 
 function publicProfile(profile: Profile) {
@@ -248,19 +248,23 @@ function publicProfile(profile: Profile) {
 
 async function updateProfile(profile: Profile, updates: ProfileUpdate, action: string) {
   const admin = createSupabaseWebhookAdminClient();
-  const { data, error } = await admin
+  let query = admin
     .from("profiles")
     .update({ ...updates, updated_at: new Date().toISOString() })
-    .eq("id", profile.id)
-    .eq("user_id", profile.user_id)
-    .select(profileSelect)
-    .single();
+    .eq("id", profile.id);
+  // Extra owner-scoping when the profile is linked to an auth user (seeded
+  // profiles may have a null user_id); keeps the update constrained without
+  // passing null into .eq().
+  if (profile.user_id) {
+    query = query.eq("user_id", profile.user_id);
+  }
+  const { data, error } = await query.select(profileSelect).single();
   if (error) throw new RouteError(500, error.message);
   await recordAuditLog(profile.user_id ?? profile.id, action, "profile", profile.id, {
     source: "knotty_vapi",
     fields: Object.keys(updates),
   });
-  return data as Profile;
+  return data as unknown as Profile;
 }
 
 async function getCompletion(profile: Profile) {

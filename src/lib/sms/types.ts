@@ -10,6 +10,8 @@ export type SmsIntent =
   | 'booking_intent'
   | 'general'
   | 'unknown'
+  | 'knotty_vapi_chat'
+  | 'knotty_vapi_chat_error'
 
 export interface SmsProfile {
   id: string
