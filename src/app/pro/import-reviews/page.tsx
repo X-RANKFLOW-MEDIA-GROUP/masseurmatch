@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AlertCircle,
   ArrowRight,
+  Check,
   CheckCircle2,
   Clock3,
   ExternalLink,
@@ -21,7 +22,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
-type PlatformId = "rubmaps" | "4corners" | "nuru" | "custom";
+type PlatformId =
+  | "rentmasseur"
+  | "masseurfinder"
+  | "gaymassagebiz"
+  | "gaymassages"
+  | "hotmasseur"
+  | "gaywellness"
+  | "travelgay"
+  | "hiswellness"
+  | "custom";
 
 type DraftLink = {
   id: string;
@@ -31,7 +41,7 @@ type DraftLink = {
 
 type ImportRecord = {
   id: string;
-  platform: PlatformId;
+  platform: string;
   source_url: string;
   status: string;
   imported_review_count: number | null;
@@ -41,12 +51,75 @@ type ImportRecord = {
   completed_at: string | null;
 };
 
-const platforms: Array<{ id: PlatformId; name: string; example: string }> = [
-  { id: "rubmaps", name: "RubMaps", example: "rubmaps.com/provider/..." },
-  { id: "4corners", name: "4Corners", example: "4corners profile link" },
-  { id: "nuru", name: "NuruMap", example: "nurumap.com/provider/..." },
-  { id: "custom", name: "Other Directory", example: "Any public directory profile" },
+type PlatformOption = {
+  id: PlatformId;
+  name: string;
+  example: string;
+  description: string;
+};
+
+const platforms: PlatformOption[] = [
+  {
+    id: "rentmasseur",
+    name: "RentMasseur",
+    example: "rentmasseur.com/...",
+    description: "Gay and male massage directory",
+  },
+  {
+    id: "masseurfinder",
+    name: "MasseurFinder",
+    example: "masseurfinder.com/...",
+    description: "Worldwide M4M massage directory",
+  },
+  {
+    id: "gaymassagebiz",
+    name: "GayMassage.biz",
+    example: "gaymassage.biz/...",
+    description: "International LGBTQ-friendly directory",
+  },
+  {
+    id: "gaymassages",
+    name: "GayMassages.com",
+    example: "gaymassages.com/...",
+    description: "Gay-friendly massage profiles and reviews",
+  },
+  {
+    id: "hotmasseur",
+    name: "HotMasseur",
+    example: "hotmasseur.com/...",
+    description: "Global male bodywork directory",
+  },
+  {
+    id: "gaywellness",
+    name: "GayWellness",
+    example: "gaywellness.com/...",
+    description: "Gay wellness and massage providers",
+  },
+  {
+    id: "travelgay",
+    name: "TravelGay",
+    example: "travelgay.com/...",
+    description: "Gay city guides with massage listings",
+  },
+  {
+    id: "hiswellness",
+    name: "His Wellness",
+    example: "hiswellness.co/...",
+    description: "LGBTQ-focused male wellness directory",
+  },
+  {
+    id: "custom",
+    name: "Other Directory",
+    example: "Any public directory profile",
+    description: "Submit a profile from another public website",
+  },
 ];
+
+const legacyPlatformNames: Record<string, string> = {
+  rubmaps: "RubMaps",
+  "4corners": "4Corners",
+  nuru: "NuruMap",
+};
 
 const statusMeta: Record<
   string,
@@ -85,7 +158,11 @@ const statusMeta: Record<
 };
 
 function getPlatformName(platform: string) {
-  return platforms.find((item) => item.id === platform)?.name ?? "Directory";
+  return (
+    platforms.find((item) => item.id === platform)?.name ??
+    legacyPlatformNames[platform] ??
+    "Other Directory"
+  );
 }
 
 function formatDate(value: string) {
@@ -97,8 +174,7 @@ function formatDate(value: string) {
 }
 
 function ImportStatusBadge({ record }: { record: ImportRecord }) {
-  const verified = record.is_verified === true;
-  const meta = verified
+  const meta = record.is_verified
     ? {
         label: "Published",
         description: "Approved imported reviews are now eligible to appear on your profile.",
@@ -109,7 +185,9 @@ function ImportStatusBadge({ record }: { record: ImportRecord }) {
   const Icon = meta.icon;
 
   return (
-    <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${meta.className}`}>
+    <div
+      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${meta.className}`}
+    >
       <Icon className={`h-3.5 w-3.5 ${record.status === "in_progress" ? "animate-spin" : ""}`} />
       {meta.label}
     </div>
@@ -118,7 +196,7 @@ function ImportStatusBadge({ record }: { record: ImportRecord }) {
 
 export default function ImportReviewsPage() {
   const { toast } = useToast();
-  const [selectedPlatform, setSelectedPlatform] = useState<PlatformId>("custom");
+  const [selectedPlatform, setSelectedPlatform] = useState<PlatformId>("rentmasseur");
   const [currentUrl, setCurrentUrl] = useState("");
   const [links, setLinks] = useState<DraftLink[]>([]);
   const [imports, setImports] = useState<ImportRecord[]>([]);
@@ -134,8 +212,7 @@ export default function ImportReviewsPage() {
       );
       setImports(data.imports ?? []);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Could not load your imports.";
-      setLoadError(message);
+      setLoadError(error instanceof Error ? error.message : "Could not load your imports.");
     } finally {
       setLoading(false);
     }
@@ -146,14 +223,25 @@ export default function ImportReviewsPage() {
   }, [loadImports]);
 
   const selectedPlatformInfo = useMemo(
-    () => platforms.find((platform) => platform.id === selectedPlatform) ?? platforms[3],
+    () => platforms.find((platform) => platform.id === selectedPlatform) ?? platforms[0],
     [selectedPlatform],
   );
 
   function addLink() {
+    if (links.length >= 5) {
+      toast({
+        title: "Five-link limit reached",
+        description: "Submit the current links before adding another profile.",
+      });
+      return;
+    }
+
     const trimmed = currentUrl.trim();
     if (!trimmed) {
-      toast({ title: "Add a profile link", description: "Paste the public link to your directory profile." });
+      toast({
+        title: "Add a profile link",
+        description: "Paste the public link to your directory profile.",
+      });
       return;
     }
 
@@ -172,7 +260,10 @@ export default function ImportReviewsPage() {
     }
 
     if (links.some((link) => link.url.toLowerCase() === trimmed.toLowerCase())) {
-      toast({ title: "Link already added", description: "Each directory profile only needs to be submitted once." });
+      toast({
+        title: "Link already added",
+        description: "Each directory profile only needs to be submitted once.",
+      });
       return;
     }
 
@@ -185,7 +276,10 @@ export default function ImportReviewsPage() {
 
   async function submitImports() {
     if (links.length === 0) {
-      toast({ title: "Add at least one link", description: "Choose a directory and paste your profile URL first." });
+      toast({
+        title: "Add at least one link",
+        description: "Choose a directory and paste your profile URL first.",
+      });
       return;
     }
 
@@ -209,7 +303,11 @@ export default function ImportReviewsPage() {
         error instanceof ApiError || error instanceof Error
           ? error.message
           : "Could not submit the import request.";
-      toast({ title: "Import request not submitted", description: message, variant: "destructive" });
+      toast({
+        title: "Import request not submitted",
+        description: message,
+        variant: "destructive",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -249,26 +347,38 @@ export default function ImportReviewsPage() {
           <div className="space-y-6 p-6">
             <div>
               <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">
-                Directory
+                Select directory
               </p>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {platforms.map((platform) => {
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                {platforms.map((platform, index) => {
                   const selected = selectedPlatform === platform.id;
                   return (
                     <button
                       key={platform.id}
                       type="button"
                       onClick={() => setSelectedPlatform(platform.id)}
-                      className={`rounded-xl border p-4 text-left transition ${
-                        selected
-                          ? "border-[#8B1E2D] bg-[#F9EDEE] ring-1 ring-[#8B1E2D]/10"
-                          : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-                      }`}
+                      className={`flex w-full items-center gap-3 px-4 py-3.5 text-left transition ${
+                        index < platforms.length - 1 ? "border-b border-slate-100" : ""
+                      } ${selected ? "bg-[#F9EDEE]" : "hover:bg-slate-50"}`}
                     >
-                      <span className={`text-sm font-semibold ${selected ? "text-[#8B1E2D]" : "text-slate-800"}`}>
-                        {platform.name}
+                      <span
+                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
+                          selected
+                            ? "border-[#8B1E2D] bg-[#8B1E2D] text-white"
+                            : "border-slate-300 bg-white text-transparent"
+                        }`}
+                      >
+                        <Check className="h-3 w-3" strokeWidth={3} />
                       </span>
-                      <span className="mt-1 block text-xs text-slate-500">{platform.example}</span>
+                      <span className="min-w-0 flex-1">
+                        <span className={`block text-sm font-semibold ${selected ? "text-[#8B1E2D]" : "text-slate-800"}`}>
+                          {platform.name}
+                        </span>
+                        <span className="block text-xs text-slate-500">{platform.description}</span>
+                      </span>
+                      <span className="hidden max-w-44 truncate text-xs text-slate-400 sm:block">
+                        {platform.example}
+                      </span>
                     </button>
                   );
                 })}
@@ -276,7 +386,10 @@ export default function ImportReviewsPage() {
             </div>
 
             <div>
-              <label htmlFor="profile-import-url" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">
+              <label
+                htmlFor="profile-import-url"
+                className="mb-2 block font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500"
+              >
                 {selectedPlatformInfo.name} profile URL
               </label>
               <div className="flex flex-col gap-3 sm:flex-row">
@@ -291,11 +404,20 @@ export default function ImportReviewsPage() {
                       addLink();
                     }
                   }}
-                  placeholder="https://"
+                  placeholder={
+                    selectedPlatform === "custom"
+                      ? "https://directory.com/your-profile"
+                      : `https://${selectedPlatformInfo.example}`
+                  }
                   disabled={submitting}
                   className="h-11 flex-1"
                 />
-                <Button type="button" onClick={addLink} disabled={submitting} className="h-11 bg-[#8B1E2D] hover:bg-[#6E1521]">
+                <Button
+                  type="button"
+                  onClick={addLink}
+                  disabled={submitting || links.length >= 5}
+                  className="h-11 bg-[#8B1E2D] hover:bg-[#6E1521]"
+                >
                   <Plus className="mr-2 h-4 w-4" />
                   Add link
                 </Button>
@@ -439,9 +561,7 @@ export default function ImportReviewsPage() {
                       <ExternalLink className="h-3 w-3 shrink-0" />
                     </a>
                     <p className="mt-2 text-xs leading-5 text-slate-500">
-                      {record.is_verified
-                        ? "This import was approved."
-                        : meta?.description}
+                      {record.is_verified ? "This import was approved." : meta?.description}
                       {record.imported_review_count && record.imported_review_count > 0
                         ? ` ${record.imported_review_count} review${record.imported_review_count === 1 ? "" : "s"} found.`
                         : ""}
