@@ -7,7 +7,17 @@ import { requireRequestSession } from "@/app/api/_lib/session";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { processPendingMigrations } from "@/app/api/migrate/_lib/processor";
 
-const supportedPlatforms = ["rubmaps", "4corners", "nuru", "custom"] as const;
+const supportedPlatforms = [
+  "rentmasseur",
+  "masseurfinder",
+  "gaymassagebiz",
+  "gaymassages",
+  "hotmasseur",
+  "gaywellness",
+  "travelgay",
+  "hiswellness",
+  "custom",
+] as const;
 
 type SupportedPlatform = (typeof supportedPlatforms)[number];
 
@@ -29,6 +39,17 @@ const requestSchema = z.object({
 });
 
 const ACTIVE_STATUSES = ["pending", "in_progress", "manual_review"];
+
+const PLATFORM_HOST_MATCHERS: Record<Exclude<SupportedPlatform, "custom">, string[]> = {
+  rentmasseur: ["rentmasseur.com"],
+  masseurfinder: ["masseurfinder.com"],
+  gaymassagebiz: ["gaymassage.biz"],
+  gaymassages: ["gaymassages.com"],
+  hotmasseur: ["hotmasseur.com"],
+  gaywellness: ["gaywellness.com"],
+  travelgay: ["travelgay.com"],
+  hiswellness: ["hiswellness.co", "hiswellness.com"],
+};
 
 function isPrivateIpv4(hostname: string) {
   const parts = hostname.split(".").map((part) => Number(part));
@@ -81,14 +102,13 @@ function parseSafePublicUrl(rawUrl: string) {
 }
 
 function assertPlatformMatch(platform: SupportedPlatform, url: URL) {
-  const hostname = url.hostname.toLowerCase();
-  const pathname = url.pathname.toLowerCase();
+  if (platform === "custom") return;
 
-  const matches =
-    platform === "custom" ||
-    (platform === "rubmaps" && (hostname === "rubmaps.com" || hostname.endsWith(".rubmaps.com")) && pathname.includes("/provider")) ||
-    (platform === "4corners" && hostname.includes("4corners")) ||
-    (platform === "nuru" && hostname.includes("nurumap") && pathname.includes("/provider"));
+  const hostname = url.hostname.toLowerCase();
+  const allowedHosts = PLATFORM_HOST_MATCHERS[platform];
+  const matches = allowedHosts.some(
+    (allowedHost) => hostname === allowedHost || hostname.endsWith(`.${allowedHost}`),
+  );
 
   if (!matches) {
     throw new RouteError(400, "The selected directory does not match the profile link.");
