@@ -47,7 +47,7 @@ function contentText(value: unknown): string | null {
 }
 
 function cleanReply(value: string): string {
-  const cleaned = value.replace(/\u0000/g, "").trim();
+  const cleaned = value.split("\u0000").join("").trim();
   if (cleaned.length <= MAX_SMS_REPLY_CHARS) return cleaned;
 
   const truncated = cleaned.slice(0, MAX_SMS_REPLY_CHARS - 1);
