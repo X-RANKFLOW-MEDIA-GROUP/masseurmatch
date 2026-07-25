@@ -1,3 +1,10 @@
+-- Defensive: guarantee the promotion columns exist even if the earlier
+-- additive migration (20260711164130) was skipped on a drifted Supabase
+-- preview branch. IF NOT EXISTS keeps this safe and idempotent.
+alter table public.profiles
+  add column if not exists keyword_slugs text[] not null default '{}'::text[],
+  add column if not exists segments text[] not null default '{}'::text[];
+
 -- ============================================================
 -- STEP 1: DELETE test/debug therapists
 -- ============================================================
