@@ -13,7 +13,7 @@ export type ModalityGuide = {
   readTime: number;
 };
 
-export const MODALITY_GUIDES: ModalityGuide[] = [
+const MODALITY_GUIDES: ModalityGuide[] = [
   {
     slug: "deep-tissue-massage-guide",
     title: "Complete Guide to Deep Tissue Massage: Benefits, Techniques & What to Expect",
@@ -541,6 +541,6 @@ export function getModalityGuide(slug: string): ModalityGuide | null {
   return MODALITY_GUIDES.find((guide) => guide.slug === slug) || null;
 }
 
-export function getModalityGuidesByService(serviceSlug: string): ModalityGuide[] {
+function getModalityGuidesByService(serviceSlug: string): ModalityGuide[] {
   return MODALITY_GUIDES.filter((guide) => guide.serviceSlug === serviceSlug);
 }

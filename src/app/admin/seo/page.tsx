@@ -76,7 +76,7 @@ export default async function AdminSeoPage() {
               <div className="grid gap-6">
                 <div className="grid gap-2">
                   <label className="text-sm font-medium text-foreground">Sitemap URL</label>
-                  <Input defaultValue="https://masseurmatch.com/sitemap.xml" readOnly className="bg-secondary/30 border-border" />
+                  <Input defaultValue="https://www.masseurmatch.com/sitemap.xml" readOnly className="bg-secondary/30 border-border" />
                 </div>
                 <div className="grid gap-2">
                   <p className="text-sm text-muted-foreground">Preview (first 5 therapists):</p>
@@ -112,10 +112,10 @@ export default async function AdminSeoPage() {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "MasseurMatch",
-  "url": "https://masseurmatch.com/",
+  "url": "https://www.masseurmatch.com/",
   "potentialAction": {
     "@type": "SearchAction",
-    "target": "https://masseurmatch.com/search?q={search_term_string}",
+    "target": "https://www.masseurmatch.com/search?q={search_term_string}",
     "query-input": "required name=search_term_string"
   },
   "numberOfTherapists": ${therapists.length}

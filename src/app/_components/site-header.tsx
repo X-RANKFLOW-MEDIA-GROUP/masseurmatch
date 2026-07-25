@@ -267,7 +267,7 @@ function MobileNav({
       <SheetTrigger asChild>
         <button
           type="button"
-          aria-label="Open menu"
+          aria-label={open ? "Close menu" : "Open menu"}
           className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg text-[#111111] hover:bg-[#F7F7F7] transition-colors"
         >
           <Menu className="w-5 h-5" />
@@ -290,7 +290,7 @@ function MobileNav({
             <Image
               src={BRAND_ASSETS.logoLockup}
               alt="MasseurMatch"
-              width={247}
+              width={168}
               height={40}
               className="h-10 w-auto object-contain"
             />
@@ -495,7 +495,7 @@ export default function SiteHeader() {
           <Image
             src={BRAND_ASSETS.logoLockup}
             alt="MasseurMatch"
-            width={345}
+            width={236}
             height={56}
             priority
             className="h-11 w-auto object-contain md:h-14"

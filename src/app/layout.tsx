@@ -5,7 +5,7 @@ import { GoogleTagManager } from "@/app/_components/google-tag-manager";
 import { SiteFooter } from "@/app/_components/site-footer";
 import SiteHeader from "@/app/_components/site-header";
 import { CookieConsent } from "@/app/_components/CookieConsent";
-import { SITE_DESCRIPTION, SITE_NAME, createPageMetadata } from "@/app/_lib/metadata";
+import { SITE_NAME, createPageMetadata } from "@/app/_lib/seo";
 import { AppProviders } from "@/app/providers";
 import { SITE_URL } from "@/lib/site";
 import { SketchFilter } from "@/components/icons";
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={satoshi.variable}>
+    <html lang="en-US" className={satoshi.variable}>
       <head></head>
       <body className="theme-masseurmatch min-h-screen overflow-x-hidden font-sans text-foreground antialiased">
         <GoogleTagManager />

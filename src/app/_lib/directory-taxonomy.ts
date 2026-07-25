@@ -168,7 +168,7 @@ export const SPECIALTY_KEYWORDS: SpecialtyKeyword[] = [
   },
 ];
 
-export const DEFAULT_CITY_KEYWORDS = SPECIALTY_KEYWORDS.map((keyword) => keyword.slug);
+const DEFAULT_CITY_KEYWORDS = SPECIALTY_KEYWORDS.map((keyword) => keyword.slug);
 
 export const formatSlugLabel = (value: string) =>
   value

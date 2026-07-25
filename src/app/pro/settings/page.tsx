@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { Bell, Key, LogOut, Save, Shield, User } from "lucide-react";
+import { Bell, Copy, Key, LogOut, Save, Shield, User } from "lucide-react";
 import Link from "next/link";
 
 type PasswordState = { current: string; next: string; confirm: string };
@@ -146,9 +146,27 @@ export default function ProSettingsPage() {
           </div>
           <div>
             <p className="mb-1 text-xs font-medium uppercase tracking-wider text-slate-500">
-              Account ID
+              Support reference
             </p>
-            <p className="font-mono text-xs text-slate-400">{user?.id ?? "—"}</p>
+            <div className="flex items-center gap-2">
+              <p className="font-mono text-xs text-slate-500">
+                {user?.id ? user.id.slice(0, 8).toUpperCase() : "—"}
+              </p>
+              {user?.id && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    void navigator.clipboard?.writeText(user.id);
+                    toast({ title: "Copied", description: "Full account reference copied to clipboard." });
+                  }}
+                  aria-label="Copy full account reference"
+                  className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                >
+                  <Copy className="h-3.5 w-3.5" strokeWidth={2.25} />
+                </button>
+              )}
+            </div>
+            <p className="mt-1 text-[11px] text-slate-400">Share this reference when contacting support.</p>
           </div>
         </div>
       </section>

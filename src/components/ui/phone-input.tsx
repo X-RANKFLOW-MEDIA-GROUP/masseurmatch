@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import {
@@ -72,6 +71,7 @@ interface PhoneInputProps {
   className?: string;
   id?: string;
   disabled?: boolean;
+  required?: boolean;
   onBlur?: () => void;
   "aria-invalid"?: boolean;
   "aria-describedby"?: string;
@@ -84,6 +84,7 @@ export function PhoneInput({
   className,
   id,
   disabled = false,
+  required = false,
   onBlur,
   "aria-invalid": ariaInvalid,
   "aria-describedby": ariaDescribedby,
@@ -142,7 +143,7 @@ export function PhoneInput({
   return (
     <div className={cn("flex gap-2", className)}>
       <Select value={countryCode} onValueChange={handleCountryChange} disabled={disabled}>
-        <SelectTrigger className="w-[110px] shrink-0">
+        <SelectTrigger className="w-[110px] shrink-0" aria-label={`Country code: ${selectedCountry.name} ${selectedCountry.dialCode}`}>
           <SelectValue>
             <span className="flex items-center gap-1.5">
               <span>{selectedCountry.flag}</span>
@@ -170,6 +171,8 @@ export function PhoneInput({
         onBlur={onBlur}
         placeholder={placeholder}
         disabled={disabled}
+        required={required}
+        aria-required={required || undefined}
         className="flex-1"
         aria-invalid={ariaInvalid}
         aria-describedby={ariaDescribedby}

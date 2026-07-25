@@ -4,6 +4,12 @@ import {
   requireAdminSession,
   recordAuditLog,
 } from "@/app/api/_lib/supabase-server";
+import {
+  createProfileCmsUpdate,
+  isProfileCmsUpdateField,
+  toProfileCmsJson,
+} from "@/lib/profile-cms-update";
+import type { Json } from "@/integrations/supabase/types";
 
 export const dynamic = "force-dynamic";
 
@@ -17,20 +23,6 @@ type AuditDetails = {
   old_value?: unknown;
   new_value?: unknown;
 };
-
-/**
- * Convert unknown values to JSON-serializable format
- */
-function toJsonValue(value: unknown): any {
-  if (value === null || value === undefined) return null;
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-    return value;
-  }
-  if (Array.isArray(value) || (typeof value === "object" && value !== null)) {
-    return value;
-  }
-  return null;
-}
 
 export async function POST(request: Request) {
   try {
@@ -57,35 +49,48 @@ export async function POST(request: Request) {
         : {};
     const fieldName = typeof details.field_name === "string" ? details.field_name : null;
 
-    if (!fieldName) {
-      return Response.json({ error: "Audit log entry has no field name" }, { status: 400 });
+    if (!fieldName || !isProfileCmsUpdateField(fieldName)) {
+      return Response.json({ error: "Audit log entry has an invalid field name" }, { status: 400 });
+    }
+
+    let update: ReturnType<typeof createProfileCmsUpdate>;
+    try {
+      update = createProfileCmsUpdate(fieldName, details.old_value);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Invalid rollback value";
+      return Response.json({ error: message }, { status: 400 });
     }
 
     const { error: updateError } = await supabase
       .from("profiles")
-      .update({
-        [fieldName]: toJsonValue(details.old_value) ?? null,
-        updated_at: new Date().toISOString(),
-      })
+      .update(update.payload)
       .eq("id", profile_id);
 
     if (updateError) {
       return Response.json({ error: "Failed to rollback" }, { status: 500 });
     }
 
-    await recordAuditLog(admin.userId, "provider.profile.field_rollback", "profile", profile_id, {
+    const auditDetails: Json = {
       field_name: fieldName,
-      old_value: toJsonValue(details.new_value) ?? null,
-      new_value: toJsonValue(details.old_value) ?? null,
+      old_value: toProfileCmsJson(details.new_value),
+      new_value: toProfileCmsJson(update.normalizedValue),
       source_audit_log_id: audit_log_id,
       rolled_back_at: new Date().toISOString(),
-    });
+    };
+
+    await recordAuditLog(
+      admin.userId,
+      "provider.profile.field_rollback",
+      "profile",
+      profile_id,
+      auditDetails,
+    );
 
     return Response.json({
       ok: true,
       profile_id,
       field_name: fieldName,
-      rolled_back_value: toJsonValue(details.old_value) ?? null,
+      rolled_back_value: update.normalizedValue,
     });
   } catch (error) {
     console.error("Rollback error:", error);

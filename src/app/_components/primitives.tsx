@@ -1,11 +1,10 @@
 import type { ReactNode } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
-export { Badge as AppBadge, Button as AppButton, Input as AppInput, Textarea as AppTextarea };
+export { Button as AppButton, Input as AppInput, Textarea as AppTextarea };
 
 export function Surface({
   className,
@@ -46,7 +45,7 @@ export function PageSection({
   );
 }
 
-export function StatGrid({
+function StatGrid({
   items,
   className,
 }: {

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createPageMetadata } from "@/app/_lib/metadata";
+import { createPageMetadata } from "@/app/_lib/seo";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { normalizeSessionRole } from "@/app/api/_lib/session";
 import ProLayoutClient from "./ProLayoutClient";

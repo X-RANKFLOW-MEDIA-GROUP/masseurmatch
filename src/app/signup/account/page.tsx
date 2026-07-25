@@ -240,6 +240,7 @@ export default function SignupAccountPage() {
                 onChange={(value) => updateField("phone", value)}
                 onBlur={() => handleBlur("phone")}
                 placeholder="(555) 000-0000"
+                required
                 aria-invalid={!!fieldErrors.phone}
                 aria-describedby={fieldErrors.phone ? "phone-error" : undefined}
               />
@@ -299,6 +300,8 @@ export default function SignupAccountPage() {
                   <Checkbox
                     id="terms"
                     checked={termsChecked}
+                    required
+                    aria-required="true"
                     aria-invalid={!!fieldErrors.terms}
                     aria-describedby={fieldErrors.terms ? "terms-error" : undefined}
                     onCheckedChange={(v) => {
@@ -332,6 +335,8 @@ export default function SignupAccountPage() {
                   <Checkbox
                     id="compliance"
                     checked={complianceChecked}
+                    required
+                    aria-required="true"
                     aria-invalid={!!fieldErrors.compliance}
                     aria-describedby={fieldErrors.compliance ? "compliance-error" : undefined}
                     onCheckedChange={(v) => {
@@ -362,6 +367,8 @@ export default function SignupAccountPage() {
                   <Checkbox
                     id="age"
                     checked={ageChecked}
+                    required
+                    aria-required="true"
                     aria-invalid={!!fieldErrors.age}
                     aria-describedby={fieldErrors.age ? "age-error" : undefined}
                     onCheckedChange={(v) => {

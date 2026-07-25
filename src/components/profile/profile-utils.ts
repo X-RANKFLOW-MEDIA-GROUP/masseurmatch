@@ -91,7 +91,7 @@ export function slugify(value: string | null | undefined) {
     .replace(/^-+|-+$/g, "");
 }
 
-export function asStringArray(value: unknown): string[] {
+function asStringArray(value: unknown): string[] {
   if (Array.isArray(value)) return value.map((item) => String(item).trim()).filter(Boolean);
   if (typeof value === "string" && value.trim()) return value.split(",").map((item) => item.trim()).filter(Boolean);
   return [];
@@ -110,14 +110,14 @@ function dateLabel(value: unknown, fallback: string) {
   if (typeof value !== "string" || !value) return fallback;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return fallback;
-  return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  return date.toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
 }
 
 function fullDateLabel(value: unknown, fallback: string) {
   if (typeof value !== "string" || !value) return fallback;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return fallback;
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 }
 
 function formatHeight(inches: unknown) {

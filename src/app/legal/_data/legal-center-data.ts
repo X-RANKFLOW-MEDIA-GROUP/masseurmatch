@@ -1,4 +1,4 @@
-export type LegalTopicLink = {
+type LegalTopicLink = {
   href: string;
   label: string;
 };

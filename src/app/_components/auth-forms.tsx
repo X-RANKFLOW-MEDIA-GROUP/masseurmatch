@@ -173,7 +173,11 @@ export function AuthForms({
       : role === "client"
         ? "/dashboard"
         : sanitizedRedirectTo;
-    router.push(destination);
+
+    // Authentication writes SSR cookies on the server. A document-level
+    // navigation reloads the auth provider from those cookies and guarantees
+    // the dashboard uses assets from the current production deployment.
+    window.location.replace(destination);
   };
 
   const resendConfirmation = async () => {
@@ -188,7 +192,7 @@ export function AuthForms({
   if (!isLogin && needsEmailConfirmation) {
     return (
       <Surface className="mx-auto max-w-lg space-y-4">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Confirm your email</h1>
+        <h2 className="font-display text-3xl font-semibold tracking-tight">Confirm your email</h2>
         <p className="text-base leading-6 text-muted-foreground">
           Check your email to confirm your account before continuing.
         </p>
@@ -215,7 +219,7 @@ export function AuthForms({
         </Link>
       </div>
 
-      <h1 className="font-display text-3xl font-semibold tracking-tight mt-6">{isLogin ? "Sign in" : "Create account"}</h1>
+      <h2 className="font-display text-3xl font-semibold tracking-tight mt-6">{isLogin ? "Sign in" : "Create account"}</h2>
       <p className="mt-3 text-base leading-6 text-muted-foreground">
         {isLogin
           ? "Welcome back. Sign in to your therapist account."

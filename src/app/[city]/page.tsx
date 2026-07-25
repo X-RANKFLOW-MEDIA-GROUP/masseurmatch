@@ -10,10 +10,19 @@ import {
   getSegmentBySlug,
 } from "@/app/_lib/directory-taxonomy";
 import { getLaunchAreaPaths, getLaunchKeywordPaths, getLaunchSegmentPaths } from "@/app/_lib/launch-urls";
-import { createPageMetadata } from "@/app/_lib/metadata";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildItemListJsonLd,
+  buildLocalBusinessJsonLd,
+  createPageMetadata,
+} from "@/app/_lib/seo";
 import { SEO_CITY_MIN_PUBLIC_PROFILES } from "@/app/_lib/sitemap-release";
-import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd, buildLocalBusinessJsonLd } from "@/app/_lib/structured-data";
-import { TherapistComparison, type ComparisonTherapistProfile } from "@/components";
+import {
+  TherapistComparison,
+  type TherapistProfile as ComparisonTherapistProfile,
+} from "@/components/sections/TherapistComparison";
+import { formatCityLabel } from "@/data/cities";
 
 type Params = { city: string };
 
@@ -50,7 +59,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     // Supabase unavailable — fall through with zero count
   }
 
-  const cityLabel = `${city.name}, ${city.stateCode}`;
+  const cityLabel = `${formatCityLabel(city.name, city.stateCode)}`;
 
   // Format count for title: use exact number for small counts, add + for larger numbers
   const countLabel = inventoryCount === 0
@@ -131,10 +140,13 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
     });
 
   const therapists = await getPublicTherapists({ city: city.name, page: 1, pageSize: 9 });
+  const hasInventory = therapists.items.length > 0;
 
   const cityIntro = DFW_SUBURB_SLUGS.has(city.slug)
     ? buildSuburbIntro(buildAreaCopyInput({ area: city.name, city: "DFW", therapists: therapists.items }))
-    : `Search-first city page for trusted male massage discovery in ${city.name}. Compare verified profiles, outcall and incall options, specialties, and direct contact in one cleaner flow.`;
+    : hasInventory
+      ? `Find trusted male massage therapists in ${city.name}. Compare verified profiles, outcall and incall options, specialties, and direct contact in one cleaner flow.`
+      : `MasseurMatch is preparing its ${city.name} directory. Every profile is reviewed before going live — explore active cities while local listings are added.`;
   const comparisonProfiles: ComparisonTherapistProfile[] = therapists.items.slice(0, 3).map((item, idx) => ({
     id: item.id,
     name: item.display_name || item.full_name || `Therapist ${idx + 1}`,
@@ -186,14 +198,20 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
       />
       <CityDirectoryPageShell
         eyebrow="City directory"
-        title={`Verified male massage therapists in ${city.name}`}
+        title={
+          hasInventory
+            ? `Verified male massage therapists in ${city.name}`
+            : `Male massage therapists in ${city.name} — coming soon`
+        }
         intro={cityIntro}
         breadcrumbJsonLd={buildBreadcrumbJsonLd([
           { name: "Home", path: "/" },
           { name: city.name, path: canonicalCityPath },
         ])}
         collectionJsonLd={buildCollectionPageJsonLd({
-          name: `Verified male massage therapists in ${city.name}`,
+          name: hasInventory
+            ? `Verified male massage therapists in ${city.name}`
+            : `Male massage therapists in ${city.name} — coming soon`,
           description: cityIntro,
           path: canonicalCityPath,
         })}
@@ -206,7 +224,9 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
           })),
         })}
         leadLinks={[
-          { href: `/search?city=${city.slug}&verified=1`, label: `Browse verified in ${city.name}` },
+          hasInventory
+            ? { href: `/search?city=${city.slug}&verified=1`, label: `Browse verified in ${city.name}` }
+            : { href: "/explore", label: "Browse active cities" },
           { href: "/search", label: "Search all cities" },
           { href: "/safety", label: "Read safety policy" },
           { href: "/compare", label: "Compare top directory alternatives" },
@@ -217,7 +237,7 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
                 title: `High-intent pages in ${city.name}`,
                 layout: "grid" as const,
                 description:
-                  "These city-plus-intent pages are designed to feel stronger than a generic directory landing page and to capture more local search demand.",
+                  "Jump straight to the type of session you're looking for in this city.",
                 items: citySegmentLinks,
               }]
             : []),
@@ -235,7 +255,7 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
                 title: `Neighborhood pages in ${city.name}`,
                 layout: "chips" as const,
                 description:
-                  "These neighborhood landers cluster local intent around the areas already covered by live therapist inventory.",
+                  "Browse by neighborhood to find therapists closest to you.",
                 items: cityAreaLinks,
               }]
             : []),
@@ -260,7 +280,7 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
         ]}
         therapists={therapists.items}
         listingTitle={`Trusted listings in ${city.name}`}
-        listingDescription="Each card combines visual quality, verification status, and direct-contact clarity so this city page performs as both a better user journey and a stronger local SEO landing page."
+        listingDescription="Each card combines visual quality, verification status, and clear direct-contact options so you can compare therapists at a glance."
         emptyTitle={`No public listings are live in ${city.name} yet.`}
         emptyDescription="You can still explore verified intent pages, broader city routes, and comparison content while this market grows."
         faqTitle={`Common Questions About Male Massage in ${city.name}`}

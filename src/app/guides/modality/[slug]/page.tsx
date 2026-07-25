@@ -4,9 +4,7 @@ import { notFound } from "next/navigation";
 import { JsonLd } from "@/app/_components/json-ld";
 import { getModalityGuide } from "@/app/_lib/modality-guides";
 import { getServiceMetadata } from "@/app/_lib/service-data";
-import { createPageMetadata } from "@/app/_lib/metadata";
-import { buildBreadcrumbJsonLd, buildArticleJsonLd } from "@/app/_lib/structured-data";
-import { siteUrl } from "@/lib/site";
+import { buildArticleJsonLd, buildBreadcrumbJsonLd, createPageMetadata } from "@/app/_lib/seo";
 import { ArrowRight } from "lucide-react";
 
 type Params = { slug: string };

@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic";
-import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
+import { errorResponse, json } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, requireAdminSession } from "@/app/api/_lib/supabase-server";
 
 export async function GET(request: Request) {

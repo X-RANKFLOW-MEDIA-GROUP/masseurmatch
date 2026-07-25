@@ -155,7 +155,7 @@ export const AREA_NEARBY_MAP: Record<string, string[]> = {
 };
 
 /** Derive available session modes from real therapist data. */
-export function deriveServiceModes(
+function deriveServiceModes(
   therapists: Pick<PublicTherapist, "incall_price" | "outcall_price" | "modality">[],
 ): string[] {
   const modes: string[] = [];
@@ -169,7 +169,7 @@ export function deriveServiceModes(
 }
 
 /** Derive top specialties by frequency from real therapist data. */
-export function deriveSpecialties(
+function deriveSpecialties(
   therapists: Pick<PublicTherapist, "specialties" | "modality">[],
 ): string[] {
   const counts: Record<string, number> = {};
@@ -188,7 +188,7 @@ export function deriveSpecialties(
 }
 
 /** Compute average starting price across incall and outcall from real data. */
-export function deriveAvgStartingPrice(
+function deriveAvgStartingPrice(
   therapists: Pick<PublicTherapist, "incall_price" | "outcall_price">[],
 ): number | null {
   const prices = therapists
@@ -199,7 +199,7 @@ export function deriveAvgStartingPrice(
 }
 
 /** Compute average years of experience from real data. */
-export function deriveAvgYearsExperience(
+function deriveAvgYearsExperience(
   therapists: Pick<PublicTherapist, "years_experience" | "start_year">[],
 ): number | null {
   const currentYear = new Date().getFullYear();

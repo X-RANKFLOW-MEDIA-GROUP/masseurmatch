@@ -1,5 +1,5 @@
 import { JsonLd } from "@/app/_components/json-ld";
-import { createPageMetadata } from "@/app/_lib/metadata";
+import { createPageMetadata } from "@/app/_lib/seo";
 import ContactPageClient from "./ContactPageClient";
 
 export const metadata = createPageMetadata({
@@ -19,13 +19,13 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "ContactPage",
   name: "Contact MasseurMatch",
-  url: "https://masseurmatch.com/contact",
+  url: "https://www.masseurmatch.com/contact",
   description:
     "Contact MasseurMatch for client support, professional support, and general business inquiries.",
   mainEntity: {
     "@type": "Organization",
     name: "MasseurMatch",
-    url: "https://masseurmatch.com",
+    url: "https://www.masseurmatch.com",
     email: "support@masseurmatch.com",
     address: {
       "@type": "PostalAddress",

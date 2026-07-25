@@ -291,7 +291,7 @@ export function ProviderGrowthMarketplace({
   );
 }
 
-export function ProviderGrowthQuickPicks() {
+function ProviderGrowthQuickPicks() {
   return (
     <Surface className="overflow-hidden rounded-3xl border-brand-secondary/20 bg-[linear-gradient(135deg,rgba(12,28,51,0.96),rgba(21,73,122,0.92))] p-0 text-white">
       <div className="grid gap-0 lg:grid-cols-[minmax(0,0.9fr),minmax(0,1.1fr)]">

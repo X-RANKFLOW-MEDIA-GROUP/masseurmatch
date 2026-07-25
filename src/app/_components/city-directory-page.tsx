@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { IconArrowRight, IconShield, IconLock } from "@/components/icons";
 import type { PublicTherapist } from "@/app/_lib/directory";
-import { buildFaqJsonLd } from "@/app/_lib/structured-data";
+import { buildFaqJsonLd } from "@/app/_lib/seo";
 import { JsonLd } from "@/app/_components/json-ld";
 import { EmptyState, Surface } from "@/app/_components/primitives";
 import { PublicTherapistCard } from "@/app/_components/PublicTherapistCard";

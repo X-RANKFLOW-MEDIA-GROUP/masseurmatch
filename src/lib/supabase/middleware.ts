@@ -6,7 +6,7 @@ import {
   SUPABASE_PUBLIC_ANON_KEY,
 } from "@/integrations/supabase/client";
 
-export type AppRole = "admin" | "provider" | "client" | null;
+type AppRole = "admin" | "provider" | "client" | null;
 
 export interface EdgeSession {
   userId: string;

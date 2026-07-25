@@ -10,10 +10,8 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  BarChart,
-  Bar,
 } from "recharts";
-import { TrendingUp, AlertCircle, Zap, Calendar } from "lucide-react";
+import { TrendingUp, AlertCircle } from "lucide-react";
 // The shared client guards against missing env; instantiating
 // @supabase/supabase-js directly here threw "supabaseKey is required" at
 // module scope and crashed every route whose bundle included this file.

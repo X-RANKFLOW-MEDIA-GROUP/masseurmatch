@@ -17,7 +17,6 @@ import {
   Loader2,
   RefreshCw,
   User,
-  MapPin,
   DollarSign,
 } from 'lucide-react'
 import { format, formatDistanceToNow, parseISO } from 'date-fns'

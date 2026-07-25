@@ -340,15 +340,32 @@ export const US_CITIES: CityData[] = RAW_CITIES.map((city) => ({
   intro: `Browse verified massage therapists in ${city.name}.`,
 }));
 
-export function getCityBySlug(slug: string): CityData | undefined {
+function getCityBySlug(slug: string): CityData | undefined {
   const normalized = slug.trim().toLowerCase();
   return US_CITIES.find((city) => city.slug === normalized);
 }
 
-export function isValidCitySlug(slug: string): boolean {
+function isValidCitySlug(slug: string): boolean {
   return Boolean(getCityBySlug(slug));
 }
 
-export function getCities(): CityData[] {
+function getCities(): CityData[] {
   return US_CITIES;
+}
+
+// "Washington DC" already carries its state code, so a naive
+// `${name}, ${stateCode}` renders "Washington DC, DC".
+export function cityDisplayName(name: string, stateCode: string): string {
+  const trimmed = name.trim();
+  const suffix = ` ${stateCode.toUpperCase()}`;
+
+  if (trimmed.toUpperCase().endsWith(suffix)) {
+    return trimmed.slice(0, trimmed.length - suffix.length).replace(/,\s*$/, "").trim();
+  }
+
+  return trimmed;
+}
+
+export function formatCityLabel(name: string, stateCode: string): string {
+  return `${cityDisplayName(name, stateCode)}, ${stateCode}`;
 }

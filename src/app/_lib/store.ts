@@ -1,8 +1,6 @@
 import { RouteError } from "@/app/api/_lib/http";
 import {
   createSupabaseAdminClient,
-  createSupabasePublicClient,
-  getUserRole,
   recordAuditLog,
 } from "@/app/api/_lib/supabase-server";
 import type { Database } from "@/integrations/supabase/types";
@@ -36,7 +34,7 @@ export type AvailableNowProfile = {
   available_now_expires: string | null;
 };
 
-export { createSupabaseAdminClient, createSupabasePublicClient, getUserRole, recordAuditLog };
+export { recordAuditLog };
 
 async function syncTherapistProfileRuntime(userId: string) {
   try {
@@ -149,7 +147,7 @@ export async function updateProfileByUserId(userId: string, updates: ProfileUpda
   return data;
 }
 
-export async function getSiteSettings() {
+async function getSiteSettings() {
   const adminClient = createSupabaseAdminClient();
   const { data, error } = await adminClient
     .from("site_settings")

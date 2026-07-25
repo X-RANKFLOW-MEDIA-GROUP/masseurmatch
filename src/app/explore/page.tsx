@@ -3,6 +3,7 @@ import Link from "next/link";
 import { JsonLd } from "@/app/_components/JsonLd";
 import { createPageMetadata, buildBreadcrumbJsonLd } from "@/app/_lib/seo";
 import { getCities } from "@/app/_lib/directory";
+import { cityDisplayName } from "@/data/cities";
 
 const FEATURED_CITY_SLUGS = [
   "atlanta",
@@ -90,7 +91,7 @@ export default function ExplorePage() {
               href={`/${city!.slug}`}
               className="rounded-lg border border-border bg-card px-3 py-2 text-sm transition-colors hover:border-primary/40"
             >
-              {city!.name}{" "}
+              {cityDisplayName(city!.name, city!.stateCode)}{" "}
               <span className="text-muted-foreground">{city!.stateCode}</span>
             </Link>
           ))}

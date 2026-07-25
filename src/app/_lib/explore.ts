@@ -8,12 +8,12 @@ import type {
 import { US_CITIES } from "@/data/cities";
 import { isVerifiedDirectoryProfile } from "@/app/_lib/public-profile";
 
-export const EXPLORE_DEFAULT_CITY = "";
-export const EXPLORE_DEFAULT_RADIUS = 25;
-export const EXPLORE_DEFAULT_PRICE_MAX = 300;
+const EXPLORE_DEFAULT_CITY = "";
+const EXPLORE_DEFAULT_RADIUS = 25;
+const EXPLORE_DEFAULT_PRICE_MAX = 300;
 export const EXPLORE_PAGE_SIZE = 24;
 
-export type ExploreView = "grid" | "map" | "swipe" | "cards";
+type ExploreView = "grid" | "map" | "swipe" | "cards";
 export type ExploreSort = "distance" | "featured" | "price" | "reviews";
 
 export type ExploreFilters = {
@@ -534,7 +534,7 @@ export function getBaseExploreFilters(filters: ExploreFilters): ExploreFilters {
   };
 }
 
-export function recalculateExploreDistances(providers: ExploreProvider[], origin: ExplorePoint) {
+function recalculateExploreDistances(providers: ExploreProvider[], origin: ExplorePoint) {
   return providers.map((provider) => withProviderDistance(provider, origin));
 }
 

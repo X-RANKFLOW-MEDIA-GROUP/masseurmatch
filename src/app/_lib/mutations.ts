@@ -35,7 +35,7 @@ export type ContactMutationResponse = {
   mock: boolean;
 };
 
-export type ProProfileMutationResponse = {
+type ProProfileMutationResponse = {
   ok: boolean;
   profile: {
     id: string;
@@ -84,6 +84,6 @@ export function sendContactMessage(input: ContactFormInput) {
   return postJson<ContactMutationResponse>("/api/contact", input);
 }
 
-export function updateProfileMutation(input: ProProfileInput) {
+function updateProfileMutation(input: ProProfileInput) {
   return postJson<ProProfileMutationResponse>("/api/pro/profile", input);
 }

@@ -19,7 +19,7 @@ const BLOCK_PATTERNS: Array<{ label: string; pattern: RegExp }> = [
   { label: "oral", pattern: /\boral\b/i },
 ];
 
-export const KNOTTY_SAFE_REDIRECT =
+const KNOTTY_SAFE_REDIRECT =
   "That’s not what we do here — MasseurMatch connects you with licensed, professional massage therapists. Want me to help find one that fits what you need?";
 
 export function runKnottyGuardrails(message: string) {

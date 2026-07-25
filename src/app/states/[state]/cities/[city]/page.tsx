@@ -3,9 +3,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCanonicalCitySlug } from "@/app/_lib/city-routing";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
-import { createPageMetadata } from "@/app/_lib/metadata";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildItemListJsonLd,
+  createPageMetadata,
+} from "@/app/_lib/seo";
 import { JsonLd } from "@/app/_components/json-ld";
-import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd } from "@/app/_lib/structured-data";
+import { formatCityLabel } from "@/data/cities";
 
 type Params = { state: string; city: string };
 
@@ -40,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const therapists = await getPublicTherapists({ city: city.name, page: 1, pageSize: 1 });
 
   return createPageMetadata({
-    title: `Massage therapists in ${city.name}, ${city.stateCode}`,
+    title: `Massage therapists in ${formatCityLabel(city.name, city.stateCode)}`,
     description: `Browse verified massage therapists in ${city.name}, ${city.stateName}. Compare specialties, incall, outcall, trust signals, availability, and direct contact options.`,
     path: `/states/${resolved.state}/cities/${city.slug}`,
     keywords: [`massage therapists ${city.name.toLowerCase()}`, `${city.name.toLowerCase()} massage directory`, `${city.stateName.toLowerCase()} massage therapists`],
@@ -82,7 +87,7 @@ export default async function StateCityPage({ params }: { params: Promise<Params
       />
       <JsonLd
         data={buildCollectionPageJsonLd({
-          name: `${city.name}, ${city.stateCode} massage therapist directory`,
+          name: `${formatCityLabel(city.name, city.stateCode)} massage therapist directory`,
           description: `State-scoped city route for massage therapists, service pages, incall, outcall, and direct contact options in ${city.name}, ${city.stateName}.`,
           path: currentPath,
         })}
@@ -102,7 +107,7 @@ export default async function StateCityPage({ params }: { params: Promise<Params
         <div className="space-y-8">
           <header className="rounded-3xl border border-border bg-background p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">State city directory</p>
-            <h1 className="mt-2 text-3xl font-semibold text-foreground">Massage Therapists in {city.name}, {city.stateCode}</h1>
+            <h1 className="mt-2 text-3xl font-semibold text-foreground">Massage Therapists in {formatCityLabel(city.name, city.stateCode)}</h1>
             <p className="mt-3 max-w-4xl text-sm leading-7 text-muted-foreground">
               This state-scoped page connects {city.name} into MasseurMatch’s national architecture. Use it to browse therapists, jump to canonical city routes, and discover service-specific pages when local inventory exists.
             </p>

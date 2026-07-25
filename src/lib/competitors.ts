@@ -1,10 +1,10 @@
-export type CompetitorFeatureRow = {
+type CompetitorFeatureRow = {
   feature: string;
   masseurmatch: string;
   competitor: string;
 };
 
-export type CompetitorFaq = {
+type CompetitorFaq = {
   question: string;
   answer: string;
 };
@@ -33,19 +33,19 @@ export type Competitor = {
   ctaBody: string;
 };
 
-export const COMPARISON_TARGET_YEAR = 2026;
+const COMPARISON_TARGET_YEAR = 2026;
 export const COMPARISON_PUBLISHED_AT = "2026-03-20T00:00:00.000Z";
 
 export const COMPARISON_HUB_INTRO =
-  "Compare MasseurMatch against the main niche directories and listing networks therapists mention most often. Every page is generated from one competitor dataset so the hub, metadata, structured data, and internal links stay aligned.";
+  "Compare MasseurMatch against the directories and listing networks therapists mention most often — presentation, trust, discovery, and pricing — so you can decide where your public profile belongs.";
 
 export function getCompetitorTierLabel(tier: CompetitorTier) {
-  if (tier === 1) return "Tier 1";
-  if (tier === 2) return "Tier 2";
-  return "Tier 3";
+  if (tier === 1) return "Most compared";
+  if (tier === 2) return "Frequently compared";
+  return "Niche & boutique";
 }
 
-export const competitors: Competitor[] = [
+const competitors: Competitor[] = [
   {
     slug: "masseurmatch-vs-masseurfinder",
     name: "MasseurFinder",

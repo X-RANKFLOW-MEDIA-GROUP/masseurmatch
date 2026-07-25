@@ -20,13 +20,13 @@ export const metadata: Metadata = {
   title: "14 Days Free — No Credit Card | MasseurMatch",
   description:
     "Create your MasseurMatch profile and get discovered by clients in your city. Try it free for 14 days with no credit card required.",
-  alternates: { canonical: "https://masseurmatch.com/free" },
+  alternates: { canonical: "https://www.masseurmatch.com/free" },
   robots: { index: false, follow: true },
   openGraph: {
     title: "Join MasseurMatch Free for 14 Days",
     description:
       "Build your professional profile, appear in local search, and connect directly with clients. No credit card required.",
-    url: "https://masseurmatch.com/free",
+    url: "https://www.masseurmatch.com/free",
     siteName: "MasseurMatch",
     type: "website",
   },

@@ -63,7 +63,7 @@ function parseSupabaseUrl(name, value) {
 
 function readJwtProjectRef(name, token) {
   // New Supabase publishable keys are opaque. Their project is validated by
-  // the URL reachability check. Legacy anon and service-role keys are JWTs.
+  // the URL configuration checks. Legacy anon and service-role keys are JWTs.
   if (token.startsWith("sb_publishable_") || token.startsWith("sb_secret_")) {
     return null;
   }
@@ -86,10 +86,11 @@ function delay(milliseconds) {
 }
 
 async function verifyReachable(origin) {
-  if (process.env.VERCEL !== "1") {
+  if (process.env.VERCEL !== "1" && process.env.SUPABASE_HEALTHCHECK_STRICT !== "1") {
     return;
   }
 
+  const strict = process.env.SUPABASE_HEALTHCHECK_STRICT === "1";
   const attempts = 3;
   const timeoutMs = 12_000;
   let lastDetail = "unknown network error";
@@ -127,9 +128,17 @@ async function verifyReachable(origin) {
     }
   }
 
-  fail(
-    `Supabase project ${origin} is unreachable after ${attempts} attempts (${lastDetail}). ` +
-      "The deployment may reference a deleted or stale preview branch.",
+  const message =
+    `Supabase project ${origin} was unreachable after ${attempts} attempts (${lastDetail}). ` +
+    "Static URL and key validation passed.";
+
+  if (strict) {
+    fail(message);
+  }
+
+  console.warn(
+    `\nSupabase reachability warning: ${message} ` +
+      "Continuing the build because external network availability is not a reliable build gate.\n",
   );
 }
 

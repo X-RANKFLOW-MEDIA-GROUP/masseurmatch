@@ -17,6 +17,7 @@ import {
 import { postJson, requestJson } from "@/app/_lib/request";
 import { useToast } from "@/hooks/use-toast";
 import { US_CITIES } from "@/data/cities";
+import { formatCityLabel } from "@/data/cities";
 
 type TravelEntry = {
   city: string;
@@ -125,6 +126,8 @@ export default function GrowthPage() {
 
   const [travel, setTravel] = useState<TravelEntry[]>([]);
   const [promotions, setPromotions] = useState<Promotion[]>([]);
+  const [savedTravel, setSavedTravel] = useState<string>("[]");
+  const [savedPromotions, setSavedPromotions] = useState<string>("[]");
   const [savingTravel, setSavingTravel] = useState(false);
   const [savingSpecials, setSavingSpecials] = useState(false);
 
@@ -140,8 +143,12 @@ export default function GrowthPage() {
         setTier((p.subscription_tier || "free").toLowerCase());
         setAvailableNow(Boolean(p.available_now));
         setExpiresAt(p.available_now_expires ?? null);
-        setTravel(normalizeTravel(p.travel_schedule));
-        setPromotions(normalizePromotions(p.promotions));
+        const loadedTravel = normalizeTravel(p.travel_schedule);
+        const loadedPromotions = normalizePromotions(p.promotions);
+        setTravel(loadedTravel);
+        setPromotions(loadedPromotions);
+        setSavedTravel(JSON.stringify(loadedTravel));
+        setSavedPromotions(JSON.stringify(loadedPromotions));
       })
       .catch(() => {
         toast({
@@ -154,6 +161,8 @@ export default function GrowthPage() {
   }, [toast]);
 
   const availableHours = TIER_AVAILABLE_NOW_HOURS[tier] ?? null;
+  const travelDirty = JSON.stringify(travel) !== savedTravel;
+  const specialsDirty = JSON.stringify(promotions) !== savedPromotions;
   // `now` ticks every 30s so the countdown stays fresh.
   void now;
   const countdown = formatCountdown(expiresAt);
@@ -194,6 +203,28 @@ export default function GrowthPage() {
   }
 
   async function saveTravel() {
+    const incomplete = travel.some(
+      (t) => t.city.trim() && (!t.start_date || !t.end_date),
+    );
+    if (incomplete) {
+      toast({
+        title: "Add dates to every trip",
+        description: "Each destination needs a start and end date before saving.",
+        variant: "destructive",
+      });
+      return;
+    }
+    const invalidRange = travel.some(
+      (t) => t.start_date && t.end_date && t.end_date < t.start_date,
+    );
+    if (invalidRange) {
+      toast({
+        title: "Check your trip dates",
+        description: "A trip's end date cannot be before its start date.",
+        variant: "destructive",
+      });
+      return;
+    }
     setSavingTravel(true);
     try {
       const cleaned = travel
@@ -205,6 +236,7 @@ export default function GrowthPage() {
         }))
         .filter((t) => t.city && t.start_date && t.end_date);
       await postJson("/api/pro/growth", { travel_schedule: cleaned });
+      setSavedTravel(JSON.stringify(travel));
       toast({ title: "Travel schedule saved", description: "Clients in those cities can now find you." });
     } catch (error) {
       toast({
@@ -224,6 +256,7 @@ export default function GrowthPage() {
         .map((p) => ({ title: p.title.trim(), description: p.description.trim() }))
         .filter((p) => p.title && p.description);
       await postJson("/api/pro/growth", { promotions: cleaned });
+      setSavedPromotions(JSON.stringify(promotions));
       toast({ title: "Specials saved", description: "Your deals now show on your public listing." });
     } catch (error) {
       toast({
@@ -322,10 +355,12 @@ export default function GrowthPage() {
                     className={inputCls("pl-9")}
                     value={entry.city}
                     placeholder="City"
+                    aria-label={`Trip ${index + 1} city`}
+                    required
                     onChange={(e) => {
                       const raw = e.target.value;
                       const match = US_CITIES.find(
-                        (c) => `${c.name}, ${c.stateCode}` === raw,
+                        (c) => `${formatCityLabel(c.name, c.stateCode)}` === raw,
                       );
                       setTravel((rows) =>
                         rows.map((r, i) =>
@@ -344,7 +379,7 @@ export default function GrowthPage() {
                     })
                       .slice(0, 20)
                       .map((c) => (
-                        <option key={`${c.slug}-${c.stateCode}`} value={`${c.name}, ${c.stateCode}`} />
+                        <option key={`${c.slug}-${c.stateCode}`} value={`${formatCityLabel(c.name, c.stateCode)}`} />
                       ))}
                   </datalist>
                 </div>
@@ -352,6 +387,7 @@ export default function GrowthPage() {
                   className={inputCls()}
                   value={entry.state}
                   placeholder="State"
+                  aria-label={`Trip ${index + 1} state`}
                   maxLength={2}
                   onChange={(e) =>
                     setTravel((rows) =>
@@ -363,6 +399,8 @@ export default function GrowthPage() {
                   type="date"
                   className={inputCls()}
                   value={entry.start_date}
+                  aria-label={`Trip ${index + 1} start date`}
+                  required
                   onChange={(e) =>
                     setTravel((rows) => rows.map((r, i) => (i === index ? { ...r, start_date: e.target.value } : r)))
                   }
@@ -371,6 +409,9 @@ export default function GrowthPage() {
                   type="date"
                   className={inputCls()}
                   value={entry.end_date}
+                  aria-label={`Trip ${index + 1} end date`}
+                  required
+                  min={entry.start_date || undefined}
                   onChange={(e) =>
                     setTravel((rows) => rows.map((r, i) => (i === index ? { ...r, end_date: e.target.value } : r)))
                   }
@@ -401,7 +442,7 @@ export default function GrowthPage() {
           <button
             type="button"
             onClick={saveTravel}
-            disabled={savingTravel}
+            disabled={savingTravel || !travelDirty}
             className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-800 disabled:opacity-50"
           >
             {savingTravel ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" strokeWidth={2.25} />}
@@ -472,7 +513,7 @@ export default function GrowthPage() {
           <button
             type="button"
             onClick={saveSpecials}
-            disabled={savingSpecials}
+            disabled={savingSpecials || !specialsDirty}
             className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-800 disabled:opacity-50"
           >
             {savingSpecials ? (

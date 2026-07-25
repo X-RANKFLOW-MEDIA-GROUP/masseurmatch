@@ -11,8 +11,13 @@ import {
   getCityCanonicalCategorySlugs,
 } from "@/app/_lib/dallas-cluster";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
-import { createPageMetadata } from "@/app/_lib/metadata";
-import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildFaqJsonLd, buildItemListJsonLd } from "@/app/_lib/structured-data";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildFaqJsonLd,
+  buildItemListJsonLd,
+  createPageMetadata,
+} from "@/app/_lib/seo";
 
 type Params = { city: string; category: string };
 

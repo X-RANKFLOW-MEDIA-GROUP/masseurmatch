@@ -12,4 +12,3 @@ export const satoshi = localFont({
   weight: "300 900",
 });
 
-export default { satoshi };

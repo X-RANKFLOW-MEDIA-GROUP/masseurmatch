@@ -3,7 +3,7 @@ import type { CityData } from "@/data/cities";
 
 export type { CityData } from "@/data/cities";
 
-export type ExploreView = "grid" | "map" | "swipe" | "cards";
+type ExploreView = "grid" | "map" | "swipe" | "cards";
 export type ExploreSort = "distance" | "featured" | "price" | "reviews";
 
 export type ExploreFilters = {
@@ -57,7 +57,7 @@ export type ExploreProvider = {
   profilePath: string;
 };
 
-export type ExploreApiProvider = ExploreProvider & {
+type ExploreApiProvider = ExploreProvider & {
   photo_url: string;
   verified_status: ExploreProvider["verifiedStatus"];
   years_experience: number | null;
@@ -82,9 +82,9 @@ export type ExplorePoint = {
 };
 
 export const EXPLORE_DEFAULT_CITY = "";
-export const EXPLORE_DEFAULT_RADIUS = 25;
+const EXPLORE_DEFAULT_RADIUS = 25;
 export const EXPLORE_DEFAULT_PRICE_MAX = 300;
-export const EXPLORE_PAGE_SIZE = 24;
+const EXPLORE_PAGE_SIZE = 24;
 
 function normalize(value: string | null | undefined) {
   return (value || "")
@@ -111,7 +111,7 @@ type SearchParamShape = Record<string, string | string[] | undefined>;
 const SORT_OPTIONS = new Set<ExploreSort>(["distance", "featured", "price", "reviews"]);
 const VIEW_OPTIONS = new Set<ExploreView>(["grid", "map", "swipe", "cards"]);
 
-export function getExploreDefaults(): ExploreFilters {
+function getExploreDefaults(): ExploreFilters {
   return {
     city: EXPLORE_DEFAULT_CITY,
     zip: "",
@@ -223,7 +223,7 @@ export function getBaseExploreFilters(filters: ExploreFilters): ExploreFilters {
   };
 }
 
-export function recalculateExploreDistances(providers: ExploreProvider[], origin: ExplorePoint) {
+function recalculateExploreDistances(providers: ExploreProvider[], origin: ExplorePoint) {
   return providers.map((provider) => ({
     ...provider,
     distance: calculateDistanceMiles(origin, {
@@ -275,7 +275,7 @@ export function applyExploreFilters(
   );
 }
 
-export function parseExploreSearchParams(params: SearchParamShape): ExploreFilters {
+function parseExploreSearchParams(params: SearchParamShape): ExploreFilters {
   const defaults = getExploreDefaults();
   const city = getFirstParam(params.city);
   const zip = getFirstParam(params.zip);
@@ -322,7 +322,7 @@ export function exploreFiltersToUrl(filters: ExploreFilters) {
   return params.toString();
 }
 
-export function serializeExploreProvider(provider: ExploreProvider): ExploreApiProvider {
+function serializeExploreProvider(provider: ExploreProvider): ExploreApiProvider {
   return {
     ...provider,
     photo_url: provider.photoUrl,
@@ -344,7 +344,7 @@ export function serializeExploreProvider(provider: ExploreProvider): ExploreApiP
   };
 }
 
-export function buildExploreItemListJsonLd(city: string, providers: ExploreProvider[]) {
+function buildExploreItemListJsonLd(city: string, providers: ExploreProvider[]) {
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",

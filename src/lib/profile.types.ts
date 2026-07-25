@@ -7,7 +7,7 @@ export type ProfileUpdate = TablesUpdate<'profiles'>
  * Subset of ProfileUpdate scoped to onboarding fields added in the
  * May 2026 schema migration (17 new columns on `profiles`).
  */
-export type OnboardingFields = Pick<
+type OnboardingFields = Pick<
   ProfileUpdate,
   | 'zip_code'
   | 'street_reference'

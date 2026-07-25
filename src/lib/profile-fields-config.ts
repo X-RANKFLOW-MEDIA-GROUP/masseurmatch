@@ -6,7 +6,7 @@
 
 import { z } from 'zod'
 
-export enum FieldType {
+enum FieldType {
   TEXT = 'text',
   TEXTAREA = 'textarea',
   ARRAY = 'array',
@@ -29,7 +29,7 @@ export enum FieldSection {
   ADVANCED = 'advanced',
 }
 
-export interface FieldChoice {
+interface FieldChoice {
   value: string | number
   label: string
   description?: string
@@ -1007,11 +1007,13 @@ export const PROFILE_FIELDS_CONFIG: ProfileFieldDefinition[] = [
     order: 6,
     choices: [
       { value: 'draft', label: 'Draft' },
-      { value: 'submitted', label: 'Submitted for Review' },
+      { value: 'pending', label: 'Pending' },
+      { value: 'pending_approval', label: 'Pending Approval' },
+      { value: 'under_review', label: 'Under Review' },
       { value: 'approved', label: 'Approved' },
-      { value: 'active', label: 'Active' },
+      { value: 'changes_requested', label: 'Changes Requested' },
+      { value: 'rejected', label: 'Rejected' },
       { value: 'suspended', label: 'Suspended' },
-      { value: 'archived', label: 'Archived' },
     ],
   },
 
@@ -1102,28 +1104,28 @@ export function getFieldByKey(key: string): ProfileFieldDefinition | undefined {
 /**
  * Helper function to get all editable fields
  */
-export function getEditableFields(): ProfileFieldDefinition[] {
+function getEditableFields(): ProfileFieldDefinition[] {
   return PROFILE_FIELDS_CONFIG.filter((field) => field.editable)
 }
 
 /**
  * Helper function to get all required fields
  */
-export function getRequiredFields(): ProfileFieldDefinition[] {
+function getRequiredFields(): ProfileFieldDefinition[] {
   return PROFILE_FIELDS_CONFIG.filter((field) => field.required)
 }
 
 /**
  * Helper function to get all admin-only fields
  */
-export function getAdminOnlyFields(): ProfileFieldDefinition[] {
+function getAdminOnlyFields(): ProfileFieldDefinition[] {
   return PROFILE_FIELDS_CONFIG.filter((field) => field.adminOnly)
 }
 
 /**
  * Helper function to validate a field value
  */
-export function validateFieldValue(
+function validateFieldValue(
   key: string,
   value: unknown,
 ): { valid: boolean; error?: string } {
@@ -1144,4 +1146,4 @@ export function validateFieldValue(
 /**
  * Type export for using field definitions in components
  */
-export type FieldDefinition = ProfileFieldDefinition
+type FieldDefinition = ProfileFieldDefinition

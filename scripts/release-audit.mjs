@@ -14,7 +14,6 @@ const requiredFiles = [
   "src/app/login/page.tsx",
   "src/app/register/page.tsx",
   "src/app/admin/page.tsx",
-  "src/lib/env.ts",
   "src/app/_lib/directory-fallback.ts",
   "scripts/validate-sitemap.mjs",
 ];

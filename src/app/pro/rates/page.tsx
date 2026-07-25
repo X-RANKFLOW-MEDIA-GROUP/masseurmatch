@@ -255,6 +255,7 @@ export default function ProviderRatesPage() {
             <button
               key={value}
               type="button"
+              aria-pressed={mode === value}
               onClick={() => changeMode(value)}
               className={`rounded-2xl border p-4 text-left transition ${
                 mode === value

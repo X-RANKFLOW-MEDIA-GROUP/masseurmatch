@@ -14,10 +14,10 @@ import { envAny } from "@/app/api/_lib/env";
  */
 
 export const OPENAI_MODEL = "gpt-4o-mini";
-export const DEEPSEEK_MODEL = "deepseek-chat";
-export const GEMINI_MODEL = "gemini-1.5-flash";
+const DEEPSEEK_MODEL = "deepseek-chat";
+const GEMINI_MODEL = "gemini-1.5-flash";
 
-export type LlmProvider = "openai" | "deepseek" | "gemini";
+type LlmProvider = "openai" | "deepseek" | "gemini";
 export type LlmResult = { text: string; provider: LlmProvider; model: string } | null;
 
 export type CompleteOptions = {

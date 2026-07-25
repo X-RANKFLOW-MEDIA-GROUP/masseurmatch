@@ -3,9 +3,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCanonicalCitySlug } from "@/app/_lib/city-routing";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
-import { createPageMetadata } from "@/app/_lib/metadata";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildItemListJsonLd,
+  createPageMetadata,
+} from "@/app/_lib/seo";
 import { JsonLd } from "@/app/_components/json-ld";
-import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd } from "@/app/_lib/structured-data";
+import { formatCityLabel } from "@/data/cities";
 
 type Params = { state: string };
 
@@ -77,7 +82,7 @@ export default async function StatePage({ params }: { params: Promise<Params> })
 
   const totalProfiles = cityInventory.reduce((sum, item) => sum + item.total, 0);
   const cityItems = cityInventory.map(({ city }) => ({
-    name: `${city.name}, ${city.stateCode}`,
+    name: `${formatCityLabel(city.name, city.stateCode)}`,
     path: `/states/${resolved.state}/cities/${city.slug}`,
   }));
 
@@ -125,7 +130,7 @@ export default async function StatePage({ params }: { params: Promise<Params> })
                   href={`/states/${resolved.state}/cities/${city.slug}`}
                   className="rounded-xl border border-border px-4 py-3 text-sm text-foreground transition-colors hover:border-primary/50 hover:bg-muted/40"
                 >
-                  <span className="font-semibold">{city.name}, {city.stateCode}</span>
+                  <span className="font-semibold">{formatCityLabel(city.name, city.stateCode)}</span>
                   <span className="mt-1 block text-xs text-muted-foreground">{total} public profiles</span>
                 </Link>
               ))}

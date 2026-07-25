@@ -1,4 +1,4 @@
-export type InquiryStatus =
+type InquiryStatus =
   | 'new'
   | 'checking'
   | 'pending_approval'
@@ -7,7 +7,7 @@ export type InquiryStatus =
   | 'completed'
   | 'cancelled'
 
-export type IntelligenceStatus = 'pending' | 'running' | 'clean' | 'flagged' | 'inconclusive'
+type IntelligenceStatus = 'pending' | 'running' | 'clean' | 'flagged' | 'inconclusive'
 
 export type RiskLevel = 'low' | 'medium' | 'high' | 'unknown'
 

@@ -67,7 +67,7 @@ export interface ProfileFaqItem {
   answer: string;
 }
 
-export interface ProfilePromotion {
+interface ProfilePromotion {
   title: string;
   description: string;
 }
@@ -85,12 +85,12 @@ export interface ProfilePhoto {
   is_primary: boolean;
 }
 
-export interface ProfileAddOn {
+interface ProfileAddOn {
   name: string;
   price?: number | null;
 }
 
-export interface ProfileTrainingEntry {
+interface ProfileTrainingEntry {
   label: string;
   detail?: string | null;
   institution?: string | null;
@@ -103,12 +103,12 @@ export interface ProfileTravelEntry {
   end_date: string;
 }
 
-export type ProfileEducationEntry = string | {
+type ProfileEducationEntry = string | {
   label?: string | null;
   institution?: string | null;
 };
 
-export type BusinessHours = Record<string, unknown> | null;
+type BusinessHours = Record<string, unknown> | null;
 
 export interface PublicTherapist {
   id: string;
@@ -184,7 +184,7 @@ export interface PublicTherapist {
   identity_verified_at?: string | null;
 }
 
-export interface ImportedReview {
+interface ImportedReview {
   id: string;
   review_text: string;
   rating: number | null;
@@ -493,7 +493,7 @@ export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTher
   ) ?? null;
 };
 
-export const getImportedReviews = async (profileId: string, limit = 5) => {
+const getImportedReviews = async (profileId: string, limit = 5) => {
   const { data } = await supabase
     .from("imported_reviews")
     .select("id, review_text, rating, reviewer_name, review_date")

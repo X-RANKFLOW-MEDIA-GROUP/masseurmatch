@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { createPageMetadata } from "@/app/_lib/metadata";
+import { createPageMetadata } from "@/app/_lib/seo";
 import ProProfileCmsPageClient from "./ProProfileCmsPageClient";
 
 export const metadata: Metadata = createPageMetadata({

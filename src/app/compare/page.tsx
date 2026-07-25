@@ -21,7 +21,7 @@ import {
 export const metadata: Metadata = createPageMetadata({
   title: "MasseurMatch vs Competitors",
   description:
-    "Compare MasseurMatch against the main massage directory competitors, organized by tier, with statically generated pages built for SEO in 2026.",
+    "See how MasseurMatch compares to other massage directories on presentation, trust, discovery, and pricing — so you can decide where your profile belongs.",
   path: "/compare",
   keywords: competitorsByTier.flatMap((competitor) => [
     `MasseurMatch vs ${competitor.name}`,
@@ -30,9 +30,9 @@ export const metadata: Metadata = createPageMetadata({
 });
 
 const tierIntro: Record<1 | 2 | 3, string> = {
-  1: "The two names therapists mention first when comparing niche directory visibility and brand positioning.",
-  2: "Secondary directory alternatives that still matter when evaluating where to place and prioritize a public profile.",
-  3: "Long-tail niche and boutique competitors that are often used as supporting channels rather than the main brand destination.",
+  1: "The names therapists mention first when deciding where their public profile should live.",
+  2: "Directory alternatives that still matter when evaluating where to place and prioritize a public profile.",
+  3: "Niche and boutique platforms that are often used as supporting channels rather than a main destination.",
 };
 
 const groupedCompetitors = [1, 2, 3].map((tier) => ({
@@ -75,7 +75,7 @@ export default function CompareHubPage() {
           <div className="page-shell relative py-14 sm:py-18">
             <div className="max-w-4xl">
               <Badge variant="premium" className="border-0 px-4 py-2 text-[11px] tracking-[0.22em]">
-                SEO comparison hub
+                Platform comparisons
               </Badge>
               <h1 className="mt-6 text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
                 MasseurMatch vs the main competitors
@@ -100,18 +100,18 @@ export default function CompareHubPage() {
                 {[
                   {
                     icon: IconSearch,
-                    title: "Search-first structure",
-                    body: "Each comparison page targets high-intent alternative queries and stays linked back into the main directory.",
+                    title: "Easy to find",
+                    body: "Every comparison links back into the directory, so you can go straight from research to browsing real profiles.",
                   },
                   {
                     icon: IconShield,
-                    title: "Cleaner positioning",
-                    body: "The pages emphasize trust, premium presentation, and a more professional public profile strategy.",
+                    title: "Trust comes first",
+                    body: "We focus on how each platform presents therapists — trust signals, professionalism, and public profile quality.",
                   },
                   {
                     icon: Scale,
-                    title: "Single source of truth",
-                    body: "Competitor data, metadata, and JSON-LD are all generated from one dataset so expansion stays consistent.",
+                    title: "Factual and consistent",
+                    body: "Each comparison sticks to what you can verify, and every page is reviewed together so the details stay consistent.",
                   },
                 ].map((item) => {
                   const Icon = item.icon;
@@ -143,7 +143,7 @@ export default function CompareHubPage() {
                     {group.label}
                   </p>
                   <h2 className="mt-3 text-3xl font-semibold tracking-tight text-brand-primary">
-                    {group.items.length} comparison pages in {group.label.toLowerCase()}
+                    {group.label}
                   </h2>
                   <p className="mt-3 text-sm leading-7 text-text-secondary">{group.description}</p>
                 </div>

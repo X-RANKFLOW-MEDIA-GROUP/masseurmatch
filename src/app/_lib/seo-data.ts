@@ -14,7 +14,7 @@ export type SeoSegment = {
   updated_at?: string | null;
 };
 
-export type SeoKeyword = {
+type SeoKeyword = {
   slug: string;
   updated_at?: string | null;
 };
@@ -31,7 +31,7 @@ export function absoluteUrl(path: string) {
   return siteUrl(path);
 }
 
-export async function fetchAllRows<T>(
+async function fetchAllRows<T>(
   table: SeoTableName,
   columns: string,
   queryBuilder?: (query: any) => any,
@@ -107,7 +107,7 @@ export async function getSeoSegments(): Promise<SeoSegment[]> {
   }));
 }
 
-export async function getSeoKeywords(): Promise<SeoKeyword[]> {
+async function getSeoKeywords(): Promise<SeoKeyword[]> {
   const dbKeywords = await tryFetchAllRows<SeoKeyword>(
     "keywords",
     "slug, updated_at",

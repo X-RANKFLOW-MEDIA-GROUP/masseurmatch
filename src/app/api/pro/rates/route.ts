@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
-import { requireRequestSession } from "@/app/_lib/session";
+import { requireRequestSession } from "@/app/api/_lib/session";
 import { createSupabaseAdminClient, recordAuditLog } from "@/app/api/_lib/supabase-server";
 import { isRateWithinLimit, MAX_RATE_PER_MINUTE } from "@/lib/provider-product-rules";
 

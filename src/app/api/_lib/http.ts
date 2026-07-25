@@ -56,7 +56,7 @@ export function withSetCookie(response: Response, cookie: string): Response {
   });
 }
 
-export function redirectResponse(location: string, cookie?: string): Response {
+function redirectResponse(location: string, cookie?: string): Response {
   const headers = new Headers({ Location: location });
   if (cookie) {
     headers.append("Set-Cookie", cookie);
@@ -68,7 +68,7 @@ export function redirectResponse(location: string, cookie?: string): Response {
   });
 }
 
-export function parseCookieHeader(header: string | null): Record<string, string> {
+function parseCookieHeader(header: string | null): Record<string, string> {
   if (!header) {
     return {};
   }
@@ -84,7 +84,7 @@ export function parseCookieHeader(header: string | null): Record<string, string>
   }, {});
 }
 
-export function getErrorMessage(error: unknown): string {
+function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
   }

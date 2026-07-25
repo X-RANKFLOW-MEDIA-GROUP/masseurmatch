@@ -5,7 +5,7 @@ import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, RefreshCw, Users, ShieldCheck, Eye, MousePointer, Phone, TrendingUp } from "lucide-react";
+import { Loader2, RefreshCw, Users, ShieldCheck, Eye } from "lucide-react";
 
 interface ReportsData {
   profiles: { total: number; active: number; verified: number };
