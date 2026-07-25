@@ -270,6 +270,7 @@ function NewTicketForm({
   return (
     <div className="mx-auto max-w-2xl space-y-6 pb-12">
       <button
+        type="button"
         onClick={onCancel}
         className="flex items-center gap-1.5 text-sm text-slate-500 transition hover:text-slate-900"
       >
@@ -286,20 +287,23 @@ function NewTicketForm({
 
       <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-6">
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-slate-700">Subject</label>
+          <label htmlFor="ticket-subject" className="text-sm font-medium text-slate-700">Subject</label>
           <Input
+            id="ticket-subject"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
             placeholder="Brief summary of your issue"
             maxLength={160}
+            required
+            aria-required="true"
           />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700">Category</label>
+            <label id="ticket-category-label" htmlFor="ticket-category" className="text-sm font-medium text-slate-700">Category</label>
             <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger>
+              <SelectTrigger id="ticket-category" aria-labelledby="ticket-category-label ticket-category">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -312,9 +316,9 @@ function NewTicketForm({
             </Select>
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700">Priority</label>
+            <label id="ticket-priority-label" htmlFor="ticket-priority" className="text-sm font-medium text-slate-700">Priority</label>
             <Select value={priority} onValueChange={setPriority}>
-              <SelectTrigger>
+              <SelectTrigger id="ticket-priority" aria-labelledby="ticket-priority-label ticket-priority">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -329,13 +333,16 @@ function NewTicketForm({
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-slate-700">Message</label>
+          <label htmlFor="ticket-message" className="text-sm font-medium text-slate-700">Message</label>
           <Textarea
+            id="ticket-message"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Describe your issue in detail…"
             rows={7}
             maxLength={8000}
+            required
+            aria-required="true"
           />
         </div>
 
@@ -346,10 +353,10 @@ function NewTicketForm({
         )}
 
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onCancel} disabled={submitting}>
+          <Button type="button" variant="outline" onClick={onCancel} disabled={submitting}>
             Cancel
           </Button>
-          <Button onClick={() => void submit()} disabled={submitting} className="gap-2">
+          <Button type="button" onClick={() => void submit()} disabled={submitting} className="gap-2">
             {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             Submit ticket
           </Button>

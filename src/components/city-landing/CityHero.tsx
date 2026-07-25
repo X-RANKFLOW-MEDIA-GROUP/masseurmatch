@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, PlayCircle, ShieldCheck } from "lucide-react";
 import type { City } from "@/data/provider-cities";
+import { formatCityLabel } from "@/data/cities";
 
 type CityHeroProps = {
   city: City;
@@ -45,7 +46,7 @@ export function CityHero({ city, profileHref, howItWorksHref = "#how-it-works" }
 
           <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
             Create a professional profile and make it easier for clients in{" "}
-            {city.name}, {city.stateCode} to discover your massage and bodywork
+            {formatCityLabel(city.name, city.stateCode)} to discover your massage and bodywork
             services.
           </p>
 

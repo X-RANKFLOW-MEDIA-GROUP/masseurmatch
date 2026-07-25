@@ -5,6 +5,7 @@ import { MapPin, Search, SlidersHorizontal, X } from "lucide-react";
 import { useState } from "react";
 import type { TherapistTier } from "@/app/_lib/directory";
 import type { CityData } from "@/data/cities";
+import { formatCityLabel } from "@/data/cities";
 
 export type DirectorySession = "" | "home-visit" | "incall";
 type DirectoryObjectiveId =
@@ -186,7 +187,7 @@ export function AdvancedDirectoryFilter({
   const matchedCity = cities.find(
     (city) => normalizeValue(city.name) === normalizeValue(filters.city) || city.slug === normalizeValue(filters.city),
   );
-  const cityLabel = matchedCity ? `${matchedCity.name}, ${matchedCity.stateCode}` : filters.city || "All cities";
+  const cityLabel = matchedCity ? `${formatCityLabel(matchedCity.name, matchedCity.stateCode)}` : filters.city || "All cities";
   const sessionLabel =
     filters.session === "home-visit"
       ? "Home Visit"
@@ -332,7 +333,7 @@ export function AdvancedDirectoryFilter({
                         <option value="">All cities</option>
                         {cities.slice(0, 200).map((city) => (
                           <option key={city.slug} value={city.name}>
-                            {city.name}, {city.stateCode}
+                            {formatCityLabel(city.name, city.stateCode)}
                           </option>
                         ))}
                       </select>

@@ -21,7 +21,7 @@ const aboutPageJsonLd = {
   "@context": "https://schema.org",
   "@type": "AboutPage",
   name: "About MasseurMatch",
-  url: "https://masseurmatch.com/about",
+  url: "https://www.masseurmatch.com/about",
   description:
     "MasseurMatch is an exclusive network where professional excellence meets absolute trust.",
   mainEntity: {

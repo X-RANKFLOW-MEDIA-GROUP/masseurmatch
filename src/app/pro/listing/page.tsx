@@ -89,9 +89,8 @@ const RATE_DISCLAIMERS = [
 ];
 
 const PAYMENT_METHODS = [
-  "American Express", "Apple Pay", "Barter", "Bitcoin", "Cash", "Check", "Dash", "Discover", "Ether",
-  "Google Wallet", "Mastercard", "Paypal", "QuickPay", "Ripple", "Samsung Pay", "Square Cash",
-  "Venmo", "Visa", "Zelle",
+  "American Express", "Apple Pay", "Cash", "Cash App", "Check", "Discover", "Google Pay",
+  "Mastercard", "PayPal", "Samsung Pay", "Venmo", "Visa", "Zelle",
 ];
 
 const LANGUAGES = [
@@ -577,6 +576,7 @@ function ChipGrid({
           <button
             key={opt}
             type="button"
+            aria-pressed={active}
             onClick={() => onToggle(opt)}
             className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm font-medium transition-all ${
               active

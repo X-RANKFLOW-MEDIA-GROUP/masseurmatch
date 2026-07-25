@@ -4,6 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
+function isoDate(human: string): string | undefined {
+  const d = new Date(human);
+  if (Number.isNaN(d.getTime())) return undefined;
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 const categories = [
   "All",
   "Wellness Tips",
@@ -54,7 +60,7 @@ const posts = [
   {
     slug: "grow-massage-practice-online",
     category: "For Therapists",
-    title: "5 Ways to Grow Your Massage Practice Online in 2025",
+    title: "5 Ways to Grow Your Massage Practice Online",
     excerpt:
       "Independent therapists need a digital presence. Here are the highest-ROI strategies for building a sustainable client base.",
     date: "February 10, 2025",
@@ -275,7 +281,7 @@ export function BlogContent() {
                     opacity: 0.45,
                   }}
                 >
-                  {featuredPost.date} | {featuredPost.readTime}
+                  <time dateTime={isoDate(featuredPost.date)}>{featuredPost.date}</time> | {featuredPost.readTime}
                 </span>
                 <Link
                   href={`/blog/${featuredPost.slug}`}
@@ -394,7 +400,7 @@ export function BlogContent() {
                       color: "#9CA3AF",
                     }}
                   >
-                    {post.date} | {post.readTime}
+                    <time dateTime={isoDate(post.date)}>{post.date}</time> | {post.readTime}
                   </span>
                   <Link
                     href={`/blog/${post.slug}`}

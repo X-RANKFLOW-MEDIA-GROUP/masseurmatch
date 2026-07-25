@@ -294,7 +294,7 @@ const FALLBACK_POSTS: BlogListItem[] = [
   {
     slug: "grow-massage-practice-online",
     category: "For Therapists",
-    title: "5 Ways to Grow Your Massage Practice Online in 2025",
+    title: "5 Ways to Grow Your Massage Practice Online",
     excerpt: "Independent therapists need a digital presence. Here are the highest-ROI strategies for building a sustainable client base.",
     tags: ["therapist business", "practice growth", "marketing"],
     date: "February 10, 2025",
@@ -412,7 +412,7 @@ const FALLBACK_FULL_POSTS: Record<string, BlogPost> = {
   },
   "grow-massage-practice-online": {
     slug: "grow-massage-practice-online",
-    title: "5 Ways to Grow Your Massage Practice Online in 2025",
+    title: "5 Ways to Grow Your Massage Practice Online",
     excerpt: "Independent therapists need a digital presence. Here are the highest-ROI strategies for building a sustainable client base.",
     category: "For Therapists",
     tags: ["therapist business", "practice growth", "marketing"],

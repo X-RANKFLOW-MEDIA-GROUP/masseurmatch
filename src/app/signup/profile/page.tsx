@@ -76,6 +76,17 @@ export default function SignupProfilePage() {
     return arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val];
   }
 
+  const requirementsMet = Boolean(
+    p.tagline.trim() &&
+      p.bio.trim() &&
+      (p.zipCode.trim() || (p.city.trim() && p.state.trim())) &&
+      p.serviceCategories.length > 0 &&
+      p.sessionLengths.length > 0 &&
+      p.startingPrice.trim() &&
+      p.locationType &&
+      p.mediaCompliance,
+  );
+
   function applyZipLookup(zipValue: string) {
     const cleanedZip = zipValue.replace(/\D/g, "").slice(0, 5);
     updateProfile({ zipCode: cleanedZip });
@@ -202,7 +213,7 @@ export default function SignupProfilePage() {
 
             <div className="space-y-2">
               <Label htmlFor="tagline">SEO Headline *</Label>
-              <Input id="tagline" value={p.tagline} onChange={(e) => updateProfile({ tagline: e.target.value })} placeholder="Professional massage therapist serving your area" maxLength={120} />
+              <Input id="tagline" value={p.tagline} onChange={(e) => updateProfile({ tagline: e.target.value })} placeholder="Professional massage therapist serving your area" maxLength={120} required aria-required="true" />
               <div className="flex flex-wrap gap-2 pt-2">
                 {headlineOptions.map((headline) => (
                   <button key={headline} type="button" onClick={() => updateProfile({ tagline: headline })} className="rounded-full border border-border bg-white px-3 py-1.5 text-xs text-muted-foreground transition hover:border-brand-secondary hover:text-brand-secondary">
@@ -217,7 +228,7 @@ export default function SignupProfilePage() {
                 <Label htmlFor="bio">Profile Description *</Label>
                 <Button type="button" variant="outline" size="sm" onClick={applyBioSuggestion}><Sparkles className="mr-2 h-4 w-4" /> Generate Clean Draft</Button>
               </div>
-              <Textarea id="bio" value={p.bio} onChange={(e) => updateProfile({ bio: e.target.value })} placeholder="Describe your experience, massage style, pressure, setup, services, and what clients can expect." maxLength={1200} rows={7} />
+              <Textarea id="bio" value={p.bio} onChange={(e) => updateProfile({ bio: e.target.value })} placeholder="Describe your experience, massage style, pressure, setup, services, and what clients can expect." maxLength={1200} rows={7} required aria-required="true" />
               <p className="text-xs text-muted-foreground">{p.bio.length}/1200. Keep it professional, local, and focused on massage services.</p>
             </div>
 
@@ -235,10 +246,10 @@ export default function SignupProfilePage() {
             <div className="grid gap-4 sm:grid-cols-[180px_1fr_120px]">
               <div className="space-y-2"><Label htmlFor="zipCode">ZIP Code</Label><Input id="zipCode" inputMode="numeric" maxLength={5} value={p.zipCode} onChange={(e) => applyZipLookup(e.target.value)} placeholder="10001" /></div>
               <div className="space-y-2"><Label>Auto Filled Area</Label><div className="flex h-12 items-center rounded-xl border border-border/90 bg-bg-subtle/40 px-4 text-sm text-muted-foreground"><Search className="mr-2 h-4 w-4" /> {zipMessage || "Enter a ZIP code to auto fill city, state, neighborhood, landmarks, and service area."}</div></div>
-              <div className="space-y-2"><Label htmlFor="state">State *</Label><select id="state" value={p.state} onChange={(e) => updateProfile({ state: e.target.value })} className="flex h-12 w-full rounded-xl border border-border/90 bg-white px-4 py-2 text-sm"><option value="">State</option>{US_STATES.map((s) => <option key={s} value={s}>{s}</option>)}</select></div>
+              <div className="space-y-2"><Label htmlFor="state">State *</Label><select id="state" value={p.state} onChange={(e) => updateProfile({ state: e.target.value })} required={!p.zipCode.trim()} aria-required={!p.zipCode.trim()} className="flex h-12 w-full rounded-xl border border-border/90 bg-white px-4 py-2 text-sm"><option value="">State</option>{US_STATES.map((s) => <option key={s} value={s}>{s}</option>)}</select></div>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
-              <div className="space-y-2"><Label htmlFor="city">City *</Label><Input id="city" value={p.city} onChange={(e) => updateProfile({ city: e.target.value })} placeholder="New York" /></div>
+              <div className="space-y-2"><Label htmlFor="city">City *</Label><Input id="city" value={p.city} onChange={(e) => updateProfile({ city: e.target.value })} placeholder="New York" required={!p.zipCode.trim()} aria-required={!p.zipCode.trim()} /></div>
               <div className="space-y-2"><Label htmlFor="neighborhood">Neighborhood or Area</Label><Input id="neighborhood" value={p.neighborhood} onChange={(e) => updateProfile({ neighborhood: e.target.value })} placeholder="Chelsea (optional)" /></div>
               <div className="space-y-2"><Label htmlFor="locationDescription">Location Note</Label><Input id="locationDescription" value={p.locationDescription} onChange={(e) => updateProfile({ locationDescription: e.target.value })} placeholder="Near major hotels or landmarks" /></div>
             </div>
@@ -251,18 +262,18 @@ export default function SignupProfilePage() {
         <Card>
           <CardContent className="space-y-6 p-6">
             <div className="flex items-center gap-2 text-brand-secondary"><BadgeCheck className="h-5 w-5" /><h2 className="font-display text-lg font-semibold text-foreground">Services, Pricing, and Body Details</h2></div>
-            <div className="space-y-2"><Label>Massage Services *</Label><div className="flex flex-wrap gap-2">{SERVICE_OPTIONS.map((cat) => <button key={cat} type="button" onClick={() => updateProfile({ serviceCategories: toggleInArray(p.serviceCategories, cat) })} className={`rounded-full border px-3 py-1.5 text-sm transition ${p.serviceCategories.includes(cat) ? "border-brand-secondary bg-brand-secondary/10 text-brand-secondary" : "border-border bg-white text-muted-foreground hover:border-border-strong"}`}>{p.serviceCategories.includes(cat) && <CheckCircle2 className="mr-1 inline h-3.5 w-3.5" />}{cat}</button>)}</div></div>
+            <div className="space-y-2"><Label>Massage Services *</Label><div role="group" aria-label="Massage services" className="flex flex-wrap gap-2">{SERVICE_OPTIONS.map((cat) => <button key={cat} type="button" aria-pressed={p.serviceCategories.includes(cat)} onClick={() => updateProfile({ serviceCategories: toggleInArray(p.serviceCategories, cat) })} className={`rounded-full border px-3 py-1.5 text-sm transition ${p.serviceCategories.includes(cat) ? "border-brand-secondary bg-brand-secondary/10 text-brand-secondary" : "border-border bg-white text-muted-foreground hover:border-border-strong"}`}>{p.serviceCategories.includes(cat) && <CheckCircle2 className="mr-1 inline h-3.5 w-3.5" />}{cat}</button>)}</div></div>
             <div className="grid gap-4 sm:grid-cols-3">
-              <div className="space-y-2"><Label>Session Lengths *</Label><div className="flex flex-wrap gap-2">{SESSION_LENGTHS.map((len) => <button key={len} type="button" onClick={() => updateProfile({ sessionLengths: toggleInArray(p.sessionLengths, len) })} className={`rounded-full border px-3 py-1.5 text-sm ${p.sessionLengths.includes(len) ? "border-brand-secondary bg-brand-secondary/10 text-brand-secondary" : "border-border bg-white text-muted-foreground"}`}>{len}</button>)}</div></div>
-              <div className="space-y-2"><Label htmlFor="startingPrice">Starting Price *</Label><div className="relative"><DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input id="startingPrice" type="number" min="0" value={p.startingPrice} onChange={(e) => updateProfile({ startingPrice: e.target.value })} placeholder="150" className="pl-9" /></div></div>
-              <div className="space-y-2"><Label>Location Type *</Label><div className="flex flex-wrap gap-2">{(["incall", "outcall", "both"] as const).map((type) => <button key={type} type="button" onClick={() => updateProfile({ locationType: type })} className={`rounded-full border px-4 py-2 text-sm font-medium transition ${p.locationType === type ? "border-brand-secondary bg-brand-secondary/10 text-brand-secondary" : "border-border bg-white text-muted-foreground"}`}>{type === "incall" ? "Incall" : type === "outcall" ? "Outcall" : "Both"}</button>)}</div></div>
+              <div className="space-y-2"><Label>Session Lengths *</Label><div role="group" aria-label="Session lengths" className="flex flex-wrap gap-2">{SESSION_LENGTHS.map((len) => <button key={len} type="button" aria-pressed={p.sessionLengths.includes(len)} onClick={() => updateProfile({ sessionLengths: toggleInArray(p.sessionLengths, len) })} className={`rounded-full border px-3 py-1.5 text-sm ${p.sessionLengths.includes(len) ? "border-brand-secondary bg-brand-secondary/10 text-brand-secondary" : "border-border bg-white text-muted-foreground"}`}>{len}</button>)}</div></div>
+              <div className="space-y-2"><Label htmlFor="startingPrice">Starting Price *</Label><div className="relative"><DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input id="startingPrice" type="number" min="0" value={p.startingPrice} onChange={(e) => updateProfile({ startingPrice: e.target.value })} placeholder="150" className="pl-9" required aria-required="true" /></div></div>
+              <div className="space-y-2"><Label>Location Type *</Label><div role="group" aria-label="Location type" className="flex flex-wrap gap-2">{(["incall", "outcall", "both"] as const).map((type) => <button key={type} type="button" aria-pressed={p.locationType === type} onClick={() => updateProfile({ locationType: type })} className={`rounded-full border px-4 py-2 text-sm font-medium transition ${p.locationType === type ? "border-brand-secondary bg-brand-secondary/10 text-brand-secondary" : "border-border bg-white text-muted-foreground"}`}>{type === "incall" ? "Incall" : type === "outcall" ? "Outcall" : "Both"}</button>)}</div></div>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2"><Label htmlFor="heightInches"><Ruler className="mr-1 inline h-4 w-4" /> Height</Label><select id="heightInches" value={p.heightInches} onChange={(e) => updateProfile({ heightInches: e.target.value })} className="flex h-12 w-full rounded-xl border border-border/90 bg-white px-4 py-2 text-sm"><option value="">Select height</option>{HEIGHT_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></div>
               <div className="space-y-2"><Label htmlFor="weightLb"><Scale className="mr-1 inline h-4 w-4" /> Weight</Label><Input id="weightLb" type="number" min="80" max="450" value={p.weightLb} onChange={(e) => updateProfile({ weightLb: e.target.value })} placeholder="180 lb" /><p className="text-xs text-muted-foreground">{poundsToKilogramsLabel(p.weightLb)}</p></div>
               <div className="space-y-2"><Label htmlFor="bodyType">Body Type</Label><select id="bodyType" value={p.bodyType} onChange={(e) => updateProfile({ bodyType: e.target.value })} className="flex h-12 w-full rounded-xl border border-border/90 bg-white px-4 py-2 text-sm"><option value="">Select body type</option>{BODY_TYPE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></div>
             </div>
-            <div className="space-y-2"><Label>Languages</Label><div className="flex flex-wrap gap-2">{LANGUAGE_OPTIONS.map((language) => <button key={language} type="button" onClick={() => updateProfile({ languages: toggleInArray(p.languages, language) })} className={`rounded-full border px-3 py-1.5 text-sm ${p.languages.includes(language) ? "border-brand-secondary bg-brand-secondary/10 text-brand-secondary" : "border-border bg-white text-muted-foreground"}`}>{language}</button>)}</div></div>
+            <div className="space-y-2"><Label>Languages</Label><div role="group" aria-label="Languages" className="flex flex-wrap gap-2">{LANGUAGE_OPTIONS.map((language) => <button key={language} type="button" aria-pressed={p.languages.includes(language)} onClick={() => updateProfile({ languages: toggleInArray(p.languages, language) })} className={`rounded-full border px-3 py-1.5 text-sm ${p.languages.includes(language) ? "border-brand-secondary bg-brand-secondary/10 text-brand-secondary" : "border-border bg-white text-muted-foreground"}`}>{language}</button>)}</div></div>
           </CardContent>
         </Card>
 
@@ -270,12 +281,19 @@ export default function SignupProfilePage() {
           <CardContent className="space-y-5 p-6">
             <div className="flex items-center gap-2 text-brand-secondary"><Camera className="h-5 w-5" /><h2 className="font-display text-lg font-semibold text-foreground">Photos and Compliance</h2></div>
             <div className="grid gap-4 sm:grid-cols-2"><div className="space-y-2"><Label htmlFor="profilePhoto">Profile Photo</Label><Input id="profilePhoto" type="file" accept="image/*" onChange={(e) => updateProfile({ profilePhoto: e.target.files?.[0] ?? null })} /></div><div className="space-y-2"><Label htmlFor="galleryPhotos">Gallery Photos</Label><Input id="galleryPhotos" type="file" accept="image/*" multiple onChange={(e) => updateProfile({ galleryPhotos: e.target.files ? Array.from(e.target.files) : [] })} /></div></div>
-            <div className="rounded-xl border border-border/60 bg-bg-subtle/30 p-4"><div className="flex items-start gap-3"><Checkbox id="mediaCompliance" checked={p.mediaCompliance} onCheckedChange={(v) => updateProfile({ mediaCompliance: v === true })} /><Label htmlFor="mediaCompliance" className="text-sm leading-snug">I confirm that my profile and photos follow MasseurMatch rules, are professional, accurate, and appropriate for a massage directory.</Label></div></div>
+            <div className="rounded-xl border border-border/60 bg-bg-subtle/30 p-4"><div className="flex items-start gap-3"><Checkbox id="mediaCompliance" checked={p.mediaCompliance} required aria-required="true" onCheckedChange={(v) => updateProfile({ mediaCompliance: v === true })} /><Label htmlFor="mediaCompliance" className="text-sm leading-snug">I confirm that my profile and photos follow MasseurMatch rules, are professional, accurate, and appropriate for a massage directory.</Label></div></div>
             <div className="rounded-xl border border-brand-secondary/20 bg-brand-secondary/5 p-4 text-sm text-muted-foreground"><strong className="text-foreground">Auto SEO preview:</strong> {buildSeoDescription({ displayName: state.displayName || state.fullName, city: p.city, neighborhood: p.neighborhood, specialties: p.serviceCategories })}</div>
           </CardContent>
         </Card>
 
-        <Button type="submit" size="lg" className="w-full">Continue to Review</Button>
+        <Button type="submit" size="lg" className="w-full" disabled={!requirementsMet}>
+          Continue to Review
+        </Button>
+        {!requirementsMet && (
+          <p className="text-center text-xs text-muted-foreground">
+            Complete the required fields marked with * to continue.
+          </p>
+        )}
       </form>
     </div>
   );

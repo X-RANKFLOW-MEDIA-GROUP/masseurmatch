@@ -295,6 +295,12 @@ function Section({ section }: { section: BlogSection }) {
   return null;
 }
 
+function isoDate(human: string): string | undefined {
+  const d = new Date(human);
+  if (Number.isNaN(d.getTime())) return undefined;
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 export default async function BlogPostPage({
   params,
 }: {
@@ -460,7 +466,7 @@ export default async function BlogPostPage({
                     marginTop: 2,
                   }}
                 >
-                  {formattedDate}
+                  <time dateTime={post.publishedAt}>{formattedDate}</time>
                 </div>
               </div>
             </div>
@@ -698,7 +704,7 @@ export default async function BlogPostPage({
                           color: "#9CA3AF",
                         }}
                       >
-                        {relatedPost.date}
+                        <time dateTime={isoDate(relatedPost.date)}>{relatedPost.date}</time>
                       </span>
                     </Link>
                   ))}

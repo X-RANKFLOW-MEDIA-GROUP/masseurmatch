@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { type CityData } from "@/data/cities";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { cn } from "@/lib/utils";
+import { formatCityLabel } from "@/data/cities";
 
 type GeoAreaCalloutProps = {
   className?: string;
@@ -31,7 +32,7 @@ export function GeoAreaCallout({
   const { city, loading, error, requestLocation, status } = useGeolocation({ autoLocate: true });
 
   const isInverse = tone === "inverse";
-  const cityLabel = city ? `${city.name}, ${city.stateCode}` : null;
+  const cityLabel = city ? `${formatCityLabel(city.name, city.stateCode)}` : null;
 
   const message = cityLabel
     ? `Location ready: ${cityLabel}.`

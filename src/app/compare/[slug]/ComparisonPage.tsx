@@ -10,7 +10,7 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
-import type { Competitor } from "@/lib/competitors";
+import { getCompetitorTierLabel, type Competitor } from "@/lib/competitors";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -41,7 +41,7 @@ export default function ComparisonPage({
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <Badge variant="premium" className="border-0 px-3 py-1 text-[11px] uppercase tracking-[0.18em]">
-                {competitor.badge || competitor.category}
+                {getCompetitorTierLabel(competitor.tier)}
               </Badge>
               <span className="rounded-full border border-white/12 bg-white/8 px-3 py-1 text-xs font-medium text-white/70">
                 {competitor.category}

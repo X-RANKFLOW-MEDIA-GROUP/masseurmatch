@@ -13,6 +13,7 @@ import { TrustSection } from "@/components/city-landing/TrustSection";
 import type { City } from "@/data/provider-cities";
 import { getCity, getCitySlugs } from "@/lib/get-city";
 import { SITE_URL } from "@/lib/site";
+import { formatCityLabel } from "@/data/cities";
 
 type Params = { citySlug: string };
 
@@ -46,8 +47,8 @@ export async function generateMetadata({
     };
   }
 
-  const title = `Massage Professionals in ${city.name}, ${city.stateCode} | MasseurMatch`;
-  const description = `Create your professional MasseurMatch profile and join the massage provider directory for ${city.name}, ${city.stateCode}. Start a 14-day free trial with no credit card required.`;
+  const title = `Massage Professionals in ${formatCityLabel(city.name, city.stateCode)} | MasseurMatch`;
+  const description = `Create your professional MasseurMatch profile and join the massage provider directory for ${formatCityLabel(city.name, city.stateCode)}. Start a 14-day free trial with no credit card required.`;
   const path = `/providers/${city.slug}`;
   const canonical = `${baseUrl}${path}`;
 
@@ -91,8 +92,8 @@ export default async function ProviderCityLandingPage({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: `Massage Professionals in ${city.name}, ${city.stateCode} | MasseurMatch`,
-    description: `Create your professional MasseurMatch profile and join the massage provider directory for ${city.name}, ${city.stateCode}. Start a 14-day free trial with no credit card required.`,
+    name: `Massage Professionals in ${formatCityLabel(city.name, city.stateCode)} | MasseurMatch`,
+    description: `Create your professional MasseurMatch profile and join the massage provider directory for ${formatCityLabel(city.name, city.stateCode)}. Start a 14-day free trial with no credit card required.`,
     url: canonical,
     inLanguage: "en-US",
     isPartOf: {

@@ -12,6 +12,7 @@ import {
   createPageMetadata,
 } from "@/app/_lib/seo";
 import { IconAward, IconShield, IconStar } from "@/components/icons";
+import { formatCityLabel } from "@/data/cities";
 
 type Params = { city: string };
 
@@ -36,7 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
 
   return createPageMetadata({
-    title: `Verified Massage Therapists in ${city.name}, ${city.stateCode} | MasseurMatch`,
+    title: `Verified Massage Therapists in ${formatCityLabel(city.name, city.stateCode)} | MasseurMatch`,
     description: `Browse verified and trusted massage therapists in ${city.name}. All therapists on MasseurMatch meet our professional standards and verification requirements.`,
     path: `/cities/${city.slug}/verified-therapists`,
     keywords: [
@@ -77,7 +78,7 @@ export default async function VerifiedTherapistsPage({ params }: { params: Promi
 
       <JsonLd
         data={buildCollectionPageJsonLd({
-          name: `Verified Massage Therapists in ${city.name}, ${city.stateCode}`,
+          name: `Verified Massage Therapists in ${formatCityLabel(city.name, city.stateCode)}`,
           description: `Browse verified and trusted professional massage therapists in ${city.name}. All profiles meet MasseurMatch professional standards.`,
           path: pagePath,
         })}

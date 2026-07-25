@@ -9,6 +9,7 @@ import {
   createPageMetadata,
 } from "@/app/_lib/seo";
 import { JsonLd } from "@/app/_components/json-ld";
+import { formatCityLabel } from "@/data/cities";
 
 type Params = { state: string; county: string };
 
@@ -99,7 +100,7 @@ export default async function CountyPage({ params }: { params: Promise<Params> }
           name: `${stateName} county city links`,
           path: `/states/${resolved.state}/counties/${resolved.county}`,
           items: cityInventory.map(({ city }) => ({
-            name: `${city.name}, ${city.stateCode}`,
+            name: `${formatCityLabel(city.name, city.stateCode)}`,
             path: `/states/${resolved.state}/cities/${city.slug}`,
           })),
         })}
@@ -125,7 +126,7 @@ export default async function CountyPage({ params }: { params: Promise<Params> }
                   href={`/states/${resolved.state}/cities/${city.slug}`}
                   className="rounded-xl border border-border px-4 py-3 text-sm text-foreground transition-colors hover:border-primary/50 hover:bg-muted/40"
                 >
-                  <span className="font-semibold">{city.name}, {city.stateCode}</span>
+                  <span className="font-semibold">{formatCityLabel(city.name, city.stateCode)}</span>
                   <span className="mt-1 block text-xs text-muted-foreground">{total} public profiles</span>
                 </Link>
               ))}

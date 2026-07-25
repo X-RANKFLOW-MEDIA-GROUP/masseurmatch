@@ -106,7 +106,7 @@ export async function GET(request: NextRequest) {
 
 function buildWelcomeHtml(name: string): string {
   return `<!doctype html>
-<html lang="en">
+<html lang="en-US">
 <body style="margin:0;padding:0;background:#FFFFFF;font-family:Arial,sans-serif;color:#4A4F5C">
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#FFFFFF;padding:28px 12px">
     <tr><td align="center">
@@ -125,7 +125,7 @@ function buildWelcomeHtml(name: string): string {
           </ol>
         </td></tr>
         <tr><td align="center" style="padding:0 28px 24px">
-          <a href="https://masseurmatch.com/signup/plan" style="display:inline-block;background:#8B1E2D;color:#FFFFFF;text-decoration:none;font-size:15px;font-weight:700;padding:12px 24px;border-radius:8px">Complete Your Profile</a>
+          <a href="https://www.masseurmatch.com/signup/plan" style="display:inline-block;background:#8B1E2D;color:#FFFFFF;text-decoration:none;font-size:15px;font-weight:700;padding:12px 24px;border-radius:8px">Complete Your Profile</a>
         </td></tr>
         <tr><td style="padding:0 28px 20px;font-size:12px;color:#71717a;line-height:1.5">
           You received this because you created a MasseurMatch account. <a href="{{unsubscribe_url}}" style="color:#8B1E2D">Unsubscribe</a>.
