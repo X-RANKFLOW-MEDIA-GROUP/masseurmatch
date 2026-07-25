@@ -33,6 +33,13 @@ function createDirectoryClient(): AdminClient {
   }
 }
 
+// Fallback/demo profiles carry synthetic ids like "fallback-bruno-santos".
+// Those must never reach queries against uuid columns (profile_photos,
+// imported_reviews, …) — Postgres rejects them with 22P02 ("invalid input
+// syntax for type uuid") and the whole request errors.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const isUuid = (value: string) => UUID_RE.test(value);
+
 const supabase: AdminClient = new Proxy({} as AdminClient, {
   get(_target, prop) {
     cachedDirectoryClient ??= createDirectoryClient();
@@ -219,8 +226,6 @@ const buildPublicTherapistsQuery = () => {
     .or("phone.is.null,phone.not.ilike.%555%");
   return q;
 };
-
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // A profile is linkable from the directory when it has a slug OR a real UUID id
 // (the profile route resolves both — `/therapists/<slug>` and `/therapists/<uuid>`).
@@ -454,10 +459,7 @@ export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTher
   // valid UUID — otherwise Postgres raises `invalid input syntax for type uuid`
   // (22P02), which fails the whole request and makes every slug-based profile
   // page return 404. For plain slugs, match by `slug` only.
-  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-    sanitizedSlug,
-  );
-  const orFilter = isUuid
+  const orFilter = isUuid(sanitizedSlug)
     ? `slug.eq.${sanitizedSlug},id.eq.${sanitizedSlug}`
     : `slug.eq.${sanitizedSlug}`;
 
@@ -494,6 +496,8 @@ export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTher
 };
 
 const getImportedReviews = async (profileId: string, limit = 5) => {
+  if (!isUuid(profileId)) return [] as ImportedReview[];
+
   const { data } = await supabase
     .from("imported_reviews")
     .select("id, review_text, rating, reviewer_name, review_date")
@@ -513,6 +517,14 @@ const resolvePhotoUrl = (
 
 export const getProfilePhotos = async (profileId: string, limit = 6) => {
   const fallback = (FALLBACK_PUBLIC_THERAPISTS as PublicTherapist[]).find((profile) => profile.id === profileId);
+
+  // Fallback ids ("fallback-…") are not UUIDs — querying profile_photos with
+  // one fails with 22P02, so serve the bundled avatar without touching the DB.
+  if (!isUuid(profileId)) {
+    if (!fallback?.avatar_url) return [];
+    return [{ id: `${fallback.id}-avatar`, storage_path: fallback.avatar_url, is_primary: true }];
+  }
+
   const { data, error } = await supabase
     .from("profile_photos")
     .select("id, storage_path, url, is_primary, sort_order")
@@ -540,6 +552,9 @@ export const getProfilePhotosBatch = async (
   limitPerProfile = 1,
 ): Promise<Map<string, ProfilePhoto[]>> => {
   const result = new Map<string, ProfilePhoto[]>();
+  // Drop fallback/demo ids defensively — most callers pre-filter, but a single
+  // non-UUID id would 22P02 the whole chunked query.
+  profileIds = profileIds.filter(isUuid);
   if (!profileIds.length) return result;
 
   // Chunk the id list before querying: Supabase encodes `.in()` arrays into

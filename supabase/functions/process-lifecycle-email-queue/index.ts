@@ -87,16 +87,30 @@ serve(async (req) => {
   const rl = checkRateLimit(getClientKey(req), { limit: 10, windowMs: 60_000 });
   if (!rl.allowed) return rateLimitResponse(rl, corsHeaders);
 
+  // Config problems are reported as 503 (not 500) with the missing variable
+  // named, so a failing cron run is immediately diagnosable from the logs:
+  // fix with `supabase secrets set RESEND_API_KEY=... UNSUBSCRIBE_HMAC_SECRET=...`.
+  const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+  const resendKey = Deno.env.get("RESEND_API_KEY") ?? "";
+  const unsubscribeSecret = Deno.env.get("UNSUBSCRIBE_HMAC_SECRET") ?? "";
+
+  const missingConfig = [
+    !supabaseUrl && "SUPABASE_URL",
+    !serviceKey && "SUPABASE_SERVICE_ROLE_KEY",
+    !resendKey && "RESEND_API_KEY",
+    !unsubscribeSecret && "UNSUBSCRIBE_HMAC_SECRET",
+  ].filter(Boolean);
+
+  if (missingConfig.length > 0) {
+    logStep("Configuration missing", { missing: missingConfig });
+    return new Response(
+      JSON.stringify({ error: "configuration_error", missing: missingConfig }),
+      { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-    const resendKey = Deno.env.get("RESEND_API_KEY") ?? "";
-    const unsubscribeSecret = Deno.env.get("UNSUBSCRIBE_HMAC_SECRET") ?? "";
-
-    if (!supabaseUrl || !serviceKey) throw new Error("Supabase service credentials are not configured");
-    if (!resendKey) throw new Error("RESEND_API_KEY not configured");
-    if (!unsubscribeSecret) throw new Error("UNSUBSCRIBE_HMAC_SECRET not configured");
-
     const supabase = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
     const unsubscribeBaseUrl = Deno.env.get("UNSUBSCRIBE_BASE_URL") || `${supabaseUrl}/functions/v1/lifecycle-unsubscribe`;
 
@@ -212,9 +226,11 @@ serve(async (req) => {
           }),
         });
 
-        const resendBody = await resendResponse.json();
+        // Resend can return non-JSON bodies on gateway errors; a parse crash
+        // here must not take down the whole batch.
+        const resendBody = await resendResponse.json().catch(() => null);
         if (!resendResponse.ok) {
-          throw new Error(resendBody?.message || "resend_send_failed");
+          throw new Error(resendBody?.message || `resend_send_failed_http_${resendResponse.status}`);
         }
 
         const providerId = resendBody?.id ?? null;
