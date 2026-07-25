@@ -9,8 +9,12 @@ import {
   getSegmentBySlug,
 } from "@/app/_lib/directory-taxonomy";
 import { getLaunchKeywordPaths } from "@/app/_lib/launch-urls";
-import { createPageMetadata } from "@/app/_lib/metadata";
-import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd } from "@/app/_lib/structured-data";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildItemListJsonLd,
+  createPageMetadata,
+} from "@/app/_lib/seo";
 import { formatCityLabel } from "@/data/cities";
 
 type Params = { city: string; segment: string };

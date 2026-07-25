@@ -1,4 +1,4 @@
-import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
+import { errorResponse, json } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, requireSession } from "@/app/api/_lib/supabase-server";
 
 export async function GET(request: Request) {

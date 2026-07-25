@@ -17,6 +17,6 @@ export function getCitySlugs(): string[] {
 }
 
 /** Every registered city, resolved. */
-export function getAllCities(): City[] {
+function getAllCities(): City[] {
   return getCitySlugs().map((slug) => ({ ...cities[slug], slug }));
 }

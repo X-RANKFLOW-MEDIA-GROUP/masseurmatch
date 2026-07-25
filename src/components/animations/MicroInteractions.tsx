@@ -18,7 +18,7 @@ export const fadeInUp = {
   }),
 };
 
-export const fadeInDown = {
+const fadeInDown = {
   hidden: { opacity: 0, y: -20 },
   visible: (i = 1) => ({
     opacity: 1,
@@ -31,7 +31,7 @@ export const fadeInDown = {
   }),
 };
 
-export const fadeInLeft = {
+const fadeInLeft = {
   hidden: { opacity: 0, x: -30 },
   visible: (i = 1) => ({
     opacity: 1,
@@ -44,7 +44,7 @@ export const fadeInLeft = {
   }),
 };
 
-export const fadeInRight = {
+const fadeInRight = {
   hidden: { opacity: 0, x: 30 },
   visible: (i = 1) => ({
     opacity: 1,
@@ -57,7 +57,7 @@ export const fadeInRight = {
   }),
 };
 
-export const scaleIn = {
+const scaleIn = {
   hidden: { opacity: 0, scale: 0.9 },
   visible: (i = 1) => ({
     opacity: 1,
@@ -70,7 +70,7 @@ export const scaleIn = {
   }),
 };
 
-export const rotateIn = {
+const rotateIn = {
   hidden: { opacity: 0, rotate: -10 },
   visible: (i = 1) => ({
     opacity: 1,
@@ -83,7 +83,7 @@ export const rotateIn = {
   }),
 };
 
-export const staggerContainer = {
+const staggerContainer = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -94,29 +94,29 @@ export const staggerContainer = {
   },
 };
 
-export const hoverScale = {
+const hoverScale = {
   whileHover: { scale: 1.03, transition: { duration: 0.3 } },
   whileTap: { scale: 0.97 },
 };
 
-export const hoverScaleSmall = {
+const hoverScaleSmall = {
   whileHover: { scale: 1.02, transition: { duration: 0.3 } },
   whileTap: { scale: 0.98 },
 };
 
-export const hoverScaleLarge = {
+const hoverScaleLarge = {
   whileHover: { scale: 1.06, transition: { duration: 0.4 } },
   whileTap: { scale: 0.94 },
 };
 
-export const hoverGlow = {
+const hoverGlow = {
   whileHover: {
     boxShadow: "0 0 30px rgba(47, 111, 228, 0.3)",
     transition: { duration: 0.3 },
   },
 };
 
-export const hoverLift = {
+const hoverLift = {
   whileHover: {
     y: -6,
     boxShadow: "0 20px 50px rgba(11, 31, 58, 0.15)",
@@ -130,7 +130,7 @@ interface AnimatedTextProps {
   delay?: number;
 }
 
-export function AnimatedText({ text, className = "", delay = 0 }: AnimatedTextProps) {
+function AnimatedText({ text, className = "", delay = 0 }: AnimatedTextProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -148,7 +148,7 @@ interface StaggerListProps {
   className?: string;
 }
 
-export function StaggerList({ children, className = "space-y-4" }: StaggerListProps) {
+function StaggerList({ children, className = "space-y-4" }: StaggerListProps) {
   return (
     <motion.div variants={staggerContainer} initial="hidden" animate="visible" className={className}>
       {children.map((child, i) => (
@@ -166,7 +166,7 @@ interface ParallaxProps {
   className?: string;
 }
 
-export function Parallax({ children, offset = 50, className = "" }: ParallaxProps) {
+function Parallax({ children, offset = 50, className = "" }: ParallaxProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [y, setY] = useState(0);
 
@@ -204,7 +204,7 @@ interface FloatingBadgeProps {
   delay?: number;
 }
 
-export function FloatingBadge({ text, delay = 0 }: FloatingBadgeProps) {
+function FloatingBadge({ text, delay = 0 }: FloatingBadgeProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -221,7 +221,7 @@ interface GradientTextProps {
   className?: string;
 }
 
-export function GradientText({ text, className = "" }: GradientTextProps) {
+function GradientText({ text, className = "" }: GradientTextProps) {
   return (
     <motion.span
       className={`bg-gradient-to-r from-brand-primary via-brand-secondary to-brand-electric bg-clip-text text-transparent ${className}`}
@@ -235,13 +235,13 @@ export function GradientText({ text, className = "" }: GradientTextProps) {
   );
 }
 
-export interface ScrollRevealProps {
+interface ScrollRevealProps {
   children: React.ReactNode;
   variant?: "fadeInUp" | "fadeInLeft" | "fadeInRight" | "scaleIn";
   threshold?: number;
 }
 
-export function ScrollReveal({ children, variant = "fadeInUp", threshold = 0.2 }: ScrollRevealProps) {
+function ScrollReveal({ children, variant = "fadeInUp", threshold = 0.2 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: threshold });
 
@@ -259,13 +259,13 @@ export function ScrollReveal({ children, variant = "fadeInUp", threshold = 0.2 }
   );
 }
 
-export const tabAnimation = {
+const tabAnimation = {
   hidden: { opacity: 0, y: 10 },
   visible: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -10 },
 };
 
-export function AnimatedTabs({
+function AnimatedTabs({
   tabs,
   activeTab,
   setActiveTab,
@@ -302,7 +302,7 @@ export function AnimatedTabs({
   );
 }
 
-export function CounterAnimation({
+function CounterAnimation({
   from = 0,
   to,
   duration = 1,

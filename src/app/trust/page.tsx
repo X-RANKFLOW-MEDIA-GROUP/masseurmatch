@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
-import { Bot, CheckCircle2, EyeOff, ShieldAlert, UserCheck } from "lucide-react";
+import { Bot, CheckCircle2, EyeOff, UserCheck } from "lucide-react";
 
 import { IconArrowRight, IconLock, IconShield } from "@/components/icons";
 

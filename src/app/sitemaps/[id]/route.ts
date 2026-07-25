@@ -1,4 +1,3 @@
-import type { MetadataRoute } from "next";
 import {
   buildCoreSitemapEntries,
   buildCitiesSitemapEntries,

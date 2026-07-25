@@ -5,20 +5,16 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   AlertCircle,
-  Download,
   Download as PdfIcon,
   Eye,
   Settings,
-  FileText,
   Clock,
-  ChevronDown,
   ChevronRight,
-  MoreVertical,
   Edit2,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { requestJson, ApiError } from "@/app/_lib/request";
-import { PROFILE_FIELDS_CONFIG, FieldSection, getFieldsBySection } from "@/lib/profile-fields-config";
+import { PROFILE_FIELDS_CONFIG, FieldSection } from "@/lib/profile-fields-config";
 
 type AuditLog = {
   id: string;

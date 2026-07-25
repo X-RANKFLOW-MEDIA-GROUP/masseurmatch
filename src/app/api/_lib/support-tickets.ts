@@ -4,7 +4,7 @@ import { Resend } from "resend";
 import { envAny, envOptional } from "@/app/api/_lib/env";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 
-export const TICKET_CATEGORIES = [
+const TICKET_CATEGORIES = [
   "billing",
   "payouts",
   "technical",
@@ -15,7 +15,7 @@ export const TICKET_CATEGORIES = [
   "other",
 ] as const;
 
-export const TICKET_PRIORITIES = ["low", "medium", "high", "urgent"] as const;
+const TICKET_PRIORITIES = ["low", "medium", "high", "urgent"] as const;
 
 export const TICKET_STATUSES = [
   "open",
@@ -26,7 +26,7 @@ export const TICKET_STATUSES = [
 ] as const;
 
 export type TicketCategory = (typeof TICKET_CATEGORIES)[number];
-export type TicketPriority = (typeof TICKET_PRIORITIES)[number];
+type TicketPriority = (typeof TICKET_PRIORITIES)[number];
 export type TicketStatus = (typeof TICKET_STATUSES)[number];
 
 export const CATEGORY_LABELS: Record<TicketCategory, string> = {
@@ -40,7 +40,7 @@ export const CATEGORY_LABELS: Record<TicketCategory, string> = {
   other: "Other",
 };
 
-export const STATUS_LABELS: Record<TicketStatus, string> = {
+const STATUS_LABELS: Record<TicketStatus, string> = {
   open: "Open",
   in_progress: "In progress",
   waiting_on_user: "Waiting on you",

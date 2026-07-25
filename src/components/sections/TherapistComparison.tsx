@@ -3,7 +3,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { X, Check, ChevronRight } from "lucide-react";
-import { fadeInUp } from "@/components/animations/MicroInteractions";
 
 export interface TherapistProfile {
   id: string;
@@ -246,7 +245,7 @@ interface CompareButtonProps {
   isSelected?: boolean;
 }
 
-export function CompareButton({
+function CompareButton({
   profileId,
   onCompare,
   isSelected = false,

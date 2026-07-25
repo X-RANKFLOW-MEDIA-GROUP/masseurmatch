@@ -4,7 +4,7 @@ type SearchParamsLike = {
   get(name: string): string | null;
 };
 
-export type KnottyAttribution = {
+type KnottyAttribution = {
   source: "knotty";
   sessionId: string;
   intent: KnottyIntent;
@@ -27,7 +27,7 @@ export function buildKnottyProfilePath(
   return `${url.pathname}${url.search}`;
 }
 
-export function readKnottyAttribution(searchParams: SearchParamsLike | null): KnottyAttribution | null {
+function readKnottyAttribution(searchParams: SearchParamsLike | null): KnottyAttribution | null {
   if (!searchParams) {
     return null;
   }

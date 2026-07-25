@@ -53,7 +53,7 @@ export function isRateLimited(
   return memoryRateLimit(key, options.windowMs, options.max);
 }
 
-export async function isRateLimitedDistributed(
+async function isRateLimitedDistributed(
   request: NextRequest,
   options: { keyPrefix: string; windowMs: number; max: number; userId?: string | null },
 ): Promise<boolean> {
@@ -79,6 +79,6 @@ export async function isRateLimitedDistributed(
   }
 }
 
-export function getRequestIp(request: NextRequest): string {
+function getRequestIp(request: NextRequest): string {
   return requestIp(request);
 }

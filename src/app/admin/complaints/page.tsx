@@ -3,9 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   AlertTriangle,
-  Clock,
   CheckCircle2,
-  MessageSquare,
   Flag,
 } from "lucide-react";
 import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";

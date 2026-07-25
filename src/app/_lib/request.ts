@@ -2,12 +2,11 @@
 
 import {
   ApiError,
-  deleteJson,
   postJson,
   requestJson as baseRequestJson,
 } from "@/app/_lib/client-api";
 
-export { ApiError, deleteJson, postJson };
+export { ApiError,  postJson };
 
 type QueryValue = string | number | boolean | null | undefined;
 type UnknownRecord = Record<string, unknown>;

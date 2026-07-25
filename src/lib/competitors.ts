@@ -1,10 +1,10 @@
-export type CompetitorFeatureRow = {
+type CompetitorFeatureRow = {
   feature: string;
   masseurmatch: string;
   competitor: string;
 };
 
-export type CompetitorFaq = {
+type CompetitorFaq = {
   question: string;
   answer: string;
 };
@@ -33,7 +33,7 @@ export type Competitor = {
   ctaBody: string;
 };
 
-export const COMPARISON_TARGET_YEAR = 2026;
+const COMPARISON_TARGET_YEAR = 2026;
 export const COMPARISON_PUBLISHED_AT = "2026-03-20T00:00:00.000Z";
 
 export const COMPARISON_HUB_INTRO =
@@ -45,7 +45,7 @@ export function getCompetitorTierLabel(tier: CompetitorTier) {
   return "Niche & boutique";
 }
 
-export const competitors: Competitor[] = [
+const competitors: Competitor[] = [
   {
     slug: "masseurmatch-vs-masseurfinder",
     name: "MasseurFinder",

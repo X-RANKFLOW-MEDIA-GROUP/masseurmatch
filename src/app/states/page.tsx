@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getCities } from "@/app/_lib/directory";
-import { createPageMetadata } from "@/app/_lib/metadata";
+import { createPageMetadata } from "@/app/_lib/seo";
 
 export const metadata = createPageMetadata({
   title: "Find massage therapists by state across the United States",

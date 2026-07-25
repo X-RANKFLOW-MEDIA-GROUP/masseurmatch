@@ -340,16 +340,16 @@ export const US_CITIES: CityData[] = RAW_CITIES.map((city) => ({
   intro: `Browse verified massage therapists in ${city.name}.`,
 }));
 
-export function getCityBySlug(slug: string): CityData | undefined {
+function getCityBySlug(slug: string): CityData | undefined {
   const normalized = slug.trim().toLowerCase();
   return US_CITIES.find((city) => city.slug === normalized);
 }
 
-export function isValidCitySlug(slug: string): boolean {
+function isValidCitySlug(slug: string): boolean {
   return Boolean(getCityBySlug(slug));
 }
 
-export function getCities(): CityData[] {
+function getCities(): CityData[] {
   return US_CITIES;
 }
 

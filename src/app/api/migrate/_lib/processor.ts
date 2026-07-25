@@ -1,6 +1,6 @@
 import { createSupabaseWebhookAdminClient } from "@/app/api/_lib/supabase-server";
 
-export interface ScrapedReview {
+interface ScrapedReview {
   reviewer_name: string | null;
   rating: number | null;
   review_text: string | null;
@@ -155,7 +155,7 @@ function extractJsonLdReviews(html: string): ScrapedReview[] {
 // manual review instead of being silently completed empty.
 const PLATFORM_SCRAPERS: Record<string, (html: string) => ScrapedReview[]> = {};
 
-export async function scrapeReviews(url: string, platform: string): Promise<ScrapedReview[]> {
+async function scrapeReviews(url: string, platform: string): Promise<ScrapedReview[]> {
   const html = await fetchHtml(url);
   if (!html) return [];
 

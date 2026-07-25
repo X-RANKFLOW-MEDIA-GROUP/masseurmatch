@@ -15,4 +15,4 @@ export const hotelSearchSchema = z
     path: ["checkOut"],
   });
 
-export type HotelSearchInput = z.infer<typeof hotelSearchSchema>;
+type HotelSearchInput = z.infer<typeof hotelSearchSchema>;

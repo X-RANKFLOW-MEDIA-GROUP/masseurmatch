@@ -6,7 +6,6 @@
 
 import { PLANS, FOUNDER_OFFER, type Plan, type PlanId, type PlanTier } from "@/lib/pricing";
 
-export type { PlanTier };
 export type SignupPlanTier = PlanTier;
 
 const descriptions: Record<PlanId, string> = {

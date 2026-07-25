@@ -7,8 +7,6 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
-  Eye,
-  MessageSquare,
   ChevronRight,
 } from "lucide-react";
 import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";

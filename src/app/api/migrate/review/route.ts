@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, requireAdminSession } from "@/app/api/_lib/supabase-server";
 import { sendEmail } from "@/app/api/_lib/email";

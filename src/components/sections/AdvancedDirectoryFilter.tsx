@@ -8,7 +8,7 @@ import type { CityData } from "@/data/cities";
 import { formatCityLabel } from "@/data/cities";
 
 export type DirectorySession = "" | "home-visit" | "incall";
-export type DirectoryObjectiveId =
+type DirectoryObjectiveId =
   | "all"
   | "deep-recovery"
   | "sports-clinical"
@@ -31,7 +31,7 @@ const TIER_LABELS: Record<TherapistTier, string> = {
   elite: "Elite",
 };
 
-export const DIRECTORY_OBJECTIVES: DirectoryObjective[] = [
+const DIRECTORY_OBJECTIVES: DirectoryObjective[] = [
   {
     id: "all",
     label: "All",
@@ -68,7 +68,7 @@ const OBJECTIVE_LOOKUP = new Map(DIRECTORY_OBJECTIVES.map((objective) => [object
 
 const normalizeValue = (value: string | null | undefined) => (value || "").trim().toLowerCase();
 
-export function resolveDirectoryObjective(
+function resolveDirectoryObjective(
   goal: string,
   modality: string,
 ): DirectoryObjective {

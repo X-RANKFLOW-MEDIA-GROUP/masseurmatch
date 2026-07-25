@@ -1,4 +1,4 @@
-export interface FieldConfig {
+interface FieldConfig {
   name: string;
   label: string;
   type: "text" | "number" | "boolean" | "array" | "json" | "date";
@@ -207,7 +207,7 @@ export const PROFILE_FIELDS_BY_SECTION: Record<string, string[]> = {
   ],
 };
 
-export const FIELD_TYPES: Record<string, "text" | "number" | "boolean" | "array" | "json" | "date"> = {
+const FIELD_TYPES: Record<string, "text" | "number" | "boolean" | "array" | "json" | "date"> = {
   // Text fields
   display_name: "text",
   full_name: "text",

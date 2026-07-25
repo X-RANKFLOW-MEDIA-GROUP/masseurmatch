@@ -1,7 +1,7 @@
 import { envAny } from "@/app/api/_lib/env";
 import { chatMessages, completeText, OPENAI_MODEL, type LlmResult } from "@/lib/ai/llm";
 
-export type CoachImpact = "high" | "medium" | "low";
+type CoachImpact = "high" | "medium" | "low";
 
 export type CoachProfile = {
   id: string;
@@ -92,7 +92,7 @@ export type PhotoScore = {
   model: string | null;
 };
 
-export type CoachRecommendation = {
+type CoachRecommendation = {
   key: string;
   title: string;
   reason: string;

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
-import { requireRequestSession } from "@/app/_lib/session";
+import { requireRequestSession } from "@/app/api/_lib/session";
 import { updateProfileByUserId } from "@/app/_lib/store";
 import {
   analyzePhoto,

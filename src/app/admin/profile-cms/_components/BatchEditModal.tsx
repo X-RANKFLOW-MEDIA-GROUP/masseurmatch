@@ -5,7 +5,6 @@ import { Profile, ProfileUpdate } from "@/lib/profile.types";
 import { PROFILE_FIELDS_BY_SECTION } from "../_lib/profile-fields";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
@@ -21,7 +20,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { AlertCircle, Eye, Check } from "lucide-react";
 import { postJson } from "@/app/_lib/client-api";
 import { useToast } from "@/hooks/use-toast";

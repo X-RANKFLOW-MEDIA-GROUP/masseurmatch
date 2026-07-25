@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Copyright, FileText, Mail, RotateCcw } from "lucide-react";
 
 import { JsonLd } from "@/app/_components/json-ld";

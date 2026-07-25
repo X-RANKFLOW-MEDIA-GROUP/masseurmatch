@@ -17,7 +17,7 @@ export interface BlogPost {
   coverAlt?: string;
 }
 
-export interface BlogAuthor {
+interface BlogAuthor {
   name: string;
   title: string;
   bio: string;
@@ -50,7 +50,7 @@ const EDITORIAL_AUTHOR: BlogAuthor = {
 /**
  * Fetch all published blog post slugs for generateStaticParams.
  */
-export async function getBlogSlugs(): Promise<string[]> {
+async function getBlogSlugs(): Promise<string[]> {
   const { data } = await supabase
     .from("blog_posts")
     .select("slug")
@@ -85,7 +85,7 @@ export async function getBlogPost(slug: string): Promise<BlogPost | null> {
 /**
  * Fetch blog posts for the listing page.
  */
-export async function getBlogListItems(options?: {
+async function getBlogListItems(options?: {
   category?: string;
   tag?: string;
   limit?: number;

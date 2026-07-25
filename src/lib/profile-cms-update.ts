@@ -3,7 +3,7 @@ import type { Database, Json } from "@/integrations/supabase/types";
 export type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 export type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 
-export const PROFILE_CMS_UPDATE_FIELDS = [
+const PROFILE_CMS_UPDATE_FIELDS = [
   "display_name",
   "full_name",
   "avatar_url",

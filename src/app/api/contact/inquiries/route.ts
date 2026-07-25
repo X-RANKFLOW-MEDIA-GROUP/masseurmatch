@@ -1,7 +1,7 @@
 ﻿import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { createSupabaseAdminClient } from '@/app/api/_lib/supabase-server';
-import { requireRequestSession } from '@/app/_lib/session';
+import { requireRequestSession } from '@/app/api/_lib/session';
 
 // GET /api/contact/inquiries — fetch inquiries for the authenticated therapist
 export async function GET(request: NextRequest) {

@@ -1,5 +1,5 @@
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
-import { createSupabaseAdminClient, requireSession } from "@/app/api/_lib/supabase-server";
+import { requireSession } from "@/app/api/_lib/supabase-server";
 
 export async function POST(request: Request) {
   try {
