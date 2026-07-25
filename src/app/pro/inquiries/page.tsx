@@ -136,12 +136,13 @@ export default function InquiriesDashboard() {
         </div>
 
         <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="new">New ({statusCounts.new})</TabsTrigger>
-            <TabsTrigger value="viewed">Viewed ({statusCounts.viewed})</TabsTrigger>
-            <TabsTrigger value="responded">Responded ({statusCounts.responded})</TabsTrigger>
-            <TabsTrigger value="archived">Archived ({statusCounts.archived})</TabsTrigger>
+          {/* Scrollable flex row on mobile — five forced grid columns overlap the nowrap labels */}
+          <TabsList className="flex w-full justify-start gap-1 overflow-x-auto sm:grid sm:grid-cols-5">
+            <TabsTrigger value="all" className="shrink-0">All</TabsTrigger>
+            <TabsTrigger value="new" className="shrink-0">New ({statusCounts.new})</TabsTrigger>
+            <TabsTrigger value="viewed" className="shrink-0">Viewed ({statusCounts.viewed})</TabsTrigger>
+            <TabsTrigger value="responded" className="shrink-0">Responded ({statusCounts.responded})</TabsTrigger>
+            <TabsTrigger value="archived" className="shrink-0">Archived ({statusCounts.archived})</TabsTrigger>
           </TabsList>
 
           <TabsContent value={selectedTab} className="space-y-4">
