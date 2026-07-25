@@ -115,8 +115,7 @@ export default async function CompareSlugPage({
   }
 
   const targetKeywords = getCompetitorKeywords(competitor.name);
-  const tierLabel = getCompetitorTierLabel(competitor.tier);
-  const articleDescription = `${competitor.metaDescription} ${tierLabel} competitor comparison for massage therapists evaluating directory alternatives on March 20, 2026.`;
+  const articleDescription = `${competitor.metaDescription} A factual comparison for massage therapists evaluating directory alternatives.`;
 
   return (
     <>

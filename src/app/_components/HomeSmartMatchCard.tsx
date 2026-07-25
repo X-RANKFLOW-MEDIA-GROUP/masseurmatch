@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { formatCityLabel } from "@/data/cities";
 
 type HomeCity = {
   slug: string;
@@ -250,7 +251,7 @@ export function HomeSmartMatchCard({ cities, featuredModalities, therapistCount 
           }
 
           setCity(matchedCity.name);
-          setLocationNote(`Using ${matchedCity.name}, ${matchedCity.stateCode}.`);
+          setLocationNote(`Using ${formatCityLabel(matchedCity.name, matchedCity.stateCode)}.`);
           trackHomeEvent("smart_match_geo_success", {
             city: matchedCity.name,
             stateCode: matchedCity.stateCode,
@@ -303,7 +304,7 @@ export function HomeSmartMatchCard({ cities, featuredModalities, therapistCount 
                 <option value="">1. City, zip, or use GPS</option>
                 {cities.map((item) => (
                   <option key={item.slug} value={item.name}>
-                    {item.name}, {item.stateCode}
+                    {formatCityLabel(item.name, item.stateCode)}
                   </option>
                 ))}
               </select>

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
-const BASE_URL = "https://masseurmatch.com";
+const BASE_URL = "https://www.masseurmatch.com";
 const OG_SITE_NAME = "MasseurMatch — Gay Massage Directory";
 
 interface SEOHeadProps {

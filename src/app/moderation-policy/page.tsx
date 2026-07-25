@@ -9,11 +9,11 @@ export const metadata: Metadata = {
   title: "Moderation Policy | MasseurMatch",
   description:
     "How MasseurMatch handles policy violations, content enforcement, account actions, and appeals. Every enforcement action is documented with a reason.",
-  alternates: { canonical: "https://masseurmatch.com/moderation-policy" },
+  alternates: { canonical: "https://www.masseurmatch.com/moderation-policy" },
   openGraph: {
     title: "Moderation Policy | MasseurMatch",
     description: "How we handle violations, enforcement actions, and appeals on MasseurMatch.",
-    url: "https://masseurmatch.com/moderation-policy",
+    url: "https://www.masseurmatch.com/moderation-policy",
     siteName: "MasseurMatch",
     type: "website",
   },
@@ -24,11 +24,11 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
   name: "Moderation Policy – MasseurMatch",
-  url: "https://masseurmatch.com/moderation-policy",
+  url: "https://www.masseurmatch.com/moderation-policy",
   publisher: {
     "@type": "Organization",
     name: "MasseurMatch",
-    url: "https://masseurmatch.com",
+    url: "https://www.masseurmatch.com",
   },
 };
 

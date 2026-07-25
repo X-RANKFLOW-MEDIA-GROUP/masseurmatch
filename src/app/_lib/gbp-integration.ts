@@ -20,10 +20,10 @@ export interface GBPProfile {
 export const generateGBPListingSchema = (profile: GBPProfile) => ({
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
-  "@id": "https://masseurmatch.com/gbp-listing",
+  "@id": "https://www.masseurmatch.com/gbp-listing",
   name: profile.businessName,
   description: "LGBTQ+-affirming male massage therapists directory - find verified, licensed professionals",
-  url: "https://masseurmatch.com",
+  url: "https://www.masseurmatch.com",
   telephone: profile.phoneNumber,
   email: profile.email,
   address: {
@@ -39,7 +39,7 @@ export const generateGBPListingSchema = (profile: GBPProfile) => ({
     "@type": "City",
     name: area,
   })),
-  image: "https://masseurmatch.com/og-image.jpg",
+  image: "https://www.masseurmatch.com/og-image.jpg",
   aggregateRating: {
     "@type": "AggregateRating",
     ratingValue: 4.8,

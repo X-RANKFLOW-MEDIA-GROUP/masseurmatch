@@ -128,10 +128,12 @@ function computePlacement(profile: ProfileData | null, completion: number): Plac
 // Memoized profile completion card
 const ProfileCard = memo(function ProfileCard({
   displayName,
+  tierLabel,
   completion,
   profileLoading
 }: {
   displayName: string;
+  tierLabel: string;
   completion: number;
   profileLoading: boolean
 }) {
@@ -153,7 +155,7 @@ const ProfileCard = memo(function ProfileCard({
           <div className="mt-0.5 flex items-center gap-1">
             <ShieldCheck className="h-3.5 w-3.5 text-[#1E7A46]" />
             <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">
-              Pro Member
+              {tierLabel}
             </span>
           </div>
         </div>
@@ -221,6 +223,8 @@ const AvailabilityCard = memo(function AvailabilityCard({
           return (
             <button
               key={option.key}
+              type="button"
+              aria-pressed={isActive}
               onClick={() => onStatusChange(option.key)}
               disabled={statusSaving}
               className={`flex flex-col items-center justify-center gap-2 border p-4 transition-all duration-300 disabled:opacity-60 ${
@@ -343,6 +347,14 @@ export default function DashboardHome() {
   const placement = useMemo(() => computePlacement(profile, completion), [profile, completion]);
   const profileStatus = profile?.status ?? "draft";
 
+  // Single resolved tier for every dashboard surface. The profiles table drives
+  // live entitlements (search placement, photo limits), so it wins over the
+  // Stripe-derived subscription state when the two disagree.
+  const resolvedTier = normalizePlanKey(profile?.subscription_tier) ?? currentTier;
+  const tierLabel = profileLoading
+    ? "Member"
+    : `${resolvedTier.charAt(0).toUpperCase()}${resolvedTier.slice(1)} Member`;
+
   return (
     <div className="mx-auto max-w-7xl space-y-8 p-6 md:p-10">
       <header className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
@@ -378,6 +390,7 @@ export default function DashboardHome() {
         <div className="space-y-6 lg:col-span-1">
           <ProfileCard
             displayName={displayName}
+            tierLabel={tierLabel}
             completion={completion}
             profileLoading={profileLoading}
           />
@@ -499,7 +512,7 @@ export default function DashboardHome() {
           </div>
 
           {/* Knotty AI teaser — only shown for non-Elite plans */}
-          {currentTier !== "elite" && (
+          {resolvedTier !== "elite" && (
             <div className="rounded-xl border border-white/10 bg-[#111111] p-5 text-white">
               <div className="flex items-start gap-3">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#C4344A]/15">

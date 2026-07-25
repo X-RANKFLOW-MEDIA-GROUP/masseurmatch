@@ -74,15 +74,21 @@ export default function ForgotPasswordPageClient() {
         )}
 
         <form onSubmit={onSubmit} className="mt-5 space-y-3">
-          <Input
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            autoComplete="email"
-            required
-            disabled={loading}
-          />
+          <div className="space-y-1.5">
+            <label htmlFor="forgot-password-email" className="text-sm font-medium text-foreground">
+              Email address
+            </label>
+            <Input
+              id="forgot-password-email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              autoComplete="email"
+              required
+              disabled={loading}
+            />
+          </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Sending..." : "Send reset link"}
           </Button>

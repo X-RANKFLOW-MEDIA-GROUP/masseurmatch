@@ -10,7 +10,7 @@ function normalizeTravelSchedule(value: unknown): ProfileTravelEntry[] {
 
 function formatDate(iso: string) {
   const d = new Date(iso);
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 }
 
 interface Props {

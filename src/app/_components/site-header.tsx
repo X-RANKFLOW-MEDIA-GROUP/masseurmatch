@@ -267,7 +267,7 @@ function MobileNav({
       <SheetTrigger asChild>
         <button
           type="button"
-          aria-label="Open menu"
+          aria-label={open ? "Close menu" : "Open menu"}
           className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg text-[#111111] hover:bg-[#F7F7F7] transition-colors"
         >
           <Menu className="w-5 h-5" />

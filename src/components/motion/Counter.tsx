@@ -10,7 +10,10 @@ type CounterProps = {
 };
 
 function formatValue(v: number, isDecimal: boolean): string {
-  return isDecimal ? v.toFixed(1) : Math.round(v).toLocaleString();
+  // Fixed locale: this runs during SSR (Node, en-US) and again during client
+  // hydration — a locale-dependent format would hydration-mismatch (#418) for
+  // visitors whose browser locale groups digits differently.
+  return isDecimal ? v.toFixed(1) : Math.round(v).toLocaleString("en-US");
 }
 
 export default function Counter({ to, suffix = "", duration = 2 }: CounterProps) {

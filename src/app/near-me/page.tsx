@@ -7,6 +7,7 @@ import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd } from "@/app/_lib/str
 import { Smartphone } from "lucide-react";
 
 import { IconMapPin, IconSpark } from "@/components/icons";
+import { formatCityLabel } from "@/data/cities";
 
 export const revalidate = 3600;
 
@@ -94,7 +95,7 @@ export default function NearMePage() {
                   href={`/cities/${city.slug}`}
                   className="rounded-lg border border-border bg-white/[0.02] px-3 py-2 text-sm font-semibold text-foreground transition hover:border-primary hover:bg-primary/5"
                 >
-                  {city.name}, {city.stateCode}
+                  {formatCityLabel(city.name, city.stateCode)}
                 </Link>
               ))}
               <Link

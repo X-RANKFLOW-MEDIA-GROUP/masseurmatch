@@ -4,6 +4,7 @@ import { useId, useMemo } from "react";
 
 import { US_CITIES } from "@/data/cities";
 import { Input } from "@/components/ui/input";
+import { formatCityLabel } from "@/data/cities";
 
 type CityAutocompleteProps = {
   value: string;
@@ -23,7 +24,7 @@ export function CityAutocomplete({ value, onChange, onCitySelect, placeholder = 
       (city) =>
         city.name.toLowerCase().includes(q) ||
         city.stateCode.toLowerCase() === q ||
-        `${city.name}, ${city.stateCode}`.toLowerCase().includes(q),
+        `${formatCityLabel(city.name, city.stateCode)}`.toLowerCase().includes(q),
     ).slice(0, 20);
   }, [value]);
 
@@ -36,7 +37,7 @@ export function CityAutocomplete({ value, onChange, onCitySelect, placeholder = 
           const raw = event.target.value;
           onChange(raw);
           const match = US_CITIES.find(
-            (c) => `${c.name}, ${c.stateCode}` === raw,
+            (c) => `${formatCityLabel(c.name, c.stateCode)}` === raw,
           );
           if (match && onCitySelect) {
             onCitySelect({ name: match.name, stateCode: match.stateCode });
@@ -46,7 +47,7 @@ export function CityAutocomplete({ value, onChange, onCitySelect, placeholder = 
       />
       <datalist id={listId}>
         {options.map((city) => (
-          <option key={`${city.slug}-${city.stateCode}`} value={`${city.name}, ${city.stateCode}`} />
+          <option key={`${city.slug}-${city.stateCode}`} value={`${formatCityLabel(city.name, city.stateCode)}`} />
         ))}
       </datalist>
     </div>

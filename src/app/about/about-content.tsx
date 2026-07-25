@@ -57,7 +57,7 @@ export default function AboutContent() {
             Our Manifesto
           </p>
           <h1 className="mt-5 font-display text-[clamp(2.5rem,6vw,5.5rem)] font-extrabold leading-[0.95] tracking-tight">
-            Elevating the standard
+            Elevating the standard{" "}
             <br />
             <span className="text-[#D4717E]">of wellness discovery.</span>
           </h1>

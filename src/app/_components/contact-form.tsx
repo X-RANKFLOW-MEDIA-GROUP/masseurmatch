@@ -162,14 +162,18 @@ export function ContactForm() {
 
       <div className="grid gap-5 md:grid-cols-2">
         <div className="grid gap-2">
-          <Label htmlFor="contact-audience" className="text-sm font-medium text-slate-200">
+          <Label id="contact-audience-label" htmlFor="contact-audience" className="text-sm font-medium text-slate-200">
             I am a
           </Label>
           <Select
             value={form.audience}
             onValueChange={(value) => updateField("audience", value as ContactAudience)}
           >
-            <SelectTrigger id="contact-audience" className={SELECT_TRIGGER_CLASSNAME}>
+            <SelectTrigger
+              id="contact-audience"
+              aria-labelledby="contact-audience-label contact-audience"
+              className={SELECT_TRIGGER_CLASSNAME}
+            >
               <SelectValue placeholder="Choose one" />
             </SelectTrigger>
             <SelectContent className={SELECT_CONTENT_CLASSNAME}>

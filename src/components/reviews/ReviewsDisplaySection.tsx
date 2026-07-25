@@ -96,7 +96,7 @@ export function ReviewsDisplay({
                       ))}
                     </div>
                   </div>
-                  <p className="text-xs text-slate-500">{new Date(review.created_at).toLocaleDateString()}</p>
+                  <p className="text-xs text-slate-500">{new Date(review.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" })}</p>
                 </div>
                 <p className="text-sm text-slate-600">{review.body}</p>
               </div>

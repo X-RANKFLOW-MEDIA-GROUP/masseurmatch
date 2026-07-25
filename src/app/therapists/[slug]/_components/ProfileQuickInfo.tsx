@@ -23,8 +23,8 @@ export function ProfileQuickInfo({ profile }: Props) {
     ...(weight ? [{ label: "Weight", value: weight }] : []),
     ...(bodyType ? [{ label: "Body Type", value: bodyType }] : []),
     ...(techniqueCount > 0 ? [{ label: "Techniques", value: techniqueCount }] : []),
-    ...(isPro && profile.profile_views ? [{ label: "Views", value: profile.profile_views.toLocaleString(), proOnly: true }] : []),
-    ...(isPro && profile.contact_clicks ? [{ label: "Contacts", value: profile.contact_clicks.toLocaleString(), proOnly: true }] : []),
+    ...(isPro && profile.profile_views ? [{ label: "Views", value: profile.profile_views.toLocaleString("en-US"), proOnly: true }] : []),
+    ...(isPro && profile.contact_clicks ? [{ label: "Contacts", value: profile.contact_clicks.toLocaleString("en-US"), proOnly: true }] : []),
   ];
 
   if (items.length === 0) return null;

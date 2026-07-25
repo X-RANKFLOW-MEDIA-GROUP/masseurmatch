@@ -42,11 +42,11 @@ export const metadata: Metadata = {
     title: "Join the MasseurMatch Waitlist — Launching Soon",
     description:
       "A better directory for verified LGBTQ+-affirming male massage. No middlemen, no guesswork. Identity-verified therapists. Direct contact. AI on every profile.",
-    url: "https://masseurmatch.com/waitlist",
+    url: "https://www.masseurmatch.com/waitlist",
     siteName: "MasseurMatch",
     type: "website",
   },
-  alternates: { canonical: "https://masseurmatch.com/waitlist" },
+  alternates: { canonical: "https://www.masseurmatch.com/waitlist" },
   robots: { index: true, follow: true },
 };
 
@@ -56,13 +56,13 @@ const pageJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
   name: "MasseurMatch Waitlist — Coming Soon",
-  url: "https://masseurmatch.com/waitlist",
+  url: "https://www.masseurmatch.com/waitlist",
   description:
     "Join the MasseurMatch waitlist. A verified, LGBTQ+-affirming male massage therapist directory launching soon as the better alternative to MasseurFinder and RentMasseur.",
   publisher: {
     "@type": "Organization",
     name: "MasseurMatch",
-    url: "https://masseurmatch.com",
+    url: "https://www.masseurmatch.com",
   },
 };
 
