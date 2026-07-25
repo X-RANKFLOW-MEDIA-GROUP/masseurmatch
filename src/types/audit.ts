@@ -23,7 +23,7 @@ export interface AuditFilterOptions {
   offset?: number;
 }
 
-export interface AuditLogStats {
+interface AuditLogStats {
   total_changes: number;
   unique_fields: string[];
   last_updated: string;

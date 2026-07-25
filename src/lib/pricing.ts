@@ -93,12 +93,12 @@ export const PLANS: Plan[] = [
   },
 ];
 
-export function getPlanById(id: PlanId): Plan | undefined {
+function getPlanById(id: PlanId): Plan | undefined {
   return PLANS.find((p) => p.id === id);
 }
 
 /** @deprecated Use getPlanById */
-export function getPlanByTier(tier: PlanTier): Plan | undefined {
+function getPlanByTier(tier: PlanTier): Plan | undefined {
   return getPlanById(tier);
 }
 

@@ -1,4 +1,4 @@
-export type ZipAreaMatch = {
+type ZipAreaMatch = {
   zip: string;
   city: string;
   state: string;
@@ -8,7 +8,7 @@ export type ZipAreaMatch = {
   landmarks: string[];
 };
 
-export const ZIP_AREA_LOOKUP: ZipAreaMatch[] = [
+const ZIP_AREA_LOOKUP: ZipAreaMatch[] = [
   {
     zip: "10001",
     city: "New York",
@@ -267,7 +267,7 @@ export async function fetchZipByCode(zip: string): Promise<ZipLookupResult | nul
   }
 }
 
-export function formatHeightLabel(totalInches: number) {
+function formatHeightLabel(totalInches: number) {
   const feet = Math.floor(totalInches / 12);
   const inches = totalInches % 12;
   const centimeters = Math.round(totalInches * 2.54);
@@ -326,7 +326,7 @@ export function buildSeoDescription(input: {
   return `${name} offers ${services} in ${area}. View profile details, availability, contact options, pricing, and service areas on MasseurMatch.`;
 }
 
-export function createSeoKeywords(input: {
+function createSeoKeywords(input: {
   city?: string | null;
   neighborhood?: string | null;
   specialties?: string[] | null;
@@ -339,7 +339,7 @@ export function createSeoKeywords(input: {
   return Array.from(new Set([...services, ...localKeywords, "deep tissue massage", "sports massage", "relaxation massage"])).slice(0, 12);
 }
 
-export function createSlug(value: string) {
+function createSlug(value: string) {
   return value
     .toLowerCase()
     .trim()

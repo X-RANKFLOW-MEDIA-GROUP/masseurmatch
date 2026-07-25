@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { LegalPage } from "@/app/_components/legal-page";
-import { createPageMetadata } from "@/app/_lib/metadata";
+import { createPageMetadata } from "@/app/_lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Therapist Subscription Agreement",

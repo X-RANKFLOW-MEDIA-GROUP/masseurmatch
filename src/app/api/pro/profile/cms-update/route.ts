@@ -2,7 +2,7 @@ import { z } from "zod";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { assertRateLimit } from "@/app/_lib/security";
-import { requireRequestSession } from "@/app/_lib/session";
+import { requireRequestSession } from "@/app/api/_lib/session";
 import { getFieldByKey } from "@/lib/profile-fields-config";
 import {
   createProfileCmsUpdate,

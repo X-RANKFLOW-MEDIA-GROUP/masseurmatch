@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { z } from "zod";
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, recordAuditLog, requireAdminSession } from "@/app/api/_lib/supabase-server";
-import type { Json, TablesUpdate } from "@/integrations/supabase/types";
+import type { TablesUpdate } from "@/integrations/supabase/types";
 
 const patchSchema = z.object({
   requireIdentityVerification: z.boolean().optional(),

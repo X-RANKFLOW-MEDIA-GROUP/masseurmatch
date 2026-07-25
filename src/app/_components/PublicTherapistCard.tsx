@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Navigation, MapPin, Check } from "lucide-react";
+import { ArrowUpRight, MapPin, Check } from "lucide-react";
 import { useMemo } from "react";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import { Pill } from "@/components/ui/pill";

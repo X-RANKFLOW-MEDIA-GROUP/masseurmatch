@@ -11,7 +11,7 @@ export type VerifiedTherapistPageConfig = {
   faqs: Array<{ question: string; answer: string }>;
 };
 
-export const VERIFIED_THERAPIST_PAGES: Record<string, VerifiedTherapistPageConfig> = {
+const VERIFIED_THERAPIST_PAGES: Record<string, VerifiedTherapistPageConfig> = {
   "dallas-tx": {
     citySlug: "dallas-tx",
     cityName: "Dallas",

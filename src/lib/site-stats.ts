@@ -7,7 +7,7 @@
  */
 
 /** Total city pages generated (full SEO footprint) */
-export const TOTAL_CITY_PAGES = 278;
+const TOTAL_CITY_PAGES = 278;
 
 /** Cities with live, active therapist coverage */
 export const LIVE_COVERAGE_CITIES = 80;
@@ -16,7 +16,7 @@ export const LIVE_COVERAGE_CITIES = 80;
  * FLAG: This must reflect real active profile count.
  * Use getPlatformStats() for runtime accuracy.
  */
-export const TOTAL_PROFILES = 50;
+const TOTAL_PROFILES = 50;
 
 /** Total service routes (city × modality combinations) */
-export const TOTAL_SERVICES = 1200;
+const TOTAL_SERVICES = 1200;

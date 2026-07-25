@@ -132,7 +132,7 @@ export async function trackProfileView(data: ProfileViewEventData) {
   });
 }
 
-export async function trackInquiry(data: InquiryEventData) {
+async function trackInquiry(data: InquiryEventData) {
   if (!isTrackableProfileId(data.profile_id)) return;
   await persist("inquiry", {
     profile_id: data.profile_id,
@@ -146,7 +146,7 @@ export async function trackInquiry(data: InquiryEventData) {
   });
 }
 
-export async function trackBooking(data: BookingEventData) {
+async function trackBooking(data: BookingEventData) {
   if (!isTrackableProfileId(data.profile_id)) return;
   await persist("booking", {
     profile_id: data.profile_id,

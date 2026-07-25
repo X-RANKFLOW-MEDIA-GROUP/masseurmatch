@@ -1,7 +1,12 @@
 import type { MetadataRoute } from "next";
 
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
-import { getCities, getSitemapProfileSlugs } from "@/app/_lib/directory";
+import { getCities, getPublicTherapists, getSitemapProfileSlugs } from "@/app/_lib/directory";
+import {
+  getKeywordSearchFilters,
+  getSegmentSearchFilters,
+  resolveDirectoryFilters,
+} from "@/app/_lib/directory-taxonomy";
 import {
   FIRST_30_URLS_IN_ORDER,
   getLaunchAreaPaths,
@@ -90,7 +95,7 @@ function stripSyntheticLastModified(entry: SitemapEntry): SitemapEntry {
   };
 }
 
-export function dedupeSitemapEntries(entries: MetadataRoute.Sitemap): MetadataRoute.Sitemap {
+function dedupeSitemapEntries(entries: MetadataRoute.Sitemap): MetadataRoute.Sitemap {
   const unique = new Map<string, SitemapEntry>();
 
   for (const entry of entries) {
@@ -111,7 +116,7 @@ export function dedupeSitemapEntries(entries: MetadataRoute.Sitemap): MetadataRo
  * query used by the profile route. Demo and fallback records never participate.
  * A database failure intentionally produces no local SEO entries.
  */
-export async function getSeoEligibleCityInventoryMap(): Promise<Map<string, number>> {
+async function getSeoEligibleCityInventoryMap(): Promise<Map<string, number>> {
   try {
     const sitemapProfiles = await getSitemapProfileSlugs();
     const slugs = [...new Set(sitemapProfiles.map((row) => row.slug).filter(isSafeProfileSlug))];
@@ -167,18 +172,58 @@ function buildEligibleLocalEntries(inventory: Map<string, number>) {
     );
   });
 
-  const services: MetadataRoute.Sitemap = servicePaths.map((path) =>
-    buildEntry(path, "weekly", 0.66),
+  const neighborhoodPaths = getLaunchAreaPaths().filter((path) => {
+    const citySlug = citySlugFromPath(path);
+    return Boolean(citySlug && eligibleCitySlugs.has(citySlug) && isLaunchUrl(path));
+  });
+
+  return { eligibleCities, cities, servicePaths, neighborhoodPaths };
+}
+
+function formatAreaLabel(areaSlug: string) {
+  return areaSlug
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+// Launch pages render meta robots noindex when their own inventory query comes
+// back empty — segment pages ([city]/[segment]), keyword pages
+// ([city]/[segment]/[keyword]), and area pages ([city]/areas/[area]) each check
+// their specific filters, not just city-level inventory. Mirror those exact
+// queries here so the sitemap never lists a URL that serves noindex.
+async function filterIndexableLaunchPaths(paths: string[]): Promise<string[]> {
+  const cityBySlug = new Map(getCities().map((city) => [city.slug, city]));
+
+  const checked = await Promise.all(
+    paths.map(async (path) => {
+      const parts = path.split("/").filter(Boolean);
+      const city = cityBySlug.get(parts[0] ?? "");
+      if (!city || parts.length < 2) return null;
+
+      const filters =
+        parts[1] === "areas" && parts[2]
+          ? { keyword: formatAreaLabel(parts[2]) }
+          : parts.length === 3
+            ? resolveDirectoryFilters(getSegmentSearchFilters(parts[1]), getKeywordSearchFilters(parts[2]))
+            : getSegmentSearchFilters(parts[1]);
+
+      try {
+        const { total } = await getPublicTherapists({
+          city: city.name,
+          page: 1,
+          pageSize: 1,
+          ...filters,
+        });
+        return total > 0 ? path : null;
+      } catch {
+        // Supabase unavailable — the page would render noindex, so stay out.
+        return null;
+      }
+    }),
   );
 
-  const neighborhoods: MetadataRoute.Sitemap = getLaunchAreaPaths()
-    .filter((path) => {
-      const citySlug = citySlugFromPath(path);
-      return Boolean(citySlug && eligibleCitySlugs.has(citySlug) && isLaunchUrl(path));
-    })
-    .map((path) => buildEntry(path, "weekly", 0.6));
-
-  return { eligibleCities, cities, services, neighborhoods };
+  return checked.filter((path): path is string => path !== null);
 }
 
 async function buildPublishedBlogEntries(now: Date): Promise<MetadataRoute.Sitemap> {
@@ -204,6 +249,12 @@ export async function buildReleaseSitemapEntries(now = new Date()): Promise<Meta
   ]);
 
   const local = buildEligibleLocalEntries(inventory);
+  const [servicePaths, neighborhoodPaths] = await Promise.all([
+    filterIndexableLaunchPaths(local.servicePaths),
+    filterIndexableLaunchPaths(local.neighborhoodPaths),
+  ]);
+  const services = servicePaths.map((path) => buildEntry(path, "weekly", 0.66));
+  const neighborhoods = neighborhoodPaths.map((path) => buildEntry(path, "weekly", 0.6));
   const hasEligibleCities = local.eligibleCities.length > 0;
 
   const core = buildCoreSitemapEntries(now)
@@ -223,8 +274,8 @@ export async function buildReleaseSitemapEntries(now = new Date()): Promise<Meta
     ...core,
     ...conditionalHubs,
     ...local.cities,
-    ...local.services,
-    ...local.neighborhoods,
+    ...services,
+    ...neighborhoods,
     ...profiles,
     ...buildGuidesSitemapEntries(now),
     ...blogPosts,

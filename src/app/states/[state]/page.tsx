@@ -3,9 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCanonicalCitySlug } from "@/app/_lib/city-routing";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
-import { createPageMetadata } from "@/app/_lib/metadata";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildItemListJsonLd,
+  createPageMetadata,
+} from "@/app/_lib/seo";
 import { JsonLd } from "@/app/_components/json-ld";
-import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildItemListJsonLd } from "@/app/_lib/structured-data";
 
 type Params = { state: string };
 

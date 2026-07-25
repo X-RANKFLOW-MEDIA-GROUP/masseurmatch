@@ -1,5 +1,5 @@
 import { JsonLd } from "@/app/_components/json-ld";
-import { createPageMetadata } from "@/app/_lib/metadata";
+import { createPageMetadata } from "@/app/_lib/seo";
 import ContactPageClient from "./ContactPageClient";
 
 export const metadata = createPageMetadata({

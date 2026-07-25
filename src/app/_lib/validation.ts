@@ -25,9 +25,9 @@ export const forgotPasswordSchema = z.object({
   redirectTo: z.string().url().optional(),
 });
 
-export const CONTACT_AUDIENCE_VALUES = ["client", "massage-professional", "other"] as const;
+const CONTACT_AUDIENCE_VALUES = ["client", "massage-professional", "other"] as const;
 
-export const contactAudienceSchema = z.enum(CONTACT_AUDIENCE_VALUES);
+const contactAudienceSchema = z.enum(CONTACT_AUDIENCE_VALUES);
 
 export const contactFormSchema = z.object({
   name: z.preprocess(trimString, z.string().min(1)),
@@ -58,18 +58,18 @@ export const contactFormSchema = z.object({
   message: z.preprocess(trimString, z.string().min(3)),
 });
 
-export const billingTierSchema = z.enum(["free", "standard", "pro", "elite"]);
+const billingTierSchema = z.enum(["free", "standard", "pro", "elite"]);
 
-export const proBillingSchema = z.object({
+const proBillingSchema = z.object({
   tier: billingTierSchema,
 });
 
-export const chatMessageSchema = z.object({
+const chatMessageSchema = z.object({
   role: z.enum(["user", "assistant", "system"]).default("user"),
   content: z.string().min(1),
 });
 
-export const chatRequestSchema = z
+const chatRequestSchema = z
   .object({
     message: z.string().min(1).optional(),
     messages: z.array(chatMessageSchema).optional(),
@@ -78,7 +78,7 @@ export const chatRequestSchema = z
     message: "Provide a message or messages array.",
   });
 
-export const knottyContextSchema = z.object({
+const knottyContextSchema = z.object({
   pagePath: z.string().max(200).optional(),
   pageQuery: z.string().max(600).optional(),
   city: z.string().max(120).nullable().optional(),
@@ -144,8 +144,8 @@ export type AuthRegisterInput = z.infer<typeof authRegisterSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ContactAudience = z.infer<typeof contactAudienceSchema>;
 export type ContactFormInput = z.infer<typeof contactFormSchema>;
-export type ProBillingInput = z.infer<typeof proBillingSchema>;
-export type ChatRequestInput = z.infer<typeof chatRequestSchema>;
-export type KnottyRequestInput = z.infer<typeof knottyRequestSchema>;
-export type KnottyEventInput = z.infer<typeof knottyEventSchema>;
+type ProBillingInput = z.infer<typeof proBillingSchema>;
+type ChatRequestInput = z.infer<typeof chatRequestSchema>;
+type KnottyRequestInput = z.infer<typeof knottyRequestSchema>;
+type KnottyEventInput = z.infer<typeof knottyEventSchema>;
 export type ProProfileInput = z.infer<typeof proProfileSchema>;

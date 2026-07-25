@@ -119,7 +119,7 @@ export function extractCsrfToken(headers: Headers): { token: string; cookieValue
   };
 }
 
-export function clearCsrfCookie(): string {
+function clearCsrfCookie(): string {
   const secure = process.env.NODE_ENV === "production";
   const parts = [
     `${CSRF_COOKIE_NAME}=`,

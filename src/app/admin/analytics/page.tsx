@@ -6,8 +6,7 @@ import {
   TrendingUp, 
   Users, 
   MapPin, 
-  DollarSign,
-  Loader2
+  DollarSign
 } from "lucide-react";
 import { DashboardSkeleton } from "@/app/_components/DashboardSkeleton";
 

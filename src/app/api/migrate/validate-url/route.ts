@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 
 const PLATFORM_VALIDATORS: Record<string, (url: string) => boolean> = {

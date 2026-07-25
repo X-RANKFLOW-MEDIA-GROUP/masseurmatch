@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { JsonLd } from "@/app/_components/json-ld";
-import { getServiceMetadata, getAllServices, NATIONAL_SERVICE_SLUGS } from "@/app/_lib/service-data";
+import { getServiceMetadata, NATIONAL_SERVICE_SLUGS } from "@/app/_lib/service-data";
 import { getPublicTherapists } from "@/app/_lib/directory";
-import { createPageMetadata } from "@/app/_lib/metadata";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
   buildFaqJsonLd,
   buildItemListJsonLd,
-} from "@/app/_lib/structured-data";
+  createPageMetadata,
+} from "@/app/_lib/seo";
 
 type Params = { service: string };
 

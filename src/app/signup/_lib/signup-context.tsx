@@ -33,7 +33,7 @@ export type BillingStatus =
   | "active"
   | "failed";
 
-export interface ProfileMigrationUrl {
+interface ProfileMigrationUrl {
   platform: string;
   url: string;
 }
@@ -142,7 +142,7 @@ const initialState: SignupState = {
   ageAndConductAttested: false,
 };
 
-export const SIGNUP_BOOTSTRAP_STORAGE_KEY = "mm_signup_bootstrap";
+const SIGNUP_BOOTSTRAP_STORAGE_KEY = "mm_signup_bootstrap";
 const SIGNUP_STATE_STORAGE_KEY = "mm_signup_state";
 
 function createPersistedStateSnapshot(state: SignupState): SignupState {

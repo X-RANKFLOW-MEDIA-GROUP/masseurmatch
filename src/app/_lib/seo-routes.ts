@@ -23,7 +23,7 @@ type StaticSitemapRoute = {
 
 export const SITEMAP_SEGMENT_IDS = [0, 1, 2, 3, 4, 5, 6] as const;
 
-export const PRIVATE_ROBOTS_PATHS = uniqueStrings([
+const PRIVATE_ROBOTS_PATHS = uniqueStrings([
   "/admin",
   "/admin/",
   "/api",
@@ -44,7 +44,7 @@ export const PRIVATE_ROBOTS_PATHS = uniqueStrings([
   "/*?*redirect=",
 ]);
 
-export const FILTER_ROBOTS_PATHS = [
+const FILTER_ROBOTS_PATHS = [
   "/search?*",
   "/*?sort=*",
   "/*?filter=*",
@@ -57,8 +57,8 @@ export const FILTER_ROBOTS_PATHS = [
   "/*?page=*",
 ];
 
-export const SEARCH_ENGINE_BOTS = ["Googlebot", "Bingbot", "Yandex", "Baiduspider"];
-export const SOCIAL_PREVIEW_BOTS = [
+const SEARCH_ENGINE_BOTS = ["Googlebot", "Bingbot", "Yandex", "Baiduspider"];
+const SOCIAL_PREVIEW_BOTS = [
   "Twitterbot",
   "facebookexternalhit",
   "LinkedInBot",
@@ -68,7 +68,7 @@ export const SOCIAL_PREVIEW_BOTS = [
   "Slackbot",
   "Applebot",
 ];
-export const AI_CRAWLER_BOTS = [
+const AI_CRAWLER_BOTS = [
   "GPTBot",
   "ChatGPT-User",
   "Claude-Web",
@@ -214,7 +214,7 @@ export function buildRobotsRules(): MetadataRoute.Robots["rules"] {
   ];
 }
 
-export function buildSitemapSegmentUrls(): string[] {
+function buildSitemapSegmentUrls(): string[] {
   return SITEMAP_SEGMENT_IDS.map((id) => absoluteUrl(`/sitemaps/${id}.xml`));
 }
 
@@ -353,12 +353,12 @@ export async function buildBlogPostsSitemapEntries(now = new Date()): Promise<Me
 }
 
 /** @deprecated Use buildCoreSitemapEntries. */
-export function buildStaticSitemapEntries(now = new Date()): MetadataRoute.Sitemap {
+function buildStaticSitemapEntries(now = new Date()): MetadataRoute.Sitemap {
   return buildCoreSitemapEntries(now);
 }
 
 /** @deprecated Use segmented sitemap.ts instead of this combined function. */
-export async function buildSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
+async function buildSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
   const [core, cities, services, profiles] = await Promise.all([
     buildCoreSitemapEntries(now),
     buildCitiesSitemapEntries(now),
@@ -370,21 +370,21 @@ export async function buildSitemapEntries(now = new Date()): Promise<MetadataRou
   return [...core, ...cities, ...services, ...neighborhoods, ...profiles, ...guides];
 }
 
-export function buildLaunchOrderList(): string[] {
+function buildLaunchOrderList(): string[] {
   return [...FIRST_30_URLS_IN_ORDER];
 }
 
 /** @deprecated Use buildServicesSitemapEntries. */
-export async function buildServicesCitySitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
+async function buildServicesCitySitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
   return buildServicesSitemapEntries(now);
 }
 
 /** @deprecated Use buildNeighborhoodsSitemapEntries. */
-export async function buildKeywordsSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
+async function buildKeywordsSitemapEntries(now = new Date()): Promise<MetadataRoute.Sitemap> {
   return buildNeighborhoodsSitemapEntries(now);
 }
 
 /** @deprecated Use buildGuidesSitemapEntries. */
-export function buildBlogSitemapEntries(now = new Date()): MetadataRoute.Sitemap {
+function buildBlogSitemapEntries(now = new Date()): MetadataRoute.Sitemap {
   return buildGuidesSitemapEntries(now);
 }

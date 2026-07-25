@@ -5,14 +5,17 @@ import { JsonLd } from "@/app/_components/json-ld";
 import { getCanonicalCitySlug, resolveCitySlug } from "@/app/_lib/city-routing";
 import {
   DALLAS_NEIGHBORHOOD_SLUGS,
-  DALLAS_ORDERED_CATEGORY_SLUGS,
-  DALLAS_SERVICE_SLUGS,
   DALLAS_SESSION_SLUGS,
   getCityCanonicalCategorySlugs,
 } from "@/app/_lib/dallas-cluster";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
-import { createPageMetadata } from "@/app/_lib/metadata";
-import { buildBreadcrumbJsonLd, buildCollectionPageJsonLd, buildFaqJsonLd, buildItemListJsonLd } from "@/app/_lib/structured-data";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+  buildFaqJsonLd,
+  buildItemListJsonLd,
+  createPageMetadata,
+} from "@/app/_lib/seo";
 import { NATIONAL_SERVICE_SLUGS, getServiceMetadata } from "@/app/_lib/service-data";
 
 type Params = { city: string };

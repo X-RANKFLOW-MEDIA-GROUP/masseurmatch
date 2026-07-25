@@ -24,7 +24,7 @@ export const NATIONAL_SERVICE_SLUGS: ServiceSlug[] = [
   "hot-stone",
 ];
 
-export const SERVICE_METADATA: Record<ServiceSlug, ServiceMetadata> = {
+const SERVICE_METADATA: Record<ServiceSlug, ServiceMetadata> = {
   "deep-tissue": {
     slug: "deep-tissue",
     label: "Deep Tissue",

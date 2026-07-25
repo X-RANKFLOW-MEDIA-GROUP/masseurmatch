@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 export type PlanKey = "free" | "standard" | "pro" | "elite" | null;
 type SupportedPlanKey = Exclude<PlanKey, null>;
 
-export interface AvailableNowConfig {
+interface AvailableNowConfig {
   enabled: boolean;
   durationHours: number;
   cooldownHours: number;
@@ -167,7 +167,7 @@ const PLAN_LIMITS: Record<SupportedPlanKey, PlanLimits> = {
 };
 
 // Exported for search ranking logic
-export const AVAILABLE_NOW_TIER_PRIORITY: Record<SupportedPlanKey, number> = {
+const AVAILABLE_NOW_TIER_PRIORITY: Record<SupportedPlanKey, number> = {
   elite: 1,
   pro: 2,
   standard: 3,

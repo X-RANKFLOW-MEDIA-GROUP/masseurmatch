@@ -1,8 +1,7 @@
-import { errorResponse, json, withSetCookie } from "@/app/api/_lib/http";
+import { errorResponse, json } from "@/app/api/_lib/http";
 import { requireSession } from "@/app/api/_lib/supabase-server";
 import { createSupabaseWebhookAdminClient } from "@/app/api/_lib/supabase-server";
 import { generateTotpSecret, generateTotpUri, generateBackupCodes } from "@/app/api/_lib/totp";
-import { RouteError } from "@/app/api/_lib/http";
 
 export async function POST(request: Request) {
   try {

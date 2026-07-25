@@ -7,7 +7,6 @@ import {
   Phone,
   CreditCard,
   ChevronRight,
-  MapPin,
   Star,
   Clock,
   TrendingUp,

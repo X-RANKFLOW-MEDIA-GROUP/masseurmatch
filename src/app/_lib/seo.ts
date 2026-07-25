@@ -3,13 +3,13 @@ import { SITE_URL, siteUrl } from "@/lib/site";
 import { buildCanonicalPath } from "@/app/_lib/route-normalization";
 
 export const SITE_NAME = "MasseurMatch";
-export const SITE_TAGLINE = "A national directory for LGBTQ+-affirming independent massage therapists";
+const SITE_TAGLINE = "A national directory for LGBTQ+-affirming independent massage therapists";
 export const SITE_DESCRIPTION =
   "Find LGBTQ+-affirming independent massage therapists across the United States by state, city, specialty, incall, outcall, trust signals, and direct contact options.";
-export const DEFAULT_SOCIAL_HANDLE = "@masseurmatch";
+const DEFAULT_SOCIAL_HANDLE = "@masseurmatch";
 export const appUrl = SITE_URL;
 
-export const DEFAULT_KEYWORDS = [
+const DEFAULT_KEYWORDS = [
   // Core brand & directory
   "MasseurMatch",
   "massage therapist directory",
@@ -120,7 +120,7 @@ type LocalBusinessJsonLdInput = {
 const dedupeStrings = (values: Array<string | null | undefined>) =>
   Array.from(new Set(values.map((value) => value?.trim()).filter((value): value is string => Boolean(value))));
 
-export const buildOgImageUrl = (params: Record<string, string | undefined>) => {
+const buildOgImageUrl = (params: Record<string, string | undefined>) => {
   const searchParams = new URLSearchParams();
 
   Object.entries(params).forEach(([key, value]) => {
@@ -293,7 +293,7 @@ export const buildFaqJsonLd = (items: FaqItem[]) => ({
   })),
 });
 
-export const buildContactPageJsonLd = () => ({
+const buildContactPageJsonLd = () => ({
   "@context": "https://schema.org",
   "@type": "ContactPage",
   name: `Contact ${SITE_NAME}`,
@@ -327,7 +327,7 @@ export const buildArticleJsonLd = ({
   image: [buildOgImageUrl({ title, label: "Blog" })],
 });
 
-export const buildProfilePageJsonLd = ({
+const buildProfilePageJsonLd = ({
   name,
   path,
   description,
@@ -405,7 +405,7 @@ export const buildProfilePageJsonLd = ({
   };
 };
 
-export const buildHealthAndBeautyBusinessJsonLd = ({
+const buildHealthAndBeautyBusinessJsonLd = ({
   name,
   slug,
   description,
