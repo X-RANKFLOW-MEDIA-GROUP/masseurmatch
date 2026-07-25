@@ -4,7 +4,7 @@ MasseurMatch is a directory platform for independent massage therapists. Visitor
 
 ## Stack
 
-- Next.js 14 App Router
+- Next.js 15 App Router
 - React 18
 - TypeScript
 - Tailwind CSS
@@ -20,17 +20,22 @@ pnpm install
 pnpm dev
 ```
 
+The development server defaults to port `5000`. `DEV_PORT` is documented in `.env.example` for tooling and local configuration that needs to reference the same port.
+
 ## Checks
 
 ```bash
 pnpm typecheck
 pnpm lint
 pnpm build
+pnpm test
 ```
 
 ## Environment
 
 Copy `.env.example` to `.env.local` and supply the credentials for your deployment.
+
+For production, set `COOKIE_DOMAIN=.masseurmatch.com` when authentication cookies must be shared by the apex, `www`, and `admin` hosts. Leave `COOKIE_DOMAIN` and its `MM_COOKIE_DOMAIN` alias unset for Vercel preview or staging deployments so cookies remain host-only.
 
 ### Critical Production Environment Variables
 
@@ -41,7 +46,13 @@ The following variables **MUST** be set in production (Vercel Settings > Environ
 
 Both can also use their alias names `CSRF_SECRET` and `SESSION_SECRET`, but `MM_*` names are preferred.
 
-To validate that these are set in a deployment, visit `/api/health` — it returns 200 if all critical vars are present, 503 otherwise.
+Validate every deployment before promotion:
+
+```bash
+curl --fail-with-body https://your-deployment.example/api/health
+```
+
+`/api/health` returns HTTP `200` with `{ "ok": true }` when both critical secrets are available. It returns HTTP `503` with JSON containing `missing` and per-secret `checks` when configuration is incomplete, allowing deployment checks to fail fast.
 
 ## Notes
 
