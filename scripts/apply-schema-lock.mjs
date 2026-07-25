@@ -30,6 +30,20 @@ function loadEnv(name) {
   return null;
 }
 
+function deriveRefFromUrl(url) {
+  try {
+    const parsed = new URL(url);
+    const hostParts = parsed.hostname.split('.');
+    // Expect something like <ref>.supabase.co
+    if (hostParts.length >= 3 && hostParts[1] === 'supabase' && hostParts[2] === 'co') {
+      return hostParts[0];
+    }
+    return null;
+  } catch (err) {
+    return null;
+  }
+}
+
 async function main() {
   const token = loadEnv("SUPABASE_ACCESS_TOKEN");
   const url = loadEnv("NEXT_PUBLIC_SUPABASE_URL");
@@ -39,14 +53,21 @@ async function main() {
     console.error("[apply-schema-lock] Create one at https://supabase.com/dashboard/account/tokens");
     process.exit(1);
   }
-  const ref = url?.match(/https:\/\/(\w+)\.supabase\.co/)?.[1];
+
+  const ref = deriveRefFromUrl(url);
   if (!ref) {
     console.error("[apply-schema-lock] Could not derive project ref from NEXT_PUBLIC_SUPABASE_URL.");
+    console.error("[apply-schema-lock] Expected a URL like https://<ref>.supabase.co");
     process.exit(1);
   }
 
   const sql = fs.readFileSync(SCHEMA_PATH, "utf8");
   console.log(`[apply-schema-lock] Applying schema lock to project ${ref} (${sql.length} bytes)...`);
+
+  if (typeof fetch === 'undefined') {
+    console.error('[apply-schema-lock] global fetch is not available. Please run with Node 18+ or provide a fetch polyfill.');
+    process.exit(1);
+  }
 
   const response = await fetch(`https://api.supabase.com/v1/projects/${ref}/database/query`, {
     method: "POST",
