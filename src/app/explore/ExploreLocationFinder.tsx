@@ -80,7 +80,7 @@ export function ExploreLocationFinder({ cities }: { cities: CityData[] }) {
 
   return (
     <div className="rounded-2xl border border-[#E8E8E8] bg-white p-4 shadow-[0_1px_2px_rgba(17,17,17,0.04),0_12px_32px_rgba(17,17,17,0.05)] sm:p-5">
-      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#8E8E8E]">
+      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#6F6F6F]">
         Find therapists near you
       </p>
 
@@ -96,7 +96,7 @@ export function ExploreLocationFinder({ cities }: { cities: CityData[] }) {
             list="explore-finder-cities"
             placeholder="Enter your city"
             aria-label="Search for your city"
-            className="w-full bg-transparent text-sm font-medium text-[#111111] outline-none placeholder:text-[#8E8E8E]"
+            className="w-full bg-transparent text-sm font-medium text-[#111111] outline-none placeholder:text-[#6F6F6F]"
           />
           <datalist id="explore-finder-cities">
             {suggestions.map((label) => (
