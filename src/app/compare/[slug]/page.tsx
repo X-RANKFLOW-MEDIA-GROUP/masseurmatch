@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { JsonLd } from "@/app/_components/json-ld";
 import {
-  SITE_DESCRIPTION,
   SITE_NAME,
   buildBreadcrumbJsonLd,
   buildFaqJsonLd,
@@ -46,7 +45,7 @@ export async function generateMetadata({
   }
 
   return createPageMetadata({
-    title: competitor.metaTitle,
+    title: `${competitor.metaTitle}: Features, SEO & Best Fit`,
     description: competitor.metaDescription,
     path: `/compare/${competitor.slug}`,
     type: "article",
@@ -77,23 +76,6 @@ function buildComparisonArticleJsonLd(slug: string, name: string, description: s
       url: siteUrl("/"),
     },
     mainEntityOfPage: siteUrl(`/compare/${slug}`),
-  };
-}
-
-function buildSoftwareApplicationJsonLd() {
-  return {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: SITE_NAME,
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Web",
-    description: SITE_DESCRIPTION,
-    url: siteUrl("/"),
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-    },
   };
 }
 
@@ -132,7 +114,6 @@ export default async function CompareSlugPage({
           articleDescription,
         )}
       />
-      <JsonLd data={buildSoftwareApplicationJsonLd()} />
       <JsonLd data={buildFaqJsonLd(competitor.faqs)} />
 
       <ComparisonPage
