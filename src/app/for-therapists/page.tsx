@@ -215,7 +215,7 @@ export default function ForTherapistsPage() {
             }}
           >
             <Link
-              href="/register"
+              href="/signup/account"
               style={{
                 display: "inline-block",
                 padding: "16px 40px",
@@ -745,7 +745,7 @@ export default function ForTherapistsPage() {
             }}
           >
             <Link
-              href="/register"
+              href="/signup/account"
               style={{
                 display: "inline-block",
                 padding: "16px 44px",

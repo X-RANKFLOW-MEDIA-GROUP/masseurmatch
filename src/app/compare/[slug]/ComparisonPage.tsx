@@ -57,7 +57,7 @@ export default function ComparisonPage({
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild variant="hero" className="rounded-full px-6">
-                <Link href="/register">
+                <Link href="/signup/account">
                   Create free profile
                   <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -218,7 +218,7 @@ export default function ComparisonPage({
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
             <Button asChild variant="default" className="rounded-full px-6">
-              <Link href="/register">
+              <Link href="/signup/account">
                 Create free profile
                 <ArrowRight className="h-4 w-4" />
               </Link>

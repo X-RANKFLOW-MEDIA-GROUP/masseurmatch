@@ -101,7 +101,7 @@ export default async function CountyPage({ params }: { params: Promise<Params> }
           path: `/states/${resolved.state}/counties/${resolved.county}`,
           items: cityInventory.map(({ city }) => ({
             name: `${formatCityLabel(city.name, city.stateCode)}`,
-            path: `/states/${resolved.state}/cities/${city.slug}`,
+            path: `/${city.slug}`,
           })),
         })}
       />
@@ -123,7 +123,7 @@ export default async function CountyPage({ params }: { params: Promise<Params> }
               {cityInventory.map(({ city, total }) => (
                 <Link
                   key={`${city.stateCode}-${city.slug}`}
-                  href={`/states/${resolved.state}/cities/${city.slug}`}
+                  href={`/${city.slug}`}
                   className="rounded-xl border border-border px-4 py-3 text-sm text-foreground transition-colors hover:border-primary/50 hover:bg-muted/40"
                 >
                   <span className="font-semibold">{formatCityLabel(city.name, city.stateCode)}</span>

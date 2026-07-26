@@ -67,7 +67,7 @@ export default function AdvertisePage() {
         </div>
 
         <div className="mt-6">
-          <Link href="/register" className="text-sm font-medium text-primary hover:underline">
+          <Link href="/signup/account" className="text-sm font-medium text-primary hover:underline">
             Create an account and advertise
           </Link>
         </div>

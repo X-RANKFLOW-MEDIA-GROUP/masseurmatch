@@ -55,17 +55,6 @@ export const DIRECTORY_SEGMENTS: DirectorySegment[] = [
     },
   },
   {
-    slug: "gay-massage",
-    label: "Gay massage therapists",
-    shortLabel: "Gay massage",
-    intro:
-      "Find LGBTQ+-affirming independent male massage therapists who create genuinely safe therapeutic experiences for gay and queer clients.",
-    search: {
-      keyword: "gay",
-      lgbtqAffirming: true,
-    },
-  },
-  {
     slug: "sports-recovery",
     label: "Sports recovery massage",
     shortLabel: "Sports recovery",

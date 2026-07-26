@@ -30,7 +30,7 @@ export const LANDING_FAQ: FaqItem[] = [
   {
     question: "Is MasseurMatch a better alternative to MasseurFinder or RentMasseur?",
     answer:
-      "MasseurMatch is a modern alternative to legacy directories like MasseurFinder and RentMasseur. It offers cleaner profile presentation, stronger local SEO, city-first landing pages, and a professional wellness-forward brand without the mixed-intent marketplace feel.",
+      "MasseurMatch is a modern alternative to legacy directories like MasseurFinder and RentMasseur. It offers cleaner profile presentation, dedicated city pages, and a professional wellness-forward brand without the mixed-intent marketplace feel.",
   },
   {
     question: "Is MasseurMatch LGBTQ+ affirming?",

@@ -52,12 +52,26 @@ const SEARCH_FAQS = [
   },
 ];
 
+// Every param that changes the rendered result set must force noindex —
+// the canonical is always bare /search, so an indexable filtered variant
+// would be a canonical/content mismatch.
+const SEARCH_FILTER_PARAMS = [
+  "city",
+  "modality",
+  "tier",
+  "keyword",
+  "session",
+  "goal",
+  "verified",
+  "available",
+  "master",
+  "lgbtq",
+] as const;
+
 export async function generateMetadata({ searchParams }: SearchPageProps): Promise<Metadata> {
   const params = await searchParams;
   const city = getFirstParam(params.city);
-  const modality = getFirstParam(params.modality);
-  const tier = getFirstParam(params.tier);
-  const hasFilters = Boolean(city || modality || tier);
+  const hasFilters = SEARCH_FILTER_PARAMS.some((param) => Boolean(getFirstParam(params[param])));
 
   return createPageMetadata({
     title: city ? `${city} massage therapists — directory search` : "Search verified massage therapists",

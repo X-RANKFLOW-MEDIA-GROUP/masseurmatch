@@ -86,7 +86,7 @@ export default function CompareHubPage() {
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button asChild variant="hero" className="rounded-full px-6">
-                  <Link href="/register">
+                  <Link href="/signup/account">
                     Create free profile
                     <IconArrowRight size={16} />
                   </Link>

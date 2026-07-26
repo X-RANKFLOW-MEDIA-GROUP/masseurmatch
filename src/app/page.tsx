@@ -54,51 +54,6 @@ export const metadata: Metadata = createPageMetadata({
   ],
 });
 
-// ─── FAQ content (also used for JSON-LD) ────────────────────────────────────
-
-const HOME_FAQ = [
-  {
-    question: "What is MasseurMatch?",
-    answer:
-      "MasseurMatch is a premium US discovery directory for verified LGBTQ+-affirming male massage therapists. Search by city, filter by specialty (deep tissue, Swedish, sports), choose incall or outcall, and contact therapists directly without any booking middleman.",
-  },
-  {
-    question: "How do I find verified male massage therapists near me?",
-    answer:
-      "Select your city on MasseurMatch, browse profiles with trust signals, compare specialties and session types (incall or outcall), check availability and pricing, then contact your therapist directly to confirm details.",
-  },
-  {
-    question: "Which cities does MasseurMatch cover?",
-    answer:
-      "MasseurMatch covers cities across the US including Dallas, Miami, New York, Los Angeles, Chicago, Houston, Atlanta, Washington DC, San Francisco, Seattle, Denver, Boston, Phoenix, Las Vegas, New Orleans, and many more.",
-  },
-  {
-    question: "What makes MasseurMatch different?",
-    answer:
-      "MasseurMatch is built for serious wellness seekers. Premium verified profiles, identity checks, transparent pricing, LGBTQ+-affirming therapists, and a professional brand that respects both clients and providers. No booking middleman — just direct contact, clear terms, and trust signals.",
-  },
-  {
-    question: "How do I know if a therapist is verified on MasseurMatch?",
-    answer:
-      "Verified therapists display trust signals on their profiles: identity verification badges, availability status, years of experience, and professional credentials. Elite tier therapists have enhanced verification and premium features.",
-  },
-  {
-    question: "Can I find outcall and incall massage options on MasseurMatch?",
-    answer:
-      "Yes. Each MasseurMatch profile clearly shows whether a therapist offers incall (at their location), outcall (to your home or hotel), or both — with pricing anchors where available.",
-  },
-  {
-    question: "Is MasseurMatch LGBTQ+ friendly?",
-    answer:
-      "Absolutely. MasseurMatch is designed as an inclusive LGBTQ+-affirming directory where clients can safely discover therapists who are welcoming, professional, and experienced with diverse clientele.",
-  },
-  {
-    question: "Does MasseurMatch handle booking or payment?",
-    answer:
-      "No. MasseurMatch is a discovery directory — not a booking platform. Clients review profiles and contact therapists directly to confirm session details, rates, availability, and boundaries outside the platform.",
-  },
-];
-
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 function isRealProfileId(id: string | null | undefined) {
@@ -151,19 +106,7 @@ export default async function HomePage() {
       <JsonLd data={buildOrganizationJsonLd()} />
 
       {/* WebSite + SearchAction */}
-      <JsonLd
-        data={{
-          ...buildWebsiteJsonLd(),
-          potentialAction: {
-            "@type": "SearchAction",
-            target: {
-              "@type": "EntryPoint",
-              urlTemplate: siteUrl("/search?q={search_term_string}&city={city_name}"),
-            },
-            "query-input": "required name=search_term_string",
-          },
-        }}
-      />
+      <JsonLd data={buildWebsiteJsonLd()} />
 
       {/* CollectionPage */}
       <JsonLd
@@ -183,8 +126,8 @@ export default async function HomePage() {
         })}
       />
 
-      {/* FAQPage */}
-      <JsonLd data={buildFaqJsonLd(HOME_FAQ)} />
+      {/* FAQPage — must mirror the FAQ content visibly rendered by FaqAccordion */}
+      <JsonLd data={buildFaqJsonLd(LANDING_FAQ)} />
 
       {/* Standalone BreadcrumbList */}
       <JsonLd

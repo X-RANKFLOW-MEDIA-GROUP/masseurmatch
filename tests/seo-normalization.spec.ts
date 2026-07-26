@@ -53,6 +53,13 @@ const CASES: Array<{ source: string; destination: string }> = [
   // /cities/dallas-tx/{category} → /dallas/{segment}
   { source: "/cities/dallas-tx/gay-massage", destination: "/dallas/lgbtq-friendly" },
   { source: "/cities/dallas-tx/deep-tissue", destination: "/dallas/wellness/deep-tissue" },
+
+  // Duplicate-intent consolidation (middleware) — one canonical URL per intent
+  { source: "/dallas/gay-massage", destination: "/dallas/lgbtq-friendly" },
+  { source: "/houston/gay-massage", destination: "/houston/lgbtq-friendly" },
+  { source: "/dallas/verified-therapists", destination: "/dallas/verified-profiles" },
+  { source: "/dallas/services/deep-tissue", destination: "/dallas/wellness/deep-tissue" },
+  { source: "/dallas/services/sports", destination: "/dallas/wellness/sports-recovery" },
 ];
 
 for (const { source, destination } of CASES) {
