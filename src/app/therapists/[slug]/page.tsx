@@ -7,7 +7,7 @@ import {
   getPublicTherapistBySlug,
   getPublicTherapists,
 } from "@/app/_lib/directory";
-import { buildBreadcrumbJsonLd, buildFaqJsonLd, createPageMetadata } from "@/app/_lib/seo";
+import { buildBreadcrumbJsonLd, createPageMetadata } from "@/app/_lib/seo";
 import { ProfileStructuredData } from "@/components/profile/ProfileStructuredData";
 import { buildProfileFaq } from "@/components/profile/profile-faq";
 import { buildProfileViewModel } from "@/components/profile/profile-utils";
@@ -114,7 +114,6 @@ export default async function TherapistPage({ params }: { params: Promise<Params
       <ProfileViewTracker profileId={dbProfile.id} source="direct" />
       {dbProfile.is_demo && <DemoProfileBanner />}
       <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Therapists", path: "/therapists" }, ...(matchedCity ? [{ name: matchedCity.name, path: `/${matchedCity.slug}` }] : []), { name: profile.name, path: profilePath }])} />
-      {faqItems.length > 0 ? <JsonLd data={buildFaqJsonLd(faqItems)} /> : null}
       <ProfileStructuredData profile={profile} />
       <VoxProfile
         profile={profile}

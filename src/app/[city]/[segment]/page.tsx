@@ -8,7 +8,7 @@ import {
   getSegmentSearchFilters,
   getSegmentBySlug,
 } from "@/app/_lib/directory-taxonomy";
-import { getLaunchKeywordPaths } from "@/app/_lib/launch-urls";
+import { getLaunchKeywordPaths, isLaunchUrl } from "@/app/_lib/launch-urls";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
@@ -60,13 +60,13 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     // Supabase unavailable — fall through with zero total
   }
 
-  const isGayMassageSegment = segment.slug === "gay-massage" || segment.slug === "lgbtq-friendly";
+  const isGayMassageSegment = segment.slug === "lgbtq-friendly";
   const cityLabel = `${formatCityLabel(city.name, city.stateCode)}`;
   const title = isGayMassageSegment
-    ? `Gay Massage Therapists in ${cityLabel} | Verified LGBTQ+-Affirming`
+    ? `Gay Massage Therapists in ${cityLabel} | LGBTQ+-Affirming`
     : `${city.name} ${segment.label}`;
   const description = isGayMassageSegment
-    ? `Find verified, LGBTQ+-affirming male massage therapists in ${cityLabel}. Browse gay-friendly profiles with identity verification, affirming practice standards, and direct contact on MasseurMatch.`
+    ? `Find LGBTQ+-affirming male massage therapists in ${cityLabel}. Browse gay-friendly profiles with visible trust signals, clear session formats, and direct contact on MasseurMatch.`
     : `${segment.intro} Compare trusted local listings, direct contact options, and stronger city-intent pages in ${city.name}.`;
   const keywords = isGayMassageSegment
     ? [
@@ -123,15 +123,21 @@ export default async function CitySegmentPage({ params }: { params: Promise<Para
     },
     {
       question: `Why does this page exist separately from the main ${city.name} page?`,
-      answer: `Segment pages give Google and visitors a stronger city-plus-intent destination, which helps MasseurMatch compete for long-tail local searches.`,
+      answer: `It narrows the full ${city.name} directory to ${segment.shortLabel.toLowerCase()} listings, so you can compare the most relevant profiles without scanning every provider in the city.`,
     },
   ];
+
+  const verifiedProfilesPath = `${canonicalCityPath}/verified-profiles`;
+  const secondaryLeadLink =
+    segment.slug !== "verified-profiles" && isLaunchUrl(verifiedProfilesPath)
+      ? { href: verifiedProfilesPath, label: `Active profiles in ${city.name}` }
+      : { href: "/search", label: "Search all providers" };
 
   return (
     <CityDirectoryPage
       eyebrow="City segment page"
       title={`${city.name} ${segment.label}`}
-      intro={`${segment.intro} This landing page gives search engines a meaningful city-plus-category destination and gives visitors a clean route into therapist profiles.`}
+      intro={`${segment.intro} Compare ${segment.shortLabel.toLowerCase()} listings in ${city.name}, then open a profile to review session details and contact the provider directly.`}
       breadcrumbJsonLd={buildBreadcrumbJsonLd([
         { name: "Home", path: "/" },
         { name: city.name, path: canonicalCityPath },
@@ -152,7 +158,7 @@ export default async function CitySegmentPage({ params }: { params: Promise<Para
       })}
       leadLinks={[
         { href: canonicalCityPath, label: `Back to ${city.name}` },
-        { href: `/search?city=${city.slug}&verified=1`, label: `Verified in ${city.name}` },
+        secondaryLeadLink,
         { href: "/safety", label: "Safety guidance" },
       ]}
       linkSections={

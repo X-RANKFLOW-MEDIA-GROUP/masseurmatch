@@ -66,33 +66,9 @@ export const FIRST_30_URLS_IN_ORDER = [
   "/chicago/wellness/incall",
   "/chicago/wellness/sports-recovery",
   "/chicago/areas/river-north",
-  // ── Gay massage SEO aggressive pages ──
-  "/dallas/gay-massage",
-  "/houston/gay-massage",
-  "/austin/gay-massage",
-  "/miami/gay-massage",
-  "/chicago/gay-massage",
-  "/los-angeles/gay-massage",
-  "/new-york/gay-massage",
-  "/san-francisco/gay-massage",
-  "/atlanta/gay-massage",
-  "/denver/gay-massage",
-  "/seattle/gay-massage",
-  "/portland/gay-massage",
-  "/fort-lauderdale/gay-massage",
-  "/west-hollywood/gay-massage",
-  "/palm-springs/gay-massage",
-  "/provincetown/gay-massage",
-  "/key-west/gay-massage",
-  "/fire-island/gay-massage",
-  "/san-diego/gay-massage",
-  "/phoenix/gay-massage",
-  "/las-vegas/gay-massage",
-  "/nashville/gay-massage",
-  "/new-orleans/gay-massage",
-  "/philadelphia/gay-massage",
-  "/minneapolis/gay-massage",
-  "/washington-dc/gay-massage",
+  // NOTE: /{city}/gay-massage duplicated /{city}/lgbtq-friendly with identical
+  // filters and metadata, so those URLs now 301 to the canonical LGBTQ-friendly
+  // segment (see src/middleware.ts) and must stay out of this launch list.
   "/san-antonio/areas/king-william",
 ] as const;
 

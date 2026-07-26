@@ -316,6 +316,42 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
   }
 
+  // ── 7b. Duplicate-intent city routes → canonical segment pages ───────────
+  // /{city}/gay-massage duplicated /{city}/lgbtq-friendly (identical filters
+  // and metadata) and /{city}/verified-therapists duplicated
+  // /{city}/verified-profiles. Consolidate ranking signals on one URL each.
+  if (topLevelParts.length === 2 && topLevelParts[1] === "gay-massage") {
+    const citySlug = resolveCitySlug(topLevelParts[0] || "");
+    if (citySlug) {
+      return permanentRedirect(`/${citySlug}/lgbtq-friendly`, request);
+    }
+  }
+  if (topLevelParts.length === 2 && topLevelParts[1] === "verified-therapists") {
+    const citySlug = resolveCitySlug(topLevelParts[0] || "");
+    if (citySlug) {
+      return permanentRedirect(`/${citySlug}/verified-profiles`, request);
+    }
+  }
+
+  // ── 7c. Legacy /{city}/services/{service} → /{city}/wellness/{keyword} ───
+  // The /services variant duplicated the canonical wellness keyword pages and
+  // self-canonicalized to /cities/... URLs that themselves redirect.
+  if (topLevelParts.length === 3 && topLevelParts[1] === "services") {
+    const citySlug = resolveCitySlug(topLevelParts[0] || "");
+    if (citySlug) {
+      const serviceToWellnessKeyword: Record<string, string> = {
+        "deep-tissue": "deep-tissue",
+        swedish: "swedish",
+        sports: "sports-recovery",
+        thai: "thai",
+        mobile: "mobile-massage",
+        hotel: "hotel-massage",
+      };
+      const keyword = serviceToWellnessKeyword[topLevelParts[2] || ""];
+      return permanentRedirect(keyword ? `/${citySlug}/wellness/${keyword}` : `/${citySlug}`, request);
+    }
+  }
+
   // ── 8. Strip crawlable language query variants (?lang=*) ──────────────────
   if (containsLangParam(searchParams)) {
     const cleaned = removeLangSearchParam(searchParams);
