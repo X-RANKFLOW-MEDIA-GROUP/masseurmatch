@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { GrainOverlay } from "@/components/motion/GrainOverlay";
@@ -10,13 +9,11 @@ const customEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export function HeroCinematic() {
   const reducedMotion = useReducedMotion();
-  const router = useRouter();
   const dur = reducedMotion ? 0 : 0.8;
   const noDelay = reducedMotion ? 0 : undefined;
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-[#0F1419] via-[#1a1f2e] to-[#0F1419]">
-      {/* Gradient background (performance optimized - no video) */}
       <div className="absolute inset-0 z-0 opacity-40">
         <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-[#8B1E2D] blur-3xl" />
         <div className="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-[#8B1E2D]/20 blur-2xl" />
@@ -30,84 +27,81 @@ export function HeroCinematic() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: dur, ease: customEase, delay: noDelay }}
-            className="flex max-w-3xl flex-col justify-center"
+            className="flex max-w-4xl flex-col justify-center"
           >
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.1 }}
-                className="mb-6 font-mono text-xs uppercase tracking-[0.3em] text-white/70"
-              >
-                LGBTQ+ Affirming • AI-Powered Discovery
-              </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.1 }}
+              className="mb-6 font-mono text-xs uppercase tracking-[0.3em] text-white/70"
+            >
+              LGBTQ+ Affirming • Direct Provider Discovery
+            </motion.p>
 
-              <motion.h1
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.15 }}
-                className="font-display text-5xl font-black leading-[1.1] tracking-tight text-white sm:text-6xl lg:text-7xl"
-              >
-                Find Your <span className="text-[#C8434F]">Verified</span> Therapist
-              </motion.h1>
+            <motion.h1
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.15 }}
+              className="font-display text-5xl font-black leading-[1.06] tracking-tight text-white sm:text-6xl lg:text-7xl"
+            >
+              Find Male Massage Therapists <span className="text-[#C8434F]">Across the United States</span>
+            </motion.h1>
 
-              <motion.p
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.2 }}
-                className="mt-8 max-w-lg text-lg leading-relaxed text-gray-300 sm:text-xl"
-              >
-                AI-powered discovery of verified, LGBTQ+-affirming male massage therapists across the US. Direct contact, transparent pricing, zero middleman.
-              </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.2 }}
+              className="mt-8 max-w-2xl text-lg leading-relaxed text-gray-300 sm:text-xl"
+            >
+              Browse city directories, compare specialties, incall and outcall options, availability, rates, and trust signals, then contact independent providers directly.
+            </motion.p>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.3 }}
-                className="mt-10 flex flex-col gap-4 sm:gap-6"
-              >
-                <div className="flex flex-wrap gap-4 sm:gap-6">
-                <button
-                  type="button"
-                  onClick={() => router.push("/search")}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.3 }}
+              className="mt-10 flex flex-col gap-4 sm:gap-6"
+            >
+              <div className="flex flex-wrap gap-4 sm:gap-6">
+                <Link
+                  href="/search"
                   className="group inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-8 py-4 text-sm font-black uppercase tracking-wider text-white shadow-2xl shadow-[#8B1E2D]/30 transition duration-300 hover:bg-[#6E1521] hover:shadow-[#8B1E2D]/50"
                 >
                   Explore Therapists
                   <ArrowUpRight size={18} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                </button>
+                </Link>
                 <Link
-                  href="/search"
+                  href="/states"
                   className="inline-flex items-center gap-2 rounded-full border border-white/20 px-8 py-4 text-sm font-black uppercase tracking-wider text-white backdrop-blur-sm transition duration-300 hover:border-[#8B1E2D]/60 hover:bg-[#8B1E2D]/10"
                 >
-                  Browse by City
+                  Browse by State
                 </Link>
-                </div>
-              </motion.div>
+              </div>
+            </motion.div>
 
-              {/* Trust indicators */}
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.4 }}
-                className="mt-12 flex flex-wrap gap-8 border-t border-white/10 pt-8"
-              >
-                <div>
-                  <p className="text-lg font-black text-white">Reviewed</p>
-                  <p className="mt-1 text-sm text-gray-400">Before going live</p>
-                </div>
-                <div>
-                  <p className="text-lg font-black text-white">Direct contact</p>
-                  <p className="mt-1 text-sm text-gray-400">No booking middleman</p>
-                </div>
-                <div>
-                  <p className="text-lg font-black text-white">LGBTQ+ affirming</p>
-                  <p className="mt-1 text-sm text-gray-400">Inclusive by design</p>
-                </div>
-              </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: dur, ease: customEase, delay: noDelay ?? 0.4 }}
+              className="mt-12 flex flex-wrap gap-8 border-t border-white/10 pt-8"
+            >
+              <div>
+                <p className="text-lg font-black text-white">Reviewed profiles</p>
+                <p className="mt-1 text-sm text-gray-400">Before public approval</p>
+              </div>
+              <div>
+                <p className="text-lg font-black text-white">Direct contact</p>
+                <p className="mt-1 text-sm text-gray-400">No booking middleman</p>
+              </div>
+              <div>
+                <p className="text-lg font-black text-white">Local discovery</p>
+                <p className="mt-1 text-sm text-gray-400">City and service pages</p>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </div>
 
-      {/* Scroll hint */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -124,12 +118,7 @@ export function HeroCinematic() {
         style={{ willChange: "transform" }}
       >
         <p className="text-xs uppercase tracking-widest text-gray-500">Scroll to explore</p>
-        <svg
-          className="mx-auto mt-2 h-5 w-5 text-gray-500"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg className="mx-auto mt-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
         </svg>
       </motion.div>
