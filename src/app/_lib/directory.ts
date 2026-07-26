@@ -4,6 +4,7 @@ import { unstable_cache } from "next/cache";
 import { createClient as createSupabaseJsClient } from "@supabase/supabase-js";
 
 import { US_CITIES } from "@/data/cities";
+import { getTravelVisit } from "@/app/_lib/travel-status";
 import { matchBodyTypeKeyword } from "@/lib/physical-profile";
 import { FALLBACK_PUBLIC_THERAPISTS } from "@/app/_lib/directory-fallback";
 import { PUBLIC_THERAPISTS_TAG } from "@/app/_lib/directory-cache";
@@ -260,6 +261,25 @@ export const getSitemapProfileSlugs = async (): Promise<Array<{ slug: string; up
   return out;
 };
 
+// Therapists visiting `cityName` on tour: an entry in travel_schedule for that
+// city that is either active now or starts within the lookahead window. The
+// date filtering happens in JS — travel_schedule is a JSONB array and PostgREST
+// can't range-compare inside it. Home-city residents are excluded (they're
+// already in the main city query, possibly on another page).
+async function fetchVisitingTherapists(cityName: string): Promise<PublicTherapist[]> {
+  const { data, error } = await buildPublicTherapistsQuery()
+    .not("travel_schedule", "is", null)
+    .limit(200);
+
+  if (error || !data) return [];
+
+  const cityKey = cityName.trim().toLowerCase();
+  return (data as unknown as PublicTherapist[])
+    .filter(isRoutableProfile)
+    .filter((p) => p.city?.trim().toLowerCase() !== cityKey)
+    .filter((p) => getTravelVisit(p.travel_schedule, cityName) !== null);
+}
+
 function isActivelyAvailable(profile: PublicTherapist) {
   return profile.available_now === true &&
     (profile.available_now_expires == null || new Date(profile.available_now_expires).getTime() > Date.now());
@@ -285,7 +305,11 @@ function applyFallbackFilters(items: PublicTherapist[], filters?: Parameters<typ
     if (name.includes("debug") || name.includes("test")) return false;
     if (profile.phone?.includes("555")) return false;
 
-    if (filters?.city && profile.city?.toLowerCase() !== filters.city.toLowerCase()) return false;
+    if (filters?.city) {
+      const livesThere = profile.city?.toLowerCase() === filters.city.toLowerCase();
+      const visitingThere = getTravelVisit(profile.travel_schedule, filters.city) !== null;
+      if (!livesThere && !visitingThere) return false;
+    }
     if (filters?.verified && profile.verification_status !== "verified") return false;
     if (filters?.availableToday && !isActivelyAvailable(profile)) return false;
     if (filters?.tier && profile.subscription_tier !== filters.tier) return false;
@@ -388,7 +412,25 @@ const fetchPublicTherapistsUncached = async (filters?: PublicTherapistFilters) =
 
   const { data: rawData, error, count } = await query;
   const routable = rawData ? (rawData as unknown as PublicTherapist[]).filter(isRoutableProfile) : [];
-  const data = sortPublicTherapists(routable);
+  let data = sortPublicTherapists(routable);
+  let visitorCount = 0;
+
+  // City listings must also surface therapists touring that city (active or
+  // upcoming travel_schedule entries). Appended on page 1 only so paginated
+  // reads never duplicate them.
+  if (!error && filters?.city && page === 1) {
+    try {
+      const visitors = await fetchVisitingTherapists(filters.city);
+      const seen = new Set(data.map((p) => p.id));
+      const extra = visitors.filter((v) => !seen.has(v.id));
+      if (extra.length > 0) {
+        visitorCount = extra.length;
+        data = sortPublicTherapists([...data, ...extra]);
+      }
+    } catch {
+      // Visitors are an enrichment — never fail the main listing over them.
+    }
+  }
 
   if (!error) {
     // Enrich profiles with their primary photos
@@ -405,7 +447,7 @@ const fetchPublicTherapistsUncached = async (filters?: PublicTherapistFilters) =
         console.log(`[getPublicTherapists] Enriched ${profileIds.length} profiles, found photos for ${photosMap.size} profiles`);
       }
     }
-    return { items: data, total: count ?? data.length, page, pageSize };
+    return { items: data, total: (count ?? routable.length) + visitorCount, page, pageSize };
   }
 
   if (process.env.NODE_ENV === 'development') {

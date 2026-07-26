@@ -63,7 +63,7 @@ function getProfileDisplayName(profile: Tables<"profiles"> | null) {
 export default function PhotoManagerPage() {
   const { toast } = useToast();
   const { profile, loading: profileLoading, updateProfile } = useProfile();
-  const { maxPhotos, planLabel, isLoading: limitsLoading } = usePlanLimits();
+  const { maxPhotos, planLabel, isTrial, isLoading: limitsLoading } = usePlanLimits();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [photos, setPhotos] = useState<PhotoRecord[]>([]);
@@ -180,7 +180,9 @@ export default function PhotoManagerPage() {
     if (remainingSlots <= 0) {
       toast({
         title: "Photo limit reached",
-        description: `Your ${planLabel} plan allows up to ${maxPhotos} photos.`,
+        description: isTrial
+          ? `During your free trial you can upload up to ${maxPhotos} photos. The full ${planLabel} allowance unlocks when your trial ends.`
+          : `Your ${planLabel} plan allows up to ${maxPhotos} photos.`,
         variant: "destructive",
       });
       event.target.value = "";
@@ -447,8 +449,10 @@ export default function PhotoManagerPage() {
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="font-display text-lg font-medium text-slate-900">New photo</h2>
             <p className="mt-2 font-sans text-sm text-slate-500">
-              Current plan: <span className="font-semibold text-slate-900">{planLabel}</span>. You
-              can keep up to <span className="font-semibold text-slate-900">{maxPhotos}</span> photos.
+              Current plan: <span className="font-semibold text-slate-900">{planLabel}</span>
+              {isTrial ? " (free trial)" : ""}. You can keep up to{" "}
+              <span className="font-semibold text-slate-900">{maxPhotos}</span> photos
+              {isTrial ? " during your trial" : ""}.
             </p>
 
             <button

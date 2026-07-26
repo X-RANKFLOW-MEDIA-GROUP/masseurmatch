@@ -423,9 +423,10 @@ function buildPayload(form: FormState) {
       ? { percent: Number(form.dayDiscountPercent), day: form.dayDiscountDay }
       : null;
 
+  // profiles.start_date is a timestamptz — a bare "YYYY-MM" is rejected by Postgres
   const startDate =
     form.startYear && form.startMonth
-      ? `${form.startYear}-${String(Number(form.startMonth)).padStart(2, "0")}`
+      ? `${form.startYear}-${String(Number(form.startMonth)).padStart(2, "0")}-01`
       : null;
 
   const mobileHours: MobileHours = form.mobileSameAsStudio
