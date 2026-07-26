@@ -13,27 +13,37 @@ export type LocalSeoCityContent = {
 
 const CITY_CONTENT: Record<string, LocalSeoCityContent> = {
   dallas: {
-    title: "Male Massage Therapists in Dallas, TX",
+    title: "Dallas Male Massage Therapists | MasseurMatch",
     description:
-      "Find male massage therapists in Dallas, TX. Compare specialties, incall and outcall options, availability, rates, trust signals, and contact providers directly.",
+      "Find male massage therapists in Dallas, TX. Compare public profiles, deep tissue and sports massage specialties, incall and outcall options, rates, availability, trust signals, and direct contact details.",
     intro:
-      "Explore male massage therapists serving Dallas, including providers offering incall, outcall, deep tissue, sports recovery, Swedish massage, and mobile sessions. Compare public profiles, availability, session formats, and direct contact options before deciding who fits your needs.",
+      "Find male massage therapists in Dallas, TX through a directory built for clear comparison and direct contact. Browse public profiles for deep tissue, sports recovery, Swedish massage, incall, outcall, mobile, and LGBTQ-friendly options across Dallas, including Oak Lawn, Uptown, Downtown, Turtle Creek, the Medical District, Love Field, and the DFW Airport area when useful provider coverage is available.",
     relatedCitySlugs: ["fort-worth", "plano", "irving", "frisco", "arlington", "richardson"],
     faqs: [
       {
         question: "How do I find a male massage therapist in Dallas?",
         answer:
-          "Browse Dallas profiles, compare specialties, rates, availability, incall or outcall options, and visible trust signals, then contact the provider directly to confirm the session details.",
+          "Browse Dallas profiles, compare specialties, rates, availability, incall or outcall options, service areas, and visible trust signals, then contact the provider directly to confirm session details.",
       },
       {
-        question: "Can I find incall and outcall massage in Dallas?",
+        question: "Can I find gay-friendly massage therapists in Dallas?",
         answer:
-          "Yes. Individual profiles show the session formats a provider offers. Confirm the location, travel area, rate, timing, and boundaries directly before scheduling.",
+          "Yes. MasseurMatch includes public provider profiles that may identify LGBTQ-friendly service. Review each profile, service description, boundaries, and trust signals before contacting the provider directly.",
+      },
+      {
+        question: "Can I find incall, outcall, or mobile massage in Dallas?",
+        answer:
+          "Yes, when providers list those session formats. Confirm the location, travel area, travel fee, rate, timing, setup, and boundaries directly with the provider before scheduling.",
       },
       {
         question: "Which Dallas neighborhoods can I browse?",
         answer:
-          "MasseurMatch may provide local discovery pages for areas such as Oak Lawn, Uptown, Downtown, Turtle Creek, the Medical District, Love Field, and the DFW Airport area when the page has useful provider coverage.",
+          "MasseurMatch may provide local discovery pages for Oak Lawn, Uptown, Downtown, Turtle Creek, the Medical District, Love Field, and the DFW Airport area when each page has useful provider coverage and distinct local value.",
+      },
+      {
+        question: "What should I compare before contacting a Dallas massage provider?",
+        answer:
+          "Compare specialties, session format, rate, availability, service area, profile completeness, photos, visible trust signals, and direct-contact information. Confirm all appointment details directly with the independent provider.",
       },
       {
         question: "Does MasseurMatch book Dallas massage sessions?",
