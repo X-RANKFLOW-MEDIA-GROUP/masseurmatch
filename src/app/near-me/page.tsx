@@ -95,7 +95,7 @@ export default function NearMePage() {
               {topCities.map((city) => (
                 <Link
                   key={city.slug}
-                  href={`/cities/${city.slug}`}
+                  href={`/${city.slug}`}
                   className="rounded-lg border border-border bg-white/[0.02] px-3 py-2 text-sm font-semibold text-foreground transition hover:border-primary hover:bg-primary/5"
                 >
                   {formatCityLabel(city.name, city.stateCode)}

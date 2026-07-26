@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { getCanonicalCitySlug } from "@/app/_lib/city-routing";
 import { getCities } from "@/app/_lib/directory";
 import { createPageMetadata } from "@/app/_lib/seo";
 
@@ -30,7 +29,7 @@ export default function CitiesIndexPage() {
           {cities.map((city) => (
             <li key={`${city.stateCode}-${city.slug}`}>
               <Link
-                href={`/cities/${getCanonicalCitySlug(city.slug)}`}
+                href={`/${city.slug}`}
                 className="block rounded-xl border border-border px-4 py-3 text-sm text-foreground transition-colors hover:border-primary/50 hover:bg-muted/40"
               >
                 {city.name}, {city.stateCode}

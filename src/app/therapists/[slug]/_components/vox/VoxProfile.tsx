@@ -145,10 +145,18 @@ export function VoxProfile({
             aria-label="Breadcrumb"
             className="mb-8 flex flex-wrap items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/60"
           >
-            <Link href={`/${profile.citySlug}`} className="transition-colors hover:text-white/70">
-              {profile.city}
+            <Link href="/" className="transition-colors hover:text-white/70">
+              Home
             </Link>
             <ChevronRight className="h-3 w-3 text-white/50" strokeWidth={2} />
+            {profile.citySlug ? (
+              <>
+                <Link href={`/${profile.citySlug}`} className="transition-colors hover:text-white/70">
+                  {profile.city}
+                </Link>
+                <ChevronRight className="h-3 w-3 text-white/50" strokeWidth={2} />
+              </>
+            ) : null}
             <Link href="/therapists" className="transition-colors hover:text-white/70">
               Therapists
             </Link>

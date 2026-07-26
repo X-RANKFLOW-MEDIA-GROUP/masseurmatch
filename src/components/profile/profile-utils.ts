@@ -144,7 +144,12 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
   const state = profile.state || String(p.state_code || "US");
   const country = String(p.country || "United States");
   const matchedCity = US_CITIES.find((item) => item.name.toLowerCase() === city.toLowerCase());
-  const citySlug = String(p.city_slug || matchedCity?.slug || slugify(`${city}-${state}`) || "search");
+  // Only emit a city slug that resolves to a real /{city} route; a guessed
+  // slug would render internal links (and breadcrumbs) that 404.
+  const citySlug =
+    [String(p.city_slug || ""), matchedCity?.slug].find(
+      (slug): slug is string => Boolean(slug && US_CITIES.some((item) => item.slug === slug)),
+    ) || "";
   const stateSlug = String(p.state_slug || slugify(state) || "states");
   const services = asStringArray(p.services).concat(asStringArray(profile.service_categories));
   const specialties = asStringArray(profile.specialties);
