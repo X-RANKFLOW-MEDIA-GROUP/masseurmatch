@@ -4,6 +4,7 @@ import { JsonLd } from "@/app/_components/JsonLd";
 import { createPageMetadata, buildBreadcrumbJsonLd } from "@/app/_lib/seo";
 import { getCities } from "@/app/_lib/directory";
 import { cityDisplayName } from "@/data/cities";
+import { ExploreLocationFinder } from "./ExploreLocationFinder";
 
 const FEATURED_CITY_SLUGS = [
   "atlanta",
@@ -75,21 +76,25 @@ export default function ExplorePage() {
         ])}
       />
 
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <h1 className="font-display text-4xl font-semibold tracking-tight">
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
+        <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
           Explore
         </h1>
         <p className="mt-1 text-muted-foreground">
           Find therapists by city or state.
         </p>
 
+        <div className="mt-6">
+          <ExploreLocationFinder cities={allCities} />
+        </div>
+
         <h2 className="mt-10 font-display text-2xl font-semibold">Cities</h2>
-        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="mt-4 grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
           {featuredCities.map((city) => (
             <Link
               key={city!.slug}
               href={`/${city!.slug}`}
-              className="rounded-lg border border-border bg-card px-3 py-2 text-sm transition-colors hover:border-primary/40"
+              className="truncate rounded-lg border border-border bg-card px-3 py-2.5 text-sm transition-colors hover:border-primary/40"
             >
               {cityDisplayName(city!.name, city!.stateCode)}{" "}
               <span className="text-muted-foreground">{city!.stateCode}</span>
@@ -103,7 +108,7 @@ export default function ExplorePage() {
             <Link
               key={state.stateCode}
               href={`/states/${toStateSlug(state.stateName)}`}
-              className="rounded-lg border border-border bg-card px-3 py-2 text-sm transition-colors hover:border-primary/40"
+              className="truncate rounded-lg border border-border bg-card px-3 py-2.5 text-sm transition-colors hover:border-primary/40"
             >
               {state.stateName}
             </Link>

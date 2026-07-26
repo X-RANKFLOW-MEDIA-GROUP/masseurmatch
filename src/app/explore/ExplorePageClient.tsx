@@ -331,6 +331,8 @@ function ViewToggle({
             key={item.value}
             type="button"
             onClick={() => onChange(item.value)}
+            aria-label={`${item.label} view`}
+            title={`${item.label} view`}
             className={cn(
               "inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] transition",
               active
@@ -338,8 +340,8 @@ function ViewToggle({
                 : "text-text-secondary hover:text-text-primary",
             )}
           >
-            <Icon className="h-4 w-4" />
-            {item.label}
+            <Icon className="h-4 w-4 shrink-0" />
+            <span className="hidden sm:inline">{item.label}</span>
           </button>
         );
       })}
@@ -1388,7 +1390,7 @@ export default function ExplorePageClient({
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr),minmax(320px,420px)]">
             <div>
               <span className="eyebrow-chip">Premium Local Discovery Engine</span>
-              <h1 className="mt-5 max-w-3xl text-4xl font-semibold tracking-[-0.05em] text-text-primary md:text-6xl">
+              <h1 className="mt-5 max-w-3xl text-3xl font-semibold tracking-[-0.05em] text-text-primary sm:text-4xl md:text-6xl">
                 Explore by the signals that actually convert.
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-text-secondary md:text-lg">
@@ -1487,7 +1489,7 @@ export default function ExplorePageClient({
               ))}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <Select
                 value={filters.sort}
                 onValueChange={(value) => handleSortChange(value as ExploreFilters["sort"])}
