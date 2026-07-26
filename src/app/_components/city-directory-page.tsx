@@ -58,12 +58,12 @@ export function CityDirectoryPage({
   faqItems?: FaqItem[];
 }) {
   const visibleLinkSections = linkSections.filter((section) => section.items.length > 0);
+  void itemListJsonLd;
 
   return (
     <>
       <JsonLd data={breadcrumbJsonLd} />
       <JsonLd data={collectionJsonLd} />
-      <JsonLd data={itemListJsonLd} />
       {faqItems.length > 0 ? <JsonLd data={buildFaqJsonLd(faqItems)} /> : null}
 
       <div className="page-shell py-10 sm:py-12">
@@ -112,14 +112,14 @@ export function CityDirectoryPage({
                   body: "Profiles are built for immediate call or message without platform detours.",
                 },
               ].map((item) => (
-                  <div key={item.title} className="bg-background px-6 py-6">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-[16px] bg-brand-primary text-white">
-                      {item.icon}
-                    </div>
-                    <h2 className="mt-4 text-base font-semibold text-foreground">{item.title}</h2>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.body}</p>
+                <div key={item.title} className="bg-background px-6 py-6">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-[16px] bg-brand-primary text-white">
+                    {item.icon}
                   </div>
-                ))}
+                  <h2 className="mt-4 text-base font-semibold text-foreground">{item.title}</h2>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.body}</p>
+                </div>
+              ))}
             </div>
           </Surface>
 
