@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
 import { CityDirectoryPage as CityDirectoryPageShell } from "@/app/_components/city-directory-page";
-import { JsonLd } from "@/app/_components/json-ld";
 import { buildAreaCopyInput, buildSuburbIntro } from "@/app/_lib/area-copy";
 import { getCities, getCityInventoryCount, getPublicTherapists } from "@/app/_lib/directory";
 import {
@@ -10,11 +10,11 @@ import {
   getSegmentBySlug,
 } from "@/app/_lib/directory-taxonomy";
 import { getLaunchAreaPaths, getLaunchKeywordPaths, getLaunchSegmentPaths } from "@/app/_lib/launch-urls";
+import { getLocalSeoCityContent } from "@/app/_lib/local-seo-content";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
   buildItemListJsonLd,
-  buildLocalBusinessJsonLd,
   createPageMetadata,
 } from "@/app/_lib/seo";
 import { SEO_CITY_MIN_PUBLIC_PROFILES } from "@/app/_lib/sitemap-release";
@@ -30,12 +30,22 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 const DFW_SUBURB_SLUGS = new Set([
-  "plano", "irving", "richardson", "fort-worth", "frisco",
-  "addison", "carrollton", "arlington", "grand-prairie",
+  "plano",
+  "irving",
+  "richardson",
+  "fort-worth",
+  "frisco",
+  "addison",
+  "carrollton",
+  "arlington",
+  "grand-prairie",
 ]);
 
+function toSlug(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
 export function generateStaticParams(): Params[] {
-  // Generate long-tail local SEO routes on demand so production builds stay fast and reliable.
   return [];
 }
 
@@ -56,38 +66,32 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   try {
     inventoryCount = await getCityInventoryCount(city.name);
   } catch {
-    // Supabase unavailable — fall through with zero count
+    inventoryCount = 0;
   }
 
-  const cityLabel = `${formatCityLabel(city.name, city.stateCode)}`;
-
-  // Format count for title: use exact number for small counts, add + for larger numbers
-  const countLabel = inventoryCount === 0
-    ? ""
-    : inventoryCount < 10
-      ? String(inventoryCount)
-      : `${inventoryCount}+`;
-
-  const title = countLabel
-    ? `${countLabel} Verified Male Massage Therapists in ${cityLabel}`
+  const localContent = getLocalSeoCityContent(city.slug);
+  const cityLabel = formatCityLabel(city.name, city.stateCode);
+  const countLabel = inventoryCount === 0 ? "" : inventoryCount < 10 ? String(inventoryCount) : `${inventoryCount}+`;
+  const title = inventoryCount > 0
+    ? localContent?.title || `${countLabel} Male Massage Therapists in ${cityLabel}`
     : `Male Massage Therapists in ${cityLabel} — Coming Soon`;
-
   const description = inventoryCount > 0
-    ? `Find trusted male massage therapists in ${cityLabel}. LGBTQ+-friendly directory with identity-verified professionals, transparent rates, and direct contact. Compare specialties & availability.`
-    : `MasseurMatch is preparing its male massage therapist directory for ${cityLabel}. Explore other active markets while local listings are added.`;
+    ? localContent?.description ||
+      `Find male massage therapists in ${cityLabel}. Compare specialties, incall and outcall options, availability, rates, trust signals, and direct contact details.`
+    : `MasseurMatch is preparing its male massage therapist directory for ${cityLabel}. Explore active markets while local listings are added.`;
 
   return createPageMetadata({
     title,
     description,
     path: `/${city.slug}`,
     keywords: [
+      `male massage ${city.name}`,
       `${city.name} male massage`,
-      `gay massage ${city.name}`,
-      `${city.name} LGBTQ massage therapist`,
-      `${city.name} verified massage therapist`,
-      `male massage near me ${city.name}`,
-      `${city.name} deep tissue massage`,
-      `${city.name} sports massage`,
+      `male massage ${city.name} ${city.stateCode}`,
+      `gay friendly massage ${city.name}`,
+      `massage therapist ${city.name}`,
+      `deep tissue massage ${city.name}`,
+      `sports massage ${city.name}`,
       `mobile massage ${city.name}`,
     ],
     noIndex: inventoryCount < SEO_CITY_MIN_PUBLIC_PROFILES,
@@ -98,55 +102,71 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
   const resolvedParams = await params;
   const city = getCities().find((entry) => entry.slug === resolvedParams.city);
 
-  if (!city) {
-    notFound();
-  }
+  if (!city) notFound();
 
   const canonicalCityPath = `/${city.slug}`;
+  const localContent = getLocalSeoCityContent(city.slug);
+  const allCities = getCities();
+
   const citySegmentLinks = getLaunchSegmentPaths()
     .filter((path) => path.startsWith(`${canonicalCityPath}/`))
     .map((path) => {
       const [, segmentSlug] = path.split("/").filter(Boolean);
       const segment = getSegmentBySlug(segmentSlug || "");
-
       return {
         href: path,
         label: segment?.shortLabel || formatSlugLabel(segmentSlug || "segment"),
         description:
-          segment?.intro ||
-          `High-intent ${formatSlugLabel(segmentSlug || "segment").toLowerCase()} route for ${city.name}.`,
+          segment?.intro || `Browse ${formatSlugLabel(segmentSlug || "segment").toLowerCase()} options in ${city.name}.`,
       };
     });
+
   const cityKeywordLinks = getLaunchKeywordPaths()
     .filter((path) => path.startsWith(`${canonicalCityPath}/`))
     .map((path) => {
       const [, , keywordSlug] = path.split("/").filter(Boolean);
       const keyword = getKeywordBySlug(keywordSlug || "");
-
-      return {
-        href: path,
-        label: keyword?.shortLabel || formatSlugLabel(keywordSlug || "service"),
-      };
+      return { href: path, label: keyword?.shortLabel || formatSlugLabel(keywordSlug || "service") };
     });
+
   const cityAreaLinks = getLaunchAreaPaths()
     .filter((path) => path.startsWith(`${canonicalCityPath}/`))
     .map((path) => {
       const [, , areaSlug] = path.split("/").filter(Boolean);
-
-      return {
-        href: path,
-        label: formatSlugLabel(areaSlug || "area"),
-      };
+      return { href: path, label: formatSlugLabel(areaSlug || "area") };
     });
+
+  const relatedCityLinks = (localContent?.relatedCitySlugs || [])
+    .map((slug) => allCities.find((entry) => entry.slug === slug))
+    .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
+    .map((entry) => ({ href: `/${entry.slug}`, label: formatCityLabel(entry.name, entry.stateCode) }));
 
   const therapists = await getPublicTherapists({ city: city.name, page: 1, pageSize: 9 });
   const hasInventory = therapists.items.length > 0;
 
-  const cityIntro = DFW_SUBURB_SLUGS.has(city.slug)
-    ? buildSuburbIntro(buildAreaCopyInput({ area: city.name, city: "DFW", therapists: therapists.items }))
-    : hasInventory
-      ? `Find trusted male massage therapists in ${city.name}. Compare verified profiles, outcall and incall options, specialties, and direct contact in one cleaner flow.`
-      : `MasseurMatch is preparing its ${city.name} directory. Every profile is reviewed before going live — explore active cities while local listings are added.`;
+  const cityIntro = localContent?.intro
+    || (DFW_SUBURB_SLUGS.has(city.slug)
+      ? buildSuburbIntro(buildAreaCopyInput({ area: city.name, city: "DFW", therapists: therapists.items }))
+      : hasInventory
+        ? `Find male massage therapists in ${city.name}. Compare public profiles, incall and outcall options, specialties, availability, rates, and direct contact details.`
+        : `MasseurMatch is preparing its ${city.name} directory. Profiles are reviewed before going live, and empty markets remain outside the sitemap until real inventory is available.`);
+
+  const defaultFaqs = [
+    {
+      question: `How do I find a male massage therapist in ${city.name}?`,
+      answer: "Compare public profiles, specialties, incall or outcall options, availability, rates, service areas, and visible trust signals before contacting a provider directly.",
+    },
+    {
+      question: `Can I find outcall massage options in ${city.name}?`,
+      answer: "Yes, when providers list outcall or mobile service. Confirm the exact location, service area, travel fee, rate, timing, and boundaries directly.",
+    },
+    {
+      question: `Does MasseurMatch handle booking in ${city.name}?`,
+      answer: "No. MasseurMatch is a discovery directory. Clients contact independent providers directly to confirm availability, pricing, boundaries, and scheduling.",
+    },
+  ];
+  const cityFaqs = localContent?.faqs || defaultFaqs;
+
   const comparisonProfiles: ComparisonTherapistProfile[] = therapists.items.slice(0, 3).map((item, idx) => ({
     id: item.id,
     name: item.display_name || item.full_name || `Therapist ${idx + 1}`,
@@ -157,9 +177,7 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
       min: item.incall_price || 80,
       max: item.outcall_price || item.incall_price || 140,
     },
-    availability: {
-      available: item.available_now === true,
-    },
+    availability: { available: item.available_now === true },
     incall: Boolean(item.incall_price),
     outcall: Boolean(item.outcall_price),
     experience: item.years_experience ?? undefined,
@@ -171,52 +189,24 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
     },
   }));
 
-  const cityFaqs = [
-    {
-      question: `How do I find a trusted male massage therapist in ${city.name}?`,
-      answer: `Start with verified profiles, then compare specialties, incall or outcall options, photo quality, and direct contact methods before you reach out.`,
-    },
-    {
-      question: `Can I find outcall massage options in ${city.name}?`,
-      answer: `Yes. Use outcall pages and listing badges to quickly identify therapists who travel to a home, hotel, or requested location.`,
-    },
-    {
-      question: `Does MasseurMatch handle booking in ${city.name}?`,
-      answer: `No. MasseurMatch is a trusted discovery directory. You contact therapists directly by phone, WhatsApp, or SMS to confirm fit, timing, and availability.`,
-    },
-  ];
-
   return (
     <>
-      <JsonLd
-        data={buildLocalBusinessJsonLd({
-          cityName: city.name,
-          stateName: city.stateName,
-          path: canonicalCityPath,
-          therapistCount: therapists.items.length,
-        })}
-      />
       <CityDirectoryPageShell
         eyebrow="City directory"
-        title={
-          hasInventory
-            ? `Verified male massage therapists in ${city.name}`
-            : `Male massage therapists in ${city.name} — coming soon`
-        }
+        title={hasInventory ? `Male massage therapists in ${city.name}` : `Male massage therapists in ${city.name} — coming soon`}
         intro={cityIntro}
         breadcrumbJsonLd={buildBreadcrumbJsonLd([
           { name: "Home", path: "/" },
+          { name: city.stateName, path: `/states/${toSlug(city.stateName)}` },
           { name: city.name, path: canonicalCityPath },
         ])}
         collectionJsonLd={buildCollectionPageJsonLd({
-          name: hasInventory
-            ? `Verified male massage therapists in ${city.name}`
-            : `Male massage therapists in ${city.name} — coming soon`,
+          name: hasInventory ? `Male massage therapists in ${city.name}` : `${city.name} massage directory — coming soon`,
           description: cityIntro,
           path: canonicalCityPath,
         })}
         itemListJsonLd={buildItemListJsonLd({
-          name: `${city.name} verified therapist listings`,
+          name: `${city.name} public therapist listings`,
           path: canonicalCityPath,
           items: therapists.items.map((item) => ({
             name: item.display_name || item.full_name || "Therapist",
@@ -225,80 +215,74 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
         })}
         leadLinks={[
           hasInventory
-            ? { href: `/search?city=${city.slug}&verified=1`, label: `Browse verified in ${city.name}` }
-            : { href: "/explore", label: "Browse active cities" },
-          { href: "/search", label: "Search all cities" },
-          { href: "/safety", label: "Read safety policy" },
-          { href: "/compare", label: "Compare top directory alternatives" },
+            ? { href: `/search?city=${city.slug}`, label: `Browse therapists in ${city.name}` }
+            : { href: "/states", label: "Browse active states" },
+          { href: "/search", label: "Search all providers" },
+          { href: "/safety", label: "Read safety guidance" },
         ]}
         linkSections={[
           ...(citySegmentLinks.length
             ? [{
-                title: `High-intent pages in ${city.name}`,
+                title: `Popular massage searches in ${city.name}`,
                 layout: "grid" as const,
-                description:
-                  "Jump straight to the type of session you're looking for in this city.",
+                description: "Browse canonical local pages by session format, audience, and service intent.",
                 items: citySegmentLinks,
               }]
             : []),
           ...(cityKeywordLinks.length
             ? [{
-                title: `Popular service intents in ${city.name}`,
+                title: `Massage techniques in ${city.name}`,
                 layout: "chips" as const,
-                description:
-                  "Jump into the service combinations people search most often when they already know the type of session they want.",
+                description: "Technique pages are indexed only when matching public provider inventory exists.",
                 items: cityKeywordLinks,
               }]
             : []),
           ...(cityAreaLinks.length
             ? [{
-                title: `Neighborhood pages in ${city.name}`,
+                title: `Neighborhoods and local areas in ${city.name}`,
                 layout: "chips" as const,
-                description:
-                  "Browse by neighborhood to find therapists closest to you.",
+                description: "Local-area pages remain inventory-gated to avoid thin or duplicate pages.",
                 items: cityAreaLinks,
+              }]
+            : []),
+          ...(relatedCityLinks.length
+            ? [{
+                title: `Nearby cities to ${city.name}`,
+                layout: "chips" as const,
+                items: relatedCityLinks,
               }]
             : []),
           {
             title: "Compare major directory alternatives",
-            layout: "chips",
+            layout: "chips" as const,
             items: [
-              {
-                href: "/compare",
-                label: "All comparisons",
-              },
-              {
-                href: "/compare/masseurmatch-vs-masseurfinder",
-                label: "vs MasseurFinder",
-              },
-              {
-                href: "/compare/masseurmatch-vs-rentmasseur",
-                label: "vs RentMasseur",
-              },
+              { href: "/compare", label: "All comparisons" },
+              { href: "/compare/masseurmatch-vs-masseurfinder", label: "MasseurMatch vs MasseurFinder" },
+              { href: "/compare/masseurmatch-vs-rentmasseur", label: "MasseurMatch vs RentMasseur" },
             ],
           },
         ]}
         therapists={therapists.items}
-        listingTitle={`Trusted listings in ${city.name}`}
-        listingDescription="Each card combines visual quality, verification status, and clear direct-contact options so you can compare therapists at a glance."
-        emptyTitle={`No public listings are live in ${city.name} yet.`}
-        emptyDescription="You can still explore verified intent pages, broader city routes, and comparison content while this market grows."
-        faqTitle={`Common Questions About Male Massage in ${city.name}`}
+        listingTitle={`Public provider profiles in ${city.name}`}
+        listingDescription="Compare specialties, session formats, availability, rates, service areas, and direct contact options."
+        emptyTitle={`No approved public profiles are live in ${city.name} yet.`}
+        emptyDescription="This city remains outside the sitemap until real public inventory is available. Browse an active state or city instead."
+        faqTitle={`Common questions about male massage in ${city.name}`}
         faqItems={cityFaqs}
       />
 
       {comparisonProfiles.length > 1 ? (
         <section className="page-shell pb-14">
           <div className="rounded-3xl border border-border bg-background p-6">
-            <h2 className="text-2xl font-semibold text-foreground">Compare top profiles in {city.name}</h2>
-            <p className="mt-2 text-sm text-muted-foreground">Use side-by-side comparison to quickly decide who matches your preferences.</p>
+            <h2 className="text-2xl font-semibold text-foreground">Compare profiles in {city.name}</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Review public profile details side by side before contacting a provider.</p>
             <div className="mt-6">
               <TherapistComparison
                 profiles={comparisonProfiles}
                 features={[
                   { key: "incall", label: "Incall" },
                   { key: "outcall", label: "Outcall" },
-                  { key: "verified", label: "Verified tier" },
+                  { key: "verified", label: "Paid directory tier" },
                   { key: "profile", label: "Public profile" },
                 ]}
               />
