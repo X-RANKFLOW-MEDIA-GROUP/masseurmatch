@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCanonicalCitySlug } from "@/app/_lib/city-routing";
+
+import { JsonLd } from "@/app/_components/json-ld";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
 import {
   buildBreadcrumbJsonLd,
@@ -9,7 +10,6 @@ import {
   buildItemListJsonLd,
   createPageMetadata,
 } from "@/app/_lib/seo";
-import { JsonLd } from "@/app/_components/json-ld";
 import { formatCityLabel } from "@/data/cities";
 
 type Params = { state: string };
@@ -36,42 +36,12 @@ function getStateDirectory(stateSlug: string) {
 }
 
 export function generateStaticParams(): Params[] {
-  // Generate long-tail local SEO routes on demand so production builds stay fast and reliable.
   return [];
 }
 
-export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
-  const resolved = await params;
-  const stateDirectory = getStateDirectory(resolved.state);
-
-  if (!stateDirectory) {
-    return createPageMetadata({
-      title: "State massage directory",
-      description: "State landing page for MasseurMatch.",
-      path: `/states/${resolved.state}`,
-      noIndex: true,
-    });
-  }
-
-  const inventory = await Promise.all(
-    stateDirectory.cities.map((city) => getPublicTherapists({ city: city.name, page: 1, pageSize: 1 })),
-  );
-  const total = inventory.reduce((sum, result) => sum + result.total, 0);
-
-  return createPageMetadata({
-    title: `Massage therapists in ${stateDirectory.stateName}`,
-    description: `Browse verified massage therapists in ${stateDirectory.stateName} by city, specialty, incall, outcall, trust signals, and direct contact options.`,
-    path: `/states/${resolved.state}`,
-    keywords: [`massage therapists ${stateDirectory.stateName.toLowerCase()}`, `${stateDirectory.stateName.toLowerCase()} massage directory`, "massage therapists by state"],
-    noIndex: total === 0,
-  });
-}
-
-export default async function StatePage({ params }: { params: Promise<Params> }) {
-  const resolved = await params;
-  const stateDirectory = getStateDirectory(resolved.state);
-
-  if (!stateDirectory) notFound();
+async function getStateInventory(stateSlug: string) {
+  const stateDirectory = getStateDirectory(stateSlug);
+  if (!stateDirectory) return null;
 
   const cityInventory = await Promise.all(
     stateDirectory.cities.map(async (city) => {
@@ -80,11 +50,48 @@ export default async function StatePage({ params }: { params: Promise<Params> })
     }),
   );
 
-  const totalProfiles = cityInventory.reduce((sum, item) => sum + item.total, 0);
-  const cityItems = cityInventory.map(({ city }) => ({
-    name: `${formatCityLabel(city.name, city.stateCode)}`,
-    path: `/states/${resolved.state}/cities/${city.slug}`,
-  }));
+  return {
+    ...stateDirectory,
+    cityInventory,
+    totalProfiles: cityInventory.reduce((sum, item) => sum + item.total, 0),
+  };
+}
+
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
+  const resolved = await params;
+  const state = await getStateInventory(resolved.state);
+
+  if (!state) {
+    return createPageMetadata({
+      title: "State massage directory",
+      description: "State landing page for MasseurMatch.",
+      path: `/states/${resolved.state}`,
+      noIndex: true,
+    });
+  }
+
+  return createPageMetadata({
+    title: `Male massage therapists in ${state.stateName}`,
+    description: `Browse male massage therapists in ${state.stateName} by city, specialty, incall, outcall, availability, trust signals, and direct contact options.`,
+    path: `/states/${resolved.state}`,
+    keywords: [
+      `male massage therapists ${state.stateName.toLowerCase()}`,
+      `${state.stateName.toLowerCase()} massage directory`,
+      "massage therapists by state",
+    ],
+    noIndex: state.totalProfiles === 0,
+  });
+}
+
+export default async function StatePage({ params }: { params: Promise<Params> }) {
+  const resolved = await params;
+  const state = await getStateInventory(resolved.state);
+
+  if (!state) notFound();
+
+  const activeCities = state.cityInventory.filter((item) => item.total > 0);
+  const upcomingCities = state.cityInventory.filter((item) => item.total === 0);
+  const itemListCities = activeCities.length > 0 ? activeCities : state.cityInventory;
 
   return (
     <>
@@ -92,21 +99,24 @@ export default async function StatePage({ params }: { params: Promise<Params> })
         data={buildBreadcrumbJsonLd([
           { name: "Home", path: "/" },
           { name: "States", path: "/states" },
-          { name: stateDirectory.stateName, path: `/states/${resolved.state}` },
+          { name: state.stateName, path: `/states/${resolved.state}` },
         ])}
       />
       <JsonLd
         data={buildCollectionPageJsonLd({
-          name: `${stateDirectory.stateName} massage therapist directory`,
-          description: `State directory for massage therapists, city pages, specialties, incall, outcall, and direct contact options in ${stateDirectory.stateName}.`,
+          name: `${state.stateName} male massage therapist directory`,
+          description: `Browse city directories and independent provider profiles in ${state.stateName}.`,
           path: `/states/${resolved.state}`,
         })}
       />
       <JsonLd
         data={buildItemListJsonLd({
-          name: `${stateDirectory.stateName} city directory`,
+          name: `${state.stateName} active city directory`,
           path: `/states/${resolved.state}`,
-          items: cityItems,
+          items: itemListCities.map(({ city }) => ({
+            name: formatCityLabel(city.name, city.stateCode),
+            path: `/${city.slug}`,
+          })),
         })}
       />
 
@@ -114,43 +124,50 @@ export default async function StatePage({ params }: { params: Promise<Params> })
         <div className="space-y-8">
           <header className="rounded-3xl border border-border bg-background p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">State directory</p>
-            <h1 className="mt-2 text-3xl font-semibold text-foreground">Massage Therapists in {stateDirectory.stateName}</h1>
+            <h1 className="mt-2 text-3xl font-semibold text-foreground">Male Massage Therapists in {state.stateName}</h1>
             <p className="mt-3 max-w-4xl text-sm leading-7 text-muted-foreground">
-              Browse MasseurMatch city pages in {stateDirectory.stateName}. State pages support national SEO while only becoming indexable when useful public inventory exists.
+              Browse canonical city pages in {state.stateName}. Active markets link directly to public provider inventory, while cities without inventory remain outside the sitemap until useful listings are available.
             </p>
-            <p className="mt-3 text-sm font-semibold text-foreground">Public profiles found across this state: {totalProfiles}</p>
+            <p className="mt-3 text-sm font-semibold text-foreground">Public profiles across this state: {state.totalProfiles}</p>
           </header>
 
-          <section className="rounded-3xl border border-border bg-background p-6">
-            <h2 className="text-2xl font-semibold text-foreground">Cities in {stateDirectory.stateName}</h2>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-              {cityInventory.map(({ city, total }) => (
-                <Link
-                  key={`${city.stateCode}-${city.slug}`}
-                  href={`/states/${resolved.state}/cities/${city.slug}`}
-                  className="rounded-xl border border-border px-4 py-3 text-sm text-foreground transition-colors hover:border-primary/50 hover:bg-muted/40"
-                >
-                  <span className="font-semibold">{formatCityLabel(city.name, city.stateCode)}</span>
-                  <span className="mt-1 block text-xs text-muted-foreground">{total} public profiles</span>
-                </Link>
-              ))}
-            </div>
-          </section>
+          {activeCities.length > 0 ? (
+            <section className="rounded-3xl border border-border bg-background p-6">
+              <h2 className="text-2xl font-semibold text-foreground">Active cities in {state.stateName}</h2>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+                {activeCities.map(({ city, total }) => (
+                  <Link
+                    key={`${city.stateCode}-${city.slug}`}
+                    href={`/${city.slug}`}
+                    className="rounded-xl border border-border px-4 py-3 text-sm text-foreground transition-colors hover:border-primary/50 hover:bg-muted/40"
+                  >
+                    <span className="font-semibold">{formatCityLabel(city.name, city.stateCode)}</span>
+                    <span className="mt-1 block text-xs text-muted-foreground">{total} public {total === 1 ? "profile" : "profiles"}</span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          ) : null}
 
-          <section className="rounded-3xl border border-border bg-background p-6">
-            <h2 className="text-2xl font-semibold text-foreground">Canonical city routes</h2>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-              {stateDirectory.cities.map((city) => (
-                <Link
-                  key={`canonical-${city.slug}`}
-                  href={`/cities/${getCanonicalCitySlug(city.slug)}`}
-                  className="rounded-xl border border-border px-4 py-3 text-xs font-semibold text-foreground transition-colors hover:border-primary/50 hover:bg-muted/40"
-                >
-                  /cities/{getCanonicalCitySlug(city.slug)}
-                </Link>
-              ))}
-            </div>
-          </section>
+          {upcomingCities.length > 0 ? (
+            <section className="rounded-3xl border border-border bg-background p-6">
+              <h2 className="text-2xl font-semibold text-foreground">More cities</h2>
+              <p className="mt-2 text-sm leading-7 text-muted-foreground">
+                These city routes remain followable but are not eligible for sitemap inclusion until real approved public inventory is available.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {upcomingCities.map(({ city }) => (
+                  <Link
+                    key={`upcoming-${city.slug}`}
+                    href={`/${city.slug}`}
+                    className="rounded-full border border-border px-3 py-2 text-xs font-semibold text-muted-foreground transition hover:bg-secondary"
+                  >
+                    {formatCityLabel(city.name, city.stateCode)}
+                  </Link>
+                ))}
+              </div>
+            </section>
+          ) : null}
         </div>
       </section>
     </>
