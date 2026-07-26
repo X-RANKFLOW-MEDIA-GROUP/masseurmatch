@@ -44,6 +44,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      # The variable has shipped with a trailing space before, which the CLI
+      # rejects as "Invalid project ref format" — strip all whitespace so a
+      # copy-paste artifact can't silently break every deploy.
+      - name: Normalize project ref
+        run: echo "SUPABASE_PROJECT_REF=$(printf '%s' "$SUPABASE_PROJECT_REF" | tr -d '[:space:]')" >> "$GITHUB_ENV"
+
       - name: Verify required config is present
         run: |
           missing=0
