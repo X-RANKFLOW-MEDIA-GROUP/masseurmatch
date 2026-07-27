@@ -1,11 +1,12 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { MapPin, Search, SlidersHorizontal, X } from "lucide-react";
+import { LoaderCircle, LocateFixed, MapPin, Search, SlidersHorizontal, X } from "lucide-react";
 import { useState } from "react";
 import type { TherapistTier } from "@/app/_lib/directory";
 import type { CityData } from "@/data/cities";
 import { formatCityLabel } from "@/data/cities";
+import { useGeolocation } from "@/hooks/useGeolocation";
 
 export type DirectorySession = "" | "home-visit" | "incall";
 type DirectoryObjectiveId =
@@ -182,6 +183,20 @@ export function AdvancedDirectoryFilter({
         filters.lgbtqAffirming,
     ),
   );
+  const [locating, setLocating] = useState(false);
+  const { requestLocation } = useGeolocation({ autoLocate: false });
+
+  const handleUseMyLocation = async () => {
+    setLocating(true);
+    try {
+      const detected = await requestLocation(true);
+      if (detected) {
+        onChange({ city: detected.name });
+      }
+    } finally {
+      setLocating(false);
+    }
+  };
 
   const activeObjective = resolveDirectoryObjective(filters.goal, filters.modality);
   const matchedCity = cities.find(
@@ -232,15 +247,29 @@ export function AdvancedDirectoryFilter({
                 </div>
               </div>
 
-              <div className="hidden min-w-[190px] items-center gap-3 rounded-[1.35rem] border border-slate-200/80 bg-white/72 px-4 py-3 shadow-[var(--shadow-md)] backdrop-blur-xl sm:flex">
-                <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
+              <button
+                type="button"
+                onClick={() => void handleUseMyLocation()}
+                disabled={locating}
+                title="Use my location"
+                className="flex min-w-[190px] items-center gap-3 rounded-[1.35rem] border border-slate-200/80 bg-white/72 px-4 py-3 text-left shadow-[var(--shadow-md)] backdrop-blur-xl transition-colors hover:border-slate-300 disabled:cursor-wait"
+              >
+                {locating ? (
+                  <LoaderCircle className="h-4 w-4 shrink-0 animate-spin text-slate-400" />
+                ) : filters.city ? (
+                  <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
+                ) : (
+                  <LocateFixed className="h-4 w-4 shrink-0 text-slate-400" />
+                )}
                 <div className="min-w-0">
                   <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-slate-400">
                     Location
                   </p>
-                  <p className="mt-1 truncate font-sans text-sm font-medium text-slate-900">{cityLabel}</p>
+                  <p className="mt-1 truncate font-sans text-sm font-medium text-slate-900">
+                    {locating ? "Detecting…" : filters.city ? cityLabel : "Use my location"}
+                  </p>
                 </div>
-              </div>
+              </button>
 
               <button
                 type="button"

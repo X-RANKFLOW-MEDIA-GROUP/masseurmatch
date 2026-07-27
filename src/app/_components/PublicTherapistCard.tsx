@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight, MapPin, Check, Plane } from "lucide-react";
+import { ArrowUpRight, MapPin, Check, Plane, Sparkles } from "lucide-react";
 import { useMemo } from "react";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import { getTravelVisit } from "@/app/_lib/travel-status";
@@ -143,6 +143,14 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
                 size="sm"
                 icon={<Check size={10} />}
                 label="Verified"
+              />
+            )}
+            {isNewProfile && (
+              <Pill
+                variant="new"
+                size="sm"
+                icon={<Sparkles size={10} strokeWidth={2.5} />}
+                label="New"
               />
             )}
           </div>
