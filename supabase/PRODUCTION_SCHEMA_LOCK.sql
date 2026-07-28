@@ -59,6 +59,7 @@ alter table public.profiles
   add column if not exists city text,
   add column if not exists state text,
   add column if not exists country text,
+  add column if not exists zip_code text,
   add column if not exists neighborhood text,
   add column if not exists neighborhood_name text,
   add column if not exists primary_area text,
