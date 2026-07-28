@@ -8,18 +8,9 @@ const activateSchema = z.object({
   activate: z.boolean(),
 });
 
+const AVAILABLE_NOW_DURATION_HOURS = 2;
+
 type SubscriptionTier = "free" | "standard" | "pro" | "elite";
-
-type TierRule = {
-  durationHours: number;
-};
-
-const TIER_RULES: Record<SubscriptionTier, TierRule | null> = {
-  free: null,
-  standard: { durationHours: 1 },
-  pro: { durationHours: 2 },
-  elite: { durationHours: 3 },
-};
 
 const VALID_TIERS = new Set<SubscriptionTier>(["free", "standard", "pro", "elite"]);
 
@@ -48,14 +39,6 @@ export async function POST(request: Request) {
       return json({ ok: true, available_now: false });
     }
 
-    const rules = TIER_RULES[tier];
-    if (!rules) {
-      throw new RouteError(
-        403,
-        "Available Now is not available on the Free plan. Upgrade to Standard, Pro, or Elite.",
-      );
-    }
-
     const now = new Date();
     const currentExpiry = profile.available_now_expires ? new Date(profile.available_now_expires) : null;
     const hasValidExpiry = currentExpiry !== null && !Number.isNaN(currentExpiry.getTime());
@@ -71,7 +54,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const expiresAt = new Date(now.getTime() + rules.durationHours * 3_600_000);
+    const expiresAt = new Date(now.getTime() + AVAILABLE_NOW_DURATION_HOURS * 3_600_000);
 
     await setAvailableNow(session.userId, {
       available_now: true,
@@ -80,15 +63,16 @@ export async function POST(request: Request) {
 
     await recordAuditLog(session.userId, "provider.available_now.activate", "profile", profile.id, {
       tier,
-      durationHours: rules.durationHours,
+      durationHours: AVAILABLE_NOW_DURATION_HOURS,
       expiresAt: expiresAt.toISOString(),
+      launchAccess: "all_plans",
     });
 
     return json({
       ok: true,
       available_now: true,
       expires_at: expiresAt.toISOString(),
-      duration_hours: rules.durationHours,
+      duration_hours: AVAILABLE_NOW_DURATION_HOURS,
     });
   } catch (error) {
     return errorResponse(error);
