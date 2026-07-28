@@ -9,6 +9,7 @@ import {
   Banknote,
   BarChart,
   Bell,
+  CircleCheckBig,
   CreditCard,
   Download,
   Image as ImageIcon,
@@ -17,6 +18,7 @@ import {
   Loader2,
   Mail,
   Menu,
+  ReceiptText,
   Settings,
   ShieldCheck,
   Sparkles,
@@ -28,22 +30,49 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { BRAND_ASSETS } from "@/lib/brand";
 
-const navItems = [
-  { name: "Dashboard", href: "/pro/dashboard", icon: LayoutDashboard },
-  { name: "My Profile", href: "/pro/listing", icon: UserCircle },
-  { name: "Import Reviews", href: "/pro/import-reviews", icon: Download, badge: "Free" },
-  { name: "AI Profile Coach", href: "/pro/ai-coach", icon: Sparkles, badge: "New" },
-  { name: "Trust & Verification", href: "/pro/trust", icon: ShieldCheck },
-  { name: "Rates", href: "/pro/rates", icon: Banknote },
-  { name: "Photos", href: "/pro/photos", icon: ImageIcon },
-  { name: "Growth Tools", href: "/pro/growth", icon: TrendingUp },
-  { name: "Inquiries", href: "/pro/inquiries", icon: Mail },
-  { name: "Analytics", href: "/pro/analytics", icon: BarChart },
-  { name: "Notifications", href: "/pro/notifications", icon: Bell },
-  { name: "Subscription", href: "/pro/subscription", icon: CreditCard },
-  { name: "Payment History", href: "/pro/payment-history", icon: WalletCards },
-  { name: "Support", href: "/pro/tickets", icon: LifeBuoy },
-  { name: "Settings", href: "/pro/settings", icon: Settings },
+const navSections = [
+  {
+    title: "Overview",
+    items: [
+      { name: "Dashboard", href: "/pro/dashboard", icon: LayoutDashboard },
+      { name: "Approval Status", href: "/pro/approval-status", icon: CircleCheckBig },
+      { name: "Notifications", href: "/pro/notifications", icon: Bell },
+    ],
+  },
+  {
+    title: "Profile",
+    items: [
+      { name: "My Profile", href: "/pro/listing", icon: UserCircle },
+      { name: "Rates", href: "/pro/rates", icon: Banknote },
+      { name: "Photos", href: "/pro/photos", icon: ImageIcon },
+      { name: "Trust & Verification", href: "/pro/trust", icon: ShieldCheck },
+      { name: "Import Reviews", href: "/pro/import-reviews", icon: Download, badge: "Free" },
+      { name: "AI Profile Coach", href: "/pro/ai-coach", icon: Sparkles, badge: "New" },
+    ],
+  },
+  {
+    title: "Business",
+    items: [
+      { name: "Growth Tools", href: "/pro/growth", icon: TrendingUp },
+      { name: "Inquiries", href: "/pro/inquiries", icon: Mail },
+      { name: "Analytics", href: "/pro/analytics", icon: BarChart },
+    ],
+  },
+  {
+    title: "Plans & Billing",
+    items: [
+      { name: "Subscription", href: "/pro/subscription", icon: CreditCard },
+      { name: "Billing", href: "/pro/billing", icon: ReceiptText },
+      { name: "Payment History", href: "/pro/payment-history", icon: WalletCards },
+    ],
+  },
+  {
+    title: "Account",
+    items: [
+      { name: "Support", href: "/pro/tickets", icon: LifeBuoy },
+      { name: "Settings", href: "/pro/settings", icon: Settings },
+    ],
+  },
 ] as const;
 
 export default function ProLayoutClient({
@@ -95,40 +124,49 @@ export default function ProLayoutClient({
         </Link>
       </div>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-5" aria-label="Provider dashboard">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+      <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Provider dashboard">
+        {navSections.map((section) => (
+          <div key={section.title} className="mb-4 last:mb-0">
+            <p className="px-3.5 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#A39A93]">
+              {section.title}
+            </p>
+            <div className="space-y-1">
+              {section.items.map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
-          return (
-            <Link key={item.name} href={item.href} className="relative block rounded-xl">
-              {isActive ? (
-                <motion.div
-                  layoutId="activeProNav"
-                  className="absolute inset-0 rounded-xl border border-[#EAD8D9] bg-[#F9EDEE]"
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                />
-              ) : null}
-              <span
-                className={`relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 font-sans text-sm transition-colors ${
-                  isActive
-                    ? "font-semibold text-[#8B1E2D]"
-                    : "text-[#6D655F] hover:bg-[#F7F3F0] hover:text-[#25211E]"
-                }`}
-              >
-                {isActive ? (
-                  <span className="absolute left-0 top-1/2 h-5 -translate-y-1/2 rounded-r-full border-l-2 border-[#8B1E2D]" />
-                ) : null}
-                <item.icon className="h-4 w-4 shrink-0" strokeWidth={2.15} />
-                <span className="min-w-0 flex-1 truncate">{item.name}</span>
-                {"badge" in item ? (
-                  <span className="rounded-full bg-[#8B1E2D] px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.08em] text-white">
-                    {item.badge}
-                  </span>
-                ) : null}
-              </span>
-            </Link>
-          );
-        })}
+                return (
+                  <Link key={item.name} href={item.href} className="relative block rounded-xl">
+                    {isActive ? (
+                      <motion.div
+                        layoutId="activeProNav"
+                        className="absolute inset-0 rounded-xl border border-[#EAD8D9] bg-[#F9EDEE]"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      />
+                    ) : null}
+                    <span
+                      className={`relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 font-sans text-sm transition-colors ${
+                        isActive
+                          ? "font-semibold text-[#8B1E2D]"
+                          : "text-[#6D655F] hover:bg-[#F7F3F0] hover:text-[#25211E]"
+                      }`}
+                    >
+                      {isActive ? (
+                        <span className="absolute left-0 top-1/2 h-5 -translate-y-1/2 rounded-r-full border-l-2 border-[#8B1E2D]" />
+                      ) : null}
+                      <item.icon className="h-4 w-4 shrink-0" strokeWidth={2.15} />
+                      <span className="min-w-0 flex-1 truncate">{item.name}</span>
+                      {"badge" in item ? (
+                        <span className="rounded-full bg-[#8B1E2D] px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.08em] text-white">
+                          {item.badge}
+                        </span>
+                      ) : null}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       <div className="m-3 rounded-2xl border border-[#E9E1DA] bg-[#FCF9F6] p-4">
