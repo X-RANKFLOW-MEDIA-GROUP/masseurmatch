@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
         zip_code: location.zip,
         specialties: profile.serviceCategories?.length ? profile.serviceCategories : null,
         incall_price: profile.startingPrice ? Number(profile.startingPrice) : null,
+        lgbtq_affirming: true,
         status: "pending_approval",
         is_active: false,
         updated_at: new Date().toISOString(),

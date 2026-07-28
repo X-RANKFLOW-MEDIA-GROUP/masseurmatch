@@ -72,6 +72,9 @@ export async function POST(request: NextRequest) {
         specialties: profile.serviceCategories?.length ? profile.serviceCategories : null,
         incall_price: profile.startingPrice ? Number(profile.startingPrice) : null,
         years_experience: profile.yearsExperience ? Number(profile.yearsExperience) : null,
+        // Mandatory platform-wide — every provider commits to
+        // LGBTQ+-affirming service in the Therapist Agreement.
+        lgbtq_affirming: true,
         _tier: planTier ?? null,
         status: "pending_approval",
         profile_status: "pending_approval",

@@ -111,7 +111,7 @@ alter table public.profiles
   add column if not exists weight_lb integer,
   add column if not exists body_type text,
   add column if not exists start_year integer,
-  add column if not exists lgbtq_affirming boolean default false,
+  add column if not exists lgbtq_affirming boolean not null default true,
   add column if not exists accepts_all_genders boolean default true,
   add column if not exists accessibility_features text[] default '{}',
   add column if not exists is_verified_identity boolean default false,
