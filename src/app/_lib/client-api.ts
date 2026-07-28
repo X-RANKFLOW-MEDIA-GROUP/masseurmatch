@@ -27,6 +27,34 @@ async function parsePayload(response: Response) {
   }
 }
 
+function extractErrorMessage(payload: unknown, status: number): string {
+  const fallback = `Request failed with status ${status}.`;
+
+  if (typeof payload !== "object" || !payload || !("error" in payload)) {
+    return fallback;
+  }
+
+  const raw = (payload as { error: unknown }).error;
+  const candidate =
+    typeof raw === "string"
+      ? raw
+      : typeof raw === "object" &&
+          raw !== null &&
+          "message" in raw &&
+          typeof (raw as { message: unknown }).message === "string"
+        ? (raw as { message: string }).message
+        : "";
+
+  // Reject empty or JSON-shaped messages (e.g. a stringified error body such
+  // as "{}") so raw payloads never reach the UI.
+  const message = candidate.trim();
+  if (!message || message.startsWith("{") || message.startsWith("[")) {
+    return fallback;
+  }
+
+  return message;
+}
+
 function needsCsrfToken(url: string, method?: string): boolean {
   return (
     method === "POST" &&
@@ -74,12 +102,7 @@ export async function requestJson<T>(
   const payload = await parsePayload(response);
 
   if (!response.ok) {
-    const message =
-      typeof payload === "object" && payload && "error" in payload
-        ? String(payload.error)
-        : `Request failed with status ${response.status}.`;
-
-    throw new ApiError(message, response.status, payload);
+    throw new ApiError(extractErrorMessage(payload, response.status), response.status, payload);
   }
 
   return payload as T;
