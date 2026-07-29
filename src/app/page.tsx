@@ -63,12 +63,22 @@ function isRealProfileId(id: string | null | undefined) {
 export default async function HomePage() {
   let featuredTherapists: Awaited<ReturnType<typeof getPublicTherapists>>["items"] = [];
   try {
-    // Run both queries in parallel — lgbtq-affirming preferred, broad as fallback
+    // Run both queries in parallel — lgbtq-affirming profiles rank first, and
+    // the broad list fills the remaining slots. Merging (instead of using the
+    // affirming list exclusively) keeps the section full even when only one or
+    // two profiles have the lgbtq_affirming flag set.
     const [lgbtqResult, broadResult] = await Promise.all([
       getPublicTherapists({ page: 1, pageSize: 6, lgbtqAffirming: true }),
       getPublicTherapists({ page: 1, pageSize: 6 }),
     ]);
-    featuredTherapists = lgbtqResult.items.length > 0 ? lgbtqResult.items : broadResult.items;
+    const seenIds = new Set<string>();
+    featuredTherapists = [...lgbtqResult.items, ...broadResult.items]
+      .filter((therapist) => {
+        if (seenIds.has(therapist.id)) return false;
+        seenIds.add(therapist.id);
+        return true;
+      })
+      .slice(0, 6);
 
     const realIds = featuredTherapists
       .filter((t) => isRealProfileId(t.id))

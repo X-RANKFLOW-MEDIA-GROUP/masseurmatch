@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getRequestSession } from "@/app/api/_lib/session";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import { resolveCityStateFromZip } from "@/app/api/_lib/zip-location";
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,15 +18,18 @@ export async function POST(request: NextRequest) {
     }
 
     const adminClient = createSupabaseAdminClient();
+    const location = await resolveCityStateFromZip(profile);
 
     const { error: updateError } = await adminClient
       .from("profiles")
       .update({
         bio: profile.bio || null,
-        city: profile.city || null,
-        state: profile.state || null,
+        city: location.city,
+        state: location.state,
+        zip_code: location.zip,
         specialties: profile.serviceCategories?.length ? profile.serviceCategories : null,
         incall_price: profile.startingPrice ? Number(profile.startingPrice) : null,
+        lgbtq_affirming: true,
         status: "pending_approval",
         is_active: false,
         updated_at: new Date().toISOString(),

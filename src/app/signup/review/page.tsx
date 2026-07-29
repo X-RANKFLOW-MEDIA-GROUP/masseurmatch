@@ -96,6 +96,7 @@ export default function SignupReviewPage() {
             certifications: p.certifications,
             city: p.city,
             state: p.state,
+            zipCode: p.zipCode,
             neighborhood: p.neighborhood,
             visitingCities: p.visitingCities,
             locationType: p.locationType,
