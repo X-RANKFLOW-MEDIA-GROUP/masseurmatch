@@ -15,6 +15,25 @@ import { supabase } from "@/integrations/supabase/client";
 
 type Tier = SignupPlanTier;
 
+// supabase.functions.invoke wraps every non-2xx response in a generic
+// "Edge Function returned a non-2xx status code" error, hiding the real
+// message the function put in its JSON body ({ error }). Pull it out so the
+// toast tells the user (and us) what actually failed.
+async function resolveFunctionError(error: unknown): Promise<Error> {
+  const context = (error as { context?: Response })?.context;
+  if (context && typeof context.json === "function") {
+    try {
+      const body = await context.clone().json();
+      if (typeof body?.error === "string" && body.error) {
+        return new Error(body.error);
+      }
+    } catch {
+      // Body wasn't JSON — fall through to the generic message.
+    }
+  }
+  return error instanceof Error ? error : new Error(String(error));
+}
+
 function toTier(value: string | null): Tier | null {
   if (value === "free" || value === "standard" || value === "pro" || value === "elite") {
     return value;
@@ -51,7 +70,7 @@ function ProBillingPageInner() {
         body: { plan_key: tier, return_path: "/pro/billing" },
       });
 
-      if (error) throw error;
+      if (error) throw await resolveFunctionError(error);
       if (data?.error) throw new Error(data.error);
 
       if (data?.url) {
@@ -87,7 +106,7 @@ function ProBillingPageInner() {
     try {
       const { data, error } = await supabase.functions.invoke("customer-portal");
 
-      if (error) throw error;
+      if (error) throw await resolveFunctionError(error);
       if (data?.error) throw new Error(data.error);
 
       if (data?.url) {
