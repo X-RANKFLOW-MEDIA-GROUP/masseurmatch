@@ -69,5 +69,31 @@ jobs:
       - name: Link project
         run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
 
+      # One-time baseline reconciliation. The remote history table records
+      # versions that were applied via the Supabase dashboard and have no file
+      # in this repo (db push then aborts with "Remote migration versions not
+      # found in local migrations directory"), while the repo migrations that
+      # predate this workflow were applied by hand and never recorded. Drop the
+      # dashboard-only rows, then record every local migration older than the
+      # baseline as applied — production already contains their schema (the DB
+      # contract check validates the app against PRODUCTION_SCHEMA_LOCK.sql).
+      # Once reconciled these repairs are no-ops, and db push applies only
+      # migrations newer than the baseline.
+      - name: Reconcile migration history
+        run: |
+          BASELINE=20260726000000
+          supabase migration repair --status reverted \
+            20260722203257 20260723071639 20260723152216 20260723175443 \
+            20260723231058 20260724004630 20260724022000 20260725170728 || true
+          applied=""
+          for f in supabase/migrations/*.sql; do
+            v=$(basename "$f" | cut -d_ -f1)
+            case "$v" in *[!0-9]*) continue ;; esac
+            if [ "$v" -lt "$BASELINE" ]; then applied="$applied $v"; fi
+          done
+          if [ -n "$applied" ]; then
+            supabase migration repair --status applied $applied || true
+          fi
+
       - name: Apply pending migrations
         run: supabase db push
