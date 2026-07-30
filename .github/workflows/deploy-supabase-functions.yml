@@ -25,6 +25,8 @@ on:
       - "supabase/functions/process-lifecycle-email-queue/**"
       - "supabase/functions/lifecycle-unsubscribe/**"
       - "supabase/functions/run-lifecycle-campaigns/**"
+      - "supabase/functions/create-checkout/**"
+      - "supabase/functions/customer-portal/**"
       - "supabase/functions/_shared/**"
       - "supabase/config.toml"
       - ".github/workflows/deploy-supabase-functions.yml"
@@ -57,6 +59,11 @@ jobs:
           fi
           [ "$missing" -eq 0 ]
 
+      # Repo variables pasted with stray whitespace (e.g. a trailing space)
+      # make the CLI fail with "Invalid project ref format".
+      - name: Normalize project ref
+        run: echo "SUPABASE_PROJECT_REF=$(echo "$SUPABASE_PROJECT_REF" | tr -d '[:space:]')" >> "$GITHUB_ENV"
+
       - uses: supabase/setup-cli@v1
         with:
           version: latest
@@ -69,3 +76,8 @@ jobs:
           supabase functions deploy process-lifecycle-email-queue --project-ref "$SUPABASE_PROJECT_REF"
           supabase functions deploy lifecycle-unsubscribe --project-ref "$SUPABASE_PROJECT_REF"
           supabase functions deploy run-lifecycle-campaigns --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Deploy billing functions
+        run: |
+          supabase functions deploy create-checkout --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy customer-portal --project-ref "$SUPABASE_PROJECT_REF"
