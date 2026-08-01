@@ -3,7 +3,7 @@
   "name": "MasseurMatch - City-First Massage Directory",
   "short_name": "MasseurMatch",
   "description": "Find massage therapists by city, specialty, and profile quality through a city-first public directory.",
-  "start_url": "/?v=20260508b",
+  "start_url": "/?v=20260731mm",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -13,14 +13,10 @@
   "categories": ["health", "lifestyle", "business"],
   "icons": [
     {
-      "src": "/favicon.svg?v=20260508b",
-      "sizes": "any",
-      "type": "image/svg+xml"
-    },
-    {
-      "src": "/favicon.ico?v=20260508b",
-      "sizes": "64x64 32x32 16x16",
-      "type": "image/x-icon"
+      "src": "https://res.cloudinary.com/dyfxkq2nk/image/upload/v1785553494/ChatGPT_Image_Jul_31_2026_10_04_01_PM_1_akq6hj.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
