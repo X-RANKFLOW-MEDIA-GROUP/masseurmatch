@@ -3,6 +3,8 @@ import type { ProfileViewModel } from "./profile-utils";
 
 type Credential = { "@type": string; credentialCategory: string; name: string; description: string };
 
+type SourceProfile = Record<string, unknown>;
+
 function buildCredentials(profile: ProfileViewModel) {
   const credentials: Credential[] = [];
   if (profile.isVerified) {
@@ -39,50 +41,84 @@ function buildOfferCatalog(profile: ProfileViewModel) {
   return { "@type": "OfferCatalog", name: `${profile.name} massage services`, itemListElement: offers };
 }
 
-export function ProfileStructuredData({ profile }: { profile: ProfileViewModel }) {
+function dateValue(value: unknown) {
+  if (typeof value !== "string" || !value) return undefined;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
+}
+
+function verifiedSameAs(sourceProfile: SourceProfile) {
+  const values = [sourceProfile.website, sourceProfile.instagram, sourceProfile.facebook, sourceProfile.linkedin]
+    .filter((value): value is string => typeof value === "string" && /^https?:\/\//i.test(value));
+  return values.length ? Array.from(new Set(values)) : undefined;
+}
+
+export function ProfileStructuredData({
+  profile,
+  sourceProfile = {},
+}: {
+  profile: ProfileViewModel;
+  sourceProfile?: SourceProfile;
+}) {
   const address = { "@type": "PostalAddress", addressLocality: profile.city, addressRegion: profile.state, addressCountry: profile.country };
   const contactPoint = [profile.phone && { "@type": "ContactPoint", telephone: profile.phone, contactType: "phone" }, profile.email && { "@type": "ContactPoint", email: profile.email, contactType: "email" }].filter(Boolean);
   const credentials = buildCredentials(profile);
   const offerCatalog = buildOfferCatalog(profile);
   const allServices = Array.from(new Set([...profile.services, ...profile.specialties, ...profile.massageTypes]));
+  const dateCreated = dateValue(sourceProfile.created_at || sourceProfile.member_since);
+  const dateModified = dateValue(sourceProfile.updated_at || sourceProfile.last_active_at);
+  const sameAs = verifiedSameAs(sourceProfile);
+
+  const person = {
+    "@type": "Person",
+    "@id": `${profile.canonicalUrl}#provider`,
+    identifier: profile.id,
+    name: profile.name,
+    image: profile.galleryImages.length ? profile.galleryImages : [profile.profilePhotoUrl],
+    address,
+    knowsLanguage: profile.languages,
+    knowsAbout: allServices.length ? allServices : undefined,
+    sameAs,
+    ...(credentials.length ? { hasCredential: credentials } : {}),
+  };
 
   const data = [
     {
       "@context": "https://schema.org",
       "@type": "ProfilePage",
+      "@id": `${profile.canonicalUrl}#profile-page`,
+      identifier: profile.id,
       name: profile.seoTitle,
       description: profile.seoDescription,
       url: profile.canonicalUrl,
-      image: profile.ogImage,
-      mainEntity: {
-        "@type": "Person",
-        name: profile.name,
-        image: profile.profilePhotoUrl,
-        address,
-        knowsLanguage: profile.languages,
-        knowsAbout: allServices.length ? allServices : undefined,
-        ...(credentials.length ? { hasCredential: credentials } : {}),
-      },
+      image: profile.galleryImages.length ? profile.galleryImages : [profile.ogImage],
+      dateCreated,
+      dateModified,
+      mainEntity: person,
     },
     {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
+      "@id": `${profile.canonicalUrl}#business`,
+      identifier: profile.id,
       name: profile.name,
       description: profile.seoDescription,
-      image: profile.ogImage,
+      image: profile.galleryImages.length ? profile.galleryImages : [profile.ogImage],
       url: profile.canonicalUrl,
       address,
       areaServed: profile.serviceAreas,
       priceRange: profile.startingPrice,
       contactPoint,
+      sameAs,
       ...(offerCatalog ? { hasOfferCatalog: offerCatalog } : {}),
     },
     {
       "@context": "https://schema.org",
       "@type": "Service",
+      "@id": `${profile.canonicalUrl}#service`,
       name: `${profile.name} massage services`,
       description: `${profile.services.join(", ")} in ${profile.city}, ${profile.state}`,
-      provider: { "@type": "Person", name: profile.name },
+      provider: { "@id": `${profile.canonicalUrl}#provider` },
       areaServed: profile.serviceAreas,
       serviceType: profile.services,
     },
