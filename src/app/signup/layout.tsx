@@ -6,9 +6,9 @@ const SIGNUP_SOCIAL_IMAGE =
   "https://res.cloudinary.com/dyfxkq2nk/image/upload/c_fill,g_center,w_1200,h_630,q_auto:best/v1785553494/ChatGPT_Image_Jul_31_2026_07_31_32_PM_tsdzpd.png";
 
 export const metadata: Metadata = createPageMetadata({
-  title: "Join MasseurMatch — Create Your Therapist Profile",
+  title: "Create Your Therapist Profile — 14 Days Free, No Credit Card",
   description:
-    "Create your MasseurMatch profile, verify your identity, and get discovered by clients looking for LGBTQ+-affirming male massage therapists.",
+    "Join MasseurMatch and create your therapist profile with a 14-day free trial. No credit card required.",
   path: "/signup",
   image: SIGNUP_SOCIAL_IMAGE,
   keywords: [
