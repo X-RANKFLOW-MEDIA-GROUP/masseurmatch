@@ -7,6 +7,7 @@ import {
   getPublicTherapistBySlug,
   getPublicTherapists,
 } from "@/app/_lib/directory";
+import { evaluateProfileSeoQuality } from "@/app/_lib/profile-seo-quality";
 import { buildBreadcrumbJsonLd, createPageMetadata } from "@/app/_lib/seo";
 import { ProfileStructuredData } from "@/components/profile/ProfileStructuredData";
 import { buildProfileFaq } from "@/components/profile/profile-faq";
@@ -38,6 +39,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
 
   const profile = buildProfileViewModel(dbProfile);
+  const seoQuality = evaluateProfileSeoQuality(dbProfile as unknown as Record<string, unknown>);
+  const shouldIndex = !dbProfile.is_demo && seoQuality.indexEligible;
 
   return {
     title: profile.seoTitle,
@@ -57,9 +60,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       description: profile.seoDescription,
       images: [profile.ogImage],
     },
-    robots: dbProfile.is_demo
-      ? { index: false, follow: false }
-      : {
+    robots: shouldIndex
+      ? {
           index: true,
           follow: true,
           googleBot: {
@@ -69,7 +71,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
             "max-snippet": -1,
             "max-video-preview": -1,
           },
-        },
+        }
+      : { index: false, follow: true },
   };
 }
 
@@ -114,7 +117,10 @@ export default async function TherapistPage({ params }: { params: Promise<Params
       <ProfileViewTracker profileId={dbProfile.id} source="direct" />
       {dbProfile.is_demo && <DemoProfileBanner />}
       <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Therapists", path: "/therapists" }, ...(matchedCity ? [{ name: matchedCity.name, path: `/${matchedCity.slug}` }] : []), { name: profile.name, path: profilePath }])} />
-      <ProfileStructuredData profile={profile} />
+      <ProfileStructuredData
+        profile={profile}
+        sourceProfile={dbProfile as unknown as Record<string, unknown>}
+      />
       <VoxProfile
         profile={profile}
         faqItems={faqItems}
