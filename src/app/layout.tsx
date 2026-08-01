@@ -15,14 +15,20 @@ import "@/styles/homepage-mobile-hotfix.css";
 import { satoshi } from "./fonts";
 import SmoothScroll from "@/components/motion/SmoothScroll";
 
+const BRAND_ICON_URL =
+  "https://res.cloudinary.com/dyfxkq2nk/image/upload/v1785553494/ChatGPT_Image_Jul_31_2026_10_04_01_PM_1_akq6hj.png";
+const SOCIAL_PREVIEW_URL =
+  "https://res.cloudinary.com/dyfxkq2nk/image/upload/v1785553494/ChatGPT_Image_Jul_31_2026_07_31_32_PM_tsdzpd.png";
+
 const rootMetadata = createPageMetadata({
   title: "MasseurMatch — Premium Directory of LGBTQ+-Affirming Male Massage Therapists",
   description:
     "AI-powered verified therapist discovery — a premium directory of male massage therapists you can trust.",
   path: "/",
+  image: SOCIAL_PREVIEW_URL,
 });
 
-const faviconVersion = "20260603mm";
+const faviconVersion = "20260731mm";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -30,9 +36,9 @@ export const metadata: Metadata = {
   manifest: `/manifest.json?v=${faviconVersion}`,
   category: "wellness",
   icons: {
-    icon: [{ url: `/favicon.ico?v=${faviconVersion}`, type: "image/x-icon" }],
-    shortcut: `/favicon.ico?v=${faviconVersion}`,
-    apple: `/favicon.ico?v=${faviconVersion}`,
+    icon: [{ url: BRAND_ICON_URL, type: "image/png" }],
+    shortcut: BRAND_ICON_URL,
+    apple: BRAND_ICON_URL,
   },
   ...rootMetadata,
   alternates: {
