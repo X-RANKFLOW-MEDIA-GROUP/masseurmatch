@@ -39,7 +39,7 @@ function buildOfferCatalog(profile: ProfileViewModel) {
   return { "@type": "OfferCatalog", name: `${profile.name} massage services`, itemListElement: offers };
 }
 
-export function ProfileStructuredData({ profile }: { profile: ProfileViewModel }) {
+export function ProfileStructuredData({ profile, sourceProfile }: { profile: ProfileViewModel; sourceProfile?: Record<string, unknown> }) {
   const address = { "@type": "PostalAddress", addressLocality: profile.city, addressRegion: profile.state, addressCountry: profile.country };
   const contactPoint = [profile.phone && { "@type": "ContactPoint", telephone: profile.phone, contactType: "phone" }, profile.email && { "@type": "ContactPoint", email: profile.email, contactType: "email" }].filter(Boolean);
   const credentials = buildCredentials(profile);
