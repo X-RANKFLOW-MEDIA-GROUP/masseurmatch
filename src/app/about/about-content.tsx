@@ -93,7 +93,7 @@ export default function AboutContent() {
       {/* Core pillars */}
       <section className="px-4 py-20 sm:px-6 lg:py-28">
         <div className="mx-auto max-w-[1100px]">
-          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#C84A5C]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#D45B6D]">
             What we stand for
           </p>
           <h2 className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold tracking-tight text-white">
@@ -124,7 +124,7 @@ export default function AboutContent() {
       <section className="border-t border-white/[0.08] px-4 py-20 sm:px-6 lg:py-28">
         <div className="mx-auto grid max-w-[1100px] gap-16 lg:grid-cols-2 lg:items-center">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#C84A5C]">
+            <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#D45B6D]">
               Why we exist
             </p>
             <h2 className="mt-3 font-display text-[clamp(1.75rem,3.5vw,2.5rem)] font-extrabold leading-tight tracking-tight text-white">
