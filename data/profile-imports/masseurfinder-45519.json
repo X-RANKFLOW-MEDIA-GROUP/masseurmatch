@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "import_status": "pending_admin_review",
+  "source": {
+    "platform": "masseurfinder",
+    "profile_id": "45519",
+    "url": "https://www.masseurfinder.com/massage-therapists/45519/",
+    "captured_at": "2026-08-02T21:49:00-05:00",
+    "advertised_testimonial_count": 13,
+    "captured_testimonial_count": 12,
+    "notes": [
+      "The public page advertised 13 testimonials, but only 12 complete testimonial records were available in the captured page content.",
+      "The overview states 14 years of experience while the structured Additional Info field states 8 years. Preserve both values for manual verification.",
+      "No star ratings or reviewer names were displayed for these testimonials; rating is null and reviewers are anonymized.",
+      "All imported reviews must remain non-public until an administrator verifies and approves them."
+    ]
+  },
+  "profile": {
+    "display_name": "Bruno",
+    "headline": "Customized Massage by Bruno",
+    "home_city": "Sao Paulo",
+    "home_state": "Sao Paulo",
+    "home_country": "BR",
+    "current_listing_location": "Atlanta, GA",
+    "service_types": ["in-studio", "mobile"],
+    "phone": "+17623345300",
+    "starting_price_usd": 160,
+    "hours": "midnight - 11 p.m. every day",
+    "overview": "Hi, my name is Bruno. I am a Brazilian therapist from Sao Paulo, Brazil, with 14 years of experience. My work focuses on Deep Tissue Massage and the Brazilian Massage Technique. Each session is designed to release muscle tension, support physical recovery, reduce stress, and promote deep relaxation. I provide a respectful, non discriminatory service and warmly welcome gay, LGBT, and all clients who value a professional and comfortable massage experience. I use unscented lotion for your comfort. A shower is available, and free parking is provided. The experience is private, smooth, and hassle free. Text or call now to book your appointment.",
+    "techniques": [
+      "AMMA Therapy",
+      "Deep Tissue",
+      "Hot Stone",
+      "Lymphatic Drainage",
+      "Myofascial Release",
+      "Shiatsu",
+      "Swedish",
+      "Zero Balancing"
+    ],
+    "experience_claims": {
+      "overview_years": 14,
+      "structured_field_years": 8,
+      "requires_manual_verification": true
+    },
+    "amenities": [
+      "Bottled Water",
+      "Drinking Water",
+      "Hot Towels",
+      "Private Restroom",
+      "Shower"
+    ],
+    "mobile_extras": ["Hot Towels", "Massage Table", "Music"],
+    "additional_services": ["Cupping", "Fitness training"],
+    "affiliations": ["National Association of Massage Therapists"],
+    "education": [
+      {
+        "start": "2006-06",
+        "end": "2008-08",
+        "credential": "LMT",
+        "school": "RIO MASSAGE SCHOOL",
+        "location": "Rio de Janeiro, Rio de Janeiro, BR"
+      }
+    ],
+    "rates": [
+      {"service": "Bruno's Signature Massage", "duration_minutes": 60, "price_usd": 160},
+      {"service": "Bruno's Signature Massage", "duration_minutes": 75, "price_usd": 210},
+      {"service": "Bruno's Signature Massage", "duration_minutes": 90, "price_usd": 260}
+    ],
+    "payments": ["American Express", "Apple Pay", "Cash", "Mastercard", "Venmo", "Visa", "Zelle"],
+    "discounts": [
+      "10% off on Mondays",
+      "Discounts available for active military, law enforcement, and repeat clients; ask for details"
+    ]
+  },
+  "reviews": [
+    {
+      "source_platform": "masseurfinder",
+      "source_url": "https://www.masseurfinder.com/massage-therapists/45519/",
+      "reviewer_name": null,
+      "reviewer_anonymized": true,
+      "rating": null,
+      "review_date": "2026-04-25",
+      "location": "Naples, FL",
+      "service_type": "in-studio",
+      "review_text": "Bruno is amazing and his massage is great. He can listen to your body with his hands and offer to you exactly what your body and soul needs without even asking. So charismatic, polite, and makes you feel at ease straight away. Highly recommend.",
+      "is_public": false
+    },
+    {
+      "source_platform": "masseurfinder",
+      "source_url": "https://www.masseurfinder.com/massage-therapists/45519/",
+      "reviewer_name": null,
+      "reviewer_anonymized": true,
+      "rating": null,
+      "review_date": "2026-01-31",
+      "location": "Tampa, FL",
+      "service_type": "in-studio",
+      "review_text": "Outstanding male massage with Bruno. Very skilled, attentive, and truly goes above and beyond. Clean, fresh-smelling space and a deeply relaxing experience. One of the best male massage services on MasseurFinder. I highly recommend Bruno.",
+      "is_public": false
+    },
+    {
+      "source_platform": "masseurfinder",
+      "source_url": "https://www.masseurfinder.com/massage-therapists/45519/",
+      "reviewer_name": null,
+      "reviewer_anonymized": true,
+      "rating": null,
+      "review_date": "2025-10-23",
+      "location": "Dallas, TX",
+      "service_type": "in-studio",
+      "review_text": "I was in Dallas for work and booked a massage with Bruno, it was incredible! His warm smile, sense of humor and strong, confident hands delivered the perfect deep-tissue pressure. The energy was very relaxing, and I left feeling completely recharged. Truly one of a kind, I can't recommend Bruno enough, he's the best massage therapist in Dallas I've had. Thank you Bruno you are A+!!!",
+      "is_public": false
+    },
+    {
+      "source_platform": "masseurfinder",
+      "source_url": "https://www.masseurfinder.com/massage-therapists/45519/",
+      "reviewer_name": null,
+      "reviewer_anonymized": true,
+      "rating": null,
+      "review_date": "2025-07-02",
+      "location": "Dallas, TX",
+      "service_type": "in-studio",
+      "review_text": "I've been seeing Bruno here in Dallas for almost a year now, and he's hands-down the best massage therapist I've ever found. There are a lot of options out there, but with him you never feel like you're wasting your money, every session is worth it. Bruno is not only incredibly skilled at deep tissue and relaxation massage, but also one of the sweetest and most charming people you'll ever meet. He always makes me feel at ease and even gives great advice on how to keep my body feeling good between sessions. If you're looking for a truly professional deep tissue or relaxation massage in Dallas, Bruno is the one to book. Don't hesitate, you'll leave feeling better than ever, and you'll see why so many of us keep coming back.",
+      "is_public": false
+    },
+    {
+      "source_platform": "masseurfinder",
+      "source_url": "https://www.masseurfinder.com/massage-therapists/45519/",
+      "reviewer_name": null,
+      "reviewer_anonymized": true,
+      "rating": null,
+      "review_date": "2025-04-02",
+      "location": "Dallas, TX",
+      "service_type": "in-studio",
+      "review_text": "One word: AMAZING! Bruno is such an amazing guy. From the first contact, he puts you at ease. He is responsive in his replies to texts and friendly. Nothing was a problem (including my mishap, where I could've died from embarrassment!) Before the massage, I changed my 1-hour meeting to 90 mins, and booking him was my best decision. His place and studio its clean and couldn't be more centrally located. He puts you at ease the moment you walk in. His photos are 100% accurate. His massage skills are second to none, coupled with his relaxed and cheery personality, meant that when I left I felt 10 years younger. He was also great at stroking my ego, so even more brownie points for that. Cannot recommend him enough - Thank you so much Bruno!",
+      "is_public": false
+    },
+    {
+      "source_platform": "masseurfinder",
+      "source_url": "https://www.masseurfinder.com/massage-therapists/45519/",
+      "reviewer_name": null,
+      "reviewer_anonymized": true,
+      "rating": null,
+      "review_date": "2025-01-04",
+      "location": "Rio de Janeiro, Rio de Janeiro, BR",
+      "service_type": "in-studio",
+      "review_text": "Yesterday I had an amazing massage from this incredibly nice and sweet man. I scheduled last minute and he was very accommodating. He greeted me with a great smile and a warm hug. He asked if there were any areas of concern or any limitations. He started the massage with my legs and calves and did some stretching to relax me. He checked in to see how I was doing, I was in bliss so relaxed just felt like I was floating. He started on my back and shoulders and found my tension spot in my left shoulder and worked the knots out. He is an incredible masseur kind friendly knowledgeable super sweet and very handsome with a beautiful smile. He made me feel at ease the whole time. I slept blissful last night and highly recommend Kevin to everyone if he lives in your town or you're lucky to have him visit yours. I will definitely be seeing him again whenever I can words alone can't describe this wonderful guy.",
+      "is_public": false,
+      "review_notes": "Source testimonial refers to Kevin although the profile is Bruno; retain exact source text and require manual verification."
+    },
+    {
+      "source_platform": "masseurfinder",
+      "source_url": "https://www.masseurfinder.com/massage-therapists/45519/",
+      "reviewer_name": null,
+      "reviewer_anonymized": true,
+      "rating": null,
+      "review_date": "2024-09-30",
+      "location": "San Jose, CA",
+      "service_type": "in-studio",
+      "review_text": "Oh man! This guy knows how to massage and found knots and tight muscles I never knew existed!!! This was a real proper full on massage that left me shattered but light headed and add to that his strong hands and arms - it was an experience and a half. If you want a lovely guy and a really good deep tissue massage that will leave no muscle untouched - he's the one for sure. I went home and just crashed out for the rest of the day! Amazing how he relaxed both mind and body.",
+      "is_public": false
+    },
+    {
+      "source_platform": "masseurfinder",
+      "source_url": "https://www.masseurfinder.com/massage-therapists/45519/",
+      "reviewer_name": null,
+      "reviewer_anonymized": true,
+      "rating": null,
+      "review_date": "2024-07-02",
+      "location": "Dallas, TX",
+      "service_type": "in-studio",
+      "review_text": "Good people are busy so it took me a while to synchronize our schedules. Bruno is a great communicator, sweet & friendly, responds promptly, knows his schedule & wants to make it work. His place is clean, purposely dimly lit, quiet except for great music at just the right volume & organized around the experiences he's providing. The minute you walk in, you can see that Bruno is totally focused on the journey he will take with you. He's super calm and explains what he's doing. He has exceptional massage skills but what he's doing is so imaginative & creative that just calling it massage seems inadequate. He's a master in his prime doing his best work. Without meaning to put anyone else down, Bruno is in a league of his own.",
+      "is_public": false
+    },
+    {
+      "source_platform": "masseurfinder",
+      "source_url": "https://www.masseurfinder.com/massage-therapists/45519/",
+      "reviewer_name": null,
+      "reviewer_anonymized": true,
+      "rating": null,
+      "review_date": "2024-03-05",
+      "location": "Dallas, TX",
+      "service_type": "in-studio",
+      "review_text": "I wanted to take a moment to tell you that you are in great hands with Bruno. I had a relaxing and invigorating massage yesterday and today I feel like a new man. Bruno is a professional from the first text message until you unfortunately have to leave his comforting touch. Communication with him was prompt and thorough. He quickly responded back to questions that I had about payment methods and setting up the appointment. Once I arrived, he was thoughtful and caring enough to ask questions to learn about problem areas in my body that he could help to solve during the massage. As an older man, I do my best to work out but as I've gotten older a lot more problems seem to happen as I age. Bruno was an attentive listener to some of my issues and suggested ways I may combat my problems in the gym after the massage. I have a lot of trouble with plantar fasciitis and he helped me in addressing this major problem a great deal both with his massage and the aftercare instruction he was able to give me. In addition to being a consummate professional, Bruno is just as handsome as his pictures indicate. Surreal massage, the best I've ever had. Bruno is my new go-to guy. I highly recommend him.",
+      "is_public": false
+    },
+    {
+      "source_platform": "masseurfinder",
+      "source_url": "https://www.masseurfinder.com/massage-therapists/45519/",
+      "reviewer_name": null,
+      "reviewer_anonymized": true,
+      "rating": null,
+      "review_date": "2024-01-06",
+      "location": "Sacramento, CA",
+      "service_type": "in-studio",
+      "review_text": "Skilled at the art of massage coupled with an amazing personality describes Bruno. I had an amazing massage and 24 hours later I still feel relaxed. Expect to feel relaxed and rejuvenated. I highly recommend him!!",
+      "is_public": false
+    },
+    {
+      "source_platform": "masseurfinder",
+      "source_url": "https://www.masseurfinder.com/massage-therapists/45519/",
+      "reviewer_name": null,
+      "reviewer_anonymized": true,
+      "rating": null,
+      "review_date": "2023-10-12",
+      "location": "Dallas, TX",
+      "service_type": "in-studio",
+      "review_text": "I had the opportunity to have a massage with Bruno. He was extremely for sly and made me feel comfortable. Was always asking me if I was comfortable and if the pressure was good. He knows what he is doing and remove the knots I had. Excellent and wonderful person. I highly recommend him.",
+      "is_public": false
+    },
+    {
+      "source_platform": "masseurfinder",
+      "source_url": "https://www.masseurfinder.com/massage-therapists/45519/",
+      "reviewer_name": null,
+      "reviewer_anonymized": true,
+      "rating": null,
+      "review_date": "2023-09-14",
+      "location": "Dallas, TX",
+      "service_type": "in-studio",
+      "review_text": "Bruno was absolutely incredible. It has been a long time since I've seen a masseuse, and I was so knotted up. He found every bad spot and worked it out. The pressure was perfect, and it was a wonderful combination of therapy and relaxation. I left feeling rejuvenated and relaxed. Bruno is so sweet and incredibly handsome (even more handsome in person!). Making the massage appointment was very easy, and he welcomes you at the door with an amazing smile. Bruno made sure I was comfortable and inquired to my needs. The room and ambience were very relaxing. The location is in a convenient location with easy parking. I highly recommend Bruno and personally cannot wait for my next visit!",
+      "is_public": false
+    }
+  ]
+}
