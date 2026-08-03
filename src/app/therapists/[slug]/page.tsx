@@ -8,7 +8,6 @@ import {
   getPublicTherapists,
 } from "@/app/_lib/directory";
 import { buildBreadcrumbJsonLd, createPageMetadata } from "@/app/_lib/seo";
-import { buildProfilePageMetadata } from "@/app/_lib/profile-metadata";
 import { ProfileStructuredData } from "@/components/profile/ProfileStructuredData";
 import { buildProfileFaq } from "@/components/profile/profile-faq";
 import { buildProfileViewModel } from "@/components/profile/profile-utils";
