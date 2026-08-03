@@ -16,6 +16,11 @@ const rpc = async <T>(
   return data;
 };
 
+type ReferralDashboardPayload = {
+  summary?: Record<string, unknown>;
+  referrals?: Array<Record<string, unknown>>;
+};
+
 export async function GET(request: Request) {
   try {
     const session = await requireRequestSession(request);
@@ -25,21 +30,13 @@ export async function GET(request: Request) {
       p_user_id: session.userId,
     });
 
-    const summary = await rpc<Record<string, unknown>>(supabase, "get_referral_summary", {
+    const dashboard = await rpc<ReferralDashboardPayload>(supabase, "get_referral_dashboard", {
       p_user_id: session.userId,
     });
 
-    const { data: signups, error: signupsError } = await supabase
-      .from("referral_signups")
-      .select("id, payment_status, reward_months, paid_at, created_at")
-      .eq("referrer_user_id", session.userId)
-      .order("created_at", { ascending: false })
-      .limit(25);
-
-    if (signupsError) throw signupsError;
-
+    const summary = dashboard.summary ?? {};
     const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://masseurmatch.com").replace(/\/$/, "");
-    const code = typeof summary?.code === "string" ? summary.code : "";
+    const code = typeof summary.code === "string" ? summary.code : "";
 
     return json({
       ok: true,
@@ -47,7 +44,7 @@ export async function GET(request: Request) {
         ...summary,
         referralLink: code ? `${appUrl}/signup?ref=${encodeURIComponent(code)}` : null,
       },
-      referrals: signups ?? [],
+      referrals: Array.isArray(dashboard.referrals) ? dashboard.referrals : [],
     });
   } catch (error) {
     return errorResponse(error);
