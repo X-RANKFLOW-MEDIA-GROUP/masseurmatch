@@ -7,6 +7,7 @@ import {
   getPublicTherapistBySlug,
   getPublicTherapists,
 } from "@/app/_lib/directory";
+import { buildProfilePageMetadata } from "@/app/_lib/profile-metadata";
 import { buildBreadcrumbJsonLd, createPageMetadata } from "@/app/_lib/seo";
 import { ProfileStructuredData } from "@/components/profile/ProfileStructuredData";
 import { buildProfileFaq } from "@/components/profile/profile-faq";
