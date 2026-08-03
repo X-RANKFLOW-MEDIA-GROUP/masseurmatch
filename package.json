@@ -23,7 +23,7 @@
     "test:unit": "vitest run",
     "test:api": "node scripts/test-api-routes.mjs",
     "preview": "next start",
-    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
+    "typecheck": "tsc --noEmit",
     "test:redirects": "playwright test tests/redirects.spec.ts",
     "accessibility-check": "echo \"No dedicated accessibility checks are configured yet.\"",
     "email": "email dev -d src/emails -p 3001",
