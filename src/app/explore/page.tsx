@@ -4,7 +4,6 @@ import { JsonLd } from "@/app/_components/JsonLd";
 import { createPageMetadata, buildBreadcrumbJsonLd } from "@/app/_lib/seo";
 import { getCities } from "@/app/_lib/directory";
 import { cityDisplayName } from "@/data/cities";
-// eslint-disable-next-line unused-imports/no-unused-imports
 import { ExploreLocationFinder } from "./ExploreLocationFinder";
 
 const FEATURED_CITY_SLUGS = [
