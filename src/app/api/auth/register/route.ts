@@ -9,6 +9,13 @@ import {
 } from "@/app/api/_lib/supabase-server";
 import { createServerSupabase } from "@/lib/supabase/server";
 
+function readReferralCookie(request: Request) {
+  const cookies = request.headers.get("cookie") ?? "";
+  const match = cookies.match(/(?:^|;\s*)mm_referral_code=([^;]+)/);
+  const value = match ? decodeURIComponent(match[1]).trim().toUpperCase() : "";
+  return /^REF[A-F0-9]{10}$/.test(value) ? value : undefined;
+}
+
 async function claimReferral(userId: string, referralCode?: string) {
   if (!referralCode) return;
 
@@ -22,8 +29,6 @@ async function claimReferral(userId: string, referralCode?: string) {
   });
 
   if (error) {
-    // Account creation must not fail because attribution could not be recorded.
-    // The error is still surfaced in server logs for operational follow-up.
     console.error('[auth/register] referral attribution failed:', error.message);
   }
 }
@@ -38,6 +43,7 @@ export async function POST(request: Request) {
     }
 
     const body = await parseJsonBody(request, authRegisterSchema);
+    const referralCode = body.referralCode ?? readReferralCookie(request);
     const email = body.email.trim().toLowerCase();
     const { origin } = new URL(request.url);
     const verificationPath = "/signup/verify?autostart=1";
@@ -51,7 +57,7 @@ export async function POST(request: Request) {
         data: {
           full_name: body.fullName,
           role: "provider",
-          referral_code: body.referralCode ?? null,
+          referral_code: referralCode ?? null,
         },
       },
     });
@@ -90,7 +96,7 @@ export async function POST(request: Request) {
       fallbackName: body.fullName,
     });
 
-    await claimReferral(data.user.id, body.referralCode);
+    await claimReferral(data.user.id, referralCode);
 
     return json({
       ok: true,
