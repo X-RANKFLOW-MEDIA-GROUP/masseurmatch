@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { createServerSupabase } from "@/lib/supabase/server";
 import { getUserRole } from "@/app/api/_lib/supabase-server";
 import { normalizeSessionRole } from "@/app/api/_lib/session";
+import { isExpectedInvalidSessionError } from "@/lib/supabase/auth-errors";
+import { createServerSupabase } from "@/lib/supabase/server";
 
 function dashboardPathForRole(role: string | null | undefined) {
   if (role === "client") return "/search";
@@ -18,14 +19,34 @@ function noStoreJson(body: unknown, init?: ResponseInit) {
   return response;
 }
 
+function signedOutResponse() {
+  return noStoreJson({ authenticated: false, dashboardPath: "/login" });
+}
+
 export async function GET() {
   const supabase = await createServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+
+  let user;
+  try {
+    const authResult = await supabase.auth.getUser();
+
+    if (authResult.error) {
+      if (!isExpectedInvalidSessionError(authResult.error)) {
+        console.error("[api/auth/me] Failed to verify session:", authResult.error);
+      }
+      return signedOutResponse();
+    }
+
+    user = authResult.data.user;
+  } catch (error) {
+    if (!isExpectedInvalidSessionError(error)) {
+      console.error("[api/auth/me] Failed to verify session:", error);
+    }
+    return signedOutResponse();
+  }
 
   if (!user) {
-    return noStoreJson({ authenticated: false, dashboardPath: "/login" });
+    return signedOutResponse();
   }
 
   // Prefer the app_metadata role (already verified with the user), but confirm
