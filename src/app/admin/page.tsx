@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getCities, getPublicTherapists } from "@/app/_lib/directory";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";
+import { AdminGettingStarted } from "@/app/admin/_components/AdminGettingStarted";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,6 +16,8 @@ import {
   CalendarCheck,
   MessageSquare,
   DollarSign,
+  Grid3X3,
+  Workflow,
 } from "lucide-react";
 
 async function getAdminStats() {
@@ -24,13 +27,13 @@ async function getAdminStats() {
     getPublicTherapists({ page: 1, pageSize: 50 }),
     Promise.resolve(getCities()),
     supabase
-      .from('booking_inquiries')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'pending_approval'),
+      .from("booking_inquiries")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pending_approval"),
     supabase
-      .from('sms_follow_up_alerts')
-      .select('id', { count: 'exact', head: true })
-      .is('resolved_at', null),
+      .from("sms_follow_up_alerts")
+      .select("id", { count: "exact", head: true })
+      .is("resolved_at", null),
   ]);
 
   return {
@@ -92,29 +95,33 @@ export default async function AdminOverviewPage() {
     {
       label: "Revenue",
       value: "—",
-      description: "See Stripe dashboard",
+      description: "Open billing operations",
       icon: DollarSign,
       color: "text-emerald-600",
       bgColor: "bg-emerald-50",
+      href: "/admin/billing",
     },
   ];
 
   const quickLinks = [
-    { href: "/admin/bookings", label: "Booking Approvals", description: `${stats.pendingBookings} inquiry${stats.pendingBookings !== 1 ? 'ies' : 'y'} waiting for your sign-off.`, icon: CalendarCheck },
-    { href: "/admin/sms", label: "SMS Auto-Reply", description: `${stats.smsAlerts} alert${stats.smsAlerts !== 1 ? 's' : ''} — conversations with no reply in 90+ min.`, icon: MessageSquare },
+    { href: "/admin/tools", label: "All Admin Tools", description: "See every admin page and background capability in one map.", icon: Grid3X3 },
+    { href: "/admin/bookings", label: "Booking Approvals", description: `${stats.pendingBookings} inquiry${stats.pendingBookings !== 1 ? "ies" : "y"} waiting for your sign-off.`, icon: CalendarCheck },
+    { href: "/admin/sms", label: "SMS Auto-Reply", description: `${stats.smsAlerts} alert${stats.smsAlerts !== 1 ? "s" : ""} — conversations with no reply in 90+ min.`, icon: MessageSquare },
     { href: "/admin/therapists", label: "Therapists", description: "Approve, suspend, verify, and feature provider profiles.", icon: HeartHandshake },
     { href: "/admin/users", label: "Users", description: "Manage provider and admin roles.", icon: Users },
-    { href: "/admin/moderation", label: "Moderation", description: "Review queued listing drafts flagged by Sightengine.", icon: ShieldAlert },
-    { href: "/admin/cities", label: "Cities", description: "Edit local landing page copy and city coverage.", icon: MapPin },
+    { href: "/admin/migrations", label: "Imports", description: "Review profile migrations and imported reviews.", icon: Workflow },
+    { href: "/admin/moderation", label: "Moderation", description: "Review queued listing drafts and flagged content.", icon: ShieldAlert },
+    { href: "/admin/cities", label: "Cities", description: "Edit local landing-page copy and city coverage.", icon: MapPin },
     { href: "/admin/keywords", label: "Keywords", description: "Manage specialty and SEO keyword surfaces.", icon: Tag },
     { href: "/admin/blog", label: "Blog", description: "Publish and maintain editorial content.", icon: Newspaper },
   ];
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader title="Dashboard" description="Admin overview — monitor platform health at a glance." />
+      <AdminPageHeader title="Dashboard" description="Choose a workflow, review urgent work, or open the complete admin tools map." />
 
-      {/* Stat Cards */}
+      <AdminGettingStarted />
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {cards.map((card) => {
           const inner = (
@@ -130,7 +137,7 @@ export default async function AdminOverviewPage() {
             </>
           );
           const cls = "rounded-2xl border border-border bg-white p-5 shadow-sm transition-shadow hover:shadow-md";
-          return 'href' in card && card.href ? (
+          return "href" in card && card.href ? (
             <Link key={card.label} href={card.href} className={`${cls} block`}>
               {inner}
             </Link>
@@ -143,34 +150,32 @@ export default async function AdminOverviewPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Recent Therapist Activity */}
-        <Card className="lg:col-span-2 border-border bg-white shadow-sm">
+        <Card className="border-border bg-white shadow-sm lg:col-span-2">
           <CardHeader>
             <CardTitle className="font-display text-base">Recent Therapist Activity</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {stats.recentTherapists.map((t) => (
-                <div key={t.id} className="flex items-center justify-between border-b border-border/50 pb-3 last:border-none last:pb-0">
+              {stats.recentTherapists.map((therapist) => (
+                <div key={therapist.id} className="flex items-center justify-between border-b border-border/50 pb-3 last:border-none last:pb-0">
                   <div>
-                    <p className="text-sm font-medium text-foreground">{t.display_name || t.full_name || "Unknown"}</p>
+                    <p className="text-sm font-medium text-foreground">{therapist.display_name || therapist.full_name || "Unknown"}</p>
                     <p className="text-xs text-muted-foreground">
-                      {t.city || "No city"} • {t.specialties?.[0] || "General"}
+                      {therapist.city || "No city"} • {therapist.specialties?.[0] || "General"}
                     </p>
                   </div>
-                  <Badge variant={t.status === "active" ? "default" : "secondary"}>
-                    {t.status || "pending"}
+                  <Badge variant={therapist.status === "active" ? "default" : "secondary"}>
+                    {therapist.status || "pending"}
                   </Badge>
                 </div>
               ))}
-              {stats.recentTherapists.length === 0 && (
+              {stats.recentTherapists.length === 0 ? (
                 <p className="py-6 text-center text-sm text-muted-foreground">No therapist activity yet.</p>
-              )}
+              ) : null}
             </div>
           </CardContent>
         </Card>
 
-        {/* Quick Links */}
         <Card className="border-border bg-white shadow-sm">
           <CardHeader>
             <CardTitle className="font-display text-base">Quick Actions</CardTitle>
@@ -186,9 +191,9 @@ export default async function AdminOverviewPage() {
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                     <link.icon className="h-4 w-4 text-primary" />
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-foreground">{link.label}</p>
-                    <p className="text-xs text-muted-foreground truncate">{link.description}</p>
+                    <p className="truncate text-xs text-muted-foreground">{link.description}</p>
                   </div>
                   <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                 </Link>
