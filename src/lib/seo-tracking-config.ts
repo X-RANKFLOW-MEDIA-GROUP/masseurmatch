@@ -121,8 +121,9 @@ export function trackAnalyticsEvent(
   if (typeof window === "undefined") return;
 
   try {
-    if (window.gtag) {
-      window.gtag("event", eventName, eventParams);
+    const gtag = (window as any).gtag;
+    if (gtag) {
+      gtag("event", eventName, eventParams);
     }
   } catch (error) {
     console.error("[Analytics] Error tracking event:", error);
