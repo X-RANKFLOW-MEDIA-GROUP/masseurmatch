@@ -23,8 +23,6 @@ const PHOTO_LIMITS: Record<string, number> = {
   elite: 20,
 }
 
-// During the 14-day free trial paid tiers are capped at 4 photos;
-// the full plan allowance unlocks when the trial converts to active.
 const TRIAL_PHOTO_LIMIT = 4
 
 const VISIBILITY_LEVELS: Record<string, number> = {
@@ -98,6 +96,36 @@ async function recordStripeEvent(
   return true
 }
 
+async function processPaidReferral(
+  supabase: ReturnType<typeof createSupabaseWebhookClient>,
+  stripe: Stripe,
+  invoice: Stripe.Invoice,
+) {
+  if (invoice.status !== 'paid' || invoice.amount_paid <= 0) return
+
+  const subscriptionId =
+    typeof invoice.parent?.subscription_details?.subscription === 'string'
+      ? invoice.parent.subscription_details.subscription
+      : invoice.parent?.subscription_details?.subscription?.id
+
+  if (!subscriptionId) return
+
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+  const userId = subscription.metadata?.user_id ?? subscription.metadata?.userId
+  if (!userId) return
+
+  const { error } = await (supabase.rpc as unknown as (
+    name: string,
+    params: Record<string, unknown>,
+  ) => Promise<{ error: { message: string } | null }>)('process_paid_referral', {
+    p_referred_user_id: userId,
+    p_stripe_subscription_id: subscriptionId,
+    p_stripe_invoice_id: invoice.id,
+  })
+
+  if (error) throw new Error(error.message)
+}
+
 export async function POST(request: NextRequest) {
   const stripe = getStripe()
   const body = await request.text()
@@ -135,6 +163,11 @@ export async function POST(request: NextRequest) {
           p_provider_transaction_id: pi.id,
         })
         if (error) throw error
+        break
+      }
+
+      case 'invoice.paid': {
+        await processPaidReferral(supabase, stripe, event.data.object as Stripe.Invoice)
         break
       }
 
@@ -207,9 +240,6 @@ export async function POST(request: NextRequest) {
         break
     }
   } catch (error) {
-    // Hoisted out of the .update({}) literal: a ternary colon inside the
-    // object value confuses validate:db-contract into reading a phantom
-    // `message` column on stripe_events.
     const processingError = error instanceof Error ? error.message : 'Unknown Stripe webhook processing error'
     await supabase
       .from('stripe_events')
