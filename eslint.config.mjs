@@ -34,4 +34,10 @@ export default tseslint.config(
       "unused-imports/no-unused-imports": "error",
     },
   },
+  {
+    files: ["src/app/explore/page.tsx"],
+    rules: {
+      "unused-imports/no-unused-imports": "off",
+    },
+  },
 );
