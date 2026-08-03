@@ -25,37 +25,41 @@ import {
   CalendarCheck,
   MessageSquare,
   Flag,
+  Grid3X3,
+  Workflow,
 } from "lucide-react";
 
 const navSections = [
   {
-    title: "Core",
+    title: "Start here",
     items: [
       { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+      { href: "/admin/tools", label: "All Tools", icon: Grid3X3 },
+    ],
+  },
+  {
+    title: "People & profiles",
+    items: [
       { href: "/admin/users", label: "Users", icon: Users },
       { href: "/admin/therapists", label: "Therapists", icon: HeartHandshake },
       { href: "/admin/photos", label: "Photos", icon: ImageIcon },
       { href: "/admin/moderation", label: "Moderation", icon: ShieldAlert },
+      { href: "/admin/verification", label: "Verification", icon: ShieldCheck },
       { href: "/admin/profile-reports", label: "Profile Reports", icon: Flag },
     ],
   },
   {
-    title: "Messaging",
+    title: "Communication",
     items: [
-      { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
+      { href: "/admin/bookings", label: "Booking Approvals", icon: CalendarCheck },
       { href: "/admin/sms", label: "SMS Auto-Reply", icon: MessageSquare },
+      { href: "/admin/tickets", label: "Tickets", icon: MessageSquare },
+      { href: "/admin/support", label: "Support", icon: LifeBuoy },
+      { href: "/admin/migrations", label: "Imports", icon: Workflow },
     ],
   },
   {
-    title: "Business",
-    items: [
-      { href: "/admin/billing", label: "Billing", icon: CreditCard },
-      { href: "/admin/reports", label: "Reports", icon: BarChart3 },
-      { href: "/admin/logs", label: "Logs", icon: FileClock },
-    ],
-  },
-  {
-    title: "Content",
+    title: "Growth & content",
     items: [
       { href: "/admin/blog", label: "Blog", icon: Newspaper },
       { href: "/admin/cities", label: "Cities", icon: MapPin },
@@ -64,11 +68,11 @@ const navSections = [
     ],
   },
   {
-    title: "Ops",
+    title: "Business & system",
     items: [
-      { href: "/admin/tickets", label: "Tickets", icon: MessageSquare },
-      { href: "/admin/support", label: "Support", icon: LifeBuoy },
-      { href: "/admin/verification", label: "Verification", icon: ShieldCheck },
+      { href: "/admin/billing", label: "Billing", icon: CreditCard },
+      { href: "/admin/reports", label: "Reports", icon: BarChart3 },
+      { href: "/admin/logs", label: "Logs", icon: FileClock },
       { href: "/admin/legal", label: "Legal", icon: FileText },
       { href: "/admin/settings", label: "Settings", icon: Settings },
     ],
@@ -92,8 +96,15 @@ export default function AdminSidebarNav() {
 
   return (
     <nav className="flex flex-1 flex-col overflow-y-auto py-2">
+      <div className="mx-3 mb-3 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2.5">
+        <p className="text-xs font-semibold text-blue-950">New to the admin?</p>
+        <Link href="/admin/tools" className="mt-0.5 block text-xs text-blue-700 hover:underline">
+          Open All Tools for a guided map.
+        </Link>
+      </div>
+
       {navSections.map((section) => (
-        <div key={section.title} className="mb-1">
+        <div key={section.title} className="mb-2">
           <p className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
             {section.title}
           </p>
