@@ -1,4 +1,5 @@
 import type { Database } from "@/integrations/supabase/types";
+import type { PublicTherapist } from "@/app/_lib/directory";
 
 type TherapistProfile = Database["public"]["Tables"]["therapist_profiles"]["Row"];
 
@@ -132,14 +133,18 @@ export function shouldIndexPage(pageType: "city" | "service" | "combination" | "
   }
 }
 
-export function getProfileIndexRobots(profile: TherapistProfile | null, cityLiveList?: string[]): string {
+export function getProfileIndexRobots(profile: TherapistProfile | PublicTherapist | null, cityLiveList?: string[]): string {
   if (!profile) {
     return "noindex, nofollow";
   }
 
   const liveList = cityLiveList || indexEligibilityConfig.citiesLiveList;
   const isVerified = profile.verification_status === "verified";
-  const isPublished = profile.is_published === true;
+
+  // is_published is on TherapistProfile but not PublicTherapist
+  // PublicTherapist from the query is always published, so assume true if field doesn't exist
+  const isPublished = "is_published" in profile ? profile.is_published === true : true;
+
   const cityInLiveList = profile.city && liveList.map((c) => c.toLowerCase()).includes(profile.city.toLowerCase());
 
   // Unpublished profiles always noindex

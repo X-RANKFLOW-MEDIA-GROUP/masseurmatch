@@ -6,9 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Save, Globe, Code } from "lucide-react";
 import { getPublicTherapists } from "@/app/_lib/directory";
+import { SeoDashboard } from "@/components/admin/seo-dashboard";
+import { buildProfileViewModel } from "@/components/profile/profile-utils";
 
 export default async function AdminSeoPage() {
   const { items: therapists } = await getPublicTherapists({ page: 1, pageSize: 5 });
+  const allTherapists = await getPublicTherapists({ page: 1, pageSize: 1000 });
+  const profiles = allTherapists.items.map((t) => buildProfileViewModel(t));
 
   return (
     <div className="space-y-6">
@@ -17,12 +21,17 @@ export default async function AdminSeoPage() {
         description="Optimize your entire website for search engines."
       />
 
-      <Tabs defaultValue="metadata">
+      <Tabs defaultValue="readiness">
         <TabsList className="mb-4">
+          <TabsTrigger value="readiness">Launch Readiness</TabsTrigger>
           <TabsTrigger value="metadata">Metadata Editor</TabsTrigger>
           <TabsTrigger value="sitemap">Sitemap Tools</TabsTrigger>
           <TabsTrigger value="json-ld">JSON-LD Preview</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="readiness">
+          <SeoDashboard profiles={profiles} />
+        </TabsContent>
 
         <TabsContent value="metadata">
           <Card className="border-border bg-white shadow-sm">

@@ -8,12 +8,14 @@ import {
   getPublicTherapists,
 } from "@/app/_lib/directory";
 import { buildBreadcrumbJsonLd, createPageMetadata } from "@/app/_lib/seo";
+import { buildProfilePageMetadata } from "@/app/_lib/profile-metadata";
 import { ProfileStructuredData } from "@/components/profile/ProfileStructuredData";
 import { buildProfileFaq } from "@/components/profile/profile-faq";
 import { buildProfileViewModel } from "@/components/profile/profile-utils";
 import { VoxProfile } from "@/app/therapists/[slug]/_components/vox/VoxProfile";
 import { DemoProfileBanner } from "@/app/_components/demo-profile-banner";
 import { ProfileViewTracker } from "@/app/therapists/[slug]/_components/ProfileViewTracker";
+import { ProfilePageTracker } from "@/app/therapists/[slug]/_components/ProfilePageTracker";
 
 type Params = { slug: string };
 
@@ -38,39 +40,16 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
 
   const profile = buildProfileViewModel(dbProfile);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://masseurmatch.com";
 
-  return {
-    title: profile.seoTitle,
-    description: profile.seoDescription,
-    keywords: profile.seoKeywords,
-    alternates: { canonical: profile.canonicalUrl },
-    openGraph: {
-      title: profile.seoTitle,
-      description: profile.seoDescription,
-      images: [{ url: profile.ogImage, alt: `${profile.name} massage therapist in ${profile.city}, ${profile.state}` }],
-      url: profile.canonicalUrl,
-      type: "profile",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: profile.seoTitle,
-      description: profile.seoDescription,
-      images: [profile.ogImage],
-    },
-    robots: dbProfile.is_demo
-      ? { index: false, follow: false }
-      : {
-          index: true,
-          follow: true,
-          googleBot: {
-            index: true,
-            follow: true,
-            "max-image-preview": "large",
-            "max-snippet": -1,
-            "max-video-preview": -1,
-          },
-        },
-  };
+  return buildProfilePageMetadata(
+    dbProfile,
+    resolvedParams.slug,
+    siteUrl,
+    profile.seoTitle,
+    profile.seoDescription,
+    profile.ogImage,
+  );
 }
 
 export default async function TherapistPage({ params }: { params: Promise<Params> }) {
@@ -111,6 +90,7 @@ export default async function TherapistPage({ params }: { params: Promise<Params
 
   return (
     <>
+      <ProfilePageTracker profile={profile} />
       <ProfileViewTracker profileId={dbProfile.id} source="direct" />
       {dbProfile.is_demo && <DemoProfileBanner />}
       <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Therapists", path: "/therapists" }, ...(matchedCity ? [{ name: matchedCity.name, path: `/${matchedCity.slug}` }] : []), { name: profile.name, path: profilePath }])} />
