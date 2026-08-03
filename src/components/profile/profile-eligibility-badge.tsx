@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { AlertCircle, CheckCircle, Clock, XCircle } from "lucide-react";
 import type { ProfileViewModel } from "./profile-utils";
 import { calculateProfileSeoCompleteness, getProfileIndexEligibility } from "@/lib/profile-seo-completeness";
-import { shouldShowProfileSeoScore, getProfileIndexRobots } from "@/lib/index-eligibility";
 
 interface ProfileEligibilityBadgeProps {
   profile: ProfileViewModel;
