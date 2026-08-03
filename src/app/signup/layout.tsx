@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { createPageMetadata } from "@/app/_lib/seo";
 import { SignupShell } from "./_components/signup-shell";
+import { ReferralCapture } from "./_components/referral-capture";
 
 const SIGNUP_SOCIAL_IMAGE =
   "https://res.cloudinary.com/dyfxkq2nk/image/upload/c_fill,g_center,w_1200,h_630,q_auto:best/v1785553494/ChatGPT_Image_Jul_31_2026_07_31_32_PM_tsdzpd.png";
@@ -18,11 +20,16 @@ export const metadata: Metadata = createPageMetadata({
     "therapist listing signup",
     "get massage clients online",
   ],
-  // Onboarding funnel — keep out of the index alongside /login, /register, and
-  // /forgot-password (robots.txt also disallows /signup).
   noIndex: true,
 });
 
 export default function SignupLayout({ children }: { children: React.ReactNode }) {
-  return <SignupShell>{children}</SignupShell>;
+  return (
+    <SignupShell>
+      <Suspense fallback={null}>
+        <ReferralCapture />
+      </Suspense>
+      {children}
+    </SignupShell>
+  );
 }
