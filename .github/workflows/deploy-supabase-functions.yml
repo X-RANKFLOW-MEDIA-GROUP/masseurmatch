@@ -65,11 +65,6 @@ jobs:
           fi
           [ "$missing" -eq 0 ]
 
-      # Repo variables pasted with stray whitespace (e.g. a trailing space)
-      # make the CLI fail with "Invalid project ref format".
-      - name: Normalize project ref
-        run: echo "SUPABASE_PROJECT_REF=$(echo "$SUPABASE_PROJECT_REF" | tr -d '[:space:]')" >> "$GITHUB_ENV"
-
       - uses: supabase/setup-cli@v1
         with:
           version: latest
