@@ -24,16 +24,21 @@ export async function GET(request: NextRequest) {
     }
 
     const emailMap = new Map(users.map((user) => [user.id, user.email]));
-    const recipients = (profiles || [])
-      .map((profile) => ({
+    const recipients = (profiles || []).flatMap((profile) => {
+      if (!profile.user_id) return [];
+
+      const email = emailMap.get(profile.user_id);
+      if (!email) return [];
+
+      return [{
         profileId: profile.id,
         userId: profile.user_id,
         name: profile.display_name || profile.full_name || "Provider",
-        email: emailMap.get(profile.user_id) || null,
+        email,
         city: profile.city || null,
         status: profile.status || null,
-      }))
-      .filter((recipient): recipient is typeof recipient & { email: string } => Boolean(recipient.email));
+      }];
+    });
 
     return NextResponse.json({ recipients });
   } catch (error) {
