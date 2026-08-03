@@ -25,13 +25,27 @@ export interface IndexEligibilityConfig {
 
 export const indexEligibilityConfig: IndexEligibilityConfig = {
   // Current launch phase
-  launchPhase: "soft-launch",
+  launchPhase: "public",
 
-  // Cities currently live (should have 5-10+ verified profiles each)
-  citiesLiveList: ["dallas", "denver", "los-angeles", "new-york", "san-francisco"],
+  // All US cities eligible for indexing (Verified profiles always indexed)
+  // Tier 1 (primary): Major markets with 10+ profiles
+  // Tier 2 (secondary): Markets with 3-9 profiles
+  // Tier 3 (emerging): Markets with 1-2 profiles (indexed but marked "coming soon")
+  citiesLiveList: [
+    // Tier 1 - Major metros (10+ profiles)
+    "dallas", "denver", "los-angeles", "new-york", "san-francisco",
+    "chicago", "miami", "atlanta", "houston", "seattle",
+    "boston", "philadelphia", "phoenix", "portland", "austin",
+    // Tier 2 - Secondary markets (3-9 profiles)
+    "sacramento", "san-diego", "nashville", "minneapolis", "columbus",
+    "las-vegas", "dc", "baltimore", "pittsburgh", "brooklyn",
+    // Tier 3 - Emerging markets (1-2 profiles)
+    "albuquerque", "anchorage", "boise", "providence", "spokane",
+    "tucson", "tulsa", "memphis", "louisville", "salt-lake-city",
+  ],
 
-  // Require minimum 3-5 profiles before indexing a city page
-  minimumProfilesPerCity: 3,
+  // Require minimum 1 profile before indexing a city page
+  minimumProfilesPerCity: 1,
 
   // Don't index generic service pages yet - too thin
   indexServicePages: false,
@@ -157,13 +171,18 @@ export function getProfileIndexRobots(profile: TherapistProfile | PublicTherapis
     return "noindex, follow";
   }
 
-  // Verified profiles in live cities: index
-  if (isVerified && cityInLiveList) {
+  // Verified profiles anywhere: index (all verified are eligible now)
+  if (isVerified) {
     return "index, follow";
   }
 
-  // Verified but not in a live city yet: noindex but allow discovery
-  return "noindex, follow";
+  // Unverified in live city: don't index yet, but allow discovery via links
+  if (cityInLiveList) {
+    return "noindex, follow";
+  }
+
+  // Unverified in non-live city: noindex, nofollow
+  return "noindex, nofollow";
 }
 
 export function shouldShowProfileSeoScore(profile: TherapistProfile | null): boolean {
