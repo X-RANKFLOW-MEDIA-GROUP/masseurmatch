@@ -16,13 +16,21 @@ import { VoxProfile } from "@/app/therapists/[slug]/_components/vox/VoxProfile";
 import { DemoProfileBanner } from "@/app/_components/demo-profile-banner";
 import { ProfileViewTracker } from "@/app/therapists/[slug]/_components/ProfileViewTracker";
 import { ProfilePageTracker } from "@/app/therapists/[slug]/_components/ProfilePageTracker";
+import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 
 type Params = { slug: string };
+
+type PublicImportedReview = {
+  review_text: string | null;
+  reviewer_name: string | null;
+  reviewer_anonymized: boolean | null;
+  review_date: string | null;
+  rating: number | null;
+};
 
 export const revalidate = 60;
 
 export async function generateStaticParams() {
-  // Public profiles are generated on demand to avoid build-time database dependency.
   return [];
 }
 
@@ -58,10 +66,33 @@ export default async function TherapistPage({ params }: { params: Promise<Params
 
   if (!dbProfile) notFound();
 
-  const [photos, relatedResult] = await Promise.all([
+  const supabase = createSupabaseAdminClient();
+  const [photos, relatedResult, importedReviewsResult] = await Promise.all([
     getProfilePhotos(dbProfile.id),
     getPublicTherapists({ city: dbProfile.city || undefined, page: 1, pageSize: 6 }),
+    supabase
+      .from("imported_reviews")
+      .select("review_text, reviewer_name, reviewer_anonymized, review_date, rating")
+      .eq("profile_id", dbProfile.id)
+      .eq("is_public", true)
+      .order("review_date", { ascending: false })
+      .limit(100),
   ]);
+
+  const importedReviews = (importedReviewsResult.data ?? []) as PublicImportedReview[];
+  const ratedReviews = importedReviews.filter((review) => typeof review.rating === "number");
+  const rating = ratedReviews.length > 0
+    ? ratedReviews.reduce((sum, review) => sum + Number(review.rating), 0) / ratedReviews.length
+    : undefined;
+  const reviewCount = importedReviews.length;
+  const reviews = importedReviews
+    .filter((review) => Boolean(review.review_text))
+    .map((review) => ({
+      quote: review.review_text || "",
+      author: review.reviewer_anonymized || !review.reviewer_name ? "Verified client" : review.reviewer_name,
+      date: review.review_date || undefined,
+    }));
+
   const profile = buildProfileViewModel(dbProfile, photos);
   const matchedCity = getCities().find((city) => city.name.toLowerCase() === profile.city.toLowerCase());
   const profilePath = `/therapists/${profile.slug}`;
@@ -102,6 +133,9 @@ export default async function TherapistPage({ params }: { params: Promise<Params
         availableNow={Boolean(dbProfile.available_now)}
         lgbtqAffirming={Boolean(dbProfile.lgbtq_affirming)}
         knottyPrompt={knottyPrompt}
+        reviews={reviews}
+        rating={rating}
+        reviewCount={reviewCount}
         businessHours={dbProfile.business_hours}
         training={Array.isArray(dbProfile.training) ? dbProfile.training : []}
         education={Array.isArray(dbProfile.education) ? dbProfile.education : []}
