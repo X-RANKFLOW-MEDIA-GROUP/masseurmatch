@@ -67,16 +67,21 @@ export default async function TherapistPage({ params }: { params: Promise<Params
   if (!dbProfile) notFound();
 
   const supabase = createSupabaseAdminClient();
+  // The production table already contains is_public and reviewer_anonymized,
+  // but the checked-in generated Supabase types have not caught up yet.
+  // Keep the database-side public filter and isolate the temporary type escape
+  // here so private imported reviews can never be rendered accidentally.
+  const importedReviewsQuery = (supabase.from("imported_reviews") as any)
+    .select("review_text, reviewer_name, reviewer_anonymized, review_date, rating")
+    .eq("profile_id", dbProfile.id)
+    .eq("is_public", true)
+    .order("review_date", { ascending: false })
+    .limit(100);
+
   const [photos, relatedResult, importedReviewsResult] = await Promise.all([
     getProfilePhotos(dbProfile.id),
     getPublicTherapists({ city: dbProfile.city || undefined, page: 1, pageSize: 6 }),
-    supabase
-      .from("imported_reviews")
-      .select("review_text, reviewer_name, reviewer_anonymized, review_date, rating")
-      .eq("profile_id", dbProfile.id)
-      .eq("is_public", true)
-      .order("review_date", { ascending: false })
-      .limit(100),
+    importedReviewsQuery,
   ]);
 
   const importedReviews = (importedReviewsResult.data ?? []) as PublicImportedReview[];
