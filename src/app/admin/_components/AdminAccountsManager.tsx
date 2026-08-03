@@ -69,7 +69,7 @@ export default function AdminAccountsManager({ initialAccounts }: { initialAccou
     <div className="space-y-5">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-        <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search name, email, city, user ID, or profile ID..." className="pl-10" />
+        <Input id="admin-accounts-search" name="adminAccountsSearch" aria-label="Search accounts" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search name, email, city, user ID, or profile ID..." className="pl-10" />
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -86,56 +86,61 @@ export default function AdminAccountsManager({ initialAccounts }: { initialAccou
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 bg-white">
-            {filtered.map((account) => (
-              <tr key={account.userId} className="align-top">
-                <td className="px-4 py-4">
-                  <p className="font-semibold text-slate-900">{account.displayName}</p>
-                  <p className="text-xs text-slate-500">{account.email || "No email"}</p>
-                  <p className="mt-1 text-[11px] text-slate-400">User: {account.userId.slice(0, 8)} · Profile: {account.profileId.slice(0, 8)}</p>
-                </td>
-                <td className="px-4 py-4 text-slate-600">{account.city || "No city"}</td>
-                <td className="px-4 py-4">
-                  <p className="capitalize text-slate-700">{account.profileStatus.replaceAll("_", " ")}</p>
-                  <p className="text-xs text-slate-500">{account.verificationStatus || "unverified"}</p>
-                  <div className="mt-1 flex gap-1 text-[10px]">
-                    {account.isFeatured ? <span className="rounded bg-amber-100 px-1.5 py-0.5 text-amber-700">Featured</span> : null}
-                    {account.isSuspended ? <span className="rounded bg-orange-100 px-1.5 py-0.5 text-orange-700">Suspended</span> : null}
-                    {account.isBanned ? <span className="rounded bg-red-100 px-1.5 py-0.5 text-red-700">Banned</span> : null}
-                  </div>
-                </td>
-                <td className="px-4 py-4 capitalize text-slate-700">{account.subscriptionTier || "free"}</td>
-                <td className="px-4 py-4">
-                  <div className="flex gap-2">
-                    <select value={roles[account.userId]} onChange={(event) => setRoles((current) => ({ ...current, [account.userId]: event.target.value as "admin" | "provider" }))} className="h-9 rounded-md border border-slate-200 bg-white px-2">
-                      <option value="provider">Provider</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                    <Button size="sm" variant="outline" disabled={busyId === account.userId} onClick={() => void saveRole(account)}>Save</Button>
-                  </div>
-                </td>
-                <td className="px-4 py-4">
-                  <div className="flex gap-2">
-                    <select value={actions[account.profileId]} onChange={(event) => setActions((current) => ({ ...current, [account.profileId]: event.target.value as ProfileAction }))} className="h-9 rounded-md border border-slate-200 bg-white px-2">
-                      <option value="approve">Approve profile</option>
-                      <option value="reject">Reject profile</option>
-                      <option value="activate">Activate profile</option>
-                      <option value="suspend">Suspend user</option>
-                      <option value="ban">Ban user</option>
-                      <option value="verify_identity">Verify identity</option>
-                      <option value="feature">Feature profile</option>
-                      <option value="unfeature">Unfeature profile</option>
-                      <option value="upgrade">Upgrade plan</option>
-                    </select>
-                    <Button size="sm" disabled={busyId === account.profileId} onClick={() => void applyProfileAction(account)}>Apply</Button>
-                  </div>
-                </td>
-                <td className="px-4 py-4">
-                  <Button size="sm" variant="ghost" disabled={!account.slug} onClick={() => account.slug && window.open(`/therapists/${account.slug}`, "_blank")}>
-                    <Eye className="mr-1 h-4 w-4" /> Profile
-                  </Button>
-                </td>
-              </tr>
-            ))}
+            {filtered.map((account) => {
+              const roleFieldId = `account-role-${account.userId}`;
+              const actionFieldId = `account-action-${account.profileId}`;
+
+              return (
+                <tr key={account.userId} className="align-top">
+                  <td className="px-4 py-4">
+                    <p className="font-semibold text-slate-900">{account.displayName}</p>
+                    <p className="text-xs text-slate-500">{account.email || "No email"}</p>
+                    <p className="mt-1 text-[11px] text-slate-400">User: {account.userId.slice(0, 8)} · Profile: {account.profileId.slice(0, 8)}</p>
+                  </td>
+                  <td className="px-4 py-4 text-slate-600">{account.city || "No city"}</td>
+                  <td className="px-4 py-4">
+                    <p className="capitalize text-slate-700">{account.profileStatus.replaceAll("_", " ")}</p>
+                    <p className="text-xs text-slate-500">{account.verificationStatus || "unverified"}</p>
+                    <div className="mt-1 flex gap-1 text-[10px]">
+                      {account.isFeatured ? <span className="rounded bg-amber-100 px-1.5 py-0.5 text-amber-700">Featured</span> : null}
+                      {account.isSuspended ? <span className="rounded bg-orange-100 px-1.5 py-0.5 text-orange-700">Suspended</span> : null}
+                      {account.isBanned ? <span className="rounded bg-red-100 px-1.5 py-0.5 text-red-700">Banned</span> : null}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 capitalize text-slate-700">{account.subscriptionTier || "free"}</td>
+                  <td className="px-4 py-4">
+                    <div className="flex gap-2">
+                      <select id={roleFieldId} name={roleFieldId} aria-label={`Role for ${account.displayName}`} value={roles[account.userId]} onChange={(event) => setRoles((current) => ({ ...current, [account.userId]: event.target.value as "admin" | "provider" }))} className="h-9 rounded-md border border-slate-200 bg-white px-2">
+                        <option value="provider">Provider</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                      <Button size="sm" variant="outline" disabled={busyId === account.userId} onClick={() => void saveRole(account)}>Save</Button>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="flex gap-2">
+                      <select id={actionFieldId} name={actionFieldId} aria-label={`Admin action for ${account.displayName}`} value={actions[account.profileId]} onChange={(event) => setActions((current) => ({ ...current, [account.profileId]: event.target.value as ProfileAction }))} className="h-9 rounded-md border border-slate-200 bg-white px-2">
+                        <option value="approve">Approve profile</option>
+                        <option value="reject">Reject profile</option>
+                        <option value="activate">Activate profile</option>
+                        <option value="suspend">Suspend user</option>
+                        <option value="ban">Ban user</option>
+                        <option value="verify_identity">Verify identity</option>
+                        <option value="feature">Feature profile</option>
+                        <option value="unfeature">Unfeature profile</option>
+                        <option value="upgrade">Upgrade plan</option>
+                      </select>
+                      <Button size="sm" disabled={busyId === account.profileId} onClick={() => void applyProfileAction(account)}>Apply</Button>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <Button size="sm" variant="ghost" disabled={!account.slug} onClick={() => account.slug && window.open(`/therapists/${account.slug}`, "_blank")}>
+                      <Eye className="mr-1 h-4 w-4" /> Profile
+                    </Button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
