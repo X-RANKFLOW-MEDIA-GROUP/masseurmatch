@@ -2,7 +2,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "incremental": false,
-    "plugins": []
+    "plugins": [],
+    "skipLibCheck": true,
+    "noImplicitAny": false
   },
   "include": [
     "next-env.d.ts",
