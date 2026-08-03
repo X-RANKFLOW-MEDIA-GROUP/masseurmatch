@@ -18,24 +18,35 @@ export function VoxGallery({ images, name }: { images: string[]; name: string })
       return (current + dir + photos.length) % photos.length;
     });
 
+  const gridColumns =
+    photos.length === 1
+      ? "mx-auto max-w-3xl grid-cols-1"
+      : photos.length === 2
+        ? "grid-cols-1 sm:grid-cols-2"
+        : "grid-cols-2 sm:grid-cols-3";
+
+  const tileRatio = photos.length === 1 ? "aspect-[4/3]" : "aspect-[4/5] sm:aspect-[4/3]";
+
   return (
     <>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <div className={`grid gap-3 ${gridColumns}`}>
         {photos.map((src, index) => (
           <button
             key={`${src}-${index}`}
             type="button"
             onClick={() => setActive(index)}
-            className={`group relative overflow-hidden rounded-2xl border border-[#efe3d8] bg-[#f3e9df] ${
-              index === 0 ? "col-span-2 row-span-2 aspect-square sm:aspect-[4/3]" : "aspect-square"
-            }`}
+            className={`group relative overflow-hidden rounded-2xl border border-[#efe3d8] bg-[#f3e9df] ${tileRatio}`}
           >
             <Image
               src={src}
               alt={`${name} — gallery photo ${index + 1}`}
               fill
-              sizes="(min-width: 640px) 33vw, 50vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes={
+                photos.length === 1
+                  ? "(min-width: 1024px) 768px, 100vw"
+                  : "(min-width: 1024px) 360px, (min-width: 640px) 50vw, 50vw"
+              }
+              className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.025]"
               loading={index === 0 ? "eager" : "lazy"}
             />
           </button>
@@ -45,6 +56,7 @@ export function VoxGallery({ images, name }: { images: string[]; name: string })
       {active !== null && (
         <div
           role="dialog"
+          aria-modal="true"
           aria-label={`${name} gallery`}
           className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/85 p-4"
           onClick={close}
@@ -61,7 +73,10 @@ export function VoxGallery({ images, name }: { images: string[]; name: string })
             <>
               <button
                 type="button"
-                onClick={(e) => { e.stopPropagation(); step(-1); }}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  step(-1);
+                }}
                 aria-label="Previous photo"
                 className="absolute left-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/20 backdrop-blur-md sm:left-6"
               >
@@ -69,7 +84,10 @@ export function VoxGallery({ images, name }: { images: string[]; name: string })
               </button>
               <button
                 type="button"
-                onClick={(e) => { e.stopPropagation(); step(1); }}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  step(1);
+                }}
                 aria-label="Next photo"
                 className="absolute right-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/20 backdrop-blur-md sm:right-6"
               >
@@ -79,7 +97,7 @@ export function VoxGallery({ images, name }: { images: string[]; name: string })
           )}
           <div
             className="relative h-[78vh] w-full max-w-4xl"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
           >
             <Image
               src={photos[active]}
