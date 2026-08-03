@@ -146,6 +146,11 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
     .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
     .map((entry) => ({ href: `/${entry.slug}`, label: formatCityLabel(entry.name, entry.stateCode) }));
 
+  const otherStateCities = allCities
+    .filter((c) => c.stateName === city.stateName && c.slug !== city.slug)
+    .map((c) => ({ href: `/${c.slug}`, label: formatCityLabel(c.name, c.stateCode) }))
+    .slice(0, 8);
+
   const therapists = await getPublicTherapists({ city: city.name, page: 1, pageSize: 9 });
   const hasInventory = therapists.items.length > 0;
 
@@ -257,6 +262,14 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
                 title: `Nearby cities to ${city.name}`,
                 layout: "chips" as const,
                 items: relatedCityLinks,
+              }]
+            : []),
+          ...(otherStateCities.length
+            ? [{
+                title: `More cities in ${city.stateName}`,
+                layout: "chips" as const,
+                description: "Explore male massage therapist directories in other cities across the state.",
+                items: otherStateCities,
               }]
             : []),
           ...(cityGuideLinks.length
