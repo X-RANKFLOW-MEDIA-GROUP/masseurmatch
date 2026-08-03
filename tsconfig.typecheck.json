@@ -3,11 +3,6 @@
   "compilerOptions": {
     "incremental": false,
     "skipLibCheck": true,
-    "noImplicitAny": false,
-    "moduleResolution": "bundler"
-  },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx"
-  ]
+    "noImplicitAny": false
+  }
 }
