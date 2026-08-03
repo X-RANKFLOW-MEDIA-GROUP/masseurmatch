@@ -25,6 +25,7 @@ import {
   CalendarCheck,
   MessageSquare,
   Flag,
+  Import,
 } from "lucide-react";
 
 const navSections = [
@@ -66,6 +67,7 @@ const navSections = [
   {
     title: "Ops",
     items: [
+      { href: "/admin/migrations", label: "Imports", icon: Import },
       { href: "/admin/tickets", label: "Tickets", icon: MessageSquare },
       { href: "/admin/support", label: "Support", icon: LifeBuoy },
       { href: "/admin/verification", label: "Verification", icon: ShieldCheck },
