@@ -27,7 +27,11 @@
       ]
     },
     "strictNullChecks": true,
-    "incremental": false
+    "incremental": false,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false
   },
   "include": [
     "next-env.d.ts",
