@@ -1,4 +1,6 @@
-import { test, expect, type APIRequestContext } from "@playwright/test";
+import { test, expect } from "@playwright/test";
+
+import { fetchCanonical } from "./helpers/fetch-canonical";
 
 /**
  * CI gate: validates every entry in the redirects manifest.
@@ -10,48 +12,6 @@ import { test, expect, type APIRequestContext } from "@playwright/test";
  */
 
 type RedirectCase = [source: string, destination: string];
-
-const REDIRECT_STATUSES = new Set([301, 302, 307, 308]);
-const MAX_INFRASTRUCTURE_REDIRECTS = 3;
-
-/**
- * Follow infrastructure-level host canonicalization transparently so the test
- * sees the application-level redirect. Vercel may use 301, 302, 307, or 308
- * for a same-path cross-origin hop, and that status may change independently
- * of the application redirect configuration.
- */
-async function fetchCanonical(
-  request: APIRequestContext,
-  url: string,
-): Promise<Awaited<ReturnType<APIRequestContext["get"]>>> {
-  let currentUrl = url;
-
-  for (let hop = 0; hop < MAX_INFRASTRUCTURE_REDIRECTS; hop += 1) {
-    const res = await request.get(currentUrl, { maxRedirects: 0 });
-    const location = res.headers()["location"];
-
-    if (!REDIRECT_STATUSES.has(res.status()) || !location) {
-      return res;
-    }
-
-    const sourceUrl = new URL(currentUrl);
-    const locationUrl = new URL(location, currentUrl);
-    const samePathAndQuery =
-      locationUrl.pathname === sourceUrl.pathname &&
-      locationUrl.search === sourceUrl.search;
-    const differentOrigin = locationUrl.origin !== sourceUrl.origin;
-
-    if (!samePathAndQuery || !differentOrigin) {
-      return res;
-    }
-
-    currentUrl = locationUrl.toString();
-  }
-
-  throw new Error(
-    `Exceeded ${MAX_INFRASTRUCTURE_REDIRECTS} same-path host redirects for ${url}`,
-  );
-}
 
 // Mirror of src/app/_lib/redirects-manifest.ts — update both together.
 // The source of truth for intent is the TS file; these cases validate HTTP behaviour.
