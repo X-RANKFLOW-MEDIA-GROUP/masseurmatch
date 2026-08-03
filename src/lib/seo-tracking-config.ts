@@ -8,6 +8,12 @@
  * - Core Web Vitals monitoring
  */
 
+declare global {
+  interface Window {
+    gtag?: (command: string, ...args: unknown[]) => void;
+  }
+}
+
 export const SeoPlatforms = {
   GOOGLE_ANALYTICS_ID: process.env.NEXT_PUBLIC_GA4_ID || "",
   SEARCH_CONSOLE_SITE: "https://masseurmatch.com",
