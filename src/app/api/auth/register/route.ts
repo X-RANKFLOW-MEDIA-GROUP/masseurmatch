@@ -1,4 +1,4 @@
-import { errorResponse, json, parseJsonBody } from "@/app/api/_lib/http";
+import { errorResponse, json, parseJsonBody, toUserErrorMessage } from "@/app/api/_lib/http";
 import { RouteError } from "@/app/api/_lib/http";
 import { assertRateLimit } from "@/app/_lib/security";
 import { authRegisterSchema } from "@/app/_lib/validation";
@@ -42,7 +42,10 @@ export async function POST(request: Request) {
           { status: 409 },
         );
       }
-      throw new RouteError(400, error?.message || "Could not create account.");
+      throw new RouteError(
+        400,
+        toUserErrorMessage(error?.message, "We couldn't create your account. Please try again."),
+      );
     }
 
     if (Array.isArray(data.user.identities) && data.user.identities.length === 0) {

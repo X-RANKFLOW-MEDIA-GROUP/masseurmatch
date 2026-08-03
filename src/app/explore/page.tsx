@@ -4,6 +4,7 @@ import { JsonLd } from "@/app/_components/JsonLd";
 import { createPageMetadata, buildBreadcrumbJsonLd } from "@/app/_lib/seo";
 import { getCities } from "@/app/_lib/directory";
 import { cityDisplayName } from "@/data/cities";
+import { ExploreLocationFinder } from "./ExploreLocationFinder";
 
 const FEATURED_CITY_SLUGS = [
   "atlanta",
@@ -104,7 +105,7 @@ export default function ExplorePage() {
             <Link
               key={city!.slug}
               href={`/${city!.slug}`}
-              className="rounded-lg border border-border bg-card px-3 py-2 text-sm transition-colors hover:border-primary/40"
+              className="truncate rounded-lg border border-border bg-card px-3 py-2.5 text-sm transition-colors hover:border-primary/40"
             >
               {cityDisplayName(city!.name, city!.stateCode)}{" "}
               <span className="text-muted-foreground">{city!.stateCode}</span>
@@ -122,7 +123,7 @@ export default function ExplorePage() {
             <Link
               key={state.stateCode}
               href={`/states/${toStateSlug(state.stateName)}`}
-              className="rounded-lg border border-border bg-card px-3 py-2 text-sm transition-colors hover:border-primary/40"
+              className="truncate rounded-lg border border-border bg-card px-3 py-2.5 text-sm transition-colors hover:border-primary/40"
             >
               {state.stateName}
             </Link>

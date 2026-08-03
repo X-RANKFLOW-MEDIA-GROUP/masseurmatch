@@ -54,7 +54,11 @@ function getConfiguredPriceId(planKey: string): string | null {
   const envName = PLAN_PRICE_ENV[planKey];
   if (!envName) return null;
   const priceId = Deno.env.get(envName)?.trim();
-  return priceId && priceId.startsWith("price_") ? priceId : null;
+  // Only accept a real-looking Stripe price ID. A placeholder value such as
+  // "price_…" passes a bare startsWith check and then 500s every checkout
+  // (free trials included) with Stripe's "No such price" — fall back to the
+  // metadata-based lookup instead.
+  return priceId && /^price_[A-Za-z0-9]+$/.test(priceId) ? priceId : null;
 }
 
 // Resolve the price for a plan: use the configured fixed price ID when set,

@@ -57,6 +57,7 @@ export default function SignupResubmitPage() {
             yearsExperience: p.yearsExperience,
             city: p.city,
             state: p.state,
+            zipCode: p.zipCode,
             neighborhood: p.neighborhood,
             locationType: p.locationType,
             serviceCategories: p.serviceCategories,

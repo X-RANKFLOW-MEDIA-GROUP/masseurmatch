@@ -9,7 +9,8 @@ import {
   getKeywordBySlug,
   getSegmentBySlug,
 } from "@/app/_lib/directory-taxonomy";
-import { getLaunchAreaPaths, getLaunchKeywordPaths, getLaunchSegmentPaths } from "@/app/_lib/launch-urls";
+import { getLaunchAreaPaths, getLaunchKeywordPaths, getLaunchSegmentPaths, isLaunchUrl } from "@/app/_lib/launch-urls";
+import { GUIDES } from "@/app/guides/data";
 import { getLocalSeoCityContent } from "@/app/_lib/local-seo-content";
 import {
   buildBreadcrumbJsonLd,
@@ -136,10 +137,19 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
       return { href: path, label: formatSlugLabel(areaSlug || "area") };
     });
 
+  const cityGuideLinks = GUIDES.filter((guide) => guide.cityLinks.includes(canonicalCityPath))
+    .slice(0, 4)
+    .map((guide) => ({ href: `/guides/${guide.slug}`, label: guide.h1 }));
+
   const relatedCityLinks = (localContent?.relatedCitySlugs || [])
     .map((slug) => allCities.find((entry) => entry.slug === slug))
     .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
     .map((entry) => ({ href: `/${entry.slug}`, label: formatCityLabel(entry.name, entry.stateCode) }));
+
+  const otherStateCities = allCities
+    .filter((c) => c.stateName === city.stateName && c.slug !== city.slug)
+    .map((c) => ({ href: `/${c.slug}`, label: formatCityLabel(c.name, c.stateCode) }))
+    .slice(0, 8);
 
   const therapists = await getPublicTherapists({ city: city.name, page: 1, pageSize: 9 });
   const hasInventory = therapists.items.length > 0;
@@ -215,7 +225,9 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
         })}
         leadLinks={[
           hasInventory
-            ? { href: `/search?city=${city.slug}`, label: `Browse therapists in ${city.name}` }
+            ? isLaunchUrl(`${canonicalCityPath}/verified-profiles`)
+              ? { href: `${canonicalCityPath}/verified-profiles`, label: `Active profiles in ${city.name}` }
+              : { href: `${canonicalCityPath}/male-therapists`, label: `Male therapists in ${city.name}` }
             : { href: "/states", label: "Browse active states" },
           { href: "/search", label: "Search all providers" },
           { href: "/safety", label: "Read safety guidance" },
@@ -250,6 +262,22 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
                 title: `Nearby cities to ${city.name}`,
                 layout: "chips" as const,
                 items: relatedCityLinks,
+              }]
+            : []),
+          ...(otherStateCities.length
+            ? [{
+                title: `More cities in ${city.stateName}`,
+                layout: "chips" as const,
+                description: "Explore male massage therapist directories in other cities across the state.",
+                items: otherStateCities,
+              }]
+            : []),
+          ...(cityGuideLinks.length
+            ? [{
+                title: `${city.name} massage guides`,
+                layout: "chips" as const,
+                description: "Editorial guides that help you choose a session format, technique, and provider with confidence.",
+                items: cityGuideLinks,
               }]
             : []),
           {

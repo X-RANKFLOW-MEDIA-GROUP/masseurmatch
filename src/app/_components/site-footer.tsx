@@ -57,6 +57,41 @@ export function SiteFooter() {
 
         </div>
 
+        {/* Discovery link grid */}
+        <div className="mb-12 grid grid-cols-2 gap-y-8 gap-x-6 sm:grid-cols-3">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-3">Popular Cities</p>
+            <ul className="space-y-2 text-xs text-gray-400">
+              <li><Link href="/dallas" className="hover:text-white transition-colors">Dallas Male Massage</Link></li>
+              <li><Link href="/houston" className="hover:text-white transition-colors">Houston Male Massage</Link></li>
+              <li><Link href="/austin" className="hover:text-white transition-colors">Austin Male Massage</Link></li>
+              <li><Link href="/miami" className="hover:text-white transition-colors">Miami Male Massage</Link></li>
+              <li><Link href="/chicago" className="hover:text-white transition-colors">Chicago Male Massage</Link></li>
+              <li><Link href="/cities" className="hover:text-white transition-colors">All Cities</Link></li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-3">Discover</p>
+            <ul className="space-y-2 text-xs text-gray-400">
+              <li><Link href="/search" className="hover:text-white transition-colors">Search Therapists</Link></li>
+              <li><Link href="/near-me" className="hover:text-white transition-colors">Massage Near Me</Link></li>
+              <li><Link href="/states" className="hover:text-white transition-colors">Browse by State</Link></li>
+              <li><Link href="/therapists" className="hover:text-white transition-colors">Therapist Directory</Link></li>
+              <li><Link href="/compare" className="hover:text-white transition-colors">Compare Directories</Link></li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-3">Learn</p>
+            <ul className="space-y-2 text-xs text-gray-400">
+              <li><Link href="/guides" className="hover:text-white transition-colors">Massage Guides</Link></li>
+              <li><Link href="/safety" className="hover:text-white transition-colors">Safety Guidance</Link></li>
+              <li><Link href="/verification" className="hover:text-white transition-colors">Verification</Link></li>
+              <li><Link href="/how-it-works" className="hover:text-white transition-colors">How It Works</Link></li>
+              <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
+            </ul>
+          </div>
+        </div>
+
         {/* Policy link grid */}
         <div className="mb-12 grid grid-cols-2 gap-y-8 gap-x-6 sm:grid-cols-3 lg:grid-cols-5">
           <div>

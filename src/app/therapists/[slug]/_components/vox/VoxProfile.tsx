@@ -39,6 +39,7 @@ import { VoxFaqAccordion } from "./VoxFaqAccordion";
 import { VoxStickyContact } from "./VoxStickyContact";
 import { VoxAiButton } from "./VoxAiButton";
 import { ReportProfileDialog } from "@/components/profile/ReportProfileDialog";
+import { trackConversion } from "@/lib/seo-tracking-config";
 
 type RelatedProfile = { name: string; slug: string; city: string; profilePhotoUrl?: string };
 type Review = { quote: string; author: string; date?: string };
@@ -95,6 +96,11 @@ export function VoxProfile({
   const emailHref = contactHref("email", profile.email);
   const websiteHref = contactHref("website", profile.website);
 
+  const handlePhoneClick = () => trackConversion("call", profile.id);
+  const handleWhatsAppClick = () => trackConversion("contact", profile.id);
+  const handleEmailClick = () => trackConversion("email", profile.id);
+  const handleWebsiteClick = () => trackConversion("contact", profile.id);
+
   const allServices = Array.from(
     new Set([...profile.services, ...profile.massageTypes, ...profile.specialties]),
   ).filter(Boolean);
@@ -145,10 +151,18 @@ export function VoxProfile({
             aria-label="Breadcrumb"
             className="mb-8 flex flex-wrap items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/60"
           >
-            <Link href={`/${profile.citySlug}`} className="transition-colors hover:text-white/70">
-              {profile.city}
+            <Link href="/" className="transition-colors hover:text-white/70">
+              Home
             </Link>
             <ChevronRight className="h-3 w-3 text-white/50" strokeWidth={2} />
+            {profile.citySlug ? (
+              <>
+                <Link href={`/${profile.citySlug}`} className="transition-colors hover:text-white/70">
+                  {profile.city}
+                </Link>
+                <ChevronRight className="h-3 w-3 text-white/50" strokeWidth={2} />
+              </>
+            ) : null}
             <Link href="/therapists" className="transition-colors hover:text-white/70">
               Therapists
             </Link>
@@ -239,6 +253,7 @@ export function VoxProfile({
                 {phoneHref && (
                   <a
                     href={phoneHref}
+                    onClick={handlePhoneClick}
                     className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-white shadow-[0_0_32px_rgba(139, 30, 45,0.4)] transition-transform hover:-translate-y-0.5"
                   >
                     <Phone className="h-4 w-4" strokeWidth={2.5} />
@@ -248,6 +263,7 @@ export function VoxProfile({
                 {whatsappHref && (
                   <a
                     href={whatsappHref}
+                    onClick={handleWhatsAppClick}
                     className="inline-flex h-12 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/15"
                   >
                     <MessageCircle className="h-4 w-4" strokeWidth={2.5} />
@@ -263,6 +279,7 @@ export function VoxProfile({
                 {emailHref && !phoneHref && !whatsappHref && (
                   <a
                     href={emailHref}
+                    onClick={handleEmailClick}
                     className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-white"
                   >
                     <Mail className="h-4 w-4" strokeWidth={2.5} />
@@ -272,6 +289,7 @@ export function VoxProfile({
                 {websiteHref && (
                   <a
                     href={websiteHref}
+                    onClick={handleWebsiteClick}
                     className="inline-flex h-12 items-center gap-2 rounded-full border border-white/20 bg-white/[0.07] px-5 font-semibold text-white/80 transition-colors hover:text-white"
                   >
                     <Globe className="h-4 w-4" strokeWidth={2.25} />
@@ -725,6 +743,7 @@ export function VoxProfile({
         startingPrice={profile.startingPrice}
         phoneHref={phoneHref}
         whatsappHref={whatsappHref}
+        profileId={profile.id}
       />
     </div>
   );

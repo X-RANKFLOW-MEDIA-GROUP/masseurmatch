@@ -1,8 +1,9 @@
 name: Deploy Supabase Functions
 
-# Auto-deploys the auth-email-hook Edge Function whenever its source lands on
-# main, so the deployed function never drifts from what's in the repo (the class
-# of bug that made confirmation links fail: a fix merged but never deployed).
+# Auto-deploys the auth-email-hook and lifecycle email Edge Functions whenever
+# their source lands on main, so the deployed functions never drift from what's
+# in the repo (the class of bug that made confirmation links fail: a fix merged
+# but never deployed).
 #
 # Requirements (set once in the repo settings):
 #   - Secret   SUPABASE_ACCESS_TOKEN  — a personal access token
@@ -21,6 +22,12 @@ on:
     branches: [main]
     paths:
       - "supabase/functions/auth-email-hook/**"
+      - "supabase/functions/process-lifecycle-email-queue/**"
+      - "supabase/functions/lifecycle-unsubscribe/**"
+      - "supabase/functions/run-lifecycle-campaigns/**"
+      - "supabase/functions/create-checkout/**"
+      - "supabase/functions/customer-portal/**"
+      - "supabase/functions/_shared/**"
       - "supabase/config.toml"
       - ".github/workflows/deploy-supabase-functions.yml"
   workflow_dispatch: {}
@@ -52,9 +59,25 @@ jobs:
           fi
           [ "$missing" -eq 0 ]
 
+      # Repo variables pasted with stray whitespace (e.g. a trailing space)
+      # make the CLI fail with "Invalid project ref format".
+      - name: Normalize project ref
+        run: echo "SUPABASE_PROJECT_REF=$(echo "$SUPABASE_PROJECT_REF" | tr -d '[:space:]')" >> "$GITHUB_ENV"
+
       - uses: supabase/setup-cli@v1
         with:
           version: latest
 
       - name: Deploy auth-email-hook
         run: supabase functions deploy auth-email-hook --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Deploy lifecycle email functions
+        run: |
+          supabase functions deploy process-lifecycle-email-queue --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy lifecycle-unsubscribe --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy run-lifecycle-campaigns --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Deploy billing functions
+        run: |
+          supabase functions deploy create-checkout --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy customer-portal --project-ref "$SUPABASE_PROJECT_REF"

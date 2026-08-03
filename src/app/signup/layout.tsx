@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import { createPageMetadata } from "@/app/_lib/seo";
 import { SignupShell } from "./_components/signup-shell";
 
+const SIGNUP_SOCIAL_IMAGE =
+  "https://res.cloudinary.com/dyfxkq2nk/image/upload/c_fill,g_center,w_1200,h_630,q_auto:best/v1785553494/ChatGPT_Image_Jul_31_2026_07_31_32_PM_tsdzpd.png";
+
 export const metadata: Metadata = createPageMetadata({
-  title: "Sign Up",
+  title: "Create Your Therapist Profile — 14 Days Free, No Credit Card",
   description:
-    "Create your professional profile on MasseurMatch, verify your identity, and start getting discovered by clients near you.",
+    "Join MasseurMatch and create your therapist profile with a 14-day free trial. No credit card required.",
   path: "/signup",
+  image: SIGNUP_SOCIAL_IMAGE,
   keywords: [
     "massage therapist sign up",
     "get listed as a massage therapist",

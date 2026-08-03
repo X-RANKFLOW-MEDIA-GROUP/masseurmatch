@@ -144,7 +144,9 @@ export default function SignupAccountPage() {
     try {
       const result = await signUp(form.email, form.password, form.fullName);
       if (result.error) {
-        setError(result.error.message);
+        setError(
+          result.error.message?.trim() || "We couldn't create your account. Please try again.",
+        );
         setLoading(false);
         return;
       }

@@ -84,9 +84,29 @@ function parseCookieHeader(header: string | null): Record<string, string> {
   }, {});
 }
 
+/**
+ * Guard user-facing error copy. Upstream libraries sometimes produce
+ * machine-shaped messages — supabase-js, for one, falls back to
+ * `JSON.stringify(body)` when an auth response has no message field, which
+ * surfaces as a literal "{}" in the UI. Reject empty or JSON-looking strings
+ * and use the provided fallback instead.
+ */
+export function toUserErrorMessage(raw: unknown, fallback: string): string {
+  if (typeof raw !== "string") {
+    return fallback;
+  }
+
+  const message = raw.trim();
+  if (!message || message.startsWith("{") || message.startsWith("[")) {
+    return fallback;
+  }
+
+  return message;
+}
+
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
-    return error.message;
+    return toUserErrorMessage(error.message, "Something went wrong. Please try again.");
   }
 
   return "Unknown error.";

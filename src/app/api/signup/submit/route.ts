@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getRequestSession } from "@/app/api/_lib/session";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { notifyAdmin } from "@/app/api/_lib/admin-notify";
+import { resolveCityStateFromZip } from "@/app/api/_lib/zip-location";
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,16 +59,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Identity verification must be completed." }, { status: 400 });
     }
 
+    const location = await resolveCityStateFromZip(profile);
+
     const { error: updateError } = await adminClient
       .from("profiles")
       .update({
         bio: profile.bio || null,
-        city: profile.city || null,
+        city: location.city,
         neighborhood_name: profile.neighborhood?.trim() || null,
-        state: profile.state || null,
+        state: location.state,
+        zip_code: location.zip,
         specialties: profile.serviceCategories?.length ? profile.serviceCategories : null,
         incall_price: profile.startingPrice ? Number(profile.startingPrice) : null,
         years_experience: profile.yearsExperience ? Number(profile.yearsExperience) : null,
+        // Mandatory platform-wide — every provider commits to
+        // LGBTQ+-affirming service in the Therapist Agreement.
+        lgbtq_affirming: true,
         _tier: planTier ?? null,
         status: "pending_approval",
         profile_status: "pending_approval",
@@ -90,8 +97,8 @@ export async function POST(request: NextRequest) {
       intro: `${profile.fullName || "A provider"} submitted their profile and is awaiting approval.`,
       fields: [
         { label: "Name", value: profile.fullName || null },
-        { label: "City", value: profile.city || null },
-        { label: "State", value: profile.state || null },
+        { label: "City", value: location.city },
+        { label: "State", value: location.state },
         { label: "Plan", value: planTier || null },
         { label: "User ID", value: session.userId },
       ],
