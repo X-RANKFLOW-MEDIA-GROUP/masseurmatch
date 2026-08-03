@@ -182,7 +182,7 @@ function DesktopNavItem({
           className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md transition-colors ${
             active
               ? "bg-[#8B1E2D] text-white shadow-sm"
-              : "text-[#6F6F6F] hover:text-[#111111] hover:bg-[#F7F7F7]"
+              : "text-[#111111] hover:text-[#111111] hover:bg-[#F7F7F7]"
           }`}
         >
           <item.icon className="w-[0.9rem] h-[0.9rem]" strokeWidth={2.35} />
@@ -209,7 +209,7 @@ function DesktopNavItem({
         className={`flex items-center gap-1 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md transition-colors ${
           active
             ? "bg-[#8B1E2D] text-white shadow-sm"
-            : "text-[#6F6F6F] hover:text-[#111111] hover:bg-[#F7F7F7]"
+            : "text-[#111111] hover:text-[#111111] hover:bg-[#F7F7F7]"
         }`}
       >
         <item.icon className="w-[0.9rem] h-[0.9rem]" strokeWidth={2.35} />
@@ -501,7 +501,7 @@ export default function SiteHeader() {
             className="h-11 w-auto object-contain md:h-14"
           />
           <div className="hidden lg:flex flex-col">
-            <span className="text-[9px] font-semibold text-[#6F6F6F] tracking-[0.12em] uppercase leading-tight">
+            <span className="text-[9px] font-semibold text-[#111111] tracking-[0.12em] uppercase leading-tight">
               LGBTQ+-Affirming Male Massage
             </span>
           </div>
@@ -528,7 +528,7 @@ export default function SiteHeader() {
             >
               <Link
                 href={dashboardPath}
-                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#6F6F6F] hover:text-[#111111] hover:bg-[#F7F7F7] transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#111111] hover:text-[#111111] hover:bg-[#F7F7F7] transition-colors"
               >
                 <UserCircle
                   className="w-[0.9rem] h-[0.9rem]"
@@ -545,7 +545,7 @@ export default function SiteHeader() {
             >
               <Link
                 href="/login"
-                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#6F6F6F] hover:text-[#111111] hover:bg-[#F7F7F7] transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wide rounded-md text-[#111111] hover:text-[#111111] hover:bg-[#F7F7F7] transition-colors"
               >
                 <UserCircle
                   className="w-[0.9rem] h-[0.9rem]"
