@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 
     const { data: profile, error: profileError } = await adminClient
       .from("profiles")
-      .select("id")
+      .select("id, display_name, full_name")
       .eq("user_id", session.userId)
       .maybeSingle();
 
@@ -41,28 +41,32 @@ export async function POST(request: Request) {
         upsert: false,
       });
 
-    let publicUrl = "";
     if (uploadError) {
-      // Storage not configured or bucket missing — store as pending without URL
-      console.warn("[provider/photos/upload] Storage upload failed:", uploadError.message);
-      publicUrl = "";
-    } else {
-      const { data: urlData } = adminClient.storage.from(bucket).getPublicUrl(fileName);
-      publicUrl = urlData?.publicUrl ?? "";
+      console.error("[provider/photos/upload] Storage upload failed:", uploadError.message);
+      throw new RouteError(503, "Photo storage is temporarily unavailable. Please try again.");
     }
 
-    // Count existing photos to determine sort_order
-    const { count } = await adminClient
+    const { data: urlData } = adminClient.storage.from(bucket).getPublicUrl(fileName);
+    const publicUrl = urlData?.publicUrl ?? "";
+
+    if (!publicUrl) {
+      await adminClient.storage.from(bucket).remove([fileName]);
+      throw new RouteError(500, "The photo was uploaded but no public URL was generated.");
+    }
+
+    const { count, error: countError } = await adminClient
       .from("profile_photos")
       .select("id", { count: "exact", head: true })
       .eq("profile_id", profile.id);
 
+    if (countError) {
+      await adminClient.storage.from(bucket).remove([fileName]);
+      throw new RouteError(500, countError.message);
+    }
+
     const sortOrder = count ?? 0;
     const isPrimary = sortOrder === 0;
 
-    // Cast: the generated Database types predate the profile_id column on
-    // profile_photos. (mime_type/file_size were dropped from the payload —
-    // the live table doesn't have them and the insert would 42703.)
     const { data: photoRow, error: insertError } = await (adminClient as any)
       .from("profile_photos")
       .insert({
@@ -73,20 +77,82 @@ export async function POST(request: Request) {
         is_primary: isPrimary,
         sort_order: sortOrder,
         moderation_status: "pending",
+        moderation_reason: "queued_for_ai_review",
       })
       .select("id, url, storage_path, is_primary, sort_order, moderation_status")
       .single();
 
-    if (insertError) throw new RouteError(500, insertError.message);
+    if (insertError || !photoRow) {
+      await adminClient.storage.from(bucket).remove([fileName]);
+      throw new RouteError(500, insertError?.message || "Could not register the uploaded photo.");
+    }
+
+    const snapshot = {
+      photoId: photoRow.id,
+      imageUrl: publicUrl,
+      isPrimary,
+      sortOrder,
+      displayName: profile.display_name || profile.full_name || null,
+      originalFileName: file.name,
+    };
+
+    const { error: queueError } = await (adminClient as any)
+      .from("moderation_queue")
+      .insert({
+        content_type: "photo",
+        profile_id: profile.id,
+        user_id: session.userId,
+        target_id: photoRow.id,
+        item_type: "photo",
+        source: "pro_photos",
+        field_name: null,
+        status: "pending",
+        priority: "normal",
+        moderation_provider: "sightengine",
+        moderation_reason: "queued_for_ai_review",
+        snapshot,
+        ai_response: null,
+      });
+
+    if (queueError) {
+      console.error("[provider/photos/upload] Could not create moderation queue item:", queueError.message);
+    }
+
+    const { data: moderationData, error: moderationError } = await adminClient.functions.invoke(
+      "moderate-photo",
+      {
+        body: {
+          photo_id: photoRow.id,
+          image_url: publicUrl,
+        },
+      },
+    );
+
+    if (moderationError) {
+      console.error("[provider/photos/upload] Automated moderation failed:", moderationError.message);
+      await (adminClient as any)
+        .from("profile_photos")
+        .update({
+          moderation_status: "pending",
+          moderation_reason: "manual_review_required",
+        })
+        .eq("id", photoRow.id);
+    }
+
+    const status = moderationError
+      ? "pending"
+      : moderationData?.approved === true
+        ? "approved"
+        : "pending";
 
     return json({
       ok: true,
       photo: {
         id: photoRow.id,
-        url: photoRow.url || photoRow.storage_path || "",
+        url: publicUrl,
         isPrimary: photoRow.is_primary ?? false,
         sortOrder: photoRow.sort_order ?? 0,
-        status: photoRow.moderation_status ?? "pending",
+        status,
       },
     });
   } catch (error) {
