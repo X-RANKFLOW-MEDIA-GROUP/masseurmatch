@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "profile_source_id": "masseurfinder:45519",
+  "profile_display_name": "Bruno",
+  "account_link": {
+    "submitted_email": "segatti.hall@gmail.clm",
+    "status": "blocked_invalid_email_domain",
+    "suggested_correction": "segatti.hall@gmail.com",
+    "automatic_linking_allowed": false,
+    "notes": "The submitted address ends in gmail.clm. Do not link or send email until the address is confirmed or corrected."
+  },
+  "combined_review_summary": {
+    "platform_count": 1,
+    "total_source_reviews_advertised": 13,
+    "total_reviews_captured": 12,
+    "total_unique_reviews": 12,
+    "rated_reviews": 0,
+    "average_rating": null,
+    "rating_scale": 5,
+    "rating_display_status": "unavailable_from_source",
+    "summary_text": "Clients frequently praise Bruno's firm and adjustable pressure, ability to identify and relieve areas of tension, professional communication, welcoming personality, clean and comfortable environment, and the relaxed or rejuvenated feeling after the session.",
+    "top_topics": [
+      {
+        "topic": "Firm and adjustable pressure",
+        "sentiment": "positive"
+      },
+      {
+        "topic": "Muscle tension and knot relief",
+        "sentiment": "positive"
+      },
+      {
+        "topic": "Professional and attentive service",
+        "sentiment": "positive"
+      },
+      {
+        "topic": "Comfortable and clean environment",
+        "sentiment": "positive"
+      },
+      {
+        "topic": "Easy communication and scheduling",
+        "sentiment": "positive"
+      },
+      {
+        "topic": "Relaxation and recovery after the session",
+        "sentiment": "positive"
+      }
+    ],
+    "public_disclosure": "Review texts were imported from an external platform. The source did not provide a verifiable aggregate or individual star rating, so MasseurMatch must not display or estimate a star score for this source."
+  },
+  "platforms": [
+    {
+      "platform": "masseurfinder",
+      "source_url": "https://www.masseurfinder.com/massage-therapists/45519/",
+      "source_average_rating": null,
+      "source_rating_scale": 5,
+      "source_review_count_advertised": 13,
+      "reviews_captured": 12,
+      "reviews_with_rating": 0,
+      "reviews_with_text": 12,
+      "rating_type": "not_available",
+      "include_in_combined_rating": false,
+      "is_verified": false,
+      "requires_admin_review": true
+    }
+  ],
+  "multi_platform_rules": {
+    "combined_rating_method": "weighted_by_rated_review_count",
+    "exclude_sources_without_verifiable_ratings": true,
+    "deduplicate_cross_platform_reviews": true,
+    "deduplication_fields": [
+      "normalized_review_text",
+      "review_date",
+      "reviewer_name",
+      "rating"
+    ],
+    "never_generate_ratings_from_review_sentiment": true,
+    "preserve_source_breakdown": true
+  },
+  "recommended_public_display": {
+    "heading": "Customer feedback",
+    "primary_metric": "12 imported reviews",
+    "rating": null,
+    "rating_note": "Star rating was not available from the source platform.",
+    "source_label": "Imported from MasseurFinder",
+    "summary": "Clients frequently mention Bruno's firm pressure, attention to problem areas, professional communication, comfortable environment, and the relaxed feeling after each session."
+  },
+  "import_status": "pending_admin_review"
+}
