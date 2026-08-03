@@ -23,10 +23,11 @@ export async function loadAccounts(): Promise<{ items: AdminAccount[]; error: st
       admin
         .from("profiles")
         .select("id, user_id, email, email_address, display_name, full_name, city, slug, profile_status, subscription_tier, verification_status, is_featured, is_suspended, is_banned, updated_at")
+        .not("id", "is", null)
         .not("user_id", "is", null)
         .order("updated_at", { ascending: false })
         .limit(200),
-      admin.from("user_roles").select("user_id, role, created_at").order("created_at", { ascending: false }),
+      admin.from("user_roles").select("user_id, role, created_at").not("user_id", "is", null).order("created_at", { ascending: false }),
     ]);
 
     if (profileError) throw new Error(profileError.message);
@@ -34,6 +35,7 @@ export async function loadAccounts(): Promise<{ items: AdminAccount[]; error: st
 
     const roleMap = new Map<string, "admin" | "provider" | null>();
     for (const row of roles ?? []) {
+      if (typeof row.user_id !== "string" || !row.user_id) continue;
       if (!roleMap.has(row.user_id)) {
         roleMap.set(row.user_id, row.role as "admin" | "provider" | null);
       }
@@ -48,21 +50,27 @@ export async function loadAccounts(): Promise<{ items: AdminAccount[]; error: st
       page = data.nextPage || 0;
     }
 
-    const items: AdminAccount[] = (profiles ?? []).map((profile) => ({
-      profileId: profile.id,
-      userId: profile.user_id as string,
-      email: authEmailMap.get(profile.user_id as string) || profile.email_address || profile.email || null,
-      role: roleMap.get(profile.user_id as string) || "provider",
-      displayName: profile.display_name || profile.full_name || "Unknown account",
-      city: profile.city,
-      slug: profile.slug,
-      profileStatus: profile.profile_status || "draft",
-      subscriptionTier: profile.subscription_tier,
-      verificationStatus: profile.verification_status,
-      isFeatured: Boolean(profile.is_featured),
-      isSuspended: Boolean(profile.is_suspended),
-      isBanned: Boolean(profile.is_banned),
-    }));
+    const items: AdminAccount[] = (profiles ?? []).flatMap((profile) => {
+      if (typeof profile.id !== "string" || !profile.id || typeof profile.user_id !== "string" || !profile.user_id) {
+        return [];
+      }
+
+      return [{
+        profileId: profile.id,
+        userId: profile.user_id,
+        email: authEmailMap.get(profile.user_id) || profile.email_address || profile.email || null,
+        role: roleMap.get(profile.user_id) || "provider",
+        displayName: profile.display_name || profile.full_name || "Unknown account",
+        city: profile.city,
+        slug: profile.slug,
+        profileStatus: profile.profile_status || "draft",
+        subscriptionTier: profile.subscription_tier,
+        verificationStatus: profile.verification_status,
+        isFeatured: Boolean(profile.is_featured),
+        isSuspended: Boolean(profile.is_suspended),
+        isBanned: Boolean(profile.is_banned),
+      }];
+    });
 
     return { items, error: null };
   } catch (error) {
