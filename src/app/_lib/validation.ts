@@ -18,6 +18,12 @@ export const authRegisterSchema = z.object({
   fullName: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(8),
+  referralCode: z
+    .preprocess(
+      (value) => (typeof value === "string" ? value.trim().toUpperCase() : value),
+      z.string().regex(/^REF[A-F0-9]{10}$/).optional(),
+    )
+    .optional(),
 });
 
 export const forgotPasswordSchema = z.object({
