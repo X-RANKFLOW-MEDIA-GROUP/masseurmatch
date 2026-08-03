@@ -6,7 +6,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard,
   Users,
-  HeartHandshake,
   ShieldCheck,
   ShieldAlert,
   CreditCard,
@@ -32,8 +31,7 @@ const navSections = [
     title: "Core",
     items: [
       { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-      { href: "/admin/users", label: "Users", icon: Users },
-      { href: "/admin/therapists", label: "Therapists", icon: HeartHandshake },
+      { href: "/admin/users", label: "Accounts", icon: Users },
       { href: "/admin/photos", label: "Photos", icon: ImageIcon },
       { href: "/admin/moderation", label: "Moderation", icon: ShieldAlert },
       { href: "/admin/profile-reports", label: "Profile Reports", icon: Flag },
