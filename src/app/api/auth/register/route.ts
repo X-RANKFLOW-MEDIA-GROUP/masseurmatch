@@ -3,8 +3,30 @@ import { RouteError } from "@/app/api/_lib/http";
 import { assertRateLimit } from "@/app/_lib/security";
 import { authRegisterSchema } from "@/app/_lib/validation";
 import { verifyCsrfToken, extractCsrfToken } from "@/app/api/_lib/csrf";
-import { ensureUserProfileAndRole } from "@/app/api/_lib/supabase-server";
+import {
+  createSupabaseAdminClient,
+  ensureUserProfileAndRole,
+} from "@/app/api/_lib/supabase-server";
 import { createServerSupabase } from "@/lib/supabase/server";
+
+async function claimReferral(userId: string, referralCode?: string) {
+  if (!referralCode) return;
+
+  const admin = createSupabaseAdminClient();
+  const { error } = await (admin.rpc as unknown as (
+    name: string,
+    params: Record<string, unknown>,
+  ) => Promise<{ error: { message: string } | null }>)('claim_referral_signup', {
+    p_referred_user_id: userId,
+    p_referral_code: referralCode,
+  });
+
+  if (error) {
+    // Account creation must not fail because attribution could not be recorded.
+    // The error is still surfaced in server logs for operational follow-up.
+    console.error('[auth/register] referral attribution failed:', error.message);
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -26,7 +48,11 @@ export async function POST(request: Request) {
       password: body.password,
       options: {
         emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(verificationPath)}`,
-        data: { full_name: body.fullName, role: "provider" },
+        data: {
+          full_name: body.fullName,
+          role: "provider",
+          referral_code: body.referralCode ?? null,
+        },
       },
     });
 
@@ -63,6 +89,8 @@ export async function POST(request: Request) {
       defaultRole: "provider",
       fallbackName: body.fullName,
     });
+
+    await claimReferral(data.user.id, body.referralCode);
 
     return json({
       ok: true,
