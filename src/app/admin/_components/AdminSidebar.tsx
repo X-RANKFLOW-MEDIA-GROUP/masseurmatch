@@ -25,6 +25,7 @@ import {
   CalendarCheck,
   MessageSquare,
   Flag,
+  Mail,
 } from "lucide-react";
 
 const navSections = [
@@ -42,6 +43,7 @@ const navSections = [
   {
     title: "Messaging",
     items: [
+      { href: "/admin/emails", label: "Email Center", icon: Mail },
       { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
       { href: "/admin/sms", label: "SMS Auto-Reply", icon: MessageSquare },
     ],
