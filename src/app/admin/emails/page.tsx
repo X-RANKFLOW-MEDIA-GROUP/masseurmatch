@@ -1,5 +1,5 @@
 import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";
-import AdminEmailComposer from "@/app/admin/emails/AdminEmailComposer";
+import AdminEmailComposer from "./AdminEmailComposer";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
