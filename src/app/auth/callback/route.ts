@@ -1,18 +1,26 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import type { EmailOtpType } from "@supabase/supabase-js";
-import { createServerSupabase } from "@/lib/supabase/server";
-import {
-  createAdminClient,
-} from "@/lib/supabase/admin";
-import { ensureUserProfileAndRole } from "@/app/api/_lib/supabase-server";
+import type { EmailOtpType, User } from "@supabase/supabase-js";
 import { assertRateLimit } from "@/app/_lib/security";
+import { ensureUserProfileAndRole } from "@/app/api/_lib/supabase-server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { isExpectedInvalidSessionError } from "@/lib/supabase/auth-errors";
+import { createServerSupabase } from "@/lib/supabase/server";
 
 function sanitizeRedirect(next: string | null): string {
   const fallback = "/pro/dashboard";
   if (!next) return fallback;
   if (!next.startsWith("/") || next.startsWith("//")) return fallback;
   return next;
+}
+
+function failedAuthRedirect(origin: string, type: EmailOtpType | null) {
+  if (type === "recovery") {
+    return NextResponse.redirect(
+      `${origin}/reset-password?error=access_denied&error_code=otp_expired`,
+    );
+  }
+  return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
 }
 
 export async function GET(request: NextRequest) {
@@ -35,23 +43,30 @@ export async function GET(request: NextRequest) {
   // Cookie-bound client: exchangeCodeForSession / verifyOtp write the Supabase
   // auth cookies onto the response automatically.
   const supabase = await createServerSupabase();
-  const { data, error } = code
-    ? await supabase.auth.exchangeCodeForSession(code)
-    : await supabase.auth.verifyOtp({ type: type!, token_hash: tokenHash! });
+  let user: User | null = null;
 
-  const user = data?.user;
-  if (error || !user?.email) {
-    console.error("[auth/callback] error:", error?.message);
-    // Recovery links that fail here are almost always a single-use token that
-    // was already consumed (commonly by an email link-scanner pre-fetch). Send
-    // the user to the reset page with a clear, actionable error instead of the
-    // generic login failure.
-    if (type === "recovery") {
-      return NextResponse.redirect(
-        `${origin}/reset-password?error=access_denied&error_code=otp_expired`,
-      );
+  try {
+    const authResult = code
+      ? await supabase.auth.exchangeCodeForSession(code)
+      : await supabase.auth.verifyOtp({ type: type!, token_hash: tokenHash! });
+
+    if (authResult.error) {
+      if (!isExpectedInvalidSessionError(authResult.error)) {
+        console.error("[auth/callback] error:", authResult.error.message);
+      }
+      return failedAuthRedirect(origin, type);
     }
-    return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+
+    user = authResult.data?.user ?? null;
+  } catch (error) {
+    if (!isExpectedInvalidSessionError(error)) {
+      console.error("[auth/callback] error:", error);
+    }
+    return failedAuthRedirect(origin, type);
+  }
+
+  if (!user?.email) {
+    return failedAuthRedirect(origin, type);
   }
 
   // Password recovery: the OTP is now verified and a recovery session cookie is
