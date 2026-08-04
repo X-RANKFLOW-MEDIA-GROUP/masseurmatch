@@ -1,29 +1,5 @@
-import AdminUsersManager from "@/app/admin/_components/AdminUsersManager";
-import { loadUsers } from "@/app/admin/_lib/loaders";
-import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";
+import { redirect } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
-export default async function AdminUsersPage() {
-  const { items, error } = await loadUsers();
-
-  return (
-    <div className="space-y-6">
-      <AdminPageHeader
-        title="Users"
-        description="Review provider accounts and move them between provider and admin roles."
-      />
-
-      {error ? (
-        <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-muted-foreground">
-          Users could not be loaded from Supabase admin right now: {error}
-        </div>
-      ) : null}
-
-      <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
-        <AdminUsersManager initialUsers={items} />
-      </div>
-    </div>
-  );
+export default function AdminUsersPage() {
+  redirect("/admin/people");
 }
