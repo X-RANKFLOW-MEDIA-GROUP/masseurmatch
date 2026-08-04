@@ -1,13 +1,36 @@
-import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
-import { createSupabaseAdminClient, requireAdminSession } from "@/app/api/_lib/supabase-server";
-import { sendEmail } from "@/app/api/_lib/email";
 import React from "react";
+import { z } from "zod";
 
-interface ReviewDecision {
-  reviewId: string;
-  approved: boolean;
-  notes?: string;
-}
+import { sendEmail } from "@/app/api/_lib/email";
+import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
+import {
+  createSupabaseAdminClient,
+  recordAuditLog,
+  requireAdminSession,
+} from "@/app/api/_lib/supabase-server";
+import { SITE_URL } from "@/lib/site";
+
+const reviewDecisionSchema = z.object({
+  reviewId: z.string().uuid(),
+  approved: z.boolean(),
+  notes: z.string().trim().max(1_000).optional(),
+});
+
+const reviewRequestSchema = z
+  .object({
+    migrationId: z.string().uuid(),
+    reviews: z.array(reviewDecisionSchema).min(1).max(1_000),
+  })
+  .superRefine((value, context) => {
+    const uniqueIds = new Set(value.reviews.map((review) => review.reviewId));
+    if (uniqueIds.size !== value.reviews.length) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["reviews"],
+        message: "Each imported review can only be decided once.",
+      });
+    }
+  });
 
 // Admin listing for /admin/migrations: pending/processed migrations with
 // their imported reviews attached.
@@ -56,130 +79,111 @@ export async function PUT(request: Request) {
   try {
     const session = await requireAdminSession(request);
     const userId = session.userId;
-
-    const body = await request.json();
-    const { migrationId, reviews, notes } = body as {
-      migrationId: string;
-      reviews: ReviewDecision[];
-      notes?: string;
-    };
-
-    if (!migrationId || !Array.isArray(reviews)) {
-      throw new RouteError(400, "Migration ID and reviews array are required.");
-    }
+    const body = await parseJsonBody(request, reviewRequestSchema);
 
     const adminClient = createSupabaseAdminClient();
 
-    // Update each review's approval status
-    for (const decision of reviews) {
+    const { data: migration, error: migrationError } = await (adminClient as any)
+      .from("profile_migrations")
+      .select("id, email")
+      .eq("id", body.migrationId)
+      .maybeSingle();
+
+    if (migrationError) throw new RouteError(500, "Could not retrieve migration.");
+    if (!migration) throw new RouteError(404, "Migration not found.");
+
+    const reviewIds = body.reviews.map((review) => review.reviewId);
+    const { data: migrationReviews, error: reviewLookupError } = await (adminClient as any)
+      .from("imported_reviews")
+      .select("id")
+      .eq("migration_id", body.migrationId);
+
+    if (reviewLookupError) throw new RouteError(500, "Could not verify imported reviews.");
+
+    const migrationReviewIds = new Set(
+      (migrationReviews ?? []).map((review: { id: string }) => review.id),
+    );
+    if (
+      migrationReviewIds.size !== reviewIds.length ||
+      reviewIds.some((reviewId) => !migrationReviewIds.has(reviewId))
+    ) {
+      throw new RouteError(400, "Include one decision for every review in this migration.");
+    }
+
+    for (const decision of body.reviews) {
       const updateData: Record<string, unknown> = {
+        is_public: decision.approved,
+        public_label: "Imported review",
         reviewed_at: new Date().toISOString(),
         reviewed_by: userId,
+        review_notes: decision.notes || null,
       };
 
-      if (decision.approved) {
-        updateData.is_public = true;
-      }
-
-      if (decision.notes) {
-        updateData.review_notes = decision.notes;
-      }
-
-      const { error: updateError } = await ((adminClient as any)
+      const { data: updatedReview, error: updateError } = await (adminClient as any)
         .from("imported_reviews")
         .update(updateData)
-        .eq("id", decision.reviewId));
+        .eq("id", decision.reviewId)
+        .eq("migration_id", body.migrationId)
+        .select("id")
+        .maybeSingle();
 
-      if (updateError) {
-        console.error("[api/migrate/review] Update error:", updateError.message);
+      if (updateError || !updatedReview) {
+        console.error(
+          "[api/migrate/review] Update error:",
+          updateError?.message || "review row did not match the selected migration",
+        );
         throw new RouteError(500, "Could not update review status.");
       }
     }
 
-    // Mark migration as verified if all reviews approved
-    const approvedCount = reviews.filter((r) => r.approved).length;
-    const { data: migration, error: selectError } = await ((adminClient as any)
+    const approvedCount = body.reviews.filter((review) => review.approved).length;
+    const rejectedCount = body.reviews.length - approvedCount;
+    const verifiedAt = new Date().toISOString();
+    const { error: verificationError } = await (adminClient as any)
       .from("profile_migrations")
-      .select("*")
-      .eq("id", migrationId)
-      .single());
+      .update({ is_verified: true, verified_at: verifiedAt, verified_by: userId })
+      .eq("id", body.migrationId);
 
-    if (selectError) {
-      console.error("[api/migrate/review] Select error:", selectError.message);
-      throw new RouteError(500, "Could not retrieve migration.");
-    }
+    if (verificationError) throw new RouteError(500, "Could not finalize migration review.");
 
-    if (migration && approvedCount > 0) {
-      const { error: migrationError } = await ((adminClient as any)
-        .from("profile_migrations")
-        .update({
-          is_verified: true,
-          verified_at: new Date().toISOString(),
-          verified_by: userId,
-        })
-        .eq("id", migrationId));
+    await recordAuditLog(userId, "profile_import_reviewed", "profile_migration", body.migrationId, {
+      approved_reviews: approvedCount,
+      rejected_reviews: rejectedCount,
+    });
 
-      if (!migrationError && migration.email) {
-        // Send notification to therapist
-        try {
-          await sendEmail({
-            to: migration.email,
-            subject: "Your Profile Migration is Complete — Reviews Now Live!",
-            react: React.createElement("div", {
-              dangerouslySetInnerHTML: {
-                __html: `
-                  <!DOCTYPE html>
-                  <html>
-                    <head>
-                      <style>
-                        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.6; color: #333; }
-                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                        .header { border-bottom: 3px solid #8B1E2D; padding-bottom: 20px; margin-bottom: 30px; }
-                        .header h1 { margin: 0; color: #111111; font-size: 24px; font-weight: bold; }
-                        .content { margin-bottom: 30px; }
-                        .stat-box { background: #F8EDEE; border-left: 4px solid #8B1E2D; padding: 20px; margin: 20px 0; text-align: center; }
-                        .stat-box .number { color: #8B1E2D; font-size: 32px; font-weight: bold; }
-                        .cta-button { display: inline-block; background-color: #8B1E2D; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
-                        .footer { border-top: 1px solid #E8E8E8; padding-top: 20px; font-size: 12px; color: #8E8E8E; }
-                      </style>
-                    </head>
-                    <body>
-                      <div class="container">
-                        <div class="header">
-                          <h1>🎉 Your Reviews Are Now Live!</h1>
-                        </div>
-                        <div class="content">
-                          <p>Great news! Your profile migration has been approved and your reviews are now appearing on your MasseurMatch profile.</p>
-                          <div class="stat-box">
-                            <div class="number">${approvedCount}</div>
-                            <div style="color: #6F6F6F; font-size: 14px; margin-top: 5px;">Reviews Published</div>
-                          </div>
-                          <p>Your reviews are now searchable on MasseurMatch and will help new clients find you. Your profile is live and accepting bookings.</p>
-                          <p><a href="https://masseurmatch.com/dashboard" class="cta-button">View Your Profile</a></p>
-                          <p>Questions? Contact concierge@masseurmatch.com</p>
-                          <p><strong>The MasseurMatch Team</strong></p>
-                        </div>
-                        <div class="footer">
-                          <p>© 2025 MasseurMatch. All rights reserved.</p>
-                        </div>
-                      </div>
-                    </body>
-                  </html>
-                `,
-              },
-            }),
-          }).catch((err) => {
-            console.error("[api/migrate/review] Email send failed:", err);
-          });
-        } catch (emailErr) {
-          console.error("[api/migrate/review] Email error:", emailErr);
-        }
-      }
+    if (migration.email) {
+      await sendEmail({
+        to: migration.email,
+        subject: approvedCount > 0
+          ? "Your imported reviews are now live"
+          : "Your profile import review is complete",
+        react: React.createElement(
+          "div",
+          null,
+          React.createElement("h1", null, "Your profile import review is complete"),
+          React.createElement(
+            "p",
+            null,
+            approvedCount > 0
+              ? `${approvedCount} imported ${approvedCount === 1 ? "review is" : "reviews are"} now published on your profile.`
+              : "None of the submitted reviews met the requirements for publication.",
+          ),
+          React.createElement(
+            "p",
+            null,
+            React.createElement("a", { href: `${SITE_URL}/pro/dashboard` }, "View your profile"),
+          ),
+        ),
+      }).catch((error) => {
+        console.error("[api/migrate/review] Email send failed:", error);
+      });
     }
 
     return json({
       ok: true,
-      message: `${approvedCount} reviews approved and published.`,
+      approved: approvedCount,
+      rejected: rejectedCount,
+      message: `${approvedCount} approved, ${rejectedCount} rejected.`,
     });
   } catch (error) {
     return errorResponse(error);

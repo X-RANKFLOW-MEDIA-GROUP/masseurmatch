@@ -560,12 +560,41 @@ create table if not exists public.imported_reviews (
 
 alter table public.imported_reviews
   add column if not exists migration_id uuid,
+  add column if not exists imported_at timestamptz default now(),
   add column if not exists reviewer_anonymized boolean default false,
   add column if not exists is_public boolean default false,
+  add column if not exists public_label text not null default 'Imported review',
   add column if not exists reviewed_by uuid,
   add column if not exists reviewed_at timestamp,
   add column if not exists review_notes text,
   add column if not exists updated_at timestamp default now();
+
+create index if not exists idx_imported_reviews_public_profile_date
+  on public.imported_reviews (profile_id, review_date desc)
+  where is_public = true;
+
+create or replace view public.public_imported_reviews
+with (security_invoker = true) as
+select
+  ir.id,
+  ir.profile_id,
+  case
+    when coalesce(ir.reviewer_anonymized, false) then null
+    else ir.reviewer_name
+  end as reviewer_name,
+  ir.rating,
+  ir.review_text,
+  ir.review_date,
+  ir.public_label,
+  ir.imported_at,
+  ir.created_at
+from public.imported_reviews ir
+where ir.is_public = true;
+
+revoke all on public.public_imported_reviews from public, anon, authenticated;
+grant select on public.public_imported_reviews to service_role;
+drop policy if exists "Public can view approved imported reviews" on public.imported_reviews;
+revoke select on public.imported_reviews from anon;
 
 -- Profile migration pipeline (/api/migrate): one row per requested import of
 -- an external profile into MasseurMatch. Mirrors the table already live in

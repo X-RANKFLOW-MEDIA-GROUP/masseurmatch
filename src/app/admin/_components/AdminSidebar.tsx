@@ -24,6 +24,9 @@ import {
   CalendarCheck,
   MessageSquare,
   Flag,
+  Grid3X3,
+  Mail,
+  Workflow,
 } from "lucide-react";
 
 const navSections = [
@@ -31,6 +34,7 @@ const navSections = [
     title: "Overview",
     items: [
       { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+      { href: "/admin/tools", label: "All Tools", icon: Grid3X3 },
       { href: "/admin/people", label: "People CRM", icon: Users },
       { href: "/admin/photos", label: "Photo Approvals", icon: ImageIcon },
       { href: "/admin/moderation", label: "Approvals", icon: ShieldAlert },
@@ -40,10 +44,12 @@ const navSections = [
   {
     title: "Communication",
     items: [
+      { href: "/admin/emails", label: "Email Center", icon: Mail },
       { href: "/admin/tickets", label: "Tickets", icon: MessageSquare },
       { href: "/admin/support", label: "Support", icon: LifeBuoy },
       { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
       { href: "/admin/sms", label: "SMS Auto-Reply", icon: MessageSquare },
+      { href: "/admin/migrations", label: "Profile Imports", icon: Workflow },
     ],
   },
   {

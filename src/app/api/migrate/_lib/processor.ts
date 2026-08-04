@@ -1,4 +1,5 @@
 import { createSupabaseWebhookAdminClient } from "@/app/api/_lib/supabase-server";
+import { assertSafePublicUrl } from "@/app/api/migrate/_lib/source-url";
 
 interface ScrapedReview {
   reviewer_name: string | null;
@@ -18,36 +19,76 @@ interface PendingMigration {
 const FETCH_TIMEOUT_MS = 10_000;
 const MAX_HTML_BYTES = 3_000_000;
 const BATCH_LIMIT = 10;
+const MAX_REDIRECTS = 5;
 
-async function fetchHtml(url: string): Promise<string | null> {
+async function readHtmlWithLimit(body: ReadableStream<Uint8Array> | null): Promise<string | null> {
+  if (!body) return null;
+
+  const reader = body.getReader();
+  const decoder = new TextDecoder();
+  let totalBytes = 0;
+  let html = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    totalBytes += value.byteLength;
+
+    if (totalBytes > MAX_HTML_BYTES) {
+      await reader.cancel();
+      return null;
+    }
+
+    html += decoder.decode(value, { stream: true });
+  }
+
+  return html + decoder.decode();
+}
+
+async function fetchHtml(rawUrl: string): Promise<string | null> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
   try {
-    const res = await fetch(url, {
-      redirect: "follow",
-      signal: controller.signal,
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (compatible; MasseurMatchImporter/1.0; +https://masseurmatch.com)",
-        Accept: "text/html,application/xhtml+xml",
-      },
-    });
+    let currentUrl = rawUrl;
 
-    if (!res.ok) {
-      console.warn(`[migrate/processor] Fetch ${url} returned ${res.status}`);
-      return null;
+    for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount += 1) {
+      const safeUrl = await assertSafePublicUrl(currentUrl);
+      const res = await fetch(safeUrl, {
+        redirect: "manual",
+        signal: controller.signal,
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (compatible; MasseurMatchImporter/1.0; +https://masseurmatch.com)",
+          Accept: "text/html,application/xhtml+xml",
+        },
+      });
+
+      if (res.status >= 300 && res.status < 400) {
+        const location = res.headers.get("location");
+        if (!location || redirectCount === MAX_REDIRECTS) return null;
+        if (res.body) await res.body.cancel();
+        currentUrl = new URL(location, safeUrl).toString();
+        continue;
+      }
+
+      if (!res.ok) {
+        console.warn(`[migrate/processor] Fetch ${safeUrl.toString()} returned ${res.status}`);
+        return null;
+      }
+
+      const contentType = res.headers.get("content-type") ?? "";
+      if (!contentType.includes("html") && !contentType.includes("xml")) return null;
+
+      const contentLength = Number(res.headers.get("content-length") || 0);
+      if (Number.isFinite(contentLength) && contentLength > MAX_HTML_BYTES) return null;
+
+      return await readHtmlWithLimit(res.body);
     }
 
-    const contentType = res.headers.get("content-type") ?? "";
-    if (!contentType.includes("html") && !contentType.includes("xml")) {
-      return null;
-    }
-
-    const text = await res.text();
-    return text.length > MAX_HTML_BYTES ? text.slice(0, MAX_HTML_BYTES) : text;
+    return null;
   } catch (err) {
-    console.warn(`[migrate/processor] Fetch failed for ${url}:`, err);
+    console.warn(`[migrate/processor] Fetch failed for ${rawUrl}:`, err);
     return null;
   } finally {
     clearTimeout(timeoutId);

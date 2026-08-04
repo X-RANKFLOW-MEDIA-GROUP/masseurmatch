@@ -193,10 +193,10 @@ function parseSchemaContract(sql) {
     }
   }
 
-  // CREATE [OR REPLACE] VIEW [schema.]view AS SELECT col1, col2, ...
+  // CREATE [OR REPLACE] VIEW [schema.]view [WITH (...)] AS SELECT col1, col2, ...
   // Register views so code that queries them doesn't trigger "missing table" errors.
   const createViewRegex = new RegExp(
-    `create\\s+(?:or\\s+replace\\s+)?(?:materialized\\s+)?view\\s+(?:if\\s+not\\s+exists\\s+)?(${TABLE_REF})\\s+as\\s+select\\s+([\\s\\S]*?)(?:from\\s|;)`,
+    `create\\s+(?:or\\s+replace\\s+)?(?:materialized\\s+)?view\\s+(?:if\\s+not\\s+exists\\s+)?(${TABLE_REF})(?:\\s+with\\s*\\([^;]*?\\))?\\s+as\\s+select\\s+([\\s\\S]*?)(?:from\\s|;)`,
     "gi"
   );
   let viewMatch;
@@ -206,7 +206,10 @@ function parseSchemaContract(sql) {
     // Extract column aliases from the SELECT list so column-level checks pass too.
     const selectList = viewMatch[2];
     for (const part of selectList.split(",")) {
-      const col = part.trim().replace(/\s+as\s+\S+$/, "").split(".").pop()?.trim().replace(/[^a-z0-9_]/gi, "");
+      const alias = part.trim().match(new RegExp(`\\s+as\\s+(${IDENT_TOKEN})\\s*$`, "i"))?.[1];
+      const col = alias
+        ? extractColumnName(alias)
+        : part.trim().split(".").pop()?.trim().replace(/[^a-z0-9_]/gi, "");
       if (col) addColumn(contract, table, col.toLowerCase());
     }
   }

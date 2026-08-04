@@ -1,136 +1,164 @@
+import React from "react";
 import { after } from "next/server";
+import { z } from "zod";
+
+import { assertRateLimit } from "@/app/_lib/security";
+import { notifyAdmin } from "@/app/api/_lib/admin-notify";
+import { sendEmail } from "@/app/api/_lib/email";
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
+import { requireRequestSession } from "@/app/api/_lib/session";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { processPendingMigrations } from "@/app/api/migrate/_lib/processor";
-import { sendEmail } from "@/app/api/_lib/email";
-import React from "react";
+import { assertSafePublicUrl } from "@/app/api/migrate/_lib/source-url";
+import { SITE_URL } from "@/lib/site";
 
-interface ProfileUrl {
-  platform: string;
-  url: string;
+const legacyPlatforms = ["rubmaps", "4corners", "nuru", "custom"] as const;
+type LegacyPlatform = (typeof legacyPlatforms)[number];
+
+const requestSchema = z.object({
+  profileUrls: z
+    .array(
+      z.object({
+        platform: z.enum(legacyPlatforms),
+        url: z.string().trim().url().max(2048),
+      }),
+    )
+    .min(1)
+    .max(5),
+  // Retained for compatibility with the signup client, but never trusted.
+  email: z.string().email().optional(),
+});
+
+const platformHosts: Record<Exclude<LegacyPlatform, "custom">, string[]> = {
+  rubmaps: ["rubmaps.com"],
+  "4corners": ["4corners.xxx"],
+  nuru: ["nurumap.com"],
+};
+
+function assertPlatformMatch(platform: LegacyPlatform, url: URL) {
+  if (platform === "custom") return;
+
+  const hostname = url.hostname.toLowerCase();
+  const matches = platformHosts[platform].some(
+    (allowedHost) => hostname === allowedHost || hostname.endsWith(`.${allowedHost}`),
+  );
+
+  if (!matches) {
+    throw new RouteError(400, "The selected directory does not match the profile link.");
+  }
 }
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { profileUrls, email } = body;
+    assertRateLimit(request, "profile-migration-initiate", { limit: 8, windowMs: 60_000 });
+    const session = await requireRequestSession(request);
+    const parsed = requestSchema.safeParse(await request.json().catch(() => null));
 
-    if (!Array.isArray(profileUrls) || profileUrls.length === 0) {
-      throw new RouteError(400, "At least one profile URL is required.");
-    }
-
-    if (!email || typeof email !== "string") {
-      throw new RouteError(400, "Email is required.");
+    if (!parsed.success) {
+      throw new RouteError(400, parsed.error.issues[0]?.message || "Add at least one valid profile link.");
     }
 
     const adminClient = createSupabaseAdminClient();
+    const { data: profile, error: profileError } = await adminClient
+      .from("profiles")
+      .select("id, email_address")
+      .eq("user_id", session.userId)
+      .maybeSingle();
 
-    // Store migration requests in database
-    const migrationData = profileUrls.map((pu: ProfileUrl) => ({
+    if (profileError) throw new RouteError(500, "Could not load your provider profile.");
+
+    const email = session.email || profile?.email_address;
+    if (!email) throw new RouteError(400, "Add an email address to your account before requesting an import.");
+
+    const normalized = await Promise.all(
+      parsed.data.profileUrls.map(async (entry) => {
+        const url = await assertSafePublicUrl(entry.url);
+        assertPlatformMatch(entry.platform, url);
+        return { platform: entry.platform, source_url: url.toString() };
+      }),
+    );
+    const uniqueEntries = Array.from(
+      new Map(normalized.map((entry) => [entry.source_url.toLowerCase(), entry])).values(),
+    );
+
+    const { data: existing, error: existingError } = await (adminClient as any)
+      .from("profile_migrations")
+      .select("source_url")
+      .eq("email", email)
+      .in("status", ["pending", "in_progress", "manual_review"]);
+
+    if (existingError) throw new RouteError(500, "Could not verify your existing import requests.");
+
+    const activeUrls = new Set(
+      (existing ?? []).map((entry: { source_url: string }) => entry.source_url.toLowerCase()),
+    );
+    const newEntries = uniqueEntries.filter((entry) => !activeUrls.has(entry.source_url.toLowerCase()));
+    if (newEntries.length === 0) {
+      throw new RouteError(409, "That profile link already has an active import request.");
+    }
+
+    const now = new Date().toISOString();
+    const migrationData = newEntries.map((entry) => ({
       email,
-      platform: pu.platform,
-      source_url: pu.url,
+      profile_id: profile?.id ?? null,
+      platform: entry.platform,
+      source_url: entry.source_url,
       status: "pending" as const,
-      created_at: new Date().toISOString(),
+      created_at: now,
     }));
 
-    const { error: insertError } = await ((adminClient as any)
+    const { error: insertError } = await (adminClient as any)
       .from("profile_migrations")
-      .insert(migrationData));
+      .insert(migrationData);
 
     if (insertError) {
       console.error("[api/migrate/initiate] Insert error:", insertError.message);
       throw new RouteError(500, "Could not save migration request.");
     }
 
-    // Send confirmation email
-    try {
-      await sendEmail({
-        to: email,
-        subject: "We're Importing Your Profile — Sit Back & Relax",
-        react: React.createElement("div", {
-          dangerouslySetInnerHTML: {
-            __html: `
-              <!DOCTYPE html>
-              <html>
-                <head>
-                  <style>
-                    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.6; color: #333; }
-                    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                    .header { border-bottom: 3px solid #8B1E2D; padding-bottom: 20px; margin-bottom: 30px; }
-                    .header h1 { margin: 0; color: #111111; font-size: 24px; font-weight: bold; }
-                    .content { margin-bottom: 30px; }
-                    .content p { margin: 15px 0; }
-                    .step { background: #FAFAFA; border-left: 4px solid #8B1E2D; padding: 15px; margin: 15px 0; }
-                    .step h3 { margin-top: 0; color: #8B1E2D; }
-                    .cta-button { display: inline-block; background-color: #8B1E2D; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
-                    .footer { border-top: 1px solid #E8E8E8; padding-top: 20px; font-size: 12px; color: #8E8E8E; }
-                  </style>
-                </head>
-                <body>
-                  <div class="container">
-                    <div class="header">
-                      <h1>Welcome to MasseurMatch</h1>
-                    </div>
-
-                    <div class="content">
-                      <p>Hi there,</p>
-                      <p>Great news! We've received your profile URLs and we're already working on importing your reviews, ratings, and service history to MasseurMatch.</p>
-
-                      <div class="step">
-                        <h3>📋 What's Happening</h3>
-                        <p>We're extracting your profiles from the directories you provided and consolidating everything into your new MasseurMatch listing. This includes:</p>
-                        <ul>
-                          <li>All client reviews and ratings</li>
-                          <li>Your service history</li>
-                          <li>Verified status and trust signals</li>
-                        </ul>
-                      </div>
-
-                      <div class="step">
-                        <h3>⏱️ Timeline</h3>
-                        <p>Migration typically takes 24–48 hours. We'll send you an email as soon as your profile is live on MasseurMatch, and you can start accepting bookings right away.</p>
-                      </div>
-
-                      <div class="step">
-                        <h3>🤝 Need Help?</h3>
-                        <p>If you have questions about the migration or need to add more profiles, just reply to this email or contact our support team at concierge@masseurmatch.com.</p>
-                      </div>
-
-                      <p>We're excited to have you on board!</p>
-                      <p><strong>The MasseurMatch Team</strong></p>
-                    </div>
-
-                    <div class="footer">
-                      <p>© 2025 MasseurMatch. All rights reserved.</p>
-                      <p>This is an automated message. Please do not reply directly to this email if you're having issues — contact us at concierge@masseurmatch.com instead.</p>
-                    </div>
-                  </div>
-                </body>
-              </html>
-            `,
-          },
-        }),
-      }).catch((err) => {
-        console.error("[api/migrate/initiate] Email send failed:", err);
-        // Don't throw — email failure shouldn't block the migration request
-      });
-    } catch (emailErr) {
-      console.error("[api/migrate/initiate] Email error:", emailErr);
-    }
-
-    // Kick off scraping as soon as the response is sent instead of waiting
-    // for the next cron sweep. The cron route remains the retry safety net.
     after(async () => {
-      try {
-        await processPendingMigrations();
-      } catch (err) {
-        console.error("[api/migrate/initiate] Background processing failed:", err);
-      }
+      const results = await Promise.allSettled([
+        processPendingMigrations(),
+        sendEmail({
+          to: email,
+          subject: "We're Importing Your Profile — Sit Back & Relax",
+          react: React.createElement(
+            "div",
+            null,
+            React.createElement("h1", null, "We received your profile links"),
+            React.createElement(
+              "p",
+              null,
+              "MasseurMatch is reviewing your external profiles and imported reviews. Most requests are completed within 24–48 hours.",
+            ),
+            React.createElement("p", null, "We'll email you when the review is complete."),
+          ),
+        }),
+        notifyAdmin({
+          subject: `New signup profile import from ${email}`,
+          heading: "Profile import requested during signup",
+          fields: [
+            { label: "Provider email", value: email },
+            { label: "Profile ID", value: profile?.id ?? null },
+            { label: "Requests", value: String(migrationData.length) },
+            { label: "Platforms", value: migrationData.map((entry) => entry.platform).join(", ") },
+          ],
+          message: migrationData.map((entry) => entry.source_url).join("\n"),
+          action: { label: "Review imports", url: `${SITE_URL}/admin/migrations` },
+          replyTo: email,
+        }),
+      ]);
+
+      results.forEach((result, index) => {
+        if (result.status === "rejected") {
+          console.error(`[api/migrate/initiate] Background task ${index + 1} failed:`, result.reason);
+        }
+      });
     });
 
     return json({
       ok: true,
+      submitted: migrationData.length,
       message: "Migration request received. You'll be notified when your profile is ready.",
     });
   } catch (error) {

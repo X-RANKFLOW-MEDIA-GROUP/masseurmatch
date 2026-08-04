@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { createPageMetadata } from "@/app/_lib/seo";
+import { getProfileCanonicalUrl } from "@/app/_lib/profile-metadata";
 import { SITE_URL } from "@/lib/site";
 
 describe("createPageMetadata", () => {
@@ -54,5 +55,19 @@ describe("createPageMetadata", () => {
     });
 
     expect(metadata.title).toBe("Dallas Male Massage Therapists | MasseurMatch");
+  });
+});
+
+describe("getProfileCanonicalUrl", () => {
+  it("never creates a double slash when the configured origin has a trailing slash", () => {
+    expect(getProfileCanonicalUrl("bruno-santos", "https://www.masseurmatch.com/")).toBe(
+      "https://www.masseurmatch.com/therapists/bruno-santos",
+    );
+  });
+
+  it("normalizes accidental slashes around the route parameter", () => {
+    expect(getProfileCanonicalUrl("/bruno-santos/", "https://www.masseurmatch.com///")).toBe(
+      "https://www.masseurmatch.com/therapists/bruno-santos",
+    );
   });
 });

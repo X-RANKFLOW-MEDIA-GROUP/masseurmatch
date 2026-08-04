@@ -1077,10 +1077,13 @@ export type Database = {
           created_at: string | null
           id: string
           imported_at: string | null
+          is_public: boolean | null
           profile_id: string | null
+          public_label: string | null
           rating: number | null
           review_date: string | null
           review_text: string | null
+          reviewer_anonymized: boolean | null
           reviewer_name: string | null
           source_platform: string | null
           source_url: string | null
@@ -1089,10 +1092,13 @@ export type Database = {
           created_at?: string | null
           id?: string
           imported_at?: string | null
+          is_public?: boolean | null
           profile_id?: string | null
+          public_label?: string | null
           rating?: number | null
           review_date?: string | null
           review_text?: string | null
+          reviewer_anonymized?: boolean | null
           reviewer_name?: string | null
           source_platform?: string | null
           source_url?: string | null
@@ -1101,10 +1107,13 @@ export type Database = {
           created_at?: string | null
           id?: string
           imported_at?: string | null
+          is_public?: boolean | null
           profile_id?: string | null
+          public_label?: string | null
           rating?: number | null
           review_date?: string | null
           review_text?: string | null
+          reviewer_anonymized?: boolean | null
           reviewer_name?: string | null
           source_platform?: string | null
           source_url?: string | null
@@ -4387,6 +4396,20 @@ export type Database = {
       }
     }
     Views: {
+      public_imported_reviews: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          imported_at: string | null
+          profile_id: string | null
+          public_label: string | null
+          rating: number | null
+          review_date: string | null
+          review_text: string | null
+          reviewer_name: string | null
+        }
+        Relationships: []
+      }
       public_therapist_profiles: {
         Row: {
           availability_note: string | null

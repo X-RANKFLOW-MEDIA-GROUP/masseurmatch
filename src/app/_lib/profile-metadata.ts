@@ -34,7 +34,9 @@ export function getProfileRobotsMetadata(
  * Important for SEO to prevent duplicate content issues.
  */
 export function getProfileCanonicalUrl(slug: string, siteUrl: string): string {
-  return `${siteUrl}/therapists/${slug}`;
+  const normalizedSiteUrl = siteUrl.replace(/\/+$/, "");
+  const normalizedSlug = slug.replace(/^\/+|\/+$/g, "");
+  return `${normalizedSiteUrl}/therapists/${normalizedSlug}`;
 }
 
 /**

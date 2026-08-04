@@ -52,7 +52,7 @@ export default function SignupMigrationPage() {
 
       if (!res.ok) {
         const err = await res.json();
-        setValidationError(err.message || "Could not validate URL. Please check and try again.");
+        setValidationError(err.error || err.message || "Could not validate URL. Please check and try again.");
         setIsValidating(false);
         return false;
       }
@@ -112,7 +112,8 @@ export default function SignupMigrationPage() {
         });
 
         if (!res.ok) {
-          setValidationError("Failed to initiate migration. Please try again.");
+          const body = await res.json().catch(() => ({}));
+          setValidationError(body.error || body.message || "Failed to initiate migration. Please try again.");
           setIsSubmitting(false);
           return;
         }
