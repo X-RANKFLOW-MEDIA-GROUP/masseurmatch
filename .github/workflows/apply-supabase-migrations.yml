@@ -97,4 +97,4 @@ jobs:
           fi
 
       - name: Apply pending migrations
-        run: supabase db push
+        run: supabase db push --include-all
