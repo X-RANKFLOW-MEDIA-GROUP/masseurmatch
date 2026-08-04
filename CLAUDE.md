@@ -83,6 +83,12 @@ The full stack already exists — do not rebuild it:
 - **CI enforces lockfile consistency** — each job runs `pnpm install --frozen-lockfile`,
   so lockfile mismatches are caught immediately in the PR.
 
+## Testing Guidelines
+
+**Test utilities rule**: If a helper function is used in more than one test file, it must live in `tests/helpers/` and both files import from there. Never duplicate test utility logic across multiple files — it causes drift and CI flakes.
+
+Example: `fetchCanonical` (follows Vercel's same-path cross-origin redirects transparently) lives in `tests/helpers/fetch-canonical.ts`. Both `redirects.spec.ts` and `seo-normalization.spec.ts` import it from there, not from duplicate inline implementations.
+
 ## Workflow
 
 - Dev branch for this work: `claude/repo-launch-readiness-KqLDX`.
