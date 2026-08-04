@@ -18,9 +18,45 @@ const REQUIRED_TABLES = [
   "identity_verifications",
   "audit_log",
   "lifecycle_email_queue",
+  "lifecycle_email_log",
+  "marketing_preferences",
+  "email_suppressions",
+  "email_provider_events",
+  "admin_email_templates",
+  "admin_email_campaigns",
   "contact_inquiries",
   "newsletter_subscribers",
   "site_settings",
+];
+
+const REQUIRED_LIFECYCLE_QUEUE_COLUMNS = [
+  "id",
+  "user_id",
+  "recipient_email",
+  "recipient_name",
+  "segment",
+  "campaign_key",
+  "flow_key",
+  "template_key",
+  "send_category",
+  "subject",
+  "body_html",
+  "body_text",
+  "from_address",
+  "reply_to",
+  "payload",
+  "scheduled_for",
+  "status",
+  "suppression_reason",
+  "provider_id",
+  "error_message",
+  "retry_count",
+  "max_retries",
+  "idempotency_key",
+  "processing_started_at",
+  "sent_at",
+  "created_at",
+  "updated_at",
 ];
 
 const REQUIRED_PROFILE_COLUMNS = [
@@ -380,6 +416,11 @@ for (const table of REQUIRED_TABLES) {
 }
 for (const column of REQUIRED_PROFILE_COLUMNS) {
   if (!contract.get("profiles")?.has(column)) errors.push(`profiles.${column} is missing from schema lock`);
+}
+for (const column of REQUIRED_LIFECYCLE_QUEUE_COLUMNS) {
+  if (!contract.get("lifecycle_email_queue")?.has(column)) {
+    errors.push(`lifecycle_email_queue.${column} is missing from schema lock`);
+  }
 }
 
 const profileStatus = schemaContainsAllowedValues(sql, "profiles_profile_status_check", ALLOWED_PROFILE_STATUS);

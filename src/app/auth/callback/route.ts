@@ -105,7 +105,10 @@ export async function GET(request: NextRequest) {
         body_text:
           "Welcome to MasseurMatch! Complete your profile to start getting discovered.",
         scheduled_for: new Date().toISOString(),
-        status: "pending",
+        // The lifecycle worker claims only queued rows. Legacy pending rows are
+        // intentionally quarantined by the schema repair and must stay distinct
+        // from new welcome emails.
+        status: "queued",
         idempotency_key: `welcome:${user.id}:${new Date().toISOString().slice(0, 10)}`,
       });
     } catch {
