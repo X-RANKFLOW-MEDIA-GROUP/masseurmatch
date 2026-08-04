@@ -4,7 +4,15 @@ import React from "react";
 import { requireAdminSession, createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { sendEmail } from "@/app/api/_lib/email";
 import { revalidatePublicDirectory } from "@/app/_lib/directory-cache";
+import { SUPABASE_PUBLIC_URL } from "@/integrations/supabase/client";
 import ProfileApprovedEmail from "@/emails/ProfileApprovedEmail";
+
+function resolvePhotoUrl(url: string | null, storagePath: string | null) {
+  if (url) return url;
+  if (!storagePath) return null;
+  if (/^https?:\/\//i.test(storagePath)) return storagePath;
+  return `${SUPABASE_PUBLIC_URL}/storage/v1/object/public/therapist-photos/${storagePath}`;
+}
 
 export async function GET(
   request: NextRequest,
@@ -37,7 +45,7 @@ export async function GET(
 
     const { data: photos } = await supabase
       .from("profile_photos")
-      .select("url")
+      .select("url, storage_path")
       .eq("profile_id", id)
       .order("sort_order", { ascending: true });
 
@@ -50,7 +58,9 @@ export async function GET(
       ok: true,
       profile: {
         ...profile,
-        photo_urls: photos?.map((p) => p.url) || [],
+        photo_urls: (photos ?? [])
+          .map((photo) => resolvePhotoUrl(photo.url, photo.storage_path))
+          .filter((url): url is string => Boolean(url)),
         document_urls: documents?.map((d) => d.url) || [],
       },
     });
@@ -87,10 +97,6 @@ export async function POST(
 
     const now = new Date().toISOString();
 
-    // Approval must also flip the fields the public directory reads
-    // (profile_status = "approved" AND visibility_status = "public"); setting
-    // only `status` left approved therapists invisible. Reject / changes hide
-    // the profile again.
     const visibility =
       action === "approve"
         ? { profile_status: "approved", visibility_status: "public", is_active: true, approved_at: now, approved_by: adminSession.userId }
@@ -109,10 +115,6 @@ export async function POST(
 
     if (error) throw error;
 
-    // A moderation decision changes the listable set the public directory
-    // caches (getPublicTherapists). Invalidate it so the newly approved (or
-    // newly hidden) profile appears/disappears immediately instead of waiting
-    // out the 60s revalidate window.
     revalidatePublicDirectory();
 
     if (action === "approve") {
@@ -134,7 +136,6 @@ export async function POST(
         });
       }
 
-      // Create in-app notification
       if (profile?.user_id) {
         await supabase.from("notifications").insert({
           user_id: profile.user_id,
@@ -145,7 +146,6 @@ export async function POST(
         });
       }
     } else if (action === "reject") {
-      // Create rejection notification
       const { data: profile } = await supabase
         .from("profiles")
         .select("user_id")
