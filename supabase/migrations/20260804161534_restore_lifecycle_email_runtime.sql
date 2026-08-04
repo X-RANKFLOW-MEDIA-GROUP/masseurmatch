@@ -34,6 +34,16 @@ create table if not exists public.email_provider_events (
   unique (provider, provider_event_id)
 );
 
+create table if not exists public.newsletter_subscribers (
+  id uuid primary key default gen_random_uuid(),
+  email citext unique not null,
+  name text,
+  city text,
+  is_active boolean not null default true,
+  unsubscribed_at timestamptz,
+  created_at timestamptz default timezone('utc', now())
+);
+
 alter table public.newsletter_subscribers
   add column if not exists unsubscribed_at timestamptz;
 
@@ -69,6 +79,7 @@ create unique index if not exists idx_lifecycle_email_queue_idempotency
 alter table public.marketing_preferences enable row level security;
 alter table public.email_suppressions enable row level security;
 alter table public.email_provider_events enable row level security;
+alter table public.newsletter_subscribers enable row level security;
 alter table public.lifecycle_email_queue enable row level security;
 alter table public.lifecycle_email_log enable row level security;
 
@@ -94,10 +105,12 @@ grant all on public.marketing_preferences to service_role;
 
 revoke all on public.email_suppressions from public, anon, authenticated;
 revoke all on public.email_provider_events from public, anon, authenticated;
+revoke all on public.newsletter_subscribers from public, anon, authenticated;
 revoke all on public.lifecycle_email_queue from public, anon, authenticated;
 revoke all on public.lifecycle_email_log from public, anon, authenticated;
 grant all on public.email_suppressions to service_role;
 grant all on public.email_provider_events to service_role;
+grant all on public.newsletter_subscribers to service_role;
 grant all on public.lifecycle_email_queue to service_role;
 grant all on public.lifecycle_email_log to service_role;
 
