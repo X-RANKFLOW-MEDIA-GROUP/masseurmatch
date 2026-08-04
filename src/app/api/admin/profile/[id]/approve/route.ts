@@ -32,11 +32,14 @@ export async function POST(
     const { error: updateError } = await adminClient
       .from("profiles")
       .update({
+        status: "approved",
         profile_status: "approved",
         visibility_status: "public",
         verification_status: "verified",
+        is_active: true,
         approved_at: now,
         approved_by: admin.userId,
+        rejection_reason: null,
         moderation_notes: body.reason || null,
         updated_at: now,
       })
@@ -46,13 +49,11 @@ export async function POST(
 
     revalidatePublicDirectory();
 
-    // Update profile_reviews
     await adminClient
       .from("profile_reviews")
       .update({ status: "approved", reviewed_at: now, reviewed_by: admin.userId })
       .eq("profile_id", profileId);
 
-    // Log admin action
     await adminClient.from("admin_actions").insert({
       action: "approve_profile",
       action_type: "approve_profile",
@@ -67,7 +68,6 @@ export async function POST(
       reason: body.reason,
     });
 
-    // Send Approval Email
     if (profile.email_address) {
       await sendEmail({
         to: profile.email_address,
