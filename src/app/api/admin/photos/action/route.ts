@@ -31,7 +31,9 @@ export async function POST(request: Request) {
 
     if (photoError) throw new RouteError(500, photoError.message);
     if (!photo) throw new RouteError(404, "Photo not found.");
+    if (!photo.profile_id) throw new RouteError(409, "Photo is not linked to a profile.");
 
+    const profileId = photo.profile_id;
     const imageUrl = photo.url || photo.storage_path || null;
     const now = new Date().toISOString();
 
@@ -39,7 +41,7 @@ export async function POST(request: Request) {
       const { error: resetError } = await supabase
         .from("profile_photos")
         .update({ is_primary: false })
-        .eq("profile_id", photo.profile_id);
+        .eq("profile_id", profileId);
       if (resetError) throw new RouteError(500, resetError.message);
 
       const { error } = await supabase
@@ -64,7 +66,7 @@ export async function POST(request: Request) {
         .from("moderation_queue")
         .upsert({
           content_type: "photo",
-          profile_id: photo.profile_id,
+          profile_id: profileId,
           user_id: photo.user_id,
           target_id: photo.id,
           item_type: "photo",
@@ -89,7 +91,7 @@ export async function POST(request: Request) {
         .from("moderation_queue")
         .upsert({
           content_type: "photo",
-          profile_id: photo.profile_id,
+          profile_id: profileId,
           user_id: photo.user_id,
           target_id: photo.id,
           item_type: "photo",
@@ -119,7 +121,7 @@ export async function POST(request: Request) {
     }
 
     await recordAuditLog(admin.userId, `photo_${body.action}`, "photo", body.photoId, {
-      profileId: photo.profile_id,
+      profileId,
       reason: body.reason || null,
     });
 
