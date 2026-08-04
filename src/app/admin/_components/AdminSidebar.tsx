@@ -6,7 +6,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard,
   Users,
-  HeartHandshake,
   ShieldCheck,
   ShieldAlert,
   CreditCard,
@@ -29,29 +28,29 @@ import {
 
 const navSections = [
   {
-    title: "Core",
+    title: "Overview",
     items: [
       { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-      { href: "/admin/users", label: "Users", icon: Users },
-      { href: "/admin/therapists", label: "Therapists", icon: HeartHandshake },
-      { href: "/admin/photos", label: "Photos", icon: ImageIcon },
-      { href: "/admin/moderation", label: "Moderation", icon: ShieldAlert },
+      { href: "/admin/people", label: "People CRM", icon: Users },
+      { href: "/admin/photos", label: "Photo Approvals", icon: ImageIcon },
+      { href: "/admin/moderation", label: "Approvals", icon: ShieldAlert },
       { href: "/admin/profile-reports", label: "Profile Reports", icon: Flag },
     ],
   },
   {
-    title: "Messaging",
+    title: "Communication",
     items: [
+      { href: "/admin/tickets", label: "Tickets", icon: MessageSquare },
+      { href: "/admin/support", label: "Support", icon: LifeBuoy },
       { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
       { href: "/admin/sms", label: "SMS Auto-Reply", icon: MessageSquare },
     ],
   },
   {
-    title: "Business",
+    title: "Revenue",
     items: [
       { href: "/admin/billing", label: "Billing", icon: CreditCard },
       { href: "/admin/reports", label: "Reports", icon: BarChart3 },
-      { href: "/admin/logs", label: "Logs", icon: FileClock },
     ],
   },
   {
@@ -64,11 +63,10 @@ const navSections = [
     ],
   },
   {
-    title: "Ops",
+    title: "System",
     items: [
-      { href: "/admin/tickets", label: "Tickets", icon: MessageSquare },
-      { href: "/admin/support", label: "Support", icon: LifeBuoy },
       { href: "/admin/verification", label: "Verification", icon: ShieldCheck },
+      { href: "/admin/logs", label: "Logs", icon: FileClock },
       { href: "/admin/legal", label: "Legal", icon: FileText },
       { href: "/admin/settings", label: "Settings", icon: Settings },
     ],
