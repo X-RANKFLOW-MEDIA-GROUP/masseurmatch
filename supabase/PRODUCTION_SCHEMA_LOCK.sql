@@ -301,10 +301,78 @@ create table if not exists public.audit_log (
   created_at timestamptz default timezone('utc', now())
 );
 
+create table if not exists public.marketing_preferences (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  marketing_opt_in boolean not null default false,
+  newsletter_opt_in boolean not null default false,
+  updated_at timestamptz not null default now(),
+  source text,
+  updated_by text
+);
+
+create table if not exists public.email_suppressions (
+  id uuid primary key default gen_random_uuid(),
+  email text not null,
+  reason text not null,
+  details jsonb not null default '{}'::jsonb,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (email, reason, is_active)
+);
+
+create table if not exists public.email_provider_events (
+  id uuid primary key default gen_random_uuid(),
+  provider text not null default 'resend',
+  provider_event_id text,
+  recipient_email text,
+  event_type text not null,
+  payload jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  unique (provider, provider_event_id)
+);
+
+create table if not exists public.admin_email_templates (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  description text,
+  subject text not null,
+  body_html text not null,
+  body_text text,
+  send_category text not null default 'marketing' check (send_category in ('marketing', 'transactional')),
+  from_address text,
+  reply_to text,
+  is_active boolean not null default true,
+  created_by uuid references auth.users(id) on delete set null,
+  updated_by uuid references auth.users(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.admin_email_campaigns (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  subject text not null,
+  body_html text not null,
+  body_text text,
+  send_category text not null check (send_category in ('marketing', 'transactional')),
+  from_address text,
+  reply_to text,
+  audience jsonb not null default '{}'::jsonb,
+  scheduled_for timestamptz not null default now(),
+  status text not null default 'draft' check (status in ('draft', 'scheduled', 'processing', 'completed', 'cancelled')),
+  template_id uuid references public.admin_email_templates(id) on delete set null,
+  created_by uuid references auth.users(id) on delete set null,
+  cancelled_by uuid references auth.users(id) on delete set null,
+  cancelled_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.lifecycle_email_queue (
   id uuid primary key default gen_random_uuid(),
   user_id uuid,
-  provider_id uuid,
+  provider_id text,
   recipient_email text,
   recipient_name text,
   segment text,
@@ -314,15 +382,21 @@ create table if not exists public.lifecycle_email_queue (
   send_category text,
   suppression_reason text,
   subject text,
-  status text default 'pending',
+  status text default 'queued',
   body_html text,
   body_text text,
+  from_address text,
+  reply_to text,
+  payload jsonb not null default '{}'::jsonb,
   scheduled_for timestamptz,
   sent_at timestamptz,
   error_message text,
   retry_count integer not null default 0,
+  max_retries integer not null default 2,
+  processing_started_at timestamptz,
   idempotency_key text unique,
-  created_at timestamptz default timezone('utc', now())
+  created_at timestamptz default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
 );
 
 create table if not exists public.contact_inquiries (
@@ -341,6 +415,7 @@ create table if not exists public.newsletter_subscribers (
   name text,
   city text,
   is_active boolean not null default true,
+  unsubscribed_at timestamptz,
   created_at timestamptz default timezone('utc', now())
 );
 
@@ -745,7 +820,7 @@ create table if not exists public.lifecycle_email_log (
   id uuid primary key default gen_random_uuid(),
   queue_id uuid,
   user_id uuid,
-  provider_id uuid,
+  provider_id text,
   provider text,
   recipient_email text,
   segment text,

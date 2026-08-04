@@ -1,5 +1,11 @@
 -- Repair production environments where the import workflow migration was
 -- recorded before imported_reviews.imported_at existed.
+-- The same drift left lifecycle_email_queue without the JSON payload used by
+-- Admin Email Center. Add it before creating campaign indexes and triggers;
+-- the following migration restores the rest of the lifecycle runtime.
+alter table public.lifecycle_email_queue
+  add column if not exists payload jsonb not null default '{}'::jsonb;
+
 alter table public.imported_reviews
   add column if not exists imported_at timestamptz default now(),
   add column if not exists public_label text not null default 'Imported review';
