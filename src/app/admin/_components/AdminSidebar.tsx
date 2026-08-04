@@ -24,6 +24,7 @@ import {
   CalendarCheck,
   MessageSquare,
   Flag,
+  Mail,
 } from "lucide-react";
 
 const navSections = [
@@ -40,6 +41,7 @@ const navSections = [
   {
     title: "Communication",
     items: [
+      { href: "/admin/emails", label: "Email Center", icon: Mail },
       { href: "/admin/tickets", label: "Tickets", icon: MessageSquare },
       { href: "/admin/support", label: "Support", icon: LifeBuoy },
       { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
