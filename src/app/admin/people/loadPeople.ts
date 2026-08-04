@@ -26,6 +26,10 @@ export type AdminPerson = {
   photos: AdminPersonPhoto[];
 };
 
+function normalizeRole(role: string | null): AdminPerson["role"] {
+  return role === "admin" || role === "provider" ? role : null;
+}
+
 export async function loadPeople(): Promise<{ items: AdminPerson[]; error: string | null }> {
   try {
     const supabase = createSupabaseAdminClient();
@@ -42,7 +46,7 @@ export async function loadPeople(): Promise<{ items: AdminPerson[]; error: strin
     if (roleError) throw new Error(roleError.message);
 
     const profileRows = profiles ?? [];
-    const profileIds = profileRows.map((profile) => profile.id);
+    const profileIds = profileRows.map((profile) => profile.id).filter((id): id is string => Boolean(id));
     const userIds = profileRows.map((profile) => profile.user_id).filter((id): id is string => Boolean(id));
 
     const [{ data: photos, error: photoError }, authUsers] = await Promise.all([
@@ -63,14 +67,17 @@ export async function loadPeople(): Promise<{ items: AdminPerson[]; error: strin
 
     if (photoError) throw new Error(photoError.message);
 
-    const roleMap = new Map<string, "admin" | "provider" | null>();
+    const roleMap = new Map<string, AdminPerson["role"]>();
     for (const role of roles ?? []) {
-      if (!roleMap.has(role.user_id)) roleMap.set(role.user_id, role.role);
+      if (role.user_id && !roleMap.has(role.user_id)) {
+        roleMap.set(role.user_id, normalizeRole(role.role));
+      }
     }
 
-    const emailMap = new Map(authUsers);
+    const emailMap = new Map<string, string | null>(authUsers);
     const photosByProfile = new Map<string, AdminPersonPhoto[]>();
     for (const photo of photos ?? []) {
+      if (!photo.profile_id || !photo.id) continue;
       const resolvedUrl = photo.url || photo.storage_path || "";
       if (!resolvedUrl) continue;
       const list = photosByProfile.get(photo.profile_id) ?? [];
@@ -86,22 +93,27 @@ export async function loadPeople(): Promise<{ items: AdminPerson[]; error: strin
     }
 
     return {
-      items: profileRows.map((profile) => ({
-        userId: profile.user_id || profile.id,
-        profileId: profile.id,
-        name: profile.display_name || profile.full_name || "Unknown user",
-        email: emailMap.get(profile.user_id || "") || profile.email_address || null,
-        city: profile.city,
-        role: roleMap.get(profile.user_id || "") || null,
-        profileStatus: profile.profile_status || "draft",
-        subscriptionTier: profile.subscription_tier,
-        verificationStatus: profile.verification_status,
-        slug: profile.slug,
-        isFeatured: Boolean(profile.is_featured),
-        isSuspended: Boolean(profile.is_suspended),
-        isBanned: Boolean(profile.is_banned),
-        photos: photosByProfile.get(profile.id) ?? [],
-      })),
+      items: profileRows
+        .filter((profile): profile is typeof profile & { id: string } => Boolean(profile.id))
+        .map((profile) => {
+          const userId = profile.user_id || profile.id;
+          return {
+            userId,
+            profileId: profile.id,
+            name: profile.display_name || profile.full_name || "Unknown user",
+            email: emailMap.get(userId) || profile.email_address || null,
+            city: profile.city,
+            role: roleMap.get(userId) || null,
+            profileStatus: profile.profile_status || "draft",
+            subscriptionTier: profile.subscription_tier,
+            verificationStatus: profile.verification_status,
+            slug: profile.slug,
+            isFeatured: Boolean(profile.is_featured),
+            isSuspended: Boolean(profile.is_suspended),
+            isBanned: Boolean(profile.is_banned),
+            photos: photosByProfile.get(profile.id) ?? [],
+          } satisfies AdminPerson;
+        }),
       error: null,
     };
   } catch (error) {
