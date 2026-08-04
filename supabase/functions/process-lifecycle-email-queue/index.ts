@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { checkRateLimit, rateLimitResponse, getClientKey } from "../_shared/rate-limit.ts";
+import { sanitizeResendTag } from "../_shared/resend-tags.ts";
 
 type QueueRow = {
   id: string;
@@ -218,10 +219,10 @@ serve(async (req) => {
             reply_to: row.reply_to || undefined,
             headers,
             tags: [
-              { name: "campaign", value: row.campaign_key || "none" },
-              { name: "flow", value: row.flow_key || "none" },
-              { name: "segment", value: row.segment || "none" },
-              { name: "template", value: row.template_key || "custom" },
+              { name: "campaign", value: sanitizeResendTag(row.campaign_key, "none") },
+              { name: "flow", value: sanitizeResendTag(row.flow_key, "none") },
+              { name: "segment", value: sanitizeResendTag(row.segment, "none") },
+              { name: "template", value: sanitizeResendTag(row.template_key, "custom") },
             ],
           }),
         });

@@ -59,9 +59,8 @@ export default function AdminMigrationsPage() {
       const migration = migrations.find((m) => m.id === migrationId);
       if (!migration) return;
 
-      const reviewsToApprove = migration.reviews
-        ?.filter((r) => approvalStatus[r.id] !== false)
-        .map((r) => ({
+      const reviewDecisions = migration.reviews
+        ?.map((r) => ({
           reviewId: r.id,
           approved: approvalStatus[r.id] !== false,
           notes: reviewNotes[r.id] || "",
@@ -72,7 +71,7 @@ export default function AdminMigrationsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           migrationId,
-          reviews: reviewsToApprove,
+          reviews: reviewDecisions,
         }),
       });
 
@@ -81,7 +80,7 @@ export default function AdminMigrationsPage() {
       }
 
       // Refresh migrations
-      fetchMigrations();
+      await fetchMigrations();
       setSelectedMigration(null);
       setReviewNotes({});
       setApprovalStatus({});
@@ -128,7 +127,7 @@ export default function AdminMigrationsPage() {
                     <p className="text-sm text-[#8E8E8E]">{migration.platform}</p>
                   </div>
                   {migration.is_verified ? (
-                    <Badge className="bg-green-100 text-green-800">Approved</Badge>
+                    <Badge className="bg-green-100 text-green-800">Reviewed</Badge>
                   ) : (
                     <Badge variant="outline" className="border-yellow-400 bg-yellow-50 text-yellow-800">
                       Pending

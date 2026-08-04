@@ -1,85 +1,48 @@
-import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
+import { z } from "zod";
 
-const PLATFORM_VALIDATORS: Record<string, (url: string) => boolean> = {
-  rubmaps: (url) => {
-    try {
-      const u = new URL(url);
-      return u.hostname.includes("rubmaps.com") && u.pathname.includes("/provider");
-    } catch {
-      return false;
-    }
-  },
-  "4corners": (url) => {
-    try {
-      const u = new URL(url);
-      return u.hostname.includes("4corners") && u.pathname.length > 1;
-    } catch {
-      return false;
-    }
-  },
-  nuru: (url) => {
-    try {
-      const u = new URL(url);
-      return u.hostname.includes("nurumap") && u.pathname.includes("/provider");
-    } catch {
-      return false;
-    }
-  },
-  custom: (url) => {
-    try {
-      const u = new URL(url);
-      return u.protocol.startsWith("http");
-    } catch {
-      return false;
-    }
-  },
-};
+import { assertRateLimit } from "@/app/_lib/security";
+import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
+import { requireRequestSession } from "@/app/api/_lib/session";
+import { assertSafePublicUrl } from "@/app/api/migrate/_lib/source-url";
+
+const platforms = ["rubmaps", "4corners", "nuru", "custom"] as const;
+const schema = z.object({
+  url: z.string().trim().url().max(2048),
+  platform: z.enum(platforms),
+});
+
+function matchesHost(hostname: string, allowedHost: string) {
+  return hostname === allowedHost || hostname.endsWith(`.${allowedHost}`);
+}
+
+function assertPlatformUrl(platform: (typeof platforms)[number], url: URL) {
+  const hostname = url.hostname.toLowerCase();
+  const path = url.pathname.toLowerCase();
+  const valid =
+    platform === "custom" ||
+    (platform === "rubmaps" && matchesHost(hostname, "rubmaps.com") && path.includes("/provider")) ||
+    (platform === "4corners" && matchesHost(hostname, "4corners.xxx") && path.length > 1) ||
+    (platform === "nuru" && matchesHost(hostname, "nurumap.com") && path.includes("/provider"));
+
+  if (!valid) {
+    throw new RouteError(400, `Invalid ${platform} URL format. Please check and try again.`);
+  }
+}
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { url, platform } = body;
+    assertRateLimit(request, "profile-migration-validate-url", { limit: 20, windowMs: 60_000 });
+    await requireRequestSession(request);
 
-    if (!url || typeof url !== "string") {
-      throw new RouteError(400, "URL is required.");
+    const parsed = schema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
+      throw new RouteError(400, parsed.error.issues[0]?.message || "Enter a valid profile URL.");
     }
 
-    if (!platform || typeof platform !== "string") {
-      throw new RouteError(400, "Platform is required.");
-    }
+    const url = await assertSafePublicUrl(parsed.data.url);
+    assertPlatformUrl(parsed.data.platform, url);
 
-    if (!PLATFORM_VALIDATORS[platform]) {
-      throw new RouteError(400, "Unsupported platform.");
-    }
-
-    const isValid = PLATFORM_VALIDATORS[platform](url);
-    if (!isValid) {
-      throw new RouteError(400, `Invalid ${platform} URL format. Please check and try again.`);
-    }
-
-    // Optional: Make a HEAD request to verify the URL is reachable
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-      const headRes = await fetch(url, {
-        method: "HEAD",
-        redirect: "follow",
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!headRes.ok && headRes.status !== 404) {
-        throw new RouteError(400, "Could not reach the URL. Please check it and try again.");
-      }
-    } catch (fetchErr) {
-      // If HEAD fails, that's okay — the URL might have CORS restrictions
-      // but we still accept it for backend validation
-      if (fetchErr instanceof RouteError) throw fetchErr;
-    }
-
-    return json({ ok: true, valid: true });
+    return json({ ok: true, valid: true, url: url.toString() });
   } catch (error) {
     return errorResponse(error);
   }

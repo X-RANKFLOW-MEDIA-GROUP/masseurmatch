@@ -5,6 +5,7 @@ import { createClient as createSupabaseJsClient } from "@supabase/supabase-js";
 
 import { US_CITIES } from "@/data/cities";
 import { getTravelVisit } from "@/app/_lib/travel-status";
+import { getProfileIndexRobots } from "@/lib/index-eligibility";
 import { matchBodyTypeKeyword } from "@/lib/physical-profile";
 import { FALLBACK_PUBLIC_THERAPISTS } from "@/app/_lib/directory-fallback";
 import { PUBLIC_THERAPISTS_TAG } from "@/app/_lib/directory-cache";
@@ -62,7 +63,7 @@ const PUBLIC_PROFILE_SELECT = `
   years_experience, start_year, languages,
   subscription_tier, _tier, verification_status, is_featured,
   is_verified_identity, is_verified_profile,
-  avatar_url, review_count,
+  avatar_url, review_count, average_rating,
   promotions, updated_at, status, profile_status, visibility_status,
   is_suspended, is_banned, available_now, available_now_expires,
   lgbtq_affirming, business_hours, custom_faq, pricing_sessions, areas_served,
@@ -168,6 +169,7 @@ export interface PublicTherapist {
   start_year?: number | null;
   avatar_url?: string | null;
   review_count?: number | null;
+  average_rating?: number | null;
   _tier?: string | null;
   neighborhood_name?: string | null;
   primary_area?: string | null;
@@ -192,12 +194,13 @@ export interface PublicTherapist {
   identity_verified_at?: string | null;
 }
 
-interface ImportedReview {
+export interface PublicImportedReview {
   id: string;
   review_text: string;
   rating: number | null;
   reviewer_name: string | null;
   review_date: string | null;
+  public_label: string | null;
 }
 
 export const getCities = () => US_CITIES;
@@ -237,9 +240,9 @@ const isRoutableProfile = (p: PublicTherapist) =>
   (typeof p.slug === "string" && p.slug.length > 0) || (typeof p.id === "string" && UUID_RE.test(p.id));
 
 // Slugs for the sitemap, sourced from the SAME query that serves the public
-// profile route (`getPublicTherapistBySlug`). This guarantees every profile URL
-// in the sitemap actually resolves (no 404s) and every resolvable profile is
-// included — the two must never disagree. Real DB rows only; no demo fallback.
+// profile route (`getPublicTherapistBySlug`). Every sitemap URL must both
+// resolve and carry an indexable robots directive. Real DB rows only; no demo
+// fallback.
 // Missing slugs are filtered here (the sitemap-specific path) rather than in the
 // shared query, so slugless-but-UUID-routable profiles still appear in the
 // directory. Pages through all results so completeness holds beyond one page.
@@ -252,7 +255,11 @@ export const getSitemapProfileSlugs = async (): Promise<Array<{ slug: string; up
       .range(from, from + PAGE - 1);
     if (error || !data || data.length === 0) break;
     for (const row of data as unknown as PublicTherapist[]) {
-      if (typeof row.slug === "string" && row.slug.length > 0) {
+      if (
+        typeof row.slug === "string" &&
+        row.slug.length > 0 &&
+        getProfileIndexRobots(row) === "index, follow"
+      ) {
         out.push({ slug: row.slug, updated_at: row.updated_at ?? null });
       }
     }
@@ -537,17 +544,30 @@ export const getPublicTherapistBySlug = async (slug: string): Promise<PublicTher
   ) ?? null;
 };
 
-const getImportedReviews = async (profileId: string, limit = 5) => {
-  if (!isUuid(profileId)) return [] as ImportedReview[];
+export const getPublicImportedReviews = async (
+  profileId: string,
+  limit = 100,
+): Promise<PublicImportedReview[]> => {
+  if (!isUuid(profileId)) return [];
 
-  const { data } = await supabase
-    .from("imported_reviews")
-    .select("id, review_text, rating, reviewer_name, review_date")
+  const { data, error } = await supabase
+    .from("public_imported_reviews")
+    .select("id, review_text, rating, reviewer_name, review_date, public_label")
     .eq("profile_id", profileId)
+    .not("review_text", "is", null)
     .order("review_date", { ascending: false, nullsFirst: false })
-    .limit(limit);
+    .limit(Math.max(1, Math.min(limit, 100)));
 
-  return (data || []) as unknown as ImportedReview[];
+  if (error || !data) return [];
+
+  return data
+    .filter(
+      (review): review is typeof review & { id: string; review_text: string } =>
+        typeof review.id === "string" &&
+        typeof review.review_text === "string" &&
+        review.review_text.trim().length > 0,
+    )
+    .map((review) => ({ ...review, review_text: review.review_text.trim() }));
 };
 
 // Resolves the displayable image URL for a profile_photos row. The live

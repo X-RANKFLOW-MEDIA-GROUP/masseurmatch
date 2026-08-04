@@ -1,11 +1,16 @@
 alter table public.imported_reviews
+  add column if not exists imported_at timestamptz default now(),
   add column if not exists public_label text not null default 'Imported review';
 
-create or replace view public.public_imported_reviews as
+create or replace view public.public_imported_reviews
+with (security_invoker = true) as
 select
   ir.id,
   ir.profile_id,
-  ir.reviewer_name,
+  case
+    when coalesce(ir.reviewer_anonymized, false) then null
+    else ir.reviewer_name
+  end as reviewer_name,
   ir.rating,
   ir.review_text,
   ir.review_date,
@@ -14,6 +19,9 @@ select
   ir.created_at
 from public.imported_reviews ir
 where ir.is_public = true;
+
+revoke all on public.public_imported_reviews from public, anon, authenticated;
+grant select on public.public_imported_reviews to service_role;
 
 create or replace function public.sync_profile_import_ticket_status()
 returns trigger

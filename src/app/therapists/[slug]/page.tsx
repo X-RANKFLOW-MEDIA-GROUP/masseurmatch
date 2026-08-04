@@ -4,6 +4,7 @@ import { JsonLd } from "@/app/_components/JsonLd";
 import {
   getCities,
   getProfilePhotos,
+  getPublicImportedReviews,
   getPublicTherapistBySlug,
   getPublicTherapists,
 } from "@/app/_lib/directory";
@@ -16,10 +17,23 @@ import { VoxProfile } from "@/app/therapists/[slug]/_components/vox/VoxProfile";
 import { DemoProfileBanner } from "@/app/_components/demo-profile-banner";
 import { ProfileViewTracker } from "@/app/therapists/[slug]/_components/ProfileViewTracker";
 import { ProfilePageTracker } from "@/app/therapists/[slug]/_components/ProfilePageTracker";
+import { SITE_URL } from "@/lib/site";
 
 type Params = { slug: string };
 
 export const revalidate = 60;
+
+function formatReviewDate(value: string | null): string | undefined {
+  if (!value) return undefined;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return undefined;
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
 
 export async function generateStaticParams() {
   // Public profiles are generated on demand to avoid build-time database dependency.
@@ -40,12 +54,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
 
   const profile = buildProfileViewModel(dbProfile);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://masseurmatch.com";
 
   return buildProfilePageMetadata(
     dbProfile,
     resolvedParams.slug,
-    siteUrl,
+    SITE_URL,
     profile.seoTitle,
     profile.seoDescription,
     profile.ogImage,
@@ -58,9 +71,10 @@ export default async function TherapistPage({ params }: { params: Promise<Params
 
   if (!dbProfile) notFound();
 
-  const [photos, relatedResult] = await Promise.all([
+  const [photos, relatedResult, importedReviews] = await Promise.all([
     getProfilePhotos(dbProfile.id),
     getPublicTherapists({ city: dbProfile.city || undefined, page: 1, pageSize: 6 }),
+    getPublicImportedReviews(dbProfile.id),
   ]);
   const profile = buildProfileViewModel(dbProfile, photos);
   const matchedCity = getCities().find((city) => city.name.toLowerCase() === profile.city.toLowerCase());
@@ -87,6 +101,23 @@ export default async function TherapistPage({ params }: { params: Promise<Params
     .slice(0, 6);
 
   const knottyPrompt = `Tell me about ${profile.name}, a massage therapist in ${profile.city}. What services and availability do they offer?`;
+  const reviews = importedReviews.map((review) => ({
+    quote: review.review_text,
+    author: review.reviewer_name || "Imported reviewer",
+    date: formatReviewDate(review.review_date),
+    rating: review.rating ?? undefined,
+    sourceLabel: review.public_label || "Imported review",
+  }));
+  const importedRatings = importedReviews
+    .map((review) => review.rating)
+    .filter((rating): rating is number => typeof rating === "number" && Number.isFinite(rating));
+  const importedAverage = importedRatings.length > 0
+    ? importedRatings.reduce((total, rating) => total + rating, 0) / importedRatings.length
+    : undefined;
+  const rating = typeof dbProfile.average_rating === "number" && dbProfile.average_rating > 0
+    ? dbProfile.average_rating
+    : importedAverage;
+  const reviewCount = Math.max(dbProfile.review_count ?? 0, reviews.length);
 
   return (
     <>
@@ -105,6 +136,9 @@ export default async function TherapistPage({ params }: { params: Promise<Params
         businessHours={dbProfile.business_hours}
         training={Array.isArray(dbProfile.training) ? dbProfile.training : []}
         education={Array.isArray(dbProfile.education) ? dbProfile.education : []}
+        reviews={reviews}
+        rating={rating}
+        reviewCount={reviewCount}
       />
     </>
   );

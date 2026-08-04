@@ -42,7 +42,13 @@ import { ReportProfileDialog } from "@/components/profile/ReportProfileDialog";
 import { trackConversion } from "@/lib/seo-tracking-config";
 
 type RelatedProfile = { name: string; slug: string; city: string; profilePhotoUrl?: string };
-type Review = { quote: string; author: string; date?: string };
+type Review = {
+  quote: string;
+  author: string;
+  date?: string;
+  rating?: number;
+  sourceLabel?: string;
+};
 
 const SERVICE_ICONS: Array<{ test: RegExp; Icon: typeof Sparkles }> = [
   { test: /deep|sport|recovery|trigger|therap/i, Icon: Activity },
@@ -82,7 +88,7 @@ export function VoxProfile({
   availableNow: boolean;
   lgbtqAffirming: boolean;
   knottyPrompt: string;
-  // Optional showcase-only social proof. Real directory profiles never pass these.
+  // Public reviews are pre-filtered on the server; source platforms stay private.
   reviews?: Review[];
   rating?: number;
   reviewCount?: number;
@@ -113,6 +119,7 @@ export function VoxProfile({
 
   const quickNavItems = [
     profile.galleryImages.length > 1 && { label: "Gallery", href: "#gallery" },
+    reviews.length > 0 && { label: "Reviews", href: "#reviews" },
     allServices.length > 0 && { label: "Services", href: "#services" },
     (profile.pricing.length > 0 || hasRate(profile.incallPrice)) && { label: "Rates", href: "#rates" },
     { label: "Availability", href: "#availability" },
@@ -327,29 +334,39 @@ export function VoxProfile({
           </Section>
         )}
 
-        {/* ── Reviews (showcase only — never shown for real directory profiles) */}
+        {/* ── Public imported reviews ─────────────────────────────────────── */}
         {reviews.length > 0 && (
-          <Section id="reviews" eyebrow="Testimonials" title="Client reviews">
+          <Section id="reviews" eyebrow="Approved history" title="Imported reviews">
             <div className="grid gap-4 md:grid-cols-3">
-              {reviews.slice(0, 6).map((review, index) => (
-                <figure
-                  key={index}
-                  className="flex h-full flex-col rounded-2xl border border-[#E8E8E8] bg-white p-6 shadow-sm"
-                >
-                  <span className="mb-3 flex items-center gap-0.5 text-[#8B1E2D]">
-                    {[0, 1, 2, 3, 4].map((i) => (
-                      <Star key={i} className="h-4 w-4 fill-current" strokeWidth={0} />
-                    ))}
-                  </span>
-                  <blockquote className="flex-1 text-[15px] leading-7 text-[#3f3a33]">
-                    &ldquo;{review.quote}&rdquo;
-                  </blockquote>
-                  <figcaption className="mt-4 text-sm font-semibold text-[#111111]">
-                    {review.author}
-                    {review.date ? <span className="ml-2 font-normal text-[#6F6050]">{review.date}</span> : null}
-                  </figcaption>
-                </figure>
-              ))}
+              {reviews.slice(0, 6).map((review, index) => {
+                const filledStars = Math.max(0, Math.min(5, Math.round(review.rating ?? 5)));
+                return (
+                  <figure
+                    key={`${review.author}-${review.date || index}`}
+                    className="flex h-full flex-col rounded-2xl border border-[#E8E8E8] bg-white p-6 shadow-sm"
+                  >
+                    <span className="mb-3 flex items-center gap-0.5" aria-label={`${filledStars} out of 5 stars`}>
+                      {[0, 1, 2, 3, 4].map((star) => (
+                        <Star
+                          key={star}
+                          className={`h-4 w-4 ${star < filledStars ? "fill-[#8B1E2D] text-[#8B1E2D]" : "text-slate-300"}`}
+                          strokeWidth={star < filledStars ? 0 : 1.75}
+                        />
+                      ))}
+                    </span>
+                    <blockquote className="flex-1 text-[15px] leading-7 text-[#3f3a33]">
+                      &ldquo;{review.quote}&rdquo;
+                    </blockquote>
+                    <figcaption className="mt-4 text-sm font-semibold text-[#111111]">
+                      {review.author}
+                      {review.date ? <span className="ml-2 font-normal text-[#6F6050]">{review.date}</span> : null}
+                      <span className="mt-1 block text-xs font-normal uppercase tracking-wide text-[#8E8E8E]">
+                        {review.sourceLabel || "Imported review"}
+                      </span>
+                    </figcaption>
+                  </figure>
+                );
+              })}
             </div>
           </Section>
         )}

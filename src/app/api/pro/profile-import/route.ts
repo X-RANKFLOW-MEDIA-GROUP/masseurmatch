@@ -2,10 +2,13 @@ import { after } from "next/server";
 import { z } from "zod";
 
 import { assertRateLimit } from "@/app/_lib/security";
+import { SITE_URL } from "@/lib/site";
+import { notifyAdmin } from "@/app/api/_lib/admin-notify";
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 import { requireRequestSession } from "@/app/api/_lib/session";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { processPendingMigrations } from "@/app/api/migrate/_lib/processor";
+import { assertSafePublicUrl } from "@/app/api/migrate/_lib/source-url";
 
 const supportedPlatforms = [
   "rentmasseur",
@@ -50,56 +53,6 @@ const PLATFORM_HOST_MATCHERS: Record<Exclude<SupportedPlatform, "custom">, strin
   travelgay: ["travelgay.com"],
   hiswellness: ["hiswellness.co", "hiswellness.com"],
 };
-
-function isPrivateIpv4(hostname: string) {
-  const parts = hostname.split(".").map((part) => Number(part));
-  if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) {
-    return false;
-  }
-
-  const [a, b] = parts;
-  return (
-    a === 10 ||
-    a === 127 ||
-    a === 0 ||
-    (a === 169 && b === 254) ||
-    (a === 172 && b >= 16 && b <= 31) ||
-    (a === 192 && b === 168)
-  );
-}
-
-function parseSafePublicUrl(rawUrl: string) {
-  let url: URL;
-
-  try {
-    url = new URL(rawUrl);
-  } catch {
-    throw new RouteError(400, "Enter a valid profile URL.");
-  }
-
-  if (url.protocol !== "https:" && url.protocol !== "http:") {
-    throw new RouteError(400, "Only HTTP and HTTPS profile links are supported.");
-  }
-
-  if (url.username || url.password) {
-    throw new RouteError(400, "Profile links cannot include embedded credentials.");
-  }
-
-  const hostname = url.hostname.replace(/^\[|\]$/g, "").toLowerCase();
-  const blockedHost =
-    hostname === "localhost" ||
-    hostname === "::1" ||
-    hostname.endsWith(".local") ||
-    hostname.endsWith(".internal") ||
-    isPrivateIpv4(hostname);
-
-  if (!hostname || blockedHost) {
-    throw new RouteError(400, "That profile link cannot be accessed.");
-  }
-
-  url.hash = "";
-  return url;
-}
 
 function assertPlatformMatch(platform: SupportedPlatform, url: URL) {
   if (platform === "custom") return;
@@ -177,14 +130,16 @@ export async function POST(request: Request) {
       throw new RouteError(400, "Add an email address to your account before requesting an import.");
     }
 
-    const normalized: NormalizedEntry[] = parsed.data.profileUrls.map((entry) => {
-      const url = parseSafePublicUrl(entry.url);
-      assertPlatformMatch(entry.platform, url);
-      return {
-        platform: entry.platform,
-        source_url: url.toString(),
-      };
-    });
+    const normalized: NormalizedEntry[] = await Promise.all(
+      parsed.data.profileUrls.map(async (entry) => {
+        const url = await assertSafePublicUrl(entry.url);
+        assertPlatformMatch(entry.platform, url);
+        return {
+          platform: entry.platform,
+          source_url: url.toString(),
+        };
+      }),
+    );
 
     const uniqueByUrl: NormalizedEntry[] = Array.from(
       new Map<string, NormalizedEntry>(
@@ -230,11 +185,29 @@ export async function POST(request: Request) {
     }
 
     after(async () => {
-      try {
-        await processPendingMigrations();
-      } catch (error) {
-        console.error("[api/pro/profile-import] Background processing failed:", error);
-      }
+      const results = await Promise.allSettled([
+        processPendingMigrations(),
+        notifyAdmin({
+          subject: `New profile import request from ${email}`,
+          heading: "Profile import requested",
+          intro: "A provider submitted external profile links for review import.",
+          fields: [
+            { label: "Provider email", value: email },
+            { label: "Profile ID", value: profile.id },
+            { label: "Requests", value: String(rows.length) },
+            { label: "Platforms", value: rows.map((row) => row.platform).join(", ") },
+          ],
+          message: rows.map((row) => row.source_url).join("\n"),
+          action: { label: "Review imports", url: `${SITE_URL}/admin/migrations` },
+          replyTo: email,
+        }),
+      ]);
+
+      results.forEach((result, index) => {
+        if (result.status === "rejected") {
+          console.error(`[api/pro/profile-import] Background task ${index + 1} failed:`, result.reason);
+        }
+      });
     });
 
     return json({
