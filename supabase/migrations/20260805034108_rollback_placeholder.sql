@@ -1,0 +1,3 @@
+-- This migration was previously applied to the remote database but has been rolled back.
+-- It is documented here to maintain consistency between local and remote migration history.
+-- No changes are applied in this migration.
