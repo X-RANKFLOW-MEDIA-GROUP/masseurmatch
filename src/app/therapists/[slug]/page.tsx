@@ -7,7 +7,12 @@ import {
   getPublicImportedReviews,
   getPublicTherapistBySlug,
   getPublicTherapists,
+  type PublicTherapist,
 } from "@/app/_lib/directory";
+import {
+  getCanonicalIdentityStatusForProfile,
+  isIdentityVerified,
+} from "@/app/_lib/identity-verification";
 import { buildProfilePageMetadata } from "@/app/_lib/profile-metadata";
 import { buildBreadcrumbJsonLd, createPageMetadata } from "@/app/_lib/seo";
 import { ProfileStructuredData } from "@/components/profile/ProfileStructuredData";
@@ -35,16 +40,29 @@ function formatReviewDate(value: string | null): string | undefined {
   }).format(date);
 }
 
+async function withCanonicalIdentity(profile: PublicTherapist): Promise<PublicTherapist> {
+  const status = await getCanonicalIdentityStatusForProfile(profile.id);
+  const verified = isIdentityVerified(status);
+
+  return {
+    ...profile,
+    verification_status: status,
+    is_verified_identity: verified,
+    // The public "Verified Pro" badge represents identity verification only.
+    // Profile review or approval must never satisfy this trust signal.
+    is_verified_profile: false,
+  };
+}
+
 export async function generateStaticParams() {
-  // Public profiles are generated on demand to avoid build-time database dependency.
   return [];
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const resolvedParams = await params;
-  const dbProfile = await getPublicTherapistBySlug(resolvedParams.slug);
+  const storedProfile = await getPublicTherapistBySlug(resolvedParams.slug);
 
-  if (!dbProfile) {
+  if (!storedProfile) {
     return createPageMetadata({
       title: "Therapist profile",
       description: "Public massage therapist profile.",
@@ -53,6 +71,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     });
   }
 
+  const dbProfile = await withCanonicalIdentity(storedProfile);
   const profile = buildProfileViewModel(dbProfile);
 
   return buildProfilePageMetadata(
@@ -67,14 +86,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 export default async function TherapistPage({ params }: { params: Promise<Params> }) {
   const resolvedParams = await params;
-  const dbProfile = await getPublicTherapistBySlug(resolvedParams.slug);
+  const storedProfile = await getPublicTherapistBySlug(resolvedParams.slug);
 
-  if (!dbProfile) notFound();
+  if (!storedProfile) notFound();
 
-  const [photos, relatedResult, importedReviews] = await Promise.all([
-    getProfilePhotos(dbProfile.id),
-    getPublicTherapists({ city: dbProfile.city || undefined, page: 1, pageSize: 6 }),
-    getPublicImportedReviews(dbProfile.id),
+  const [dbProfile, photos, relatedResult, importedReviews] = await Promise.all([
+    withCanonicalIdentity(storedProfile),
+    getProfilePhotos(storedProfile.id),
+    getPublicTherapists({ city: storedProfile.city || undefined, page: 1, pageSize: 6 }),
+    getPublicImportedReviews(storedProfile.id),
   ]);
   const profile = buildProfileViewModel(dbProfile, photos);
   const matchedCity = getCities().find((city) => city.name.toLowerCase() === profile.city.toLowerCase());
