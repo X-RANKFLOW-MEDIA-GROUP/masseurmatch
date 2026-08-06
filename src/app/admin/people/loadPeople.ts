@@ -1,4 +1,5 @@
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import { normalizeIdentityStatus } from "@/app/_lib/identity-verification";
 
 export type AdminPersonPhoto = {
   id: string;
@@ -49,13 +50,21 @@ export async function loadPeople(): Promise<{ items: AdminPerson[]; error: strin
     const profileIds = profileRows.map((profile) => profile.id).filter((id): id is string => Boolean(id));
     const userIds = profileRows.map((profile) => profile.user_id).filter((id): id is string => Boolean(id));
 
-    const [{ data: photos, error: photoError }, authUsers] = await Promise.all([
+    const [{ data: photos, error: photoError }, { data: identityRows, error: identityError }, authUsers] = await Promise.all([
       profileIds.length
         ? supabase
             .from("profile_photos")
             .select("id,profile_id,storage_path,url,is_primary,sort_order,moderation_status,moderation_reason,created_at")
             .in("profile_id", profileIds)
             .order("sort_order", { ascending: true })
+        : Promise.resolve({ data: [], error: null }),
+      userIds.length
+        ? supabase
+            .from("identity_verifications")
+            .select("id,user_id,status,created_at,updated_at")
+            .in("user_id", userIds)
+            .order("created_at", { ascending: false, nullsFirst: false })
+            .order("updated_at", { ascending: false, nullsFirst: false })
         : Promise.resolve({ data: [], error: null }),
       Promise.all(
         userIds.map(async (userId) => {
@@ -66,11 +75,19 @@ export async function loadPeople(): Promise<{ items: AdminPerson[]; error: strin
     ]);
 
     if (photoError) throw new Error(photoError.message);
+    if (identityError) throw new Error(identityError.message);
 
     const roleMap = new Map<string, AdminPerson["role"]>();
     for (const role of roles ?? []) {
       if (role.user_id && !roleMap.has(role.user_id)) {
         roleMap.set(role.user_id, normalizeRole(role.role));
+      }
+    }
+
+    const identityStatusMap = new Map<string, string>();
+    for (const row of identityRows ?? []) {
+      if (row.user_id && !identityStatusMap.has(row.user_id)) {
+        identityStatusMap.set(row.user_id, normalizeIdentityStatus(row.status));
       }
     }
 
@@ -106,7 +123,7 @@ export async function loadPeople(): Promise<{ items: AdminPerson[]; error: strin
             role: roleMap.get(userId) || null,
             profileStatus: profile.profile_status || "draft",
             subscriptionTier: profile.subscription_tier,
-            verificationStatus: profile.verification_status,
+            verificationStatus: identityStatusMap.get(userId) || "not_started",
             slug: profile.slug,
             isFeatured: Boolean(profile.is_featured),
             isSuspended: Boolean(profile.is_suspended),
