@@ -13,6 +13,10 @@ import type { TablesUpdate } from "@/integrations/supabase/types";
 import { slugify } from "@/components/profile/profile-utils";
 import { buildProfileSlug } from "@/app/_lib/profile-slug";
 
+// Fields that must never be blanked by a profile save. A payload with an
+// empty/null value for one of these (typically an unhydrated client form)
+// keeps the existing database value instead of wiping it. Clearing these
+// intentionally goes through admin tooling, not the self-serve editor.
 const PROTECTED_TEXT_FIELDS = [
   "display_name",
   "full_name",
@@ -131,11 +135,13 @@ export async function GET(request: Request) {
   try {
     const session = await requireRequestSession(request);
     const admin = createSupabaseAdminClient();
+
+    // Check if this is a dashboard request (minimal data needed)
     const isDashboard = new URL(request.url).searchParams.get("dashboard") === "true";
 
     const select = isDashboard
-      ? "id, display_name, full_name, bio, city, state, status, profile_status, visibility_status, is_active, current_status, available_now, available_now_expires, specialties, incall_price, outcall_price, subscription_tier, is_featured, completion_percentage"
-      : "*";
+      ? "id, display_name, full_name, bio, city, state, status, is_active, current_status, available_now, available_now_expires, specialties, incall_price, outcall_price, subscription_tier, is_featured"
+      : "*"; // Full select for other requests
 
     const { data: profile, error } = await admin
       .from("profiles")
@@ -144,6 +150,7 @@ export async function GET(request: Request) {
       .maybeSingle();
 
     if (error) throw new RouteError(500, error.message);
+
     return json({ ok: true, profile });
   } catch (error) {
     return errorResponse(error);
@@ -153,30 +160,49 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     assertRateLimit(request, "pro-profile", { limit: 20, windowMs: 60_000 });
+
     const session = await requireRequestSession(request);
     const profile = await getProfileByUserId(session.userId);
 
-    if (!profile) throw new RouteError(404, "Profile not found.");
+    if (!profile) {
+      throw new RouteError(404, "Profile not found.");
+    }
 
     const rawBody = await request.json().catch(() => {
       throw new RouteError(400, "Invalid JSON request body.");
     });
     const parsed = parseProfilePayload(rawBody);
+
     const rulesAccepted = rawBody && typeof rawBody === "object" && (rawBody as Record<string, unknown>).rulesAccepted === true;
+
+    // Auto-approve is never granted based on client-supplied flags.
+    // Profile edits maintain current status; admin reviews via audit log.
     const canAutoApprove = false;
+
     const now = new Date().toISOString();
+
+    // Keep profile visible during edits: don't change status to under_review
+    // Admin can review changes through audit log while profile stays public
     const nextStatus = profile.profile_status;
+
     const statusUpdates: Record<string, unknown> = {
-      profile_status: nextStatus,
+      profile_status: nextStatus,  // Explicitly maintain current status
       updated_at: now,
     };
 
+    // Only update additional fields if auto-approve (which never happens in current logic)
     if (canAutoApprove) {
       statusUpdates.approved_at = now;
       statusUpdates.visibility_status = "public";
     }
-    if (rulesAccepted) statusUpdates.terms_accepted_at = now;
 
+    if (rulesAccepted) {
+      statusUpdates.terms_accepted_at = now;
+    }
+
+    // Slug rules: a client-supplied slug wins, an existing slug is never
+    // regenerated (published URLs stay stable), and a profile that still has
+    // no slug gets one derived from its display name.
     const updates = { ...parsed.updates } as Record<string, unknown>;
     const clientSlug = typeof updates.slug === "string" ? slugify(updates.slug) : "";
     if (clientSlug) {
@@ -192,29 +218,287 @@ export async function POST(request: Request) {
       }
     }
 
-    const safeUpdates = updates as TablesUpdate<"profiles">;
-    const updatedProfile = await updateProfileByUserId(session.userId, {
-      ...safeUpdates,
+    const nextProfile = await updateProfileByUserId(session.userId, {
+      ...updates,
       ...statusUpdates,
     });
 
-    await recordAuditLog(session.userId, "profile_updated", "profile", profile.id, {
+    await recordAuditLog(session.userId, "provider.profile.update", "profile", profile.id, {
       fields: parsed.fields,
-      status: nextStatus,
+      autoApproved: canAutoApprove,
     });
 
-    if (canAutoApprove && profile.email_address) {
-      await sendEmail({
-        to: profile.email_address,
-        subject: "Your MasseurMatch Profile is Approved!",
-        react: React.createElement(ProfileApprovedEmail, {
-          profileUrl: `https://masseurmatch.com/therapists/${updatedProfile.slug || profile.id}`,
-          dashboardUrl: "https://masseurmatch.com/pro/dashboard",
-        }),
-      });
+    if (canAutoApprove) {
+      const emailAddress = (nextProfile as Record<string, unknown>)?.email_address as string | null
+        || profile.email_address as string | null;
+      const slug = nextProfile?.slug || profile.slug;
+      if (emailAddress) {
+        sendEmail({
+          to: emailAddress,
+          subject: "Your MasseurMatch Profile is Approved!",
+          react: React.createElement(ProfileApprovedEmail, {
+            profileUrl: `https://masseurmatch.com/therapists/${slug || profile.id}`,
+          }),
+        }).catch((err) => {
+          console.error("[api/pro/profile] Approval email failed:", err);
+        });
+      }
     }
 
-    return json({ ok: true, profile: updatedProfile });
+    await import("@/app/_lib/revalidate").then(({ buildTherapistRevalidatePaths, triggerRevalidate }) =>
+      buildTherapistRevalidatePaths({
+        id: nextProfile?.id || profile.id,
+        slug: nextProfile?.slug || profile.slug,
+        city: nextProfile?.city || profile.city,
+      }).then((paths) => triggerRevalidate(paths, { request }))
+    ).catch((error) => {
+      console.error("[api/pro/profile] Revalidation failed:", error);
+    });
+
+    return json({ ok: true, profile: nextProfile, autoApproved: canAutoApprove });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
+
+// ── Full editor save (every MasseurFinder "Edit Profile" field) ────────────
+
+const hoursEntrySchema = z.object({
+  days: z.string().max(40),
+  start: z.string().max(20),
+  end: z.string().max(20),
+});
+
+const mobileHoursSchema = z.union([
+  z.object({ sameAsStudio: z.literal(true) }),
+  z.array(hoursEntrySchema),
+]);
+
+const pricingSessionSchema = z.object({
+  minutes: z.number().int().min(1).max(600),
+  incall_rate: z.number().int().min(0).nullable(),
+  outcall_rate: z.number().int().min(0).nullable(),
+});
+
+function validatePricingMarkup(sessions: z.infer<typeof pricingSessionSchema>[]) {
+  if (sessions.length < 2) return true;
+  const base = sessions.find((s) => s.minutes === 60);
+  if (!base) return true;
+
+  for (const s of sessions) {
+    if (s.minutes === 60) continue;
+    const ratio = s.minutes / 60;
+    if (s.incall_rate != null && base.incall_rate != null && base.incall_rate > 0) {
+      const maxRate = Math.ceil(base.incall_rate * ratio * 1.3334);
+      if (s.incall_rate > maxRate) return false;
+    }
+    if (s.outcall_rate != null && base.outcall_rate != null && base.outcall_rate > 0) {
+      const maxRate = Math.ceil(base.outcall_rate * ratio * 1.3334);
+      if (s.outcall_rate > maxRate) return false;
+    }
+  }
+  return true;
+}
+
+const educationEntrySchema = z.object({
+  degree: z.string().max(120).default(""),
+  institution: z.string().max(160).default(""),
+  location: z.string().max(160).default(""),
+  start_month: z.number().int().min(0).max(12).nullable().default(null),
+  start_year: z.number().int().min(1900).max(2100).nullable().default(null),
+  end_month: z.number().int().min(0).max(12).nullable().default(null),
+  end_year: z.number().int().min(1900).max(2100).nullable().default(null),
+});
+
+const dayDiscountSchema = z
+  .object({
+    percent: z.number().int().min(0).max(100),
+    day: z.string().max(20),
+  })
+  .nullable();
+
+const strArr = z.array(z.string().max(200)).max(120);
+
+const fullProfileSchema = z.object({
+  displayName: z.string().min(1).max(120).optional(),
+  headline: z.string().max(160).optional().nullable(),
+  bio: z.string().max(4000).optional().nullable(),
+  tagline: z.string().max(200).optional().nullable(),
+
+  city: z.string().max(120).optional().nullable(),
+  state: z.string().max(120).optional().nullable(),
+  neighborhood: z.string().max(160).optional().nullable(),
+  zipCode: z.string().max(12).optional().nullable(),
+
+  phone: z.string().max(40).optional().nullable(),
+  whatsapp: z.string().max(40).optional().nullable(),
+  email: z.string().max(160).optional().nullable(),
+  showEmail: z.boolean().optional(),
+  website: z.string().max(255).optional().nullable(),
+  bookingUrl: z.string().max(255).optional().nullable(),
+  bookingPlatform: z.string().max(80).optional().nullable(),
+
+  offersIncall: z.boolean().optional(),
+  offersOutcall: z.boolean().optional(),
+  outcallRadius: z.number().int().min(0).max(1000).optional().nullable(),
+  mapEnabled: z.boolean().optional(),
+
+  massageTechniques: strArr.optional(),
+  serviceCategories: strArr.optional(),
+  specialties: strArr.optional(),
+  massageSetup: strArr.optional(),
+  mobileExtras: strArr.optional(),
+  additionalServices: strArr.optional(),
+  studioAmenities: strArr.optional(),
+  productsUsed: strArr.optional(),
+  productsSold: strArr.optional(),
+  paymentMethods: strArr.optional(),
+  languages: strArr.optional(),
+  affiliations: strArr.optional(),
+  rateDisclaimers: strArr.optional(),
+  regularDiscounts: strArr.optional(),
+
+  pricingSessions: z.array(pricingSessionSchema).max(40).optional(),
+  dayOfWeekDiscount: dayDiscountSchema.optional(),
+  educationEntries: z.array(educationEntrySchema).max(40).optional(),
+  studioHours: z.array(hoursEntrySchema).max(20).optional(),
+  mobileHours: mobileHoursSchema.optional(),
+
+  startDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}(-\d{2})?$/, "Expected YYYY-MM or YYYY-MM-DD")
+    .optional()
+    .nullable(),
+  yearsExperience: z.number().int().min(0).max(80).optional().nullable(),
+  heightInches: z.number().int().min(36).max(96).optional().nullable(),
+  weightLb: z.number().int().min(60).max(600).optional().nullable(),
+  bodyType: z.string().max(50).optional().nullable(),
+
+  availableNow: z.boolean().optional(),
+  availableNowExpires: z.string().max(40).optional().nullable(),
+  currentStatus: z.string().max(60).optional().nullable(),
+  lgbtqAffirming: z.boolean().optional(),
+});
+
+export async function PATCH(request: Request) {
+  try {
+    assertRateLimit(request, "pro-profile", { limit: 30, windowMs: 60_000 });
+
+    const session = await requireRequestSession(request);
+    const profile = await getProfileByUserId(session.userId);
+    if (!profile) {
+      throw new RouteError(404, "Profile not found.");
+    }
+
+    const body = await parseJsonBody(request, fullProfileSchema);
+
+    const updates: TablesUpdate<"profiles"> = {};
+    const text = (v: string | null | undefined) => (v && v.trim() ? v.trim() : null);
+
+    if (body.displayName !== undefined) {
+      updates.display_name = body.displayName.trim();
+      updates.full_name = body.displayName.trim();
+    }
+    if (body.headline !== undefined) updates.headline = text(body.headline);
+    // bio/city/state are load-bearing (routing, SEO, listing eligibility) —
+    // a blank value in the payload means "unset field in the form", never
+    // "erase what's in the database", so only non-empty values are applied.
+    if (text(body.bio)) updates.bio = text(body.bio);
+    if (body.tagline !== undefined) updates.tagline = text(body.tagline);
+
+    if (text(body.city)) updates.city = text(body.city);
+    if (text(body.state)) updates.state = text(body.state);
+    if (body.neighborhood !== undefined) updates.neighborhood = text(body.neighborhood);
+    if (body.zipCode !== undefined) updates.zip_code = text(body.zipCode);
+
+    if (body.phone !== undefined) updates.phone = text(body.phone);
+    if (body.whatsapp !== undefined) updates.whatsapp_number = text(body.whatsapp);
+    if (body.email !== undefined) updates.email_address = text(body.email);
+    if (body.showEmail !== undefined) updates.show_email = body.showEmail;
+    if (body.website !== undefined) updates.website = text(body.website);
+    if (body.bookingUrl !== undefined) updates.booking_url = text(body.bookingUrl);
+    if (body.bookingPlatform !== undefined) updates.booking_platform = text(body.bookingPlatform);
+
+    if (body.offersIncall !== undefined) updates.offers_incall = body.offersIncall;
+    if (body.offersOutcall !== undefined) updates.offers_outcall = body.offersOutcall;
+    if (body.outcallRadius !== undefined) updates.outcall_radius = body.outcallRadius;
+    if (body.mapEnabled !== undefined) updates.map_enabled = body.mapEnabled;
+
+    if (body.massageTechniques !== undefined) updates.massage_techniques = body.massageTechniques;
+    if (body.serviceCategories !== undefined) updates.service_categories = body.serviceCategories;
+    if (body.specialties !== undefined) updates.specialties = body.specialties;
+    if (body.massageSetup !== undefined) updates.massage_setup = body.massageSetup;
+    if (body.mobileExtras !== undefined) updates.mobile_extras = body.mobileExtras;
+    if (body.additionalServices !== undefined) updates.additional_services = body.additionalServices;
+    if (body.studioAmenities !== undefined) updates.studio_amenities = body.studioAmenities;
+    if (body.productsUsed !== undefined) updates.products_used = body.productsUsed;
+    if (body.productsSold !== undefined) updates.products_sold = body.productsSold;
+    if (body.paymentMethods !== undefined) updates.payment_methods = body.paymentMethods;
+    if (body.languages !== undefined) updates.languages = body.languages;
+    if (body.affiliations !== undefined) updates.affiliations = body.affiliations;
+    if (body.rateDisclaimers !== undefined) updates.rate_disclaimers = body.rateDisclaimers;
+    if (body.regularDiscounts !== undefined) updates.regular_discounts = body.regularDiscounts;
+
+    if (body.pricingSessions !== undefined) {
+      if (!validatePricingMarkup(body.pricingSessions)) {
+        throw new RouteError(400, "Rates cannot exceed 33.33% above the 60-minute base rate.");
+      }
+      updates.pricing_sessions = body.pricingSessions;
+    }
+    if (body.dayOfWeekDiscount !== undefined) updates.day_of_week_discount = body.dayOfWeekDiscount;
+    if (body.educationEntries !== undefined) updates.education_entries = body.educationEntries;
+    if (body.studioHours !== undefined) updates.studio_hours = body.studioHours;
+    if (body.mobileHours !== undefined) updates.mobile_hours = body.mobileHours;
+
+    if (body.startDate !== undefined) {
+      // start_date is timestamptz; pad month-only values so Postgres accepts them
+      const startDate = text(body.startDate);
+      updates.start_date =
+        startDate && /^\d{4}-\d{2}$/.test(startDate) ? `${startDate}-01` : startDate;
+    }
+    if (body.yearsExperience !== undefined) updates.years_experience = body.yearsExperience;
+    if (body.heightInches !== undefined) updates.height_inches = body.heightInches;
+    if (body.weightLb !== undefined) updates.weight_lb = body.weightLb;
+    if (body.bodyType !== undefined) updates.body_type = text(body.bodyType);
+
+    // available_now / available_now_expires are intentionally NOT writable here.
+    // The paid "Available Now" badge is gated by tier + TTL in
+    // /api/pro/available-now; accepting it on the general profile PATCH let any
+    // user (including Free) grant themselves the badge with no expiry.
+    if (body.currentStatus !== undefined) updates.current_status = text(body.currentStatus);
+    if (body.lgbtqAffirming !== undefined) updates.lgbtq_affirming = body.lgbtqAffirming;
+
+    updates.profile_status =
+      profile.profile_status === "approved" ? "under_review" : profile.profile_status;
+    updates.updated_at = new Date().toISOString();
+
+    const adminClient = createSupabaseAdminClient();
+    const { data: nextProfile, error } = await adminClient
+      .from("profiles")
+      .update(updates)
+      .eq("user_id", session.userId)
+      .select("*")
+      .maybeSingle();
+
+    if (error) throw new RouteError(500, error.message);
+
+    await recordAuditLog(session.userId, "provider.profile.update", "profile", profile.id, {
+      fields: Object.keys(updates),
+    });
+
+    await import("@/app/_lib/revalidate")
+      .then(({ buildTherapistRevalidatePaths, triggerRevalidate }) =>
+        buildTherapistRevalidatePaths({
+          id: nextProfile?.id || profile.id,
+          slug: nextProfile?.slug || profile.slug,
+          city: nextProfile?.city || profile.city,
+        }).then((paths) => triggerRevalidate(paths, { request })),
+      )
+      .catch((revalError) => {
+        console.error("[api/pro/profile] Revalidation failed:", revalError);
+      });
+
+    return json({ ok: true, profile: nextProfile });
   } catch (error) {
     return errorResponse(error);
   }
