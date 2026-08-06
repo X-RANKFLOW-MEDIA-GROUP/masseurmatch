@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowUpRight, BarChart3, Loader2, LockKeyhole, MapPin, Radar, RefreshCw } from "lucide-react";
 
@@ -112,13 +113,13 @@ export default function DemandRadarPage() {
           <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[#716862]">
             Upgrade to Elite to compare city and neighborhood demand signals, competition, confidence, and market opportunities.
           </p>
-          <a
+          <Link
             href="/pro/subscription"
             className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#8B1E2D] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#741824]"
           >
             View Elite plan
             <ArrowUpRight className="h-4 w-4" />
-          </a>
+          </Link>
         </div>
       </div>
     );
