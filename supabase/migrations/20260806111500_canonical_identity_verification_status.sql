@@ -62,8 +62,13 @@ security definer
 set search_path = public, pg_temp
 as $$
 begin
-  perform public.sync_profile_identity_verification(coalesce(new.user_id, old.user_id));
-  return coalesce(new, old);
+  if tg_op = 'DELETE' then
+    perform public.sync_profile_identity_verification(old.user_id);
+    return old;
+  end if;
+
+  perform public.sync_profile_identity_verification(new.user_id);
+  return new;
 end;
 $$;
 
