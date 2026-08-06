@@ -8,8 +8,10 @@ security definer
 set search_path = public, pg_temp
 as $$
 declare
-  v_status text := 'not_started';
+  v_session_status text := 'not_started';
+  v_profile_status text := 'unverified';
   v_status_at timestamptz := null;
+  v_verified_at timestamptz := null;
   v_verified boolean := false;
 begin
   if p_user_id is null then
@@ -27,26 +29,45 @@ begin
       else 'not_started'
     end,
     coalesce(iv.updated_at, iv.created_at)
-  into v_status, v_status_at
+  into v_session_status, v_status_at
   from public.identity_verifications iv
   where iv.user_id = p_user_id
   order by iv.created_at desc nulls last, iv.updated_at desc nulls last, iv.id desc
   limit 1;
 
   if not found then
-    v_status := 'not_started';
+    v_session_status := 'not_started';
     v_status_at := null;
   end if;
 
-  v_verified := v_status = 'verified';
+  v_verified := v_session_status = 'verified';
+  v_verified_at := case
+    when v_verified then coalesce(v_status_at, timezone('utc', now()))
+    else null
+  end;
+
+  -- profiles.verification_status has a narrower legacy constraint. Richer
+  -- session states remain in identity_verifications and provider APIs.
+  v_profile_status := case
+    when v_session_status = 'verified' then 'verified'
+    when v_session_status = 'pending' then 'pending'
+    when v_session_status = 'processing' then 'processing'
+    when v_session_status = 'failed' then 'rejected'
+    else 'unverified'
+  end;
 
   update public.profiles
   set
     is_verified_identity = v_verified,
-    verification_status = v_status,
-    identity_verified_at = case when v_verified then coalesce(v_status_at, timezone('utc', now())) else null end,
+    verification_status = v_profile_status,
+    identity_verified_at = v_verified_at,
     updated_at = timezone('utc', now())
-  where user_id = p_user_id;
+  where user_id = p_user_id
+    and (
+      is_verified_identity is distinct from v_verified
+      or verification_status is distinct from v_profile_status
+      or identity_verified_at is distinct from v_verified_at
+    );
 end;
 $$;
 
@@ -65,6 +86,10 @@ begin
   if tg_op = 'DELETE' then
     perform public.sync_profile_identity_verification(old.user_id);
     return old;
+  end if;
+
+  if tg_op = 'UPDATE' and old.user_id is distinct from new.user_id then
+    perform public.sync_profile_identity_verification(old.user_id);
   end if;
 
   perform public.sync_profile_identity_verification(new.user_id);
