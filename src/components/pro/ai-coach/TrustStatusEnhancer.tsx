@@ -7,39 +7,73 @@ type VerificationResponse = {
   identity?: { status?: string };
 };
 
-function applyIdentityStatus(statusValue: string | undefined) {
-  const status = (statusValue || "not_started").trim().toLowerCase();
+function normalizeStatus(value: string | undefined) {
+  return (value || "not_started").trim().toLowerCase();
+}
+
+function applyIdentityStatus(statusValue: string | undefined): boolean {
+  const status = normalizeStatus(statusValue);
   const verified = status === "verified";
   const headings = Array.from(document.querySelectorAll("h3"));
   const heading = headings.find((element) => element.textContent?.trim() === "Trust Signals");
   const section = heading?.closest("section");
-  if (!section) return;
+  if (!section) return false;
 
   const chips = Array.from(section.querySelectorAll("span"));
-  const chip = chips.find((element) => element.textContent?.includes("ID Verified"));
-  if (!chip) return;
+  const chip = chips.find(
+    (element) =>
+      element.textContent?.includes("ID Verified") ||
+      element.hasAttribute("data-canonical-identity-status"),
+  );
+  if (!chip) return false;
 
-  chip.textContent = verified ? "ID Verified: verified" : `ID Verified: ${status.replace(/_/g, " ")}`;
-  chip.className = verified
+  const expectedText = verified
+    ? "ID Verified: verified"
+    : `ID Verified: ${status.replace(/_/g, " ")}`;
+  const expectedClass = verified
     ? "inline-flex items-center gap-1.5 rounded-full bg-[#EDF7EF] px-3 py-2 text-xs font-semibold text-[#347348]"
     : "inline-flex items-center gap-1.5 rounded-full bg-[#FFF4E5] px-3 py-2 text-xs font-semibold text-[#986116]";
-  chip.setAttribute("data-canonical-identity-status", status);
+
+  if (
+    chip.getAttribute("data-canonical-identity-status") !== status ||
+    chip.textContent !== expectedText ||
+    chip.className !== expectedClass
+  ) {
+    chip.textContent = expectedText;
+    chip.className = expectedClass;
+    chip.setAttribute("data-canonical-identity-status", status);
+  }
+
+  return true;
 }
 
 export function TrustStatusEnhancer() {
   useEffect(() => {
     let cancelled = false;
+    let canonicalStatus = "not_started";
+
+    const observer = new MutationObserver(() => {
+      if (!cancelled) applyIdentityStatus(canonicalStatus);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
 
     requestJson<VerificationResponse>("/api/provider/verification")
       .then((data) => {
-        if (!cancelled) applyIdentityStatus(data.identity?.status);
+        if (cancelled) return;
+        canonicalStatus = normalizeStatus(data.identity?.status);
+        applyIdentityStatus(canonicalStatus);
       })
       .catch(() => {
-        if (!cancelled) applyIdentityStatus("not_started");
+        if (cancelled) return;
+        canonicalStatus = "not_started";
+        applyIdentityStatus(canonicalStatus);
       });
+
+    applyIdentityStatus(canonicalStatus);
 
     return () => {
       cancelled = true;
+      observer.disconnect();
     };
   }, []);
 
