@@ -97,7 +97,13 @@ export async function POST(request: NextRequest) {
 
     await adminClient
       .from("profiles")
-      .update({ stripe_verification_session_id: verificationSession.id })
+      .update({
+        stripe_verification_session_id: verificationSession.id,
+        is_verified_identity: false,
+        verification_status: "pending",
+        identity_verified_at: null,
+        updated_at: new Date().toISOString(),
+      })
       .eq("user_id", targetUserId);
 
     return NextResponse.json({
