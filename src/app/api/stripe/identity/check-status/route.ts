@@ -36,15 +36,30 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const requester = await requireSession(request);
-    const requesterRole = await getUserRole(requester.userId);
     const stripe = getStripe();
     const adminClient = createSupabaseAdminClient();
 
     const stripeSession = await stripe.identity.verificationSessions.retrieve(sessionId);
-    const userId = stripeSession.metadata?.userId ?? requester.userId;
+    const userId = stripeSession.metadata?.userId;
 
-    if (requesterRole !== "admin" && requester.userId !== userId) {
+    if (!userId) {
+      return NextResponse.json({ error: "Verification session not found or invalid." }, { status: 404 });
+    }
+
+    // Allow unauthenticated requests to check their own verification status after
+    // Stripe redirects (session may have expired). Also allow admins to check any.
+    let requester: typeof undefined | Awaited<ReturnType<typeof requireSession>>;
+    let requesterRole: string | null = null;
+
+    try {
+      requester = await requireSession(request);
+      requesterRole = await getUserRole(requester.userId);
+    } catch {
+      // Unauthenticated is OK — just limit access to the user's own verification
+      requester = undefined;
+    }
+
+    if (requester && requesterRole !== "admin" && requester.userId !== userId) {
       return NextResponse.json({ error: "Forbidden." }, { status: 403 });
     }
 
