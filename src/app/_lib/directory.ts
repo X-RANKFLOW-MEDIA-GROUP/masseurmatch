@@ -591,7 +591,7 @@ export const getProfilePhotos = async (profileId: string, limit = 6) => {
     .from("profile_photos")
     .select("id, storage_path, url, is_primary, sort_order")
     .eq("profile_id", profileId)
-    .or("moderation_status.eq.approved,moderation_status.is.null,moderation_status.eq.pending")
+    .eq("moderation_status", "approved")
     .order("sort_order", { ascending: true })
     .limit(limit);
 
@@ -635,7 +635,7 @@ export const getProfilePhotosBatch = async (
         .from("profile_photos")
         .select("id, profile_id, storage_path, url, is_primary, sort_order, moderation_status")
         .in("profile_id", chunk)
-        .or("moderation_status.eq.approved,moderation_status.is.null,moderation_status.eq.pending")
+        .eq("moderation_status", "approved")
         .order("sort_order", { ascending: true }),
     ),
   );
