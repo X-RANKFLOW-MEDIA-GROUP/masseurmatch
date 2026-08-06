@@ -1,34 +1,74 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-// Protected by INTERNAL_API_KEY header — never expose this endpoint publicly.
 const INTERNAL_KEY = process.env.INTERNAL_API_KEY ?? "";
+
+type DemandTrend = "rising" | "stable" | "falling";
 
 interface DemandScoreRow {
   city: string;
   state: string;
   neighborhood?: string | null;
   score: number;
-  trend: "rising" | "stable" | "falling";
+  trend: DemandTrend;
   search_volume_index: number;
   competition_index: number;
-  week_start: string; // ISO date e.g. "2026-06-08"
+  confidence?: number | null;
+  source?: string;
+  methodology_version?: string;
+  week_start: string;
+  collected_at?: string;
+  expires_at?: string | null;
 }
 
-function isValidRow(r: unknown): r is DemandScoreRow {
-  if (!r || typeof r !== "object") return false;
-  const row = r as Record<string, unknown>;
+function isScore(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 100;
+}
+
+function isIsoDate(value: unknown): value is string {
+  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`));
+}
+
+function isIsoTimestamp(value: unknown): value is string {
+  return typeof value === "string" && !Number.isNaN(Date.parse(value));
+}
+
+function isValidRow(value: unknown): value is DemandScoreRow {
+  if (!value || typeof value !== "object") return false;
+  const row = value as Record<string, unknown>;
   return (
-    typeof row.city === "string" &&
-    typeof row.state === "string" &&
-    typeof row.score === "number" &&
-    row.score >= 0 &&
-    row.score <= 100 &&
+    typeof row.city === "string" && row.city.trim().length >= 2 &&
+    typeof row.state === "string" && row.state.trim().length === 2 &&
+    isScore(row.score) &&
     (row.trend === "rising" || row.trend === "stable" || row.trend === "falling") &&
-    typeof row.search_volume_index === "number" &&
-    typeof row.competition_index === "number" &&
-    typeof row.week_start === "string"
+    isScore(row.search_volume_index) &&
+    isScore(row.competition_index) &&
+    (row.confidence === undefined || row.confidence === null || isScore(row.confidence)) &&
+    isIsoDate(row.week_start) &&
+    (row.collected_at === undefined || isIsoTimestamp(row.collected_at)) &&
+    (row.expires_at === undefined || row.expires_at === null || isIsoTimestamp(row.expires_at))
   );
+}
+
+function normalizeRow(row: DemandScoreRow) {
+  const collectedAt = row.collected_at ?? new Date().toISOString();
+  const expiresAt = row.expires_at ?? new Date(Date.parse(collectedAt) + 7 * 86_400_000).toISOString();
+  return {
+    city: row.city.trim(),
+    state: row.state.trim().toUpperCase(),
+    neighborhood: row.neighborhood?.trim() || null,
+    score: row.score,
+    trend: row.trend,
+    search_volume_index: row.search_volume_index,
+    competition_index: row.competition_index,
+    confidence: row.confidence ?? 50,
+    source: row.source?.trim() || "internal-ingestion",
+    methodology_version: row.methodology_version?.trim() || "mvp-v1",
+    week_start: row.week_start,
+    collected_at: collectedAt,
+    expires_at: expiresAt,
+    is_sample: false,
+  };
 }
 
 export async function POST(req: NextRequest) {
@@ -44,15 +84,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  if (!Array.isArray(body)) {
-    return NextResponse.json({ error: "Body must be an array of demand score rows" }, { status: 400 });
+  if (!Array.isArray(body) || body.length === 0 || body.length > 1000) {
+    return NextResponse.json({ error: "Body must contain 1 to 1000 demand score rows" }, { status: 400 });
   }
 
-  const rows = body as unknown[];
-  const invalid = rows.filter((r) => !isValidRow(r));
-  if (invalid.length > 0) {
+  const invalidIndexes = body
+    .map((row, index) => (isValidRow(row) ? null : index))
+    .filter((index): index is number => index !== null);
+  if (invalidIndexes.length > 0) {
     return NextResponse.json(
-      { error: `${invalid.length} row(s) failed validation`, invalid },
+      { error: `${invalidIndexes.length} row(s) failed validation`, invalid_indexes: invalidIndexes },
       { status: 422 },
     );
   }
@@ -66,18 +107,19 @@ export async function POST(req: NextRequest) {
   const admin = createClient(supabaseUrl, serviceKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
+  const normalized = (body as DemandScoreRow[]).map(normalizeRow);
 
   const { data, error } = await admin
     .from("demand_scores")
-    .upsert(rows as DemandScoreRow[], {
-      onConflict: "city,state,neighborhood,week_start",
+    .upsert(normalized, {
+      onConflict: "city_key,state_key,neighborhood_key,week_start,methodology_version",
       ignoreDuplicates: false,
     })
     .select("id");
 
   if (error) {
     console.error("[demand-scores] upsert error", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Demand score ingestion failed" }, { status: 500 });
   }
 
   return NextResponse.json({ inserted: data?.length ?? 0 });
