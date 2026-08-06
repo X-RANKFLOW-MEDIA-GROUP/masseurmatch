@@ -1,6 +1,10 @@
 -- Harden Demand Radar for server-side Elite access and auditable freshness.
 
 ALTER TABLE public.demand_scores
+  ADD COLUMN IF NOT EXISTS city_key text
+    GENERATED ALWAYS AS (lower(trim(city))) STORED,
+  ADD COLUMN IF NOT EXISTS state_key text
+    GENERATED ALWAYS AS (upper(trim(state))) STORED,
   ADD COLUMN IF NOT EXISTS neighborhood_key text
     GENERATED ALWAYS AS (COALESCE(lower(trim(neighborhood)), '')) STORED,
   ADD COLUMN IF NOT EXISTS confidence int CHECK (confidence BETWEEN 0 AND 100),
@@ -22,10 +26,10 @@ WHERE week_start = DATE '2026-06-08'
 
 DROP INDEX IF EXISTS demand_scores_city_state_neighborhood_week_start_idx;
 CREATE UNIQUE INDEX IF NOT EXISTS demand_scores_market_week_method_idx
-  ON public.demand_scores (lower(trim(city)), upper(trim(state)), neighborhood_key, week_start, methodology_version);
+  ON public.demand_scores (city_key, state_key, neighborhood_key, week_start, methodology_version);
 
 CREATE INDEX IF NOT EXISTS demand_scores_latest_market_idx
-  ON public.demand_scores (upper(trim(state)), lower(trim(city)), week_start DESC);
+  ON public.demand_scores (state_key, city_key, week_start DESC);
 
 DROP POLICY IF EXISTS "Authenticated users can read demand scores" ON public.demand_scores;
 REVOKE ALL ON TABLE public.demand_scores FROM anon, authenticated;
