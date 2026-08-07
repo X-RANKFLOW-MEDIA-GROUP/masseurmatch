@@ -4,13 +4,24 @@ import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/h
 import { createSupabaseAdminClient, recordAuditLog, requireAdminSession } from "@/app/api/_lib/supabase-server";
 import { SUPABASE_PUBLIC_URL } from "@/integrations/supabase/client";
 
-// Prefer the stored public URL; otherwise derive one from the storage path.
-// Rendering the raw storage_path in <img src> produced broken images.
+function isAbsoluteUrl(value: string) {
+  return /^https?:\/\//i.test(value);
+}
+
 function photoUrl(url: unknown, storagePath: unknown): string {
-  if (typeof url === "string" && url) return url;
-  if (typeof storagePath === "string" && storagePath) {
-    return `${SUPABASE_PUBLIC_URL}/storage/v1/object/public/therapist-photos/${storagePath}`;
+  const storedUrl = typeof url === "string" ? url.trim() : "";
+  const storedPath = typeof storagePath === "string" ? storagePath.trim() : "";
+
+  if (storedUrl) {
+    if (isAbsoluteUrl(storedUrl)) return storedUrl;
+    return `${SUPABASE_PUBLIC_URL}/storage/v1/object/public/therapist-photos/${storedUrl.replace(/^\/+/, "")}`;
   }
+
+  if (storedPath) {
+    if (isAbsoluteUrl(storedPath)) return storedPath;
+    return `${SUPABASE_PUBLIC_URL}/storage/v1/object/public/therapist-photos/${storedPath.replace(/^\/+/, "")}`;
+  }
+
   return "";
 }
 
@@ -32,7 +43,6 @@ export async function GET(request: Request) {
       .limit(100);
 
     if (error) {
-      // If foreign key join fails, fall back to photos only
       const { data: fallbackPhotos, error: fallbackError } = await adminClient
         .from("profile_photos")
         .select("id, profile_id, url, storage_path, is_primary, sort_order, moderation_status, moderation_reason, created_at")
