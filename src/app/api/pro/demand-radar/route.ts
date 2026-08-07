@@ -10,6 +10,19 @@ import {
 
 type Db = { from: (table: string) => any };
 
+function toPreviewRow(row: DemandScoreRecord) {
+  return {
+    id: row.id,
+    city: row.city,
+    state: row.state,
+    neighborhood: null,
+    score: row.score,
+    trend: row.trend,
+    week_start: row.week_start,
+    collected_at: row.collected_at,
+  };
+}
+
 export async function GET(request: Request) {
   try {
     const session = await requireRequestSession(request);
@@ -25,10 +38,8 @@ export async function GET(request: Request) {
     if (!profile) throw new RouteError(404, "Provider profile not found.");
 
     const tier = String(profile.subscription_tier ?? "free").toLowerCase();
-    const isAdmin = session.role === "admin" || session.email.endsWith("@masseurmatch.com");
-    if (tier !== "elite" && !isAdmin) {
-      throw new RouteError(403, "Demand Radar requires an active Elite plan.", "elite_required");
-    }
+    const isAdmin = session.role === "admin";
+    const hasFullAccess = tier === "elite" || isAdmin;
 
     const { data, error } = await db
       .from("demand_scores")
@@ -56,22 +67,45 @@ export async function GET(request: Request) {
       .sort()
       .at(-1) ?? null;
 
+    const market = {
+      city: profile.city ?? null,
+      state: profile.state ?? null,
+      weekStart: latestWeek,
+      freshness: getDemandFreshness(freshestCollectedAt),
+      collectedAt: freshestCollectedAt,
+    };
+
+    if (!hasFullAccess) {
+      return json({
+        ok: true,
+        access: {
+          tier,
+          full: false,
+          preview: true,
+        },
+        market,
+        local: localRows.slice(0, 1).map(toPreviewRow),
+        opportunities: ranked.slice(0, 3).map(toPreviewRow),
+        disclaimer:
+          "Demand Radar Preview shows relative market signals. Scores do not guarantee searches, inquiries, contacts, or revenue.",
+      });
+    }
+
     return json({
       ok: true,
-      market: {
-        city: profile.city ?? null,
-        state: profile.state ?? null,
-        weekStart: latestWeek,
-        freshness: getDemandFreshness(freshestCollectedAt),
-        collectedAt: freshestCollectedAt,
+      access: {
+        tier,
+        full: true,
+        preview: false,
       },
+      market,
       local: localRows.map((row) => ({ ...row, opportunity_score: getOpportunityScore(row) })),
       opportunities: ranked.slice(0, 20).map((row) => ({
         ...row,
         opportunity_score: getOpportunityScore(row),
       })),
       disclaimer:
-        "Demand Radar shows relative market signals. Scores do not guarantee searches, inquiries, bookings, or revenue.",
+        "Demand Radar shows relative market signals. Scores do not guarantee searches, inquiries, contacts, or revenue.",
     });
   } catch (error) {
     return errorResponse(error);
