@@ -49,12 +49,16 @@ const cancelSchema = z.object({
 const postSchema = z.discriminatedUnion("action", [campaignSchema, templateSchema, cancelSchema]);
 
 const templateIdResultSchema = z.string().uuid();
-const cancelledResultSchema = z.coerce.number().int().nonnegative();
+const rpcCountSchema = z.preprocess(
+  (value) => (typeof value === "string" ? Number(value) : value),
+  z.number().int().nonnegative(),
+);
+const cancelledResultSchema = rpcCountSchema;
 const campaignResultSchema = z.object({
   campaignId: z.string().uuid(),
-  total: z.coerce.number().int().nonnegative(),
-  queued: z.coerce.number().int().nonnegative(),
-  suppressed: z.coerce.number().int().nonnegative(),
+  total: rpcCountSchema,
+  queued: rpcCountSchema,
+  suppressed: rpcCountSchema,
 });
 
 type RpcClient = ReturnType<typeof createSupabaseAdminClient> & {

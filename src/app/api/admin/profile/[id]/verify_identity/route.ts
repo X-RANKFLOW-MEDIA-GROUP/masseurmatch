@@ -1,6 +1,12 @@
 export const dynamic = "force-dynamic";
+
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
-import { createSupabaseAdminClient, recordAuditLog, requireAdminSession } from "@/app/api/_lib/supabase-server";
+import { getCanonicalIdentityStatusForUser } from "@/app/_lib/identity-verification";
+import {
+  createSupabaseAdminClient,
+  recordAuditLog,
+  requireAdminSession,
+} from "@/app/api/_lib/supabase-server";
 
 export async function POST(
   request: Request,
@@ -20,30 +26,46 @@ export async function POST(
     if (fetchError) throw new RouteError(500, fetchError.message);
     if (!profile) throw new RouteError(404, "Profile not found.");
 
+    const canonicalStatus = await getCanonicalIdentityStatusForUser(profile.user_id);
+    if (canonicalStatus !== "verified") {
+      throw new RouteError(
+        409,
+        "Identity cannot be marked verified until the latest Stripe Identity session is verified.",
+      );
+    }
+
+    const verifiedAt = new Date().toISOString();
     const { error: updateError } = await adminClient
       .from("profiles")
       .update({
         is_verified_identity: true,
         verification_status: "verified",
-        updated_at: new Date().toISOString(),
+        identity_verified_at: verifiedAt,
+        updated_at: verifiedAt,
       })
       .eq("id", profileId);
 
     if (updateError) throw new RouteError(500, updateError.message);
 
     await adminClient.from("admin_actions").insert({
-      action: "verify_identity",
-      action_type: "verify_identity",
+      action: "sync_identity_verification",
+      action_type: "sync_identity_verification",
       target_table: "profiles",
       admin_id: admin.userId,
       target_user_id: profile.user_id,
       target_profile_id: profileId,
-      reason: null,
+      reason: "Synced from verified Stripe Identity session",
     });
 
-    await recordAuditLog(admin.userId, "verify_identity", "profile", profileId, null);
+    await recordAuditLog(
+      admin.userId,
+      "sync_identity_verification",
+      "profile",
+      profileId,
+      { source: "identity_verifications", status: canonicalStatus },
+    );
 
-    return json({ ok: true, profileId, verified: true });
+    return json({ ok: true, profileId, verified: true, source: "stripe_identity" });
   } catch (error) {
     return errorResponse(error);
   }

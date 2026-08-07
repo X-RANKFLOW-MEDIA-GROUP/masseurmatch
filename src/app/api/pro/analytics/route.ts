@@ -8,76 +8,89 @@ function dayKey(iso: string) {
   return iso.slice(0, 10);
 }
 
+function emptySeries(since: Date) {
+  return Array.from({ length: WINDOW_DAYS }, (_, index) => ({
+    date: dayKey(new Date(since.getTime() + index * 86_400_000).toISOString()),
+    visitors: 0,
+  }));
+}
+
 export async function GET(request: Request) {
   try {
     const session = await requireRequestSession(request);
     const admin = createSupabaseAdminClient();
+    const since = new Date(Date.now() - (WINDOW_DAYS - 1) * 86_400_000);
+    since.setUTCHours(0, 0, 0, 0);
 
     const { data: profile, error: profileError } = await admin
       .from("profiles")
-      .select("id, contact_clicks")
+      .select("id, contact_clicks, visibility_status, profile_status, status, is_active")
       .eq("user_id", session.userId)
       .maybeSingle();
 
     if (profileError) throw new RouteError(500, profileError.message);
 
-    // No profile yet (e.g. setup incomplete) — return zeros so the page
-    // renders the "No visits yet" empty state instead of an error.
-    if (!profile) {
-      const since = new Date(Date.now() - (WINDOW_DAYS - 1) * 86_400_000);
-      since.setUTCHours(0, 0, 0, 0);
-      const series = Array.from({ length: WINDOW_DAYS }, (_, i) => ({
-        date: dayKey(new Date(since.getTime() + i * 86_400_000).toISOString()),
-        visitors: 0,
-      }));
-      return json({ ok: true, windowDays: WINDOW_DAYS, series, totals: { windowViews: 0, windowUniqueVisitors: 0, allTimeViews: 0, allTimeContactClicks: 0 } });
-    }
-
-    const since = new Date(Date.now() - (WINDOW_DAYS - 1) * 86_400_000);
-    since.setUTCHours(0, 0, 0, 0);
-
-    // Safely query events - profile.id should always exist at this point due to line 26 check
     if (!profile?.id) {
-      throw new RouteError(500, "Profile ID missing");
+      return json({
+        ok: true,
+        windowDays: WINDOW_DAYS,
+        isLive: false,
+        series: emptySeries(since),
+        totals: {
+          windowViews: 0,
+          windowUniqueVisitors: 0,
+          allTimeViews: 0,
+          allTimeContactClicks: 0,
+        },
+      });
     }
 
-    const { data: events, error: eventsError } = await admin
-      .from("ranking_events")
-      .select("event_name, created_at")
-      .eq("therapist_id", profile.id)
-      .eq("event_name", "profile_viewed")
-      .gte("created_at", since.toISOString())
-      .order("created_at", { ascending: false })
-      .limit(100); // 30 days of data; even heavily visited profiles stay under 100
+    const [windowResult, allTimeResult] = await Promise.all([
+      admin
+        .from("profile_view_analytics")
+        .select("created_at, session_id")
+        .eq("profile_id", profile.id)
+        .gte("created_at", since.toISOString())
+        .order("created_at", { ascending: false })
+        .limit(10_000),
+      admin
+        .from("profile_view_analytics")
+        .select("id", { count: "exact", head: true })
+        .eq("profile_id", profile.id),
+    ]);
 
-    if (eventsError) throw new RouteError(500, eventsError.message);
+    if (windowResult.error) throw new RouteError(500, windowResult.error.message);
+    if (allTimeResult.error) throw new RouteError(500, allTimeResult.error.message);
 
-    // Build a continuous 30-day series of daily visitors.
-    const buckets = new Map<string, number>();
-    for (let i = 0; i < WINDOW_DAYS; i += 1) {
-      const d = new Date(since.getTime() + i * 86_400_000);
-      buckets.set(dayKey(d.toISOString()), 0);
-    }
+    const buckets = new Map(emptySeries(since).map((point) => [point.date, 0]));
+    const uniqueSessions = new Set<string>();
 
-    let windowViews = 0;
-    for (const event of events ?? []) {
+    for (const event of windowResult.data ?? []) {
       if (!event.created_at) continue;
       const key = dayKey(event.created_at);
-      if (!buckets.has(key)) continue;
-      buckets.set(key, (buckets.get(key) ?? 0) + 1);
-      windowViews += 1;
+      if (buckets.has(key)) buckets.set(key, (buckets.get(key) ?? 0) + 1);
+      if (event.session_id) uniqueSessions.add(event.session_id);
     }
 
     const series = Array.from(buckets.entries()).map(([date, visitors]) => ({ date, visitors }));
+    const windowViews = (windowResult.data ?? []).length;
+    const isLive = Boolean(
+      profile.is_active ||
+      profile.visibility_status === "public" ||
+      profile.profile_status === "approved" ||
+      profile.status === "approved" ||
+      profile.status === "active"
+    );
 
     return json({
       ok: true,
       windowDays: WINDOW_DAYS,
+      isLive,
       series,
       totals: {
         windowViews,
-        windowUniqueVisitors: windowViews,
-        allTimeViews: windowViews,
+        windowUniqueVisitors: uniqueSessions.size || windowViews,
+        allTimeViews: allTimeResult.count ?? windowViews,
         allTimeContactClicks: Number(profile.contact_clicks) || 0,
       },
     });

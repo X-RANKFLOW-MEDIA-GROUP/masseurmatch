@@ -1959,6 +1959,53 @@ export type Database = {
           },
         ]
       }
+      profile_view_analytics: {
+        Row: {
+          created_at: string | null
+          id: string
+          profile_id: string | null
+          referrer: string | null
+          session_id: string | null
+          source: string | null
+          user_ip: string | null
+          viewer_city: string | null
+          viewer_state: string | null
+          viewer_zip: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          profile_id?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          source?: string | null
+          user_ip?: string | null
+          viewer_city?: string | null
+          viewer_state?: string | null
+          viewer_zip?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          profile_id?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          source?: string | null
+          user_ip?: string | null
+          viewer_city?: string | null
+          viewer_state?: string | null
+          viewer_zip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_view_analytics_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           _tier: string | null
