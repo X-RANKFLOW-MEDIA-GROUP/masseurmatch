@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { Zap, Brain, Target, MessageSquare } from "lucide-react";
 import { GrainOverlay } from "@/components/motion/GrainOverlay";
@@ -34,6 +35,10 @@ export function AIDiscoverySection() {
   const reducedMotion = useReducedMotion();
   const dur = reducedMotion ? 0 : 0.7;
 
+  const openKnotty = () => {
+    window.dispatchEvent(new CustomEvent("knotty:open"));
+  };
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-[#ffffff] to-[#f7f7f7] py-24 lg:py-32">
       <GrainOverlay opacity={0.02} className="z-0" />
@@ -45,7 +50,6 @@ export function AIDiscoverySection() {
       />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -65,7 +69,6 @@ export function AIDiscoverySection() {
           </p>
         </motion.div>
 
-        {/* Large visual showcase - Glassmorphism cards in grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {features.map((feature, index) => {
             const Icon = feature.icon;
@@ -82,7 +85,6 @@ export function AIDiscoverySection() {
                 }}
                 className="group relative overflow-hidden rounded-[24px] border border-[#E8E8E8] bg-white/60 p-8 backdrop-blur-md transition duration-300 hover:border-[#8B1E2D]/30 hover:bg-white/80 hover:shadow-lg"
               >
-                {/* Gradient overlay on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-[#8B1E2D]/5 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
 
                 <div className="relative z-10">
@@ -102,7 +104,6 @@ export function AIDiscoverySection() {
           })}
         </div>
 
-        {/* CTA Section */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -120,16 +121,17 @@ export function AIDiscoverySection() {
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <button
               type="button"
+              onClick={openKnotty}
               className="inline-flex items-center gap-2 rounded-full bg-[#8B1E2D] px-8 py-4 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-[#8B1E2D]/20 transition hover:bg-[#6E1521] hover:shadow-[#8B1E2D]/40"
             >
               Ask Knotty AI
             </button>
-            <button
-              type="button"
+            <Link
+              href="/therapists"
               className="inline-flex items-center gap-2 rounded-full border border-[#D9D9D9] bg-white px-8 py-4 text-sm font-black uppercase tracking-wider text-[#111111] transition hover:border-[#8B1E2D]/50 hover:bg-[#F8EDEE]"
             >
               Browse All Therapists
-            </button>
+            </Link>
           </div>
         </motion.div>
       </div>
