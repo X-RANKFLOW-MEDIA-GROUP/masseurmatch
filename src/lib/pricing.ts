@@ -85,7 +85,7 @@ export const PLANS: Plan[] = [
       "Everything in Pro",
       "3 active cities",
       "Knotty AI answering on your profile 24/7",
-      "Demand Radar (city + neighborhood demand data)",
+      "Full Demand Radar city market intelligence",
       "Auto tour pages for travel schedules",
       "Priority support",
     ],
