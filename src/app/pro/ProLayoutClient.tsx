@@ -34,7 +34,7 @@ const navItems = [
   { name: "My Profile", href: "/pro/listing", icon: UserCircle },
   { name: "Import Reviews", href: "/pro/import-reviews", icon: Download, badge: "Free" },
   { name: "AI Profile Coach", href: "/pro/ai-coach", icon: Sparkles, badge: "New" },
-  { name: "Demand Radar", href: "/pro/demand-radar", icon: Radar, badge: "Elite" },
+  { name: "Demand Radar", href: "/pro/demand-radar", icon: Radar, badge: "Preview" },
   { name: "Trust & Verification", href: "/pro/trust", icon: ShieldCheck },
   { name: "Rates", href: "/pro/rates", icon: Banknote },
   { name: "Photos", href: "/pro/photos", icon: ImageIcon },
