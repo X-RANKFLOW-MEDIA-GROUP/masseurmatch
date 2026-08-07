@@ -1,7 +1,11 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Script from "next/script";
 import { BlogContent } from "./_components/BlogContent";
 import { NewsletterSignup } from "./_components/NewsletterSignup";
+import { AdminPublishedPosts } from "./_components/AdminPublishedPosts";
+import { getPublicAdminBlogPosts, toPublicAdminBlogListItem } from "@/app/_lib/public-admin-blog";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Blog | Massage Therapy Tips, Wellness & LGBTQ+ Resources - MasseurMatch",
@@ -32,7 +36,10 @@ const jsonLd = {
   },
 };
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const storedPosts = await getPublicAdminBlogPosts();
+  const publishedPosts = storedPosts.map(toPublicAdminBlogListItem);
+
   return (
     <>
       <Script
@@ -90,13 +97,12 @@ export default function BlogPage() {
               lineHeight: 1.7,
             }}
           >
-            Wellness insight, LGBTQ+ health resources, and industry expertise -
-            curated for clients and therapists alike.
+            Wellness insight, LGBTQ+ health resources, and industry expertise - curated for clients and therapists alike.
           </p>
         </section>
 
+        <AdminPublishedPosts posts={publishedPosts} />
         <BlogContent />
-
         <NewsletterSignup />
       </div>
     </>
