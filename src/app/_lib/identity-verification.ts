@@ -11,6 +11,8 @@ export type CanonicalIdentityStatus =
   | "canceled"
   | "verified";
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export function normalizeIdentityStatus(value: unknown): CanonicalIdentityStatus {
   const status = typeof value === "string" ? value.trim().toLowerCase() : "";
 
@@ -58,7 +60,7 @@ export async function getCanonicalIdentityStatusForUser(
 export async function getCanonicalIdentityStatusForProfile(
   profileId: string | null | undefined,
 ): Promise<CanonicalIdentityStatus> {
-  if (!profileId) return "not_started";
+  if (!profileId || !UUID_RE.test(profileId)) return "not_started";
 
   try {
     const admin = createSupabaseAdminClient();
