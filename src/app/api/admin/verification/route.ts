@@ -34,7 +34,11 @@ export async function GET(request: Request) {
     }
 
     const userIds = Array.from(
-      new Set([...(identityRows ?? []), ...(textRows ?? [])].map((row) => row.user_id).filter(Boolean)),
+      new Set(
+        [...(identityRows ?? []), ...(textRows ?? [])]
+          .map((row) => row.user_id)
+          .filter((userId): userId is string => typeof userId === "string" && userId.length > 0),
+      ),
     );
 
     const userMap = new Map<string, VerificationUser>();
@@ -50,6 +54,8 @@ export async function GET(request: Request) {
       }
 
       for (const profile of profiles ?? []) {
+        if (!profile.user_id) continue;
+
         userMap.set(profile.user_id, {
           user_id: profile.user_id,
           name: profile.display_name || profile.full_name || null,
@@ -81,8 +87,8 @@ export async function GET(request: Request) {
       );
     }
 
-    const enrich = <T extends { user_id: string }>(row: T) => {
-      const user = userMap.get(row.user_id);
+    const enrich = <T extends { user_id: string | null }>(row: T) => {
+      const user = row.user_id ? userMap.get(row.user_id) : undefined;
       return {
         ...row,
         user_name: user?.name ?? null,
