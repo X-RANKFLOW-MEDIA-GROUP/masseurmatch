@@ -8,14 +8,6 @@ type VerificationUser = {
   email: string | null;
 };
 
-type VerificationRow = {
-  user_id: string | null;
-};
-
-function hasUserId<T extends VerificationRow>(row: T): row is T & { user_id: string } {
-  return typeof row.user_id === "string" && row.user_id.length > 0;
-}
-
 export async function GET(request: Request) {
   try {
     await requireAdminSession(request);
@@ -44,8 +36,8 @@ export async function GET(request: Request) {
     const userIds = Array.from(
       new Set(
         [...(identityRows ?? []), ...(textRows ?? [])]
-          .filter(hasUserId)
-          .map((row) => row.user_id),
+          .map((row) => row.user_id)
+          .filter((userId): userId is string => typeof userId === "string" && userId.length > 0),
       ),
     );
 
@@ -95,7 +87,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const enrich = <T extends VerificationRow>(row: T) => {
+    const enrich = <T extends { user_id: string | null }>(row: T) => {
       const user = row.user_id ? userMap.get(row.user_id) : undefined;
       return {
         ...row,
