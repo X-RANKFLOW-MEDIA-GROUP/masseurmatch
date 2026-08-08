@@ -321,6 +321,10 @@ begin
 end;
 $$;
 
+-- Disable the legacy immediate-award RPC. New paid referrals must pass qualification first.
+revoke execute on function public.process_paid_referral(uuid, text, text) from service_role;
+revoke execute on function public.process_paid_referral(uuid, text, text) from public, anon, authenticated;
+
 revoke execute on function public.qualify_paid_referral(uuid, text, text, text, text, integer, text[]) from public, anon, authenticated;
 revoke execute on function public.award_qualified_referral(uuid) from public, anon, authenticated;
 revoke execute on function public.finalize_qualified_referrals() from public, anon, authenticated;
