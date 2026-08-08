@@ -5,10 +5,19 @@ import { NextResponse } from "next/server";
 import { STRIPE_API_VERSION } from "@/app/api/_lib/stripe-config";
 import { createSupabaseAdminClient, requireAdminSession } from "@/app/api/_lib/supabase-server";
 
-function getStripe() {
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) throw new Error("STRIPE_SECRET_KEY is not configured.");
+function getIdentityStripe() {
+  const key = process.env.STRIPE_IDENTITY_RESTRICTED_KEY;
+  if (!key) return null;
   return new Stripe(key, { apiVersion: STRIPE_API_VERSION });
+}
+
+function photoUnavailable() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      "Cache-Control": "private, no-store, max-age=0",
+    },
+  });
 }
 
 export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
@@ -24,22 +33,26 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       .maybeSingle();
 
     if (error || !verification?.stripe_session_id) {
-      return NextResponse.json({ error: "Verification session not found." }, { status: 404 });
+      return photoUnavailable();
     }
 
-    const stripe = getStripe();
+    const stripe = getIdentityStripe();
+    if (!stripe) {
+      return photoUnavailable();
+    }
+
     const session = await stripe.identity.verificationSessions.retrieve(verification.stripe_session_id, {
       expand: ["last_verification_report"],
     });
 
     const report = session.last_verification_report;
     if (!report || typeof report === "string") {
-      return NextResponse.json({ error: "Stripe verification report is not available yet." }, { status: 404 });
+      return photoUnavailable();
     }
 
     const selfieFileId = report.selfie?.selfie;
     if (!selfieFileId) {
-      return NextResponse.json({ error: "No Stripe selfie is available for this verification." }, { status: 404 });
+      return photoUnavailable();
     }
 
     const fileLink = await stripe.fileLinks.create({
@@ -48,12 +61,13 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     });
 
     if (!fileLink.url) {
-      return NextResponse.json({ error: "Stripe did not return a usable verification photo URL." }, { status: 502 });
+      return photoUnavailable();
     }
 
     return NextResponse.redirect(fileLink.url, 302);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unable to load Stripe verification photo.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Unknown Stripe Identity photo error";
+    console.warn("[admin/verification/photo] Stripe Identity photo unavailable:", message);
+    return photoUnavailable();
   }
 }
