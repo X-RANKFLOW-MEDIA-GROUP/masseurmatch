@@ -8,29 +8,38 @@ import {
   ensureUserProfileAndRole,
 } from "@/app/api/_lib/supabase-server";
 import { createServerSupabase } from "@/lib/supabase/server";
+import {
+  REFERRAL_COOKIE_NAME,
+  clearReferralCookieHeader,
+  normalizeReferralCode,
+} from "@/lib/referrals";
 
 function readReferralCookie(request: Request) {
   const cookies = request.headers.get("cookie") ?? "";
-  const match = cookies.match(/(?:^|;\s*)mm_referral_code=([^;]+)/);
-  const value = match ? decodeURIComponent(match[1]).trim().toUpperCase() : "";
-  return /^REF[A-F0-9]{10}$/.test(value) ? value : undefined;
+  const pattern = new RegExp(`(?:^|;\\s*)${REFERRAL_COOKIE_NAME}=([^;]+)`);
+  const match = cookies.match(pattern);
+  const raw = match ? decodeURIComponent(match[1]) : undefined;
+  return normalizeReferralCode(raw) ?? undefined;
 }
 
 async function claimReferral(userId: string, referralCode?: string) {
-  if (!referralCode) return;
+  if (!referralCode) return false;
 
   const admin = createSupabaseAdminClient();
-  const { error } = await (admin.rpc as unknown as (
+  const { data, error } = await (admin.rpc as unknown as (
     name: string,
     params: Record<string, unknown>,
-  ) => Promise<{ error: { message: string } | null }>)('claim_referral_signup', {
+  ) => Promise<{ data: boolean | null; error: { message: string } | null }>)('claim_referral_signup', {
     p_referred_user_id: userId,
     p_referral_code: referralCode,
   });
 
   if (error) {
     console.error('[auth/register] referral attribution failed:', error.message);
+    return false;
   }
+
+  return data === true;
 }
 
 export async function POST(request: Request) {
@@ -43,7 +52,7 @@ export async function POST(request: Request) {
     }
 
     const body = await parseJsonBody(request, authRegisterSchema);
-    const referralCode = body.referralCode ?? readReferralCookie(request);
+    const referralCode = normalizeReferralCode(body.referralCode) ?? readReferralCookie(request);
     const email = body.email.trim().toLowerCase();
     const { origin } = new URL(request.url);
     const verificationPath = "/signup/verify?autostart=1";
@@ -96,17 +105,21 @@ export async function POST(request: Request) {
       fallbackName: body.fullName,
     });
 
-    await claimReferral(data.user.id, referralCode);
+    const referralClaimed = await claimReferral(data.user.id, referralCode);
 
-    return json({
+    const response = json({
       ok: true,
       user: { id: data.user.id, email: data.user.email },
       role,
+      referralClaimed,
       requiresEmailConfirmation: !data.session,
       message: data.session
         ? "Account created. You can continue onboarding now."
         : "Check your email to confirm your account before continuing.",
     });
+
+    response.headers.append("Set-Cookie", clearReferralCookieHeader());
+    return response;
   } catch (error) {
     return errorResponse(error);
   }
