@@ -806,40 +806,145 @@ export type Database = {
       }
       demand_scores: {
         Row: {
+          baseline_index: number
           city: string
+          city_key: string | null
+          collected_at: string | null
           competition_index: number
+          confidence: number | null
           created_at: string
+          expires_at: string | null
+          growth_pct: number | null
           id: string
+          is_sample: boolean
+          methodology_version: string
           neighborhood: string | null
+          neighborhood_key: string | null
+          persistence_score: number
+          region_code: string | null
+          region_name: string | null
+          run_id: string | null
+          sample_size: number
           score: number
+          score_components: Json
           search_volume_index: number
+          source: string | null
+          spike_score: number
           state: string
+          state_key: string | null
           trend: string
+          velocity_score: number
           week_start: string
         }
         Insert: {
+          baseline_index?: number
           city: string
+          city_key?: string | null
+          collected_at?: string | null
           competition_index?: number
+          confidence?: number | null
           created_at?: string
+          expires_at?: string | null
+          growth_pct?: number | null
           id?: string
+          is_sample?: boolean
+          methodology_version?: string
           neighborhood?: string | null
+          neighborhood_key?: string | null
+          persistence_score?: number
+          region_code?: string | null
+          region_name?: string | null
+          run_id?: string | null
+          sample_size?: number
           score: number
+          score_components?: Json
           search_volume_index?: number
+          source?: string | null
+          spike_score?: number
           state: string
+          state_key?: string | null
           trend?: string
+          velocity_score?: number
           week_start: string
         }
         Update: {
+          baseline_index?: number
           city?: string
+          city_key?: string | null
+          collected_at?: string | null
           competition_index?: number
+          confidence?: number | null
           created_at?: string
+          expires_at?: string | null
+          growth_pct?: number | null
           id?: string
+          is_sample?: boolean
+          methodology_version?: string
           neighborhood?: string | null
+          neighborhood_key?: string | null
+          persistence_score?: number
+          region_code?: string | null
+          region_name?: string | null
+          run_id?: string | null
+          sample_size?: number
           score?: number
+          score_components?: Json
           search_volume_index?: number
+          source?: string | null
+          spike_score?: number
           state?: string
+          state_key?: string | null
           trend?: string
+          velocity_score?: number
           week_start?: string
+        }
+        Relationships: []
+      }
+      demand_collection_runs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error_summary: Json
+          id: string
+          markets_failed: number
+          markets_requested: number
+          markets_succeeded: number
+          metadata: Json
+          rows_ingested: number
+          run_id: string
+          started_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error_summary?: Json
+          id?: string
+          markets_failed?: number
+          markets_requested?: number
+          markets_succeeded?: number
+          metadata?: Json
+          rows_ingested?: number
+          run_id: string
+          started_at: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error_summary?: Json
+          id?: string
+          markets_failed?: number
+          markets_requested?: number
+          markets_succeeded?: number
+          metadata?: Json
+          rows_ingested?: number
+          run_id?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }

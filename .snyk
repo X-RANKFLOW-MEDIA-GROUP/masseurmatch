@@ -1,0 +1,9 @@
+# Snyk policy for repository-scoped Open Source findings.
+# Reviewed 2026-08-07. Keep exceptions narrow, documented, and expiring.
+version: v1.25.0
+ignore:
+  'SNYK-JS-NEXT-15105315':
+    - '*':
+        reason: 'Not exploitable in this application: experimental.ppr/cacheComponents and NEXT_PRIVATE_MINIMAL_MODE=1 are not configured. Reassess before expiry or if either prerequisite is introduced.'
+        expires: '2026-09-30T00:00:00.000Z'
+patch: {}

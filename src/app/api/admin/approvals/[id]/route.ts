@@ -14,6 +14,12 @@ function resolvePhotoUrl(url: string | null, storagePath: string | null) {
   return `${SUPABASE_PUBLIC_URL}/storage/v1/object/public/therapist-photos/${storagePath}`;
 }
 
+function normalizeCompletion(value: unknown) {
+  const numeric = typeof value === "number" ? value : Number(value ?? 0);
+  if (!Number.isFinite(numeric)) return 0;
+  return Math.min(100, Math.max(0, Math.round(numeric)));
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -34,7 +40,8 @@ export async function GET(
         id, full_name, display_name, email, phone, city, neighborhood_name,
         bio, specialties, incall_price, outcall_price, status, profile_status,
         created_at, submitted_at, approved_at, approved_by, rejected_at, rejected_by,
-        rejection_reason, moderation_notes, is_verified_identity, is_verified_phone
+        rejection_reason, moderation_notes, is_verified_identity, is_verified_phone,
+        completion_percentage
       `)
       .eq("id", id)
       .single();
@@ -58,6 +65,7 @@ export async function GET(
       ok: true,
       profile: {
         ...profile,
+        profile_completion: normalizeCompletion(profile.completion_percentage),
         photo_urls: (photos ?? [])
           .map((photo) => resolvePhotoUrl(photo.url, photo.storage_path))
           .filter((url): url is string => Boolean(url)),

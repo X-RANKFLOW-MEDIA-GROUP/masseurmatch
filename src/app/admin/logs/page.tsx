@@ -9,11 +9,11 @@ import { Loader2, RefreshCw } from "lucide-react";
 
 interface AuditEntry {
   id: string;
-  admin_user_id: string;
+  admin_user_id: string | null;
   action: string;
   target_type: string;
   target_id: string | null;
-  details: any;
+  details: unknown;
   created_at: string;
 }
 
@@ -30,8 +30,8 @@ export default function AdminLogsPage() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       setLogs(json.logs ?? []);
-    } catch (err: any) {
-      setError(err.message ?? "Failed to load logs.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to load logs.");
     } finally {
       setLoading(false);
     }
@@ -85,24 +85,26 @@ export default function AdminLogsPage() {
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Action</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Target</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Target ID</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Admin</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Actor</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Details</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Timestamp</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {logs.map((log) => (
-                  <tr key={log.id} className="bg-white hover:bg-secondary/20 transition-colors">
+                  <tr key={log.id} className="bg-white transition-colors hover:bg-secondary/20">
                     <td className="px-4 py-3">
                       <Badge variant={actionVariant(log.action)}>{log.action}</Badge>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{log.target_type}</td>
-                    <td className="px-4 py-3 font-mono text-xs truncate max-w-[120px]">{log.target_id || "—"}</td>
-                    <td className="px-4 py-3 font-mono text-xs truncate max-w-[120px]">{log.admin_user_id.slice(0, 8)}…</td>
-                    <td className="px-4 py-3 font-mono text-[10px] text-muted-foreground truncate max-w-[200px]">
-                      {log.details ? JSON.stringify(log.details).slice(0, 80) : "—"}
+                    <td className="max-w-[120px] truncate px-4 py-3 font-mono text-xs">{log.target_id || "—"}</td>
+                    <td className="max-w-[140px] truncate px-4 py-3 font-mono text-xs">
+                      {formatActor(log.admin_user_id)}
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground text-xs whitespace-nowrap">
+                    <td className="max-w-[200px] truncate px-4 py-3 font-mono text-[10px] text-muted-foreground">
+                      {formatDetails(log.details)}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-xs text-muted-foreground">
                       {new Date(log.created_at).toLocaleString()}
                     </td>
                   </tr>
@@ -121,6 +123,21 @@ export default function AdminLogsPage() {
       </Card>
     </div>
   );
+}
+
+function formatActor(adminUserId: string | null) {
+  return adminUserId ? `${adminUserId.slice(0, 8)}…` : "System";
+}
+
+function formatDetails(details: unknown) {
+  if (details === null || details === undefined) return "—";
+
+  try {
+    const serialized = typeof details === "string" ? details : JSON.stringify(details);
+    return serialized ? serialized.slice(0, 80) : "—";
+  } catch {
+    return "Unserializable details";
+  }
 }
 
 function actionVariant(action: string) {
