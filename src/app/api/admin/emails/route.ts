@@ -149,7 +149,7 @@ export async function POST(request: Request) {
     if (body.action === "ai_generate") {
       assertRateLimit(request, "admin-email-center-ai", { limit: 12, windowMs: 60_000 });
       const draft = await generateAiEmail(body);
-      await recordAuditLog(admin.userId, "admin_email_ai_draft_generated", "email_draft", null, {
+      await recordAuditLog(admin.userId, "admin_email_ai_draft_generated", "email_draft", undefined, {
         category: body.category,
         audience: body.audience,
         tone: body.tone,
