@@ -17,8 +17,8 @@ const rpc = async <T>(
 };
 
 type ReferralDashboardPayload = {
-  summary?: Record<string, unknown>;
-  referrals?: Array<Record<string, unknown>>;
+  summary?: Record<string, unknown> | null;
+  referrals?: Array<Record<string, unknown> | null> | null;
 };
 
 export async function GET(request: Request) {
