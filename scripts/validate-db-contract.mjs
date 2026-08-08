@@ -5,6 +5,10 @@ import path from "node:path";
 
 const ROOT = process.cwd();
 const SCHEMA_PATH = path.join(ROOT, "supabase/PRODUCTION_SCHEMA_LOCK.sql");
+const SCHEMA_EXTENSION_PATHS = [
+  path.join(ROOT, "supabase/migrations/20260806220000_harden_demand_radar.sql"),
+  path.join(ROOT, "supabase/migrations/20260806230000_demand_radar_pipeline.sql"),
+];
 const SCAN_DIRS = ["src", "scripts", "tests", "supabase"];
 
 const REQUIRED_TABLES = [
@@ -401,12 +405,15 @@ function schemaContainsAllowedValues(sql, constraintName, values) {
   return { ok: missing.length === 0, missing };
 }
 
-if (!fs.existsSync(SCHEMA_PATH)) {
-  console.error(`Missing schema lock file: ${path.relative(ROOT, SCHEMA_PATH)}`);
-  process.exit(1);
+const contractPaths = [SCHEMA_PATH, ...SCHEMA_EXTENSION_PATHS];
+for (const contractPath of contractPaths) {
+  if (!fs.existsSync(contractPath)) {
+    console.error(`Missing schema contract file: ${path.relative(ROOT, contractPath)}`);
+    process.exit(1);
+  }
 }
 
-const sql = fs.readFileSync(SCHEMA_PATH, "utf8");
+const sql = contractPaths.map((contractPath) => fs.readFileSync(contractPath, "utf8")).join("\n");
 const contract = parseSchemaContract(sql);
 const scanned = scanReferences();
 const errors = [];

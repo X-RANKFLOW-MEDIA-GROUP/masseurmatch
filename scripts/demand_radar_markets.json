@@ -1,0 +1,24 @@
+{
+  "markets": [
+    {"city":"Dallas","state":"TX","region_code":"US-TX","region_name":"Texas","competition_index":72},
+    {"city":"Fort Worth","state":"TX","region_code":"US-TX","region_name":"Texas","competition_index":52},
+    {"city":"Houston","state":"TX","region_code":"US-TX","region_name":"Texas","competition_index":68},
+    {"city":"Austin","state":"TX","region_code":"US-TX","region_name":"Texas","competition_index":74},
+    {"city":"San Antonio","state":"TX","region_code":"US-TX","region_name":"Texas","competition_index":48},
+    {"city":"New York","state":"NY","region_code":"US-NY","region_name":"New York","competition_index":88},
+    {"city":"Los Angeles","state":"CA","region_code":"US-CA","region_name":"California","competition_index":86},
+    {"city":"San Francisco","state":"CA","region_code":"US-CA","region_name":"California","competition_index":82},
+    {"city":"Miami","state":"FL","region_code":"US-FL","region_name":"Florida","competition_index":84},
+    {"city":"Fort Lauderdale","state":"FL","region_code":"US-FL","region_name":"Florida","competition_index":70},
+    {"city":"Orlando","state":"FL","region_code":"US-FL","region_name":"Florida","competition_index":62},
+    {"city":"Chicago","state":"IL","region_code":"US-IL","region_name":"Illinois","competition_index":78},
+    {"city":"Atlanta","state":"GA","region_code":"US-GA","region_name":"Georgia","competition_index":66},
+    {"city":"Denver","state":"CO","region_code":"US-CO","region_name":"Colorado","competition_index":64},
+    {"city":"Phoenix","state":"AZ","region_code":"US-AZ","region_name":"Arizona","competition_index":60},
+    {"city":"Las Vegas","state":"NV","region_code":"US-NV","region_name":"Nevada","competition_index":76},
+    {"city":"Seattle","state":"WA","region_code":"US-WA","region_name":"Washington","competition_index":67},
+    {"city":"Washington","state":"DC","region_code":"US-DC","region_name":"District of Columbia","competition_index":79},
+    {"city":"Boston","state":"MA","region_code":"US-MA","region_name":"Massachusetts","competition_index":73},
+    {"city":"Philadelphia","state":"PA","region_code":"US-PA","region_name":"Pennsylvania","competition_index":65}
+  ]
+}
