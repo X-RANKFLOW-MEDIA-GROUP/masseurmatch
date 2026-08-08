@@ -95,3 +95,16 @@ Example: `fetchCanonical` (follows Vercel's same-path cross-origin redirects tra
 - Before pushing, run: `npx tsc --noEmit`, `npx eslint <changed files>`,
   `pnpm run build`, and verify `pnpm-lock.yaml` is updated.
 - Do not open PRs unless explicitly asked.
+
+## Deployments
+
+Vercel does not build every commit. `vercel.json` delegates the decision to
+`scripts/vercel-ignore-build.mjs` (`ignoreCommand`), which builds production
+(`main`) and pull-request previews, and **skips pushes to a branch that has no
+pull request open**. Skipped builds appear as *Skipped*, never as *Error*.
+
+The reason is that deployment records are immutable: a work-in-progress commit
+that fails to compile leaves a permanent red row in the Deployments list even
+after the next commit fixes it. Open a pull request — a draft is enough — as
+soon as you want a preview URL or CI coverage; both are keyed to the pull
+request, not to the branch.
