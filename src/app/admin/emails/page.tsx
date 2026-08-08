@@ -9,7 +9,7 @@ export default function AdminEmailsPage() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Email Center"
-        description="Build compliant campaigns, save templates, schedule delivery, and monitor the Resend lifecycle queue."
+        description="Generate AI assisted newsletters and campaigns, segment audiences, save templates, schedule delivery, and monitor the compliant lifecycle email system."
       />
       <AdminEmailCenter />
     </div>
