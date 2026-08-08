@@ -1,24 +1,61 @@
 import { NextResponse } from "next/server";
+import { assertRateLimit } from "@/app/_lib/security";
+import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import {
+  REFERRAL_COOKIE_MAX_AGE_SECONDS,
+  REFERRAL_COOKIE_NAME,
+  normalizeReferralCode,
+} from "@/lib/referrals";
 
-const REFERRAL_CODE_RE = /^REF[A-F0-9]{10}$/;
+async function referralCodeExists(referralCode: string) {
+  const admin = createSupabaseAdminClient();
+  const query = (admin.from as unknown as (table: string) => {
+    select: (columns: string) => {
+      eq: (column: string, value: string) => {
+        maybeSingle: () => Promise<{ data: { id?: string } | null; error: { message: string } | null }>;
+      };
+    };
+  })("referral_codes");
 
-export async function POST(request: Request) {
-  const body = await request.json().catch(() => ({}));
-  const referralCode = typeof body.referralCode === "string"
-    ? body.referralCode.trim().toUpperCase()
-    : "";
+  const { data, error } = await query
+    .select("id")
+    .eq("code", referralCode)
+    .maybeSingle();
 
-  if (!REFERRAL_CODE_RE.test(referralCode)) {
-    return NextResponse.json({ ok: false, error: "Invalid referral code." }, { status: 400 });
+  if (error) {
+    console.error("[referrals/capture] referral lookup failed:", error.message);
+    return false;
   }
 
-  const response = NextResponse.json({ ok: true });
-  response.cookies.set("mm_referral_code", referralCode, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24 * 30,
-    path: "/",
-  });
-  return response;
+  return Boolean(data?.id);
+}
+
+export async function POST(request: Request) {
+  try {
+    assertRateLimit(request, "referral-capture", { limit: 30, windowMs: 60_000 });
+
+    const body = await request.json().catch(() => ({}));
+    const referralCode = normalizeReferralCode(body.referralCode);
+
+    if (!referralCode || !(await referralCodeExists(referralCode))) {
+      return NextResponse.json({ ok: false, error: "Invalid referral code." }, { status: 400 });
+    }
+
+    const response = NextResponse.json({ ok: true });
+    response.cookies.set(REFERRAL_COOKIE_NAME, referralCode, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: REFERRAL_COOKIE_MAX_AGE_SECONDS,
+      path: "/",
+    });
+    return response;
+  } catch (error) {
+    if (error instanceof Error && error.name === "RouteError") {
+      return NextResponse.json({ ok: false, error: error.message }, { status: 429 });
+    }
+
+    console.error("[referrals/capture] unexpected failure:", error);
+    return NextResponse.json({ ok: false, error: "Unable to capture referral." }, { status: 500 });
+  }
 }
