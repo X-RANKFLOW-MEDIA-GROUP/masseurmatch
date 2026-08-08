@@ -17,7 +17,6 @@ const STEPS = [
   { path: "/signup/review", label: "Review" },
 ] as const;
 
-// Pages that don't show the stepper (post-submission)
 const NO_STEPPER = ["/signup/pending", "/signup/confirmation", "/signup/rejected", "/signup/resubmit"];
 
 function ProgressStepper() {
@@ -65,11 +64,9 @@ export function SignupShell({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const isAccountPage = pathname === "/signup/account";
 
   useEffect(() => {
-    // Don't redirect authenticated users who are in the signup flow
-    // (after account creation, they need to complete verification, profile, etc.)
-    // Only redirect if they're on the entry page (/signup) and already authenticated
     if (!loading && user && pathname === "/signup") {
       router.replace("/pro/dashboard");
     }
@@ -79,7 +76,14 @@ export function SignupShell({ children }: { children: React.ReactNode }) {
     <SignupProvider>
       <AuroraBackgroundLight className="min-h-[calc(100vh-74px)]">
         <ProgressStepper />
-        <div className="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">{children}</div>
+        <div
+          className={cn(
+            "mx-auto w-full px-4 pb-16 sm:px-6",
+            isAccountPage ? "max-w-7xl" : "max-w-5xl",
+          )}
+        >
+          {children}
+        </div>
       </AuroraBackgroundLight>
     </SignupProvider>
   );
