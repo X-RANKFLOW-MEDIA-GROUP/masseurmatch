@@ -16,9 +16,14 @@ function parseDashboard(value: Json | null): ReferralDashboardPayload {
   if (!isRecord(value)) return {};
 
   const summary = isRecord(value.summary) ? value.summary : undefined;
-  const referrals = Array.isArray(value.referrals)
-    ? value.referrals.filter(isRecord)
-    : undefined;
+  let referrals: Array<Record<string, unknown>> | undefined;
+
+  if (Array.isArray(value.referrals)) {
+    referrals = [];
+    for (const referral of value.referrals) {
+      if (isRecord(referral)) referrals.push(referral);
+    }
+  }
 
   return { summary, referrals };
 }
