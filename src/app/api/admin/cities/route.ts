@@ -38,12 +38,18 @@ async function saveCity(input: z.infer<typeof citySchema>): Promise<StoredCity> 
   const nextCities = store.cities.filter((candidate) => candidate.slug !== slug);
   nextCities.unshift(city);
 
-  await writeContentStore({
-    ...store,
-    cities: nextCities,
-  });
-
+  await writeContentStore({ ...store, cities: nextCities });
   return city;
+}
+
+export async function GET(request: Request) {
+  try {
+    await requireAdminSession(request);
+    const store = await readContentStore();
+    return json({ ok: true, cities: store.cities });
+  } catch (error) {
+    return errorResponse(error);
+  }
 }
 
 export async function POST(request: Request) {
@@ -63,10 +69,7 @@ export async function POST(request: Request) {
       console.error("[api/admin/cities] Revalidation failed:", error);
     });
 
-    return json({
-      ok: true,
-      city,
-    });
+    return json({ ok: true, city });
   } catch (error) {
     return errorResponse(error);
   }

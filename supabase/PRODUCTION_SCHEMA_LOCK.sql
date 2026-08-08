@@ -464,10 +464,10 @@ create table if not exists public.blog_posts (
   slug text unique,
   title text,
   excerpt text,
-  body text,
+  seo_description text,
+  content text,
   tags text[] default '{}',
   published_at timestamptz,
-  seo_description text,
   created_at timestamptz default timezone('utc', now()),
   updated_at timestamptz default timezone('utc', now())
 );
@@ -1518,9 +1518,6 @@ alter table public.audit_log
   add column if not exists reason text,
   add column if not exists target_profile_id uuid,
   add column if not exists target_user_id uuid;
-
-alter table public.blog_posts
-  add column if not exists body text;
 
 alter table public.conversations
   add column if not exists participant_a_id uuid references auth.users(id) on delete cascade,
