@@ -6,7 +6,11 @@ import { STRIPE_API_VERSION } from "@/app/api/_lib/stripe-config";
 import { createSupabaseAdminClient, requireAdminSession } from "@/app/api/_lib/supabase-server";
 
 function getIdentityStripe() {
-  const key = process.env.STRIPE_IDENTITY_RESTRICTED_KEY;
+  const key =
+    process.env.STRIPE_IDENTITY_RESTRICTED_KEY ||
+    process.env.STRIPE_RESTRICTED_ACCESS_KEY ||
+    process.env.STRIPE_SECRET_KEY;
+
   if (!key) return null;
   return new Stripe(key, { apiVersion: STRIPE_API_VERSION });
 }
