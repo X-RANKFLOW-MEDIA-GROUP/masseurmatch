@@ -54,10 +54,11 @@ export async function GET(request: Request) {
       }
 
       for (const profile of profiles ?? []) {
-        if (!profile.user_id) continue;
+        const userId = profile.user_id;
+        if (!userId) continue;
 
-        userMap.set(profile.user_id, {
-          user_id: profile.user_id,
+        userMap.set(userId, {
+          user_id: userId,
           name: profile.display_name || profile.full_name || null,
           email: profile.email_address || profile.email || null,
         });
