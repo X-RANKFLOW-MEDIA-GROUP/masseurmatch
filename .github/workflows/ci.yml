@@ -114,7 +114,7 @@ jobs:
       - run: pnpm validate:db-contract
 
   unit-tests:
-    name: Unit Tests
+    name: Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -126,7 +126,7 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm test:unit
+      - run: pnpm test
 
   build:
     name: Build
