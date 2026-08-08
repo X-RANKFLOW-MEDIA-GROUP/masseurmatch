@@ -157,6 +157,9 @@ async function processPaidReferral(
 ) {
   if (invoice.status !== 'paid' || invoice.amount_paid <= 0) return
 
+  const invoiceId = invoice.id
+  if (!invoiceId) return
+
   const subscriptionId =
     typeof invoice.parent?.subscription_details?.subscription === 'string'
       ? invoice.parent.subscription_details.subscription
@@ -168,14 +171,14 @@ async function processPaidReferral(
   const userId = subscription.metadata?.user_id ?? subscription.metadata?.userId
   if (!userId) return
 
-  const signals = await getReferralPaymentSignals(stripe, invoice.id)
+  const signals = await getReferralPaymentSignals(stripe, invoiceId)
   const { error } = await (supabase.rpc as unknown as (
     name: string,
     params: Record<string, unknown>,
   ) => Promise<{ error: { message: string } | null }>)('qualify_paid_referral', {
     p_referred_user_id: userId,
     p_stripe_subscription_id: subscriptionId,
-    p_stripe_invoice_id: invoice.id,
+    p_stripe_invoice_id: invoiceId,
     p_stripe_charge_id: signals.chargeId,
     p_payment_fingerprint: signals.fingerprint,
     p_risk_score: signals.riskScore,
