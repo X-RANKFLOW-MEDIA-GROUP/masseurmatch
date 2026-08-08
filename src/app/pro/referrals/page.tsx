@@ -117,10 +117,10 @@ export default function ReferralsPage() {
       <header>
         <Badge variant="secondary">Referral rewards</Badge>
         <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-foreground">
-          Earn premium months
+          Earn Standard months
         </h1>
         <p className="mt-2 max-w-2xl text-muted-foreground">
-          Earn one month of premium for every new provider who joins with your link and becomes a paying customer. Referral rewards are capped at six months.
+          Earn one month of Standard for every new provider who joins with your link and completes their first paid subscription invoice. Rewards are capped at six lifetime months and begin after any active paid entitlement.
         </p>
       </header>
 
@@ -136,7 +136,7 @@ export default function ReferralsPage() {
           <CardContent className="p-5">
             <Gift className="h-5 w-5 text-[#8B1E2D]" />
             <p className="mt-4 text-2xl font-bold">{summary.premiumMonthsEarned}</p>
-            <p className="text-sm text-muted-foreground">Premium months earned</p>
+            <p className="text-sm text-muted-foreground">Standard months earned</p>
           </CardContent>
         </Card>
         <Card>
@@ -175,7 +175,7 @@ export default function ReferralsPage() {
           </div>
           {summary.bonusExpiresAt ? (
             <p className="text-sm text-muted-foreground">
-              Current referral bonus: {summary.bonusTier ?? "premium"} through {formatDate(summary.bonusExpiresAt)}.
+              Referral entitlement: {summary.bonusTier ?? "standard"} through {formatDate(summary.bonusExpiresAt)}.
             </p>
           ) : null}
         </CardContent>
@@ -189,7 +189,7 @@ export default function ReferralsPage() {
           {referrals.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border px-6 py-10 text-center">
               <p className="font-medium text-foreground">No referrals yet</p>
-              <p className="mt-1 text-sm text-muted-foreground">Share your unique link to begin earning premium time.</p>
+              <p className="mt-1 text-sm text-muted-foreground">Share your unique link to begin earning Standard time.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -213,7 +213,7 @@ export default function ReferralsPage() {
                       </td>
                       <td className="px-3 py-4">{formatDate(referral.paid_at)}</td>
                       <td className="px-3 py-4 text-right font-semibold">
-                        {referral.reward_months ? `+${referral.reward_months} month` : "—"}
+                        {referral.reward_months ? `+${referral.reward_months} Standard month` : "—"}
                       </td>
                     </tr>
                   ))}
