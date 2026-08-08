@@ -10,6 +10,7 @@ import {
   toProfileCmsJson,
   type ProfileCmsUpdateField,
   type ProfileRow,
+  type ProfileUpdate,
 } from "@/lib/profile-cms-update";
 import type { Json } from "@/integrations/supabase/types";
 
@@ -126,7 +127,7 @@ export async function POST(request: Request) {
     let updatedProfile: ProfileRow = profile;
 
     if (hasChanged) {
-      const updates = update.payload;
+      const updates: ProfileUpdate = { ...update.payload };
 
       if (profile.profile_status === "approved") {
         updates.profile_status = "under_review";
