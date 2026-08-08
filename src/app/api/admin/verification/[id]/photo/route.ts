@@ -47,6 +47,10 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       expires_at: Math.floor(Date.now() / 1000) + 30,
     });
 
+    if (!fileLink.url) {
+      return NextResponse.json({ error: "Stripe did not return a usable verification photo URL." }, { status: 502 });
+    }
+
     return NextResponse.redirect(fileLink.url, 302);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to load Stripe verification photo.";
