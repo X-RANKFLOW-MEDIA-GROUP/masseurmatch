@@ -2,6 +2,12 @@ export const dynamic = "force-dynamic";
 import { errorResponse, json } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, requireAdminSession } from "@/app/api/_lib/supabase-server";
 
+type VerificationUser = {
+  user_id: string;
+  name: string | null;
+  email: string | null;
+};
+
 export async function GET(request: Request) {
   try {
     await requireAdminSession(request);
@@ -27,10 +33,67 @@ export async function GET(request: Request) {
       console.warn("[admin/verification] text_verifications query failed:", textError.message);
     }
 
+    const userIds = Array.from(
+      new Set([...(identityRows ?? []), ...(textRows ?? [])].map((row) => row.user_id).filter(Boolean)),
+    );
+
+    const userMap = new Map<string, VerificationUser>();
+
+    if (userIds.length > 0) {
+      const { data: profiles, error: profilesError } = await adminClient
+        .from("profiles")
+        .select("user_id, display_name, full_name, email_address, email")
+        .in("user_id", userIds);
+
+      if (profilesError) {
+        console.warn("[admin/verification] profiles enrichment failed:", profilesError.message);
+      }
+
+      for (const profile of profiles ?? []) {
+        userMap.set(profile.user_id, {
+          user_id: profile.user_id,
+          name: profile.display_name || profile.full_name || null,
+          email: profile.email_address || profile.email || null,
+        });
+      }
+
+      await Promise.all(
+        userIds.map(async (userId) => {
+          const existing = userMap.get(userId);
+          if (existing?.email && existing?.name) return;
+
+          const { data, error } = await adminClient.auth.admin.getUserById(userId);
+          if (error || !data.user) return;
+
+          const metadata = data.user.user_metadata ?? {};
+          const metadataName =
+            (typeof metadata.display_name === "string" && metadata.display_name) ||
+            (typeof metadata.full_name === "string" && metadata.full_name) ||
+            (typeof metadata.name === "string" && metadata.name) ||
+            null;
+
+          userMap.set(userId, {
+            user_id: userId,
+            name: existing?.name || metadataName,
+            email: existing?.email || data.user.email || null,
+          });
+        }),
+      );
+    }
+
+    const enrich = <T extends { user_id: string }>(row: T) => {
+      const user = userMap.get(row.user_id);
+      return {
+        ...row,
+        user_name: user?.name ?? null,
+        user_email: user?.email ?? null,
+      };
+    };
+
     return json({
       ok: true,
-      identity: identityRows ?? [],
-      text: textRows ?? [],
+      identity: (identityRows ?? []).map(enrich),
+      text: (textRows ?? []).map(enrich),
     });
   } catch (error) {
     return errorResponse(error);
