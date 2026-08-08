@@ -9,6 +9,7 @@ import {
   recordAuditLog,
   requireAdminSession,
 } from "@/app/api/_lib/supabase-server";
+import { completeText } from "@/lib/ai/llm";
 
 const campaignSchema = z.object({
   action: z.literal("create_campaign"),
@@ -46,7 +47,27 @@ const cancelSchema = z.object({
   campaignId: z.string().uuid(),
 });
 
-const postSchema = z.discriminatedUnion("action", [campaignSchema, templateSchema, cancelSchema]);
+const aiGenerateSchema = z.object({
+  action: z.literal("ai_generate"),
+  objective: z.string().trim().min(3).max(1200),
+  audience: z.string().trim().max(500).default("MasseurMatch providers"),
+  tone: z.enum(["professional", "warm", "concise", "educational", "promotional"]).default("professional"),
+  cta: z.string().trim().max(300).optional().nullable(),
+  offer: z.string().trim().max(500).optional().nullable(),
+  category: z.enum(["marketing", "transactional"]).default("marketing"),
+});
+
+const postSchema = z.discriminatedUnion("action", [campaignSchema, templateSchema, cancelSchema, aiGenerateSchema]);
+
+const aiResultSchema = z.object({
+  campaignName: z.string().min(1).max(120),
+  subject: z.string().min(1).max(180),
+  previewText: z.string().max(220).default(""),
+  bodyHtml: z.string().min(1).max(150_000),
+  bodyText: z.string().min(1).max(80_000),
+  suggestedAudience: z.string().max(500).default(""),
+  suggestedSchedule: z.string().max(120).default(""),
+});
 
 const templateIdResultSchema = z.string().uuid();
 const rpcCountSchema = z.preprocess(
@@ -64,6 +85,40 @@ const campaignResultSchema = z.object({
 type RpcClient = ReturnType<typeof createSupabaseAdminClient> & {
   rpc: (name: string, params?: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>;
 };
+
+function fallbackAiEmail(body: z.infer<typeof aiGenerateSchema>) {
+  const ctaText = body.cta || "Open your MasseurMatch dashboard";
+  const title = body.objective.length > 72 ? "A MasseurMatch update for your profile" : body.objective;
+  const offerLine = body.offer ? `<p><strong>${body.offer}</strong></p>` : "";
+  return {
+    campaignName: title.slice(0, 120),
+    subject: title.slice(0, 180),
+    previewText: "A useful update from MasseurMatch.",
+    bodyHtml: `<p>Hi {{name}},</p><p>${body.objective}</p>${offerLine}<p><a href="https://www.masseurmatch.com/pro/dashboard">${ctaText}</a></p><p>Best,<br />MasseurMatch</p>`,
+    bodyText: `Hi {{name}},\n\n${body.objective}${body.offer ? `\n\n${body.offer}` : ""}\n\n${ctaText}: https://www.masseurmatch.com/pro/dashboard\n\nBest,\nMasseurMatch`,
+    suggestedAudience: body.audience,
+    suggestedSchedule: "Send during the recipient's local daytime after reviewing the draft.",
+  };
+}
+
+async function generateAiEmail(body: z.infer<typeof aiGenerateSchema>) {
+  const result = await completeText({
+    json: true,
+    temperature: 0.45,
+    maxTokens: 1800,
+    timeoutMs: 12_000,
+    system: `You are the MasseurMatch Email Center copywriter. MasseurMatch is a professional directory platform. Providers are independent. Do not imply MasseurMatch books appointments, processes service payments, verifies professional licenses, guarantees income, guarantees visibility, or offers sexual services. Keep all content professional, non-sexual, inclusive, truthful and suitable for email. Never invent user-specific metrics, product features, discounts, deadlines or claims that were not supplied. Marketing copy must be respectful and should assume unsubscribe/preferences controls exist in the delivery layer. Return STRICT JSON only with these keys: campaignName, subject, previewText, bodyHtml, bodyText, suggestedAudience, suggestedSchedule. HTML must be email-safe, simple, mobile-friendly and use {{name}} and {{city}} only when useful. Use https://www.masseurmatch.com/pro/dashboard as the default CTA URL.`,
+    user: `Create one complete email draft.\nObjective: ${body.objective}\nAudience: ${body.audience}\nTone: ${body.tone}\nCategory: ${body.category}\nCTA request: ${body.cta || "Use the provider dashboard CTA when appropriate"}\nOffer or announcement details: ${body.offer || "None supplied"}\nReturn the final draft, not commentary.`,
+  });
+
+  if (!result?.text) return fallbackAiEmail(body);
+  try {
+    const parsed = JSON.parse(result.text) as unknown;
+    return aiResultSchema.parse(parsed);
+  } catch {
+    return fallbackAiEmail(body);
+  }
+}
 
 export async function GET(request: Request) {
   try {
@@ -90,6 +145,18 @@ export async function POST(request: Request) {
     const admin = await requireAdminSession(request);
     assertRateLimit(request, "admin-email-center-write", { limit: 20, windowMs: 60_000 });
     const body = await parseJsonBody(request, postSchema);
+
+    if (body.action === "ai_generate") {
+      assertRateLimit(request, "admin-email-center-ai", { limit: 12, windowMs: 60_000 });
+      const draft = await generateAiEmail(body);
+      await recordAuditLog(admin.userId, "admin_email_ai_draft_generated", "email_draft", null, {
+        category: body.category,
+        audience: body.audience,
+        tone: body.tone,
+      });
+      return json({ ok: true, draft });
+    }
+
     const adminClient = createSupabaseAdminClient() as RpcClient;
 
     if (body.action === "save_template") {
@@ -108,7 +175,6 @@ export async function POST(request: Request) {
       if (error) throw new RouteError(500, error.message);
 
       const templateId = templateIdResultSchema.parse(data);
-
       await recordAuditLog(admin.userId, "admin_email_template_saved", "email_template", templateId, {
         name: body.name,
         sendCategory: body.sendCategory,
@@ -124,7 +190,6 @@ export async function POST(request: Request) {
       if (error) throw new RouteError(500, error.message);
 
       const cancelled = cancelledResultSchema.parse(data);
-
       await recordAuditLog(admin.userId, "admin_email_campaign_cancelled", "email_campaign", body.campaignId, {
         cancelledQueuedMessages: cancelled,
       });
@@ -133,9 +198,7 @@ export async function POST(request: Request) {
 
     const selectedAudience =
       body.userIds.length + body.profileStatuses.length + body.plans.length + body.cities.length + body.states.length;
-    if (selectedAudience === 0) {
-      throw new RouteError(400, "Choose recipients or at least one audience filter.");
-    }
+    if (selectedAudience === 0) throw new RouteError(400, "Choose recipients or at least one audience filter.");
     if (body.sendCategory === "transactional" && body.userIds.length === 0) {
       throw new RouteError(400, "Transactional campaigns require explicitly selected recipients.");
     }
