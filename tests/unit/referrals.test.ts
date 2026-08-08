@@ -41,6 +41,26 @@ describe("referral rules", () => {
     expect(migration).toContain("stripe_invoice_id = p_stripe_invoice_id");
   });
 
+  it("holds rewards for 14 days and blocks reused payment fingerprints", () => {
+    const migration = source("supabase/migrations/20260808193000_referral_antifraud.sql");
+    expect(migration).toContain("now() + interval '14 days'");
+    expect(migration).toContain("payment_fingerprint_reused");
+    expect(migration).toContain("v_score >= 70 then 'rejected'");
+    expect(migration).toContain("v_score >= 30 then 'review'");
+    expect(migration).toContain("finalize-qualified-referrals-hourly");
+  });
+
+  it("revokes referral rewards after full refunds or disputes", () => {
+    const webhook = source("src/app/api/webhooks/stripe/route.ts");
+    const migration = source("supabase/migrations/20260808193000_referral_antifraud.sql");
+    expect(webhook).toContain("case 'charge.refunded'");
+    expect(webhook).toContain("case 'charge.dispute.created'");
+    expect(webhook).toContain("qualify_paid_referral");
+    expect(webhook).toContain("payment_method_details?.card?.fingerprint");
+    expect(migration).toContain("revoke_referral_reward");
+    expect(migration).toContain("premium_months_earned = greatest(0, premium_months_earned - 1)");
+  });
+
   it("keeps the referral page discoverable from the Pro navigation", () => {
     const navigation = source("src/app/pro/ProLayoutClient.tsx");
     expect(navigation).toContain('href: "/pro/referrals"');

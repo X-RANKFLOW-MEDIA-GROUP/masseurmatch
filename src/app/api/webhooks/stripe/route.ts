@@ -96,12 +96,69 @@ async function recordStripeEvent(
   return true
 }
 
+type InvoicePaymentLite = {
+  status?: string | null
+  payment?: {
+    type?: string | null
+    payment_intent?: string | Stripe.PaymentIntent | null
+  } | null
+}
+
+async function getReferralPaymentSignals(stripe: Stripe, invoiceId: string) {
+  const invoicePayments = stripe.invoicePayments as unknown as {
+    list(params: { invoice: string; limit?: number }): Promise<{ data: InvoicePaymentLite[] }>
+  }
+  const payments = await invoicePayments.list({ invoice: invoiceId, limit: 10 })
+  const invoicePayment = payments.data.find(
+    (item) => item.status === 'paid' && item.payment?.type === 'payment_intent' && item.payment.payment_intent,
+  )
+
+  const paymentIntentRef = invoicePayment?.payment?.payment_intent
+  const paymentIntentId =
+    typeof paymentIntentRef === 'string' ? paymentIntentRef : paymentIntentRef?.id
+  if (!paymentIntentId) {
+    return { chargeId: null, fingerprint: null, riskScore: 0, riskReasons: [] as string[] }
+  }
+
+  const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId, {
+    expand: ['latest_charge'],
+  })
+  const latestCharge = paymentIntent.latest_charge
+  const charge =
+    typeof latestCharge === 'string'
+      ? await stripe.charges.retrieve(latestCharge)
+      : latestCharge
+
+  const fingerprint = charge?.payment_method_details?.card?.fingerprint ?? null
+  const riskLevel = charge?.outcome?.risk_level ?? null
+  let riskScore = 0
+  const riskReasons: string[] = []
+
+  if (riskLevel === 'highest') {
+    riskScore += 70
+    riskReasons.push('stripe_risk_highest')
+  } else if (riskLevel === 'elevated') {
+    riskScore += 30
+    riskReasons.push('stripe_risk_elevated')
+  }
+
+  return {
+    chargeId: charge?.id ?? null,
+    fingerprint,
+    riskScore,
+    riskReasons,
+  }
+}
+
 async function processPaidReferral(
   supabase: ReturnType<typeof createSupabaseWebhookClient>,
   stripe: Stripe,
   invoice: Stripe.Invoice,
 ) {
   if (invoice.status !== 'paid' || invoice.amount_paid <= 0) return
+
+  const invoiceId = invoice.id
+  if (!invoiceId) return
 
   const subscriptionId =
     typeof invoice.parent?.subscription_details?.subscription === 'string'
@@ -114,15 +171,36 @@ async function processPaidReferral(
   const userId = subscription.metadata?.user_id ?? subscription.metadata?.userId
   if (!userId) return
 
+  const signals = await getReferralPaymentSignals(stripe, invoiceId)
   const { error } = await (supabase.rpc as unknown as (
     name: string,
     params: Record<string, unknown>,
-  ) => Promise<{ error: { message: string } | null }>)('process_paid_referral', {
+  ) => Promise<{ error: { message: string } | null }>)('qualify_paid_referral', {
     p_referred_user_id: userId,
     p_stripe_subscription_id: subscriptionId,
-    p_stripe_invoice_id: invoice.id,
+    p_stripe_invoice_id: invoiceId,
+    p_stripe_charge_id: signals.chargeId,
+    p_payment_fingerprint: signals.fingerprint,
+    p_risk_score: signals.riskScore,
+    p_risk_reasons: signals.riskReasons,
   })
 
+  if (error) throw new Error(error.message)
+}
+
+async function revokeReferralForCharge(
+  supabase: ReturnType<typeof createSupabaseWebhookClient>,
+  chargeId: string | null | undefined,
+  reason: string,
+) {
+  if (!chargeId) return
+  const { error } = await (supabase.rpc as unknown as (
+    name: string,
+    params: Record<string, unknown>,
+  ) => Promise<{ error: { message: string } | null }>)('revoke_referral_reward', {
+    p_stripe_charge_id: chargeId,
+    p_reason: reason,
+  })
   if (error) throw new Error(error.message)
 }
 
@@ -168,6 +246,21 @@ export async function POST(request: NextRequest) {
 
       case 'invoice.paid': {
         await processPaidReferral(supabase, stripe, event.data.object as Stripe.Invoice)
+        break
+      }
+
+      case 'charge.refunded': {
+        const charge = event.data.object as Stripe.Charge
+        if (charge.refunded) {
+          await revokeReferralForCharge(supabase, charge.id, 'stripe_full_refund')
+        }
+        break
+      }
+
+      case 'charge.dispute.created': {
+        const dispute = event.data.object as Stripe.Dispute
+        const chargeId = typeof dispute.charge === 'string' ? dispute.charge : dispute.charge?.id
+        await revokeReferralForCharge(supabase, chargeId, 'stripe_dispute_created')
         break
       }
 
