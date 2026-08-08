@@ -245,9 +245,20 @@ export default function ProProfileCmsPageClient() {
     setErrors({});
 
     try {
-      const response = await postJson<ProfileResponse>("/api/pro/profile/cms-update", form);
+      let updatedProfile = profile;
+      const changedFields = Object.entries(form).filter(
+        ([key, value]) => profile && JSON.stringify(profile[key]) !== JSON.stringify(value)
+      );
 
-      setProfile(response.profile);
+      for (const [fieldName, value] of changedFields) {
+        const response = await postJson<ProfileResponse>("/api/pro/profile/cms-update", {
+          field_name: fieldName,
+          value,
+        });
+        updatedProfile = response.profile;
+      }
+
+      setProfile(updatedProfile);
       toast({
         title: "Profile saved",
         description: "Your CMS profile has been updated successfully.",
