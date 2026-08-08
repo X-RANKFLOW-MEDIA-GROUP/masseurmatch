@@ -4,8 +4,8 @@ import type { Json } from "@/integrations/supabase/app-database";
 import { createReferralSupabaseAdminClient } from "./supabase";
 
 type ReferralDashboardPayload = {
-  summary?: Record<string, unknown>;
-  referrals?: Array<Record<string, unknown>>;
+  summary?: Record<string, unknown> | null;
+  referrals?: Array<Record<string, unknown> | null> | null;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
