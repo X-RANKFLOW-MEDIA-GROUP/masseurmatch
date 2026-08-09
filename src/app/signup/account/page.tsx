@@ -216,7 +216,7 @@ export default function SignupAccountPage() {
   return (
     <div className="pb-8 pt-2">
       <div className="grid overflow-hidden rounded-[28px] border border-border/70 bg-card shadow-[var(--shadow-lg)] lg:grid-cols-[1.08fr_0.92fr]">
-        <section className="relative min-h-[680px] overflow-hidden bg-brand-primary text-white lg:min-h-[860px]">
+        <section className="relative order-2 min-h-[420px] overflow-hidden bg-brand-primary text-white lg:order-1 lg:min-h-[860px]">
           <Image
             src={BRAND_ASSETS.heroPoster}
             alt="Professional massage therapy room"
@@ -228,7 +228,7 @@ export default function SignupAccountPage() {
           <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/62 to-black/30" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/15" />
 
-          <div className="relative flex h-full min-h-[680px] flex-col justify-between p-7 sm:p-10 lg:min-h-[860px] lg:p-12">
+          <div className="relative flex h-full min-h-[420px] flex-col justify-between p-7 sm:p-10 lg:min-h-[860px] lg:p-12">
             <div className="max-w-xl pt-3 lg:pt-12">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-white/75">
                 Grow your practice
@@ -242,8 +242,8 @@ export default function SignupAccountPage() {
               </p>
             </div>
 
-            <div className="space-y-7">
-              <div className="grid gap-3 sm:grid-cols-2">
+            <div className="mt-8 space-y-7 lg:mt-0">
+              <div className="hidden gap-3 sm:grid sm:grid-cols-2 lg:grid">
                 {BENEFITS.map((item) => (
                   <div
                     key={item.title}
@@ -269,7 +269,7 @@ export default function SignupAccountPage() {
           </div>
         </section>
 
-        <section className="bg-card px-5 py-7 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
+        <section className="order-1 bg-card px-5 py-7 sm:px-8 sm:py-10 lg:order-2 lg:px-10 lg:py-12">
           <div className="mx-auto max-w-xl">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-secondary">
@@ -523,7 +523,7 @@ export default function SignupAccountPage() {
               )}
 
               <Button type="submit" size="lg" className="w-full" disabled={loading}>
-                {loading ? "Creating Account…" : "Create Therapist Account"}
+                {loading ? "Creating Account…" : "Create Account & Continue"}
               </Button>
 
               <div className="rounded-xl border border-border/70 bg-card px-4 py-3">
