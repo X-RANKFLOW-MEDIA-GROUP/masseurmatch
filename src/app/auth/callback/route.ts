@@ -2,17 +2,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import type { EmailOtpType, User } from "@supabase/supabase-js";
 import { assertRateLimit } from "@/app/_lib/security";
+import { resolveAuthDestination, sanitizeRedirect } from "@/app/auth/callback/destination";
 import { ensureUserProfileAndRole } from "@/app/api/_lib/supabase-server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isExpectedInvalidSessionError } from "@/lib/supabase/auth-errors";
 import { createServerSupabase } from "@/lib/supabase/server";
-
-function sanitizeRedirect(next: string | null): string {
-  const fallback = "/pro/dashboard";
-  if (!next) return fallback;
-  if (!next.startsWith("/") || next.startsWith("//")) return fallback;
-  return next;
-}
 
 function failedAuthRedirect(origin: string, type: EmailOtpType | null) {
   if (type === "recovery") {
@@ -116,9 +110,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // New accounts continue the signup wizard; returning users go where they
-  // asked (default: their dashboard).
-  const destination = profileCreated ? "/signup/plan" : next;
+  const destination = resolveAuthDestination({ profileCreated, next });
   return NextResponse.redirect(`${origin}${destination}`);
 }
 
