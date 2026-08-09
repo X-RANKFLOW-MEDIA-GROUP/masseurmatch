@@ -8,7 +8,6 @@ import {
   CalendarClock,
   CheckCircle2,
   Eye,
-  FileText,
   History,
   Loader2,
   Mail,
