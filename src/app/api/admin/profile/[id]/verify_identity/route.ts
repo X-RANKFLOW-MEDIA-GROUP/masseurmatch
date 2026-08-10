@@ -25,8 +25,10 @@ export async function POST(
 
     if (fetchError) throw new RouteError(500, fetchError.message);
     if (!profile) throw new RouteError(404, "Profile not found.");
+    if (!profile.user_id) throw new RouteError(409, "Profile is not linked to a user account.");
 
-    const canonicalStatus = await getCanonicalIdentityStatusForUser(profile.user_id);
+    const userId = profile.user_id;
+    const canonicalStatus = await getCanonicalIdentityStatusForUser(userId);
     if (canonicalStatus !== "verified") {
       throw new RouteError(
         409,
@@ -52,7 +54,7 @@ export async function POST(
       action_type: "sync_identity_verification",
       target_table: "profiles",
       admin_id: admin.userId,
-      target_user_id: profile.user_id,
+      target_user_id: userId,
       target_profile_id: profileId,
       reason: "Synced from verified Stripe Identity session",
     });
