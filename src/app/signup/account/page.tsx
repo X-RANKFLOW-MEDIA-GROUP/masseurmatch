@@ -171,19 +171,19 @@ export default function SignupAccountPage() {
   }
 
   return (
-    <div className="mx-auto max-w-lg space-y-8 py-8">
+    <div className="mx-auto max-w-2xl space-y-8 py-8 sm:py-12">
       <div className="text-center">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-foreground">
+        <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
           Create Your Account
         </h1>
-        <p className="mt-3 text-muted-foreground">
+        <p className="mt-3 text-muted-foreground sm:text-base">
           Set up your login details to continue your profile registration.
         </p>
       </div>
 
-      <Card>
-        <CardContent className="p-6">
-          <form ref={formRef} onSubmit={handleSubmit} className="space-y-5" noValidate>
+      <Card className="mx-auto w-full max-w-lg">
+        <CardContent className="p-6 sm:p-8">
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 sm:space-y-7" noValidate>
             <div className="space-y-2">
               <Label htmlFor="fullName">Full Name *</Label>
               <Input
@@ -296,9 +296,9 @@ export default function SignupAccountPage() {
               )}
             </div>
 
-            <div className="space-y-3 rounded-xl border border-border/60 bg-bg-subtle/30 p-4">
-              <div className="space-y-1">
-                <div className="flex items-start gap-3">
+            <div className="space-y-4 rounded-xl border border-border/60 bg-bg-subtle/30 p-4 sm:p-6">
+              <div className="space-y-2">
+                <div className="flex items-start gap-3 sm:gap-4">
                   <Checkbox
                     id="terms"
                     checked={termsChecked}
@@ -314,8 +314,9 @@ export default function SignupAccountPage() {
                         return next;
                       });
                     }}
+                    className="mt-1 flex-shrink-0"
                   />
-                  <Label htmlFor="terms" className="text-sm leading-snug">
+                  <Label htmlFor="terms" className="text-sm leading-relaxed sm:text-base">
                     I agree to the{" "}
                     <Link href="/terms" className="text-brand-secondary underline" target="_blank" rel="noopener noreferrer">
                       Terms of Service
@@ -332,8 +333,8 @@ export default function SignupAccountPage() {
                   </p>
                 )}
               </div>
-              <div className="space-y-1">
-                <div className="flex items-start gap-3">
+              <div className="space-y-2">
+                <div className="flex items-start gap-3 sm:gap-4">
                   <Checkbox
                     id="compliance"
                     checked={complianceChecked}
@@ -349,8 +350,9 @@ export default function SignupAccountPage() {
                         return next;
                       });
                     }}
+                    className="mt-1 flex-shrink-0"
                   />
-                  <Label htmlFor="compliance" className="text-sm leading-snug">
+                  <Label htmlFor="compliance" className="text-sm leading-relaxed sm:text-base">
                     I acknowledge the{" "}
                     <Link href="/therapist-agreement" className="text-brand-secondary underline" target="_blank" rel="noopener noreferrer">
                       Therapist Agreement
@@ -364,8 +366,8 @@ export default function SignupAccountPage() {
                   </p>
                 )}
               </div>
-              <div className="space-y-1">
-                <div className="flex items-start gap-3">
+              <div className="space-y-2">
+                <div className="flex items-start gap-3 sm:gap-4">
                   <Checkbox
                     id="age"
                     checked={ageChecked}
@@ -381,8 +383,9 @@ export default function SignupAccountPage() {
                         return next;
                       });
                     }}
+                    className="mt-1 flex-shrink-0"
                   />
-                  <Label htmlFor="age" className="text-sm leading-snug">
+                  <Label htmlFor="age" className="text-sm leading-relaxed sm:text-base">
                     I confirm I am at least 18 years old and that I provide professional, non-sexual massage
                     therapy only. I will not use MasseurMatch to offer, solicit, or arrange sexual services.
                   </Label>
@@ -401,7 +404,7 @@ export default function SignupAccountPage() {
               </p>
             )}
 
-            <Button type="submit" size="lg" className="w-full" disabled={loading}>
+            <Button type="submit" size="lg" className="w-full min-h-12 text-base font-medium sm:mt-2" disabled={loading}>
               {loading ? "Creating Account…" : "Continue to Verification"}
             </Button>
 
