@@ -5,6 +5,9 @@ import { createServerSupabase } from "@/lib/supabase/server";
 
 function isAuthCookie(name: string) {
   return (
+    // Legacy: this build authenticates purely with Supabase SSR cookies and
+    // never issues mm_session. Kept so a browser still holding one from an
+    // older deploy has it cleared on logout.
     name === "mm_session" ||
     name.startsWith("sb-") ||
     name.includes("-auth-token") ||

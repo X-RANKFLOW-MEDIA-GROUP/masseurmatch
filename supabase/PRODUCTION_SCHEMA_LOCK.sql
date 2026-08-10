@@ -1,6 +1,17 @@
 -- MasseurMatch Production Schema Lock (idempotent)
 -- This file is the production database contract used by go-live validation.
 -- It must stay additive-only: no destructive drops, no renames, no data loss.
+--
+-- SCOPE: tables, columns, constraints, indexes and RLS only. Application RPCs
+-- (sync_stripe_subscription, process_stripe_*, qualify_paid_referral,
+-- revoke_referral_reward, admin_email_*, get_nearby_therapists, and the rest)
+-- are NOT defined here — their bodies live in supabase/migrations/ so there is
+-- a single source of truth for each. A database provisioned from this file
+-- alone therefore has the right shape but none of the functions, which fails
+-- at runtime rather than at deploy time (a Stripe webhook that never syncs a
+-- tier, an admin panel that never loads). When standing up a new environment,
+-- apply the migrations as well. scripts/validate-db-contract.mjs enforces that
+-- every RPC the app calls is defined somewhere under supabase/.
 
 create extension if not exists pgcrypto;
 create extension if not exists citext;
