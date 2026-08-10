@@ -1,7 +1,4 @@
-type LegalTopicLink = {
-  href: string;
-  label: string;
-};
+type LegalTopicLink = { href: string; label: string };
 
 export type LegalTopic = {
   id: string;
@@ -12,239 +9,170 @@ export type LegalTopic = {
   links?: LegalTopicLink[];
 };
 
-export const LEGAL_LAST_UPDATED = "March 10, 2026";
+export const LEGAL_LAST_UPDATED = "August 10, 2026";
 
 export const LEGAL_QUICK_FACTS = [
-  {
-    label: "Governing law",
-    value: "Delaware, USA",
-  },
-  {
-    label: "Last updated",
-    value: "March 10, 2026",
-  },
-  {
-    label: "Covered topics",
-    value: "Terms, privacy, billing & more",
-  },
-  {
-    label: "Platform model",
-    value: "Directory only, not bookings",
-  },
+  { label: "Governing law", value: "Delaware, USA" },
+  { label: "Last reviewed", value: LEGAL_LAST_UPDATED },
+  { label: "Coverage", value: "Terms, privacy, safety & billing" },
+  { label: "Platform model", value: "Directory only" },
 ] as const;
 
 export const LEGAL_QUICK_ANSWERS = [
   {
-    question: "Does MasseurMatch handle bookings or payments between users?",
-    answer:
-      "No. The platform is a directory and visibility tool. Direct scheduling, payments, and service arrangements happen outside the platform between the parties involved.",
+    question: "Does MasseurMatch book appointments or process client payments?",
+    answer: "No. MasseurMatch is a directory and visibility platform. Providers and clients communicate, schedule, and arrange payment directly outside the platform.",
   },
   {
-    question: "Does MasseurMatch verify every provider license or background?",
-    answer:
-      "No. The legal package states that credentials and profile content should not be treated as independently verified unless a listing is expressly marked and explained as verified.",
+    question: "Does MasseurMatch verify professional licenses?",
+    answer: "No. MasseurMatch does not independently verify therapist licenses. Any badge or verification indicator means only the specific checks described by the platform for that badge.",
   },
   {
-    question: "What happens with illegal, sexual, or exploitative content?",
-    answer:
-      "The policies apply zero tolerance to sexual solicitation, trafficking, exploitation, illegal conduct, misleading credentials, and unsafe content. Listings can be removed immediately and matters may be escalated.",
+    question: "Who is responsible for a provider's services?",
+    answer: "Providers are independent businesses or individuals. They are responsible for their profile accuracy, legal compliance, credentials, rates, availability, and services.",
   },
   {
-    question: "Where should privacy, billing, DMCA, or legal requests go?",
-    answer:
-      "The page routes visitors to the correct mailbox based on the subject they choose, and the contact matrix below lists the correct team and expected response window.",
+    question: "Where do legal, privacy, billing, and support requests go?",
+    answer: "Legal, privacy, DMCA, and formal compliance matters go to legal@masseurmatch.com; billing matters go to billing@masseurmatch.com; general support and account questions go to support@masseurmatch.com.",
   },
 ] as const;
 
 export const LEGAL_TOPICS: readonly LegalTopic[] = [
   {
     id: "terms",
-    title: "Terms of Use and Platform Boundaries",
-    summary:
-      "The 2026 legal package makes clear that MasseurMatch is a directory, not an employer, agency, booking tool, or payment intermediary. Users must be 18+ and use the platform lawfully.",
+    title: "Terms of Service and Platform Role",
+    summary: "MasseurMatch is a directory, not an employer, agency, healthcare provider, booking service, or payment intermediary for massage sessions.",
     highlights: [
-      "The platform does not book appointments, process client-to-provider payments, or guarantee outcomes.",
-      "Users are responsible for their own due diligence before contacting a listed provider.",
-      "Accounts may be suspended or terminated for false information, underage use, or prohibited conduct.",
-      "The terms include broad warranty disclaimers, liability limits, and user indemnification obligations.",
-    ],
-    mergedNotes: [
-      "The imported Legal Hub wording reinforces the same boundary: advertising exposure only, no service transaction management.",
-      "The merged copy keeps the stronger March 2026 framework while preserving the Legal Hub's emphasis on zero tolerance for illegal services.",
+      "Users must be at least 18 years old and use the service lawfully.",
+      "Clients contact independent providers directly and perform their own due diligence.",
+      "MasseurMatch does not guarantee availability, results, earnings, credentials, or service quality.",
+      "Accounts and listings may be restricted or removed for policy violations, fraud, or unlawful activity.",
     ],
     links: [
-      { href: "/terms", label: "Read full Terms" },
+      { href: "/terms", label: "Terms of Service" },
       { href: "/platform-disclaimer", label: "Platform Disclaimer" },
     ],
   },
   {
     id: "providers",
-    title: "Therapist Listings, Advertiser Rules, and Billing",
-    summary:
-      "Therapists remain independent providers. They are responsible for their licenses, content accuracy, local-law compliance, and subscription billing obligations.",
+    title: "Provider Terms, Subscriptions, and Visibility",
+    summary: "Providers remain independent and are responsible for truthful listings, lawful business practices, subscriptions, and direct interactions with clients.",
     highlights: [
-      "Listing content must stay truthful, current, professional, and legally compliant.",
-      "Subscriptions renew automatically unless canceled before renewal; Stripe handles payment processing.",
-      "Refunds are limited and typically tied to billing errors, legal requirements, or platform-side failures.",
-      "Chargebacks, false claims, or policy violations can lead to suspension or termination without refund.",
-    ],
-    mergedNotes: [
-      "This section merges the March 2026 therapist agreement with Legal Hub additions around advertiser policy, refund eligibility, and right-to-remove language.",
-      "The merged version also keeps the Legal Hub note that advertising performance, leads, and earnings are never guaranteed.",
+      "Paid tiers and featured placement affect visibility or features but do not guarantee leads, revenue, or ranking outcomes.",
+      "Providers must keep profile, pricing, location, travel, and contact information accurate.",
+      "Subscription, cancellation, renewal, and refund rules are governed by the applicable paid-plan terms.",
+      "MasseurMatch does not create an employment, agency, partnership, or contractor relationship with providers.",
     ],
     links: [
-      { href: "/therapist-agreement", label: "Therapist Agreement" },
-      { href: "/pricing", label: "Pricing" },
+      { href: "/therapist-agreement", label: "Provider Agreement" },
+      { href: "/subscriptions", label: "Subscription Terms" },
+      { href: "/refund-policy", label: "Refund Policy" },
     ],
   },
   {
     id: "privacy",
-    title: "Privacy, Notice at Collection, and Cookies",
-    summary:
-      "The privacy package explains what data is collected, why it is used, how it is shared, and what rights users have under laws such as the TDPSA and CCPA/CPRA.",
+    title: "Privacy, Data Use, Cookies, and User Choices",
+    summary: "The privacy package explains the categories of data collected, why they are used, service providers involved, retention, security practices, and available user choices.",
     highlights: [
-      "Collected data may include account details, therapist profile data, support messages, subscription status, and limited technical usage data.",
-      "MasseurMatch states that it does not sell personal data and uses processors such as Stripe, Supabase, Vercel, and email vendors for specific platform needs.",
-      "Short-form notices must appear at or before collection points such as account signup, checkout, and support forms.",
-      "Cookie usage is split between strictly necessary cookies and consent-based categories like analytics and functional preferences.",
-    ],
-    mergedNotes: [
-      "The imported Legal Hub copy adds explicit reminders that health or medical data should not be treated as part of the normal platform flow and that protected health information is not part of the intended data model.",
-      "The merged page keeps the more complete March 2026 rights language while preserving the Legal Hub's emphasis on verification data being handled by Stripe Identity where applicable.",
+      "Data may include account, profile, contact, location, subscription, support, cookie, analytics, verification, and AI-interaction information where those features are used.",
+      "MasseurMatch uses service providers only for defined platform functions and should not make privacy promises that exceed actual product behavior.",
+      "Users may request access, correction, or deletion where applicable and subject to legal or operational retention requirements.",
+      "Cookie and analytics disclosures should match the technologies actually deployed on the site.",
     ],
     links: [
       { href: "/privacy", label: "Privacy Policy" },
       { href: "/cookie-policy", label: "Cookie Policy" },
+      { href: "/data-deletion", label: "Data Deletion" },
     ],
   },
   {
     id: "content",
-    title: "Content Standards, Safety, and Community Enforcement",
-    summary:
-      "Content must remain professional, accurate, and lawful. The safety framework covers acceptable use, photo rules, anti-trafficking, complaints, phishing warnings, and non-discrimination.",
+    title: "Content, Conduct, Trust, and Safety",
+    summary: "Profiles and communications connected to MasseurMatch must remain lawful, professional, accurate, and consistent with the platform's content and safety policies.",
     highlights: [
-      "Sexual solicitation, nudity, minors, trafficking, illegal activity, hate speech, and deceptive or unsafe content are prohibited.",
-      "Photos must reflect the real provider or workspace and cannot use stolen images, misleading AI faces, or sexually suggestive imagery.",
-      "Reports may lead to content removal, warnings, suspension, permanent bans, or referrals to law enforcement.",
-      "The legal package commits to an inclusive environment and prohibits discriminatory conduct.",
-    ],
-    mergedNotes: [
-      "This section folds in the Legal Hub topics for content guidelines, photo rules, anti-trafficking, complaints and compliance, phishing and scam notice, and non-discrimination.",
-      "The merged guidance also preserves the Legal Hub's simple warning that the platform never asks for passwords or one-time codes by email or SMS.",
+      "Sexual solicitation, trafficking, coercion, exploitation, illegal services, harassment, scams, and deceptive conduct are prohibited.",
+      "Photos and profile claims must accurately represent the provider and may not impersonate another person or mislead users.",
+      "Reports can lead to review, content removal, suspension, or account termination depending on severity and evidence.",
+      "MasseurMatch does not verify licenses and does not guarantee that a listed provider is suitable for a particular user.",
     ],
     links: [
       { href: "/community-guidelines", label: "Community Guidelines" },
-      { href: "/platform-disclaimer", label: "Platform Disclaimer" },
+      { href: "/acceptable-use", label: "Acceptable Use" },
+      { href: "/prohibited-conduct", label: "Prohibited Conduct" },
+    ],
+  },
+  {
+    id: "verification",
+    title: "Badges and Verification Disclosures",
+    summary: "Verification indicators are limited signals. Each badge means only the checks expressly described by MasseurMatch and is not a professional-license, background, safety, or quality guarantee.",
+    highlights: [
+      "Identity verification may be handled by a third-party verification provider.",
+      "A badge does not mean MasseurMatch endorses a provider or guarantees services.",
+      "Users should confirm any credential, license, insurance, or qualification important to their decision directly with the provider or relevant authority.",
+      "Verification status may be removed when information changes or platform requirements are no longer met.",
+    ],
+    links: [{ href: "/badge-disclaimer", label: "Badge Disclaimer" }],
+  },
+  {
+    id: "communications",
+    title: "Email, SMS, and AI Disclosures",
+    summary: "Email, SMS, and AI-assisted features require clear disclosures, appropriate consent where required, practical opt-out mechanisms, and truthful descriptions of what the automation does.",
+    highlights: [
+      "Transactional and marketing communications should be distinguished and handled according to the applicable consent context.",
+      "Marketing recipients must have a practical opt-out path; SMS programs should honor supported STOP/HELP flows when applicable.",
+      "AI-generated or AI-assisted output should not be presented as a human professional judgment when it is not one.",
+      "Users remain responsible for reviewing information before relying on it for decisions about independent providers.",
+    ],
+    links: [
+      { href: "/sms-terms", label: "SMS Terms" },
+      { href: "/email-opt-out", label: "Email Opt-Out" },
+      { href: "/ai-disclosure", label: "AI Disclosure" },
     ],
   },
   {
     id: "ip",
-    title: "DMCA, Trademarks, and Repeat Infringer Rules",
-    summary:
-      "MasseurMatch publishes a formal DMCA process, designates a DMCA contact channel, and reserves the right to act quickly on substantiated intellectual property complaints.",
+    title: "Copyright, DMCA, and Intellectual Property",
+    summary: "MasseurMatch provides a process for copyright notices, counter-notices, and other intellectual-property complaints and may remove content while reviewing a substantiated report.",
     highlights: [
-      "DMCA notices must include specific information such as the copyrighted work, the allegedly infringing URL, and a signed good-faith statement.",
-      "The package distinguishes DMCA requests from general legal requests so each can be handled through the proper channel.",
-      "Trademark and copyright complaints may lead to removal or other enforcement measures.",
-      "Repeat intellectual property violations can lead to account termination.",
+      "Copyright notices should identify the protected work, disputed material, contact information, and the statements required for a valid notice.",
+      "Counter-notice procedures are available where applicable.",
+      "Repeated substantiated infringement may result in account action.",
+      "Formal IP and DMCA requests should be sent to legal@masseurmatch.com.",
     ],
-    mergedNotes: [
-      "The imported Legal Hub material strengthens this section by adding an explicit repeat-infringer policy based on multiple substantiated violations inside a rolling twelve-month window.",
-    ],
-  },
-  {
-    id: "accessibility",
-    title: "Accessibility, Marketing Consent, and SMS Rules",
-    summary:
-      "The legal package pairs accessibility commitments with the consent language required for email and SMS programs.",
-    highlights: [
-      "The stated accessibility target is WCAG 2.1 AA, with a process for reporting barriers and tracking remediation.",
-      "Marketing email rules include sender identification, unsubscribe handling, and truthful subject lines.",
-      "Marketing SMS requires express written consent, while transactional messages follow a different rule set.",
-      "Users must have a clear way to opt out, including STOP and HELP style flows for text messaging where applicable.",
-    ],
-    mergedNotes: [
-      "This section merges the March 2026 consent framework with the Legal Hub's SMS terms language and accessibility summary.",
-    ],
-    links: [
-      { href: "/accessibility", label: "Accessibility Statement" },
-    ],
+    links: [{ href: "/dmca", label: "DMCA Policy" }],
   },
   {
     id: "disputes",
-    title: "Governing Law, Disputes, and Formal Legal Process",
-    summary:
-      "The package sets Delaware law as the governing framework, requires a first attempt at informal resolution, and explains how arbitration, court exceptions, and formal legal process are handled.",
+    title: "Disputes and Formal Legal Process",
+    summary: "The governing terms explain applicable law, dispute procedures, limitations, and where formal legal process must be sent.",
     highlights: [
-      "Before formal proceedings, users must send a written complaint and allow a good-faith attempt at resolution.",
-      "Many disputes are routed to binding individual arbitration, with class-action and jury-trial waivers in the package.",
-      "Court access is preserved for certain emergency or intellectual-property disputes.",
-      "Formal subpoenas, court orders, and law-enforcement requests must go through the legal process channel.",
+      "Users should review the current Terms of Service for the controlling dispute language.",
+      "Formal legal notices and law-enforcement requests must go to legal@masseurmatch.com.",
+      "Nothing in the Legal Center replaces the complete terms governing a specific service or subscription.",
+      "Policy summaries are provided for readability; the linked full policies control if a summary and a full policy differ.",
     ],
-    mergedNotes: [
-      "The imported Legal Hub text adds a straightforward subpoena compliance policy and reiterates that legal requests should go to the legal contact mailbox.",
-    ],
+    links: [{ href: "/terms", label: "Terms of Service" }],
   },
 ];
 
 export const LEGAL_SUPPLEMENTAL_NOTICES = [
-  {
-    title: "Advertiser policy",
-    body: "Advertisers remain independent and are responsible for their own compliance, content, and business results.",
-  },
-  {
-    title: "Anti-trafficking",
-    body: "The platform maintains zero tolerance for trafficking, coercion, exploitation, or illegal services.",
-  },
-  {
-    title: "Complaints and compliance",
-    body: "Complaints may require supporting evidence and can result in removal, suspension, or escalation.",
-  },
-  {
-    title: "Health data disclaimer",
-    body: "MasseurMatch is not a healthcare provider and does not handle protected health information.",
-  },
-  {
-    title: "Phishing and scam notice",
-    body: "The platform should never ask users for passwords or one-time codes by email or SMS.",
-  },
-  {
-    title: "Repeat infringer policy",
-    body: "Repeated substantiated IP violations can lead to account termination.",
-  },
+  { title: "Directory-only model", body: "MasseurMatch helps people discover independent providers; it does not manage massage bookings, client-provider payments, calendars, or reviews." },
+  { title: "No license verification", body: "MasseurMatch does not independently verify professional massage licenses. Users should verify credentials important to them directly." },
+  { title: "Paid visibility", body: "Subscriptions and add-ons may affect placement or features but do not guarantee impressions, contacts, clients, revenue, or search-engine outcomes." },
+  { title: "AI disclosure", body: "AI-assisted features may generate suggestions or summaries. They are not legal, medical, or professional advice and should be reviewed before use." },
+  { title: "Anti-exploitation", body: "Trafficking, coercion, exploitation, illegal services, and sexual solicitation through the platform are prohibited." },
+  { title: "Security", body: "Users should never send passwords or one-time verification codes to someone claiming to represent MasseurMatch." },
 ] as const;
 
 export const LEGAL_CONTACT_MATRIX = [
-  {
-    matter: "Legal inquiries, subpoenas, law enforcement requests, cease and desist",
-    email: "legal@masseurmatch.com",
-    responseWindow: "5 business days",
-  },
-  {
-    matter: "DMCA copyright takedowns and counter-notifications",
-    email: "dmca@masseurmatch.com",
-    responseWindow: "2 business days",
-  },
-  {
-    matter: "Privacy rights requests, access, deletion, or correction",
-    email: "privacy@masseurmatch.com",
-    responseWindow: "45 days where legally applicable",
-  },
-  {
-    matter: "Billing disputes, cancellations, and refund requests",
-    email: "billing@masseurmatch.com",
-    responseWindow: "3 business days",
-  },
-  {
-    matter: "General support, content reports, accessibility, and account issues",
-    email: "support@masseurmatch.com",
-    responseWindow: "2 business days",
-  },
+  { matter: "Legal notices, privacy rights, DMCA, subpoenas, law enforcement, and formal compliance", email: "legal@masseurmatch.com", responseWindow: "Reviewed according to the applicable request type" },
+  { matter: "Billing, subscription, cancellation, charge, and refund questions", email: "billing@masseurmatch.com", responseWindow: "Handled by the billing team" },
+  { matter: "General support, accounts, content reports, accessibility, and product questions", email: "support@masseurmatch.com", responseWindow: "Handled by the support team" },
 ] as const;
 
 export const LEGAL_CONTACT_SUBJECTS = [
-  "Legal inquiry",
-  "Privacy request",
+  "Legal or compliance inquiry",
+  "Privacy or data request",
   "DMCA or copyright notice",
   "Billing, cancellation, or refund",
   "Content report or safety concern",

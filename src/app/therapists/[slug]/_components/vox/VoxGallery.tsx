@@ -4,8 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
-// Photo gallery with a lightweight lightbox. Server data passes the image URLs;
-// interaction (open / next / prev) is handled here.
+// Gallery thumbnails preserve the full uploaded photo instead of cropping it.
+// The neutral frame keeps mixed portrait/landscape uploads visually consistent.
 export function VoxGallery({ images, name }: { images: string[]; name: string }) {
   const [active, setActive] = useState<number | null>(null);
   const photos = images.slice(0, 9);
@@ -46,7 +46,7 @@ export function VoxGallery({ images, name }: { images: string[]; name: string })
                   ? "(min-width: 1024px) 768px, 100vw"
                   : "(min-width: 1024px) 360px, (min-width: 640px) 50vw, 50vw"
               }
-              className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.025]"
+              className="object-contain p-1 transition-transform duration-500 group-hover:scale-[1.015]"
               loading={index === 0 ? "eager" : "lazy"}
             />
           </button>
