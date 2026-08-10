@@ -4,6 +4,7 @@ import {
   recordAuditLog,
   requireAdminSession,
 } from "@/app/api/_lib/supabase-server";
+import type { Json } from "@/integrations/supabase/types";
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -59,7 +60,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       .update({
         status: nextStatus,
         last_error: decision === "reject" ? reason : null,
-        metadata,
+        metadata: metadata as Json,
         updated_at: reviewedAt,
       })
       .eq("id", id);
