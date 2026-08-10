@@ -163,9 +163,27 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
-            const sha = context.payload.pull_request.head.sha;
-            const deadlineMs = Date.now() + 10 * 60 * 1000;
+            const pullRequest = context.payload.pull_request;
+            const sha = pullRequest.head.sha;
             const isPreview = (u) => !!u && /vercel\.app/.test(u);
+
+            // Vercel decides whether to build at the moment it receives a push and
+            // never revisits that decision. A head commit that already existed when
+            // the pull request was opened was therefore pushed while
+            // scripts/vercel-ignore-build.mjs had no pull request to key on, so its
+            // build was skipped and no preview is ever coming for that exact commit.
+            //
+            // That is unavoidable, not a fault: a branch must exist on the remote
+            // before a pull request can be opened against it, so the first push of
+            // every new branch lands in this state. Treat it as a warning and keep
+            // the wait short. Any later commit does get a preview, so a missing one
+            // there is a real failure worth blocking on.
+            const headCommit = await github.rest.repos.getCommit({
+              owner: context.repo.owner, repo: context.repo.repo, ref: sha,
+            });
+            const previewImpossible =
+              Date.parse(headCommit.data.commit.committer.date) < Date.parse(pullRequest.created_at);
+            const deadlineMs = Date.now() + (previewImpossible ? 90 * 1000 : 10 * 60 * 1000);
             while (Date.now() < deadlineMs) {
               const deployments = await github.rest.repos.listDeployments({
                 owner: context.repo.owner, repo: context.repo.repo, sha, per_page: 100,
@@ -191,22 +209,33 @@ jobs:
               await new Promise((r) => setTimeout(r, 15000));
             }
             core.setOutput('url', '');
+
+            if (previewImpossible) {
+              core.warning(
+                [
+                  `E2E and accessibility suites did NOT run for ${sha.slice(0, 7)}.`,
+                  '',
+                  'This commit predates the pull request, so Vercel skipped its build and no',
+                  'preview exists to test against. Expected for the first push of a branch.',
+                  '',
+                  'To exercise the UI before merging, push another commit: it will build a',
+                  'preview and both suites will run against it.',
+                ].join('\n'),
+              );
+              return;
+            }
+
             core.setFailed(
               [
                 'No Vercel preview URL resolved for this pull request.',
                 '',
-                'Without a preview there is nothing for the E2E and accessibility suites to',
-                'run against, and they would be skipped silently — a green pull request that',
-                'never exercised the UI. Failing loudly instead.',
+                'This commit was pushed while the pull request was already open, so Vercel',
+                'should have built a preview for it. Without one there is nothing for the E2E',
+                'and accessibility suites to run against and they would skip silently, leaving',
+                'a green pull request that never exercised the UI.',
                 '',
-                'Most likely cause: the branch was pushed BEFORE the pull request existed, so',
-                'scripts/vercel-ignore-build.mjs skipped the build (a pull request is what makes',
-                'a preview worth building) and Vercel does not rebuild that commit when the pull',
-                'request opens later.',
-                '',
-                'Fix: push any new commit to this branch. Now that the pull request is open the',
-                'preview will build, and this job will pass. Opening the pull request as a draft',
-                'before the first push avoids the situation entirely.',
+                'Check the Vercel dashboard: the build likely failed, or scripts/vercel-ignore',
+                '-build.mjs skipped it unexpectedly.',
               ].join('\n'),
             );
 
