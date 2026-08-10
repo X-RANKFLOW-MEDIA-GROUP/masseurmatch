@@ -18,13 +18,16 @@ import {
   SITE_DESCRIPTION,
 } from "@/app/_lib/seo";
 import { siteUrl } from "@/lib/site";
-import { getProfilePhotosBatch, getPublicTherapists } from "@/app/_lib/directory";
+import {
+  getProfilePhotosBatch,
+  getPublicTherapistBySlug,
+  getPublicTherapists,
+} from "@/app/_lib/directory";
+import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { LANDING_FAQ } from "@/lib/marketing/home-data";
 import type { Metadata } from "next";
 
 export const revalidate = 3600;
-
-// ─── Metadata ───────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = createPageMetadata({
   title: "Find Verified Male Massage Therapists Near You | MasseurMatch",
@@ -32,21 +35,17 @@ export const metadata: Metadata = createPageMetadata({
     "MasseurMatch is the premium US directory for verified LGBTQ+-affirming male massage therapists. Search Dallas, Miami, NYC, LA, Chicago & cities across the US. Compare deep tissue, Swedish, outcall & incall options. A modern alternative to MasseurFinder and RentMasseur.",
   path: "/",
   keywords: [
-    // Brand
     "MasseurMatch",
     "male massage therapist directory",
-    // Primary search intent
     "verified male massage therapist",
     "male massage therapist near me",
     "massage therapist near me",
     "LGBTQ affirming massage",
     "gay friendly massage therapist",
-    // Services
     "deep tissue massage",
     "Swedish massage",
     "outcall massage service",
     "incall massage",
-    // Cities (top markets)
     "massage therapist Dallas",
     "massage therapist Miami",
     "massage therapist New York",
@@ -54,25 +53,50 @@ export const metadata: Metadata = createPageMetadata({
   ],
 });
 
-// ─── Page ────────────────────────────────────────────────────────────────────
-
 function isRealProfileId(id: string | null | undefined) {
   return Boolean(id && !id.toLowerCase().startsWith("fallback-"));
+}
+
+async function getHomepageFeaturedProfiles() {
+  const admin = createSupabaseAdminClient();
+  const now = Date.now();
+  const { data, error } = await (admin as any)
+    .from("featured_masters")
+    .select("profile_id, display_order, starts_at, ends_at")
+    .eq("is_active", true)
+    .order("display_order", { ascending: true })
+    .order("created_at", { ascending: false })
+    .limit(24);
+
+  if (error || !data) return [];
+
+  const activeIds = data
+    .filter((entry: { profile_id: string | null; starts_at: string | null; ends_at: string | null }) => {
+      if (!entry.profile_id) return false;
+      const startsAt = entry.starts_at ? new Date(entry.starts_at).getTime() : null;
+      const endsAt = entry.ends_at ? new Date(entry.ends_at).getTime() : null;
+      return (startsAt == null || startsAt <= now) && (endsAt == null || endsAt > now);
+    })
+    .map((entry: { profile_id: string }) => entry.profile_id);
+
+  const profiles = await Promise.all(activeIds.map((id: string) => getPublicTherapistBySlug(id)));
+  return profiles.filter((profile): profile is NonNullable<typeof profile> => profile !== null).slice(0, 6);
 }
 
 export default async function HomePage() {
   let featuredTherapists: Awaited<ReturnType<typeof getPublicTherapists>>["items"] = [];
   try {
-    // Run both queries in parallel — lgbtq-affirming profiles rank first, and
-    // the broad list fills the remaining slots. Merging (instead of using the
-    // affirming list exclusively) keeps the section full even when only one or
-    // two profiles have the lgbtq_affirming flag set.
-    const [lgbtqResult, broadResult] = await Promise.all([
-      getPublicTherapists({ page: 1, pageSize: 6, lgbtqAffirming: true }),
-      getPublicTherapists({ page: 1, pageSize: 6 }),
+    // Featured Masters are the source of truth for the homepage. Public directory
+    // results only fill empty slots, so an admin feature action guarantees priority
+    // while still enforcing the normal approved/public/safety eligibility rules.
+    const [managedFeatured, lgbtqResult, broadResult] = await Promise.all([
+      getHomepageFeaturedProfiles(),
+      getPublicTherapists({ page: 1, pageSize: 12, lgbtqAffirming: true }),
+      getPublicTherapists({ page: 1, pageSize: 12 }),
     ]);
+
     const seenIds = new Set<string>();
-    featuredTherapists = [...lgbtqResult.items, ...broadResult.items]
+    featuredTherapists = [...managedFeatured, ...lgbtqResult.items, ...broadResult.items]
       .filter((therapist) => {
         if (seenIds.has(therapist.id)) return false;
         seenIds.add(therapist.id);
@@ -80,23 +104,24 @@ export default async function HomePage() {
       })
       .slice(0, 6);
 
-    const realIds = featuredTherapists
-      .filter((t) => isRealProfileId(t.id))
-      .map((t) => t.id);
-
+    const realIds = featuredTherapists.filter((t) => isRealProfileId(t.id)).map((t) => t.id);
     if (realIds.length > 0) {
       const photoBatch = await getProfilePhotosBatch(realIds, 1);
       featuredTherapists = featuredTherapists.map((therapist) => {
         if (!isRealProfileId(therapist.id)) return therapist;
         const photos = photoBatch.get(therapist.id) ?? [];
         const primaryPhoto = photos.find((photo) => photo.is_primary) ?? photos[0];
-        return primaryPhoto
-          ? { ...therapist, profile_photo: primaryPhoto.storage_path }
-          : therapist;
+        return primaryPhoto ? { ...therapist, profile_photo: primaryPhoto.storage_path } : therapist;
       });
     }
   } catch {
-    featuredTherapists = [];
+    // Never take the homepage down if the featured-management table is unavailable.
+    try {
+      const fallback = await getPublicTherapists({ page: 1, pageSize: 6 });
+      featuredTherapists = fallback.items;
+    } catch {
+      featuredTherapists = [];
+    }
   }
 
   const topCityItems = [
@@ -112,13 +137,8 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Organization */}
       <JsonLd data={buildOrganizationJsonLd()} />
-
-      {/* WebSite + SearchAction */}
       <JsonLd data={buildWebsiteJsonLd()} />
-
-      {/* CollectionPage */}
       <JsonLd
         data={buildCollectionPageJsonLd({
           name: "MasseurMatch — Verified Male Massage Therapist Directory",
@@ -126,8 +146,6 @@ export default async function HomePage() {
           path: "/",
         })}
       />
-
-      {/* Top Cities ItemList */}
       <JsonLd
         data={buildItemListJsonLd({
           name: "Top Cities — Male Massage Therapist Directory",
@@ -135,27 +153,16 @@ export default async function HomePage() {
           items: topCityItems,
         })}
       />
-
-      {/* FAQPage — must mirror the FAQ content visibly rendered by FaqAccordion */}
       <JsonLd data={buildFaqJsonLd(LANDING_FAQ)} />
-
-      {/* Standalone BreadcrumbList */}
       <JsonLd
         data={{
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
-            {
-              "@type": "ListItem",
-              position: 1,
-              name: "Home",
-              item: siteUrl("/"),
-            },
+            { "@type": "ListItem", position: 1, name: "Home", item: siteUrl("/") },
           ],
         }}
       />
-
-      {/* SpeakableSpecification */}
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -171,31 +178,14 @@ export default async function HomePage() {
       />
 
       <div className="relative min-h-screen overflow-x-hidden bg-background">
-        {/* 1. Hero Cinematic — Large hero section with cinematic visual */}
         <HeroCinematic />
-
-        {/* 2. Featured Verified Profiles — Premium editorial cards (moved after hero) */}
         <FeaturedTherapistsEditorial featuredTherapists={featuredTherapists} />
-
-        {/* 3. AI-Powered Discovery Section */}
         <AIDiscoverySection />
-
-        {/* 4. Browse by Major Cities */}
         <CityDiscoveryShowcase />
-
-        {/* 5. How It Works — 3-step premium layout */}
         <HowItWorksPremium />
-
-        {/* 6. Trust / Verification Dashboard */}
         <TrustDashboardSection />
-
-        {/* 7. Provider Growth CTA */}
         <ProviderGrowthCTA />
-
-        {/* 8. FAQ Section */}
         <FaqAccordion items={LANDING_FAQ} />
-
-        {/* 9. Final CTA */}
         <FinalCta />
       </div>
     </>
