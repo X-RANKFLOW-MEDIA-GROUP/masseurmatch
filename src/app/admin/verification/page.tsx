@@ -4,7 +4,7 @@ import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, RefreshCw, CheckCircle2, Clock, XCircle, UserRound } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Clock, Loader2, RefreshCw, UserRound, XCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface IdentityVerification {
@@ -14,6 +14,7 @@ interface IdentityVerification {
   user_email: string | null;
   status: string;
   stripe_session_id: string | null;
+  last_error: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -59,6 +60,16 @@ function UserIdentity({ name, email, userId }: { name: string | null; email: str
   );
 }
 
+const statusLabel = (status: string) => {
+  if (status === "requires_input") return "Action Required";
+  if (status === "processing") return "Processing";
+  if (status === "verified") return "Verified";
+  if (status === "canceled" || status === "cancelled") return "Canceled";
+  if (status === "pending") return "Pending";
+  if (status === "failed" || status === "rejected") return "Failed";
+  return status.replaceAll("_", " ");
+};
+
 export default function AdminVerificationPage() {
   const [identity, setIdentity] = useState<IdentityVerification[]>([]);
   const [text, setText] = useState<TextVerification[]>([]);
@@ -87,15 +98,16 @@ export default function AdminVerificationPage() {
 
   const statusColor = (status: string) => {
     if (status === "verified") return "default" as const;
+    if (status === "requires_input" || status === "failed" || status === "rejected") return "destructive" as const;
     if (status === "pending" || status === "processing") return "secondary" as const;
-    if (status === "failed" || status === "rejected") return "destructive" as const;
     return "outline" as const;
   };
 
   const statusIcon = (status: string) => {
     if (status === "verified") return <CheckCircle2 className="h-4 w-4" />;
+    if (status === "requires_input") return <AlertTriangle className="h-4 w-4" />;
     if (status === "pending" || status === "processing") return <Clock className="h-4 w-4" />;
-    if (status === "failed" || status === "rejected") return <XCircle className="h-4 w-4" />;
+    if (status === "failed" || status === "rejected" || status === "canceled" || status === "cancelled") return <XCircle className="h-4 w-4" />;
     return null;
   };
 
@@ -105,7 +117,7 @@ export default function AdminVerificationPage() {
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader title="Verification" description="Review identity and text verification records with user details and Stripe Identity selfie evidence." />
+      <AdminPageHeader title="Verification" description="Review identity and text verification records with clear Stripe Identity status and required user action." />
 
       <Tabs defaultValue="identity">
         <TabsList className="mb-4">
@@ -126,6 +138,7 @@ export default function AdminVerificationPage() {
                   <thead><tr className="border-b border-border bg-secondary/30">
                     <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">User</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Reason / Action</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Stripe Session</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Created</th>
                   </tr></thead>
@@ -138,16 +151,32 @@ export default function AdminVerificationPage() {
                             <UserIdentity name={v.user_name} email={v.user_email} userId={v.user_id} />
                           </div>
                         </td>
-                        <td className="px-4 py-3"><Badge variant={statusColor(v.status)} className="gap-1">{statusIcon(v.status)}{v.status}</Badge></td>
+                        <td className="px-4 py-3"><Badge variant={statusColor(v.status)} className="gap-1">{statusIcon(v.status)}{statusLabel(v.status)}</Badge></td>
+                        <td className="min-w-[260px] px-4 py-3 text-xs">
+                          {v.status === "requires_input" ? (
+                            <div className="space-y-1">
+                              <div className="font-medium text-destructive">User must retry identity verification.</div>
+                              <div className="text-muted-foreground">{v.last_error || "Stripe requires additional user input. No specific reason was stored."}</div>
+                            </div>
+                          ) : v.status === "processing" ? (
+                            <span className="text-muted-foreground">Stripe is processing the verification. No user action is currently required.</span>
+                          ) : v.status === "verified" ? (
+                            <span className="text-muted-foreground">Verification completed successfully.</span>
+                          ) : v.status === "pending" ? (
+                            <span className="text-muted-foreground">Internal pending state. Review integration if this remains unchanged.</span>
+                          ) : (
+                            <span className="text-muted-foreground">{v.last_error || "No additional details."}</span>
+                          )}
+                        </td>
                         <td className="px-4 py-3 font-mono text-xs" title={v.stripe_session_id || undefined}>{v.stripe_session_id || "—"}</td>
                         <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(v.created_at).toLocaleString()}</td>
                       </tr>
                     ))}
-                    {identity.length === 0 && <tr><td colSpan={4} className="px-4 py-10 text-center text-muted-foreground">No identity verifications yet.</td></tr>}
+                    {identity.length === 0 && <tr><td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">No identity verifications yet.</td></tr>}
                   </tbody>
                 </table>
               </div>
-              <p className="mt-3 text-xs text-muted-foreground">Stripe selfie images are requested only for authenticated admins and are served through short lived Stripe file links. Images are not copied into MasseurMatch storage.</p>
+              <p className="mt-3 text-xs text-muted-foreground">Action Required means the user must return to Stripe Identity and retry or correct the verification. It does not mean an admin approval is waiting. Stripe selfie images are requested only for authenticated admins and are served through short lived Stripe file links. Images are not copied into MasseurMatch storage.</p>
             </CardContent>
           </Card>
         </TabsContent>
@@ -173,7 +202,7 @@ export default function AdminVerificationPage() {
                       <tr key={v.id} className="bg-white transition-colors hover:bg-secondary/20">
                         <td className="px-4 py-3"><UserIdentity name={v.user_name} email={v.user_email} userId={v.user_id} /></td>
                         <td className="px-4 py-3 font-mono text-xs">{v.phone}</td>
-                        <td className="px-4 py-3"><Badge variant={statusColor(v.status)} className="gap-1">{statusIcon(v.status)}{v.status}</Badge></td>
+                        <td className="px-4 py-3"><Badge variant={statusColor(v.status)} className="gap-1">{statusIcon(v.status)}{statusLabel(v.status)}</Badge></td>
                         <td className="px-4 py-3 text-xs">{v.attempt_count}</td>
                         <td className="px-4 py-3 text-xs text-muted-foreground">{v.verified_at ? new Date(v.verified_at).toLocaleString() : "—"}</td>
                       </tr>

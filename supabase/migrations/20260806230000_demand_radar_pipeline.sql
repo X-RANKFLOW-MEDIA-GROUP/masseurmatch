@@ -36,6 +36,35 @@ CREATE TABLE IF NOT EXISTS public.demand_collection_runs (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 
+-- The table may already exist from an earlier/partial deployment. CREATE TABLE IF NOT EXISTS
+-- does not reconcile missing columns, so repair the contract explicitly before indexes are created.
+ALTER TABLE public.demand_collection_runs
+  ADD COLUMN IF NOT EXISTS run_id text,
+  ADD COLUMN IF NOT EXISTS status text,
+  ADD COLUMN IF NOT EXISTS started_at timestamptz,
+  ADD COLUMN IF NOT EXISTS completed_at timestamptz,
+  ADD COLUMN IF NOT EXISTS markets_requested int NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS markets_succeeded int NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS markets_failed int NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS rows_ingested int NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS error_summary jsonb NOT NULL DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS created_at timestamptz NOT NULL DEFAULT now(),
+  ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT now();
+
+-- Backfill only the compatibility fields needed by this migration. A legacy table can have
+-- rows without started_at; created_at is the safest available historical fallback.
+UPDATE public.demand_collection_runs
+SET started_at = COALESCE(started_at, created_at, now())
+WHERE started_at IS NULL;
+
+ALTER TABLE public.demand_collection_runs
+  ALTER COLUMN started_at SET NOT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS demand_collection_runs_run_id_uidx
+  ON public.demand_collection_runs (run_id)
+  WHERE run_id IS NOT NULL;
+
 CREATE INDEX IF NOT EXISTS demand_collection_runs_started_at_idx
   ON public.demand_collection_runs (started_at DESC);
 
