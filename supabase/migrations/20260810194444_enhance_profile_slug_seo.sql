@@ -1,0 +1,32 @@
+-- Migration: Enhance Profile Slug Generation for SEO
+-- Date: 2026-08-10
+--
+-- SUMMARY:
+-- Updates the profile slug generation logic to include specialty and city
+-- for improved SEO. This is a CODE-SIDE change with backward compatibility.
+--
+-- NEW SLUG FORMAT:
+-- {specialty}-therapist-{city}-{display_name}-{id_fragment}
+-- Example: deep-tissue-therapist-new-york-john-doe-a1b2c3d4
+--
+-- BACKWARD COMPATIBILITY:
+-- - Existing slugs in the database are NOT modified
+-- - Profiles without a slug will receive new SEO-optimized slugs
+-- - Profiles can opt-in to regenerate their slug via the API
+--
+-- IMPLEMENTATION:
+-- Changes are in:
+-- - src/app/_lib/profile-slug.ts (buildProfileSlug function)
+-- - src/app/api/pro/profile/route.ts (API call to buildProfileSlug)
+-- - Tests updated in tests/unit/profile-slug.test.ts
+--
+-- DATABASE CHANGES:
+-- None. The slug column already supports the new format.
+-- The database schema has no constraints that would prevent the new format.
+--
+-- MIGRATION NOTES:
+-- - No data migration required
+-- - No downtime
+-- - Fully backward compatible
+-- - Old URLs will continue to work
+-- - New profiles will have better SEO slugs

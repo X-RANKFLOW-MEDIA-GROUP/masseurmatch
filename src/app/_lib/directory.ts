@@ -301,6 +301,10 @@ function sortPublicTherapists(items: PublicTherapist[]) {
     const aAvail = isActivelyAvailable(a) ? 1 : 0;
     const bAvail = isActivelyAvailable(b) ? 1 : 0;
     if (bAvail !== aAvail) return bAvail - aAvail;
+    // Prioritize profiles with photos for better visual presentation on featured sections
+    const aHasPhoto = (a.profile_photo || a.avatar_url) ? 1 : 0;
+    const bHasPhoto = (b.profile_photo || b.avatar_url) ? 1 : 0;
+    if (bHasPhoto !== aHasPhoto) return bHasPhoto - aHasPhoto;
     return (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0);
   });
 }

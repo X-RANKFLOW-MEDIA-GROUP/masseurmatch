@@ -202,7 +202,7 @@ export async function POST(request: Request) {
 
     // Slug rules: a client-supplied slug wins, an existing slug is never
     // regenerated (published URLs stay stable), and a profile that still has
-    // no slug gets one derived from its display name.
+    // no slug gets one derived from its display name, city, and specialty.
     const updates = { ...parsed.updates } as Record<string, unknown>;
     const clientSlug = typeof updates.slug === "string" ? slugify(updates.slug) : "";
     if (clientSlug) {
@@ -214,7 +214,13 @@ export async function POST(request: Request) {
           (typeof updates.display_name === "string" && updates.display_name) ||
           profile.display_name ||
           profile.full_name;
-        updates.slug = buildProfileSlug(displayName, profile.id);
+        const city =
+          (typeof updates.city === "string" && updates.city) ||
+          profile.city;
+        const specialty = Array.isArray(updates.specialties)
+          ? updates.specialties[0]
+          : profile.specialties?.[0];
+        updates.slug = buildProfileSlug(displayName, profile.id, city, specialty);
       }
     }
 
