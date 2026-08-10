@@ -109,10 +109,18 @@ after the next commit fixes it. Open a pull request — a draft is enough — as
 soon as you want a preview URL or CI coverage; both are keyed to the pull
 request, not to the branch.
 
-**Open the draft pull request before the first push.** Vercel decides whether to
-build at the moment it receives the push, and it does not revisit that decision
-when a pull request opens afterwards. Push first and that commit never gets a
-preview — which means `E2E Tests` and `Accessibility (WCAG 2.1 AA)` have nothing
-to run against. The `preview-url` job fails in that case rather than skipping
-them quietly, so the pull request goes red until you push again. Opening the
-draft first costs nothing and avoids the round trip.
+**The first commit of a branch never gets a preview.** Vercel decides whether to
+build at the moment it receives a push and never revisits that decision, and a
+branch has to exist on the remote before a pull request can be opened against
+it. So the first push always arrives with no pull request to key on, is skipped,
+and stays skipped once the pull request opens. There is no way to order it
+differently — this is a property of the setup, not a mistake.
+
+The practical consequence: on that first commit `E2E Tests` and
+`Accessibility (WCAG 2.1 AA)` do not run. `preview-url` says so with a warning
+instead of failing, since nothing is wrong. **Push a second commit before
+merging anything whose UI matters** — it builds a preview and both suites run
+against it.
+
+If a preview is missing for a commit pushed *after* the pull request was opened,
+that is a genuine fault and `preview-url` fails: Vercel should have built one.
