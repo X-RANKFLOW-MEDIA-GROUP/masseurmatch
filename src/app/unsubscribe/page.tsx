@@ -1,8 +1,6 @@
 'use client';
 
 import { Suspense } from 'react';
-import { ArrowRight } from 'lucide-react';
-import Link from 'next/link';
 import UnsubscribeClient from './unsubscribe-client';
 
 export default function UnsubscribePage() {
