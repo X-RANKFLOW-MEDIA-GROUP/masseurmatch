@@ -71,7 +71,7 @@ export async function POST(request: Request) {
         { label: "Document", value: documentType.replaceAll("_", " ") },
         { label: "Verification ID", value: verificationId },
       ],
-      action: { label: "Review verification", url: `${appUrl}/admin/verification` },
+      action: { label: "Review verification", url: `${appUrl}/admin/verification/manual` },
       replyTo: profile?.email_address || profile?.email || session.email || null,
     });
 
