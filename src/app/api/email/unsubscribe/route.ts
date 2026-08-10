@@ -24,8 +24,8 @@ export async function POST(request: NextRequest) {
     try {
       const verified = await jwtVerify(token, JWT_SECRET);
       const payload = verified.payload as Record<string, unknown>;
-      userId = payload.sub || payload.user_id;
-      email = payload.email || '';
+      userId = (payload.sub || payload.user_id) as string;
+      email = (payload.email as string) || '';
 
       if (!userId || typeof userId !== 'string') {
         return NextResponse.json(
@@ -44,11 +44,11 @@ export async function POST(request: NextRequest) {
     const adminClient = createSupabaseWebhookAdminClient();
 
     try {
-      const { data: existing, error: fetchError } = await adminClient
-        .from('marketing_preferences')
+      const { data: existing, error: fetchError } = await (adminClient
+        .from('marketing_preferences' as any)
         .select('*')
         .eq('user_id', userId)
-        .maybeSingle();
+        .maybeSingle() as any);
 
       if (fetchError) {
         console.error('[Unsubscribe] Database fetch error:', fetchError);
@@ -60,15 +60,15 @@ export async function POST(request: NextRequest) {
 
       if (existing) {
         // Update existing preferences
-        const { error: updateError } = await adminClient
-          .from('marketing_preferences')
+        const { error: updateError } = await (adminClient
+          .from('marketing_preferences' as any)
           .update({
             marketing_opt_in: false,
             newsletter_opt_in: false,
             updated_at: new Date().toISOString(),
             updated_by: 'unsubscribe-link',
           })
-          .eq('user_id', userId);
+          .eq('user_id', userId) as any);
 
         if (updateError) {
           console.error('[Unsubscribe] Database update error:', updateError);
@@ -79,14 +79,14 @@ export async function POST(request: NextRequest) {
         }
       } else {
         // Create new preferences record
-        const { error: insertError } = await adminClient
-          .from('marketing_preferences')
+        const { error: insertError } = await (adminClient
+          .from('marketing_preferences' as any)
           .insert({
             user_id: userId,
             marketing_opt_in: false,
             newsletter_opt_in: false,
             updated_by: 'unsubscribe-link',
-          });
+          }) as any);
 
         if (insertError) {
           console.error('[Unsubscribe] Database insert error:', insertError);
