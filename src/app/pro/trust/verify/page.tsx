@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, CheckCircle2, Loader2, ShieldCheck, Upload } from "lucide-react";
 
@@ -14,6 +14,14 @@ const DOCUMENT_TYPES = [
 type UploadKind = "id_front" | "id_back" | "selfie";
 
 export default function ManualIdentityVerificationPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-[420px] items-center justify-center"><Loader2 className="h-7 w-7 animate-spin text-slate-400" /></div>}>
+      <ManualIdentityVerificationContent />
+    </Suspense>
+  );
+}
+
+function ManualIdentityVerificationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const verificationId = searchParams.get("verificationId") ?? "";
