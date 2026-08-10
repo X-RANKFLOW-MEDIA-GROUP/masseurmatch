@@ -7,12 +7,14 @@ import {
   ensureUserProfileAndRole,
   recordAuditLog,
 } from "@/app/api/_lib/supabase-server";
+import { buildCityRevalidatePaths, buildTherapistRevalidatePaths, normalizeRevalidatePaths, triggerRevalidate } from "@/app/_lib/revalidate";
+import { slugify } from "@/app/_lib/utils";
 import type { Database } from "@/integrations/supabase/types";
 
 type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 
 const GROWTH_SELECT =
-  "id, subscription_tier, available_now, available_now_expires, travel_schedule, promotions, current_status, is_active";
+  "id, slug, city, subscription_tier, available_now, available_now_expires, travel_schedule, promotions, current_status, is_active";
 
 const travelEntrySchema = z.object({
   city: z.string().min(1).max(120),
@@ -31,11 +33,6 @@ const growthSchema = z.object({
   promotions: z.array(promotionSchema).max(10).optional(),
 });
 
-// Load the caller's profile row, creating it when missing. Accounts whose
-// signup slipped past the profile-creation trigger (35 of the first 47 users)
-// have a session but no profiles row, which turned every /pro surface that
-// hits this route into a 404. Self-healing here repairs those accounts the
-// moment they open their dashboard.
 async function loadOrCreateGrowthProfile(
   admin: ReturnType<typeof createSupabaseAdminClient>,
   session: RequestSession,
@@ -49,17 +46,12 @@ async function loadOrCreateGrowthProfile(
   if (error) throw new RouteError(500, error.message);
   if (data) return data;
 
-  // Only sessions that already carry provider/admin standing may trigger the
-  // repair — otherwise an authenticated client-role user could turn this
-  // endpoint into a provider-role grant.
   if (session.role !== "provider" && session.role !== "admin") {
     throw new RouteError(404, "Profile not found.");
   }
 
   const { data: authUser, error: userError } = await admin.auth.admin.getUserById(session.userId);
-  if (userError || !authUser?.user) {
-    throw new RouteError(404, "Profile not found.");
-  }
+  if (userError || !authUser?.user) throw new RouteError(404, "Profile not found.");
 
   await ensureUserProfileAndRole(authUser.user, { defaultRole: "provider" });
 
@@ -79,7 +71,6 @@ export async function GET(request: Request) {
     const session = await requireRequestSession(request);
     const admin = createSupabaseAdminClient();
     const data = await loadOrCreateGrowthProfile(admin, session);
-
     return json({ ok: true, profile: data });
   } catch (error) {
     return errorResponse(error);
@@ -89,11 +80,9 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     assertRateLimit(request, "pro-growth", { limit: 30, windowMs: 60_000 });
-
     const session = await requireRequestSession(request);
     const body = await parseJsonBody(request, growthSchema);
     const admin = createSupabaseAdminClient();
-
     const profile = await loadOrCreateGrowthProfile(admin, session);
 
     const updates: ProfileUpdate = { updated_at: new Date().toISOString() };
@@ -112,6 +101,20 @@ export async function POST(request: Request) {
     await recordAuditLog(session.userId, "provider.growth.update", "profile", profile.id, {
       fields: Object.keys(body),
     });
+
+    if (next) {
+      try {
+        const therapistPaths = await buildTherapistRevalidatePaths({ id: next.id, slug: next.slug, city: next.city });
+        const travelPaths = body.travel_schedule
+          ? await Promise.all(
+              body.travel_schedule.map((trip) => buildCityRevalidatePaths(slugify(trip.city))),
+            )
+          : [];
+        await triggerRevalidate(normalizeRevalidatePaths([...therapistPaths, ...travelPaths.flat()]), { request });
+      } catch (revalidationError) {
+        console.error("[api/pro/growth] Revalidation failed:", revalidationError);
+      }
+    }
 
     return json({ ok: true, profile: next });
   } catch (error) {

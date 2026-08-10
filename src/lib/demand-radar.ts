@@ -8,6 +8,7 @@ export interface DemandScoreRecord {
   neighborhood: string | null;
   score: number;
   trend: DemandTrend;
+  spike_score: number | null;
   search_volume_index: number;
   competition_index: number;
   confidence: number | null;
@@ -17,14 +18,10 @@ export interface DemandScoreRecord {
   expires_at: string | null;
 }
 
-export function getDemandFreshness(
-  collectedAt: string | null | undefined,
-  now = new Date(),
-): DataFreshness {
+export function getDemandFreshness(collectedAt: string | null | undefined, now = new Date()): DataFreshness {
   if (!collectedAt) return "unknown";
   const collected = new Date(collectedAt);
   if (Number.isNaN(collected.getTime())) return "unknown";
-
   const ageHours = Math.max(0, (now.getTime() - collected.getTime()) / 3_600_000);
   if (ageHours <= 48) return "fresh";
   if (ageHours <= 168) return "delayed";
@@ -36,6 +33,14 @@ export function getDemandLabel(score: number): string {
   if (score >= 70) return "High";
   if (score >= 50) return "Moderate";
   return "Low";
+}
+
+export function getSpikeLabel(score: number | null | undefined): string {
+  if (score == null) return "No signal";
+  if (score >= 80) return "Spiking";
+  if (score >= 60) return "Accelerating";
+  if (score >= 40) return "Active";
+  return "Normal";
 }
 
 export function getOpportunityScore(record: Pick<DemandScoreRecord, "score" | "competition_index" | "confidence">): number {

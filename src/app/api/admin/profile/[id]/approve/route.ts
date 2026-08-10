@@ -4,6 +4,7 @@ import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/h
 import { createSupabaseAdminClient, recordAuditLog, requireAdminSession } from "@/app/api/_lib/supabase-server";
 import { sendEmail } from "@/app/api/_lib/email";
 import { revalidatePublicDirectory } from "@/app/_lib/directory-cache";
+import { buildProfileSlug } from "@/app/_lib/profile-slug";
 import ProfileApprovedEmail from "@/emails/ProfileApprovedEmail";
 import React from "react";
 
@@ -29,9 +30,14 @@ export async function POST(
     if (fetchError) throw new RouteError(500, fetchError.message);
     if (!profile) throw new RouteError(404, "Profile not found.");
 
+    // Public profile pages are slug-addressed. Older/imported profiles can reach
+    // admin review without a slug, so approval must repair that invariant.
+    const publicSlug = profile.slug || buildProfileSlug(profile.display_name || profile.full_name, profile.id);
+
     const { error: updateError } = await adminClient
       .from("profiles")
       .update({
+        slug: publicSlug,
         status: "approved",
         profile_status: "approved",
         visibility_status: "public",
@@ -66,6 +72,7 @@ export async function POST(
 
     await recordAuditLog(admin.userId, "approve_profile", "profile", profileId, {
       reason: body.reason,
+      slug: publicSlug,
     });
 
     if (profile.email_address) {
@@ -73,12 +80,12 @@ export async function POST(
         to: profile.email_address,
         subject: "Your MasseurMatch Profile is Approved!",
         react: React.createElement(ProfileApprovedEmail, {
-          profileUrl: `https://masseurmatch.com/therapists/${profile.slug || profile.id}`,
+          profileUrl: `https://masseurmatch.com/therapists/${publicSlug}`,
         }),
       });
     }
 
-    return json({ ok: true, profileId, status: "approved" });
+    return json({ ok: true, profileId, slug: publicSlug, status: "approved" });
   } catch (error) {
     return errorResponse(error);
   }
