@@ -10,7 +10,7 @@ export async function GET(request: Request) {
     const [identityResult, textResult] = await Promise.all([
       adminClient
         .from("identity_verifications")
-        .select("id, status, stripe_session_id, created_at, updated_at")
+        .select("id, status, stripe_session_id, last_error, created_at, updated_at")
         .eq("user_id", session.userId)
         .order("created_at", { ascending: false, nullsFirst: false })
         .order("updated_at", { ascending: false, nullsFirst: false })
@@ -36,11 +36,19 @@ export async function GET(request: Request) {
             id: identityRow.id,
             status: identityStatus,
             stripeSessionId: identityRow.stripe_session_id,
+            lastError: identityRow.last_error,
             createdAt: identityRow.created_at,
             updatedAt: identityRow.updated_at,
             verifiedAt: identityStatus === "verified" ? identityRow.updated_at : null,
           }
-        : { status: "not_started", verifiedAt: null },
+        : {
+            status: "not_started",
+            stripeSessionId: null,
+            lastError: null,
+            createdAt: null,
+            updatedAt: null,
+            verifiedAt: null,
+          },
       text: textRow
         ? {
             id: textRow.id,
