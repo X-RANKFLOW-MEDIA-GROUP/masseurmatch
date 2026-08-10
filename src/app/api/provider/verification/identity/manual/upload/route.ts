@@ -1,5 +1,6 @@
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, requireSession } from "@/app/api/_lib/supabase-server";
+import type { Json } from "@/integrations/supabase/types";
 
 const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "application/pdf"]);
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
@@ -64,7 +65,7 @@ export async function POST(request: Request) {
 
     const { error: updateError } = await admin
       .from("identity_verifications")
-      .update({ metadata, updated_at: new Date().toISOString() })
+      .update({ metadata: metadata as Json, updated_at: new Date().toISOString() })
       .eq("id", verificationId)
       .eq("user_id", session.userId);
 
