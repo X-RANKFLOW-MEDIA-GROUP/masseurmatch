@@ -108,3 +108,11 @@ that fails to compile leaves a permanent red row in the Deployments list even
 after the next commit fixes it. Open a pull request — a draft is enough — as
 soon as you want a preview URL or CI coverage; both are keyed to the pull
 request, not to the branch.
+
+**Open the draft pull request before the first push.** Vercel decides whether to
+build at the moment it receives the push, and it does not revisit that decision
+when a pull request opens afterwards. Push first and that commit never gets a
+preview — which means `E2E Tests` and `Accessibility (WCAG 2.1 AA)` have nothing
+to run against. The `preview-url` job fails in that case rather than skipping
+them quietly, so the pull request goes red until you push again. Opening the
+draft first costs nothing and avoids the round trip.
