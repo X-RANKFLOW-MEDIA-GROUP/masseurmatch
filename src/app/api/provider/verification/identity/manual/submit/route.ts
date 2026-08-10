@@ -1,6 +1,7 @@
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 import { notifyAdmin } from "@/app/api/_lib/admin-notify";
 import { createSupabaseAdminClient, requireSession } from "@/app/api/_lib/supabase-server";
+import type { Json } from "@/integrations/supabase/types";
 
 export async function POST(request: Request) {
   try {
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
 
     const { error: updateError } = await admin
       .from("identity_verifications")
-      .update({ provider: "manual", status: "pending", last_error: null, metadata, updated_at: submittedAt })
+      .update({ provider: "manual", status: "pending", last_error: null, metadata: metadata as Json, updated_at: submittedAt })
       .eq("id", verificationId)
       .eq("user_id", session.userId);
 
