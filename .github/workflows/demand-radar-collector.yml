@@ -48,7 +48,7 @@ jobs:
           cache-dependency-path: scripts/requirements-demand-radar.txt
 
       - name: Install collector dependencies
-        run: pip install --require-hashes=false -r scripts/requirements-demand-radar.txt
+        run: pip install -r scripts/requirements-demand-radar.txt
 
       - name: Validate required secrets
         if: ${{ github.event_name == 'schedule' || github.event_name == 'push' || inputs.dry_run != true }}
