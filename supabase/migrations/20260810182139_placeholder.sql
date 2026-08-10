@@ -1,3 +1,0 @@
--- Placeholder for deleted migration
--- This file exists to satisfy Supabase's migration sync requirements
--- The actual migration was removed via 20260810194501_remove_reverted_migrations.sql

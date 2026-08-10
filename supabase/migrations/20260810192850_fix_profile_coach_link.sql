@@ -1,4 +1,2 @@
--- Migration history reconciliation.
--- Applied directly to the linked Supabase project on 2026-08-10 and already
--- recorded remotely as fix_profile_coach_link.
--- No-op locally to restore the missing migration version without replaying production DDL.
+-- Placeholder for removed migration
+-- This migration was removed from the migration history via 20260810194501_remove_reverted_migrations.sql
