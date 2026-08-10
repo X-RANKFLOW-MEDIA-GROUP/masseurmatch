@@ -25,7 +25,7 @@ const COOKIE_TYPES = [
     required: true,
     description:
       "Required for the platform to function. These cookies manage your session, authenticate your account, and prevent cross-site request forgery. You cannot opt out of essential cookies.",
-    examples: ["mm_session (authentication)", "csrf_token (security)"],
+    examples: ["sb-<project>-auth-token (authentication)", "csrf_token (security)"],
   },
   {
     id: "preference",

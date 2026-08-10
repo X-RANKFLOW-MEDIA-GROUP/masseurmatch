@@ -141,9 +141,10 @@ test.describe.serial("Auth Security", () => {
 
       await page.waitForURL(/\/(pro|onboard|dashboard)/, { timeout: 15000 });
 
-      // Check session cookie exists
+      // Check session cookie exists. Authentication is Supabase SSR, so the
+      // session lives in sb-<project>-auth-token cookies, not mm_session.
       const cookies = await context.cookies();
-      const sessionCookie = cookies.find((c) => c.name === "mm_session");
+      const sessionCookie = cookies.find((c) => c.name.startsWith("sb-"));
 
       expect(sessionCookie).toBeDefined();
       expect(sessionCookie?.httpOnly).toBe(true);
@@ -343,10 +344,12 @@ test.describe.serial("Auth Security", () => {
       // Should redirect to login
       await expect(page).toHaveURL(/\/(login|register)/);
 
-      // Session cookie should be cleared
+      // Session cookie should be cleared. Logout expires the Supabase SSR
+      // cookies, so the browser either drops them outright or keeps an empty
+      // value — both count as cleared.
       const cookies = await context.cookies();
-      const sessionCookie = cookies.find((c) => c.name === "mm_session");
-      expect(sessionCookie?.value).toBe("");
+      const sessionCookie = cookies.find((c) => c.name.startsWith("sb-"));
+      expect(sessionCookie?.value ?? "").toBe("");
 
       await deleteUserByEmail(testUser);
     });

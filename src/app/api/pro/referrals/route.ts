@@ -28,21 +28,62 @@ function parseDashboard(value: Json | null): ReferralDashboardPayload {
   return { summary, referrals };
 }
 
+function emptySummary() {
+  return {
+    code: "",
+    referralCount: 0,
+    premiumMonthsEarned: 0,
+    pendingReferrals: 0,
+    paidReferrals: 0,
+    maxPremiumMonths: 6,
+    remainingPremiumMonths: 6,
+    bonusExpiresAt: null,
+    bonusTier: null,
+    referralLink: null,
+  };
+}
+
 export async function GET(request: Request) {
   try {
     const session = await requireRequestSession(request);
     const supabase = createReferralSupabaseAdminClient();
 
+    // Expiration is maintenance work, not a prerequisite for rendering the
+    // referral dashboard. A stale/missing expiration RPC must not take the
+    // entire page down.
     const { error: expireError } = await supabase.rpc("expire_referral_bonus_for_user", {
       p_user_id: session.userId,
     });
-    if (expireError) throw new Error(expireError.message);
+    if (expireError) {
+      console.error("[api/pro/referrals] unable to expire referral bonus", {
+        userId: session.userId,
+        code: expireError.code,
+        message: expireError.message,
+      });
+    }
 
     const { data: dashboardData, error: dashboardError } = await supabase.rpc(
       "get_referral_dashboard",
       { p_user_id: session.userId },
     );
-    if (dashboardError) throw new Error(dashboardError.message);
+
+    if (dashboardError) {
+      console.error("[api/pro/referrals] unable to load referral dashboard", {
+        userId: session.userId,
+        code: dashboardError.code,
+        message: dashboardError.message,
+      });
+
+      // Keep the authenticated page usable while a referral migration/RPC is
+      // being rolled out or repaired. The client receives a stable response
+      // shape instead of a 500 that cascades into the page error state.
+      return json({
+        ok: true,
+        summary: emptySummary(),
+        referrals: [],
+        unavailable: true,
+      });
+    }
 
     const dashboard = parseDashboard(dashboardData);
     const summary = dashboard.summary ?? {};
@@ -52,10 +93,12 @@ export async function GET(request: Request) {
     return json({
       ok: true,
       summary: {
+        ...emptySummary(),
         ...summary,
         referralLink: code ? `${appUrl}/signup?ref=${encodeURIComponent(code)}` : null,
       },
       referrals: dashboard.referrals ?? [],
+      unavailable: false,
     });
   } catch (error) {
     return errorResponse(error);

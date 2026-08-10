@@ -14,7 +14,6 @@ import {
   createPageMetadata,
 } from "@/app/_lib/seo";
 import type { DirectorySession } from "@/components/sections/AdvancedDirectoryFilter";
-import { TextReveal } from "@/components/animations/TextReveal";
 import SearchPageClient from "./SearchPageClient";
 
 type SearchPageProps = {
@@ -33,7 +32,7 @@ const SEARCH_FAQS = [
   {
     question: "How do I find a therapist near me?",
     answer:
-      "Use the city filter to narrow results to your area. Then compare specialties, verification badges, and pricing before contacting a therapist directly.",
+      "Use your location or the city filter to narrow results to your area. Then compare specialties, profile details, availability, and pricing before contacting a therapist directly.",
   },
   {
     question: "Does MasseurMatch handle booking or payments?",
@@ -43,18 +42,15 @@ const SEARCH_FAQS = [
   {
     question: "What does the verified badge mean?",
     answer:
-      "Verified therapists have completed one or more identity and profile checks. This signals a higher level of trust within the directory.",
+      "A verification badge reflects the checks described on MasseurMatch's verification page. Review each profile and contact the independent provider directly for any details important to you.",
   },
   {
     question: "Can I filter by specialty or session type?",
     answer:
-      "Yes. Use the modality and session filters to narrow results by deep tissue, Swedish, outcall, incall, and more.",
+      "Yes. Use the modality and session filters to narrow results by massage technique, outcall, incall, and other profile details.",
   },
 ];
 
-// Every param that changes the rendered result set must force noindex —
-// the canonical is always bare /search, so an indexable filtered variant
-// would be a canonical/content mismatch.
 const SEARCH_FILTER_PARAMS = [
   "city",
   "modality",
@@ -74,10 +70,10 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
   const hasFilters = SEARCH_FILTER_PARAMS.some((param) => Boolean(getFirstParam(params[param])));
 
   return createPageMetadata({
-    title: city ? `${city} massage therapists — directory search` : "Search verified massage therapists",
+    title: city ? `${city} massage therapists — directory search` : "Search massage therapists",
     description: city
-      ? `Search verified massage therapists in ${city}. Compare specialties, availability, and pricing — then contact directly.`
-      : "Search the MasseurMatch directory by city, specialty, session format, and tier. Find verified massage therapists and contact them directly.",
+      ? `Search massage therapists in ${city}. Compare specialties, availability, profile details, and pricing, then contact providers directly.`
+      : "Search the MasseurMatch directory by city, specialty, session format, and tier. Compare public massage therapist profiles and contact providers directly.",
     path: "/search",
     noIndex: hasFilters,
   });
@@ -109,7 +105,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     tier: tier || undefined,
     lgbtqAffirming: lgbtqAffirming || undefined,
     page: 1,
-    pageSize: 12,
+    pageSize: 500,
   });
   const quickCities = cities.slice(0, 12);
 
@@ -123,7 +119,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       />
       <JsonLd
         data={buildCollectionPageJsonLd({
-          name: "Search verified massage therapists",
+          name: "Search massage therapists",
           description:
             "Search massage therapist listings by city, specialty, session format, and listing tier through the public MasseurMatch directory.",
           path: "/search",
@@ -141,29 +137,20 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       />
       <JsonLd data={buildFaqJsonLd(SEARCH_FAQS)} />
 
-      <div className="page-shell py-10">
-        <div className="rounded-[2.2rem] border border-slate-800 bg-slate-950 px-6 py-8 shadow-[var(--shadow-xl)] sm:px-8 sm:py-10">
-          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.32em] text-slate-400">Explore and search</p>
-          <h1 className="mt-4 max-w-4xl font-display text-5xl font-medium tracking-tight text-white sm:text-6xl lg:text-7xl">
-            <TextReveal text="Find trusted therapists fast." delay={0.05} />
-          </h1>
-          <p className="mt-5 max-w-2xl font-sans text-lg font-light leading-relaxed text-slate-300">
-            Search is built for confidence-first discovery: visible verification, cleaner local intent pages, and direct
-            contact options that move users from browsing to calling or messaging in seconds.
+      <div className="page-shell py-6 sm:py-8">
+        <header className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="font-mono text-[11px] font-medium uppercase tracking-[0.24em] text-brand-secondary">
+              Find a therapist
+            </p>
+            <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+              {city ? `Massage therapists in ${city}` : "Browse massage therapists"}
+            </h1>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-muted-foreground">
+            Profiles first. Filter by location, specialty, availability, service format, and price without digging through extra content.
           </p>
-        </div>
-
-        <div className="mt-6 flex flex-wrap gap-2">
-          {quickCities.map((entry) => (
-            <Link
-              key={entry.slug}
-              href={`/${entry.slug}`}
-              className="rounded-full border border-slate-200 bg-white px-3 py-2 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
-            >
-              {entry.name}
-            </Link>
-          ))}
-        </div>
+        </header>
 
         <SearchPageClient
           cities={cities}
@@ -183,18 +170,29 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           }}
         />
 
+        <div className="mt-8 flex flex-wrap gap-2" aria-label="Popular cities">
+          {quickCities.map((entry) => (
+            <Link
+              key={entry.slug}
+              href={`/${entry.slug}`}
+              className="rounded-full border border-slate-200 bg-white px-3 py-2 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+            >
+              {entry.name}
+            </Link>
+          ))}
+        </div>
+
         <section className="mt-12 grid gap-6 rounded-3xl border border-border bg-background p-6 shadow-sm lg:grid-cols-2">
           <div>
-            <h2 className="text-2xl font-semibold text-foreground">Built to support safer discovery at scale</h2>
+            <h2 className="text-2xl font-semibold text-foreground">Helpful details without blocking discovery</h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              Search points visitors into city pages, therapist detail pages, specialty landing pages, and trust content
-              so the site has meaningful internal links instead of one thin results screen.
+              MasseurMatch connects visitors with public provider profiles, city pages, specialty pages, and trust information while keeping the directory itself immediately usable.
             </p>
             <div className="mt-5 flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/how-it-works" className="text-primary hover:underline">
                 How it works
               </Link>
-              <Link href="/safety" className="text-primary hover:underline">
+              <Link href="/trust" className="text-primary hover:underline">
                 Trust and safety
               </Link>
             </div>
