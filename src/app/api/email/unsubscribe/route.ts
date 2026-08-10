@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 import { createSupabaseWebhookAdminClient } from '@/app/api/_lib/supabase-server';
-import { RouteError } from '@/app/api/_lib/http';
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.UNSUBSCRIBE_JWT_SECRET || process.env.JWT_SECRET || 'unsubscribe-secret-key'
