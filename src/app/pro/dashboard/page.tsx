@@ -1,554 +1,196 @@
 "use client";
 
-import { useEffect, useState, useMemo, useCallback, memo } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import {
-  AlertCircle,
-  ArrowRight,
-  Sparkles,
-  Car,
-  Check,
-  CheckCircle2,
-  Clock,
-  Eye,
-  EyeOff,
-  Gauge,
-  Plane,
-  Settings,
-  ShieldCheck,
-  UserCircle,
-  X,
-  Zap,
-} from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { normalizePlanKey } from "@/hooks/usePlanLimits";
-import { requestJson, ApiError } from "@/app/_lib/request";
-import { NotificationsWidget } from "@/components/dashboard/NotificationsWidget";
+import { useEffect, useMemo, useState } from "react";
+import { Car, Eye, EyeOff, Loader2, Plane, Settings, Zap } from "lucide-react";
 
-const statusOptions = [
-  { key: "available", label: "Available Now", icon: Zap, color: "emerald" },
-  { key: "mobile", label: "Mobile", icon: Car, color: "indigo" },
-  { key: "traveling", label: "Traveling", icon: Plane, color: "amber" },
-  { key: "hidden", label: "Hidden", icon: EyeOff, color: "rose" },
-] as const;
+import { postJson, requestJson } from "@/app/_lib/request";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
-type AvailabilityStatus = (typeof statusOptions)[number]["key"];
-
-const statusMessages: Record<AvailabilityStatus, string> = {
-  available: "Your profile is visible at the top of local search results with the 'Available Now' badge.",
-  mobile: "In-call / out-call mode is active. Edit your service radius on your profile.",
-  traveling: "Set your destination city and travel dates to attract advance inquiries.",
-  hidden: "Invisible mode — your profile has been temporarily removed from search results.",
+type TravelEntry = { city?: string; state?: string; start_date?: string; end_date?: string };
+type DashboardProfile = {
+  id?: string;
+  display_name?: string | null;
+  full_name?: string | null;
+  city?: string | null;
+  subscription_tier?: string | null;
+  available_now?: boolean | null;
+  available_now_expires?: string | null;
+  travel_schedule?: unknown;
+  current_status?: string | null;
+  is_active?: boolean | null;
 };
 
-// Sober, light-surface status palette: success green = available, brand red =
-// mobile, ink = traveling, muted = hidden. No indigo/amber/rose.
-const IDLE_STYLE = "bg-white border-[#E8E8E8] text-[#6F6F6F] hover:bg-[#F7F7F7]";
-const colorMap: Record<string, { active: string; idle: string }> = {
-  emerald: { active: "bg-[#EFF6F1] border-[#1E7A46]/40 text-[#1E7A46]", idle: IDLE_STYLE },
-  indigo: { active: "bg-brand-secondary/[0.08] border-brand-secondary/40 text-brand-secondary", idle: IDLE_STYLE },
-  amber: { active: "bg-[#F5F5F5] border-[#111111]/25 text-[#111111]", idle: IDLE_STYLE },
-  rose: { active: "bg-[#F7F7F7] border-[#D9D9D9] text-[#8E8E8E]", idle: IDLE_STYLE },
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 },
-};
-
-type ProfileData = {
-  id: string;
-  status: string;
-  is_active: boolean | null;
-  available_now: boolean | null;
-  available_now_expires: string | null;
-  display_name: string | null;
-  full_name: string;
-  bio: string | null;
-  city: string | null;
-  state: string | null;
-  specialties: string[] | null;
-  incall_price: number | null;
-  outcall_price: number | null;
-  subscription_tier: string | null;
-  is_featured: boolean | null;
-};
-
-function computeCompletion(profile: ProfileData | null): number {
-  if (!profile) return 0;
-  const checks = [
-    Boolean(profile.display_name || profile.full_name),
-    Boolean(profile.bio),
-    Boolean(profile.city),
-    Boolean(profile.specialties?.length),
-    Boolean(profile.incall_price || profile.outcall_price),
-  ];
-  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+function normalizeTravel(value: unknown): TravelEntry[] {
+  return Array.isArray(value) ? (value.filter((item) => item && typeof item === "object") as TravelEntry[]) : [];
 }
 
-const TIER_PLACEMENT_BASE: Record<string, number> = {
-  free: 25,
-  standard: 45,
-  pro: 60,
-  elite: 70,
-};
-
-function isAvailableNowLive(profile: ProfileData | null): boolean {
-  if (!profile?.available_now) return false;
-  if (!profile.available_now_expires) return true;
-  return new Date(profile.available_now_expires).getTime() > Date.now();
+function isTravelCurrentOrUpcoming(trips: TravelEntry[]) {
+  const now = new Date();
+  const today = now.toISOString().slice(0, 10);
+  return trips.some((trip) => Boolean(trip.city && trip.end_date && trip.end_date >= today));
 }
 
-type PlacementScore = {
-  score: number;
-  grade: string;
-  factors: { label: string; met: boolean; points: number }[];
-};
-
-function computePlacement(profile: ProfileData | null, completion: number): PlacementScore {
-  const tier = (profile?.subscription_tier || "free").toLowerCase();
-  const base = TIER_PLACEMENT_BASE[tier] ?? TIER_PLACEMENT_BASE.free;
-
-  const factors = [
-    { label: `Plan tier (${tier})`, met: true, points: base },
-    { label: "Profile completeness", met: completion >= 80, points: Math.round((completion / 100) * 15) },
-    { label: "Featured placement", met: Boolean(profile?.is_featured), points: profile?.is_featured ? 10 : 0 },
-    { label: "Available Now active", met: isAvailableNowLive(profile), points: isAvailableNowLive(profile) ? 5 : 0 },
-  ];
-
-  const score = Math.min(100, factors.reduce((sum, f) => sum + f.points, 0));
-  const grade =
-    score >= 90 ? "A+" : score >= 80 ? "A" : score >= 70 ? "B+" : score >= 60 ? "B" : score >= 45 ? "C" : "D";
-
-  return { score, grade, factors };
-}
-
-// Memoized profile completion card
-const ProfileCard = memo(function ProfileCard({
-  displayName,
-  tierLabel,
-  completion,
-  profileLoading
+function StatusCard({
+  title,
+  description,
+  icon: Icon,
+  active,
+  children,
 }: {
-  displayName: string;
-  tierLabel: string;
-  completion: number;
-  profileLoading: boolean
+  title: string;
+  description: string;
+  icon: typeof Zap;
+  active?: boolean;
+  children: React.ReactNode;
 }) {
   return (
-    <motion.div
-      variants={fadeUp}
-      initial="hidden"
-      animate="show"
-      className="relative overflow-hidden border border-slate-200/60 bg-white p-6 shadow-sm"
-    >
-      <div className="flex items-center gap-4">
-        <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-tr from-brand-secondary to-[#6E1521]">
-          <UserCircle className="relative h-10 w-10 text-white" />
-        </div>
-        <div>
-          <h2 className="font-display text-xl font-medium text-slate-900">
-            {displayName}
-          </h2>
-          <div className="mt-0.5 flex items-center gap-1">
-            <ShieldCheck className="h-3.5 w-3.5 text-[#1E7A46]" />
-            <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">
-              {tierLabel}
-            </span>
+    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+            <Icon className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="font-display text-base font-semibold text-slate-900">{title}</h2>
+            <p className="mt-1 text-xs leading-5 text-slate-500">{description}</p>
           </div>
         </div>
-      </div>
-
-      <div className="mt-6">
-        <div className="mb-2 flex justify-between text-xs">
-          <span className="font-mono uppercase tracking-wider text-slate-500">
-            Profile Completion
+        {typeof active === "boolean" ? (
+          <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${active ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
+            {active ? "ON" : "OFF"}
           </span>
-          <span className="font-mono font-semibold text-slate-900">
-            {profileLoading ? "…" : `${completion}%`}
-          </span>
-        </div>
-        <div className="h-1.5 w-full overflow-hidden bg-slate-100">
-          {!profileLoading && (
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${completion}%` }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="h-full bg-slate-900"
-            />
-          )}
-        </div>
-        {!profileLoading && completion < 100 && (
-          <p className="mt-2 text-[11px] text-slate-500">
-            <Link href="/pro/listing" className="text-brand-secondary underline">
-              Complete your profile
-            </Link>{" "}
-            to appear in more searches.
-          </p>
-        )}
+        ) : null}
       </div>
-    </motion.div>
+      <div className="mt-5">{children}</div>
+    </section>
   );
-});
+}
 
-// Memoized availability status card
-const AvailabilityCard = memo(function AvailabilityCard({
-  activeStatus,
-  statusSaving,
-  onStatusChange
-}: {
-  activeStatus: AvailabilityStatus;
-  statusSaving: boolean;
-  onStatusChange: (status: AvailabilityStatus) => void;
-}) {
-  return (
-    <motion.div
-      variants={fadeUp}
-      initial="hidden"
-      animate="show"
-      transition={{ delay: 0.1 }}
-      className="border border-slate-200/60 bg-white p-6 text-slate-900 shadow-sm"
-    >
-      <h3 className="mb-4 font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">
-        Availability
-      </h3>
+export default function ProDashboardPage() {
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<DashboardProfile | null>(null);
+  const [saving, setSaving] = useState<string | null>(null);
 
-      <div className="grid grid-cols-2 gap-3">
-        {statusOptions.map((option) => {
-          const isActive = activeStatus === option.key;
-          const colors = colorMap[option.color];
-
-          return (
-            <button
-              key={option.key}
-              type="button"
-              aria-pressed={isActive}
-              onClick={() => onStatusChange(option.key)}
-              disabled={statusSaving}
-              className={`flex flex-col items-center justify-center gap-2 border p-4 transition-all duration-300 disabled:opacity-60 ${
-                isActive ? colors.active : colors.idle
-              }`}
-            >
-              <option.icon className="h-6 w-6" />
-              <span className="font-sans text-xs font-medium">{option.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="mt-4 border border-[#E8E8E8] bg-[#F7F7F7] p-3 font-sans text-xs leading-relaxed text-[#6F6F6F]">
-        {statusMessages[activeStatus]}
-      </div>
-    </motion.div>
-  );
-});
-
-const ProfileStatusBanner = memo(function ProfileStatusBanner({ status }: { status: string }) {
-  if (status === "active") {
-    return (
-      <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
-        <CheckCircle2 className="h-4 w-4 shrink-0 text-green-600" />
-        Your profile is <strong>live</strong> and visible to clients.
-      </div>
-    );
+  async function refresh() {
+    const growth = await requestJson<{ ok: boolean; profile: DashboardProfile }>("/api/pro/growth");
+    setProfile(growth.profile);
   }
-  if (status === "pending_approval") {
-    return (
-      <div className="flex items-center gap-2 rounded-lg border border-[#E8E8E8] bg-[#F7F7F7] px-4 py-3 text-sm text-[#6F6F6F]">
-        <Clock className="h-4 w-4 shrink-0 text-brand-secondary" />
-        Your profile is <strong>pending review</strong>. We'll notify you once it's approved.
-      </div>
-    );
-  }
-  if (status === "rejected") {
-    return (
-      <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-        <AlertCircle className="h-4 w-4 shrink-0 text-red-600" />
-        Your profile was <strong>not approved</strong>.{" "}
-        <Link href="/signup/resubmit" className="underline font-semibold">
-          Update and resubmit
-        </Link>
-      </div>
-    );
-  }
-  return (
-    <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-      <Clock className="h-4 w-4 shrink-0 text-slate-500" />
-      Complete your profile to go live.{" "}
-      <Link href="/signup/profile" className="underline font-semibold">
-        Continue setup
-      </Link>
-    </div>
-  );
-});
-
-export default function DashboardHome() {
-  const router = useRouter();
-  const { user, subscription } = useAuth();
-  const currentTier = normalizePlanKey(subscription?.plan_key) ?? (subscription?.subscribed ? "standard" : "free");
-  const [activeStatus, setActiveStatus] = useState<AvailabilityStatus>("available");
-  const [statusSaving, setStatusSaving] = useState(false);
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [profileLoading, setProfileLoading] = useState(true);
-
-  // Memoize display name computation
-  const displayName = useMemo(() => {
-    const meta = (
-      user as { user_metadata?: { full_name?: string; name?: string } } | null
-    )?.user_metadata;
-    const name = meta?.full_name || meta?.name || user?.email?.split("@")[0] || "Pro";
-    return name.split(" ")[0].slice(0, 20);
-  }, [user]);
 
   useEffect(() => {
-    // Fetch only dashboard-needed fields for better performance
-    requestJson<{ ok: boolean; profile: ProfileData | null }>("/api/pro/profile?dashboard=true")
-      .then((data) => {
-        setProfile(data.profile);
-        // Reflect the general presence status (current_status / is_active), not
-        // the paid "Available Now" badge, which is managed separately.
-        const currentStatus = (data.profile as { current_status?: string } | null)?.current_status;
-        if (currentStatus === "available" || currentStatus === "mobile" || currentStatus === "traveling") {
-          setActiveStatus(currentStatus as AvailabilityStatus);
-        } else if (data.profile?.is_active === false) {
-          setActiveStatus("hidden");
-        }
-      })
-      .catch((error) => {
-        if (error instanceof ApiError && error.status === 401) {
-          router.push("/login");
-        } else {
-          setProfile(null);
-        }
-      })
-      .finally(() => setProfileLoading(false));
-  }, [router]);
+    refresh()
+      .catch((error) => toast({ title: "Could not load dashboard", description: error instanceof Error ? error.message : "Try again.", variant: "destructive" }))
+      .finally(() => setLoading(false));
+  }, [toast]);
 
-  // Memoize status change handler to prevent child re-renders
-  const handleStatusChange = useCallback(async (status: AvailabilityStatus) => {
-    setActiveStatus(status);
-    setStatusSaving(true);
+  const trips = useMemo(() => normalizeTravel(profile?.travel_schedule), [profile?.travel_schedule]);
+  const traveling = isTravelCurrentOrUpcoming(trips);
+  const availableNow = Boolean(
+    profile?.available_now &&
+      (!profile.available_now_expires || new Date(profile.available_now_expires).getTime() > Date.now()),
+  );
+  const visible = profile?.is_active !== false && profile?.current_status !== "hidden";
+  const displayName = profile?.display_name || profile?.full_name || "Your profile";
+
+  async function toggleAvailableNow() {
+    setSaving("available");
     try {
-      await requestJson("/api/pro/availability", {
-        method: "POST",
-        body: JSON.stringify({ status }),
-      });
-    } catch {
-      // status updated optimistically; API failure is non-fatal
+      await postJson("/api/pro/available-now", { activate: !availableNow });
+      await refresh();
+      toast({ title: availableNow ? "Available Now turned off" : "Available Now activated" });
+    } catch (error) {
+      toast({ title: "Could not update Available Now", description: error instanceof Error ? error.message : "Try again.", variant: "destructive" });
     } finally {
-      setStatusSaving(false);
+      setSaving(null);
     }
-  }, []);
+  }
 
-  // Memoize expensive computations
-  const completion = useMemo(() => computeCompletion(profile), [profile]);
-  const placement = useMemo(() => computePlacement(profile, completion), [profile, completion]);
-  const profileStatus = profile?.status ?? "draft";
+  async function toggleVisibility() {
+    setSaving("visibility");
+    try {
+      await postJson("/api/pro/availability", { status: visible ? "hidden" : "available" });
+      await refresh();
+      toast({ title: visible ? "Profile hidden" : "Profile visible" });
+    } catch (error) {
+      toast({ title: "Could not update profile visibility", description: error instanceof Error ? error.message : "Try again.", variant: "destructive" });
+    } finally {
+      setSaving(null);
+    }
+  }
 
-  // Single resolved tier for every dashboard surface. The profiles table drives
-  // live entitlements (search placement, photo limits), so it wins over the
-  // Stripe-derived subscription state when the two disagree.
-  const resolvedTier = normalizePlanKey(profile?.subscription_tier) ?? currentTier;
-  const tierLabel = profileLoading
-    ? "Member"
-    : `${resolvedTier.charAt(0).toUpperCase()}${resolvedTier.slice(1)} Member`;
+  if (loading) return <div className="flex min-h-[55vh] items-center justify-center"><Loader2 className="h-5 w-5 animate-spin text-slate-500" /></div>;
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 p-6 md:p-10">
-      <header className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+    <main className="mx-auto max-w-5xl space-y-6 p-4 pb-28 md:p-8">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="font-display text-3xl font-semibold tracking-tight text-slate-900">
-            Dashboard
-          </h1>
-          <p className="mt-1 font-sans text-sm text-slate-500">
-            Track your profile performance and manage availability.
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Provider dashboard</p>
+          <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-slate-900">{displayName}</h1>
+          <p className="mt-1 text-sm text-slate-500">Visibility tools are independent. Turning one on no longer turns the others off.</p>
         </div>
-        <div className="flex gap-3">
-          <Link
-            href="/pro/listing"
-            className="border border-slate-200 bg-white px-4 py-2 font-mono text-xs uppercase tracking-wider text-slate-600 shadow-sm transition-colors hover:bg-slate-50"
-          >
-            Edit Profile
-          </Link>
-          <Link
-            href="/pro/settings"
-            className="border border-slate-200 bg-white px-4 py-2 font-mono text-xs uppercase tracking-wider text-slate-600 shadow-sm transition-colors hover:bg-slate-50"
-          >
-            <Settings className="inline h-3.5 w-3.5" />
-          </Link>
-        </div>
+        <Button asChild variant="outline"><Link href="/pro/listing"><Settings className="mr-2 h-4 w-4" />Edit listing</Link></Button>
       </header>
 
-      {!profileLoading && <ProfileStatusBanner status={profileStatus} />}
-
-      <NotificationsWidget />
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-1">
-          <ProfileCard
-            displayName={displayName}
-            tierLabel={tierLabel}
-            completion={completion}
-            profileLoading={profileLoading}
-          />
-          <AvailabilityCard
-            activeStatus={activeStatus}
-            statusSaving={statusSaving}
-            onStatusChange={handleStatusChange}
-          />
+      {!visible ? (
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">
+          Your profile is OFF and hidden from public discovery. Available Now, travel, and mobile settings remain saved but are not publicly discoverable until visibility is turned back on.
         </div>
+      ) : null}
 
-        <div className="space-y-6 lg:col-span-2">
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            className="overflow-hidden border border-slate-200/60 bg-white shadow-sm"
-          >
-            <div className="flex items-center justify-between border-b border-slate-100 p-5">
-              <div className="flex items-center gap-2">
-                <Gauge className="h-4 w-4 text-slate-500" strokeWidth={2.25} />
-                <h3 className="font-sans font-semibold text-slate-900">Search Placement</h3>
-              </div>
-              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">
-                Ranking diagnostics
-              </span>
-            </div>
-            <div className="grid gap-5 p-5 sm:grid-cols-[140px_1fr] sm:items-center">
-              <div className="flex flex-col items-center justify-center rounded-xl border border-[#111111] bg-[#111111] p-5 text-white">
-                <span className="font-display text-4xl font-semibold">
-                  {profileLoading ? "…" : placement.grade}
-                </span>
-                <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">
-                  {profileLoading ? "" : `${placement.score} / 100`}
-                </span>
-              </div>
-              <ul className="space-y-2.5">
-                {placement.factors.map((factor) => (
-                  <li key={factor.label} className="flex items-center justify-between gap-3 text-sm">
-                    <span className="flex items-center gap-2 text-slate-600">
-                      {factor.met ? (
-                        <Check className="h-4 w-4 text-[#1E7A46]" strokeWidth={2.5} />
-                      ) : (
-                        <X className="h-4 w-4 text-slate-300" strokeWidth={2.5} />
-                      )}
-                      {factor.label}
-                    </span>
-                    <span className="font-mono text-xs text-slate-500">+{factor.points}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="border-t border-slate-100 bg-slate-50/60 px-5 py-3">
-              <p className="text-xs text-slate-500">
-                Raise your placement:{" "}
-                <Link href="/pro/listing" className="font-medium text-brand-secondary underline">
-                  complete your profile
-                </Link>
-                ,{" "}
-                <Link href="/pro/growth" className="font-medium text-brand-secondary underline">
-                  go live with Available Now
-                </Link>
-                , or{" "}
-                <Link href="/pro/subscription" className="font-medium text-brand-secondary underline">
-                  upgrade your plan
-                </Link>
-                .
-              </p>
-            </div>
-          </motion.div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <StatusCard
+          icon={Zap}
+          title="Available Now"
+          active={availableNow}
+          description="Temporary live badge. This can be active at the same time as travel and mobile service."
+        >
+          <Button onClick={toggleAvailableNow} disabled={saving === "available"}>
+            {saving === "available" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Zap className="mr-2 h-4 w-4" />}
+            {availableNow ? "Turn off live badge" : "Activate Available Now"}
+          </Button>
+        </StatusCard>
 
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-            {[
-              { label: "Profile Views", icon: Eye, note: "We start tracking views the day your listing goes live. Check back soon for your first insights." },
-              { label: "Inquiries", icon: Zap, note: "Check Inquiries tab" },
-              { label: "Avg. Rating", icon: ShieldCheck, note: "No reviews yet. Reviews will appear here as clients leave feedback." },
-            ].map((item) => (
-              <motion.div
-                key={item.label}
-                variants={fadeUp}
-                initial="hidden"
-                animate="show"
-                className="flex flex-col gap-2 border border-slate-200/60 bg-white p-4 shadow-sm"
-              >
-                <item.icon className="h-4 w-4 text-slate-400" />
-                <div>
-                  <div className="font-display text-lg font-medium text-slate-400">&mdash;</div>
-                  <div className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-slate-500">
-                    {item.label}
-                  </div>
-                  <div className="mt-1 text-[10px] text-slate-400">{item.note}</div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+        <StatusCard
+          icon={Plane}
+          title="Traveling"
+          active={traveling}
+          description="Travel dates work independently and surface your profile in destination-city discovery."
+        >
+          <Button asChild variant="outline"><Link href="/pro/growth"><Plane className="mr-2 h-4 w-4" />Manage travel dates</Link></Button>
+        </StatusCard>
 
-          <div className="border border-slate-200/60 bg-white shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-100 p-5">
-              <h3 className="font-sans font-semibold text-slate-900">Quick Links</h3>
-            </div>
-            <div className="grid grid-cols-1 gap-0 divide-y divide-slate-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-              {[
-                { href: "/pro/listing", label: "Edit Profile", desc: "Update bio, photos, and services" },
-                { href: "/pro/growth", label: "Growth Tools", desc: "Available Now, travel, and specials" },
-                { href: "/pro/photos", label: "Manage Photos", desc: "Upload and reorder gallery photos" },
-                { href: "/pro/inquiries", label: "Inquiries", desc: "View messages from clients" },
-                { href: "/pro/analytics", label: "Analytics", desc: "See your visitor trends" },
-                { href: "/pro/subscription", label: "Subscription", desc: "View or upgrade your plan" },
-              ].map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="flex flex-col gap-0.5 p-5 transition hover:bg-slate-50"
-                >
-                  <span className="font-sans text-sm font-semibold text-slate-800">{link.label}</span>
-                  <span className="font-sans text-xs text-slate-500">{link.desc}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
+        <StatusCard
+          icon={Car}
+          title="Mobile / Outcall"
+          description="Configure outcall service and radius separately from Available Now and travel."
+        >
+          <Button asChild variant="outline"><Link href="/pro/listing"><Car className="mr-2 h-4 w-4" />Configure mobile service</Link></Button>
+        </StatusCard>
 
-          {/* Knotty AI teaser — only shown for non-Elite plans */}
-          {resolvedTier !== "elite" && (
-            <div className="rounded-xl border border-white/10 bg-[#111111] p-5 text-white">
-              <div className="flex items-start gap-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#C4344A]/15">
-                  <Sparkles className="h-4 w-4 text-[#C4344A]" strokeWidth={2.25} />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold">Knotty AI — available on Elite</p>
-                  <p className="mt-1 text-xs leading-relaxed text-white/60">
-                    Elite profiles get a Knotty AI chat widget that answers client questions 24/7
-                    directly on your listing — rates, availability, specialties, and more —
-                    without you lifting a finger.
-                  </p>
-                  <Link
-                    href="/pro/billing?upgrade=elite"
-                    className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#C4344A] hover:text-white"
-                  >
-                    Upgrade to Elite
-                    <ArrowRight className="h-3 w-3" strokeWidth={2.5} />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {profileStatus === "pending_approval" && (
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
-              <p className="font-semibold text-slate-800 mb-1">What happens next?</p>
-              <ol className="list-decimal list-inside space-y-1 text-xs">
-                <li>Our team reviews your profile and photos — usually within 1–2 business days.</li>
-                <li>You'll receive an email once approved.</li>
-                <li>After approval your listing goes live and clients can find you in search.</li>
-              </ol>
-            </div>
-          )}
-        </div>
+        <StatusCard
+          icon={visible ? Eye : EyeOff}
+          title="Profile visibility"
+          active={visible}
+          description="This is the master switch. OFF is the only state that removes your profile from public discovery."
+        >
+          <Button variant={visible ? "outline" : "default"} onClick={toggleVisibility} disabled={saving === "visibility"}>
+            {saving === "visibility" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : visible ? <EyeOff className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
+            {visible ? "Turn profile OFF" : "Turn profile ON"}
+          </Button>
+        </StatusCard>
       </div>
-    </div>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="font-display text-base font-semibold text-slate-900">Quick actions</h2>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button asChild variant="outline"><Link href="/pro/listing">Profile & pricing</Link></Button>
+          <Button asChild variant="outline"><Link href="/pro/growth">Travel & specials</Link></Button>
+          <Button asChild variant="outline"><Link href="/pro/photos">Photos</Link></Button>
+          <Button asChild variant="outline"><Link href="/pro/subscription">Subscription</Link></Button>
+        </div>
+      </section>
+    </main>
   );
 }
