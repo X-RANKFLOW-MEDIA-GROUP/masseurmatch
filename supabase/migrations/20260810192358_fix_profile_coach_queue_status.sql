@@ -1,0 +1,4 @@
+-- Migration history reconciliation.
+-- Applied directly to the linked Supabase project on 2026-08-10 and already
+-- recorded remotely as fix_profile_coach_queue_status.
+-- No-op locally to restore the missing migration version without replaying production DDL.

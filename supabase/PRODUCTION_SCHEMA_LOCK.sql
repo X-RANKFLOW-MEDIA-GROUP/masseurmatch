@@ -1312,16 +1312,48 @@ create table if not exists therapist_photos (
 );
 
 create table if not exists demand_scores (
-  id                  uuid primary key default gen_random_uuid(),
-  city                text not null,
-  state               text not null,
-  neighborhood        text,
-  score               integer not null,
-  trend               text not null default 'stable',
-  search_volume_index integer not null default 0,
-  competition_index   integer not null default 0,
-  week_start          date not null,
-  created_at          timestamptz not null default now()
+  id                    uuid primary key default gen_random_uuid(),
+  city                  text not null,
+  state                 text not null,
+  neighborhood          text,
+  region_code           text,
+  region_name           text,
+  score                 integer not null,
+  trend                 text not null default 'stable',
+  search_volume_index   integer not null default 0,
+  competition_index     integer not null default 0,
+  spike_score           integer not null default 0,
+  baseline_index        integer not null default 0,
+  growth_pct            numeric(8, 2),
+  velocity_score        integer not null default 0,
+  persistence_score     integer not null default 0,
+  confidence            integer,
+  sample_size           integer not null default 0,
+  score_components      jsonb not null default '{}'::jsonb,
+  source                text default 'internal-ingestion',
+  methodology_version   text default 'mvp-v1',
+  week_start            date not null,
+  collected_at          timestamptz,
+  expires_at            timestamptz,
+  run_id                text,
+  is_sample             boolean not null default false,
+  created_at            timestamptz not null default now()
+);
+
+create table if not exists demand_collection_runs (
+  id uuid primary key default gen_random_uuid(),
+  run_id text not null unique,
+  status text not null check (status in ('running', 'completed', 'partial', 'failed')),
+  started_at timestamptz not null,
+  completed_at timestamptz,
+  markets_requested integer not null default 0 check (markets_requested >= 0),
+  markets_succeeded integer not null default 0 check (markets_succeeded >= 0),
+  markets_failed integer not null default 0 check (markets_failed >= 0),
+  rows_ingested integer not null default 0 check (rows_ingested >= 0),
+  error_summary jsonb not null default '[]'::jsonb,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
 create table if not exists admin_actions (
