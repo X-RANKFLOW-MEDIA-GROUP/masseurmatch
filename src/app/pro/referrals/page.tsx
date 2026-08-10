@@ -213,7 +213,7 @@ export default function ReferralsPage() {
                       </td>
                       <td className="px-3 py-4">{formatDate(referral.paid_at)}</td>
                       <td className="px-3 py-4 text-right font-semibold">
-                        {referral.reward_months ? `+${referral.reward_months} Standard month` : "—"}
+                        {referral.reward_months ? `+${referral.reward_months} Standard month${referral.reward_months === 1 ? "" : "s"}` : "—"}
                       </td>
                     </tr>
                   ))}
