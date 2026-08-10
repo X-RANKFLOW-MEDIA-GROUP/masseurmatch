@@ -50,5 +50,10 @@ jobs:
         run: pnpm validate:db-contract
       - name: Release audit
         run: pnpm release:audit
+      # Aggregate gate. The discrete steps above exist so a failure points at the
+      # exact gate; this step additionally verifies the aggregate script itself
+      # stays wired to the same set of checks.
+      - name: Release check (aggregate gate)
+        run: pnpm release:check
       - name: Production build
         run: pnpm build

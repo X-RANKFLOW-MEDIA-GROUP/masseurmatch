@@ -10,6 +10,10 @@ const SCHEMA_EXTENSION_PATHS = [
   path.join(ROOT, "supabase/migrations/20260806230000_demand_radar_pipeline.sql"),
 ];
 const SCAN_DIRS = ["src", "scripts", "tests", "supabase"];
+// Every .sql file that can define a database function. Unlike the table/column
+// contract (which the schema lock owns outright), function bodies live in the
+// migration history, so the RPC check reads the whole SQL corpus.
+const SQL_DEFINITION_DIRS = ["supabase"];
 
 const REQUIRED_TABLES = [
   "users",
@@ -396,6 +400,57 @@ function scanReferences() {
   return references;
 }
 
+/**
+ * Collects every Postgres function name defined anywhere in the SQL corpus.
+ * Matches `create [or replace] function [public.]name(` in either case.
+ */
+function collectDefinedFunctions() {
+  const defined = new Set();
+  const functionRegex = new RegExp(
+    `create\\s+(?:or\\s+replace\\s+)?function\\s+(?:${IDENT_TOKEN}\\s*\\.\\s*)?(${IDENT_TOKEN})\\s*\\(`,
+    "gi",
+  );
+
+  for (const file of SQL_DEFINITION_DIRS.flatMap(walkFiles)) {
+    if (!file.endsWith(".sql")) continue;
+    const normalized = normalizeSql(fs.readFileSync(file, "utf8"));
+    let match;
+    while ((match = functionRegex.exec(normalized))) {
+      defined.add(unquoteIdentifier(match[1]).toLowerCase());
+    }
+  }
+
+  return defined;
+}
+
+/**
+ * Collects every RPC name the application invokes. Covers the direct call form
+ * and the cast form used where the generated Supabase types do not yet know the
+ * function, i.e. the rpc member cast through an inline signature before being
+ * applied to the function name.
+ */
+function scanRpcReferences() {
+  const references = new Map();
+  const direct = /\.rpc\(\s*["'`]([a-zA-Z_][a-zA-Z0-9_]*)["'`]/g;
+  const cast = /\.rpc\s+as\s+unknown\s+as[\s\S]{0,500}?\)\(\s*["'`]([a-zA-Z_][a-zA-Z0-9_]*)["'`]/g;
+
+  for (const file of SCAN_DIRS.flatMap(walkFiles)) {
+    if (file.endsWith(".sql")) continue;
+    const source = fs.readFileSync(file, "utf8");
+    for (const regex of [direct, cast]) {
+      regex.lastIndex = 0;
+      let match;
+      while ((match = regex.exec(source))) {
+        const name = match[1].toLowerCase();
+        if (!references.has(name)) references.set(name, new Set());
+        references.get(name).add(path.relative(ROOT, file));
+      }
+    }
+  }
+
+  return references;
+}
+
 function schemaContainsAllowedValues(sql, constraintName, values) {
   const normalized = normalizeSql(sql);
   const index = normalized.indexOf(constraintName.toLowerCase());
@@ -445,6 +500,17 @@ for (const [table, columns] of scanned) {
   for (const [column, files] of columns) {
     if (!contract.get(table)?.has(column)) errors.push(`Referenced column missing from schema lock: ${table}.${column} (${[...files].slice(0, 3).join(", ")})`);
   }
+}
+
+// Every RPC the application calls must be defined by some migration. A missing
+// definition is invisible at build/type time and only surfaces as a runtime 500
+// (a Stripe webhook that never syncs a tier, an admin panel that never loads).
+const definedFunctions = collectDefinedFunctions();
+for (const [rpcName, files] of scanRpcReferences()) {
+  if (definedFunctions.has(rpcName)) continue;
+  errors.push(
+    `Referenced RPC missing from SQL definitions: ${rpcName} (${[...files].slice(0, 3).join(", ")})`,
+  );
 }
 
 if (errors.length) {

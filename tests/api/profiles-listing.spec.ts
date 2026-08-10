@@ -14,7 +14,9 @@ test.describe('GET /api/pro/profiles', () => {
   });
 
   test('rejects anonymous requests with query params (city)', async ({ request }) => {
-    const res = await request.get('/api/pro/profiles?city=São Paulo');
+    const res = await request.get(
+      `/api/pro/profiles?city=${encodeURIComponent('Los Angeles')}`,
+    );
     expect(res.status()).toBe(401);
     const data = await res.json();
     expect(data.profiles).toBeUndefined();

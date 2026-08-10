@@ -14,13 +14,13 @@ import { cn } from "@/lib/utils";
  *
  * Usage:
  *   <TherapistCardTilt
- *     name="Sofia Almeida"
- *     specialty="Deep Tissue · Relaxamento"
- *     location="São Paulo, SP"
+ *     name="James Carter"
+ *     specialty="Deep Tissue · Swedish"
+ *     location="Los Angeles, CA"
  *     rating={4.9}
  *     reviewCount={128}
  *     pricePerHour={180}
- *     avatarUrl="/images/sofia.jpg"
+ *     avatarUrl="/images/james-carter.jpg"
  *     verified
  *   />
  */
