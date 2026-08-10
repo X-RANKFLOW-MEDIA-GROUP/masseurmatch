@@ -33,6 +33,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const files = (manual.files ?? {}) as Record<string, { path?: string }>;
     const paths = Object.values(files).map((entry) => entry?.path).filter((path): path is string => Boolean(path));
 
+    // Privacy-first: a review decision is not finalized unless the sensitive
+    // source files can be removed from storage in the same operation.
+    if (paths.length > 0) {
+      const { error: removeError } = await admin.storage.from("identity-documents").remove(paths);
+      if (removeError) throw new RouteError(500, "Could not securely remove identity documents. Review was not finalized.");
+    }
+
     const metadata = {
       ...currentMetadata,
       manual: {
@@ -58,11 +65,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       .eq("id", id);
 
     if (updateError) throw new RouteError(500, updateError.message);
-
-    if (paths.length > 0) {
-      const { error: removeError } = await admin.storage.from("identity-documents").remove(paths);
-      if (removeError) console.error("[manual-review] Failed to delete sensitive files:", removeError.message);
-    }
 
     await recordAuditLog(session.userId, `manual_identity_${decision}`, "identity_verification", id, {
       user_id: verification.user_id,
