@@ -1,6 +1,13 @@
 name: Demand Radar Collector
 
 on:
+  push:
+    branches:
+      - feature/spike-score-ui-live-data
+    paths:
+      - .github/workflows/demand-radar-collector.yml
+      - scripts/demand_radar_markets_national.json
+      - scripts/collect_google_trends.py
   schedule:
     - cron: "17 8 * * *"
   workflow_dispatch:
@@ -44,19 +51,19 @@ jobs:
         run: pip install --require-hashes=false -r scripts/requirements-demand-radar.txt
 
       - name: Validate required secrets
-        if: ${{ github.event_name == 'schedule' || inputs.dry_run != true }}
+        if: ${{ github.event_name == 'schedule' || github.event_name == 'push' || inputs.dry_run != true }}
         shell: bash
         run: |
           test -n "$DEMAND_RADAR_APP_URL" || { echo "DEMAND_RADAR_APP_URL is missing"; exit 1; }
           test -n "$INTERNAL_API_KEY" || { echo "INTERNAL_API_KEY is missing"; exit 1; }
 
-      - name: Collect and ingest demand scores
+      - name: Collect and ingest nationwide demand scores
         id: collect
         shell: bash
         run: |
           mkdir -p artifacts
           args=(
-            --config scripts/demand_radar_markets.json
+            --config scripts/demand_radar_markets_national.json
             --output artifacts/demand-radar-run.json
             --log-file artifacts/demand-radar.log
             --market-limit "${{ inputs.market_limit || '0' }}"
@@ -70,7 +77,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          echo "## Demand Radar collection" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Demand Radar nationwide collection" >> "$GITHUB_STEP_SUMMARY"
           if [[ -f artifacts/demand-radar-run.json ]]; then
             python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import json
