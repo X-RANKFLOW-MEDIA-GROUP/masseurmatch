@@ -2,7 +2,81 @@
 
 This checklist defines the minimum release gates required before sending MasseurMatch to production.
 
-> **Final go-live closure pass (2026-07-25):** full repository gate (section 1) passes end to end.
+> **Final go-live closure pass (2026-08-09):** full repository gate (section 1) passes end to end.
+>
+> The repository entered this pass already green on every gate, so this pass is
+> narrow by design: it closes two real defects and one blind spot in the gate
+> itself rather than restating checks that already hold.
+>
+> Changes in this pass (2026-08-09):
+> - `scripts/validate-db-contract.mjs`: the contract gate validated tables and
+>   columns but never functions, so a `.rpc()` call with no matching SQL
+>   definition passed every gate and failed only at runtime (a Stripe webhook
+>   that never syncs a tier, an admin panel that never loads). The validator now
+>   collects every RPC the app invokes — both the direct call form and the
+>   `as unknown as` cast form used where the generated Supabase types do not
+>   know the function — and fails when any of them has no
+>   `create [or replace] function` anywhere under `supabase/`. All 14 RPCs
+>   currently referenced resolve; the check was verified against a deliberately
+>   broken reference before being committed.
+> - `src/app/auth/callback/route.ts` + new `src/app/auth/callback/destination.ts`:
+>   fixed the Google sign-in destination. The social buttons on the "Sign up"
+>   tab always attach `next=/pro/onboard`, and the callback honoured `next`
+>   verbatim for any account that already had a profile — so an existing
+>   provider who signed in with Google from that tab was sent back into the plan
+>   picker instead of their dashboard. New accounts now enter onboarding at
+>   `/pro/onboard` (the same entry point the password signup form uses, so
+>   social and password signups converge); returning users get `next`, except
+>   when `next` is the onboarding entry, which resolves to `/pro/dashboard`.
+>   The routing rules moved into a dependency-free module so they are unit
+>   tested (`tests/unit/auth-callback-destination.test.ts`, 7 cases, including
+>   open-redirect rejection).
+> - `.github/workflows/release-checks.yml`: added the `pnpm release:check`
+>   aggregate step between `release:audit` and `build`. See the risk note below.
+> - `src/components/ui/therapist-card-tilt.tsx`: translated the remaining
+>   Portuguese in the usage example (`"Deep Tissue · Relaxamento"` /
+>   `"São Paulo, SP"`) to the English US sample already used by the design-system
+>   page. `tests/api/profiles-listing.spec.ts`: the anonymous-rejection case now
+>   filters on an encoded US city instead of `São Paulo`.
+> - Re-verified as already correct, unchanged: no legacy artifacts
+>   (`vite.config.ts`, `index.html`, `package-lock.json`, `public/robots.txt`
+>   absent); `packageManager` is `pnpm@10.32.1`; `.gitattributes` is exactly
+>   `* text=auto eol=lf`; `.vscode/extensions.json` recommends only the three
+>   required extensions; Tailwind content paths contain no `src/mm` or
+>   `src/pages` globs; `profiles_profile_status_check` already excludes
+>   `submitted` and no `profile_status: "submitted"` remains in source
+>   (`submitted` is retained only on `profile_reviews.status`, where the review
+>   workflow needs it); no public phone OTP UI (only email OTP and Stripe
+>   Identity — phone stays a profile field); Stripe checkout sends
+>   `metadata.user_id` on both the session and the subscription; the webhook
+>   verifies signatures, is idempotent via `stripe_events`, and syncs tier,
+>   `_tier`, `photo_limit`, `visibility_level`, customer/subscription IDs and
+>   `current_period_end`, downgrading to `free` on
+>   `customer.subscription.deleted`; `release:audit` fails when
+>   `STRIPE_PRICE_STANDARD|PRO|ELITE` are unset while `STRIPE_SECRET_KEY` is set.
+> - Risk note — `pnpm release:check` in CI: this step re-runs lint, typecheck,
+>   test, validate:sitemap, validate:db-contract, release:audit **and build**,
+>   all of which already ran as discrete steps, and is followed by another
+>   `pnpm build`. It adds no new signal and roughly doubles CI wall time. It is
+>   included because the release specification enumerates it; deleting the step
+>   is a safe one-line revert if throughput matters more than the aggregate
+>   script staying exercised.
+> - Open item — `mm_session`: the specification asks the OAuth callback to
+>   "sync mm_session". No such cookie is issued anywhere in the codebase; the
+>   app is fully on Supabase SSR cookies (`sb-*`), and `mm_session` survives
+>   only as a name in the logout sweep and the cookie-policy copy. The callback
+>   does establish the session (`exchangeCodeForSession` writes the auth cookies
+>   onto the response) and does sync the profile/role rows via
+>   `ensureUserProfileAndRole`. Re-introducing a bespoke session cookie would be
+>   a second, parallel auth system, so it was deliberately not done. Removing
+>   the two dead `mm_session` references is left as separate cleanup.
+> - Validation results (2026-08-09): `pnpm install --frozen-lockfile`, lockfile
+>   diff clean, `pnpm lint` (0 errors), `pnpm typecheck`, `pnpm test`
+>   (201 unit + 8 API smoke), `pnpm validate:sitemap`,
+>   `pnpm validate:db-contract`, `pnpm release:audit`, `pnpm release:check`, and
+>   `pnpm build` all pass.
+>
+> Previous closure (2026-07-25): full repository gate (section 1) passes end to end.
 >
 > Changes in this pass (2026-07-25):
 > - `.github/workflows/release-checks.yml`: the single `pnpm release:check` step was split
