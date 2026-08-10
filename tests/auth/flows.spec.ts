@@ -158,7 +158,11 @@ test.describe.serial("Auth launch flow", () => {
     expect(rolesError).toBeNull();
     expect(roles?.some((entry) => entry.role === "provider")).toBeTruthy();
 
-    const sessionCookie = (await context.cookies()).find((cookie) => cookie.name === "mm_session");
+    // Authentication is Supabase SSR: the session lives in sb-<project>-auth-token
+    // cookies. There is no mm_session cookie in this build.
+    const sessionCookie = (await context.cookies()).find((cookie) =>
+      cookie.name.startsWith("sb-"),
+    );
     expect(sessionCookie?.value).toBeTruthy();
   });
 

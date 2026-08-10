@@ -31,6 +31,7 @@ interface ReferralResponse {
   ok: boolean;
   summary: ReferralSummary;
   referrals: ReferralRow[];
+  unavailable?: boolean;
 }
 
 function formatDate(value: string | null) {
@@ -39,6 +40,7 @@ function formatDate(value: string | null) {
     month: "short",
     day: "numeric",
     year: "numeric",
+    timeZone: "UTC",
   }).format(new Date(value));
 }
 
@@ -124,6 +126,14 @@ export default function ReferralsPage() {
         </p>
       </header>
 
+      {data.unavailable ? (
+        <Card>
+          <CardContent className="p-5 text-sm text-muted-foreground">
+            Referral data is temporarily unavailable. Your account and existing rewards are not affected. Please try again shortly.
+          </CardContent>
+        </Card>
+      ) : null}
+
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardContent className="p-5">
@@ -161,15 +171,15 @@ export default function ReferralsPage() {
         </CardHeader>
         <CardContent className="space-y-5">
           <div className="rounded-xl border border-border bg-muted/30 p-4">
-            <p className="break-all font-mono text-sm text-foreground">{summary.referralLink}</p>
-            <p className="mt-2 text-xs text-muted-foreground">Code: {summary.code}</p>
+            <p className="break-all font-mono text-sm text-foreground">{summary.referralLink ?? "Referral link temporarily unavailable"}</p>
+            <p className="mt-2 text-xs text-muted-foreground">Code: {summary.code || "—"}</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button onClick={() => void copyLink()}>
+            <Button disabled={!summary.referralLink} onClick={() => void copyLink()}>
               {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
               {copied ? "Copied" : "Copy link"}
             </Button>
-            <Button variant="outline" onClick={() => void shareLink()}>
+            <Button disabled={!summary.referralLink} variant="outline" onClick={() => void shareLink()}>
               <Share2 className="mr-2 h-4 w-4" /> Share
             </Button>
           </div>
@@ -213,7 +223,7 @@ export default function ReferralsPage() {
                       </td>
                       <td className="px-3 py-4">{formatDate(referral.paid_at)}</td>
                       <td className="px-3 py-4 text-right font-semibold">
-                        {referral.reward_months ? `+${referral.reward_months} Standard month` : "—"}
+                        {referral.reward_months ? `+${referral.reward_months} Standard month${referral.reward_months === 1 ? "" : "s"}` : "—"}
                       </td>
                     </tr>
                   ))}
