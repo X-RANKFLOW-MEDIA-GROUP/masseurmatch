@@ -36,6 +36,7 @@ const navSections = [
       { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
       { href: "/admin/tools", label: "All Tools", icon: Grid3X3 },
       { href: "/admin/people", label: "People CRM", icon: Users },
+      { href: "/admin/migrations", label: "Import Profiles", icon: Workflow },
       { href: "/admin/photos", label: "Photo Approvals", icon: ImageIcon },
       { href: "/admin/moderation", label: "Approvals", icon: ShieldAlert },
       { href: "/admin/profile-reports", label: "Profile Reports", icon: Flag },
@@ -49,7 +50,6 @@ const navSections = [
       { href: "/admin/support", label: "Support", icon: LifeBuoy },
       { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
       { href: "/admin/sms", label: "SMS Auto-Reply", icon: MessageSquare },
-      { href: "/admin/migrations", label: "Profile Imports", icon: Workflow },
     ],
   },
   {
@@ -125,25 +125,15 @@ export default function AdminSidebarNav() {
       ))}
 
       <div className="mt-auto border-t border-slate-100 pt-2">
-        <Link
-          href="/"
-          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
-        >
+        <Link href="/" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900">
           <Home className="h-4 w-4 shrink-0" />
           Back to Site
         </Link>
-        <Link
-          href="/pro/dashboard"
-          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
-        >
+        <Link href="/pro/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900">
           <LayoutDashboard className="h-4 w-4 shrink-0" />
           Pro Dashboard
         </Link>
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
-        >
+        <button type="button" onClick={handleLogout} className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900">
           <LogOut className="h-4 w-4 shrink-0" />
           Logout
         </button>
