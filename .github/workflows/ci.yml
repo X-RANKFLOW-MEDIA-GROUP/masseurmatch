@@ -190,8 +190,25 @@ jobs:
               }
               await new Promise((r) => setTimeout(r, 15000));
             }
-            core.warning('No Vercel preview URL resolved in time; tests will fall back to PLAYWRIGHT_BASE_URL.');
             core.setOutput('url', '');
+            core.setFailed(
+              [
+                'No Vercel preview URL resolved for this pull request.',
+                '',
+                'Without a preview there is nothing for the E2E and accessibility suites to',
+                'run against, and they would be skipped silently — a green pull request that',
+                'never exercised the UI. Failing loudly instead.',
+                '',
+                'Most likely cause: the branch was pushed BEFORE the pull request existed, so',
+                'scripts/vercel-ignore-build.mjs skipped the build (a pull request is what makes',
+                'a preview worth building) and Vercel does not rebuild that commit when the pull',
+                'request opens later.',
+                '',
+                'Fix: push any new commit to this branch. Now that the pull request is open the',
+                'preview will build, and this job will pass. Opening the pull request as a draft',
+                'before the first push avoids the situation entirely.',
+              ].join('\n'),
+            );
 
   e2e:
     name: E2E Tests

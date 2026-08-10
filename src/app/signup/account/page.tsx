@@ -1,25 +1,24 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowRight, CheckCircle2, Loader2, ShieldCheck, UserRoundPlus } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardContent } from "@/components/ui/card";
-import { PhoneInput } from "@/components/ui/phone-input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { useSignup } from "../_lib/signup-context";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSignup } from "../_lib/signup-context";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_RE = /^\d{10,}$/; // At least 10 digits, allows +1-234-567-8900 format after cleanup
-
-type FieldErrors = Record<string, string>;
 
 export default function SignupAccountPage() {
   const router = useRouter();
+  const { signUp } = useAuth();
   const {
     state,
     setAccountInfo,
@@ -28,7 +27,6 @@ export default function SignupAccountPage() {
     setComplianceAcknowledged,
     setAgeAndConductAttested,
   } = useSignup();
-  const { signUp } = useAuth();
 
   const [form, setForm] = useState({
     fullName: state.fullName || "",
@@ -38,385 +36,144 @@ export default function SignupAccountPage() {
     password: "",
     confirmPassword: "",
   });
-  const [termsChecked, setTermsChecked] = useState(state.termsAccepted);
-  const [complianceChecked, setComplianceChecked] = useState(state.complianceAcknowledged);
-  const [ageChecked, setAgeChecked] = useState(state.ageAndConductAttested);
-  const [error, setError] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [terms, setTerms] = useState(state.termsAccepted);
+  const [policies, setPolicies] = useState(state.complianceAcknowledged);
+  const [adult, setAdult] = useState(state.ageAndConductAttested);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const formRef = useRef<HTMLFormElement>(null);
+  const update = (key: keyof typeof form, value: string) =>
+    setForm((current) => ({ ...current, [key]: value }));
 
-  function updateField(field: string, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-    // Clear field error on edit
-    setFieldErrors((prev) => {
-      if (!prev[field]) return prev;
-      const next = { ...prev };
-      delete next[field];
-      return next;
-    });
-  }
-
-  const validateField = useCallback(
-    (field: string): string | null => {
-      switch (field) {
-        case "fullName":
-          return form.fullName.trim() ? null : "Full name is required.";
-        case "email":
-          if (!form.email.trim()) return "Email is required.";
-          if (!EMAIL_RE.test(form.email.trim())) return "Enter a valid email address.";
-          return null;
-        case "phone": {
-          const cleaned = form.phone.replace(/\D/g, "");
-          return !cleaned || cleaned.length < 10
-            ? "A valid phone number is required (at least 10 digits)."
-            : null;
-        }
-        case "password":
-          return form.password.length < 8
-            ? "Password must be at least 8 characters."
-            : null;
-        case "confirmPassword":
-          return form.password !== form.confirmPassword
-            ? "Passwords do not match."
-            : null;
-        case "terms":
-          return termsChecked ? null : "You must accept the Terms of Service.";
-        case "compliance":
-          return complianceChecked
-            ? null
-            : "You must acknowledge the Therapist Agreement and platform policies.";
-        case "age":
-          return ageChecked
-            ? null
-            : "You must confirm you are 18+ and will not offer sexual services.";
-        default:
-          return null;
-      }
-    },
-    [form, termsChecked, complianceChecked, ageChecked],
-  );
-
-  function handleBlur(field: string) {
-    const msg = validateField(field);
-    setFieldErrors((prev) => {
-      if (msg) return { ...prev, [field]: msg };
-      const next = { ...prev };
-      delete next[field];
-      return next;
-    });
-  }
-
-  function validateAll(): FieldErrors {
-    const fields = ["fullName", "email", "phone", "password", "confirmPassword", "terms", "compliance", "age"];
-    const errors: FieldErrors = {};
-    for (const f of fields) {
-      const msg = validateField(f);
-      if (msg) errors[f] = msg;
-    }
-    return errors;
-  }
-
-  function focusFirstInvalid(errors: FieldErrors) {
-    const order = ["fullName", "email", "phone", "password", "confirmPassword", "terms", "compliance", "age"];
-    for (const f of order) {
-      if (errors[f]) {
-        const el = formRef.current?.querySelector<HTMLElement>(`#${f}`);
-        el?.focus();
-        return;
-      }
-    }
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
     setError(null);
 
-    const errors = validateAll();
-    setFieldErrors(errors);
-    if (Object.keys(errors).length > 0) {
-      focusFirstInvalid(errors);
-      return;
-    }
+    const phoneDigits = form.phone.replace(/\D/g, "");
+    if (!form.fullName.trim()) return setError("Enter your full name.");
+    if (!EMAIL_RE.test(form.email.trim())) return setError("Enter a valid email address.");
+    if (phoneDigits.length < 10) return setError("Enter a valid phone number.");
+    if (form.password.length < 8) return setError("Password must be at least 8 characters.");
+    if (form.password !== form.confirmPassword) return setError("Passwords do not match.");
+    if (!terms || !policies || !adult) return setError("Accept the required account terms to continue.");
 
     setLoading(true);
     try {
-      const result = await signUp(form.email, form.password, form.fullName);
+      const result = await signUp(form.email.trim(), form.password, form.fullName.trim());
       if (result.error) {
-        setError(
-          result.error.message?.trim() || "We couldn't create your account. Please try again.",
-        );
-        setLoading(false);
+        setError(result.error.message || "We could not create your account.");
         return;
       }
 
       setAccountInfo({
-        fullName: form.fullName,
-        displayName: form.displayName || form.fullName,
-        email: form.email,
+        fullName: form.fullName.trim(),
+        displayName: form.displayName.trim() || form.fullName.trim(),
+        email: form.email.trim(),
         phone: form.phone,
       });
       markAccountCreated();
-      setTermsAccepted(termsChecked);
-      setComplianceAcknowledged(complianceChecked);
-      setAgeAndConductAttested(ageChecked);
-
+      setTermsAccepted(terms);
+      setComplianceAcknowledged(policies);
+      setAgeAndConductAttested(adult);
       router.push("/signup/verify");
-    } catch {
-      setError("An unexpected error occurred. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "We could not create your account.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 py-8 sm:py-12">
-      <div className="text-center">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          Create Your Account
-        </h1>
-        <p className="mt-3 text-muted-foreground sm:text-base">
-          Set up your login details to continue your profile registration.
-        </p>
-      </div>
-
-      <Card className="mx-auto w-full max-w-lg">
-        <CardContent className="p-6 sm:p-8">
-          <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 sm:space-y-7" noValidate>
-            <div className="space-y-2">
-              <Label htmlFor="fullName">Full Name *</Label>
-              <Input
-                id="fullName"
-                value={form.fullName}
-                onChange={(e) => updateField("fullName", e.target.value)}
-                onBlur={() => handleBlur("fullName")}
-                placeholder="Your full legal name"
-                required
-                aria-invalid={!!fieldErrors.fullName}
-                aria-describedby={fieldErrors.fullName ? "fullName-error" : undefined}
-              />
-              {fieldErrors.fullName && (
-                <p id="fullName-error" role="alert" className="text-xs text-destructive">
-                  {fieldErrors.fullName}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="displayName">Display Name</Label>
-              <Input
-                id="displayName"
-                value={form.displayName}
-                onChange={(e) => updateField("displayName", e.target.value)}
-                placeholder="Public alias (optional)"
-              />
-              <p className="text-xs text-muted-foreground">This is the name shown on your public profile.</p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address *</Label>
-              <Input
-                id="email"
-                type="email"
-                value={form.email}
-                onChange={(e) => updateField("email", e.target.value)}
-                onBlur={() => handleBlur("email")}
-                placeholder="you@example.com"
-                required
-                aria-invalid={!!fieldErrors.email}
-                aria-describedby={fieldErrors.email ? "email-error" : undefined}
-              />
-              {fieldErrors.email && (
-                <p id="email-error" role="alert" className="text-xs text-destructive">
-                  {fieldErrors.email}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number *</Label>
-              <PhoneInput
-                id="phone"
-                value={form.phone}
-                onChange={(value) => updateField("phone", value)}
-                onBlur={() => handleBlur("phone")}
-                placeholder="(555) 000-0000"
-                required
-                aria-invalid={!!fieldErrors.phone}
-                aria-describedby={fieldErrors.phone ? "phone-error" : undefined}
-              />
-              {fieldErrors.phone ? (
-                <p id="phone-error" role="alert" className="text-xs text-destructive">
-                  {fieldErrors.phone}
-                </p>
-              ) : (
-                <p className="text-xs text-muted-foreground">Required for verification. Select your country to auto-fill the code.</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">Password *</Label>
-              <PasswordInput
-                id="password"
-                value={form.password}
-                onChange={(e) => updateField("password", e.target.value)}
-                onBlur={() => handleBlur("password")}
-                placeholder="At least 8 characters"
-                required
-                minLength={8}
-                showStrength
-                aria-invalid={!!fieldErrors.password}
-                aria-describedby={fieldErrors.password ? "password-error" : undefined}
-              />
-              {fieldErrors.password && (
-                <p id="password-error" role="alert" className="text-xs text-destructive">
-                  {fieldErrors.password}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password *</Label>
-              <PasswordInput
-                id="confirmPassword"
-                value={form.confirmPassword}
-                onChange={(e) => updateField("confirmPassword", e.target.value)}
-                onBlur={() => handleBlur("confirmPassword")}
-                placeholder="Re-enter your password"
-                required
-                minLength={8}
-                aria-invalid={!!fieldErrors.confirmPassword}
-                aria-describedby={fieldErrors.confirmPassword ? "confirmPassword-error" : undefined}
-              />
-              {fieldErrors.confirmPassword && (
-                <p id="confirmPassword-error" role="alert" className="text-xs text-destructive">
-                  {fieldErrors.confirmPassword}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-4 rounded-xl border border-border/60 bg-bg-subtle/30 p-4 sm:p-6">
-              <div className="space-y-2">
-                <div className="flex items-start gap-3 sm:gap-4">
-                  <Checkbox
-                    id="terms"
-                    checked={termsChecked}
-                    required
-                    aria-required="true"
-                    aria-invalid={!!fieldErrors.terms}
-                    aria-describedby={fieldErrors.terms ? "terms-error" : undefined}
-                    onCheckedChange={(v) => {
-                      setTermsChecked(v === true);
-                      setFieldErrors((prev) => {
-                        const next = { ...prev };
-                        delete next.terms;
-                        return next;
-                      });
-                    }}
-                    className="mt-1 flex-shrink-0"
-                  />
-                  <Label htmlFor="terms" className="text-sm leading-relaxed sm:text-base">
-                    I agree to the{" "}
-                    <Link href="/terms" className="text-brand-secondary underline" target="_blank" rel="noopener noreferrer">
-                      Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link href="/privacy" className="text-brand-secondary underline" target="_blank" rel="noopener noreferrer">
-                      Privacy Policy
-                    </Link>
-                  </Label>
-                </div>
-                {fieldErrors.terms && (
-                  <p id="terms-error" role="alert" className="pl-7 text-xs text-destructive">
-                    {fieldErrors.terms}
-                  </p>
-                )}
+    <main className="mx-auto max-w-5xl py-4 sm:py-8">
+      <div className="grid overflow-hidden rounded-[28px] border border-border bg-background shadow-[var(--shadow-lg)] lg:grid-cols-[0.82fr_1.18fr]">
+        <aside className="bg-slate-950 p-7 text-white sm:p-9 lg:p-10">
+          <div className="flex h-full flex-col justify-between gap-10">
+            <div>
+              <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10">
+                <UserRoundPlus className="h-5 w-5" />
               </div>
-              <div className="space-y-2">
-                <div className="flex items-start gap-3 sm:gap-4">
-                  <Checkbox
-                    id="compliance"
-                    checked={complianceChecked}
-                    required
-                    aria-required="true"
-                    aria-invalid={!!fieldErrors.compliance}
-                    aria-describedby={fieldErrors.compliance ? "compliance-error" : undefined}
-                    onCheckedChange={(v) => {
-                      setComplianceChecked(v === true);
-                      setFieldErrors((prev) => {
-                        const next = { ...prev };
-                        delete next.compliance;
-                        return next;
-                      });
-                    }}
-                    className="mt-1 flex-shrink-0"
-                  />
-                  <Label htmlFor="compliance" className="text-sm leading-relaxed sm:text-base">
-                    I acknowledge the{" "}
-                    <Link href="/therapist-agreement" className="text-brand-secondary underline" target="_blank" rel="noopener noreferrer">
-                      Therapist Agreement
-                    </Link>{" "}
-                    and platform policies
-                  </Label>
-                </div>
-                {fieldErrors.compliance && (
-                  <p id="compliance-error" role="alert" className="pl-7 text-xs text-destructive">
-                    {fieldErrors.compliance}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-start gap-3 sm:gap-4">
-                  <Checkbox
-                    id="age"
-                    checked={ageChecked}
-                    required
-                    aria-required="true"
-                    aria-invalid={!!fieldErrors.age}
-                    aria-describedby={fieldErrors.age ? "age-error" : undefined}
-                    onCheckedChange={(v) => {
-                      setAgeChecked(v === true);
-                      setFieldErrors((prev) => {
-                        const next = { ...prev };
-                        delete next.age;
-                        return next;
-                      });
-                    }}
-                    className="mt-1 flex-shrink-0"
-                  />
-                  <Label htmlFor="age" className="text-sm leading-relaxed sm:text-base">
-                    I confirm I am at least 18 years old and that I provide professional, non-sexual massage
-                    therapy only. I will not use MasseurMatch to offer, solicit, or arrange sexual services.
-                  </Label>
-                </div>
-                {fieldErrors.age && (
-                  <p id="age-error" role="alert" className="pl-7 text-xs text-destructive">
-                    {fieldErrors.age}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {error && (
-              <p role="alert" className="rounded-lg bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
-                {error}
+              <p className="mt-7 text-xs font-semibold uppercase tracking-[0.22em] text-white/55">Create your account</p>
+              <h1 className="mt-3 font-display text-3xl font-bold leading-tight sm:text-4xl">
+                Get listed without the signup maze.
+              </h1>
+              <p className="mt-4 text-sm leading-7 text-white/70">
+                Create your secure login, verify your contact details, then complete your public therapist profile.
               </p>
-            )}
+            </div>
 
-            <Button type="submit" size="lg" className="w-full min-h-12 text-base font-medium sm:mt-2" disabled={loading}>
-              {loading ? "Creating Account…" : "Continue to Verification"}
-            </Button>
+            <div className="space-y-4 text-sm text-white/78">
+              <div className="flex gap-3"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" /> Direct client contact outside MasseurMatch.</div>
+              <div className="flex gap-3"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" /> Location, pricing, availability, and travel visibility.</div>
+              <div className="flex gap-3"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" /> Profile review before public listing.</div>
+            </div>
+          </div>
+        </aside>
 
-            <p className="text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
-              <Link href="/login" className="text-brand-secondary underline">
-                Log in
-              </Link>
-            </p>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+        <section className="p-5 sm:p-8 lg:p-10">
+          <div className="mx-auto max-w-2xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-secondary">Account</p>
+            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-foreground">Your therapist login</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Only the essentials. You will build your listing after verification.</p>
+
+            <form onSubmit={handleSubmit} className="mt-7 space-y-5">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="fullName">Full name *</Label>
+                  <Input id="fullName" autoComplete="name" value={form.fullName} onChange={(e) => update("fullName", e.target.value)} placeholder="Your full name" />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="displayName">Display name</Label>
+                  <Input id="displayName" value={form.displayName} onChange={(e) => update("displayName", e.target.value)} placeholder="Name shown publicly (optional)" />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="email">Email *</Label>
+                  <Input id="email" type="email" autoComplete="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="you@example.com" />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="phone">Phone *</Label>
+                  <PhoneInput id="phone" value={form.phone} onChange={(value) => update("phone", value)} placeholder="(555) 000-0000" />
+                  <p className="text-xs text-muted-foreground">Used for contact verification and account security.</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password *</Label>
+                  <PasswordInput id="password" autoComplete="new-password" value={form.password} onChange={(e) => update("password", e.target.value)} placeholder="8+ characters" showStrength />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm password *</Label>
+                  <PasswordInput id="confirmPassword" autoComplete="new-password" value={form.confirmPassword} onChange={(e) => update("confirmPassword", e.target.value)} placeholder="Repeat password" />
+                </div>
+              </div>
+
+              <div className="space-y-3 rounded-2xl border border-border bg-bg-subtle/45 p-4 text-sm">
+                <label className="flex items-start gap-3">
+                  <Checkbox checked={terms} onCheckedChange={(value) => setTerms(value === true)} />
+                  <span>I agree to the <Link href="/terms" target="_blank" className="font-medium text-brand-secondary underline">Terms of Service</Link> and <Link href="/privacy" target="_blank" className="font-medium text-brand-secondary underline">Privacy Policy</Link>.</span>
+                </label>
+                <label className="flex items-start gap-3">
+                  <Checkbox checked={policies} onCheckedChange={(value) => setPolicies(value === true)} />
+                  <span>I acknowledge the <Link href="/therapist-agreement" target="_blank" className="font-medium text-brand-secondary underline">Therapist Agreement</Link> and platform policies.</span>
+                </label>
+                <label className="flex items-start gap-3">
+                  <Checkbox checked={adult} onCheckedChange={(value) => setAdult(value === true)} />
+                  <span>I confirm I am at least 18 years old.</span>
+                </label>
+              </div>
+
+              {error ? <p role="alert" className="rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">{error}</p> : null}
+
+              <Button type="submit" size="lg" className="w-full gap-2" disabled={loading}>
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                Create account
+                {!loading ? <ArrowRight className="h-4 w-4" /> : null}
+              </Button>
+
+              <p className="text-center text-sm text-muted-foreground">
+                Already registered? <Link href="/login" className="font-medium text-brand-secondary underline">Log in</Link>
+              </p>
+            </form>
+          </div>
+        </section>
+      </div>
+    </main>
   );
 }
