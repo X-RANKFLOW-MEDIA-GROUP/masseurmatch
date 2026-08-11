@@ -25,12 +25,17 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (verificationError) throw new RouteError(500, verificationError.message);
-    if (!verification || verification.provider !== "manual") throw new RouteError(404, "Manual verification not found.");
+    if (!verification || verification.provider !== "manual") throw new RouteError(404, "Identity verification not found.");
     if (!["not_started", "pending"].includes(verification.status)) throw new RouteError(409, "This verification has already been submitted.");
 
     const currentMetadata = (verification.metadata ?? {}) as Record<string, unknown>;
     const manual = ((currentMetadata.manual ?? {}) as Record<string, unknown>);
     const files = ((manual.files ?? {}) as Record<string, unknown>);
+    const expiresAt = typeof manual.expiresAt === "string" ? manual.expiresAt : "";
+
+    if (!expiresAt || Date.parse(expiresAt) <= Date.now()) {
+      throw new RouteError(410, "Verification challenge expired. Start a new verification.");
+    }
 
     if (!files.id_front || !files.selfie) {
       throw new RouteError(400, "Upload the front of your ID and a current selfie before submitting.");
@@ -63,9 +68,9 @@ export async function POST(request: Request) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://www.masseurmatch.com";
     await notifyAdmin({
-      subject: "Manual identity verification requires review",
+      subject: "Identity verification requires review",
       heading: "Identity verification review",
-      intro: "A provider submitted a government ID and live challenge selfie for manual review.",
+      intro: "A provider submitted a government ID and current challenge selfie for review.",
       fields: [
         { label: "Provider", value: profile?.display_name || profile?.full_name || "Provider" },
         { label: "Email", value: profile?.email_address || profile?.email || session.email },

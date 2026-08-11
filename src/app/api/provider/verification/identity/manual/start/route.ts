@@ -3,6 +3,40 @@ import { randomInt, randomUUID } from "node:crypto";
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, requireSession } from "@/app/api/_lib/supabase-server";
 
+const CHALLENGE_TTL_MS = 30 * 60 * 1000;
+
+export async function GET(request: Request) {
+  try {
+    const session = await requireSession(request);
+    const verificationId = new URL(request.url).searchParams.get("verificationId")?.trim() ?? "";
+    if (!verificationId) throw new RouteError(400, "verificationId is required.");
+
+    const admin = createSupabaseAdminClient();
+    const { data: verification, error } = await admin
+      .from("identity_verifications")
+      .select("id, user_id, provider, status, metadata")
+      .eq("id", verificationId)
+      .eq("user_id", session.userId)
+      .maybeSingle();
+
+    if (error) throw new RouteError(500, error.message);
+    if (!verification || verification.provider !== "manual") throw new RouteError(404, "Identity verification not found.");
+    if (!["not_started", "pending"].includes(verification.status)) throw new RouteError(409, "This verification is no longer active.");
+
+    const metadata = (verification.metadata ?? {}) as Record<string, unknown>;
+    const manual = (metadata.manual ?? {}) as Record<string, unknown>;
+    const challengeCode = typeof manual.challengeCode === "string" ? manual.challengeCode : "";
+    const expiresAt = typeof manual.expiresAt === "string" ? manual.expiresAt : "";
+
+    if (!challengeCode || !expiresAt) throw new RouteError(409, "Verification challenge is unavailable. Start a new verification.");
+    if (Date.parse(expiresAt) <= Date.now()) throw new RouteError(410, "Verification challenge expired. Start a new verification.");
+
+    return json({ ok: true, verificationId, challengeCode, expiresAt });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const session = await requireSession(request);
@@ -17,12 +51,13 @@ export async function POST(request: Request) {
     if (profileError) throw new RouteError(500, profileError.message);
     if (!profile) throw new RouteError(404, "Provider profile not found.");
 
-    const now = new Date().toISOString();
+    const now = new Date();
+    const nowIso = now.toISOString();
+    const expiresAt = new Date(now.getTime() + CHALLENGE_TTL_MS).toISOString();
 
-    // Only one active manual attempt should be authoritative at a time.
     await admin
       .from("identity_verifications")
-      .update({ status: "canceled", updated_at: now })
+      .update({ status: "canceled", updated_at: nowIso })
       .eq("user_id", session.userId)
       .eq("provider", "manual")
       .in("status", ["not_started", "pending"]);
@@ -31,8 +66,9 @@ export async function POST(request: Request) {
     const challengeCode = String(randomInt(100000, 1000000));
     const metadata = {
       manual: {
-        version: 1,
+        version: 2,
         challengeCode,
+        expiresAt,
         files: {},
         submittedAt: null,
         reviewedAt: null,
@@ -48,12 +84,12 @@ export async function POST(request: Request) {
       status: "not_started",
       last_error: null,
       metadata,
-      updated_at: now,
+      updated_at: nowIso,
     });
 
     if (insertError) throw new RouteError(500, insertError.message);
 
-    return json({ ok: true, verificationId, challengeCode });
+    return json({ ok: true, verificationId, expiresAt });
   } catch (error) {
     return errorResponse(error);
   }
