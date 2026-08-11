@@ -37,7 +37,7 @@ export async function GET(request: Request) {
       .maybeSingle();
 
     if (error) throw new RouteError(500, error.message);
-    if (!verification || verification.provider !== "manual") throw new RouteError(404, "Identity verification not found.");
+    if (!verification || verification.verification_method !== "manual") throw new RouteError(404, "Identity verification not found.");
     if (!["not_started", "pending"].includes(verification.status)) throw new RouteError(409, "This verification is no longer active.");
 
     const metadata = (verification.metadata ?? {}) as Record<string, unknown>;
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
       .from("identity_verifications")
       .select("id, metadata")
       .eq("user_id", session.userId)
-      .eq("provider", "manual")
+      .eq("verification_method", "manual")
       .in("status", ["not_started", "pending"]);
 
     if (activeError) throw new RouteError(500, activeError.message);
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
       .from("identity_verifications")
       .update({ status: "canceled", updated_at: nowIso })
       .eq("user_id", session.userId)
-      .eq("provider", "manual")
+      .eq("verification_method", "manual")
       .in("status", ["not_started", "pending"]);
 
     const verificationId = randomUUID();

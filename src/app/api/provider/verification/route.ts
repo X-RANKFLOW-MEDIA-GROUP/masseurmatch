@@ -44,7 +44,7 @@ export async function GET(request: Request) {
         ? {
             id: identityRow.id,
             status: identityStatus,
-            provider: identityRow.provider ?? "manual",
+            provider: identityRow.verification_method ?? "manual",
             lastError: identityRow.last_error,
             createdAt: identityRow.created_at,
             updatedAt: identityRow.updated_at,
