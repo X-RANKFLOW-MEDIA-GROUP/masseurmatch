@@ -107,12 +107,15 @@ export default async function HomePage() {
     const realIds = featuredTherapists.filter((t) => isRealProfileId(t.id)).map((t) => t.id);
     if (realIds.length > 0) {
       const photoBatch = await getProfilePhotosBatch(realIds, 1);
-      featuredTherapists = featuredTherapists.map((therapist) => {
-        if (!isRealProfileId(therapist.id)) return therapist;
-        const photos = photoBatch.get(therapist.id) ?? [];
-        const primaryPhoto = photos.find((photo) => photo.is_primary) ?? photos[0];
-        return primaryPhoto ? { ...therapist, profile_photo: primaryPhoto.storage_path } : therapist;
-      });
+      featuredTherapists = featuredTherapists
+        .map((therapist) => {
+          if (!isRealProfileId(therapist.id)) return therapist;
+          const photos = photoBatch.get(therapist.id) ?? [];
+          const primaryPhoto = photos.find((photo) => photo.is_primary);
+          // Require primary photo for featured profiles on homepage
+          return primaryPhoto ? { ...therapist, profile_photo: primaryPhoto.storage_path } : null;
+        })
+        .filter((t): t is NonNullable<typeof t> => t !== null);
     }
   } catch {
     // Never take the homepage down if the featured-management table is unavailable.
