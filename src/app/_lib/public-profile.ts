@@ -20,7 +20,7 @@ export function isVerifiedDirectoryProfile(
   );
 }
 
-/** Whether the therapist has completed real Stripe Identity verification. */
+/** Whether the provider has completed MasseurMatch identity verification. */
 export function isIdentityVerified(
   profile: Pick<PublicTherapist, "verification_status">,
 ) {
