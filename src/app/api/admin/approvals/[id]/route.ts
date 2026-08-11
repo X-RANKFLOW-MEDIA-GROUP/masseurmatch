@@ -149,8 +149,8 @@ export async function POST(
           user_id: profile.user_id,
           type: "profile_approved",
           title: "Profile Approved!",
-          body: "Your therapist profile has been reviewed and approved. It's now visible to clients.",
-          metadata: { profile_id: id, slug: profile.slug },
+          message: "Your therapist profile has been reviewed and approved. It's now visible to clients.",
+          data: { profile_id: id, slug: profile.slug },
         });
       }
     } else if (action === "reject") {
@@ -165,8 +165,8 @@ export async function POST(
           user_id: profile.user_id,
           type: "profile_rejected",
           title: "Profile Review Complete",
-          body: `Your profile needs adjustments before it can be approved. Reason: ${notes || "Please review your profile and try again."}`,
-          metadata: { profile_id: id, reason: notes },
+          message: `Your profile needs adjustments before it can be approved. Reason: ${notes || "Please review your profile and try again."}`,
+          data: { profile_id: id, reason: notes },
         });
       }
     }

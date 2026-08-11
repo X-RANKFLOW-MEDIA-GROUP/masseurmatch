@@ -10,37 +10,8 @@ const PROFILE_CMS_UPDATE_FIELDS = [
   "email",
   "slug",
   "bio",
-  "education",
-  "training",
-  "certifications",
-  "massage_setup",
-  "incall_amenities",
-  "mobile_extras",
-  "products_used",
-  "products_sold",
-  "studio_amenities",
-  "affiliations",
-  "pricing_sessions",
-  "regular_discounts",
-  "day_of_week_discount",
-  "weekly_special",
-  "business_hours",
-  "incall",
-  "outcall",
-  "traveling",
-  "starting_price",
-  "outcall_radius_miles",
   "seo_title",
   "seo_description",
-  "presentation_video_url",
-  "social_media",
-  "tagline",
-  "booking_platform",
-  "booking_url",
-  "keyword_slugs",
-  "custom_faq",
-  "years_experience",
-  "seo_keywords",
 ] as const satisfies readonly (keyof ProfileUpdate & keyof ProfileRow)[];
 
 export type ProfileCmsUpdateField = (typeof PROFILE_CMS_UPDATE_FIELDS)[number];
@@ -142,62 +113,8 @@ function assignProfileCmsUpdateValue(
     case "slug":
     case "bio":
     case "seo_title":
-    case "seo_description":
-    case "presentation_video_url":
-    case "tagline":
-    case "booking_platform":
-    case "booking_url": {
+    case "seo_description": {
       const normalized = toNullableString(fieldName, value);
-      update[fieldName] = normalized;
-      return normalized;
-    }
-
-    case "education":
-    case "training":
-    case "certifications": {
-      const normalized = toSerializedString(fieldName, value);
-      update[fieldName] = normalized;
-      return normalized;
-    }
-
-    case "massage_setup":
-    case "incall_amenities":
-    case "mobile_extras":
-    case "products_used":
-    case "products_sold":
-    case "studio_amenities":
-    case "affiliations":
-    case "keyword_slugs":
-    case "seo_keywords": {
-      const normalized = toStringArray(fieldName, value);
-      update[fieldName] = normalized;
-      return normalized;
-    }
-
-    case "pricing_sessions":
-    case "regular_discounts":
-    case "day_of_week_discount":
-    case "weekly_special":
-    case "business_hours":
-    case "social_media":
-    case "custom_faq": {
-      const normalized = toProfileCmsJson(value);
-      update[fieldName] = normalized;
-      return normalized;
-    }
-
-    case "incall":
-    case "outcall":
-    case "traveling": {
-      const normalized = toNullableBoolean(fieldName, value);
-      update[fieldName] = normalized;
-      return normalized;
-    }
-
-    case "starting_price":
-    case "outcall_radius_miles":
-    case "years_experience": {
-      const normalized = toNullableNumber(fieldName, value);
       update[fieldName] = normalized;
       return normalized;
     }

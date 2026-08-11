@@ -14,7 +14,7 @@ import type { Database } from "@/integrations/supabase/types";
 type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 
 const GROWTH_SELECT =
-  "id, slug, city, subscription_tier, available_now, available_now_expires, travel_schedule, promotions, current_status, is_active";
+  "id, slug, city, subscription_tier, available_now, available_now_expires, travel_schedule, promotions, visibility_status, is_active";
 
 const travelEntrySchema = z.object({
   city: z.string().min(1).max(120),

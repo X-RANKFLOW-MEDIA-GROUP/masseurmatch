@@ -120,14 +120,20 @@ export async function POST(request: NextRequest) {
 
     const isVerified = hasContactEvent || !!inquiry;
 
+    const { data: clientProfile } = await supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("user_id", session.userId)
+      .maybeSingle();
+
     const { data, error } = await supabase
       .from("reviews")
       .insert({
         client_id: session.userId,
         therapist_id: therapistId,
         rating,
-        title: title?.trim() || null,
-        content: content?.trim() || null,
+        author_name: clientProfile?.display_name || "Anonymous",
+        body: content?.trim() || title?.trim() || "",
         is_verified: isVerified,
       })
       .select()
@@ -148,7 +154,7 @@ export async function POST(request: NextRequest) {
         user_id: therapistProfile.user_id,
         type: "new_review",
         title: "New Review Received",
-        body: `You received a ${rating}-star review${title ? `: "${title}"` : ""}`,
+        message: `You received a ${rating}-star review${title ? `: "${title}"` : ""}`,
         data: { review_id: data.id, rating },
       });
     }

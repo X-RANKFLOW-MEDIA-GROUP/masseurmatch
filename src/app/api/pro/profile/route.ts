@@ -140,7 +140,7 @@ export async function GET(request: Request) {
     const isDashboard = new URL(request.url).searchParams.get("dashboard") === "true";
 
     const select = isDashboard
-      ? "id, display_name, full_name, bio, city, state, status, is_active, current_status, available_now, available_now_expires, specialties, incall_price, outcall_price, subscription_tier, is_featured"
+      ? "id, display_name, full_name, bio, city, state, status, is_active, visibility_status, available_now, available_now_expires, specialties, incall_price, outcall_price, subscription_tier, is_featured"
       : "*"; // Full select for other requests
 
     const { data: profile, error } = await admin
@@ -428,22 +428,16 @@ export async function PATCH(request: Request) {
     if (body.offersIncall !== undefined) updates.offers_incall = body.offersIncall;
     if (body.offersOutcall !== undefined) updates.offers_outcall = body.offersOutcall;
     if (body.outcallRadius !== undefined) updates.outcall_radius = body.outcallRadius;
-    if (body.mapEnabled !== undefined) updates.map_enabled = body.mapEnabled;
 
     if (body.massageTechniques !== undefined) updates.massage_techniques = body.massageTechniques;
     if (body.serviceCategories !== undefined) updates.service_categories = body.serviceCategories;
     if (body.specialties !== undefined) updates.specialties = body.specialties;
-    if (body.massageSetup !== undefined) updates.massage_setup = body.massageSetup;
-    if (body.mobileExtras !== undefined) updates.mobile_extras = body.mobileExtras;
-    if (body.additionalServices !== undefined) updates.additional_services = body.additionalServices;
-    if (body.studioAmenities !== undefined) updates.studio_amenities = body.studioAmenities;
-    if (body.productsUsed !== undefined) updates.products_used = body.productsUsed;
-    if (body.productsSold !== undefined) updates.products_sold = body.productsSold;
-    if (body.paymentMethods !== undefined) updates.payment_methods = body.paymentMethods;
+    if (body.massageSetup !== undefined) updates.massage_setup = typeof body.massageSetup === 'string' ? body.massageSetup : JSON.stringify(body.massageSetup);
+    if (body.mobileExtras !== undefined) updates.mobile_extras = typeof body.mobileExtras === 'string' ? body.mobileExtras : JSON.stringify(body.mobileExtras);
+    if (body.productsUsed !== undefined) updates.products_used = typeof body.productsUsed === 'string' ? body.productsUsed : JSON.stringify(body.productsUsed);
+    if (body.productsSold !== undefined) updates.products_sold = typeof body.productsSold === 'string' ? body.productsSold : JSON.stringify(body.productsSold);
+    if (body.paymentMethods !== undefined) updates.payment_methods = typeof body.paymentMethods === 'string' ? body.paymentMethods : JSON.stringify(body.paymentMethods);
     if (body.languages !== undefined) updates.languages = body.languages;
-    if (body.affiliations !== undefined) updates.affiliations = body.affiliations;
-    if (body.rateDisclaimers !== undefined) updates.rate_disclaimers = body.rateDisclaimers;
-    if (body.regularDiscounts !== undefined) updates.regular_discounts = body.regularDiscounts;
 
     if (body.pricingSessions !== undefined) {
       if (!validatePricingMarkup(body.pricingSessions)) {
@@ -452,16 +446,7 @@ export async function PATCH(request: Request) {
       updates.pricing_sessions = body.pricingSessions;
     }
     if (body.dayOfWeekDiscount !== undefined) updates.day_of_week_discount = body.dayOfWeekDiscount;
-    if (body.educationEntries !== undefined) updates.education_entries = body.educationEntries;
-    if (body.studioHours !== undefined) updates.studio_hours = body.studioHours;
     if (body.mobileHours !== undefined) updates.mobile_hours = body.mobileHours;
-
-    if (body.startDate !== undefined) {
-      // start_date is timestamptz; pad month-only values so Postgres accepts them
-      const startDate = text(body.startDate);
-      updates.start_date =
-        startDate && /^\d{4}-\d{2}$/.test(startDate) ? `${startDate}-01` : startDate;
-    }
     if (body.yearsExperience !== undefined) updates.years_experience = body.yearsExperience;
     if (body.heightInches !== undefined) updates.height_inches = body.heightInches;
     if (body.weightLb !== undefined) updates.weight_lb = body.weightLb;
@@ -471,7 +456,7 @@ export async function PATCH(request: Request) {
     // The paid "Available Now" badge is gated by tier + TTL in
     // /api/pro/available-now; accepting it on the general profile PATCH let any
     // user (including Free) grant themselves the badge with no expiry.
-    if (body.currentStatus !== undefined) updates.current_status = text(body.currentStatus);
+    if (body.currentStatus !== undefined) updates.visibility_status = text(body.currentStatus);
     if (body.lgbtqAffirming !== undefined) updates.lgbtq_affirming = body.lgbtqAffirming;
 
     updates.profile_status =

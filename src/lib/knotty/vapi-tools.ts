@@ -61,9 +61,7 @@ const profileSelect = [
   "incall_price",
   "outcall_price",
   "pricing_sessions",
-  "studio_hours",
   "mobile_hours",
-  "availability_note",
   "travel_schedule",
   "profile_status",
   "visibility_status",
@@ -233,9 +231,7 @@ function publicProfile(profile: Profile) {
     incallPrice: profile.incall_price,
     outcallPrice: profile.outcall_price,
     pricingSessions: profile.pricing_sessions,
-    studioHours: profile.studio_hours,
     mobileHours: profile.mobile_hours,
-    availabilityNote: profile.availability_note,
     travelSchedule: profile.travel_schedule,
     profileStatus: profile.profile_status,
     visibilityStatus: profile.visibility_status,
@@ -282,7 +278,7 @@ async function getCompletion(profile: Profile) {
     languages: Boolean(profile.languages?.length),
     service_type: Boolean(profile.offers_incall || profile.offers_outcall),
     rates: Boolean(profile.starting_price || profile.incall_price || profile.outcall_price || profile.pricing_sessions),
-    availability: Boolean(profile.studio_hours || profile.mobile_hours || profile.availability_note),
+    availability: Boolean(profile.mobile_hours || profile.travel_schedule),
     photo: Boolean(count && count > 0),
   };
   const completed = Object.entries(checks).filter(([, value]) => value).map(([key]) => key);
@@ -292,7 +288,7 @@ async function getCompletion(profile: Profile) {
   return {
     completionPercent:
       profile.completion_percentage ??
-      profile.profile_completion_score ??
+      profile.completion_score ??
       profile.profile_completeness ??
       calculatedPercent,
     calculatedPercent,

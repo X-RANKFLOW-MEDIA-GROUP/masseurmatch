@@ -33,13 +33,13 @@ export async function POST(request: Request) {
 
     const { data: verification, error: verificationError } = await admin
       .from("identity_verifications")
-      .select("id, user_id, provider, status, metadata")
+      .select("id, user_id, verification_method, status, metadata")
       .eq("id", verificationId)
       .eq("user_id", session.userId)
       .maybeSingle();
 
     if (verificationError) throw new RouteError(500, verificationError.message);
-    if (!verification || verification.provider !== "manual") throw new RouteError(404, "Identity verification not found.");
+    if (!verification || verification.verification_method !== "manual") throw new RouteError(404, "Identity verification not found.");
     if (!["not_started", "pending"].includes(verification.status)) throw new RouteError(409, "This verification has already been submitted.");
 
     const currentMetadata = (verification.metadata ?? {}) as Record<string, unknown>;
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
 
     const { error: updateError } = await admin
       .from("identity_verifications")
-      .update({ provider: "manual", status: "pending", last_error: null, metadata: metadata as Json, updated_at: submittedAt })
+      .update({ status: "pending", last_error: null, metadata: metadata as Json, updated_at: submittedAt })
       .eq("id", verificationId)
       .eq("user_id", session.userId);
 

@@ -37,6 +37,14 @@ export async function POST(request: Request) {
     const imageUrl = photo.url || photo.storage_path || null;
     const now = new Date().toISOString();
 
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("user_id")
+      .eq("id", profileId)
+      .maybeSingle();
+
+    if (!profile?.user_id) throw new RouteError(500, "Profile has no associated user.");
+
     if (body.action === "set_primary") {
       const { error: resetError } = await supabase
         .from("profile_photos")
@@ -67,15 +75,15 @@ export async function POST(request: Request) {
         .upsert({
           content_type: "photo",
           profile_id: profileId,
-          user_id: photo.user_id,
+          user_id: profile.user_id,
           target_id: photo.id,
           item_type: "photo",
           source: "admin_people_crm",
           status: approved ? "approved" : "rejected",
           moderation_provider: "admin",
           moderation_reason: body.reason || (approved ? "admin_approved" : "admin_rejected"),
-          reviewed_at: now,
-          reviewed_by: admin.userId,
+          resolved_at: now,
+          resolved_by: admin.userId,
           snapshot: imageUrl ? { photoId: photo.id, imageUrl } : { photoId: photo.id },
         }, { onConflict: "target_id" });
     }
@@ -92,7 +100,7 @@ export async function POST(request: Request) {
         .upsert({
           content_type: "photo",
           profile_id: profileId,
-          user_id: photo.user_id,
+          user_id: profile.user_id,
           target_id: photo.id,
           item_type: "photo",
           source: "admin_people_crm",

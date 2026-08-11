@@ -216,7 +216,7 @@ type ProfileRecord = {
   body_type?: string | null;
   available_now?: boolean | null;
   available_now_expires?: string | null;
-  current_status?: string | null;
+  visibility_status?: string | null;
   lgbtq_affirming?: boolean | null;
 };
 
@@ -401,7 +401,7 @@ function mapProfileToForm(profile: ProfileRecord | null | undefined): FormState 
     weightLb: typeof profile.weight_lb === "number" ? String(profile.weight_lb) : "",
     bodyType: normalizeBodyTypeValue(profile.body_type) || "",
     availableNow: profile.available_now ?? false,
-    currentStatus: profile.current_status || "",
+    currentStatus: profile.visibility_status || "",
     lgbtqAffirming: profile.lgbtq_affirming ?? false,
   };
 }

@@ -258,6 +258,10 @@ create table if not exists public.identity_verifications (
   stripe_verification_session_id text,
   stripe_session_id text,
   last_error text,
+  verification_method text,
+  document_type text,
+  legal_name_hash text,
+  metadata jsonb,
   created_at timestamptz default timezone('utc', now()),
   updated_at timestamptz default timezone('utc', now())
 );
@@ -490,7 +494,9 @@ create table if not exists public.reviews (
   client_id uuid,
   client_email text,
   reviewer_name text,
+  author_name text,
   title text,
+  body text,
   content text,
   review_text text,
   rating integer,

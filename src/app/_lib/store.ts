@@ -19,7 +19,7 @@ const PROFILE_SELECT = `
   subscription_tier, is_featured, is_suspended, is_banned,
   stripe_customer_id, stripe_subscription_id, current_period_end,
   photo_limit, visibility_level, featured_until,
-  current_status, service_radius_km, travel_destination,
+  service_radius_miles,
   promotions, seo_title, seo_description, seo_keywords,
   travel_schedule,
   updated_at, created_at
@@ -38,46 +38,6 @@ export type AvailableNowProfile = {
 };
 
 export { recordAuditLog };
-
-async function syncTherapistProfileRuntime(userId: string) {
-  try {
-    const adminClient = createSupabaseAdminClient();
-
-    const { data: profile } = await adminClient
-      .from("profiles")
-      .select("id,user_id,slug,display_name,full_name,headline,bio,city,state,phone,email_address,visibility_status,profile_status")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (!profile?.id) {
-      return;
-    }
-
-    const payload = {
-      profile_id: profile.id,
-      user_id: profile.user_id,
-      slug: profile.slug || profile.id,
-      display_name: profile.display_name || profile.full_name || "Therapist",
-      headline: profile.headline || null,
-      bio: profile.bio || null,
-      city: profile.city || "Unlisted",
-      state: profile.state || null,
-      contact_email: profile.email_address || null,
-      phone: profile.phone || null,
-      is_published:
-        profile.visibility_status === "public" && profile.profile_status === "approved",
-      moderation_status:
-        profile.profile_status === "approved" ? "approved" : "draft",
-      updated_at: new Date().toISOString(),
-    };
-
-    await adminClient
-      .from("therapist_profiles")
-      .upsert(payload, { onConflict: "profile_id" });
-  } catch {
-    // best effort runtime sync
-  }
-}
 
 export async function getProfileByUserId(userId: string) {
   const adminClient = createSupabaseAdminClient();
@@ -125,8 +85,6 @@ export async function setAvailableNow(
   if (error) {
     throw new RouteError(500, error.message);
   }
-
-  await syncTherapistProfileRuntime(userId);
 }
 
 export async function updateProfileByUserId(userId: string, updates: ProfileUpdate) {
@@ -144,8 +102,6 @@ export async function updateProfileByUserId(userId: string, updates: ProfileUpda
   if (error) {
     throw new RouteError(500, error.message);
   }
-
-  await syncTherapistProfileRuntime(userId);
 
   return data;
 }

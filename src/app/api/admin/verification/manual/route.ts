@@ -10,8 +10,8 @@ export async function GET(request: Request) {
 
     const { data: rows, error } = await admin
       .from("identity_verifications")
-      .select("id,user_id,profile_id,status,provider,last_error,metadata,created_at,updated_at")
-      .eq("provider", "manual")
+      .select("id,user_id,profile_id,status,verification_method,last_error,metadata,created_at,updated_at")
+      .eq("verification_method", "manual")
       .order("created_at", { ascending: false })
       .limit(100);
 

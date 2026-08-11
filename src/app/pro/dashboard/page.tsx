@@ -18,7 +18,7 @@ type DashboardProfile = {
   available_now?: boolean | null;
   available_now_expires?: string | null;
   travel_schedule?: unknown;
-  current_status?: string | null;
+  visibility_status?: string | null;
   is_active?: boolean | null;
 };
 
@@ -91,7 +91,7 @@ export default function ProDashboardPage() {
     profile?.available_now &&
       (!profile.available_now_expires || new Date(profile.available_now_expires).getTime() > Date.now()),
   );
-  const visible = profile?.is_active !== false && profile?.current_status !== "hidden";
+  const visible = profile?.is_active !== false && profile?.visibility_status !== "hidden";
   const displayName = profile?.display_name || profile?.full_name || "Your profile";
 
   async function toggleAvailableNow() {
