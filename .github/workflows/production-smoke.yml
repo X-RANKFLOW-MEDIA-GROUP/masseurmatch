@@ -1,0 +1,52 @@
+# This suite used to run inside CI as the pull-request E2E gate, via a
+# `PLAYWRIGHT_BASE_URL` fallback that pointed at production. That made every
+# pull request whose commit had no preview report a green E2E run while never
+# touching its own code — it was checking that masseurmatch.com was up, which
+# is a useful claim but not the one a pull request needs.
+#
+# Splitting it out keeps the claim and makes it honest: green here means
+# production is healthy. Green on a pull request means that pull request was
+# exercised. The two no longer masquerade as each other.
+
+name: Production Smoke
+
+on:
+  schedule:
+    # Every six hours. Production changes only when main deploys, so this is
+    # about catching drift and outages, not about gating changes.
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: production-smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Production smoke (masseurmatch.com)
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-jammy
+      options: --ipc=host
+    env:
+      PLAYWRIGHT_BASE_URL: ${{ vars.PLAYWRIGHT_BASE_URL }}
+    if: ${{ vars.PLAYWRIGHT_BASE_URL != '' }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.32.1
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Run smoke tests against production
+        run: pnpm exec playwright test
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: production-smoke-report
+          path: playwright-report/
+          retention-days: 7
+          if-no-files-found: ignore

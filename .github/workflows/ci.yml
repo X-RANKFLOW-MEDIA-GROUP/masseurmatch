@@ -247,9 +247,13 @@ jobs:
       options: --ipc=host
     needs: [build, preview-url]
     env:
-      PLAYWRIGHT_BASE_URL: ${{ needs.preview-url.outputs.url != '' && needs.preview-url.outputs.url || vars.PLAYWRIGHT_BASE_URL }}
+      # The preview for THIS pull request, and nothing else. Falling back to a
+      # fixed URL here used to point the suite at production, so a pull request
+      # whose commit had no preview reported a green E2E run having never
+      # exercised its own code. Production is covered by production-smoke.yml.
+      PLAYWRIGHT_BASE_URL: ${{ needs.preview-url.outputs.url }}
       VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
-    if: ${{ always() && needs.build.result == 'success' && (needs.preview-url.outputs.url != '' || vars.PLAYWRIGHT_BASE_URL != '') }}
+    if: ${{ always() && needs.build.result == 'success' && needs.preview-url.outputs.url != '' }}
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
@@ -278,9 +282,10 @@ jobs:
       options: --ipc=host
     needs: [build, preview-url]
     env:
-      PLAYWRIGHT_BASE_URL: ${{ needs.preview-url.outputs.url != '' && needs.preview-url.outputs.url || vars.PLAYWRIGHT_BASE_URL }}
+      # Same rule as the E2E job: the preview for THIS pull request only.
+      PLAYWRIGHT_BASE_URL: ${{ needs.preview-url.outputs.url }}
       VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
-    if: ${{ always() && needs.build.result == 'success' && (needs.preview-url.outputs.url != '' || vars.PLAYWRIGHT_BASE_URL != '') }}
+    if: ${{ always() && needs.build.result == 'success' && needs.preview-url.outputs.url != '' }}
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
