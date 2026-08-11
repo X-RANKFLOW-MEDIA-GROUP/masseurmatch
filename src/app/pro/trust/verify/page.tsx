@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, CheckCircle2, Loader2, ShieldCheck, Upload } from "lucide-react";
 
@@ -25,7 +25,8 @@ function ManualIdentityVerificationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const verificationId = searchParams.get("verificationId") ?? "";
-  const challengeCode = searchParams.get("challengeCode") ?? "";
+  const [challengeCode, setChallengeCode] = useState("");
+  const [challengeLoading, setChallengeLoading] = useState(true);
   const [documentType, setDocumentType] = useState("drivers_license");
   const [documentCountry, setDocumentCountry] = useState("US");
   const [files, setFiles] = useState<Partial<Record<UploadKind, File>>>({});
@@ -33,10 +34,33 @@ function ManualIdentityVerificationContent() {
   const [error, setError] = useState<string | null>(null);
   const [complete, setComplete] = useState(false);
 
+  useEffect(() => {
+    if (!verificationId) {
+      setChallengeLoading(false);
+      return;
+    }
+
+    let active = true;
+    void (async () => {
+      try {
+        const res = await fetch(`/api/provider/verification/identity/manual/start?verificationId=${encodeURIComponent(verificationId)}`, { cache: "no-store" });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error ?? "Verification challenge unavailable.");
+        if (active) setChallengeCode(data.challengeCode ?? "");
+      } catch (err) {
+        if (active) setError(err instanceof Error ? err.message : "Verification challenge unavailable.");
+      } finally {
+        if (active) setChallengeLoading(false);
+      }
+    })();
+
+    return () => { active = false; };
+  }, [verificationId]);
+
   const needsBack = documentType !== "passport";
   const ready = useMemo(
-    () => Boolean(verificationId && files.id_front && files.selfie && (!needsBack || files.id_back)),
-    [files, needsBack, verificationId],
+    () => Boolean(verificationId && challengeCode && files.id_front && files.selfie && (!needsBack || files.id_back)),
+    [challengeCode, files, needsBack, verificationId],
   );
 
   async function upload(kind: UploadKind, file: File) {
@@ -74,22 +98,26 @@ function ManualIdentityVerificationContent() {
     }
   }
 
-  if (!verificationId || !challengeCode) {
+  if (!verificationId || (!challengeLoading && !challengeCode)) {
     return (
       <div className="mx-auto max-w-2xl p-6 md:p-10">
         <div className="rounded-xl border border-rose-200 bg-rose-50 p-5 text-rose-800">
-          <div className="flex gap-3"><AlertCircle className="mt-0.5 h-5 w-5" /><div><h1 className="font-semibold">Verification session unavailable</h1><p className="mt-1 text-sm">Return to Trust &amp; Verification and start identity verification again.</p></div></div>
+          <div className="flex gap-3"><AlertCircle className="mt-0.5 h-5 w-5" /><div><h1 className="font-semibold">Verification session unavailable</h1><p className="mt-1 text-sm">{error || "Return to Trust & Verification and start identity verification again."}</p></div></div>
         </div>
       </div>
     );
   }
 
+  if (challengeLoading) {
+    return <div className="flex min-h-[420px] items-center justify-center"><Loader2 className="h-7 w-7 animate-spin text-slate-400" /></div>;
+  }
+
   return (
     <div className="mx-auto max-w-3xl space-y-6 p-6 pb-24 md:p-10">
       <div>
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-slate-600"><ShieldCheck className="h-3.5 w-3.5" /> Secure manual review</div>
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-slate-600"><ShieldCheck className="h-3.5 w-3.5" /> Secure identity review</div>
         <h1 className="font-display text-3xl font-medium tracking-tight text-slate-900">Verify your identity</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500">MasseurMatch is temporarily reviewing identity documents manually. Your documents are stored privately and removed after the review decision.</p>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500">Submit a government-issued ID and a current selfie with the one-time challenge code below. Documents are stored privately and removed after the review decision.</p>
       </div>
 
       {complete ? (
@@ -99,9 +127,9 @@ function ManualIdentityVerificationContent() {
       ) : (
         <>
           <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
-            <div className="text-xs font-semibold uppercase tracking-wider text-amber-700">Live selfie challenge</div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-amber-700">One-time selfie challenge</div>
             <div className="mt-2 font-mono text-4xl font-bold tracking-[0.18em] text-amber-950">{challengeCode}</div>
-            <p className="mt-3 text-sm leading-relaxed text-amber-800">For your selfie, hold a paper showing this six-digit code next to your face. Your face and the entire code must be clearly visible. This helps prevent use of an old or stolen photo.</p>
+            <p className="mt-3 text-sm leading-relaxed text-amber-800">Write this six-digit code on paper and hold it next to your face in the selfie. Your face and the full code must be clearly visible. The challenge expires after 30 minutes.</p>
           </div>
 
           <div className="grid gap-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-2">
@@ -121,7 +149,7 @@ function ManualIdentityVerificationContent() {
             <FilePicker label="Current selfie with challenge code" required accept="image/jpeg,image/png,image/webp" file={files.selfie} onChange={(file) => setFiles((prev) => ({ ...prev, selfie: file }))} />
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs leading-relaxed text-slate-600">Identity verification confirms that MasseurMatch reviewed a government-issued identity document and a current selfie. It does not verify professional licensing, background history, qualifications, or services.</div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs leading-relaxed text-slate-600">Identity verification confirms only that MasseurMatch reviewed a government-issued identity document and a current selfie. It does not verify professional licensing, background history, qualifications, or services.</div>
 
           {error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">{error}</div>}
 
