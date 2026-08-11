@@ -2,7 +2,7 @@
 
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, CheckCircle2, Loader2, Mail, Phone, ShieldCheck } from "lucide-react";
+import { ArrowRight, CheckCircle2, Clock, Loader2, Mail, Phone, ShieldCheck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,6 @@ function VerificationPage() {
     markEmailVerified,
     markPhoneVerified,
     setIdentityStatus,
-    setStripeIdentitySessionId,
   } = useSignup();
 
   const [emailCode, setEmailCode] = useState("");
@@ -148,56 +147,62 @@ function VerificationPage() {
   }
 
   const checkIdentity = useCallback(async () => {
-    if (!state.stripeIdentitySessionId) return;
+    if (!user) return;
     setIdentityLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/stripe/identity/check-status?sessionId=${encodeURIComponent(state.stripeIdentitySessionId)}`, { cache: "no-store" });
+      const response = await fetch("/api/provider/verification/identity/status", { cache: "no-store" });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error || "Could not check identity status.");
       if (body.status === "verified") setIdentityStatus("verified");
       else if (body.status === "requires_input") setIdentityStatus("requires_input");
-      else if (body.status === "canceled") setIdentityStatus("failed");
+      else if (body.status === "failed" || body.status === "canceled") setIdentityStatus("failed");
+      else if (body.status === "not_started") setIdentityStatus("not_started");
       else setIdentityStatus("processing");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not check identity status.");
     } finally {
       setIdentityLoading(false);
     }
-  }, [setIdentityStatus, state.stripeIdentitySessionId]);
+  }, [setIdentityStatus, user]);
+
+  useEffect(() => {
+    if (user) void checkIdentity();
+  }, [checkIdentity, user]);
 
   async function startIdentity() {
     setIdentityLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/stripe/identity/create-session", {
+      const response = await fetch("/api/provider/verification/identity/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error || "Could not start identity verification.");
-      setStripeIdentitySessionId(body.sessionId);
+      if (!body.url) throw new Error("Identity verification did not return a secure upload page.");
       setIdentityStatus("processing");
-      if (body.url) window.location.href = body.url;
+      const separator = body.url.includes("?") ? "&" : "?";
+      window.location.href = `${body.url}${separator}returnTo=signup`;
     } catch (err) {
       setIdentityStatus("failed");
       setError(err instanceof Error ? err.message : "Could not start identity verification.");
-    } finally {
       setIdentityLoading(false);
     }
   }
 
   if (!authLoading && !user && !state.email) return null;
   const identityVerified = state.identityVerificationStatus === "verified";
-  const canContinue = state.emailVerified && state.phoneVerified;
+  const identityPending = state.identityVerificationStatus === "processing";
+  const canContinue = state.emailVerified && state.phoneVerified && identityVerified;
 
   return (
     <main className="mx-auto max-w-2xl space-y-5 py-5 sm:py-8">
       <header>
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-secondary">Verification</p>
-        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-foreground">Confirm your contact details</h1>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">Email and phone verification must work before the profile wizard continues.</p>
+        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-foreground">Confirm your account and identity</h1>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">Email, phone, and identity verification must be completed before your profile can be submitted for moderation.</p>
       </header>
 
       {error ? <p role="alert" className="rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">{error}</p> : null}
@@ -243,21 +248,27 @@ function VerificationPage() {
 
       <Card>
         <CardContent className="space-y-4 p-5 sm:p-6">
-          <div className="flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-brand-secondary" /><h2 className="font-semibold">Identity check</h2>{identityVerified ? <Badge className="ml-auto bg-emerald-600">Verified</Badge> : null}</div>
-          <p className="text-sm text-muted-foreground">Stripe Identity handles the ID check. MasseurMatch does not store the ID document.</p>
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-brand-secondary" />
+            <h2 className="font-semibold">Identity</h2>
+            {identityVerified ? <Badge className="ml-auto bg-emerald-600">Identity Verified</Badge> : identityPending ? <Badge variant="secondary" className="ml-auto"><Clock className="mr-1 h-3 w-3" /> Pending review</Badge> : null}
+          </div>
+          <p className="text-sm text-muted-foreground">MasseurMatch reviews a government-issued ID and a current challenge selfie. Sensitive images are stored privately and deleted after the review decision.</p>
           {!identityVerified ? (
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" onClick={startIdentity} disabled={identityLoading}>{identityLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}{state.stripeIdentitySessionId ? "Resume ID verification" : "Start ID verification"}</Button>
-              {state.stripeIdentitySessionId ? <Button variant="ghost" onClick={checkIdentity} disabled={identityLoading}>Check status</Button> : null}
+              {!identityPending ? <Button variant="outline" onClick={startIdentity} disabled={identityLoading}>{identityLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}{state.identityVerificationStatus === "requires_input" || state.identityVerificationStatus === "failed" ? "Resubmit identity" : "Start identity verification"}</Button> : null}
+              <Button variant="ghost" onClick={() => void checkIdentity()} disabled={identityLoading}>{identityLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}Check status</Button>
             </div>
           ) : null}
+          {identityPending ? <p className="text-xs text-muted-foreground">Your evidence was submitted and is waiting for human review. We will email you after a decision.</p> : null}
+          <p className="text-xs text-muted-foreground">Identity Verified confirms identity only. It does not verify professional licensing, background, qualifications, or services.</p>
         </CardContent>
       </Card>
 
       <Button size="lg" className="w-full gap-2" disabled={!canContinue} onClick={() => router.push("/signup/profile")}>
         Continue to profile <ArrowRight className="h-4 w-4" />
       </Button>
-      {!canContinue ? <p className="text-center text-xs text-muted-foreground">Complete both email and phone verification to continue.</p> : null}
+      {!canContinue ? <p className="text-center text-xs text-muted-foreground">Complete email, phone, and identity verification to continue.</p> : null}
     </main>
   );
 }
