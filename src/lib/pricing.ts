@@ -73,7 +73,7 @@ export const PLANS: Plan[] = [
       "Views + clicks analytics",
       "Homepage rotation",
       "Weekly specials",
-      "Verified badge (Stripe Identity, with public verification date)",
+      "Identity Verified badge (with public verification date)",
     ],
   },
   {
