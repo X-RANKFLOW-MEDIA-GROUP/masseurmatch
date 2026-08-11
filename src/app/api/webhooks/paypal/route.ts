@@ -6,6 +6,7 @@ import {
   syncPayPalSubscription,
 } from "@/app/api/_lib/paypal";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import type { Json } from "@/integrations/supabase/types";
 
 export const dynamic = "force-dynamic";
 
@@ -52,12 +53,11 @@ function getSubscriptionId(event: PayPalWebhookEvent) {
 
 export async function POST(request: Request) {
   const admin = createSupabaseAdminClient();
-  let event: PayPalWebhookEvent | null = null;
   let eventId: string | null = null;
 
   try {
     const rawBody = await request.text();
-    event = JSON.parse(rawBody) as PayPalWebhookEvent;
+    const event = JSON.parse(rawBody) as PayPalWebhookEvent;
     eventId = typeof event.id === "string" ? event.id : null;
     const eventType = typeof event.event_type === "string" ? event.event_type : "unknown";
 
@@ -108,7 +108,7 @@ export async function POST(request: Request) {
     const { error: insertError } = await admin.from("paypal_events").insert({
       paypal_event_id: eventId,
       event_type: eventType,
-      payload: event,
+      payload: event as unknown as Json,
       processed_at: new Date().toISOString(),
     });
     if (insertError) {
@@ -126,11 +126,14 @@ export async function POST(request: Request) {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     if (eventId) {
-      await admin
-        .from("paypal_events")
-        .update({ processing_error: message, failed_at: new Date().toISOString() })
-        .eq("paypal_event_id", eventId)
-        .catch(() => undefined);
+      try {
+        await admin
+          .from("paypal_events")
+          .update({ processing_error: message, failed_at: new Date().toISOString() })
+          .eq("paypal_event_id", eventId);
+      } catch {
+        // Preserve the original webhook error so PayPal can retry it.
+      }
     }
     console.error("[paypal-webhook]", message);
     return NextResponse.json({ ok: false, error: "Webhook processing failed." }, { status: 500 });
