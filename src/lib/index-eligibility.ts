@@ -153,7 +153,7 @@ export function getProfileIndexRobots(profile: TherapistProfile | PublicTherapis
   }
 
   const liveList = cityLiveList || indexEligibilityConfig.citiesLiveList;
-  const isVerified = profile.verification_status === "verified";
+  const isVerified = "verification_status" in profile ? profile.verification_status === "verified" : false;
 
   // is_published is on TherapistProfile but not PublicTherapist
   // PublicTherapist from the query is always published, so assume true if field doesn't exist
@@ -189,5 +189,7 @@ export function shouldShowProfileSeoScore(profile: TherapistProfile | null): boo
   if (!profile) return false;
 
   // Only show SEO score to verified, published profiles
-  return profile.verification_status === "verified" && profile.is_published === true;
+  const isVerified = "verification_status" in profile ? profile.verification_status === "verified" : false;
+  const isPublished = "is_published" in profile ? profile.is_published === true : false;
+  return isVerified && isPublished;
 }

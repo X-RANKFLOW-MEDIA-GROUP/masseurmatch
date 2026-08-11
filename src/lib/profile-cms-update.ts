@@ -18,8 +18,6 @@ const PROFILE_CMS_UPDATE_FIELDS = [
   "mobile_extras",
   "products_used",
   "products_sold",
-  "studio_amenities",
-  "affiliations",
   "pricing_sessions",
   "regular_discounts",
   "day_of_week_discount",

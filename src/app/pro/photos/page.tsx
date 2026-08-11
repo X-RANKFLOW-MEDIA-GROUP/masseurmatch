@@ -258,6 +258,10 @@ export default function PhotoManagerPage() {
 
         const insertedPhoto = photoRecord as { id: string };
 
+        if (!profile.user_id) {
+          throw new Error("Profile has no associated user.");
+        }
+
         const { error: queueInsertError } = await supabase.from("moderation_queue").insert({
           content_type: "photo",
           profile_id: profile.id,
@@ -267,7 +271,7 @@ export default function PhotoManagerPage() {
           source: "pro_photos",
           field_name: null,
           status: "pending",
-          priority: 0,
+          priority: "0",
           moderation_provider: "sightengine",
           moderation_reason: "queued_for_ai_review",
           snapshot: {

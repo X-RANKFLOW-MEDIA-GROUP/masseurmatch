@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     const [identityResult, textResult] = await Promise.all([
       adminClient
         .from("identity_verifications")
-        .select("id, status, provider, last_error, metadata, created_at, updated_at")
+        .select("id, status, verification_method, last_error, metadata, created_at, updated_at")
         .eq("user_id", session.userId)
         .order("created_at", { ascending: false, nullsFirst: false })
         .order("updated_at", { ascending: false, nullsFirst: false })

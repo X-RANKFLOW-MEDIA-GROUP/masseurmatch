@@ -62,7 +62,7 @@ export async function POST(request: Request) {
 
     const { data: verification, error: verificationError } = await admin
       .from("identity_verifications")
-      .select("id, user_id, provider, status, metadata")
+      .select("id, user_id, verification_method, status, metadata")
       .eq("id", verificationId)
       .eq("user_id", session.userId)
       .maybeSingle();

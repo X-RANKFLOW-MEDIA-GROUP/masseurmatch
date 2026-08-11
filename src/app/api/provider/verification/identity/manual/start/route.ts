@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     const admin = createSupabaseAdminClient();
     const { data: verification, error } = await admin
       .from("identity_verifications")
-      .select("id, user_id, provider, status, metadata")
+      .select("id, user_id, verification_method, status, metadata")
       .eq("id", verificationId)
       .eq("user_id", session.userId)
       .maybeSingle();
@@ -128,8 +128,10 @@ export async function POST(request: Request) {
       id: verificationId,
       user_id: session.userId,
       profile_id: profile.id,
-      provider: "manual",
+      verification_method: "manual",
       status: "not_started",
+      document_type: "selfie",
+      legal_name_hash: "",
       last_error: null,
       metadata,
       updated_at: nowIso,

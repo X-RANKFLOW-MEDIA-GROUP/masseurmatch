@@ -49,14 +49,14 @@ function buildSyncArgs(tier: string, sub: Stripe.Subscription, subscriptionStatu
     status === 'trialing' && tier !== 'free' ? Math.min(tierPhotoLimit, TRIAL_PHOTO_LIMIT) : tierPhotoLimit
 
   return {
-    p_user_id:                sub.metadata?.user_id ?? sub.metadata?.userId ?? null,
-    p_stripe_customer_id:     customerId,
+    p_user_id:                sub.metadata?.user_id ?? sub.metadata?.userId ?? "",
+    p_stripe_customer_id:     customerId ?? "",
     p_stripe_subscription_id: sub.id,
     p_tier:                   tier,
     p_photo_limit:            photoLimit,
     p_visibility_level:       VISIBILITY_LEVELS[tier] ?? 1,
-    p_current_period_end:     getCurrentPeriodEnd(sub),
-    p_subscription_status:    status,
+    p_current_period_end:     getCurrentPeriodEnd(sub) ?? new Date().toISOString(),
+    p_subscription_status:    status ?? "",
   }
 }
 
@@ -323,7 +323,7 @@ export async function POST(request: NextRequest) {
         const vs = event.data.object as Stripe.Identity.VerificationSession
         const { error } = await supabase.rpc('process_stripe_identity_requires_input', {
           p_stripe_session_id: vs.id,
-          p_last_error_reason: vs.last_error?.reason ?? null,
+          p_last_error_reason: vs.last_error?.reason || undefined,
         })
         if (error) throw error
         break

@@ -5087,42 +5087,6 @@ export type Database = {
         }
         Relationships: []
       }
-      featured_masters: {
-        Row: {
-          city: string | null
-          created_at: string | null
-          display_order: number | null
-          ends_at: string | null
-          featured_by: string | null
-          id: string
-          is_active: boolean | null
-          profile_id: string | null
-          starts_at: string | null
-        }
-        Insert: {
-          city?: string | null
-          created_at?: string | null
-          display_order?: number | null
-          ends_at?: string | null
-          featured_by?: string | null
-          id?: string
-          is_active?: boolean | null
-          profile_id?: string | null
-          starts_at?: string | null
-        }
-        Update: {
-          city?: string | null
-          created_at?: string | null
-          display_order?: number | null
-          ends_at?: string | null
-          featured_by?: string | null
-          id?: string
-          is_active?: boolean | null
-          profile_id?: string | null
-          starts_at?: string | null
-        }
-        Relationships: []
-      }
       photo_moderations: {
         Row: {
           admin_notes: string | null

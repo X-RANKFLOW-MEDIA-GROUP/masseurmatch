@@ -8,7 +8,7 @@ export async function GET(request: Request) {
     const admin = createSupabaseAdminClient();
     const { data, error } = await admin
       .from("identity_verifications")
-      .select("id, status, provider, last_error, created_at, updated_at")
+      .select("id, status, verification_method, last_error, created_at, updated_at")
       .eq("user_id", session.userId)
       .order("created_at", { ascending: false })
       .limit(1)
