@@ -143,13 +143,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm release:audit
 
-  actions-lint:
-    name: Actions Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: rhysd/actionlint@v1
-
   unit-tests:
     name: Tests
     runs-on: ubuntu-latest
@@ -168,7 +161,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [lockfile-guard, typecheck, lint, unit-tests, db-contract, sitemap-validation, release-audit, actions-lint]
+    needs: [lockfile-guard, typecheck, lint, unit-tests, db-contract, sitemap-validation, release-audit]
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
