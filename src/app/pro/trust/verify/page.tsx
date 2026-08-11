@@ -28,6 +28,7 @@ function ManualIdentityVerificationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const verificationId = searchParams.get("verificationId") ?? "";
+  const returnTo = searchParams.get("returnTo") === "signup" ? "signup" : "trust";
   const [challengeCode, setChallengeCode] = useState("");
   const [challengeLoading, setChallengeLoading] = useState(true);
   const [documentType, setDocumentType] = useState("drivers_license");
@@ -106,7 +107,7 @@ function ManualIdentityVerificationContent() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error ?? "Could not submit identity verification.");
       setComplete(true);
-      window.setTimeout(() => router.replace("/pro/trust"), 1200);
+      window.setTimeout(() => router.replace(returnTo === "signup" ? "/signup/verify?identity_submitted=1" : "/pro/trust"), 1200);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not submit identity verification.");
     } finally {
@@ -138,7 +139,7 @@ function ManualIdentityVerificationContent() {
 
       {complete ? (
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-emerald-900">
-          <div className="flex items-center gap-3"><CheckCircle2 className="h-6 w-6" /><div><h2 className="font-semibold">Submitted for review</h2><p className="mt-1 text-sm text-emerald-700">Your identity verification is now pending admin review.</p></div></div>
+          <div className="flex items-center gap-3"><CheckCircle2 className="h-6 w-6" /><div><h2 className="font-semibold">Submitted for review</h2><p className="mt-1 text-sm text-emerald-700">Your identity verification is now pending human review. We will email you after a decision.</p></div></div>
         </div>
       ) : (
         <>
