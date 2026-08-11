@@ -1,6 +1,8 @@
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import type { TablesInsert } from "@/integrations/supabase/types";
 
 export type PayPalPlanKey = "standard" | "pro" | "elite";
+type LocalSubscriptionStatus = "trialing" | "active" | "past_due" | "canceled" | "expired";
 
 export const PAYPAL_PLAN_IDS: Record<PayPalPlanKey, string> = {
   standard: "P-0LK9851678808213YNJ5TSKQ",
@@ -79,7 +81,7 @@ type PayPalSubscription = {
   };
 };
 
-function mapPayPalStatus(status: string, hasPayment: boolean) {
+function mapPayPalStatus(status: string, hasPayment: boolean): LocalSubscriptionStatus {
   const value = status.toUpperCase();
   if (value === "ACTIVE") return hasPayment ? "active" : "trialing";
   if (value === "SUSPENDED") return "past_due";
@@ -123,7 +125,7 @@ export async function syncPayPalSubscription(subscription: PayPalSubscription) {
     .eq("provider_subscription_id", subscription.id)
     .maybeSingle();
 
-  const row = {
+  const row: TablesInsert<"therapist_subscriptions"> = {
     therapist_profile_id: profile.id,
     profile_id: profile.id,
     plan_id: plan.id,
