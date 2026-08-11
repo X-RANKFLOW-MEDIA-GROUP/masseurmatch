@@ -4927,21 +4927,30 @@ export type Database = {
       }
       therapist_profiles: {
         Row: {
+          city: string | null
           created_at: string | null
+          display_name: string | null
+          full_name: string | null
           id: string
           profile_id: string | null
           updated_at: string | null
           user_id: string | null
         }
         Insert: {
+          city?: string | null
           created_at?: string | null
+          display_name?: string | null
+          full_name?: string | null
           id?: string
           profile_id?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
         Update: {
+          city?: string | null
           created_at?: string | null
+          display_name?: string | null
+          full_name?: string | null
           id?: string
           profile_id?: string | null
           updated_at?: string | null
