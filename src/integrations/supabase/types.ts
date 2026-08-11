@@ -5370,6 +5370,42 @@ export type Database = {
         }
         Relationships: []
       }
+      public_imported_reviews: {
+        Row: {
+          id: string
+          profile_id: string | null
+          reviewer_name: string | null
+          rating: number | null
+          review_text: string | null
+          review_date: string | null
+          public_label: string | null
+          imported_at: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: never
+          profile_id?: string | null
+          reviewer_name?: never
+          rating?: never
+          review_text?: never
+          review_date?: never
+          public_label?: never
+          imported_at?: never
+          created_at?: never
+        }
+        Update: {
+          id?: never
+          profile_id?: never
+          reviewer_name?: never
+          rating?: never
+          review_text?: never
+          review_date?: never
+          public_label?: never
+          imported_at?: never
+          created_at?: never
+        }
+        Relationships: []
+      }
     }
     Functions: {
       can_send_marketing_email: {
