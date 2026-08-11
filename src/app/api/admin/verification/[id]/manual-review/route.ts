@@ -68,7 +68,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     if (error) throw new RouteError(500, error.message);
     if (!verification || verification.provider !== "manual") throw new RouteError(404, "Manual verification not found.");
+    if (!verification.user_id) throw new RouteError(409, "Identity verification is not linked to a user account.");
     if (verification.status !== "pending") throw new RouteError(409, "Only pending manual verifications can be reviewed.");
+    const verificationUserId = verification.user_id;
 
     const reviewedAt = new Date().toISOString();
     const currentMetadata = (verification.metadata ?? {}) as Record<string, unknown>;
@@ -117,14 +119,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const { data: profile } = await admin
       .from("profiles")
       .select("display_name, full_name, email_address, email")
-      .eq("user_id", verification.user_id)
+      .eq("user_id", verificationUserId)
       .maybeSingle();
 
     let providerEmail = profile?.email_address || profile?.email || null;
     let providerName = profile?.display_name || profile?.full_name || null;
 
     if (!providerEmail || !providerName) {
-      const { data: authData } = await admin.auth.admin.getUserById(verification.user_id);
+      const { data: authData } = await admin.auth.admin.getUserById(verificationUserId);
       providerEmail = providerEmail || authData.user?.email || null;
       const authMetadata = authData.user?.user_metadata as Record<string, unknown> | undefined;
       providerName = providerName
@@ -151,7 +153,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     }
 
     await recordAuditLog(session.userId, `manual_identity_${decision}`, "identity_verification", id, {
-      user_id: verification.user_id,
+      user_id: verificationUserId,
       decision,
       criteria: approvedCriteria,
       rejection_code: decision === "reject" ? rejectionCode : null,
