@@ -1,6 +1,2 @@
--- Migration history reconciliation.
--- This migration was applied directly to the linked Supabase project on 2026-08-10
--- and is already recorded remotely as profile_coach_premium_email_and_9am_sender.
--- The schema change itself is intentionally not replayed here: this file restores the
--- missing local migration version so Supabase branch/preview history remains consistent.
--- Subsequent recorded migrations on the same date contain the follow-up fixes.
+-- Placeholder for removed migration
+-- This migration was removed from the migration history via 20260810194501_remove_reverted_migrations.sql
