@@ -67,6 +67,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       if (removeError) throw new RouteError(500, "Could not securely remove identity documents. Review was not finalized.");
     }
 
+    const approvedCriteria = decision === "approve" ? Array.from(APPROVAL_CRITERIA) : [];
     const metadata = {
       ...currentMetadata,
       manual: {
@@ -74,7 +75,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         reviewedAt,
         reviewedBy: session.userId,
         decision,
-        approvalCriteria: decision === "approve" ? APPROVAL_CRITERIA : [],
+        approvalCriteria: approvedCriteria,
         rejectionCode: decision === "reject" ? rejectionCode : null,
         rejectionReason: decision === "reject" ? reason || null : null,
         files: {},
@@ -83,10 +84,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     };
 
     const nextStatus = decision === "approve" ? "verified" : "requires_input";
-    const providerMessage =
-      decision === "reject"
-        ? reason || rejectionCode.replaceAll("_", " ")
-        : null;
+    const providerMessage = decision === "reject" ? reason || rejectionCode.replaceAll("_", " ") : null;
 
     const { error: updateError } = await admin
       .from("identity_verifications")
@@ -103,7 +101,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     await recordAuditLog(session.userId, `manual_identity_${decision}`, "identity_verification", id, {
       user_id: verification.user_id,
       decision,
-      criteria: decision === "approve" ? APPROVAL_CRITERIA : [],
+      criteria: approvedCriteria,
       rejection_code: decision === "reject" ? rejectionCode : null,
       reason: decision === "reject" ? reason || null : null,
     });
