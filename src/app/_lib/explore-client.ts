@@ -270,9 +270,14 @@ export function applyExploreFilters(
 ) {
   const nextProviders = origin ? recalculateExploreDistances(providers, origin) : providers;
   return sortProviders(
-    nextProviders.filter((provider) => provider.missingFields.length === 0 && filterProvider(provider, filters)),
+    nextProviders.filter((provider) => !isHiddenExploreProvider(provider) && filterProvider(provider, filters)),
     filters.sort,
   );
+}
+
+function isHiddenExploreProvider(provider: ExploreProvider) {
+  const HARD_MISSING_FIELDS = new Set(["neighborhood"]);
+  return provider.missingFields.some((field) => HARD_MISSING_FIELDS.has(field));
 }
 
 function parseExploreSearchParams(params: SearchParamShape): ExploreFilters {
