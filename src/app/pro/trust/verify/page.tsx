@@ -11,6 +11,9 @@ const DOCUMENT_TYPES = [
   ["military_id", "Military ID"],
 ] as const;
 
+const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+const MAX_FILE_SIZE_BYTES = 8 * 1024 * 1024;
+
 type UploadKind = "id_front" | "id_back" | "selfie";
 
 export default function ManualIdentityVerificationPage() {
@@ -62,6 +65,19 @@ function ManualIdentityVerificationContent() {
     () => Boolean(verificationId && challengeCode && files.id_front && files.selfie && (!needsBack || files.id_back)),
     [challengeCode, files, needsBack, verificationId],
   );
+
+  function setValidatedFile(kind: UploadKind, file: File) {
+    if (!ACCEPTED_IMAGE_TYPES.has(file.type)) {
+      setError("Only JPEG, PNG, or WebP images are allowed.");
+      return;
+    }
+    if (file.size <= 0 || file.size > MAX_FILE_SIZE_BYTES) {
+      setError("Each image must be 8 MB or smaller.");
+      return;
+    }
+    setError(null);
+    setFiles((prev) => ({ ...prev, [kind]: file }));
+  }
 
   async function upload(kind: UploadKind, file: File) {
     const form = new FormData();
@@ -139,14 +155,14 @@ function ManualIdentityVerificationContent() {
               </select>
             </label>
             <label className="space-y-2 text-sm font-medium text-slate-700">Issuing country
-              <input value={documentCountry} onChange={(e) => setDocumentCountry(e.target.value.toUpperCase().slice(0, 2))} placeholder="US" className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm uppercase outline-none focus:border-slate-400" />
+              <input value={documentCountry} onChange={(e) => setDocumentCountry(e.target.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 2))} placeholder="US" className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm uppercase outline-none focus:border-slate-400" />
             </label>
           </div>
 
           <div className="space-y-4">
-            <FilePicker label="Government ID — front" required file={files.id_front} onChange={(file) => setFiles((prev) => ({ ...prev, id_front: file }))} />
-            {needsBack && <FilePicker label="Government ID — back" required file={files.id_back} onChange={(file) => setFiles((prev) => ({ ...prev, id_back: file }))} />}
-            <FilePicker label="Current selfie with challenge code" required accept="image/jpeg,image/png,image/webp" file={files.selfie} onChange={(file) => setFiles((prev) => ({ ...prev, selfie: file }))} />
+            <FilePicker label="Government ID — front" required file={files.id_front} onChange={(file) => setValidatedFile("id_front", file)} />
+            {needsBack && <FilePicker label="Government ID — back" required file={files.id_back} onChange={(file) => setValidatedFile("id_back", file)} />}
+            <FilePicker label="Current selfie with challenge code" required file={files.selfie} onChange={(file) => setValidatedFile("selfie", file)} />
           </div>
 
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs leading-relaxed text-slate-600">Identity verification confirms only that MasseurMatch reviewed a government-issued identity document and a current selfie. It does not verify professional licensing, background history, qualifications, or services.</div>
@@ -163,14 +179,14 @@ function ManualIdentityVerificationContent() {
   );
 }
 
-function FilePicker({ label, required, accept = "image/jpeg,image/png,image/webp,application/pdf", file, onChange }: { label: string; required?: boolean; accept?: string; file?: File; onChange: (file: File) => void }) {
+function FilePicker({ label, required, file, onChange }: { label: string; required?: boolean; file?: File; onChange: (file: File) => void }) {
   return (
     <label className="block cursor-pointer rounded-xl border border-dashed border-slate-300 bg-white p-5 transition hover:border-slate-400 hover:bg-slate-50">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100"><Upload className="h-5 w-5 text-slate-600" /></div>
-        <div className="min-w-0"><div className="text-sm font-semibold text-slate-800">{label}{required ? " *" : ""}</div><div className="mt-0.5 truncate text-xs text-slate-500">{file ? file.name : "JPEG, PNG, WebP or PDF · max 10 MB"}</div></div>
+        <div className="min-w-0"><div className="text-sm font-semibold text-slate-800">{label}{required ? " *" : ""}</div><div className="mt-0.5 truncate text-xs text-slate-500">{file ? file.name : "JPEG, PNG, or WebP · max 8 MB"}</div></div>
       </div>
-      <input type="file" accept={accept} className="sr-only" onChange={(e) => { const next = e.target.files?.[0]; if (next) onChange(next); }} />
+      <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { const next = e.target.files?.[0]; if (next) onChange(next); }} />
     </label>
   );
 }
