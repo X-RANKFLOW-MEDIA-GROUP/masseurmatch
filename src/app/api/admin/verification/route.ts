@@ -15,7 +15,7 @@ export async function GET(request: Request) {
 
     const { data: identityRows, error: idError } = await adminClient
       .from("identity_verifications")
-      .select("id, user_id, provider, status, last_error, created_at, updated_at")
+      .select("id, user_id, verification_method, status, last_error, created_at, updated_at")
       .order("created_at", { ascending: false })
       .limit(100);
 

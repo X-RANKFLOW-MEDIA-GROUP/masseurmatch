@@ -19,7 +19,6 @@ type AdminImportedReview = Pick<
   | "review_date"
   | "source_platform"
   | "source_url"
-  | "imported_at"
 > & {
   profile: Pick<ProfileRow, "id" | "display_name" | "full_name" | "city"> | null;
 };
@@ -62,8 +61,8 @@ async function loadImportedReviews(): Promise<AdminLoadResult<AdminImportedRevie
     const adminClient = createSupabaseAdminClient();
     const { data, error } = await adminClient
       .from("imported_reviews")
-      .select("id, profile_id, review_text, reviewer_name, rating, review_date, source_platform, source_url, imported_at")
-      .order("imported_at", { ascending: false })
+      .select("id, profile_id, review_text, reviewer_name, rating, review_date, source_platform, source_url")
+      .order("created_at", { ascending: false })
       .limit(50);
 
     if (error) {

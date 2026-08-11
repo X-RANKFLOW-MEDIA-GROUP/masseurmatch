@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 import { z } from "zod";
 
+import type { Database } from "@/integrations/supabase/types";
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import {
   createSupabaseAdminClient,
@@ -52,17 +53,17 @@ async function applyReviewAdminAction(
     };
   }
 
-  const updates = {
-    review_text: input.reviewText,
-    reviewer_name: input.reviewerName,
-    rating: input.rating,
-    review_date: input.reviewDate,
-    source_platform: input.sourcePlatform,
-    source_url: input.sourceUrl,
-  };
+  type ImportedReviewUpdate = Database["public"]["Tables"]["imported_reviews"]["Update"];
+  const updates: ImportedReviewUpdate = {};
 
-  const hasUpdates = Object.values(updates).some((value) => value !== undefined);
-  if (!hasUpdates) {
+  if (input.reviewText !== undefined) updates.review_text = input.reviewText;
+  if (input.reviewerName !== undefined) updates.reviewer_name = input.reviewerName;
+  if (input.rating !== undefined) updates.rating = input.rating;
+  if (input.reviewDate !== undefined) updates.review_date = input.reviewDate;
+  if (input.sourcePlatform !== undefined && input.sourcePlatform !== null) updates.source_platform = input.sourcePlatform;
+  if (input.sourceUrl !== undefined) updates.source_url = input.sourceUrl;
+
+  if (Object.keys(updates).length === 0) {
     throw new RouteError(400, "Provide at least one review field to update.");
   }
 

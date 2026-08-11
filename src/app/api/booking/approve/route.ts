@@ -76,8 +76,10 @@ export async function POST(request: NextRequest) {
       const { data: appt } = await supabase
         .from('appointments')
         .insert({
-          user_id: session.userId, // placeholder — in full impl would be client's auth id
+          client_id: session.userId,
           therapist_id: typed.therapist_id,
+          start_time: startTime.toISOString(),
+          end_time: endTime.toISOString(),
           starts_at: startTime.toISOString(),
           ends_at: endTime.toISOString(),
           notes: `Service: ${typed.service_type ?? 'massage'} | Location: ${typed.client_hotel ? 'client_location' : 'therapist_location'} | Hotel: ${typed.client_hotel ?? 'N/A'} | Inquiry: ${typed.id}`,

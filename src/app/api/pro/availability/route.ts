@@ -28,10 +28,8 @@ export async function POST(request: Request) {
     // gated by subscription tier and TTL in /api/pro/available-now. Coupling it
     // to this status let free users grant themselves the paid badge for free.
     const nextProfile = await updateProfileByUserId(session.userId, {
-      current_status: body.status,
-      is_active: body.status !== "hidden",
-      service_radius_km: body.radius ?? 15,
-      travel_destination: body.travelDestination ?? null,
+      visibility_status: body.status,
+      service_radius_miles: body.radius ?? 15,
     });
 
     await recordAuditLog(session.userId, "provider.availability.update", "profile", profile.id, {
