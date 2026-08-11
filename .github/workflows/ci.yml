@@ -148,17 +148,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Install actionlint
-        env:
-          ACTIONLINT_VERSION: 1.6.27
-        run: |
-          tmpdir="$(mktemp -d)"
-          curl -sSfL "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_linux_amd64.tar.gz" | tar -xz -C "$tmpdir" actionlint
-          install -m 0755 "$tmpdir/actionlint" /usr/local/bin/actionlint
-          actionlint --version
-      - name: Lint GitHub Actions workflows
-        run: |
-          actionlint .github/workflows/*.yml
+      - uses: ryderd/actionlint-action@v1
+        with:
+          args: .github/workflows/*.yml
 
   unit-tests:
     name: Tests
