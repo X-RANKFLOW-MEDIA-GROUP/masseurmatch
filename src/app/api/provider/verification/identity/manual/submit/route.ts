@@ -1,11 +1,24 @@
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 import { notifyAdmin } from "@/app/api/_lib/admin-notify";
+import { isRateLimitedDistributed } from "@/app/api/_lib/rate-limit";
 import { createSupabaseAdminClient, requireSession } from "@/app/api/_lib/supabase-server";
 import type { Json } from "@/integrations/supabase/types";
 
 export async function POST(request: Request) {
   try {
     const session = await requireSession(request);
+
+    if (
+      await isRateLimitedDistributed(request, {
+        keyPrefix: "identity-submit",
+        windowMs: 60 * 60 * 1000,
+        max: 6,
+        userId: session.userId,
+      })
+    ) {
+      throw new RouteError(429, "Too many identity verification submissions. Please try again later.");
+    }
+
     const admin = createSupabaseAdminClient();
     const body = await request.json().catch(() => ({} as Record<string, unknown>));
     const verificationId = typeof body.verificationId === "string" ? body.verificationId.trim() : "";
@@ -16,6 +29,7 @@ export async function POST(request: Request) {
     if (!new Set(["drivers_license", "passport", "state_id", "military_id"]).has(documentType)) {
       throw new RouteError(400, "Select a valid document type.");
     }
+    if (!/^[A-Z]{2}$/.test(documentCountry)) throw new RouteError(400, "Issuing country must use a two-letter country code.");
 
     const { data: verification, error: verificationError } = await admin
       .from("identity_verifications")
@@ -29,8 +43,8 @@ export async function POST(request: Request) {
     if (!["not_started", "pending"].includes(verification.status)) throw new RouteError(409, "This verification has already been submitted.");
 
     const currentMetadata = (verification.metadata ?? {}) as Record<string, unknown>;
-    const manual = ((currentMetadata.manual ?? {}) as Record<string, unknown>);
-    const files = ((manual.files ?? {}) as Record<string, unknown>);
+    const manual = (currentMetadata.manual ?? {}) as Record<string, unknown>;
+    const files = (manual.files ?? {}) as Record<string, unknown>;
     const expiresAt = typeof manual.expiresAt === "string" ? manual.expiresAt : "";
 
     if (!expiresAt || Date.parse(expiresAt) <= Date.now()) {
@@ -41,13 +55,17 @@ export async function POST(request: Request) {
       throw new RouteError(400, "Upload the front of your ID and a current selfie before submitting.");
     }
 
+    if (documentType !== "passport" && !files.id_back) {
+      throw new RouteError(400, "Upload the back of your ID before submitting.");
+    }
+
     const submittedAt = new Date().toISOString();
     const metadata = {
       ...currentMetadata,
       manual: {
         ...manual,
         documentType,
-        documentCountry: documentCountry || "US",
+        documentCountry,
         submittedAt,
       },
     };

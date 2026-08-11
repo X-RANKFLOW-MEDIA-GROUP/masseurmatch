@@ -1,4 +1,3 @@
-import type { NextRequest } from "next/server";
 import { Redis } from "@upstash/redis";
 
 const memoryBuckets = new Map<string, { count: number; resetAt: number }>();
@@ -19,7 +18,7 @@ function getRedis() {
   return redisClient;
 }
 
-function requestIp(request: NextRequest): string {
+function requestIp(request: Request): string {
   return (
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     request.headers.get("x-real-ip") ||
@@ -45,7 +44,7 @@ function memoryRateLimit(key: string, windowMs: number, max: number): boolean {
 }
 
 export function isRateLimited(
-  request: NextRequest,
+  request: Request,
   options: { keyPrefix: string; windowMs: number; max: number; userId?: string | null },
 ): boolean {
   const actor = options.userId || requestIp(request);
@@ -53,8 +52,8 @@ export function isRateLimited(
   return memoryRateLimit(key, options.windowMs, options.max);
 }
 
-async function isRateLimitedDistributed(
-  request: NextRequest,
+export async function isRateLimitedDistributed(
+  request: Request,
   options: { keyPrefix: string; windowMs: number; max: number; userId?: string | null },
 ): Promise<boolean> {
   const actor = options.userId || requestIp(request);
@@ -77,8 +76,4 @@ async function isRateLimitedDistributed(
     console.error("rate_limit_redis_failed", { keyPrefix: options.keyPrefix, error });
     return memoryRateLimit(key, options.windowMs, options.max);
   }
-}
-
-function getRequestIp(request: NextRequest): string {
-  return requestIp(request);
 }
