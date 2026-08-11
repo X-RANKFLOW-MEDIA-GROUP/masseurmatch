@@ -669,15 +669,17 @@ function SidebarFilters({
       <div className="space-y-6 overflow-y-auto pb-28">
         <section>
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.22em] text-text-muted">Radius</h3>
+            <label htmlFor="sidebar-radius-slider" className="text-sm font-semibold uppercase tracking-[0.22em] text-text-muted">Radius</label>
             <span className="text-sm font-semibold text-brand-secondary">{draft.radius} mi</span>
           </div>
           <div className="mt-4">
             <Slider
+              id="sidebar-radius-slider"
               value={[draft.radius]}
               min={5}
               max={100}
               step={5}
+              thumbLabels={["Radius"]}
               onValueChange={(value) => onDraftChange({ ...draft, radius: value[0] || draft.radius })}
             />
           </div>
@@ -687,10 +689,12 @@ function SidebarFilters({
           {FILTER_CHIPS.map((chip) => (
             <label
               key={chip.key}
+              htmlFor={`filter-${chip.key}`}
               className="flex items-center justify-between rounded-[20px] border border-border-subtle bg-white/82 px-4 py-3 text-sm text-text-secondary shadow-[inset_0_1px_0_rgb(255_255_255/_0.92)]"
             >
               <span>{chip.label}</span>
               <Checkbox
+                id={`filter-${chip.key}`}
                 checked={draft[chip.key]}
                 onCheckedChange={(checked) =>
                   onDraftChange({ ...draft, [chip.key]: Boolean(checked) } as ExploreFilters)
@@ -702,17 +706,19 @@ function SidebarFilters({
 
         <section>
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.22em] text-text-muted">Starting Price</h3>
+            <label htmlFor="filter-price-range" className="text-sm font-semibold uppercase tracking-[0.22em] text-text-muted">Starting Price</label>
             <span className="text-sm font-semibold text-brand-secondary">
               ${draft.priceMin} - ${draft.priceMax}
             </span>
           </div>
           <div className="mt-4">
             <Slider
+              id="filter-price-range"
               value={[draft.priceMin, draft.priceMax]}
               min={0}
               max={EXPLORE_DEFAULT_PRICE_MAX}
               step={5}
+              thumbLabels={["Minimum price", "Maximum price"]}
               onValueChange={(value) =>
                 onDraftChange({
                   ...draft,
@@ -1434,9 +1440,11 @@ export default function ExplorePageClient({
         <section className="mt-6 rounded-[30px] border border-border-subtle/90 bg-white/88 p-4 shadow-[var(--shadow-lg)] backdrop-blur-2xl md:p-5">
           <div className="grid gap-4 xl:grid-cols-[minmax(220px,320px),minmax(220px,280px),1fr,auto,auto]">
             <div className="rounded-[22px] border border-border-subtle bg-[rgb(var(--color-bg-body-rgb)/0.76)] px-4 py-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-text-muted">City or ZIP</p>
+              <label htmlFor="explore-location-input" className="text-[11px] font-semibold uppercase tracking-[0.2em] text-text-muted">City or ZIP</label>
               <div className="mt-2 flex items-center gap-2">
                 <input
+                  id="explore-location-input"
+                  name="location"
                   value={locationInput}
                   onChange={(event) => {
                     setUsingDetectedLocation(false);
@@ -1444,6 +1452,7 @@ export default function ExplorePageClient({
                   }}
                   list="explore-city-options"
                   placeholder="City or ZIP code"
+                  autoComplete="off"
                   className="w-full bg-transparent text-sm font-medium text-text-primary outline-none placeholder:text-text-muted"
                 />
                 <button
@@ -1464,11 +1473,12 @@ export default function ExplorePageClient({
 
             <div className="rounded-[22px] border border-border-subtle bg-[rgb(var(--color-bg-body-rgb)/0.76)] px-4 py-3">
               <div className="flex items-center justify-between">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-text-muted">Radius</p>
+                <label htmlFor="explore-radius-slider" className="text-[11px] font-semibold uppercase tracking-[0.2em] text-text-muted">Radius</label>
                 <span className="text-sm font-semibold text-brand-secondary">{filters.radius} mi</span>
               </div>
               <div className="mt-4">
                 <Slider
+                  id="explore-radius-slider"
                   value={[filters.radius]}
                   min={5}
                   max={100}

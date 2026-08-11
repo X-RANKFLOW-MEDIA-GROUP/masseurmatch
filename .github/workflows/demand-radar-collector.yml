@@ -3,7 +3,7 @@ name: Demand Radar Collector
 on:
   push:
     branches:
-      - feature/spike-score-ui-live-data
+      - fix/demand-radar-national-trends
     paths:
       - .github/workflows/demand-radar-collector.yml
       - scripts/demand_radar_markets_national.json
