@@ -30,10 +30,7 @@ export async function POST(
     const userId = profile.user_id;
     const canonicalStatus = await getCanonicalIdentityStatusForUser(userId);
     if (canonicalStatus !== "verified") {
-      throw new RouteError(
-        409,
-        "Identity cannot be marked verified until the latest Stripe Identity session is verified.",
-      );
+      throw new RouteError(409, "Identity cannot be marked verified until the latest identity review is approved.");
     }
 
     const verifiedAt = new Date().toISOString();
@@ -56,7 +53,7 @@ export async function POST(
       admin_id: admin.userId,
       target_user_id: userId,
       target_profile_id: profileId,
-      reason: "Synced from verified Stripe Identity session",
+      reason: "Synced from approved identity verification record",
     });
 
     await recordAuditLog(
@@ -67,7 +64,7 @@ export async function POST(
       { source: "identity_verifications", status: canonicalStatus },
     );
 
-    return json({ ok: true, profileId, verified: true, source: "stripe_identity" });
+    return json({ ok: true, profileId, verified: true, source: "identity_verification" });
   } catch (error) {
     return errorResponse(error);
   }
