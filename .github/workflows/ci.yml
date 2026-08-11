@@ -113,6 +113,53 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm validate:db-contract
 
+  sitemap-validation:
+    name: Sitemap Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.32.1
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm validate:sitemap
+
+  release-audit:
+    name: Release Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.32.1
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm release:audit
+
+  actions-lint:
+    name: Actions Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install actionlint
+        env:
+          ACTIONLINT_VERSION: 1.6.27
+        run: |
+          tmpdir="$(mktemp -d)"
+          curl -sSfL "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_linux_amd64.tar.gz" | tar -xz -C "$tmpdir" actionlint
+          install -m 0755 "$tmpdir/actionlint" /usr/local/bin/actionlint
+          actionlint --version
+      - name: Lint GitHub Actions workflows
+        run: |
+          actionlint .github/workflows/*.yml
+
   unit-tests:
     name: Tests
     runs-on: ubuntu-latest
@@ -131,7 +178,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [lockfile-guard, typecheck, lint, unit-tests, db-contract]
+    needs: [lockfile-guard, typecheck, lint, unit-tests, db-contract, sitemap-validation, release-audit, actions-lint]
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
