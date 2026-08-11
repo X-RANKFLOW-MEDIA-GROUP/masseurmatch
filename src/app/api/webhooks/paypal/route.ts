@@ -5,8 +5,6 @@ import {
   paypalRequest,
   syncPayPalSubscription,
 } from "@/app/api/_lib/paypal";
-import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
-import type { Json } from "@/integrations/supabase/types";
 
 export const dynamic = "force-dynamic";
 
@@ -52,16 +50,11 @@ function getSubscriptionId(event: PayPalWebhookEvent) {
 }
 
 export async function POST(request: Request) {
-  const admin = createSupabaseAdminClient();
-  let eventId: string | null = null;
-
   try {
     const rawBody = await request.text();
     const event = JSON.parse(rawBody) as PayPalWebhookEvent;
-    eventId = typeof event.id === "string" ? event.id : null;
-    const eventType = typeof event.event_type === "string" ? event.event_type : "unknown";
 
-    if (!eventId) {
+    if (typeof event.id !== "string") {
       return NextResponse.json({ ok: false, error: "Missing PayPal event id." }, { status: 400 });
     }
 
@@ -97,44 +90,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: "Invalid PayPal webhook signature." }, { status: 401 });
     }
 
-    const { data: existing, error: lookupError } = await admin
-      .from("paypal_events")
-      .select("id")
-      .eq("paypal_event_id", eventId)
-      .maybeSingle();
-    if (lookupError) throw new Error(lookupError.message);
-    if (existing?.id) return NextResponse.json({ ok: true, duplicate: true });
-
-    const { error: insertError } = await admin.from("paypal_events").insert({
-      paypal_event_id: eventId,
-      event_type: eventType,
-      payload: event as unknown as Json,
-      processed_at: new Date().toISOString(),
-    });
-    if (insertError) {
-      if (insertError.code === "23505") return NextResponse.json({ ok: true, duplicate: true });
-      throw new Error(insertError.message);
-    }
-
     const subscriptionId = getSubscriptionId(event);
     if (subscriptionId) {
       const subscription = await fetchPayPalSubscription(subscriptionId);
       await syncPayPalSubscription(subscription);
     }
 
+    // Replayed PayPal events are safe: syncPayPalSubscription updates the same
+    // provider_subscription_id row and recomputes the same profile entitlement.
     return NextResponse.json({ ok: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    if (eventId) {
-      try {
-        await admin
-          .from("paypal_events")
-          .update({ processing_error: message, failed_at: new Date().toISOString() })
-          .eq("paypal_event_id", eventId);
-      } catch {
-        // Preserve the original webhook error so PayPal can retry it.
-      }
-    }
     console.error("[paypal-webhook]", message);
     return NextResponse.json({ ok: false, error: "Webhook processing failed." }, { status: 500 });
   }
