@@ -150,14 +150,8 @@ export async function syncPayPalSubscription(subscription: PayPalSubscription) {
     .from("profiles")
     .update({
       subscription_tier: currentTier,
-      tier: currentTier,
-      _tier: currentTier,
-      subscription_plan: currentTier,
       subscription_status: localStatus,
       current_period_end: nextBilling,
-      subscription_current_period_end: nextBilling,
-      subscription_current_period_start: subscription.start_time ?? null,
-      subscription_cancel_at_period_end: localStatus === "canceled",
       updated_at: new Date().toISOString(),
     })
     .eq("id", profile.id);
