@@ -3167,8 +3167,11 @@ export type Database = {
           bio: string | null
           body_type: string | null
           booking_link: string | null
+          booking_platform: string | null
+          booking_url: string | null
           boost_score: number
           business_hours: Json | null
+          business_trips: Json | null
           canonical_city_slug: string | null
           certifications: string | null
           city: string | null
@@ -3191,6 +3194,7 @@ export type Database = {
           id: string
           identity_verified_at: string | null
           incall: boolean | null
+          incall_amenities: string[] | null
           incall_price: number | null
           inquiry_count: number | null
           is_active: boolean | null
@@ -3211,7 +3215,10 @@ export type Database = {
           lgbtq_affirming: boolean | null
           location_type: string | null
           longitude: number | null
+          massage_setup: string | null
           massage_techniques: string[] | null
+          mobile_extras: Json | null
+          mobile_hours: Json | null
           modalities: string[] | null
           modality: string | null
           moderation_notes: string | null
@@ -3223,6 +3230,7 @@ export type Database = {
           outcall_price: number | null
           outcall_radius: number | null
           outcall_radius_miles: number | null
+          payment_methods: Json | null
           phone: string | null
           phone_number: string | null
           photo_limit: number | null
@@ -3237,6 +3245,8 @@ export type Database = {
           price_min: number | null
           pricing_sessions: Json | null
           primary_area: string | null
+          products_sold: Json | null
+          products_used: Json | null
           profile_completeness: number | null
           profile_status: string | null
           profile_views: number | null
@@ -3256,6 +3266,7 @@ export type Database = {
           seo_keywords: string[] | null
           seo_title: string | null
           service_categories: string[] | null
+          service_radius_miles: number | null
           session_duration: number | null
           session_lengths: number[] | null
           show_email: boolean
@@ -3294,10 +3305,12 @@ export type Database = {
           visibility_status: string | null
           visiting: boolean | null
           website: string | null
+          weekly_special: Json | null
           weight_lb: number | null
           whatsapp: string | null
           whatsapp_number: string | null
           years_experience: number | null
+          zip_code: string | null
         }
         Insert: {
           _tier?: string | null
@@ -4882,6 +4895,270 @@ export type Database = {
           },
         ]
       }
+      therapist_profiles: {
+        Row: {
+          created_at: string | null
+          id: string
+          profile_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          profile_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          profile_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profile_documents: {
+        Row: {
+          created_at: string | null
+          document_type: string | null
+          id: string
+          profile_id: string | null
+          status: string | null
+          storage_path: string | null
+          type: string | null
+          url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          document_type?: string | null
+          id?: string
+          profile_id?: string | null
+          status?: string | null
+          storage_path?: string | null
+          type?: string | null
+          url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          document_type?: string | null
+          id?: string
+          profile_id?: string | null
+          status?: string | null
+          storage_path?: string | null
+          type?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
+      subscription_plans: {
+        Row: {
+          code: string | null
+          id: string
+        }
+        Insert: {
+          code?: string | null
+          id?: string
+        }
+        Update: {
+          code?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      therapist_subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean | null
+          created_at: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          plan_id: string | null
+          profile_id: string | null
+          provider: string | null
+          provider_subscription_id: string | null
+          status: string | null
+          therapist_profile_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          cancel_at_period_end?: boolean | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_id?: string | null
+          profile_id?: string | null
+          provider?: string | null
+          provider_subscription_id?: string | null
+          status?: string | null
+          therapist_profile_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          cancel_at_period_end?: boolean | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_id?: string | null
+          profile_id?: string | null
+          provider?: string | null
+          provider_subscription_id?: string | null
+          status?: string | null
+          therapist_profile_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_suspensions: {
+        Row: {
+          admin_id: string | null
+          created_at: string | null
+          duration_days: number | null
+          ends_at: string | null
+          id: string
+          reason: string | null
+          reason_detail: string | null
+          type: string | null
+          user_id: string | null
+        }
+        Insert: {
+          admin_id?: string | null
+          created_at?: string | null
+          duration_days?: number | null
+          ends_at?: string | null
+          id?: string
+          reason?: string | null
+          reason_detail?: string | null
+          type?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          admin_id?: string | null
+          created_at?: string | null
+          duration_days?: number | null
+          ends_at?: string | null
+          id?: string
+          reason?: string | null
+          reason_detail?: string | null
+          type?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      featured_masters: {
+        Row: {
+          city: string | null
+          created_at: string | null
+          display_order: number | null
+          ends_at: string | null
+          featured_by: string | null
+          id: string
+          is_active: boolean | null
+          profile_id: string | null
+          starts_at: string | null
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          ends_at?: string | null
+          featured_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          profile_id?: string | null
+          starts_at?: string | null
+        }
+        Update: {
+          city?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          ends_at?: string | null
+          featured_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          profile_id?: string | null
+          starts_at?: string | null
+        }
+        Relationships: []
+      }
+      photo_moderations: {
+        Row: {
+          admin_notes: string | null
+          created_at: string | null
+          flagged_at: string | null
+          id: string
+          photo_id: string | null
+          reason: string | null
+          reviewed_at: string | null
+          status: string | null
+          therapist_id: string | null
+          type: string | null
+          url: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string | null
+          flagged_at?: string | null
+          id?: string
+          photo_id?: string | null
+          reason?: string | null
+          reviewed_at?: string | null
+          status?: string | null
+          therapist_id?: string | null
+          type?: string | null
+          url?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string | null
+          flagged_at?: string | null
+          id?: string
+          photo_id?: string | null
+          reason?: string | null
+          reviewed_at?: string | null
+          status?: string | null
+          therapist_id?: string | null
+          type?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
+      checkout_sessions: {
+        Row: {
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          plan_id: string | null
+          profile_id: string | null
+          status: string | null
+          therapist_profile_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          plan_id?: string | null
+          profile_id?: string | null
+          status?: string | null
+          therapist_profile_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          plan_id?: string | null
+          profile_id?: string | null
+          status?: string | null
+          therapist_profile_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       ai_profile_coach_source: {
@@ -5593,6 +5870,7 @@ export type Database = {
           id: string
           identity_verified_at: string | null
           incall: boolean | null
+          incall_amenities: string[] | null
           incall_price: number | null
           inquiry_count: number | null
           is_active: boolean | null
@@ -5613,7 +5891,10 @@ export type Database = {
           lgbtq_affirming: boolean | null
           location_type: string | null
           longitude: number | null
+          massage_setup: string | null
           massage_techniques: string[] | null
+          mobile_extras: Json | null
+          mobile_hours: Json | null
           modalities: string[] | null
           modality: string | null
           moderation_notes: string | null
@@ -5625,6 +5906,7 @@ export type Database = {
           outcall_price: number | null
           outcall_radius: number | null
           outcall_radius_miles: number | null
+          payment_methods: Json | null
           phone: string | null
           phone_number: string | null
           photo_limit: number | null
@@ -5639,6 +5921,8 @@ export type Database = {
           price_min: number | null
           pricing_sessions: Json | null
           primary_area: string | null
+          products_sold: Json | null
+          products_used: Json | null
           profile_completeness: number | null
           profile_status: string | null
           profile_views: number | null
@@ -5658,6 +5942,7 @@ export type Database = {
           seo_keywords: string[] | null
           seo_title: string | null
           service_categories: string[] | null
+          service_radius_miles: number | null
           session_duration: number | null
           session_lengths: number[] | null
           show_email: boolean
@@ -5696,10 +5981,12 @@ export type Database = {
           visibility_status: string | null
           visiting: boolean | null
           website: string | null
+          weekly_special: Json | null
           weight_lb: number | null
           whatsapp: string | null
           whatsapp_number: string | null
           years_experience: number | null
+          zip_code: string | null
         }
         SetofOptions: {
           from: "*"
