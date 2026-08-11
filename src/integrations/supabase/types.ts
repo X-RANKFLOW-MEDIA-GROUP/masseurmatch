@@ -3330,8 +3330,11 @@ export type Database = {
           bio?: string | null
           body_type?: string | null
           booking_link?: string | null
+          booking_platform?: string | null
+          booking_url?: string | null
           boost_score?: number
           business_hours?: Json | null
+          business_trips?: Json | null
           canonical_city_slug?: string | null
           certifications?: string | null
           city?: string | null
@@ -3343,8 +3346,10 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           custom_faq?: Json | null
+          day_of_week_discount?: Json | null
           display_name?: string | null
           education?: string | null
+          education_entries?: Json | null
           email?: string | null
           email_address?: string | null
           featured_until?: string | null
@@ -3354,6 +3359,7 @@ export type Database = {
           id?: string
           identity_verified_at?: string | null
           incall?: boolean | null
+          incall_amenities?: string[] | null
           incall_price?: number | null
           inquiry_count?: number | null
           is_active?: boolean | null
@@ -3374,7 +3380,10 @@ export type Database = {
           lgbtq_affirming?: boolean | null
           location_type?: string | null
           longitude?: number | null
+          massage_setup?: string | null
           massage_techniques?: string[] | null
+          mobile_extras?: Json | null
+          mobile_hours?: Json | null
           modalities?: string[] | null
           modality?: string | null
           moderation_notes?: string | null
@@ -3386,6 +3395,7 @@ export type Database = {
           outcall_price?: number | null
           outcall_radius?: number | null
           outcall_radius_miles?: number | null
+          payment_methods?: Json | null
           phone?: string | null
           phone_number?: string | null
           photo_limit?: number | null
@@ -3400,6 +3410,8 @@ export type Database = {
           price_min?: number | null
           pricing_sessions?: Json | null
           primary_area?: string | null
+          products_sold?: Json | null
+          products_used?: Json | null
           profile_completeness?: number | null
           profile_status?: string | null
           profile_views?: number | null
@@ -3419,6 +3431,7 @@ export type Database = {
           seo_keywords?: string[] | null
           seo_title?: string | null
           service_categories?: string[] | null
+          service_radius_miles?: number | null
           session_duration?: number | null
           session_lengths?: number[] | null
           show_email?: boolean
@@ -3457,10 +3470,12 @@ export type Database = {
           visibility_status?: string | null
           visiting?: boolean | null
           website?: string | null
+          weekly_special?: Json | null
           weight_lb?: number | null
           whatsapp?: string | null
           whatsapp_number?: string | null
           years_experience?: number | null
+          zip_code?: string | null
         }
         Update: {
           _tier?: string | null
@@ -3480,8 +3495,11 @@ export type Database = {
           bio?: string | null
           body_type?: string | null
           booking_link?: string | null
+          booking_platform?: string | null
+          booking_url?: string | null
           boost_score?: number
           business_hours?: Json | null
+          business_trips?: Json | null
           canonical_city_slug?: string | null
           certifications?: string | null
           city?: string | null
@@ -3493,8 +3511,10 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           custom_faq?: Json | null
+          day_of_week_discount?: Json | null
           display_name?: string | null
           education?: string | null
+          education_entries?: Json | null
           email?: string | null
           email_address?: string | null
           featured_until?: string | null
@@ -3504,6 +3524,7 @@ export type Database = {
           id?: string
           identity_verified_at?: string | null
           incall?: boolean | null
+          incall_amenities?: string[] | null
           incall_price?: number | null
           inquiry_count?: number | null
           is_active?: boolean | null
@@ -3524,7 +3545,10 @@ export type Database = {
           lgbtq_affirming?: boolean | null
           location_type?: string | null
           longitude?: number | null
+          massage_setup?: string | null
           massage_techniques?: string[] | null
+          mobile_extras?: Json | null
+          mobile_hours?: Json | null
           modalities?: string[] | null
           modality?: string | null
           moderation_notes?: string | null
@@ -3536,6 +3560,7 @@ export type Database = {
           outcall_price?: number | null
           outcall_radius?: number | null
           outcall_radius_miles?: number | null
+          payment_methods?: Json | null
           phone?: string | null
           phone_number?: string | null
           photo_limit?: number | null
@@ -3550,6 +3575,8 @@ export type Database = {
           price_min?: number | null
           pricing_sessions?: Json | null
           primary_area?: string | null
+          products_sold?: Json | null
+          products_used?: Json | null
           profile_completeness?: number | null
           profile_status?: string | null
           profile_views?: number | null
@@ -3569,6 +3596,7 @@ export type Database = {
           seo_keywords?: string[] | null
           seo_title?: string | null
           service_categories?: string[] | null
+          service_radius_miles?: number | null
           session_duration?: number | null
           session_lengths?: number[] | null
           show_email?: boolean
@@ -3607,10 +3635,12 @@ export type Database = {
           visibility_status?: string | null
           visiting?: boolean | null
           website?: string | null
+          weekly_special?: Json | null
           weight_lb?: number | null
           whatsapp?: string | null
           whatsapp_number?: string | null
           years_experience?: number | null
+          zip_code?: string | null
         }
         Relationships: []
       }
