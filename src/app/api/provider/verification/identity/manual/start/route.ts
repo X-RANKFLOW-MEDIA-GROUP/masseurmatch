@@ -1,9 +1,26 @@
 import { randomInt, randomUUID } from "node:crypto";
 
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
+import { isRateLimitedDistributed } from "@/app/api/_lib/rate-limit";
 import { createSupabaseAdminClient, requireSession } from "@/app/api/_lib/supabase-server";
 
 const CHALLENGE_TTL_MS = 30 * 60 * 1000;
+
+function manualFilePaths(metadata: unknown): string[] {
+  if (!metadata || typeof metadata !== "object") return [];
+  const manual = (metadata as Record<string, unknown>).manual;
+  if (!manual || typeof manual !== "object") return [];
+  const files = (manual as Record<string, unknown>).files;
+  if (!files || typeof files !== "object") return [];
+
+  return Object.values(files as Record<string, unknown>)
+    .map((entry) => {
+      if (!entry || typeof entry !== "object") return null;
+      const path = (entry as Record<string, unknown>).path;
+      return typeof path === "string" && path.length > 0 ? path : null;
+    })
+    .filter((path): path is string => Boolean(path));
+}
 
 export async function GET(request: Request) {
   try {
@@ -40,6 +57,18 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const session = await requireSession(request);
+
+    if (
+      await isRateLimitedDistributed(request, {
+        keyPrefix: "identity-start",
+        windowMs: 60 * 60 * 1000,
+        max: 5,
+        userId: session.userId,
+      })
+    ) {
+      throw new RouteError(429, "Too many identity verification attempts. Please try again later.");
+    }
+
     const admin = createSupabaseAdminClient();
 
     const { data: profile, error: profileError } = await admin
@@ -55,6 +84,25 @@ export async function POST(request: Request) {
     const nowIso = now.toISOString();
     const expiresAt = new Date(now.getTime() + CHALLENGE_TTL_MS).toISOString();
 
+    const { data: activeAttempts, error: activeError } = await admin
+      .from("identity_verifications")
+      .select("id, metadata")
+      .eq("user_id", session.userId)
+      .eq("provider", "manual")
+      .in("status", ["not_started", "pending"]);
+
+    if (activeError) throw new RouteError(500, activeError.message);
+
+    for (const attempt of activeAttempts ?? []) {
+      const paths = manualFilePaths(attempt.metadata);
+      if (paths.length > 0) {
+        const { error: removeError } = await admin.storage.from("identity-documents").remove(paths);
+        if (removeError) {
+          throw new RouteError(500, "Could not securely remove documents from the previous verification attempt.");
+        }
+      }
+    }
+
     await admin
       .from("identity_verifications")
       .update({ status: "canceled", updated_at: nowIso })
@@ -66,7 +114,7 @@ export async function POST(request: Request) {
     const challengeCode = String(randomInt(100000, 1000000));
     const metadata = {
       manual: {
-        version: 2,
+        version: 3,
         challengeCode,
         expiresAt,
         files: {},
