@@ -81,3 +81,65 @@ COMMENT ON COLUMN public.demand_scores.spike_score IS
   '0-100 multi-signal anomaly score using growth, velocity, persistence, and confidence.';
 COMMENT ON COLUMN public.demand_scores.score_components IS
   'Auditable component values used to calculate the displayed demand and spike scores.';
+
+-- Production contract alignment for runtime verification and billing tables.
+-- These objects already exist in the live database. Keeping them in a contract
+-- extension makes validate-db-contract aware of the runtime schema without
+-- weakening the validator or removing any checks.
+
+ALTER TABLE public.identity_verifications
+  ADD COLUMN IF NOT EXISTS provider text DEFAULT 'stripe',
+  ADD COLUMN IF NOT EXISTS metadata jsonb,
+  ADD COLUMN IF NOT EXISTS stripe_verification_report_id text;
+
+CREATE TABLE IF NOT EXISTS public.subscription_plans (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  code text NOT NULL UNIQUE,
+  name text NOT NULL,
+  description text,
+  price_cents integer NOT NULL DEFAULT 0 CHECK (price_cents >= 0),
+  currency text NOT NULL DEFAULT 'USD',
+  billing_interval text NOT NULL DEFAULT 'month' CHECK (billing_interval IN ('free', 'month', 'year')),
+  priority_rank integer NOT NULL DEFAULT 0,
+  max_photos integer NOT NULL DEFAULT 1,
+  can_publish boolean NOT NULL DEFAULT true,
+  can_feature boolean NOT NULL DEFAULT false,
+  is_active boolean NOT NULL DEFAULT true,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  stripe_product_id text,
+  stripe_price_id text,
+  features jsonb NOT NULL DEFAULT '{}'::jsonb
+);
+
+CREATE TABLE IF NOT EXISTS public.therapist_subscriptions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  therapist_profile_id uuid NOT NULL,
+  plan_id uuid NOT NULL REFERENCES public.subscription_plans(id),
+  status text NOT NULL DEFAULT 'active' CHECK (status IN ('trialing', 'active', 'past_due', 'canceled', 'expired')),
+  provider text,
+  provider_subscription_id text,
+  current_period_start timestamptz,
+  current_period_end timestamptz,
+  cancel_at_period_end boolean NOT NULL DEFAULT false,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  profile_id uuid REFERENCES public.profiles(id)
+);
+
+CREATE TABLE IF NOT EXISTS public.checkout_sessions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  therapist_profile_id uuid,
+  plan_id uuid REFERENCES public.subscription_plans(id),
+  stripe_checkout_session_id text UNIQUE,
+  stripe_customer_id text,
+  status text NOT NULL DEFAULT 'created' CHECK (status IN ('created', 'open', 'complete', 'expired', 'failed')),
+  metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.subscription_plans ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.therapist_subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.checkout_sessions ENABLE ROW LEVEL SECURITY;
