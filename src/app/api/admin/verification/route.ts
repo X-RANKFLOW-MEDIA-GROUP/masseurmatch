@@ -15,13 +15,11 @@ export async function GET(request: Request) {
 
     const { data: identityRows, error: idError } = await adminClient
       .from("identity_verifications")
-      .select("id, user_id, status, stripe_session_id, last_error, created_at, updated_at")
+      .select("id, user_id, provider, status, last_error, created_at, updated_at")
       .order("created_at", { ascending: false })
       .limit(100);
 
-    if (idError) {
-      console.warn("[admin/verification] identity_verifications query failed:", idError.message);
-    }
+    if (idError) console.warn("[admin/verification] identity_verifications query failed:", idError.message);
 
     const { data: textRows, error: textError } = await adminClient
       .from("text_verifications")
@@ -29,9 +27,7 @@ export async function GET(request: Request) {
       .order("created_at", { ascending: false })
       .limit(100);
 
-    if (textError) {
-      console.warn("[admin/verification] text_verifications query failed:", textError.message);
-    }
+    if (textError) console.warn("[admin/verification] text_verifications query failed:", textError.message);
 
     const userIds = Array.from(
       new Set(
@@ -49,14 +45,11 @@ export async function GET(request: Request) {
         .select("user_id, display_name, full_name, email_address, email")
         .in("user_id", userIds);
 
-      if (profilesError) {
-        console.warn("[admin/verification] profiles enrichment failed:", profilesError.message);
-      }
+      if (profilesError) console.warn("[admin/verification] profiles enrichment failed:", profilesError.message);
 
       for (const profile of profiles ?? []) {
         const userId = profile.user_id;
         if (!userId) continue;
-
         userMap.set(userId, {
           user_id: userId,
           name: profile.display_name || profile.full_name || null,
@@ -68,17 +61,14 @@ export async function GET(request: Request) {
         userIds.map(async (userId) => {
           const existing = userMap.get(userId);
           if (existing?.email && existing?.name) return;
-
           const { data, error } = await adminClient.auth.admin.getUserById(userId);
           if (error || !data.user) return;
-
           const metadata = data.user.user_metadata ?? {};
           const metadataName =
             (typeof metadata.display_name === "string" && metadata.display_name) ||
             (typeof metadata.full_name === "string" && metadata.full_name) ||
             (typeof metadata.name === "string" && metadata.name) ||
             null;
-
           userMap.set(userId, {
             user_id: userId,
             name: existing?.name || metadataName,
@@ -90,11 +80,7 @@ export async function GET(request: Request) {
 
     const enrich = <T extends { user_id: string | null }>(row: T) => {
       const user = row.user_id ? userMap.get(row.user_id) : undefined;
-      return {
-        ...row,
-        user_name: user?.name ?? null,
-        user_email: user?.email ?? null,
-      };
+      return { ...row, user_name: user?.name ?? null, user_email: user?.email ?? null };
     };
 
     return json({

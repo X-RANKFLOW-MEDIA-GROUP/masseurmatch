@@ -71,7 +71,8 @@ const navSections = [
   {
     title: "System",
     items: [
-      { href: "/admin/verification", label: "Verification", icon: ShieldCheck },
+      { href: "/admin/verification/manual", label: "ID Review", icon: ShieldCheck },
+      { href: "/admin/verification", label: "Verification Status", icon: ShieldCheck },
       { href: "/admin/logs", label: "Logs", icon: FileClock },
       { href: "/admin/legal", label: "Legal", icon: FileText },
       { href: "/admin/settings", label: "Settings", icon: Settings },
@@ -98,9 +99,7 @@ export default function AdminSidebarNav() {
     <nav className="flex flex-1 flex-col overflow-y-auto py-2">
       {navSections.map((section) => (
         <div key={section.title} className="mb-1">
-          <p className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
-            {section.title}
-          </p>
+          <p className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400">{section.title}</p>
           <ul>
             {section.items.map((item) => {
               const active = isActive(item.href, item.exact);
@@ -125,18 +124,9 @@ export default function AdminSidebarNav() {
       ))}
 
       <div className="mt-auto border-t border-slate-100 pt-2">
-        <Link href="/" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900">
-          <Home className="h-4 w-4 shrink-0" />
-          Back to Site
-        </Link>
-        <Link href="/pro/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900">
-          <LayoutDashboard className="h-4 w-4 shrink-0" />
-          Pro Dashboard
-        </Link>
-        <button type="button" onClick={handleLogout} className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900">
-          <LogOut className="h-4 w-4 shrink-0" />
-          Logout
-        </button>
+        <Link href="/" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"><Home className="h-4 w-4 shrink-0" />Back to Site</Link>
+        <Link href="/pro/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"><LayoutDashboard className="h-4 w-4 shrink-0" />Pro Dashboard</Link>
+        <button type="button" onClick={handleLogout} className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"><LogOut className="h-4 w-4 shrink-0" />Logout</button>
       </div>
     </nav>
   );

@@ -1,9 +1,11 @@
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
+import { sendEmail } from "@/app/api/_lib/email";
 import {
   createSupabaseAdminClient,
   recordAuditLog,
   requireAdminSession,
 } from "@/app/api/_lib/supabase-server";
+import IdentityVerificationDecisionEmail from "@/emails/IdentityVerificationDecisionEmail";
 import type { Json } from "@/integrations/supabase/types";
 
 const APPROVAL_CRITERIA = ["document_valid", "document_unexpired", "selfie_matches", "challenge_visible"] as const;
@@ -18,6 +20,18 @@ const REJECTION_CODES = new Set([
   "missing_document_side",
   "other",
 ]);
+
+const REJECTION_LABELS: Record<string, string> = {
+  document_unreadable: "The identity document was not readable enough to review.",
+  document_expired: "The identity document appears expired.",
+  document_invalid: "The identity document could not be accepted as valid evidence.",
+  selfie_mismatch: "The selfie could not be confidently matched to the identity document.",
+  challenge_missing: "The required one-time challenge code was missing from the selfie.",
+  challenge_unreadable: "The one-time challenge code was not readable in the selfie.",
+  suspected_tampering: "The submitted evidence showed signs that require a fresh submission.",
+  missing_document_side: "A required side of the identity document was missing.",
+  other: "The identity evidence requires a new submission.",
+};
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -54,7 +68,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     if (error) throw new RouteError(500, error.message);
     if (!verification || verification.provider !== "manual") throw new RouteError(404, "Manual verification not found.");
+    if (!verification.user_id) throw new RouteError(409, "Identity verification is not linked to a user account.");
     if (verification.status !== "pending") throw new RouteError(409, "Only pending manual verifications can be reviewed.");
+    const verificationUserId = verification.user_id;
 
     const reviewedAt = new Date().toISOString();
     const currentMetadata = (verification.metadata ?? {}) as Record<string, unknown>;
@@ -84,7 +100,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     };
 
     const nextStatus = decision === "approve" ? "verified" : "requires_input";
-    const providerMessage = decision === "reject" ? reason || rejectionCode.replaceAll("_", " ") : null;
+    const providerMessage = decision === "reject"
+      ? reason || REJECTION_LABELS[rejectionCode] || "A new identity submission is required."
+      : null;
 
     const { error: updateError } = await admin
       .from("identity_verifications")
@@ -98,15 +116,52 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     if (updateError) throw new RouteError(500, updateError.message);
 
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("display_name, full_name, email_address, email")
+      .eq("user_id", verificationUserId)
+      .maybeSingle();
+
+    let providerEmail = profile?.email_address || profile?.email || null;
+    let providerName = profile?.display_name || profile?.full_name || null;
+
+    if (!providerEmail || !providerName) {
+      const { data: authData } = await admin.auth.admin.getUserById(verificationUserId);
+      providerEmail = providerEmail || authData.user?.email || null;
+      const authMetadata = authData.user?.user_metadata as Record<string, unknown> | undefined;
+      providerName = providerName
+        || (typeof authMetadata?.display_name === "string" ? authMetadata.display_name : null)
+        || (typeof authMetadata?.full_name === "string" ? authMetadata.full_name : null)
+        || null;
+    }
+
+    let notificationSent = false;
+    if (providerEmail) {
+      const notification = await sendEmail({
+        to: providerEmail,
+        subject: decision === "approve"
+          ? "Your MasseurMatch identity verification is approved"
+          : "Action required: resubmit your MasseurMatch identity verification",
+        react: IdentityVerificationDecisionEmail({
+          decision: decision === "approve" ? "approved" : "resubmit",
+          providerName,
+          reason: providerMessage,
+        }),
+      });
+      notificationSent = notification.success;
+      if (!notification.success) console.warn("[manual-identity-review] provider notification failed", notification.error);
+    }
+
     await recordAuditLog(session.userId, `manual_identity_${decision}`, "identity_verification", id, {
-      user_id: verification.user_id,
+      user_id: verificationUserId,
       decision,
       criteria: approvedCriteria,
       rejection_code: decision === "reject" ? rejectionCode : null,
       reason: decision === "reject" ? reason || null : null,
+      notification_sent: notificationSent,
     });
 
-    return json({ ok: true, status: nextStatus });
+    return json({ ok: true, status: nextStatus, notificationSent });
   } catch (error) {
     return errorResponse(error);
   }

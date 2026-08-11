@@ -10,17 +10,15 @@
  *    is the primary lever — do not claim otherwise.
  *
  * 2. PROFILE STRENGTH (below) is a separate idea: the quality signals a
- *    provider controls. They do NOT reorder search results — they are what
- *    turns a listing view into an actual client contact. The point values are
- *    an illustrative self-check, not a search-ranking formula.
+ *    provider controls. They do NOT reorder search results — they are an
+ *    illustrative self-check for a clearer, more useful directory listing.
  *
- * 3. MasseurMatch does NOT verify professional licenses (they are
- *    self-declared — see src/app/badge-disclaimer/page.tsx). The only
- *    verification we perform is identity (Stripe Identity, a Pro/Elite
- *    feature) plus moderation review before a profile goes live.
+ * 3. MasseurMatch does NOT independently verify professional licenses,
+ *    certifications, background history, qualifications, or services. The
+ *    Identity Verified badge is limited to identity evidence review. Profile
+ *    moderation is separate and required before publication.
  */
 
-/** The real directory ordering, highest-priority first. */
 export interface PlacementFactor {
   key: string;
   label: string;
@@ -45,11 +43,9 @@ export const PLACEMENT_FACTORS: readonly PlacementFactor[] = [
   },
 ] as const;
 
-/** Quality signals a provider controls — they win the client, not the slot. */
 export interface StrengthSignal {
   key: string;
   label: string;
-  /** Illustrative relative weight toward profile strength (the six sum to 100) */
   weight: number;
   blurb: string;
   action: string;
@@ -57,54 +53,53 @@ export interface StrengthSignal {
 
 export const STRENGTH_SIGNALS: readonly StrengthSignal[] = [
   {
-    key: "reviews",
-    label: "Client reviews",
+    key: "clarity",
+    label: "Listing clarity",
     weight: 24,
     blurb:
-      "Volume and rating, both. Recent reviews count for more than old ones. We never write, sell, seed or remove reviews — they are the clearest proof a client has that other people trusted you first.",
-    action: "Send existing clients your profile link and ask them to leave a review.",
+      "A clear headline, professional description, visible rates, and accurate service details reduce uncertainty before a client decides whether to contact you.",
+    action: "Make the first screen of your profile answer who you are, what you offer, where you serve, and how to contact you.",
   },
   {
     key: "photos",
     label: "Photo quality",
     weight: 20,
     blurb:
-      "Resolution, lighting, and whether the photos are actually of you and your space. Stock images and pixelated phone shots read as a red flag. You do not need a studio — you need daylight and a steady hand.",
-    action: "Three photos minimum, taken near a window, no filters.",
+      "Resolution, lighting, and professional presentation matter. Stock images, misleading images, and low-quality uploads weaken trust and may fail moderation.",
+    action: "Use clear, recent, professional photos that accurately represent you and your practice.",
   },
   {
     key: "completeness",
     label: "Profile completeness",
     weight: 18,
     blurb:
-      "Modalities, rates, service area, availability, bio. Every empty field is a question a client has to ask before booking — and most will not ask. They contact the therapist who already answered.",
-    action: "Fill every field. It is the cheapest edge you will ever get, and it costs nothing.",
+      "Modalities, rates, service area, availability, bio, and contact preferences help clients evaluate fit before reaching out.",
+    action: "Complete every relevant profile field and keep the information current.",
   },
   {
     key: "identity",
     label: "Verified identity",
     weight: 16,
     blurb:
-      "Pro and Elite profiles can verify their identity through Stripe Identity, shown with a public verification date, and every profile is reviewed by our moderation team before going live. Note: we do not independently verify professional licenses — those are self-declared, and clients can confirm them with the state board.",
-    action: "Verify your identity (Pro and up) and keep your self-declared credentials accurate.",
+      "Identity Verified means MasseurMatch reviewed supported government-issued identity evidence and a current challenge selfie. It does not verify professional licensing, background history, qualifications, or services.",
+    action: "Complete identity verification when eligible and keep all self-declared professional information accurate.",
   },
   {
-    key: "response",
-    label: "Response time",
+    key: "contact",
+    label: "Contact readiness",
     weight: 12,
     blurb:
-      "How fast you reply to a first message. Clients booking a massage are usually booking for this week, and a two-day reply is a lost client for both of us.",
-    action: "Turn on notifications and reply — even when the reply is no.",
+      "Accurate contact methods and availability make it easier for clients to reach you directly. MasseurMatch is a directory and does not manage appointments between clients and providers.",
+    action: "Keep your phone, messaging options, and availability information current.",
   },
   {
     key: "activity",
     label: "Recent activity",
     weight: 10,
     blurb:
-      "Whether you have logged in, updated availability or replied lately. A stale profile with month-old availability wastes a client's time and rarely earns the contact.",
-    action: "Keep your availability current. That is the whole requirement.",
+      "Regularly updated profile details and availability reduce stale information and make the directory more useful to clients.",
+    action: "Review your listing regularly and update anything that has changed.",
   },
 ] as const;
 
-/** Maximum profile-strength value — the six signals sum to this. */
 export const MAX_STRENGTH = STRENGTH_SIGNALS.reduce((sum, s) => sum + s.weight, 0);

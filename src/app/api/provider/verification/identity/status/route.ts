@@ -1,22 +1,30 @@
-import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
-import { requireSession } from "@/app/api/_lib/supabase-server";
+import { errorResponse, json } from "@/app/api/_lib/http";
+import { createSupabaseAdminClient, requireSession } from "@/app/api/_lib/supabase-server";
+import { normalizeIdentityStatus } from "@/app/_lib/identity-verification";
 
 export async function GET(request: Request) {
   try {
     const session = await requireSession(request);
-    // Delegate to the existing Stripe identity check-status route
-    const res = await fetch(
-      new URL("/api/stripe/identity/check-status", request.url).toString(),
-      {
-        method: "GET",
-        headers: {
-          cookie: request.headers.get("cookie") ?? "",
-        },
-      }
-    );
-    const data = await res.json();
-    if (!res.ok) throw new RouteError(res.status as 400 | 401 | 403 | 404 | 500, data.error ?? "Failed to check identity status.");
-    return json({ ok: true, ...data });
+    const admin = createSupabaseAdminClient();
+    const { data, error } = await admin
+      .from("identity_verifications")
+      .select("id, status, provider, last_error, created_at, updated_at")
+      .eq("user_id", session.userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    return json({
+      ok: true,
+      status: normalizeIdentityStatus(data?.status),
+      provider: data?.provider ?? "manual",
+      verificationId: data?.id ?? null,
+      lastError: data?.last_error ?? null,
+      createdAt: data?.created_at ?? null,
+      updatedAt: data?.updated_at ?? null,
+    });
   } catch (error) {
     return errorResponse(error);
   }
