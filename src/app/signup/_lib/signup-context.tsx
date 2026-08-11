@@ -25,7 +25,6 @@ export type SubmissionStatus =
   | "approved"
   | "rejected";
 
-
 export type BillingStatus =
   | "not_started"
   | "payment_method_collected"
@@ -78,7 +77,6 @@ export interface SignupState {
   emailVerified: boolean;
   phoneVerified: boolean;
   identityVerificationStatus: IdentityVerificationStatus;
-  stripeIdentitySessionId: string | null;
   profile: SignupProfile;
   profileCompleted: boolean;
   submissionStatus: SubmissionStatus;
@@ -130,7 +128,6 @@ const initialState: SignupState = {
   emailVerified: false,
   phoneVerified: false,
   identityVerificationStatus: "not_started",
-  stripeIdentitySessionId: null,
   profile: emptyProfile,
   profileCompleted: false,
   submissionStatus: "draft",
@@ -169,7 +166,6 @@ interface SignupContextType {
   markEmailVerified: () => void;
   markPhoneVerified: () => void;
   setIdentityStatus: (status: IdentityVerificationStatus) => void;
-  setStripeIdentitySessionId: (id: string) => void;
   updateProfile: (updates: Partial<SignupProfile>) => void;
   markProfileCompleted: () => void;
   setTermsAccepted: (v: boolean) => void;
@@ -267,7 +263,6 @@ export function SignupProvider({ children }: { children: ReactNode }) {
   const markEmailVerified = useCallback(() => setState((s) => ({ ...s, emailVerified: true })), []);
   const markPhoneVerified = useCallback(() => setState((s) => ({ ...s, phoneVerified: true })), []);
   const setIdentityStatus = useCallback((status: IdentityVerificationStatus) => setState((s) => ({ ...s, identityVerificationStatus: status })), []);
-  const setStripeIdentitySessionId = useCallback((id: string) => setState((s) => ({ ...s, stripeIdentitySessionId: id })), []);
   const updateProfile = useCallback((updates: Partial<SignupProfile>) => setState((s) => ({ ...s, profile: { ...s.profile, ...updates } })), []);
   const markProfileCompleted = useCallback(() => setState((s) => ({ ...s, profileCompleted: true })), []);
   const setTermsAccepted = useCallback((v: boolean) => setState((s) => ({ ...s, termsAccepted: v })), []);
@@ -296,7 +291,6 @@ export function SignupProvider({ children }: { children: ReactNode }) {
         markEmailVerified,
         markPhoneVerified,
         setIdentityStatus,
-        setStripeIdentitySessionId,
         updateProfile,
         markProfileCompleted,
         setTermsAccepted,
