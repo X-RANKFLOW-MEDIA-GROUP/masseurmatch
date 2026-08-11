@@ -10,9 +10,6 @@ export type ProfileUpdate = TablesUpdate<'profiles'>
 type OnboardingFields = Pick<
   ProfileUpdate,
   | 'zip_code'
-  | 'street_reference'
-  | 'map_enabled'
-  | 'location_marker_type'
   | 'massage_setup'
   | 'incall_amenities'
   | 'mobile_extras'
@@ -20,7 +17,6 @@ type OnboardingFields = Pick<
   | 'products_sold'
   | 'payment_methods'
   | 'regular_discounts'
-  | 'day_of_week_discount'
   | 'weekly_special'
   | 'booking_platform'
   | 'booking_url'
