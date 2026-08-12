@@ -7,7 +7,6 @@ import {
   BadgeCheck,
   Crown,
   Star,
-  Phone,
   MessageCircle,
   Mail,
   Globe,
@@ -68,6 +67,13 @@ function hasRate(value: string) {
   return Boolean(value) && value !== "Contact for rates";
 }
 
+interface HoursEntry {
+  day?: string;
+  enabled?: boolean;
+  start_time?: string;
+  end_time?: string;
+}
+
 export function VoxProfile({
   profile,
   faqItems,
@@ -79,6 +85,9 @@ export function VoxProfile({
   rating,
   reviewCount,
   businessHours,
+  studioHours = [],
+  mobileHours = [],
+  currentStatus = '',
   training,
   education,
 }: {
@@ -93,17 +102,18 @@ export function VoxProfile({
   rating?: number;
   reviewCount?: number;
   businessHours?: Record<string, unknown> | null;
+  studioHours?: HoursEntry[];
+  mobileHours?: HoursEntry[];
+  currentStatus?: string;
   training?: Array<{ label: string; detail?: string | null; institution?: string | null } | string>;
   education?: Array<{ label?: string | null; institution?: string | null } | string> | string;
 }) {
   const firstName = profile.name.split(" ")[0] || profile.name;
-  const phoneHref = contactHref("phone", profile.phone);
-  const whatsappHref = contactHref("whatsapp", profile.whatsapp);
+  const phoneHref = contactHref("whatsapp", profile.phone);
   const emailHref = contactHref("email", profile.email);
   const websiteHref = contactHref("website", profile.website);
 
-  const handlePhoneClick = () => trackConversion("call", profile.id);
-  const handleWhatsAppClick = () => trackConversion("contact", profile.id);
+  const handlePhoneClick = () => trackConversion("contact", profile.id);
   const handleEmailClick = () => trackConversion("email", profile.id);
   const handleWebsiteClick = () => trackConversion("contact", profile.id);
 
@@ -263,23 +273,13 @@ export function VoxProfile({
                     onClick={handlePhoneClick}
                     className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-white shadow-[0_0_32px_rgba(139, 30, 45,0.4)] transition-transform hover:-translate-y-0.5"
                   >
-                    <Phone className="h-4 w-4" strokeWidth={2.5} />
-                    Text {firstName}
-                  </a>
-                )}
-                {whatsappHref && (
-                  <a
-                    href={whatsappHref}
-                    onClick={handleWhatsAppClick}
-                    className="inline-flex h-12 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/15"
-                  >
                     <MessageCircle className="h-4 w-4" strokeWidth={2.5} />
-                    WhatsApp
+                    WhatsApp {firstName}
                   </a>
                 )}
                 {profile.phone && !phoneHref && (
                   <span className="inline-flex h-12 items-center gap-2 rounded-full border border-white/20 bg-white/[0.07] px-5 font-semibold text-white">
-                    <Phone className="h-4 w-4 text-[#8B1E2D]" strokeWidth={2.5} />
+                    <MessageCircle className="h-4 w-4 text-[#8B1E2D]" strokeWidth={2.5} />
                     {profile.phone}
                   </span>
                 )}
@@ -513,6 +513,55 @@ export function VoxProfile({
           </Section>
         ) : null}
 
+        {/* ── Schedule ───────────────────────────────────────────────────── */}
+        {(studioHours.length > 0 || currentStatus) && (
+          <Section id="schedule" eyebrow="Schedule" title="Studio schedule">
+            <div className="space-y-6">
+              {studioHours.length > 0 ? (
+                <div>
+                  <h3 className="mb-4 text-sm font-semibold text-[#111111]">Studio Hours</h3>
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    {studioHours.map((entry) => {
+                      const day = entry.day || '';
+                      const isOpen = entry.enabled !== false;
+                      const startTime = entry.start_time || '';
+                      const endTime = entry.end_time || '';
+
+                      return (
+                        <div key={day} className="rounded-lg border border-[#E8E8E8] bg-white p-4 text-sm">
+                          <div className="font-semibold text-[#111111]">{day.slice(0, 3)}</div>
+                          {isOpen ? (
+                            <div className="mt-1 text-[#5a5147]">
+                              {startTime && endTime ? (
+                                <>
+                                  <div>{startTime}</div>
+                                  <div className="text-xs text-[#8E8E8E]">–</div>
+                                  <div>{endTime}</div>
+                                </>
+                              ) : (
+                                <div className="text-emerald-600 font-medium">Open</div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="mt-1 text-slate-400">Closed</div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
+
+              {currentStatus && (
+                <div className="rounded-2xl border border-[#E8E8E8] bg-gradient-to-br from-[#FFF4EA] to-[#FFECD4] p-6">
+                  <h3 className="mb-2 text-sm font-semibold text-[#111111]">Current Status</h3>
+                  <p className="text-[#5a5147]">{currentStatus}</p>
+                </div>
+              )}
+            </div>
+          </Section>
+        )}
+
         {/* ── Business Hours ───────────────────────────────────────────────── */}
         {businessHours && typeof businessHours === "object" && !Array.isArray(businessHours) && Object.keys(businessHours).length > 0 && (
           <Section id="business-hours" eyebrow="Hours" title="Business hours">
@@ -615,11 +664,14 @@ export function VoxProfile({
                 src={`https://maps.google.com/maps?q=${profile.mapLat},${profile.mapLng}&z=12&output=embed`}
               />
             ) : (
-              <div className="flex h-56 items-center justify-center bg-slate-50">
-                <span className="flex items-center gap-2 text-[#5a5147]">
-                  <MapPin className="h-5 w-5 text-[#8B1E2D]" strokeWidth={2.25} />
-                  {profile.neighborhood}, {profile.city}, {profile.state}
-                </span>
+              <div className="flex h-72 items-center justify-center bg-gradient-to-br from-[#f9f7f4] to-[#f3ede8]">
+                <div className="flex flex-col items-center gap-3 text-center">
+                  <MapPin className="h-6 w-6 text-[#8B1E2D]" strokeWidth={2.25} />
+                  <div>
+                    <p className="font-semibold text-[#111111]">{profile.neighborhood}</p>
+                    <p className="text-sm text-[#6F6050]">{profile.city}, {profile.state}</p>
+                  </div>
+                </div>
               </div>
             )}
             <div className="flex items-center gap-2 bg-white px-6 py-4 text-sm text-[#5a5147]">
@@ -759,7 +811,6 @@ export function VoxProfile({
         name={profile.name}
         startingPrice={profile.startingPrice}
         phoneHref={phoneHref}
-        whatsappHref={whatsappHref}
         profileId={profile.id}
       />
     </div>

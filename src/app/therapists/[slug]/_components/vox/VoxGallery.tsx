@@ -25,7 +25,7 @@ export function VoxGallery({ images, name }: { images: string[]; name: string })
         ? "grid-cols-1 sm:grid-cols-2"
         : "grid-cols-2 sm:grid-cols-3";
 
-  const tileRatio = photos.length === 1 ? "aspect-[4/3]" : "aspect-[4/5] sm:aspect-[4/3]";
+  const tileRatio = photos.length === 1 ? "aspect-[4/3]" : "aspect-square";
 
   return (
     <>
@@ -46,7 +46,7 @@ export function VoxGallery({ images, name }: { images: string[]; name: string })
                   ? "(min-width: 1024px) 768px, 100vw"
                   : "(min-width: 1024px) 360px, (min-width: 640px) 50vw, 50vw"
               }
-              className="object-contain p-1 transition-transform duration-500 group-hover:scale-[1.015]"
+              className="object-cover transition-transform duration-500 group-hover:scale-[1.015]"
               loading={index === 0 ? "eager" : "lazy"}
             />
           </button>

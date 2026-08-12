@@ -60,11 +60,15 @@ export function PublicTherapistCard({ therapist, priority = false }: { therapist
   const travelBadge = useMemo(() => {
     const visit = getTravelVisit(therapist.travel_schedule);
     if (!visit) return null;
+    // Don't show travel badge if visiting their base city
+    const baseCity = therapist.city?.trim().toLowerCase();
+    const visitingCity = visit.entry.city?.trim().toLowerCase();
+    if (baseCity && visitingCity && baseCity === visitingCity) return null;
     return {
       label: visit.status === "now" ? "Visiting Now" : "Visiting Soon",
       city: visit.entry.city,
     };
-  }, [therapist.travel_schedule]);
+  }, [therapist.travel_schedule, therapist.city]);
 
   const startingPrice = getStartingPrice(therapist);
   const priceLabel = formatCurrency(startingPrice);

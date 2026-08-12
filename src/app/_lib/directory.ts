@@ -66,7 +66,7 @@ const PUBLIC_PROFILE_SELECT = `
   avatar_url, review_count, average_rating,
   promotions, updated_at, status, profile_status, visibility_status,
   is_suspended, is_banned, available_now, available_now_expires,
-  lgbtq_affirming, business_hours, custom_faq, pricing_sessions, areas_served,
+  lgbtq_affirming, business_hours, studio_hours, mobile_hours, current_status, custom_faq, pricing_sessions, areas_served,
   outcall_radius_miles, travel_schedule, add_ons, training, education, contact_clicks,
   seo_title, seo_description, seo_keywords, created_at
 `;
