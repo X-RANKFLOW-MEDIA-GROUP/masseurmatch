@@ -9,12 +9,12 @@ import { createResendTopicsService, type UpdateTopicInput } from '@/lib/resend/t
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await requireAdminSession(request as unknown as Request);
 
-    const { id } = params;
     if (!id) {
       return NextResponse.json(
         { success: false, error: 'Topic ID is required' },
@@ -57,12 +57,12 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await requireAdminSession(request as unknown as Request);
 
-    const { id } = params;
     if (!id) {
       return NextResponse.json(
         { success: false, error: 'Topic ID is required' },
@@ -104,12 +104,12 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await requireAdminSession(request as unknown as Request);
 
-    const { id } = params;
     if (!id) {
       return NextResponse.json(
         { success: false, error: 'Topic ID is required' },
