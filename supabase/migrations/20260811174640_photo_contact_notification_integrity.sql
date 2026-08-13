@@ -1,0 +1,1 @@
+-- Restored historical migration marker. Production already contains the applied schema change.
