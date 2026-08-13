@@ -22,6 +22,9 @@
       }
     ],
     "paths": {
+      "@/integrations/supabase/types": [
+        "./src/integrations/supabase/runtime-types.ts"
+      ],
       "@/*": [
         "./src/*"
       ]
