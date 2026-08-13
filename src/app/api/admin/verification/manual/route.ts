@@ -10,8 +10,8 @@ export async function GET(request: Request) {
 
     const { data: rows, error } = await admin
       .from("identity_verifications")
-      .select("id,user_id,profile_id,status,verification_method,last_error,metadata,created_at,updated_at")
-      .eq("verification_method", "manual")
+      .select("id,user_id,profile_id,status,provider,last_error,metadata,created_at,updated_at")
+      .eq("provider", "manual")
       .order("created_at", { ascending: false })
       .limit(100);
 
@@ -39,6 +39,7 @@ export async function GET(request: Request) {
       ok: true,
       verifications: (rows ?? []).map((row) => ({
         ...row,
+        verification_method: row.provider,
         user_name: row.user_id ? profiles.get(row.user_id)?.name ?? null : null,
         user_email: row.user_id ? profiles.get(row.user_id)?.email ?? null : null,
       })),
