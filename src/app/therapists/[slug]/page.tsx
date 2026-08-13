@@ -25,6 +25,17 @@ import { ProfilePageTracker } from "@/app/therapists/[slug]/_components/ProfileP
 import { SITE_URL } from "@/lib/site";
 
 type Params = { slug: string };
+type ProfileHoursEntry = {
+  day?: string;
+  enabled?: boolean;
+  start_time?: string;
+  end_time?: string;
+};
+type RuntimePublicTherapist = PublicTherapist & {
+  studio_hours?: ProfileHoursEntry[] | null;
+  mobile_hours?: ProfileHoursEntry[] | null;
+  current_status?: string | null;
+};
 
 export const revalidate = 60;
 
@@ -96,6 +107,7 @@ export default async function TherapistPage({ params }: { params: Promise<Params
     getPublicTherapists({ city: storedProfile.city || undefined, page: 1, pageSize: 6 }),
     getPublicImportedReviews(storedProfile.id),
   ]);
+  const runtimeProfile = dbProfile as RuntimePublicTherapist;
   const profile = buildProfileViewModel(dbProfile, photos);
   const matchedCity = getCities().find((city) => city.name.toLowerCase() === profile.city.toLowerCase());
   const profilePath = `/therapists/${profile.slug}`;
@@ -154,9 +166,9 @@ export default async function TherapistPage({ params }: { params: Promise<Params
         lgbtqAffirming={Boolean(dbProfile.lgbtq_affirming)}
         knottyPrompt={knottyPrompt}
         businessHours={dbProfile.business_hours}
-        studioHours={Array.isArray(dbProfile.studio_hours) ? dbProfile.studio_hours : []}
-        mobileHours={Array.isArray(dbProfile.mobile_hours) ? dbProfile.mobile_hours : []}
-        currentStatus={typeof dbProfile.current_status === 'string' ? dbProfile.current_status : ''}
+        studioHours={Array.isArray(runtimeProfile.studio_hours) ? runtimeProfile.studio_hours : []}
+        mobileHours={Array.isArray(runtimeProfile.mobile_hours) ? runtimeProfile.mobile_hours : []}
+        currentStatus={typeof runtimeProfile.current_status === "string" ? runtimeProfile.current_status : ""}
         training={Array.isArray(dbProfile.training) ? dbProfile.training : []}
         education={Array.isArray(dbProfile.education) ? dbProfile.education : []}
         reviews={reviews}

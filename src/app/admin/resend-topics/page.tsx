@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useResendTopics } from '@/app/_lib/hooks/useResendTopics';
 import type { CreateTopicInput } from '@/lib/resend/topics';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Trash2, Edit2, Plus } from 'lucide-react';
+import { ArrowLeft, Trash2, Edit2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ResendTopicsPage() {

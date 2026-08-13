@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -110,6 +110,7 @@ export function VoxProfile({
 }) {
   const firstName = profile.name.split(" ")[0] || profile.name;
   const phoneHref = contactHref("whatsapp", profile.phone);
+  const whatsappHref = contactHref("whatsapp", profile.whatsapp);
   const emailHref = contactHref("email", profile.email);
   const websiteHref = contactHref("website", profile.website);
 

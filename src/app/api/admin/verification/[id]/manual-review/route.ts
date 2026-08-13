@@ -62,12 +62,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const admin = createSupabaseAdminClient();
     const { data: verification, error } = await admin
       .from("identity_verifications")
-      .select("id, user_id, verification_method, status, metadata")
+      .select("id, user_id, provider, status, metadata")
       .eq("id", id)
       .maybeSingle();
 
     if (error) throw new RouteError(500, error.message);
-    if (!verification || verification.verification_method !== "manual") throw new RouteError(404, "Manual verification not found.");
+    if (!verification || verification.provider !== "manual") throw new RouteError(404, "Manual verification not found.");
     if (!verification.user_id) throw new RouteError(409, "Identity verification is not linked to a user account.");
     if (verification.status !== "pending") throw new RouteError(409, "Only pending manual verifications can be reviewed.");
     const verificationUserId = verification.user_id;

@@ -36,7 +36,7 @@ class ResendTopicsService {
       const response = await this.resend.topics.create({
         name: input.name,
         description: input.description,
-        default_subscription: input.default_subscription || 'opt_out',
+        defaultSubscription: input.default_subscription || 'opt_out',
       });
 
       if (response.error) {
@@ -84,7 +84,7 @@ class ResendTopicsService {
   }
 
   /**
-   * Update a topic
+   * Update a topic. Resend does not allow changing default subscription after creation.
    */
   async updateTopic(input: UpdateTopicInput): Promise<Topic> {
     try {
@@ -92,7 +92,6 @@ class ResendTopicsService {
         id: input.id,
         name: input.name,
         description: input.description,
-        default_subscription: input.default_subscription,
       });
 
       if (response.error) {
