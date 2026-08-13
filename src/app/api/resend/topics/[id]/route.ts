@@ -3,18 +3,20 @@ import { requireAdminSession } from '@/app/api/_lib/supabase-server';
 import { RouteError } from '@/app/api/_lib/http';
 import { createResendTopicsService, type UpdateTopicInput } from '@/lib/resend/topics';
 
+type TopicRouteContext = { params: Promise<{ id: string }> };
+
 /**
  * GET /api/resend/topics/[id]
  * Retrieve a specific topic (requires admin session)
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: TopicRouteContext
 ) {
   try {
     await requireAdminSession(request as unknown as Request);
 
-    const { id } = params;
+    const { id } = await params;
     if (!id) {
       return NextResponse.json(
         { success: false, error: 'Topic ID is required' },
@@ -57,12 +59,12 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: TopicRouteContext
 ) {
   try {
     await requireAdminSession(request as unknown as Request);
 
-    const { id } = params;
+    const { id } = await params;
     if (!id) {
       return NextResponse.json(
         { success: false, error: 'Topic ID is required' },
@@ -104,12 +106,12 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: TopicRouteContext
 ) {
   try {
     await requireAdminSession(request as unknown as Request);
 
-    const { id } = params;
+    const { id } = await params;
     if (!id) {
       return NextResponse.json(
         { success: false, error: 'Topic ID is required' },
