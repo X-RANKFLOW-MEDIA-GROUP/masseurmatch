@@ -1,61 +1,56 @@
-import type { Database, Json } from "./types";
+import type {
+  Database as GeneratedDatabase,
+  Json as GeneratedJson,
+} from "./types";
 
-type PublicSchema = Database["public"];
+export type Json = GeneratedJson;
+
+type PublicSchema = GeneratedDatabase["public"];
 type PublicTables = PublicSchema["Tables"];
+type IdentityVerificationsTable = PublicTables["identity_verifications"];
 type ProfilesTable = PublicTables["profiles"];
 
-type RuntimeIdentityVerificationRow = {
-  created_at: string;
-  id: string;
-  last_error: string | null;
-  metadata: Json | null;
-  profile_id: string | null;
-  provider: string | null;
-  status: string;
-  stripe_session_id: string | null;
-  stripe_verification_report_id: string | null;
-  stripe_verification_session_id: string | null;
-  updated_at: string;
-  user_id: string | null;
-};
-
-type RuntimeIdentityVerificationInsert = {
-  created_at?: string;
-  id?: string;
-  last_error?: string | null;
-  metadata?: Json | null;
-  profile_id?: string | null;
-  provider?: string | null;
-  status?: string;
-  stripe_session_id?: string | null;
-  stripe_verification_report_id?: string | null;
-  stripe_verification_session_id?: string | null;
-  updated_at?: string;
-  user_id?: string | null;
-};
-
-type RuntimeIdentityVerificationUpdate = RuntimeIdentityVerificationInsert;
-
-type RuntimeIdentityVerificationsTable = {
-  Row: RuntimeIdentityVerificationRow;
-  Insert: RuntimeIdentityVerificationInsert;
-  Update: RuntimeIdentityVerificationUpdate;
-  Relationships: [];
+type RuntimeIdentityVerificationsTable = Omit<
+  IdentityVerificationsTable,
+  "Row" | "Insert" | "Update"
+> & {
+  Row: IdentityVerificationsTable["Row"] & {
+    provider: string | null;
+    stripe_verification_session_id: string | null;
+  };
+  Insert: Partial<IdentityVerificationsTable["Insert"]> & {
+    provider?: string | null;
+    stripe_verification_session_id?: string | null;
+  };
+  Update: IdentityVerificationsTable["Update"] & {
+    provider?: string | null;
+    stripe_verification_session_id?: string | null;
+  };
 };
 
 type RuntimeProfilesTable = Omit<ProfilesTable, "Row" | "Insert" | "Update"> & {
-  Row: ProfilesTable["Row"] & { studio_hours: Json | null };
-  Insert: ProfilesTable["Insert"] & { studio_hours?: Json | null };
-  Update: ProfilesTable["Update"] & { studio_hours?: Json | null };
+  Row: ProfilesTable["Row"] & {
+    current_status: string | null;
+    studio_hours: Json | null;
+  };
+  Insert: ProfilesTable["Insert"] & {
+    current_status?: string | null;
+    studio_hours?: Json | null;
+  };
+  Update: ProfilesTable["Update"] & {
+    current_status?: string | null;
+    studio_hours?: Json | null;
+  };
 };
 
 /**
- * Narrow compatibility overlay for fields confirmed in the live production
- * schema but missing from the checked-in generated types. Keep this additive
- * and small; regenerate the canonical types file separately when schema drift
- * is reconciled across all environments.
+ * Compatibility overlay for fields confirmed in the live production schema
+ * but missing from the checked-in generated Supabase types. It intentionally
+ * preserves the generated shape while adding the runtime contract required by
+ * the application. Regenerate the canonical types separately once schema drift
+ * is reconciled across every environment.
  */
-export type RuntimeDatabase = Omit<Database, "public"> & {
+export type RuntimeDatabase = Omit<GeneratedDatabase, "public"> & {
   public: Omit<PublicSchema, "Tables"> & {
     Tables: Omit<PublicTables, "identity_verifications" | "profiles"> & {
       identity_verifications: RuntimeIdentityVerificationsTable;
@@ -63,3 +58,5 @@ export type RuntimeDatabase = Omit<Database, "public"> & {
     };
   };
 };
+
+export type Database = RuntimeDatabase;
