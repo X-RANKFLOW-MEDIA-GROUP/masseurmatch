@@ -84,7 +84,7 @@ class ResendTopicsService {
   }
 
   /**
-   * Update a topic
+   * Update a topic. Resend does not allow changing default subscription after creation.
    */
   async updateTopic(input: UpdateTopicInput): Promise<Topic> {
     try {
@@ -92,7 +92,6 @@ class ResendTopicsService {
         id: input.id,
         name: input.name,
         description: input.description,
-        defaultSubscription: input.default_subscription,
       });
 
       if (response.error) {
