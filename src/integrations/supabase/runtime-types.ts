@@ -4,6 +4,14 @@ import type {
 } from "./types";
 
 export type Json = GeneratedJson;
+export type {
+  CompositeTypes,
+  Enums,
+  Tables,
+  TablesInsert,
+  TablesUpdate,
+} from "./types";
+export { Constants } from "./types";
 
 type PublicSchema = GeneratedDatabase["public"];
 type PublicTables = PublicSchema["Tables"];
