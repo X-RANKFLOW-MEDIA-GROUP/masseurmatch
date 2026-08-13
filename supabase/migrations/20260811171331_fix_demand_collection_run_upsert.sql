@@ -1,0 +1,2 @@
+-- Historical production migration marker restored to keep local and remote Supabase migration history aligned.
+-- The production schema already contains this migration's effect.
