@@ -61,6 +61,7 @@ export type ProfileViewModel = {
   website: string | null;
   instagram: string | null;
   email: string | null;
+  showEmail: boolean;
   preferredContactMethod: string;
   isVerified: boolean;
   isFeatured: boolean;
@@ -232,12 +233,13 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
     lastActiveAt: fullDateLabel(p.last_active_at || profile.updated_at, "Recently active"),
     responseTime: String(p.response_time || (profile.available_now ? "Typically responds quickly" : "Response time available after contact")),
     memberSince: dateLabel(p.member_since || p.created_at || profile.updated_at, "Member profile active"),
-    phone: profile.whatsapp_number || profile.phone,
-    whatsapp: null,
+    phone: profile.phone || profile.whatsapp_number,
+    whatsapp: profile.whatsapp_number,
     telegram: typeof p.telegram === "string" ? p.telegram : typeof p.telegram_handle === "string" ? p.telegram_handle : null,
     website: profile.website,
     instagram: typeof p.instagram === "string" ? p.instagram : null,
     email: profile.email_address,
+    showEmail: Boolean(profile.show_email),
     preferredContactMethod: String(p.preferred_contact_method || p.preferred_contact || (profile.whatsapp_number ? "WhatsApp" : profile.phone ? "Phone" : "Email")),
     isVerified: Boolean(p.is_verified ?? profile.is_verified_identity ?? profile.is_verified_profile ?? profile.verification_status === "verified"),
     isFeatured: Boolean(profile.is_featured),
@@ -256,9 +258,10 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
   };
 }
 
-export function contactHref(type: "phone" | "whatsapp" | "telegram" | "email" | "website" | "instagram", value: string | null) {
+export function contactHref(type: "phone" | "sms" | "whatsapp" | "telegram" | "email" | "website" | "instagram", value: string | null) {
   if (!value) return null;
   if (type === "phone") return `tel:${value.replace(/[^+\d]/g, "")}`;
+  if (type === "sms") return `sms:${value.replace(/[^+\d]/g, "")}`;
   if (type === "whatsapp") return `https://wa.me/${value.replace(/[^\d]/g, "")}`;
   if (type === "telegram") return value.startsWith("http") ? value : `https://t.me/${value.replace(/^@/, "")}`;
   if (type === "email") return `mailto:${value}`;
