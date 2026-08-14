@@ -1,8 +1,8 @@
 name: Deploy Supabase Functions
 
 # Auto-deploys production Edge Functions that must stay in lockstep with the
-# repository. Webhook/cron functions may intentionally disable gateway JWT in
-# supabase/config.toml only when they implement their own authentication.
+# repository. Functions with verify_jwt=false must implement their own verified
+# webhook/token authentication or be intentionally public read-only endpoints.
 #
 # Requirements:
 #   - Secret   SUPABASE_ACCESS_TOKEN
@@ -13,9 +13,12 @@ on:
     branches: [main]
     paths:
       - "supabase/functions/auth-email-hook/**"
+      - "supabase/functions/cloudinary-sign/**"
       - "supabase/functions/process-lifecycle-email-queue/**"
       - "supabase/functions/lifecycle-unsubscribe/**"
       - "supabase/functions/run-lifecycle-campaigns/**"
+      - "supabase/functions/run-post-signup-campaigns/**"
+      - "supabase/functions/send-city-digest/**"
       - "supabase/functions/create-checkout/**"
       - "supabase/functions/customer-portal/**"
       - "supabase/functions/moderate-photo/**"
@@ -59,14 +62,18 @@ jobs:
         with:
           version: latest
 
-      - name: Deploy authentication hook
-        run: supabase functions deploy auth-email-hook --project-ref "$SUPABASE_PROJECT_REF"
+      - name: Deploy authentication and upload functions
+        run: |
+          supabase functions deploy auth-email-hook --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy cloudinary-sign --project-ref "$SUPABASE_PROJECT_REF"
 
       - name: Deploy lifecycle email functions
         run: |
           supabase functions deploy process-lifecycle-email-queue --project-ref "$SUPABASE_PROJECT_REF"
           supabase functions deploy lifecycle-unsubscribe --project-ref "$SUPABASE_PROJECT_REF"
           supabase functions deploy run-lifecycle-campaigns --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy run-post-signup-campaigns --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy send-city-digest --project-ref "$SUPABASE_PROJECT_REF"
 
       - name: Deploy billing functions
         run: |
