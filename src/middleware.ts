@@ -286,15 +286,38 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return permanentRedirect("/signup/plan", request);
   }
 
-  // ── 2. /explore?city=X  →  301 /explore/usa/{slug} ───────────────────────
-  if (pathname === "/explore" && searchParams.get("city")) {
-    const slug = exploreCityToSlug(searchParams.get("city")!);
-    // Guard against an empty slug, which would redirect to /explore/usa (404).
-    if (slug) {
-      return permanentRedirect(`/explore/usa/${slug}`, request);
+  // City pages are the single source of truth for local inventory. Keep the
+  // generic search surface for advanced filters, but send a location-only
+  // search straight to the canonical city directory.
+  if (pathname === "/search" && searchParams.get("city")) {
+    const nonLocationParams = [...searchParams.keys()].filter(
+      (key) => !["city", "source", "radius", "sort", "view"].includes(key),
+    );
+    const citySlug = resolveCitySlug(exploreCityToSlug(searchParams.get("city")!));
+
+    if (citySlug && nonLocationParams.length === 0) {
+      return permanentRedirect(`/${citySlug}`, request);
     }
   }
 
+  // The old city-specific Explore surface duplicated the city directory and
+  // could hide valid profiles when coordinates were incomplete. Consolidate
+  // it into the canonical city page, regardless of its legacy filter params.
+  const exploreCityMatch = pathname.match(/^\/explore\/usa\/([^/]+)\/?$/);
+  if (exploreCityMatch) {
+    const citySlug = resolveCitySlug(exploreCityMatch[1] || "");
+    if (citySlug) {
+      return permanentRedirect(`/${citySlug}`, request);
+    }
+  }
+
+  // /explore?city=X -> 301 /{city}
+  if (pathname === "/explore" && searchParams.get("city")) {
+    const citySlug = resolveCitySlug(exploreCityToSlug(searchParams.get("city")!));
+    if (citySlug) {
+      return permanentRedirect(`/${citySlug}`, request);
+    }
+  }
   // ── 3. /pt-br/  →  301 /pt-br ────────────────────────────────────────────
   if (pathname === "/pt-br/") {
     return permanentRedirect("/pt-br", request);
