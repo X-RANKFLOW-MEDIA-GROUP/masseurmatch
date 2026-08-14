@@ -1,0 +1,1 @@
+-- Restored migration history marker for version 20260811175344.
