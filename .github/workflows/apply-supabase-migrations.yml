@@ -1,24 +1,13 @@
-name: Apply Supabase Migrations
+name: Apply Supabase Migrations Manually
 
-# Applies pending SQL migrations in supabase/migrations/ to production.
-# Migration history is canonical and forward-only: this workflow never edits
-# supabase_migrations.schema_migrations and never uses migration repair.
-#
-# Requirements:
-#   - Secret   SUPABASE_ACCESS_TOKEN
-#   - Secret   SUPABASE_DB_PASSWORD
-#   - Variable SUPABASE_PROJECT_REF
+# Manual recovery path only. Normal production deploys are orchestrated by
+# deploy-supabase-functions.yml so migrations finish before Edge Functions.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "supabase/migrations/**"
-      - ".github/workflows/apply-supabase-migrations.yml"
   workflow_dispatch: {}
 
 concurrency:
-  group: apply-supabase-migrations
+  group: deploy-supabase-production
   cancel-in-progress: false
 
 jobs:
@@ -38,18 +27,12 @@ jobs:
       - name: Verify required config is present
         run: |
           missing=0
-          if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
-            echo "::error::Secret SUPABASE_ACCESS_TOKEN is not set."
-            missing=1
-          fi
-          if [ -z "$SUPABASE_DB_PASSWORD" ]; then
-            echo "::error::Secret SUPABASE_DB_PASSWORD is not set."
-            missing=1
-          fi
-          if [ -z "$SUPABASE_PROJECT_REF" ]; then
-            echo "::error::Variable SUPABASE_PROJECT_REF is not set."
-            missing=1
-          fi
+          for name in SUPABASE_ACCESS_TOKEN SUPABASE_DB_PASSWORD SUPABASE_PROJECT_REF; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is not configured."
+              missing=1
+            fi
+          done
           [ "$missing" -eq 0 ]
 
       - uses: supabase/setup-cli@v1
