@@ -54,6 +54,13 @@ const PROFILE_SELECT = [
   "weight_lb",
   "body_type",
   "featured_until",
+  "profile_status",
+  "visibility_status",
+  "is_active",
+  "is_suspended",
+  "is_banned",
+  "email_address",
+  "phone",
 ].join(", ");
 
 const QUICK_ACTION_MESSAGES: Record<KnottyQuickAction, string> = {
@@ -62,6 +69,55 @@ const QUICK_ACTION_MESSAGES: Record<KnottyQuickAction, string> = {
   verified: "Show Verified",
   help_choose: "Help Me Choose",
 };
+
+const EXCLUDED_DISPLAY_TERMS = ["test", "debug", "admin", "example", "demo"] as const;
+const EXCLUDED_SLUG_TERMS = ["admin", "test", "example", "dev"] as const;
+
+function lowerText(value: unknown) {
+  return typeof value === "string" ? value.trim().toLowerCase() : "";
+}
+
+/**
+ * Canonical discovery eligibility mirrors the public directory contract.
+ * The legacy `profiles.status` column is intentionally ignored: production
+ * contains approved/public providers whose old status is still `pending`.
+ */
+export function isKnottyDirectoryEligible(row: Record<string, unknown>) {
+  const displayName = lowerText(row.display_name);
+  const email = lowerText(row.email_address);
+  const slug = lowerText(row.slug);
+  const phone = lowerText(row.phone);
+
+  return (
+    row.profile_status === "approved" &&
+    row.visibility_status === "public" &&
+    row.is_suspended === false &&
+    row.is_banned === false &&
+    row.is_active !== false &&
+    Boolean(displayName) &&
+    !EXCLUDED_DISPLAY_TERMS.some((term) => displayName.includes(term)) &&
+    (!email || (!email.includes("@example") && !email.includes("admin.dev@"))) &&
+    (!slug || !EXCLUDED_SLUG_TERMS.some((term) => slug.includes(term))) &&
+    (!phone || !phone.includes("555"))
+  );
+}
+
+function applyKnottyDirectoryEligibility(query: any) {
+  return query
+    .eq("profile_status", "approved")
+    .eq("visibility_status", "public")
+    .eq("is_suspended", false)
+    .eq("is_banned", false)
+    .or("is_active.eq.true,is_active.is.null")
+    .not("display_name", "ilike", "%test%")
+    .not("display_name", "ilike", "%debug%")
+    .not("display_name", "ilike", "%admin%")
+    .not("display_name", "ilike", "%example%")
+    .not("display_name", "ilike", "%demo%")
+    .or("email_address.is.null,and(email_address.not.ilike.%@example%,email_address.not.ilike.%admin.dev@%)")
+    .or("slug.is.null,and(slug.not.ilike.%admin%,slug.not.ilike.%test%,slug.not.ilike.%example%,slug.not.ilike.%dev%)")
+    .or("phone.is.null,phone.not.ilike.%555%");
+}
 
 function normalizeContext(context: KnottyContext | undefined) {
   const query = context?.pageQuery ? new URLSearchParams(context.pageQuery) : null;
@@ -198,19 +254,22 @@ async function fetchCandidatesFromRpc(adminClient: any, context: ReturnType<type
     rpcRows.map((row) => [String(row.id), typeof row.distance_miles === "number" ? row.distance_miles : null]),
   );
 
-  const { data, error } = await adminClient
-    .from("profiles")
-    .select(PROFILE_SELECT)
-    .in("id", ids);
+  const { data, error } = await applyKnottyDirectoryEligibility(
+    adminClient.from("profiles").select(PROFILE_SELECT).in("id", ids),
+  );
 
+  // Never fall back to raw RPC rows: the RPC predates suspension/ban filters.
+  // A failed re-check should broaden through the canonical direct query instead.
   if (error || !data) {
-    return rpcRows.map((row) => toCandidate(row));
+    return [] as KnottyCandidate[];
   }
 
-  const rows: Array<Record<string, unknown>> = (data as Array<Record<string, unknown>>).map((row) => ({
-    ...row,
-    distance_miles: distanceMap.get(String(row.id)) ?? null,
-  }));
+  const rows: Array<Record<string, unknown>> = (data as Array<Record<string, unknown>>)
+    .filter(isKnottyDirectoryEligible)
+    .map((row) => ({
+      ...row,
+      distance_miles: distanceMap.get(String(row.id)) ?? null,
+    }));
 
   const rowMap = new Map<string, Record<string, unknown>>(
     rows.map((row) => [String(row.id), row] as const),
@@ -226,12 +285,9 @@ async function fetchCandidatesDirect(
   context: ReturnType<typeof normalizeContext>,
   city: string | null,
 ) {
-  let query = adminClient
-    .from("profiles")
-    .select(PROFILE_SELECT)
-    .or("is_active.eq.true,is_active.is.null")
-    .in("status", ["active", "approved"])
-    .limit(60);
+  let query = applyKnottyDirectoryEligibility(
+    adminClient.from("profiles").select(PROFILE_SELECT),
+  ).limit(60);
 
   if (city) {
     query = query.ilike("city", city);
@@ -239,30 +295,31 @@ async function fetchCandidatesDirect(
 
   const { data, error } = await query;
   if (!error && data && data.length > 0) {
-    return (data as Array<Record<string, unknown>>).map((row) =>
-      toCandidate({
-        ...row,
-        distance_miles:
-          typeof context.lat === "number" &&
-          typeof context.lng === "number" &&
-          typeof row.latitude === "number" &&
-          typeof row.longitude === "number"
-            ? undefined
-            : null,
-      }),
-    );
+    return (data as Array<Record<string, unknown>>)
+      .filter(isKnottyDirectoryEligible)
+      .map((row) =>
+        toCandidate({
+          ...row,
+          distance_miles:
+            typeof context.lat === "number" &&
+            typeof context.lng === "number" &&
+            typeof row.latitude === "number" &&
+            typeof row.longitude === "number"
+              ? undefined
+              : null,
+        }),
+      );
   }
 
   if (city) {
-    const fallback = await adminClient
-      .from("profiles")
-      .select(PROFILE_SELECT)
-      .or("is_active.eq.true,is_active.is.null")
-      .in("status", ["active", "approved"])
-      .limit(60);
+    const fallback = await applyKnottyDirectoryEligibility(
+      adminClient.from("profiles").select(PROFILE_SELECT),
+    ).limit(60);
 
     if (!fallback.error && fallback.data) {
-      return (fallback.data as Array<Record<string, unknown>>).map((row) => toCandidate(row));
+      return (fallback.data as Array<Record<string, unknown>>)
+        .filter(isKnottyDirectoryEligible)
+        .map((row) => toCandidate(row));
     }
   }
 
