@@ -154,9 +154,6 @@ export default async function TherapistPage({ params }: { params: Promise<Params
         lgbtqAffirming={Boolean(dbProfile.lgbtq_affirming)}
         knottyPrompt={knottyPrompt}
         businessHours={dbProfile.business_hours}
-        studioHours={Array.isArray(dbProfile.studio_hours) ? dbProfile.studio_hours : []}
-        mobileHours={Array.isArray(dbProfile.mobile_hours) ? dbProfile.mobile_hours : []}
-        currentStatus={typeof dbProfile.current_status === 'string' ? dbProfile.current_status : ''}
         training={Array.isArray(dbProfile.training) ? dbProfile.training : []}
         education={Array.isArray(dbProfile.education) ? dbProfile.education : []}
         reviews={reviews}
