@@ -17,7 +17,7 @@ interface DemandScoreRow {
   score: number;
   trend: DemandTrend;
   search_volume_index: number;
-  competition_index: number;
+  competition_index?: number | null;
   spike_score?: number;
   baseline_index?: number;
   growth_pct?: number | null;
@@ -46,29 +46,14 @@ interface CollectionRun {
   metadata?: Record<string, unknown>;
 }
 
-interface IngestionEnvelope {
-  run: CollectionRun;
-  rows: DemandScoreRow[];
-}
+interface IngestionEnvelope { run: CollectionRun; rows: DemandScoreRow[]; }
 
-function isScore(value: unknown): value is number {
-  return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 100;
-}
-function isNonNegativeInteger(value: unknown, maximum = 10_000): value is number {
-  return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= maximum;
-}
-function isFiniteNumber(value: unknown): value is number {
-  return typeof value === "number" && Number.isFinite(value);
-}
-function isIsoDate(value: unknown): value is string {
-  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`));
-}
-function isIsoTimestamp(value: unknown): value is string {
-  return typeof value === "string" && !Number.isNaN(Date.parse(value));
-}
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
-}
+function isScore(value: unknown): value is number { return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 100; }
+function isNonNegativeInteger(value: unknown, maximum = 10_000): value is number { return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= maximum; }
+function isFiniteNumber(value: unknown): value is number { return typeof value === "number" && Number.isFinite(value); }
+function isIsoDate(value: unknown): value is string { return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`)); }
+function isIsoTimestamp(value: unknown): value is string { return typeof value === "string" && !Number.isNaN(Date.parse(value)); }
+function isPlainObject(value: unknown): value is Record<string, unknown> { return Boolean(value) && typeof value === "object" && !Array.isArray(value); }
 
 function isValidRow(value: unknown): value is DemandScoreRow {
   if (!isPlainObject(value)) return false;
@@ -79,7 +64,7 @@ function isValidRow(value: unknown): value is DemandScoreRow {
     isScore(value.score) &&
     (value.trend === "rising" || value.trend === "stable" || value.trend === "falling") &&
     isScore(value.search_volume_index) &&
-    isScore(value.competition_index) &&
+    (value.competition_index === undefined || value.competition_index === null || isScore(value.competition_index)) &&
     (value.spike_score === undefined || isScore(value.spike_score)) &&
     (value.baseline_index === undefined || isScore(value.baseline_index)) &&
     (value.growth_pct === undefined || value.growth_pct === null || (isFiniteNumber(value.growth_pct) && value.growth_pct >= -1000 && value.growth_pct <= 1000)) &&
@@ -97,17 +82,12 @@ function isValidRow(value: unknown): value is DemandScoreRow {
 
 function isValidRun(value: unknown): value is CollectionRun {
   if (!isPlainObject(value)) return false;
-  return (
-    typeof value.run_id === "string" && value.run_id.trim().length >= 8 && value.run_id.length <= 100 &&
+  return typeof value.run_id === "string" && value.run_id.trim().length >= 8 && value.run_id.length <= 100 &&
     (value.status === "running" || value.status === "completed" || value.status === "partial" || value.status === "failed") &&
     isIsoTimestamp(value.started_at) &&
     (value.completed_at === undefined || value.completed_at === null || isIsoTimestamp(value.completed_at)) &&
-    isNonNegativeInteger(value.markets_requested) &&
-    isNonNegativeInteger(value.markets_succeeded) &&
-    isNonNegativeInteger(value.markets_failed) &&
-    (value.error_summary === undefined || Array.isArray(value.error_summary)) &&
-    (value.metadata === undefined || isPlainObject(value.metadata))
-  );
+    isNonNegativeInteger(value.markets_requested) && isNonNegativeInteger(value.markets_succeeded) && isNonNegativeInteger(value.markets_failed) &&
+    (value.error_summary === undefined || Array.isArray(value.error_summary)) && (value.metadata === undefined || isPlainObject(value.metadata));
 }
 
 function parseEnvelope(body: unknown): IngestionEnvelope | null {
@@ -125,7 +105,7 @@ function normalizeRow(row: DemandScoreRow, envelopeRunId: string) {
   return {
     city: row.city.trim(), state: row.state.trim().toUpperCase(), region_code: row.region_code?.trim().toUpperCase() || null,
     region_name: row.region_name?.trim() || null, neighborhood: row.neighborhood?.trim() || null, score: row.score, trend: row.trend,
-    search_volume_index: row.search_volume_index, competition_index: row.competition_index, spike_score: row.spike_score ?? 0,
+    search_volume_index: row.search_volume_index, competition_index: row.competition_index ?? null, spike_score: row.spike_score ?? 0,
     baseline_index: row.baseline_index ?? 0, growth_pct: row.growth_pct ?? null, velocity_score: row.velocity_score ?? 0,
     persistence_score: row.persistence_score ?? 0, confidence: row.confidence ?? 50, sample_size: row.sample_size ?? 0,
     score_components: row.score_components ?? {}, source: row.source?.trim() || "internal-ingestion",
@@ -138,28 +118,22 @@ function usDate(value: string) {
   return new Intl.DateTimeFormat("en-US", { month: "2-digit", day: "2-digit", year: "numeric", timeZone: "UTC" }).format(new Date(value));
 }
 
-async function sendSpikeAlerts(admin: ReturnType<typeof createClient>, rows: Array<{id:string;city:string;state:string;spike_score:number|null;confidence:number|null;trend:DemandTrend;collected_at:string|null;run_id:string|null}>) {
+async function sendSpikeAlerts(admin: any, rows: Array<{id:string;city:string;state:string;spike_score:number|null;confidence:number|null;trend:DemandTrend;collected_at:string|null;run_id:string|null}>) {
   const apiKey = process.env.RESEND_API_KEY ?? "";
   if (!apiKey) return { sent: 0, skipped: rows.length, reason: "RESEND_API_KEY missing" };
   const resend = new Resend(apiKey);
   let sent = 0;
   let skipped = 0;
-
   const alertRows = rows.filter((row) => row.trend === "rising" && (row.spike_score ?? 0) >= 80 && (row.confidence ?? 0) >= 50);
+
   for (const row of alertRows) {
-    const { data: profiles, error: profileError } = await admin.from("profiles")
-      .select("id,email,email_address,city,state,subscription_tier")
-      .ilike("city", row.city).ilike("state", row.state).eq("subscription_tier", "elite");
+    const { data: profiles, error: profileError } = await admin.from("profiles").select("id,email,email_address,city,state,subscription_tier").ilike("city", row.city).ilike("state", row.state).eq("subscription_tier", "elite");
     if (profileError || !profiles?.length) { skipped += 1; continue; }
 
     const profileIds = profiles.map((p: any) => p.id);
-    const { data: prefs } = await admin.from("ai_profile_coach_email_preferences")
-      .select("profile_id,include_market_insights,daily_email_enabled")
-      .in("profile_id", profileIds);
+    const { data: prefs } = await admin.from("ai_profile_coach_email_preferences").select("profile_id,include_market_insights,daily_email_enabled").in("profile_id", profileIds);
     const prefMap = new Map((prefs ?? []).map((p: any) => [p.profile_id, p]));
-
-    const { data: existing } = await admin.from("demand_radar_spike_alert_deliveries")
-      .select("profile_id").eq("demand_score_id", row.id).in("profile_id", profileIds);
+    const { data: existing } = await admin.from("demand_radar_spike_alert_deliveries").select("profile_id").eq("demand_score_id", row.id).in("profile_id", profileIds);
     const alreadySent = new Set((existing ?? []).map((item: any) => item.profile_id));
 
     for (const profile of profiles as any[]) {
@@ -169,10 +143,7 @@ async function sendSpikeAlerts(admin: ReturnType<typeof createClient>, rows: Arr
 
       const start = row.collected_at ? new Date(row.collected_at) : new Date();
       const end = new Date(start.getTime() + 7 * 86_400_000);
-      const { error: queueError } = await admin.from("demand_radar_spike_alert_deliveries").insert({
-        profile_id: profile.id, demand_score_id: row.id, run_id: row.run_id, city: row.city, state: row.state,
-        spike_score: row.spike_score ?? 0, confidence: row.confidence, recipient_email: email, status: "queued",
-      });
+      const { error: queueError } = await admin.from("demand_radar_spike_alert_deliveries").insert({ profile_id: profile.id, demand_score_id: row.id, run_id: row.run_id, city: row.city, state: row.state, spike_score: row.spike_score ?? 0, confidence: row.confidence, recipient_email: email, status: "queued" });
       if (queueError) { skipped += 1; continue; }
 
       try {
@@ -195,7 +166,6 @@ async function sendSpikeAlerts(admin: ReturnType<typeof createClient>, rows: Arr
 export async function POST(req: NextRequest) {
   const apiKey = req.headers.get("x-internal-api-key") ?? "";
   if (!INTERNAL_KEY || apiKey !== INTERNAL_KEY) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   let body: unknown;
   try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 }); }
   const envelope = parseEnvelope(body);
@@ -217,9 +187,7 @@ export async function POST(req: NextRequest) {
   if (runError) { console.error("[demand-scores] collection run upsert error", runError); return NextResponse.json({ error: "Collection run logging failed" }, { status: 500 }); }
   if (normalized.length === 0) return NextResponse.json({ inserted: 0, run_id: envelope.run.run_id, status: envelope.run.status });
 
-  const { data, error } = await admin.from("demand_scores").upsert(normalized, { onConflict: "city_key,state_key,neighborhood_key,week_start,methodology_version", ignoreDuplicates: false })
-    .select("id,city,state,spike_score,confidence,trend,collected_at,run_id");
-
+  const { data, error } = await admin.from("demand_scores").upsert(normalized, { onConflict: "city_key,state_key,neighborhood_key,week_start,methodology_version", ignoreDuplicates: false }).select("id,city,state,spike_score,confidence,trend,collected_at,run_id");
   if (error) {
     console.error("[demand-scores] upsert error", error);
     await admin.from("demand_collection_runs").update({ status: "failed", completed_at: new Date().toISOString(), error_summary: [...(envelope.run.error_summary ?? []), { scope: "database", error: error.message }], updated_at: new Date().toISOString() }).eq("run_id", envelope.run.run_id);
@@ -229,6 +197,5 @@ export async function POST(req: NextRequest) {
   const inserted = data?.length ?? 0;
   await admin.from("demand_collection_runs").update({ rows_ingested: inserted, updated_at: new Date().toISOString() }).eq("run_id", envelope.run.run_id);
   const alerts = await sendSpikeAlerts(admin, (data ?? []) as any);
-
   return NextResponse.json({ inserted, run_id: envelope.run.run_id, status: envelope.run.status, alerts });
 }
