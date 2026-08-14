@@ -386,6 +386,12 @@ const fullProfileSchema = z.object({
   lgbtqAffirming: z.boolean().optional(),
 });
 
+function normalizeStartDate(value: string | null | undefined) {
+  if (!value) return null;
+  const date = /^\d{4}-\d{2}$/.test(value) ? `${value}-01` : value;
+  return `${date}T00:00:00.000Z`;
+}
+
 export async function PATCH(request: Request) {
   try {
     assertRateLimit(request, "pro-profile", { limit: 30, windowMs: 60_000 });
@@ -398,7 +404,9 @@ export async function PATCH(request: Request) {
 
     const body = await parseJsonBody(request, fullProfileSchema);
 
-    const updates: TablesUpdate<"profiles"> = {};
+    // The generated Supabase type file can lag the live schema. Use a generic
+    // object while building the payload, then cast only at the database boundary.
+    const updates: Record<string, unknown> = {};
     const text = (v: string | null | undefined) => (v && v.trim() ? v.trim() : null);
 
     if (body.displayName !== undefined) {
@@ -428,16 +436,22 @@ export async function PATCH(request: Request) {
     if (body.offersIncall !== undefined) updates.offers_incall = body.offersIncall;
     if (body.offersOutcall !== undefined) updates.offers_outcall = body.offersOutcall;
     if (body.outcallRadius !== undefined) updates.outcall_radius = body.outcallRadius;
+    if (body.mapEnabled !== undefined) updates.map_enabled = body.mapEnabled;
 
     if (body.massageTechniques !== undefined) updates.massage_techniques = body.massageTechniques;
     if (body.serviceCategories !== undefined) updates.service_categories = body.serviceCategories;
     if (body.specialties !== undefined) updates.specialties = body.specialties;
-    if (body.massageSetup !== undefined) updates.massage_setup = typeof body.massageSetup === 'string' ? body.massageSetup : JSON.stringify(body.massageSetup);
-    if (body.mobileExtras !== undefined) updates.mobile_extras = typeof body.mobileExtras === 'string' ? body.mobileExtras : JSON.stringify(body.mobileExtras);
-    if (body.productsUsed !== undefined) updates.products_used = typeof body.productsUsed === 'string' ? body.productsUsed : JSON.stringify(body.productsUsed);
-    if (body.productsSold !== undefined) updates.products_sold = typeof body.productsSold === 'string' ? body.productsSold : JSON.stringify(body.productsSold);
-    if (body.paymentMethods !== undefined) updates.payment_methods = typeof body.paymentMethods === 'string' ? body.paymentMethods : JSON.stringify(body.paymentMethods);
+    if (body.massageSetup !== undefined) updates.massage_setup = body.massageSetup;
+    if (body.mobileExtras !== undefined) updates.mobile_extras = body.mobileExtras;
+    if (body.additionalServices !== undefined) updates.additional_services = body.additionalServices;
+    if (body.studioAmenities !== undefined) updates.studio_amenities = body.studioAmenities;
+    if (body.productsUsed !== undefined) updates.products_used = body.productsUsed;
+    if (body.productsSold !== undefined) updates.products_sold = body.productsSold;
+    if (body.paymentMethods !== undefined) updates.payment_methods = body.paymentMethods;
     if (body.languages !== undefined) updates.languages = body.languages;
+    if (body.affiliations !== undefined) updates.affiliations = body.affiliations;
+    if (body.rateDisclaimers !== undefined) updates.rate_disclaimers = body.rateDisclaimers;
+    if (body.regularDiscounts !== undefined) updates.regular_discounts = body.regularDiscounts;
 
     if (body.pricingSessions !== undefined) {
       if (!validatePricingMarkup(body.pricingSessions)) {
@@ -446,7 +460,10 @@ export async function PATCH(request: Request) {
       updates.pricing_sessions = body.pricingSessions;
     }
     if (body.dayOfWeekDiscount !== undefined) updates.day_of_week_discount = body.dayOfWeekDiscount;
+    if (body.educationEntries !== undefined) updates.education_entries = body.educationEntries;
+    if (body.studioHours !== undefined) updates.studio_hours = body.studioHours;
     if (body.mobileHours !== undefined) updates.mobile_hours = body.mobileHours;
+    if (body.startDate !== undefined) updates.start_date = normalizeStartDate(body.startDate);
     if (body.yearsExperience !== undefined) updates.years_experience = body.yearsExperience;
     if (body.heightInches !== undefined) updates.height_inches = body.heightInches;
     if (body.weightLb !== undefined) updates.weight_lb = body.weightLb;
@@ -466,7 +483,7 @@ export async function PATCH(request: Request) {
     const adminClient = createSupabaseAdminClient();
     const { data: nextProfile, error } = await adminClient
       .from("profiles")
-      .update(updates)
+      .update(updates as TablesUpdate<"profiles">)
       .eq("user_id", session.userId)
       .select("*")
       .maybeSingle();

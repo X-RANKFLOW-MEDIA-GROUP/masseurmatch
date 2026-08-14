@@ -34,8 +34,8 @@ export type ProfileViewModel = {
   serviceArea: string;
   serviceAreas: string[];
   nearbyCities: Array<{ name: string; slug: string }>;
-  mapLat: number | null;
-  mapLng: number | null;
+  mapLat: number | string | null;
+  mapLng: number | string | null;
   travelRadius: string;
   incallAvailable: boolean;
   outcallAvailable: boolean;
@@ -174,6 +174,10 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
   const tier = profile.subscription_tier || String(p.tier || "");
   const seoKeywords = asStringArray(p.seo_keywords);
   const canonicalUrl = String(p.canonical_url || `${SITE_URL}/therapists/${profile.slug || profile.id}`);
+  const rawMapLat = typeof p.map_lat === "number" ? p.map_lat : profile.latitude ?? null;
+  const rawMapLng = typeof p.map_lng === "number" ? p.map_lng : profile.longitude ?? null;
+  const hasCoordinates = typeof rawMapLat === "number" && typeof rawMapLng === "number";
+  const hasRealCity = Boolean(profile.city?.trim());
 
   return {
     id: profile.id,
@@ -205,8 +209,8 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
     serviceArea: String(p.service_area || serviceAreas.join(", ") || `${city} metro`),
     serviceAreas: serviceAreas.length ? serviceAreas : [city],
     nearbyCities,
-    mapLat: typeof p.map_lat === "number" ? p.map_lat : profile.latitude ?? null,
-    mapLng: typeof p.map_lng === "number" ? p.map_lng : profile.longitude ?? null,
+    mapLat: hasCoordinates ? rawMapLat : hasRealCity ? city : null,
+    mapLng: hasCoordinates ? rawMapLng : hasRealCity ? state : null,
     travelRadius: profile.outcall_radius_miles ? `${profile.outcall_radius_miles} miles` : p.travel_radius ? `${p.travel_radius} miles` : "Travel radius on request",
     incallAvailable,
     outcallAvailable,
