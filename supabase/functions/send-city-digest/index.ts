@@ -1,16 +1,36 @@
-// supabase/functions/send-city-digest/index.ts
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { requireScheduledJob, ScheduledJobAuthError } from "../_shared/job-auth.ts";
 
-const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-mm-job-token",
+};
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "no-store" },
+  });
+}
 
-serve(async (_req) => {
+function escapeHtml(value: unknown) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
+
   try {
-    // 1. Fetch all active subscribers grouped by city
+    const { client: supabase } = await requireScheduledJob(req, "send-city-digest");
+    const resendApiKey = Deno.env.get("RESEND_API_KEY")?.trim() ?? "";
+    if (!resendApiKey) return json({ error: "configuration_error", missing: ["RESEND_API_KEY"] }, 503);
+
     const { data: subscribers, error: subError } = await supabase
       .from("newsletter_subscribers")
       .select("email, name, city")
@@ -18,73 +38,81 @@ serve(async (_req) => {
 
     if (subError) throw subError;
     if (!subscribers || subscribers.length === 0) {
-      return new Response(JSON.stringify({ success: true, message: "No active subscribers." }), {
-        headers: { "Content-Type": "application/json" },
-      });
+      return json({ success: true, message: "No active subscribers." });
     }
 
-    // Group subscribers by city to minimize database calls for content
     const cityGroups: Record<string, typeof subscribers> = {};
-    for (const sub of subscribers) {
-      const city = sub.city ?? "Unknown";
-      if (!cityGroups[city]) cityGroups[city] = [];
-      cityGroups[city].push(sub);
+    for (const subscriber of subscribers) {
+      const city = subscriber.city?.trim() || "Unknown";
+      cityGroups[city] ??= [];
+      cityGroups[city].push(subscriber);
     }
 
-    // 2. Process each city
+    let sent = 0;
+    let failed = 0;
+
     for (const [city, citySubscribers] of Object.entries(cityGroups)) {
-      // Fetch newest therapists in this city
-      const { data: newTherapists } = await supabase
+      const { data: newTherapists, error: therapistError } = await supabase
         .from("profiles")
-        .select("display_name, specialty, avatar_url, slug")
+        .select("display_name, specialty, specialties, slug")
         .eq("city", city)
-        .eq("is_active", true)
+        .eq("profile_status", "approved")
+        .eq("visibility_status", "public")
+        .eq("is_suspended", false)
+        .eq("is_banned", false)
         .order("created_at", { ascending: false })
         .limit(2);
 
+      if (therapistError) throw therapistError;
+
       const therapistList = (newTherapists ?? [])
-        .map((t) => `• ${t.display_name} — ${t.specialty ?? "Massage Therapy"}`)
+        .map((therapist) => {
+          const specialty = therapist.specialty || therapist.specialties?.[0] || "Massage Therapy";
+          return `• ${escapeHtml(therapist.display_name || "MasseurMatch provider")} — ${escapeHtml(specialty)}`;
+        })
         .join("\n");
 
-      // 3. Send Email via Resend to all users in this city
-      const emailPayloads = citySubscribers.map((sub) => ({
+      const safeCity = escapeHtml(city);
+      const cityPath = encodeURIComponent(city.toLowerCase());
+      const emailPayloads = citySubscribers.map((subscriber) => ({
         from: "MasseurMatch Concierge <concierge@masseurmatch.com>",
-        to: sub.email,
-        subject: `The ${city} Digest: New elite therapists near you.`,
+        to: subscriber.email,
+        subject: `The ${city} Digest: New massage professionals near you.`,
         html: [
-          `<h1>Hello ${sub.name ?? "there"},</h1>`,
-          `<p>Here is your curated weekly selection for <strong>${city}</strong>.</p>`,
-          therapistList
-            ? `<h2>New Additions</h2><pre>${therapistList}</pre>`
-            : "",
-          `<p><a href="https://masseurmatch.com/cities/${encodeURIComponent(city.toLowerCase())}">View all in ${city} &rarr;</a></p>`,
-          `<hr/><p style="font-size:12px;color:#888;">You received this because you subscribed to the ${city} City Digest. <a href="https://masseurmatch.com/unsubscribe">Unsubscribe</a></p>`,
+          `<h1>Hello ${escapeHtml(subscriber.name || "there")},</h1>`,
+          `<p>Here is your curated weekly selection for <strong>${safeCity}</strong>.</p>`,
+          therapistList ? `<h2>New Additions</h2><pre>${therapistList}</pre>` : "",
+          `<p><a href="https://masseurmatch.com/cities/${cityPath}">View all in ${safeCity} &rarr;</a></p>`,
+          `<hr/><p style="font-size:12px;color:#888;">You received this because you subscribed to the ${safeCity} City Digest. <a href="https://masseurmatch.com/unsubscribe">Unsubscribe</a></p>`,
         ].join(""),
       }));
 
-      // Fire to Resend in batches
-      const res = await fetch("https://api.resend.com/emails/batch", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${RESEND_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(emailPayloads),
-      });
+      // Keep each provider request bounded even if a city has a large list.
+      for (let start = 0; start < emailPayloads.length; start += 50) {
+        const batch = emailPayloads.slice(start, start + 50);
+        const response = await fetch("https://api.resend.com/emails/batch", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${resendApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(batch),
+        });
 
-      if (!res.ok) {
-        console.error(`Failed to send batch for ${city}: ${res.status} ${await res.text()}`);
+        if (!response.ok) {
+          failed += batch.length;
+          console.error(`[send-city-digest] Resend batch failed for city ${city}: HTTP ${response.status}`);
+        } else {
+          sent += batch.length;
+        }
       }
     }
 
-    return new Response(JSON.stringify({ success: true, message: "Digests dispatched." }), {
-      headers: { "Content-Type": "application/json" },
-    });
+    return json({ success: failed === 0, sent, failed });
   } catch (error) {
-    console.error(error);
-    return new Response(JSON.stringify({ error: String(error) }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    const status = error instanceof ScheduledJobAuthError ? error.status : 500;
+    const message = error instanceof Error ? error.message : String(error);
+    if (status >= 500) console.error("[send-city-digest]", message);
+    return json({ error: message }, status);
   }
 });
