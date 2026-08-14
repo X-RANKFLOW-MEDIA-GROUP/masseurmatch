@@ -63,24 +63,13 @@ def spike_metrics(values: Sequence[float], anchors: Sequence[float]) -> dict[str
     conf = confidence(clean, clean_anchors)
     if len(clean) < 8:
         current = round(avg(clean[-7:])) if clean else 0
-        return {
-            "current_index": current,
-            "baseline_index": current,
-            "spike_score": round(conf * 0.10),
-            "growth_pct": 0.0,
-            "velocity_score": 0,
-            "persistence_score": 0,
-            "confidence": conf,
-            "trend": "stable",
-            "components": {"confidence": conf, "sample_size": len(clean), "insufficient_history": True},
-        }
+        return {"current_index": current, "baseline_index": current, "spike_score": round(conf * 0.10), "growth_pct": 0.0, "velocity_score": 0, "persistence_score": 0, "confidence": conf, "trend": "stable", "components": {"confidence": conf, "sample_size": len(clean), "insufficient_history": True}}
 
     recent = clean[-7:]
     baseline = clean[max(0, len(clean) - 35) : -7] or clean[:-7]
     current_avg = avg(recent)
     baseline_avg = avg(baseline)
     baseline_std = statistics.pstdev(baseline) if len(baseline) > 1 else 0.0
-
     z_score = (current_avg - baseline_avg) / max(baseline_std, 5.0)
     anomaly = clamp((z_score + 1) * 25)
     growth_pct = ((current_avg / baseline_avg) - 1) * 100 if baseline_avg >= 1 else 0.0
@@ -91,37 +80,8 @@ def spike_metrics(values: Sequence[float], anchors: Sequence[float]) -> dict[str
     threshold = baseline_avg + 0.25 * baseline_std
     persistence = clamp(100 * sum(v > threshold for v in recent) / len(recent))
     spike = round(clamp(0.30 * anomaly + 0.25 * growth + 0.20 * velocity + 0.15 * persistence + 0.10 * conf))
-
-    trend = "stable"
-    if spike >= 60 or growth_pct >= 20:
-        trend = "rising"
-    elif growth_pct <= -20 and spike < 35:
-        trend = "falling"
-
-    return {
-        "current_index": round(clamp(current_avg)),
-        "baseline_index": round(clamp(baseline_avg)),
-        "spike_score": spike,
-        "growth_pct": round(growth_pct, 2),
-        "velocity_score": round(velocity),
-        "persistence_score": round(persistence),
-        "confidence": conf,
-        "trend": trend,
-        "components": {
-            "anomaly": round(anomaly, 2),
-            "growth": round(growth, 2),
-            "velocity": round(velocity, 2),
-            "persistence": round(persistence, 2),
-            "confidence": conf,
-            "z_score": round(z_score, 3),
-            "growth_pct": round(growth_pct, 2),
-            "velocity_pct": round(velocity_pct, 2),
-            "current_mean": round(current_avg, 2),
-            "baseline_mean": round(baseline_avg, 2),
-            "baseline_std": round(baseline_std, 2),
-            "sample_size": len(clean),
-        },
-    }
+    trend = "rising" if spike >= 60 or growth_pct >= 20 else "falling" if growth_pct <= -20 and spike < 35 else "stable"
+    return {"current_index": round(clamp(current_avg)), "baseline_index": round(clamp(baseline_avg)), "spike_score": spike, "growth_pct": round(growth_pct, 2), "velocity_score": round(velocity), "persistence_score": round(persistence), "confidence": conf, "trend": trend, "components": {"anomaly": round(anomaly, 2), "growth": round(growth, 2), "velocity": round(velocity, 2), "persistence": round(persistence, 2), "confidence": conf, "z_score": round(z_score, 3), "growth_pct": round(growth_pct, 2), "velocity_pct": round(velocity_pct, 2), "current_mean": round(current_avg, 2), "baseline_mean": round(baseline_avg, 2), "baseline_std": round(baseline_std, 2), "sample_size": len(clean)}}
 
 
 def intent_keywords(city: str) -> list[str]:
@@ -139,17 +99,13 @@ def load_markets(path: Path) -> list[dict[str, Any]]:
     for item in markets:
         if not isinstance(item, dict):
             raise ValueError("Every market must be an object")
-        market = {
-            "city": str(item.get("city", "")).strip(),
-            "state": str(item.get("state", "")).strip().upper(),
-            "region_code": str(item.get("region_code", "")).strip().upper(),
-            "region_name": str(item.get("region_name", "")).strip(),
-            "competition_index": int(item.get("competition_index", 50)),
-        }
+        raw_competition = item.get("competition_index")
+        competition_index = int(raw_competition) if raw_competition is not None else None
+        market = {"city": str(item.get("city", "")).strip(), "state": str(item.get("state", "")).strip().upper(), "region_code": str(item.get("region_code", "")).strip().upper(), "region_name": str(item.get("region_name", "")).strip(), "competition_index": competition_index}
         key = (market["city"].lower(), market["state"])
         if not market["city"] or len(market["state"]) != 2 or not market["region_code"].startswith("US-"):
             raise ValueError(f"Invalid market: {item}")
-        if key in seen or not 0 <= market["competition_index"] <= 100:
+        if key in seen or (competition_index is not None and not 0 <= competition_index <= 100):
             raise ValueError(f"Duplicate or invalid market: {item}")
         seen.add(key)
         result.append(market)
@@ -198,27 +154,7 @@ def collect_market(client: Any, market: dict[str, Any], timeframe: str, run_id: 
     metrics = spike_metrics(values, anchors)
     collected = datetime.now(UTC)
     demand = round(clamp(0.65 * metrics["current_index"] + 0.25 * metrics["spike_score"] + 0.10 * metrics["confidence"]))
-    return {
-        **market,
-        "neighborhood": None,
-        "score": demand,
-        "trend": metrics["trend"],
-        "search_volume_index": metrics["current_index"],
-        "spike_score": metrics["spike_score"],
-        "baseline_index": metrics["baseline_index"],
-        "growth_pct": metrics["growth_pct"],
-        "velocity_score": metrics["velocity_score"],
-        "persistence_score": metrics["persistence_score"],
-        "confidence": metrics["confidence"],
-        "sample_size": len(values),
-        "score_components": {**metrics["components"], "anchor_keyword": ANCHOR, "intent_keywords": intent_keywords(market["city"]), "first_sample_date": dates[0] if dates else None, "last_sample_date": dates[-1] if dates else None},
-        "source": SOURCE,
-        "methodology_version": METHOD,
-        "week_start": week_start(collected.date()),
-        "collected_at": collected.isoformat(),
-        "expires_at": (collected + timedelta(hours=72)).isoformat(),
-        "run_id": run_id,
-    }
+    return {**market, "neighborhood": None, "score": demand, "trend": metrics["trend"], "search_volume_index": metrics["current_index"], "spike_score": metrics["spike_score"], "baseline_index": metrics["baseline_index"], "growth_pct": metrics["growth_pct"], "velocity_score": metrics["velocity_score"], "persistence_score": metrics["persistence_score"], "confidence": metrics["confidence"], "sample_size": len(values), "score_components": {**metrics["components"], "anchor_keyword": ANCHOR, "intent_keywords": intent_keywords(market["city"]), "first_sample_date": dates[0] if dates else None, "last_sample_date": dates[-1] if dates else None, "competition_source": "unavailable" if market["competition_index"] is None else "configured"}, "source": SOURCE, "methodology_version": METHOD, "week_start": week_start(collected.date()), "collected_at": collected.isoformat(), "expires_at": (collected + timedelta(hours=72)).isoformat(), "run_id": run_id}
 
 
 def post_payload(url: str, key: str, payload: dict[str, Any]) -> dict[str, Any]:
@@ -226,12 +162,7 @@ def post_payload(url: str, key: str, payload: dict[str, Any]) -> dict[str, Any]:
         import requests
     except ImportError as exc:
         raise RuntimeError("Install requests before running the collector") from exc
-    response = requests.post(
-        f"{url.rstrip('/')}/api/internal/demand-scores",
-        json=payload,
-        headers={"x-internal-api-key": key, "user-agent": "masseurmatch-demand-radar/2.0"},
-        timeout=60,
-    )
+    response = requests.post(f"{url.rstrip('/')}/api/internal/demand-scores", json=payload, headers={"x-internal-api-key": key, "user-agent": "masseurmatch-demand-radar/2.0"}, timeout=60)
     if not response.ok:
         raise RuntimeError(f"Ingestion HTTP {response.status_code}: {response.text[:500]}")
     parsed = response.json()
@@ -290,20 +221,7 @@ def main() -> int:
                 time.sleep(delay)
 
         status = "completed" if rows and not errors else "partial" if rows else "failed"
-        payload = {
-            "run": {
-                "run_id": run_id,
-                "status": status,
-                "started_at": started.isoformat(),
-                "completed_at": datetime.now(UTC).isoformat(),
-                "markets_requested": len(markets),
-                "markets_succeeded": len(rows),
-                "markets_failed": len(errors),
-                "error_summary": errors,
-                "metadata": {"anchor_keyword": ANCHOR, "timeframe": args.timeframe, "methodology_version": METHOD, "source": SOURCE, "dry_run": args.dry_run},
-            },
-            "rows": rows,
-        }
+        payload = {"run": {"run_id": run_id, "status": status, "started_at": started.isoformat(), "completed_at": datetime.now(UTC).isoformat(), "markets_requested": len(markets), "markets_succeeded": len(rows), "markets_failed": len(errors), "error_summary": errors, "metadata": {"anchor_keyword": ANCHOR, "timeframe": args.timeframe, "methodology_version": METHOD, "source": SOURCE, "dry_run": args.dry_run}}, "rows": rows}
         api_response = None
         if not args.dry_run:
             url = os.getenv("DEMAND_RADAR_APP_URL") or os.getenv("NEXT_PUBLIC_APP_URL") or ""
@@ -316,20 +234,7 @@ def main() -> int:
     except Exception as exc:
         LOG.exception("Demand Radar run failed")
         errors.append({"scope": "run", "error": str(exc)[:1000]})
-        payload = {
-            "run": {
-                "run_id": run_id,
-                "status": "failed",
-                "started_at": started.isoformat(),
-                "completed_at": datetime.now(UTC).isoformat(),
-                "markets_requested": len(markets),
-                "markets_succeeded": len(rows),
-                "markets_failed": max(len(errors), 1),
-                "error_summary": errors,
-                "metadata": {"methodology_version": METHOD, "source": SOURCE, "dry_run": args.dry_run},
-            },
-            "rows": rows,
-        }
+        payload = {"run": {"run_id": run_id, "status": "failed", "started_at": started.isoformat(), "completed_at": datetime.now(UTC).isoformat(), "markets_requested": len(markets), "markets_succeeded": len(rows), "markets_failed": max(len(errors), 1), "error_summary": errors, "metadata": {"methodology_version": METHOD, "source": SOURCE, "dry_run": args.dry_run}}, "rows": rows}
         write_artifact(args.output, payload)
         if not args.dry_run:
             url = os.getenv("DEMAND_RADAR_APP_URL") or os.getenv("NEXT_PUBLIC_APP_URL") or ""
