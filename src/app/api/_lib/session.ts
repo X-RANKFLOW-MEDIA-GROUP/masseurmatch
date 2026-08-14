@@ -1,20 +1,16 @@
 import { createServerClient } from "@supabase/ssr";
 
 import { RouteError } from "@/app/api/_lib/http";
-import {
-  SUPABASE_PUBLIC_URL,
-  SUPABASE_PUBLIC_ANON_KEY,
-} from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { getPublicSupabaseConfig } from "@/lib/supabase/public-env";
 
 export interface RequestSession {
   userId: string;
   email: string;
   role: "admin" | "provider" | "client" | null;
   /**
-   * ISO timestamp of the access token expiry. Retained for backward
-   * compatibility with callers that surface it; identity is always
-   * re-verified against Supabase, never trusted from this value.
+   * ISO timestamp retained for backward compatibility with callers that surface
+   * it. Identity is always re-verified against Supabase.
    */
   expiresAt: string;
 }
@@ -53,32 +49,25 @@ function parseRequestCookies(request: Request): ParsedCookie[] {
 
 /**
  * Builds a read-only, cookie-bound Supabase client from an incoming request.
- * Used to verify the caller's identity inside route handlers, where the
- * response object is not available for cookie rotation (the middleware keeps
- * the session fresh on document navigations).
  */
 export function supabaseFromRequest(request: Request) {
   const cookies = parseRequestCookies(request);
-  return createServerClient<Database>(
-    SUPABASE_PUBLIC_URL,
-    SUPABASE_PUBLIC_ANON_KEY,
-    {
-      cookies: {
-        getAll() {
-          return cookies;
-        },
-        setAll() {
-          // No mutable response in a bare route-handler context.
-        },
+  const { url, key } = getPublicSupabaseConfig();
+
+  return createServerClient<Database>(url, key, {
+    cookies: {
+      getAll() {
+        return cookies;
+      },
+      setAll() {
+        // No mutable response in a bare route-handler context.
       },
     },
-  );
+  });
 }
 
 /**
- * Returns the verified session for the request, or null when the caller is not
- * authenticated. The identity is validated by Supabase Auth (`getUser`), so the
- * result can be trusted for authorization.
+ * Returns the verified session for the request, or null when unauthenticated.
  */
 export async function getRequestSession(
   request: Request,
