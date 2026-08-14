@@ -66,6 +66,50 @@ async function beginEventProcessing(
   return "process";
 }
 
+async function resolveCanonicalProfileId(
+  db: SupabaseClient,
+  metadata: Record<string, string> | null | undefined,
+): Promise<string | null> {
+  const profileId = metadata?.profile_id?.trim();
+  if (profileId) return profileId;
+
+  const legacyId = metadata?.therapist_profile_id?.trim();
+  if (!legacyId) return null;
+
+  const { data, error } = await db
+    .from("therapist_profiles")
+    .select("profile_id")
+    .eq("id", legacyId)
+    .maybeSingle();
+  if (error) throw new Error(`legacy_profile_mapping_failed:${error.code || "unknown"}`);
+  return data?.profile_id ?? null;
+}
+
+async function resolvePlanId(db: SupabaseClient, planCode: string): Promise<string> {
+  const { data: plan, error } = await db
+    .from("subscription_plans")
+    .select("id")
+    .eq("code", planCode)
+    .eq("is_active", true)
+    .maybeSingle();
+  if (error || !plan) throw new Error("subscription_plan_not_found");
+  return plan.id;
+}
+
+function mapSubscriptionStatus(status: Stripe.Subscription.Status): string {
+  const statusMap: Record<string, string> = {
+    trialing: "trialing",
+    active: "active",
+    past_due: "past_due",
+    canceled: "canceled",
+    unpaid: "past_due",
+    incomplete: "past_due",
+    incomplete_expired: "expired",
+    paused: "expired",
+  };
+  return statusMap[status] ?? "past_due";
+}
+
 Deno.serve(async (request) => {
   if (request.method !== "POST") return reply({ error: "method_not_allowed" }, 405);
 
@@ -102,79 +146,45 @@ Deno.serve(async (request) => {
 
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
-      const profileId = session.metadata?.profile_id;
-      const therapistProfileId = session.metadata?.therapist_profile_id;
-      const planCode = session.metadata?.plan_code;
+      const metadata = session.metadata ?? {};
+      const profileId = await resolveCanonicalProfileId(db, metadata);
+      const legacyProfileId = metadata.therapist_profile_id?.trim() || null;
+      const planCode = metadata.plan_code?.trim() || metadata.masseurmatch_plan?.trim() || "";
 
-      if (profileId && therapistProfileId && planCode) {
-        const { data: plan, error: planError } = await db
-          .from("subscription_plans")
-          .select("id")
-          .eq("code", planCode)
-          .single();
-        if (planError || !plan) throw new Error("subscription_plan_not_found");
+      if (!profileId || !planCode) throw new Error("checkout_metadata_incomplete");
+      const planId = await resolvePlanId(db, planCode);
+      const customerId = typeof session.customer === "string" ? session.customer : session.customer?.id || "";
 
+      if (customerId) {
         const { error: profileError } = await db
           .from("profiles")
-          .update({ stripe_customer_id: String(session.customer ?? "") })
+          .update({ stripe_customer_id: customerId })
           .eq("id", profileId);
         if (profileError) throw new Error(`profile_billing_update_failed:${profileError.code || "unknown"}`);
+      }
 
-        const { error: checkoutError } = await db.from("checkout_sessions").upsert(
+      const { error: checkoutError } = await db.from("checkout_sessions").upsert(
+        {
+          profile_id: profileId,
+          therapist_profile_id: legacyProfileId,
+          plan_id: planId,
+          stripe_checkout_session_id: session.id,
+          stripe_customer_id: customerId || null,
+          status: "complete",
+          metadata: session as unknown as Record<string, unknown>,
+        },
+        { onConflict: "stripe_checkout_session_id" },
+      );
+      if (checkoutError) throw new Error(`checkout_persist_failed:${checkoutError.code || "unknown"}`);
+
+      if (typeof session.subscription === "string" && session.subscription) {
+        const subscription = await stripe.subscriptions.retrieve(session.subscription);
+        const { error: subscriptionError } = await db.from("therapist_subscriptions").upsert(
           {
             profile_id: profileId,
-            therapist_profile_id: therapistProfileId,
-            plan_id: plan.id,
-            stripe_checkout_session_id: session.id,
-            stripe_customer_id: String(session.customer ?? ""),
-            status: "complete",
-            metadata: session as unknown as Record<string, unknown>,
-          },
-          { onConflict: "stripe_checkout_session_id" },
-        );
-        if (checkoutError) throw new Error(`checkout_persist_failed:${checkoutError.code || "unknown"}`);
-
-        const { error: subscriptionError } = await db.from("therapist_subscriptions").upsert(
-          {
-            therapist_profile_id: therapistProfileId,
-            plan_id: plan.id,
-            status: "active",
-            provider: "stripe",
-            provider_subscription_id: String(session.subscription ?? ""),
-          },
-          { onConflict: "therapist_profile_id" },
-        );
-        if (subscriptionError) throw new Error(`subscription_persist_failed:${subscriptionError.code || "unknown"}`);
-      }
-    }
-
-    if (event.type.startsWith("customer.subscription.")) {
-      const subscription = event.data.object as Stripe.Subscription;
-      const therapistProfileId = subscription.metadata?.therapist_profile_id;
-      const planCode = subscription.metadata?.plan_code;
-
-      if (therapistProfileId && planCode) {
-        const { data: plan, error: planError } = await db
-          .from("subscription_plans")
-          .select("id")
-          .eq("code", planCode)
-          .single();
-        if (planError || !plan) throw new Error("subscription_plan_not_found");
-
-        const statusMap: Record<string, string> = {
-          trialing: "trialing",
-          active: "active",
-          past_due: "past_due",
-          canceled: "canceled",
-          unpaid: "past_due",
-          incomplete_expired: "expired",
-        };
-
-        const { error: subscriptionError } = await db.from("therapist_subscriptions").upsert(
-          {
-            therapist_profile_id: therapistProfileId,
-            plan_id: plan.id,
-            status: statusMap[subscription.status] ?? "past_due",
+            therapist_profile_id: legacyProfileId,
+            plan_id: planId,
+            status: mapSubscriptionStatus(subscription.status),
             provider: "stripe",
             provider_subscription_id: subscription.id,
             current_period_start: subscription.current_period_start
@@ -185,10 +195,41 @@ Deno.serve(async (request) => {
               : null,
             cancel_at_period_end: subscription.cancel_at_period_end,
           },
-          { onConflict: "therapist_profile_id" },
+          { onConflict: "profile_id" },
         );
         if (subscriptionError) throw new Error(`subscription_persist_failed:${subscriptionError.code || "unknown"}`);
       }
+    }
+
+    if (event.type.startsWith("customer.subscription.")) {
+      const subscription = event.data.object as Stripe.Subscription;
+      const metadata = subscription.metadata ?? {};
+      const profileId = await resolveCanonicalProfileId(db, metadata);
+      const legacyProfileId = metadata.therapist_profile_id?.trim() || null;
+      const planCode = metadata.plan_code?.trim() || metadata.masseurmatch_plan?.trim() || "";
+
+      if (!profileId || !planCode) throw new Error("subscription_metadata_incomplete");
+      const planId = await resolvePlanId(db, planCode);
+
+      const { error: subscriptionError } = await db.from("therapist_subscriptions").upsert(
+        {
+          profile_id: profileId,
+          therapist_profile_id: legacyProfileId,
+          plan_id: planId,
+          status: mapSubscriptionStatus(subscription.status),
+          provider: "stripe",
+          provider_subscription_id: subscription.id,
+          current_period_start: subscription.current_period_start
+            ? new Date(subscription.current_period_start * 1000).toISOString()
+            : null,
+          current_period_end: subscription.current_period_end
+            ? new Date(subscription.current_period_end * 1000).toISOString()
+            : null,
+          cancel_at_period_end: subscription.cancel_at_period_end,
+        },
+        { onConflict: "profile_id" },
+      );
+      if (subscriptionError) throw new Error(`subscription_persist_failed:${subscriptionError.code || "unknown"}`);
     }
 
     const { error: completeError } = await db
