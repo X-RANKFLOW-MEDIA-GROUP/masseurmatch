@@ -8,16 +8,29 @@ interface ProfileViewTrackerProps {
   source?: "search" | "explore" | "direct" | "recommendation";
 }
 
+const ANALYTICS_SESSION_KEY = "mm:analytics:session_id";
+
+function getAnalyticsSessionId() {
+  try {
+    const existing = sessionStorage.getItem(ANALYTICS_SESSION_KEY);
+    if (existing) return existing;
+
+    const sessionId = crypto.randomUUID();
+    sessionStorage.setItem(ANALYTICS_SESSION_KEY, sessionId);
+    return sessionId;
+  } catch {
+    return undefined;
+  }
+}
+
 export function ProfileViewTracker({ profileId, source = "direct" }: ProfileViewTrackerProps) {
   useEffect(() => {
-    // Track profile view
     trackProfileView({
       profile_id: profileId,
       source,
-      session_id: typeof window !== "undefined" ? sessionStorage.getItem("session_id") || undefined : undefined,
+      session_id: getAnalyticsSessionId(),
     });
   }, [profileId, source]);
 
-  // This component doesn't render anything
   return null;
 }
