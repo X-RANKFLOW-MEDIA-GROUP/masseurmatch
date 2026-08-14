@@ -2,14 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/app/_components/json-ld";
 import { GeoAreaCallout } from "@/app/_components/geo-area-callout";
-import { getCities, getPublicTherapists } from "@/app/_lib/directory";
+import { getCities } from "@/app/_lib/directory";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
-  buildItemListJsonLd,
   createPageMetadata,
 } from "@/app/_lib/seo";
-import SearchPageClient from "@/app/search/SearchPageClient";
 import { formatCityLabel } from "@/data/cities";
 
 export const dynamic = "force-dynamic";
@@ -30,7 +28,6 @@ export const metadata: Metadata = createPageMetadata({
 
 export default async function NearMePage() {
   const cities = getCities();
-  const results = await getPublicTherapists({ page: 1, pageSize: 500 });
   const topCities = cities.slice(0, 12);
 
   return (
@@ -49,17 +46,6 @@ export default async function NearMePage() {
           path: "/near-me",
         })}
       />
-      <JsonLd
-        data={buildItemListJsonLd({
-          name: "Massage therapists near me",
-          path: "/near-me",
-          items: results.items.map((item) => ({
-            name: item.display_name || item.full_name || "Therapist",
-            path: `/therapists/${item.slug || item.id}`,
-          })),
-        })}
-      />
-
       <main className="page-shell py-6 sm:py-8">
         <header className="mb-4">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-secondary">Near me</p>
@@ -67,28 +53,16 @@ export default async function NearMePage() {
             Find massage therapists near you
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Browse profiles now, or use your location to narrow the directory to your area.
+            Use your location to open the local city directory. We do not show unrelated listings from across the country on this page.
           </p>
         </header>
 
-        <GeoAreaCallout compact navigateToSearch source="near-me" className="mb-5" />
-
-        <SearchPageClient
-          cities={cities}
-          items={results.items}
-          total={results.total}
-          filters={{
-            city: "",
-            modality: "",
-            keyword: "",
-            session: "",
-            goal: "",
-            verified: false,
-            availableToday: false,
-            masterOnly: false,
-            tier: "",
-            lgbtqAffirming: false,
-          }}
+        <GeoAreaCallout
+          compact
+          navigateToCity
+          autoNavigateToCity
+          source="near-me"
+          className="mb-5"
         />
 
         <section className="mt-10 border-t border-border pt-8">
