@@ -46,7 +46,11 @@ describe("demand radar helpers", () => {
     expect(getOpportunityScore(base)).toBe(74);
   });
 
-  it("ranks lower competition above equal demand", () => {
+  it("does not invent opportunity when competition is unknown", () => {
+    expect(getOpportunityScore({ ...base, competition_index: null })).toBeNull();
+  });
+
+  it("ranks lower competition above equal demand when both competition values are known", () => {
     const lowerCompetition = { ...base, id: "2", competition_index: 20 };
     expect(rankDemandRecords([base, lowerCompetition])[0]?.id).toBe("2");
   });
