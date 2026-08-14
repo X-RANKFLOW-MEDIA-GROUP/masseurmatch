@@ -31,6 +31,11 @@ function normalizeRole(role: string | null): AdminPerson["role"] {
   return role === "admin" || role === "provider" ? role : null;
 }
 
+function adminProfileStatus(status: string | null) {
+  if (status === "under_review") return "under_review (pending)";
+  return status || "draft";
+}
+
 export async function loadPeople(): Promise<{ items: AdminPerson[]; error: string | null }> {
   try {
     const supabase = createSupabaseAdminClient();
@@ -121,7 +126,7 @@ export async function loadPeople(): Promise<{ items: AdminPerson[]; error: strin
             email: emailMap.get(userId) || profile.email_address || null,
             city: profile.city,
             role: roleMap.get(userId) || null,
-            profileStatus: profile.profile_status || "draft",
+            profileStatus: adminProfileStatus(profile.profile_status),
             subscriptionTier: profile.subscription_tier,
             verificationStatus: identityStatusMap.get(userId) || "not_started",
             slug: profile.slug,
