@@ -74,7 +74,7 @@ export default function SignupAccountPage() {
         fullName: form.fullName.trim(),
         displayName: form.displayName.trim() || form.fullName.trim(),
         email: form.email.trim(),
-        phone: form.phone,
+        phone: form.phone.trim(),
       });
       markAccountCreated();
       setTermsAccepted(terms);
@@ -137,7 +137,7 @@ export default function SignupAccountPage() {
                 <div className="space-y-2 sm:col-span-2">
                   <Label htmlFor="phone">Phone *</Label>
                   <PhoneInput id="phone" value={form.phone} onChange={(value) => update("phone", value)} placeholder="(555) 000-0000" />
-                  <p className="text-xs text-muted-foreground">Used for contact verification and account security.</p>
+                  <p className="text-xs text-muted-foreground">Required. This becomes the default public contact number on your profile and is also used for verification and account security.</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Password *</Label>

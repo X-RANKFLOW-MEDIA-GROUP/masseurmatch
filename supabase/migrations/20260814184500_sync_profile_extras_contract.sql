@@ -1,6 +1,5 @@
--- Synchronize the additive schema contract with intended provider profile
--- fields. ADD COLUMN IF NOT EXISTS preserves every existing row and makes the
--- migration safe for both production and fresh preview databases.
+-- Synchronize the additive schema contract with profile fields already present
+-- in production. This migration is idempotent and safe for existing databases.
 
 alter table public.profiles
   add column if not exists map_enabled boolean default false,

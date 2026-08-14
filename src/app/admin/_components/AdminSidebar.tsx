@@ -45,6 +45,7 @@ const navSections = [
   {
     title: "Communication",
     items: [
+      { href: "/admin/messaging", label: "Messaging", icon: MessageSquare },
       { href: "/admin/emails", label: "Email Center", icon: Mail },
       { href: "/admin/tickets", label: "Tickets", icon: MessageSquare },
       { href: "/admin/support", label: "Support", icon: LifeBuoy },
