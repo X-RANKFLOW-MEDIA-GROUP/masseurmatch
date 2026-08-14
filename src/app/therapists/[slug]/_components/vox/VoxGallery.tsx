@@ -35,7 +35,7 @@ export function VoxGallery({ images, name }: { images: string[]; name: string })
             key={`${src}-${index}`}
             type="button"
             onClick={() => setActive(index)}
-            className={`group relative overflow-hidden rounded-2xl border border-[#efe3d8] bg-[#f3e9df] ${tileRatio}`}
+            className={`group relative overflow-hidden rounded-2xl border border-[#efe3d8] bg-[#f7f3ef] ${tileRatio}`}
           >
             <Image
               src={src}
@@ -46,7 +46,7 @@ export function VoxGallery({ images, name }: { images: string[]; name: string })
                   ? "(min-width: 1024px) 768px, 100vw"
                   : "(min-width: 1024px) 360px, (min-width: 640px) 50vw, 50vw"
               }
-              className="object-cover transition-transform duration-500 group-hover:scale-[1.015]"
+              className="object-contain p-1 transition-transform duration-500 group-hover:scale-[1.015]"
               loading={index === 0 ? "eager" : "lazy"}
             />
           </button>
