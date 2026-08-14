@@ -1,6 +1,8 @@
 export type DemandTrend = "rising" | "stable" | "falling";
 export type DataFreshness = "fresh" | "delayed" | "stale" | "unknown";
 export type SpikeWindowStatus = "active" | "watch" | "normal";
+export type CompetitionSignalStatus = "reliable" | "experimental" | "unavailable";
+export type MarketSignalStatus = "spiking" | "accelerating" | "building" | "normal";
 
 export interface DemandScoreRecord {
   id: string;
@@ -17,6 +19,14 @@ export interface DemandScoreRecord {
   week_start: string;
   collected_at: string | null;
   expires_at: string | null;
+  run_id?: string | null;
+  methodology_version?: string | null;
+  baseline_index?: number | null;
+  growth_pct?: number | null;
+  velocity_score?: number | null;
+  persistence_score?: number | null;
+  sample_size?: number | null;
+  score_components?: Record<string, unknown> | null;
 }
 
 export interface SpikeWindow {
@@ -59,8 +69,15 @@ export function getSpikeLabel(score: number | null | undefined): string {
   return "Normal";
 }
 
-// Accepts partial rows (API responses may omit optional signal fields); the
-// implementation already treats missing values as "no signal".
+export function getMarketSignalStatus(record: Pick<DemandScoreRecord, "trend" | "spike_score" | "confidence">): MarketSignalStatus {
+  const spike = record.spike_score ?? 0;
+  const confidence = record.confidence ?? 0;
+  if (record.trend === "rising" && spike >= 80 && confidence >= 50) return "spiking";
+  if (record.trend === "rising" && spike >= 60) return "accelerating";
+  if (record.trend === "rising" || spike >= 40) return "building";
+  return "normal";
+}
+
 export function getSpikeWindow(record: {
   trend: DemandTrend;
   spike_score?: number | null;
@@ -93,13 +110,32 @@ export function getOpportunityScore(record: Pick<DemandScoreRecord, "score" | "c
   return Math.round(record.score * 0.65 + lowCompetition * 0.2 + confidence * 0.15);
 }
 
-export function rankDemandRecords(records: DemandScoreRecord[]): DemandScoreRecord[] {
+export function getCompetitionSignalStatus(records: Array<Pick<DemandScoreRecord, "competition_index">>): CompetitionSignalStatus {
+  const values = records.map((row) => row.competition_index).filter((value): value is number => typeof value === "number" && Number.isFinite(value));
+  if (values.length === 0) return "unavailable";
+  const unique = new Set(values.map((value) => Math.round(value))).size;
+  const spread = Math.max(...values) - Math.min(...values);
+  if (values.length >= 5 && unique >= 3 && spread >= 15) return "reliable";
+  return "experimental";
+}
+
+export function getMarketPercentile(rank: number, total: number): number | null {
+  if (!Number.isInteger(rank) || !Number.isInteger(total) || rank < 1 || total < 1 || rank > total) return null;
+  if (total === 1) return 100;
+  return Math.round(((total - rank) / (total - 1)) * 100);
+}
+
+export function rankDemandRecords(records: DemandScoreRecord[], options: { useOpportunity?: boolean } = {}): DemandScoreRecord[] {
+  const useOpportunity = options.useOpportunity ?? true;
   return [...records].sort((a, b) => {
-    const aOpportunity = getOpportunityScore(a);
-    const bOpportunity = getOpportunityScore(b);
-    if (aOpportunity != null && bOpportunity != null && bOpportunity !== aOpportunity) return bOpportunity - aOpportunity;
+    if (useOpportunity) {
+      const aOpportunity = getOpportunityScore(a);
+      const bOpportunity = getOpportunityScore(b);
+      if (aOpportunity != null && bOpportunity != null && bOpportunity !== aOpportunity) return bOpportunity - aOpportunity;
+    }
     if ((b.spike_score ?? 0) !== (a.spike_score ?? 0)) return (b.spike_score ?? 0) - (a.spike_score ?? 0);
     if (b.score !== a.score) return b.score - a.score;
+    if ((b.confidence ?? 0) !== (a.confidence ?? 0)) return (b.confidence ?? 0) - (a.confidence ?? 0);
     return `${a.city}-${a.neighborhood ?? ""}`.localeCompare(`${b.city}-${b.neighborhood ?? ""}`);
   });
 }
