@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
+// This regression suite is intentionally part of PR validation so Vercel tests the same build gate used in Production.
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const validatorPath = path.join(scriptDir, "validate-supabase-env.mjs");
 const PROD_REF = "ijsdpozjfjjufjsoexod";
