@@ -15,6 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_APP_URL: https://masseurmatch.com
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       KNOTTY_LEARNING_ENABLED: "false"
       KNOTTY_DEBUG_RANKING: "false"
     steps:
@@ -50,9 +52,6 @@ jobs:
         run: pnpm validate:db-contract
       - name: Release audit
         run: pnpm release:audit
-      # Aggregate gate. The discrete steps above exist so a failure points at the
-      # exact gate; this step additionally verifies the aggregate script itself
-      # stays wired to the same set of checks.
       - name: Release check (aggregate gate)
         run: pnpm release:check
       - name: Production build
