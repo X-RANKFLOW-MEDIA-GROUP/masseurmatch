@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  formatUsDate,
   getDemandFreshness,
   getDemandLabel,
   getOpportunityScore,
+  getSpikeWindow,
   rankDemandRecords,
+  shouldSendSpikeAlert,
   type DemandScoreRecord,
 } from "@/lib/demand-radar";
 
@@ -15,6 +18,7 @@ const base: DemandScoreRecord = {
   neighborhood: null,
   score: 80,
   trend: "rising",
+  spike_score: 82,
   search_volume_index: 82,
   competition_index: 50,
   confidence: 80,
@@ -33,6 +37,11 @@ describe("demand radar helpers", () => {
     expect(getDemandFreshness(null, now)).toBe("unknown");
   });
 
+  it("formats dashboard dates as MM/DD/YYYY", () => {
+    expect(formatUsDate("2026-08-14")).toBe("08/14/2026");
+    expect(formatUsDate("2026-08-14T10:30:00.000Z")).toBe("08/14/2026");
+  });
+
   it("calculates an opportunity score from demand, competition, and confidence", () => {
     expect(getOpportunityScore(base)).toBe(74);
   });
@@ -47,5 +56,19 @@ describe("demand radar helpers", () => {
     expect(getDemandLabel(75)).toBe("High");
     expect(getDemandLabel(55)).toBe("Moderate");
     expect(getDemandLabel(30)).toBe("Low");
+  });
+
+  it("creates a clear seven-day active spike window", () => {
+    const window = getSpikeWindow(base);
+    expect(window.status).toBe("active");
+    expect(formatUsDate(window.start)).toBe("08/06/2026");
+    expect(formatUsDate(window.end)).toBe("08/13/2026");
+    expect(shouldSendSpikeAlert(base)).toBe(true);
+  });
+
+  it("does not email normal or low-confidence signals", () => {
+    expect(shouldSendSpikeAlert({ ...base, spike_score: 55 })).toBe(false);
+    expect(shouldSendSpikeAlert({ ...base, confidence: 30 })).toBe(false);
+    expect(shouldSendSpikeAlert({ ...base, trend: "stable" })).toBe(false);
   });
 });
