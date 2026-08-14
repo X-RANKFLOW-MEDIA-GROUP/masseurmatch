@@ -36,7 +36,7 @@ class ResendTopicsService {
       const response = await this.resend.topics.create({
         name: input.name,
         description: input.description,
-        default_subscription: input.default_subscription || 'opt_out',
+        defaultSubscription: input.default_subscription || 'opt_out',
       });
 
       if (response.error) {
@@ -92,7 +92,7 @@ class ResendTopicsService {
         id: input.id,
         name: input.name,
         description: input.description,
-        default_subscription: input.default_subscription,
+        defaultSubscription: input.default_subscription,
       });
 
       if (response.error) {
