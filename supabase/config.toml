@@ -11,6 +11,10 @@ project_id = "ijsdpozjfjjufjsoexod"
     verify_jwt = false
   [functions.lifecycle-unsubscribe]
     verify_jwt = false
+  [functions.moderate-photo]
+    verify_jwt = true
+  [functions.moderate-text]
+    verify_jwt = true
   [functions.process-lifecycle-email-queue]
     verify_jwt = false
   [functions.resend-webhook]
