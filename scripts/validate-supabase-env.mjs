@@ -1,19 +1,10 @@
 const PRODUCTION_PROJECT_REF = "ijsdpozjfjjufjsoexod";
-const PRODUCTION_HOSTNAME = `${PRODUCTION_PROJECT_REF}.supabase.co`;
-const FALLBACK_URL = `https://${PRODUCTION_HOSTNAME}`;
 
 const urlVariableNames = [
   "SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_URL",
   "NEXT_PUBLIC_STORAGE_SUPABASE_URL",
   "VITE_SUPABASE_URL",
-];
-
-const publicUrlPriority = [
-  "NEXT_PUBLIC_SUPABASE_URL",
-  "NEXT_PUBLIC_STORAGE_SUPABASE_URL",
-  "VITE_SUPABASE_URL",
-  "SUPABASE_URL",
 ];
 
 const keyVariableNames = [
@@ -24,6 +15,11 @@ const keyVariableNames = [
   "VITE_SUPABASE_PUBLISHABLE_KEY",
   "SUPABASE_SERVICE_ROLE_KEY",
   "SITEMAP_SUPABASE_KEY",
+];
+
+const browserKeyVariableNames = [
+  "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+  "NEXT_PUBLIC_SUPABASE_ANON_KEY",
 ];
 
 function fail(message) {
@@ -62,8 +58,8 @@ function parseSupabaseUrl(name, value) {
 }
 
 function readJwtProjectRef(name, token) {
-  // New Supabase publishable keys are opaque. Their project is validated by
-  // the URL configuration checks. Legacy anon and service-role keys are JWTs.
+  // New Supabase publishable/secret keys are opaque. Their project is validated
+  // by the URL configuration checks. Legacy anon/service-role keys are JWTs.
   if (token.startsWith("sb_publishable_") || token.startsWith("sb_secret_")) {
     return null;
   }
@@ -106,9 +102,8 @@ async function verifyReachable(origin) {
         signal: controller.signal,
       });
 
-      // Supabase's gateway may return 401 without an apikey. That still proves
-      // the project hostname resolves and accepts TLS/HTTP. Deleted preview
-      // branches fail before an HTTP response is received.
+      // A gateway 401 still proves the configured project resolves and accepts
+      // TLS/HTTP; a deleted or invalid project fails before a response exists.
       if (response.status >= 500) {
         lastDetail = `HTTP ${response.status}`;
       } else {
@@ -142,18 +137,18 @@ async function verifyReachable(origin) {
   );
 }
 
+const browserUrl = configuredValue("NEXT_PUBLIC_SUPABASE_URL");
+if (!browserUrl) {
+  fail("NEXT_PUBLIC_SUPABASE_URL must be configured; no fallback project is used.");
+}
+
+const selectedUrl = parseSupabaseUrl("NEXT_PUBLIC_SUPABASE_URL", browserUrl);
 const configuredUrls = urlVariableNames
   .map((name) => {
     const value = configuredValue(name);
     return value ? [name, parseSupabaseUrl(name, value)] : null;
   })
   .filter(Boolean);
-
-const selectedUrlName = publicUrlPriority.find((name) => configuredValue(name));
-const selectedUrl = parseSupabaseUrl(
-  selectedUrlName || "application fallback",
-  selectedUrlName ? configuredValue(selectedUrlName) : FALLBACK_URL,
-);
 
 for (const [name, parsed] of configuredUrls) {
   if (parsed.origin !== selectedUrl.origin) {
@@ -162,6 +157,13 @@ for (const [name, parsed] of configuredUrls) {
         "All Supabase URL variables in one deployment must use the same project.",
     );
   }
+}
+
+const browserKeyName = browserKeyVariableNames.find((name) => configuredValue(name));
+if (!browserKeyName) {
+  fail(
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY must be configured.",
+  );
 }
 
 if (process.env.VERCEL_ENV === "production" && selectedUrl.projectRef !== PRODUCTION_PROJECT_REF) {
@@ -187,5 +189,5 @@ await verifyReachable(selectedUrl.origin);
 const environment = process.env.VERCEL_ENV || "local/ci";
 console.log(
   `Supabase environment verified for ${environment}: ${selectedUrl.hostname} ` +
-    `(${configuredUrls.length} configured URL variable(s)).`,
+    `(${configuredUrls.length} configured URL variable(s), browser key ${browserKeyName}).`,
 );
