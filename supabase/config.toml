@@ -27,3 +27,7 @@ project_id = "ijsdpozjfjjufjsoexod"
     verify_jwt = true
   [functions.send-city-digest]
     verify_jwt = true
+  [functions.stripe-webhook]
+    verify_jwt = false
+  [functions.twilio-inbound]
+    verify_jwt = false
