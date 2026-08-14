@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { z } from "zod";
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, recordAuditLog, requireAdminSession } from "@/app/api/_lib/supabase-server";
-import { SUPABASE_PUBLIC_URL } from "@/integrations/supabase/client";
+import { getPublicSupabaseUrl } from "@/lib/supabase/public-env";
 
 function isAbsoluteUrl(value: string) {
   return /^https?:\/\//i.test(value);
@@ -14,12 +14,12 @@ function photoUrl(url: unknown, storagePath: unknown): string {
 
   if (storedUrl) {
     if (isAbsoluteUrl(storedUrl)) return storedUrl;
-    return `${SUPABASE_PUBLIC_URL}/storage/v1/object/public/therapist-photos/${storedUrl.replace(/^\/+/, "")}`;
+    return `${getPublicSupabaseUrl()}/storage/v1/object/public/therapist-photos/${storedUrl.replace(/^\/+/, "")}`;
   }
 
   if (storedPath) {
     if (isAbsoluteUrl(storedPath)) return storedPath;
-    return `${SUPABASE_PUBLIC_URL}/storage/v1/object/public/therapist-photos/${storedPath.replace(/^\/+/, "")}`;
+    return `${getPublicSupabaseUrl()}/storage/v1/object/public/therapist-photos/${storedPath.replace(/^\/+/, "")}`;
   }
 
   return "";

@@ -4,14 +4,14 @@ import React from "react";
 import { requireAdminSession, createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { sendEmail } from "@/app/api/_lib/email";
 import { revalidatePublicDirectory } from "@/app/_lib/directory-cache";
-import { SUPABASE_PUBLIC_URL } from "@/integrations/supabase/client";
+import { getPublicSupabaseUrl } from "@/lib/supabase/public-env";
 import ProfileApprovedEmail from "@/emails/ProfileApprovedEmail";
 
 function resolvePhotoUrl(url: string | null, storagePath: string | null) {
   if (url) return url;
   if (!storagePath) return null;
   if (/^https?:\/\//i.test(storagePath)) return storagePath;
-  return `${SUPABASE_PUBLIC_URL}/storage/v1/object/public/therapist-photos/${storagePath}`;
+  return `${getPublicSupabaseUrl()}/storage/v1/object/public/therapist-photos/${storagePath}`;
 }
 
 function normalizeCompletion(value: unknown) {

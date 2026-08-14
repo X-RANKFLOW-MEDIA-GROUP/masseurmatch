@@ -1,44 +1,42 @@
-// Use @supabase/ssr's createBrowserClient so the PKCE code_verifier is stored
+// Browser-only Supabase client.
+//
+// Uses @supabase/ssr's createBrowserClient so the PKCE code_verifier is stored
 // in a cookie (not localStorage). This lets the server-side /auth/callback
 // route handler (createServerClient) read the same verifier and successfully
-// call exchangeCodeForSession. Using plain createClient stores the verifier
-// in localStorage, which the server can never access → OAuth always fails.
+// call exchangeCodeForSession. Using plain createClient stores the verifier in
+// localStorage, which the server can never access → OAuth always fails.
 import { createBrowserClient } from "@supabase/ssr";
 import type { Database } from "./types";
 
-// Production fallbacks: NEXT_PUBLIC_* vars are inlined at build time, and a
-// build made without them ships a client that cannot reach Supabase at all
-// (profile pages and search die on hydration). The anon key is Supabase's
-// publishable key — it is designed to ship in the browser bundle, and
-// everything it can read or write is enforced by Row Level Security.
-const FALLBACK_SUPABASE_URL = "https://ijsdpozjfjjufjsoexod.supabase.co";
-const FALLBACK_SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlqc2Rwb3pqZmpqdWZqc29leG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwMDcxNTYsImV4cCI6MjA3NzU4MzE1Nn0.S6fGMlOp8KLHwPGL9ebOQvDUqY3C79bw3SH9IOsCi2M";
+// Public Supabase configuration is read strictly from the NEXT_PUBLIC_* vars.
+// There is deliberately no hardcoded fallback URL or key: a misconfigured build
+// must fail clearly instead of silently shipping a client that points at a
+// stale or removed project (which previously surfaced as runtime ENOTFOUND
+// errors and a dead directory).
+export function createClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-// Exported for server modules (e.g. the public directory) that need an
-// anon-key fallback when the service-role env isn't configured, such as
-// env-less CI builds. The values are public by design; keep the literals in
-// this file only — .gitleaks.toml allowlists exactly this path.
-export const SUPABASE_PUBLIC_URL =
-  process.env.NEXT_PUBLIC_SUPABASE_URL ||
-  process.env.NEXT_PUBLIC_STORAGE_SUPABASE_URL ||
-  process.env.VITE_SUPABASE_URL ||
-  FALLBACK_SUPABASE_URL;
+  if (!url || !key) {
+    throw new Error(
+      "Missing public Supabase environment variables (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).",
+    );
+  }
 
-export const SUPABASE_PUBLIC_ANON_KEY =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-  process.env.NEXT_PUBLIC_STORAGE_SUPABASE_ANON_KEY ||
-  process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-  FALLBACK_SUPABASE_ANON_KEY;
-
-const SUPABASE_URL = SUPABASE_PUBLIC_URL;
-const SUPABASE_ANON_KEY = SUPABASE_PUBLIC_ANON_KEY;
-
-function createClient() {
-  return createBrowserClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
+  return createBrowserClient<Database>(url, key);
 }
 
 // Singleton for the many existing `import { supabase } from "..."` callsites.
-// Cookie-based storage means multiple instances share the same auth state.
-export const supabase = createClient();
+// Created lazily so merely importing this module never throws — client modules
+// are imported during build-time prerendering even when no query actually runs.
+let singleton: ReturnType<typeof createClient> | null = null;
+
+export const supabase = new Proxy({} as ReturnType<typeof createClient>, {
+  get(_target, prop: string | symbol) {
+    singleton ??= createClient();
+    const value = (singleton as unknown as Record<string | symbol, unknown>)[prop];
+    return typeof value === "function"
+      ? (value as (...args: unknown[]) => unknown).bind(singleton)
+      : value;
+  },
+});

@@ -1,10 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 
 import { RouteError } from "@/app/api/_lib/http";
-import {
-  SUPABASE_PUBLIC_URL,
-  SUPABASE_PUBLIC_ANON_KEY,
-} from "@/integrations/supabase/client";
+import { getPublicSupabaseConfig } from "@/lib/supabase/public-env";
 import type { Database } from "@/integrations/supabase/types";
 
 export interface RequestSession {
@@ -59,20 +56,17 @@ function parseRequestCookies(request: Request): ParsedCookie[] {
  */
 export function supabaseFromRequest(request: Request) {
   const cookies = parseRequestCookies(request);
-  return createServerClient<Database>(
-    SUPABASE_PUBLIC_URL,
-    SUPABASE_PUBLIC_ANON_KEY,
-    {
-      cookies: {
-        getAll() {
-          return cookies;
-        },
-        setAll() {
-          // No mutable response in a bare route-handler context.
-        },
+  const { url, key } = getPublicSupabaseConfig();
+  return createServerClient<Database>(url, key, {
+    cookies: {
+      getAll() {
+        return cookies;
+      },
+      setAll() {
+        // No mutable response in a bare route-handler context.
       },
     },
-  );
+  });
 }
 
 /**

@@ -2,10 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import type { Provider } from "@supabase/supabase-js";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import {
-  SUPABASE_PUBLIC_ANON_KEY,
-  SUPABASE_PUBLIC_URL,
-} from "@/integrations/supabase/client";
+
+import { getPublicSupabaseConfig } from "@/lib/supabase/public-env";
 
 const CANONICAL_ORIGIN = "https://www.masseurmatch.com";
 const ALLOWED_PROVIDERS = new Set<Provider>(["google", "apple"]);
@@ -48,7 +46,8 @@ export async function GET(request: NextRequest) {
     options?: Parameters<NextResponse["cookies"]["set"]>[2];
   }> = [];
 
-  const supabase = createServerClient(SUPABASE_PUBLIC_URL, SUPABASE_PUBLIC_ANON_KEY, {
+  const { url, key } = getPublicSupabaseConfig();
+  const supabase = createServerClient(url, key, {
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (values) => {

@@ -10,10 +10,7 @@ import { matchBodyTypeKeyword } from "@/lib/physical-profile";
 import { FALLBACK_PUBLIC_THERAPISTS } from "@/app/_lib/directory-fallback";
 import { PUBLIC_THERAPISTS_TAG } from "@/app/_lib/directory-cache";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
-import {
-  SUPABASE_PUBLIC_ANON_KEY,
-  SUPABASE_PUBLIC_URL,
-} from "@/integrations/supabase/client";
+import { getPublicSupabaseConfig } from "@/lib/supabase/public-env";
 import type { Database } from "@/integrations/supabase/types";
 
 // Lazily created so importing this module never throws. Eager creation dies
@@ -29,7 +26,8 @@ function createDirectoryClient(): AdminClient {
   try {
     return createSupabaseAdminClient();
   } catch {
-    return createSupabaseJsClient<Database>(SUPABASE_PUBLIC_URL, SUPABASE_PUBLIC_ANON_KEY, {
+    const { url, key } = getPublicSupabaseConfig();
+    return createSupabaseJsClient<Database>(url, key, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
   }
