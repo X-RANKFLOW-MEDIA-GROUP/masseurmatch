@@ -59,7 +59,12 @@ export default function SignupAccountPage() {
 
     setLoading(true);
     try {
-      const result = await signUp(form.email.trim(), form.password, form.fullName.trim());
+      const result = await signUp(
+        form.email.trim(),
+        form.password,
+        form.fullName.trim(),
+        form.phone.trim(),
+      );
       if (result.error) {
         setError(result.error.message || "We could not create your account.");
         return;

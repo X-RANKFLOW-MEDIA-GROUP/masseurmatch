@@ -1410,6 +1410,9 @@ export type Database = {
           created_at: string | null
           description: string
           id: string
+          reported_profile_id: string | null
+          reporter_id: string | null
+          resolved_at: string | null
           respondent_id: string
           reviewed_at: string | null
           reviewed_by: string | null
@@ -1424,6 +1427,9 @@ export type Database = {
           created_at?: string | null
           description: string
           id?: string
+          reported_profile_id?: string | null
+          reporter_id?: string | null
+          resolved_at?: string | null
           respondent_id: string
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -1438,6 +1444,9 @@ export type Database = {
           created_at?: string | null
           description?: string
           id?: string
+          reported_profile_id?: string | null
+          reporter_id?: string | null
+          resolved_at?: string | null
           respondent_id?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -3183,8 +3192,10 @@ export type Database = {
           created_at: string
           current_period_end: string | null
           custom_faq: Json | null
+          day_of_week_discount: Json | null
           display_name: string | null
           education: string | null
+          education_entries: Json | null
           email: string | null
           email_address: string | null
           featured_until: string | null
@@ -3215,9 +3226,10 @@ export type Database = {
           lgbtq_affirming: boolean | null
           location_type: string | null
           longitude: number | null
-          massage_setup: string | null
+          map_enabled: boolean | null
+          massage_setup: string[] | null
           massage_techniques: string[] | null
-          mobile_extras: Json | null
+          mobile_extras: string[] | null
           mobile_hours: Json | null
           modalities: string[] | null
           modality: string | null
@@ -3230,7 +3242,7 @@ export type Database = {
           outcall_price: number | null
           outcall_radius: number | null
           outcall_radius_miles: number | null
-          payment_methods: Json | null
+          payment_methods: string[] | null
           phone: string | null
           phone_number: string | null
           photo_limit: number | null
@@ -3245,8 +3257,8 @@ export type Database = {
           price_min: number | null
           pricing_sessions: Json | null
           primary_area: string | null
-          products_sold: Json | null
-          products_used: Json | null
+          products_sold: string[] | null
+          products_used: string[] | null
           profile_completeness: number | null
           profile_status: string | null
           profile_views: number | null
@@ -3261,6 +3273,9 @@ export type Database = {
           reviewed_at: string | null
           reviewed_by: string | null
           role: string | null
+          affiliations: string[] | null
+          additional_services: string[] | null
+          rate_disclaimers: string[] | null
           segments: string[]
           seo_description: string | null
           seo_keywords: string[] | null
@@ -3275,11 +3290,13 @@ export type Database = {
           social_media: Json | null
           specialties: string[] | null
           specialty: string | null
+          start_date: string | null
           start_year: number | null
           starting_price: number | null
           starting_rate: number | null
           state: string | null
           status: string | null
+          studio_amenities: string[] | null
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           stripe_verification_session_id: string | null
@@ -3380,9 +3397,10 @@ export type Database = {
           lgbtq_affirming?: boolean | null
           location_type?: string | null
           longitude?: number | null
-          massage_setup?: string | null
+          map_enabled?: boolean | null
+          massage_setup?: string[] | null
           massage_techniques?: string[] | null
-          mobile_extras?: Json | null
+          mobile_extras?: string[] | null
           mobile_hours?: Json | null
           modalities?: string[] | null
           modality?: string | null
@@ -3395,7 +3413,7 @@ export type Database = {
           outcall_price?: number | null
           outcall_radius?: number | null
           outcall_radius_miles?: number | null
-          payment_methods?: Json | null
+          payment_methods?: string[] | null
           phone?: string | null
           phone_number?: string | null
           photo_limit?: number | null
@@ -3410,8 +3428,8 @@ export type Database = {
           price_min?: number | null
           pricing_sessions?: Json | null
           primary_area?: string | null
-          products_sold?: Json | null
-          products_used?: Json | null
+          products_sold?: string[] | null
+          products_used?: string[] | null
           profile_completeness?: number | null
           profile_status?: string | null
           profile_views?: number | null
@@ -3426,6 +3444,9 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           role?: string | null
+          affiliations?: string[] | null
+          additional_services?: string[] | null
+          rate_disclaimers?: string[] | null
           segments?: string[]
           seo_description?: string | null
           seo_keywords?: string[] | null
@@ -3440,11 +3461,13 @@ export type Database = {
           social_media?: Json | null
           specialties?: string[] | null
           specialty?: string | null
+          start_date?: string | null
           start_year?: number | null
           starting_price?: number | null
           starting_rate?: number | null
           state?: string | null
           status?: string | null
+          studio_amenities?: string[] | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           stripe_verification_session_id?: string | null
@@ -3545,9 +3568,10 @@ export type Database = {
           lgbtq_affirming?: boolean | null
           location_type?: string | null
           longitude?: number | null
-          massage_setup?: string | null
+          map_enabled?: boolean | null
+          massage_setup?: string[] | null
           massage_techniques?: string[] | null
-          mobile_extras?: Json | null
+          mobile_extras?: string[] | null
           mobile_hours?: Json | null
           modalities?: string[] | null
           modality?: string | null
@@ -3560,7 +3584,7 @@ export type Database = {
           outcall_price?: number | null
           outcall_radius?: number | null
           outcall_radius_miles?: number | null
-          payment_methods?: Json | null
+          payment_methods?: string[] | null
           phone?: string | null
           phone_number?: string | null
           photo_limit?: number | null
@@ -3575,8 +3599,8 @@ export type Database = {
           price_min?: number | null
           pricing_sessions?: Json | null
           primary_area?: string | null
-          products_sold?: Json | null
-          products_used?: Json | null
+          products_sold?: string[] | null
+          products_used?: string[] | null
           profile_completeness?: number | null
           profile_status?: string | null
           profile_views?: number | null
@@ -3591,6 +3615,9 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           role?: string | null
+          affiliations?: string[] | null
+          additional_services?: string[] | null
+          rate_disclaimers?: string[] | null
           segments?: string[]
           seo_description?: string | null
           seo_keywords?: string[] | null
@@ -3605,11 +3632,13 @@ export type Database = {
           social_media?: Json | null
           specialties?: string[] | null
           specialty?: string | null
+          start_date?: string | null
           start_year?: number | null
           starting_price?: number | null
           starting_rate?: number | null
           state?: string | null
           status?: string | null
+          studio_amenities?: string[] | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           stripe_verification_session_id?: string | null
@@ -6219,4 +6248,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-

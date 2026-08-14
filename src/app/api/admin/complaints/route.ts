@@ -29,8 +29,7 @@ export async function GET(request: NextRequest) {
         status,
         created_at,
         resolved_at,
-        admin_notes,
-        profiles!reported_profile_id(id, full_name, display_name)
+        admin_notes
       `
       )
       .order("created_at", { ascending: false });
@@ -45,9 +44,44 @@ export async function GET(request: NextRequest) {
       throw error;
     }
 
+    const profileIds = [
+      ...new Set(
+        (complaints ?? [])
+          .map((complaint) => complaint.reported_profile_id)
+          .filter((profileId): profileId is string => Boolean(profileId)),
+      ),
+    ];
+
+    const profilesById = new Map<
+      string,
+      { id: string; full_name: string | null; display_name: string | null }
+    >();
+
+    if (profileIds.length > 0) {
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name, display_name")
+        .in("id", profileIds);
+
+      if (profilesError) {
+        throw profilesError;
+      }
+
+      for (const profile of profiles ?? []) {
+        profilesById.set(profile.id, profile);
+      }
+    }
+
+    const complaintsWithProfiles = (complaints ?? []).map((complaint) => ({
+      ...complaint,
+      profiles: complaint.reported_profile_id
+        ? profilesById.get(complaint.reported_profile_id) ?? null
+        : null,
+    }));
+
     return NextResponse.json({
       ok: true,
-      complaints: complaints || [],
+      complaints: complaintsWithProfiles,
     });
   } catch (error) {
     console.error("[api/admin/complaints] Error:", error);

@@ -7,8 +7,9 @@
  * (createServerClient) also use these so a single key-naming convention holds
  * across the whole app.
  *
- * There is deliberately no fallback: a missing public configuration must fail
- * clearly rather than silently pointing at a stale or removed Supabase project.
+ * There is deliberately no hardcoded default: a missing public configuration
+ * must fail clearly rather than silently pointing at a stale or removed
+ * Supabase project.
  */
 export interface PublicSupabaseConfig {
   url: string;

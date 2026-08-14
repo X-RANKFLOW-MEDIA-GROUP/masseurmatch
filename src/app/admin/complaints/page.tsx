@@ -21,9 +21,9 @@ type Complaint = {
   admin_notes: string | null;
   profiles: {
     id: string;
-    full_name: string;
+    full_name: string | null;
     display_name: string | null;
-  };
+  } | null;
 };
 
 type ComplaintFilter = "pending" | "resolved" | "dismissed" | "all";
@@ -131,7 +131,9 @@ export default function ComplaintsPage() {
                       </div>
                     </div>
                     <h3 className="font-semibold text-foreground">
-                      {complaint.profiles.display_name || complaint.profiles.full_name}
+                      {complaint.profiles?.display_name ||
+                        complaint.profiles?.full_name ||
+                        "Profile unavailable"}
                     </h3>
                     <p className="text-sm text-muted-foreground mb-3">
                       Reported on {new Date(complaint.created_at).toLocaleDateString()}

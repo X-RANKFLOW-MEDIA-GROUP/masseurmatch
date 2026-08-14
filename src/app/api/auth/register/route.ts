@@ -22,6 +22,13 @@ function readReferralCookie(request: Request) {
   return normalizeReferralCode(raw) ?? undefined;
 }
 
+function normalizePhone(value: string) {
+  const trimmed = value.trim();
+  if (trimmed.startsWith("+")) return `+${trimmed.slice(1).replace(/\D/g, "")}`;
+  const digits = trimmed.replace(/\D/g, "");
+  return digits.length === 10 ? `+1${digits}` : `+${digits}`;
+}
+
 async function claimReferral(userId: string, referralCode?: string) {
   if (!referralCode) return false;
 
@@ -54,6 +61,7 @@ export async function POST(request: Request) {
     const body = await parseJsonBody(request, authRegisterSchema);
     const referralCode = normalizeReferralCode(body.referralCode) ?? readReferralCookie(request);
     const email = body.email.trim().toLowerCase();
+    const phone = normalizePhone(body.phone);
     const { origin } = new URL(request.url);
     const verificationPath = "/signup/verify?autostart=1";
 
@@ -65,6 +73,7 @@ export async function POST(request: Request) {
         emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(verificationPath)}`,
         data: {
           full_name: body.fullName,
+          phone,
           role: "provider",
           referral_code: referralCode ?? null,
         },
@@ -104,6 +113,23 @@ export async function POST(request: Request) {
       defaultRole: "provider",
       fallbackName: body.fullName,
     });
+
+    const admin = createSupabaseAdminClient();
+    const { error: phoneSyncError } = await admin
+      .from("profiles")
+      .update({
+        phone,
+        phone_number: phone,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("user_id", data.user.id);
+
+    if (phoneSyncError) {
+      throw new RouteError(
+        500,
+        "Account created, but the required phone number could not be saved. Please contact support.",
+      );
+    }
 
     const referralClaimed = await claimReferral(data.user.id, referralCode);
 

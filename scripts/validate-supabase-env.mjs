@@ -1,6 +1,4 @@
 const PRODUCTION_PROJECT_REF = "ijsdpozjfjjufjsoexod";
-const PRODUCTION_HOSTNAME = `${PRODUCTION_PROJECT_REF}.supabase.co`;
-const FALLBACK_URL = `https://${PRODUCTION_HOSTNAME}`;
 
 const urlVariableNames = [
   "SUPABASE_URL",
@@ -150,9 +148,14 @@ const configuredUrls = urlVariableNames
   .filter(Boolean);
 
 const selectedUrlName = publicUrlPriority.find((name) => configuredValue(name));
+if (!selectedUrlName) {
+  fail(
+    "SUPABASE_URL or NEXT_PUBLIC_SUPABASE_URL must be configured; no fallback project is used.",
+  );
+}
 const selectedUrl = parseSupabaseUrl(
-  selectedUrlName || "application fallback",
-  selectedUrlName ? configuredValue(selectedUrlName) : FALLBACK_URL,
+  selectedUrlName,
+  configuredValue(selectedUrlName),
 );
 
 for (const [name, parsed] of configuredUrls) {
