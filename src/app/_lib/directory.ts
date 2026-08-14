@@ -192,6 +192,9 @@ export interface PublicTherapist {
   created_at?: string | null;
   is_demo?: boolean | null;
   identity_verified_at?: string | null;
+  studio_hours?: Record<string, unknown> | null;
+  mobile_hours?: Record<string, unknown> | null;
+  current_status?: string | null;
 }
 
 export interface PublicImportedReview {

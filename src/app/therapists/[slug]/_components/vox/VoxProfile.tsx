@@ -283,7 +283,7 @@ export function VoxProfile({
                     {profile.phone}
                   </span>
                 )}
-                {emailHref && !phoneHref && !whatsappHref && (
+                {emailHref && !phoneHref && (
                   <a
                     href={emailHref}
                     onClick={handleEmailClick}
@@ -784,9 +784,9 @@ export function VoxProfile({
             Message {firstName} directly to confirm fit, availability, and location. No signup, no middlemen.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            {(phoneHref || whatsappHref || emailHref) && (
+            {(phoneHref || emailHref) && (
               <a
-                href={phoneHref || whatsappHref || emailHref || "#contact"}
+                href={phoneHref || emailHref || "#contact"}
                 className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-white shadow-[0_0_32px_rgba(139, 30, 45,0.35)] transition-transform hover:-translate-y-0.5"
               >
                 <Sparkles className="h-4 w-4" strokeWidth={2.5} />
