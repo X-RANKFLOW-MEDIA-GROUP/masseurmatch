@@ -1714,3 +1714,48 @@ create table if not exists public.admin_content (
   keywords jsonb not null default '[]'::jsonb,
   updated_at timestamptz not null default now()
 );
+
+-- Per-provider AI Profile Coach email preferences (owner-managed via RLS).
+create table if not exists public.ai_profile_coach_email_preferences (
+  profile_id uuid primary key references public.profiles(id) on delete cascade,
+  daily_email_enabled boolean not null default true,
+  send_time_local time not null default '08:00',
+  timezone text not null default 'America/Chicago',
+  include_performance boolean not null default true,
+  include_market_insights boolean not null default true,
+  include_trial_status boolean not null default true,
+  include_ai_rewrite boolean not null default true,
+  last_sent_at timestamptz,
+  last_queued_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.ai_profile_coach_email_preferences enable row level security;
+
+-- Delivery ledger for Demand Radar spike alert emails (service-role only).
+create table if not exists public.demand_radar_spike_alert_deliveries (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid not null references public.profiles(id) on delete cascade,
+  demand_score_id uuid not null references public.demand_scores(id) on delete cascade,
+  run_id text,
+  city text not null,
+  state text not null,
+  spike_score integer not null,
+  confidence integer,
+  recipient_email text not null,
+  status text not null default 'queued' check (status in ('queued','sent','failed','skipped')),
+  provider_message_id text,
+  error text,
+  sent_at timestamptz,
+  created_at timestamptz not null default now(),
+  unique(profile_id, demand_score_id)
+);
+
+create index if not exists demand_radar_spike_alert_deliveries_profile_idx
+  on public.demand_radar_spike_alert_deliveries(profile_id, created_at desc);
+
+create index if not exists demand_radar_spike_alert_deliveries_run_idx
+  on public.demand_radar_spike_alert_deliveries(run_id, created_at desc);
+
+alter table public.demand_radar_spike_alert_deliveries enable row level security;

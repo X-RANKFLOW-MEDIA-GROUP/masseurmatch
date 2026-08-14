@@ -5738,6 +5738,10 @@ export type Database = {
         Args: { p_profile_id: string }
         Returns: string
       }
+      get_profile_view_analytics: {
+        Args: { p_profile_id: string; p_since: string }
+        Returns: Json
+      }
       get_nearby_therapists: {
         Args: {
           p_lat: number
