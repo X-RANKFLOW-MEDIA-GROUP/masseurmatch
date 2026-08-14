@@ -1,5 +1,5 @@
 import Stripe from "npm:stripe@17.7.0";
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.57.2";
 
 function reply(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -14,8 +14,63 @@ function requiredEnv(name: string): string {
   return value;
 }
 
+async function beginEventProcessing(
+  db: SupabaseClient,
+  event: Stripe.Event,
+): Promise<"process" | "duplicate"> {
+  const now = new Date().toISOString();
+  const { error: insertError } = await db.from("stripe_events").insert({
+    stripe_event_id: event.id,
+    event_type: event.type,
+    payload: event as unknown as Record<string, unknown>,
+    processing_status: "processing",
+    processed_at: now,
+    processing_error: null,
+    failed_at: null,
+  });
+
+  if (!insertError) return "process";
+  if (insertError.code !== "23505") {
+    throw new Error(`stripe_event_persist_failed:${insertError.code || "unknown"}`);
+  }
+
+  const { data: existing, error: existingError } = await db
+    .from("stripe_events")
+    .select("processing_status, processed_at")
+    .eq("stripe_event_id", event.id)
+    .single();
+  if (existingError || !existing) {
+    throw new Error(`stripe_event_lookup_failed:${existingError?.code || "unknown"}`);
+  }
+
+  if (existing.processing_status === "processed") return "duplicate";
+
+  const lastAttemptAt = new Date(existing.processed_at).getTime();
+  const stale = !Number.isFinite(lastAttemptAt) || Date.now() - lastAttemptAt > 10 * 60_000;
+  if (existing.processing_status === "processing" && !stale) {
+    throw new Error("stripe_event_already_processing");
+  }
+
+  const { error: retryError } = await db
+    .from("stripe_events")
+    .update({
+      processing_status: "processing",
+      processed_at: now,
+      processing_error: null,
+      failed_at: null,
+      payload: event as unknown as Record<string, unknown>,
+    })
+    .eq("stripe_event_id", event.id);
+  if (retryError) throw new Error(`stripe_event_retry_state_failed:${retryError.code || "unknown"}`);
+
+  return "process";
+}
+
 Deno.serve(async (request) => {
   if (request.method !== "POST") return reply({ error: "method_not_allowed" }, 405);
+
+  let db: SupabaseClient | null = null;
+  let eventId: string | null = null;
 
   try {
     const stripeSecretKey = requiredEnv("STRIPE_SECRET_KEY");
@@ -36,18 +91,14 @@ Deno.serve(async (request) => {
       return reply({ error: "invalid_webhook_signature" }, 400);
     }
 
-    const db = createClient(supabaseUrl, serviceRoleKey, {
+    eventId = event.id;
+    db = createClient(supabaseUrl, serviceRoleKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    const { error: eventError } = await db.from("stripe_events").insert({
-      stripe_event_id: event.id,
-      event_type: event.type,
-      payload: event as unknown as Record<string, unknown>,
-    });
-
-    if (eventError?.code === "23505") return reply({ received: true, duplicate: true });
-    if (eventError) throw new Error(`stripe_event_persist_failed:${eventError.code || "unknown"}`);
+    if ((await beginEventProcessing(db, event)) === "duplicate") {
+      return reply({ received: true, duplicate: true });
+    }
 
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
@@ -140,14 +191,35 @@ Deno.serve(async (request) => {
       }
     }
 
+    const { error: completeError } = await db
+      .from("stripe_events")
+      .update({
+        processing_status: "processed",
+        processed_at: new Date().toISOString(),
+        processing_error: null,
+        failed_at: null,
+      })
+      .eq("stripe_event_id", event.id);
+    if (completeError) throw new Error(`stripe_event_complete_state_failed:${completeError.code || "unknown"}`);
+
     return reply({ received: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error("[stripe-webhook] Processing failed", { error: message });
+    console.error("[stripe-webhook] Processing failed", { eventId, error: message });
 
-    if (message.startsWith("missing_")) {
-      return reply({ error: "webhook_not_configured" }, 503);
+    if (db && eventId) {
+      await db
+        .from("stripe_events")
+        .update({
+          processing_status: "failed",
+          processing_error: message.slice(0, 1000),
+          failed_at: new Date().toISOString(),
+        })
+        .eq("stripe_event_id", eventId);
     }
+
+    if (message.startsWith("missing_")) return reply({ error: "webhook_not_configured" }, 503);
+    if (message === "stripe_event_already_processing") return reply({ error: "event_processing" }, 409);
     return reply({ error: "webhook_processing_failed" }, 500);
   }
 });
