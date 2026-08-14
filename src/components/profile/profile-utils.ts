@@ -138,6 +138,34 @@ function businessDays(hours: unknown) {
     .map(([key]) => key.charAt(0).toUpperCase() + key.slice(1));
 }
 
+function normalizePricingSessions(value: unknown, currency: string) {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === "object")
+    .map((item) => {
+      const minutes = typeof item.minutes === "number"
+        ? item.minutes
+        : typeof item.duration === "number"
+          ? item.duration
+          : null;
+      const technique = typeof item.technique === "string" ? item.technique.trim() : "";
+      const legacyName = typeof item.name === "string" ? item.name.trim() : "";
+      const mode = typeof item.mode === "string" ? item.mode : "simple";
+      const incallValue = typeof item.incall_rate === "number" ? item.incall_rate : item.incall;
+      const outcallValue = typeof item.outcall_rate === "number" ? item.outcall_rate : item.outcall;
+      const incallAsk = item.incall_ask_me === true || mode === "ask_me";
+      const outcallAsk = item.outcall_ask_me === true || mode === "ask_me";
+
+      return {
+        name: technique || legacyName || (minutes ? `${minutes}-minute session` : "Massage session"),
+        duration: minutes ? `${minutes} minutes` : "Custom duration",
+        incall: incallAsk ? "Ask Me" : money(incallValue, currency),
+        outcall: outcallAsk ? "Ask Me" : money(outcallValue, currency),
+      };
+    });
+}
+
 export function buildProfileViewModel(profile: PublicTherapist, photos: ProfilePhoto[] = []): ProfileViewModel {
   const p = profile as AnyProfile;
   const name = profile.display_name || profile.full_name || String(p.name || "MasseurMatch Therapist");
@@ -145,8 +173,6 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
   const state = profile.state || String(p.state_code || "US");
   const country = String(p.country || "United States");
   const matchedCity = US_CITIES.find((item) => item.name.toLowerCase() === city.toLowerCase());
-  // Only emit a city slug that resolves to a real /{city} route; a guessed
-  // slug would render internal links (and breadcrumbs) that 404.
   const citySlug =
     [String(p.city_slug || ""), matchedCity?.slug].find(
       (slug): slug is string => Boolean(slug && US_CITIES.some((item) => item.slug === slug)),
@@ -163,7 +189,8 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
   const profilePhotoUrl = String(p.profile_photo_url || profile.profile_photo || profile.avatar_url || photos.find((photo) => photo.is_primary)?.storage_path || PLACEHOLDER);
   const coverPhotoUrl = String(p.cover_photo_url || p.cover_photo || galleryFromProfile[0] || galleryFromPhotos.find((url) => url !== profilePhotoUrl) || DEFAULT_COVER);
   const galleryImages = Array.from(new Set([profilePhotoUrl, coverPhotoUrl, ...galleryFromProfile, ...galleryFromPhotos])).filter(Boolean).slice(0, 12);
-  const pricingSessions = Array.isArray(profile.pricing_sessions) ? profile.pricing_sessions : [];
+  const pricing = normalizePricingSessions(profile.pricing_sessions, currency);
+  const rawPricingSessions = Array.isArray(profile.pricing_sessions) ? profile.pricing_sessions : [];
   const serviceAreas = Array.from(new Set([...asStringArray(p.service_areas), ...(profile.areas_served || [])])).filter(Boolean);
   const nearbyCities = US_CITIES
     .filter((item) => item.name.toLowerCase() !== city.toLowerCase() && (!matchedCity || item.stateCode === matchedCity.stateCode))
@@ -219,13 +246,12 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
     massageTypes: massageTypes.length ? Array.from(new Set(massageTypes)) : ["Therapeutic massage"],
     sessionDurationOptions: asStringArray(p.session_duration_options).length
       ? asStringArray(p.session_duration_options)
-      : pricingSessions.map((item) => item.duration ? `${item.duration} minutes` : item.name || "Session").filter(Boolean),
-    pricing: pricingSessions.map((item) => ({
-      name: item.name || "Massage session",
-      duration: item.duration ? `${item.duration} minutes` : "Custom duration",
-      incall: money(item.incall, currency),
-      outcall: money(item.outcall, currency),
-    })),
+      : rawPricingSessions.map((item) => {
+          const row = item as unknown as Record<string, unknown>;
+          const minutes = typeof row.minutes === "number" ? row.minutes : typeof row.duration === "number" ? row.duration : null;
+          return minutes ? `${minutes} minutes` : typeof row.name === "string" ? row.name : "Session";
+        }).filter(Boolean),
+    pricing,
     startingPrice: money(profile.starting_price || profile.incall_price || profile.outcall_price, currency),
     incallPrice: money(profile.incall_price, currency),
     outcallPrice: money(profile.outcall_price, currency),
