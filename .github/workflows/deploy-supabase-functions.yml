@@ -23,6 +23,9 @@ on:
       - "supabase/functions/customer-portal/**"
       - "supabase/functions/moderate-photo/**"
       - "supabase/functions/moderate-text/**"
+      - "supabase/functions/resend-webhook/**"
+      - "supabase/functions/stripe-webhook/**"
+      - "supabase/functions/twilio-inbound/**"
       - "supabase/functions/_shared/**"
       - "supabase/config.toml"
       - ".github/workflows/deploy-supabase-functions.yml"
@@ -79,6 +82,12 @@ jobs:
         run: |
           supabase functions deploy create-checkout --project-ref "$SUPABASE_PROJECT_REF"
           supabase functions deploy customer-portal --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy stripe-webhook --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Deploy messaging webhooks
+        run: |
+          supabase functions deploy resend-webhook --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy twilio-inbound --project-ref "$SUPABASE_PROJECT_REF"
 
       - name: Deploy moderation functions
         run: |
