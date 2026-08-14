@@ -72,9 +72,6 @@ export async function POST(request: Request) {
       .insert({
         profile_id: profile.id,
         user_id: session.userId,
-        // Public profile/gallery code historically expects storage_path to be
-        // directly displayable. Keep the canonical public URL there while the
-        // actual storage object key remains available in the moderation snapshot.
         storage_path: publicUrl,
         url: publicUrl,
         is_primary: isPrimary,
@@ -111,7 +108,7 @@ export async function POST(request: Request) {
         source: "pro_photos",
         field_name: null,
         status: "pending",
-        priority: "normal",
+        priority: 0,
         moderation_provider: "sightengine",
         moderation_reason: "queued_for_ai_review",
         snapshot,
