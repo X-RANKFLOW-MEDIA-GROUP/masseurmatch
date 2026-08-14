@@ -11,6 +11,13 @@ type AnalyticsRpcResult = {
   allTimeViews?: number;
 };
 
+type RpcClient = ReturnType<typeof createSupabaseAdminClient> & {
+  rpc: (
+    name: string,
+    params?: Record<string, unknown>,
+  ) => Promise<{ data: unknown; error: { message: string } | null }>;
+};
+
 function emptySeries() {
   const since = new Date(Date.now() - WINDOW_DAYS * 86_400_000);
   const firstDay = new Date(since);
@@ -28,7 +35,7 @@ function emptySeries() {
 export async function GET(request: Request) {
   try {
     const session = await requireRequestSession(request);
-    const admin = createSupabaseAdminClient();
+    const admin = createSupabaseAdminClient() as RpcClient;
     const since = new Date(Date.now() - WINDOW_DAYS * 86_400_000).toISOString();
 
     const { data: profile, error: profileError } = await admin
