@@ -1,43 +1,69 @@
-name: Deploy Supabase Functions
+name: Deploy Supabase Production
 
-# Auto-deploys production Edge Functions that must stay in lockstep with the
-# repository. Functions with verify_jwt=false must implement their own verified
-# webhook/token authentication or be intentionally public read-only endpoints.
+# Canonical production deploy. Database migrations run first; Edge Functions
+# deploy only after the migration job succeeds. This prevents a new function
+# from depending on schema/RPC changes that have not reached production yet.
 #
 # Requirements:
 #   - Secret   SUPABASE_ACCESS_TOKEN
+#   - Secret   SUPABASE_DB_PASSWORD
 #   - Variable SUPABASE_PROJECT_REF
 
 on:
   push:
     branches: [main]
     paths:
-      - "supabase/functions/auth-email-hook/**"
-      - "supabase/functions/cloudinary-sign/**"
-      - "supabase/functions/process-lifecycle-email-queue/**"
-      - "supabase/functions/lifecycle-unsubscribe/**"
-      - "supabase/functions/run-lifecycle-campaigns/**"
-      - "supabase/functions/run-post-signup-campaigns/**"
-      - "supabase/functions/send-city-digest/**"
-      - "supabase/functions/create-checkout/**"
-      - "supabase/functions/customer-portal/**"
-      - "supabase/functions/moderate-photo/**"
-      - "supabase/functions/moderate-text/**"
-      - "supabase/functions/resend-webhook/**"
-      - "supabase/functions/stripe-webhook/**"
-      - "supabase/functions/twilio-inbound/**"
-      - "supabase/functions/_shared/**"
+      - "supabase/migrations/**"
+      - "supabase/functions/**"
       - "supabase/config.toml"
       - ".github/workflows/deploy-supabase-functions.yml"
   workflow_dispatch: {}
 
 concurrency:
-  group: deploy-supabase-functions
+  group: deploy-supabase-production
   cancel-in-progress: false
 
 jobs:
+  migrate:
+    name: Apply Supabase migrations
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Normalize project ref
+        run: echo "SUPABASE_PROJECT_REF=$(printf '%s' "$SUPABASE_PROJECT_REF" | tr -d '[:space:]')" >> "$GITHUB_ENV"
+
+      - name: Verify required config is present
+        run: |
+          missing=0
+          for name in SUPABASE_ACCESS_TOKEN SUPABASE_DB_PASSWORD SUPABASE_PROJECT_REF; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is not configured."
+              missing=1
+            fi
+          done
+          [ "$missing" -eq 0 ]
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link production project
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Verify migration history parity
+        run: supabase migration list
+
+      - name: Apply pending migrations
+        run: supabase db push --include-all
+
   deploy:
     name: Deploy Supabase Edge Functions
+    needs: migrate
     runs-on: ubuntu-latest
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
