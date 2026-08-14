@@ -8,6 +8,7 @@ const SCHEMA_PATH = path.join(ROOT, "supabase/PRODUCTION_SCHEMA_LOCK.sql");
 const SCHEMA_EXTENSION_PATHS = [
   path.join(ROOT, "supabase/migrations/20260806220000_harden_demand_radar.sql"),
   path.join(ROOT, "supabase/migrations/20260806230000_demand_radar_pipeline.sql"),
+  path.join(ROOT, "supabase/migrations/20260814184500_sync_profile_extras_contract.sql"),
 ];
 const SCAN_DIRS = ["src", "scripts", "tests", "supabase"];
 // Every .sql file that can define a database function. Unlike the table/column
