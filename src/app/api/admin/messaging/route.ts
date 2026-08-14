@@ -253,7 +253,7 @@ export async function POST(request: Request) {
     if (settingsError) throw new RouteError(500, settingsError.message);
     if (settings?.global_pause) throw new RouteError(409, "Messaging is globally paused.");
 
-    let { data: conversation, error: conversationError } = await db
+    const { data: existingConversation, error: conversationError } = await db
       .from("messaging_conversations")
       .select("id")
       .eq("contact_id", body.contactId)
@@ -263,6 +263,8 @@ export async function POST(request: Request) {
       .limit(1)
       .maybeSingle();
     if (conversationError) throw new RouteError(500, conversationError.message);
+
+    let conversation = existingConversation;
 
     if (!conversation) {
       const created = await db
