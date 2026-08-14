@@ -14,6 +14,7 @@ import {
   ShieldOff,
   Users,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import { requestJson } from "@/app/_lib/request";
 import { Badge } from "@/components/ui/badge";
@@ -72,6 +73,8 @@ type Campaign = {
   transport_preference: string;
   created_at: string;
 };
+
+type SummaryCard = [label: string, value: number, icon: LucideIcon];
 
 type Snapshot = {
   ok: boolean;
@@ -215,13 +218,13 @@ export default function AdminMessaging() {
       ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        {[
+        {([
           ["Contacts", counts.contacts, Users],
           ["Open chats", counts.openConversations, MessageSquare],
           ["Queued", counts.pending, Clock3],
           ["Failed", counts.failed, AlertCircle],
           ["Opted out", counts.optedOut, ShieldOff],
-        ].map(([label, value, Icon]) => (
+        ] satisfies SummaryCard[]).map(([label, value, Icon]) => (
           <Card key={String(label)}>
             <CardContent className="flex items-center justify-between p-4">
               <div><p className="text-xs font-medium uppercase tracking-wide text-slate-500">{String(label)}</p><p className="mt-1 text-2xl font-bold">{String(value)}</p></div>

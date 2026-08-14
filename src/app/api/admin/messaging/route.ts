@@ -9,6 +9,7 @@ import {
   recordAuditLog,
   requireAdminSession,
 } from "@/app/api/_lib/supabase-server";
+import type { Json } from "@/integrations/supabase/types";
 
 const updateSettingsSchema = z.object({
   action: z.literal("update_settings"),
@@ -184,7 +185,7 @@ export async function POST(request: Request) {
     const db = createSupabaseAdminClient() as DbClient;
 
     if (body.action === "update_settings") {
-      const patch: Record<string, unknown> = {};
+      const patch: Record<string, Json | undefined> = {};
       if (body.globalPause !== undefined) patch.global_pause = body.globalPause;
       if (body.knottyEnabled !== undefined) patch.knotty_enabled = body.knottyEnabled;
       if (Object.keys(patch).length === 0) throw new RouteError(400, "No settings supplied.");
@@ -202,7 +203,7 @@ export async function POST(request: Request) {
     }
 
     if (body.action === "update_contact") {
-      const patch: Record<string, unknown> = {};
+      const patch: Record<string, Json | undefined> = {};
       if (body.lifecycleStatus !== undefined) patch.lifecycle_status = body.lifecycleStatus;
       if (body.knottyEnabled !== undefined) patch.knotty_enabled = body.knottyEnabled;
       if (body.optedOut !== undefined) {
@@ -253,7 +254,7 @@ export async function POST(request: Request) {
     if (settingsError) throw new RouteError(500, settingsError.message);
     if (settings?.global_pause) throw new RouteError(409, "Messaging is globally paused.");
 
-    let { data: conversation, error: conversationError } = await db
+    const { data: existingConversation, error: conversationError } = await db
       .from("messaging_conversations")
       .select("id")
       .eq("contact_id", body.contactId)
@@ -263,6 +264,7 @@ export async function POST(request: Request) {
       .limit(1)
       .maybeSingle();
     if (conversationError) throw new RouteError(500, conversationError.message);
+    let conversation = existingConversation;
 
     if (!conversation) {
       const created = await db
