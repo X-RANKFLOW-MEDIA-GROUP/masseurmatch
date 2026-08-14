@@ -114,7 +114,12 @@ export function VoxProfile({
   const callHref = contactHref("phone", profile.phone);
   const smsHref = contactHref("sms", profile.phone);
   const whatsappHref = contactHref("whatsapp", profile.whatsapp);
-  const emailHref = profile.showEmail ? contactHref("email", profile.email) : null;
+  // Email is opt-in (show_email), but also serves as the fallback so a profile
+  // whose only contact channel is email never renders an empty contact section.
+  const emailHref =
+    profile.showEmail || (!callHref && !smsHref && !whatsappHref)
+      ? contactHref("email", profile.email)
+      : null;
   const websiteHref = contactHref("website", profile.website);
   const primaryContactHref = callHref || smsHref || whatsappHref || emailHref;
 
@@ -306,10 +311,14 @@ export function VoxProfile({
                   <a
                     href={emailHref}
                     onClick={handleEmailClick}
-                    className="inline-flex h-12 items-center gap-2 rounded-full border border-white/20 bg-white/[0.07] px-6 font-semibold text-white transition-colors hover:border-white/40"
+                    className={
+                      callHref || smsHref || whatsappHref
+                        ? "inline-flex h-12 items-center gap-2 rounded-full border border-white/20 bg-white/[0.07] px-6 font-semibold text-white transition-colors hover:border-white/40"
+                        : "inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-white shadow-[0_0_32px_rgba(139,30,45,0.4)] transition-transform hover:-translate-y-0.5"
+                    }
                   >
-                    <Mail className="h-4 w-4 text-[#8B1E2D]" strokeWidth={2.5} />
-                    Email
+                    <Mail className={callHref || smsHref || whatsappHref ? "h-4 w-4 text-[#8B1E2D]" : "h-4 w-4"} strokeWidth={2.5} />
+                    {callHref || smsHref || whatsappHref ? "Email" : `Email ${firstName}`}
                   </a>
                 )}
                 {websiteHref && (

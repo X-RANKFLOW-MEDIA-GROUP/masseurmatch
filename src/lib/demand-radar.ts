@@ -59,7 +59,14 @@ export function getSpikeLabel(score: number | null | undefined): string {
   return "Normal";
 }
 
-export function getSpikeWindow(record: Pick<DemandScoreRecord, "spike_score" | "trend" | "collected_at" | "confidence">): SpikeWindow {
+// Accepts partial rows (API responses may omit optional signal fields); the
+// implementation already treats missing values as "no signal".
+export function getSpikeWindow(record: {
+  trend: DemandTrend;
+  spike_score?: number | null;
+  confidence?: number | null;
+  collected_at?: string | null;
+}): SpikeWindow {
   const spike = record.spike_score ?? 0;
   const confidence = record.confidence ?? 0;
   const collected = record.collected_at ? new Date(record.collected_at) : null;
