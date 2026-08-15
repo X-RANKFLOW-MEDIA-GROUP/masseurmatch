@@ -46,7 +46,6 @@ export interface SmsLog {
   intent: SmsIntent | null
   status: string
   is_manual: boolean
-  booking_inquiry_id: string | null
   created_at: string
 }
 
