@@ -15,8 +15,8 @@ describe("isDatabaseUuid", () => {
   });
 
   it("rejects malformed identifiers instead of sending them to uuid columns", () => {
-    expect(isDatabaseUuid("")) .toBe(false);
-    expect(isDatabaseUuid("550e8400-e29b-41d4-a716")) .toBe(false);
-    expect(isDatabaseUuid("not-a-uuid")) .toBe(false);
+    expect(isDatabaseUuid("")).toBe(false);
+    expect(isDatabaseUuid("550e8400-e29b-41d4-a716")).toBe(false);
+    expect(isDatabaseUuid("not-a-uuid")).toBe(false);
   });
 });
