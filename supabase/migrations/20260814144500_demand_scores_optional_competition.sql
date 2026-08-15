@@ -1,0 +1,3 @@
+-- Historical no-op marker.
+-- This change was already applied in production as migration 20260814143218.
+-- The canonical earlier migration now exists in this repository.

@@ -18,6 +18,9 @@ export const authRegisterSchema = z.object({
   fullName: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(8),
+  phone: z.string().trim().max(40).refine((value) => value.replace(/\D/g, "").length >= 10, {
+    message: "Enter a valid phone number.",
+  }),
   referralCode: z
     .preprocess(
       (value) => (typeof value === "string" ? value.trim().toUpperCase() : value),

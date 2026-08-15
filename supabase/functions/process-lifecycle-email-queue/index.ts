@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { checkRateLimit, rateLimitResponse, getClientKey } from "../_shared/rate-limit.ts";
 import { sanitizeResendTag } from "../_shared/resend-tags.ts";
+import { requireScheduledJob, ScheduledJobAuthError } from "../_shared/job-auth.ts";
 
 type QueueRow = {
   id: string;
@@ -30,15 +30,13 @@ type QueueRow = {
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-mm-job-token",
 };
 
 const DEFAULT_FROM = {
   marketing: "updates@updates.masseurmatch.com",
   transactional: "noreply@mail.masseurmatch.com",
 };
-
-const SITE_URL = Deno.env.get("SITE_URL") ?? "https://masseurmatch.com";
 
 function logStep(step: string, details?: Record<string, unknown>) {
   console.log(`[LIFECYCLE-WORKER] ${step}${details ? ` ${JSON.stringify(details)}` : ""}`);
@@ -84,35 +82,37 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
-
-  const rl = checkRateLimit(getClientKey(req), { limit: 10, windowMs: 60_000 });
-  if (!rl.allowed) return rateLimitResponse(rl, corsHeaders);
-
-  // Config problems are reported as 503 (not 500) with the missing variable
-  // named, so a failing cron run is immediately diagnosable from the logs:
-  // fix with `supabase secrets set RESEND_API_KEY=... UNSUBSCRIBE_HMAC_SECRET=...`.
-  const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-  const resendKey = Deno.env.get("RESEND_API_KEY") ?? "";
-  const unsubscribeSecret = Deno.env.get("UNSUBSCRIBE_HMAC_SECRET") ?? "";
-
-  const missingConfig = [
-    !supabaseUrl && "SUPABASE_URL",
-    !serviceKey && "SUPABASE_SERVICE_ROLE_KEY",
-    !resendKey && "RESEND_API_KEY",
-    !unsubscribeSecret && "UNSUBSCRIBE_HMAC_SECRET",
-  ].filter(Boolean);
-
-  if (missingConfig.length > 0) {
-    logStep("Configuration missing", { missing: missingConfig });
-    return new Response(
-      JSON.stringify({ error: "configuration_error", missing: missingConfig }),
-      { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ error: "method_not_allowed" }), {
+      status: 405,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   try {
-    const supabase = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
+    const { client: supabase } = await requireScheduledJob(req, "process-lifecycle-email-queue");
+
+    const rl = checkRateLimit(getClientKey(req), { limit: 10, windowMs: 60_000 });
+    if (!rl.allowed) return rateLimitResponse(rl, corsHeaders);
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const resendKey = Deno.env.get("RESEND_API_KEY") ?? "";
+    const unsubscribeSecret = Deno.env.get("UNSUBSCRIBE_HMAC_SECRET") ?? "";
+
+    const missingConfig = [
+      !supabaseUrl && "SUPABASE_URL",
+      !resendKey && "RESEND_API_KEY",
+      !unsubscribeSecret && "UNSUBSCRIBE_HMAC_SECRET",
+    ].filter(Boolean);
+
+    if (missingConfig.length > 0) {
+      logStep("Configuration missing", { missing: missingConfig });
+      return new Response(
+        JSON.stringify({ error: "configuration_error", missing: missingConfig }),
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const unsubscribeBaseUrl = Deno.env.get("UNSUBSCRIBE_BASE_URL") || `${supabaseUrl}/functions/v1/lifecycle-unsubscribe`;
 
     const payload = await req.json().catch(() => ({}));
@@ -227,8 +227,6 @@ serve(async (req) => {
           }),
         });
 
-        // Resend can return non-JSON bodies on gateway errors; a parse crash
-        // here must not take down the whole batch.
         const resendBody = await resendResponse.json().catch(() => null);
         if (!resendResponse.ok) {
           throw new Error(resendBody?.message || `resend_send_failed_http_${resendResponse.status}`);
@@ -308,22 +306,17 @@ serve(async (req) => {
     logStep("Worker completed", { processed: queue.length, sent, skipped, failed });
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        processed: queue.length,
-        sent,
-        skipped,
-        failed,
-      }),
+      JSON.stringify({ success: true, processed: queue.length, sent, skipped, failed }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {
+    const status = error instanceof ScheduledJobAuthError ? error.status : 500;
     const message = error instanceof Error ? error.message : String(error);
-    logStep("Worker failed", { error: message });
+    if (status >= 500) logStep("Worker failed", { error: message });
 
     return new Response(
       JSON.stringify({ error: message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { status, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
 });

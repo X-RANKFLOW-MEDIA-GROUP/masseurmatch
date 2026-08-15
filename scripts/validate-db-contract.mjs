@@ -8,6 +8,7 @@ const SCHEMA_PATH = path.join(ROOT, "supabase/PRODUCTION_SCHEMA_LOCK.sql");
 const SCHEMA_EXTENSION_PATHS = [
   path.join(ROOT, "supabase/migrations/20260806220000_harden_demand_radar.sql"),
   path.join(ROOT, "supabase/migrations/20260806230000_demand_radar_pipeline.sql"),
+  path.join(ROOT, "supabase/migrations/20260814184500_sync_profile_extras_contract.sql"),
 ];
 const SCAN_DIRS = ["src", "scripts", "tests", "supabase"];
 // Every .sql file that can define a database function. Unlike the table/column
@@ -308,9 +309,24 @@ function extractSelectColumns(selectBody) {
 function extractObjectKeys(objectBody) {
   const keys = new Set();
   const ignoredKeys = new Set(["true", "false", "null", "undefined"]);
+  const shorthandPattern = new RegExp(`^(${IDENTIFIER})$`);
   let depth = 0;
   let quote = null;
   let inValue = false; // true after key: — suppresses ternary `:` false positives
+  let segmentStart = -1; // start of the current top-level `key: value` / `key` segment
+
+  const addKey = (key) => {
+    if (!key || ignoredKeys.has(key) || key !== key.toLowerCase()) return;
+    keys.add(key);
+  };
+
+  // `{ metadata }` is an ES shorthand write of the `metadata` column. Without
+  // this the segment carries no `:` and the column is never contract-checked,
+  // which is how messaging_contacts.metadata reached production unnoticed.
+  const closeSegment = (end) => {
+    if (inValue || segmentStart < 0) return;
+    addKey(objectBody.slice(segmentStart, end).trim().match(shorthandPattern)?.[1]);
+  };
 
   for (let index = 0; index < objectBody.length; index += 1) {
     const char = objectBody[index];
@@ -328,18 +344,25 @@ function extractObjectKeys(objectBody) {
 
     if (char === "{" || char === "[") {
       depth += 1;
+      if (depth === 1) segmentStart = index + 1;
       continue;
     }
 
     if (char === "}" || char === "]") {
+      if (depth === 1) closeSegment(index);
       depth = Math.max(0, depth - 1);
-      if (depth === 0) inValue = false;
+      if (depth === 0) {
+        inValue = false;
+        segmentStart = -1;
+      }
       continue;
     }
 
     // A comma at depth 1 means we moved to the next key-value pair
     if (char === "," && depth === 1) {
+      closeSegment(index);
       inValue = false;
+      segmentStart = index + 1;
       continue;
     }
 
@@ -349,7 +372,7 @@ function extractObjectKeys(objectBody) {
     const match = before.match(new RegExp(`(${IDENTIFIER})\\s*$`));
     const key = match?.[1];
     if (key && !ignoredKeys.has(key) && key === key.toLowerCase()) {
-      keys.add(key);
+      addKey(key);
       inValue = true; // suppress ternary `:` until next comma at depth 1
     }
   }

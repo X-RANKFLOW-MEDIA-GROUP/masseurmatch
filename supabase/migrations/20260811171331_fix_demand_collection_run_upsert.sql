@@ -1,2 +1,2 @@
--- Historical production migration marker restored for local/remote Supabase migration history parity.
--- Production already contains the applied schema change for this migration version.
+drop index if exists public.demand_collection_runs_run_id_uidx;
+alter table public.demand_collection_runs add constraint demand_collection_runs_run_id_key unique (run_id);

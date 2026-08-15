@@ -49,11 +49,14 @@ const CONTENT_ROUTES = [
   "/los-angeles",
   "/chicago",
   "/houston",
-  "/therapists/kevin-os",
-  "/therapists/bruno-dallas-tx", // 307 → /therapists/bruno-santos
 ] as const;
 
 const NOT_FOUND_ROUTE = "/this-page-should-404";
+const SYNTHETIC_PROFILE_ROUTES = [
+  "/therapists/kevin-os",
+  "/therapists/bruno-dallas-tx",
+  "/therapists/ethan-cole",
+] as const;
 
 const VIEWPORTS = [
   { name: "desktop", width: 1440, height: 900 },
@@ -206,6 +209,13 @@ test.describe("404 handling", () => {
     const homeish = page.locator('a[href="/"], a[href="/waitlist"], a[href="/therapists"], a[href="/search"]').first();
     await expect(homeish).toBeVisible();
   });
+
+  for (const route of SYNTHETIC_PROFILE_ROUTES) {
+    test(`synthetic fixture ${route} is not published`, async ({ page }) => {
+      const resp = await page.goto(route, { waitUntil: "domcontentloaded" });
+      expect(resp?.status()).toBe(404);
+    });
+  }
 });
 
 // ─── 2 & 4. Header links + dropdowns ─────────────────────────────────────────

@@ -1,290 +1,248 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
-import { checkRateLimit, rateLimitResponse, getClientKey } from "../_shared/rate-limit.ts";
+import { checkRateLimit, rateLimitResponse } from "../_shared/rate-limit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const logStep = (step: string, details?: any) => {
-  console.log(`[CREATE-CHECKOUT] ${step}${details ? ` - ${JSON.stringify(details)}` : ""}`);
-};
+const ALLOWED_PLANS = new Set(["free", "standard", "pro", "elite"]);
+const STRIPE_PRICE_RE = /^price_[A-Za-z0-9]+$/;
 
-// Plan definitions — prices are created lazily in Stripe on first use.
-// "free" creates a $0 trial-style subscription without a checkout redirect.
-const PLANS: Record<string, { name: string; amount: number; features: string; isFree?: boolean }> = {
-  free: {
-    name: "Free",
-    amount: 0,
-    features: '1 photo, bottom search placement, no Available Now, 1 travel schedule per month, no analytics, "Basic Listing" watermark',
-    isFree: true,
-  },
-  standard: {
-    name: "Standard",
-    amount: 3900,
-    features: "6 photos, middle search placement, Available Now for 2 hours, 3 travel schedules per month, views analytics, newsletter chance",
-  },
-  pro: {
-    name: "Pro",
-    amount: 7900,
-    features: "12 photos plus video, top search placement, Available Now for 3 hours, unlimited travel schedules, views and clicks analytics, homepage rotation, weekly specials, verified badge",
-  },
-  elite: {
-    name: "Elite",
-    amount: 9900,
-    features: "Everything in Pro, 3 active cities, Knotty AI answering on your profile 24/7, Demand Radar, auto tour pages for travel schedules, priority support",
-  },
-};
-
-// Promotion codes are now entered by users at checkout (allow_promotion_codes: true)
-
-// Fixed Stripe price IDs (preferred). Set these as Supabase Edge Function
-// secrets so checkout uses your curated Stripe catalog instead of minting
-// products/prices at runtime:
-//   STRIPE_PRICE_STANDARD / STRIPE_PRICE_PRO / STRIPE_PRICE_ELITE
-const PLAN_PRICE_ENV: Record<string, string> = {
-  standard: "STRIPE_PRICE_STANDARD",
-  pro: "STRIPE_PRICE_PRO",
-  elite: "STRIPE_PRICE_ELITE",
-};
-
-function getConfiguredPriceId(planKey: string): string | null {
-  const envName = PLAN_PRICE_ENV[planKey];
-  if (!envName) return null;
-  const priceId = Deno.env.get(envName)?.trim();
-  // Only accept a real-looking Stripe price ID. A placeholder value such as
-  // "price_…" passes a bare startsWith check and then 500s every checkout
-  // (free trials included) with Stripe's "No such price" — fall back to the
-  // metadata-based lookup instead.
-  return priceId && /^price_[A-Za-z0-9]+$/.test(priceId) ? priceId : null;
+class HttpError extends Error {
+  constructor(readonly status: number, message: string) {
+    super(message);
+  }
 }
 
-// Resolve the price for a plan: use the configured fixed price ID when set,
-// otherwise fall back to lazily searching/creating one in Stripe (dev only).
-async function resolvePriceId(stripe: Stripe, planKey: string): Promise<string> {
-  const configured = getConfiguredPriceId(planKey);
-  if (configured) {
-    logStep("Using configured price ID", { planKey, priceId: configured });
-    return configured;
-  }
-  logStep("No fixed price ID configured; falling back to lazy price creation", {
-    planKey,
-    envVar: PLAN_PRICE_ENV[planKey] ?? null,
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "no-store" },
   });
-  return getOrCreatePrice(stripe, planKey);
 }
 
-async function getOrCreatePrice(stripe: Stripe, planKey: string): Promise<string> {
-  const plan = PLANS[planKey];
-  // Search for existing product by metadata
-  const products = await stripe.products.search({
-    query: `metadata["masseurmatch_plan"]:"${planKey}"`,
-  });
-
-  let productId: string;
-  if (products.data.length > 0) {
-    productId = products.data[0].id;
-    logStep("Found existing product", { planKey, productId });
-  } else {
-    const product = await stripe.products.create({
-      name: `MasseurMatch ${plan.name}`,
-      description: plan.features,
-      metadata: { masseurmatch_plan: planKey },
-    });
-    productId = product.id;
-    logStep("Created product", { planKey, productId });
-  }
-
-  // Find existing recurring price for this product
-  const prices = await stripe.prices.list({
-    product: productId,
-    active: true,
-    type: "recurring",
-    limit: 5,
-  });
-
-  const existingPrice = prices.data.find(
-    (p) => p.unit_amount === plan.amount && p.recurring?.interval === "month"
-  );
-
-  if (existingPrice) {
-    logStep("Found existing price", { priceId: existingPrice.id });
-    return existingPrice.id;
-  }
-
-  const price = await stripe.prices.create({
-    product: productId,
-    unit_amount: plan.amount,
-    currency: "usd",
-    recurring: { interval: "month" },
-  });
-  logStep("Created price", { priceId: price.id });
-  return price.id;
+function requiredEnv(name: string): string {
+  const value = Deno.env.get(name)?.trim() ?? "";
+  if (!value) throw new HttpError(503, `${name} is not configured`);
+  return value;
 }
 
+function getBearerToken(request: Request): string {
+  const header = request.headers.get("authorization") ?? "";
+  if (!header.toLowerCase().startsWith("bearer ")) return "";
+  return header.slice(7).trim();
+}
+
+function billingUrl(query: string): string {
+  const configured = Deno.env.get("SITE_URL")?.trim() || "https://masseurmatch.com";
+  const origin = new URL(configured);
+  if (origin.protocol !== "https:" && origin.hostname !== "localhost") {
+    throw new HttpError(503, "SITE_URL must use HTTPS");
+  }
+  const url = new URL("/pro/billing", origin);
+  url.search = query;
+  return url.toString();
+}
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  const rl = checkRateLimit(getClientKey(req), { limit: 10, windowMs: 60_000 });
-  if (!rl.allowed) return rateLimitResponse(rl, corsHeaders);
-
-  const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-  const supabaseAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
-  const supabaseClient = createClient(supabaseUrl, supabaseAnon);
-  const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, { auth: { persistSession: false } });
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
   try {
-    logStep("Function started");
+    const supabaseUrl = requiredEnv("SUPABASE_URL");
+    const serviceRoleKey = requiredEnv("SUPABASE_SERVICE_ROLE_KEY");
+    const stripeKey = requiredEnv("STRIPE_SECRET_KEY");
+    const authToken = getBearerToken(req);
+    if (!authToken) throw new HttpError(401, "Authentication required");
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header");
-    const token = authHeader.replace("Bearer ", "");
-    const { data } = await supabaseClient.auth.getUser(token);
-    const user = data.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { email: user.email });
+    const db = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
 
-    let body: { plan_key?: string };
-    try {
-      body = await req.json();
-    } catch {
-      throw new Error("Invalid request body - must be valid JSON");
+    const { data: userData, error: userError } = await db.auth.getUser(authToken);
+    if (userError || !userData.user?.email) {
+      throw new HttpError(401, "Invalid or expired session");
     }
-    const { plan_key } = body;
-    if (!plan_key || !PLANS[plan_key]) {
-      throw new Error(`Invalid plan: ${plan_key}. Valid plans: ${Object.keys(PLANS).join(", ")}`);
-    }
-    const plan = PLANS[plan_key];
-    logStep("Plan requested", { plan_key, isFree: !!plan.isFree });
+    const user = userData.user;
 
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY not set");
+    const rl = checkRateLimit(`user:${user.id}`, { limit: 10, windowMs: 60_000 });
+    if (!rl.allowed) return rateLimitResponse(rl, corsHeaders);
+
+    const payload = await req.json().catch(() => null) as { plan_key?: string } | null;
+    const planKey = payload?.plan_key?.trim().toLowerCase() ?? "";
+    if (!ALLOWED_PLANS.has(planKey)) {
+      throw new HttpError(400, "Invalid subscription plan");
+    }
+
+    const { data: profile, error: profileError } = await db
+      .from("profiles")
+      .select("id, phone, stripe_customer_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (profileError) throw new HttpError(500, "Could not load provider profile");
+    if (!profile) throw new HttpError(404, "Provider profile not found");
+
+    const { data: plan, error: planError } = await db
+      .from("subscription_plans")
+      .select("id, code, stripe_price_id, is_active")
+      .eq("code", planKey)
+      .eq("is_active", true)
+      .maybeSingle();
+    if (planError) throw new HttpError(500, "Could not load subscription plan");
+    if (!plan) throw new HttpError(400, "Subscription plan is unavailable");
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+    let customerId = profile.stripe_customer_id?.trim() || "";
 
-    // ── Anti-fraud: check for existing Stripe customers with same email or past subs ──
-    const customers = await stripe.customers.list({ email: user.email, limit: 5 });
-    let customerId: string | undefined;
+    if (!customerId) {
+      const customers = await stripe.customers.list({ email: user.email, limit: 5 });
+      customerId = customers.data[0]?.id || "";
+    }
 
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
-      logStep("Found existing customer", { customerId });
-
-      // Check for any active or trialing subscription
-      const activeSubs = await stripe.subscriptions.list({ customer: customerId, status: "active", limit: 1 });
-      const trialingSubs = await stripe.subscriptions.list({ customer: customerId, status: "trialing", limit: 1 });
-      if (activeSubs.data.length > 0 || trialingSubs.data.length > 0) {
-        throw new Error("You already have an active subscription. Manage it from your dashboard.");
+    if (customerId) {
+      const [activeSubscriptions, trialingSubscriptions] = await Promise.all([
+        stripe.subscriptions.list({ customer: customerId, status: "active", limit: 1 }),
+        stripe.subscriptions.list({ customer: customerId, status: "trialing", limit: 1 }),
+      ]);
+      if (activeSubscriptions.data.length > 0 || trialingSubscriptions.data.length > 0) {
+        throw new HttpError(409, "You already have an active subscription. Manage it from your dashboard.");
       }
 
-      // Anti-fraud for free plan: block if they ever had a subscription (prevents trial abuse)
-      if (plan.isFree) {
-        const allSubs = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 50 });
-        if (allSubs.data.length > 0) {
-          throw new Error("Free trial is only available for new members. Please choose a paid plan.");
+      if (planKey === "free") {
+        const allSubscriptions = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 50 });
+        if (allSubscriptions.data.length > 0) {
+          throw new HttpError(409, "Free trial is only available for new members. Please choose a paid plan.");
         }
       }
     }
 
-    // ── Anti-fraud for free plan: check if another profile exists with same phone ──
-    if (plan.isFree) {
-      const { data: profile } = await supabaseAdmin
+    if (planKey === "free" && profile.phone) {
+      const { data: duplicates, error: duplicateError } = await db
         .from("profiles")
-        .select("phone")
-        .eq("user_id", user.id)
-        .single();
-
-      if (profile?.phone) {
-        const { data: duplicates } = await supabaseAdmin
-          .from("profiles")
-          .select("id")
-          .eq("phone", profile.phone)
-          .neq("user_id", user.id)
-          .limit(1);
-
-        if (duplicates && duplicates.length > 0) {
-          throw new Error("This phone number is already associated with another account. Free trial is limited to one per person.");
-        }
+        .select("id")
+        .eq("phone", profile.phone)
+        .neq("user_id", user.id)
+        .limit(1);
+      if (duplicateError) throw new HttpError(500, "Could not validate free trial eligibility");
+      if (duplicates && duplicates.length > 0) {
+        throw new HttpError(409, "This phone number is already associated with another account. Free trial is limited to one per person.");
       }
     }
 
-    // For free plan: create a trial subscription without requiring a credit card
-    if (plan.isFree) {
-      const priceId = await resolvePriceId(stripe, "standard"); // Use standard as the base
+    // Free is intentionally implemented as the existing 14-day cardless trial
+    // on the Standard Stripe price. The public plan code remains "free" so the
+    // webhook persists the correct MasseurMatch entitlement.
+    let priceId = plan.stripe_price_id?.trim() || "";
+    if (planKey === "free") {
+      const { data: standardPlan, error: standardError } = await db
+        .from("subscription_plans")
+        .select("stripe_price_id")
+        .eq("code", "standard")
+        .eq("is_active", true)
+        .maybeSingle();
+      if (standardError) throw new HttpError(500, "Could not load free trial price");
+      priceId = standardPlan?.stripe_price_id?.trim() || "";
+    }
 
-      // Create or reuse customer
+    if (!STRIPE_PRICE_RE.test(priceId)) {
+      throw new HttpError(503, "Stripe pricing is not configured for this plan");
+    }
+
+    const metadata = {
+      masseurmatch_plan: planKey,
+      plan_code: planKey,
+      profile_id: profile.id,
+      user_id: user.id,
+    };
+
+    if (planKey === "free") {
       if (!customerId) {
         const customer = await stripe.customers.create({
           email: user.email,
-          metadata: { user_id: user.id, source: "masseurmatch" },
+          metadata: { profile_id: profile.id, user_id: user.id, source: "masseurmatch" },
         });
         customerId = customer.id;
-        logStep("Created new customer for cardless trial", { customerId });
+
+        const { error: customerPersistError } = await db
+          .from("profiles")
+          .update({ stripe_customer_id: customerId })
+          .eq("id", profile.id);
+        if (customerPersistError) {
+          throw new HttpError(500, "Could not persist Stripe customer mapping");
+        }
       }
 
-      // Create subscription directly with 14-day trial, no payment method required
       const subscription = await stripe.subscriptions.create({
         customer: customerId,
         items: [{ price: priceId }],
         trial_period_days: 14,
         payment_behavior: "default_incomplete",
-        payment_settings: {
-          save_default_payment_method: "on_subscription",
-        },
-        trial_settings: {
-          end_behavior: { missing_payment_method: "pause" },
-        },
-        metadata: { masseurmatch_plan: "free", user_id: user.id },
+        payment_settings: { save_default_payment_method: "on_subscription" },
+        trial_settings: { end_behavior: { missing_payment_method: "pause" } },
+        metadata,
       });
 
-      logStep("Free trial subscription created (no card)", { subscriptionId: subscription.id });
+      console.log("[CREATE-CHECKOUT] Cardless trial created", {
+        userId: user.id,
+        profileId: profile.id,
+        subscriptionId: subscription.id,
+      });
 
-      return new Response(JSON.stringify({
+      return json({
         success: true,
         subscription_id: subscription.id,
-        trial_end: new Date(subscription.trial_end! * 1000).toISOString(),
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        trial_end: subscription.trial_end
+          ? new Date(subscription.trial_end * 1000).toISOString()
+          : null,
       });
     }
 
-    // ── Paid plan checkout ──
-    const priceId = await resolvePriceId(stripe, plan_key);
-
-    const sessionParams: Stripe.Checkout.SessionCreateParams = {
-      customer: customerId,
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId || undefined,
       customer_email: customerId ? undefined : user.email,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
       subscription_data: {
         trial_period_days: 14,
-        metadata: { masseurmatch_plan: plan_key, user_id: user.id },
+        metadata,
       },
       payment_method_collection: "if_required",
       allow_promotion_codes: true,
-      success_url: `${req.headers.get("origin")}/pro/billing?success=true`,
-      cancel_url: `${req.headers.get("origin")}/pro/billing?canceled=true`,
-      metadata: { user_id: user.id, plan_key },
-    };
-
-    const session = await stripe.checkout.sessions.create(sessionParams);
-    logStep("Checkout session created", { sessionId: session.id, url: session.url });
-
-    return new Response(JSON.stringify({ url: session.url }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      success_url: billingUrl("?success=true"),
+      cancel_url: billingUrl("?canceled=true"),
+      metadata,
     });
+
+    if (!session.url) throw new HttpError(502, "Stripe did not return a checkout URL");
+
+    const { error: checkoutError } = await db.from("checkout_sessions").upsert(
+      {
+        profile_id: profile.id,
+        plan_id: plan.id,
+        stripe_checkout_session_id: session.id,
+        stripe_customer_id: customerId || null,
+        status: "open",
+        metadata: { plan_code: planKey, user_id: user.id },
+      },
+      { onConflict: "stripe_checkout_session_id" },
+    );
+    if (checkoutError) throw new HttpError(500, "Could not persist checkout session");
+
+    console.log("[CREATE-CHECKOUT] Checkout session created", {
+      userId: user.id,
+      profileId: profile.id,
+      sessionId: session.id,
+      plan: planKey,
+    });
+
+    return json({ url: session.url });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    logStep("ERROR", { message: msg });
-    return new Response(JSON.stringify({ error: msg }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
-    });
+    const status = error instanceof HttpError ? error.status : 500;
+    const message = error instanceof Error ? error.message : String(error);
+    if (status >= 500) console.error("[CREATE-CHECKOUT] Error", { message });
+    return json({ error: status >= 500 ? "Checkout is temporarily unavailable." : message }, status);
   }
 });

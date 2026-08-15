@@ -26,7 +26,7 @@ interface AuthContextType {
   loading: boolean;
   subscription: SubscriptionState;
   refreshSubscription: () => Promise<void>;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null; requiresEmailConfirmation?: boolean; message?: string }>;
+  signUp: (email: string, password: string, fullName: string, phone: string) => Promise<{ error: Error | null; requiresEmailConfirmation?: boolean; message?: string }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null; role?: AppRole; redirect?: string }>;
   signOut: () => Promise<void>;
 }
@@ -132,9 +132,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => authSub.unsubscribe();
   }, [refreshSubscription]);
 
-  const signUp = async (email: string, password: string, fullName: string) => {
+  const signUp = async (email: string, password: string, fullName: string, phone: string) => {
     try {
-      const result = await registerMutation({ email, password, fullName });
+      const result = await registerMutation({ email, password, fullName, phone });
       // Only read a live session when email confirmation is NOT required.
       // When it is, there is no session yet — the user must confirm by email.
       if (!result.requiresEmailConfirmation) {
