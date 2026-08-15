@@ -1,7 +1,3 @@
--- Forward record of the production policy repair applied on 2026-08-14.
--- The historical migration 20260813225500 is also marked applied remotely so
--- local and remote migration histories remain aligned.
-
 drop policy if exists "therapist_subscriptions_select_own_or_admin" on public.therapist_subscriptions;
 create policy "therapist_subscriptions_select_own_or_admin"
   on public.therapist_subscriptions for select

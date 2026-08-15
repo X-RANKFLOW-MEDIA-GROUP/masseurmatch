@@ -1,2 +1,2 @@
--- Historical production migration marker restored to keep local and remote Supabase migration history aligned.
--- The production schema already contains this migration's effect.
+drop index if exists public.demand_collection_runs_run_id_uidx;
+alter table public.demand_collection_runs add constraint demand_collection_runs_run_id_key unique (run_id);

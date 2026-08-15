@@ -1,2 +1,3 @@
-alter table public.demand_scores alter column competition_index drop not null;
-alter table public.demand_scores alter column competition_index drop default;
+-- Historical no-op marker.
+-- This change was already applied in production as migration 20260814143218.
+-- The canonical earlier migration now exists in this repository.

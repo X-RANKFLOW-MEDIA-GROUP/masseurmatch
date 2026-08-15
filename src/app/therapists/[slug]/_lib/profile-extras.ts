@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
+import { isDatabaseUuid } from "@/lib/database-id";
 
 export type PublicProfileExtras = {
   zip_code: string | null;
@@ -47,6 +48,14 @@ function stringArray(value: unknown) {
 }
 
 export async function getPublicProfileExtras(profileId: string): Promise<PublicProfileExtras> {
+  // Directory fallback profiles use stable synthetic identifiers such as
+  // `fallback-<slug>`. The profiles.id column is uuid, so querying with a
+  // synthetic identifier would make PostgREST/PostgreSQL reject the request
+  // before RLS or maybeSingle() can handle it.
+  if (!isDatabaseUuid(profileId)) {
+    return EMPTY_EXTRAS;
+  }
+
   const admin = createSupabaseAdminClient();
   const { data, error } = await (admin as any)
     .from("profiles")
