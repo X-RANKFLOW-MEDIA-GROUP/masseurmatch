@@ -34,8 +34,8 @@ export type ProfileViewModel = {
   serviceArea: string;
   serviceAreas: string[];
   nearbyCities: Array<{ name: string; slug: string }>;
-  mapLat: number | null;
-  mapLng: number | null;
+  mapLat: number | string | null;
+  mapLng: number | string | null;
   travelRadius: string;
   incallAvailable: boolean;
   outcallAvailable: boolean;
@@ -61,6 +61,7 @@ export type ProfileViewModel = {
   website: string | null;
   instagram: string | null;
   email: string | null;
+  showEmail: boolean;
   preferredContactMethod: string;
   isVerified: boolean;
   isFeatured: boolean;
@@ -137,6 +138,34 @@ function businessDays(hours: unknown) {
     .map(([key]) => key.charAt(0).toUpperCase() + key.slice(1));
 }
 
+function normalizePricingSessions(value: unknown, currency: string) {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === "object")
+    .map((item) => {
+      const minutes = typeof item.minutes === "number"
+        ? item.minutes
+        : typeof item.duration === "number"
+          ? item.duration
+          : null;
+      const technique = typeof item.technique === "string" ? item.technique.trim() : "";
+      const legacyName = typeof item.name === "string" ? item.name.trim() : "";
+      const mode = typeof item.mode === "string" ? item.mode : "simple";
+      const incallValue = typeof item.incall_rate === "number" ? item.incall_rate : item.incall;
+      const outcallValue = typeof item.outcall_rate === "number" ? item.outcall_rate : item.outcall;
+      const incallAsk = item.incall_ask_me === true || mode === "ask_me";
+      const outcallAsk = item.outcall_ask_me === true || mode === "ask_me";
+
+      return {
+        name: technique || legacyName || (minutes ? `${minutes}-minute session` : "Massage session"),
+        duration: minutes ? `${minutes} minutes` : "Custom duration",
+        incall: incallAsk ? "Ask Me" : money(incallValue, currency),
+        outcall: outcallAsk ? "Ask Me" : money(outcallValue, currency),
+      };
+    });
+}
+
 export function buildProfileViewModel(profile: PublicTherapist, photos: ProfilePhoto[] = []): ProfileViewModel {
   const p = profile as AnyProfile;
   const name = profile.display_name || profile.full_name || String(p.name || "MasseurMatch Therapist");
@@ -144,8 +173,6 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
   const state = profile.state || String(p.state_code || "US");
   const country = String(p.country || "United States");
   const matchedCity = US_CITIES.find((item) => item.name.toLowerCase() === city.toLowerCase());
-  // Only emit a city slug that resolves to a real /{city} route; a guessed
-  // slug would render internal links (and breadcrumbs) that 404.
   const citySlug =
     [String(p.city_slug || ""), matchedCity?.slug].find(
       (slug): slug is string => Boolean(slug && US_CITIES.some((item) => item.slug === slug)),
@@ -162,7 +189,8 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
   const profilePhotoUrl = String(p.profile_photo_url || profile.profile_photo || profile.avatar_url || photos.find((photo) => photo.is_primary)?.storage_path || PLACEHOLDER);
   const coverPhotoUrl = String(p.cover_photo_url || p.cover_photo || galleryFromProfile[0] || galleryFromPhotos.find((url) => url !== profilePhotoUrl) || DEFAULT_COVER);
   const galleryImages = Array.from(new Set([profilePhotoUrl, coverPhotoUrl, ...galleryFromProfile, ...galleryFromPhotos])).filter(Boolean).slice(0, 12);
-  const pricingSessions = Array.isArray(profile.pricing_sessions) ? profile.pricing_sessions : [];
+  const pricing = normalizePricingSessions(profile.pricing_sessions, currency);
+  const rawPricingSessions = Array.isArray(profile.pricing_sessions) ? profile.pricing_sessions : [];
   const serviceAreas = Array.from(new Set([...asStringArray(p.service_areas), ...(profile.areas_served || [])])).filter(Boolean);
   const nearbyCities = US_CITIES
     .filter((item) => item.name.toLowerCase() !== city.toLowerCase() && (!matchedCity || item.stateCode === matchedCity.stateCode))
@@ -173,6 +201,10 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
   const tier = profile.subscription_tier || String(p.tier || "");
   const seoKeywords = asStringArray(p.seo_keywords);
   const canonicalUrl = String(p.canonical_url || `${SITE_URL}/therapists/${profile.slug || profile.id}`);
+  const rawMapLat = typeof p.map_lat === "number" ? p.map_lat : profile.latitude ?? null;
+  const rawMapLng = typeof p.map_lng === "number" ? p.map_lng : profile.longitude ?? null;
+  const hasCoordinates = typeof rawMapLat === "number" && typeof rawMapLng === "number";
+  const hasRealCity = Boolean(profile.city?.trim());
 
   return {
     id: profile.id,
@@ -204,8 +236,8 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
     serviceArea: String(p.service_area || serviceAreas.join(", ") || `${city} metro`),
     serviceAreas: serviceAreas.length ? serviceAreas : [city],
     nearbyCities,
-    mapLat: typeof p.map_lat === "number" ? p.map_lat : profile.latitude ?? null,
-    mapLng: typeof p.map_lng === "number" ? p.map_lng : profile.longitude ?? null,
+    mapLat: hasCoordinates ? rawMapLat : hasRealCity ? city : null,
+    mapLng: hasCoordinates ? rawMapLng : hasRealCity ? state : null,
     travelRadius: profile.outcall_radius_miles ? `${profile.outcall_radius_miles} miles` : p.travel_radius ? `${p.travel_radius} miles` : "Travel radius on request",
     incallAvailable,
     outcallAvailable,
@@ -214,13 +246,12 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
     massageTypes: massageTypes.length ? Array.from(new Set(massageTypes)) : ["Therapeutic massage"],
     sessionDurationOptions: asStringArray(p.session_duration_options).length
       ? asStringArray(p.session_duration_options)
-      : pricingSessions.map((item) => item.duration ? `${item.duration} minutes` : item.name || "Session").filter(Boolean),
-    pricing: pricingSessions.map((item) => ({
-      name: item.name || "Massage session",
-      duration: item.duration ? `${item.duration} minutes` : "Custom duration",
-      incall: money(item.incall, currency),
-      outcall: money(item.outcall, currency),
-    })),
+      : rawPricingSessions.map((item) => {
+          const row = item as unknown as Record<string, unknown>;
+          const minutes = typeof row.minutes === "number" ? row.minutes : typeof row.duration === "number" ? row.duration : null;
+          return minutes ? `${minutes} minutes` : typeof row.name === "string" ? row.name : "Session";
+        }).filter(Boolean),
+    pricing,
     startingPrice: money(profile.starting_price || profile.incall_price || profile.outcall_price, currency),
     incallPrice: money(profile.incall_price, currency),
     outcallPrice: money(profile.outcall_price, currency),
@@ -232,12 +263,13 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
     lastActiveAt: fullDateLabel(p.last_active_at || profile.updated_at, "Recently active"),
     responseTime: String(p.response_time || (profile.available_now ? "Typically responds quickly" : "Response time available after contact")),
     memberSince: dateLabel(p.member_since || p.created_at || profile.updated_at, "Member profile active"),
-    phone: profile.whatsapp_number || profile.phone,
-    whatsapp: null,
+    phone: profile.phone || profile.whatsapp_number,
+    whatsapp: profile.whatsapp_number,
     telegram: typeof p.telegram === "string" ? p.telegram : typeof p.telegram_handle === "string" ? p.telegram_handle : null,
     website: profile.website,
     instagram: typeof p.instagram === "string" ? p.instagram : null,
     email: profile.email_address,
+    showEmail: Boolean(profile.show_email),
     preferredContactMethod: String(p.preferred_contact_method || p.preferred_contact || (profile.whatsapp_number ? "WhatsApp" : profile.phone ? "Phone" : "Email")),
     isVerified: Boolean(p.is_verified ?? profile.is_verified_identity ?? profile.is_verified_profile ?? profile.verification_status === "verified"),
     isFeatured: Boolean(profile.is_featured),
@@ -256,9 +288,10 @@ export function buildProfileViewModel(profile: PublicTherapist, photos: ProfileP
   };
 }
 
-export function contactHref(type: "phone" | "whatsapp" | "telegram" | "email" | "website" | "instagram", value: string | null) {
+export function contactHref(type: "phone" | "sms" | "whatsapp" | "telegram" | "email" | "website" | "instagram", value: string | null) {
   if (!value) return null;
   if (type === "phone") return `tel:${value.replace(/[^+\d]/g, "")}`;
+  if (type === "sms") return `sms:${value.replace(/[^+\d]/g, "")}`;
   if (type === "whatsapp") return `https://wa.me/${value.replace(/[^\d]/g, "")}`;
   if (type === "telegram") return value.startsWith("http") ? value : `https://t.me/${value.replace(/^@/, "")}`;
   if (type === "email") return `mailto:${value}`;

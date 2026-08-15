@@ -2,10 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import type { Provider } from "@supabase/supabase-js";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import {
-  SUPABASE_PUBLIC_ANON_KEY,
-  SUPABASE_PUBLIC_URL,
-} from "@/integrations/supabase/client";
+
+import { getPublicSupabaseConfig } from "@/lib/supabase/public-env";
 
 const CANONICAL_ORIGIN = "https://www.masseurmatch.com";
 const ALLOWED_PROVIDERS = new Set<Provider>(["google", "apple"]);
@@ -31,11 +29,11 @@ export async function GET(request: NextRequest) {
   }
 
   // PKCE's verifier cookie must be created and consumed on the same host.
-  // Supabase falls back to the configured Site URL when a preview/deployment
-  // hostname is not allow-listed, which previously moved the callback to www
-  // and caused `bad_code_verifier`. Start production OAuth only on the
-  // canonical host so the verifier and callback always share one cookie jar.
-  if (process.env.NODE_ENV === "production" && !isLocalHost(requestUrl.hostname) && requestUrl.origin !== CANONICAL_ORIGIN) {
+  if (
+    process.env.NODE_ENV === "production" &&
+    !isLocalHost(requestUrl.hostname) &&
+    requestUrl.origin !== CANONICAL_ORIGIN
+  ) {
     const canonicalStart = new URL("/auth/oauth", CANONICAL_ORIGIN);
     canonicalStart.searchParams.set("provider", provider);
     canonicalStart.searchParams.set("next", next);
@@ -48,7 +46,8 @@ export async function GET(request: NextRequest) {
     options?: Parameters<NextResponse["cookies"]["set"]>[2];
   }> = [];
 
-  const supabase = createServerClient(SUPABASE_PUBLIC_URL, SUPABASE_PUBLIC_ANON_KEY, {
+  const { url, key } = getPublicSupabaseConfig();
+  const supabase = createServerClient(url, key, {
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (values) => {

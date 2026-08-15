@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -8,6 +8,8 @@ import {
   Crown,
   Star,
   MessageCircle,
+  MessageSquare,
+  Phone,
   Mail,
   Globe,
   Clock,
@@ -109,9 +111,17 @@ export function VoxProfile({
   education?: Array<{ label?: string | null; institution?: string | null } | string> | string;
 }) {
   const firstName = profile.name.split(" ")[0] || profile.name;
-  const phoneHref = contactHref("whatsapp", profile.phone);
-  const emailHref = contactHref("email", profile.email);
+  const callHref = contactHref("phone", profile.phone);
+  const smsHref = contactHref("sms", profile.phone);
+  const whatsappHref = contactHref("whatsapp", profile.whatsapp);
+  // Email is opt-in (show_email), but also serves as the fallback so a profile
+  // whose only contact channel is email never renders an empty contact section.
+  const emailHref =
+    profile.showEmail || (!callHref && !smsHref && !whatsappHref)
+      ? contactHref("email", profile.email)
+      : null;
   const websiteHref = contactHref("website", profile.website);
+  const primaryContactHref = callHref || smsHref || whatsappHref || emailHref;
 
   const handlePhoneClick = () => trackConversion("contact", profile.id);
   const handleEmailClick = () => trackConversion("email", profile.id);
@@ -267,30 +277,48 @@ export function VoxProfile({
 
               {/* Contact CTAs */}
               <div id="contact" className="mt-8 flex flex-wrap items-center gap-3">
-                {phoneHref && (
+                {callHref && (
                   <a
-                    href={phoneHref}
+                    href={callHref}
                     onClick={handlePhoneClick}
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-white shadow-[0_0_32px_rgba(139, 30, 45,0.4)] transition-transform hover:-translate-y-0.5"
+                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-white shadow-[0_0_32px_rgba(139,30,45,0.4)] transition-transform hover:-translate-y-0.5"
                   >
-                    <MessageCircle className="h-4 w-4" strokeWidth={2.5} />
-                    WhatsApp {firstName}
+                    <Phone className="h-4 w-4" strokeWidth={2.5} />
+                    Call {firstName}
                   </a>
                 )}
-                {profile.phone && !phoneHref && (
-                  <span className="inline-flex h-12 items-center gap-2 rounded-full border border-white/20 bg-white/[0.07] px-5 font-semibold text-white">
-                    <MessageCircle className="h-4 w-4 text-[#8B1E2D]" strokeWidth={2.5} />
-                    {profile.phone}
-                  </span>
+                {smsHref && (
+                  <a
+                    href={smsHref}
+                    onClick={handlePhoneClick}
+                    className="inline-flex h-12 items-center gap-2 rounded-full border border-white/20 bg-white/[0.07] px-6 font-semibold text-white transition-colors hover:border-white/40"
+                  >
+                    <MessageSquare className="h-4 w-4 text-[#8B1E2D]" strokeWidth={2.5} />
+                    Text
+                  </a>
                 )}
-                {emailHref && !phoneHref && !whatsappHref && (
+                {whatsappHref && (
+                  <a
+                    href={whatsappHref}
+                    onClick={handlePhoneClick}
+                    className="inline-flex h-12 items-center gap-2 rounded-full border border-white/20 bg-white/[0.07] px-6 font-semibold text-white transition-colors hover:border-white/40"
+                  >
+                    <MessageCircle className="h-4 w-4 text-[#8B1E2D]" strokeWidth={2.5} />
+                    WhatsApp
+                  </a>
+                )}
+                {emailHref && (
                   <a
                     href={emailHref}
                     onClick={handleEmailClick}
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-white"
+                    className={
+                      callHref || smsHref || whatsappHref
+                        ? "inline-flex h-12 items-center gap-2 rounded-full border border-white/20 bg-white/[0.07] px-6 font-semibold text-white transition-colors hover:border-white/40"
+                        : "inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-white shadow-[0_0_32px_rgba(139,30,45,0.4)] transition-transform hover:-translate-y-0.5"
+                    }
                   >
-                    <Mail className="h-4 w-4" strokeWidth={2.5} />
-                    Email {firstName}
+                    <Mail className={callHref || smsHref || whatsappHref ? "h-4 w-4 text-[#8B1E2D]" : "h-4 w-4"} strokeWidth={2.5} />
+                    {callHref || smsHref || whatsappHref ? "Email" : `Email ${firstName}`}
                   </a>
                 )}
                 {websiteHref && (
@@ -784,9 +812,9 @@ export function VoxProfile({
             Message {firstName} directly to confirm fit, availability, and location. No signup, no middlemen.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            {(phoneHref || whatsappHref || emailHref) && (
+            {primaryContactHref && (
               <a
-                href={phoneHref || whatsappHref || emailHref || "#contact"}
+                href={primaryContactHref}
                 className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8B1E2D] px-7 font-semibold text-white shadow-[0_0_32px_rgba(139, 30, 45,0.35)] transition-transform hover:-translate-y-0.5"
               >
                 <Sparkles className="h-4 w-4" strokeWidth={2.5} />
@@ -810,7 +838,10 @@ export function VoxProfile({
       <VoxStickyContact
         name={profile.name}
         startingPrice={profile.startingPrice}
-        phoneHref={phoneHref}
+        callHref={callHref}
+        smsHref={smsHref}
+        whatsappHref={whatsappHref}
+        emailHref={emailHref}
         profileId={profile.id}
       />
     </div>

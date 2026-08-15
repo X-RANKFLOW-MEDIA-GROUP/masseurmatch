@@ -15,18 +15,12 @@ const IMAGE_MODELS = [
   "gore-2.0",
   "offensive",
   "text-content-2.0",
-  // Returns a per-face "minor" probability, used to keep any image that may
-  // depict a minor out of auto-approval and escalate it to human review.
   "face-attributes",
 ] as const;
 
-// A face scoring at or above this is treated as possibly a minor and forces
-// human review. Kept conservative because youthful-looking adults false-positive;
-// a false flag only means a reviewer approves it manually.
 const MINOR_REVIEW_THRESHOLD = 0.5;
-// Any hint of a minor combined with a sexual/suggestive signal is escalated as a
-// potential CSAM case, at a lower threshold given the severity.
 const MINOR_CSAM_THRESHOLD = 0.3;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const IMAGE_TEXT_CATEGORIES = [
   "sexual",
@@ -43,6 +37,8 @@ const COUNTRY_HINTS = "us,ca,gb,br,pt,es,fr,de,it,mx";
 
 type ModeratePhotoPayload = {
   photo_id?: string;
+  // Kept for backwards-compatible request parsing only. The function intentionally
+  // ignores caller-supplied image content and moderates the image stored for photo_id.
   image_url?: string;
   image_base64?: string;
 };
@@ -82,12 +78,32 @@ type SightengineImageResponse = {
   faces?: Array<{ attributes?: { minor?: number } }>;
 };
 
+class HttpError extends Error {
+  constructor(
+    readonly status: number,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
+function jsonResponse(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+    },
+  });
+}
+
 function getCredentials() {
   const apiUser = Deno.env.get("SIGHTENGINE_API_USER") ?? "";
   const apiSecret = Deno.env.get("SIGHTENGINE_API_SECRET") ?? "";
 
   if (!apiUser || !apiSecret) {
-    throw new Error("Sightengine credentials are not configured.");
+    throw new HttpError(503, "Photo moderation is temporarily unavailable.");
   }
 
   return { apiUser, apiSecret };
@@ -98,48 +114,49 @@ function getSupabaseAdmin() {
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
   if (!url || !serviceRoleKey) {
-    return null;
+    throw new HttpError(503, "Photo moderation backend is not configured.");
   }
 
-  return createClient(url, serviceRoleKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  });
+  return {
+    client: createClient(url, serviceRoleKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    }),
+    serviceRoleKey,
+  };
 }
 
-function decodeBase64(base64: string) {
-  const normalized = base64.includes(",") ? base64.split(",").pop() ?? "" : base64;
-  const binary = atob(normalized);
-  const bytes = new Uint8Array(binary.length);
-
-  for (let i = 0; i < binary.length; i += 1) {
-    bytes[i] = binary.charCodeAt(i);
+function getBearerToken(request: Request) {
+  const header = request.headers.get("authorization") ?? "";
+  if (!header.toLowerCase().startsWith("bearer ")) {
+    return "";
   }
-
-  return bytes;
+  return header.slice(7).trim();
 }
 
-function createRequestBody(payload: ModeratePhotoPayload, apiUser: string, apiSecret: string) {
-  const formData = new FormData();
-  formData.append("models", IMAGE_MODELS.join(","));
-  formData.append("text_categories", IMAGE_TEXT_CATEGORIES.join(","));
-  formData.append("opt_lang", LANGUAGE_HINTS);
-  formData.append("opt_countries", COUNTRY_HINTS);
-  formData.append("api_user", apiUser);
-  formData.append("api_secret", apiSecret);
-
-  if (payload.image_url) {
-    formData.append("url", payload.image_url);
-  } else if (payload.image_base64) {
-    const bytes = decodeBase64(payload.image_base64);
-    formData.append("media", new Blob([bytes], { type: "image/jpeg" }), "upload.jpg");
-  } else {
-    throw new Error("image_url or image_base64 is required.");
+async function authenticateRequest(request: Request) {
+  const token = getBearerToken(request);
+  if (!token) {
+    throw new HttpError(401, "Authentication required.");
   }
 
-  return formData;
+  const { client, serviceRoleKey } = getSupabaseAdmin();
+  if (token === serviceRoleKey) {
+    return { client, kind: "service" as const, userId: null as string | null };
+  }
+
+  const {
+    data: { user },
+    error,
+  } = await client.auth.getUser(token);
+
+  if (error || !user) {
+    throw new HttpError(401, "Invalid or expired authentication token.");
+  }
+
+  return { client, kind: "user" as const, userId: user.id };
 }
 
 function toPercent(value: number | undefined) {
@@ -150,40 +167,19 @@ function decideModeration(data: SightengineImageResponse): ModerationDecision {
   const flags: string[] = [];
   const nudity = data.nudity ?? {};
 
-  if ((nudity.sexual_activity ?? 0) >= 0.12) {
-    flags.push(`sexual_activity:${toPercent(nudity.sexual_activity)}%`);
-  }
-
-  if ((nudity.sexual_display ?? 0) >= 0.12) {
-    flags.push(`sexual_display:${toPercent(nudity.sexual_display)}%`);
-  }
-
-  if ((nudity.erotica ?? 0) >= 0.2) {
-    flags.push(`erotica:${toPercent(nudity.erotica)}%`);
-  }
-
-  if ((nudity.very_suggestive ?? 0) >= 0.6) {
-    flags.push(`very_suggestive:${toPercent(nudity.very_suggestive)}%`);
-  }
-
-  if ((data.weapon ?? 0) >= 0.5) {
-    flags.push(`weapon:${toPercent(data.weapon)}%`);
-  }
-
-  if ((data.gore ?? 0) >= 0.35) {
-    flags.push(`gore:${toPercent(data.gore)}%`);
-  }
-
-  if ((data.offensive ?? 0) >= 0.4) {
-    flags.push(`offensive:${toPercent(data.offensive)}%`);
-  }
+  if ((nudity.sexual_activity ?? 0) >= 0.12) flags.push(`sexual_activity:${toPercent(nudity.sexual_activity)}%`);
+  if ((nudity.sexual_display ?? 0) >= 0.12) flags.push(`sexual_display:${toPercent(nudity.sexual_display)}%`);
+  if ((nudity.erotica ?? 0) >= 0.2) flags.push(`erotica:${toPercent(nudity.erotica)}%`);
+  if ((nudity.very_suggestive ?? 0) >= 0.6) flags.push(`very_suggestive:${toPercent(nudity.very_suggestive)}%`);
+  if ((data.weapon ?? 0) >= 0.5) flags.push(`weapon:${toPercent(data.weapon)}%`);
+  if ((data.gore ?? 0) >= 0.35) flags.push(`gore:${toPercent(data.gore)}%`);
+  if ((data.offensive ?? 0) >= 0.4) flags.push(`offensive:${toPercent(data.offensive)}%`);
 
   const textCategories = data.text?.detected_categories ?? [];
   if (textCategories.length > 0) {
     flags.push(`embedded_text:${textCategories.slice(0, 4).join(",")}`);
   }
 
-  // Minor / CSAM screening. Take the highest per-face minor probability.
   const minorScore = (data.faces ?? []).reduce(
     (max, face) => Math.max(max, face.attributes?.minor ?? 0),
     0,
@@ -198,12 +194,10 @@ function decideModeration(data: SightengineImageResponse): ModerationDecision {
   let csamSuspected = false;
 
   if (minorScore >= MINOR_CSAM_THRESHOLD && hasSexualSignal) {
-    // Potential child sexual abuse material — highest severity, never auto-approve.
     csamSuspected = true;
     priority = "high";
     flags.push(`CSAM_SUSPECTED:minor:${toPercent(minorScore)}%`);
   } else if (minorScore >= MINOR_REVIEW_THRESHOLD) {
-    // Possible minor with no sexual signal — still requires human confirmation.
     priority = "high";
     flags.push(`possible_minor:${toPercent(minorScore)}%`);
   }
@@ -217,79 +211,99 @@ function decideModeration(data: SightengineImageResponse): ModerationDecision {
   };
 }
 
-async function persistModeration(photoId: string | undefined, decision: ModerationDecision) {
-  if (!photoId) {
-    return;
-  }
-
-  const supabaseAdmin = getSupabaseAdmin();
-  if (!supabaseAdmin) {
-    return;
-  }
-
-  await supabaseAdmin
-    .from("profile_photos")
-    .update({
-      moderation_status: decision.approved ? "approved" : "pending",
-      moderation_reason: decision.reason,
-    })
-    .eq("id", photoId);
-}
-
-async function getPhotoQueueContext(photoId: string | undefined): Promise<PhotoQueueContext | null> {
-  if (!photoId) {
-    return null;
-  }
-
-  const supabaseAdmin = getSupabaseAdmin();
-  if (!supabaseAdmin) {
-    return null;
-  }
-
-  const { data: photo, error: photoError } = await supabaseAdmin
+async function getPhotoQueueContext(client: ReturnType<typeof createClient>, photoId: string): Promise<PhotoQueueContext> {
+  const { data: photo, error: photoError } = await client
     .from("profile_photos")
     .select("id, profile_id, storage_path, url, is_primary, sort_order")
     .eq("id", photoId)
     .maybeSingle();
 
-  if (photoError || !photo) {
-    return null;
+  if (photoError) {
+    throw new HttpError(500, "Could not load the photo for moderation.");
+  }
+  if (!photo) {
+    throw new HttpError(404, "Photo not found.");
   }
 
-  const { data: profile, error: profileError } = await supabaseAdmin
+  const { data: profile, error: profileError } = await client
     .from("profiles")
     .select("id, user_id, display_name, full_name")
     .eq("id", photo.profile_id)
     .maybeSingle();
 
-  if (profileError || !profile) {
-    return null;
+  if (profileError) {
+    throw new HttpError(500, "Could not load the photo owner.");
+  }
+  if (!profile) {
+    throw new HttpError(409, "Photo is not linked to a valid profile.");
+  }
+
+  let imageUrl: string | null = null;
+  const storedCandidates = [photo.url, photo.storage_path].filter(
+    (value): value is string => typeof value === "string" && value.trim().length > 0,
+  );
+
+  for (const candidate of storedCandidates) {
+    if (/^https?:\/\//i.test(candidate)) {
+      imageUrl = candidate;
+      break;
+    }
+  }
+
+  if (!imageUrl && photo.storage_path) {
+    const { data } = client.storage.from("therapist-photos").getPublicUrl(photo.storage_path);
+    imageUrl = data?.publicUrl || null;
   }
 
   return {
     photoId: photo.id,
     profileId: photo.profile_id,
     userId: profile.user_id ?? null,
-    imageUrl: photo.storage_path || photo.url || null,
+    imageUrl,
     isPrimary: Boolean(photo.is_primary),
     sortOrder: typeof photo.sort_order === "number" ? photo.sort_order : null,
     displayName: profile.display_name || profile.full_name || null,
   };
 }
 
+function createRequestBody(imageUrl: string, apiUser: string, apiSecret: string) {
+  const formData = new FormData();
+  formData.append("models", IMAGE_MODELS.join(","));
+  formData.append("text_categories", IMAGE_TEXT_CATEGORIES.join(","));
+  formData.append("opt_lang", LANGUAGE_HINTS);
+  formData.append("opt_countries", COUNTRY_HINTS);
+  formData.append("api_user", apiUser);
+  formData.append("api_secret", apiSecret);
+  formData.append("url", imageUrl);
+  return formData;
+}
+
+async function persistModeration(
+  client: ReturnType<typeof createClient>,
+  photoId: string,
+  decision: ModerationDecision,
+) {
+  const { error } = await client
+    .from("profile_photos")
+    .update({
+      moderation_status: decision.approved ? "approved" : "pending",
+      moderation_reason: decision.reason,
+    })
+    .eq("id", photoId);
+
+  if (error) {
+    throw new HttpError(500, "Photo moderation result could not be saved.");
+  }
+}
+
 async function syncModerationQueue(
-  photoId: string | undefined,
+  client: ReturnType<typeof createClient>,
+  context: PhotoQueueContext,
   decision: ModerationDecision,
   provider = "sightengine",
 ) {
-  const context = await getPhotoQueueContext(photoId);
-  if (!context?.userId) {
-    return;
-  }
-
-  const supabaseAdmin = getSupabaseAdmin();
-  if (!supabaseAdmin) {
-    return;
+  if (!context.userId) {
+    throw new HttpError(409, "Photo profile has no associated user.");
   }
 
   const pendingStatus = decision.approved ? "approved" : "pending";
@@ -301,17 +315,8 @@ async function syncModerationQueue(
     displayName: context.displayName,
   };
 
-  const { data: existingQueueItem } = await supabaseAdmin
-    .from("moderation_queue")
-    .select("id")
-    .eq("item_type", "photo")
-    .eq("source", "pro_photos")
-    .eq("target_id", context.photoId)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
   const queuePayload = {
+    content_type: "photo",
     profile_id: context.profileId,
     user_id: context.userId,
     target_id: context.photoId,
@@ -336,74 +341,75 @@ async function syncModerationQueue(
     resolved_at: decision.approved ? new Date().toISOString() : null,
   };
 
-  if (existingQueueItem?.id) {
-    await supabaseAdmin.from("moderation_queue").update(queuePayload).eq("id", existingQueueItem.id);
-    return;
-  }
+  const { error } = await client
+    .from("moderation_queue")
+    .upsert(queuePayload, { onConflict: "target_id" });
 
-  await supabaseAdmin.from("moderation_queue").insert(queuePayload);
+  if (error) {
+    console.error("[moderate-photo] Failed to sync moderation queue:", error.message);
+  }
 }
 
 serve(async (request) => {
   if (request.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
-
-  const rl = checkRateLimit(getClientKey(request), { limit: 20, windowMs: 60_000 });
-  if (!rl.allowed) {
-    return rateLimitResponse(rl, corsHeaders);
+  if (request.method !== "POST") {
+    return jsonResponse({ error: "Method not allowed." }, 405);
   }
 
   try {
-    const payload = (await request.json()) as ModeratePhotoPayload;
-    const { apiUser, apiSecret } = getCredentials();
-    const formData = createRequestBody(payload, apiUser, apiSecret);
+    const auth = await authenticateRequest(request);
+    const rateKey = auth.kind === "user" ? `user:${auth.userId}` : `service:${getClientKey(request)}`;
+    const rl = checkRateLimit(rateKey, { limit: auth.kind === "service" ? 120 : 20, windowMs: 60_000 });
+    if (!rl.allowed) {
+      return rateLimitResponse(rl, corsHeaders);
+    }
 
+    const payload = (await request.json()) as ModeratePhotoPayload;
+    const photoId = payload.photo_id?.trim() ?? "";
+    if (!UUID_RE.test(photoId)) {
+      throw new HttpError(400, "A valid photo_id is required.");
+    }
+
+    const context = await getPhotoQueueContext(auth.client, photoId);
+    if (auth.kind === "user" && context.userId !== auth.userId) {
+      throw new HttpError(403, "You do not have access to this photo.");
+    }
+    if (!context.imageUrl) {
+      throw new HttpError(422, "The stored photo does not have a moderation URL.");
+    }
+
+    const { apiUser, apiSecret } = getCredentials();
     const response = await fetch("https://api.sightengine.com/1.0/check.json", {
       method: "POST",
-      body: formData,
+      body: createRequestBody(context.imageUrl, apiUser, apiSecret),
     });
 
     const data = (await response.json()) as SightengineImageResponse;
     if (!response.ok || data.status !== "success") {
-      throw new Error(data.error?.message || `Sightengine photo moderation failed (${response.status}).`);
+      throw new HttpError(502, data.error?.message || "Photo moderation provider failed.");
     }
 
     const decision = decideModeration(data);
-    await persistModeration(payload.photo_id, decision);
-    await syncModerationQueue(payload.photo_id, decision);
+    await persistModeration(auth.client, context.photoId, decision);
+    await syncModerationQueue(auth.client, context, decision);
 
-    return new Response(
-      JSON.stringify({
-        approved: decision.approved,
-        reason: decision.reason,
-        provider: "sightengine",
-        flags: decision.flags,
-        priority: decision.priority,
-        csam_suspected: decision.csamSuspected,
-        photo_id: payload.photo_id ?? null,
-      }),
-      {
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json",
-        },
-      },
-    );
+    return jsonResponse({
+      approved: decision.approved,
+      reason: decision.reason,
+      provider: "sightengine",
+      flags: decision.flags,
+      priority: decision.priority,
+      csam_suspected: decision.csamSuspected,
+      photo_id: context.photoId,
+    });
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-
-    return new Response(
-      JSON.stringify({
-        error: message,
-      }),
-      {
-        status: 500,
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json",
-        },
-      },
-    );
+    const status = error instanceof HttpError ? error.status : 500;
+    const message = error instanceof Error ? error.message : "Photo moderation failed.";
+    if (status >= 500) {
+      console.error("[moderate-photo]", message);
+    }
+    return jsonResponse({ error: message }, status);
   }
 });

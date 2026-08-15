@@ -3,17 +3,31 @@ project_id = "ijsdpozjfjjufjsoexod"
 [functions]
   [functions.auth-email-hook]
     verify_jwt = false
+  [functions.cloudinary-sign]
+    verify_jwt = true
   [functions.create-checkout]
-    verify_jwt = false
+    verify_jwt = true
   [functions.customer-portal]
-    verify_jwt = false
+    verify_jwt = true
   [functions.generate-sitemap]
     verify_jwt = false
   [functions.lifecycle-unsubscribe]
     verify_jwt = false
+  [functions.moderate-photo]
+    verify_jwt = true
+  [functions.moderate-text]
+    verify_jwt = true
   [functions.process-lifecycle-email-queue]
-    verify_jwt = false
+    verify_jwt = true
   [functions.resend-webhook]
     verify_jwt = false
   [functions.run-lifecycle-campaigns]
+    verify_jwt = true
+  [functions.run-post-signup-campaigns]
+    verify_jwt = true
+  [functions.send-city-digest]
+    verify_jwt = true
+  [functions.stripe-webhook]
+    verify_jwt = false
+  [functions.twilio-inbound]
     verify_jwt = false

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getCities, getPublicTherapists } from "@/app/_lib/directory";
+import { getCities } from "@/app/_lib/directory";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,33 +12,46 @@ import {
   Newspaper,
   Tag,
   ArrowUpRight,
-  CalendarCheck,
-  MessageSquare,
-  DollarSign,
+  BadgeCheck,
+  LifeBuoy,
 } from "lucide-react";
+
+const REVIEW_STATUSES = ["under_review", "pending", "pending_review", "pending_approval"];
 
 async function getAdminStats() {
   const supabase = createSupabaseAdminClient();
-
-  const [therapistsResult, cities, bookingCountResult, smsAlertCountResult] = await Promise.all([
-    getPublicTherapists({ page: 1, pageSize: 50 }),
+  const db = supabase as any;
+  const [
+    profilesResult,
+    reviewResult,
+    moderationResult,
+    identityResult,
+    supportResult,
+    recentResult,
+    cities,
+  ] = await Promise.all([
+    db.from("profiles").select("id", { count: "exact", head: true }).eq("role", "provider"),
+    db.from("profiles").select("id", { count: "exact", head: true }).in("profile_status", REVIEW_STATUSES),
+    db.from("moderation_queue").select("id", { count: "exact", head: true }).eq("status", "pending"),
+    db.from("identity_verifications").select("id", { count: "exact", head: true }).in("status", ["pending", "requires_input"]),
+    db.from("support_tickets").select("id", { count: "exact", head: true }).in("status", ["open", "pending", "in_progress"]),
+    db
+      .from("profiles")
+      .select("id,display_name,full_name,city,specialties,profile_status,visibility_status,updated_at")
+      .eq("role", "provider")
+      .order("updated_at", { ascending: false })
+      .limit(8),
     Promise.resolve(getCities()),
-    supabase
-      .from('booking_inquiries')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'pending_approval'),
-    supabase
-      .from('sms_follow_up_alerts')
-      .select('id', { count: 'exact', head: true })
-      .is('resolved_at', null),
   ]);
 
   return {
-    therapists: therapistsResult.total,
+    therapists: profilesResult.count ?? 0,
     cities: cities.length,
-    recentTherapists: therapistsResult.items.slice(0, 5),
-    pendingBookings: bookingCountResult.count ?? 0,
-    smsAlerts: smsAlertCountResult.count ?? 0,
+    needsReview: reviewResult.count ?? 0,
+    moderationPending: moderationResult.count ?? 0,
+    identityAttention: identityResult.count ?? 0,
+    supportOpen: supportResult.count ?? 0,
+    recentTherapists: recentResult.data ?? [],
   };
 }
 
@@ -49,62 +62,62 @@ export default async function AdminOverviewPage() {
     {
       label: "Total Therapists",
       value: String(stats.therapists),
-      description: "Active profiles",
+      description: "Provider profiles in Supabase",
       icon: HeartHandshake,
       color: "text-primary",
       bgColor: "bg-primary/10",
+      href: "/admin/people",
+    },
+    {
+      label: "Needs Review",
+      value: String(stats.needsReview),
+      description: "Under review or pending",
+      icon: ShieldAlert,
+      color: "text-amber-700",
+      bgColor: "bg-amber-50",
+      href: "/admin/people",
+    },
+    {
+      label: "Photo Moderation",
+      value: String(stats.moderationPending),
+      description: "Pending moderation items",
+      icon: ShieldAlert,
+      color: "text-orange-700",
+      bgColor: "bg-orange-50",
+      href: "/admin/moderation",
+    },
+    {
+      label: "Identity Attention",
+      value: String(stats.identityAttention),
+      description: "Pending or requires input",
+      icon: BadgeCheck,
+      color: "text-indigo-700",
+      bgColor: "bg-indigo-50",
+      href: "/admin/people",
+    },
+    {
+      label: "Support Open",
+      value: String(stats.supportOpen),
+      description: "Open or in progress tickets",
+      icon: LifeBuoy,
+      color: "text-violet-700",
+      bgColor: "bg-violet-50",
     },
     {
       label: "Cities Covered",
       value: String(stats.cities),
-      description: "Active locations",
+      description: "Directory city definitions",
       icon: MapPin,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
-    },
-    {
-      label: "Booking Approvals",
-      value: String(stats.pendingBookings),
-      description: "Need your sign-off",
-      icon: CalendarCheck,
-      color: "text-red-600",
-      bgColor: "bg-red-50",
-      href: "/admin/bookings",
-    },
-    {
-      label: "SMS Alerts",
-      value: String(stats.smsAlerts),
-      description: "Unanswered 90+ min",
-      icon: MessageSquare,
-      color: "text-violet-600",
-      bgColor: "bg-violet-50",
-      href: "/admin/sms",
-    },
-    {
-      label: "Moderation",
-      value: "—",
-      description: "Review queued listings",
-      icon: ShieldAlert,
-      color: "text-amber-600",
-      bgColor: "bg-amber-50",
-      href: "/admin/moderation",
-    },
-    {
-      label: "Revenue",
-      value: "—",
-      description: "See Stripe dashboard",
-      icon: DollarSign,
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50",
+      href: "/admin/cities",
     },
   ];
 
   const quickLinks = [
-    { href: "/admin/bookings", label: "Booking Approvals", description: `${stats.pendingBookings} inquiry${stats.pendingBookings !== 1 ? 'ies' : 'y'} waiting for your sign-off.`, icon: CalendarCheck },
-    { href: "/admin/sms", label: "SMS Auto-Reply", description: `${stats.smsAlerts} alert${stats.smsAlerts !== 1 ? 's' : ''} — conversations with no reply in 90+ min.`, icon: MessageSquare },
-    { href: "/admin/therapists", label: "Therapists", description: "Approve, suspend, verify, and feature provider profiles.", icon: HeartHandshake },
+    { href: "/admin/people", label: "People CRM", description: `${stats.needsReview} profile${stats.needsReview === 1 ? "" : "s"} currently need review.`, icon: HeartHandshake },
+    { href: "/admin/moderation", label: "Moderation", description: `${stats.moderationPending} moderation item${stats.moderationPending === 1 ? "" : "s"} pending.`, icon: ShieldAlert },
     { href: "/admin/users", label: "Users", description: "Manage provider and admin roles.", icon: Users },
-    { href: "/admin/moderation", label: "Moderation", description: "Review queued listing drafts flagged by Sightengine.", icon: ShieldAlert },
     { href: "/admin/cities", label: "Cities", description: "Edit local landing page copy and city coverage.", icon: MapPin },
     { href: "/admin/keywords", label: "Keywords", description: "Manage specialty and SEO keyword surfaces.", icon: Tag },
     { href: "/admin/blog", label: "Blog", description: "Publish and maintain editorial content.", icon: Newspaper },
@@ -112,9 +125,8 @@ export default async function AdminOverviewPage() {
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader title="Dashboard" description="Admin overview — monitor platform health at a glance." />
+      <AdminPageHeader title="Dashboard" description="Admin overview grounded in the current production database." />
 
-      {/* Stat Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {cards.map((card) => {
           const inner = (
@@ -130,36 +142,33 @@ export default async function AdminOverviewPage() {
             </>
           );
           const cls = "rounded-2xl border border-border bg-white p-5 shadow-sm transition-shadow hover:shadow-md";
-          return 'href' in card && card.href ? (
+          return card.href ? (
             <Link key={card.label} href={card.href} className={`${cls} block`}>
               {inner}
             </Link>
           ) : (
-            <div key={card.label} className={cls}>
-              {inner}
-            </div>
+            <div key={card.label} className={cls}>{inner}</div>
           );
         })}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Recent Therapist Activity */}
         <Card className="lg:col-span-2 border-border bg-white shadow-sm">
           <CardHeader>
             <CardTitle className="font-display text-base">Recent Therapist Activity</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {stats.recentTherapists.map((t) => (
-                <div key={t.id} className="flex items-center justify-between border-b border-border/50 pb-3 last:border-none last:pb-0">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{t.display_name || t.full_name || "Unknown"}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {t.city || "No city"} • {t.specialties?.[0] || "General"}
+              {stats.recentTherapists.map((t: any) => (
+                <div key={t.id} className="flex items-center justify-between gap-4 border-b border-border/50 pb-3 last:border-none last:pb-0">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-foreground">{t.display_name || t.full_name || "Unknown"}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {t.city || "No city"} · {t.specialties?.[0] || "General"} · {t.visibility_status || "unknown visibility"}
                     </p>
                   </div>
-                  <Badge variant={t.status === "active" ? "default" : "secondary"}>
-                    {t.status || "pending"}
+                  <Badge variant={t.profile_status === "approved" ? "default" : "secondary"}>
+                    {t.profile_status || "draft"}
                   </Badge>
                 </div>
               ))}
@@ -170,7 +179,6 @@ export default async function AdminOverviewPage() {
           </CardContent>
         </Card>
 
-        {/* Quick Links */}
         <Card className="border-border bg-white shadow-sm">
           <CardHeader>
             <CardTitle className="font-display text-base">Quick Actions</CardTitle>
@@ -178,17 +186,13 @@ export default async function AdminOverviewPage() {
           <CardContent>
             <div className="space-y-2">
               {quickLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="flex items-center gap-3 rounded-xl p-3 transition-colors hover:bg-secondary/50"
-                >
+                <Link key={link.href} href={link.href} className="flex items-center gap-3 rounded-xl p-3 transition-colors hover:bg-secondary/50">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                     <link.icon className="h-4 w-4 text-primary" />
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-foreground">{link.label}</p>
-                    <p className="text-xs text-muted-foreground truncate">{link.description}</p>
+                    <p className="truncate text-xs text-muted-foreground">{link.description}</p>
                   </div>
                   <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                 </Link>

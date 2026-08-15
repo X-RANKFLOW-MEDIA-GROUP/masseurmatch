@@ -37,6 +37,11 @@ const CASES: Array<{ source: string; destination: string }> = [
   { source: "/dallas/verified-therapists", destination: "/dallas/verified-profiles" },
   { source: "/dallas/services/deep-tissue", destination: "/dallas/wellness/deep-tissue" },
   { source: "/dallas/services/sports", destination: "/dallas/wellness/sports-recovery" },
+
+  // Local discovery uses the canonical city inventory instead of maintaining
+  // competing search and Explore result sets.
+  { source: "/search?city=Dallas", destination: "/dallas" },
+  { source: "/explore/usa/dallas?city=Dallas&radius=25&sort=distance&view=grid", destination: "/dallas" },
 ];
 
 for (const { source, destination } of CASES) {
