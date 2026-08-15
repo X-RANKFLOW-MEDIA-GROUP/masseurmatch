@@ -1,22 +1,33 @@
-import { Resend } from 'resend';
-import WelcomeEmail from '@/emails/WelcomeEmail';
+import { Resend } from "resend";
+
 import { envAny } from "@/app/api/_lib/env";
 import { RouteError } from "@/app/api/_lib/http";
 import type { ContactAudience } from "@/app/_lib/validation";
+import WelcomeEmail from "@/emails/WelcomeEmail";
 
 let _resend: Resend | null = null;
+
+function allowExplicitEmailMock() {
+  return process.env.NODE_ENV !== "production" && process.env.ALLOW_EMAIL_MOCKS === "true";
+}
+
 function getResend() {
+  const apiKey = envAny(["RESEND_API_KEY"]);
+  if (!apiKey) {
+    throw new RouteError(503, "Email service is not configured.");
+  }
+
   if (!_resend) {
-    _resend = new Resend(process.env.RESEND_API_KEY || "re_placeholder");
+    _resend = new Resend(apiKey);
   }
   return _resend;
 }
 
 async function sendWelcomeEmail(email: string, name: string, token: string) {
   await getResend().emails.send({
-    from: 'MasseurMatch Concierge <concierge@masseurmatch.com>',
+    from: "MasseurMatch Concierge <concierge@masseurmatch.com>",
     to: email,
-    subject: 'Welcome to MasseurMatch PRO',
+    subject: "Welcome to MasseurMatch PRO",
     react: WelcomeEmail({
       name,
       isTherapist: true,
@@ -61,23 +72,6 @@ function resolveContactRecipient(subject: string, audience?: ContactAudience) {
     return "press@masseurmatch.com";
   }
 
-  if (
-    normalized.includes("partner") ||
-    normalized.includes("partnership") ||
-    normalized.includes("business") ||
-    normalized.includes("sponsorship")
-  ) {
-    return "support@masseurmatch.com";
-  }
-
-  if (audience === "massage-professional") {
-    return "support@masseurmatch.com";
-  }
-
-  if (audience === "other") {
-    return "support@masseurmatch.com";
-  }
-
   return "support@masseurmatch.com";
 }
 
@@ -107,11 +101,15 @@ export async function sendSupportEmail(input: {
   const audienceLabel = formatContactAudience(input.audience);
 
   if (!apiKey) {
-    return {
-      id: `mock-contact-${Date.now()}`,
-      mock: true,
-      to,
-    };
+    if (allowExplicitEmailMock()) {
+      return {
+        id: `mock-contact-${Date.now()}`,
+        mock: true,
+        to,
+      };
+    }
+
+    throw new RouteError(503, "Email service is temporarily unavailable.");
   }
 
   const from = envAny(["RESEND_FROM_EMAIL"], "MasseurMatch <onboarding@resend.dev>");
@@ -153,3 +151,6 @@ export async function sendSupportEmail(input: {
     to,
   };
 }
+
+// Keep the helper referenced by legacy onboarding code in this module.
+void sendWelcomeEmail;

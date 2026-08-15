@@ -3,7 +3,6 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-// This regression suite is intentionally part of PR validation so Vercel tests the same build gate used in Production.
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const validatorPath = path.join(scriptDir, "validate-supabase-env.mjs");
 const PROD_REF = "ijsdpozjfjjufjsoexod";
@@ -65,6 +64,18 @@ function expectFail(name, overrides, expectedError) {
 }
 
 expectPass(
+  "valid production configuration",
+  {
+    VERCEL_ENV: "production",
+    SUPABASE_URL: PROD_URL,
+    NEXT_PUBLIC_SUPABASE_URL: PROD_URL,
+    SUPABASE_ANON_KEY: fakeJwt(PROD_REF),
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: fakeJwt(PROD_REF),
+    SUPABASE_SERVICE_ROLE_KEY: fakeJwt(PROD_REF, "service_role"),
+  },
+);
+
+expectPass(
   "shadowed legacy variables",
   {
     VERCEL_ENV: "production",
@@ -80,11 +91,30 @@ expectPass(
 );
 
 expectFail(
+  "missing browser URL",
+  {
+    SUPABASE_URL: PROD_URL,
+    SUPABASE_ANON_KEY: fakeJwt(PROD_REF),
+  },
+  /NEXT_PUBLIC_SUPABASE_URL must be configured/,
+);
+
+expectFail(
+  "missing browser key",
+  {
+    SUPABASE_URL: PROD_URL,
+    NEXT_PUBLIC_SUPABASE_URL: PROD_URL,
+  },
+  /NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY must be configured/,
+);
+
+expectFail(
   "server and browser project mismatch",
   {
     VERCEL_ENV: "production",
     SUPABASE_URL: PROD_URL,
     NEXT_PUBLIC_SUPABASE_URL: OTHER_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: fakeJwt(OTHER_REF),
   },
   /active Supabase URLs must use the same project/,
 );
@@ -95,6 +125,7 @@ expectFail(
     VERCEL_ENV: "production",
     SUPABASE_URL: OTHER_URL,
     NEXT_PUBLIC_SUPABASE_URL: OTHER_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: fakeJwt(OTHER_REF),
   },
   /MasseurMatch production must use ijsdpozjfjjufjsoexod/,
 );
@@ -105,7 +136,7 @@ expectFail(
     VERCEL_ENV: "production",
     SUPABASE_URL: PROD_URL,
     NEXT_PUBLIC_SUPABASE_URL: PROD_URL,
-    SUPABASE_ANON_KEY: fakeJwt(OTHER_REF),
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: fakeJwt(OTHER_REF),
   },
   /belongs to project aaaaaaaaaaaaaaaaaaaa, but its active runtime URL uses ijsdpozjfjjufjsoexod/,
 );
@@ -116,9 +147,10 @@ expectFail(
     VERCEL_ENV: "production",
     SUPABASE_URL: PROD_URL,
     NEXT_PUBLIC_SUPABASE_URL: PROD_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: fakeJwt(PROD_REF),
     SUPABASE_SERVICE_ROLE_KEY: fakeJwt(PROD_REF, "anon"),
   },
   /JWT role anon, but service_role is required/,
 );
 
-console.log("Supabase environment validator regression tests passed (5 checks).");
+console.log("Supabase environment validator regression tests passed (8 checks).");

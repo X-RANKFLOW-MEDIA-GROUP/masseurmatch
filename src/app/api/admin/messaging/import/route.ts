@@ -70,10 +70,9 @@ export async function POST(request: Request) {
     const deduped = [...uniqueByPhone.values()];
 
     const phones = deduped.map((item) => item.phone);
-    const { data: existingRows, error: existingError } = await db
-      .from("messaging_contacts")
-      .select("id,phone_e164,opted_out")
-      .in("phone_e164", phones);
+    const { data: existingRows, error: existingError } = phones.length
+      ? await db.from("messaging_contacts").select("id,phone_e164,opted_out").in("phone_e164", phones)
+      : { data: [], error: null };
     if (existingError) throw new RouteError(500, existingError.message);
 
     const existing = new Map<string, { id: string; opted_out: boolean }>(
@@ -141,7 +140,7 @@ export async function POST(request: Request) {
       admin.userId,
       "admin_messaging_contacts_imported",
       "messaging_contacts",
-      null,
+      undefined,
       {
         received: body.rows.length,
         inserted,

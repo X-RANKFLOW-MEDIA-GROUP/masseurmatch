@@ -8,9 +8,25 @@ const corsHeaders = {
 };
 
 const SUCCESS_TEXT = "You have been unsubscribed. You will no longer receive marketing emails from MasseurMatch.";
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const TOKEN_RE = /^[a-f0-9]{64}$/i;
+
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "no-store" },
+  });
+}
 
 function toBytes(input: string): Uint8Array {
   return new TextEncoder().encode(input);
+}
+
+function secureEquals(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let index = 0; index < a.length; index += 1) diff |= a.charCodeAt(index) ^ b.charCodeAt(index);
+  return diff === 0;
 }
 
 async function hmacHex(value: string, secret: string): Promise<string> {
@@ -22,34 +38,28 @@ async function hmacHex(value: string, secret: string): Promise<string> {
     ["sign"],
   );
 
-  const sig = await crypto.subtle.sign("HMAC", key, toBytes(value));
-  return Array.from(new Uint8Array(sig))
-    .map((b) => b.toString(16).padStart(2, "0"))
+  const signature = await crypto.subtle.sign("HMAC", key, toBytes(value));
+  return Array.from(new Uint8Array(signature))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
     .join("");
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method !== "GET" && req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
   const rl = checkRateLimit(getClientKey(req), { limit: 20, windowMs: 60_000 });
   if (!rl.allowed) return rateLimitResponse(rl, corsHeaders);
 
-  if (req.method !== "GET" && req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-
   try {
-    const unsubscribeSecret = Deno.env.get("UNSUBSCRIBE_HMAC_SECRET") ?? "";
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const unsubscribeSecret = Deno.env.get("UNSUBSCRIBE_HMAC_SECRET")?.trim() ?? "";
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")?.trim() ?? "";
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")?.trim() ?? "";
 
-    if (!unsubscribeSecret) throw new Error("UNSUBSCRIBE_HMAC_SECRET not configured");
-    if (!supabaseUrl || !serviceKey) throw new Error("Supabase service credentials are not configured");
+    if (unsubscribeSecret.length < 32 || !supabaseUrl || !serviceKey) {
+      console.error("[lifecycle-unsubscribe] Required server configuration is missing");
+      return json({ error: "Unsubscribe service is temporarily unavailable" }, 503);
+    }
 
     let email = "";
     let token = "";
@@ -64,22 +74,18 @@ serve(async (req) => {
       token = String(body?.token ?? "").trim();
     }
 
-    if (!email || !token) {
-      return new Response(JSON.stringify({ error: "Missing email or token" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (!EMAIL_RE.test(email) || email.length > 254 || !TOKEN_RE.test(token)) {
+      return json({ error: "Invalid unsubscribe link" }, 400);
     }
 
     const expectedToken = await hmacHex(email, unsubscribeSecret);
-    if (expectedToken !== token) {
-      return new Response(JSON.stringify({ error: "Invalid token" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (!secureEquals(expectedToken, token.toLowerCase())) {
+      return json({ error: "Invalid unsubscribe link" }, 401);
     }
 
-    const supabase = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
+    const supabase = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
     const { error } = await supabase.rpc("unsubscribe_marketing_email", { p_email: email });
     if (error) throw error;
 
@@ -90,19 +96,15 @@ serve(async (req) => {
           ...corsHeaders,
           "Content-Type": "text/plain; charset=utf-8",
           "Cache-Control": "no-store",
+          "Referrer-Policy": "no-referrer",
         },
       });
     }
 
-    return new Response(JSON.stringify({ success: true, message: SUCCESS_TEXT }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return json({ success: true, message: SUCCESS_TEXT });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    console.error("[lifecycle-unsubscribe] Failed", { error: message });
+    return json({ error: "Unsubscribe service is temporarily unavailable" }, 500);
   }
 });

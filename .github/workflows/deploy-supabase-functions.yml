@@ -1,44 +1,69 @@
-name: Deploy Supabase Functions
+name: Deploy Supabase Production
 
-# Auto-deploys the auth-email-hook and lifecycle email Edge Functions whenever
-# their source lands on main, so the deployed functions never drift from what's
-# in the repo (the class of bug that made confirmation links fail: a fix merged
-# but never deployed).
+# Canonical production deploy. Database migrations run first; Edge Functions
+# deploy only after the migration job succeeds. This prevents a new function
+# from depending on schema/RPC changes that have not reached production yet.
 #
-# Requirements (set once in the repo settings):
-#   - Secret   SUPABASE_ACCESS_TOKEN  — a personal access token
-#              (Supabase → Account → Access Tokens). Settings → Secrets and
-#              variables → Actions → Secrets.
-#   - Variable SUPABASE_PROJECT_REF   — the *production* project ref
-#              (Supabase → Project Settings → General → Reference ID).
-#              Settings → Secrets and variables → Actions → Variables.
-#
-# verify_jwt for auth-email-hook is pinned to false in supabase/config.toml,
-# which the CLI honours on deploy — the hook authenticates itself via the
-# Standard Webhooks signature, not a user JWT.
+# Requirements:
+#   - Secret   SUPABASE_ACCESS_TOKEN
+#   - Secret   SUPABASE_DB_PASSWORD
+#   - Variable SUPABASE_PROJECT_REF
 
 on:
   push:
     branches: [main]
     paths:
-      - "supabase/functions/auth-email-hook/**"
-      - "supabase/functions/process-lifecycle-email-queue/**"
-      - "supabase/functions/lifecycle-unsubscribe/**"
-      - "supabase/functions/run-lifecycle-campaigns/**"
-      - "supabase/functions/create-checkout/**"
-      - "supabase/functions/customer-portal/**"
-      - "supabase/functions/_shared/**"
+      - "supabase/migrations/**"
+      - "supabase/functions/**"
       - "supabase/config.toml"
       - ".github/workflows/deploy-supabase-functions.yml"
   workflow_dispatch: {}
 
 concurrency:
-  group: deploy-supabase-functions
+  group: deploy-supabase-production
   cancel-in-progress: false
 
 jobs:
+  migrate:
+    name: Apply Supabase migrations
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Normalize project ref
+        run: echo "SUPABASE_PROJECT_REF=$(printf '%s' "$SUPABASE_PROJECT_REF" | tr -d '[:space:]')" >> "$GITHUB_ENV"
+
+      - name: Verify required config is present
+        run: |
+          missing=0
+          for name in SUPABASE_ACCESS_TOKEN SUPABASE_DB_PASSWORD SUPABASE_PROJECT_REF; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is not configured."
+              missing=1
+            fi
+          done
+          [ "$missing" -eq 0 ]
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link production project
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Verify migration history parity
+        run: supabase migration list
+
+      - name: Apply pending migrations
+        run: supabase db push --include-all
+
   deploy:
-    name: Deploy auth-email-hook
+    name: Deploy Supabase Edge Functions
+    needs: migrate
     runs-on: ubuntu-latest
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -46,9 +71,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      # The variable has shipped with a trailing space before, which the CLI
-      # rejects as "Invalid project ref format" — strip all whitespace so a
-      # copy-paste artifact can't silently break every deploy.
       - name: Normalize project ref
         run: echo "SUPABASE_PROJECT_REF=$(printf '%s' "$SUPABASE_PROJECT_REF" | tr -d '[:space:]')" >> "$GITHUB_ENV"
 
@@ -56,11 +78,11 @@ jobs:
         run: |
           missing=0
           if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
-            echo "::error::Secret SUPABASE_ACCESS_TOKEN is not set — add it under Settings → Secrets and variables → Actions."
+            echo "::error::Secret SUPABASE_ACCESS_TOKEN is not set."
             missing=1
           fi
           if [ -z "$SUPABASE_PROJECT_REF" ]; then
-            echo "::error::Variable SUPABASE_PROJECT_REF is not set — add it under Settings → Secrets and variables → Actions → Variables."
+            echo "::error::Variable SUPABASE_PROJECT_REF is not set."
             missing=1
           fi
           [ "$missing" -eq 0 ]
@@ -69,16 +91,31 @@ jobs:
         with:
           version: latest
 
-      - name: Deploy auth-email-hook
-        run: supabase functions deploy auth-email-hook --project-ref "$SUPABASE_PROJECT_REF"
+      - name: Deploy authentication and upload functions
+        run: |
+          supabase functions deploy auth-email-hook --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy cloudinary-sign --project-ref "$SUPABASE_PROJECT_REF"
 
       - name: Deploy lifecycle email functions
         run: |
           supabase functions deploy process-lifecycle-email-queue --project-ref "$SUPABASE_PROJECT_REF"
           supabase functions deploy lifecycle-unsubscribe --project-ref "$SUPABASE_PROJECT_REF"
           supabase functions deploy run-lifecycle-campaigns --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy run-post-signup-campaigns --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy send-city-digest --project-ref "$SUPABASE_PROJECT_REF"
 
       - name: Deploy billing functions
         run: |
           supabase functions deploy create-checkout --project-ref "$SUPABASE_PROJECT_REF"
           supabase functions deploy customer-portal --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy stripe-webhook --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Deploy messaging webhooks
+        run: |
+          supabase functions deploy resend-webhook --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy twilio-inbound --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Deploy moderation functions
+        run: |
+          supabase functions deploy moderate-photo --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy moderate-text --project-ref "$SUPABASE_PROJECT_REF"
