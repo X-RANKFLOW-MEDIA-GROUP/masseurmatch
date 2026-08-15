@@ -15,7 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_APP_URL: https://masseurmatch.com
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      # Public browser configuration required to compile the production bundle.
+      # Prefer repository secrets when configured, otherwise use the project's
+      # publishable client values explicitly. No privileged key is committed.
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://ijsdpozjfjjufjsoexod.supabase.co' }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_SnBq62riIQi-RvKxIlshyw_YnK_X68M' }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       KNOTTY_LEARNING_ENABLED: "false"
       KNOTTY_DEBUG_RANKING: "false"
