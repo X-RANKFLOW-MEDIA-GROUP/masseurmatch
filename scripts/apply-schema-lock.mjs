@@ -2,8 +2,12 @@
 
 // Applies supabase/PRODUCTION_SCHEMA_LOCK.sql to the LIVE Supabase database
 // through the Supabase Management API (HTTPS), then verifies the result with
-// scripts/verify-live-schema.mjs. The schema lock is idempotent and
-// additive-only, so re-running is safe.
+// scripts/verify-live-schema.mjs.
+//
+// IMPORTANT: the historical schema lock currently contains out-of-scope
+// booking/session-payment tables. This command fails closed until those legacy
+// declarations are removed, preventing an old additive contract from
+// recreating deprecated runtime objects after the canonical cleanup migration.
 //
 // Env (or .env.local fallback):
 //   SUPABASE_ACCESS_TOKEN      personal access token (sbp_...), required
@@ -17,6 +21,13 @@ import { spawnSync } from "node:child_process";
 
 const ROOT = process.cwd();
 const SCHEMA_PATH = path.join(ROOT, "supabase/PRODUCTION_SCHEMA_LOCK.sql");
+const FORBIDDEN_LEGACY_TABLES = [
+  "appointments",
+  "booking_inquiries",
+  "booking_analytics",
+  "payment_transactions",
+  "therapist_availability",
+];
 
 function loadEnv(name) {
   if (process.env[name]) return process.env[name].trim();
@@ -28,6 +39,20 @@ function loadEnv(name) {
     if (line.slice(0, eq).trim() === name) return line.slice(eq + 1).trim();
   }
   return null;
+}
+
+function assertCanonicalSchemaLock(sql) {
+  const offenders = FORBIDDEN_LEGACY_TABLES.filter((table) => {
+    const pattern = new RegExp(`create\\s+table\\s+(?:if\\s+not\\s+exists\\s+)?(?:public\\.)?${table}\\b`, "i");
+    return pattern.test(sql);
+  });
+
+  if (offenders.length === 0) return;
+
+  console.error("[apply-schema-lock] Refusing to apply a non-canonical schema lock to production.");
+  console.error(`[apply-schema-lock] Remove legacy table declarations first: ${offenders.join(", ")}`);
+  console.error("[apply-schema-lock] Canonical MasseurMatch is directory-only; booking, scheduling, and session-payment tables must not be recreated.");
+  process.exit(1);
 }
 
 async function main() {
@@ -46,6 +71,7 @@ async function main() {
   }
 
   const sql = fs.readFileSync(SCHEMA_PATH, "utf8");
+  assertCanonicalSchemaLock(sql);
   console.log(`[apply-schema-lock] Applying schema lock to project ${ref} (${sql.length} bytes)...`);
 
   const response = await fetch(`https://api.supabase.com/v1/projects/${ref}/database/query`, {
@@ -63,8 +89,6 @@ async function main() {
     process.exit(1);
   }
 
-  // PostgREST caches the schema; without a reload the verifier reads stale
-  // column lists and reports gaps that no longer exist.
   console.log("[apply-schema-lock] Schema lock applied. Reloading PostgREST schema cache...");
   await fetch(`https://api.supabase.com/v1/projects/${ref}/database/query`, {
     method: "POST",
