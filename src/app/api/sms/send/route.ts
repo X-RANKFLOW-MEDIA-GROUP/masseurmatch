@@ -7,7 +7,7 @@ import { sendSms, logSms, upsertFollowUpAlert } from '@/lib/sms/twilio-utils'
 // POST /api/sms/send — manual outbound SMS (admin or operator)
 export async function POST(request: NextRequest) {
   try {
-    const session = await requireAdminSession(request as unknown as Request)
+    await requireAdminSession(request as unknown as Request)
 
     const body = await request.json() as {
       to: string
@@ -20,7 +20,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'to and message are required' }, { status: 400 })
     }
 
-    // Get the from number: from profile or env default
     let fromNumber = body.from_number ?? process.env.TWILIO_PHONE_NUMBER ?? ''
 
     if (body.profile_id && !body.from_number) {
@@ -46,7 +45,6 @@ export async function POST(request: NextRequest) {
       intent: null,
       status: 'sent',
       is_manual: true,
-      booking_inquiry_id: null,
     })
 
     await upsertFollowUpAlert(body.profile_id ?? null, body.to, fromNumber, 'outbound')
