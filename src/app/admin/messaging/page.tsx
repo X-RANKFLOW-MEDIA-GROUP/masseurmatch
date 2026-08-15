@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { createPageMetadata } from "@/app/_lib/seo";
-import AdminMessaging from "./AdminMessaging";
+import MessagingClientShell from "./MessagingClientShell";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Messaging",
@@ -11,5 +11,5 @@ export const metadata: Metadata = createPageMetadata({
 });
 
 export default function AdminMessagingPage() {
-  return <AdminMessaging />;
+  return <MessagingClientShell />;
 }

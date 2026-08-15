@@ -1,32 +1,13 @@
-name: Apply Supabase Migrations
+name: Apply Supabase Migrations Manually
 
-# Applies pending SQL migrations in supabase/migrations/ to the production
-# database, so schema changes merged to main can be rolled out without a
-# laptop (run it from the GitHub mobile app via Actions → this workflow →
-# Run workflow, or let the push trigger handle it on merge).
-#
-# Requirements (Settings → Secrets and variables → Actions):
-#   - Secret   SUPABASE_ACCESS_TOKEN — personal access token
-#              (Supabase → Account → Access Tokens). Already used by the
-#              deploy-supabase-functions workflow.
-#   - Secret   SUPABASE_DB_PASSWORD  — the database password
-#              (Supabase → Project Settings → Database; resettable there).
-#   - Variable SUPABASE_PROJECT_REF  — the production project ref.
-#
-# `supabase db push` only applies migrations missing from the remote
-# supabase_migrations.schema_migrations history, in version order — it is a
-# no-op when everything is already applied.
+# Manual recovery path only. Normal production deploys are orchestrated by
+# deploy-supabase-functions.yml so migrations finish before Edge Functions.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "supabase/migrations/**"
-      - ".github/workflows/apply-supabase-migrations.yml"
   workflow_dispatch: {}
 
 concurrency:
-  group: apply-supabase-migrations
+  group: deploy-supabase-production
   cancel-in-progress: false
 
 jobs:
@@ -40,61 +21,29 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      # The variable has shipped with a trailing space before, which the CLI
-      # rejects as "Invalid project ref format" — strip all whitespace so a
-      # copy-paste artifact can't silently break the migration run.
       - name: Normalize project ref
         run: echo "SUPABASE_PROJECT_REF=$(printf '%s' "$SUPABASE_PROJECT_REF" | tr -d '[:space:]')" >> "$GITHUB_ENV"
 
       - name: Verify required config is present
         run: |
           missing=0
-          if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
-            echo "::error::Secret SUPABASE_ACCESS_TOKEN is not set — add it under Settings → Secrets and variables → Actions."
-            missing=1
-          fi
-          if [ -z "$SUPABASE_DB_PASSWORD" ]; then
-            echo "::error::Secret SUPABASE_DB_PASSWORD is not set — copy it from Supabase → Project Settings → Database (or reset it there) and add it under Settings → Secrets and variables → Actions."
-            missing=1
-          fi
-          if [ -z "$SUPABASE_PROJECT_REF" ]; then
-            echo "::error::Variable SUPABASE_PROJECT_REF is not set — add it under Settings → Secrets and variables → Actions → Variables."
-            missing=1
-          fi
+          for name in SUPABASE_ACCESS_TOKEN SUPABASE_DB_PASSWORD SUPABASE_PROJECT_REF; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is not configured."
+              missing=1
+            fi
+          done
           [ "$missing" -eq 0 ]
 
       - uses: supabase/setup-cli@v1
         with:
           version: latest
 
-      - name: Link project
+      - name: Link production project
         run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
 
-      # One-time baseline reconciliation. The remote history table records
-      # versions that were applied via the Supabase dashboard and have no file
-      # in this repo (db push then aborts with "Remote migration versions not
-      # found in local migrations directory"), while the repo migrations that
-      # predate this workflow were applied by hand and never recorded. Drop the
-      # dashboard-only rows, then record every local migration older than the
-      # baseline as applied — production already contains their schema (the DB
-      # contract check validates the app against PRODUCTION_SCHEMA_LOCK.sql).
-      # Once reconciled these repairs are no-ops, and db push applies only
-      # migrations newer than the baseline.
-      - name: Reconcile migration history
-        run: |
-          BASELINE=20260726000000
-          supabase migration repair --status reverted \
-            20260722203257 20260723071639 20260723152216 20260723175443 \
-            20260723231058 20260724004630 20260724022000 20260725170728 || true
-          applied=""
-          for f in supabase/migrations/*.sql; do
-            v=$(basename "$f" | cut -d_ -f1)
-            case "$v" in *[!0-9]*) continue ;; esac
-            if [ "$v" -lt "$BASELINE" ]; then applied="$applied $v"; fi
-          done
-          if [ -n "$applied" ]; then
-            supabase migration repair --status applied $applied || true
-          fi
+      - name: Verify migration history parity
+        run: supabase migration list
 
       - name: Apply pending migrations
         run: supabase db push --include-all

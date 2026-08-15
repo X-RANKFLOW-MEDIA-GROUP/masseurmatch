@@ -185,7 +185,7 @@ export async function POST(request: Request) {
     const db = createSupabaseAdminClient() as DbClient;
 
     if (body.action === "update_settings") {
-      const patch: Record<string, Json | undefined> = {};
+      const patch: { [key: string]: Json | undefined } = {};
       if (body.globalPause !== undefined) patch.global_pause = body.globalPause;
       if (body.knottyEnabled !== undefined) patch.knotty_enabled = body.knottyEnabled;
       if (Object.keys(patch).length === 0) throw new RouteError(400, "No settings supplied.");
@@ -203,7 +203,7 @@ export async function POST(request: Request) {
     }
 
     if (body.action === "update_contact") {
-      const patch: Record<string, Json | undefined> = {};
+      const patch: { [key: string]: Json | undefined } = {};
       if (body.lifecycleStatus !== undefined) patch.lifecycle_status = body.lifecycleStatus;
       if (body.knottyEnabled !== undefined) patch.knotty_enabled = body.knottyEnabled;
       if (body.optedOut !== undefined) {
@@ -264,6 +264,7 @@ export async function POST(request: Request) {
       .limit(1)
       .maybeSingle();
     if (conversationError) throw new RouteError(500, conversationError.message);
+
     let conversation = existingConversation;
 
     if (!conversation) {

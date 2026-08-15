@@ -12,7 +12,9 @@ create table if not exists public.messaging_settings (
   updated_at timestamptz not null default now()
 );
 
-insert into public.messaging_settings (id) values ('default') on conflict (id) do nothing;
+insert into public.messaging_settings (id)
+values ('default')
+on conflict (id) do nothing;
 
 create table if not exists public.messaging_contacts (
   id uuid primary key default gen_random_uuid(),
@@ -143,7 +145,9 @@ create index if not exists idx_messaging_queue_ready on public.messaging_queue(s
 create index if not exists idx_messaging_queue_contact on public.messaging_queue(contact_id, created_at desc);
 
 create or replace function public.messaging_touch_updated_at()
-returns trigger language plpgsql as $$
+returns trigger
+language plpgsql
+as $$
 begin
   new.updated_at = now();
   return new;
@@ -151,7 +155,9 @@ end;
 $$;
 
 create or replace function public.messaging_contact_optout_guard()
-returns trigger language plpgsql as $$
+returns trigger
+language plpgsql
+as $$
 begin
   if new.opted_out and not coalesce(old.opted_out, false) then
     new.opted_out_at := coalesce(new.opted_out_at, now());
@@ -159,23 +165,33 @@ begin
     new.knotty_enabled := false;
 
     update public.messaging_queue
-      set status = 'cancelled', last_error = coalesce(last_error, 'contact_opted_out'), updated_at = now()
-    where contact_id = new.id and status in ('pending','claimed');
+      set status = 'cancelled',
+          last_error = coalesce(last_error, 'contact_opted_out'),
+          updated_at = now()
+    where contact_id = new.id
+      and status in ('pending','claimed');
 
     update public.messaging_conversations
-      set status = 'opted_out', knotty_enabled = false, updated_at = now()
+      set status = 'opted_out',
+          knotty_enabled = false,
+          updated_at = now()
     where contact_id = new.id;
 
     update public.messaging_campaign_contacts
-      set status = 'opted_out', skip_reason = coalesce(skip_reason, 'contact_opted_out'), updated_at = now()
-    where contact_id = new.id and status in ('pending','queued');
+      set status = 'opted_out',
+          skip_reason = coalesce(skip_reason, 'contact_opted_out'),
+          updated_at = now()
+    where contact_id = new.id
+      and status in ('pending','queued');
   end if;
   return new;
 end;
 $$;
 
 create or replace function public.messaging_message_activity_sync()
-returns trigger language plpgsql as $$
+returns trigger
+language plpgsql
+as $$
 begin
   update public.messaging_conversations
   set last_message_at = new.created_at,
@@ -223,7 +239,10 @@ returns table (
   transport_preference text,
   idempotency_key text
 )
-language plpgsql security definer set search_path = public as $$
+language plpgsql
+security definer
+set search_path = public
+as $$
 declare
   v_id uuid;
 begin
@@ -252,8 +271,11 @@ begin
   end if;
 
   update public.messaging_queue
-  set status = 'claimed', locked_at = now(), locked_by = p_worker_id,
-      attempts = attempts + 1, updated_at = now()
+  set status = 'claimed',
+      locked_at = now(),
+      locked_by = p_worker_id,
+      attempts = attempts + 1,
+      updated_at = now()
   where id = v_id;
 
   return query
@@ -270,23 +292,40 @@ revoke all on function public.messaging_claim_next_queue(text) from public;
 revoke all on function public.messaging_claim_next_queue(text) from anon;
 revoke all on function public.messaging_claim_next_queue(text) from authenticated;
 
-create trigger trg_messaging_settings_updated_at before update on public.messaging_settings
+create trigger trg_messaging_settings_updated_at
+before update on public.messaging_settings
 for each row execute function public.messaging_touch_updated_at();
-create trigger trg_messaging_contacts_updated_at before update on public.messaging_contacts
+
+create trigger trg_messaging_contacts_updated_at
+before update on public.messaging_contacts
 for each row execute function public.messaging_touch_updated_at();
-create trigger trg_messaging_contacts_optout before update of opted_out on public.messaging_contacts
+
+create trigger trg_messaging_contacts_optout
+before update of opted_out on public.messaging_contacts
 for each row execute function public.messaging_contact_optout_guard();
-create trigger trg_messaging_campaigns_updated_at before update on public.messaging_campaigns
+
+create trigger trg_messaging_campaigns_updated_at
+before update on public.messaging_campaigns
 for each row execute function public.messaging_touch_updated_at();
-create trigger trg_messaging_campaign_contacts_updated_at before update on public.messaging_campaign_contacts
+
+create trigger trg_messaging_campaign_contacts_updated_at
+before update on public.messaging_campaign_contacts
 for each row execute function public.messaging_touch_updated_at();
-create trigger trg_messaging_conversations_updated_at before update on public.messaging_conversations
+
+create trigger trg_messaging_conversations_updated_at
+before update on public.messaging_conversations
 for each row execute function public.messaging_touch_updated_at();
-create trigger trg_messaging_messages_updated_at before update on public.messaging_messages
+
+create trigger trg_messaging_messages_updated_at
+before update on public.messaging_messages
 for each row execute function public.messaging_touch_updated_at();
-create trigger trg_messaging_messages_activity after insert on public.messaging_messages
+
+create trigger trg_messaging_messages_activity
+after insert on public.messaging_messages
 for each row execute function public.messaging_message_activity_sync();
-create trigger trg_messaging_queue_updated_at before update on public.messaging_queue
+
+create trigger trg_messaging_queue_updated_at
+before update on public.messaging_queue
 for each row execute function public.messaging_touch_updated_at();
 
 alter table public.messaging_settings enable row level security;
@@ -316,18 +355,18 @@ comment on table public.messaging_contacts is 'Admin-only outreach contacts. Sep
 comment on table public.messaging_messages is 'Channel-neutral message ledger for campaign, Knotty, human, and inbound contact messages.';
 comment on table public.messaging_queue is 'Durable outbound queue consumed by an authorized sender bridge or messaging provider.';
 
-do $$
-begin
-  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'messaging_contacts') then
-    alter publication supabase_realtime add table public.messaging_contacts;
-  end if;
-  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'messaging_conversations') then
-    alter publication supabase_realtime add table public.messaging_conversations;
-  end if;
-  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'messaging_messages') then
-    alter publication supabase_realtime add table public.messaging_messages;
-  end if;
-  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'messaging_queue') then
-    alter publication supabase_realtime add table public.messaging_queue;
-  end if;
-end $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'messaging_contacts') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.messaging_contacts;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'messaging_conversations') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.messaging_conversations;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'messaging_messages') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.messaging_messages;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'messaging_queue') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.messaging_queue;
+  END IF;
+END $$;

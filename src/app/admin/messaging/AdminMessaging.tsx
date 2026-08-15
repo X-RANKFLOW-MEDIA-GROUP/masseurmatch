@@ -74,8 +74,6 @@ type Campaign = {
   created_at: string;
 };
 
-type SummaryCard = [label: string, value: number, icon: LucideIcon];
-
 type Snapshot = {
   ok: boolean;
   settings: {
@@ -185,6 +183,13 @@ export default function AdminMessaging() {
   }
 
   const counts = data?.counts || { contacts: 0, optedOut: 0, pending: 0, failed: 0, openConversations: 0 };
+  const summaryCards: Array<{ label: string; value: number; Icon: LucideIcon }> = [
+    { label: "Contacts", value: counts.contacts, Icon: Users },
+    { label: "Open chats", value: counts.openConversations, Icon: MessageSquare },
+    { label: "Queued", value: counts.pending, Icon: Clock3 },
+    { label: "Failed", value: counts.failed, Icon: AlertCircle },
+    { label: "Opted out", value: counts.optedOut, Icon: ShieldOff },
+  ];
 
   return (
     <div className="space-y-5">
@@ -218,16 +223,10 @@ export default function AdminMessaging() {
       ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        {([
-          ["Contacts", counts.contacts, Users],
-          ["Open chats", counts.openConversations, MessageSquare],
-          ["Queued", counts.pending, Clock3],
-          ["Failed", counts.failed, AlertCircle],
-          ["Opted out", counts.optedOut, ShieldOff],
-        ] satisfies SummaryCard[]).map(([label, value, Icon]) => (
-          <Card key={String(label)}>
+        {summaryCards.map(({ label, value, Icon }) => (
+          <Card key={label}>
             <CardContent className="flex items-center justify-between p-4">
-              <div><p className="text-xs font-medium uppercase tracking-wide text-slate-500">{String(label)}</p><p className="mt-1 text-2xl font-bold">{String(value)}</p></div>
+              <div><p className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</p><p className="mt-1 text-2xl font-bold">{value}</p></div>
               <Icon className="h-5 w-5 text-slate-400" />
             </CardContent>
           </Card>
