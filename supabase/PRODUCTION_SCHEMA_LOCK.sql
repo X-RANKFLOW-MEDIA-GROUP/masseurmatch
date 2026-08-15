@@ -1851,9 +1851,15 @@ create table if not exists public.messaging_contacts (
   last_outbound_at timestamptz,
   last_inbound_at timestamptz,
   last_activity_at timestamptz,
+  source text,
+  metadata jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.messaging_contacts
+  add column if not exists source text,
+  add column if not exists metadata jsonb not null default '{}'::jsonb;
 
 create table if not exists public.messaging_conversations (
   id uuid primary key default gen_random_uuid(),

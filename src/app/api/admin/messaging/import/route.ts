@@ -141,7 +141,7 @@ export async function POST(request: Request) {
       admin.userId,
       "admin_messaging_contacts_imported",
       "messaging_contacts",
-      null,
+      undefined,
       {
         received: body.rows.length,
         inserted,
