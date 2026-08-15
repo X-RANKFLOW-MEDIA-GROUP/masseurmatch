@@ -72,6 +72,13 @@ export function supabaseFromRequest(request: Request) {
 export async function getRequestSession(
   request: Request,
 ): Promise<RequestSession | null> {
+  // An unauthenticated request has nothing for Supabase to verify. Returning
+  // early keeps protected routes correctly at 401 even when a local/test
+  // environment intentionally has no Supabase credentials configured.
+  if (!request.headers.get("cookie")) {
+    return null;
+  }
+
   const supabase = supabaseFromRequest(request);
 
   const {
