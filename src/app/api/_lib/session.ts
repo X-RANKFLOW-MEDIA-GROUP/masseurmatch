@@ -47,6 +47,10 @@ function parseRequestCookies(request: Request): ParsedCookie[] {
     });
 }
 
+function hasSupabaseAuthCookie(cookies: ParsedCookie[]) {
+  return cookies.some(({ name }) => /^sb-[a-z0-9]+-auth-token(?:\.\d+)?$/i.test(name));
+}
+
 /**
  * Builds a read-only, cookie-bound Supabase client from an incoming request.
  */
@@ -72,10 +76,13 @@ export function supabaseFromRequest(request: Request) {
 export async function getRequestSession(
   request: Request,
 ): Promise<RequestSession | null> {
-  // An unauthenticated request has nothing for Supabase to verify. Returning
-  // early keeps protected routes correctly at 401 even when a local/test
-  // environment intentionally has no Supabase credentials configured.
-  if (!request.headers.get("cookie")) {
+  const cookies = parseRequestCookies(request);
+
+  // CSRF, analytics, preference, and other unrelated cookies do not represent
+  // an authenticated Supabase session. Avoid loading external auth config for
+  // requests that cannot possibly authenticate, preserving the correct 401
+  // response in local/test environments and reducing unnecessary auth calls.
+  if (!hasSupabaseAuthCookie(cookies)) {
     return null;
   }
 
