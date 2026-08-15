@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     return json({
       ok: true,
       status: normalizeIdentityStatus(data?.status),
-      provider: data?.provider ?? "manual",
+      provider: data?.provider ?? (data ? "stripe" : "manual"),
       verificationId: data?.id ?? null,
       lastError: data?.last_error ?? null,
       createdAt: data?.created_at ?? null,

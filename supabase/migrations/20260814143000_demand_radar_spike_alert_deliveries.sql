@@ -1,0 +1,4 @@
+-- Historical no-op marker.
+-- This DDL was already applied in production as migration 20260814142947.
+-- Keeping this later version inert prevents duplicate execution while preserving
+-- a deterministic migration sequence for fresh environments.

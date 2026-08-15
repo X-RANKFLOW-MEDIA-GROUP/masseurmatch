@@ -13,13 +13,13 @@ export async function GET(request: Request) {
 
     let query = supabase
       .from("notifications")
-      .select("id, type, title, body, metadata, read_at, created_at")
+      .select("id, type, title, body, metadata, is_read, created_at")
       .eq("user_id", session.userId)
       .order("created_at", { ascending: false })
       .limit(limit);
 
     if (unreadOnly) {
-      query = query.is("read_at", null);
+      query = query.is("is_read", null);
     }
 
     const { data: notifications, error } = await query;
@@ -61,7 +61,7 @@ export async function PATCH(request: Request) {
     // Mark as read
     const { error } = await supabase
       .from("notifications")
-      .update({ read_at: new Date().toISOString() })
+      .update({ is_read: true })
       .eq("id", notificationId);
 
     if (error) throw new RouteError(500, error.message);

@@ -25,7 +25,7 @@ export function VoxGallery({ images, name }: { images: string[]; name: string })
         ? "grid-cols-1 sm:grid-cols-2"
         : "grid-cols-2 sm:grid-cols-3";
 
-  const tileRatio = photos.length === 1 ? "aspect-[4/3]" : "aspect-[4/5] sm:aspect-[4/3]";
+  const tileRatio = photos.length === 1 ? "aspect-[4/3]" : "aspect-square";
 
   return (
     <>
@@ -35,7 +35,7 @@ export function VoxGallery({ images, name }: { images: string[]; name: string })
             key={`${src}-${index}`}
             type="button"
             onClick={() => setActive(index)}
-            className={`group relative overflow-hidden rounded-2xl border border-[#efe3d8] bg-[#f3e9df] ${tileRatio}`}
+            className={`group relative overflow-hidden rounded-2xl border border-[#efe3d8] bg-[#f7f3ef] ${tileRatio}`}
           >
             <Image
               src={src}

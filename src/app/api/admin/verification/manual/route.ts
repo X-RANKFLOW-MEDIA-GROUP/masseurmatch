@@ -39,6 +39,7 @@ export async function GET(request: Request) {
       ok: true,
       verifications: (rows ?? []).map((row) => ({
         ...row,
+        verification_method: row.provider,
         user_name: row.user_id ? profiles.get(row.user_id)?.name ?? null : null,
         user_email: row.user_id ? profiles.get(row.user_id)?.email ?? null : null,
       })),

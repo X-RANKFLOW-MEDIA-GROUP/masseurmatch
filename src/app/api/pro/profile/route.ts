@@ -13,10 +13,6 @@ import type { TablesUpdate } from "@/integrations/supabase/types";
 import { slugify } from "@/components/profile/profile-utils";
 import { buildProfileSlug } from "@/app/_lib/profile-slug";
 
-// Fields that must never be blanked by a profile save. A payload with an
-// empty/null value for one of these (typically an unhydrated client form)
-// keeps the existing database value instead of wiping it. Clearing these
-// intentionally goes through admin tooling, not the self-serve editor.
 const PROTECTED_TEXT_FIELDS = [
   "display_name",
   "full_name",
@@ -48,6 +44,20 @@ function stripDestructiveEmptyFields(updates: Record<string, unknown>) {
     }
   }
   return updates;
+}
+
+function normalizePhone(value: unknown) {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  const digits = trimmed.replace(/\D/g, "");
+  if (digits.length < 10) return null;
+  if (trimmed.startsWith("+")) return `+${digits}`;
+  return digits.length === 10 ? `+1${digits}` : `+${digits}`;
+}
+
+function profileStoredPhone(profile: unknown) {
+  const record = profile as Record<string, unknown>;
+  return normalizePhone(record.phone) || normalizePhone(record.phone_number);
 }
 
 function parseProfilePayload(raw: unknown) {
@@ -135,13 +145,11 @@ export async function GET(request: Request) {
   try {
     const session = await requireRequestSession(request);
     const admin = createSupabaseAdminClient();
-
-    // Check if this is a dashboard request (minimal data needed)
     const isDashboard = new URL(request.url).searchParams.get("dashboard") === "true";
 
     const select = isDashboard
-      ? "id, display_name, full_name, bio, city, state, status, is_active, current_status, available_now, available_now_expires, specialties, incall_price, outcall_price, subscription_tier, is_featured"
-      : "*"; // Full select for other requests
+      ? "id, display_name, full_name, bio, city, state, phone, phone_number, status, is_active, visibility_status, available_now, available_now_expires, specialties, incall_price, outcall_price, subscription_tier, is_featured"
+      : "*";
 
     const { data: profile, error } = await admin
       .from("profiles")
@@ -150,7 +158,6 @@ export async function GET(request: Request) {
       .maybeSingle();
 
     if (error) throw new RouteError(500, error.message);
-
     return json({ ok: true, profile });
   } catch (error) {
     return errorResponse(error);
@@ -163,46 +170,35 @@ export async function POST(request: Request) {
 
     const session = await requireRequestSession(request);
     const profile = await getProfileByUserId(session.userId);
-
-    if (!profile) {
-      throw new RouteError(404, "Profile not found.");
-    }
+    if (!profile) throw new RouteError(404, "Profile not found.");
 
     const rawBody = await request.json().catch(() => {
       throw new RouteError(400, "Invalid JSON request body.");
     });
     const parsed = parseProfilePayload(rawBody);
 
+    const requestedPhone = normalizePhone(parsed.updates.phone);
+    const effectivePhone = requestedPhone || profileStoredPhone(profile);
+    if (!effectivePhone) {
+      throw new RouteError(422, "A valid phone number is required on every provider profile.", "PHONE_REQUIRED");
+    }
+    parsed.updates.phone = effectivePhone;
+    parsed.updates.phone_number = effectivePhone;
+
     const rulesAccepted = rawBody && typeof rawBody === "object" && (rawBody as Record<string, unknown>).rulesAccepted === true;
-
-    // Auto-approve is never granted based on client-supplied flags.
-    // Profile edits maintain current status; admin reviews via audit log.
     const canAutoApprove = false;
-
     const now = new Date().toISOString();
-
-    // Keep profile visible during edits: don't change status to under_review
-    // Admin can review changes through audit log while profile stays public
-    const nextStatus = profile.profile_status;
-
     const statusUpdates: Record<string, unknown> = {
-      profile_status: nextStatus,  // Explicitly maintain current status
+      profile_status: profile.profile_status,
       updated_at: now,
     };
 
-    // Only update additional fields if auto-approve (which never happens in current logic)
     if (canAutoApprove) {
       statusUpdates.approved_at = now;
       statusUpdates.visibility_status = "public";
     }
+    if (rulesAccepted) statusUpdates.terms_accepted_at = now;
 
-    if (rulesAccepted) {
-      statusUpdates.terms_accepted_at = now;
-    }
-
-    // Slug rules: a client-supplied slug wins, an existing slug is never
-    // regenerated (published URLs stay stable), and a profile that still has
-    // no slug gets one derived from its display name, city, and specialty.
     const updates = { ...parsed.updates } as Record<string, unknown>;
     const clientSlug = typeof updates.slug === "string" ? slugify(updates.slug) : "";
     if (clientSlug) {
@@ -214,9 +210,7 @@ export async function POST(request: Request) {
           (typeof updates.display_name === "string" && updates.display_name) ||
           profile.display_name ||
           profile.full_name;
-        const city =
-          (typeof updates.city === "string" && updates.city) ||
-          profile.city;
+        const city = (typeof updates.city === "string" && updates.city) || profile.city;
         const specialty = Array.isArray(updates.specialties)
           ? updates.specialties[0]
           : profile.specialties?.[0];
@@ -266,8 +260,6 @@ export async function POST(request: Request) {
     return errorResponse(error);
   }
 }
-
-// ── Full editor save (every MasseurFinder "Edit Profile" field) ────────────
 
 const hoursEntrySchema = z.object({
   days: z.string().max(40),
@@ -330,12 +322,10 @@ const fullProfileSchema = z.object({
   headline: z.string().max(160).optional().nullable(),
   bio: z.string().max(4000).optional().nullable(),
   tagline: z.string().max(200).optional().nullable(),
-
   city: z.string().max(120).optional().nullable(),
   state: z.string().max(120).optional().nullable(),
   neighborhood: z.string().max(160).optional().nullable(),
   zipCode: z.string().max(12).optional().nullable(),
-
   phone: z.string().max(40).optional().nullable(),
   whatsapp: z.string().max(40).optional().nullable(),
   email: z.string().max(160).optional().nullable(),
@@ -343,12 +333,10 @@ const fullProfileSchema = z.object({
   website: z.string().max(255).optional().nullable(),
   bookingUrl: z.string().max(255).optional().nullable(),
   bookingPlatform: z.string().max(80).optional().nullable(),
-
   offersIncall: z.boolean().optional(),
   offersOutcall: z.boolean().optional(),
   outcallRadius: z.number().int().min(0).max(1000).optional().nullable(),
   mapEnabled: z.boolean().optional(),
-
   massageTechniques: strArr.optional(),
   serviceCategories: strArr.optional(),
   specialties: strArr.optional(),
@@ -363,13 +351,11 @@ const fullProfileSchema = z.object({
   affiliations: strArr.optional(),
   rateDisclaimers: strArr.optional(),
   regularDiscounts: strArr.optional(),
-
   pricingSessions: z.array(pricingSessionSchema).max(40).optional(),
   dayOfWeekDiscount: dayDiscountSchema.optional(),
   educationEntries: z.array(educationEntrySchema).max(40).optional(),
   studioHours: z.array(hoursEntrySchema).max(20).optional(),
   mobileHours: mobileHoursSchema.optional(),
-
   startDate: z
     .string()
     .regex(/^\d{4}-\d{2}(-\d{2})?$/, "Expected YYYY-MM or YYYY-MM-DD")
@@ -379,12 +365,17 @@ const fullProfileSchema = z.object({
   heightInches: z.number().int().min(36).max(96).optional().nullable(),
   weightLb: z.number().int().min(60).max(600).optional().nullable(),
   bodyType: z.string().max(50).optional().nullable(),
-
   availableNow: z.boolean().optional(),
   availableNowExpires: z.string().max(40).optional().nullable(),
   currentStatus: z.string().max(60).optional().nullable(),
   lgbtqAffirming: z.boolean().optional(),
 });
+
+function normalizeStartDate(value: string | null | undefined) {
+  if (!value) return null;
+  const date = /^\d{4}-\d{2}$/.test(value) ? `${value}-01` : value;
+  return `${date}T00:00:00.000Z`;
+}
 
 export async function PATCH(request: Request) {
   try {
@@ -392,44 +383,41 @@ export async function PATCH(request: Request) {
 
     const session = await requireRequestSession(request);
     const profile = await getProfileByUserId(session.userId);
-    if (!profile) {
-      throw new RouteError(404, "Profile not found.");
-    }
+    if (!profile) throw new RouteError(404, "Profile not found.");
 
     const body = await parseJsonBody(request, fullProfileSchema);
-
-    const updates: TablesUpdate<"profiles"> = {};
+    const updates: Record<string, unknown> = {};
     const text = (v: string | null | undefined) => (v && v.trim() ? v.trim() : null);
+
+    const effectivePhone = normalizePhone(body.phone) || profileStoredPhone(profile);
+    if (!effectivePhone) {
+      throw new RouteError(422, "A valid phone number is required on every provider profile.", "PHONE_REQUIRED");
+    }
 
     if (body.displayName !== undefined) {
       updates.display_name = body.displayName.trim();
       updates.full_name = body.displayName.trim();
     }
     if (body.headline !== undefined) updates.headline = text(body.headline);
-    // bio/city/state are load-bearing (routing, SEO, listing eligibility) —
-    // a blank value in the payload means "unset field in the form", never
-    // "erase what's in the database", so only non-empty values are applied.
     if (text(body.bio)) updates.bio = text(body.bio);
     if (body.tagline !== undefined) updates.tagline = text(body.tagline);
-
     if (text(body.city)) updates.city = text(body.city);
     if (text(body.state)) updates.state = text(body.state);
     if (body.neighborhood !== undefined) updates.neighborhood = text(body.neighborhood);
     if (body.zipCode !== undefined) updates.zip_code = text(body.zipCode);
 
-    if (body.phone !== undefined) updates.phone = text(body.phone);
+    updates.phone = effectivePhone;
+    updates.phone_number = effectivePhone;
     if (body.whatsapp !== undefined) updates.whatsapp_number = text(body.whatsapp);
     if (body.email !== undefined) updates.email_address = text(body.email);
     if (body.showEmail !== undefined) updates.show_email = body.showEmail;
     if (body.website !== undefined) updates.website = text(body.website);
     if (body.bookingUrl !== undefined) updates.booking_url = text(body.bookingUrl);
     if (body.bookingPlatform !== undefined) updates.booking_platform = text(body.bookingPlatform);
-
     if (body.offersIncall !== undefined) updates.offers_incall = body.offersIncall;
     if (body.offersOutcall !== undefined) updates.offers_outcall = body.offersOutcall;
     if (body.outcallRadius !== undefined) updates.outcall_radius = body.outcallRadius;
     if (body.mapEnabled !== undefined) updates.map_enabled = body.mapEnabled;
-
     if (body.massageTechniques !== undefined) updates.massage_techniques = body.massageTechniques;
     if (body.serviceCategories !== undefined) updates.service_categories = body.serviceCategories;
     if (body.specialties !== undefined) updates.specialties = body.specialties;
@@ -455,33 +443,23 @@ export async function PATCH(request: Request) {
     if (body.educationEntries !== undefined) updates.education_entries = body.educationEntries;
     if (body.studioHours !== undefined) updates.studio_hours = body.studioHours;
     if (body.mobileHours !== undefined) updates.mobile_hours = body.mobileHours;
-
-    if (body.startDate !== undefined) {
-      // start_date is timestamptz; pad month-only values so Postgres accepts them
-      const startDate = text(body.startDate);
-      updates.start_date =
-        startDate && /^\d{4}-\d{2}$/.test(startDate) ? `${startDate}-01` : startDate;
-    }
+    if (body.startDate !== undefined) updates.start_date = normalizeStartDate(body.startDate);
     if (body.yearsExperience !== undefined) updates.years_experience = body.yearsExperience;
     if (body.heightInches !== undefined) updates.height_inches = body.heightInches;
     if (body.weightLb !== undefined) updates.weight_lb = body.weightLb;
     if (body.bodyType !== undefined) updates.body_type = text(body.bodyType);
-
-    // available_now / available_now_expires are intentionally NOT writable here.
-    // The paid "Available Now" badge is gated by tier + TTL in
-    // /api/pro/available-now; accepting it on the general profile PATCH let any
-    // user (including Free) grant themselves the badge with no expiry.
     if (body.currentStatus !== undefined) updates.current_status = text(body.currentStatus);
     if (body.lgbtqAffirming !== undefined) updates.lgbtq_affirming = body.lgbtqAffirming;
 
-    updates.profile_status =
-      profile.profile_status === "approved" ? "under_review" : profile.profile_status;
+    // Self-service edits are audited but do not demote an already approved
+    // profile. This keeps rate and profile edits live without an admin round trip.
+    updates.profile_status = profile.profile_status;
     updates.updated_at = new Date().toISOString();
 
     const adminClient = createSupabaseAdminClient();
     const { data: nextProfile, error } = await adminClient
       .from("profiles")
-      .update(updates)
+      .update(updates as TablesUpdate<"profiles">)
       .eq("user_id", session.userId)
       .select("*")
       .maybeSingle();
@@ -490,6 +468,7 @@ export async function PATCH(request: Request) {
 
     await recordAuditLog(session.userId, "provider.profile.update", "profile", profile.id, {
       fields: Object.keys(updates),
+      keptCurrentApproval: profile.profile_status === "approved",
     });
 
     await import("@/app/_lib/revalidate")

@@ -85,7 +85,10 @@ export async function GET(request: Request) {
 
     return json({
       ok: true,
-      identity: (identityRows ?? []).map(enrich),
+      identity: (identityRows ?? []).map((row) => enrich({
+        ...row,
+        verification_method: row.provider,
+      })),
       text: (textRows ?? []).map(enrich),
     });
   } catch (error) {

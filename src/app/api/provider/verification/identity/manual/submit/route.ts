@@ -72,7 +72,7 @@ export async function POST(request: Request) {
 
     const { error: updateError } = await admin
       .from("identity_verifications")
-      .update({ provider: "manual", status: "pending", last_error: null, metadata: metadata as Json, updated_at: submittedAt })
+      .update({ status: "pending", last_error: null, metadata: metadata as Json, updated_at: submittedAt })
       .eq("id", verificationId)
       .eq("user_id", session.userId);
 

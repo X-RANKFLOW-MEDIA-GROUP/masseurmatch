@@ -2,7 +2,7 @@ import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, requireSession } from "@/app/api/_lib/supabase-server";
 
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 
 export async function POST(request: Request) {
   try {
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     if (!profile) throw new RouteError(404, "Profile not found.");
 
     const ext = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
-    const fileName = `${session.userId}/${Date.now()}.${ext}`;
+    const fileName = `${session.userId}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
     const bucket = "therapist-photos";
 
     const arrayBuffer = await file.arrayBuffer();
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
       .insert({
         profile_id: profile.id,
         user_id: session.userId,
-        storage_path: fileName,
+        storage_path: publicUrl,
         url: publicUrl,
         is_primary: isPrimary,
         sort_order: sortOrder,
@@ -90,6 +90,7 @@ export async function POST(request: Request) {
     const snapshot = {
       photoId: photoRow.id,
       imageUrl: publicUrl,
+      storageObjectKey: fileName,
       isPrimary,
       sortOrder,
       displayName: profile.display_name || profile.full_name || null,
@@ -107,7 +108,7 @@ export async function POST(request: Request) {
         source: "pro_photos",
         field_name: null,
         status: "pending",
-        priority: "normal",
+        priority: 0,
         moderation_provider: "sightengine",
         moderation_reason: "queued_for_ai_review",
         snapshot,

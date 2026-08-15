@@ -159,6 +159,7 @@ export async function POST(request: NextRequest) {
       .from('contact_inquiries')
       .insert([
         {
+          therapist_id: profile.id,
           profile_id: profile.id,
           client_name: clientName,
           client_email: clientEmail,

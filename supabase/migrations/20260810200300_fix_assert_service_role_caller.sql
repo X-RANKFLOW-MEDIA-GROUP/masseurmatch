@@ -1,0 +1,5 @@
+-- Historical migration marker.
+-- The original body replaced the service-role assertion with a no-op. Production
+-- now contains the secure implementation from
+-- 20260814143136_repair_identity_referrals_and_demand_score_constraints.sql.
+-- Intentionally no-op so new environments never weaken that authorization guard.
