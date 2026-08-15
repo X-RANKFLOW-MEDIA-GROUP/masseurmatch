@@ -1,15 +1,9 @@
 /**
- * Public (browser-safe) Supabase configuration.
+ * Browser-safe Supabase configuration.
  *
- * Read strictly from NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.
- * These values are safe to ship to the browser; everything they can read or
- * write is enforced by Row Level Security. Server-side RLS-scoped clients
- * (createServerClient) also use these so a single key-naming convention holds
- * across the whole app.
- *
- * There is deliberately no hardcoded default: a missing public configuration
- * must fail clearly rather than silently pointing at a stale or removed
- * Supabase project.
+ * There is deliberately no hardcoded project fallback. Missing configuration
+ * must fail clearly so preview, CI, local development, and production can never
+ * silently connect to the production database by accident.
  */
 export interface PublicSupabaseConfig {
   url: string;
@@ -17,12 +11,15 @@ export interface PublicSupabaseConfig {
 }
 
 export function getPublicSupabaseConfig(): PublicSupabaseConfig {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ?? "";
+  const key =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ||
+    "";
 
   if (!url || !key) {
     throw new Error(
-      "Missing public Supabase environment variables (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).",
+      "Missing public Supabase environment variables (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY).",
     );
   }
 

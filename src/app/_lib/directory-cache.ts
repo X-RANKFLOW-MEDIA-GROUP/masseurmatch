@@ -1,6 +1,20 @@
 import "server-only";
 
 import { revalidateTag } from "next/cache";
+import { FALLBACK_PUBLIC_THERAPISTS } from "@/app/_lib/directory-fallback";
+
+/**
+ * Synthetic fallback therapists are development fixtures, never production
+ * data. Production must surface a real empty/error state when the database is
+ * unavailable instead of silently publishing invented provider profiles.
+ *
+ * directory.ts imports this module alongside directory-fallback, so clearing
+ * the shared array here applies to every fallback path without changing test
+ * fixtures. Tests/dev can still opt into fixture behavior outside production.
+ */
+if (process.env.NODE_ENV === "production") {
+  FALLBACK_PUBLIC_THERAPISTS.length = 0;
+}
 
 /**
  * Cache tag for the public directory reads (getPublicTherapists — homepage,

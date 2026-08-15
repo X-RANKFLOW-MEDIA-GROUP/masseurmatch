@@ -1772,3 +1772,202 @@ create index if not exists demand_radar_spike_alert_deliveries_run_idx
   on public.demand_radar_spike_alert_deliveries(run_id, created_at desc);
 
 alter table public.demand_radar_spike_alert_deliveries enable row level security;
+
+-- Deterministic daily snapshots produced by the AI Profile Coach. This table
+-- previously existed only in migration history, which left it outside the
+-- production schema contract validated by CI.
+create table if not exists public.ai_profile_coach_daily_snapshots (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid not null references public.profiles(id) on delete cascade,
+  snapshot_date date not null default current_date,
+  profile_score integer not null default 0 check (profile_score between 0 and 100),
+  previous_profile_score integer check (previous_profile_score between 0 and 100),
+  score_change integer not null default 0,
+  visibility_score integer not null default 0 check (visibility_score between 0 and 100),
+  trust_score integer not null default 0 check (trust_score between 0 and 100),
+  content_score integer not null default 0 check (content_score between 0 and 100),
+  conversion_score integer not null default 0 check (conversion_score between 0 and 100),
+  profile_views_1d integer not null default 0,
+  profile_views_7d integer not null default 0,
+  profile_views_30d integer not null default 0,
+  profile_views_change_pct numeric(8,2),
+  contact_clicks_1d integer not null default 0,
+  contact_clicks_7d integer not null default 0,
+  contact_clicks_30d integer not null default 0,
+  contact_rate_pct numeric(8,2),
+  favorites_7d integer not null default 0,
+  inquiries_7d integer not null default 0,
+  average_search_position numeric(8,2),
+  local_demand_score integer,
+  local_demand_trend text,
+  strongest_keyword text,
+  weakest_section text,
+  top_recommendation_key text,
+  top_recommendation_title text,
+  top_recommendation_reason text,
+  top_recommendation_action text,
+  top_recommendation_impact text check (top_recommendation_impact in ('high','medium','low')),
+  recommended_headline text,
+  missing_fields jsonb not null default '[]'::jsonb,
+  completed_fields jsonb not null default '[]'::jsonb,
+  trust_signals jsonb not null default '{}'::jsonb,
+  photo_analysis jsonb not null default '{}'::jsonb,
+  content_analysis jsonb not null default '{}'::jsonb,
+  market_analysis jsonb not null default '{}'::jsonb,
+  recommendation_list jsonb not null default '[]'::jsonb,
+  trial_status text,
+  trial_day integer,
+  trial_days_remaining integer,
+  subscription_tier text,
+  email_subject text,
+  email_preheader text,
+  email_payload jsonb not null default '{}'::jsonb,
+  generated_at timestamptz not null default now(),
+  created_at timestamptz not null default now(),
+  unique(profile_id, snapshot_date)
+);
+
+create index if not exists ai_profile_coach_daily_snapshots_profile_date_idx
+  on public.ai_profile_coach_daily_snapshots(profile_id, snapshot_date desc);
+
+alter table public.ai_profile_coach_daily_snapshots enable row level security;
+
+-- Admin messaging control plane. All access is server-side through the
+-- service-role client; RLS keeps these records unavailable to public clients.
+create table if not exists public.messaging_settings (
+  id text primary key default 'default',
+  receiving_number text not null default '',
+  transport_mode text not null default 'automatic',
+  knotty_enabled boolean not null default true,
+  global_pause boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+insert into public.messaging_settings (id)
+values ('default')
+on conflict (id) do nothing;
+
+create table if not exists public.messaging_contacts (
+  id uuid primary key default gen_random_uuid(),
+  phone_e164 text not null unique,
+  name text,
+  city text,
+  state text,
+  timezone text,
+  profile_url text,
+  lifecycle_status text not null default 'new',
+  knotty_enabled boolean not null default true,
+  opted_out boolean not null default false,
+  opted_out_at timestamptz,
+  opted_out_reason text,
+  last_outbound_at timestamptz,
+  last_inbound_at timestamptz,
+  last_activity_at timestamptz,
+  source text,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.messaging_contacts
+  add column if not exists source text,
+  add column if not exists metadata jsonb not null default '{}'::jsonb;
+
+create table if not exists public.messaging_conversations (
+  id uuid primary key default gen_random_uuid(),
+  contact_id uuid not null references public.messaging_contacts(id) on delete cascade,
+  receiving_number text not null,
+  status text not null default 'open',
+  knotty_enabled boolean not null default true,
+  current_channel text not null default 'unknown',
+  unread_count integer not null default 0,
+  last_message_at timestamptz,
+  last_inbound_at timestamptz,
+  last_outbound_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.messaging_campaigns (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  status text not null default 'draft',
+  transport_preference text not null default 'automatic',
+  started_at timestamptz,
+  completed_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.messaging_messages (
+  id uuid primary key default gen_random_uuid(),
+  conversation_id uuid not null references public.messaging_conversations(id) on delete cascade,
+  contact_id uuid not null references public.messaging_contacts(id) on delete cascade,
+  campaign_id uuid references public.messaging_campaigns(id) on delete set null,
+  direction text not null,
+  sender_type text not null,
+  body text not null,
+  channel text not null default 'unknown',
+  delivery_status text not null default 'queued',
+  external_id text,
+  idempotency_key text unique,
+  sent_at timestamptz,
+  delivered_at timestamptz,
+  received_at timestamptz,
+  failed_at timestamptz,
+  error_code text,
+  error_message text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.messaging_queue (
+  id uuid primary key default gen_random_uuid(),
+  campaign_id uuid references public.messaging_campaigns(id) on delete set null,
+  contact_id uuid not null references public.messaging_contacts(id) on delete cascade,
+  conversation_id uuid not null references public.messaging_conversations(id) on delete cascade,
+  message_id uuid not null references public.messaging_messages(id) on delete cascade,
+  body text not null,
+  transport_preference text not null default 'automatic',
+  status text not null default 'pending',
+  scheduled_for timestamptz not null default now(),
+  priority integer not null default 0,
+  attempts integer not null default 0,
+  max_attempts integer not null default 3,
+  locked_at timestamptz,
+  locked_by text,
+  last_error text,
+  sent_at timestamptz,
+  delivered_at timestamptz,
+  failed_at timestamptz,
+  idempotency_key text unique,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists messaging_contacts_activity_idx
+  on public.messaging_contacts(last_activity_at desc, created_at desc);
+
+create index if not exists messaging_conversations_contact_status_idx
+  on public.messaging_conversations(contact_id, receiving_number, status, created_at desc);
+
+create index if not exists messaging_messages_conversation_idx
+  on public.messaging_messages(conversation_id, created_at);
+
+create index if not exists messaging_queue_status_schedule_idx
+  on public.messaging_queue(status, scheduled_for, priority desc);
+
+alter table public.messaging_settings enable row level security;
+alter table public.messaging_contacts enable row level security;
+alter table public.messaging_conversations enable row level security;
+alter table public.messaging_campaigns enable row level security;
+alter table public.messaging_messages enable row level security;
+alter table public.messaging_queue enable row level security;
+
+grant all on public.ai_profile_coach_daily_snapshots to service_role;
+grant all on public.messaging_settings to service_role;
+grant all on public.messaging_contacts to service_role;
+grant all on public.messaging_conversations to service_role;
+grant all on public.messaging_campaigns to service_role;
+grant all on public.messaging_messages to service_role;
+grant all on public.messaging_queue to service_role;

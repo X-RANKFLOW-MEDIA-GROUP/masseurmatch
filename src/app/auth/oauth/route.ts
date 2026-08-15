@@ -29,11 +29,11 @@ export async function GET(request: NextRequest) {
   }
 
   // PKCE's verifier cookie must be created and consumed on the same host.
-  // Supabase falls back to the configured Site URL when a preview/deployment
-  // hostname is not allow-listed, which previously moved the callback to www
-  // and caused `bad_code_verifier`. Start production OAuth only on the
-  // canonical host so the verifier and callback always share one cookie jar.
-  if (process.env.NODE_ENV === "production" && !isLocalHost(requestUrl.hostname) && requestUrl.origin !== CANONICAL_ORIGIN) {
+  if (
+    process.env.NODE_ENV === "production" &&
+    !isLocalHost(requestUrl.hostname) &&
+    requestUrl.origin !== CANONICAL_ORIGIN
+  ) {
     const canonicalStart = new URL("/auth/oauth", CANONICAL_ORIGIN);
     canonicalStart.searchParams.set("provider", provider);
     canonicalStart.searchParams.set("next", next);

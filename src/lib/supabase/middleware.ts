@@ -24,10 +24,6 @@ function normalizeRole(value: unknown): AppRole {
 /**
  * Refreshes the Supabase auth session at the edge and returns the verified
  * user alongside a response carrying any rotated auth cookies.
- *
- * The role is read from `app_metadata` (server-writable only, so it is safe to
- * trust for routing) which the auth API routes keep in sync with the
- * `user_roles` table.
  */
 export async function updateSession(request: NextRequest): Promise<{
   response: NextResponse;

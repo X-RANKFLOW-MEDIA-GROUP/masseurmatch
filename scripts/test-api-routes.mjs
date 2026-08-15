@@ -13,9 +13,6 @@ const nextCommand =
   process.platform === "win32"
     ? path.join(process.cwd(), "node_modules", ".bin", "next.cmd")
     : path.join(process.cwd(), "node_modules", ".bin", "next");
-// This project ships a custom `webpack` config (see next.config.mjs).
-// Next.js 15+ no longer supports the --webpack CLI flag; the webpack function
-// in the config is used automatically by default.
 const nextArgs = ["dev", "-p", port, "--hostname", "127.0.0.1"];
 const serverCommand =
   process.platform === "win32" ? "powershell.exe" : nextCommand;
@@ -156,11 +153,6 @@ async function stopServer(child) {
   });
 }
 
-// Remove stale production pages dir before spawning the dev server.
-// A previous `pnpm build` writes pages/_document.js as a CJS bundle; when
-// `next dev` then starts it tries to load that file via require(), which fails
-// in an ESM project. Deleting the directory forces Next to regenerate it in
-// dev mode with the correct module format.
 rmSync(path.join(process.cwd(), ".next", "server", "pages"), { recursive: true, force: true });
 
 const server = spawn(serverCommand, serverArgs, {
@@ -171,6 +163,7 @@ const server = spawn(serverCommand, serverArgs, {
     NEXT_PUBLIC_SUPABASE_URL: testSupabaseUrl,
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: testSupabasePublishableKey,
     RESEND_API_KEY: "",
+    ALLOW_EMAIL_MOCKS: "true",
   },
   stdio: ["ignore", "pipe", "pipe"],
 });
@@ -219,7 +212,7 @@ try {
     assert.equal(response.status, 200);
     ensure(json?.ok === true, "Contact should return ok=true.");
     ensure(json?.to === "support@masseurmatch.com", "Contact should target support inbox.");
-    ensure(json?.mock === true, "Contact should use mock delivery when RESEND_API_KEY is blank.");
+    ensure(json?.mock === true, "Contact should use explicit non-production mock delivery in smoke tests.");
     checks.push("contact");
   }
 

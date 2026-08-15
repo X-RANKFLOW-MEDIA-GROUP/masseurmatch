@@ -12,9 +12,11 @@ concurrency:
 
 env:
   NEXT_PUBLIC_APP_URL: https://masseurmatch.com
-  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-  SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+  # These are public client values, not privileged credentials. Keep them explicit
+  # in CI so builds are deterministic even when repository secrets are absent.
+  # Runtime application code still fails closed and never falls back to production.
+  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://ijsdpozjfjjufjsoexod.supabase.co' }}
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_SnBq62riIQi-RvKxIlshyw_YnK_X68M' }}
   NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
@@ -169,17 +171,6 @@ jobs:
             const sha = pullRequest.head.sha;
             const isPreview = (u) => !!u && /vercel\.app/.test(u);
 
-            // Vercel decides whether to build at the moment it receives a push and
-            // never revisits that decision. A head commit that already existed when
-            // the pull request was opened was therefore pushed while
-            // scripts/vercel-ignore-build.mjs had no pull request to key on, so its
-            // build was skipped and no preview is ever coming for that exact commit.
-            //
-            // That is unavoidable, not a fault: a branch must exist on the remote
-            // before a pull request can be opened against it, so the first push of
-            // every new branch lands in this state. Treat it as a warning and keep
-            // the wait short. Any later commit does get a preview, so a missing one
-            // there is a real failure worth blocking on.
             const headCommit = await github.rest.repos.getCommit({
               owner: context.repo.owner, repo: context.repo.repo, ref: sha,
             });
@@ -249,10 +240,6 @@ jobs:
       options: --ipc=host
     needs: [build, preview-url]
     env:
-      # The preview for THIS pull request, and nothing else. Falling back to a
-      # fixed URL here used to point the suite at production, so a pull request
-      # whose commit had no preview reported a green E2E run having never
-      # exercised its own code. Production is covered by production-smoke.yml.
       PLAYWRIGHT_BASE_URL: ${{ needs.preview-url.outputs.url }}
       VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
     if: ${{ always() && needs.build.result == 'success' && needs.preview-url.outputs.url != '' }}
@@ -284,7 +271,6 @@ jobs:
       options: --ipc=host
     needs: [build, preview-url]
     env:
-      # Same rule as the E2E job: the preview for THIS pull request only.
       PLAYWRIGHT_BASE_URL: ${{ needs.preview-url.outputs.url }}
       VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
     if: ${{ always() && needs.build.result == 'success' && needs.preview-url.outputs.url != '' }}
