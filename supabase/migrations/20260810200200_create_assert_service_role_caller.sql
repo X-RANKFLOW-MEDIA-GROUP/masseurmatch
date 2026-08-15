@@ -1,0 +1,5 @@
+-- Historical migration marker.
+-- The original implementation was never recorded in production and is superseded by
+-- 20260814143136_repair_identity_referrals_and_demand_score_constraints.sql.
+-- Intentionally no-op so migration parity can be restored without weakening the
+-- production service-role authorization guard.

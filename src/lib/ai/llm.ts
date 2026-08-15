@@ -4,6 +4,7 @@ import {
   HarmCategory,
 } from "@google/generative-ai";
 import { envAny } from "@/app/api/_lib/env";
+import { getKnottyWebsiteKnowledge } from "@/lib/knotty/website-knowledge";
 
 /**
  * Shared text-completion helper for MasseurMatch's AI features (Knotty, the
@@ -32,6 +33,21 @@ export type CompleteOptions = {
 
 export function hasAnyLlmKey(): boolean {
   return Boolean(envAny(["OPENAI_API_KEY", "DEEPSEEK_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY"], ""));
+}
+
+function enrichKnottySystemPrompt(system: string): string {
+  const isKnottyPrompt = /\bknotty\b/i.test(system) && /\bmasseurmatch\b/i.test(system);
+  if (!isKnottyPrompt) return system;
+
+  return `${system}\n\n${getKnottyWebsiteKnowledge()}`;
+}
+
+function enrichKnottyChatMessages(messages: ChatMessage[]): ChatMessage[] {
+  return messages.map((message) =>
+    message.role === "system"
+      ? { ...message, content: enrichKnottySystemPrompt(message.content) }
+      : message,
+  );
 }
 
 async function tryOpenAI(apiKey: string, o: CompleteOptions): Promise<string | null> {
@@ -229,10 +245,12 @@ export async function chatMessages(
   messages: ChatMessage[],
   o: { temperature?: number; maxTokens?: number; timeoutMs?: number } = {},
 ): Promise<LlmResult> {
+  const enrichedMessages = enrichKnottyChatMessages(messages);
+
   const deepseekKey = envAny(["DEEPSEEK_API_KEY"], "");
   if (deepseekKey) {
     try {
-      const text = await tryDeepSeekChat(deepseekKey, messages, o);
+      const text = await tryDeepSeekChat(deepseekKey, enrichedMessages, o);
       if (text) return { text, provider: "deepseek", model: DEEPSEEK_MODEL };
     } catch {
       // fall through
@@ -242,7 +260,7 @@ export async function chatMessages(
   const openaiKey = envAny(["OPENAI_API_KEY"], "");
   if (openaiKey) {
     try {
-      const text = await tryOpenAIChat(openaiKey, messages, o);
+      const text = await tryOpenAIChat(openaiKey, enrichedMessages, o);
       if (text) return { text, provider: "openai", model: OPENAI_MODEL };
     } catch {
       // fall through
@@ -252,7 +270,7 @@ export async function chatMessages(
   const geminiKey = envAny(["GEMINI_API_KEY", "GOOGLE_API_KEY"], "");
   if (geminiKey) {
     try {
-      const text = await tryGeminiChat(geminiKey, messages, o);
+      const text = await tryGeminiChat(geminiKey, enrichedMessages, o);
       if (text) return { text, provider: "gemini", model: GEMINI_MODEL };
     } catch {
       // fall through
@@ -266,10 +284,15 @@ export async function chatMessages(
 
 /** Complete a prompt. Provider order: DeepSeek → OpenAI → Gemini. */
 export async function completeText(o: CompleteOptions): Promise<LlmResult> {
+  const enrichedOptions = {
+    ...o,
+    system: enrichKnottySystemPrompt(o.system),
+  };
+
   const deepseekKey = envAny(["DEEPSEEK_API_KEY"], "");
   if (deepseekKey) {
     try {
-      const text = await tryDeepSeek(deepseekKey, o);
+      const text = await tryDeepSeek(deepseekKey, enrichedOptions);
       if (text) return { text, provider: "deepseek", model: DEEPSEEK_MODEL };
     } catch {
       // fall through
@@ -279,7 +302,7 @@ export async function completeText(o: CompleteOptions): Promise<LlmResult> {
   const openaiKey = envAny(["OPENAI_API_KEY"], "");
   if (openaiKey) {
     try {
-      const text = await tryOpenAI(openaiKey, o);
+      const text = await tryOpenAI(openaiKey, enrichedOptions);
       if (text) return { text, provider: "openai", model: OPENAI_MODEL };
     } catch {
       // fall through
@@ -289,7 +312,7 @@ export async function completeText(o: CompleteOptions): Promise<LlmResult> {
   const geminiKey = envAny(["GEMINI_API_KEY", "GOOGLE_API_KEY"], "");
   if (geminiKey) {
     try {
-      const text = await tryGemini(geminiKey, o);
+      const text = await tryGemini(geminiKey, enrichedOptions);
       if (text) return { text, provider: "gemini", model: GEMINI_MODEL };
     } catch {
       // fall through — caller uses its own fallback

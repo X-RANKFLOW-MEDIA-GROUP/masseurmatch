@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { LocateFixed } from "lucide-react";
 import { IconMapPin } from "@/components/icons";
@@ -14,6 +15,8 @@ import { formatCityLabel } from "@/data/cities";
 type GeoAreaCalloutProps = {
   className?: string;
   navigateToSearch?: boolean;
+  navigateToCity?: boolean;
+  autoNavigateToCity?: boolean;
   onResolved?: (city: CityData) => void;
   source?: string;
   tone?: "default" | "inverse";
@@ -23,6 +26,8 @@ type GeoAreaCalloutProps = {
 export function GeoAreaCallout({
   className,
   navigateToSearch = false,
+  navigateToCity = false,
+  autoNavigateToCity = false,
   onResolved,
   source = "geolocation",
   tone = "default",
@@ -33,6 +38,12 @@ export function GeoAreaCallout({
 
   const isInverse = tone === "inverse";
   const cityLabel = city ? `${formatCityLabel(city.name, city.stateCode)}` : null;
+
+  useEffect(() => {
+    if (city && navigateToCity && autoNavigateToCity) {
+      router.replace(`/${city.slug}`);
+    }
+  }, [autoNavigateToCity, city, navigateToCity, router]);
 
   const message = cityLabel
     ? `Location ready: ${cityLabel}.`
@@ -50,6 +61,11 @@ export function GeoAreaCallout({
     }
 
     onResolved?.(resolvedCity);
+
+    if (navigateToCity) {
+      router.push(`/${resolvedCity.slug}`);
+      return;
+    }
 
     if (navigateToSearch) {
       router.push(

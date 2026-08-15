@@ -71,6 +71,7 @@ export function AuthForms({
   const { toast } = useToast();
   const { signIn, signUp } = useAuth();
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -117,7 +118,7 @@ export function AuthForms({
 
     const result = isLogin
       ? await signIn(email.trim(), password)
-      : await signUp(email.trim(), password, fullName.trim());
+      : await signUp(email.trim(), password, fullName.trim(), phone.trim());
 
     setLoading(false);
 
@@ -243,16 +244,31 @@ export function AuthForms({
         )}
         <form onSubmit={onSubmit} className="space-y-3">
           {!isLogin ? (
-            <AppInput
-              aria-label="Full name"
-              placeholder="Full name"
-              value={fullName}
-              onChange={(event) => setFullName(event.target.value)}
-              minLength={2}
-              maxLength={120}
-              required
-              disabled={loading}
-            />
+            <>
+              <AppInput
+                aria-label="Full name"
+                placeholder="Full name"
+                value={fullName}
+                onChange={(event) => setFullName(event.target.value)}
+                minLength={2}
+                maxLength={120}
+                autoComplete="name"
+                required
+                disabled={loading}
+              />
+              <AppInput
+                type="tel"
+                inputMode="tel"
+                aria-label="Phone number"
+                placeholder="Phone number"
+                value={phone}
+                onChange={(event) => setPhone(event.target.value)}
+                autoComplete="tel"
+                maxLength={40}
+                required
+                disabled={loading}
+              />
+            </>
           ) : null}
           <AppInput
             type="email"

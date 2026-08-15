@@ -4,23 +4,39 @@ import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 
 const WINDOW_DAYS = 30;
 
-function dayKey(iso: string) {
-  return iso.slice(0, 10);
-}
+type AnalyticsRpcResult = {
+  series?: Array<{ date?: string; views?: number }>;
+  windowViews?: number;
+  windowUniqueVisitors?: number;
+  allTimeViews?: number;
+};
 
-function emptySeries(since: Date) {
-  return Array.from({ length: WINDOW_DAYS }, (_, index) => ({
-    date: dayKey(new Date(since.getTime() + index * 86_400_000).toISOString()),
-    visitors: 0,
-  }));
+type RpcClient = ReturnType<typeof createSupabaseAdminClient> & {
+  rpc: (
+    name: string,
+    params?: Record<string, unknown>,
+  ) => Promise<{ data: unknown; error: { message: string } | null }>;
+};
+
+function emptySeries() {
+  const since = new Date(Date.now() - WINDOW_DAYS * 86_400_000);
+  const firstDay = new Date(since);
+  firstDay.setUTCHours(0, 0, 0, 0);
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+
+  const points: Array<{ date: string; visitors: number }> = [];
+  for (let cursor = firstDay.getTime(); cursor <= today.getTime(); cursor += 86_400_000) {
+    points.push({ date: new Date(cursor).toISOString().slice(0, 10), visitors: 0 });
+  }
+  return points;
 }
 
 export async function GET(request: Request) {
   try {
     const session = await requireRequestSession(request);
-    const admin = createSupabaseAdminClient();
-    const since = new Date(Date.now() - (WINDOW_DAYS - 1) * 86_400_000);
-    since.setUTCHours(0, 0, 0, 0);
+    const admin = createSupabaseAdminClient() as RpcClient;
+    const since = new Date(Date.now() - WINDOW_DAYS * 86_400_000).toISOString();
 
     const { data: profile, error: profileError } = await admin
       .from("profiles")
@@ -35,7 +51,7 @@ export async function GET(request: Request) {
         ok: true,
         windowDays: WINDOW_DAYS,
         isLive: false,
-        series: emptySeries(since),
+        series: emptySeries(),
         totals: {
           windowViews: 0,
           windowUniqueVisitors: 0,
@@ -45,35 +61,20 @@ export async function GET(request: Request) {
       });
     }
 
-    const [windowResult, allTimeResult] = await Promise.all([
-      admin
-        .from("profile_view_analytics")
-        .select("created_at, session_id")
-        .eq("profile_id", profile.id)
-        .gte("created_at", since.toISOString())
-        .order("created_at", { ascending: false })
-        .limit(10_000),
-      admin
-        .from("profile_view_analytics")
-        .select("id", { count: "exact", head: true })
-        .eq("profile_id", profile.id),
-    ]);
+    const { data: analytics, error: analyticsError } = await admin.rpc("get_profile_view_analytics", {
+      p_profile_id: profile.id,
+      p_since: since,
+    });
 
-    if (windowResult.error) throw new RouteError(500, windowResult.error.message);
-    if (allTimeResult.error) throw new RouteError(500, allTimeResult.error.message);
+    if (analyticsError) throw new RouteError(500, analyticsError.message);
 
-    const buckets = new Map(emptySeries(since).map((point) => [point.date, 0]));
-    const uniqueSessions = new Set<string>();
+    const result = (analytics ?? {}) as AnalyticsRpcResult;
+    const series = (result.series ?? []).map((point) => ({
+      date: String(point.date ?? ""),
+      visitors: Number(point.views) || 0,
+    }));
 
-    for (const event of windowResult.data ?? []) {
-      if (!event.created_at) continue;
-      const key = dayKey(event.created_at);
-      if (buckets.has(key)) buckets.set(key, (buckets.get(key) ?? 0) + 1);
-      if (event.session_id) uniqueSessions.add(event.session_id);
-    }
-
-    const series = Array.from(buckets.entries()).map(([date, visitors]) => ({ date, visitors }));
-    const windowViews = (windowResult.data ?? []).length;
+    const windowViews = Number(result.windowViews) || 0;
     const isLive = Boolean(
       profile.is_active ||
       profile.visibility_status === "public" ||
@@ -89,8 +90,8 @@ export async function GET(request: Request) {
       series,
       totals: {
         windowViews,
-        windowUniqueVisitors: uniqueSessions.size || windowViews,
-        allTimeViews: allTimeResult.count ?? windowViews,
+        windowUniqueVisitors: Number(result.windowUniqueVisitors) || 0,
+        allTimeViews: Number(result.allTimeViews) || windowViews,
         allTimeContactClicks: Number(profile.contact_clicks) || 0,
       },
     });
