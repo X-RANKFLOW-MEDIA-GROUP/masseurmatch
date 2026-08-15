@@ -18,7 +18,6 @@ export interface UpdateTopicInput {
   id: string;
   name?: string;
   description?: string;
-  default_subscription?: 'opt_in' | 'opt_out';
 }
 
 class ResendTopicsService {

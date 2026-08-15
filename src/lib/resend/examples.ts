@@ -73,7 +73,6 @@ export async function updateTopicSettings() {
   const updatedTopic = await topicsService.updateTopic({
     id: 'topic-uuid-here',
     description: 'Updated description',
-    default_subscription: 'opt_in',
   });
 
   console.log('Updated topic:', updatedTopic);
