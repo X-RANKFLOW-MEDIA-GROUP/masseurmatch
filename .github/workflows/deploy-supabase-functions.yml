@@ -23,6 +23,9 @@ concurrency:
   group: deploy-supabase-production
   cancel-in-progress: false
 
+env:
+  SUPABASE_CLI_VERSION: 2.114.0
+
 jobs:
   migrate:
     name: Apply Supabase migrations
@@ -50,7 +53,7 @@ jobs:
 
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: ${{ env.SUPABASE_CLI_VERSION }}
 
       - name: Link production project
         run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
@@ -89,7 +92,7 @@ jobs:
 
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: ${{ env.SUPABASE_CLI_VERSION }}
 
       - name: Deploy authentication and upload functions
         run: |
