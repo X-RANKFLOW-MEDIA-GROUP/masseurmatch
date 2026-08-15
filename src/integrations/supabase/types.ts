@@ -3260,6 +3260,7 @@ export type Database = {
           products_sold: string[] | null
           products_used: string[] | null
           profile_completeness: number | null
+          profile_completion_score: number | null
           profile_status: string | null
           profile_views: number | null
           promotions: Json | null
@@ -3431,6 +3432,7 @@ export type Database = {
           products_sold?: string[] | null
           products_used?: string[] | null
           profile_completeness?: number | null
+          profile_completion_score?: number | null
           profile_status?: string | null
           profile_views?: number | null
           promotions?: Json | null
@@ -3602,6 +3604,7 @@ export type Database = {
           products_sold?: string[] | null
           products_used?: string[] | null
           profile_completeness?: number | null
+          profile_completion_score?: number | null
           profile_status?: string | null
           profile_views?: number | null
           promotions?: Json | null
