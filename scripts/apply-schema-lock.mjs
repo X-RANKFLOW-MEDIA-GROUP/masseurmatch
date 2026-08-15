@@ -5,9 +5,10 @@
 // scripts/verify-live-schema.mjs.
 //
 // IMPORTANT: the historical schema lock currently contains out-of-scope
-// booking/session-payment tables. This command fails closed until those legacy
-// declarations are removed, preventing an old additive contract from
-// recreating deprecated runtime objects after the canonical cleanup migration.
+// booking/session-payment tables and an obsolete SECURITY DEFINER is_admin().
+// This command fails closed until those declarations are removed, preventing an
+// old additive contract from recreating deprecated runtime objects or restoring
+// elevated admin-helper privileges after hardening migrations.
 //
 // Env (or .env.local fallback):
 //   SUPABASE_ACCESS_TOKEN      personal access token (sbp_...), required
@@ -47,12 +48,19 @@ function assertCanonicalSchemaLock(sql) {
     return pattern.test(sql);
   });
 
-  if (offenders.length === 0) return;
+  if (offenders.length > 0) {
+    console.error("[apply-schema-lock] Refusing to apply a non-canonical schema lock to production.");
+    console.error(`[apply-schema-lock] Remove legacy table declarations first: ${offenders.join(", ")}`);
+    console.error("[apply-schema-lock] Canonical MasseurMatch is directory-only; booking, scheduling, and session-payment tables must not be recreated.");
+    process.exit(1);
+  }
 
-  console.error("[apply-schema-lock] Refusing to apply a non-canonical schema lock to production.");
-  console.error(`[apply-schema-lock] Remove legacy table declarations first: ${offenders.join(", ")}`);
-  console.error("[apply-schema-lock] Canonical MasseurMatch is directory-only; booking, scheduling, and session-payment tables must not be recreated.");
-  process.exit(1);
+  const insecureIsAdmin = /create\s+or\s+replace\s+function\s+(?:public\.)?is_admin\s*\(\s*\)[\s\S]*?security\s+definer[\s\S]*?\$\$\s*;/i;
+  if (insecureIsAdmin.test(sql)) {
+    console.error("[apply-schema-lock] Refusing to apply a schema lock that recreates public.is_admin() as SECURITY DEFINER.");
+    console.error("[apply-schema-lock] is_admin() must remain SECURITY INVOKER and rely on public.user_roles RLS.");
+    process.exit(1);
+  }
 }
 
 async function main() {
