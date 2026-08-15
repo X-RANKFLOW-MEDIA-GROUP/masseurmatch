@@ -55,8 +55,10 @@ function assertCanonicalSchemaLock(sql) {
     process.exit(1);
   }
 
-  const insecureIsAdmin = /create\s+or\s+replace\s+function\s+(?:public\.)?is_admin\s*\(\s*\)[\s\S]*?security\s+definer[\s\S]*?\$\$\s*;/i;
-  if (insecureIsAdmin.test(sql)) {
+  const isAdminHeader = sql.match(
+    /create\s+or\s+replace\s+function\s+(?:public\.)?is_admin\s*\(\s*\)([\s\S]*?)\bas\s+\$\$/i,
+  )?.[1];
+  if (isAdminHeader && /\bsecurity\s+definer\b/i.test(isAdminHeader)) {
     console.error("[apply-schema-lock] Refusing to apply a schema lock that recreates public.is_admin() as SECURITY DEFINER.");
     console.error("[apply-schema-lock] is_admin() must remain SECURITY INVOKER and rely on public.user_roles RLS.");
     process.exit(1);
