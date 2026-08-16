@@ -9,7 +9,7 @@ import {
 import { getImessageBridgeStatus } from "@/lib/messaging/imessage-bridge-health";
 import { getImessageOutboundReadiness } from "@/lib/messaging/imessage-outbound-readiness";
 
-type Db = ReturnType<typeof createSupabaseAdminClient> & { from: (table: string) => any };
+type Db = { from: (table: string) => any };
 
 type WorkerRow = {
   worker_id: string;
@@ -38,7 +38,7 @@ export async function GET(request: Request) {
     await requireAdminSession(request);
     assertRateLimit(request, "admin-imessage-bridge-health", { limit: 120, windowMs: 60_000 });
 
-    const db = createSupabaseAdminClient() as Db;
+    const db = createSupabaseAdminClient() as unknown as Db;
     const [workersResult, settingsResult, queueResult, consentResult] = await Promise.all([
       db
         .from("messaging_imessage_bridge_workers")
