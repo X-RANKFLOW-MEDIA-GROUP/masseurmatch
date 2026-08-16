@@ -9,30 +9,25 @@ import { getProfileIndexRobots } from "@/lib/index-eligibility";
 import { matchBodyTypeKeyword } from "@/lib/physical-profile";
 import { FALLBACK_PUBLIC_THERAPISTS } from "@/app/_lib/directory-fallback";
 import { PUBLIC_THERAPISTS_TAG } from "@/app/_lib/directory-cache";
-import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import {
   SUPABASE_PUBLIC_ANON_KEY,
   SUPABASE_PUBLIC_URL,
 } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
-// Lazily created so importing this module never throws. Eager creation dies
-// with "SUPABASE_URL is not configured" wherever the env isn't present —
-// vitest, and Next's build-time page-data collection — before any query
-// actually runs. When the service-role env is missing entirely (env-less CI
-// builds, sitemap prerender), public directory reads fall back to the anon
-// key: everything this module serves is public data governed by RLS anyway.
-type AdminClient = ReturnType<typeof createSupabaseAdminClient>;
-let cachedDirectoryClient: AdminClient | null = null;
+// Public directory reads must always use the public Supabase project config and
+// RLS. Using the server service-role client here creates a split-brain preview:
+// Vercel can point SUPABASE_URL at an empty Supabase preview branch while the
+// public NEXT_PUBLIC_* config still targets the real public directory dataset.
+// Keep creation lazy so importing this module remains safe during env-less
+// tests and Next build-time page-data collection.
+type DirectoryClient = ReturnType<typeof createSupabaseJsClient<Database>>;
+let cachedDirectoryClient: DirectoryClient | null = null;
 
-function createDirectoryClient(): AdminClient {
-  try {
-    return createSupabaseAdminClient();
-  } catch {
-    return createSupabaseJsClient<Database>(SUPABASE_PUBLIC_URL, SUPABASE_PUBLIC_ANON_KEY, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    });
-  }
+function createDirectoryClient(): DirectoryClient {
+  return createSupabaseJsClient<Database>(SUPABASE_PUBLIC_URL, SUPABASE_PUBLIC_ANON_KEY, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
 }
 
 // Fallback/demo profiles carry synthetic ids like "fallback-bruno-santos".
@@ -42,10 +37,10 @@ function createDirectoryClient(): AdminClient {
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const isUuid = (value: string) => UUID_RE.test(value);
 
-const supabase: AdminClient = new Proxy({} as AdminClient, {
+const supabase: DirectoryClient = new Proxy({} as DirectoryClient, {
   get(_target, prop) {
     cachedDirectoryClient ??= createDirectoryClient();
-    const value = cachedDirectoryClient[prop as keyof AdminClient];
+    const value = cachedDirectoryClient[prop as keyof DirectoryClient];
     return typeof value === "function" ? value.bind(cachedDirectoryClient) : value;
   },
 });
@@ -480,7 +475,7 @@ const fetchPublicTherapistsUncached = async (filters?: PublicTherapistFilters) =
  * Cached public-directory read. This is the hot path — homepage, city pages,
  * search, sitemap all call it, and every call otherwise sequential-scans the
  * profiles table (P75 ~720ms, thousands of calls/day). We wrap the pure fetch
- * in `unstable_cache` (anon/admin client, no cookies → cacheable) with a short
+ * in `unstable_cache` (anon client, no cookies → cacheable) with a short
  * 60s revalidate window so newly-published profiles still surface quickly, and
  * a shared tag so the admin approve/reject routes can invalidate on demand
  * (revalidateTag(PUBLIC_THERAPISTS_TAG)) for instant appearance.
