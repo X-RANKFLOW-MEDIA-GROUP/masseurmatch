@@ -53,8 +53,9 @@ preflight_messages() {
 
 write_config() {
   local app_url="${MASSEURMATCH_APP_URL:-https://masseurmatch.com}"
-  local worker_id="${IMESSAGE_WORKER_ID:-masseurmatch-$(scutil --get LocalHostName 2>/dev/null || hostname)}"
+  local worker_id="${IMESSAGE_WORKER_ID:-masseurmatch-imessage-01}"
   local poll_ms="${IMESSAGE_POLL_MS:-5000}"
+  local heartbeat_ms="${IMESSAGE_HEARTBEAT_MS:-30000}"
   local replay="${IMESSAGE_REPLAY_HISTORY:-0}"
   local chat_db="${IMESSAGE_CHAT_DB:-$HOME/Library/Messages/chat.db}"
   local state_dir="${IMESSAGE_STATE_DIR:-$HOME/.masseurmatch-imessage-bridge}"
@@ -64,11 +65,19 @@ write_config() {
     *) fail "MASSEURMATCH_APP_URL must use HTTPS, except localhost development." ;;
   esac
 
+  case "$worker_id" in
+    ''|*[!A-Za-z0-9._:-]*) fail "IMESSAGE_WORKER_ID contains unsupported characters." ;;
+  esac
+
   case "$poll_ms" in
     ''|*[!0-9]*) fail "IMESSAGE_POLL_MS must be numeric." ;;
   esac
+  case "$heartbeat_ms" in
+    ''|*[!0-9]*) fail "IMESSAGE_HEARTBEAT_MS must be numeric." ;;
+  esac
 
-  [ "$poll_ms" -ge 2000 ] || fail "IMESSAGE_POLL_MS must be at least 2000."
+  [ "$poll_ms" -ge 2000 ] && [ "$poll_ms" -le 60000 ] || fail "IMESSAGE_POLL_MS must be between 2000 and 60000."
+  [ "$heartbeat_ms" -ge 15000 ] && [ "$heartbeat_ms" -le 60000 ] || fail "IMESSAGE_HEARTBEAT_MS must be between 15000 and 60000."
   [ "$replay" = "0" ] || fail "Installer refuses history replay. Keep IMESSAGE_REPLAY_HISTORY=0."
 
   mkdir -p "$APP_DIR" "$LOG_DIR" "$HOME/Library/LaunchAgents"
@@ -80,6 +89,7 @@ export MASSEURMATCH_APP_URL='$app_url'
 export IMESSAGE_BRIDGE_SECRET='${IMESSAGE_BRIDGE_SECRET}'
 export IMESSAGE_WORKER_ID='$worker_id'
 export IMESSAGE_POLL_MS='$poll_ms'
+export IMESSAGE_HEARTBEAT_MS='$heartbeat_ms'
 export IMESSAGE_REPLAY_HISTORY='0'
 export IMESSAGE_CHAT_DB='$chat_db'
 export IMESSAGE_STATE_DIR='$state_dir'
