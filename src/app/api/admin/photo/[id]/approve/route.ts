@@ -5,6 +5,9 @@ import { createSupabaseAdminClient, recordAuditLog, requireAdminSession } from "
 import { sendEmail } from "@/app/api/_lib/email";
 import PhotoApprovedEmail from "@/emails/PhotoApprovedEmail";
 
+const PENDING_BUCKET = "pending-photos";
+const PUBLIC_BUCKET = "therapist-photos";
+
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -14,24 +17,56 @@ export async function POST(
     const { id: photoId } = await params;
     const adminClient = createSupabaseAdminClient();
 
-    const { data: photo, error: fetchError } = await adminClient
+    const { data: photo, error: fetchError } = await (adminClient as any)
       .from("profile_photos")
-      .select("id, profile_id, user_id")
+      .select("id, profile_id, user_id, storage_bucket, storage_path, url")
       .eq("id", photoId)
       .maybeSingle();
 
     if (fetchError) throw new RouteError(500, fetchError.message);
     if (!photo) throw new RouteError(404, "Photo not found.");
 
-    const { error: updateError } = await adminClient
+    let publicUrl = photo.url ?? null;
+    if (photo.storage_bucket === PENDING_BUCKET && photo.storage_path) {
+      const { data: blob, error: downloadError } = await adminClient.storage
+        .from(PENDING_BUCKET)
+        .download(photo.storage_path);
+      if (downloadError || !blob) throw new RouteError(500, "Pending photo could not be read from private storage.");
+
+      const { error: uploadError } = await adminClient.storage
+        .from(PUBLIC_BUCKET)
+        .upload(photo.storage_path, blob, { contentType: blob.type || "application/octet-stream", upsert: false });
+      if (uploadError) throw new RouteError(500, "Approved photo could not be published.");
+
+      const { data: publicData } = adminClient.storage.from(PUBLIC_BUCKET).getPublicUrl(photo.storage_path);
+      publicUrl = publicData?.publicUrl ?? null;
+      if (!publicUrl) {
+        await adminClient.storage.from(PUBLIC_BUCKET).remove([photo.storage_path]);
+        throw new RouteError(500, "Approved photo did not receive a public URL.");
+      }
+    }
+
+    const { error: updateError } = await (adminClient as any)
       .from("profile_photos")
       .update({
         moderation_status: "approved",
         moderation_reason: "admin_approved",
+        ...(photo.storage_bucket === PENDING_BUCKET
+          ? { storage_bucket: PUBLIC_BUCKET, url: publicUrl }
+          : {}),
       })
       .eq("id", photoId);
 
-    if (updateError) throw new RouteError(500, updateError.message);
+    if (updateError) {
+      if (photo.storage_bucket === PENDING_BUCKET && photo.storage_path) {
+        await adminClient.storage.from(PUBLIC_BUCKET).remove([photo.storage_path]);
+      }
+      throw new RouteError(500, updateError.message);
+    }
+
+    if (photo.storage_bucket === PENDING_BUCKET && photo.storage_path) {
+      await adminClient.storage.from(PENDING_BUCKET).remove([photo.storage_path]);
+    }
 
     await adminClient.from("admin_actions").insert({
       action: "approve_photo",
@@ -61,9 +96,7 @@ export async function POST(
           react: React.createElement(PhotoApprovedEmail, {
             dashboardUrl: "https://masseurmatch.com/pro/dashboard",
           }),
-        }).catch((err) => {
-          console.error("[api/admin/photo/approve] Email send failed:", err);
-        });
+        }).catch((err) => console.error("[api/admin/photo/approve] Email send failed:", err));
       }
     }
 
