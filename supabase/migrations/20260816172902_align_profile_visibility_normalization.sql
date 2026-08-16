@@ -65,8 +65,7 @@ begin
   insert into public.audit_log (
     admin_id, admin_user_id, action, target_type,
     target_id, target_profile_id, reason, details
-  )
-  values (
+  ) values (
     v_admin, v_admin, 'profile.' || p_action, 'profile',
     p_profile_id, p_profile_id, p_reason, p_details
   );

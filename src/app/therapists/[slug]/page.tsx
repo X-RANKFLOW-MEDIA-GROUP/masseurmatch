@@ -4,6 +4,7 @@ import { JsonLd } from "@/app/_components/JsonLd";
 import {
   getCities,
   getProfilePhotos,
+  getPublicImportedReviews,
   getPublicTherapistBySlug,
   getPublicTherapists,
   type PublicTherapist,
@@ -18,6 +19,7 @@ import { ProfileStructuredData } from "@/components/profile/ProfileStructuredDat
 import { buildProfileFaq } from "@/components/profile/profile-faq";
 import { buildProfileViewModel } from "@/components/profile/profile-utils";
 import { VoxProfile } from "@/app/therapists/[slug]/_components/vox/VoxProfile";
+import { ImportedReviewsSection } from "@/app/therapists/[slug]/_components/vox/ImportedReviewsSection";
 import { DemoProfileBanner } from "@/app/_components/demo-profile-banner";
 import { ProfileViewTracker } from "@/app/therapists/[slug]/_components/ProfileViewTracker";
 import { ProfilePageTracker } from "@/app/therapists/[slug]/_components/ProfilePageTracker";
@@ -91,11 +93,12 @@ export default async function TherapistPage({ params }: { params: Promise<Params
 
   if (!storedProfile) notFound();
 
-  const [dbProfile, photos, relatedResult, extras] = await Promise.all([
+  const [dbProfile, photos, relatedResult, extras, importedReviews] = await Promise.all([
     withCanonicalIdentity(storedProfile),
     getProfilePhotos(storedProfile.id),
     getPublicTherapists({ city: storedProfile.city || undefined, page: 1, pageSize: 6 }),
     getPublicProfileExtras(storedProfile.id),
+    getPublicImportedReviews(storedProfile.id, 100),
   ]);
 
   const expandedServices = unique([
@@ -195,6 +198,7 @@ export default async function TherapistPage({ params }: { params: Promise<Params
         training={training}
         education={education}
       />
+      <ImportedReviewsSection reviews={importedReviews} />
     </>
   );
 }
