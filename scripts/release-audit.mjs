@@ -34,6 +34,25 @@ const requiredRoutePaths = [
 
 const forbiddenPhrases = ["Book Now", "Reserve Appointment", "License Verified by MasseurMatch"];
 
+const forbiddenRuntimePaths = [
+  "src/app/api/reviews/route.ts",
+  "src/app/api/availability/route.ts",
+  "src/app/api/booking/approve/route.ts",
+  "src/app/api/booking/confirm/route.ts",
+  "src/app/api/booking/inquire/route.ts",
+  "src/app/api/booking/slots/route.ts",
+  "src/app/api/stripe/payment-intent/route.ts",
+  "src/app/api/stripe/payment-history/route.ts",
+  "src/app/api/stripe/refund/route.ts",
+  "src/app/pro/bookings/page.tsx",
+  "src/app/admin/bookings/page.tsx",
+];
+
+const forbiddenRuntimeTokens = [
+  "process_stripe_payment_intent_succeeded",
+  "process_stripe_payment_intent_failed",
+];
+
 function assert(condition, message) {
   if (!condition) {
     throw new Error(message);
@@ -88,8 +107,7 @@ function checkBuildScripts() {
   }
 }
 
-function checkForbiddenPhrases() {
-  const appDir = path.join(root, "src/app");
+function collectSourceFiles(rootDir) {
   const files = [];
   const walk = (dir) => {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -100,11 +118,31 @@ function checkForbiddenPhrases() {
       }
     }
   };
-  walk(appDir);
-  for (const file of files) {
+  walk(rootDir);
+  return files;
+}
+
+function checkForbiddenPhrases() {
+  const appDir = path.join(root, "src/app");
+  for (const file of collectSourceFiles(appDir)) {
     const text = fs.readFileSync(file, "utf8");
     for (const phrase of forbiddenPhrases) {
       assert(!text.includes(phrase), `Forbidden phrase "${phrase}" found in ${path.relative(root, file)}`);
+    }
+  }
+}
+
+function checkCanonicalDirectoryRuntime() {
+  for (const relPath of forbiddenRuntimePaths) {
+    assert(!exists(relPath), `Noncanonical booking/review runtime path must not exist: ${relPath}`);
+  }
+
+  for (const relRoot of ["src/app", "src/lib"]) {
+    for (const file of collectSourceFiles(path.join(root, relRoot))) {
+      const text = fs.readFileSync(file, "utf8");
+      for (const token of forbiddenRuntimeTokens) {
+        assert(!text.includes(token), `Retired session-payment runtime token "${token}" found in ${path.relative(root, file)}`);
+      }
     }
   }
 }
@@ -154,6 +192,7 @@ function run() {
   checkSitemapPrivacyRules();
   checkBuildScripts();
   checkForbiddenPhrases();
+  checkCanonicalDirectoryRuntime();
   checkStripePriceIds();
   checkCriticalTodoFixme();
   console.log("[release-audit] OK");

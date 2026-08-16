@@ -9,7 +9,17 @@ import {
   recordAuditLog,
   requireAdminSession,
 } from "@/app/api/_lib/supabase-server";
-import type { Json } from "@/integrations/supabase/types";
+
+const lifecycleStatuses = [
+  "new",
+  "queued",
+  "contacted",
+  "replied",
+  "interested",
+  "not_interested",
+  "opted_out",
+  "invalid",
+] as const;
 
 const updateSettingsSchema = z.object({
   action: z.literal("update_settings"),
@@ -20,7 +30,7 @@ const updateSettingsSchema = z.object({
 const updateContactSchema = z.object({
   action: z.literal("update_contact"),
   contactId: z.string().uuid(),
-  lifecycleStatus: z.enum(["new", "contacted", "replied", "interested", "converted", "closed"]).optional(),
+  lifecycleStatus: z.enum(lifecycleStatuses).optional(),
   knottyEnabled: z.boolean().optional(),
   optedOut: z.boolean().optional(),
   optedOutReason: z.string().trim().max(300).optional().nullable(),
@@ -49,6 +59,19 @@ type DbClient = ReturnType<typeof createSupabaseAdminClient> & {
 };
 
 type QueryResult<T> = { data: T | null; error: { message: string } | null; count?: number | null };
+
+type MessagingSettingsPatch = {
+  global_pause?: boolean;
+  knotty_enabled?: boolean;
+};
+
+type MessagingContactPatch = {
+  lifecycle_status?: (typeof lifecycleStatuses)[number];
+  knotty_enabled?: boolean;
+  opted_out?: boolean;
+  opted_out_at?: string | null;
+  opted_out_reason?: string | null;
+};
 
 function assertQuery<T>(result: QueryResult<T>, label: string): T | null {
   if (result.error) throw new RouteError(500, `${label}: ${result.error.message}`);
@@ -123,7 +146,7 @@ export async function GET(request: Request) {
         .limit(100),
       db.from("messaging_contacts").select("id", { count: "exact", head: true }),
       db.from("messaging_contacts").select("id", { count: "exact", head: true }).eq("opted_out", true),
-      db.from("messaging_queue").select("id", { count: "exact", head: true }).in("status", ["pending", "processing"]),
+      db.from("messaging_queue").select("id", { count: "exact", head: true }).in("status", ["pending", "claimed"]),
       db.from("messaging_queue").select("id", { count: "exact", head: true }).eq("status", "failed"),
       db.from("messaging_conversations").select("id", { count: "exact", head: true }).eq("status", "open"),
     ]);
@@ -185,7 +208,7 @@ export async function POST(request: Request) {
     const db = createSupabaseAdminClient() as DbClient;
 
     if (body.action === "update_settings") {
-      const patch: { [key: string]: Json | undefined } = {};
+      const patch: MessagingSettingsPatch = {};
       if (body.globalPause !== undefined) patch.global_pause = body.globalPause;
       if (body.knottyEnabled !== undefined) patch.knotty_enabled = body.knottyEnabled;
       if (Object.keys(patch).length === 0) throw new RouteError(400, "No settings supplied.");
@@ -203,14 +226,18 @@ export async function POST(request: Request) {
     }
 
     if (body.action === "update_contact") {
-      const patch: { [key: string]: Json | undefined } = {};
+      const patch: MessagingContactPatch = {};
       if (body.lifecycleStatus !== undefined) patch.lifecycle_status = body.lifecycleStatus;
       if (body.knottyEnabled !== undefined) patch.knotty_enabled = body.knottyEnabled;
       if (body.optedOut !== undefined) {
         patch.opted_out = body.optedOut;
         patch.opted_out_at = body.optedOut ? new Date().toISOString() : null;
         patch.opted_out_reason = body.optedOut ? body.optedOutReason || "admin" : null;
-        if (body.optedOut) patch.knotty_enabled = false;
+        if (body.optedOut) {
+          patch.knotty_enabled = false;
+        } else if (body.lifecycleStatus === undefined) {
+          patch.lifecycle_status = "new";
+        }
       }
       if (Object.keys(patch).length === 0) throw new RouteError(400, "No contact changes supplied.");
 
