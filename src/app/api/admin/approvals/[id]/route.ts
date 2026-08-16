@@ -14,6 +14,12 @@ function resolvePhotoUrl(url: string | null, storagePath: string | null) {
   return `${SUPABASE_PUBLIC_URL}/storage/v1/object/public/therapist-photos/${storagePath}`;
 }
 
+function normalizePhone(value: string | null | undefined) {
+  if (!value) return null;
+  const digits = value.replace(/\D/g, "");
+  return digits.length >= 10 ? digits : null;
+}
+
 function normalizeCompletion(value: unknown) {
   const numeric = typeof value === "number" ? value : Number(value ?? 0);
   if (!Number.isFinite(numeric)) return 0;
@@ -100,7 +106,7 @@ export async function POST(
     if (action === "approve") {
       const { data: publishCandidate, error: candidateError } = await supabase
         .from("profiles")
-        .select("city, phone, phone_number")
+        .select("user_id, city, phone, phone_number, is_verified_phone")
         .eq("id", id)
         .maybeSingle();
 
@@ -108,10 +114,18 @@ export async function POST(
       if (!publishCandidate) {
         return NextResponse.json({ ok: false, error: "Profile not found" }, { status: 404 });
       }
+      if (!publishCandidate.user_id) {
+        return NextResponse.json(
+          { ok: false, error: "Profile is not linked to a provider account." },
+          { status: 422 },
+        );
+      }
 
       const missingRequiredFields: string[] = [];
+      const profilePhone = publishCandidate.phone?.trim() || publishCandidate.phone_number?.trim() || null;
       if (!publishCandidate.city?.trim()) missingRequiredFields.push("city");
-      if (!(publishCandidate.phone?.trim() || publishCandidate.phone_number?.trim())) missingRequiredFields.push("phone");
+      if (!profilePhone) missingRequiredFields.push("phone");
+      if (publishCandidate.is_verified_phone !== true) missingRequiredFields.push("verified phone");
 
       if (missingRequiredFields.length > 0) {
         return NextResponse.json(
@@ -119,6 +133,24 @@ export async function POST(
             ok: false,
             error: `Profile cannot be published until these required fields are completed: ${missingRequiredFields.join(", ")}.`,
             missingRequiredFields,
+          },
+          { status: 422 },
+        );
+      }
+
+      const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(publishCandidate.user_id);
+      const authPhone = normalizePhone(authUser.user?.phone);
+      if (
+        authError ||
+        !authUser.user?.phone_confirmed_at ||
+        !authPhone ||
+        authPhone !== normalizePhone(profilePhone)
+      ) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error: "Profile phone must match the phone number confirmed by Supabase before publication.",
+            missingRequiredFields: ["verified phone"],
           },
           { status: 422 },
         );
