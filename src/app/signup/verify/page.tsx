@@ -22,6 +22,18 @@ async function syncServerSession(accessToken?: string) {
   });
 }
 
+async function syncVerifiedPhoneProfile() {
+  const response = await fetch("/api/provider/verification/phone/sync", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(body.error || "Phone was verified, but the profile could not be synchronized.");
+  }
+  return body as { ok: true; phone: string; verifiedAt: string };
+}
+
 function normalizePhone(value: string) {
   const trimmed = value.trim();
   if (trimmed.startsWith("+")) return `+${trimmed.slice(1).replace(/\D/g, "")}`;
@@ -138,6 +150,13 @@ function VerificationPage() {
       });
       if (verifyError) throw verifyError;
       await syncServerSession(data.session?.access_token);
+      const synced = await syncVerifiedPhoneProfile();
+      setAccountInfo({
+        fullName: state.fullName,
+        displayName: state.displayName || state.fullName,
+        email: state.email,
+        phone: synced.phone,
+      });
       markPhoneVerified();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid or expired phone code.");
