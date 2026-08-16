@@ -1,0 +1,61 @@
+-- Combine equivalent permissive OR policies into one policy per action scope.
+
+-- AI coach snapshots: preserve SELECT access when user owns by user_id OR profile_id; preserve writes only for user_id owner.
+drop policy if exists ai_profile_coach_daily_snapshots_owner_all on public.ai_profile_coach_daily_snapshots;
+drop policy if exists providers_read_own_ai_coach_snapshots on public.ai_profile_coach_daily_snapshots;
+create policy ai_profile_coach_daily_snapshots_select_own on public.ai_profile_coach_daily_snapshots
+  for select to authenticated
+  using (((select auth.uid()) = user_id) or (profile_id = (select auth.uid())));
+create policy ai_profile_coach_daily_snapshots_insert_own on public.ai_profile_coach_daily_snapshots
+  for insert to authenticated
+  with check ((select auth.uid()) = user_id);
+create policy ai_profile_coach_daily_snapshots_update_own on public.ai_profile_coach_daily_snapshots
+  for update to authenticated
+  using ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id);
+create policy ai_profile_coach_daily_snapshots_delete_own on public.ai_profile_coach_daily_snapshots
+  for delete to authenticated
+  using ((select auth.uid()) = user_id);
+
+-- Messaging tables: old effective predicate for every action was owner OR admin.
+drop policy if exists messaging_campaigns_admin_all on public.messaging_campaigns;
+drop policy if exists messaging_campaigns_owner_all on public.messaging_campaigns;
+create policy messaging_campaigns_owner_or_admin_all on public.messaging_campaigns
+  for all to authenticated
+  using (((select auth.uid()) = user_id) or is_admin())
+  with check (((select auth.uid()) = user_id) or is_admin());
+
+drop policy if exists messaging_contacts_admin_all on public.messaging_contacts;
+drop policy if exists messaging_contacts_owner_all on public.messaging_contacts;
+create policy messaging_contacts_owner_or_admin_all on public.messaging_contacts
+  for all to authenticated
+  using (((select auth.uid()) = user_id) or is_admin())
+  with check (((select auth.uid()) = user_id) or is_admin());
+
+drop policy if exists messaging_conversations_admin_all on public.messaging_conversations;
+drop policy if exists messaging_conversations_owner_all on public.messaging_conversations;
+create policy messaging_conversations_owner_or_admin_all on public.messaging_conversations
+  for all to authenticated
+  using (((select auth.uid()) = user_id) or is_admin())
+  with check (((select auth.uid()) = user_id) or is_admin());
+
+drop policy if exists messaging_messages_admin_all on public.messaging_messages;
+drop policy if exists messaging_messages_owner_all on public.messaging_messages;
+create policy messaging_messages_owner_or_admin_all on public.messaging_messages
+  for all to authenticated
+  using (((select auth.uid()) = user_id) or is_admin())
+  with check (((select auth.uid()) = user_id) or is_admin());
+
+drop policy if exists messaging_queue_admin_all on public.messaging_queue;
+drop policy if exists messaging_queue_owner_all on public.messaging_queue;
+create policy messaging_queue_owner_or_admin_all on public.messaging_queue
+  for all to authenticated
+  using (((select auth.uid()) = user_id) or is_admin())
+  with check (((select auth.uid()) = user_id) or is_admin());
+
+drop policy if exists messaging_settings_admin_all on public.messaging_settings;
+drop policy if exists messaging_settings_owner_all on public.messaging_settings;
+create policy messaging_settings_owner_or_admin_all on public.messaging_settings
+  for all to authenticated
+  using (((select auth.uid()) = user_id) or is_admin())
+  with check (((select auth.uid()) = user_id) or is_admin());
