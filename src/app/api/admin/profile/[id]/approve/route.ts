@@ -35,6 +35,7 @@ export async function POST(
 
     if (fetchError) throw new RouteError(500, fetchError.message);
     if (!profile) throw new RouteError(404, "Profile not found.");
+    if (!profile.user_id) throw new RouteError(422, "Profile is not linked to a provider account.");
 
     const profilePhone = profile.phone?.trim() || profile.phone_number?.trim() || null;
     const missingRequiredFields: string[] = [];
