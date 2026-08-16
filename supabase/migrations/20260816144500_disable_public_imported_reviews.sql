@@ -18,6 +18,10 @@ alter table public.imported_reviews
   add constraint imported_reviews_never_public_check
   check (is_public = false);
 
+alter table public.imported_reviews enable row level security;
+
+revoke select on table public.imported_reviews from anon, authenticated;
+
 do $$
 declare
   v_public_count bigint;
