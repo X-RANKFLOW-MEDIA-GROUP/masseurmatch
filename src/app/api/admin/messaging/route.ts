@@ -9,7 +9,7 @@ import {
   recordAuditLog,
   requireAdminSession,
 } from "@/app/api/_lib/supabase-server";
-import type { Json } from "@/integrations/supabase/types";
+import type { Database } from "@/integrations/supabase/types";
 
 const updateSettingsSchema = z.object({
   action: z.literal("update_settings"),
@@ -47,6 +47,8 @@ const postSchema = z.discriminatedUnion("action", [
 type DbClient = ReturnType<typeof createSupabaseAdminClient> & {
   from: (table: string) => any;
 };
+type MessagingSettingsUpdate = Database["public"]["Tables"]["messaging_settings"]["Update"];
+type MessagingContactUpdate = Database["public"]["Tables"]["messaging_contacts"]["Update"];
 
 type QueryResult<T> = { data: T | null; error: { message: string } | null; count?: number | null };
 
@@ -62,7 +64,7 @@ function safeSearch(value: string | null) {
 
 export async function GET(request: Request) {
   try {
-    await requireAdminSession(request);
+    const admin = await requireAdminSession(request);
     assertRateLimit(request, "admin-messaging-read", { limit: 120, windowMs: 60_000 });
 
     const url = new URL(request.url);
@@ -79,6 +81,7 @@ export async function GET(request: Request) {
       .select(
         "id,phone_e164,name,city,state,timezone,profile_url,lifecycle_status,knotty_enabled,opted_out,opted_out_at,opted_out_reason,last_outbound_at,last_inbound_at,last_activity_at,created_at,updated_at",
       )
+      .eq("user_id", admin.userId)
       .order("last_activity_at", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false })
       .limit(300);
@@ -106,6 +109,7 @@ export async function GET(request: Request) {
         .select(
           "id,contact_id,receiving_number,status,knotty_enabled,current_channel,unread_count,last_message_at,last_inbound_at,last_outbound_at,created_at,updated_at,messaging_contacts(id,name,phone_e164,city,state,lifecycle_status,opted_out,knotty_enabled)",
         )
+        .eq("user_id", admin.userId)
         .order("last_message_at", { ascending: false, nullsFirst: false })
         .order("created_at", { ascending: false })
         .limit(150),
@@ -119,13 +123,14 @@ export async function GET(request: Request) {
         .select(
           "id,campaign_id,contact_id,conversation_id,message_id,body,transport_preference,status,scheduled_for,priority,attempts,max_attempts,locked_at,locked_by,last_error,sent_at,delivered_at,failed_at,created_at,messaging_contacts(id,name,phone_e164,city,state)",
         )
+        .eq("user_id", admin.userId)
         .order("created_at", { ascending: false })
         .limit(100),
-      db.from("messaging_contacts").select("id", { count: "exact", head: true }),
-      db.from("messaging_contacts").select("id", { count: "exact", head: true }).eq("opted_out", true),
-      db.from("messaging_queue").select("id", { count: "exact", head: true }).in("status", ["pending", "processing"]),
-      db.from("messaging_queue").select("id", { count: "exact", head: true }).eq("status", "failed"),
-      db.from("messaging_conversations").select("id", { count: "exact", head: true }).eq("status", "open"),
+      db.from("messaging_contacts").select("id", { count: "exact", head: true }).eq("user_id", admin.userId),
+      db.from("messaging_contacts").select("id", { count: "exact", head: true }).eq("user_id", admin.userId).eq("opted_out", true),
+      db.from("messaging_queue").select("id", { count: "exact", head: true }).eq("user_id", admin.userId).in("status", ["pending", "processing"]),
+      db.from("messaging_queue").select("id", { count: "exact", head: true }).eq("user_id", admin.userId).eq("status", "failed"),
+      db.from("messaging_conversations").select("id", { count: "exact", head: true }).eq("user_id", admin.userId).eq("status", "open"),
     ]);
 
     const selectedMessagesResult = conversationId
@@ -134,6 +139,7 @@ export async function GET(request: Request) {
           .select(
             "id,conversation_id,contact_id,campaign_id,direction,sender_type,body,channel,delivery_status,external_id,sent_at,delivered_at,received_at,failed_at,error_code,error_message,created_at,updated_at",
           )
+          .eq("user_id", admin.userId)
           .eq("conversation_id", conversationId)
           .order("created_at", { ascending: true })
           .limit(500)
@@ -185,7 +191,7 @@ export async function POST(request: Request) {
     const db = createSupabaseAdminClient() as DbClient;
 
     if (body.action === "update_settings") {
-      const patch: { [key: string]: Json | undefined } = {};
+      const patch: MessagingSettingsUpdate = {};
       if (body.globalPause !== undefined) patch.global_pause = body.globalPause;
       if (body.knottyEnabled !== undefined) patch.knotty_enabled = body.knottyEnabled;
       if (Object.keys(patch).length === 0) throw new RouteError(400, "No settings supplied.");
@@ -203,7 +209,7 @@ export async function POST(request: Request) {
     }
 
     if (body.action === "update_contact") {
-      const patch: { [key: string]: Json | undefined } = {};
+      const patch: MessagingContactUpdate = {};
       if (body.lifecycleStatus !== undefined) patch.lifecycle_status = body.lifecycleStatus;
       if (body.knottyEnabled !== undefined) patch.knotty_enabled = body.knottyEnabled;
       if (body.optedOut !== undefined) {
@@ -218,6 +224,7 @@ export async function POST(request: Request) {
         .from("messaging_contacts")
         .update(patch)
         .eq("id", body.contactId)
+        .eq("user_id", admin.userId)
         .select(
           "id,phone_e164,name,city,state,lifecycle_status,knotty_enabled,opted_out,opted_out_at,opted_out_reason,last_activity_at,updated_at",
         )
@@ -232,7 +239,8 @@ export async function POST(request: Request) {
       const { error } = await db
         .from("messaging_conversations")
         .update({ unread_count: 0 })
-        .eq("id", body.conversationId);
+        .eq("id", body.conversationId)
+        .eq("user_id", admin.userId);
       if (error) throw new RouteError(500, error.message);
       return json({ ok: true });
     }
@@ -241,6 +249,7 @@ export async function POST(request: Request) {
       .from("messaging_contacts")
       .select("id,phone_e164,opted_out,knotty_enabled")
       .eq("id", body.contactId)
+      .eq("user_id", admin.userId)
       .single();
     if (contactError) throw new RouteError(500, contactError.message);
     if (!contact) throw new RouteError(404, "Contact not found.");
@@ -257,6 +266,7 @@ export async function POST(request: Request) {
     const { data: existingConversation, error: conversationError } = await db
       .from("messaging_conversations")
       .select("id")
+      .eq("user_id", admin.userId)
       .eq("contact_id", body.contactId)
       .eq("receiving_number", settings.receiving_number)
       .eq("status", "open")
@@ -271,6 +281,7 @@ export async function POST(request: Request) {
       const created = await db
         .from("messaging_conversations")
         .insert({
+          user_id: admin.userId,
           contact_id: body.contactId,
           receiving_number: settings.receiving_number,
           current_channel: "unknown",
@@ -286,6 +297,7 @@ export async function POST(request: Request) {
     const createdMessage = await db
       .from("messaging_messages")
       .insert({
+        user_id: admin.userId,
         conversation_id: conversation.id,
         contact_id: body.contactId,
         direction: "outbound",
@@ -302,6 +314,7 @@ export async function POST(request: Request) {
     const queued = await db
       .from("messaging_queue")
       .insert({
+        user_id: admin.userId,
         contact_id: body.contactId,
         conversation_id: conversation.id,
         message_id: createdMessage.data.id,
@@ -317,7 +330,8 @@ export async function POST(request: Request) {
       await db
         .from("messaging_messages")
         .update({ delivery_status: "failed", failed_at: new Date().toISOString(), error_message: queued.error.message })
-        .eq("id", createdMessage.data.id);
+        .eq("id", createdMessage.data.id)
+        .eq("user_id", admin.userId);
       throw new RouteError(500, queued.error.message);
     }
 
@@ -327,12 +341,7 @@ export async function POST(request: Request) {
       queueId: queued.data.id,
     });
 
-    return json({
-      ok: true,
-      messageId: createdMessage.data.id,
-      queue: queued.data,
-      conversationId: conversation.id,
-    });
+    return json({ ok: true, messageId: createdMessage.data.id, queue: queued.data, conversationId: conversation.id });
   } catch (error) {
     return errorResponse(error);
   }
