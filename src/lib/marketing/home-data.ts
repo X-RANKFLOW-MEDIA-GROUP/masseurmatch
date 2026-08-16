@@ -42,7 +42,6 @@ export const LANDING_FAQ: FaqItem[] = [
 type LaunchCityCard = {
   href: string;
   city: CityData;
-  listingCount: number;
   routeCount: number;
   highlights: string[];
 };
@@ -88,7 +87,6 @@ export function getLaunchCityCards(cities: CityData[]): LaunchCityCard[] {
     return {
       href: `/${city.slug}`,
       city,
-      listingCount: city.count,
       routeCount: CITY_ROUTE_COUNTS[city.slug] ?? 0,
       highlights: CITY_HIGHLIGHTS[city.slug] ?? ["City Directory", "Direct Contact"],
     };
