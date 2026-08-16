@@ -87,7 +87,8 @@ export async function GET(request: Request) {
 
     const dashboard = parseDashboard(dashboardData);
     const summary = dashboard.summary ?? {};
-    const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://masseurmatch.com").replace(/\/$/, "");
+    let appUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://masseurmatch.com").replace(/\/$/, "");
+    appUrl = appUrl.replace("://www.", "://"); // Normalize to remove www. prefix
     const code = typeof summary.code === "string" ? summary.code : "";
 
     return json({
