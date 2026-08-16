@@ -6,6 +6,7 @@ import path from "node:path";
 const ROOT = process.cwd();
 const SCHEMA_PATH = path.join(ROOT, "supabase/PRODUCTION_SCHEMA_LOCK.sql");
 const SCHEMA_EXTENSION_PATHS = [
+  path.join(ROOT, "supabase/schema-lock/20260816_messaging_ownership.sql"),
   path.join(ROOT, "supabase/migrations/20260723150000_ai_profile_coach_base.sql"),
   path.join(ROOT, "supabase/migrations/20260806220000_harden_demand_radar.sql"),
   path.join(ROOT, "supabase/migrations/20260806230000_demand_radar_pipeline.sql"),
@@ -151,8 +152,8 @@ const ALLOWED_PROFILE_STATUS = [
 const ALLOWED_SUBSCRIPTION_TIERS = ["free", "standard", "pro", "elite", "featured"];
 const IGNORED_TABLES = new Set(["auth.users", "storage.buckets", "storage.objects"]);
 const IDENTIFIER = "[a-zA-Z_][a-zA-Z0-9_]*";
-const IDENT_TOKEN = `(?:"[^"]+"|${IDENTIFIER})`; // quoted or unquoted identifier
-const TABLE_REF = `(?:${IDENT_TOKEN}\\s*\\.\\s*)?${IDENT_TOKEN}`; // [schema.]table
+const IDENT_TOKEN = `(?:"[^"]+"|${IDENTIFIER})`;
+const TABLE_REF = `(?:${IDENT_TOKEN}\\s*\\.\\s*)?${IDENT_TOKEN}`;
 
 function walkFiles(dir) {
   const absolute = path.join(ROOT, dir);
@@ -186,12 +187,6 @@ function unquoteIdentifier(identifier) {
 }
 
 function extractTableName(tableRef) {
-  // Handles:
-  // - profiles
-  // - public.profiles
-  // - "profiles"
-  // - "public"."profiles"
-  // - public."profiles"
   const parts = tableRef
     .split(".")
     .map((p) => p.trim())
@@ -216,7 +211,6 @@ function parseSchemaContract(sql) {
   const contract = new Map();
   const normalized = normalizeSql(sql);
 
-  // CREATE TABLE [IF NOT EXISTS] [schema.]table (...)
   const createTableRegex = new RegExp(
     `create\\s+table\\s+(?:if\\s+not\\s+exists\\s+)?(${TABLE_REF})\\s*\\(([\\s\\S]*?)\\);`,
     "gi"
@@ -233,15 +227,12 @@ function parseSchemaContract(sql) {
       const line = rawLine.trim().replace(/,$/, "");
       if (!line || /^(constraint|primary|foreign|unique|check|exclude)\b/.test(line)) continue;
 
-      // Column definition starts with either "quoted_ident" or unquoted_ident
       const colMatch = line.match(new RegExp(`^("([^"]|"")*"|${IDENTIFIER})\\b`, "i"));
       const rawColumn = colMatch?.[1];
       if (rawColumn) addColumn(contract, table, extractColumnName(rawColumn));
     }
   }
 
-  // CREATE [OR REPLACE] VIEW [schema.]view [WITH (...)] AS SELECT col1, col2, ...
-  // Register views so code that queries them doesn't trigger "missing table" errors.
   const createViewRegex = new RegExp(
     `create\\s+(?:or\\s+replace\\s+)?(?:materialized\\s+)?view\\s+(?:if\\s+not\\s+exists\\s+)?(${TABLE_REF})(?:\\s+with\\s*\\([^;]*?\\))?\\s+as\\s+select\\s+([\\s\\S]*?)(?:from\\s|;)`,
     "gi"
@@ -250,7 +241,6 @@ function parseSchemaContract(sql) {
   while ((viewMatch = createViewRegex.exec(normalized))) {
     const table = extractTableName(viewMatch[1]);
     if (!contract.has(table)) contract.set(table, new Set());
-    // Extract column aliases from the SELECT list so column-level checks pass too.
     const selectList = viewMatch[2];
     for (const part of selectList.split(",")) {
       const alias = part.trim().match(new RegExp(`\\s+as\\s+(${IDENT_TOKEN})\\s*$`, "i"))?.[1];
@@ -261,14 +251,12 @@ function parseSchemaContract(sql) {
     }
   }
 
-  // ALTER TABLE [schema.]table ... ;
   const alterRegex = new RegExp(`alter\\s+table\\s+(${TABLE_REF})[\\s\\S]*?;`, "gi");
   let alterMatch;
   while ((alterMatch = alterRegex.exec(normalized))) {
     const table = extractTableName(alterMatch[1]);
     const statement = alterMatch[0];
 
-    // ADD COLUMN [IF NOT EXISTS] column_name
     const columnRegex = new RegExp(
       `add\\s+column\\s+(?:if\\s+not\\s+exists\\s+)?("([^"]|"")*"|${IDENTIFIER})\\b`,
       "gi"
@@ -314,17 +302,14 @@ function extractObjectKeys(objectBody) {
   const shorthandPattern = new RegExp(`^(${IDENTIFIER})$`);
   let depth = 0;
   let quote = null;
-  let inValue = false; // true after key: — suppresses ternary `:` false positives
-  let segmentStart = -1; // start of the current top-level `key: value` / `key` segment
+  let inValue = false;
+  let segmentStart = -1;
 
   const addKey = (key) => {
     if (!key || ignoredKeys.has(key) || key !== key.toLowerCase()) return;
     keys.add(key);
   };
 
-  // `{ metadata }` is an ES shorthand write of the `metadata` column. Without
-  // this the segment carries no `:` and the column is never contract-checked,
-  // which is how messaging_contacts.metadata reached production unnoticed.
   const closeSegment = (end) => {
     if (inValue || segmentStart < 0) return;
     addKey(objectBody.slice(segmentStart, end).trim().match(shorthandPattern)?.[1]);
@@ -360,7 +345,6 @@ function extractObjectKeys(objectBody) {
       continue;
     }
 
-    // A comma at depth 1 means we moved to the next key-value pair
     if (char === "," && depth === 1) {
       closeSegment(index);
       inValue = false;
@@ -375,7 +359,7 @@ function extractObjectKeys(objectBody) {
     const key = match?.[1];
     if (key && !ignoredKeys.has(key) && key === key.toLowerCase()) {
       addKey(key);
-      inValue = true; // suppress ternary `:` until next comma at depth 1
+      inValue = true;
     }
   }
 
@@ -425,10 +409,6 @@ function scanReferences() {
   return references;
 }
 
-/**
- * Collects every Postgres function name defined anywhere in the SQL corpus.
- * Matches `create [or replace] function [public.]name(` in either case.
- */
 function collectDefinedFunctions() {
   const defined = new Set();
   const functionRegex = new RegExp(
@@ -448,12 +428,6 @@ function collectDefinedFunctions() {
   return defined;
 }
 
-/**
- * Collects every RPC name the application invokes. Covers the direct call form
- * and the cast form used where the generated Supabase types do not yet know the
- * function, i.e. the rpc member cast through an inline signature before being
- * applied to the function name.
- */
 function scanRpcReferences() {
   const references = new Map();
   const direct = /\.rpc\(\s*["'`]([a-zA-Z_][a-zA-Z0-9_]*)["'`]/g;
@@ -527,9 +501,6 @@ for (const [table, columns] of scanned) {
   }
 }
 
-// Every RPC the application calls must be defined by some migration. A missing
-// definition is invisible at build/type time and only surfaces as a runtime 500
-// (a Stripe webhook that never syncs a tier, an admin panel that never loads).
 const definedFunctions = collectDefinedFunctions();
 for (const [rpcName, files] of scanRpcReferences()) {
   if (definedFunctions.has(rpcName)) continue;
