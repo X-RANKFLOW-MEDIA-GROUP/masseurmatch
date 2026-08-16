@@ -5,14 +5,33 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
+const BRIDGE_VERSION = "imessage-bridge-v1";
 const BASE_URL = (process.env.MASSEURMATCH_APP_URL || "https://masseurmatch.com").replace(/\/$/, "");
 const SECRET = process.env.IMESSAGE_BRIDGE_SECRET?.trim();
-const WORKER_ID = process.env.IMESSAGE_WORKER_ID?.trim() || `mac-${os.hostname()}`;
-const POLL_MS = Math.max(2000, Number(process.env.IMESSAGE_POLL_MS || 5000));
+const WORKER_ID = process.env.IMESSAGE_WORKER_ID?.trim() || "masseurmatch-imessage-01";
 const CHAT_DB = process.env.IMESSAGE_CHAT_DB || path.join(os.homedir(), "Library/Messages/chat.db");
 const STATE_DIR = process.env.IMESSAGE_STATE_DIR || path.join(os.homedir(), ".masseurmatch-imessage-bridge");
 const STATE_FILE = path.join(STATE_DIR, "state.json");
 const REPLAY_HISTORY = process.env.IMESSAGE_REPLAY_HISTORY === "1";
+const STARTED_AT = new Date().toISOString();
+
+function boundedNumberEnv(name, fallback, minimum, maximum) {
+  const parsed = Number(process.env[name] || fallback);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(maximum, Math.max(minimum, Math.round(parsed)));
+}
+
+const POLL_MS = boundedNumberEnv("IMESSAGE_POLL_MS", 5000, 2000, 60_000);
+const HEARTBEAT_MS = boundedNumberEnv("IMESSAGE_HEARTBEAT_MS", 30_000, 15_000, 60_000);
+
+const health = {
+  lastCycleAt: null,
+  lastInboundAt: null,
+  lastOutboundAt: null,
+  lastErrorCode: null,
+  lastErrorAt: null,
+};
+let lastHeartbeatAttemptAt = 0;
 
 if (process.platform !== "darwin") {
   console.error("This bridge must run on macOS with the Messages app signed into iMessage.");
@@ -33,6 +52,11 @@ function saveState(state) {
   const temp = `${STATE_FILE}.tmp`;
   fs.writeFileSync(temp, JSON.stringify(state, null, 2), { mode: 0o600 });
   fs.renameSync(temp, STATE_FILE);
+}
+
+function markHealthError(code) {
+  health.lastErrorCode = code;
+  health.lastErrorAt = new Date().toISOString();
 }
 
 function normalizePhone(value) {
@@ -90,6 +114,32 @@ async function api(pathname, options = {}) {
     throw new Error(`${pathname} returned ${response.status}: ${payload.error || payload.message || "unknown error"}`);
   }
   return payload;
+}
+
+async function sendHeartbeat(force = false) {
+  const now = Date.now();
+  if (!force && now - lastHeartbeatAttemptAt < HEARTBEAT_MS) return;
+  lastHeartbeatAttemptAt = now;
+
+  try {
+    await api("/api/messaging/imessage/heartbeat", {
+      method: "POST",
+      body: JSON.stringify({
+        bridgeVersion: BRIDGE_VERSION,
+        startedAt: STARTED_AT,
+        lastCycleAt: health.lastCycleAt,
+        lastInboundAt: health.lastInboundAt,
+        lastOutboundAt: health.lastOutboundAt,
+        lastErrorCode: health.lastErrorCode,
+        lastErrorAt: health.lastErrorAt,
+        replayHistory: REPLAY_HISTORY,
+        pollMs: POLL_MS,
+      }),
+    });
+  } catch (error) {
+    markHealthError("HEARTBEAT_API_FAILED");
+    console.error("[heartbeat]", error instanceof Error ? error.message : error);
+  }
 }
 
 function appleScriptString(value) {
@@ -156,12 +206,14 @@ async function forwardInbound(state) {
             receivedAt: appleDateToIso(row.apple_date),
           }),
         });
+        health.lastInboundAt = new Date().toISOString();
       }
       state.lastInboundRowId = Math.max(state.lastInboundRowId || 0, rowId);
       saveState(state);
     } catch (error) {
+      markHealthError("INBOUND_FORWARD_FAILED");
       console.error(`[inbound row ${rowId}]`, error instanceof Error ? error.message : error);
-      break;
+      throw error;
     }
   }
 }
@@ -169,7 +221,7 @@ async function forwardInbound(state) {
 async function sendOneOutbound() {
   const claimed = await api("/api/messaging/imessage/claim", { method: "POST", body: "{}" });
   const item = claimed.item;
-  if (!item) return false;
+  if (!item) return null;
 
   const queueId = item.queue_id;
   try {
@@ -185,8 +237,10 @@ async function sendOneOutbound() {
         occurredAt: new Date().toISOString(),
       }),
     });
+    health.lastOutboundAt = new Date().toISOString();
     return true;
   } catch (error) {
+    markHealthError("IMESSAGE_SEND_FAILED");
     const message = error instanceof Error ? error.message : String(error);
     await api("/api/messaging/imessage/status", {
       method: "POST",
@@ -206,24 +260,31 @@ async function sendOneOutbound() {
 async function cycle(state) {
   await forwardInbound(state);
   for (let count = 0; count < 10; count += 1) {
-    const sent = await sendOneOutbound();
-    if (!sent) break;
+    const result = await sendOneOutbound();
+    if (result === null) break;
+    if (result === false) return false;
     await new Promise((resolve) => setTimeout(resolve, 1200));
   }
+  return true;
 }
 
 async function main() {
   const state = loadState();
-  console.log(`MasseurMatch iMessage bridge started as ${WORKER_ID}.`);
+  console.log(`MasseurMatch iMessage bridge ${BRIDGE_VERSION} started as ${WORKER_ID}.`);
   console.log(`API: ${BASE_URL}`);
   console.log(`Messages DB: ${CHAT_DB}`);
 
+  await sendHeartbeat(true);
+
   while (true) {
     try {
-      await cycle(state);
+      const completed = await cycle(state);
+      if (completed) health.lastCycleAt = new Date().toISOString();
     } catch (error) {
+      markHealthError("BRIDGE_CYCLE_FAILED");
       console.error(error instanceof Error ? error.message : error);
     }
+    await sendHeartbeat();
     await new Promise((resolve) => setTimeout(resolve, POLL_MS));
   }
 }
