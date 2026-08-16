@@ -85,9 +85,6 @@ export const PROFILE_FIELDS_BY_SECTION: Record<string, string[]> = {
     "price_max",
     "starting_price",
     "starting_rate",
-    "booking_url",
-    "booking_link",
-    "booking_platform",
     "website",
   ],
   "Verification & Status": [
@@ -208,7 +205,6 @@ export const PROFILE_FIELDS_BY_SECTION: Record<string, string[]> = {
 };
 
 const FIELD_TYPES: Record<string, "text" | "number" | "boolean" | "array" | "json" | "date"> = {
-  // Text fields
   display_name: "text",
   full_name: "text",
   email: "text",
@@ -234,8 +230,6 @@ const FIELD_TYPES: Record<string, "text" | "number" | "boolean" | "array" | "jso
   modality: "text",
   education: "text",
   training: "text",
-  booking_link: "text",
-  booking_platform: "text",
   website: "text",
   profile_status: "text",
   verification_status: "text",
@@ -268,9 +262,7 @@ const FIELD_TYPES: Record<string, "text" | "number" | "boolean" | "array" | "jso
   id: "text",
   avatar_url: "text",
   photo_url: "text",
-  booking_url: "text",
 
-  // Number fields
   incall_price: "number",
   outcall_price: "number",
   price_min: "number",
@@ -301,7 +293,6 @@ const FIELD_TYPES: Record<string, "text" | "number" | "boolean" | "array" | "jso
   profile_completion_score: "number",
   photo_limit: "number",
 
-  // Boolean fields
   is_verified_email: "boolean",
   is_verified_phone: "boolean",
   is_verified_photos: "boolean",
@@ -325,7 +316,6 @@ const FIELD_TYPES: Record<string, "text" | "number" | "boolean" | "array" | "jso
   show_email: "boolean",
   subscription_cancel_at_period_end: "boolean",
 
-  // Array fields
   specialties: "array",
   languages: "array",
   languages_spoken: "array",
@@ -349,7 +339,6 @@ const FIELD_TYPES: Record<string, "text" | "number" | "boolean" | "array" | "jso
   massage_setup: "array",
   affiliations: "array",
 
-  // JSON fields
   add_ons: "json",
   business_hours: "json",
   mobile_hours: "json",
@@ -366,7 +355,6 @@ const FIELD_TYPES: Record<string, "text" | "number" | "boolean" | "array" | "jso
   custom_faq: "json",
   education_entries: "json",
 
-  // Date fields
   created_at: "date",
   updated_at: "date",
   submitted_at: "date",
