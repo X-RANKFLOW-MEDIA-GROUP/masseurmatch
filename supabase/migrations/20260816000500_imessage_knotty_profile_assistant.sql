@@ -1,8 +1,20 @@
 -- Secure profile-assistance layer for the existing admin messaging system.
 -- Additive only. iMessage is the transport; Knotty never receives credentials.
 
+-- Production already carries user ownership on the messaging tables. Reassert
+-- those columns idempotently so clean environments reproduce the live contract.
 alter table public.messaging_contacts
+  add column if not exists user_id uuid references auth.users(id) on delete cascade,
   add column if not exists profile_id uuid references public.profiles(id) on delete set null;
+
+alter table public.messaging_conversations
+  add column if not exists user_id uuid references auth.users(id) on delete cascade;
+
+alter table public.messaging_messages
+  add column if not exists user_id uuid references auth.users(id) on delete cascade;
+
+alter table public.messaging_queue
+  add column if not exists user_id uuid references auth.users(id) on delete cascade;
 
 create index if not exists idx_messaging_contacts_profile_id
   on public.messaging_contacts(profile_id)
