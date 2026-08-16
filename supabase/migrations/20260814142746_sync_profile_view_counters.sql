@@ -1,3 +1,5 @@
+BEGIN;
+
 LOCK TABLE public.profile_view_analytics IN SHARE ROW EXCLUSIVE MODE;
 
 CREATE OR REPLACE FUNCTION public.sync_profile_view_counters()
@@ -57,3 +59,5 @@ SET profile_views = n.total,
 FROM normalized n
 WHERE p.id = n.id
   AND (p.profile_views IS DISTINCT FROM n.total OR p.view_count IS DISTINCT FROM n.total);
+
+COMMIT;
