@@ -1,66 +1,12 @@
-import { errorResponse, json } from "@/app/api/_lib/http";
-import { requireSession } from "@/app/api/_lib/supabase-server";
-import { createSupabaseWebhookAdminClient } from "@/app/api/_lib/supabase-server";
-import { verifyTotp } from "@/app/api/_lib/totp";
-import { RouteError } from "@/app/api/_lib/http";
-import { assertRateLimit } from "@/app/_lib/security";
+import { json } from "@/app/api/_lib/http";
 
-export async function POST(request: Request) {
-  try {
-    // Throttle code guessing: a 6-digit TOTP is brute-forceable otherwise.
-    assertRateLimit(request, "auth-mfa-verify", { limit: 5, windowMs: 60_000 });
-    const session = await requireSession(request);
-    let code: string;
-    try {
-      const body = await request.json() as Record<string, unknown>;
-      code = body.code as string;
-    } catch {
-      throw new RouteError(400, "Invalid request body.");
-    }
-
-    if (!code || typeof code !== "string" || code.length !== 6 || !/^\d+$/.test(code)) {
-      throw new RouteError(400, "Code must be 6 digits.");
-    }
-    const adminClient = createSupabaseWebhookAdminClient();
-
-    // Retrieve pending MFA setup
-    const { data: pending, error: pendingError } = await (adminClient
-      .from("mfa_pending" as any)
-      .select("totp_secret, backup_codes")
-      .eq("user_id", session.userId)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle() as any);
-
-    if (pendingError || !pending) {
-      throw new RouteError(400, "No pending MFA setup found. Start setup first.");
-    }
-
-    // Verify TOTP code
-    if (!verifyTotp(pending.totp_secret, code)) {
-      throw new RouteError(401, "Invalid verification code.");
-    }
-
-    // Enable MFA for user
-    await (adminClient.from("user_mfa" as any).upsert({
-      user_id: session.userId,
-      totp_secret: pending.totp_secret,
-      backup_codes: pending.backup_codes,
-      enabled_at: new Date().toISOString(),
-    } as any) as any);
-
-    // Remove pending setup
-    await (adminClient.from("mfa_pending" as any).delete().eq("user_id", session.userId) as any);
-
-    return json({
-      ok: true,
-      message: "MFA enabled successfully. Save your backup codes in a secure place.",
-      backupCodes: pending.backup_codes,
-    });
-  } catch (error) {
-    if (error instanceof RouteError) {
-      return json({ ok: false, error: error.message }, { status: error.status });
-    }
-    return errorResponse(error);
-  }
+export async function POST() {
+  return json(
+    {
+      ok: false,
+      error: "This MFA endpoint has been retired. Administrators must use native Supabase TOTP at /admin-mfa.",
+      code: "MFA_ENDPOINT_RETIRED",
+    },
+    { status: 410 },
+  );
 }
