@@ -12,6 +12,12 @@ export const metadata: Metadata = createPageMetadata({
   noIndex: true,
 });
 
+function normalizePhone(value: string | null | undefined) {
+  if (!value) return null;
+  const digits = value.replace(/\D/g, "");
+  return digits.length >= 10 ? digits : null;
+}
+
 async function ensureProAccess() {
   const supabase = await createServerSupabase();
   const {
@@ -28,6 +34,32 @@ async function ensureProAccess() {
 
   if (role !== "provider" && role !== "admin") {
     redirect("/");
+  }
+
+  // Admins are not provider listings and should not be forced through provider
+  // phone verification just to use administrative tooling under /pro.
+  if (role === "admin") return;
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("phone, phone_number, is_verified_phone, visibility_status")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (!profile || profile.visibility_status !== "public") return;
+
+  const profilePhone = normalizePhone(profile.phone) || normalizePhone(profile.phone_number);
+  const authPhone = normalizePhone(user.phone);
+  const verified = Boolean(
+    profile.is_verified_phone === true &&
+    profilePhone &&
+    authPhone &&
+    user.phone_confirmed_at &&
+    profilePhone === authPhone,
+  );
+
+  if (!verified) {
+    redirect("/verify-phone?redirect=%2Fpro%2Fdashboard");
   }
 }
 
