@@ -1,6 +1,7 @@
--- Historical marker for a duplicate production migration execution.
---
--- Production recorded 20260816075841 with the same name and SQL as
+-- Migration history alignment marker.
+-- Production already records version 20260816075841 with the same migration name.
+-- The actual verified-phone enforcement is implemented by
 -- 20260816075500_enforce_verified_phone_for_public_profiles.sql.
--- The canonical DDL remains in 20260816075500. This marker preserves remote
--- migration lineage without executing the trigger/function definition twice.
+-- Keep this file as a no-op so repository and production migration ledgers stay aligned.
+
+select 1;
