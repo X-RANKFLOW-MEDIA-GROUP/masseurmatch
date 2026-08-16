@@ -6,7 +6,7 @@ export async function GET(request: Request) {
     const session = await requireSession(request);
     const adminClient = createSupabaseAdminClient();
 
-    const { data: profile, error: profileError } = await adminClient
+    const { data: profile, error: profileError } = await (adminClient as any)
       .from("profiles")
       .select(
         "id, user_id, display_name, full_name, bio, city, state, profile_status, visibility_status, " +
@@ -21,16 +21,16 @@ export async function GET(request: Request) {
     let approvedPhotos = 0;
     let pendingPhotos = 0;
     if (profile?.id) {
-      const { data: photoCounts, error: photoError } = await adminClient
+      const { data: photoCounts, error: photoError } = await (adminClient as any)
         .from("profile_photos")
         .select("id, moderation_status")
         .eq("profile_id", profile.id);
 
       if (photoError) throw new RouteError(500, photoError.message);
       if (photoCounts) {
-        approvedPhotos = photoCounts.filter((photo) => photo.moderation_status === "approved").length;
+        approvedPhotos = photoCounts.filter((photo: any) => photo.moderation_status === "approved").length;
         pendingPhotos = photoCounts.filter(
-          (photo) => !photo.moderation_status || photo.moderation_status === "pending"
+          (photo: any) => !photo.moderation_status || photo.moderation_status === "pending"
         ).length;
       }
     }
