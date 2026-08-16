@@ -7,6 +7,20 @@ import { revalidatePublicDirectory } from "@/app/_lib/directory-cache";
 import { getPublicSupabaseUrl } from "@/lib/supabase/public-env";
 import ProfileApprovedEmail from "@/emails/ProfileApprovedEmail";
 
+type RequestedTier = "free" | "standard" | "pro" | "elite";
+
+function normalizeRequestedTier(value: string | null | undefined): RequestedTier {
+  if (value === "standard" || value === "pro" || value === "elite") return value;
+  return "free";
+}
+
+function planLabel(tier: RequestedTier) {
+  if (tier === "standard") return "Standard";
+  if (tier === "pro") return "Pro";
+  if (tier === "elite") return "Elite";
+  return "Free";
+}
+
 function resolvePhotoUrl(url: string | null, storagePath: string | null) {
   if (url) return url;
   if (!storagePath) return null;
@@ -103,10 +117,14 @@ export async function POST(
     };
     const supabase = createSupabaseAdminClient();
 
+    let requestedTier: RequestedTier = "free";
+    let paymentRequired = false;
+    let activePaidEntitlement = false;
+
     if (action === "approve") {
       const { data: publishCandidate, error: candidateError } = await supabase
         .from("profiles")
-        .select("user_id, city, phone, phone_number, is_verified_phone")
+        .select("user_id, city, phone, phone_number, is_verified_phone, _tier")
         .eq("id", id)
         .maybeSingle();
 
@@ -155,6 +173,21 @@ export async function POST(
           { status: 422 },
         );
       }
+
+      requestedTier = normalizeRequestedTier(publishCandidate._tier);
+      paymentRequired = requestedTier !== "free";
+
+      if (paymentRequired) {
+        const { data: subscriptions, error: subscriptionError } = await supabase
+          .from("therapist_subscriptions")
+          .select("id")
+          .eq("profile_id", id)
+          .eq("provider", "paypal")
+          .in("status", ["trialing", "active"])
+          .limit(1);
+        if (subscriptionError) throw subscriptionError;
+        activePaidEntitlement = Boolean(subscriptions?.length);
+      }
     }
 
     const statusMap = {
@@ -164,10 +197,17 @@ export async function POST(
     };
 
     const now = new Date().toISOString();
+    const publishNow = action === "approve" && (!paymentRequired || activePaidEntitlement);
 
     const visibility =
       action === "approve"
-        ? { profile_status: "approved", visibility_status: "public", is_active: true, approved_at: now, approved_by: adminSession.userId }
+        ? {
+            profile_status: "approved",
+            visibility_status: publishNow ? "public" : "hidden",
+            is_active: publishNow,
+            approved_at: now,
+            approved_by: adminSession.userId,
+          }
         : action === "reject"
           ? { profile_status: "rejected", visibility_status: "hidden", is_active: false, rejected_at: now, rejected_by: adminSession.userId, rejection_reason: notes || null }
           : { profile_status: "changes_requested", visibility_status: "hidden", is_active: false };
@@ -192,14 +232,23 @@ export async function POST(
         .eq("id", id)
         .single();
 
+      const checkoutRequired = paymentRequired && !activePaidEntitlement;
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || "https://masseurmatch.com";
+      const billingUrl = `${appUrl}/pro/billing?checkout=${requestedTier}`;
+
       if (profile?.email_address) {
         const profileSlug = profile.slug ?? id;
         await sendEmail({
           to: profile.email_address,
-          subject: "Your MasseurMatch Profile is Approved!",
+          subject: checkoutRequired
+            ? `Your MasseurMatch profile is approved — activate ${planLabel(requestedTier)}`
+            : "Your MasseurMatch Profile is Approved!",
           react: React.createElement(ProfileApprovedEmail, {
             profileUrl: `https://masseurmatch.com/therapists/${profileSlug}`,
-            dashboardUrl: "https://masseurmatch.com/pro/dashboard",
+            dashboardUrl: `${appUrl}/pro/dashboard`,
+            billingUrl,
+            requiresPayment: checkoutRequired,
+            planName: planLabel(requestedTier),
           }),
         });
       }
@@ -208,9 +257,13 @@ export async function POST(
         await supabase.from("notifications").insert({
           user_id: profile.user_id,
           type: "profile_approved",
-          title: "Profile Approved!",
-          message: "Your therapist profile has been reviewed and approved. It's now visible to clients.",
-          data: { profile_id: id, slug: profile.slug },
+          title: checkoutRequired ? "Profile Approved — Activate Your Plan" : "Profile Approved!",
+          message: checkoutRequired
+            ? `Your profile passed review. Activate your ${planLabel(requestedTier)} subscription through PayPal to publish your listing.`
+            : "Your therapist profile has been reviewed and approved. It's now visible to clients.",
+          data: checkoutRequired
+            ? { profile_id: id, slug: profile.slug, billing_url: billingUrl, requested_tier: requestedTier }
+            : { profile_id: id, slug: profile.slug },
         });
       }
     } else if (action === "reject") {
