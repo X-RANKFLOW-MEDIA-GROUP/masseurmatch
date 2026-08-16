@@ -104,19 +104,25 @@ test.describe.serial("Auth launch flow", () => {
     await deleteUserByEmail(email);
   });
 
-  test("register provisions auth user, profile, and provider role", async ({ page, context }) => {
+  test("register provisions auth user, profile, and provider role", async ({ page }) => {
     test.slow();
 
     await page.goto("/register");
 
+    // Labels are "Full name *", "Email *", "Phone *", "Password *" and
+    // "Confirm password *". /^password/i must stay anchored so it does not
+    // also match "Confirm password".
     await page.getByLabel(/full name/i).fill(fullName);
-    await page.getByLabel(/email address/i).fill(email);
-    await page.getByLabel(/phone number/i).fill("5551112222");
+    await page.getByLabel(/^email/i).fill(email);
+    await page.getByLabel(/^phone/i).fill("5551112222");
     await page.getByLabel(/^password/i).fill(password);
     await page.getByLabel(/confirm password/i).fill(password);
     await page.getByRole("checkbox", { name: /i agree to the terms of service/i }).check();
     await page.getByRole("checkbox", { name: /i acknowledge the therapist agreement/i }).check();
-    await page.getByRole("button", { name: /continue to verification/i }).click();
+    // All three attestations are required; without this one the form refuses to
+    // submit with "Accept the required account terms to continue."
+    await page.getByRole("checkbox", { name: /i confirm i am at least 18/i }).check();
+    await page.getByRole("button", { name: /create account/i }).click();
 
     await expect(page).toHaveURL(/\/signup\/verify$/, { timeout: 30_000 });
 
@@ -136,17 +142,20 @@ test.describe.serial("Auth launch flow", () => {
 
     const { data: profile, error: profileError } = await adminClient
       .from("profiles")
-      .select("user_id, full_name, status, is_active")
+      .select("user_id, full_name, status, profile_status, visibility_status")
       .eq("user_id", createdUserId!)
       .maybeSingle();
 
     expect(profileError).toBeNull();
+    // These are the values ensureUserProfileAndRole actually writes. The
+    // profile must not be publicly visible before moderation.
     expect(profile).toEqual(
       expect.objectContaining({
         user_id: createdUserId,
         full_name: fullName,
-        status: "draft",
-        is_active: false,
+        status: "pending",
+        profile_status: "draft",
+        visibility_status: "hidden",
       }),
     );
 
@@ -158,12 +167,26 @@ test.describe.serial("Auth launch flow", () => {
     expect(rolesError).toBeNull();
     expect(roles?.some((entry) => entry.role === "provider")).toBeTruthy();
 
-    // Authentication is Supabase SSR: the session lives in sb-<project>-auth-token
-    // cookies. There is no mm_session cookie in this build.
-    const sessionCookie = (await context.cookies()).find((cookie) =>
-      cookie.name.startsWith("sb-"),
+    // Email confirmation is mandatory on this project (mailer_autoconfirm is
+    // false), so registration deliberately ends WITHOUT a session — asserting a
+    // session cookie here would assert the wrong product behaviour. What must
+    // hold is that /signup/verify explains the wait instead of bouncing the new
+    // account back to the account form, where re-submitting only fails with
+    // "an account with this email already exists".
+    await expect(
+      page.getByRole("heading", { name: /confirm your email to continue/i }),
+    ).toBeVisible();
+    await expect(page.getByText(email)).toBeVisible();
+
+    // Confirm the address the way clicking the emailed link would. Without
+    // this the account stays unconfirmed and every later test in this serial
+    // suite fails at sign-in with "Email not confirmed" — there is no inbox
+    // here to click through.
+    const { error: confirmError } = await adminClient.auth.admin.updateUserById(
+      createdUserId!,
+      { email_confirm: true },
     );
-    expect(sessionCookie?.value).toBeTruthy();
+    expect(confirmError).toBeNull();
   });
 
   test("login succeeds but signup submit still rejects fake verification claims", async ({ page }) => {
