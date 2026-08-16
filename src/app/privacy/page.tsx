@@ -1,312 +1,167 @@
-﻿import type { Metadata } from "next";
-import Script from "next/script";
+import type { Metadata } from "next";
+import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy | MasseurMatch",
+import { LegalPage } from "@/app/_components/legal-page";
+import { createPageMetadata } from "@/app/_lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
+  title: "Privacy Policy",
   description:
-    "MasseurMatch's privacy policy: how we collect, use, and protect your personal information. We never sell your data. CCPA and GDPR rights included.",
-  alternates: { canonical: "https://www.masseurmatch.com/privacy" },
-  openGraph: {
-    title: "Privacy Policy | MasseurMatch",
-    description: "How MasseurMatch collects, uses, and protects your data. We never sell your information.",
-    url: "https://www.masseurmatch.com/privacy",
-    siteName: "MasseurMatch",
-    type: "website",
-  },
-  robots: { index: true, follow: true },
-};
-
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  name: "Privacy Policy - MasseurMatch",
-  url: "https://www.masseurmatch.com/privacy",
-  description: "MasseurMatch privacy policy: data collection, use, and your rights.",
-  publisher: {
-    "@type": "Organization",
-    name: "MasseurMatch",
-    url: "https://www.masseurmatch.com",
-  },
-};
-
-const sections = [
-  {
-    id: "information-we-collect",
-    title: "1. Information We Collect",
-    content: `We collect information you provide directly when creating an account, listing a practice, or contacting us. This includes your name, email address, and (for therapists) your service and profile details.
-
-We also collect limited technical data automatically, including your IP address, browser type, and pages visited on our site. This data is used solely to maintain and improve the platform.
-
-We do not collect health information, sensitive personal data, or any information about the nature of your massage therapy sessions.`,
-  },
-  {
-    id: "how-we-use-information",
-    title: "2. How We Use Your Information",
-    content: `We use your information to:
-
-- Operate and maintain the MasseurMatch directory
-- Review profile quality and completeness
-- Send transactional communications (account confirmations, support responses)
-- Improve platform functionality and user experience
-- Detect and prevent fraud, abuse, or policy violations
-
-We do not use your information for advertising profiling or behavioral targeting. We do not send unsolicited marketing communications without your explicit consent.`,
-  },
-  {
-    id: "data-sharing",
-    title: "3. Data Sharing & Third Parties",
-    content: `We never sell your personal information to third parties. Period.
-
-We share limited data only with:
-
-- Safety/compliance partners when required by law
-- Payment processors (Stripe) for handling subscription payments - we never store payment card data
-- Hosting and infrastructure providers (Vercel, Supabase) who process data solely on our behalf under strict data processing agreements
-- Law enforcement when required by valid legal process
-
-Any third-party service provider we use is contractually prohibited from using your data for their own purposes.`,
-  },
-  {
-    id: "cookies",
-    title: "4. Cookies & Tracking",
-    content: `We use a minimal set of cookies necessary to operate the platform (authentication, session state). We do not use third-party advertising cookies or behavioral tracking technologies.
-
-You can disable cookies in your browser settings. Disabling cookies may affect your ability to log in and use account features. See our Cookie Policy at /cookie-policy for a full breakdown.`,
-  },
-  {
-    id: "your-rights",
-    title: "5. Your Privacy Rights",
-    content: `Depending on your location, you may have rights including:
-
-- Access: Request a copy of the personal data we hold about you
-- Correction: Request that we correct inaccurate data
-- Deletion: Request deletion of your personal data ("right to be forgotten")
-- Portability: Request your data in a machine-readable format
-- Objection: Object to certain types of processing
-
-To exercise any of these rights, email privacy@masseurmatch.com. We respond to all requests within 30 days.`,
-  },
-  {
-    id: "ccpa",
-    title: "6. California Privacy Rights (CCPA)",
-    content: `If you are a California resident, the California Consumer Privacy Act (CCPA) provides you with specific rights:
-
-- Right to Know: You may request that we disclose the categories and specific pieces of personal information we have collected about you.
-- Right to Delete: You may request deletion of your personal information, subject to certain exceptions.
-- Right to Opt-Out of Sale: We do not sell your personal information. However, you may submit an opt-out request at any time to privacy@masseurmatch.com and we will confirm our non-sale status.
-- Right to Non-Discrimination: We will not discriminate against you for exercising any CCPA rights.
-
-Authorized agents may submit requests on your behalf by contacting us at privacy@masseurmatch.com. We may require verification of identity before fulfilling requests.`,
-  },
-  {
-    id: "gdpr",
-    title: "7. European Privacy Rights (GDPR)",
-    content: `If you are located in the European Economic Area (EEA), United Kingdom, or Switzerland, you have rights under the General Data Protection Regulation (GDPR) and equivalent laws:
-
-- Lawful Basis: We process your data under the following legal bases: (a) performance of a contract (operating your account and profile), (b) legitimate interests (platform security, fraud prevention, analytics), and (c) consent (where explicitly sought).
-- Right of Access (Article 15): Request a copy of your data.
-- Right to Rectification (Article 16): Request correction of inaccurate data.
-- Right to Erasure (Article 17): Request deletion of your data ("right to be forgotten").
-- Right to Restriction (Article 18): Request restriction of processing in certain circumstances.
-- Right to Data Portability (Article 20): Receive your data in a structured, machine-readable format.
-- Right to Object (Article 21): Object to processing based on legitimate interests.
-- Right to Lodge a Complaint: You have the right to lodge a complaint with your local supervisory authority.
-
-Data Controller: XRankFlow Media Group LLC, legal@masseurmatch.com.
-We do not transfer personal data outside the US except where necessary to operate the platform (e.g., Supabase, Vercel infrastructure), in which case we rely on standard contractual clauses or equivalent mechanisms.`,
-  },
-  {
-    id: "data-security",
-    title: "8. Data Security",
-    content: `We implement industry-standard security measures including TLS encryption in transit, encrypted storage for sensitive data, and access controls that limit staff access to personal data on a need-to-know basis.
-
-No method of transmission over the internet is 100% secure. While we use commercially reasonable security measures, we cannot guarantee absolute security.`,
-  },
-  {
-    id: "retention",
-    title: "9. Data Retention",
-    content: `We retain account data for as long as your account is active. If you delete your account, we delete your personal data within 30 days, except where retention is required by law or for legitimate business purposes (e.g., fraud prevention records).`,
-  },
-  {
-    id: "children",
-    title: "10. Children's Privacy",
-    content: `MasseurMatch is not directed to children under 18. We do not knowingly collect personal information from anyone under 18. If you believe a minor has provided us with personal information, please contact us immediately at privacy@masseurmatch.com.`,
-  },
-  {
-    id: "changes",
-    title: "11. Changes to This Policy",
-    content: `We may update this policy from time to time. We will notify registered users of material changes via email and update the "Last Updated" date below. Continued use of the platform after changes constitutes acceptance of the updated policy.`,
-  },
-  {
-    id: "contact",
-    title: "12. Contact",
-    content: `For privacy-related questions or to exercise your rights:
-
-Email: privacy@masseurmatch.com
-Legal: legal@masseurmatch.com
-Support: support@masseurmatch.com
-Operator: XRankFlow Media Group LLC (Delaware)
-Mailing: 2810 N Church St PMB 74302, Wilmington, DE 19802`,
-  },
-];
+    "How MasseurMatch collects, uses, shares, protects, and retains personal information, including identity verification evidence.",
+  path: "/privacy",
+  keywords: ["privacy policy", "data privacy", "identity verification privacy", "MasseurMatch privacy"],
+});
 
 export default function PrivacyPage() {
   return (
-    <>
-      <Script
-        id="privacy-jsonld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+    <LegalPage title="Privacy Policy" path="/privacy" lastUpdated="August 15, 2026">
+      <p>
+        MasseurMatch is operated by XRankFlow Media Group LLC. This policy explains the categories of information
+        we process, why we process them, how verification evidence is handled, and the choices available to users.
+        MasseurMatch does not sell personal information for monetary consideration.
+      </p>
 
-      <div
-        style={{
-          background: "#FFFFFF",
-          color: "#111111",
-          fontFamily: "'Georgia', 'Times New Roman', serif",
-          minHeight: "100vh",
-        }}
-      >
-        <section
-          style={{
-            background: "#111111",
-            color: "#FFFFFF",
-            padding: "80px 24px 72px",
-          }}
-        >
-          <div style={{ maxWidth: 820, margin: "0 auto" }}>
-            <p
-              style={{
-                fontSize: 11,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                color: "#D4717E",
-                marginBottom: 20,
-                fontFamily: "system-ui, sans-serif",
-              }}
-            >
-              Legal
-            </p>
-            <h1
-              style={{
-                fontSize: "clamp(32px, 5vw, 52px)",
-                fontWeight: 400,
-                lineHeight: 1.1,
-                marginBottom: 20,
-                color: "#FFFFFF",
-              }}
-            >
-              Privacy Policy
-            </h1>
-            <p
-              style={{
-                fontSize: 14,
-                color: "#9CA3AF",
-                fontFamily: "system-ui, sans-serif",
-              }}
-            >
-              Last Updated: April 27, 2026
-            </p>
-            <p
-              style={{
-                fontSize: 16,
-                color: "#B0B8C4",
-                marginTop: 16,
-                fontFamily: "system-ui, sans-serif",
-                lineHeight: 1.7,
-                maxWidth: 560,
-              }}
-            >
-              MasseurMatch is operated by XRankFlow Media Group LLC. This policy
-              explains how we collect, use, and protect your information. We
-              believe in radical transparency - and we never sell your data.
-            </p>
-          </div>
-        </section>
+      <h2>1. Information We Collect</h2>
+      <p>Depending on how you use MasseurMatch, we may collect:</p>
+      <ul>
+        <li><strong>Account information:</strong> name, display name, email address, phone number, authentication status, and account preferences.</li>
+        <li><strong>Provider profile information:</strong> city, state, service areas, biography, techniques, pricing, availability, photos, business information, and other information a provider chooses to publish.</li>
+        <li><strong>Identity verification evidence:</strong> a government-issued identity document, a current challenge selfie, the one-time challenge code shown in that selfie, verification status, and limited audit metadata.</li>
+        <li><strong>Billing information:</strong> subscription and transaction metadata. Payment card details are handled by Stripe and are not stored by MasseurMatch as full card numbers.</li>
+        <li><strong>Communications:</strong> support requests, reports, email and SMS preferences, and messages sent to MasseurMatch or through supported platform communication features.</li>
+        <li><strong>AI interactions:</strong> prompts, questions, profile context, and generated responses when a user chooses to use Knotty AI or another MasseurMatch AI feature.</li>
+        <li><strong>Technical and analytics data:</strong> IP address, device and browser information, page activity, referral information, profile views, contact events, and similar security or product analytics.</li>
+      </ul>
+      <p>
+        MasseurMatch does not need information about the private details of an off-platform massage session in
+        order to operate the directory. Do not submit unnecessary medical, financial, authentication, or other
+        highly sensitive information through public profile fields or support forms.
+      </p>
 
-        <div
-          style={{
-            maxWidth: 820,
-            margin: "0 auto",
-            padding: "72px 24px 100px",
-            display: "grid",
-            gridTemplateColumns: "200px 1fr",
-            gap: 64,
-            alignItems: "start",
-          }}
-        >
-          <nav
-            aria-label="Privacy policy sections"
-            style={{
-              position: "sticky",
-              top: 100,
-            }}
-          >
-            <p
-              style={{
-                fontSize: 10,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                fontFamily: "system-ui, sans-serif",
-                color: "#8B1E2D",
-                marginBottom: 16,
-              }}
-            >
-              Sections
-            </p>
-            {sections.map((section) => (
-              <a
-                key={section.id}
-                href={`#${section.id}`}
-                style={{
-                  display: "block",
-                  fontSize: 12,
-                  fontFamily: "system-ui, sans-serif",
-                  color: "#6B7280",
-                  textDecoration: "none",
-                  padding: "6px 0",
-                  lineHeight: 1.4,
-                }}
-              >
-                {section.title}
-              </a>
-            ))}
-          </nav>
+      <h2>2. Identity Verification</h2>
+      <p>
+        The current MasseurMatch identity verification flow uses a government-issued ID, a current challenge
+        selfie, and human review. Identity evidence is stored in private verification storage while the review is
+        pending. When an approval or rejection decision is finalized, the application removes the submitted raw
+        identity images and retains limited status and audit metadata needed to operate the trust feature, prevent
+        abuse, and document the decision.
+      </p>
+      <p>
+        Identity Verified confirms a point-in-time identity review only. It is not a professional license check,
+        background check, qualification review, endorsement, or guarantee. See the{" "}
+        <Link href="/verification">Identity Verification page</Link> for the public badge explanation.
+      </p>
 
-          <div>
-            {sections.map((section) => (
-              <section
-                key={section.id}
-                id={section.id}
-                style={{ marginBottom: 52, scrollMarginTop: 100 }}
-              >
-                <h2
-                  style={{
-                    fontSize: 20,
-                    fontWeight: 400,
-                    marginBottom: 16,
-                    paddingBottom: 12,
-                    borderBottom: "1px solid rgba(17,17,17,0.1)",
-                  }}
-                >
-                  {section.title}
-                </h2>
-                <div
-                  style={{
-                    fontSize: 15,
-                    lineHeight: 1.85,
-                    color: "#374151",
-                    fontFamily: "system-ui, sans-serif",
-                    whiteSpace: "pre-line",
-                  }}
-                >
-                  {section.content}
-                </div>
-              </section>
-            ))}
-          </div>
-        </div>
-      </div>
-    </>
+      <h2>3. How We Use Information</h2>
+      <ul>
+        <li>Operate accounts, profiles, search, directory pages, subscriptions, and provider tools.</li>
+        <li>Verify email, phone, and identity where those workflows are used.</li>
+        <li>Review profile quality, moderation status, safety reports, and policy compliance.</li>
+        <li>Provide support and send transactional or consented communications.</li>
+        <li>Measure site and profile performance and improve product reliability.</li>
+        <li>Detect fraud, abuse, security incidents, spam, and prohibited conduct.</li>
+        <li>Provide AI-assisted features using the minimum context reasonably needed for the requested feature.</li>
+        <li>Comply with legal obligations and enforce platform terms.</li>
+      </ul>
+
+      <h2>4. Service Providers and Data Sharing</h2>
+      <p>
+        We may disclose information to service providers that help operate MasseurMatch, including database and
+        hosting infrastructure, payment processing, email and messaging delivery, analytics, security, and AI
+        infrastructure. These providers process information for operational purposes under their applicable
+        agreements and privacy terms.
+      </p>
+      <p>
+        Stripe processes provider subscription payments. MasseurMatch may also disclose information when required
+        by valid legal process, to protect users or the platform, to investigate fraud or abuse, or in connection
+        with a corporate transaction where permitted by law.
+      </p>
+
+      <h2>5. Public Profile Information</h2>
+      <p>
+        Provider profiles are designed for public discovery. Information marked for public display may appear on
+        profile pages, directory results, city or service pages, search engines, and social previews. Providers
+        should publish only information they are comfortable making public. Private verification evidence is not
+        part of the public profile.
+      </p>
+
+      <h2>6. Cookies and Similar Technologies</h2>
+      <p>
+        MasseurMatch uses cookies and similar technologies for authentication, session state, preferences,
+        security, analytics, and other platform functionality. See our{" "}
+        <Link href="/cookie-policy">Cookie Policy</Link> for additional details and available controls.
+      </p>
+
+      <h2>7. Data Retention</h2>
+      <p>
+        Retention depends on the type of information and why it is needed. Account and profile information may be
+        retained while an account is active. Billing, security, moderation, fraud-prevention, consent, and audit
+        records may be retained longer when reasonably necessary or legally required. Raw identity evidence is
+        deleted after the manual verification decision as described above; limited verification metadata may be
+        retained.
+      </p>
+
+      <h2>8. Security</h2>
+      <p>
+        We use administrative, technical, and organizational safeguards intended to protect information, including
+        access controls and encrypted transport. No internet service can guarantee absolute security. Users are
+        responsible for protecting their credentials and should contact us promptly if they suspect unauthorized
+        account access.
+      </p>
+
+      <h2>9. Your Choices and Privacy Requests</h2>
+      <p>
+        Depending on applicable law, you may have rights to request access, correction, deletion, portability,
+        restriction, or information about certain processing. You may also manage communication preferences using
+        the controls provided in MasseurMatch emails, messages, or account settings.
+      </p>
+      <p>
+        Submit privacy requests to <a href="mailto:privacy@masseurmatch.com">privacy@masseurmatch.com</a>. We may
+        need to verify your identity before completing a request. Some information may be retained where permitted
+        or required for security, fraud prevention, legal compliance, billing records, dispute resolution, or
+        enforcement of our agreements.
+      </p>
+
+      <h2>10. California and Other U.S. State Privacy Rights</h2>
+      <p>
+        Residents of jurisdictions with applicable consumer privacy laws may have additional rights regarding
+        access, correction, deletion, portability, and certain disclosures. MasseurMatch does not sell personal
+        information for monetary consideration. Requests may be submitted to privacy@masseurmatch.com for review
+        under the law that applies to the request.
+      </p>
+
+      <h2>11. International Users</h2>
+      <p>
+        MasseurMatch is a U.S.-based service. If you access the platform from another country, your information may
+        be processed in the United States or other locations where our service providers operate. Where required,
+        appropriate contractual or legal mechanisms may be used for international processing.
+      </p>
+
+      <h2>12. Children</h2>
+      <p>
+        MasseurMatch is intended only for adults age 18 or older. We do not knowingly permit minors to create
+        provider or client accounts. Contact us if you believe a minor has submitted personal information.
+      </p>
+
+      <h2>13. Changes to This Policy</h2>
+      <p>
+        We may update this policy as the platform, vendors, legal requirements, or data practices change. Material
+        updates will be reflected by a new “Last updated” date and, where appropriate, additional notice.
+      </p>
+
+      <h2>14. Contact</h2>
+      <p>
+        Privacy: <a href="mailto:privacy@masseurmatch.com">privacy@masseurmatch.com</a><br />
+        Legal: <a href="mailto:legal@masseurmatch.com">legal@masseurmatch.com</a><br />
+        Support: <a href="mailto:support@masseurmatch.com">support@masseurmatch.com</a><br />
+        Operator: XRankFlow Media Group LLC<br />
+        Mailing address: 2810 N Church St PMB 74302, Wilmington, DE 19802
+      </p>
+
+      <p>
+        This policy describes current platform practices in plain English and should be reviewed by qualified
+        counsel as the product, jurisdictions served, and data-processing vendors evolve.
+      </p>
+    </LegalPage>
   );
 }
