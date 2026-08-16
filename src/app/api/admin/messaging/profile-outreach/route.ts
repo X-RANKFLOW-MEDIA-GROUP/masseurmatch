@@ -18,7 +18,7 @@ const requestSchema = z.object({
   limit: z.number().int().min(1).max(300).optional().default(100),
 });
 
-type Db = ReturnType<typeof createSupabaseAdminClient> & { from: (table: string) => any };
+type Db = { from: (table: string) => any };
 type Profile = Record<string, any> & {
   id: string;
   user_id: string | null;
@@ -28,6 +28,12 @@ type Profile = Record<string, any> & {
   phone_number: string | null;
   whatsapp_number: string | null;
   whatsapp: string | null;
+};
+type NotificationPreference = {
+  user_id: string;
+  sms_enabled: boolean | null;
+  phone_e164: string | null;
+  timezone: string | null;
 };
 
 const PROFILE_SELECT = [
@@ -71,7 +77,6 @@ const PROFILE_SELECT = [
   "is_active",
   "is_suspended",
   "is_banned",
-  "account_status",
   "role",
 ].join(",");
 
@@ -180,16 +185,16 @@ export async function POST(request: Request) {
     const admin = await requireAdminSession(request);
     assertRateLimit(request, "profile-completion-imessage-outreach", { limit: 20, windowMs: 60_000 });
     const body = await parseJsonBody(request, requestSchema);
-    const db = createSupabaseAdminClient() as Db;
+    const db = createSupabaseAdminClient() as unknown as Db;
 
     const profilesResult = await db
       .from("profiles")
       .select(PROFILE_SELECT)
       .eq("role", "provider")
       .eq("is_demo", false)
+      .eq("is_active", true)
       .eq("is_banned", false)
       .eq("is_suspended", false)
-      .eq("account_status", "active")
       .not("user_id", "is", null)
       .limit(body.limit);
     if (profilesResult.error) throw new RouteError(500, profilesResult.error.message);
@@ -203,8 +208,8 @@ export async function POST(request: Request) {
           .in("user_id", userIds)
       : { data: [], error: null };
     if (preferencesResult.error) throw new RouteError(500, preferencesResult.error.message);
-    const preferences = new Map<string, any>(
-      (preferencesResult.data || []).map((row: any) => [row.user_id, row]),
+    const preferences = new Map<string, NotificationPreference>(
+      ((preferencesResult.data || []) as NotificationPreference[]).map((row) => [row.user_id, row] as const),
     );
 
     const profileIds = profiles.map((profile) => profile.id);
