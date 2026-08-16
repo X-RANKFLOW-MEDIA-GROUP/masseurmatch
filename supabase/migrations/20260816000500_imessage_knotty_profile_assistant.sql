@@ -1,6 +1,20 @@
 -- Secure profile-assistance layer for the existing admin messaging system.
 -- Additive only. iMessage is the transport; Knotty never receives credentials.
 
+-- iMessage profile assistance requires its own explicit preference. Do not
+-- backfill from sms_enabled: SMS notification consent is not treated as consent
+-- for the Knotty iMessage profile-assistance workflow.
+alter table public.user_notification_preferences
+  add column if not exists imessage_profile_assistant_enabled boolean not null default false,
+  add column if not exists imessage_profile_assistant_consent_at timestamptz,
+  add column if not exists imessage_profile_assistant_consent_version text,
+  add column if not exists imessage_profile_assistant_opted_out_at timestamptz;
+
+comment on column public.user_notification_preferences.imessage_profile_assistant_enabled is 'Explicit opt in for Knotty profile assistance over iMessage.';
+comment on column public.user_notification_preferences.imessage_profile_assistant_consent_at is 'Timestamp when the provider most recently opted in to Knotty iMessage profile assistance.';
+comment on column public.user_notification_preferences.imessage_profile_assistant_consent_version is 'Consent copy/version accepted for Knotty iMessage profile assistance.';
+comment on column public.user_notification_preferences.imessage_profile_assistant_opted_out_at is 'Timestamp when the provider most recently disabled Knotty iMessage profile assistance.';
+
 -- Production already carries user ownership on the messaging tables. Reassert
 -- those columns idempotently so clean environments reproduce the live contract.
 alter table public.messaging_contacts
