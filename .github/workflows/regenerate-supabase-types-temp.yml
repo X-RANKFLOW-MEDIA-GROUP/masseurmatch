@@ -21,10 +21,11 @@ jobs:
         with:
           ref: agent/regenerate-supabase-types-20260815
 
-      - name: Verify required config
+      - name: Normalize and verify required config
         run: |
+          echo "SUPABASE_PROJECT_REF=$(printf '%s' "$SUPABASE_PROJECT_REF" | tr -d '[:space:]')" >> "$GITHUB_ENV"
           test -n "$SUPABASE_ACCESS_TOKEN"
-          test -n "$SUPABASE_PROJECT_REF"
+          test -n "$(printf '%s' "$SUPABASE_PROJECT_REF" | tr -d '[:space:]')"
 
       - uses: supabase/setup-cli@v1
         with:
