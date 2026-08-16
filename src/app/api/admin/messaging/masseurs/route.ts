@@ -4,7 +4,7 @@ import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, requireAdminSession } from "@/app/api/_lib/supabase-server";
 import { getProfileCompletionAudit, normalizePhoneE164 } from "@/lib/messaging/profile-completion";
 
-type DbClient = ReturnType<typeof createSupabaseAdminClient> & {
+type DbClient = {
   from: (table: string) => any;
 };
 
@@ -80,7 +80,10 @@ function profilePhone(profile: Profile) {
 export async function GET(request: Request) {
   try {
     await requireAdminSession(request);
-    const db = createSupabaseAdminClient() as DbClient;
+    // The generated Supabase schema can lag newly applied additive messaging migrations.
+    // Keep this admin read endpoint on the runtime client shape so profile_id remains usable
+    // without weakening or changing the database contract itself.
+    const db = createSupabaseAdminClient() as unknown as DbClient;
 
     const profilesResult = await db
       .from("profiles")
