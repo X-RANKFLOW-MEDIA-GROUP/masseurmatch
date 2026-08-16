@@ -48,7 +48,7 @@ const sections = [
       { href: "/admin/tickets", label: "Tickets", description: "Work operational and customer-service tickets.", icon: MessageSquare },
       { href: "/admin/support", label: "Support", description: "Open the support operations workspace.", icon: LifeBuoy },
       { href: "/admin/sms", label: "SMS Auto-Reply", description: "Monitor SMS conversations and unresolved follow-ups.", icon: MessageSquare },
-      { href: "/admin/migrations", label: "Profile Imports", description: "Review external profile imports and approve imported reviews.", icon: Workflow },
+      { href: "/admin/migrations", label: "Profile Imports", description: "Review external profile imports and retain historical review records privately.", icon: Workflow },
     ],
   },
   {

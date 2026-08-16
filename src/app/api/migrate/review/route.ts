@@ -1,14 +1,11 @@
-import React from "react";
 import { z } from "zod";
 
-import { sendEmail } from "@/app/api/_lib/email";
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import {
   createSupabaseAdminClient,
   recordAuditLog,
   requireAdminSession,
 } from "@/app/api/_lib/supabase-server";
-import { SITE_URL } from "@/lib/site";
 
 const reviewDecisionSchema = z.object({
   reviewId: z.string().uuid(),
@@ -70,15 +67,12 @@ export async function PUT(request: Request) {
 
     const { data: migration, error: migrationError } = await (adminClient as any)
       .from("profile_migrations")
-      .select("id, email")
+      .select("id")
       .eq("id", body.migrationId)
       .maybeSingle();
     if (migrationError) throw new RouteError(500, "Could not retrieve migration.");
     if (!migration) throw new RouteError(404, "Migration not found.");
 
-    // Only pending testimonials can be moderated from this endpoint. Previously
-    // the API required a decision for every historical review, which prevented
-    // the admin UI from safely reviewing newly imported testimonials later.
     const { data: pendingRows, error: pendingError } = await (adminClient as any)
       .from("imported_reviews")
       .select("id")
@@ -92,30 +86,31 @@ export async function PUT(request: Request) {
       pendingIds.size !== submittedIds.length ||
       submittedIds.some((reviewId) => !pendingIds.has(reviewId))
     ) {
-      throw new RouteError(400, "Include one decision for every pending testimonial in this migration.");
+      throw new RouteError(400, "Include one decision for every pending imported review in this migration.");
     }
 
     const reviewedAt = new Date().toISOString();
     for (const decision of body.reviews) {
+      const decisionLabel = decision.approved ? "retained_private" : "excluded_private";
+      const note = [decisionLabel, decision.notes?.trim()].filter(Boolean).join(": ");
       const { data: updatedReview, error: updateError } = await (adminClient as any)
         .from("imported_reviews")
         .update({
-          is_public: decision.approved,
-          public_label: "Imported review",
+          is_public: false,
           reviewed_at: reviewedAt,
           reviewed_by: userId,
-          review_notes: decision.notes || null,
+          review_notes: note || decisionLabel,
         })
         .eq("id", decision.reviewId)
         .eq("migration_id", body.migrationId)
         .is("reviewed_at", null)
         .select("id")
         .maybeSingle();
-      if (updateError || !updatedReview) throw new RouteError(500, "Could not update testimonial status.");
+      if (updateError || !updatedReview) throw new RouteError(500, "Could not update imported review status.");
     }
 
-    const approvedCount = body.reviews.filter((review) => review.approved).length;
-    const rejectedCount = body.reviews.length - approvedCount;
+    const retainedCount = body.reviews.filter((review) => review.approved).length;
+    const excludedCount = body.reviews.length - retainedCount;
     const { error: verificationError } = await (adminClient as any)
       .from("profile_migrations")
       .update({ is_verified: true, verified_at: reviewedAt, verified_by: userId, updated_at: reviewedAt })
@@ -123,31 +118,18 @@ export async function PUT(request: Request) {
     if (verificationError) throw new RouteError(500, "Could not finalize migration review.");
 
     await recordAuditLog(userId, "profile_import_reviewed", "profile_migration", body.migrationId, {
-      approved_reviews: approvedCount,
-      rejected_reviews: rejectedCount,
+      retained_private_reviews: retainedCount,
+      excluded_private_reviews: excludedCount,
+      public_reviews: 0,
     });
 
-    if (migration.email) {
-      await sendEmail({
-        to: migration.email,
-        subject: approvedCount > 0 ? "Your imported reviews are now live" : "Your profile import review is complete",
-        react: React.createElement(
-          "div",
-          null,
-          React.createElement("h1", null, "Your profile import review is complete"),
-          React.createElement(
-            "p",
-            null,
-            approvedCount > 0
-              ? `${approvedCount} imported ${approvedCount === 1 ? "review is" : "reviews are"} now published on your profile.`
-              : "None of the submitted reviews met the requirements for publication.",
-          ),
-          React.createElement("p", null, React.createElement("a", { href: `${SITE_URL}/pro/dashboard` }, "View your profile")),
-        ),
-      }).catch((error) => console.error("[api/migrate/review] Email send failed:", error));
-    }
-
-    return json({ ok: true, approved: approvedCount, rejected: rejectedCount, message: `${approvedCount} approved, ${rejectedCount} rejected.` });
+    return json({
+      ok: true,
+      retained: retainedCount,
+      excluded: excludedCount,
+      public: 0,
+      message: `${retainedCount} retained privately, ${excludedCount} excluded from use. No reviews were published.`,
+    });
   } catch (error) {
     return errorResponse(error);
   }
