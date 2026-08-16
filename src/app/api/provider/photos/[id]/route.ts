@@ -19,9 +19,9 @@ export async function DELETE(
     if (profileError) throw new RouteError(500, profileError.message);
     if (!profile) throw new RouteError(404, "Profile not found.");
 
-    const { data: photo, error: fetchError } = await adminClient
+    const { data: photo, error: fetchError } = await (adminClient as any)
       .from("profile_photos")
-      .select("id, profile_id, user_id, storage_path")
+      .select("id, profile_id, user_id, storage_bucket, storage_path")
       .eq("id", photoId)
       .eq("profile_id", profile.id)
       .eq("user_id", session.userId)
@@ -30,9 +30,14 @@ export async function DELETE(
     if (fetchError) throw new RouteError(500, fetchError.message);
     if (!photo) throw new RouteError(404, "Photo not found or access denied.");
 
-    if (photo.storage_path && !/^https?:\/\//i.test(photo.storage_path)) {
+    const storageBucket = String(photo.storage_bucket || "external");
+    if (
+      photo.storage_path &&
+      !/^https?:\/\//i.test(photo.storage_path) &&
+      (storageBucket === "pending-photos" || storageBucket === "therapist-photos")
+    ) {
       const { error: storageError } = await adminClient.storage
-        .from("therapist-photos")
+        .from(storageBucket)
         .remove([photo.storage_path]);
 
       if (storageError) {
