@@ -33,13 +33,34 @@ create table if not exists public.user_roles (
 );
 
 create or replace function public.is_admin()
-returns boolean language sql stable security definer set search_path=public as $$
+returns boolean language sql stable security invoker set search_path=public as $$
   select exists(
     select 1 from public.user_roles ur
     where ur.user_id = auth.uid()
       and ur.role = 'admin'
   );
 $$;
+
+alter table public.user_roles enable row level security;
+grant select on table public.user_roles to anon, authenticated;
+
+drop policy if exists "Users can read their own role" on public.user_roles;
+drop policy if exists user_roles_select_own on public.user_roles;
+create policy user_roles_select_own
+  on public.user_roles
+  for select
+  to authenticated
+  using ((select auth.uid()) = user_id);
+
+drop policy if exists user_roles_anon_no_rows on public.user_roles;
+create policy user_roles_anon_no_rows
+  on public.user_roles
+  for select
+  to anon
+  using (false);
+
+revoke execute on function public.is_admin() from public;
+grant execute on function public.is_admin() to anon, authenticated, service_role;
 
 create table if not exists public.users (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -907,7 +928,6 @@ create index if not exists idx_text_verifications_reviewed_at on public.text_ver
 create index if not exists idx_admin_actions_admin on public.admin_actions(admin_id, created_at desc);
 create index if not exists idx_admin_actions_target_user on public.admin_actions(target_user_id, created_at desc);
 create index if not exists idx_admin_actions_type on public.admin_actions(action_type, created_at desc);
-create index if not exists idx_appointments_user_id on public.appointments(user_id);
 
 -- Signup trigger. profiles.id is NOT NULL with no default (and on databases
 -- provisioned from the legacy shape it references auth.users), so the insert
@@ -1024,36 +1044,6 @@ create table if not exists public.favorites (
   created_at timestamptz not null default timezone('utc', now())
 );
 
-create table if not exists public.appointments (
-  id uuid primary key default gen_random_uuid(),
-  client_id uuid not null references auth.users(id) on delete cascade,
-  therapist_id uuid not null references auth.users(id) on delete cascade,
-  user_id uuid references auth.users(id) on delete cascade,
-  status text not null default 'pending',
-  service_type text,
-  location_type text,
-  notes text,
-  start_time timestamptz not null,
-  end_time timestamptz not null,
-  starts_at timestamptz,
-  ends_at timestamptz,
-  created_at timestamptz not null default timezone('utc', now()),
-  updated_at timestamptz not null default timezone('utc', now())
-);
-
-create table if not exists public.payment_transactions (
-  id uuid primary key default gen_random_uuid(),
-  appointment_id uuid references public.appointments(id) on delete set null,
-  stripe_payment_intent_id text unique,
-  provider_transaction_id text,
-  provider text,
-  amount integer,
-  currency text,
-  status text not null default 'pending',
-  created_at timestamptz not null default timezone('utc', now()),
-  updated_at timestamptz not null default timezone('utc', now())
-);
-
 create table if not exists public.notifications (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -1080,18 +1070,6 @@ create table if not exists public.messages (
   read_at timestamptz,
   created_at timestamptz not null default timezone('utc', now())
 );
-
-create table if not exists public.therapist_availability (
-  id uuid primary key default gen_random_uuid(),
-  therapist_id uuid not null references auth.users(id) on delete cascade,
-  day_of_week integer not null,
-  start_time text not null,
-  end_time text not null,
-  created_at timestamptz not null default timezone('utc', now())
-);
-alter table public.payment_transactions add column if not exists user_id uuid references auth.users(id) on delete set null;
-alter table public.payment_transactions add column if not exists stripe_refund_id text;
-alter table public.payment_transactions add column if not exists amount_cents integer;
 
 create table if not exists public.waitlist_rate_limits (
   id            uuid primary key default gen_random_uuid(),
@@ -1128,34 +1106,6 @@ create table if not exists public.waitlist_signups (
   created_at       timestamptz not null default now()
 );
 
-create table if not exists public.booking_inquiries (
-  id                   uuid primary key default gen_random_uuid(),
-  client_name          text,
-  client_phone         text,
-  client_email         text,
-  client_hotel         text,
-  service_type         text default 'massage',
-  preferred_date       date,
-  preferred_time       text,
-  duration_minutes     integer default 60,
-  message              text,
-  source               text default 'website' check (source in ('website','sms','whatsapp','direct')),
-  therapist_id         uuid references public.profiles(id) on delete set null,
-  status               text not null default 'new' check (status in ('new','checking','pending_approval','approved','denied','completed','cancelled')),
-  intelligence_status  text not null default 'pending' check (intelligence_status in ('pending','running','clean','flagged','inconclusive')),
-  intelligence_report  jsonb default '{}',
-  ai_conversation      jsonb default '[]',
-  confirmed_date       date,
-  confirmed_time       text,
-  appointment_id       uuid references public.appointments(id) on delete set null,
-  sheets_row_id        text,
-  admin_notes          text,
-  reviewed_by          uuid references auth.users(id) on delete set null,
-  reviewed_at          timestamptz,
-  created_at           timestamptz default now(),
-  updated_at           timestamptz default now()
-);
-
 create table if not exists public.sms_profiles (
   id                   uuid primary key default gen_random_uuid(),
   profile_id           uuid not null references public.profiles(id) on delete cascade,
@@ -1188,7 +1138,6 @@ create table if not exists public.sms_logs (
   intent              text,
   status              text default 'received' check (status in ('received','queued','sent','delivered','failed','undelivered')),
   is_manual           boolean not null default false,
-  booking_inquiry_id  uuid references public.booking_inquiries(id) on delete set null,
   created_at          timestamptz default now()
 );
 
@@ -1235,34 +1184,6 @@ create table if not exists moderation_queue (
   payload              jsonb,
   created_at           timestamptz not null default now(),
   updated_at           timestamptz not null default now()
-);
-
-create table if not exists payment_transactions (
-  id                      uuid primary key default gen_random_uuid(),
-  appointment_id          uuid,
-  user_id                 uuid,
-  therapist_id            uuid,
-  amount_cents            integer,
-  currency                text default 'USD',
-  status                  text default 'pending',
-  provider                text,
-  provider_transaction_id text,
-  stripe_refund_id        text,
-  metadata                jsonb,
-  created_at              timestamptz not null default now()
-);
-
-create table if not exists appointments (
-  id           uuid primary key default gen_random_uuid(),
-  user_id      uuid,
-  therapist_id uuid,
-  profile_id   uuid,
-  starts_at    timestamptz,
-  ends_at      timestamptz,
-  status       text not null default 'pending',
-  notes        text,
-  created_at   timestamptz not null default now(),
-  updated_at   timestamptz not null default now()
 );
 
 create table if not exists text_verifications (
@@ -1477,20 +1398,6 @@ create table if not exists public.inquiry_analytics (
   created_at timestamptz default now()
 );
 
-create table if not exists public.booking_analytics (
-  id uuid default gen_random_uuid() primary key,
-  profile_id uuid references public.profiles(id) on delete cascade,
-  technique text,
-  session_type text,
-  session_duration_minutes int,
-  location_city text,
-  location_state text,
-  location_zip text,
-  price decimal(10, 2),
-  user_ip text,
-  created_at timestamptz default now()
-);
-
 create index if not exists idx_search_analytics_city on public.search_analytics(city, created_at);
 create index if not exists idx_search_analytics_zip on public.search_analytics(zip_code, created_at);
 create index if not exists idx_search_analytics_query on public.search_analytics(query, created_at);
@@ -1498,8 +1405,6 @@ create index if not exists idx_profile_views_profile on public.profile_view_anal
 create index if not exists idx_profile_views_city on public.profile_view_analytics(viewer_city, created_at);
 create index if not exists idx_inquiry_profile on public.inquiry_analytics(profile_id, created_at);
 create index if not exists idx_inquiry_city on public.inquiry_analytics(user_city, created_at);
-create index if not exists idx_booking_profile on public.booking_analytics(profile_id, created_at);
-create index if not exists idx_booking_city on public.booking_analytics(location_city, created_at);
 
 -- Keyword trends tables for Market Intelligence
 create table if not exists public.keyword_trends (
@@ -1554,13 +1459,6 @@ alter table public.analytics_events
   add column if not exists state text null,
   add column if not exists user_id uuid null references auth.users(id) on delete set null;
 
-alter table public.appointments
-  add column if not exists client_id uuid references auth.users(id) on delete cascade,
-  add column if not exists end_time timestamptz,
-  add column if not exists location_type text,
-  add column if not exists service_type text,
-  add column if not exists start_time timestamptz;
-
 alter table public.audit_log
   add column if not exists action_type text,
   add column if not exists metadata jsonb,
@@ -1600,11 +1498,6 @@ alter table public.newsletter_subscribers
 
 alter table public.notifications
   add column if not exists message text;
-
-alter table public.payment_transactions
-  add column if not exists amount integer,
-  add column if not exists stripe_payment_intent_id text unique,
-  add column if not exists updated_at timestamptz not null default timezone('utc', now());
 
 alter table public.profile_reviews
   add column if not exists moderation_notes text;
