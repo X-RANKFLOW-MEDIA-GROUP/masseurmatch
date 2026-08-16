@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { assertRateLimit } from "@/app/_lib/security";
+import type { Database } from "@/integrations/supabase/types";
 import { assertImessageBridgeAuthorized } from "@/lib/messaging/imessage-bridge-auth";
 
 const statusSchema = z.object({
@@ -18,6 +19,8 @@ const statusSchema = z.object({
 const workerSchema = z.string().trim().min(1).max(120);
 
 type Db = ReturnType<typeof createSupabaseAdminClient> & { from: (table: string) => any };
+type MessagingQueueUpdate = Database["public"]["Tables"]["messaging_queue"]["Update"];
+type MessagingMessageUpdate = Database["public"]["Tables"]["messaging_messages"]["Update"];
 
 export async function POST(request: Request) {
   try {
@@ -84,7 +87,7 @@ export async function POST(request: Request) {
       return json({ ok: true, retryScheduled: true });
     }
 
-    const queuePatch: Record<string, unknown> = {
+    const queuePatch: MessagingQueueUpdate = {
       status: body.status,
       locked_at: null,
       locked_by: null,
@@ -103,7 +106,7 @@ export async function POST(request: Request) {
     if (queueUpdate.error) throw new Error(queueUpdate.error.message);
 
     if (queue.message_id) {
-      const messagePatch: Record<string, unknown> = {
+      const messagePatch: MessagingMessageUpdate = {
         delivery_status: body.status,
       };
       if (body.externalId) messagePatch.external_id = body.externalId;
