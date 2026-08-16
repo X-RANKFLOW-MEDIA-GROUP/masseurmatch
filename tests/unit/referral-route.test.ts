@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   requireRequestSession: vi.fn(),
@@ -18,7 +18,12 @@ import { GET } from "@/app/api/pro/referrals/route";
 describe("GET /api/pro/referrals", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://masseurmatch.com");
     mocks.requireRequestSession.mockResolvedValue({ userId: "user-1", role: "provider" });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("returns the normal dashboard response through the service-role client", async () => {
