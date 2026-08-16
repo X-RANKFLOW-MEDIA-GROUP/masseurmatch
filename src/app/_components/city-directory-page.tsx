@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { IconArrowRight, IconShield, IconLock } from "@/components/icons";
+import { IconArrowRight, IconShield } from "@/components/icons";
 import type { PublicTherapist } from "@/app/_lib/directory";
 import { buildFaqJsonLd } from "@/app/_lib/seo";
 import { JsonLd } from "@/app/_components/json-ld";
@@ -32,10 +32,15 @@ export function CityDirectoryPage({
   collectionJsonLd,
   itemListJsonLd,
   leadLinks = [],
+  quickLinks = [],
   linkSections = [],
   therapists,
   listingTitle,
   listingDescription,
+  listingCount,
+  visitingTherapists = [],
+  visitingTitle,
+  visitingDescription,
   emptyTitle,
   emptyDescription,
   faqTitle,
@@ -48,34 +53,40 @@ export function CityDirectoryPage({
   collectionJsonLd: Record<string, unknown>;
   itemListJsonLd: Record<string, unknown>;
   leadLinks?: LinkItem[];
+  quickLinks?: LinkItem[];
   linkSections?: LinkSection[];
   therapists: PublicTherapist[];
   listingTitle: string;
   listingDescription: string;
+  listingCount?: number;
+  visitingTherapists?: PublicTherapist[];
+  visitingTitle?: string;
+  visitingDescription?: string;
   emptyTitle: string;
   emptyDescription: string;
   faqTitle?: string;
   faqItems?: FaqItem[];
 }) {
   const visibleLinkSections = linkSections.filter((section) => section.items.length > 0);
-  void itemListJsonLd;
+  const localCount = listingCount ?? therapists.length;
 
   return (
     <>
       <JsonLd data={breadcrumbJsonLd} />
       <JsonLd data={collectionJsonLd} />
+      <JsonLd data={itemListJsonLd} />
       {faqItems.length > 0 ? <JsonLd data={buildFaqJsonLd(faqItems)} /> : null}
 
-      <div className="page-shell py-10 sm:py-12">
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr),minmax(300px,0.85fr)]">
-          <Surface className="overflow-hidden p-0">
-            <div className="border-b border-border bg-[linear-gradient(135deg,rgb(var(--color-brand-primary-rgb))_0%,rgb(var(--color-brand-secondary-rgb))_100%)] px-6 py-6 text-white sm:px-8">
-              <div className="max-w-3xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/62">{eyebrow}</p>
-                <h1 className="mt-3 text-4xl font-semibold tracking-tight text-white sm:text-5xl">{title}</h1>
-                <p className="mt-4 text-base leading-8 text-white/74">{intro}</p>
-              </div>
+      <div className="page-shell py-8 sm:py-10">
+        <Surface className="overflow-hidden p-0">
+          <div className="bg-[linear-gradient(135deg,rgb(var(--color-brand-primary-rgb))_0%,rgb(var(--color-brand-secondary-rgb))_100%)] px-6 py-7 text-white sm:px-8 sm:py-8">
+            <div className="max-w-4xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/62">{eyebrow}</p>
+              <h1 className="mt-3 text-4xl font-semibold tracking-tight text-white sm:text-5xl">{title}</h1>
+              <p className="mt-4 max-w-3xl text-base leading-8 text-white/78">{intro}</p>
+            </div>
 
+            {leadLinks.length > 0 ? (
               <div className="mt-6 flex flex-wrap gap-3">
                 {leadLinks.map((link, index) => (
                   <Link
@@ -92,69 +103,80 @@ export function CityDirectoryPage({
                   </Link>
                 ))}
               </div>
-            </div>
-
-            <div className="grid gap-px bg-border-subtle sm:grid-cols-3">
-              {[
-                {
-                  icon: <IconShield size={20} />,
-                  title: "Trust-first discovery",
-                  body: "Verification status is visible where available so users can shortlist faster.",
-                },
-                {
-                  icon: <IconShield size={20} />,
-                  title: "Premium local intent",
-                  body: "City, segment, and service pages create cleaner long-tail search entry points.",
-                },
-                {
-                  icon: <IconLock size={20} />,
-                  title: "Direct connection",
-                  body: "Profiles are built for immediate call or message without platform detours.",
-                },
-              ].map((item) => (
-                <div key={item.title} className="bg-background px-6 py-6">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-[16px] bg-brand-primary text-white">
-                    {item.icon}
-                  </div>
-                  <h2 className="mt-4 text-base font-semibold text-foreground">{item.title}</h2>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.body}</p>
-                </div>
-              ))}
-            </div>
-          </Surface>
-
-          <div className="rounded-[32px] border border-[#E8E8E8] bg-[linear-gradient(135deg,#FAFAFA_0%,#ffffff_100%)] p-6 shadow-[0_16px_36px_rgba(17,17,17,0.05)]">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#a56b21]">
-              Why this page feels safer
-            </p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-brand-primary">
-              A clearer trust layer than a generic listing page
-            </h2>
-            <div className="mt-5 space-y-3">
-              {[
-                "Visible verification and profile-quality signals.",
-                "Clearer incall and outcall expectations before contact.",
-                "Safety guidance and reporting paths linked from the listing journey.",
-                "Editorially cleaner pages built for fast mobile decisions.",
-              ].map((point) => (
-                <div key={point} className="rounded-[20px] border border-[#ece3d6] bg-white px-4 py-3 text-sm leading-6 text-text-secondary">
-                  {point}
-                </div>
-              ))}
-            </div>
-            <Link
-              href="/safety"
-              className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-secondary transition hover:gap-3"
-            >
-              Read the safety policy
-              <IconArrowRight size={16} />
-            </Link>
+            ) : null}
           </div>
-        </div>
+        </Surface>
+
+        {quickLinks.length > 0 ? (
+          <nav className="mt-4 flex flex-wrap gap-2" aria-label="Directory filters">
+            {quickLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="rounded-full border border-border bg-background px-4 py-2 text-xs font-semibold text-foreground transition hover:bg-secondary"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        ) : null}
+
+        <section className="mt-7" id="local-profiles">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold text-foreground">{listingTitle}</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-7 text-muted-foreground">{listingDescription}</p>
+            </div>
+            <span className="inline-flex w-fit items-center rounded-full border border-border bg-background px-4 py-2 text-xs font-semibold text-muted-foreground">
+              {localCount} local {localCount === 1 ? "profile" : "profiles"}
+            </span>
+          </div>
+
+          {therapists.length > 0 ? (
+            <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-3">
+              {therapists.map((therapist) => (
+                <PublicTherapistCard key={therapist.id} therapist={therapist} />
+              ))}
+            </div>
+          ) : (
+            <EmptyState className="mt-5" title={emptyTitle} description={emptyDescription} />
+          )}
+        </section>
+
+        {visitingTherapists.length > 0 ? (
+          <section className="mt-10 border-t border-border pt-8">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-secondary">Temporary location</p>
+              <h2 className="mt-2 text-2xl font-semibold text-foreground">{visitingTitle || "Visiting providers"}</h2>
+              {visitingDescription ? (
+                <p className="mt-2 max-w-3xl text-sm leading-7 text-muted-foreground">{visitingDescription}</p>
+              ) : null}
+            </div>
+            <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-3">
+              {visitingTherapists.map((therapist) => (
+                <PublicTherapistCard key={therapist.id} therapist={therapist} />
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        <section className="mt-10 rounded-3xl border border-border bg-secondary/20 p-5 sm:p-6">
+          <div className="flex gap-4">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-primary text-white">
+              <IconShield size={20} />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">Compare profiles first, then explore local guidance</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Public listings stay at the top of the city experience. Local service pages, neighborhoods, nearby cities, guides, safety information, and FAQs remain below for useful context and crawlable internal linking.
+              </p>
+            </div>
+          </div>
+        </section>
 
         <div className="mt-8 space-y-8">
           {visibleLinkSections.map((section) => (
-            <section key={section.title} className="mt-8">
+            <section key={section.title}>
               <h2 className="text-2xl font-semibold text-foreground">{section.title}</h2>
               {section.description ? <p className="mt-3 text-sm leading-7 text-muted-foreground">{section.description}</p> : null}
 
@@ -185,30 +207,8 @@ export function CityDirectoryPage({
             </section>
           ))}
 
-          <section className="mt-10">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <h2 className="text-2xl font-semibold text-foreground">{listingTitle}</h2>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">{listingDescription}</p>
-              </div>
-              <span className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Trusted directory layout
-              </span>
-            </div>
-
-            {therapists.length > 0 ? (
-              <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-3">
-                {therapists.map((therapist) => (
-                  <PublicTherapistCard key={therapist.id} therapist={therapist} />
-                ))}
-              </div>
-            ) : (
-              <EmptyState className="mt-6" title={emptyTitle} description={emptyDescription} />
-            )}
-          </section>
-
           {faqItems.length > 0 ? (
-            <section className="mt-10 rounded-3xl border border-border bg-background p-6 shadow-sm">
+            <section className="rounded-3xl border border-border bg-background p-6 shadow-sm">
               <h2 className="text-2xl font-semibold text-foreground">{faqTitle || "Common questions"}</h2>
               <div className="mt-4 space-y-4">
                 {faqItems.map((item) => (
