@@ -23,7 +23,7 @@ function getSupabaseUrl() {
 }
 
 function getAnonKey() {
-  return envAny(["SUPABASE_ANON_KEY", "NEXT_PUBLIC_SUPABASE_ANON_KEY", "VITE_SUPABASE_PUBLISHABLE_KEY"]);
+  return envAny(["NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "VITE_SUPABASE_PUBLISHABLE_KEY"]);
 }
 
 function getServiceRoleKey() {
@@ -65,7 +65,7 @@ export function createSupabasePublicClient() {
   const url = getSupabaseUrl();
   const anonKey = getAnonKey();
   assertConfig(url, "SUPABASE_URL");
-  assertConfig(anonKey, "SUPABASE_ANON_KEY");
+  assertConfig(anonKey, "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
 
   return createClient<Database>(url, anonKey, baseOptions());
 }
