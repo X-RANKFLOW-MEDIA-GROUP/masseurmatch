@@ -3,7 +3,7 @@ import { getProfileIndexRobots } from "@/lib/index-eligibility";
 import type { Database } from "@/integrations/supabase/types";
 import type { PublicTherapist } from "@/app/_lib/directory";
 
-type TherapistProfile = Database["public"]["Tables"]["therapist_profiles"]["Row"];
+type TherapistProfile = Database["public"]["Tables"]["profiles"]["Row"];
 
 interface RobotsMetadata {
   index: boolean;

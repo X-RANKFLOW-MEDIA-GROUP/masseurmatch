@@ -52,7 +52,12 @@ export async function POST(request: Request) {
     const body = await parseJsonBody(request, bodySchema);
     const db = createSupabaseAdminClient() as DbClient;
 
-    const normalized = body.rows.map((row, index) => ({ index, row, phone: normalizeUsPhone(row.phone) }));
+    const normalized = body.rows.map((row, index) => ({
+      index,
+      row,
+      phone: normalizeUsPhone(row.phone),
+    }));
+
     const invalid = normalized.filter((item) => !item.phone);
     const valid = normalized.filter((item): item is typeof item & { phone: string } => Boolean(item.phone));
 
@@ -66,21 +71,16 @@ export async function POST(request: Request) {
 
     const phones = deduped.map((item) => item.phone);
     const { data: existingRows, error: existingError } = phones.length
-      ? await db
-          .from("messaging_contacts")
-          .select("id,phone_e164,opted_out")
-          .eq("user_id", admin.userId)
-          .in("phone_e164", phones)
+      ? await db.from("messaging_contacts").select("id,phone_e164,opted_out").in("phone_e164", phones)
       : { data: [], error: null };
     if (existingError) throw new RouteError(500, existingError.message);
 
-    const existingEntries = (existingRows || []).map(
-      (row: { id: string; phone_e164: string; opted_out: boolean }): [string, { id: string; opted_out: boolean }] => [
+    const existing = new Map<string, { id: string; opted_out: boolean }>(
+      (existingRows || []).map((row: { id: string; phone_e164: string; opted_out: boolean }) => [
         row.phone_e164,
         { id: row.id, opted_out: row.opted_out },
-      ],
+      ] as const),
     );
-    const existing = new Map<string, { id: string; opted_out: boolean }>(existingEntries);
 
     let inserted = 0;
     let updated = 0;
@@ -95,7 +95,9 @@ export async function POST(request: Request) {
         continue;
       }
 
-      const metadata = item.row.textMessage ? { imported_text_message: item.row.textMessage } : {};
+      const metadata = item.row.textMessage
+        ? { imported_text_message: item.row.textMessage }
+        : {};
 
       if (current) {
         if (current.opted_out) protectedOptOuts += 1;
@@ -108,18 +110,16 @@ export async function POST(request: Request) {
           source: body.source,
           metadata,
         };
-        const { error } = await db
-          .from("messaging_contacts")
-          .update(patch)
-          .eq("id", current.id)
-          .eq("user_id", admin.userId);
-        if (error) errors.push({ row: item.index + 2, phone: item.phone, error: error.message });
-        else updated += 1;
+        const { error } = await db.from("messaging_contacts").update(patch).eq("id", current.id);
+        if (error) {
+          errors.push({ row: item.index + 2, phone: item.phone, error: error.message });
+        } else {
+          updated += 1;
+        }
         continue;
       }
 
       const { error } = await db.from("messaging_contacts").insert({
-        user_id: admin.userId,
         phone_e164: item.phone,
         name: item.row.name || null,
         city: item.row.city || null,
@@ -129,22 +129,31 @@ export async function POST(request: Request) {
         source: body.source,
         metadata,
       });
-      if (error) errors.push({ row: item.index + 2, phone: item.phone, error: error.message });
-      else inserted += 1;
+      if (error) {
+        errors.push({ row: item.index + 2, phone: item.phone, error: error.message });
+      } else {
+        inserted += 1;
+      }
     }
 
-    await recordAuditLog(admin.userId, "admin_messaging_contacts_imported", "messaging_contacts", undefined, {
-      received: body.rows.length,
-      inserted,
-      updated,
-      skipped,
-      invalid: invalid.length,
-      duplicatesInsideFile,
-      protectedOptOuts,
-      errors: errors.length,
-      duplicateMode: body.duplicateMode,
-      source: body.source,
-    });
+    await recordAuditLog(
+      admin.userId,
+      "admin_messaging_contacts_imported",
+      "messaging_contacts",
+      undefined,
+      {
+        received: body.rows.length,
+        inserted,
+        updated,
+        skipped,
+        invalid: invalid.length,
+        duplicatesInsideFile,
+        protectedOptOuts,
+        errors: errors.length,
+        duplicateMode: body.duplicateMode,
+        source: body.source,
+      },
+    );
 
     return json({
       ok: true,

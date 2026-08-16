@@ -10,6 +10,12 @@ import React from "react";
 
 const schema = z.object({ reason: z.string().optional() });
 
+function normalizePhone(value: string | null | undefined) {
+  if (!value) return null;
+  const digits = value.replace(/\D/g, "");
+  return digits.length >= 10 ? digits : null;
+}
+
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -23,12 +29,40 @@ export async function POST(
     const now = new Date().toISOString();
     const { data: profile, error: fetchError } = await adminClient
       .from("profiles")
-      .select("id, user_id, profile_status, display_name, full_name, email_address, slug")
+      .select("id, user_id, profile_status, display_name, full_name, email_address, slug, city, phone, phone_number, is_verified_phone")
       .eq("id", profileId)
       .maybeSingle();
 
     if (fetchError) throw new RouteError(500, fetchError.message);
     if (!profile) throw new RouteError(404, "Profile not found.");
+    if (!profile.user_id) throw new RouteError(422, "Profile is not linked to a provider account.");
+
+    const profilePhone = profile.phone?.trim() || profile.phone_number?.trim() || null;
+    const missingRequiredFields: string[] = [];
+    if (!profile.city?.trim()) missingRequiredFields.push("city");
+    if (!profilePhone) missingRequiredFields.push("phone");
+    if (profile.is_verified_phone !== true) missingRequiredFields.push("verified phone");
+
+    if (missingRequiredFields.length > 0) {
+      throw new RouteError(
+        422,
+        `Profile cannot be published until these required fields are completed: ${missingRequiredFields.join(", ")}.`,
+      );
+    }
+
+    const { data: authUser, error: authError } = await adminClient.auth.admin.getUserById(profile.user_id);
+    const authPhone = normalizePhone(authUser.user?.phone);
+    if (
+      authError ||
+      !authUser.user?.phone_confirmed_at ||
+      !authPhone ||
+      authPhone !== normalizePhone(profilePhone)
+    ) {
+      throw new RouteError(
+        422,
+        "Profile phone must match the phone number confirmed by Supabase before publication.",
+      );
+    }
 
     // Public profile pages are slug-addressed. Older/imported profiles can reach
     // admin review without a slug, so approval must repair that invariant.
@@ -41,7 +75,6 @@ export async function POST(
         status: "approved",
         profile_status: "approved",
         visibility_status: "public",
-        verification_status: "verified",
         is_active: true,
         approved_at: now,
         approved_by: admin.userId,

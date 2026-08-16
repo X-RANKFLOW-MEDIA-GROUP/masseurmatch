@@ -3608,7 +3608,7 @@ export type Database = {
           state: string | null
           timezone: string
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           city?: string | null
@@ -3630,7 +3630,7 @@ export type Database = {
           state?: string | null
           timezone?: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           city?: string | null
@@ -3652,7 +3652,7 @@ export type Database = {
           state?: string | null
           timezone?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -3670,7 +3670,7 @@ export type Database = {
           status: string
           unread_count: number
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           contact_id: string
@@ -3685,7 +3685,7 @@ export type Database = {
           status?: string
           unread_count?: number
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           contact_id?: string
@@ -3700,7 +3700,7 @@ export type Database = {
           status?: string
           unread_count?: number
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -3734,7 +3734,7 @@ export type Database = {
           sender_type: string
           sent_at: string | null
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           body: string
@@ -3757,7 +3757,7 @@ export type Database = {
           sender_type: string
           sent_at?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           body?: string
@@ -3780,7 +3780,7 @@ export type Database = {
           sender_type?: string
           sent_at?: string | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -3830,7 +3830,7 @@ export type Database = {
           status: string
           transport_preference: string
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           attempts?: number
@@ -3855,7 +3855,7 @@ export type Database = {
           status?: string
           transport_preference?: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           attempts?: number
@@ -3880,7 +3880,7 @@ export type Database = {
           status?: string
           transport_preference?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
