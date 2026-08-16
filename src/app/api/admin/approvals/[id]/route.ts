@@ -114,6 +114,12 @@ export async function POST(
       if (!publishCandidate) {
         return NextResponse.json({ ok: false, error: "Profile not found" }, { status: 404 });
       }
+      if (!publishCandidate.user_id) {
+        return NextResponse.json(
+          { ok: false, error: "Profile is not linked to a provider account." },
+          { status: 422 },
+        );
+      }
 
       const missingRequiredFields: string[] = [];
       const profilePhone = publishCandidate.phone?.trim() || publishCandidate.phone_number?.trim() || null;
