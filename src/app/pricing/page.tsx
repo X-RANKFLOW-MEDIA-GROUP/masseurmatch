@@ -76,8 +76,8 @@ const faqs = [
     a: "Those are paid advertising placements and labels. They do not imply endorsement, credential verification, or recommendation by MasseurMatch.",
   },
   {
-    q: "What payment methods do you accept?",
-    a: "We accept major credit and debit cards through Stripe for listing plans, and provider billing is managed securely through Stripe.",
+    q: "How is provider subscription billing processed?",
+    a: "Paid provider subscriptions are processed through PayPal. Available payment methods are shown by PayPal at checkout. MasseurMatch does not store full payment card or bank account numbers.",
   },
 ];
 
@@ -121,7 +121,6 @@ export default function PricingPage() {
             )}
           </div>
 
-          {/* Market anchoring strip */}
           <div className="mx-auto mt-8 max-w-3xl rounded-3xl border border-badge-promo-border/60 bg-badge-promo-light/70 px-6 py-4">
             <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-badge-promo">How we compare</p>
             <div className="mt-3 grid grid-cols-3 gap-3 text-center">
