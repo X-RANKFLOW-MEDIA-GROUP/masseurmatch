@@ -32,7 +32,10 @@ type Profile = Record<string, any> & {
 };
 type NotificationPreference = {
   user_id: string;
-  sms_enabled: boolean | null;
+  imessage_profile_assistant_enabled: boolean | null;
+  imessage_profile_assistant_consent_at: string | null;
+  imessage_profile_assistant_consent_version: string | null;
+  imessage_profile_assistant_opted_out_at: string | null;
   phone_e164: string | null;
   timezone: string | null;
 };
@@ -94,7 +97,7 @@ function profilePhone(profile: Profile) {
 function initialMessage(profile: Profile, missing: string[]) {
   const name = nameFor(profile);
   const summary = summarizeMissingFields(missing as any);
-  return `Hi ${name}, this is Knotty from MasseurMatch. I can help you finish your profile by iMessage. Your profile is missing ${summary}. Reply START and I'll guide you one section at a time. Never send your password by text. Reply STOP to opt out.`;
+  return `Hi ${name}, this is Knotty from MasseurMatch. You enabled profile assistance by iMessage. Your profile is missing ${summary}. Reply START and I'll guide you one section at a time. Never send your password by text. Reply STOP to opt out.`;
 }
 
 async function ensureContact(db: Db, profile: Profile, phone: string, timezone: string | null) {
@@ -208,7 +211,7 @@ export async function POST(request: Request) {
     const preferencesResult = userIds.length
       ? await db
           .from("user_notification_preferences")
-          .select("user_id,sms_enabled,phone_e164,timezone")
+          .select("user_id,imessage_profile_assistant_enabled,imessage_profile_assistant_consent_at,imessage_profile_assistant_consent_version,imessage_profile_assistant_opted_out_at,phone_e164,timezone")
           .in("user_id", userIds)
       : { data: [], error: null };
     if (preferencesResult.error) throw new RouteError(500, preferencesResult.error.message);
@@ -249,7 +252,9 @@ export async function POST(request: Request) {
       let reason: string | null = null;
       if (audit.complete) reason = "profile_complete";
       else if (!profile.user_id) reason = "no_authenticated_user";
-      else if (!pref || pref.sms_enabled !== true) reason = "sms_not_enabled";
+      else if (!pref || pref.imessage_profile_assistant_enabled !== true) reason = "imessage_assistant_not_enabled";
+      else if (!pref.imessage_profile_assistant_consent_at || !pref.imessage_profile_assistant_consent_version) reason = "imessage_consent_missing";
+      else if (pref.imessage_profile_assistant_opted_out_at) reason = "imessage_opted_out";
       else if (!phone) reason = "no_valid_phone";
 
       if (reason) {
@@ -270,6 +275,8 @@ export async function POST(request: Request) {
           name: nameFor(profile),
           eligible: true,
           phone,
+          consentAt: pref!.imessage_profile_assistant_consent_at,
+          consentVersion: pref!.imessage_profile_assistant_consent_version,
           missing: audit.missing,
         });
         continue;
@@ -330,6 +337,8 @@ export async function POST(request: Request) {
             purpose: "profile_completion_outreach",
             audit_version: audit.version,
             missing_fields: audit.missing,
+            consent_at: pref!.imessage_profile_assistant_consent_at,
+            consent_version: pref!.imessage_profile_assistant_consent_version,
           },
         })
         .select("id,body")
@@ -378,7 +387,7 @@ export async function POST(request: Request) {
         eligible,
         queued,
         targetProfileId: body.profileId || null,
-        consentGate: "user_notification_preferences.sms_enabled",
+        consentGate: "user_notification_preferences.imessage_profile_assistant_enabled",
       },
     );
 
