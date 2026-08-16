@@ -49,14 +49,14 @@ function buildSyncArgs(tier: string, sub: Stripe.Subscription, subscriptionStatu
     status === 'trialing' && tier !== 'free' ? Math.min(tierPhotoLimit, TRIAL_PHOTO_LIMIT) : tierPhotoLimit
 
   return {
-    p_user_id:                sub.metadata?.user_id ?? sub.metadata?.userId ?? "",
-    p_stripe_customer_id:     customerId ?? "",
+    p_user_id: sub.metadata?.user_id ?? sub.metadata?.userId ?? "",
+    p_stripe_customer_id: customerId ?? "",
     p_stripe_subscription_id: sub.id,
-    p_tier:                   tier,
-    p_photo_limit:            photoLimit,
-    p_visibility_level:       VISIBILITY_LEVELS[tier] ?? 1,
-    p_current_period_end:     getCurrentPeriodEnd(sub) ?? new Date().toISOString(),
-    p_subscription_status:    status ?? "",
+    p_tier: tier,
+    p_photo_limit: photoLimit,
+    p_visibility_level: VISIBILITY_LEVELS[tier] ?? 1,
+    p_current_period_end: getCurrentPeriodEnd(sub) ?? new Date().toISOString(),
+    p_subscription_status: status ?? "",
   }
 }
 
@@ -83,9 +83,9 @@ async function recordStripeEvent(
 
   const { error: insertError } = await supabase.from('stripe_events').insert({
     stripe_event_id: event.id,
-    event_type:      event.type,
-    payload:         event as unknown as Json,
-    processed_at:    new Date().toISOString(),
+    event_type: event.type,
+    payload: event as unknown as Json,
+    processed_at: new Date().toISOString(),
   })
 
   if (insertError) {
@@ -114,20 +114,14 @@ async function getReferralPaymentSignals(stripe: Stripe, invoiceId: string) {
   )
 
   const paymentIntentRef = invoicePayment?.payment?.payment_intent
-  const paymentIntentId =
-    typeof paymentIntentRef === 'string' ? paymentIntentRef : paymentIntentRef?.id
+  const paymentIntentId = typeof paymentIntentRef === 'string' ? paymentIntentRef : paymentIntentRef?.id
   if (!paymentIntentId) {
     return { chargeId: null, fingerprint: null, riskScore: 0, riskReasons: [] as string[] }
   }
 
-  const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId, {
-    expand: ['latest_charge'],
-  })
+  const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId, { expand: ['latest_charge'] })
   const latestCharge = paymentIntent.latest_charge
-  const charge =
-    typeof latestCharge === 'string'
-      ? await stripe.charges.retrieve(latestCharge)
-      : latestCharge
+  const charge = typeof latestCharge === 'string' ? await stripe.charges.retrieve(latestCharge) : latestCharge
 
   const fingerprint = charge?.payment_method_details?.card?.fingerprint ?? null
   const riskLevel = charge?.outcome?.risk_level ?? null
@@ -142,12 +136,7 @@ async function getReferralPaymentSignals(stripe: Stripe, invoiceId: string) {
     riskReasons.push('stripe_risk_elevated')
   }
 
-  return {
-    chargeId: charge?.id ?? null,
-    fingerprint,
-    riskScore,
-    riskReasons,
-  }
+  return { chargeId: charge?.id ?? null, fingerprint, riskScore, riskReasons }
 }
 
 async function processPaidReferral(
@@ -217,33 +206,11 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = createSupabaseWebhookClient()
-
   const shouldProcess = await recordStripeEvent(supabase, event)
-  if (!shouldProcess) {
-    return NextResponse.json({ received: true, duplicate: true })
-  }
+  if (!shouldProcess) return NextResponse.json({ received: true, duplicate: true })
 
   try {
     switch (event.type) {
-      case 'payment_intent.succeeded': {
-        const pi = event.data.object as Stripe.PaymentIntent
-        const { error } = await supabase.rpc('process_stripe_payment_intent_succeeded', {
-          p_provider_transaction_id: pi.id,
-          p_appointment_id:          pi.metadata.appointment_id ?? null,
-        })
-        if (error) throw error
-        break
-      }
-
-      case 'payment_intent.payment_failed': {
-        const pi = event.data.object as Stripe.PaymentIntent
-        const { error } = await supabase.rpc('process_stripe_payment_intent_failed', {
-          p_provider_transaction_id: pi.id,
-        })
-        if (error) throw error
-        break
-      }
-
       case 'invoice.paid': {
         await processPaidReferral(supabase, stripe, event.data.object as Stripe.Invoice)
         break
@@ -251,9 +218,7 @@ export async function POST(request: NextRequest) {
 
       case 'charge.refunded': {
         const charge = event.data.object as Stripe.Charge
-        if (charge.refunded) {
-          await revokeReferralForCharge(supabase, charge.id, 'stripe_full_refund')
-        }
+        if (charge.refunded) await revokeReferralForCharge(supabase, charge.id, 'stripe_full_refund')
         break
       }
 
@@ -266,20 +231,14 @@ export async function POST(request: NextRequest) {
 
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
-        const subscriptionId =
-          typeof session.subscription === 'string' ? session.subscription : session.subscription?.id
+        const subscriptionId = typeof session.subscription === 'string' ? session.subscription : session.subscription?.id
         const userId = session.metadata?.user_id ?? session.metadata?.userId
         const planKey = session.metadata?.plan_key ?? session.metadata?.planKey
-
         if (!subscriptionId || !userId) break
 
         const tier = planKeyToTier(planKey)
         const sub = await stripe.subscriptions.retrieve(subscriptionId)
-
-        const { error } = await supabase.rpc('sync_stripe_subscription', {
-          ...buildSyncArgs(tier, sub),
-          p_user_id: userId,
-        })
+        const { error } = await supabase.rpc('sync_stripe_subscription', { ...buildSyncArgs(tier, sub), p_user_id: userId })
         if (error) throw error
         break
       }
@@ -313,7 +272,7 @@ export async function POST(request: NextRequest) {
         if (!userId) break
         const { error } = await supabase.rpc('process_stripe_identity_verified', {
           p_stripe_session_id: vs.id,
-          p_user_id:           userId,
+          p_user_id: userId,
         })
         if (error) throw error
         break
@@ -336,12 +295,8 @@ export async function POST(request: NextRequest) {
     const processingError = error instanceof Error ? error.message : 'Unknown Stripe webhook processing error'
     await supabase
       .from('stripe_events')
-      .update({
-        processing_error: processingError,
-        failed_at: new Date().toISOString(),
-      })
+      .update({ processing_error: processingError, failed_at: new Date().toISOString() })
       .eq('stripe_event_id', event.id)
-
     throw error
   }
 
