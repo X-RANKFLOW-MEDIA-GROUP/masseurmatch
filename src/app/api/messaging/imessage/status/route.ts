@@ -3,7 +3,6 @@ import { z } from "zod";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { assertRateLimit } from "@/app/_lib/security";
-import type { Database } from "@/integrations/supabase/types";
 import { assertImessageBridgeAuthorized } from "@/lib/messaging/imessage-bridge-auth";
 
 const statusSchema = z.object({
@@ -19,8 +18,25 @@ const statusSchema = z.object({
 const workerSchema = z.string().trim().min(1).max(120);
 
 type Db = ReturnType<typeof createSupabaseAdminClient> & { from: (table: string) => any };
-type MessagingQueueUpdate = Database["public"]["Tables"]["messaging_queue"]["Update"];
-type MessagingMessageUpdate = Database["public"]["Tables"]["messaging_messages"]["Update"];
+type MessagingQueueUpdate = {
+  status?: "pending" | "sent" | "delivered" | "failed";
+  locked_at?: string | null;
+  locked_by?: string | null;
+  last_error?: string | null;
+  scheduled_for?: string | null;
+  sent_at?: string | null;
+  delivered_at?: string | null;
+  failed_at?: string | null;
+};
+type MessagingMessageUpdate = {
+  delivery_status?: "queued" | "sent" | "delivered" | "failed";
+  external_id?: string | null;
+  sent_at?: string | null;
+  delivered_at?: string | null;
+  failed_at?: string | null;
+  error_code?: string | null;
+  error_message?: string | null;
+};
 
 export async function POST(request: Request) {
   try {
