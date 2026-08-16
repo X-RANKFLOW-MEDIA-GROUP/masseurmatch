@@ -85,9 +85,6 @@ export const PROFILE_FIELDS_BY_SECTION: Record<string, string[]> = {
     "price_max",
     "starting_price",
     "starting_rate",
-    "booking_url",
-    "booking_link",
-    "booking_platform",
     "website",
   ],
   "Verification & Status": [
@@ -234,8 +231,6 @@ const FIELD_TYPES: Record<string, "text" | "number" | "boolean" | "array" | "jso
   modality: "text",
   education: "text",
   training: "text",
-  booking_link: "text",
-  booking_platform: "text",
   website: "text",
   profile_status: "text",
   verification_status: "text",
@@ -268,7 +263,6 @@ const FIELD_TYPES: Record<string, "text" | "number" | "boolean" | "array" | "jso
   id: "text",
   avatar_url: "text",
   photo_url: "text",
-  booking_url: "text",
 
   // Number fields
   incall_price: "number",
