@@ -59,7 +59,7 @@ const PROFILE_SELECT = [
   "is_banned",
 ].join(",");
 
-type Db = ReturnType<typeof createSupabaseAdminClient> & { from: (table: string) => any; rpc: (fn: string, args?: any) => any };
+type Db = { from: (table: string) => any; rpc: (fn: string, args?: any) => any };
 type Profile = Record<string, any> & { id: string; user_id: string | null };
 type Contact = {
   id: string;
@@ -421,7 +421,7 @@ export async function processKnottyImessageInbound(input: {
   externalId: string;
   receivedAt?: string | null;
 }) {
-  const db = createSupabaseAdminClient() as Db;
+  const db = createSupabaseAdminClient() as unknown as Db;
   const phone = normalizePhoneE164(input.from);
   if (!phone) throw new Error("Invalid inbound phone number.");
   const cleanBody = sanitizeText(input.body).slice(0, 4000);
@@ -507,7 +507,7 @@ export async function processKnottyImessageInbound(input: {
     return { handled: true, replied: false, reason: "profile_ineligible" as const, conversationId: conversation.id };
   }
 
-  let session = await getOrCreateSession(db, contact, conversation, profile);
+  const session = await getOrCreateSession(db, contact, conversation, profile);
   await db.from("messaging_profile_sessions").update({ last_inbound_message_id: inbound.data.id }).eq("id", session.id);
 
   if (/^(help|start|complete my profile|finish my profile|profile help|setup|set up)$/i.test(cleanBody.trim())) {
@@ -558,7 +558,7 @@ export async function processKnottyImessageInbound(input: {
 }
 
 export async function verifyKnottyProfileSession(token: string, authenticatedUserId: string) {
-  const db = createSupabaseAdminClient() as Db;
+  const db = createSupabaseAdminClient() as unknown as Db;
   const tokenHash = hashToken(token);
   const sessionResult = await db
     .from("messaging_profile_sessions")
