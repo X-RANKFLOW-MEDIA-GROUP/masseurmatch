@@ -18,25 +18,23 @@ export async function GET(request: Request) {
 
     if (profileError) throw new RouteError(500, profileError.message);
 
-    // Photo counts
     let approvedPhotos = 0;
     let pendingPhotos = 0;
-    if (profile && 'id' in profile) {
-      const { data: photoCounts } = await adminClient
-        .from("therapist_photos")
-        .select("id, status")
-        .eq("user_id", session.userId);
+    if (profile?.id) {
+      const { data: photoCounts, error: photoError } = await adminClient
+        .from("profile_photos")
+        .select("id, moderation_status")
+        .eq("profile_id", profile.id);
+
+      if (photoError) throw new RouteError(500, photoError.message);
       if (photoCounts) {
-        approvedPhotos = photoCounts.filter(
-          (p: any) => p.status === "approved"
-        ).length;
+        approvedPhotos = photoCounts.filter((photo) => photo.moderation_status === "approved").length;
         pendingPhotos = photoCounts.filter(
-          (p: any) => p.status === "pending_review"
+          (photo) => !photo.moderation_status || photo.moderation_status === "pending"
         ).length;
       }
     }
 
-    // Identity verification status
     let identityStatus = "not_started";
     const { data: identityRow } = await adminClient
       .from("identity_verifications")
@@ -46,10 +44,9 @@ export async function GET(request: Request) {
       .limit(1)
       .maybeSingle();
     if (identityRow?.status) {
-      identityStatus = (identityRow as any).status;
+      identityStatus = identityRow.status;
     }
 
-    // Text verification status
     let textStatus = "not_started";
     const { data: textRow } = await adminClient
       .from("text_verifications")
@@ -59,7 +56,7 @@ export async function GET(request: Request) {
       .limit(1)
       .maybeSingle();
     if (textRow?.status) {
-      textStatus = (textRow as any).status;
+      textStatus = textRow.status;
     }
 
     return json({
