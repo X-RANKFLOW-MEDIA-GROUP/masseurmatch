@@ -19,8 +19,6 @@ export function getProfileRobotsMetadata(
 ): RobotsMetadata {
   const robotsDirective = getProfileIndexRobots(profile);
 
-  // Parse directive string into Metadata format
-  // Format: "index, follow" or "noindex, nofollow"
   const [indexing, following] = robotsDirective.split(",").map((s) => s.trim());
 
   return {
@@ -29,19 +27,14 @@ export function getProfileRobotsMetadata(
   };
 }
 
-/**
- * Generate canonical URL for profile page.
- * Important for SEO to prevent duplicate content issues.
- */
+/** Generate canonical URL for profile page. */
 export function getProfileCanonicalUrl(slug: string, siteUrl: string): string {
   const normalizedSiteUrl = siteUrl.replace(/\/+$/, "");
   const normalizedSlug = slug.replace(/^\/+|\/+$/g, "");
   return `${normalizedSiteUrl}/therapists/${normalizedSlug}`;
 }
 
-/**
- * Enhanced profile metadata with SEO optimization and indexing rules.
- */
+/** Enhanced profile metadata with SEO optimization and indexing rules. */
 export function buildProfilePageMetadata(
   profile: TherapistProfile | PublicTherapist | null,
   slug: string,
@@ -62,7 +55,10 @@ export function buildProfilePageMetadata(
     }
   }
 
-  const city = profile?.city || "your area";
+  const city =
+    profile && "city" in profile && typeof profile.city === "string" && profile.city.trim()
+      ? profile.city
+      : "your area";
 
   const title = seoTitle || `${displayName || "Therapist"} - MasseurMatch`;
   const description =
