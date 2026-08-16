@@ -13,11 +13,19 @@ import {
   summarizeMissingFields,
 } from "@/lib/messaging/profile-completion";
 
-const requestSchema = z.object({
-  action: z.enum(["preview", "queue"]),
+const previewRequestSchema = z.object({
+  action: z.literal("preview"),
   limit: z.number().int().min(1).max(300).optional().default(100),
   profileId: z.string().uuid().optional(),
 });
+
+const queueRequestSchema = z.object({
+  action: z.literal("queue"),
+  limit: z.number().int().min(1).max(1).optional().default(1),
+  profileId: z.string().uuid(),
+});
+
+const requestSchema = z.discriminatedUnion("action", [previewRequestSchema, queueRequestSchema]);
 
 type Db = { from: (table: string) => any };
 type Profile = Record<string, any> & {
@@ -232,12 +240,15 @@ export async function POST(request: Request) {
 
     const settingsResult = await db
       .from("messaging_settings")
-      .select("receiving_number,global_pause")
+      .select("receiving_number,global_pause,imessage_outbound_enabled")
       .eq("id", "default")
       .single();
     if (settingsResult.error) throw new RouteError(500, settingsResult.error.message);
     if (body.action === "queue" && settingsResult.data.global_pause) {
       throw new RouteError(409, "Messaging is globally paused.");
+    }
+    if (body.action === "queue" && settingsResult.data.imessage_outbound_enabled !== true) {
+      throw new RouteError(409, "Outbound iMessage is disarmed.");
     }
 
     const results: Array<Record<string, unknown>> = [];
