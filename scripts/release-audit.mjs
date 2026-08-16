@@ -137,11 +137,12 @@ function checkCanonicalDirectoryRuntime() {
     assert(!exists(relPath), `Noncanonical booking/review runtime path must not exist: ${relPath}`);
   }
 
-  const sourceRoot = path.join(root, "src");
-  for (const file of collectSourceFiles(sourceRoot)) {
-    const text = fs.readFileSync(file, "utf8");
-    for (const token of forbiddenRuntimeTokens) {
-      assert(!text.includes(token), `Retired session-payment runtime token "${token}" found in ${path.relative(root, file)}`);
+  for (const relRoot of ["src/app", "src/lib"]) {
+    for (const file of collectSourceFiles(path.join(root, relRoot))) {
+      const text = fs.readFileSync(file, "utf8");
+      for (const token of forbiddenRuntimeTokens) {
+        assert(!text.includes(token), `Retired session-payment runtime token "${token}" found in ${path.relative(root, file)}`);
+      }
     }
   }
 }
