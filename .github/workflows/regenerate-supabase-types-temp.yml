@@ -1,0 +1,80 @@
+name: Regenerate Supabase Types Temp
+
+on:
+  push:
+    branches:
+      - agent/exact-supabase-types-20260816
+    paths:
+      - .github/workflows/regenerate-supabase-types-temp.yml
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v6
+        with:
+          ref: agent/exact-supabase-types-20260816
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.32.1
+          run_install: false
+
+      - name: Install Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate production types
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          pnpm exec supabase gen types typescript \
+            --project-id ijsdpozjfjjufjsoexod \
+            --schema public \
+            > src/integrations/supabase/types.ts
+
+      - name: Reject retired runtime contracts
+        run: |
+          set -euo pipefail
+          file=src/integrations/supabase/types.ts
+          for token in \
+            'appointments: {' \
+            'booking_inquiries: {' \
+            'booking_analytics: {' \
+            'payment_transactions: {' \
+            'therapist_availability: {' \
+            'booking_inquiry_id:' \
+            'process_stripe_payment_intent_succeeded' \
+            'process_stripe_payment_intent_failed'
+          do
+            if grep -Fq "$token" "$file"; then
+              echo "Retired Supabase contract found in generated types: $token" >&2
+              exit 1
+            fi
+          done
+
+      - name: Commit exact generated types
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- src/integrations/supabase/types.ts; then
+            echo 'Generated types are already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/integrations/supabase/types.ts
+          git commit -m 'Regenerate Supabase types from production'
+          git push origin HEAD:agent/exact-supabase-types-20260816
