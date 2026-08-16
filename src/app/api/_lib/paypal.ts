@@ -1,3 +1,4 @@
+import { revalidatePublicDirectory } from "@/app/_lib/directory-cache";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import type { TablesInsert } from "@/integrations/supabase/types";
 
@@ -112,7 +113,7 @@ export async function syncPayPalSubscription(subscription: PayPalSubscription) {
   const admin = createSupabaseAdminClient();
   const { data: profile, error: profileError } = await admin
     .from("profiles")
-    .select("id")
+    .select("id, profile_status, visibility_status, is_active, _tier, subscription_status")
     .eq("user_id", userId)
     .single();
   if (profileError || !profile) throw new Error("Provider profile not found for PayPal subscription.");
@@ -158,18 +159,39 @@ export async function syncPayPalSubscription(subscription: PayPalSubscription) {
     if (error) throw new Error(error.message);
   }
 
+  const shouldPublishInitialPaidActivation =
+    isEntitled &&
+    profile.profile_status === "approved" &&
+    profile.visibility_status === "hidden" &&
+    profile.is_active === false &&
+    profile._tier === planKey &&
+    !profile.subscription_status;
+
   const { error: updateError } = await admin
     .from("profiles")
     .update({
       subscription_tier: currentTier,
       subscription_status: localStatus,
       current_period_end: nextBilling,
+      ...(shouldPublishInitialPaidActivation
+        ? { visibility_status: "public", is_active: true }
+        : {}),
       updated_at: new Date().toISOString(),
     })
     .eq("id", profile.id);
   if (updateError) throw new Error(updateError.message);
 
-  return { planKey, localStatus, profileId: profile.id, nextBilling };
+  if (shouldPublishInitialPaidActivation) {
+    revalidatePublicDirectory();
+  }
+
+  return {
+    planKey,
+    localStatus,
+    profileId: profile.id,
+    nextBilling,
+    published: shouldPublishInitialPaidActivation,
+  };
 }
 
 export async function fetchPayPalSubscription(subscriptionId: string) {
