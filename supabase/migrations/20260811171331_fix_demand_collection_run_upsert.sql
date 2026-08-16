@@ -1,2 +1,34 @@
+-- Replace the partial unique index on run_id with a real table constraint, so
+-- PostgREST upserts can target `on_conflict=run_id` (a partial index is not a
+-- valid conflict target).
+--
+-- This must be guarded. On a database built from scratch, the CREATE TABLE in
+-- 20260806230000_demand_radar_pipeline.sql already declares
+-- `run_id text NOT NULL UNIQUE`, and Postgres names that constraint
+-- demand_collection_runs_run_id_key — exactly the name added here. ADD
+-- CONSTRAINT has no IF NOT EXISTS form, so replaying this migration onto a
+-- fresh database aborted with 42710 "constraint already exists".
+--
+-- Production never hit it: the migration is recorded as applied there, so
+-- `supabase db push` skips it. Fresh replays are the only path that runs it,
+-- which meant every Supabase preview branch ended in MIGRATIONS_FAILED and no
+-- pull request ever got its schema verified against a real branch database.
+--
+-- The drop below targets an index (…_run_id_uidx) while the constraint being
+-- added is a different object (…_run_id_key), so it guards nothing on its own.
+
 drop index if exists public.demand_collection_runs_run_id_uidx;
-alter table public.demand_collection_runs add constraint demand_collection_runs_run_id_key unique (run_id);
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conrelid = 'public.demand_collection_runs'::regclass
+      and conname = 'demand_collection_runs_run_id_key'
+  ) then
+    alter table public.demand_collection_runs
+      add constraint demand_collection_runs_run_id_key unique (run_id);
+  end if;
+end
+$$;
