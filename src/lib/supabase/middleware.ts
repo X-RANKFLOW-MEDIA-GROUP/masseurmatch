@@ -23,6 +23,11 @@ function normalizeRole(value: unknown): AppRole {
   return null;
 }
 
+function normalizeAssuranceLevel(value: unknown): AuthenticatorAssuranceLevel {
+  if (value === "aal1" || value === "aal2") return value;
+  return null;
+}
+
 /**
  * Refreshes the Supabase auth session at the edge and returns the verified
  * user alongside a response carrying any rotated auth cookies.
@@ -67,9 +72,9 @@ export async function updateSession(request: NextRequest): Promise<{
   // Non-admin users are not gated on AAL by the middleware.
   const { data: assurance, error: assuranceError } =
     await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-  const aal: AuthenticatorAssuranceLevel = assuranceError
+  const aal = assuranceError
     ? null
-    : assurance.currentLevel ?? null;
+    : normalizeAssuranceLevel(assurance.currentLevel);
 
   return {
     response,
