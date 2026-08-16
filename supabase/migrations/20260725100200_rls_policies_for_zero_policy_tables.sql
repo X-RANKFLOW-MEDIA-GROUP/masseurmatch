@@ -47,8 +47,8 @@ BEGIN
 END $$;
 
 -- ── therapist_subscriptions ──────────────────────────────────────────────────
--- Read-only for the owning therapist (via profiles / therapist_profiles) and
--- admins. Writes happen exclusively through service-role server flows.
+-- Read-only for the owning therapist via canonical public.profiles and admins.
+-- Writes happen exclusively through service-role server flows.
 DO $$
 BEGIN
   IF to_regclass('public.therapist_subscriptions') IS NULL THEN RETURN; END IF;
@@ -63,11 +63,6 @@ BEGIN
         SELECT 1 FROM public.profiles p
         WHERE p.id = therapist_subscriptions.profile_id
           AND (p.user_id = (SELECT auth.uid()) OR p.id = (SELECT auth.uid()))
-      )
-      OR EXISTS (
-        SELECT 1 FROM public.therapist_profiles tp
-        WHERE tp.id = therapist_subscriptions.therapist_profile_id
-          AND tp.user_id = (SELECT auth.uid())
       )
     )$pol$;
 END $$;
