@@ -16,6 +16,7 @@ import {
 const requestSchema = z.object({
   action: z.enum(["preview", "queue"]),
   limit: z.number().int().min(1).max(300).optional().default(100),
+  profileId: z.string().uuid().optional(),
 });
 
 type Db = { from: (table: string) => any };
@@ -187,7 +188,7 @@ export async function POST(request: Request) {
     const body = await parseJsonBody(request, requestSchema);
     const db = createSupabaseAdminClient() as unknown as Db;
 
-    const profilesResult = await db
+    let profilesQuery = db
       .from("profiles")
       .select(PROFILE_SELECT)
       .eq("role", "provider")
@@ -195,8 +196,11 @@ export async function POST(request: Request) {
       .eq("is_active", true)
       .eq("is_banned", false)
       .eq("is_suspended", false)
-      .not("user_id", "is", null)
-      .limit(body.limit);
+      .not("user_id", "is", null);
+
+    if (body.profileId) profilesQuery = profilesQuery.eq("id", body.profileId);
+
+    const profilesResult = await profilesQuery.limit(body.profileId ? 1 : body.limit);
     if (profilesResult.error) throw new RouteError(500, profilesResult.error.message);
     const profiles = (profilesResult.data || []) as Profile[];
 
@@ -369,12 +373,19 @@ export async function POST(request: Request) {
       body.action === "queue" ? "profile_completion_imessage_outreach_queued" : "profile_completion_imessage_outreach_previewed",
       "messaging_campaign",
       undefined,
-      { scanned: profiles.length, eligible, queued, consentGate: "user_notification_preferences.sms_enabled" },
+      {
+        scanned: profiles.length,
+        eligible,
+        queued,
+        targetProfileId: body.profileId || null,
+        consentGate: "user_notification_preferences.sms_enabled",
+      },
     );
 
     return json({
       ok: true,
       action: body.action,
+      targetProfileId: body.profileId || null,
       scanned: profiles.length,
       eligible,
       queued,
