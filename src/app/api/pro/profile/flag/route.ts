@@ -57,7 +57,7 @@ export async function POST(request: Request) {
       source: "pro_listing",
       field_name: body.flaggedField,
       status: "pending",
-      priority: "0",
+      priority: 0,
       moderation_provider: sanitizeOptionalText(body.moderationProvider) || "sightengine",
       moderation_reason: sanitizeText(body.moderationReason),
       snapshot: snapshot as Json,
@@ -76,9 +76,7 @@ export async function POST(request: Request) {
       .eq("status", "pending")
       .maybeSingle();
 
-    if (queueLookupError) {
-      throw new RouteError(500, queueLookupError.message);
-    }
+    if (queueLookupError) throw new RouteError(500, queueLookupError.message);
 
     let queueId = existingQueueItem?.id ?? null;
 
@@ -87,21 +85,14 @@ export async function POST(request: Request) {
         .from("moderation_queue")
         .update(queuePayload)
         .eq("id", queueId);
-
-      if (queueUpdateError) {
-        throw new RouteError(500, queueUpdateError.message);
-      }
+      if (queueUpdateError) throw new RouteError(500, queueUpdateError.message);
     } else {
       const { data: insertedQueueItem, error: queueInsertError } = await adminClient
         .from("moderation_queue")
         .insert(queuePayload)
         .select("id")
         .single();
-
-      if (queueInsertError) {
-        throw new RouteError(500, queueInsertError.message);
-      }
-
+      if (queueInsertError) throw new RouteError(500, queueInsertError.message);
       queueId = insertedQueueItem?.id ?? null;
     }
 
@@ -112,11 +103,7 @@ export async function POST(request: Request) {
       snapshot,
     });
 
-    return json({
-      ok: true,
-      queued: true,
-      queueId,
-    });
+    return json({ ok: true, queued: true, queueId });
   } catch (error) {
     return errorResponse(error);
   }
