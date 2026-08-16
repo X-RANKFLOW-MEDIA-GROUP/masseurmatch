@@ -72,7 +72,7 @@ export async function POST(request: Request) {
       .insert({
         profile_id: profile.id,
         user_id: session.userId,
-        storage_path: publicUrl,
+        storage_path: fileName,
         url: publicUrl,
         is_primary: isPrimary,
         sort_order: sortOrder,
