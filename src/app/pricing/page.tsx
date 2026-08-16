@@ -13,11 +13,10 @@ import { Button } from "@/components/ui/button";
 export const metadata: Metadata = {
   title: "Pricing | Listing Plans & Growth Add-Ons - MasseurMatch",
   description:
-    "Compare Free, Standard, Pro, and Elite listing plans plus stackable visibility boosts, trust upgrades, geo discovery, and premium exposure add-ons.",
+    "Compare Free, Standard, Pro, and Elite listing plans, promotional placement, analytics, travel tools, and other provider features.",
   openGraph: {
     title: "MasseurMatch Pricing for Massage Therapists",
-    description:
-      "Base listing plans plus market-aligned add-ons for visibility, trust, geo discovery, and premium exposure.",
+    description: "Compare provider listing plans and clearly labeled visibility add-ons.",
     url: "https://www.masseurmatch.com/pricing",
     siteName: "MasseurMatch",
     type: "website",
@@ -36,140 +35,109 @@ const pricingSchema = {
     price: String(plan.price),
     priceCurrency: "USD",
     description: plan.description,
-    eligibleCustomerType: "https://schema.org/BusinessEntityType",
   })),
 };
 
 const strategyCards = [
   {
     icon: TrendingUp,
-    title: "Visibility first",
-    body: "Low-ticket boosts make it easy to buy fast, while mid-ticket placements capture therapists ready for a bigger demand push.",
+    title: "Visibility",
+    body: "Paid tiers and promotional placements can increase where and how often an eligible profile appears. They do not guarantee leads, clients, bookings, or revenue.",
   },
   {
     icon: IconShield,
-    title: "Trust converts",
-    body: "Verification credentials and proof badges improve first-contact conversion and support higher pricing confidence.",
+    title: "Trust stays separate",
+    body: "Identity verification is earned through the verification workflow. Payment, Featured placement, and subscription tier do not verify identity or professional credentials.",
   },
   {
     icon: IconSpark,
-    title: "Stack for margin",
-    body: "Recurring analytics and geo tools create software-style revenue, while scarce premium slots protect higher-margin inventory.",
+    title: "Add only what you need",
+    body: "Optional add-ons can expand visibility, analytics, geo discovery, or other product capabilities when those products are available.",
   },
 ];
 
 const faqs = [
   {
     q: "Can I start with Free and upgrade later?",
-    a: "Yes. Start with Free, then move into Standard, Pro, or Elite whenever you want stronger placement and richer profile tools.",
+    a: "Yes. You can start with Free and move to another available plan when you want the features and placement included in that tier.",
   },
   {
     q: "Do paid plans include a trial?",
-    a: "Yes. Paid tiers include a 14-day free trial, and the first 50 members keep the founder discount for the first 3 months after trial.",
+    a: "The current paid tiers show a 14-day trial. The founding-member introductory offer provides 50% off the first three paid months for eligible founding members. The temporary discount ends after those three paid months.",
   },
   {
-    q: "How do the add-ons work?",
-    a: "Add-ons are stackable upgrades for visibility, trust, geo discovery, analytics, and premium exposure. Each add-on clearly shows its impact preview, duration, placement, and best bundle so it is easy to compare before purchase.",
+    q: "What does the founding-member price lock cover?",
+    a: "For an eligible founding member, the base subscription rate that applies after the temporary introductory discount stays locked while that same subscription remains continuously active and eligible. The lock does not extend the temporary discount or freeze taxes, separate add-ons, upgrades, or different plans.",
   },
   {
-    q: "What does Featured, Boosted, or Trending mean?",
-    a: "Those are paid advertising placements and labels. They do not imply endorsement, credential verification, or recommendation by MasseurMatch.",
+    q: "What do Featured, Boosted, Trending, or Sponsored mean?",
+    a: "They are promotional or advertising signals. They do not imply endorsement, identity verification, professional licensing, qualifications, or recommendation by MasseurMatch.",
   },
   {
-    q: "What payment methods do you accept?",
-    a: "We accept major credit and debit cards through Stripe for listing plans, and provider billing is managed securely through Stripe.",
+    q: "What does Identity Verified mean?",
+    a: "Identity Verified is separate from paid placement. It means the provider successfully completed MasseurMatch's identity-only review. It does not verify professional licenses, background, qualifications, or service quality.",
+  },
+  {
+    q: "How is provider billing processed?",
+    a: "Provider subscription billing is processed through Stripe. MasseurMatch does not store full payment card numbers.",
   },
 ];
 
 export default function PricingPage() {
   return (
     <>
-      <Script
-        id="pricing-jsonld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingSchema) }}
-      />
+      <Script id="pricing-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingSchema) }} />
 
       <div className="bg-[radial-gradient(circle_at_top,rgba(139,30,45,0.05),transparent_35%),linear-gradient(180deg,#ffffff_0%,#f7f7f7_100%)]">
         <section className="container mx-auto px-4 pb-10 pt-14 sm:pt-20">
           <div className="mx-auto max-w-4xl text-center">
             <Badge variant="premium">Pricing</Badge>
             <h1 className="font-display mt-6 text-4xl font-semibold tracking-tight text-foreground sm:text-6xl">
-              Plans and add-ons built for maximum visibility and conversion
+              Choose the visibility and tools that fit your practice
             </h1>
             <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">
-              Start with a base listing, then stack market-aligned boosts, credibility layers, geo targeting, and
-              limited premium exposure to increase demand without forcing every therapist into the same plan.
+              Plans combine listing features, placement, analytics, travel tools, and other provider capabilities.
+              Promotional placement is always separate from identity verification and professional credentials.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button asChild size="lg" variant="hero">
-                <Link href="/signup/plan">
-                  Choose a plan
-                  <IconArrowRight size={16} />
-                </Link>
+                <Link href="/signup/plan">Choose a plan <IconArrowRight size={16} /></Link>
               </Button>
               <Button asChild size="lg" variant="outline">
                 <Link href="/pro/billing#addons">See add-ons</Link>
               </Button>
             </div>
 
-            {PRICE_LOCK && (
+            {PRICE_LOCK ? (
               <p className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-badge-verified-border bg-badge-verified-light px-3.5 py-1.5 text-xs font-semibold text-badge-verified">
-                <IconLock size={14} />
-                Founding-member price lock — your rate never increases while subscribed
+                <IconLock size={14} /> Founding-member base-rate lock while the eligible subscription remains active
               </p>
-            )}
-          </div>
-
-          {/* Market anchoring strip */}
-          <div className="mx-auto mt-8 max-w-3xl rounded-3xl border border-badge-promo-border/60 bg-badge-promo-light/70 px-6 py-4">
-            <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-badge-promo">How we compare</p>
-            <div className="mt-3 grid grid-cols-3 gap-3 text-center">
-              <div>
-                <p className="text-xl font-bold text-foreground">$300–$375</p>
-                <p className="mt-0.5 text-xs text-muted-foreground">Legacy directories · one city</p>
-              </div>
-              <div className="flex flex-col items-center justify-center">
-                <p className="text-xs font-medium text-amber-700">vs. MasseurMatch Elite</p>
-              </div>
-              <div>
-                <p className="text-xl font-bold text-foreground">$99</p>
-                <p className="mt-0.5 text-xs text-muted-foreground">3 cities + AI + Demand Radar</p>
-              </div>
-            </div>
+            ) : null}
           </div>
 
           <div className="mx-auto mt-10 grid max-w-5xl gap-4 md:grid-cols-3">
             <div className="rounded-3xl border border-border bg-white/92 p-5 text-left shadow-[var(--shadow-md)]">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Trial</p>
-              <p className="mt-3 text-2xl font-semibold text-foreground">14 days on paid tiers</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">Let therapists experience the visibility lift before the first paid cycle starts.</p>
+              <p className="mt-3 text-2xl font-semibold text-foreground">14 days on current paid tiers</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">Trial terms are shown before purchase.</p>
             </div>
             <div className="rounded-3xl border border-border bg-white/92 p-5 text-left shadow-[var(--shadow-md)]">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Founder offer</p>
-              <p className="mt-3 text-2xl font-semibold text-foreground">50% off first 3 months</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">A strong pricing anchor that improves early conversion without discounting the full catalog long term.</p>
+              <p className="mt-3 text-2xl font-semibold text-foreground">50% off first 3 paid months</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">The introductory discount is temporary; the eligible post-promotion base rate is the amount covered by the price lock.</p>
             </div>
             <div className="rounded-3xl border border-border bg-white/92 p-5 text-left shadow-[var(--shadow-md)]">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Monetization mix</p>
-              <p className="mt-3 text-2xl font-semibold text-foreground">$6 to $59 add-ons</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">Low-ticket impulse buys, recurring SaaS upgrades, and premium scarce inventory are all designed to stack.</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Directory model</p>
+              <p className="mt-3 text-2xl font-semibold text-foreground">No session commission</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">MasseurMatch does not process massage-session bookings or take a commission from off-platform session payments.</p>
             </div>
           </div>
         </section>
 
         <section className="container mx-auto px-4 py-8">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div className="max-w-3xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Base plans</p>
-              <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                Choose the right plan foundation
-              </h2>
-              <p className="mt-4 text-base leading-7 text-muted-foreground">
-                Free and Standard keep the barrier low. Pro and Elite give therapists the stronger media, placement,
-                and analytics foundation that makes the add-on catalog even more effective.
-              </p>
-            </div>
+          <div className="max-w-3xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Base plans</p>
+            <h2 className="font-display mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Compare current plan features</h2>
           </div>
 
           <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -186,13 +154,11 @@ export default function PricingPage() {
                   {plan.popular ? <Badge>Most Popular</Badge> : null}
                   <Badge variant="secondary">{plan.tier === "free" ? "No trial needed" : "14-day free trial"}</Badge>
                 </div>
-
                 <p className="mt-4 text-sm uppercase tracking-[0.18em] text-muted-foreground">{plan.tier}</p>
                 <h3 className="font-display mt-2 text-2xl font-semibold tracking-tight text-foreground">{plan.name}</h3>
                 <p className="mt-2 text-3xl font-semibold text-foreground">{plan.priceDisplay}</p>
                 {plan.founderPrice ? <p className="mt-2 text-sm font-medium text-brand-secondary">{plan.founderPrice}</p> : null}
                 <p className="mt-3 text-sm leading-6 text-muted-foreground">{plan.description}</p>
-
                 <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
@@ -201,11 +167,9 @@ export default function PricingPage() {
                     </li>
                   ))}
                 </ul>
-
                 <Button asChild className="mt-6 w-full" variant={plan.popular ? "hero" : "outline"}>
                   <Link href={`/signup/plan?selected=${plan.tier}`}>
-                    {plan.tier === "free" ? "Start free" : "Start 14-day trial"}
-                    <IconArrowRight size={16} />
+                    {plan.tier === "free" ? "Start free" : "Start 14-day trial"} <IconArrowRight size={16} />
                   </Link>
                 </Button>
               </section>
@@ -216,10 +180,7 @@ export default function PricingPage() {
         <section className="container mx-auto px-4 py-8">
           <div className="grid gap-4 lg:grid-cols-3">
             {strategyCards.map((card) => (
-              <div
-                key={card.title}
-                className="rounded-3xl border border-border bg-white/92 p-6 shadow-[var(--shadow-md)]"
-              >
+              <div key={card.title} className="rounded-3xl border border-border bg-white/92 p-6 shadow-[var(--shadow-md)]">
                 <card.icon className="h-5 w-5 text-brand-secondary" />
                 <h3 className="font-display mt-4 text-2xl font-semibold tracking-tight text-foreground">{card.title}</h3>
                 <p className="mt-3 text-sm leading-6 text-muted-foreground">{card.body}</p>
@@ -239,9 +200,7 @@ export default function PricingPage() {
             <div className="mt-6 space-y-4">
               {faqs.map((item) => (
                 <details key={item.q} className="rounded-[1.4rem] border border-border/80 bg-slate-950/[0.02] px-5 py-4">
-                  <summary className="cursor-pointer list-none text-base font-semibold text-foreground">
-                    {item.q}
-                  </summary>
+                  <summary className="cursor-pointer list-none text-base font-semibold text-foreground">{item.q}</summary>
                   <p className="mt-3 text-sm leading-7 text-muted-foreground">{item.a}</p>
                 </details>
               ))}
@@ -249,8 +208,10 @@ export default function PricingPage() {
 
             <div className="mt-6 rounded-3xl border border-dashed border-border/80 bg-white/70 px-5 py-4">
               <p className="text-sm leading-7 text-muted-foreground">
-                All plans and add-ons are advertising products. Featured placement, boosted visibility, verified labels,
-                and similar signals do not imply endorsement, qualification, or recommendation by MasseurMatch.
+                Paid plans and paid add-ons are listing, feature, or promotional products. Featured, Boosted,
+                Trending, Sponsored, and similar promotional labels do not imply endorsement, identity
+                verification, professional licensing, qualifications, or recommendation. Identity Verified is a
+                separate identity-only trust signal earned through the verification workflow.
               </p>
             </div>
           </div>
@@ -259,23 +220,15 @@ export default function PricingPage() {
         <section className="container mx-auto px-4 pb-16 pt-4">
           <div className="rounded-[2.4rem] border border-brand-secondary/15 bg-[linear-gradient(135deg,rgba(12,28,51,0.98),rgba(18,53,88,0.95))] px-8 py-12 text-white shadow-[var(--shadow-xl)]">
             <div className="mx-auto max-w-3xl text-center">
-              <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-                Start with the right plan and add only the upgrades that move revenue
-              </h2>
+              <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Choose the plan that matches the visibility and tools you need</h2>
               <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-white/72">
-                Keep entry friction low with Free or Standard, then use Pro, Elite, and stackable add-ons to scale
-                visibility, trust, and premium exposure as demand grows.
+                Upgrade for defined product features and promotional placement, not for promises of clients, bookings, income, or professional endorsement.
               </p>
               <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
                 <Button asChild size="lg" variant="premium">
-                  <Link href="/signup/plan">
-                    Choose your plan
-                    <IconArrowRight size={16} />
-                  </Link>
+                  <Link href="/signup/plan">Choose your plan <IconArrowRight size={16} /></Link>
                 </Button>
-                <Button asChild size="lg" variant="glass">
-                  <Link href="/contact">Talk to us first</Link>
-                </Button>
+                <Button asChild size="lg" variant="glass"><Link href="/contact">Talk to us first</Link></Button>
               </div>
             </div>
           </div>
