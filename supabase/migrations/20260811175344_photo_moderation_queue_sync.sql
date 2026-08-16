@@ -7,7 +7,7 @@ SET
   moderation_reason = COALESCE(pp.moderation_reason, mq.moderation_reason),
   updated_at = timezone('utc'::text, now())
 FROM public.profile_photos pp
-WHERE mq.target_id = pp.id
+WHERE mq.target_id = pp.id::text
   AND mq.item_type = 'photo'
   AND (
     mq.status IS DISTINCT FROM pp.moderation_status
@@ -29,7 +29,7 @@ SELECT
   ))
 FROM public.profile_photos pp
 WHERE pp.id IS NOT NULL
-  AND NOT EXISTS (SELECT 1 FROM public.moderation_queue mq WHERE mq.target_id = pp.id);
+  AND NOT EXISTS (SELECT 1 FROM public.moderation_queue mq WHERE mq.target_id = pp.id::text);
 
 CREATE OR REPLACE FUNCTION public.sync_profile_photo_moderation_queue()
 RETURNS trigger
