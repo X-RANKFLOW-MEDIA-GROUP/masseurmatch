@@ -25,10 +25,10 @@ export type SpecialtyKeyword = {
 export const DIRECTORY_SEGMENTS: DirectorySegment[] = [
   {
     slug: "verified-profiles",
-    label: "Active male massage therapists",
-    shortLabel: "Active",
+    label: "Identity Verified massage therapists",
+    shortLabel: "Identity Verified",
     intro:
-      "Browse active profiles first so city discovery starts with clearer trust signals, cleaner listings, and direct contact options.",
+      "Browse public profiles whose providers completed MasseurMatch's separate identity review using a supported government ID, a current challenge selfie, and human review. Identity verification is not a professional license check, background check, endorsement, or guarantee.",
     search: {
       verified: true,
     },
@@ -38,17 +38,17 @@ export const DIRECTORY_SEGMENTS: DirectorySegment[] = [
     label: "Male massage therapists",
     shortLabel: "Male therapists",
     intro:
-      "Compare male massage therapist profiles with city context, specialties, and direct contact without marketplace friction.",
+      "Compare public male massage therapist profiles by city, provider supplied specialties, session format, rates, availability, and direct contact options.",
     search: {
       keyword: "male",
     },
   },
   {
     slug: "lgbtq-friendly",
-    label: "LGBTQ-friendly massage therapists",
-    shortLabel: "LGBTQ-friendly",
+    label: "LGBTQ+-affirming massage therapists",
+    shortLabel: "LGBTQ+-affirming",
     intro:
-      "Explore welcoming profiles built for respectful, inclusive discovery with visible trust and safety guidance.",
+      "Explore public profiles from providers who indicate that they are LGBTQ+-affirming, alongside visible platform trust signals and direct contact options.",
     search: {
       keyword: "gay",
       lgbtqAffirming: true,
@@ -59,17 +59,17 @@ export const DIRECTORY_SEGMENTS: DirectorySegment[] = [
     label: "Sports recovery massage",
     shortLabel: "Sports recovery",
     intro:
-      "Find therapists focused on recovery, mobility, body maintenance, and performance-minded wellness sessions.",
+      "Browse public profiles that mention sports, recovery, mobility, or related bodywork in their provider supplied information.",
     search: {
       keyword: "sports",
     },
   },
   {
     slug: "wellness",
-    label: "Premium wellness massage",
+    label: "Wellness massage",
     shortLabel: "Wellness",
     intro:
-      "Browse calm, premium wellness-focused listings with stronger editorial consistency and straightforward contact flow.",
+      "Browse public massage provider profiles and compare service descriptions, rates, availability, and direct contact options.",
     search: {},
   },
 ];
@@ -80,7 +80,7 @@ export const SPECIALTY_KEYWORDS: SpecialtyKeyword[] = [
     label: "Deep tissue massage",
     shortLabel: "Deep tissue",
     intro:
-      "Compare deep tissue massage listings, rates, and trust signals for focused pressure, relief, and recovery support.",
+      "Compare public profiles that list deep tissue massage among their provider supplied techniques or specialties.",
     search: {
       modality: "deep",
     },
@@ -90,7 +90,7 @@ export const SPECIALTY_KEYWORDS: SpecialtyKeyword[] = [
     label: "Swedish massage",
     shortLabel: "Swedish",
     intro:
-      "Browse Swedish massage listings designed around relaxation, circulation, and full-body maintenance.",
+      "Browse public profiles that list Swedish massage among their provider supplied techniques or specialties.",
     search: {
       modality: "swedish",
     },
@@ -100,7 +100,7 @@ export const SPECIALTY_KEYWORDS: SpecialtyKeyword[] = [
     label: "Sports recovery massage",
     shortLabel: "Sports recovery",
     intro:
-      "Find sports recovery listings that focus on mobility, maintenance, and performance-minded bodywork in your city.",
+      "Browse public profiles that mention sports, recovery, mobility, or related bodywork in their provider supplied information.",
     search: {
       keyword: "sports",
     },
@@ -110,7 +110,7 @@ export const SPECIALTY_KEYWORDS: SpecialtyKeyword[] = [
     label: "Thai massage",
     shortLabel: "Thai",
     intro:
-      "Find Thai massage profiles that emphasize stretching, mobility, and assisted bodywork with direct contact clarity.",
+      "Browse public profiles that list Thai massage among their provider supplied techniques or specialties.",
     search: {
       modality: "thai",
     },
@@ -120,7 +120,7 @@ export const SPECIALTY_KEYWORDS: SpecialtyKeyword[] = [
     label: "Mobile massage",
     shortLabel: "Mobile",
     intro:
-      "Explore mobile massage listings for therapists who can travel to homes, hotels, and requested locations.",
+      "Browse public profiles that list mobile or outcall service. Confirm the exact travel area and current availability directly with the provider.",
     search: {
       session: "home-visit",
     },
@@ -130,7 +130,7 @@ export const SPECIALTY_KEYWORDS: SpecialtyKeyword[] = [
     label: "Hotel massage",
     shortLabel: "Hotel",
     intro:
-      "Browse hotel massage listings for travel-focused sessions with clear direct-contact and availability expectations.",
+      "Browse public profiles that list outcall or mobile service relevant to hotel locations. Confirm hotel coverage and access requirements directly with the provider.",
     search: {
       session: "home-visit",
     },
@@ -140,7 +140,7 @@ export const SPECIALTY_KEYWORDS: SpecialtyKeyword[] = [
     label: "Outcall massage",
     shortLabel: "Outcall",
     intro:
-      "Explore outcall massage listings for therapists who travel to homes, hotels, or requested locations.",
+      "Browse public profiles that list outcall or mobile service. Confirm the exact travel area, current rate, and availability directly with the provider.",
     search: {
       session: "home-visit",
     },
@@ -150,14 +150,12 @@ export const SPECIALTY_KEYWORDS: SpecialtyKeyword[] = [
     label: "Incall massage",
     shortLabel: "Incall",
     intro:
-      "Browse incall massage listings for sessions hosted in a therapist studio, office, or treatment space.",
+      "Browse public profiles that list incall service. Confirm the provider's current location details, rate, and availability directly before scheduling.",
     search: {
       session: "incall",
     },
   },
 ];
-
-const DEFAULT_CITY_KEYWORDS = SPECIALTY_KEYWORDS.map((keyword) => keyword.slug);
 
 export const formatSlugLabel = (value: string) =>
   value

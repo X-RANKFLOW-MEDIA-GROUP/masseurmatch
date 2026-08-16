@@ -20,13 +20,13 @@ export interface Plan {
   anchor?: string;
 }
 
-/** First 50 founding members lock in 50% off for their first 3 months. */
+/** First 50 founding members receive 50% off for their first 3 paid months. */
 export const FOUNDER_OFFER = { discountPct: 50, months: 3 } as const;
 
 /**
- * When true, founding-member rates are grandfathered — the subscriber's
- * price never increases while the subscription remains active.
- * Do NOT touch live subscriptions when updating the Elite price.
+ * When true, the eligible founding member's base subscription rate that applies
+ * after any temporary introductory discount is grandfathered while that same
+ * subscription remains continuously active and in good standing.
  */
 export const PRICE_LOCK = true;
 
@@ -73,7 +73,7 @@ export const PLANS: Plan[] = [
       "Views + clicks analytics",
       "Homepage rotation",
       "Weekly specials",
-      "Identity Verified badge (with public verification date)",
+      "Public Identity Verified badge after successful identity review",
     ],
   },
   {

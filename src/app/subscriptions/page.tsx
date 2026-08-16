@@ -7,120 +7,140 @@ import { createPageMetadata } from "@/app/_lib/seo";
 export const metadata: Metadata = createPageMetadata({
   title: "Paid Subscription and Add-On Terms",
   description:
-    "Terms governing paid subscriptions, add-ons, boosts, and visibility tools on MasseurMatch — billing, renewal, and important limitations.",
+    "Terms governing paid subscriptions, add-ons, boosts, and visibility tools on MasseurMatch — billing, renewal, price locks, and important limitations.",
   path: "/subscriptions",
   keywords: ["subscription terms", "paid listing", "add-on terms", "billing policy"],
 });
 
 export default function SubscriptionsPage() {
   return (
-    <LegalPage title="Paid Subscription and Add-On Terms" path="/subscriptions" lastUpdated="June 29, 2026">
+    <LegalPage title="Paid Subscription and Add-On Terms" path="/subscriptions" lastUpdated="August 15, 2026">
       <p>
-        These Paid Subscription and Add-On Terms govern all paid products available through MasseurMatch,
-        including provider subscription plans, profile add-ons, boost credits, and featured placement tools.
-        These terms supplement the general{" "}
+        These Paid Subscription and Add-On Terms govern paid products available through MasseurMatch, including
+        provider subscription plans, profile add-ons, boosts, and featured placement tools. They supplement the{" "}
         <Link href="/terms">Terms of Service</Link> and the{" "}
-        <Link href="/provider-terms">Provider Terms</Link>. By purchasing any paid product, you agree to these terms.
+        <Link href="/provider-terms">Provider Terms</Link>.
       </p>
 
-      <h2>1. What Paid Products Cover</h2>
-      <p>MasseurMatch offers the following categories of paid products:</p>
+      <h2>1. Paid Products</h2>
       <ul>
-        <li><strong>Subscription plans:</strong> Recurring monthly or annual plans that grant providers a listed profile with plan-specific features and visibility benefits.</li>
-        <li><strong>Add-ons:</strong> Optional paid features purchased separately, such as additional photo slots, highlight badges, priority contact buttons, or analytics access.</li>
-        <li><strong>Boost credits:</strong> Credits used to temporarily increase a profile&apos;s visibility in relevant search results or category pages.</li>
-        <li><strong>Featured placement:</strong> Placement of a profile in promoted positions within search results, city pages, or category listings.</li>
+        <li><strong>Subscription plans:</strong> recurring listing plans with plan-specific profile, visibility, analytics, travel, AI, or other features shown at purchase.</li>
+        <li><strong>Add-ons and boosts:</strong> optional products that may temporarily or continuously change visibility, media capacity, analytics, or other listing features.</li>
+        <li><strong>Featured or sponsored placement:</strong> paid promotional positioning within eligible MasseurMatch surfaces.</li>
       </ul>
+      <p>
+        Current prices, included features, billing cadence, promotional terms, and trial terms are shown on the
+        pricing or checkout surface before purchase and may differ by product or promotion.
+      </p>
 
       <h2>2. Billing and Recurring Charges</h2>
       <p>
-        Subscription plans renew automatically at the end of each billing period (monthly or annual) unless
-        canceled before the renewal date. By subscribing, you authorize MasseurMatch and its payment processor
-        (Stripe) to charge your payment method on a recurring basis.
+        Recurring subscriptions renew at the end of the billing period shown at checkout unless canceled before
+        renewal. By subscribing, you authorize MasseurMatch and Stripe to charge the selected payment method for
+        recurring amounts, applicable taxes, and purchases you authorize.
       </p>
       <p>
-        You are responsible for ensuring your payment information is current and accurate. Failed payments may
-        result in suspension of your listing until the account is resolved. You will be notified of upcoming
-        renewals where required by law.
-      </p>
-
-      <h2>3. Add-Ons and Boost Credits</h2>
-      <p>
-        Add-ons and boost credits may be purchased separately and are typically non-recurring one-time purchases.
-        Some add-ons may be bundled with subscription plans. Boost credits are consumed when used and do not
-        carry over indefinitely — check your account for expiration terms that apply to your specific credit
-        type.
+        Failed or reversed payments may result in loss of paid features or suspension of paid visibility until the
+        billing issue is resolved.
       </p>
 
-      <h2>4. No Guarantee of Results</h2>
+      <h2>3. Trials and Introductory Promotions</h2>
       <p>
-        Paid subscriptions, boost credits, add-ons, featured placements, and all other visibility tools may
-        increase display opportunities for your profile, but they do not guarantee any views, messages, leads,
-        bookings, clients, income, revenue, rankings, or other outcomes.
+        If a plan includes a free trial or introductory discount, the duration and post-promotion price are shown
+        before purchase. A temporary introductory discount ends when its stated promotional period ends unless the
+        offer expressly says otherwise.
       </p>
       <p>
-        Visibility placement is determined by multiple factors including location, search filters, user behavior,
-        subscription tier, moderation status, and platform discretion. MasseurMatch does not guarantee any
-        specific position or ranking at any time.
-      </p>
-
-      <h2>5. Platform Discretion</h2>
-      <p>
-        MasseurMatch reserves the right to modify, pause, or remove paid features, placements, or visibility
-        tools in its sole discretion, including for policy violations, safety concerns, technical maintenance, or
-        platform changes. We are not obligated to provide refunds for paid features affected by policy
-        enforcement actions where you are in violation of platform rules.
+        For example, the current founding-member promotion may provide 50% off for the first three paid months
+        after any applicable trial. That introductory discount does not continue indefinitely merely because a
+        separate base-rate price lock applies.
       </p>
 
-      <h2>6. Payment Processing</h2>
+      <h2>4. Founding-Member Price Lock</h2>
       <p>
-        All payments are processed by Stripe. By purchasing a paid product, you agree to Stripe&apos;s terms of
-        service and payment processing policies. MasseurMatch does not store full credit card numbers. Payment
-        disputes must be submitted through the process described in our{" "}
+        When MasseurMatch displays a founding-member price-lock offer for a subscription, the subscriber&apos;s base
+        subscription rate that applies after any stated temporary introductory discount is intended to remain
+        locked while that same eligible subscription remains continuously active and in good standing.
+      </p>
+      <p>
+        The price lock does not extend a temporary trial or introductory discount beyond its stated duration and
+        does not freeze taxes, separately purchased add-ons, usage-based products, optional upgrades, a different
+        plan selected by the provider, or new products not included in the locked subscription. A canceled or
+        terminated subscription may lose its locked rate if later restarted.
+      </p>
+
+      <h2>5. Add-Ons and Boosts</h2>
+      <p>
+        Add-ons and boosts may be one-time, recurring, duration-based, or usage-based as disclosed before purchase.
+        Availability, inventory, placement, and expiration rules may vary by product. Purchasing a promotional
+        feature does not convert that feature into a trust or credential signal.
+      </p>
+
+      <h2>6. No Guarantee of Results</h2>
+      <p>
+        Paid subscriptions, boosts, add-ons, and featured placements may increase display opportunities or unlock
+        product features, but they do not guarantee views, messages, leads, clients, bookings, income, revenue, or
+        any particular business result.
+      </p>
+      <p>
+        Paid placement and trust signals are separate. An Identity Verified badge is displayed only after the
+        applicable identity review is successfully completed; payment by itself does not verify identity,
+        professional licensing, qualifications, background, or service quality.
+      </p>
+
+      <h2>7. Payment Processing</h2>
+      <p>
+        Provider billing is processed through Stripe. MasseurMatch does not store full payment card numbers.
+        Payment and billing disputes are also subject to our{" "}
         <Link href="/refund-policy">Refund and Cancellation Policy</Link>.
       </p>
 
-      <h2>7. Cancellation</h2>
+      <h2>8. Cancellation</h2>
       <p>
-        You may cancel your subscription at any time through your account settings or by contacting{" "}
-        <a href="mailto:billing@masseurmatch.com">billing@masseurmatch.com</a>. Cancellation typically takes
-        effect at the end of the current billing period. Access to plan features continues until the end of the
-        period for which you have paid.
+        You may cancel through available account controls or by contacting{" "}
+        <a href="mailto:billing@masseurmatch.com">billing@masseurmatch.com</a>. Unless otherwise stated or required
+        by law, cancellation takes effect at the end of the current paid period and stops future recurring charges.
       </p>
 
-      <h2>8. Refunds</h2>
+      <h2>9. Refunds</h2>
       <p>
-        Refund eligibility is governed by our{" "}
-        <Link href="/refund-policy">Refund and Cancellation Policy</Link>. In general, subscription fees are
-        non-refundable except as required by law or in cases of billing error. We do not issue refunds based
-        solely on dissatisfaction with visibility, leads, bookings, or profile performance.
+        Refund eligibility is governed by the{" "}
+        <Link href="/refund-policy">Refund and Cancellation Policy</Link>. Lack of views, inquiries, clients,
+        bookings, ranking position, or revenue does not by itself create a refund entitlement.
       </p>
 
-      <h2>9. Price Changes</h2>
+      <h2>10. Price and Feature Changes</h2>
       <p>
-        We reserve the right to change subscription pricing or the features included in each plan. For existing
-        subscribers, price changes will be communicated with reasonable advance notice and will take effect at
-        the next renewal date.
+        MasseurMatch may change prices for new purchases, new subscribers, unlocked subscriptions, add-ons, and
+        future products, and may change the features offered by a plan. If an active subscription is covered by an
+        express founding-member base-rate price lock, a general future price increase will not override that
+        specific lock while the subscription remains eligible under Section 4.
       </p>
 
-      <h2>10. Content Requirements</h2>
+      <h2>11. Moderation and Platform Rules</h2>
       <p>
-        Paid listings remain subject to all platform content policies. Purchasing a paid plan does not exempt a
-        profile from moderation. Listings that violate platform rules may be suspended or removed without refund,
-        regardless of subscription status.
+        Paid status never overrides moderation, safety, content, or publication rules. MasseurMatch may hide,
+        restrict, suspend, or remove a listing for policy, safety, legal, billing, or technical reasons. Paid
+        advertising labels such as Featured, Boosted, or Sponsored are not endorsements or professional
+        credentials.
       </p>
 
-      <h2>11. Changes to These Terms</h2>
+      <h2>12. Changes to These Terms</h2>
       <p>
-        We may update these terms at any time. Updated terms will apply to renewals and new purchases after the
-        effective date.
+        These terms may be updated as products and billing practices evolve. Updates do not retroactively erase an
+        express active price-lock commitment except as permitted by the terms of that specific offer or applicable
+        law.
       </p>
 
-      <h2>12. Contact</h2>
+      <h2>13. Contact</h2>
       <p>
         Billing questions: <a href="mailto:billing@masseurmatch.com">billing@masseurmatch.com</a>.<br />
-        Response window: 3 business days.<br />
-        Operator: XRankFlow Media Group LLC — Dover, Delaware, USA.
+        Operator: XRankFlow Media Group LLC.
+      </p>
+
+      <p>
+        These terms are written to describe the current product contract in plain English and should be reviewed
+        by qualified counsel as billing products and jurisdictions evolve.
       </p>
     </LegalPage>
   );

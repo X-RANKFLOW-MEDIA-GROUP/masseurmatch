@@ -104,7 +104,7 @@ test.describe("Auth pages smoke", () => {
 
     await expect(page).not.toHaveURL(/\/(404|500)/);
     // Ensures the main tag rendered correctly without breaking.
-    await expect(page.locator("main")).toBeVisible();
+    await expect(page.getByRole("main").first()).toBeVisible();
   });
 
   test("/pro/dashboard redirects unauthenticated users to login", async ({ page }) => {

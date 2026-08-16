@@ -21,9 +21,9 @@ const SOCIAL_PREVIEW_URL =
   "https://res.cloudinary.com/dyfxkq2nk/image/upload/v1785553494/ChatGPT_Image_Jul_31_2026_07_31_32_PM_tsdzpd.png";
 
 const rootMetadata = createPageMetadata({
-  title: "MasseurMatch — Premium Directory of LGBTQ+-Affirming Male Massage Therapists",
+  title: "MasseurMatch — Directory of LGBTQ+-Affirming Male Massage Therapists",
   description:
-    "AI-powered verified therapist discovery — a premium directory of male massage therapists you can trust.",
+    "Discover public profiles from independent LGBTQ+-affirming male massage therapists and compare provider supplied details, trust signals, and direct contact options.",
   path: "/",
   image: SOCIAL_PREVIEW_URL,
 });

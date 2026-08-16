@@ -31,7 +31,6 @@ async function fetchSegmentTherapists(cityName: string, segmentSlug: string) {
 }
 
 export function generateStaticParams(): Params[] {
-  // Generate long-tail local SEO routes on demand so production builds stay fast and reliable.
   return [];
 }
 
@@ -41,9 +40,6 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const segment = getSegmentBySlug(resolvedParams.segment);
   const routePath = `/${resolvedParams.city}/${resolvedParams.segment}`;
 
-  // The launch URL list controls sitemap/discovery exposure only. Any canonical
-  // city + segment combination must remain routable so legacy redirects never
-  // terminate at a 404.
   if (!city || !segment) {
     return createPageMetadata({
       title: "Directory",
@@ -57,29 +53,26 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   try {
     ({ total } = await fetchSegmentTherapists(city.name, segment.slug));
   } catch {
-    // Supabase unavailable — fall through with zero total
+    total = 0;
   }
 
   const isGayMassageSegment = segment.slug === "lgbtq-friendly";
-  const cityLabel = `${formatCityLabel(city.name, city.stateCode)}`;
+  const cityLabel = formatCityLabel(city.name, city.stateCode);
   const title = isGayMassageSegment
-    ? `Gay Massage Therapists in ${cityLabel} | LGBTQ+-Affirming`
+    ? `LGBTQ+-Affirming Male Massage Therapists in ${cityLabel}`
     : `${city.name} ${segment.label}`;
   const description = isGayMassageSegment
-    ? `Find LGBTQ+-affirming male massage therapists in ${cityLabel}. Browse gay-friendly profiles with visible trust signals, clear session formats, and direct contact on MasseurMatch.`
-    : `${segment.intro} Compare trusted local listings, direct contact options, and stronger city-intent pages in ${city.name}.`;
+    ? `Browse public LGBTQ+-affirming male massage therapist profiles in ${cityLabel}. Compare provider supplied details, visible trust signals, session formats, rates, availability, and direct contact options.`
+    : `${segment.intro} Compare public provider profiles and direct contact options in ${city.name}.`;
   const keywords = isGayMassageSegment
     ? [
-        `gay massage ${city.name}`,
-        `gay massage therapist ${city.name}`,
         `LGBTQ massage ${city.name}`,
-        `gay-friendly massage near me`,
+        `LGBTQ massage therapist ${city.name}`,
+        `gay friendly massage ${city.name}`,
         `male massage therapist ${city.name}`,
-        `queer massage ${city.name}`,
-        `${city.name} gay bodywork`,
         `LGBTQ affirming massage ${city.stateCode}`,
       ]
-    : [city.name, segment.label, `${city.name} verified massage`, `${city.name} ${segment.shortLabel}`];
+    : [city.name, segment.label, `${city.name} ${segment.shortLabel}`];
 
   return createPageMetadata({
     title,
@@ -95,49 +88,52 @@ export default async function CitySegmentPage({ params }: { params: Promise<Para
   const city = getCities().find((entry) => entry.slug === resolvedParams.city);
   const segment = getSegmentBySlug(resolvedParams.segment);
 
-  if (!city || !segment) {
-    notFound();
-  }
+  if (!city || !segment) notFound();
 
   const therapists = await fetchSegmentTherapists(city.name, segment.slug);
+  const hasInventory = therapists.items.length > 0;
   const canonicalCityPath = `/${city.slug}`;
   const launchServiceLinks = getLaunchKeywordPaths()
     .filter((path) => path.startsWith(`${canonicalCityPath}/${segment.slug}/`))
     .map((path) => {
       const [, , keywordSlug] = path.split("/").filter(Boolean);
       const keyword = getKeywordBySlug(keywordSlug || "");
-
       return {
         href: path,
         label: keyword?.shortLabel || formatSlugLabel(keywordSlug || "service"),
       };
     });
+
   const segmentFaqs = [
     {
       question: `What does ${segment.shortLabel} mean on MasseurMatch?`,
-      answer: `This page groups listings around ${segment.shortLabel.toLowerCase()} intent in ${city.name}, making local discovery safer, cleaner, and faster.`,
+      answer: `This page groups public profiles that match the ${segment.shortLabel.toLowerCase()} filter in ${city.name}. Review each provider's own profile details and visible trust signals before contacting them directly.`,
     },
     {
-      question: `How do I contact providers from this ${city.name} page?`,
-      answer: `Open any profile and use the direct call or message actions. MasseurMatch stays discovery-first and does not process bookings on-site.`,
+      question: `Are matching providers currently listed in ${city.name}?`,
+      answer: hasInventory
+        ? `Yes. This page currently has public profiles matching the ${segment.shortLabel.toLowerCase()} filter in ${city.name}.`
+        : `No approved public profiles currently match this exact filter in ${city.name}. Use the broader city directory to see other public profiles.`,
     },
     {
-      question: `Why does this page exist separately from the main ${city.name} page?`,
-      answer: `It narrows the full ${city.name} directory to ${segment.shortLabel.toLowerCase()} listings, so you can compare the most relevant profiles without scanning every provider in the city.`,
+      question: `Does MasseurMatch handle bookings from this ${city.name} page?`,
+      answer: `No. MasseurMatch is a discovery directory. Scheduling, pricing, payment, credentials important to you, and session arrangements are confirmed directly with the independent provider.`,
     },
   ];
 
   const verifiedProfilesPath = `${canonicalCityPath}/verified-profiles`;
   const secondaryLeadLink =
     segment.slug !== "verified-profiles" && isLaunchUrl(verifiedProfilesPath)
-      ? { href: verifiedProfilesPath, label: `Active profiles in ${city.name}` }
+      ? { href: verifiedProfilesPath, label: `Identity Verified profiles in ${city.name}` }
       : { href: "/search", label: "Search all providers" };
 
   return (
     <CityDirectoryPage
-      eyebrow="City segment page"
+      eyebrow="City directory filter"
       title={`${city.name} ${segment.label}`}
-      intro={`${segment.intro} Compare ${segment.shortLabel.toLowerCase()} listings in ${city.name}, then open a profile to review session details and contact the provider directly.`}
+      intro={hasInventory
+        ? `${segment.intro} Compare currently matched public profiles in ${city.name}, then open a profile to review provider supplied details and contact options.`
+        : `${segment.intro} No approved public profiles currently match this exact filter in ${city.name}. Browse the broader city directory while new listings are reviewed.`}
       breadcrumbJsonLd={buildBreadcrumbJsonLd([
         { name: "Home", path: "/" },
         { name: city.name, path: canonicalCityPath },
@@ -145,7 +141,9 @@ export default async function CitySegmentPage({ params }: { params: Promise<Para
       ])}
       collectionJsonLd={buildCollectionPageJsonLd({
         name: `${city.name} ${segment.label}`,
-        description: `${segment.intro} Browse local listings and internal specialty links in ${city.name}.`,
+        description: hasInventory
+          ? `${segment.intro} Browse currently matched public profiles in ${city.name}.`
+          : `No approved public profiles currently match the ${segment.shortLabel.toLowerCase()} filter in ${city.name}.`,
         path: `${canonicalCityPath}/${segment.slug}`,
       })}
       itemListJsonLd={buildItemListJsonLd({
@@ -165,21 +163,22 @@ export default async function CitySegmentPage({ params }: { params: Promise<Para
         launchServiceLinks.length
           ? [
               {
-                title: `Service pages inside ${segment.shortLabel}`,
+                title: `Related services in ${city.name}`,
                 layout: "chips" as const,
-                description:
-                  "Use these city-plus-service routes to narrow the directory by both intent and modality without losing the trust context.",
+                description: "Narrow the public directory by service or session format where matching provider inventory exists.",
                 items: launchServiceLinks,
               },
             ]
           : []
       }
       therapists={therapists.items}
-      listingTitle="Listings on this page"
-      listingDescription={`These listings reflect the ${segment.shortLabel.toLowerCase()} focus in ${city.name} and are structured to feel more premium, more trustworthy, and easier to scan on mobile.`}
-      emptyTitle="No listings matched this segment yet."
-      emptyDescription="Use the service links above or return to the city page for broader trusted-directory coverage."
-      faqTitle={`Common Questions About ${segment.shortLabel} Massage in ${city.name}`}
+      listingTitle="Public profiles on this page"
+      listingDescription={hasInventory
+        ? `These public profiles currently match the ${segment.shortLabel.toLowerCase()} filter in ${city.name}.`
+        : `No approved public profiles currently match the ${segment.shortLabel.toLowerCase()} filter in ${city.name}.`}
+      emptyTitle="No public listings matched this filter yet."
+      emptyDescription="Return to the city page to view other public provider profiles."
+      faqTitle={`Common Questions About ${segment.shortLabel} in ${city.name}`}
       faqItems={segmentFaqs}
     />
   );

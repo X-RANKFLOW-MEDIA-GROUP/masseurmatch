@@ -30,14 +30,13 @@ import type { Metadata } from "next";
 export const revalidate = 3600;
 
 export const metadata: Metadata = createPageMetadata({
-  title: "Find Verified Male Massage Therapists Near You | MasseurMatch",
+  title: "Find Male Massage Therapists Near You | MasseurMatch",
   description:
-    "MasseurMatch is the premium US directory for verified LGBTQ+-affirming male massage therapists. Search Dallas, Miami, NYC, LA, Chicago & cities across the US. Compare deep tissue, Swedish, outcall & incall options. A modern alternative to MasseurFinder and RentMasseur.",
+    "MasseurMatch is a US directory for LGBTQ+-affirming independent male massage therapists. Compare public profiles, specialties, incall and outcall options, rates, availability, trust signals, and direct contact details.",
   path: "/",
   keywords: [
     "MasseurMatch",
     "male massage therapist directory",
-    "verified male massage therapist",
     "male massage therapist near me",
     "massage therapist near me",
     "LGBTQ affirming massage",
@@ -86,9 +85,6 @@ async function getHomepageFeaturedProfiles() {
 export default async function HomePage() {
   let featuredTherapists: Awaited<ReturnType<typeof getPublicTherapists>>["items"] = [];
   try {
-    // Featured Masters are the source of truth for the homepage. Public directory
-    // results only fill empty slots, so an admin feature action guarantees priority
-    // while still enforcing the normal approved/public/safety eligibility rules.
     const [managedFeatured, lgbtqResult, broadResult] = await Promise.all([
       getHomepageFeaturedProfiles(),
       getPublicTherapists({ page: 1, pageSize: 12, lgbtqAffirming: true }),
@@ -112,13 +108,11 @@ export default async function HomePage() {
           if (!isRealProfileId(therapist.id)) return therapist;
           const photos = photoBatch.get(therapist.id) ?? [];
           const primaryPhoto = photos.find((photo) => photo.is_primary);
-          // Require primary photo for featured profiles on homepage
           return primaryPhoto ? { ...therapist, profile_photo: primaryPhoto.storage_path } : null;
         })
         .filter((t): t is NonNullable<typeof t> => t !== null);
     }
   } catch {
-    // Never take the homepage down if the featured-management table is unavailable.
     try {
       const fallback = await getPublicTherapists({ page: 1, pageSize: 6 });
       featuredTherapists = fallback.items;
@@ -144,7 +138,7 @@ export default async function HomePage() {
       <JsonLd data={buildWebsiteJsonLd()} />
       <JsonLd
         data={buildCollectionPageJsonLd({
-          name: "MasseurMatch — Verified Male Massage Therapist Directory",
+          name: "MasseurMatch — Male Massage Therapist Directory",
           description: SITE_DESCRIPTION,
           path: "/",
         })}
@@ -170,7 +164,7 @@ export default async function HomePage() {
         data={{
           "@context": "https://schema.org",
           "@type": "WebPage",
-          name: "MasseurMatch — Verified Male Massage Therapist Directory",
+          name: "MasseurMatch — Male Massage Therapist Directory",
           description: SITE_DESCRIPTION,
           url: siteUrl("/"),
           speakable: {

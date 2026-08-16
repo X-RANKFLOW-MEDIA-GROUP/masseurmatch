@@ -5,7 +5,7 @@ import {
   type TherapistTier,
   getPublicTherapists,
   getProfilePhotosBatch,
-} from "@/app/_lib/directory"; // getProfilePhotosBatch used below
+} from "@/app/_lib/directory";
 import {
   buildBreadcrumbJsonLd,
   buildCollectionPageJsonLd,
@@ -35,10 +35,10 @@ export async function generateMetadata({ searchParams }: TherapistsPageProps): P
   const hasFilters = Boolean(city || modality || tier || page > 1);
 
   return createPageMetadata({
-    title: city ? `Massage therapists in ${city}` : "Verified massage therapists across the United States",
+    title: city ? `Massage therapists in ${city}` : "Massage therapists across the United States",
     description: city
-      ? `Browse verified massage therapists in ${city}. Compare specialties, incall, outcall, trust signals, and direct contact details.`
-      : "Browse verified LGBTQ+-affirming massage therapists across the United States by state, city, specialty, incall, outcall, and direct contact options.",
+      ? `Browse public massage therapist profiles in ${city}. Compare provider supplied specialties, incall and outcall options, rates, availability, visible trust signals, and direct contact details.`
+      : "Browse public LGBTQ+-affirming massage therapist profiles across the United States by state, city, specialty, incall, outcall, and direct contact options.",
     path: "/therapists",
     keywords: [
       "national massage therapist directory",
@@ -92,9 +92,9 @@ export default async function TherapistsPage({ searchParams }: TherapistsPagePro
       />
       <JsonLd
         data={buildCollectionPageJsonLd({
-          name: "Verified massage therapists across the United States",
+          name: "Massage therapists across the United States",
           description:
-            "Browse public massage therapist listings across the United States.",
+            "Browse public massage therapist listings across the United States. Identity Verified appears only on profiles that completed the separate identity review process.",
           path: "/therapists",
         })}
       />
@@ -110,7 +110,6 @@ export default async function TherapistsPage({ searchParams }: TherapistsPagePro
       />
 
       <div className="min-h-screen bg-[#FAFAFA]">
-        {/* ── Hero / page header ──────────────────────────────────────────── */}
         <div className="relative bg-[#111111] px-4 py-12 sm:px-6 sm:py-16">
           <div
             aria-hidden="true"
@@ -130,8 +129,8 @@ export default async function TherapistsPage({ searchParams }: TherapistsPagePro
               Find your massage therapist.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-white/55">
-              Browse verified LGBTQ+-affirming therapists across the United States.
-              Your location is detected automatically — or search by city and specialty.
+              Browse public LGBTQ+-affirming therapist profiles across the United States.
+              Compare profile details and individual trust signals, then contact the provider directly.
             </p>
             <div className="mt-5 flex flex-wrap gap-4 text-sm">
               <Link href="/cities" className="font-semibold text-[#8B1E2D] hover:text-[#6E1521]">
@@ -147,7 +146,6 @@ export default async function TherapistsPage({ searchParams }: TherapistsPagePro
           </div>
         </div>
 
-        {/* ── Explore section (filter + grid) ────────────────────────────── */}
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
           <TherapistsPageClient
             items={itemsWithPhotos}
