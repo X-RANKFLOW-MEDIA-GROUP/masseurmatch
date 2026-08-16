@@ -49,6 +49,9 @@ export default function SignupReviewPage() {
     setLoading(true);
 
     try {
+      if (!state.emailVerified) throw new Error("Email verification must be completed before submitting.");
+      if (!state.phone?.trim() || !state.phoneVerified) throw new Error("Phone verification must be completed before submitting.");
+      if (state.identityVerificationStatus !== "verified") throw new Error("Identity verification must be completed before submitting.");
       if (!state.termsAccepted) throw new Error("You must accept the Terms of Service before submitting.");
       if (!state.complianceAcknowledged) throw new Error("You must acknowledge the Therapist Agreement and platform policies.");
       if (!state.ageAndConductAttested) throw new Error("You must confirm you are 18+ and provide non-sexual massage therapy only.");
@@ -118,6 +121,12 @@ export default function SignupReviewPage() {
     }
   }
 
+  const verificationComplete =
+    state.emailVerified &&
+    Boolean(state.phone?.trim()) &&
+    state.phoneVerified &&
+    state.identityVerificationStatus === "verified";
+
   return (
     <div className="mx-auto max-w-2xl space-y-8 py-8">
       <div className="text-center">
@@ -142,7 +151,7 @@ export default function SignupReviewPage() {
           <div className="flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-brand-secondary" /><h2 className="font-display text-lg font-semibold text-foreground">Verification</h2></div>
           <ul className="space-y-2 text-sm">
             <li className="flex items-center gap-2"><CheckCircle2 className={`h-4 w-4 ${state.emailVerified ? "text-green-500" : "text-muted-foreground"}`} />Email verified</li>
-            {state.phone && <li className="flex items-center gap-2"><CheckCircle2 className={`h-4 w-4 ${state.phoneVerified ? "text-green-500" : "text-muted-foreground"}`} />Phone verified</li>}
+            <li className="flex items-center gap-2"><CheckCircle2 className={`h-4 w-4 ${state.phoneVerified ? "text-green-500" : "text-muted-foreground"}`} />Phone verified</li>
             <li className="flex items-center gap-2"><CheckCircle2 className={`h-4 w-4 ${state.identityVerificationStatus === "verified" ? "text-green-500" : "text-muted-foreground"}`} />Identity reviewed and verified by MasseurMatch</li>
           </ul>
           <p className="text-xs text-muted-foreground">Identity verification confirms identity only. It does not verify professional licensing, background, qualifications, or services.</p>
@@ -184,12 +193,12 @@ export default function SignupReviewPage() {
         </CardContent>
       </Card>
 
-      {(!state.emailVerified || state.identityVerificationStatus !== "verified") && (
-        <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-700">Complete email and identity verification on the <Link href="/signup/verify" className="font-medium underline">Verify step</Link> before submitting.</p>
+      {!verificationComplete && (
+        <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-700">Complete email, phone, and identity verification on the <Link href="/signup/verify" className="font-medium underline">Verify step</Link> before submitting.</p>
       )}
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
         <Button asChild variant="outline"><Link href="/signup/profile">Back to Edit Profile</Link></Button>
-        <Button size="lg" onClick={handleSubmit} disabled={loading || !state.emailVerified || state.identityVerificationStatus !== "verified" || !state.termsAccepted || !state.complianceAcknowledged || !state.ageAndConductAttested}>{loading ? uploadProgress ?? "Submitting…" : "Submit for Review"}</Button>
+        <Button size="lg" onClick={handleSubmit} disabled={loading || !verificationComplete || !state.termsAccepted || !state.complianceAcknowledged || !state.ageAndConductAttested}>{loading ? uploadProgress ?? "Submitting…" : "Submit for Review"}</Button>
       </div>
     </div>
   );

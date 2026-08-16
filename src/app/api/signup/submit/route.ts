@@ -4,6 +4,15 @@ import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import { notifyAdmin } from "@/app/api/_lib/admin-notify";
 import { resolveCityStateFromZip } from "@/app/api/_lib/zip-location";
 
+function normalizePhone(value: string | null | undefined) {
+  if (!value) return null;
+  const trimmed = value.trim();
+  const digits = trimmed.replace(/\D/g, "");
+  if (digits.length < 10) return null;
+  if (trimmed.startsWith("+")) return `+${digits}`;
+  return digits.length === 10 ? `+1${digits}` : `+${digits}`;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getRequestSession(request);
@@ -43,6 +52,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Email must be verified." }, { status: 400 });
     }
 
+    const verifiedPhone = normalizePhone(authUser.user.phone);
+    if (!verifiedPhone || !authUser.user.phone_confirmed_at) {
+      return NextResponse.json(
+        { error: "Phone verification must be completed before submitting your profile." },
+        { status: 400 },
+      );
+    }
+
     const { data: identityVerification, error: verificationError } = await adminClient
       .from("identity_verifications")
       .select("status")
@@ -69,6 +86,9 @@ export async function POST(request: NextRequest) {
         neighborhood_name: profile.neighborhood?.trim() || null,
         state: location.state,
         zip_code: location.zip,
+        phone: verifiedPhone,
+        phone_number: verifiedPhone,
+        is_verified_phone: true,
         specialties: profile.serviceCategories?.length ? profile.serviceCategories : null,
         incall_price: profile.startingPrice ? Number(profile.startingPrice) : null,
         years_experience: profile.yearsExperience ? Number(profile.yearsExperience) : null,
@@ -99,6 +119,7 @@ export async function POST(request: NextRequest) {
         { label: "Name", value: profile.fullName || null },
         { label: "City", value: location.city },
         { label: "State", value: location.state },
+        { label: "Phone", value: verifiedPhone },
         { label: "Plan", value: planTier || null },
         { label: "User ID", value: session.userId },
       ],

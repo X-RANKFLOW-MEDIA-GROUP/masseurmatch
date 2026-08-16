@@ -23,6 +23,18 @@ async function syncServerSession(accessToken?: string) {
   });
 }
 
+async function syncVerifiedPhoneProfile() {
+  const response = await fetch("/api/provider/verification/phone/sync", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(body.error || "Phone was verified, but the profile could not be synchronized.");
+  }
+  return body as { ok: true; phone: string; verifiedAt: string };
+}
+
 function normalizePhone(value: string) {
   const trimmed = value.trim();
   if (trimmed.startsWith("+")) return `+${trimmed.slice(1).replace(/\D/g, "")}`;
@@ -64,15 +76,23 @@ function VerificationPage() {
 
     const metadata = user.user_metadata as Record<string, unknown> | undefined;
     const fullName = state.fullName || (typeof metadata?.full_name === "string" ? metadata.full_name : user.email?.split("@")[0] || "User");
+    const signupPhone = state.phone || user.phone || "";
     setAccountInfo({
       fullName,
       displayName: state.displayName || fullName,
       email: state.email || user.email || "",
-      phone: state.phone || user.phone || "",
+      phone: signupPhone,
     });
 
     if (user.email_confirmed_at) markEmailVerified();
-    if (user.phone_confirmed_at) markPhoneVerified();
+    if (
+      user.phone_confirmed_at &&
+      user.phone &&
+      signupPhone &&
+      normalizePhone(signupPhone) === normalizePhone(user.phone)
+    ) {
+      markPhoneVerified();
+    }
   }, [authLoading, markEmailVerified, markPhoneVerified, router, setAccountInfo, state.displayName, state.email, state.fullName, state.phone, user]);
 
   async function sendEmailVerification() {
@@ -144,6 +164,13 @@ function VerificationPage() {
       });
       if (verifyError) throw verifyError;
       await syncServerSession(data.session?.access_token);
+      const synced = await syncVerifiedPhoneProfile();
+      setAccountInfo({
+        fullName: state.fullName,
+        displayName: state.displayName || state.fullName,
+        email: state.email,
+        phone: synced.phone,
+      });
       markPhoneVerified();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid or expired phone code.");
