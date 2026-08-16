@@ -183,7 +183,7 @@ function listFromAnswer(raw: string) {
   return Array.from(
     new Set(
       raw
-        .split(/[,;\/]|\s+and\s+/i)
+        .split(/[,;/]|\s+and\s+/i)
         .map((item) => item.trim())
         .filter(Boolean),
     ),
