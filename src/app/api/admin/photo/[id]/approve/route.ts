@@ -15,7 +15,7 @@ export async function POST(
     const adminClient = createSupabaseAdminClient();
 
     const { data: photo, error: fetchError } = await adminClient
-      .from("therapist_photos")
+      .from("profile_photos")
       .select("id, profile_id, user_id")
       .eq("id", photoId)
       .maybeSingle();
@@ -24,10 +24,10 @@ export async function POST(
     if (!photo) throw new RouteError(404, "Photo not found.");
 
     const { error: updateError } = await adminClient
-      .from("therapist_photos")
+      .from("profile_photos")
       .update({
-        status: "approved",
-        approval_status: "approved",
+        moderation_status: "approved",
+        moderation_reason: "admin_approved",
       })
       .eq("id", photoId);
 
@@ -47,7 +47,6 @@ export async function POST(
       profileId: photo.profile_id,
     });
 
-    // Send approval notification email
     if (photo.profile_id) {
       const { data: profile } = await adminClient
         .from("profiles")
