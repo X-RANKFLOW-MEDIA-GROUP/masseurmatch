@@ -27,6 +27,11 @@ export function normalizeSessionRole(value: unknown): RequestSession["role"] {
   return null;
 }
 
+function normalizeAssuranceLevel(value: unknown): AuthenticatorAssuranceLevel {
+  if (value === "aal1" || value === "aal2") return value;
+  return null;
+}
+
 interface ParsedCookie {
   name: string;
   value: string;
@@ -111,9 +116,9 @@ export async function getRequestSession(
 
   const { data: assurance, error: assuranceError } =
     await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-  const aal: AuthenticatorAssuranceLevel = assuranceError
+  const aal = assuranceError
     ? null
-    : assurance.currentLevel ?? null;
+    : normalizeAssuranceLevel(assurance.currentLevel);
 
   if (role === "admin" && aal !== "aal2") {
     throw new RouteError(
