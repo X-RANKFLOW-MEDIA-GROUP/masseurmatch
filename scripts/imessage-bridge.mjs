@@ -12,6 +12,7 @@ const POLL_MS = Math.max(2000, Number(process.env.IMESSAGE_POLL_MS || 5000));
 const CHAT_DB = process.env.IMESSAGE_CHAT_DB || path.join(os.homedir(), "Library/Messages/chat.db");
 const STATE_DIR = process.env.IMESSAGE_STATE_DIR || path.join(os.homedir(), ".masseurmatch-imessage-bridge");
 const STATE_FILE = path.join(STATE_DIR, "state.json");
+const REPLAY_HISTORY = process.env.IMESSAGE_REPLAY_HISTORY === "1";
 
 if (process.platform !== "darwin") {
   console.error("This bridge must run on macOS with the Messages app signed into iMessage.");
@@ -27,14 +28,6 @@ if (!fs.existsSync(CHAT_DB)) {
 }
 
 fs.mkdirSync(STATE_DIR, { recursive: true, mode: 0o700 });
-
-function loadState() {
-  try {
-    return JSON.parse(fs.readFileSync(STATE_FILE, "utf8"));
-  } catch {
-    return { lastInboundRowId: 0 };
-  }
-}
 
 function saveState(state) {
   const temp = `${STATE_FILE}.tmp`;
@@ -58,6 +51,28 @@ function sqliteJson(sql) {
     maxBuffer: 5 * 1024 * 1024,
   }).trim();
   return output ? JSON.parse(output) : [];
+}
+
+function currentInboundRowId() {
+  const rows = sqliteJson("select coalesce(max(ROWID), 0) as row_id from message where is_from_me = 0 and service = 'iMessage';");
+  return Number(rows[0]?.row_id || 0);
+}
+
+function loadState() {
+  try {
+    const state = JSON.parse(fs.readFileSync(STATE_FILE, "utf8"));
+    return { lastInboundRowId: Number(state.lastInboundRowId || 0) };
+  } catch {
+    const lastInboundRowId = REPLAY_HISTORY ? 0 : currentInboundRowId();
+    const state = { lastInboundRowId };
+    saveState(state);
+    console.log(
+      REPLAY_HISTORY
+        ? "History replay enabled. Existing inbound iMessages will be processed."
+        : `First start: initialized at inbound row ${lastInboundRowId}. Existing message history will not be replayed.`,
+    );
+    return state;
+  }
 }
 
 async function api(pathname, options = {}) {
