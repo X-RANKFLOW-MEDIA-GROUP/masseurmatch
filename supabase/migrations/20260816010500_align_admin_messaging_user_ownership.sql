@@ -8,9 +8,9 @@
 
 do $$
 declare
-  table_name text;
+  v_table_name text;
 begin
-  foreach table_name in array array[
+  foreach v_table_name in array array[
     'messaging_contacts',
     'messaging_conversations',
     'messaging_messages',
@@ -19,15 +19,15 @@ begin
   loop
     if exists (
       select 1
-      from information_schema.columns
-      where table_schema = 'public'
-        and information_schema.columns.table_name = table_name
-        and column_name = 'user_id'
-        and is_nullable = 'NO'
+      from information_schema.columns c
+      where c.table_schema = 'public'
+        and c.table_name = v_table_name
+        and c.column_name = 'user_id'
+        and c.is_nullable = 'NO'
     ) then
       execute format(
         'alter table public.%I alter column user_id drop not null',
-        table_name
+        v_table_name
       );
     end if;
   end loop;
