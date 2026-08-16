@@ -15,31 +15,38 @@ export async function POST(
     const body = await parseJsonBody(request, schema);
     const adminClient = createSupabaseAdminClient();
 
-    const { data: photo, error: fetchError } = await adminClient
-      .from("therapist_photos")
-      .select("id, profile_id, user_id, storage_path")
+    const { data: photo, error: fetchError } = await (adminClient as any)
+      .from("profile_photos")
+      .select("id, profile_id, user_id, storage_bucket, storage_path")
       .eq("id", photoId)
       .maybeSingle();
 
     if (fetchError) throw new RouteError(500, fetchError.message);
     if (!photo) throw new RouteError(404, "Photo not found.");
 
-    const { error: updateError } = await adminClient
-      .from("therapist_photos")
+    const rejectionReason = body.reason || "admin_rejected";
+    const storageBucket = String(photo.storage_bucket || "external");
+    const objectKey = typeof photo.storage_path === "string" && !/^https?:\/\//i.test(photo.storage_path)
+      ? photo.storage_path
+      : null;
+
+    if (objectKey && (storageBucket === "pending-photos" || storageBucket === "therapist-photos")) {
+      const { error: storageError } = await adminClient.storage.from(storageBucket).remove([objectKey]);
+      if (storageError) {
+        console.warn("[api/admin/photo/reject] Storage cleanup failed:", storageError.message);
+      }
+    }
+
+    const { error: updateError } = await (adminClient as any)
+      .from("profile_photos")
       .update({
-        status: "rejected",
-        approval_status: "rejected",
-        rejection_reason: body.reason || "admin_rejected",
+        moderation_status: "rejected",
+        moderation_reason: rejectionReason,
+        ...(objectKey ? { url: null } : {}),
       })
       .eq("id", photoId);
 
     if (updateError) throw new RouteError(500, updateError.message);
-
-    // Remove the actual storage object so the CDN URL returns 404 immediately.
-    // Best-effort: a missing or already-deleted path should not fail the request.
-    if (photo.storage_path && !photo.storage_path.startsWith("http")) {
-      await adminClient.storage.from("therapist-photos").remove([photo.storage_path]);
-    }
 
     await adminClient.from("admin_actions").insert({
       action: "reject_photo",

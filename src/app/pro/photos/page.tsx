@@ -5,20 +5,33 @@ import { Camera, CheckCircle2, Clock, Loader2, Star, Trash2, UploadCloud, XCircl
 import { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
-import type { Tables } from "@/integrations/supabase/types";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
 import { useProfile } from "@/hooks/useProfile";
 import { useToast } from "@/hooks/use-toast";
 
 type TabKey = "approved" | "pending" | "rejected";
-type PhotoRecord = Tables<"profile_photos"> & {
+type PhotoRecord = {
   id: string;
-  storage_path?: string | null;
-  url?: string | null;
-  moderation_status?: string | null;
-  moderation_reason?: string | null;
-  is_primary?: boolean | null;
-  sort_order?: number | null;
+  url: string;
+  is_primary: boolean;
+  sort_order: number;
+  moderation_status: string;
+  moderation_reason: string | null;
+  created_at: string | null;
+};
+
+type PhotosResponse = {
+  ok?: boolean;
+  error?: string;
+  photos?: Array<{
+    id: string;
+    url: string;
+    isPrimary: boolean;
+    sortOrder: number;
+    status: string;
+    reason: string | null;
+    createdAt: string | null;
+  }>;
 };
 
 type UploadResponse = {
@@ -33,12 +46,6 @@ type UploadResponse = {
     status: "approved" | "pending";
   };
 };
-
-function getPhotoUrl(photo: PhotoRecord) {
-  if (photo.storage_path?.startsWith("http")) return photo.storage_path;
-  if (photo.url?.startsWith("http")) return photo.url;
-  return photo.storage_path || photo.url || "";
-}
 
 export default function PhotoManagerPage() {
   const { toast } = useToast();
@@ -62,24 +69,32 @@ export default function PhotoManagerPage() {
     }
 
     setPhotosLoading(true);
-    const { data, error } = await supabase
-      .from("profile_photos")
-      .select("*")
-      .eq("profile_id", profile.id)
-      .order("sort_order", { ascending: true })
-      .limit(100);
+    try {
+      const response = await fetch("/api/provider/photos", { credentials: "same-origin", cache: "no-store" });
+      const payload = (await response.json().catch(() => ({}))) as PhotosResponse;
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.error || "Could not load your photos.");
+      }
 
-    if (error) {
+      setPhotos((payload.photos ?? []).map((photo) => ({
+        id: photo.id,
+        url: photo.url,
+        is_primary: photo.isPrimary,
+        sort_order: photo.sortOrder,
+        moderation_status: photo.status,
+        moderation_reason: photo.reason,
+        created_at: photo.createdAt,
+      })));
+    } catch (error) {
       toast({
         title: "Could not load your photos",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Please try again.",
         variant: "destructive",
       });
       setPhotos([]);
-    } else {
-      setPhotos((data ?? []) as PhotoRecord[]);
+    } finally {
+      setPhotosLoading(false);
     }
-    setPhotosLoading(false);
   }, [profile?.id, toast]);
 
   useEffect(() => {
@@ -290,26 +305,23 @@ export default function PhotoManagerPage() {
           <div className="mt-5 rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">No {activeTab} photos.</div>
         ) : (
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {visiblePhotos.map((photo) => {
-              const src = getPhotoUrl(photo);
-              return (
-                <article key={photo.id} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                  <div className="relative aspect-[4/3] bg-slate-100">
-                    {src ? <Image src={src} alt="Provider profile photo" fill sizes="(min-width: 1024px) 30vw, 50vw" className="object-contain" /> : null}
-                    {photo.is_primary ? <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-slate-900 shadow"><Star className="h-3.5 w-3.5 fill-current" /> Primary</span> : null}
+            {visiblePhotos.map((photo) => (
+              <article key={photo.id} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                <div className="relative aspect-[4/3] bg-slate-100">
+                  {photo.url ? <Image src={photo.url} alt="Provider profile photo" fill sizes="(min-width: 1024px) 30vw, 50vw" className="object-contain" /> : null}
+                  {photo.is_primary ? <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-slate-900 shadow"><Star className="h-3.5 w-3.5 fill-current" /> Primary</span> : null}
+                </div>
+                <div className="flex items-center justify-between gap-3 p-4">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{photo.moderation_status || "pending"}</div>
+                  <div className="flex gap-2">
+                    {!photo.is_primary && photo.moderation_status === "approved" ? (
+                      <button type="button" onClick={() => setPrimaryPhoto(photo.id)} className="rounded-lg border border-slate-200 p-2 text-slate-700" aria-label="Set as primary"><Star className="h-4 w-4" /></button>
+                    ) : null}
+                    <button type="button" onClick={() => deletePhoto(photo.id)} className="rounded-lg border border-rose-200 p-2 text-rose-600" aria-label="Delete photo"><Trash2 className="h-4 w-4" /></button>
                   </div>
-                  <div className="flex items-center justify-between gap-3 p-4">
-                    <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{photo.moderation_status || "pending"}</div>
-                    <div className="flex gap-2">
-                      {!photo.is_primary && photo.moderation_status === "approved" ? (
-                        <button type="button" onClick={() => setPrimaryPhoto(photo.id)} className="rounded-lg border border-slate-200 p-2 text-slate-700" aria-label="Set as primary"><Star className="h-4 w-4" /></button>
-                      ) : null}
-                      <button type="button" onClick={() => deletePhoto(photo.id)} className="rounded-lg border border-rose-200 p-2 text-rose-600" aria-label="Delete photo"><Trash2 className="h-4 w-4" /></button>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+                </div>
+              </article>
+            ))}
           </div>
         )}
       </section>

@@ -21,9 +21,9 @@ export async function GET(request: Request) {
         .select("id", { count: "exact", head: true })
         .in("profile_status", ["pending_approval", "under_review"]),
       adminClient
-        .from("therapist_photos")
+        .from("profile_photos")
         .select("id", { count: "exact", head: true })
-        .eq("status", "pending_review"),
+        .eq("moderation_status", "pending"),
       adminClient
         .from("identity_verifications")
         .select("id", { count: "exact", head: true })
