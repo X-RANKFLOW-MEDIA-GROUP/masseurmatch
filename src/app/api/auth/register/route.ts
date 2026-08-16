@@ -104,7 +104,7 @@ export async function POST(request: Request) {
         {
           ok: false,
           error:
-              "An account with this email already exists. Sign in instead — or resend the confirmation email if you never opened it.",
+            "An account with this email already exists. Sign in instead — or resend the confirmation email if you never opened it.",
           code: "USER_EXISTS",
         },
         { status: 409 },
