@@ -3,6 +3,7 @@ import type { TablesInsert } from "@/integrations/supabase/types";
 
 export type PayPalPlanKey = "standard" | "pro" | "elite";
 type LocalSubscriptionStatus = "trialing" | "active" | "past_due" | "canceled" | "expired";
+type PayPalEnvironment = "live" | "sandbox";
 
 export const PAYPAL_PLAN_IDS: Record<PayPalPlanKey, string> = {
   standard: "P-0LK9851678808213YNJ5TSKQ",
@@ -17,8 +18,19 @@ export function getPayPalPlanKey(planId: string | null | undefined): PayPalPlanK
   return PLAN_BY_ID.get(planId) ?? null;
 }
 
+export function getPayPalEnvironment(): PayPalEnvironment {
+  const environment = process.env.PAYPAL_ENVIRONMENT?.trim().toLowerCase();
+  if (environment !== "live" && environment !== "sandbox") {
+    throw new Error("PAYPAL_ENVIRONMENT must be configured as either live or sandbox.");
+  }
+  if (process.env.VERCEL_ENV === "production" && environment !== "live") {
+    throw new Error("Production PayPal billing requires PAYPAL_ENVIRONMENT=live.");
+  }
+  return environment;
+}
+
 export function getPayPalBaseUrl() {
-  return (process.env.PAYPAL_ENVIRONMENT || "sandbox").toLowerCase() === "live"
+  return getPayPalEnvironment() === "live"
     ? "https://api-m.paypal.com"
     : "https://api-m.sandbox.paypal.com";
 }
