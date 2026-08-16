@@ -1,4 +1,5 @@
 import { revalidatePublicDirectory } from "@/app/_lib/directory-cache";
+import { shouldPublishInitialPaidActivation } from "@/app/api/_lib/provider-billing-gates";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import type { TablesInsert } from "@/integrations/supabase/types";
 
@@ -159,13 +160,15 @@ export async function syncPayPalSubscription(subscription: PayPalSubscription) {
     if (error) throw new Error(error.message);
   }
 
-  const shouldPublishInitialPaidActivation =
-    isEntitled &&
-    profile.profile_status === "approved" &&
-    profile.visibility_status === "hidden" &&
-    profile.is_active === false &&
-    profile._tier === planKey &&
-    !profile.subscription_status;
+  const publishInitialPaidActivation = shouldPublishInitialPaidActivation({
+    isEntitled,
+    profileStatus: profile.profile_status,
+    visibilityStatus: profile.visibility_status,
+    isActive: profile.is_active,
+    requestedTier: profile._tier,
+    planKey,
+    subscriptionStatus: profile.subscription_status,
+  });
 
   const { error: updateError } = await admin
     .from("profiles")
@@ -173,7 +176,7 @@ export async function syncPayPalSubscription(subscription: PayPalSubscription) {
       subscription_tier: currentTier,
       subscription_status: localStatus,
       current_period_end: nextBilling,
-      ...(shouldPublishInitialPaidActivation
+      ...(publishInitialPaidActivation
         ? { visibility_status: "public", is_active: true }
         : {}),
       updated_at: new Date().toISOString(),
@@ -181,7 +184,7 @@ export async function syncPayPalSubscription(subscription: PayPalSubscription) {
     .eq("id", profile.id);
   if (updateError) throw new Error(updateError.message);
 
-  if (shouldPublishInitialPaidActivation) {
+  if (publishInitialPaidActivation) {
     revalidatePublicDirectory();
   }
 
@@ -190,7 +193,7 @@ export async function syncPayPalSubscription(subscription: PayPalSubscription) {
     localStatus,
     profileId: profile.id,
     nextBilling,
-    published: shouldPublishInitialPaidActivation,
+    published: publishInitialPaidActivation,
   };
 }
 
