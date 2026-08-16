@@ -1,1 +1,3 @@
--- Applied remotely; placeholder for local tracking.
+-- Historical migration marker.
+-- This version is already recorded in the production migration history.
+-- Intentionally no-op: preserves migration lineage for Supabase branch rebases without reapplying schema changes.

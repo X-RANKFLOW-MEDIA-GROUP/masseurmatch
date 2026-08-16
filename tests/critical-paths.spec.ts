@@ -15,7 +15,7 @@ async function openFirstPublishedTherapist(page: Page): Promise<string> {
 
   const href = await profileLink.getAttribute("href");
   expect(href, "directory must expose at least one real therapist profile link").toMatch(
-    /^\/therapists\/[a-z0-9][a-z0-9-]*$/i,
+    /^\/therapists\/(?:[a-z0-9][a-z0-9-]*|[0-9a-f-]{36})$/i,
   );
 
   const profileResponse = await page.goto(href!, { waitUntil: "networkidle" });
