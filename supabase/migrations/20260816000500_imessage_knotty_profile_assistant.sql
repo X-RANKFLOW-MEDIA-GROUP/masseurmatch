@@ -151,7 +151,10 @@ with provider_phones as (
   where p.role = 'provider'
     and coalesce(p.is_demo, false) = false
 ), unique_provider_phones as (
-  select phone_e164, min(profile_id) as profile_id, min(user_id) as user_id
+  select
+    phone_e164,
+    (array_agg(profile_id))[1] as profile_id,
+    (array_agg(user_id))[1] as user_id
   from provider_phones
   where phone_e164 is not null
   group by phone_e164
