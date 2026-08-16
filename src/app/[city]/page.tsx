@@ -3,13 +3,13 @@ import { notFound } from "next/navigation";
 
 import { CityDirectoryPage as CityDirectoryPageShell } from "@/app/_components/city-directory-page";
 import { buildAreaCopyInput, buildSuburbIntro } from "@/app/_lib/area-copy";
-import { getCities, getCityInventoryCount, getPublicTherapists } from "@/app/_lib/directory";
+import { getCities, getPublicTherapists, type PublicTherapist } from "@/app/_lib/directory";
 import {
   formatSlugLabel,
   getKeywordBySlug,
   getSegmentBySlug,
 } from "@/app/_lib/directory-taxonomy";
-import { getLaunchAreaPaths, getLaunchKeywordPaths, getLaunchSegmentPaths, isLaunchUrl } from "@/app/_lib/launch-urls";
+import { getLaunchAreaPaths, getLaunchKeywordPaths, getLaunchSegmentPaths } from "@/app/_lib/launch-urls";
 import { GUIDES } from "@/app/guides/data";
 import { getLocalSeoCityContent } from "@/app/_lib/local-seo-content";
 import {
@@ -19,6 +19,7 @@ import {
   createPageMetadata,
 } from "@/app/_lib/seo";
 import { SEO_CITY_MIN_PUBLIC_PROFILES } from "@/app/_lib/sitemap-release";
+import { getTravelVisit } from "@/app/_lib/travel-status";
 import {
   TherapistComparison,
   type TherapistProfile as ComparisonTherapistProfile,
@@ -26,6 +27,7 @@ import {
 import { formatCityLabel } from "@/data/cities";
 
 type Params = { city: string };
+type DirectoryCity = ReturnType<typeof getCities>[number];
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -44,6 +46,39 @@ const DFW_SUBURB_SLUGS = new Set([
 
 function toSlug(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+function normalizeLocation(value: string | null | undefined) {
+  return value?.trim().toLowerCase() || "";
+}
+
+function matchesCityState(
+  cityName: string | null | undefined,
+  state: string | null | undefined,
+  city: DirectoryCity,
+) {
+  const normalizedState = normalizeLocation(state);
+  return normalizeLocation(cityName) === normalizeLocation(city.name)
+    && (normalizedState === normalizeLocation(city.stateCode) || normalizedState === normalizeLocation(city.stateName));
+}
+
+function isLocalProfile(profile: PublicTherapist, city: DirectoryCity) {
+  return matchesCityState(profile.city, profile.state, city);
+}
+
+function isValidVisitor(profile: PublicTherapist, city: DirectoryCity) {
+  if (isLocalProfile(profile, city)) return false;
+  const visit = getTravelVisit(profile.travel_schedule, city.name);
+  if (!visit) return false;
+  return matchesCityState(visit.entry.city, visit.entry.state, city);
+}
+
+async function loadCityProfiles(city: DirectoryCity) {
+  const results = await getPublicTherapists({ city: city.name, page: 1, pageSize: 500 });
+  return {
+    local: results.items.filter((profile) => isLocalProfile(profile, city)),
+    visiting: results.items.filter((profile) => isValidVisitor(profile, city)),
+  };
 }
 
 export function generateStaticParams(): Params[] {
@@ -65,20 +100,20 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   let inventoryCount = 0;
   try {
-    inventoryCount = await getCityInventoryCount(city.name);
+    const { local } = await loadCityProfiles(city);
+    inventoryCount = local.length;
   } catch {
     inventoryCount = 0;
   }
 
   const localContent = getLocalSeoCityContent(city.slug);
   const cityLabel = formatCityLabel(city.name, city.stateCode);
-  const countLabel = inventoryCount === 0 ? "" : inventoryCount < 10 ? String(inventoryCount) : `${inventoryCount}+`;
   const title = inventoryCount > 0
-    ? localContent?.title || `${countLabel} Male Massage Therapists in ${cityLabel}`
+    ? localContent?.title || `Male Massage Therapists in ${cityLabel}`
     : `Male Massage Therapists in ${cityLabel} — Coming Soon`;
   const description = inventoryCount > 0
-    ? localContent?.description ||
-      `Find male massage therapists in ${cityLabel}. Compare specialties, incall and outcall options, availability, rates, trust signals, and direct contact details.`
+    ? localContent?.description
+      || `Browse male massage therapists in ${cityLabel}. Compare public profiles, massage services, availability, rates, and incall or outcall options on MasseurMatch.`
     : `MasseurMatch is preparing its male massage therapist directory for ${cityLabel}. Explore active markets while local listings are added.`;
 
   return createPageMetadata({
@@ -108,6 +143,8 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
   const canonicalCityPath = `/${city.slug}`;
   const localContent = getLocalSeoCityContent(city.slug);
   const allCities = getCities();
+  const cityLabel = formatCityLabel(city.name, city.stateCode);
+  const encodedCity = encodeURIComponent(city.name);
 
   const citySegmentLinks = getLaunchSegmentPaths()
     .filter((path) => path.startsWith(`${canonicalCityPath}/`))
@@ -147,18 +184,18 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
     .map((entry) => ({ href: `/${entry.slug}`, label: formatCityLabel(entry.name, entry.stateCode) }));
 
   const otherStateCities = allCities
-    .filter((c) => c.stateName === city.stateName && c.slug !== city.slug)
-    .map((c) => ({ href: `/${c.slug}`, label: formatCityLabel(c.name, c.stateCode) }))
+    .filter((entry) => entry.stateName === city.stateName && entry.slug !== city.slug)
+    .map((entry) => ({ href: `/${entry.slug}`, label: formatCityLabel(entry.name, entry.stateCode) }))
     .slice(0, 8);
 
-  const therapists = await getPublicTherapists({ city: city.name, page: 1, pageSize: 9 });
-  const hasInventory = therapists.items.length > 0;
+  const { local: localTherapists, visiting: visitingTherapists } = await loadCityProfiles(city);
+  const hasInventory = localTherapists.length > 0;
 
   const cityIntro = localContent?.intro
     || (DFW_SUBURB_SLUGS.has(city.slug)
-      ? buildSuburbIntro(buildAreaCopyInput({ area: city.name, city: "DFW", therapists: therapists.items }))
+      ? buildSuburbIntro(buildAreaCopyInput({ area: city.name, city: "DFW", therapists: localTherapists }))
       : hasInventory
-        ? `Find male massage therapists in ${city.name}. Compare public profiles, incall and outcall options, specialties, availability, rates, and direct contact details.`
+        ? `Find male massage therapists in ${cityLabel}. Compare public profiles, incall and outcall options, specialties, availability, rates, and direct contact details.`
         : `MasseurMatch is preparing its ${city.name} directory. Profiles are reviewed before going live, and empty markets remain outside the sitemap until real inventory is available.`);
 
   const defaultFaqs = [
@@ -177,7 +214,7 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
   ];
   const cityFaqs = localContent?.faqs || defaultFaqs;
 
-  const comparisonProfiles: ComparisonTherapistProfile[] = therapists.items.slice(0, 3).map((item, idx) => ({
+  const comparisonProfiles: ComparisonTherapistProfile[] = localTherapists.slice(0, 3).map((item, idx) => ({
     id: item.id,
     name: item.display_name || item.full_name || `Therapist ${idx + 1}`,
     image: item.avatar_url || "",
@@ -194,7 +231,7 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
     features: {
       incall: Boolean(item.incall_price),
       outcall: Boolean(item.outcall_price),
-      verified: item._tier === "standard" || item._tier === "pro" || item._tier === "elite",
+      verified: item.verification_status === "verified",
       profile: true,
     },
   }));
@@ -203,7 +240,7 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
     <>
       <CityDirectoryPageShell
         eyebrow="City directory"
-        title={hasInventory ? `Male massage therapists in ${city.name}` : `Male massage therapists in ${city.name} — coming soon`}
+        title={hasInventory ? `Male massage therapists in ${cityLabel}` : `Male massage therapists in ${cityLabel} — coming soon`}
         intro={cityIntro}
         breadcrumbJsonLd={buildBreadcrumbJsonLd([
           { name: "Home", path: "/" },
@@ -211,26 +248,29 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
           { name: city.name, path: canonicalCityPath },
         ])}
         collectionJsonLd={buildCollectionPageJsonLd({
-          name: hasInventory ? `Male massage therapists in ${city.name}` : `${city.name} massage directory — coming soon`,
+          name: hasInventory ? `Male massage therapists in ${cityLabel}` : `${city.name} massage directory — coming soon`,
           description: cityIntro,
           path: canonicalCityPath,
         })}
         itemListJsonLd={buildItemListJsonLd({
-          name: `${city.name} public therapist listings`,
+          name: `${cityLabel} public therapist listings`,
           path: canonicalCityPath,
-          items: therapists.items.map((item) => ({
+          items: localTherapists.map((item) => ({
             name: item.display_name || item.full_name || "Therapist",
             path: `/therapists/${item.slug || item.id}`,
           })),
         })}
         leadLinks={[
-          hasInventory
-            ? isLaunchUrl(`${canonicalCityPath}/verified-profiles`)
-              ? { href: `${canonicalCityPath}/verified-profiles`, label: `Active profiles in ${city.name}` }
-              : { href: `${canonicalCityPath}/male-therapists`, label: `Male therapists in ${city.name}` }
-            : { href: "/states", label: "Browse active states" },
-          { href: "/search", label: "Search all providers" },
-          { href: "/safety", label: "Read safety guidance" },
+          { href: `/search?city=${encodedCity}`, label: `Search ${city.name}` },
+          { href: "/cities", label: "Browse all cities" },
+          { href: "/safety", label: "Safety guidance" },
+        ]}
+        quickLinks={[
+          { href: `/search?city=${encodedCity}&available=1`, label: "Available now" },
+          { href: `/search?city=${encodedCity}&session=incall`, label: "Incall" },
+          { href: `/search?city=${encodedCity}&session=home-visit`, label: "Outcall" },
+          { href: `/search?city=${encodedCity}&verified=1`, label: "Verified" },
+          { href: `/search?city=${encodedCity}`, label: "More filters" },
         ]}
         linkSections={[
           ...(citySegmentLinks.length
@@ -290,10 +330,14 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
             ],
           },
         ]}
-        therapists={therapists.items}
-        listingTitle={`Public provider profiles in ${city.name}`}
-        listingDescription="Compare specialties, session formats, availability, rates, service areas, and direct contact options."
-        emptyTitle={`No approved public profiles are live in ${city.name} yet.`}
+        therapists={localTherapists}
+        listingTitle={`Massage therapists based in ${cityLabel}`}
+        listingDescription="Local public profiles appear first. Compare specialties, session formats, availability, rates, service areas, and direct contact options before exploring broader local content."
+        listingCount={localTherapists.length}
+        visitingTherapists={visitingTherapists}
+        visitingTitle={`Visiting ${cityLabel}`}
+        visitingDescription={`These providers are based elsewhere but have a current or upcoming public travel schedule for ${cityLabel}. They are kept separate from local ${city.name} listings.`}
+        emptyTitle={`No approved public profiles are live in ${cityLabel} yet.`}
         emptyDescription="This city remains outside the sitemap until real public inventory is available. Browse an active state or city instead."
         faqTitle={`Common questions about male massage in ${city.name}`}
         faqItems={cityFaqs}
@@ -310,7 +354,7 @@ export default async function CityDirectoryPage({ params }: { params: Promise<Pa
                 features={[
                   { key: "incall", label: "Incall" },
                   { key: "outcall", label: "Outcall" },
-                  { key: "verified", label: "Paid directory tier" },
+                  { key: "verified", label: "Verified" },
                   { key: "profile", label: "Public profile" },
                 ]}
               />
