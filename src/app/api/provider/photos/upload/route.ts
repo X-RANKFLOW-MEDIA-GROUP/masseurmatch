@@ -3,6 +3,7 @@ import { createSupabaseAdminClient, requireSession } from "@/app/api/_lib/supaba
 
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+const PENDING_BUCKET = "pending-photos";
 
 export async function POST(request: Request) {
   try {
@@ -31,27 +32,18 @@ export async function POST(request: Request) {
 
     const ext = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
     const fileName = `${session.userId}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
-    const bucket = "therapist-photos";
 
     const arrayBuffer = await file.arrayBuffer();
     const { error: uploadError } = await adminClient.storage
-      .from(bucket)
+      .from(PENDING_BUCKET)
       .upload(fileName, arrayBuffer, {
         contentType: file.type,
         upsert: false,
       });
 
     if (uploadError) {
-      console.error("[provider/photos/upload] Storage upload failed:", uploadError.message);
+      console.error("[provider/photos/upload] Private storage upload failed:", uploadError.message);
       throw new RouteError(503, "Photo storage is temporarily unavailable. Please try again.");
-    }
-
-    const { data: urlData } = adminClient.storage.from(bucket).getPublicUrl(fileName);
-    const publicUrl = urlData?.publicUrl ?? "";
-
-    if (!publicUrl) {
-      await adminClient.storage.from(bucket).remove([fileName]);
-      throw new RouteError(500, "The photo was uploaded but no public URL was generated.");
     }
 
     const { count, error: countError } = await adminClient
@@ -60,7 +52,7 @@ export async function POST(request: Request) {
       .eq("profile_id", profile.id);
 
     if (countError) {
-      await adminClient.storage.from(bucket).remove([fileName]);
+      await adminClient.storage.from(PENDING_BUCKET).remove([fileName]);
       throw new RouteError(500, countError.message);
     }
 
@@ -72,24 +64,25 @@ export async function POST(request: Request) {
       .insert({
         profile_id: profile.id,
         user_id: session.userId,
-        storage_path: publicUrl,
-        url: publicUrl,
+        storage_bucket: PENDING_BUCKET,
+        storage_path: fileName,
+        url: null,
         is_primary: isPrimary,
         sort_order: sortOrder,
         moderation_status: "pending",
         moderation_reason: "queued_for_ai_review",
       })
-      .select("id, url, storage_path, is_primary, sort_order, moderation_status")
+      .select("id, is_primary, sort_order, moderation_status")
       .single();
 
     if (insertError || !photoRow) {
-      await adminClient.storage.from(bucket).remove([fileName]);
+      await adminClient.storage.from(PENDING_BUCKET).remove([fileName]);
       throw new RouteError(500, insertError?.message || "Could not register the uploaded photo.");
     }
 
     const snapshot = {
       photoId: photoRow.id,
-      imageUrl: publicUrl,
+      storageBucket: PENDING_BUCKET,
       storageObjectKey: fileName,
       isPrimary,
       sortOrder,
@@ -121,24 +114,22 @@ export async function POST(request: Request) {
 
     const { data: moderationData, error: moderationError } = await adminClient.functions.invoke(
       "moderate-photo",
-      {
-        body: {
-          photo_id: photoRow.id,
-          image_url: publicUrl,
-        },
-      },
+      { body: { photo_id: photoRow.id } },
     );
 
     if (moderationError) {
       console.error("[provider/photos/upload] Automated moderation failed:", moderationError.message);
       await (adminClient as any)
         .from("profile_photos")
-        .update({
-          moderation_status: "pending",
-          moderation_reason: "manual_review_required",
-        })
+        .update({ moderation_status: "pending", moderation_reason: "manual_review_required" })
         .eq("id", photoRow.id);
     }
+
+    const { data: currentPhoto } = await (adminClient as any)
+      .from("profile_photos")
+      .select("url, moderation_status")
+      .eq("id", photoRow.id)
+      .maybeSingle();
 
     const status = moderationError
       ? "pending"
@@ -150,10 +141,10 @@ export async function POST(request: Request) {
       ok: true,
       photo: {
         id: photoRow.id,
-        url: publicUrl,
+        url: currentPhoto?.url ?? "",
         isPrimary: photoRow.is_primary ?? false,
         sortOrder: photoRow.sort_order ?? 0,
-        status,
+        status: currentPhoto?.moderation_status ?? status,
       },
     });
   } catch (error) {

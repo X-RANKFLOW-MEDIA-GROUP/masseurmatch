@@ -1,42 +1,53 @@
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 import { createSupabaseAdminClient, requireSession } from "@/app/api/_lib/supabase-server";
 
+const PENDING_BUCKET = "pending-photos";
+
 export async function GET(request: Request) {
   try {
     const session = await requireSession(request);
     const adminClient = createSupabaseAdminClient();
 
-    const { data: profile } = await adminClient
+    const { data: profile, error: profileError } = await adminClient
       .from("profiles")
       .select("id")
       .eq("user_id", session.userId)
       .maybeSingle();
 
-    if (!profile) {
-      return json({ ok: true, photos: [] });
-    }
+    if (profileError) throw new RouteError(500, profileError.message);
+    if (!profile) return json({ ok: true, photos: [] });
 
-    const { data: photos, error } = await adminClient
-      .from("therapist_photos")
-      .select("id, storage_path, public_url, photo_type, sort_order, status, rejection_reason, created_at")
-      .eq("user_id", session.userId)
+    const { data: photos, error } = await (adminClient as any)
+      .from("profile_photos")
+      .select("id, url, storage_bucket, storage_path, is_primary, sort_order, moderation_status, moderation_reason, created_at")
+      .eq("profile_id", profile.id)
       .order("sort_order", { ascending: true })
-      .limit(100); // Most therapists won't exceed 100 photos
+      .limit(100);
 
     if (error) throw new RouteError(500, error.message);
 
-    return json({
-      ok: true,
-      photos: (photos ?? []).map((p) => ({
-        id: p.id,
-        url: p.public_url || p.storage_path || "",
-        isPrimary: p.photo_type === "profile",
-        sortOrder: p.sort_order ?? 0,
-        status: p.status ?? "pending_review",
-        reason: p.rejection_reason ?? null,
-        createdAt: p.created_at,
-      })),
-    });
+    const mapped = await Promise.all((photos ?? []).map(async (photo: any) => {
+      let photoUrl = typeof photo.url === "string" ? photo.url : "";
+      if (!photoUrl && photo.storage_bucket === PENDING_BUCKET && photo.storage_path) {
+        const { data: signed } = await adminClient.storage.from(PENDING_BUCKET).createSignedUrl(photo.storage_path, 600);
+        photoUrl = signed?.signedUrl ?? "";
+      }
+      if (!photoUrl && typeof photo.storage_path === "string" && /^https?:\/\//i.test(photo.storage_path)) {
+        photoUrl = photo.storage_path;
+      }
+
+      return {
+        id: photo.id,
+        url: photoUrl,
+        isPrimary: photo.is_primary === true,
+        sortOrder: photo.sort_order ?? 0,
+        status: photo.moderation_status ?? "pending",
+        reason: photo.moderation_reason ?? null,
+        createdAt: photo.created_at,
+      };
+    }));
+
+    return json({ ok: true, photos: mapped });
   } catch (error) {
     return errorResponse(error);
   }
