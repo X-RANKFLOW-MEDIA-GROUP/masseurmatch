@@ -82,12 +82,35 @@ create table if not exists public.messaging_profile_audit_log (
 create index if not exists idx_messaging_profile_audit_profile_created
   on public.messaging_profile_audit_log(profile_id, created_at desc);
 
+-- Runtime liveness only: no message bodies, phone numbers or provider PII.
+create table if not exists public.messaging_imessage_bridge_workers (
+  worker_id text primary key check (char_length(worker_id) between 1 and 120),
+  bridge_version text not null check (char_length(bridge_version) between 1 and 80),
+  started_at timestamptz not null,
+  last_seen_at timestamptz not null default now(),
+  last_cycle_at timestamptz,
+  last_inbound_at timestamptz,
+  last_outbound_at timestamptz,
+  last_error_code text check (
+    last_error_code is null or last_error_code ~ '^[A-Z0-9_]{1,80}$'
+  ),
+  last_error_at timestamptz,
+  replay_history boolean not null default false,
+  poll_ms integer not null default 5000 check (poll_ms between 2000 and 60000),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_messaging_imessage_bridge_workers_last_seen
+  on public.messaging_imessage_bridge_workers(last_seen_at desc);
+
 create trigger trg_messaging_profile_sessions_updated_at
 before update on public.messaging_profile_sessions
 for each row execute function public.messaging_touch_updated_at();
 
 alter table public.messaging_profile_sessions enable row level security;
 alter table public.messaging_profile_audit_log enable row level security;
+alter table public.messaging_imessage_bridge_workers enable row level security;
 
 create policy messaging_profile_sessions_admin_all on public.messaging_profile_sessions
 for all to authenticated using (public.is_admin()) with check (public.is_admin());
@@ -95,11 +118,19 @@ for all to authenticated using (public.is_admin()) with check (public.is_admin()
 create policy messaging_profile_audit_admin_read on public.messaging_profile_audit_log
 for select to authenticated using (public.is_admin());
 
+create policy messaging_imessage_bridge_workers_admin_read
+on public.messaging_imessage_bridge_workers
+for select to authenticated
+using (public.is_admin());
+
 revoke all on public.messaging_profile_sessions from anon;
 revoke all on public.messaging_profile_audit_log from anon;
+revoke all on public.messaging_imessage_bridge_workers from anon;
 
 grant select, insert, update, delete on public.messaging_profile_sessions to service_role;
 grant select, insert on public.messaging_profile_audit_log to service_role;
+grant select on public.messaging_imessage_bridge_workers to authenticated;
+grant select, insert, update, delete on public.messaging_imessage_bridge_workers to service_role;
 
 -- Populate links only when a phone maps to exactly one provider profile.
 -- Ambiguous phone matches are deliberately left unlinked for manual review.
@@ -136,3 +167,4 @@ where c.phone_e164 = u.phone_e164
 
 comment on table public.messaging_profile_sessions is 'Short-lived authorization and pending-field state for Knotty profile assistance over iMessage.';
 comment on table public.messaging_profile_audit_log is 'Immutable audit trail for profile changes staged or applied through Knotty iMessage assistance.';
+comment on table public.messaging_imessage_bridge_workers is 'Liveness and sanitized operational health for authenticated MasseurMatch iMessage bridge workers.';
