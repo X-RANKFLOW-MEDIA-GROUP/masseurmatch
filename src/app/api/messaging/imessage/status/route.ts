@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
-import { errorResponse, json, parseJsonBody } from "@/app/api/_lib/http";
+import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { assertRateLimit } from "@/app/_lib/security";
 import { assertImessageBridgeAuthorized } from "@/lib/messaging/imessage-bridge-auth";
 
@@ -15,18 +15,21 @@ const statusSchema = z.object({
   occurredAt: z.string().datetime().optional().nullable(),
 });
 
+const workerSchema = z.string().trim().min(1).max(120);
+
 type Db = ReturnType<typeof createSupabaseAdminClient> & { from: (table: string) => any };
 
 export async function POST(request: Request) {
   try {
     assertImessageBridgeAuthorized(request);
     assertRateLimit(request, "imessage-bridge-status", { limit: 600, windowMs: 60_000 });
+    const workerId = workerSchema.parse(request.headers.get("x-imessage-worker-id") || "imessage-bridge");
     const body = await parseJsonBody(request, statusSchema);
     const db = createSupabaseAdminClient() as Db;
 
     const queueResult = await db
       .from("messaging_queue")
-      .select("id,message_id,attempts,max_attempts,status")
+      .select("id,message_id,attempts,max_attempts,status,transport_preference,locked_by")
       .eq("id", body.queueId)
       .single();
     if (queueResult.error) throw new Error(queueResult.error.message);
@@ -36,7 +39,21 @@ export async function POST(request: Request) {
       attempts: number;
       max_attempts: number;
       status: string;
+      transport_preference: string;
+      locked_by: string | null;
     };
+
+    if (queue.transport_preference !== "imessage") {
+      throw new RouteError(409, "Queue item is not assigned to iMessage.", "IMESSAGE_QUEUE_TRANSPORT_MISMATCH");
+    }
+
+    if (body.status === "delivered") {
+      if (!new Set(["sent", "delivered"]).has(queue.status)) {
+        throw new RouteError(409, "Queue item is not eligible for a delivered update.", "IMESSAGE_QUEUE_STATUS_MISMATCH");
+      }
+    } else if (queue.status !== "claimed" || queue.locked_by !== workerId) {
+      throw new RouteError(409, "Queue item is not claimed by this iMessage worker.", "IMESSAGE_QUEUE_WORKER_MISMATCH");
+    }
 
     const occurredAt = body.occurredAt || new Date().toISOString();
     const canRetry = body.status === "failed" && body.retryable && queue.attempts < queue.max_attempts;
