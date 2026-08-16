@@ -30,9 +30,7 @@ const requestSchema = z
     }
   });
 
-type Db = ReturnType<typeof createSupabaseAdminClient> & {
-  from: (table: string) => any;
-};
+type Db = { from: (table: string) => any };
 
 type WorkerRow = {
   worker_id: string;
@@ -118,7 +116,7 @@ export async function POST(request: Request) {
     const admin = await requireAdminSession(request);
     assertRateLimit(request, "admin-imessage-outbound-control", { limit: 20, windowMs: 60_000 });
     const body = await parseJsonBody(request, requestSchema);
-    const db = createSupabaseAdminClient() as Db;
+    const db = createSupabaseAdminClient() as unknown as Db;
 
     if (body.action === "disarm") {
       const { data, error } = await db
