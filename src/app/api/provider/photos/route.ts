@@ -6,35 +6,36 @@ export async function GET(request: Request) {
     const session = await requireSession(request);
     const adminClient = createSupabaseAdminClient();
 
-    const { data: profile } = await adminClient
+    const { data: profile, error: profileError } = await adminClient
       .from("profiles")
       .select("id")
       .eq("user_id", session.userId)
       .maybeSingle();
 
+    if (profileError) throw new RouteError(500, profileError.message);
     if (!profile) {
       return json({ ok: true, photos: [] });
     }
 
     const { data: photos, error } = await adminClient
-      .from("therapist_photos")
-      .select("id, storage_path, public_url, photo_type, sort_order, status, rejection_reason, created_at")
-      .eq("user_id", session.userId)
+      .from("profile_photos")
+      .select("id, url, storage_path, is_primary, sort_order, moderation_status, moderation_reason, created_at")
+      .eq("profile_id", profile.id)
       .order("sort_order", { ascending: true })
-      .limit(100); // Most therapists won't exceed 100 photos
+      .limit(100);
 
     if (error) throw new RouteError(500, error.message);
 
     return json({
       ok: true,
-      photos: (photos ?? []).map((p) => ({
-        id: p.id,
-        url: p.public_url || p.storage_path || "",
-        isPrimary: p.photo_type === "profile",
-        sortOrder: p.sort_order ?? 0,
-        status: p.status ?? "pending_review",
-        reason: p.rejection_reason ?? null,
-        createdAt: p.created_at,
+      photos: (photos ?? []).map((photo) => ({
+        id: photo.id,
+        url: photo.url || photo.storage_path || "",
+        isPrimary: photo.is_primary === true,
+        sortOrder: photo.sort_order ?? 0,
+        status: photo.moderation_status ?? "pending",
+        reason: photo.moderation_reason ?? null,
+        createdAt: photo.created_at,
       })),
     });
   } catch (error) {
