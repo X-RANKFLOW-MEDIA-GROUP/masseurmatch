@@ -23,7 +23,7 @@ type MessagingQueueUpdate = {
   locked_at?: string | null;
   locked_by?: string | null;
   last_error?: string | null;
-  scheduled_for?: string | null;
+  scheduled_for?: string;
   sent_at?: string | null;
   delivered_at?: string | null;
   failed_at?: string | null;
