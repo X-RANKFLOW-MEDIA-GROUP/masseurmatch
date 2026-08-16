@@ -23,12 +23,23 @@ export async function POST(
     const now = new Date().toISOString();
     const { data: profile, error: fetchError } = await adminClient
       .from("profiles")
-      .select("id, user_id, profile_status, display_name, full_name, email_address, slug")
+      .select("id, user_id, profile_status, display_name, full_name, email_address, slug, city, phone, phone_number")
       .eq("id", profileId)
       .maybeSingle();
 
     if (fetchError) throw new RouteError(500, fetchError.message);
     if (!profile) throw new RouteError(404, "Profile not found.");
+
+    const missingRequiredFields: string[] = [];
+    if (!profile.city?.trim()) missingRequiredFields.push("city");
+    if (!(profile.phone?.trim() || profile.phone_number?.trim())) missingRequiredFields.push("phone");
+
+    if (missingRequiredFields.length > 0) {
+      throw new RouteError(
+        422,
+        `Profile cannot be published until these required fields are completed: ${missingRequiredFields.join(", ")}.`,
+      );
+    }
 
     // Public profile pages are slug-addressed. Older/imported profiles can reach
     // admin review without a slug, so approval must repair that invariant.
@@ -41,7 +52,6 @@ export async function POST(
         status: "approved",
         profile_status: "approved",
         visibility_status: "public",
-        verification_status: "verified",
         is_active: true,
         approved_at: now,
         approved_by: admin.userId,

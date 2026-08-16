@@ -37,7 +37,7 @@ export async function GET(
     const { data: profile, error } = await supabase
       .from("profiles")
       .select(`
-        id, full_name, display_name, email, phone, city, neighborhood_name,
+        id, full_name, display_name, email, phone, phone_number, city, neighborhood_name,
         bio, specialties, incall_price, outcall_price, status, profile_status,
         created_at, submitted_at, approved_at, approved_by, rejected_at, rejected_by,
         rejection_reason, moderation_notes, is_verified_identity, is_verified_phone,
@@ -96,6 +96,34 @@ export async function POST(
       notes: string;
     };
     const supabase = createSupabaseAdminClient();
+
+    if (action === "approve") {
+      const { data: publishCandidate, error: candidateError } = await supabase
+        .from("profiles")
+        .select("city, phone, phone_number")
+        .eq("id", id)
+        .maybeSingle();
+
+      if (candidateError) throw candidateError;
+      if (!publishCandidate) {
+        return NextResponse.json({ ok: false, error: "Profile not found" }, { status: 404 });
+      }
+
+      const missingRequiredFields: string[] = [];
+      if (!publishCandidate.city?.trim()) missingRequiredFields.push("city");
+      if (!(publishCandidate.phone?.trim() || publishCandidate.phone_number?.trim())) missingRequiredFields.push("phone");
+
+      if (missingRequiredFields.length > 0) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error: `Profile cannot be published until these required fields are completed: ${missingRequiredFields.join(", ")}.`,
+            missingRequiredFields,
+          },
+          { status: 422 },
+        );
+      }
+    }
 
     const statusMap = {
       approve: "approved",
