@@ -1,0 +1,58 @@
+name: Regenerate Supabase Types Temporary
+
+on:
+  push:
+    branches:
+      - agent/regenerate-supabase-types-20260815
+    paths:
+      - .github/workflows/regenerate-supabase-types-temp.yml
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: agent/regenerate-supabase-types-20260815
+
+      - name: Verify required config
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN"
+          test -n "$SUPABASE_PROJECT_REF"
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Regenerate production types
+        run: |
+          supabase gen types typescript --project-id "$SUPABASE_PROJECT_REF" --schema public > src/integrations/supabase/types.ts
+
+      - name: Reject retired runtime objects
+        run: |
+          if grep -Eq '^      (appointments|booking_inquiries|booking_analytics|payment_transactions|therapist_availability):' src/integrations/supabase/types.ts; then
+            echo '::error::Generated types still expose retired booking/session-payment tables.'
+            exit 1
+          fi
+          if grep -Eq '^          booking_inquiry_id:' src/integrations/supabase/types.ts; then
+            echo '::error::Generated types still expose sms_logs.booking_inquiry_id.'
+            exit 1
+          fi
+
+      - name: Commit generated types
+        run: |
+          if git diff --quiet -- src/integrations/supabase/types.ts; then
+            echo 'Types already match production.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/integrations/supabase/types.ts
+          git commit -m 'chore: regenerate Supabase types from production'
+          git push origin HEAD:agent/regenerate-supabase-types-20260815
