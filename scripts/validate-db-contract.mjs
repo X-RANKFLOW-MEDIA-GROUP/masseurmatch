@@ -11,8 +11,8 @@ const SCHEMA_EXTENSION_PATHS = [
   path.join(ROOT, "supabase/migrations/20260806230000_demand_radar_pipeline.sql"),
   path.join(ROOT, "supabase/migrations/20260814182734_create_admin_messaging_core.sql"),
   path.join(ROOT, "supabase/migrations/20260814184500_sync_profile_extras_contract.sql"),
-  path.join(ROOT, "supabase/migrations/20260816000500_imessage_knotty_profile_assistant.sql"),
-  path.join(ROOT, "supabase/migrations/20260816000600_claim_imessage_queue.sql"),
+  path.join(ROOT, "supabase/migrations/20260816034151_imessage_knotty_profile_assistant.sql"),
+  path.join(ROOT, "supabase/migrations/20260816034202_claim_imessage_queue.sql"),
 ];
 const SCAN_DIRS = ["src", "scripts", "tests", "supabase"];
 // Every .sql file that can define a database function. Unlike the table/column
