@@ -153,6 +153,40 @@ function createPersistedStateSnapshot(state: SignupState): SignupState {
   };
 }
 
+/**
+ * Signup progress is kept in localStorage, not sessionStorage.
+ *
+ * Email confirmation is mandatory on this project, so the wizard is always
+ * interrupted: the user leaves for their inbox and comes back through a link
+ * that opens a *new tab*. sessionStorage is per-tab, so the returning tab saw
+ * an empty wizard and /signup/verify bounced them to /signup/account — where
+ * re-submitting the form fails with "account already exists". localStorage
+ * survives that round trip (and a browser restart).
+ *
+ * sessionStorage is still read once so an in-flight signup started on the old
+ * build is not thrown away by the deploy.
+ */
+function readPersistedState(key: string): Partial<SignupState> | null {
+  if (typeof window === "undefined") return null;
+
+  const raw =
+    window.localStorage.getItem(key) ?? window.sessionStorage.getItem(key);
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(raw) as Partial<SignupState>;
+  } catch {
+    // Malformed persisted state from an older build.
+    return null;
+  }
+}
+
+function clearPersistedState(key: string) {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(key);
+  window.sessionStorage.removeItem(key);
+}
+
 interface SignupContextType {
   state: SignupState;
   setPlan: (tier: SignupPlanTier) => void;
@@ -187,35 +221,32 @@ export function SignupProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const persisted = window.sessionStorage.getItem(SIGNUP_STATE_STORAGE_KEY);
-    const bootstrap = window.sessionStorage.getItem(SIGNUP_BOOTSTRAP_STORAGE_KEY);
+    const nextState = readPersistedState(SIGNUP_STATE_STORAGE_KEY);
+    const bootstrapState = readPersistedState(SIGNUP_BOOTSTRAP_STORAGE_KEY);
 
-    if (!persisted && !bootstrap) return;
+    if (!nextState && !bootstrapState) return;
 
-    try {
-      const nextState = persisted ? (JSON.parse(persisted) as Partial<SignupState>) : {};
-      const bootstrapState = bootstrap ? (JSON.parse(bootstrap) as Partial<SignupState>) : {};
+    setState((current) => ({
+      ...current,
+      ...nextState,
+      ...bootstrapState,
+      profile: {
+        ...current.profile,
+        ...(nextState?.profile || {}),
+        ...(bootstrapState?.profile || {}),
+      },
+    }));
 
-      setState((current) => ({
-        ...current,
-        ...nextState,
-        ...bootstrapState,
-        profile: {
-          ...current.profile,
-          ...(nextState.profile || {}),
-          ...(bootstrapState.profile || {}),
-        },
-      }));
-    } catch {
-      // Ignore malformed persisted state from older builds.
-    } finally {
-      window.sessionStorage.removeItem(SIGNUP_BOOTSTRAP_STORAGE_KEY);
-    }
+    clearPersistedState(SIGNUP_BOOTSTRAP_STORAGE_KEY);
   }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    window.sessionStorage.setItem(SIGNUP_STATE_STORAGE_KEY, JSON.stringify(createPersistedStateSnapshot(state)));
+    window.localStorage.setItem(
+      SIGNUP_STATE_STORAGE_KEY,
+      JSON.stringify(createPersistedStateSnapshot(state)),
+    );
+    window.sessionStorage.removeItem(SIGNUP_STATE_STORAGE_KEY);
   }, [state]);
 
   useEffect(() => {
@@ -231,10 +262,16 @@ export function SignupProvider({ children }: { children: ReactNode }) {
     const derivedPhone = user.phone?.trim() ?? "";
 
     setState((current) => {
-      const nextFullName = current.fullName || derivedFullName;
-      const nextDisplayName = current.displayName || nextFullName;
-      const nextEmail = current.email || derivedEmail;
-      const nextPhone = current.phone || derivedPhone;
+      // Persisted progress now outlives the tab, so it can belong to a
+      // different account on a shared browser. The signed-in identity always
+      // wins over a stale saved one.
+      const isStaleIdentity =
+        Boolean(current.email) && Boolean(derivedEmail) && current.email !== derivedEmail;
+
+      const nextFullName = (isStaleIdentity ? derivedFullName : current.fullName) || derivedFullName;
+      const nextDisplayName = (isStaleIdentity ? nextFullName : current.displayName) || nextFullName;
+      const nextEmail = isStaleIdentity ? derivedEmail : current.email || derivedEmail;
+      const nextPhone = (isStaleIdentity ? derivedPhone : current.phone) || derivedPhone;
 
       if (
         current.accountCreated &&
@@ -274,10 +311,8 @@ export function SignupProvider({ children }: { children: ReactNode }) {
   const setStripeCustomerId = useCallback((id: string) => setState((s) => ({ ...s, stripeCustomerId: id })), []);
 
   const reset = useCallback(() => {
-    if (typeof window !== "undefined") {
-      window.sessionStorage.removeItem(SIGNUP_BOOTSTRAP_STORAGE_KEY);
-      window.sessionStorage.removeItem(SIGNUP_STATE_STORAGE_KEY);
-    }
+    clearPersistedState(SIGNUP_BOOTSTRAP_STORAGE_KEY);
+    clearPersistedState(SIGNUP_STATE_STORAGE_KEY);
     setState(initialState);
   }, []);
 
