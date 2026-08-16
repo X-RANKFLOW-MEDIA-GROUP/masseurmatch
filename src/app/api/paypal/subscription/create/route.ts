@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/http";
 import { PAYPAL_PLAN_IDS, paypalRequest, type PayPalPlanKey } from "@/app/api/_lib/paypal";
+import { canStartPaidSubscription } from "@/app/api/_lib/provider-billing-gates";
 import { requireRequestSession } from "@/app/api/_lib/session";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
       .single();
     if (profileError || !profile) throw new RouteError(404, "Provider profile not found.");
 
-    if (profile.profile_status !== "approved") {
+    if (!canStartPaidSubscription(profile.profile_status)) {
       throw new RouteError(409, "Your provider profile must be approved before starting a paid subscription.");
     }
 
