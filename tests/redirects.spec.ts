@@ -13,8 +13,9 @@ import { fetchCanonical } from "./helpers/fetch-canonical";
 
 type RedirectCase = [source: string, destination: string];
 
-// Mirror of src/app/_lib/redirects-manifest.ts — update both together.
-// The source of truth for intent is the TS file; these cases validate HTTP behaviour.
+// Mirror of the LEGACY_REDIRECTS list in next.config.mjs (static paths) and the
+// pattern redirects in src/middleware.ts — update together. Those declare the
+// redirects; these cases validate the HTTP behaviour they actually produce.
 const REDIRECT_CASES: RedirectCase[] = [
   // /city/* → /{city}
   ["/city/dallas",         "/dallas"],
@@ -53,6 +54,7 @@ const REDIRECT_CASES: RedirectCase[] = [
   ["/cities/dallas-tx/hotel",          "/dallas/wellness/hotel-massage"],
   // Global legacy aliases
   ["/massage-therapists", "/therapists"],
+  ["/professionals",      "/therapists"],
 ];
 
 for (const [source, destination] of REDIRECT_CASES) {
