@@ -63,3 +63,11 @@ begin
   end if;
 end
 $$;
+
+-- Contract mirror for the canonical photo storage field introduced in production
+-- by 20260816041949_harden_photo_storage_and_add_bucket_contract.sql. This file is
+-- one of the validator's approved additive schema extensions, so keeping the
+-- column here makes fresh-schema validation aware of the runtime contract. The
+-- later migration remains the production history source and is idempotent.
+alter table public.profile_photos
+  add column if not exists storage_bucket text not null default 'external';
