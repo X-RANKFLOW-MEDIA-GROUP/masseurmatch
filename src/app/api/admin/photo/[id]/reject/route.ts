@@ -4,6 +4,22 @@ import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/h
 import { createSupabaseAdminClient, recordAuditLog, requireAdminSession } from "@/app/api/_lib/supabase-server";
 
 const schema = z.object({ reason: z.string().min(1).optional() });
+const STORAGE_PUBLIC_MARKER = "/storage/v1/object/public/therapist-photos/";
+
+function getSupabaseStorageObjectKey(storagePath: string | null) {
+  const value = storagePath?.trim();
+  if (!value) return null;
+  if (!/^https?:\/\//i.test(value)) return value.replace(/^\/+/, "");
+
+  try {
+    const pathname = new URL(value).pathname;
+    const markerIndex = pathname.indexOf(STORAGE_PUBLIC_MARKER);
+    if (markerIndex < 0) return null;
+    return decodeURIComponent(pathname.slice(markerIndex + STORAGE_PUBLIC_MARKER.length));
+  } catch {
+    return null;
+  }
+}
 
 export async function POST(
   request: Request,
@@ -16,7 +32,7 @@ export async function POST(
     const adminClient = createSupabaseAdminClient();
 
     const { data: photo, error: fetchError } = await adminClient
-      .from("therapist_photos")
+      .from("profile_photos")
       .select("id, profile_id, user_id, storage_path")
       .eq("id", photoId)
       .maybeSingle();
@@ -24,21 +40,25 @@ export async function POST(
     if (fetchError) throw new RouteError(500, fetchError.message);
     if (!photo) throw new RouteError(404, "Photo not found.");
 
+    const rejectionReason = body.reason || "admin_rejected";
     const { error: updateError } = await adminClient
-      .from("therapist_photos")
+      .from("profile_photos")
       .update({
-        status: "rejected",
-        approval_status: "rejected",
-        rejection_reason: body.reason || "admin_rejected",
+        moderation_status: "rejected",
+        moderation_reason: rejectionReason,
       })
       .eq("id", photoId);
 
     if (updateError) throw new RouteError(500, updateError.message);
 
-    // Remove the actual storage object so the CDN URL returns 404 immediately.
-    // Best-effort: a missing or already-deleted path should not fail the request.
-    if (photo.storage_path && !photo.storage_path.startsWith("http")) {
-      await adminClient.storage.from("therapist-photos").remove([photo.storage_path]);
+    const objectKey = getSupabaseStorageObjectKey(photo.storage_path);
+    if (objectKey) {
+      const { error: storageError } = await adminClient.storage
+        .from("therapist-photos")
+        .remove([objectKey]);
+      if (storageError) {
+        console.warn("[api/admin/photo/reject] Storage cleanup failed:", storageError.message);
+      }
     }
 
     await adminClient.from("admin_actions").insert({
