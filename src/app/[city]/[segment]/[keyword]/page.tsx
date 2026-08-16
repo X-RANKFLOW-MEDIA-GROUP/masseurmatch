@@ -21,7 +21,6 @@ type Params = { city: string; segment: string; keyword: string };
 export const revalidate = 60;
 
 export function generateStaticParams(): Params[] {
-  // Generate long-tail local SEO routes on demand so production builds stay fast and reliable.
   return [];
 }
 
@@ -44,13 +43,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const keyword = getKeywordBySlug(resolvedParams.keyword);
   const routePath = `/${resolvedParams.city}/${resolvedParams.segment}/${resolvedParams.keyword}`;
 
-  // The launch URL allowlist controls sitemap/discovery exposure only. Valid
-  // canonical city + segment + keyword combinations must render so legacy
-  // redirects never terminate at a 404.
   if (!city || !segment || !keyword) {
     return createPageMetadata({
       title: "Specialty page",
-      description: "Keyword directory page.",
+      description: "Massage provider specialty directory page.",
       path: routePath,
       noIndex: true,
     });
@@ -60,14 +56,14 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   try {
     ({ total } = await fetchKeywordTherapists(city.name, segment.slug, keyword.slug));
   } catch {
-    // Supabase unavailable — fall through with zero total
+    total = 0;
   }
 
   return createPageMetadata({
     title: `${keyword.label} in ${city.name}`,
-    description: `${keyword.intro} Compare trusted local therapist listings through the ${segment.shortLabel.toLowerCase()} path in ${city.name}.`,
+    description: `${keyword.intro} Compare public provider profiles and direct contact options for ${keyword.shortLabel.toLowerCase()} in ${city.name}.`,
     path: `/${city.slug}/${segment.slug}/${keyword.slug}`,
-    keywords: [city.name, keyword.label, segment.label, `${city.name} verified ${keyword.shortLabel}`],
+    keywords: [city.name, keyword.label, segment.label, `${city.name} ${keyword.shortLabel}`],
     noIndex: total === 0,
   });
 }
@@ -78,24 +74,26 @@ export default async function CityKeywordPage({ params }: { params: Promise<Para
   const segment = getSegmentBySlug(resolvedParams.segment);
   const keyword = getKeywordBySlug(resolvedParams.keyword);
 
-  if (!city || !segment || !keyword) {
-    notFound();
-  }
+  if (!city || !segment || !keyword) notFound();
 
   const therapists = await fetchKeywordTherapists(city.name, segment.slug, keyword.slug);
   const canonicalCityPath = `/${city.slug}`;
+  const hasInventory = therapists.items.length > 0;
+
   const keywordFaqs = [
     {
       question: `How do I choose ${keyword.shortLabel.toLowerCase()} in ${city.name}?`,
-      answer: `Compare specialties, profile bios, verification signals, and session format first, then contact providers directly to confirm fit and availability.`,
+      answer: `Compare provider supplied specialties, profile details, visible trust signals, and session format, then contact the independent provider directly to confirm fit, credentials important to you, and availability.`,
     },
     {
-      question: `Can I find nearby ${keyword.shortLabel.toLowerCase()} options fast?`,
-      answer: `Yes. This page is optimized for local discovery and links to profiles built for immediate call or message actions on mobile.`,
+      question: `Are ${keyword.shortLabel.toLowerCase()} providers currently listed in ${city.name}?`,
+      answer: hasInventory
+        ? `Yes. This page currently has public profiles matching ${keyword.shortLabel.toLowerCase()} in ${city.name}. Review each profile and contact the provider directly for current details.`
+        : `No approved public profiles currently match this exact specialty page. Use the broader ${city.name} directory to check other public profiles.`,
     },
     {
-      question: `Is this page only for booking ${keyword.shortLabel.toLowerCase()}?`,
-      answer: `No. MasseurMatch is a discovery engine. This page helps visitors find a more relevant shortlist, but scheduling still happens directly between visitor and provider.`,
+      question: `Does MasseurMatch book ${keyword.shortLabel.toLowerCase()} sessions?`,
+      answer: `No. MasseurMatch is a discovery directory. Scheduling, pricing, payment, and session arrangements happen directly between the client and the independent provider.`,
     },
   ];
 
@@ -103,7 +101,9 @@ export default async function CityKeywordPage({ params }: { params: Promise<Para
     <CityDirectoryPage
       eyebrow="Specialty massage page"
       title={`${keyword.label} in ${city.name}`}
-      intro={`${keyword.intro} This specialty page also inherits the ${segment.shortLabel.toLowerCase()} path so search engines and users have stronger context around the page intent.`}
+      intro={hasInventory
+        ? `${keyword.intro} Compare public profiles currently matched to ${keyword.shortLabel.toLowerCase()} in ${city.name}, including provider supplied service details and direct contact options.`
+        : `${keyword.intro} No approved public profiles currently match this exact specialty in ${city.name}. Browse the broader city directory while new listings are reviewed.`}
       breadcrumbJsonLd={buildBreadcrumbJsonLd([
         { name: "Home", path: "/" },
         { name: city.name, path: canonicalCityPath },
@@ -112,7 +112,9 @@ export default async function CityKeywordPage({ params }: { params: Promise<Para
       ])}
       collectionJsonLd={buildCollectionPageJsonLd({
         name: `${keyword.label} in ${city.name}`,
-        description: `${keyword.intro} Compare local therapist listings in ${city.name}.`,
+        description: hasInventory
+          ? `${keyword.intro} Compare public provider profiles in ${city.name}.`
+          : `No approved public provider profiles currently match ${keyword.shortLabel.toLowerCase()} in ${city.name}.`,
         path: `${canonicalCityPath}/${segment.slug}/${keyword.slug}`,
       })}
       itemListJsonLd={buildItemListJsonLd({
@@ -130,9 +132,11 @@ export default async function CityKeywordPage({ params }: { params: Promise<Para
       ]}
       therapists={therapists.items}
       listingTitle={`Listings for ${keyword.shortLabel}`}
-      listingDescription={`Compare public therapist cards that match ${keyword.shortLabel.toLowerCase()} in ${city.name}, with trust signals and direct-contact clarity kept visible.`}
+      listingDescription={hasInventory
+        ? `Compare public profiles that currently match ${keyword.shortLabel.toLowerCase()} in ${city.name}.`
+        : `No approved public profiles currently match this exact specialty in ${city.name}.`}
       emptyTitle={`No public listings matched ${keyword.shortLabel} yet.`}
-      emptyDescription="Try the broader city segment page or the main city page to view nearby or related therapist profiles."
+      emptyDescription="Try the broader city segment page or the main city page to view other public provider profiles."
       faqTitle={`Common Questions About ${keyword.shortLabel} in ${city.name}`}
       faqItems={keywordFaqs}
     />
