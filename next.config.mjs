@@ -1,10 +1,15 @@
 import path from "node:path";
 
 /**
- * Redirect manifest — mirrors src/app/_lib/redirects-manifest.ts.
- * Source of truth for intent: the TypeScript file.
- * Source of truth for HTTP behaviour: these entries.
- * Keep both files in sync when adding new redirects.
+ * Redirect manifest — the source of truth for static path redirects.
+ * Pattern-based redirects (city slugs, legacy /cities/* trees) live in
+ * src/middleware.ts instead.
+ *
+ * Every entry here must have a matching case in tests/redirects.spec.ts, which
+ * gates CI on the live status code and Location header. Add to both together.
+ *
+ * (An earlier comment pointed at src/app/_lib/redirects-manifest.ts; no such
+ * file exists — these entries and the spec are the only two places.)
  */
 const LEGACY_REDIRECTS = [
   // /city/{slug} → /{slug}  (old single-level city format)
@@ -64,6 +69,10 @@ const LEGACY_REDIRECTS = [
   // infinite 308 loop. Capitalized variants are handled safely by the
   // case-sensitive (===) guards in src/middleware.ts instead.
   { source: "/massage-therapists", destination: "/therapists", permanent: true },
+  // "/professionals" 404s and appears in search results for the directory.
+  // It has never existed in this codebase, so it predates the rebuild — the
+  // directory of therapists is the page it described.
+  { source: "/professionals", destination: "/therapists", permanent: true },
   // Profile slug renamed from the account name to the display name.
   { source: "/therapists/gleicimar-hall-3890ba48", destination: "/therapists/bruno-3890ba48", permanent: true },
   // Privacy policy alias — some external links use the longer form
