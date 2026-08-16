@@ -225,25 +225,6 @@ export async function POST(request: NextRequest) {
 
   try {
     switch (event.type) {
-      case 'payment_intent.succeeded': {
-        const pi = event.data.object as Stripe.PaymentIntent
-        const { error } = await supabase.rpc('process_stripe_payment_intent_succeeded', {
-          p_provider_transaction_id: pi.id,
-          p_appointment_id:          pi.metadata.appointment_id ?? null,
-        })
-        if (error) throw error
-        break
-      }
-
-      case 'payment_intent.payment_failed': {
-        const pi = event.data.object as Stripe.PaymentIntent
-        const { error } = await supabase.rpc('process_stripe_payment_intent_failed', {
-          p_provider_transaction_id: pi.id,
-        })
-        if (error) throw error
-        break
-      }
-
       case 'invoice.paid': {
         await processPaidReferral(supabase, stripe, event.data.object as Stripe.Invoice)
         break

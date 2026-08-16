@@ -66,7 +66,6 @@ export async function POST(request: NextRequest) {
     intent: "knotty_vapi_chat",
     status: "received",
     is_manual: false,
-    booking_inquiry_id: null,
   });
 
   try {
@@ -82,7 +81,6 @@ export async function POST(request: NextRequest) {
       intent: "knotty_vapi_chat",
       status: "sent",
       is_manual: false,
-      booking_inquiry_id: null,
     });
 
     return twiml(buildTwimlReply(reply));
@@ -104,7 +102,6 @@ export async function POST(request: NextRequest) {
       intent: "knotty_vapi_chat_error",
       status: "sent",
       is_manual: false,
-      booking_inquiry_id: null,
     });
 
     return twiml(buildTwimlReply(fallback));

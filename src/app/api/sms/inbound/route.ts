@@ -38,7 +38,6 @@ function getPublicWebhookUrl(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  // Parse Twilio form-encoded body
   const formData = await request.formData()
   const params: Record<string, string> = {}
   formData.forEach((v, k) => { params[k] = String(v) })
@@ -52,8 +51,6 @@ export async function POST(request: NextRequest) {
     return twimlResponse(buildTwimlEmpty())
   }
 
-  // Validate Twilio signature whenever the auth token is configured.
-  // Skipping only when no token is present (local dev without Twilio credentials).
   if (process.env.TWILIO_AUTH_TOKEN) {
     const signature = request.headers.get('x-twilio-signature') ?? ''
     const url = getPublicWebhookUrl(request)
@@ -62,10 +59,8 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // Get the SMS profile for this Twilio number
   const smsProfile = await getSmsProfileForNumber(to)
 
-  // Log the inbound message
   await logSms({
     profile_id: smsProfile?.id ?? null,
     from_number: from,
@@ -76,41 +71,27 @@ export async function POST(request: NextRequest) {
     intent: null,
     status: 'received',
     is_manual: false,
-    booking_inquiry_id: null,
   })
 
-  // Resolve any pending follow-up alert since they replied
   await upsertFollowUpAlert(smsProfile?.id ?? null, from, to, 'inbound')
 
-  // If no profile or AI is off, just log and return empty TwiML
   if (!smsProfile || !smsProfile.ready_to_reply) {
     return twimlResponse(buildTwimlEmpty())
   }
 
-  // Detect intent
   const { intent } = await detectIntent(body)
 
-  // Update intent on the log (best-effort, async)
-  // (don't await — we'll reply fast)
-
-  // Check if we should escalate to human
   if (shouldEscalate(intent, smsProfile)) {
-    // Send operator alert if alert_phone is configured
     if (smsProfile.alert_phone) {
       const alertMsg = `ALERT: ${from} texted "${body}" — needs manual response (${intent})`
       await sendSms(smsProfile.alert_phone, alertMsg)
     }
-    // Don't auto-reply for escalated intents — human handles it
     return twimlResponse(buildTwimlEmpty())
   }
 
-  // Get conversation history for context
   const history = await getConversationHistory(from, to)
-
-  // Generate AI reply
   const reply = await generateSmsReply(body, intent, smsProfile, history)
 
-  // Log outbound reply
   await logSms({
     profile_id: smsProfile.id,
     from_number: to,
@@ -121,12 +102,9 @@ export async function POST(request: NextRequest) {
     intent,
     status: 'sent',
     is_manual: false,
-    booking_inquiry_id: null,
   })
 
-  // Track follow-up alert (we replied, waiting for their response)
   await upsertFollowUpAlert(smsProfile.id, from, to, 'outbound')
 
-  // Reply via TwiML
   return twimlResponse(buildTwimlReply(reply))
 }

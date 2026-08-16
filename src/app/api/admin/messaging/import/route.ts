@@ -79,7 +79,7 @@ export async function POST(request: Request) {
       (existingRows || []).map((row: { id: string; phone_e164: string; opted_out: boolean }) => [
         row.phone_e164,
         { id: row.id, opted_out: row.opted_out },
-      ]),
+      ] as const),
     );
 
     let inserted = 0;
