@@ -26,6 +26,7 @@ export default function ProSettingsPage() {
   const [notifEmail, setNotifEmail] = useState(true);
   const [notifSms, setNotifSms] = useState(false);
   const [notifPush, setNotifPush] = useState(false);
+  const [imessageAssistant, setImessageAssistant] = useState(false);
   const [smsPhone, setSmsPhone] = useState("");
   const [notifLoading, setNotifLoading] = useState(false);
 
@@ -43,6 +44,7 @@ export default function ProSettingsPage() {
         setNotifEmail(Boolean(prefs?.email_enabled));
         setNotifSms(Boolean(prefs?.sms_enabled));
         setNotifPush(Boolean(prefs?.push_enabled));
+        setImessageAssistant(Boolean(prefs?.imessage_profile_assistant_enabled));
         setSmsPhone(prefs?.phone_e164 ?? "");
       } catch (error) {
         console.error("Failed to load notification preferences", error);
@@ -70,7 +72,6 @@ export default function ProSettingsPage() {
 
     setPwLoading(true);
 
-    // Re-authenticate with the current password before updating
     const email = user?.email ?? "";
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email,
@@ -107,13 +108,15 @@ export default function ProSettingsPage() {
         emailEnabled: notifEmail,
         smsEnabled: notifSms,
         pushEnabled: notifPush,
+        imessageProfileAssistantEnabled: imessageAssistant,
         phoneE164: smsPhone || null,
       }),
     });
+    const responseBody = await res.json().catch(() => null);
     setNotifLoading(false);
 
     if (!res.ok) {
-      toast({ title: "Error", description: "Could not save preferences." });
+      toast({ title: "Error", description: responseBody?.error || "Could not save preferences." });
       return;
     }
 
@@ -123,15 +126,10 @@ export default function ProSettingsPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-8 p-6 pb-32 md:p-10">
       <header>
-        <h1 className="font-display text-3xl font-semibold tracking-tight text-slate-900">
-          Settings
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Manage your account, security, and notification preferences.
-        </p>
+        <h1 className="font-display text-3xl font-semibold tracking-tight text-slate-900">Settings</h1>
+        <p className="mt-1 text-sm text-slate-500">Manage your account, security, and notification preferences.</p>
       </header>
 
-      {/* Account info */}
       <section className="overflow-hidden border border-slate-200/60 bg-white shadow-sm">
         <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-4">
           <User className="h-4 w-4 text-slate-500" />
@@ -139,19 +137,13 @@ export default function ProSettingsPage() {
         </div>
         <div className="space-y-4 p-6">
           <div>
-            <p className="mb-1 text-xs font-medium uppercase tracking-wider text-slate-500">
-              Email
-            </p>
+            <p className="mb-1 text-xs font-medium uppercase tracking-wider text-slate-500">Email</p>
             <p className="font-sans text-sm text-slate-900">{user?.email ?? "—"}</p>
           </div>
           <div>
-            <p className="mb-1 text-xs font-medium uppercase tracking-wider text-slate-500">
-              Support reference
-            </p>
+            <p className="mb-1 text-xs font-medium uppercase tracking-wider text-slate-500">Support reference</p>
             <div className="flex items-center gap-2">
-              <p className="font-mono text-xs text-slate-500">
-                {user?.id ? user.id.slice(0, 8).toUpperCase() : "—"}
-              </p>
+              <p className="font-mono text-xs text-slate-500">{user?.id ? user.id.slice(0, 8).toUpperCase() : "—"}</p>
               {user?.id && (
                 <button
                   type="button"
@@ -171,7 +163,6 @@ export default function ProSettingsPage() {
         </div>
       </section>
 
-      {/* Change password */}
       <section className="overflow-hidden border border-slate-200/60 bg-white shadow-sm">
         <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-4">
           <Key className="h-4 w-4 text-slate-500" />
@@ -179,147 +170,100 @@ export default function ProSettingsPage() {
         </div>
         <form onSubmit={handlePasswordChange} className="space-y-4 p-6">
           <div className="grid gap-2">
-            <label htmlFor="current-pw" className="text-xs font-medium uppercase tracking-wider text-slate-500">
-              Current Password
-            </label>
-            <PasswordInput
-              id="current-pw"
-              value={pwForm.current}
-              onChange={(e) => setPwForm((f) => ({ ...f, current: e.target.value }))}
-              required
-              autoComplete="current-password"
-            />
+            <label htmlFor="current-pw" className="text-xs font-medium uppercase tracking-wider text-slate-500">Current Password</label>
+            <PasswordInput id="current-pw" value={pwForm.current} onChange={(e) => setPwForm((f) => ({ ...f, current: e.target.value }))} required autoComplete="current-password" />
           </div>
           <div className="grid gap-2">
-            <label htmlFor="new-pw" className="text-xs font-medium uppercase tracking-wider text-slate-500">
-              New Password
-            </label>
-            <PasswordInput
-              id="new-pw"
-              value={pwForm.next}
-              onChange={(e) => setPwForm((f) => ({ ...f, next: e.target.value }))}
-              required
-              minLength={8}
-              autoComplete="new-password"
-            />
+            <label htmlFor="new-pw" className="text-xs font-medium uppercase tracking-wider text-slate-500">New Password</label>
+            <PasswordInput id="new-pw" value={pwForm.next} onChange={(e) => setPwForm((f) => ({ ...f, next: e.target.value }))} required minLength={8} autoComplete="new-password" />
           </div>
           <div className="grid gap-2">
-            <label htmlFor="confirm-pw" className="text-xs font-medium uppercase tracking-wider text-slate-500">
-              Confirm New Password
-            </label>
-            <PasswordInput
-              id="confirm-pw"
-              value={pwForm.confirm}
-              onChange={(e) => setPwForm((f) => ({ ...f, confirm: e.target.value }))}
-              required
-              autoComplete="new-password"
-            />
+            <label htmlFor="confirm-pw" className="text-xs font-medium uppercase tracking-wider text-slate-500">Confirm New Password</label>
+            <PasswordInput id="confirm-pw" value={pwForm.confirm} onChange={(e) => setPwForm((f) => ({ ...f, confirm: e.target.value }))} required autoComplete="new-password" />
           </div>
           {pwError && <p className="text-sm text-red-600">{pwError}</p>}
-          <Button
-            type="submit"
-            disabled={pwLoading || !pwForm.current || !pwForm.next || !pwForm.confirm}
-            className="gap-2"
-          >
+          <Button type="submit" disabled={pwLoading || !pwForm.current || !pwForm.next || !pwForm.confirm} className="gap-2">
             <Save className="h-4 w-4" />
             {pwLoading ? "Saving…" : "Save Password"}
           </Button>
         </form>
       </section>
 
-      {/* Security */}
       <section className="overflow-hidden border border-slate-200/60 bg-white shadow-sm">
         <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-4">
           <Shield className="h-4 w-4 text-slate-500" />
           <h2 className="font-sans text-sm font-semibold text-slate-900">Security</h2>
         </div>
         <div className="p-6">
-          <p className="mb-4 text-sm text-slate-500">
-            If you forgot your password, you can reset it via email.
-          </p>
-          <Button variant="outline" asChild>
-            <Link href="/forgot-password">Reset via Email</Link>
-          </Button>
+          <p className="mb-4 text-sm text-slate-500">If you forgot your password, you can reset it via email.</p>
+          <Button variant="outline" asChild><Link href="/forgot-password">Reset via Email</Link></Button>
         </div>
       </section>
 
-      {/* Notifications */}
       <section className="overflow-hidden border border-slate-200/60 bg-white shadow-sm">
         <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-4">
           <Bell className="h-4 w-4 text-slate-500" />
           <h2 className="font-sans text-sm font-semibold text-slate-900">Notifications</h2>
         </div>
-        <div className="space-y-4 p-6">
-          <label className="flex cursor-pointer items-center justify-between">
+        <div className="space-y-5 p-6">
+          <label className="flex cursor-pointer items-center justify-between gap-4">
             <div>
               <p className="text-sm font-medium text-slate-900">Email Notifications</p>
               <p className="text-xs text-slate-500">New contacts, messages, and ranking updates</p>
             </div>
-            <input
-              type="checkbox"
-              checked={notifEmail}
-              onChange={(e) => setNotifEmail(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300"
-            />
+            <input type="checkbox" checked={notifEmail} onChange={(e) => setNotifEmail(e.target.checked)} className="h-4 w-4 rounded border-slate-300" />
           </label>
-          <label className="flex cursor-pointer items-center justify-between">
+          <label className="flex cursor-pointer items-center justify-between gap-4">
             <div>
               <p className="text-sm font-medium text-slate-900">SMS Notifications</p>
               <p className="text-xs text-slate-500">Urgent alerts for new contact requests</p>
             </div>
-            <input
-              type="checkbox"
-              checked={notifSms}
-              onChange={(e) => setNotifSms(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300"
-            />
+            <input type="checkbox" checked={notifSms} onChange={(e) => setNotifSms(e.target.checked)} className="h-4 w-4 rounded border-slate-300" />
           </label>
-          <label className="flex cursor-pointer items-center justify-between">
+          <label className="flex cursor-pointer items-center justify-between gap-4">
             <div>
               <p className="text-sm font-medium text-slate-900">Push Notifications</p>
               <p className="text-xs text-slate-500">Browser alerts for real-time updates</p>
             </div>
-            <input
-              type="checkbox"
-              checked={notifPush}
-              onChange={(e) => setNotifPush(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300"
-            />
+            <input type="checkbox" checked={notifPush} onChange={(e) => setNotifPush(e.target.checked)} className="h-4 w-4 rounded border-slate-300" />
           </label>
-          <div className="grid gap-2">
-            <label htmlFor="sms-phone" className="text-xs font-medium uppercase tracking-wider text-slate-500">
-              SMS Phone (E.164)
+          <div className="border-t border-slate-100 pt-5">
+            <label className="flex cursor-pointer items-start justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium text-slate-900">Knotty Profile Assistant via iMessage</p>
+                <p className="mt-1 text-xs leading-5 text-slate-500">
+                  Allow Knotty to text this phone number through iMessage when your provider profile is incomplete and guide you through profile updates. Standard carrier or data charges may apply. Reply STOP anytime to opt out.
+                </p>
+              </div>
+              <input
+                type="checkbox"
+                checked={imessageAssistant}
+                onChange={(e) => setImessageAssistant(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-slate-300"
+                aria-label="Enable Knotty Profile Assistant via iMessage"
+              />
             </label>
-            <Input
-              id="sms-phone"
-              type="tel"
-              value={smsPhone}
-              onChange={(e) => setSmsPhone(e.target.value)}
-              placeholder="+15551234567"
-            />
           </div>
-          <Button onClick={handleSaveNotifications} className="gap-2">
+          <div className="grid gap-2">
+            <label htmlFor="sms-phone" className="text-xs font-medium uppercase tracking-wider text-slate-500">Phone Number</label>
+            <Input id="sms-phone" type="tel" value={smsPhone} onChange={(e) => setSmsPhone(e.target.value)} placeholder="+15551234567" />
+            <p className="text-xs text-slate-400">Used only for the text features you enable above.</p>
+          </div>
+          <Button onClick={handleSaveNotifications} disabled={notifLoading} className="gap-2">
             <Save className="h-4 w-4" />
             {notifLoading ? "Saving..." : "Save Preferences"}
           </Button>
         </div>
       </section>
 
-      {/* Sign out */}
       <section className="overflow-hidden border border-rose-200 bg-rose-50 shadow-sm">
         <div className="flex items-center gap-3 border-b border-rose-100 px-6 py-4">
           <LogOut className="h-4 w-4 text-rose-500" />
           <h2 className="font-sans text-sm font-semibold text-rose-900">Session</h2>
         </div>
         <div className="p-6">
-          <p className="mb-4 text-sm text-rose-700">
-            Sign out from all devices.
-          </p>
-          <Button
-            variant="destructive"
-            onClick={async () => { await signOut(); router.push("/"); }}
-            className="gap-2"
-          >
+          <p className="mb-4 text-sm text-rose-700">Sign out from all devices.</p>
+          <Button variant="destructive" onClick={async () => { await signOut(); router.push("/"); }} className="gap-2">
             <LogOut className="h-4 w-4" />
             Sign Out
           </Button>
