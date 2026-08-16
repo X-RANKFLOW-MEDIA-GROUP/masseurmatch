@@ -4,22 +4,6 @@ import { errorResponse, json, parseJsonBody, RouteError } from "@/app/api/_lib/h
 import { createSupabaseAdminClient, recordAuditLog, requireAdminSession } from "@/app/api/_lib/supabase-server";
 
 const schema = z.object({ reason: z.string().min(1).optional() });
-const STORAGE_PUBLIC_MARKER = "/storage/v1/object/public/therapist-photos/";
-
-function getSupabaseStorageObjectKey(storagePath: string | null) {
-  const value = storagePath?.trim();
-  if (!value) return null;
-  if (!/^https?:\/\//i.test(value)) return value.replace(/^\/+/, "");
-
-  try {
-    const pathname = new URL(value).pathname;
-    const markerIndex = pathname.indexOf(STORAGE_PUBLIC_MARKER);
-    if (markerIndex < 0) return null;
-    return decodeURIComponent(pathname.slice(markerIndex + STORAGE_PUBLIC_MARKER.length));
-  } catch {
-    return null;
-  }
-}
 
 export async function POST(
   request: Request,
@@ -31,9 +15,9 @@ export async function POST(
     const body = await parseJsonBody(request, schema);
     const adminClient = createSupabaseAdminClient();
 
-    const { data: photo, error: fetchError } = await adminClient
+    const { data: photo, error: fetchError } = await (adminClient as any)
       .from("profile_photos")
-      .select("id, profile_id, user_id, storage_path")
+      .select("id, profile_id, user_id, storage_bucket, storage_path")
       .eq("id", photoId)
       .maybeSingle();
 
@@ -41,25 +25,28 @@ export async function POST(
     if (!photo) throw new RouteError(404, "Photo not found.");
 
     const rejectionReason = body.reason || "admin_rejected";
-    const { error: updateError } = await adminClient
-      .from("profile_photos")
-      .update({
-        moderation_status: "rejected",
-        moderation_reason: rejectionReason,
-      })
-      .eq("id", photoId);
+    const storageBucket = String(photo.storage_bucket || "external");
+    const objectKey = typeof photo.storage_path === "string" && !/^https?:\/\//i.test(photo.storage_path)
+      ? photo.storage_path
+      : null;
 
-    if (updateError) throw new RouteError(500, updateError.message);
-
-    const objectKey = getSupabaseStorageObjectKey(photo.storage_path);
-    if (objectKey) {
-      const { error: storageError } = await adminClient.storage
-        .from("therapist-photos")
-        .remove([objectKey]);
+    if (objectKey && (storageBucket === "pending-photos" || storageBucket === "therapist-photos")) {
+      const { error: storageError } = await adminClient.storage.from(storageBucket).remove([objectKey]);
       if (storageError) {
         console.warn("[api/admin/photo/reject] Storage cleanup failed:", storageError.message);
       }
     }
+
+    const { error: updateError } = await (adminClient as any)
+      .from("profile_photos")
+      .update({
+        moderation_status: "rejected",
+        moderation_reason: rejectionReason,
+        ...(objectKey ? { url: null } : {}),
+      })
+      .eq("id", photoId);
+
+    if (updateError) throw new RouteError(500, updateError.message);
 
     await adminClient.from("admin_actions").insert({
       action: "reject_photo",
