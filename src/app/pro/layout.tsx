@@ -42,11 +42,11 @@ async function ensureProAccess() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("phone, phone_number, is_verified_phone, visibility_status")
+    .select("phone, phone_number, is_verified_phone")
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!profile || profile.visibility_status !== "public") return;
+  if (!profile) return;
 
   const profilePhone = normalizePhone(profile.phone) || normalizePhone(profile.phone_number);
   const authPhone = normalizePhone(user.phone);
@@ -58,6 +58,9 @@ async function ensureProAccess() {
     profilePhone === authPhone,
   );
 
+  // Every provider account must complete phone verification before using the
+  // provider dashboard. This also catches draft/hidden legacy accounts that
+  // otherwise could never reach the publication gate that requires verification.
   if (!verified) {
     redirect("/verify-phone?redirect=%2Fpro%2Fdashboard");
   }
