@@ -46,4 +46,6 @@ The broader emergency stop remains `global_pause = true` plus stopping the dedic
 
 The gate is enforced in PostgreSQL inside `messaging_claim_next_imessage_queue()`. A client UI bug, admin route mistake, or pending queue item cannot bypass the disabled gate because the worker receives no claimable row.
 
+The generic `messaging_claim_next_queue()` function explicitly excludes `transport_preference = 'imessage'`, so shared messaging workers cannot bypass the dedicated iMessage gate.
+
 The worker ID supplied by the bridge must match a recent heartbeat row, preventing an unregistered or stale worker ID from claiming outbound iMessages.
