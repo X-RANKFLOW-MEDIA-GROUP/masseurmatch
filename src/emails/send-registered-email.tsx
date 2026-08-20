@@ -22,15 +22,15 @@ type SendRegisteredEmailOptions<K extends EmailTemplateKey> = {
   topicId?: string;
 };
 
-function renderTemplate<K extends EmailTemplateKey>(template: K, props: TemplateProps[K]) {
-  switch (template) {
-    case 'subscriptionCancelledPremium':
-      return <SubscriptionCancelledPremiumEmail {...(props as SubscriptionCancelledPremiumEmailProps)} />;
-    default: {
-      const exhaustive: never = template;
-      throw new Error(`Unsupported email template: ${exhaustive}`);
-    }
+function renderTemplate(
+  template: EmailTemplateKey,
+  props: SubscriptionCancelledPremiumEmailProps,
+) {
+  if (template === 'subscriptionCancelledPremium') {
+    return <SubscriptionCancelledPremiumEmail {...props} />;
   }
+
+  throw new Error(`Unsupported email template: ${String(template)}`);
 }
 
 export async function sendRegisteredEmail<K extends EmailTemplateKey>(
@@ -43,7 +43,10 @@ export async function sendRegisteredEmail<K extends EmailTemplateKey>(
     {
       to: options.to,
       subject: options.subject || template.subject,
-      react: renderTemplate(options.template, options.props),
+      react: renderTemplate(
+        options.template,
+        options.props as SubscriptionCancelledPremiumEmailProps,
+      ),
       text: options.text,
       replyTo: options.replyTo,
       headers: options.headers,
