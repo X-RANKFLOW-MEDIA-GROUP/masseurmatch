@@ -64,7 +64,7 @@ export async function sendEmailWithTopic(options: SendEmailWithTopicOptions, api
 
   try {
     const result = await resend.emails.send(
-      emailOptions as Parameters<typeof resend.emails.send>[0],
+      emailOptions as unknown as Parameters<typeof resend.emails.send>[0],
       options.idempotencyKey ? { idempotencyKey: options.idempotencyKey } : undefined,
     );
 
@@ -100,7 +100,7 @@ export async function sendBatchEmailsWithTopic(
 
   try {
     const result = await resend.batch.send(
-      batch as Parameters<typeof resend.batch.send>[0],
+      batch as unknown as Parameters<typeof resend.batch.send>[0],
       idempotencyKey ? { idempotencyKey } : undefined,
     );
 
