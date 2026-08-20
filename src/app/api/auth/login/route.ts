@@ -17,7 +17,8 @@ import {
 
 function dashboardPathForRole(role: string | null | undefined) {
   if (role === "client") return "/search";
-  if (role === "admin" || role === "provider") return "/pro/dashboard";
+  if (role === "admin") return "/admin-mfa?redirect=%2Fadmin";
+  if (role === "provider") return "/pro/dashboard";
   return "/pro/dashboard";
 }
 

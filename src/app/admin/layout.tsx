@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { RouteError } from "@/app/api/_lib/http";
 import { createPageMetadata } from "@/app/_lib/seo";
-import { requireAdminSession } from "@/app/api/_lib/supabase-server";
+import { createServerSupabase } from "@/lib/supabase/server";
 import AdminLayoutShell from "@/app/admin/_components/AdminLayoutShell";
 
 export const dynamic = "force-dynamic";
@@ -19,23 +17,25 @@ export const metadata: Metadata = createPageMetadata({
 });
 
 async function ensureAdminAccess() {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore.toString();
+  const supabase = await createServerSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  try {
-    await requireAdminSession(
-      new Request("http://localhost/admin", {
-        headers: {
-          cookie: cookieHeader,
-        },
-      }),
-    );
-  } catch (error) {
-    if (error instanceof RouteError && error.status === 401) {
-      redirect("/login?redirect=%2Fadmin");
-    }
+  if (!user) {
+    redirect("/login?redirect=%2Fadmin");
+  }
 
+  const role = (user.app_metadata as Record<string, unknown> | undefined)?.role;
+  if (role !== "admin") {
     redirect("/");
+  }
+
+  const { data: assurance, error } =
+    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+
+  if (error || assurance.currentLevel !== "aal2") {
+    redirect("/admin-mfa?redirect=%2Fadmin");
   }
 }
 
