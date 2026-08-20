@@ -1,5 +1,6 @@
 import { AdminPageHeader } from "@/app/admin/_components/AdminPageHeader";
 import AdminEmailCenter from "./AdminEmailCenter";
+import SystemEmailTools from "./SystemEmailTools";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -9,8 +10,9 @@ export default function AdminEmailsPage() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Email Center"
-        description="Generate AI assisted newsletters and campaigns, segment audiences, save templates, schedule delivery, and monitor the compliant lifecycle email system."
+        description="Preview system templates, verify AI setup, create campaigns, segment audiences, save templates, schedule delivery, and monitor email operations."
       />
+      <SystemEmailTools />
       <AdminEmailCenter />
     </div>
   );
