@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-// Applies supabase/PRODUCTION_SCHEMA_LOCK.sql to the LIVE Supabase database
-// through the Supabase Management API (HTTPS), then verifies the result with
-// scripts/verify-live-schema.mjs.
+// Applies the canonical production schema-lock bundle to the LIVE Supabase
+// database through the Supabase Management API (HTTPS), then verifies the
+// result with scripts/verify-live-schema.mjs.
 //
 // IMPORTANT: canonical MasseurMatch is directory-only. This command fails
 // closed if the schema lock references deprecated booking/session-payment
@@ -24,6 +24,7 @@ import { spawnSync } from "node:child_process";
 
 const ROOT = process.cwd();
 const SCHEMA_PATH = path.join(ROOT, "supabase/PRODUCTION_SCHEMA_LOCK.sql");
+const SCHEMA_EXTENSION_DIR = path.join(ROOT, "supabase/schema-lock");
 const FORBIDDEN_LEGACY_TABLES = [
   "appointments",
   "booking_inquiries",
@@ -42,6 +43,22 @@ function loadEnv(name) {
     if (line.slice(0, eq).trim() === name) return line.slice(eq + 1).trim();
   }
   return null;
+}
+
+function loadSchemaLockBundle() {
+  const parts = [fs.readFileSync(SCHEMA_PATH, "utf8")];
+  if (!fs.existsSync(SCHEMA_EXTENSION_DIR)) return parts.join("\n\n");
+
+  const extensions = fs
+    .readdirSync(SCHEMA_EXTENSION_DIR)
+    .filter((name) => name.endsWith(".sql"))
+    .sort();
+
+  for (const name of extensions) {
+    parts.push(fs.readFileSync(path.join(SCHEMA_EXTENSION_DIR, name), "utf8"));
+  }
+
+  return parts.join("\n\n");
 }
 
 function stripSqlComments(sql) {
@@ -105,11 +122,11 @@ function assertCanonicalSchemaLock(sql) {
 }
 
 async function main() {
-  const sql = fs.readFileSync(SCHEMA_PATH, "utf8");
+  const sql = loadSchemaLockBundle();
   assertCanonicalSchemaLock(sql);
 
   if (process.argv.includes("--check-only")) {
-    console.log("[apply-schema-lock] Canonical schema lock validation passed.");
+    console.log("[apply-schema-lock] Canonical schema lock bundle validation passed.");
     return;
   }
 
@@ -127,7 +144,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`[apply-schema-lock] Applying schema lock to project ${ref} (${sql.length} bytes)...`);
+  console.log(`[apply-schema-lock] Applying schema lock bundle to project ${ref} (${sql.length} bytes)...`);
 
   const response = await fetch(`https://api.supabase.com/v1/projects/${ref}/database/query`, {
     method: "POST",
