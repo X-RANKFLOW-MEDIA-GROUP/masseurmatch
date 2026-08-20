@@ -227,16 +227,17 @@ function VerificationPage() {
 
   if (authLoading) return null;
 
-  // Awaiting email confirmation: the account exists but has no session, so none
-  // of the verification steps below can run yet.
+  // Awaiting email confirmation: the account exists but has no session. Keep all
+  // required verification steps visible so providers know exactly what remains
+  // before their profile can be submitted and eventually shown publicly.
   if (!user) {
     return (
       <main className="mx-auto max-w-2xl space-y-5 py-5 sm:py-8">
         <header>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-secondary">Verification</p>
-          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-foreground">Confirm your email to continue</h1>
+          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-foreground">Complete your required verification</h1>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            Your account was created. Open the confirmation link we emailed you, then come back here to finish phone and identity verification.
+            Email, phone, and identity verification are required before your provider profile can be submitted for review or go live. Confirm your email first to unlock the next steps.
           </p>
         </header>
 
@@ -246,7 +247,8 @@ function VerificationPage() {
           <CardContent className="space-y-4 p-5 sm:p-6">
             <div className="flex items-center gap-2">
               <Mail className="h-5 w-5 text-brand-secondary" />
-              <h2 className="font-semibold">Check your inbox</h2>
+              <h2 className="font-semibold">Email</h2>
+              <Badge variant="secondary" className="ml-auto">Step 1</Badge>
             </div>
             {state.email ? (
               <>
@@ -277,6 +279,35 @@ function VerificationPage() {
             )}
           </CardContent>
         </Card>
+
+        <Card>
+          <CardContent className="space-y-4 p-5 sm:p-6">
+            <div className="flex items-center gap-2">
+              <Phone className="h-5 w-5 text-brand-secondary" />
+              <h2 className="font-semibold">Phone</h2>
+              <Badge variant="secondary" className="ml-auto">Required</Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">{state.phone || "Phone number saved during account creation"}</p>
+            <p className="text-sm text-muted-foreground">
+              Phone ownership must be confirmed by a 6-digit SMS code before your profile can be approved or shown publicly.
+            </p>
+            <Button variant="outline" disabled>Verify email first to unlock SMS</Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="space-y-4 p-5 sm:p-6">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-brand-secondary" />
+              <h2 className="font-semibold">Identity</h2>
+              <Badge variant="secondary" className="ml-auto">Required</Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Identity verification remains part of the provider approval flow and becomes available after your account session is confirmed.
+            </p>
+            <Button variant="outline" disabled>Verify email first</Button>
+          </CardContent>
+        </Card>
       </main>
     );
   }
@@ -290,7 +321,7 @@ function VerificationPage() {
       <header>
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-secondary">Verification</p>
         <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-foreground">Confirm your account and identity</h1>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">Email, phone, and identity verification must be completed before your profile can be submitted for moderation.</p>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">Email, phone, and identity verification must be completed before your profile can be submitted for moderation or go live.</p>
       </header>
 
       {error ? <p role="alert" className="rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">{error}</p> : null}
@@ -330,7 +361,7 @@ function VerificationPage() {
               </div>
             ) : <Button variant="outline" onClick={sendPhoneVerification} disabled={phoneLoading || !state.emailVerified}>{phoneLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}Send SMS code</Button>
           ) : null}
-          {!state.emailVerified && !state.phoneVerified ? <p className="text-xs text-muted-foreground">Verify email first; then SMS verification becomes available.</p> : null}
+          {!state.emailVerified && !state.phoneVerified ? <p className="text-xs text-muted-foreground">Verify email first; then SMS verification becomes available. Phone verification is required before your profile can go live.</p> : null}
         </CardContent>
       </Card>
 

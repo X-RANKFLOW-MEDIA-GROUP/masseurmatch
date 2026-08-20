@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createPageMetadata } from "@/app/_lib/seo";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { normalizeSessionRole } from "@/app/api/_lib/session";
+import { getProviderPhoneVerificationState } from "@/lib/provider-phone-verification";
 import ProLayoutClient from "./ProLayoutClient";
 
 export const metadata: Metadata = createPageMetadata({
@@ -11,12 +12,6 @@ export const metadata: Metadata = createPageMetadata({
   path: "/pro",
   noIndex: true,
 });
-
-function normalizePhone(value: string | null | undefined) {
-  if (!value) return null;
-  const digits = value.replace(/\D/g, "");
-  return digits.length >= 10 ? digits : null;
-}
 
 async function ensureProAccess() {
   const supabase = await createServerSupabase();
@@ -42,22 +37,23 @@ async function ensureProAccess() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("phone, phone_number, is_verified_phone, visibility_status")
+    .select("phone, phone_number, is_verified_phone")
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!profile || profile.visibility_status !== "public") return;
+  if (!profile) return;
 
-  const profilePhone = normalizePhone(profile.phone) || normalizePhone(profile.phone_number);
-  const authPhone = normalizePhone(user.phone);
-  const verified = Boolean(
-    profile.is_verified_phone === true &&
-    profilePhone &&
-    authPhone &&
-    user.phone_confirmed_at &&
-    profilePhone === authPhone,
-  );
+  const { verified } = getProviderPhoneVerificationState({
+    profilePhone: profile.phone,
+    profilePhoneNumber: profile.phone_number,
+    isVerifiedPhone: profile.is_verified_phone,
+    authPhone: user.phone,
+    phoneConfirmedAt: user.phone_confirmed_at,
+  });
 
+  // Every provider account must prove ownership of its profile phone before
+  // using /pro. This includes draft/hidden legacy accounts, not only profiles
+  // that already reached public visibility.
   if (!verified) {
     redirect("/verify-phone?redirect=%2Fpro%2Fdashboard");
   }
