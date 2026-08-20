@@ -1,16 +1,57 @@
+import type { ReactNode } from 'react';
 import { Resend } from 'resend';
 
 export interface SendEmailWithTopicOptions {
   to: string;
   subject: string;
-  html: string;
+  html?: string;
+  react?: ReactNode;
+  text?: string;
   topicId?: string;
   topicNames?: string[];
   replyTo?: string;
+  headers?: Record<string, string>;
+  idempotencyKey?: string;
+}
+
+function assertEmailContent(options: SendEmailWithTopicOptions) {
+  const hasHtml = typeof options.html === 'string' && options.html.length > 0;
+  const hasReact = options.react !== undefined && options.react !== null;
+
+  if (hasHtml === hasReact) {
+    throw new Error('Provide exactly one email body: html or react');
+  }
+}
+
+function buildEmailPayload(options: SendEmailWithTopicOptions) {
+  assertEmailContent(options);
+
+  const payload: Record<string, unknown> = {
+    from: 'MasseurMatch <notifications@masseurmatch.com>',
+    to: options.to,
+    subject: options.subject,
+  };
+
+  if (options.html) payload.html = options.html;
+  if (options.react) payload.react = options.react;
+  if (options.text !== undefined) payload.text = options.text;
+  if (options.replyTo) payload.replyTo = options.replyTo;
+  if (options.headers) payload.headers = options.headers;
+
+  // Preserve the existing topic integration contract used by this project.
+  if (options.topicId) {
+    payload.topic_id = options.topicId;
+  } else if (options.topicNames && options.topicNames.length > 0) {
+    payload.topic_ids = options.topicNames;
+  }
+
+  return payload;
 }
 
 /**
- * Send an email using Resend with topic support for subscription management
+ * Send an email using the existing Resend integration.
+ * Supports either raw HTML or a React Email component, plus plain text,
+ * custom headers, topics, and Resend idempotency keys.
  */
 export async function sendEmailWithTopic(options: SendEmailWithTopicOptions, apiKey?: string) {
   const key = apiKey || process.env.RESEND_API_KEY;
@@ -19,26 +60,13 @@ export async function sendEmailWithTopic(options: SendEmailWithTopicOptions, api
   }
 
   const resend = new Resend(key);
-
-  const emailOptions: any = {
-    from: 'notifications@masseurmatch.com',
-    to: options.to,
-    subject: options.subject,
-    html: options.html,
-  };
-
-  if (options.replyTo) {
-    emailOptions.reply_to = options.replyTo;
-  }
-
-  if (options.topicId) {
-    emailOptions.topic_id = options.topicId;
-  } else if (options.topicNames && options.topicNames.length > 0) {
-    emailOptions.topic_ids = options.topicNames;
-  }
+  const emailOptions = buildEmailPayload(options);
 
   try {
-    const result = await resend.emails.send(emailOptions);
+    const result = await resend.emails.send(
+      emailOptions as unknown as Parameters<typeof resend.emails.send>[0],
+      options.idempotencyKey ? { idempotencyKey: options.idempotencyKey } : undefined,
+    );
 
     if (result.error) {
       throw new Error(result.error.message || 'Failed to send email');
@@ -55,11 +83,12 @@ export async function sendEmailWithTopic(options: SendEmailWithTopicOptions, api
 }
 
 /**
- * Send a batch of emails with topic support
+ * Send a batch of emails with the same body options supported by single sends.
  */
 export async function sendBatchEmailsWithTopic(
   emails: SendEmailWithTopicOptions[],
-  apiKey?: string
+  apiKey?: string,
+  idempotencyKey?: string,
 ) {
   const key = apiKey || process.env.RESEND_API_KEY;
   if (!key) {
@@ -67,18 +96,13 @@ export async function sendBatchEmailsWithTopic(
   }
 
   const resend = new Resend(key);
-
-  const batch = emails.map((email) => ({
-    from: 'notifications@masseurmatch.com',
-    to: email.to,
-    subject: email.subject,
-    html: email.html,
-    topic_id: email.topicId,
-    reply_to: email.replyTo,
-  }));
+  const batch = emails.map((email) => buildEmailPayload(email));
 
   try {
-    const result = await resend.batch.send(batch as Parameters<typeof resend.batch.send>[0]);
+    const result = await resend.batch.send(
+      batch as unknown as Parameters<typeof resend.batch.send>[0],
+      idempotencyKey ? { idempotencyKey } : undefined,
+    );
 
     if (result.error) {
       throw new Error(result.error.message || 'Failed to send batch emails');
