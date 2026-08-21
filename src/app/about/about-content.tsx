@@ -6,11 +6,8 @@ import Link from "next/link";
 
 import { IconArrowRight, IconGlobe, IconLock, IconShield, IconStar } from "@/components/icons";
 
-const ABOUT_COLORS = {
-  background: "#0D0D0F",
-  burgundy: "#A92D40",
-  highlight: "#D65C6E",
-} as const;
+const RENE_PHOTO =
+  "https://res.cloudinary.com/dyfxkq2nk/image/upload/v1787352177/17DF33F3-A1A4-450E-8001-725E746DA0F9_xdmryx.png";
 
 function Pillar({ icon: Icon, title, text }: { icon: React.ComponentType<{ size?: number; className?: string }>; title: string; text: string }) {
   return (
@@ -173,6 +170,65 @@ export default function AboutContent() {
               <p className="mt-1 text-xs leading-5 text-white/65">Inclusive by design — every profile clearly marked.</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Team */}
+      <section className="relative overflow-hidden border-t border-white/[0.08] px-4 py-20 sm:px-6 lg:py-28">
+        <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-0 h-80 w-80 -translate-x-1/2 rounded-full bg-[#A92D40]/10 blur-3xl" />
+        <div className="relative mx-auto max-w-[1100px]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#D65C6E]">Meet the team</p>
+          <h2 className="mt-3 max-w-2xl font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-extrabold tracking-tight text-white">
+            Technology shaped by perspective.
+          </h2>
+
+          <motion.div
+            initial={reduced ? false : { opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-10 overflow-hidden rounded-3xl border border-white/[0.10] bg-white/[0.04]"
+          >
+            <div className="grid lg:grid-cols-[0.9fr_1.1fr]">
+              <div className="relative min-h-[420px] overflow-hidden bg-white/[0.03] lg:min-h-[560px]">
+                <img
+                  src={RENE_PHOTO}
+                  alt="Rene, Web Development Specialist at MasseurMatch"
+                  className="absolute inset-0 h-full w-full object-cover object-top"
+                  loading="lazy"
+                />
+                <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#0D0D0F]/70 to-transparent lg:hidden" />
+              </div>
+
+              <div className="flex flex-col justify-center p-7 sm:p-10 lg:p-14">
+                <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#D65C6E]">
+                  Web Development Specialist
+                </p>
+                <h3 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">Rene</h3>
+                <p className="mt-2 text-sm font-medium text-white/50">Cuba · University of Havana</p>
+
+                <p className="mt-7 text-sm leading-7 text-white/70 sm:text-base">
+                  Born and educated in Cuba, Rene brings a thoughtful, detail-driven approach to the technology behind MasseurMatch. A graduate of the University of Havana, he specializes in web development and helps translate ambitious product ideas into polished, intuitive digital experiences.
+                </p>
+                <p className="mt-4 text-sm leading-7 text-white/70 sm:text-base">
+                  His work reflects the principle at the center of MasseurMatch: technology should make trust, discovery, and connection feel simpler. From the structure users never see to the interactions they experience every day, Rene focuses on building a platform that feels fast, considered, and genuinely useful to the community it serves.
+                </p>
+
+                <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                  {[
+                    ["Focus", "Web development"],
+                    ["Education", "University of Havana"],
+                    ["Perspective", "Cuban-born"],
+                  ].map(([label, value]) => (
+                    <div key={label} className="rounded-2xl border border-white/[0.08] bg-black/20 p-4">
+                      <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40">{label}</p>
+                      <p className="mt-2 text-xs font-semibold text-white/85">{value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
