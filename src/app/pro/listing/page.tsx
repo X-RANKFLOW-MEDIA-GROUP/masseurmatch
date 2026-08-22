@@ -1224,12 +1224,11 @@ export default function MyListingPage() {
         </div>
 
         <div className="space-y-4 border-t border-slate-100 pt-4">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Rate notes</p>
-          <ChipGrid options={RATE_DISCLAIMERS} selected={form.rateDisclaimers} onToggle={(v) => toggleArr("rateDisclaimers", v)} columns={2} />
-        </div>
-
-        <div className="space-y-4 border-t border-slate-100 pt-4">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Discounts</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">Disclaimers & discounts</p>
+          <Field>
+            <FieldLabel>Rate Disclaimers</FieldLabel>
+            <ChipGrid options={RATE_DISCLAIMERS} selected={form.rateDisclaimers} onToggle={(v) => toggleArr("rateDisclaimers", v)} columns={2} />
+          </Field>
           <Field>
             <FieldLabel>Regular Discounts</FieldLabel>
             <ChipGrid options={REGULAR_DISCOUNTS} selected={form.regularDiscounts} onToggle={(v) => toggleArr("regularDiscounts", v)} columns={3} />
@@ -1238,7 +1237,7 @@ export default function MyListingPage() {
             <FieldLabel>Day-of-Week Discount</FieldLabel>
             <div className="grid gap-2 sm:grid-cols-2">
               <select className={inputCls()} value={form.dayDiscountPercent} onChange={(e) => set("dayDiscountPercent", e.target.value)}>
-                <option value="">No discount</option>
+                <option value="">No percentage</option>
                 {DISCOUNT_PERCENTS.map((p) => <option key={p} value={String(p)}>{p}% off</option>)}
               </select>
               <select className={inputCls()} value={form.dayDiscountDay} onChange={(e) => set("dayDiscountDay", e.target.value)}>
