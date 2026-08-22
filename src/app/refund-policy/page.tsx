@@ -13,115 +13,110 @@ export const metadata: Metadata = createPageMetadata({
 
 export default function RefundPolicyPage() {
   return (
-    <LegalPage title="Refund and Cancellation Policy" path="/refund-policy" lastUpdated="June 29, 2026">
+    <LegalPage title="Refund and Cancellation Policy" path="/refund-policy" lastUpdated="August 16, 2026">
       <p>
-        This Refund and Cancellation Policy governs all paid products on MasseurMatch, including subscription
-        plans, add-ons, boost credits, and featured placements. By purchasing any paid product, you agree to this
-        policy.
+        This Refund and Cancellation Policy governs paid products made available through MasseurMatch, including
+        provider subscription plans and, when offered, add-ons, boost credits, and featured placements. By
+        purchasing a paid product, you agree to this policy.
       </p>
 
       <h2>1. Cancellation</h2>
       <p>
-        You may cancel your MasseurMatch subscription at any time through your account settings or by contacting{" "}
+        You may cancel a recurring MasseurMatch subscription through PayPal or by contacting{" "}
         <a href="mailto:billing@masseurmatch.com">billing@masseurmatch.com</a>.
       </p>
       <ul>
-        <li>Cancellations for monthly plans take effect at the end of the current monthly billing period.</li>
-        <li>Cancellations for annual plans take effect at the end of the current annual billing period.</li>
-        <li>You retain access to paid plan features through the end of the period for which you have paid.</li>
-        <li>Your listing will revert to the appropriate free or lower tier at the end of the billing period.</li>
+        <li>Cancellation stops future recurring renewals once processed.</li>
+        <li>Unless the checkout terms or applicable law provide otherwise, paid access continues through the end of the already-paid billing period.</li>
+        <li>At the end of paid entitlement, your profile may revert to the appropriate free or lower tier.</li>
+        <li>Canceling a subscription does not automatically create a refund for charges already processed.</li>
       </ul>
 
       <h2>2. Refunds — General Principle</h2>
       <p>
-        MasseurMatch subscription fees are generally non-refundable. This includes cases where you cancel before
-        the end of a billing period, are dissatisfied with visibility, leads, messages, bookings, client
-        acquisition, or income results, or where you simply no longer wish to use the service.
+        MasseurMatch subscription fees are generally non-refundable except where required by applicable law or
+        where MasseurMatch confirms a qualifying billing error. This includes cancellation before the end of a
+        billing period, dissatisfaction with visibility, or a decision to stop using the service.
       </p>
       <p>
-        We do not issue refunds based solely on lack of performance, views, messages, leads, bookings, clients,
-        income, revenue, or profile ranking. Paid visibility is an opportunity, not a guarantee.
+        We do not issue refunds solely because a profile did not receive an expected number of views, messages,
+        leads, bookings, clients, income, revenue, or a particular ranking. Paid visibility creates promotional
+        opportunities, not guaranteed outcomes.
       </p>
 
-      <h2>3. Refunds — When They May Apply</h2>
-      <p>
-        Refunds or credits may be considered in the following limited circumstances:
-      </p>
+      <h2>3. When Refunds or Credits May Apply</h2>
+      <p>Refunds or account credits may be considered in limited circumstances, including:</p>
       <ul>
-        <li><strong>Billing errors:</strong> If you were charged an incorrect amount or charged after a valid cancellation was processed.</li>
-        <li><strong>Duplicate charges:</strong> If you were charged multiple times for the same period due to a technical error.</li>
-        <li><strong>Platform outage:</strong> If a significant, extended platform outage prevented you from accessing a paid feature for a material portion of your billing period.</li>
-        <li><strong>Legal requirement:</strong> If a refund is required under applicable law based on your location and circumstances.</li>
-        <li><strong>Account removal by MasseurMatch:</strong> If MasseurMatch removes your account without cause (i.e., without a policy violation), a prorated refund for the unused portion of your subscription may be issued at our discretion.</li>
+        <li><strong>Billing errors:</strong> You were charged an incorrect amount or charged after a cancellation that should already have stopped renewal.</li>
+        <li><strong>Duplicate charges:</strong> The same subscription period or product was charged more than once because of a confirmed technical error.</li>
+        <li><strong>Material platform failure:</strong> A significant MasseurMatch outage prevented access to a paid feature for a material portion of the applicable paid period.</li>
+        <li><strong>Legal requirement:</strong> A refund is required by applicable law based on your location and circumstances.</li>
+        <li><strong>Removal without policy cause:</strong> MasseurMatch removes paid access without a provider policy violation and determines a refund or credit is appropriate.</li>
       </ul>
       <p>
-        Refund eligibility is determined at MasseurMatch&apos;s sole discretion. Approval of a refund in one
-        case does not create an obligation to issue refunds in similar cases.
+        Any discretionary refund or credit is evaluated case by case. A refund issued in one situation does not
+        create an obligation to issue the same refund in another situation.
       </p>
 
       <h2>4. Policy Violations</h2>
       <p>
-        Accounts suspended or terminated for violations of platform policies — including content violations,
-        prohibited conduct, fraudulent activity, or any other policy breach — are not eligible for refunds,
-        regardless of the remaining subscription period or unused add-ons.
+        Accounts restricted, suspended, or terminated for violations of MasseurMatch policies may be ineligible
+        for refunds to the extent permitted by law. Paid status does not exempt a provider from moderation, trust,
+        safety, content, or prohibited-conduct rules.
       </p>
 
-      <h2>5. Add-Ons and Boost Credits</h2>
+      <h2>5. Add-Ons, Boost Credits, and Promotional Products</h2>
       <p>
-        Add-ons and boost credits are non-refundable once purchased. Used boost credits cannot be reversed.
-        Unused add-ons or credits remaining at account closure are forfeited and are not eligible for refund.
+        When these products are offered, their refundability, duration, expiration, and usage terms are disclosed
+        at purchase. Consumed promotional credits or completed promotional placement periods are generally not
+        refundable unless required by law or affected by a confirmed MasseurMatch billing or delivery error.
       </p>
 
-      <h2>6. Featured Placements</h2>
+      <h2>6. Payment Processor</h2>
       <p>
-        Featured placement fees are non-refundable once the placement period has begun. If a featured placement
-        cannot be delivered due to a platform error, a pro-rated credit may be offered at our discretion.
+        Provider subscription payments are processed through PayPal. Approved refunds are returned through the
+        available PayPal refund flow to the applicable funding source where possible. The time required for a
+        refund to appear is controlled by PayPal, the funding source, and the relevant financial institution and
+        may vary. MasseurMatch does not control those external posting timelines.
       </p>
 
-      <h2>7. Payment Processor Limitations</h2>
+      <h2>7. Payment Disputes and Chargebacks</h2>
       <p>
-        All payments are processed by Stripe. Refunds processed through Stripe typically appear on your original
-        payment method within 5–10 business days, depending on your bank or card issuer. We do not control the
-        timeline for your bank to post a credit.
+        If you believe a charge is incorrect, contact <a href="mailto:billing@masseurmatch.com">billing@masseurmatch.com</a>{" "}
+        so we can investigate. A payment dispute or chargeback may cause the related subscription entitlement to
+        be suspended while the dispute is reviewed. Fraudulent or abusive disputes may result in account action
+        consistent with MasseurMatch policies.
       </p>
 
-      <h2>8. Chargebacks</h2>
+      <h2>8. How to Request a Refund</h2>
       <p>
-        If you initiate a chargeback or payment dispute through your bank or card issuer before contacting us to
-        resolve a billing issue, we may suspend your account pending resolution. Fraudulent chargebacks may
-        result in permanent account termination. We encourage you to contact us first so we can resolve billing
-        concerns promptly.
-      </p>
-
-      <h2>9. How to Request a Refund</h2>
-      <p>
-        To request a refund, contact{" "}
-        <a href="mailto:billing@masseurmatch.com">billing@masseurmatch.com</a> with:
+        To request review of a charge, contact <a href="mailto:billing@masseurmatch.com">billing@masseurmatch.com</a>{" "}
+        and include:
       </p>
       <ul>
-        <li>Your account email address.</li>
+        <li>Your MasseurMatch account email address.</li>
         <li>The transaction date and amount.</li>
-        <li>The reason for your refund request.</li>
-        <li>Any supporting documentation (such as a screenshot of a billing error).</li>
+        <li>The PayPal transaction or subscription identifier, if available.</li>
+        <li>The reason for your request.</li>
+        <li>Supporting documentation relevant to the billing issue.</li>
       </ul>
-      <p>We will respond within 3 business days.</p>
 
-      <h2>10. Annual Plans</h2>
+      <h2>9. Trials and Promotional Pricing</h2>
       <p>
-        Annual subscriptions are non-refundable after the first 14 calendar days from the initial purchase date,
-        except as required by law. Within the first 14 days, you may request a prorated refund for the unused
-        portion if you cancel for any reason.
+        Any trial, introductory discount, founding-member offer, or promotional pricing is governed by the terms
+        shown at signup or checkout. A temporary promotional discount ending as disclosed does not itself create
+        refund eligibility.
       </p>
 
-      <h2>11. Changes to This Policy</h2>
+      <h2>10. Changes to This Policy</h2>
       <p>
-        We may update this policy at any time. Updated terms apply to purchases made after the effective date.
+        We may update this policy from time to time. Changes apply as permitted by law and according to any notice
+        requirements that apply to existing recurring subscriptions.
       </p>
 
-      <h2>12. Contact</h2>
+      <h2>11. Contact</h2>
       <p>
         Billing and refund requests: <a href="mailto:billing@masseurmatch.com">billing@masseurmatch.com</a>.<br />
-        Response window: 3 business days.<br />
         Operator: XRankFlow Media Group LLC — Dover, Delaware, USA.
       </p>
     </LegalPage>

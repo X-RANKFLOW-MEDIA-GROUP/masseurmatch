@@ -6,6 +6,8 @@ import { setTimeout as sleep } from "node:timers/promises";
 
 const port = process.env.API_TEST_PORT || "3311";
 const baseUrl = `http://127.0.0.1:${port}`;
+const testSupabaseUrl = "http://127.0.0.1:54321";
+const testSupabasePublishableKey = "test-publishable-key";
 const debug = process.env.API_TEST_DEBUG === "1";
 const nextCommand =
   process.platform === "win32"
@@ -158,6 +160,8 @@ const server = spawn(serverCommand, serverArgs, {
   env: {
     ...process.env,
     NEXT_TELEMETRY_DISABLED: "1",
+    NEXT_PUBLIC_SUPABASE_URL: testSupabaseUrl,
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: testSupabasePublishableKey,
     RESEND_API_KEY: "",
     ALLOW_EMAIL_MOCKS: "true",
   },

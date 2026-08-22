@@ -8,15 +8,16 @@ import type { Database } from "@/integrations/supabase/types";
 type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 
 const PROFILE_SELECT = `
-  id, user_id, slug, display_name, full_name, headline, bio, city, state, neighborhood,
+  id, user_id, slug, display_name, full_name, headline, bio, city, state, neighborhood, street_reference,
   phone, whatsapp_number, email_address, website,
   service_categories, massage_techniques, specialties,
   incall_price, outcall_price, starting_price,
   height_inches, weight_lb, body_type,
   offers_incall, offers_outcall, outcall_radius,
   years_experience, languages,
-  profile_status, visibility_status, verification_status,
+  profile_status, visibility_status, verification_status, current_status,
   subscription_tier, is_featured, is_suspended, is_banned,
+  available_now, available_now_expires,
   stripe_customer_id, stripe_subscription_id, current_period_end,
   photo_limit, visibility_level, featured_until,
   service_radius_miles,
