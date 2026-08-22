@@ -25,6 +25,7 @@ import { ProfileViewTracker } from "@/app/therapists/[slug]/_components/ProfileV
 import { ProfilePageTracker } from "@/app/therapists/[slug]/_components/ProfilePageTracker";
 import { getPublicProfileExtras } from "@/app/therapists/[slug]/_lib/profile-extras";
 import { SITE_URL } from "@/lib/site";
+import { formatProviderStatus } from "@/lib/provider-status";
 
 type Params = { slug: string };
 type ProfileHoursEntry = {
@@ -194,7 +195,7 @@ export default async function TherapistPage({ params }: { params: Promise<Params
         businessHours={dbProfile.business_hours}
         studioHours={Array.isArray(runtimeProfile.studio_hours) ? runtimeProfile.studio_hours : []}
         mobileHours={Array.isArray(runtimeProfile.mobile_hours) ? runtimeProfile.mobile_hours : []}
-        currentStatus={typeof runtimeProfile.current_status === "string" ? runtimeProfile.current_status : ""}
+        currentStatus={formatProviderStatus(typeof runtimeProfile.current_status === "string" ? runtimeProfile.current_status : "")}
         training={training}
         education={education}
       />
