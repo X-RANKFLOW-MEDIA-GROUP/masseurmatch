@@ -12,6 +12,8 @@ import ProfileApprovedEmail from "@/emails/ProfileApprovedEmail";
 import type { TablesUpdate } from "@/integrations/supabase/types";
 import { slugify } from "@/components/profile/profile-utils";
 import { buildProfileSlug } from "@/app/_lib/profile-slug";
+import { resolveAvailableNowTransition } from "@/app/_lib/available-now";
+import { PROVIDER_STATUS_VALUES } from "@/lib/provider-status";
 
 const PROTECTED_TEXT_FIELDS = [
   "display_name",
@@ -326,6 +328,7 @@ const fullProfileSchema = z.object({
   state: z.string().max(120).optional().nullable(),
   neighborhood: z.string().max(160).optional().nullable(),
   zipCode: z.string().max(12).optional().nullable(),
+  streetReference: z.string().max(255).optional().nullable(),
   phone: z.string().max(40).optional().nullable(),
   whatsapp: z.string().max(40).optional().nullable(),
   email: z.string().max(160).optional().nullable(),
@@ -366,8 +369,7 @@ const fullProfileSchema = z.object({
   weightLb: z.number().int().min(60).max(600).optional().nullable(),
   bodyType: z.string().max(50).optional().nullable(),
   availableNow: z.boolean().optional(),
-  availableNowExpires: z.string().max(40).optional().nullable(),
-  currentStatus: z.string().max(60).optional().nullable(),
+  currentStatus: z.enum(PROVIDER_STATUS_VALUES).optional().nullable(),
   lgbtqAffirming: z.boolean().optional(),
 });
 
@@ -399,12 +401,13 @@ export async function PATCH(request: Request) {
       updates.full_name = body.displayName.trim();
     }
     if (body.headline !== undefined) updates.headline = text(body.headline);
-    if (text(body.bio)) updates.bio = text(body.bio);
+    if (body.bio !== undefined) updates.bio = text(body.bio);
     if (body.tagline !== undefined) updates.tagline = text(body.tagline);
     if (text(body.city)) updates.city = text(body.city);
     if (text(body.state)) updates.state = text(body.state);
     if (body.neighborhood !== undefined) updates.neighborhood = text(body.neighborhood);
     if (body.zipCode !== undefined) updates.zip_code = text(body.zipCode);
+    if (body.streetReference !== undefined) updates.street_reference = text(body.streetReference);
 
     updates.phone = effectivePhone;
     updates.phone_number = effectivePhone;
@@ -448,7 +451,11 @@ export async function PATCH(request: Request) {
     if (body.heightInches !== undefined) updates.height_inches = body.heightInches;
     if (body.weightLb !== undefined) updates.weight_lb = body.weightLb;
     if (body.bodyType !== undefined) updates.body_type = text(body.bodyType);
-    if (body.currentStatus !== undefined) updates.current_status = text(body.currentStatus);
+    if (body.availableNow !== undefined) {
+      const transition = resolveAvailableNowTransition(profile, body.availableNow);
+      Object.assign(updates, transition.updates);
+    }
+    if (body.currentStatus !== undefined) updates.current_status = body.currentStatus;
     if (body.lgbtqAffirming !== undefined) updates.lgbtq_affirming = body.lgbtqAffirming;
 
     // Self-service edits are audited but do not demote an already approved

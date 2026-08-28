@@ -38,7 +38,7 @@ type RadarRow = {
   neighborhood: string | null;
   score: number;
   trend: DemandTrend;
-  spike_score?: number | null;
+  spike_score: number | null;
   week_start: string;
   collected_at: string | null;
   search_volume_index?: number;

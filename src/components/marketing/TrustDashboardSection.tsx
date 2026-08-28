@@ -11,7 +11,7 @@ const trustPillars = [
   {
     icon: Shield,
     title: "Reviewed Before Going Live",
-    description: "Every profile is reviewed before it appears. Pro and Elite therapists can add identity verification via Stripe Identity.",
+    description: "Every profile is reviewed before it appears. Pro and Elite therapists can complete MasseurMatch identity verification.",
   },
   {
     icon: Lock,
@@ -44,7 +44,6 @@ export function TrustDashboardSection() {
         className="left-[10%] top-[20%] z-[1]"
       />
 
-      {/* Grid texture background */}
       <div
         className="absolute inset-0 z-0 opacity-[0.01]"
         style={{
@@ -55,7 +54,6 @@ export function TrustDashboardSection() {
       />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -75,7 +73,6 @@ export function TrustDashboardSection() {
           </p>
         </motion.div>
 
-        {/* Trust pillars grid */}
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {trustPillars.map((pillar, index) => {
             const Icon = pillar.icon;
@@ -92,7 +89,6 @@ export function TrustDashboardSection() {
                 }}
                 className="group relative overflow-hidden rounded-[24px] border border-white/10 bg-gradient-to-br from-white/5 to-white/2 p-8 backdrop-blur-md transition duration-300 hover:border-[#8B1E2D]/30 hover:bg-white/[0.08]"
               >
-                {/* Glow effect */}
                 <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-[#8B1E2D]/10 blur-2xl transition duration-300 group-hover:bg-[#8B1E2D]/20" />
 
                 <div className="relative z-10">
@@ -112,7 +108,6 @@ export function TrustDashboardSection() {
           })}
         </div>
 
-        {/* Dashboard mockup */}
         <motion.div
           initial={{ opacity: 0, y: 50, scale: 0.95 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -120,7 +115,6 @@ export function TrustDashboardSection() {
           transition={{ duration: dur + 0.2, ease: customEase, delay: 0.4 }}
           className="mt-20 overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-white/5 to-white/2 p-8 backdrop-blur-md sm:p-12"
         >
-          {/* Dashboard header */}
           <div className="mb-8 flex items-center justify-between border-b border-white/10 pb-8">
             <div>
               <p className="font-mono text-xs uppercase tracking-widest text-[#8B1E2D]">
@@ -144,7 +138,6 @@ export function TrustDashboardSection() {
             </div>
           </div>
 
-          {/* Trust process (qualitative — no unverifiable counts pre-launch) */}
           <div className="grid gap-6 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/5 bg-white/5 p-6">
               <p className="font-mono text-xs uppercase tracking-widest text-gray-400">
@@ -158,7 +151,7 @@ export function TrustDashboardSection() {
                 Identity Verification
               </p>
               <p className="mt-3 font-display text-xl font-black text-white">Available to Pro &amp; Elite</p>
-              <p className="mt-1 text-sm text-gray-400">Optional Stripe Identity check with a public verification date.</p>
+              <p className="mt-1 text-sm text-gray-400">MasseurMatch reviews a government-issued ID and current challenge selfie for identity only.</p>
             </div>
             <div className="rounded-2xl border border-white/5 bg-white/5 p-6">
               <p className="font-mono text-xs uppercase tracking-widest text-gray-400">
@@ -170,7 +163,6 @@ export function TrustDashboardSection() {
           </div>
         </motion.div>
 
-        {/* Bottom statement */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}

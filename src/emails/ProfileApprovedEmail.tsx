@@ -6,10 +6,14 @@ import * as React from 'react';
 interface ProfileApprovedEmailProps {
   profileUrl?: string;
   dashboardUrl?: string;
+  billingUrl?: string;
+  requiresPayment?: boolean;
+  planName?: string;
 }
 
 const SITE_URL = 'https://masseurmatch.com';
 const DASHBOARD_PATH = '/pro/dashboard';
+const BILLING_PATH = '/pro/billing';
 
 function safeUrl(value: string | undefined, fallbackPath: string) {
   if (!value) return `${SITE_URL}${fallbackPath}`;
@@ -21,41 +25,84 @@ function safeUrl(value: string | undefined, fallbackPath: string) {
 export default function ProfileApprovedEmail({
   profileUrl,
   dashboardUrl,
+  billingUrl,
+  requiresPayment = false,
+  planName,
 }: ProfileApprovedEmailProps) {
   const safeDashboardUrl = safeUrl(dashboardUrl, DASHBOARD_PATH);
   const safeProfileUrl = safeUrl(profileUrl, DASHBOARD_PATH);
+  const safeBillingUrl = safeUrl(billingUrl, BILLING_PATH);
+  const paidPlanName = planName || 'Paid';
 
   return (
-    <BaseLayout previewText="Your MasseurMatch profile is approved">
+    <BaseLayout
+      previewText={
+        requiresPayment
+          ? `Your MasseurMatch profile is approved — activate ${paidPlanName}`
+          : 'Your MasseurMatch profile is approved'
+      }
+    >
       <Text className="text-slate-900 text-xl font-medium mb-4">
         Your profile is approved
       </Text>
 
-      <Text className="text-slate-600 text-sm leading-relaxed mb-6">
-        Good news. Your MasseurMatch profile has been approved and your provider account is ready to manage.
-      </Text>
+      {requiresPayment ? (
+        <>
+          <Text className="text-slate-600 text-sm leading-relaxed mb-6">
+            Good news. Your MasseurMatch profile passed review. Your listing is not public yet because you selected the {paidPlanName} plan.
+          </Text>
 
-      <Text className="text-slate-600 text-sm leading-relaxed mb-6">
-        Use your dashboard to review your listing, update profile details, manage photos, and keep your information accurate.
-      </Text>
+          <Text className="text-slate-600 text-sm leading-relaxed mb-6">
+            Activate your subscription through PayPal to publish your approved profile and unlock the features included with your selected plan.
+          </Text>
 
-      <Section className="text-center mt-6 mb-4">
-        <Button
-          href={safeDashboardUrl}
-          className="bg-slate-950 text-white px-8 py-3 rounded-md text-sm font-semibold tracking-wide"
-        >
-          Go to Dashboard
-        </Button>
-      </Section>
+          <Section className="text-center mt-6 mb-4">
+            <Button
+              href={safeBillingUrl}
+              className="bg-slate-950 text-white px-8 py-3 rounded-md text-sm font-semibold tracking-wide"
+            >
+              Activate {paidPlanName} Plan
+            </Button>
+          </Section>
 
-      <Section className="text-center mb-6">
-        <Button
-          href={safeProfileUrl}
-          className="bg-white text-slate-950 border border-slate-300 px-8 py-3 rounded-md text-sm font-semibold tracking-wide"
-        >
-          View Public Profile
-        </Button>
-      </Section>
+          <Section className="text-center mb-6">
+            <Button
+              href={safeDashboardUrl}
+              className="bg-white text-slate-950 border border-slate-300 px-8 py-3 rounded-md text-sm font-semibold tracking-wide"
+            >
+              Go to Dashboard
+            </Button>
+          </Section>
+        </>
+      ) : (
+        <>
+          <Text className="text-slate-600 text-sm leading-relaxed mb-6">
+            Good news. Your MasseurMatch profile has been approved and your provider account is ready to manage.
+          </Text>
+
+          <Text className="text-slate-600 text-sm leading-relaxed mb-6">
+            Use your dashboard to review your listing, update profile details, manage photos, and keep your information accurate.
+          </Text>
+
+          <Section className="text-center mt-6 mb-4">
+            <Button
+              href={safeDashboardUrl}
+              className="bg-slate-950 text-white px-8 py-3 rounded-md text-sm font-semibold tracking-wide"
+            >
+              Go to Dashboard
+            </Button>
+          </Section>
+
+          <Section className="text-center mb-6">
+            <Button
+              href={safeProfileUrl}
+              className="bg-white text-slate-950 border border-slate-300 px-8 py-3 rounded-md text-sm font-semibold tracking-wide"
+            >
+              View Public Profile
+            </Button>
+          </Section>
+        </>
+      )}
     </BaseLayout>
   );
 }

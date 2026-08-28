@@ -154,10 +154,7 @@ export const PROFILE_FIELDS_BY_SECTION: Record<string, string[]> = {
     "service_categories",
     "add_ons",
   ],
-  "Ratings & Reviews": [
-    "average_rating",
-    "rating_average",
-    "review_count",
+  Engagement: [
     "profile_views",
     "view_count",
     "contact_clicks",
@@ -280,9 +277,6 @@ const FIELD_TYPES: Record<string, "text" | "number" | "boolean" | "array" | "jso
   weight_lb: "number",
   visibility_level: "number",
   session_duration: "number",
-  average_rating: "number",
-  rating_average: "number",
-  review_count: "number",
   profile_views: "number",
   view_count: "number",
   contact_clicks: "number",

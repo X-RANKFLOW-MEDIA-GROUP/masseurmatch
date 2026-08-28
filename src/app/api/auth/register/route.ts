@@ -86,7 +86,8 @@ export async function POST(request: Request) {
         return json(
           {
             ok: false,
-            error: "An account with this email already exists. Please sign in instead.",
+            error:
+              "An account with this email already exists. Sign in instead — or resend the confirmation email if you never opened it.",
             code: "USER_EXISTS",
           },
           { status: 409 },
@@ -102,7 +103,8 @@ export async function POST(request: Request) {
       return json(
         {
           ok: false,
-          error: "An account with this email already exists. Please sign in instead.",
+          error:
+            "An account with this email already exists. Sign in instead — or resend the confirmation email if you never opened it.",
           code: "USER_EXISTS",
         },
         { status: 409 },

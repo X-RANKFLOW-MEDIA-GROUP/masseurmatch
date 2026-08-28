@@ -3,6 +3,14 @@
 import { getCsrfToken, clearCsrfToken } from "@/app/_lib/csrf-client";
 
 export class ApiError extends Error {
+  /**
+   * Machine-readable error code from the API envelope (`{ ok: false, error,
+   * code }`). Callers must branch on this instead of pattern-matching the
+   * human-readable message — matching on prose is how a wrong-password reply
+   * ended up being shown to users as a security-token failure.
+   */
+  readonly code?: string;
+
   constructor(
     message: string,
     public status: number,
@@ -10,7 +18,17 @@ export class ApiError extends Error {
   ) {
     super(message);
     this.name = "ApiError";
+    this.code = extractErrorCode(payload);
   }
+}
+
+function extractErrorCode(payload: unknown): string | undefined {
+  if (typeof payload !== "object" || !payload || !("code" in payload)) {
+    return undefined;
+  }
+
+  const raw = (payload as { code: unknown }).code;
+  return typeof raw === "string" && raw.trim() ? raw.trim() : undefined;
 }
 
 async function parsePayload(response: Response) {

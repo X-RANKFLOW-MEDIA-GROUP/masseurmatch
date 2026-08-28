@@ -187,7 +187,7 @@ export async function POST(req: NextRequest) {
   if (runError) { console.error("[demand-scores] collection run upsert error", runError); return NextResponse.json({ error: "Collection run logging failed" }, { status: 500 }); }
   if (normalized.length === 0) return NextResponse.json({ inserted: 0, run_id: envelope.run.run_id, status: envelope.run.status });
 
-  const { data, error } = await admin.from("demand_scores").upsert(normalized, { onConflict: "city_key,state_key,neighborhood_key,week_start,methodology_version", ignoreDuplicates: false }).select("id,city,state,spike_score,confidence,trend,collected_at,run_id");
+  const { data, error } = await admin.from("demand_scores").upsert(normalized, { onConflict: "city_key,state_key,neighborhood_key,week_start", ignoreDuplicates: false }).select("id,city,state,spike_score,confidence,trend,collected_at,run_id");
   if (error) {
     console.error("[demand-scores] upsert error", error);
     await admin.from("demand_collection_runs").update({ status: "failed", completed_at: new Date().toISOString(), error_summary: [...(envelope.run.error_summary ?? []), { scope: "database", error: error.message }], updated_at: new Date().toISOString() }).eq("run_id", envelope.run.run_id);

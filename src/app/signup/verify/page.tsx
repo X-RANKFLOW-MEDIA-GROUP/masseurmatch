@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, CheckCircle2, Clock, Loader2, Mail, Phone, ShieldCheck } from "lucide-react";
 
@@ -64,7 +65,12 @@ function VerificationPage() {
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
-      if (!state.email) router.replace("/signup/account");
+      // No session yet is the normal state right after signing up: email
+      // confirmation is mandatory, so the account exists but cannot sign in.
+      // Never send them back to /signup/account — re-submitting that form only
+      // fails with "an account with this email already exists", which is the
+      // dead end users kept hitting. The awaiting-confirmation panel below
+      // handles this case instead.
       return;
     }
 
@@ -219,7 +225,62 @@ function VerificationPage() {
     }
   }
 
-  if (!authLoading && !user && !state.email) return null;
+  if (authLoading) return null;
+
+  // Awaiting email confirmation: the account exists but has no session, so none
+  // of the verification steps below can run yet.
+  if (!user) {
+    return (
+      <main className="mx-auto max-w-2xl space-y-5 py-5 sm:py-8">
+        <header>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-secondary">Verification</p>
+          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-foreground">Confirm your email to continue</h1>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Your account was created. Open the confirmation link we emailed you, then come back here to finish phone and identity verification.
+          </p>
+        </header>
+
+        {error ? <p role="alert" className="rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">{error}</p> : null}
+
+        <Card>
+          <CardContent className="space-y-4 p-5 sm:p-6">
+            <div className="flex items-center gap-2">
+              <Mail className="h-5 w-5 text-brand-secondary" />
+              <h2 className="font-semibold">Check your inbox</h2>
+            </div>
+            {state.email ? (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  We sent a confirmation link to <strong className="text-foreground">{state.email}</strong>. It can take a minute to arrive — check spam too.
+                </p>
+                {emailSent ? <p className="text-sm text-emerald-700">Confirmation email sent again.</p> : null}
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" onClick={sendEmailVerification} disabled={emailLoading}>
+                    {emailLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    Resend confirmation email
+                  </Button>
+                  <Button variant="ghost" asChild>
+                    <Link href="/login">Already confirmed? Sign in</Link>
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  Sign in to pick up where you left off, or create your account if you have not yet.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button asChild><Link href="/login">Sign in</Link></Button>
+                  <Button variant="outline" asChild><Link href="/signup/account">Create an account</Link></Button>
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </main>
+    );
+  }
+
   const identityVerified = state.identityVerificationStatus === "verified";
   const identityPending = state.identityVerificationStatus === "processing";
   const canContinue = state.emailVerified && state.phoneVerified && identityVerified;

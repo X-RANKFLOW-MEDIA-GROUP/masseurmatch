@@ -26,6 +26,7 @@ import { ApiError, requestJson } from "@/app/_lib/request";
 import { useToast } from "@/hooks/use-toast";
 import { BODY_TYPE_OPTIONS, normalizeBodyTypeValue } from "@/lib/physical-profile";
 import { lookupZipArea } from "@/lib/profile-autofill";
+import { PROVIDER_STATUS_OPTIONS } from "@/lib/provider-status";
 
 // ─────────────────────────────────────────────────────────────────────────
 // Option lists (exact MasseurFinder strings)
@@ -135,10 +136,6 @@ const HOURS_DAYS = [
 ];
 const OUTCALL_RADII = [10, 20, 40, 80, 160, 240];
 
-const CURRENT_STATUS_OPTIONS = [
-  "Available", "Available now", "Booking ahead", "Limited availability", "Away", "Unavailable",
-];
-
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const CLOCK_HOURS = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -179,6 +176,7 @@ type ProfileRecord = {
   state?: string | null;
   neighborhood?: string | null;
   zip_code?: string | null;
+  street_reference?: string | null;
   phone?: string | null;
   whatsapp_number?: string | null;
   email_address?: string | null;
@@ -217,6 +215,7 @@ type ProfileRecord = {
   available_now?: boolean | null;
   available_now_expires?: string | null;
   visibility_status?: string | null;
+  current_status?: string | null;
   lgbtq_affirming?: boolean | null;
 };
 
@@ -347,10 +346,30 @@ function parseStartDate(value: string | null | undefined): { month: string; year
   return { month: m ? String(Number(m)) : "", year: y ?? "" };
 }
 
+function parseStreetReference(value: string | null | undefined): { street1: string; street2: string } {
+  const cleaned = value?.trim();
+  if (!cleaned) return { street1: "", street2: "" };
+  const separator = " & ";
+  const index = cleaned.indexOf(separator);
+  if (index < 0) return { street1: cleaned, street2: "" };
+  return {
+    street1: cleaned.slice(0, index).trim(),
+    street2: cleaned.slice(index + separator.length).trim(),
+  };
+}
+
+function buildStreetReference(street1: string, street2: string): string | null {
+  const first = street1.trim();
+  const second = street2.trim();
+  if (first && second) return `${first} & ${second}`;
+  return first || second || null;
+}
+
 function mapProfileToForm(profile: ProfileRecord | null | undefined): FormState {
   if (!profile) return EMPTY_FORM;
   const displayName = profile.display_name || profile.full_name || "";
   const start = parseStartDate(profile.start_date);
+  const street = parseStreetReference(profile.street_reference);
   const mobile = profile.mobile_hours;
   const mobileSameAsStudio = !!mobile && !Array.isArray(mobile) && mobile.sameAsStudio === true;
   return {
@@ -362,8 +381,8 @@ function mapProfileToForm(profile: ProfileRecord | null | undefined): FormState 
     state: profile.state || "",
     neighborhood: profile.neighborhood || "",
     zipCode: profile.zip_code || "",
-    street1: "",
-    street2: "",
+    street1: street.street1,
+    street2: street.street2,
     phone: profile.phone || "",
     whatsapp: profile.whatsapp_number || "",
     email: profile.email_address || "",
@@ -401,7 +420,7 @@ function mapProfileToForm(profile: ProfileRecord | null | undefined): FormState 
     weightLb: typeof profile.weight_lb === "number" ? String(profile.weight_lb) : "",
     bodyType: normalizeBodyTypeValue(profile.body_type) || "",
     availableNow: profile.available_now ?? false,
-    currentStatus: profile.visibility_status || "",
+    currentStatus: profile.current_status || "",
     lgbtqAffirming: profile.lgbtq_affirming ?? false,
   };
 }
@@ -442,6 +461,7 @@ function buildPayload(form: FormState) {
     state: form.state || null,
     neighborhood: form.neighborhood || null,
     zipCode: form.zipCode || null,
+    streetReference: buildStreetReference(form.street1, form.street2),
     phone: form.phone || null,
     whatsapp: form.whatsapp || null,
     email: form.email || null,
@@ -863,7 +883,7 @@ export default function MyListingPage() {
         setProfileStatus(response.profile.profile_status ?? profileStatus);
       }
       setSaveState("success");
-      toast({ title: "Profile saved", description: "Your changes were saved and sent to the review queue." });
+      toast({ title: "Profile saved", description: "Your changes were saved successfully." });
       window.setTimeout(() => setSaveState("idle"), 2800);
     } catch (error) {
       setSaveState("error");
@@ -1256,7 +1276,7 @@ export default function MyListingPage() {
             <FieldLabel>Current Status</FieldLabel>
             <select className={inputCls()} value={form.currentStatus} onChange={(e) => set("currentStatus", e.target.value)}>
               <option value="">Not set</option>
-              {CURRENT_STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
+              {PROVIDER_STATUS_OPTIONS.map((status) => <option key={status.value} value={status.value}>{status.label}</option>)}
             </select>
           </Field>
           <Toggle checked={form.lgbtqAffirming} onChange={(v) => set("lgbtqAffirming", v)} label="My practice is LGBTQ+-affirming" />

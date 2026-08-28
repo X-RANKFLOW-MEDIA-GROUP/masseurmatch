@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Check, Eye, EyeOff, Loader2, Star, X } from "lucide-react";
+import { Archive, Check, EyeOff, Loader2, Star, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,7 +36,7 @@ export default function AdminMigrationsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [reviewNotes, setReviewNotes] = useState<Record<string, string>>({});
-  const [approvalStatus, setApprovalStatus] = useState<Record<string, boolean>>({});
+  const [retentionStatus, setRetentionStatus] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     void fetchMigrations();
@@ -69,27 +69,27 @@ export default function AdminMigrationsPage() {
 
   const openMigration = (migration: Migration) => {
     setSelectedMigration(migration.id);
-    setApprovalStatus({});
+    setRetentionStatus({});
     setReviewNotes({});
     setErrorMessage(null);
   };
 
-  const decideAllPending = (approved: boolean) => {
-    setApprovalStatus((current) => {
+  const decideAllPending = (retain: boolean) => {
+    setRetentionStatus((current) => {
       const next = { ...current };
       pendingReviews.forEach((review) => {
-        next[review.id] = approved;
+        next[review.id] = retain;
       });
       return next;
     });
   };
 
-  const handlePublishDecisions = async () => {
+  const handleSaveDecisions = async () => {
     if (!selectedMig || pendingReviews.length === 0) return;
 
-    const undecided = pendingReviews.filter((review) => approvalStatus[review.id] === undefined);
+    const undecided = pendingReviews.filter((review) => retentionStatus[review.id] === undefined);
     if (undecided.length > 0) {
-      setErrorMessage(`Review every pending testimonial first (${undecided.length} remaining).`);
+      setErrorMessage(`Review every pending historical record first (${undecided.length} remaining).`);
       return;
     }
 
@@ -103,7 +103,7 @@ export default function AdminMigrationsPage() {
           migrationId: selectedMig.id,
           reviews: pendingReviews.map((review) => ({
             reviewId: review.id,
-            approved: approvalStatus[review.id],
+            approved: retentionStatus[review.id],
             notes: reviewNotes[review.id] || "",
           })),
         }),
@@ -111,15 +111,15 @@ export default function AdminMigrationsPage() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => null);
-        throw new Error(body?.error || "Failed to save review decisions");
+        throw new Error(body?.error || "Failed to save imported review decisions");
       }
 
       await fetchMigrations();
-      setApprovalStatus({});
+      setRetentionStatus({});
       setReviewNotes({});
     } catch (error) {
       console.error("Error saving migration review decisions:", error);
-      setErrorMessage(error instanceof Error ? error.message : "Could not save review decisions.");
+      setErrorMessage(error instanceof Error ? error.message : "Could not save imported review decisions.");
     } finally {
       setIsSaving(false);
     }
@@ -138,11 +138,15 @@ export default function AdminMigrationsPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-[#111111]">Import Profiles</h1>
-          <p className="text-[#6F6F6F]">Review imported testimonials before they are published.</p>
+          <p className="text-[#6F6F6F]">Imported review history is retained privately for migration records and is never published.</p>
         </div>
         <Button variant="outline" onClick={() => void fetchMigrations()}>
           Refresh
         </Button>
+      </div>
+
+      <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+        MasseurMatch does not publish client reviews or ratings. Imported testimonials remain private historical records.
       </div>
 
       {errorMessage ? (
@@ -159,7 +163,6 @@ export default function AdminMigrationsPage() {
         ) : (
           migrations.map((migration) => {
             const pendingCount = migration.reviews?.filter((review) => !review.reviewed_at).length ?? 0;
-            const liveCount = migration.reviews?.filter((review) => review.is_public).length ?? 0;
             return (
               <Card
                 key={migration.id}
@@ -177,13 +180,13 @@ export default function AdminMigrationsPage() {
                         {pendingCount} pending
                       </Badge>
                     ) : (
-                      <Badge className="bg-green-100 text-green-800">Reviewed</Badge>
+                      <Badge className="bg-slate-100 text-slate-700">Archived</Badge>
                     )}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-1 text-sm text-[#6F6F6F]">
-                  <p>{migration.imported_review_count ?? 0} imported testimonials</p>
-                  <p>{liveCount} currently public</p>
+                  <p>{migration.imported_review_count ?? 0} private historical review records</p>
+                  <p>0 public reviews</p>
                   <p className="capitalize">Migration: {migration.status.replaceAll("_", " ")}</p>
                 </CardContent>
               </Card>
@@ -219,18 +222,18 @@ export default function AdminMigrationsPage() {
             <section className="space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-lg font-semibold text-[#111111]">Pending publication review</h2>
+                  <h2 className="text-lg font-semibold text-[#111111]">Pending historical review records</h2>
                   <p className="text-sm text-[#6F6F6F]">
-                    Approve publishes the testimonial. Reject keeps it private.
+                    Retain keeps the record in the private archive. Exclude marks it as not usable. Neither option publishes it.
                   </p>
                 </div>
                 {pendingReviews.length > 0 ? (
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={() => decideAllPending(true)}>
-                      Approve all
+                      Retain all privately
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => decideAllPending(false)}>
-                      Reject all
+                      Exclude all
                     </Button>
                   </div>
                 ) : null}
@@ -239,7 +242,7 @@ export default function AdminMigrationsPage() {
               {pendingReviews.length > 0 ? (
                 <div className="space-y-4">
                   {pendingReviews.map((review) => {
-                    const decision = approvalStatus[review.id];
+                    const decision = retentionStatus[review.id];
                     return (
                       <div key={review.id} className="rounded-xl border border-[#E8E8E8] p-4">
                         <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
@@ -247,7 +250,7 @@ export default function AdminMigrationsPage() {
                             <p className="font-semibold text-[#111111]">{review.reviewer_name || "Imported client"}</p>
                             <div className="mt-1 flex items-center gap-2">
                               {review.rating ? (
-                                <div className="flex gap-0.5">
+                                <div className="flex gap-0.5" aria-label="Historical source rating">
                                   {Array.from({ length: 5 }).map((_, index) => (
                                     <Star
                                       key={index}
@@ -270,20 +273,20 @@ export default function AdminMigrationsPage() {
                           <div className="flex gap-2">
                             <button
                               type="button"
-                              aria-label="Approve testimonial"
-                              onClick={() => setApprovalStatus((current) => ({ ...current, [review.id]: true }))}
+                              aria-label="Retain privately"
+                              onClick={() => setRetentionStatus((current) => ({ ...current, [review.id]: true }))}
                               className={`rounded-lg border p-2 transition-colors ${
                                 decision === true
                                   ? "border-green-300 bg-green-100 text-green-700"
                                   : "border-[#E4E4E4] bg-white text-[#8E8E8E] hover:bg-green-50 hover:text-green-700"
                               }`}
                             >
-                              <Check className="h-4 w-4" />
+                              <Archive className="h-4 w-4" />
                             </button>
                             <button
                               type="button"
-                              aria-label="Reject testimonial"
-                              onClick={() => setApprovalStatus((current) => ({ ...current, [review.id]: false }))}
+                              aria-label="Exclude from use"
+                              onClick={() => setRetentionStatus((current) => ({ ...current, [review.id]: false }))}
                               className={`rounded-lg border p-2 transition-colors ${
                                 decision === false
                                   ? "border-red-300 bg-red-100 text-red-700"
@@ -309,7 +312,7 @@ export default function AdminMigrationsPage() {
                   })}
 
                   <Button
-                    onClick={() => void handlePublishDecisions()}
+                    onClick={() => void handleSaveDecisions()}
                     disabled={isSaving}
                     className="w-full bg-[#8B1E2D] hover:bg-[#6E1521]"
                   >
@@ -321,39 +324,28 @@ export default function AdminMigrationsPage() {
                     ) : (
                       <>
                         <Check className="mr-2 h-4 w-4" />
-                        Save decisions & publish approved
+                        Save private archive decisions
                       </>
                     )}
                   </Button>
                 </div>
               ) : (
-                <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
-                  No testimonials are waiting for review.
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+                  No imported review records are waiting for review.
                 </div>
               )}
             </section>
 
             {reviewedReviews.length > 0 ? (
               <section className="space-y-4">
-                <h2 className="text-lg font-semibold text-[#111111]">Reviewed testimonials</h2>
+                <h2 className="text-lg font-semibold text-[#111111]">Private review archive</h2>
                 <div className="space-y-3">
                   {reviewedReviews.map((review) => (
                     <div key={review.id} className="rounded-xl border border-[#E8E8E8] bg-[#FAFAFA] p-4">
                       <div className="mb-2 flex items-center justify-between gap-3">
                         <p className="font-semibold text-[#111111]">{review.reviewer_name || "Imported client"}</p>
-                        <Badge
-                          variant="outline"
-                          className={
-                            review.is_public
-                              ? "border-green-300 bg-green-50 text-green-700"
-                              : "border-slate-300 bg-white text-slate-600"
-                          }
-                        >
-                          {review.is_public ? (
-                            <><Eye className="mr-1 h-3 w-3" /> Public</>
-                          ) : (
-                            <><EyeOff className="mr-1 h-3 w-3" /> Private</>
-                          )}
+                        <Badge variant="outline" className="border-slate-300 bg-white text-slate-600">
+                          <EyeOff className="mr-1 h-3 w-3" /> Private archive
                         </Badge>
                       </div>
                       <p className="text-sm leading-6 text-[#625C58]">{review.review_text}</p>

@@ -1,8 +1,11 @@
+import { revalidatePublicDirectory } from "@/app/_lib/directory-cache";
+import { shouldPublishInitialPaidActivation } from "@/app/api/_lib/provider-billing-gates";
 import { createSupabaseAdminClient } from "@/app/api/_lib/supabase-server";
 import type { TablesInsert } from "@/integrations/supabase/types";
 
 export type PayPalPlanKey = "standard" | "pro" | "elite";
 type LocalSubscriptionStatus = "trialing" | "active" | "past_due" | "canceled" | "expired";
+type PayPalEnvironment = "live" | "sandbox";
 
 export const PAYPAL_PLAN_IDS: Record<PayPalPlanKey, string> = {
   standard: "P-0LK9851678808213YNJ5TSKQ",
@@ -17,8 +20,19 @@ export function getPayPalPlanKey(planId: string | null | undefined): PayPalPlanK
   return PLAN_BY_ID.get(planId) ?? null;
 }
 
+export function getPayPalEnvironment(): PayPalEnvironment {
+  const environment = process.env.PAYPAL_ENVIRONMENT?.trim().toLowerCase();
+  if (environment !== "live" && environment !== "sandbox") {
+    throw new Error("PAYPAL_ENVIRONMENT must be configured as either live or sandbox.");
+  }
+  if (process.env.VERCEL_ENV === "production" && environment !== "live") {
+    throw new Error("Production PayPal billing requires PAYPAL_ENVIRONMENT=live.");
+  }
+  return environment;
+}
+
 export function getPayPalBaseUrl() {
-  return (process.env.PAYPAL_ENVIRONMENT || "sandbox").toLowerCase() === "live"
+  return getPayPalEnvironment() === "live"
     ? "https://api-m.paypal.com"
     : "https://api-m.sandbox.paypal.com";
 }
@@ -100,7 +114,7 @@ export async function syncPayPalSubscription(subscription: PayPalSubscription) {
   const admin = createSupabaseAdminClient();
   const { data: profile, error: profileError } = await admin
     .from("profiles")
-    .select("id")
+    .select("id, profile_status, visibility_status, is_active, _tier, subscription_status")
     .eq("user_id", userId)
     .single();
   if (profileError || !profile) throw new Error("Provider profile not found for PayPal subscription.");
@@ -146,18 +160,41 @@ export async function syncPayPalSubscription(subscription: PayPalSubscription) {
     if (error) throw new Error(error.message);
   }
 
+  const publishInitialPaidActivation = shouldPublishInitialPaidActivation({
+    isEntitled,
+    profileStatus: profile.profile_status,
+    visibilityStatus: profile.visibility_status,
+    isActive: profile.is_active,
+    requestedTier: profile._tier,
+    planKey,
+    subscriptionStatus: profile.subscription_status,
+  });
+
   const { error: updateError } = await admin
     .from("profiles")
     .update({
       subscription_tier: currentTier,
       subscription_status: localStatus,
       current_period_end: nextBilling,
+      ...(publishInitialPaidActivation
+        ? { visibility_status: "public", is_active: true }
+        : {}),
       updated_at: new Date().toISOString(),
     })
     .eq("id", profile.id);
   if (updateError) throw new Error(updateError.message);
 
-  return { planKey, localStatus, profileId: profile.id, nextBilling };
+  if (publishInitialPaidActivation) {
+    revalidatePublicDirectory();
+  }
+
+  return {
+    planKey,
+    localStatus,
+    profileId: profile.id,
+    nextBilling,
+    published: publishInitialPaidActivation,
+  };
 }
 
 export async function fetchPayPalSubscription(subscriptionId: string) {

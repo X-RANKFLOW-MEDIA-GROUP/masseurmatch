@@ -19,11 +19,13 @@ import { ProfileStructuredData } from "@/components/profile/ProfileStructuredDat
 import { buildProfileFaq } from "@/components/profile/profile-faq";
 import { buildProfileViewModel } from "@/components/profile/profile-utils";
 import { VoxProfile } from "@/app/therapists/[slug]/_components/vox/VoxProfile";
+import { ImportedReviewsSection } from "@/app/therapists/[slug]/_components/vox/ImportedReviewsSection";
 import { DemoProfileBanner } from "@/app/_components/demo-profile-banner";
 import { ProfileViewTracker } from "@/app/therapists/[slug]/_components/ProfileViewTracker";
 import { ProfilePageTracker } from "@/app/therapists/[slug]/_components/ProfilePageTracker";
 import { getPublicProfileExtras } from "@/app/therapists/[slug]/_lib/profile-extras";
 import { SITE_URL } from "@/lib/site";
+import { formatProviderStatus } from "@/lib/provider-status";
 
 type Params = { slug: string };
 type ProfileHoursEntry = {
@@ -39,18 +41,6 @@ type RuntimePublicTherapist = PublicTherapist & {
 };
 
 export const revalidate = 60;
-
-function formatReviewDate(value: string | null): string | undefined {
-  if (!value) return undefined;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return undefined;
-
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(date);
-}
 
 async function withCanonicalIdentity(profile: PublicTherapist): Promise<PublicTherapist> {
   const status = await getCanonicalIdentityStatusForProfile(profile.id);
@@ -104,12 +94,12 @@ export default async function TherapistPage({ params }: { params: Promise<Params
 
   if (!storedProfile) notFound();
 
-  const [dbProfile, photos, relatedResult, importedReviews, extras] = await Promise.all([
+  const [dbProfile, photos, relatedResult, extras, importedReviews] = await Promise.all([
     withCanonicalIdentity(storedProfile),
     getProfilePhotos(storedProfile.id),
     getPublicTherapists({ city: storedProfile.city || undefined, page: 1, pageSize: 6 }),
-    getPublicImportedReviews(storedProfile.id),
     getPublicProfileExtras(storedProfile.id),
+    getPublicImportedReviews(storedProfile.id, 100),
   ]);
 
   const expandedServices = unique([
@@ -152,23 +142,6 @@ export default async function TherapistPage({ params }: { params: Promise<Params
     .slice(0, 6);
 
   const knottyPrompt = `Tell me about ${profile.name}, a massage therapist in ${profile.city}. What services and availability do they offer?`;
-  const reviews = importedReviews.map((review) => ({
-    quote: review.review_text,
-    author: review.reviewer_name || "Imported reviewer",
-    date: formatReviewDate(review.review_date),
-    rating: review.rating ?? undefined,
-    sourceLabel: review.public_label || "Imported review",
-  }));
-  const importedRatings = importedReviews
-    .map((review) => review.rating)
-    .filter((rating): rating is number => typeof rating === "number" && Number.isFinite(rating));
-  const importedAverage = importedRatings.length > 0
-    ? importedRatings.reduce((total, rating) => total + rating, 0) / importedRatings.length
-    : undefined;
-  const rating = typeof dbProfile.average_rating === "number" && dbProfile.average_rating > 0
-    ? dbProfile.average_rating
-    : importedAverage;
-  const reviewCount = Math.max(dbProfile.review_count ?? 0, reviews.length);
 
   const publicDetails: Array<{ label: string; detail?: string | null }> = [];
   if (extras.massage_setup.length) publicDetails.push({ label: "Massage setup", detail: extras.massage_setup.join(", ") });
@@ -222,13 +195,11 @@ export default async function TherapistPage({ params }: { params: Promise<Params
         businessHours={dbProfile.business_hours}
         studioHours={Array.isArray(runtimeProfile.studio_hours) ? runtimeProfile.studio_hours : []}
         mobileHours={Array.isArray(runtimeProfile.mobile_hours) ? runtimeProfile.mobile_hours : []}
-        currentStatus={typeof runtimeProfile.current_status === "string" ? runtimeProfile.current_status : ""}
+        currentStatus={formatProviderStatus(typeof runtimeProfile.current_status === "string" ? runtimeProfile.current_status : "")}
         training={training}
         education={education}
-        reviews={reviews}
-        rating={rating}
-        reviewCount={reviewCount}
       />
+      <ImportedReviewsSection reviews={importedReviews} />
     </>
   );
 }

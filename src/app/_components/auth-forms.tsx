@@ -9,6 +9,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { resendConfirmationMutation } from "@/app/_lib/mutations";
 import { useToast } from "@/hooks/use-toast";
 
+// Apple is not enabled on the Supabase project (GoTrue answers "provider is
+// not enabled"), so the button could only ever bounce the user back to /login
+// with an error. Keep it behind a flag until the provider is configured.
+const APPLE_OAUTH_ENABLED = process.env.NEXT_PUBLIC_APPLE_OAUTH_ENABLED === "true";
+
 function SocialButtons({ label, redirectTo = "/pro/dashboard" }: { label: string; redirectTo?: string }) {
   const [loading, setLoading] = useState<string | null>(null);
 
@@ -36,6 +41,7 @@ function SocialButtons({ label, redirectTo = "/pro/dashboard" }: { label: string
         </svg>
         {loading === "google" ? "Connecting…" : `${label} with Google`}
       </button>
+      {APPLE_OAUTH_ENABLED ? (
       <button
         type="button"
         disabled={!!loading}
@@ -47,6 +53,7 @@ function SocialButtons({ label, redirectTo = "/pro/dashboard" }: { label: string
         </svg>
         {loading === "apple" ? "Connecting…" : `${label} with Apple`}
       </button>
+      ) : null}
     </div>
   );
 }
@@ -124,32 +131,42 @@ export function AuthForms({
 
     if (result.error) {
       const errorMsg = result.error.message || "";
-      const errorCode = (result.error as any)?.code || "";
+      const errorCode = (result.error as { code?: unknown }).code;
+      const code = typeof errorCode === "string" ? errorCode : "";
       const isUserExists =
+        code === "USER_EXISTS" ||
         errorMsg.includes("already exists") ||
-        errorMsg.includes("USER_EXISTS") ||
-        (typeof errorCode === "string" && errorCode === "USER_EXISTS");
+        errorMsg.includes("USER_EXISTS");
 
-      const isInvalidToken =
-        errorCode === "AUTH_INVALID" ||
-        errorMsg.includes("Invalid email or password") ||
-        errorMsg.includes("Invalid token");
+      // The server already returns user-safe copy for every auth failure, so
+      // show it verbatim. Only the CSRF rejection needs rewording, because
+      // "security token" means nothing to someone who just typed a password.
+      const description = isUserExists
+        ? "An account with this email already exists. Sign in instead, or use “Forgot password?” if you cannot remember it."
+        : code === "CSRF_INVALID"
+          ? "Your session expired before the form was submitted. Please try again."
+          : errorMsg || "Something went wrong. Please try again.";
 
+      setError(description);
       toast({
         title: isLogin ? "Login failed" : "Could not register",
-        description: isUserExists
-          ? "An account with this email already exists. Please sign in instead."
-          : isInvalidToken && isLogin
-            ? "Invalid token please try again"
-            : errorMsg,
+        description,
         variant: "destructive",
       });
 
-      if (isUserExists) {
+      // An unconfirmed account cannot sign in at all, so surface the resend
+      // panel instead of leaving the user to guess.
+      if (code === "EMAIL_NOT_CONFIRMED") {
+        setNeedsEmailConfirmation(true);
+      }
+
+      if (isUserExists && !isLogin) {
         setTimeout(() => router.push("/login"), 1000);
       }
       return;
     }
+
+    setError(null);
 
     if (!isLogin) {
       const signUpResult = result as Awaited<ReturnType<typeof signUp>>;
@@ -190,7 +207,7 @@ export function AuthForms({
     }
   };
 
-  if (!isLogin && needsEmailConfirmation) {
+  if (needsEmailConfirmation) {
     return (
       <Surface className="mx-auto max-w-lg space-y-4">
         <h2 className="font-display text-3xl font-semibold tracking-tight">Confirm your email</h2>
@@ -199,6 +216,13 @@ export function AuthForms({
         </p>
         <p className="text-sm text-muted-foreground">We sent a confirmation link to <strong>{email}</strong>.</p>
         <AppButton className="w-full" onClick={resendConfirmation}>Resend confirmation email</AppButton>
+        <button
+          type="button"
+          onClick={() => setNeedsEmailConfirmation(false)}
+          className="w-full text-center text-sm font-semibold text-primary hover:underline"
+        >
+          Back to sign in
+        </button>
       </Surface>
     );
   }

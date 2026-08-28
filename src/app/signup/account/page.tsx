@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { useAuth } from "@/contexts/AuthContext";
+import { resendConfirmationMutation } from "@/app/_lib/mutations";
 import { useSignup } from "../_lib/signup-context";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -41,9 +42,21 @@ export default function SignupAccountPage() {
   const [adult, setAdult] = useState(state.ageAndConductAttested);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [existingAccount, setExistingAccount] = useState(false);
+  const [resendState, setResendState] = useState<"idle" | "sending" | "sent" | "failed">("idle");
 
   const update = (key: keyof typeof form, value: string) =>
     setForm((current) => ({ ...current, [key]: value }));
+
+  async function resendConfirmation() {
+    setResendState("sending");
+    try {
+      await resendConfirmationMutation(form.email.trim());
+      setResendState("sent");
+    } catch {
+      setResendState("failed");
+    }
+  }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -66,9 +79,15 @@ export default function SignupAccountPage() {
         form.phone.trim(),
       );
       if (result.error) {
+        const code = (result.error as { code?: unknown }).code;
         setError(result.error.message || "We could not create your account.");
+        // An existing address is a dead end unless we offer a way forward: the
+        // account may simply be one whose confirmation email was never opened.
+        setExistingAccount(code === "USER_EXISTS");
         return;
       }
+
+      setExistingAccount(false);
 
       setAccountInfo({
         fullName: form.fullName.trim(),
@@ -164,7 +183,26 @@ export default function SignupAccountPage() {
                 </label>
               </div>
 
-              {error ? <p role="alert" className="rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">{error}</p> : null}
+              {error ? (
+                <div role="alert" className="space-y-3 rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                  <p>{error}</p>
+                  {existingAccount ? (
+                    <div className="flex flex-wrap items-center gap-3 text-foreground">
+                      <Link href="/login" className="font-medium text-brand-secondary underline">Sign in</Link>
+                      <button
+                        type="button"
+                        onClick={resendConfirmation}
+                        disabled={resendState === "sending"}
+                        className="font-medium text-brand-secondary underline disabled:opacity-60"
+                      >
+                        {resendState === "sending" ? "Sending…" : "Resend confirmation email"}
+                      </button>
+                      {resendState === "sent" ? <span className="text-muted-foreground">Confirmation email sent.</span> : null}
+                      {resendState === "failed" ? <span className="text-muted-foreground">Could not resend right now.</span> : null}
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
 
               <Button type="submit" size="lg" className="w-full gap-2" disabled={loading}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
