@@ -10,7 +10,6 @@ import {
   BarChart,
   Bell,
   CreditCard,
-  Download,
   Gift,
   Image as ImageIcon,
   LayoutDashboard,
@@ -33,7 +32,6 @@ import { BRAND_ASSETS } from "@/lib/brand";
 const navItems = [
   { name: "Dashboard", href: "/pro/dashboard", icon: LayoutDashboard },
   { name: "My Profile", href: "/pro/listing", icon: UserCircle },
-  { name: "Import Reviews", href: "/pro/import-reviews", icon: Download, badge: "Free" },
   { name: "AI Profile Coach", href: "/pro/ai-coach", icon: Sparkles, badge: "New" },
   { name: "Demand Radar", href: "/pro/demand-radar", icon: Radar, badge: "Preview" },
   { name: "Trust & Verification", href: "/pro/trust", icon: ShieldCheck },
