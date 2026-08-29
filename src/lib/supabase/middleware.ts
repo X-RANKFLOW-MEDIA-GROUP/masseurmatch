@@ -5,11 +5,13 @@ import type { Database } from "@/integrations/supabase/types";
 import { getPublicSupabaseConfig } from "@/lib/supabase/public-env";
 
 type AppRole = "admin" | "provider" | "client" | null;
+type AuthenticatorAssuranceLevel = "aal1" | "aal2" | null;
 
 export interface EdgeSession {
   userId: string;
   email: string | null;
   role: AppRole;
+  aal: AuthenticatorAssuranceLevel;
 }
 
 function normalizeRole(value: unknown): AppRole {
@@ -18,6 +20,11 @@ function normalizeRole(value: unknown): AppRole {
     return "provider";
   }
   if (value === "client") return "client";
+  return null;
+}
+
+function normalizeAssuranceLevel(value: unknown): AuthenticatorAssuranceLevel {
+  if (value === "aal1" || value === "aal2") return value;
   return null;
 }
 
@@ -61,12 +68,21 @@ export async function updateSession(request: NextRequest): Promise<{
     normalizeRole((user.app_metadata as Record<string, unknown> | undefined)?.role) ??
     normalizeRole((user.user_metadata as Record<string, unknown> | undefined)?.role);
 
+  // Fail closed for privileged routes when assurance cannot be determined.
+  // Non-admin users are not gated on AAL by the middleware.
+  const { data: assurance, error: assuranceError } =
+    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  const aal = assuranceError
+    ? null
+    : normalizeAssuranceLevel(assurance.currentLevel);
+
   return {
     response,
     session: {
       userId: user.id,
       email: user.email ?? null,
       role: metadataRole,
+      aal,
     },
   };
 }

@@ -4,10 +4,13 @@ import { RouteError } from "@/app/api/_lib/http";
 import type { Database } from "@/integrations/supabase/types";
 import { getPublicSupabaseConfig } from "@/lib/supabase/public-env";
 
+type AuthenticatorAssuranceLevel = "aal1" | "aal2" | null;
+
 export interface RequestSession {
   userId: string;
   email: string;
   role: "admin" | "provider" | "client" | null;
+  aal: AuthenticatorAssuranceLevel;
   /**
    * ISO timestamp retained for backward compatibility with callers that surface
    * it. Identity is always re-verified against Supabase.
@@ -21,6 +24,11 @@ export function normalizeSessionRole(value: unknown): RequestSession["role"] {
     return "provider";
   }
   if (value === "client") return "client";
+  return null;
+}
+
+function normalizeAssuranceLevel(value: unknown): AuthenticatorAssuranceLevel {
+  if (value === "aal1" || value === "aal2") return value;
   return null;
 }
 
@@ -72,16 +80,17 @@ export function supabaseFromRequest(request: Request) {
 
 /**
  * Returns the verified session for the request, or null when unauthenticated.
+ *
+ * Admin sessions are fail-closed at AAL1. Native Supabase TOTP enrollment and
+ * challenge happen on /admin-mfa using a cookie-bound Supabase client directly;
+ * every normal admin API that uses this shared session helper therefore requires
+ * a successfully completed second factor without duplicating checks per route.
  */
 export async function getRequestSession(
   request: Request,
 ): Promise<RequestSession | null> {
   const cookies = parseRequestCookies(request);
 
-  // CSRF, analytics, preference, and other unrelated cookies do not represent
-  // an authenticated Supabase session. Avoid loading external auth config for
-  // requests that cannot possibly authenticate, preserving the correct 401
-  // response in local/test environments and reducing unnecessary auth calls.
   if (!hasSupabaseAuthCookie(cookies)) {
     return null;
   }
@@ -105,10 +114,25 @@ export async function getRequestSession(
       (user.user_metadata as Record<string, unknown> | undefined)?.role,
     );
 
+  const { data: assurance, error: assuranceError } =
+    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  const aal = assuranceError
+    ? null
+    : normalizeAssuranceLevel(assurance.currentLevel);
+
+  if (role === "admin" && aal !== "aal2") {
+    throw new RouteError(
+      403,
+      "Admin multi-factor authentication is required.",
+      "ADMIN_MFA_REQUIRED",
+    );
+  }
+
   return {
     userId: user.id,
     email: user.email ?? "",
     role,
+    aal,
     expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
   };
 }
