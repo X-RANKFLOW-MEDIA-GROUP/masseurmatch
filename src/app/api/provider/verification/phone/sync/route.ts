@@ -1,15 +1,10 @@
 import { errorResponse, json, RouteError } from "@/app/api/_lib/http";
 import { assertRateLimit } from "@/app/_lib/security";
 import { createSupabaseAdminClient, requireSession } from "@/app/api/_lib/supabase-server";
-
-function normalizePhone(value: string | null | undefined) {
-  if (!value) return null;
-  const trimmed = value.trim();
-  const digits = trimmed.replace(/\D/g, "");
-  if (digits.length < 10) return null;
-  if (trimmed.startsWith("+")) return `+${digits}`;
-  return digits.length === 10 ? `+1${digits}` : `+${digits}`;
-}
+import {
+  getProviderPhoneVerificationState,
+  normalizeProviderPhone,
+} from "@/lib/provider-phone-verification";
 
 async function loadPhoneState(userId: string) {
   const adminClient = createSupabaseAdminClient();
@@ -17,7 +12,7 @@ async function loadPhoneState(userId: string) {
     adminClient.auth.admin.getUserById(userId),
     adminClient
       .from("profiles")
-      .select("phone, phone_number, is_verified_phone, visibility_status")
+      .select("phone, phone_number, is_verified_phone")
       .eq("user_id", userId)
       .maybeSingle(),
   ]);
@@ -42,27 +37,26 @@ export async function GET(request: Request) {
     const session = await requireSession(request);
     const { adminClient, user, profile } = await loadPhoneState(session.userId);
 
-    const profilePhone = normalizePhone(profile.phone) || normalizePhone(profile.phone_number);
-    const authPhone = normalizePhone(user.phone);
-    const authConfirmedForProfile = Boolean(
-      profilePhone &&
-      authPhone &&
-      user.phone_confirmed_at &&
-      profilePhone === authPhone,
-    );
+    const state = getProviderPhoneVerificationState({
+      profilePhone: profile.phone,
+      profilePhoneNumber: profile.phone_number,
+      isVerifiedPhone: profile.is_verified_phone,
+      authPhone: user.phone,
+      phoneConfirmedAt: user.phone_confirmed_at,
+    });
 
-    let verified = profile.is_verified_phone === true && authConfirmedForProfile;
+    let verified = state.verified;
 
     // Legacy profiles may already have the same number confirmed in Supabase Auth
     // but predate the profile-level verification flag. Repair those automatically
     // so the provider is not charged another SMS or interrupted unnecessarily.
-    if (!verified && authConfirmedForProfile && authPhone) {
+    if (!verified && state.authConfirmedForProfile && state.authPhone) {
       const now = new Date().toISOString();
       const { error: syncError } = await adminClient
         .from("profiles")
         .update({
-          phone: authPhone,
-          phone_number: authPhone,
+          phone: state.authPhone,
+          phone_number: state.authPhone,
           is_verified_phone: true,
           updated_at: now,
         })
@@ -76,9 +70,9 @@ export async function GET(request: Request) {
 
     return json({
       ok: true,
-      phone: profilePhone,
+      phone: state.profilePhone,
       verified,
-      requiresVerification: profile.visibility_status === "public" && !verified,
+      requiresVerification: !verified,
     });
   } catch (error) {
     return errorResponse(error);
@@ -90,15 +84,10 @@ export async function POST(request: Request) {
     assertRateLimit(request, "provider-phone-sync", { limit: 10, windowMs: 60_000 });
 
     const session = await requireSession(request);
-    const adminClient = createSupabaseAdminClient();
-    const { data, error } = await adminClient.auth.admin.getUserById(session.userId);
+    const { adminClient, user } = await loadPhoneState(session.userId);
 
-    if (error || !data.user) {
-      throw new RouteError(404, "Account not found.");
-    }
-
-    const phone = normalizePhone(data.user.phone);
-    if (!phone || !data.user.phone_confirmed_at) {
+    const phone = normalizeProviderPhone(user.phone);
+    if (!phone || !user.phone_confirmed_at) {
       throw new RouteError(
         409,
         "Phone verification must be completed before the profile can use this number.",
@@ -124,7 +113,8 @@ export async function POST(request: Request) {
     return json({
       ok: true,
       phone,
-      verifiedAt: data.user.phone_confirmed_at,
+      verified: true,
+      verifiedAt: user.phone_confirmed_at,
     });
   } catch (error) {
     return errorResponse(error);

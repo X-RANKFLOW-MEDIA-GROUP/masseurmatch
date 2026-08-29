@@ -23,13 +23,15 @@ function safeDestination(value: string | null) {
   return value;
 }
 
-async function syncServerSession(accessToken?: string) {
-  if (!accessToken) return;
-  await fetch("/api/auth/sync-session", {
+async function syncServerSession(accessToken: string) {
+  const response = await fetch("/api/auth/sync-session", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ access_token: accessToken }),
   });
+  if (!response.ok) {
+    throw new Error("Phone was confirmed, but your secure session could not be refreshed. Please try again.");
+  }
 }
 
 async function fetchPhoneStatus() {
@@ -58,7 +60,7 @@ async function persistVerifiedPhone() {
   if (!response.ok) {
     throw new Error(body.error || "Phone was verified, but the profile could not be updated.");
   }
-  return body as { ok: true; phone: string; verifiedAt: string };
+  return body as { ok: true; phone: string; verified: true; verifiedAt: string };
 }
 
 function VerifyPhonePageContent() {
@@ -113,6 +115,8 @@ function VerifyPhonePageContent() {
     setSending(true);
     setError(null);
     try {
+      // Updating the authenticated Supabase user with a phone number sends the
+      // ownership OTP. The profile itself is not marked verified at this point.
       const { error: updateError } = await supabase.auth.updateUser({ phone: normalized });
       if (updateError) throw updateError;
       setPhone(normalized);
@@ -139,7 +143,14 @@ function VerifyPhonePageContent() {
       });
       if (verifyError) throw verifyError;
 
-      await syncServerSession(data.session?.access_token);
+      const accessToken =
+        data.session?.access_token ||
+        (await supabase.auth.getSession()).data.session?.access_token;
+      if (!accessToken) {
+        throw new Error("Phone was confirmed, but the authenticated session could not be refreshed.");
+      }
+
+      await syncServerSession(accessToken);
       await persistVerifiedPhone();
       router.replace(destination);
       router.refresh();
@@ -148,6 +159,12 @@ function VerifyPhonePageContent() {
     } finally {
       setVerifying(false);
     }
+  }
+
+  function changeNumber() {
+    setCodeSent(false);
+    setCode("");
+    setError(null);
   }
 
   if (loading) {
@@ -168,10 +185,14 @@ function VerifyPhonePageContent() {
 
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-secondary">Account security</p>
-            <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-foreground">Verify your phone</h1>
+            <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-foreground">Confirm your phone number</h1>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              A verified phone number is required for every public MasseurMatch provider profile. Your listing remains public while you complete this one-time verification.
+              MasseurMatch must confirm that you control the phone number attached to your provider profile before the profile can be approved or shown in public search.
             </p>
+          </div>
+
+          <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">
+            <strong>How it works:</strong> we send a 6-digit SMS code to your number. Your phone is marked verified only after you enter the correct code and Supabase Auth confirms ownership.
           </div>
 
           {error ? (
@@ -187,20 +208,24 @@ function VerifyPhonePageContent() {
               value={phone}
               onChange={setPhone}
               placeholder="(555) 000-0000"
-              disabled={sending || verifying}
+              disabled={sending || verifying || codeSent}
             />
             <p className="text-xs text-muted-foreground">
-              You can keep the number already on your profile or replace it with a new number. A new number is saved only after successful verification.
+              Use the number clients should use to contact you. It is saved to your provider profile only after successful verification.
             </p>
           </div>
 
           {!codeSent ? (
             <Button className="w-full gap-2" size="lg" onClick={sendCode} disabled={sending || !phone.trim()}>
               {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Phone className="h-4 w-4" />}
-              Send SMS code
+              Send verification code
             </Button>
           ) : (
             <div className="space-y-4">
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                Verification code sent to <strong>{phone}</strong>.
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="phone-code">6-digit SMS code</Label>
                 <Input
@@ -211,18 +236,24 @@ function VerifyPhonePageContent() {
                   onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
                   placeholder="000000"
                   disabled={verifying}
+                  autoFocus
                 />
               </div>
 
               <Button className="w-full gap-2" size="lg" onClick={verifyCode} disabled={verifying || code.length !== 6}>
                 {verifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
-                Verify and continue
+                Verify phone
               </Button>
 
-              <Button variant="ghost" className="w-full" onClick={sendCode} disabled={sending || verifying}>
-                {sending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                Send a new code
-              </Button>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <Button variant="outline" onClick={sendCode} disabled={sending || verifying}>
+                  {sending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  Send new code
+                </Button>
+                <Button variant="ghost" onClick={changeNumber} disabled={sending || verifying}>
+                  Use a different number
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>
